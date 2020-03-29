@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>CFBundleIconFile</key>
+	<string>appicon.icns</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleGetInfoString</key>
+	<string>scrite - build your screenplay</string>
+	<key>CFBundleExecutable</key>
+	<string>scrite</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.teriflix.scrite</string>
+	<key>CFBundleVersion</key>
+        <string>0.1.1</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>Vendor</key>
+	<string>TERIFLIX Entertainment Spaces Pvt. Ltd.</string>
+	<key>NOTE</key>
+	<string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+</dict>
+</plist>

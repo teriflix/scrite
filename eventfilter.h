@@ -1,0 +1,76 @@
+/****************************************************************************
+**
+** Copyright (C) Prashanth Udupa, Bengaluru
+** Email: prashanth.udupa@gmail.com
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+#ifndef EVENTFILTER_H
+#define EVENTFILTER_H
+
+#include <QObject>
+#include <QQmlEngine>
+#include <QJsonObject>
+
+class EventFilter;
+
+class EventFilterResult : public QObject
+{
+    Q_OBJECT
+
+public:
+    ~EventFilterResult();
+
+    Q_PROPERTY(bool filter READ filter WRITE setFilter NOTIFY filterChanged)
+    void setFilter(bool val);
+    bool filter() const { return m_filter; }
+    Q_SIGNAL void filterChanged();
+
+    Q_PROPERTY(bool acceptEvent READ acceptEvent WRITE setAcceptEvent NOTIFY acceptEventChanged)
+    void setAcceptEvent(bool val);
+    bool acceptEvent() const { return m_acceptEvent; }
+    Q_SIGNAL void acceptEventChanged();
+
+private:
+    friend class EventFilter;
+    EventFilterResult(QObject *parent=nullptr);
+
+private:
+    bool m_filter;
+    bool m_acceptEvent;
+};
+
+class EventFilter : public QObject
+{
+    Q_OBJECT
+
+public:
+    EventFilter(QObject *parent=nullptr);
+    ~EventFilter();
+
+    static EventFilter *qmlAttachedProperties(QObject *object);
+
+    Q_PROPERTY(QList<int> events READ events WRITE setEvents NOTIFY eventsChanged)
+    void setEvents(const QList<int> &val);
+    QList<int> events() const { return m_events; }
+    Q_SIGNAL void eventsChanged();
+
+    Q_SIGNAL void filter(QObject *object, const QJsonObject &event, EventFilterResult *result);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event);
+
+private:
+    QList<int> m_events;
+};
+
+Q_DECLARE_METATYPE(EventFilter*)
+QML_DECLARE_TYPEINFO(EventFilter, QML_HAS_ATTACHED_PROPERTIES)
+
+#endif // EVENTFILTER_H
