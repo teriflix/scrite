@@ -261,6 +261,7 @@ private:
     QQuickTextDocument* m_textDocument;
     ScreenplayFormat* m_screenplayFormat;
     QBasicTimer m_initializeDocumentTimer;
+    QList<SceneElement::Type> m_tabHistory;
 };
 
 #endif // FORMATTING_H

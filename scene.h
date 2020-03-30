@@ -99,7 +99,7 @@ public:
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     void setText(const QString &val);
-    QString text() const { return m_text; }
+    QString text() const;
     Q_SIGNAL void textChanged();
 
     Q_SIGNAL void elementChanged();

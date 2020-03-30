@@ -517,12 +517,41 @@ void SceneDocumentBinder::setForceSyncDocument(bool val)
 
 void SceneDocumentBinder::tab()
 {
-    SceneElement *element = this->currentElement();
-    if(element == nullptr)
+    if(m_cursorPosition < 0 || m_textDocument == nullptr || m_currentElement == nullptr || this->document() == nullptr)
         return;
 
-    int type = element->type();
-    element->setType( SceneElement::Type( (type+1)%SceneElement::Heading ) );
+    const int elementNr = m_scene->indexOfElement(m_currentElement);
+    if(elementNr < 0)
+        return;
+
+    switch(m_currentElement->type())
+    {
+    case SceneElement::Action:
+        m_currentElement->setType(SceneElement::Character);
+        break;
+    case SceneElement::Character:
+        if(m_tabHistory.isEmpty())
+            m_currentElement->setType(SceneElement::Action);
+        else
+            m_currentElement->setType(SceneElement::Transition);
+        break;
+    case SceneElement::Dialogue:
+        m_currentElement->setType(SceneElement::Parenthetical);
+        break;
+    case SceneElement::Parenthetical:
+        m_currentElement->setType(SceneElement::Dialogue);
+        break;
+    case SceneElement::Shot:
+        m_currentElement->setType(SceneElement::Transition);
+        break;
+    case SceneElement::Transition:
+        m_currentElement->setType(SceneElement::Action);
+        break;
+    default:
+        break;
+    }
+
+    m_tabHistory.append(m_currentElement->type());
 }
 
 void SceneDocumentBinder::backtab()
@@ -589,6 +618,8 @@ void SceneDocumentBinder::initializeDocument()
 
     m_initializingDocument = true;
 
+    m_tabHistory.clear();
+
     QTextDocument *document = m_textDocument->textDocument();
     document->blockSignals(true);
     document->clear();
@@ -628,6 +659,7 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
     m_currentElement = val;
     emit currentElementChanged();
 
+    m_tabHistory.clear();
     this->evaluateAutoCompleteHints();
 }
 
@@ -714,6 +746,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     }
 
     sceneElement->setText(block.text());
+    m_tabHistory.clear();
 }
 
 void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)

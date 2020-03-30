@@ -55,8 +55,6 @@ int NotificationManager::rowCount(const QModelIndex &parent) const
 
 QVariant NotificationManager::data(const QModelIndex &index, int role) const
 {
-    qDebug() << Q_FUNC_INFO << index.row() << role;
-
     if(index.row() < 0 || index.row() >= m_notifications.size())
         return QVariant();
 

@@ -159,6 +159,21 @@ void SceneElement::setText(const QString &val)
         emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
 }
 
+QString SceneElement::text() const
+{
+    if(m_type == SceneElement::Parenthetical)
+    {
+        QString text = m_text;
+        if(!text.startsWith("("))
+            text.prepend("(");
+        if(!text.endsWith(")"))
+            text.append(")");
+        return text;
+    }
+
+    return m_text;
+}
+
 bool SceneElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
