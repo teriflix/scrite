@@ -394,9 +394,12 @@ void ScriteDocument::setFileName(const QString &val)
 
     m_fileName = val.trimmed();
 
-    QFileInfo fi(m_fileName);
-    if(fi.suffix().isEmpty())
-        m_fileName += ".scrite";
+    if(!m_fileName.isEmpty())
+    {
+        QFileInfo fi(m_fileName);
+        if(!fi.isDir() && !fi.baseName().isEmpty() && fi.suffix().isEmpty())
+            m_fileName += ".scrite";
+    }
 
     emit fileNameChanged();
 }
