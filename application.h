@@ -35,6 +35,16 @@ public:
         return url.toLocalFile();
     }
 
+    enum Platform { LinuxDesktop, WindowsDesktop, MacOS };
+    Q_ENUM(Platform)
+    Q_PROPERTY(Platform platform READ platform CONSTANT)
+    Platform platform() const;
+
+    Q_PROPERTY(QString controlKey READ controlKey CONSTANT)
+    QString controlKey() const;
+
+    Q_INVOKABLE QString polishShortcutTextForDispaly(const QString &text) const;
+
     Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY baseWindowTitleChanged)
     void setBaseWindowTitle(const QString &val);
     QString baseWindowTitle() const { return m_baseWindowTitle; }

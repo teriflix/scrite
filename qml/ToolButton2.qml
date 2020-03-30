@@ -20,7 +20,7 @@ ToolButton {
     property real suggestedWidth: 120
     property real suggestedHeight: 50
     property string shortcut
-    property string shortcutText: shortcut
+    property string shortcutText: shortcuts
 
     font.pixelSize: 16
     hoverEnabled: true
@@ -70,4 +70,7 @@ ToolButton {
         text: toolButton.text
         shortcut: toolButton.shortcut
     }
+
+    ToolTip.text: app.polishShortcutTextForDispaly(text + "\t" + shortcut)
+    ToolTip.visible: hovered
 }

@@ -34,6 +34,37 @@ Application::~Application()
 
 }
 
+#ifdef Q_OS_MAC
+Application::Platform Application::platform() const
+{
+    return Application::MacOS;
+}
+#else
+#ifdef Q_OS_WIN
+Application::Platform Application::platform() const
+{
+    return Application::WindowsDesktop;
+}
+#else
+Application::Platform Application::platform() const
+{
+    return Application::LinuxDesktop;
+}
+#endif
+#endif
+
+QString Application::controlKey() const
+{
+    return this->platform() == Application::MacOS ? "⌘" : "Ctrl";
+}
+
+QString Application::polishShortcutTextForDispaly(const QString &text) const
+{
+    QString text2 = text;
+    text2.replace("Ctrl", this->controlKey(), Qt::CaseInsensitive);
+    return text2;
+}
+
 void Application::setBaseWindowTitle(const QString &val)
 {
     if(m_baseWindowTitle == val)
