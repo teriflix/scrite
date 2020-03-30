@@ -98,7 +98,11 @@ int main(int argc, char **argv)
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;
 
+    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+    format.setSamples(4);
+
     QQuickView qmlView;
+    qmlView.setFormat(format);
     scriteDocument.formatting()->setScreen(qmlView.screen());
     qmlView.setTitle(scriteDocument.documentWindowTitle());
     QObject::connect(&scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);

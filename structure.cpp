@@ -711,53 +711,6 @@ void Structure::setZoomLevel(qreal val)
     emit zoomLevelChanged();
 }
 
-QJsonObject Structure::evaluateCurve(const QPointF &p1, const QPointF &p2) const
-{
-    static const qreal minSize = 10.0;
-
-    QPointF cp;
-
-    if(p1 != p2)
-    {
-        QRectF rect = QRectF(p1,p2).normalized();
-        QPointF rectCenter = rect.center();
-        rect.setWidth( qMax(rect.width(),minSize) );
-        rect.setHeight( qMax(rect.height(),minSize) );
-        rect.moveCenter(rectCenter);
-
-        if(p2.y() > p1.y())
-        {
-            if(p1.x() < p2.x())
-                cp = rect.bottomLeft();
-            else
-                cp = rect.bottomRight();
-        }
-        else
-        {
-            if(p1.x() < p2.x())
-                cp = rect.topLeft();
-            else
-                cp = rect.bottomLeft();
-        }
-    }
-    else
-        cp = p1;
-
-    auto createPointJson = [](const QPointF &pt) {
-        QJsonObject ptJson;
-        ptJson.insert("x", pt.x());
-        ptJson.insert("y", pt.x());
-        return ptJson;
-    };
-
-    QJsonObject ret;
-    ret.insert("fromPoint", createPointJson(p1));
-    ret.insert("toPoint", createPointJson(p2));
-    ret.insert("controlPoint", createPointJson(cp));
-
-    return ret;
-}
-
 bool Structure::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -902,17 +855,30 @@ void Structure::evaluateCharacterNames()
 
 StructureElementConnector::StructureElementConnector(QQuickItem *parent)
                           :AbstractShapeItem(parent),
-                           m_toElement(nullptr),
-                           m_fromElement(nullptr)
+                            m_lineType(StraightLine),
+                            m_toElement(nullptr),
+                            m_fromElement(nullptr),
+                            m_arrowAndLabelSpacing(30)
 {
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);
     this->setOutlineWidth(4);
+
+    connect(this, &AbstractShapeItem::contentRectChanged, this, &StructureElementConnector::updateArrowAndLabelPositions);
 }
 
 StructureElementConnector::~StructureElementConnector()
 {
 
+}
+
+void StructureElementConnector::setLineType(StructureElementConnector::LineType val)
+{
+    if(m_lineType == val)
+        return;
+
+    m_lineType = val;
+    emit lineTypeChanged();
 }
 
 void StructureElementConnector::setFromElement(StructureElement *val)
@@ -925,6 +891,9 @@ void StructureElementConnector::setFromElement(StructureElement *val)
         disconnect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         disconnect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
         disconnect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
+
+        Scene *scene = m_fromElement->scene();
+        disconnect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
     }
 
     m_fromElement = val;
@@ -934,9 +903,14 @@ void StructureElementConnector::setFromElement(StructureElement *val)
         connect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         connect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
         connect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
+
+        Scene *scene = m_fromElement->scene();
+        connect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
     }
 
     emit fromElementChanged();
+
+    this->pickElementColor();
 
     this->update();
 }
@@ -951,6 +925,9 @@ void StructureElementConnector::setToElement(StructureElement *val)
         disconnect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         disconnect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
         disconnect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
+
+        Scene *scene = m_toElement->scene();
+        disconnect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
     }
 
     m_toElement = val;
@@ -960,11 +937,27 @@ void StructureElementConnector::setToElement(StructureElement *val)
         connect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         connect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
         connect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
+
+        Scene *scene = m_toElement->scene();
+        connect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
     }
 
     emit toElementChanged();
 
+    this->pickElementColor();
+
     this->update();
+}
+
+void StructureElementConnector::setArrowAndLabelSpacing(qreal val)
+{
+    if( qFuzzyCompare(m_arrowAndLabelSpacing, val) )
+        return;
+
+    m_arrowAndLabelSpacing = val;
+    emit arrowAndLabelSpacingChanged();
+
+    this->updateArrowAndLabelPositions();
 }
 
 QPainterPath StructureElementConnector::shape() const
@@ -974,14 +967,69 @@ QPainterPath StructureElementConnector::shape() const
         return path;
 
     const QLineF line(m_fromElement->x(), m_fromElement->y(),  m_toElement->x(), m_toElement->y());
-    const QPointF lineCenter = line.pointAt(0.5);
-    const qreal angle = line.angle();
 
-    path.moveTo(line.p1());
-    path.lineTo(line.p2());
+    if(m_lineType == StraightLine)
+    {
+        path.moveTo(line.p1());
+        path.lineTo(line.p2());
+    }
+    else
+    {
+        static const qreal minSize = 10.0;
+        const QPointF p1 = line.p1();
+        const QPointF p2 = line.p2();
+
+        QPointF cp;
+        if(p1 != p2)
+        {
+            QRectF rect = QRectF(p1,p2).normalized();
+            QPointF rectCenter = rect.center();
+            rect.setWidth( qMax(rect.width(),minSize) );
+            rect.setHeight( qMax(rect.height(),minSize) );
+            rect.moveCenter(rectCenter);
+
+            if(p2.y() > p1.y())
+            {
+                if(p1.x() < p2.x())
+                    cp = rect.bottomLeft();
+                else
+                    cp = rect.bottomRight();
+            }
+            else
+            {
+                if(p1.x() < p2.x())
+                    cp = rect.topLeft();
+                else
+                    cp = rect.topRight();
+            }
+        }
+        else
+            cp = p1;
+
+        const qreal length = line.length();
+        const qreal dist = 20.0;
+        const qreal dt = dist / length;
+        const qreal maxdt = 1.0 - dt;
+        const QLineF l1(p1, cp);
+        const QLineF l2(cp, p2);
+        qreal t = dt;
+
+        path.moveTo(p1);
+        while(t < maxdt)
+        {
+            const QLineF l( l1.pointAt(t), l2.pointAt(t) );
+            const QPointF p = l.pointAt(t);
+            path.lineTo(p);
+            t += dt;
+        }
+        path.lineTo(p2);
+    }
 
     static const QList<QPointF> arrowPoints = QList<QPointF>()
             << QPointF(-10,-5) << QPointF(0, 0) << QPointF(-10,5);
+
+    const qreal angle = path.angleAtPercent(0.5);
+    const QPointF lineCenter = path.pointAtPercent(0.5);
 
     QTransform tx;
     tx.translate(lineCenter.x(), lineCenter.y());
@@ -999,4 +1047,49 @@ void StructureElementConnector::onElementDestroyed(StructureElement *element)
         this->setFromElement(nullptr);
     else if(element == m_toElement)
         this->setToElement(nullptr);
+}
+
+void StructureElementConnector::pickElementColor()
+{
+    if(m_fromElement != nullptr && m_toElement != nullptr)
+    {
+        const QColor c1 = m_fromElement->scene()->color();
+        const QColor c2 = m_toElement->scene()->color();
+        QColor mix = QColor::fromRgbF( (c1.redF()+c2.redF())/2.0,
+                                       (c1.greenF()+c2.greenF())/2.0,
+                                       (c1.blueF()+c2.blueF())/2.0 );
+        this->setOutlineColor(mix);
+    }
+}
+
+void StructureElementConnector::updateArrowAndLabelPositions()
+{
+    const QPainterPath path = this->currentShape();
+    if(path.isEmpty())
+        return;
+
+    const qreal pathLength = path.length();
+    const qreal arrowT = 0.5;
+    const qreal labelT = 0.45 - (m_arrowAndLabelSpacing / pathLength);
+
+    this->setArrowPosition( this->currentShape().pointAtPercent(arrowT) );
+    this->setSuggestedLabelPosition( this->currentShape().pointAtPercent(labelT) );
+}
+
+void StructureElementConnector::setArrowPosition(const QPointF &val)
+{
+    if(m_arrowPosition == val)
+        return;
+
+    m_arrowPosition = val;
+    emit arrowPositionChanged();
+}
+
+void StructureElementConnector::setSuggestedLabelPosition(const QPointF &val)
+{
+    if(m_suggestedLabelPosition == val)
+        return;
+
+    m_suggestedLabelPosition = val;
+    emit suggestedLabelPositionChanged();
 }

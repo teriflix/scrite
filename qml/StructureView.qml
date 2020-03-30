@@ -504,8 +504,27 @@ Item {
                 model: scriteDocument.structureElementSequence
 
                 StructureElementConnector {
+                    lineType: StructureElementConnector.CurvedLine
                     fromElement: scriteDocument.structure.elementAt(modelData.from)
                     toElement: scriteDocument.structure.elementAt(modelData.to)
+                    arrowAndLabelSpacing: labelBg.width
+
+                    Rectangle {
+                        id: labelBg
+                        width: Math.max(label.width,label.height)+20
+                        height: width; radius: width/2
+                        border.width: 1; border.color: "black"
+                        x: parent.suggestedLabelPosition.x - radius
+                        y: parent.suggestedLabelPosition.y - radius
+                        color: Qt.tint(parent.outlineColor, "#E0FFFFFF")
+
+                        Text {
+                            id: label
+                            anchors.centerIn: parent
+                            font.pixelSize: 12
+                            text: (index+1)
+                        }
+                    }
                 }
             }
         }

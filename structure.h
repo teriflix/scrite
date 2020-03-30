@@ -295,8 +295,6 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_INVOKABLE QJsonObject evaluateCurve(const QPointF &p1, const QPointF &p2) const;
-
     Q_SIGNAL void structureChanged();
 
 protected:
@@ -351,6 +349,13 @@ public:
     StructureElementConnector(QQuickItem *parent=nullptr);
     ~StructureElementConnector();
 
+    enum LineType { StraightLine, CurvedLine };
+    Q_ENUM(LineType)
+    Q_PROPERTY(LineType lineType READ lineType WRITE setLineType NOTIFY lineTypeChanged)
+    void setLineType(LineType val);
+    LineType lineType() const { return m_lineType; }
+    Q_SIGNAL void lineTypeChanged();
+
     Q_PROPERTY(StructureElement* fromElement READ fromElement WRITE setFromElement NOTIFY fromElementChanged)
     void setFromElement(StructureElement* val);
     StructureElement* fromElement() const { return m_fromElement; }
@@ -361,15 +366,36 @@ public:
     StructureElement* toElement() const { return m_toElement; }
     Q_SIGNAL void toElementChanged();
 
+    Q_PROPERTY(qreal arrowAndLabelSpacing READ arrowAndLabelSpacing WRITE setArrowAndLabelSpacing NOTIFY arrowAndLabelSpacingChanged)
+    void setArrowAndLabelSpacing(qreal val);
+    qreal arrowAndLabelSpacing() const { return m_arrowAndLabelSpacing; }
+    Q_SIGNAL void arrowAndLabelSpacingChanged();
+
+    Q_PROPERTY(QPointF arrowPosition READ arrowPosition NOTIFY arrowPositionChanged)
+    QPointF arrowPosition() const { return m_arrowPosition; }
+    Q_SIGNAL void arrowPositionChanged();
+
+    Q_PROPERTY(QPointF suggestedLabelPosition READ suggestedLabelPosition NOTIFY suggestedLabelPositionChanged)
+    QPointF suggestedLabelPosition() const { return m_suggestedLabelPosition; }
+    Q_SIGNAL void suggestedLabelPositionChanged();
+
     QPainterPath shape() const;
 
 private:
     void requestUpdate() { this->update(); }
     void onElementDestroyed(StructureElement *element);
+    void pickElementColor();
+    void updateArrowAndLabelPositions();
+    void setArrowPosition(const QPointF &val);
+    void setSuggestedLabelPosition(const QPointF &val);
 
 private:
+    LineType m_lineType;
     StructureElement* m_toElement;
     StructureElement* m_fromElement;
+    qreal m_arrowAndLabelSpacing;
+    QPointF m_arrowPosition;
+    QPointF m_suggestedLabelPosition;
 };
 
 #endif // STRUCTURE_H

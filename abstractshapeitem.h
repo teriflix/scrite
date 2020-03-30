@@ -71,6 +71,8 @@ public:
     QRectF contentRect() const;
     Q_SIGNAL void contentRectChanged();
 
+    QPainterPath currentShape() const { return m_path; }
+
     virtual QPainterPath shape() const = 0;
 
 protected:

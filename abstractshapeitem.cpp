@@ -244,8 +244,34 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
     QSGOpacityNode *trianglesNode = static_cast<QSGOpacityNode*>(rootNode->childAtIndex(0));
     trianglesNode->setOpacity( m_renderType & FillAlso ? 1 : 0 );
 
+    QSGGeometryNode *fillNode = static_cast<QSGGeometryNode*>(trianglesNode->firstChild());
+    if(fillNode != nullptr)
+    {
+        QSGFlatColorMaterial *fillMaterial = static_cast<QSGFlatColorMaterial*>(fillNode->material());
+
+        if(fillMaterial != nullptr)
+        {
+            QColor fillColor = m_fillColor;
+            fillColor.setAlphaF(fillColor.alphaF() * this->opacity());
+            fillMaterial->setColor(fillColor);
+        }
+    }
+
     QSGOpacityNode *outlinesNode = static_cast<QSGOpacityNode*>(rootNode->childAtIndex(1));
     outlinesNode->setOpacity( m_renderType & OutlineAlso ? 1 : 0 );
+
+    QSGGeometryNode *outlineNode = static_cast<QSGGeometryNode*>(outlinesNode->firstChild());
+    if(outlineNode != nullptr)
+    {
+        QSGFlatColorMaterial *outlineMaterial = static_cast<QSGFlatColorMaterial*>(outlineNode->material());
+
+        if(outlineMaterial != nullptr)
+        {
+            QColor outlineColor = m_outlineColor;
+            outlineColor.setAlphaF(outlineColor.alphaF() * this->opacity());
+            outlineMaterial->setColor(outlineColor);
+        }
+    }
 
     return rootNode;
 }
