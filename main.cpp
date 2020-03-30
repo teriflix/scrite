@@ -30,7 +30,7 @@
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 1, 1);
+    const QVersionNumber applicationVersion(0, 1, 2);
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setApplicationVersion(applicationVersion.toString() + "-beta");
