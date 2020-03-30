@@ -164,7 +164,7 @@ Item {
                                                             return
                                                         }
                                                     }
-                                                    fileDialog.launch(modelData)
+                                                    fileDialog.launch("IMPORT " + modelData)
                                                 }
                                             }, this)
                                         else
@@ -287,12 +287,13 @@ Item {
         id: resetContentAnimation
         property string filePath
         property var callback
+        property bool openFileDialog: false
 
         PropertyAnimation {
             target: contentLoader
             properties: "opacity"
             from: 1; to: 0
-            duration: 500
+            duration: 100
         }
 
         ScriptAction {
@@ -305,6 +306,10 @@ Item {
                 resetContentAnimation.filePath = ""
                 resetContentAnimation.callback = undefined
                 contentLoader.active = true
+
+                if(resetContentAnimation.openFileDialog)
+                    fileDialog.open()
+                resetContentAnimation.openFileDialog = false
             }
         }
 
@@ -312,7 +317,7 @@ Item {
             target: contentLoader
             properties: "opacity"
             from: 0; to: 1
-            duration: 500
+            duration: 100
         }
     }
 
@@ -547,6 +552,7 @@ Item {
                     "callback": function(path) {
                         scriteDocument.open(path)
                     },
+                    "reset": true,
                     "notificationTitle": "Opening Scrite Project"
                 },
                 "SAVE": {
@@ -555,6 +561,7 @@ Item {
                     "callback": function(path) {
                         scriteDocument.saveAs(path)
                     },
+                    "reset": false,
                     "notificationTitle": "Saving Scrite Project"
                 }
             }
@@ -566,6 +573,7 @@ Item {
                     "callback": function(path) {
                         scriteDocument.importFile(path, format)
                     },
+                    "reset": true,
                     "notificationTitle": "Creating Scrite project from " + format
                 }
             })
@@ -577,6 +585,7 @@ Item {
                     "callback": function(path) {
                         scriteDocument.exportFile(path, format)
                     },
+                    "reset": false,
                     "notificationTitle": "Exporting Scrite project to " + format
                 }
             })
@@ -587,9 +596,13 @@ Item {
         property var modes
 
         function launch(launchMode) {
-            resetContentAnimation.start()
             mode = launchMode
-            open()
+            var modeInfo = modes[mode]
+            if(modeInfo["reset"] === true) {
+                resetContentAnimation.openFileDialog = true
+                resetContentAnimation.start()
+            } else
+                open()
         }
 
         onAccepted: {
