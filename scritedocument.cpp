@@ -17,6 +17,7 @@
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
 #include "pdfexporter.h"
+#include "htmlexporter.h"
 #include "aggregation.h"
 #include "qobjectfactory.h"
 
@@ -41,6 +42,7 @@ DeviceIOFactories::DeviceIOFactories()
 
     ExporterFactory.addClass<PdfExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
+    ExporterFactory.addClass<HtmlExporter>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()

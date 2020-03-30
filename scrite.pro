@@ -15,6 +15,7 @@ HEADERS += \
     finaldraftimporter.h \
     formatting.h \
     gridbackgrounditem.h \
+    htmlexporter.h \
     logger.h \
     notification.h \
     notificationmanager.h \
@@ -52,6 +53,7 @@ SOURCES += \
     finaldraftimporter.cpp \
     formatting.cpp \
     gridbackgrounditem.cpp \
+    htmlexporter.cpp \
     logger.cpp \
     main.cpp \
     notification.cpp \
