@@ -145,7 +145,7 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenPageWid
     const qreal blockWidthInPixels = pageWidth * m_blockWidth;
     const qreal fullMargin = (pageWidth - blockWidthInPixels);
     const qreal halfMargin = fullMargin*0.5;
-    const qreal leftMargin = m_blockAlignment.testFlag(Qt::AlignLeft) ? 0 : (m_blockAlignment.testFlag(Qt::AlignCenter) ? halfMargin : fullMargin);
+    const qreal leftMargin = m_blockAlignment.testFlag(Qt::AlignLeft) ? 0 : (m_blockAlignment.testFlag(Qt::AlignHCenter) ? halfMargin : fullMargin);
     const qreal rightMargin = pageWidth - blockWidthInPixels - leftMargin;
 
     QTextBlockFormat format;
