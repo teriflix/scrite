@@ -21,6 +21,8 @@
 #include <QApplication>
 #include <QVersionNumber>
 
+#include "errorreport.h"
+
 typedef QApplication QtApplicationClass;
 
 class Application : public QtApplicationClass
@@ -65,10 +67,13 @@ public:
 
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
 
+    Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
+
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
 
 private:
+    ErrorReport *m_errorReport;
     QString m_baseWindowTitle;
     QVersionNumber m_versionNumber;
 };

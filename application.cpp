@@ -12,10 +12,16 @@
 ****************************************************************************/
 
 #include "application.h"
-#include <QFontDatabase>
+
+#include <QDir>
+#include <QProcess>
+#include <QFileInfo>
 #include <QJsonArray>
+#include <QMessageBox>
 #include <QJsonObject>
 #include <QColorDialog>
+#include <QFontDatabase>
+#include <QStandardPaths>
 
 Application *Application::instance()
 {
@@ -24,6 +30,7 @@ Application *Application::instance()
 
 Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
+      m_errorReport(new ErrorReport(this)),
       m_versionNumber(version)
 {
     this->setBaseWindowTitle("scrite - build your screenplay");
@@ -108,6 +115,59 @@ QColor Application::pickColor(const QColor &initial) const
 QRectF Application::textBoundingRect(const QString &text, const QFont &font) const
 {
     return QFontMetricsF(font).boundingRect(text);
+}
+
+void Application::revealFileOnDesktop(const QString &pathIn)
+{
+    m_errorReport->clear();
+
+    // The implementation of this function is inspired from QtCreator's
+    // implementation of FileUtils::showInGraphicalShell() method
+    const QFileInfo fileInfo(pathIn);
+
+    // Mac, Windows support folder or file.
+    if (this->platform() == WindowsDesktop)
+    {
+        const QString explorer = QStandardPaths::locate(QStandardPaths::AppDataLocation, "explorer.exe");
+        if (explorer.isEmpty())
+        {
+            m_errorReport->setErrorMessage("Could not find explorer.exe in path to launch Windows Explorer.");
+            return;
+        }
+
+        QStringList param;
+        if (!fileInfo.isDir())
+            param += QLatin1String("/select,");
+        param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+        QProcess::startDetached(explorer, param);
+    }
+    else if (this->platform() == MacOS)
+    {
+        QStringList scriptArgs;
+        scriptArgs << QLatin1String("-e")
+                   << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
+                                         .arg(fileInfo.canonicalFilePath());
+        QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+        scriptArgs.clear();
+        scriptArgs << QLatin1String("-e")
+                   << QLatin1String("tell application \"Finder\" to activate");
+        QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+    }
+    else
+    {
+#if 0 // TODO
+        // we cannot select a file here, because no file browser really supports it...
+        const QString folder = fileInfo.isDir() ? fileInfo.absoluteFilePath() : fileInfo.filePath();
+        const QString app = UnixUtils::fileBrowser(ICore::settings());
+        QProcess browserProc;
+        const QString browserArgs = UnixUtils::substituteFileBrowserParameters(app, folder);
+        bool success = browserProc.startDetached(browserArgs);
+        const QString error = QString::fromLocal8Bit(browserProc.readAllStandardError());
+        success = success && error.isEmpty();
+        if (!success)
+            showGraphicalShellError(parent, app, error);
+#endif
+    }
 }
 
 bool Application::notify(QObject *object, QEvent *event)

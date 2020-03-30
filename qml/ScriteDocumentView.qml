@@ -584,6 +584,7 @@ Item {
                     "selectExisting": false,
                     "callback": function(path) {
                         scriteDocument.exportFile(path, format)
+                        app.revealFileOnDesktop(path)
                     },
                     "reset": false,
                     "notificationTitle": "Exporting Scrite project to " + format
@@ -611,4 +612,10 @@ Item {
             resetContentAnimation.start()
         }
     }
+
+    property ErrorReport applicationErrors: Aggregation.findErrorReport(app)
+    Notification.active: applicationErrors ? applicationErrors.hasError : false
+    Notification.title: "Scrite Error"
+    Notification.text: applicationErrors ? applicationErrors.hasError : ""
+    Notification.autoClose: false
 }
