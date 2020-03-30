@@ -14,6 +14,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <QMap>
 #include <QColor>
 #include <QQmlListProperty>
 #include <QAbstractListModel>
@@ -50,12 +51,23 @@ public:
     Q_PROPERTY(QString locationTypeAsString READ locationTypeAsString NOTIFY locationTypeChanged)
     QString locationTypeAsString() const;
 
+    static QMap<LocationType,QString> locationTypeStringMap();
+
     Q_PROPERTY(QString location READ location WRITE setLocation NOTIFY locationChanged)
     void setLocation(const QString &val);
     QString location() const { return m_location; }
     Q_SIGNAL void locationChanged();
 
-    enum Moment { NoMoment=-1, Day, Night, Morning, Afternoon, Evening, Later, MomentsLater, Continuous, TheNextDay };
+    enum Moment
+    {
+        NoMoment=-1,
+        Day, Night,
+        Morning, Afternoon, Evening,
+        Later, MomentsLater,
+        Continuous, TheNextDay,
+        Earlier, MomentsEarlier,
+        ThePreviousDay
+    };
     Q_ENUM(Moment)
     Q_PROPERTY(Moment moment READ moment WRITE setMoment NOTIFY momentChanged)
     void setMoment(Moment val);
@@ -64,6 +76,8 @@ public:
 
     Q_PROPERTY(QString momentAsString READ momentAsString NOTIFY momentChanged)
     QString momentAsString() const;
+
+    static QMap<Moment,QString> momentStringMap();
 
     QString toString() const;
 

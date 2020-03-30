@@ -15,6 +15,7 @@
 #define APPLICATION_H
 
 #include <QUrl>
+#include <QRectF>
 #include <QColor>
 #include <QJsonObject>
 #include <QApplication>
@@ -61,6 +62,8 @@ public:
     Q_INVOKABLE QJsonObject systemFontInfo() const;
 
     Q_INVOKABLE QColor pickColor(const QColor &initial) const;
+
+    Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);

@@ -105,6 +105,11 @@ QColor Application::pickColor(const QColor &initial) const
     return QColorDialog::getColor(initial, nullptr, "Select Color", options);
 }
 
+QRectF Application::textBoundingRect(const QString &text, const QFont &font) const
+{
+    return QFontMetricsF(font).boundingRect(text);
+}
+
 bool Application::notify(QObject *object, QEvent *event)
 {
     const bool ret = QtApplicationClass::notify(object, event);

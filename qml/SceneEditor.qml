@@ -272,6 +272,9 @@ Item {
                     ListElement { value: SceneHeading.MomentsLater; display: "MOMENTS LATER" }
                     ListElement { value: SceneHeading.Continuous; display: "CONTINUOUS" }
                     ListElement { value: SceneHeading.TheNextDay; display: "THE NEXT DAY" }
+                    ListElement { value: SceneHeading.Earlier; display: "EARLIER" }
+                    ListElement { value: SceneHeading.MomentsEarlier; display: "MOMENTS EARLIER" }
+                    ListElement { value: SceneHeading.ThePreviousDay; display: "THE PREVIOUS DAY" }
                 }
                 textRole: "display"
                 editable: false
@@ -279,6 +282,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 font: headingFont
                 onActivated: scene.heading.moment = model.get(index).value
+                width: app.textBoundingRect("THE PREVIOUS DAY", font).width + 50
             }
         }
     }

@@ -112,8 +112,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement timesOfDayE = doc.createElement("TimesOfDay");
     smartTypeE.appendChild(timesOfDayE);
     timesOfDayE.setAttribute("Separator", " - ");
-    static const QStringList moments = QStringList() << "DAY" << "NIGHT" << "MORNING"
-        << "AFTERNOON" << "EVENING" << "LATER" << "MOMENTS LATER" << "CONTINUOUS" << "THE NEXT DAY";
+    const QStringList moments = SceneHeading::momentStringMap().values();
     Q_FOREACH(QString moment, moments)
     {
         QDomElement timeOfDayE = doc.createElement("TimeOfDay");

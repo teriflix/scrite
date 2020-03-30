@@ -121,17 +121,14 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         const QString moment = heading.mid(field2SepLoc+1).trimmed();
         const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
 
-        static const QStringList locationTypes = QStringList() << "INT." << "EXT." << "I/E.";
         scene->heading()->setEnabled(true);
-        scene->heading()->setLocationType(SceneHeading::LocationType(locationTypes.indexOf(locationType)));
+        scene->heading()->setLocationType(SceneHeading::locationTypeStringMap().key(locationType));
         scene->heading()->setLocation(location);
 
         const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
         scene->setTitle( QString("[%1] %2").arg(sceneIndex+1).arg(titleBit.toLower()) );
 
-        static const QStringList moments = QStringList() << "DAY" << "NIGHT" << "MORNING"
-            << "AFTERNOON" << "EVENING" << "LATER" << "MOMENTS LATER" << "CONTINUOUS" << "THE NEXT DAY";
-        scene->heading()->setMoment(SceneHeading::Moment(moments.indexOf(moment)));
+        scene->heading()->setMoment(SceneHeading::momentStringMap().key(moment));
 
         return scene;
     };

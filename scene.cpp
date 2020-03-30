@@ -50,15 +50,20 @@ void SceneHeading::setLocationType(SceneHeading::LocationType val)
 
 QString SceneHeading::locationTypeAsString() const
 {
-    switch(m_locationType)
+    return this->locationTypeStringMap().value(m_locationType, "NONE");
+}
+
+QMap<SceneHeading::LocationType, QString> SceneHeading::locationTypeStringMap()
+{
+    static QMap<LocationType,QString> map;
+    if(map.isEmpty())
     {
-    case Interior: return "INT.";
-    case Exterior: return "EXT.";
-    case Both: return "I/E.";
-    default: break;
+        map[Interior] = "INT.";
+        map[Exterior] = "EXT.";
+        map[Both] = "I/E.";
     }
 
-    return "NONE";
+    return map;
 }
 
 void SceneHeading::setLocation(const QString &val)
@@ -81,21 +86,29 @@ void SceneHeading::setMoment(SceneHeading::Moment val)
 
 QString SceneHeading::momentAsString() const
 {
-    switch(m_moment)
+    return this->momentStringMap().value(m_moment, "NONE");
+}
+
+QMap<SceneHeading::Moment, QString> SceneHeading::momentStringMap()
+{
+    static QMap<SceneHeading::Moment,QString> map;
+    if(map.isEmpty())
     {
-    case Day: return "DAY";
-    case Night: return "NIGHT";
-    case Morning: return "MORNING";
-    case Afternoon: return "AFTERNOON";
-    case Evening: return "EVENING";
-    case Later: return "LATER";
-    case MomentsLater: return "MOMENTS LATER";
-    case Continuous: return "CONTINUOUS";
-    case TheNextDay: return "THE NEXT DAY";
-    default: break;
+        map[Day] = "DAY";
+        map[Night] = "NIGHT";
+        map[Morning] = "MORNING";
+        map[Afternoon] = "AFTERNOON";
+        map[Evening] = "EVENING";
+        map[Later] = "LATER";
+        map[MomentsLater] = "MOMENTS LATER";
+        map[Continuous] = "CONTINUOUS";
+        map[TheNextDay] = "THE NEXT DAY";
+        map[Earlier] = "EARLIER";
+        map[MomentsEarlier] = "MOMENTS LATER";
+        map[ThePreviousDay] = "THE PREVIOUS DAY";
     }
 
-    return "NONE";
+    return map;
 }
 
 QString SceneHeading::toString() const
