@@ -1069,11 +1069,17 @@ void StructureElementConnector::updateArrowAndLabelPositions()
         return;
 
     const qreal pathLength = path.length();
+    if(pathLength < 0 || qFuzzyCompare(pathLength,0))
+        return;
+
     const qreal arrowT = 0.5;
     const qreal labelT = 0.45 - (m_arrowAndLabelSpacing / pathLength);
 
     this->setArrowPosition( this->currentShape().pointAtPercent(arrowT) );
-    this->setSuggestedLabelPosition( this->currentShape().pointAtPercent(labelT) );
+    if(labelT < 0 || labelT > 1)
+        this->setSuggestedLabelPosition(this->arrowPosition());
+    else
+        this->setSuggestedLabelPosition( this->currentShape().pointAtPercent(labelT) );
 }
 
 void StructureElementConnector::setArrowPosition(const QPointF &val)

@@ -90,10 +90,11 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
     static const qreal elementX = 275;
     static const qreal elementY = 100;
-    static const qreal elementSpacing = 120;
+    static const qreal elementXSpacing = 200;
+    static const qreal elementYSpacing = 120;
     static const qreal canvasSpaceBuffer = 500;
 
-    const qreal requiredSpace = paragraphs.size()*elementSpacing + canvasSpaceBuffer;
+    const qreal requiredSpace = paragraphs.size()*elementYSpacing + canvasSpaceBuffer;
     if(structure->canvasHeight() < requiredSpace)
     {
         structure->setCanvasWidth(requiredSpace);
@@ -107,8 +108,8 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         Scene *scene = new Scene(structureElement);
         scene->setColor(sceneColors.at(sceneIndex%sceneColors.length()));
         structureElement->setScene(scene);
-        structureElement->setX(elementX);
-        structureElement->setY(elementY + elementSpacing*sceneIndex);
+        structureElement->setX(elementX + (sceneIndex%2 ? elementXSpacing : 0));
+        structureElement->setY(elementY + elementYSpacing*sceneIndex);
         structure->addElement(structureElement);
 
         ScreenplayElement *screenplayElement = new ScreenplayElement(screenplay);
