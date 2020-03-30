@@ -15,6 +15,7 @@ HEADERS += \
     finaldraftimporter.h \
     formatting.h \
     gridbackgrounditem.h \
+    hourglass.h \
     htmlexporter.h \
     logger.h \
     notification.h \
@@ -36,6 +37,7 @@ HEADERS += \
     screenplay.h \
     scritedocument.h \
     structure.h \
+    textexporter.h \
     textshapeitem.h \
     timeprofiler.h
 
@@ -72,6 +74,7 @@ SOURCES += \
     screenplay.cpp \
     scritedocument.cpp \
     structure.cpp \
+    textexporter.cpp \
     textshapeitem.cpp \
     timeprofiler.cpp
 

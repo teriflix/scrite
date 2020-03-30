@@ -30,7 +30,7 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
                      m_backgroundColor(Qt::transparent),
                      m_format(parent),
                      m_textAlignment(Qt::AlignLeft),
-                     m_blockAlignment(Qt::AlignCenter),
+                     m_blockAlignment(Qt::AlignHCenter),
                      m_elementType(type)
 {
     CACHE_DEFAULT_PROPERTY_VALUES

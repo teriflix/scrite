@@ -607,9 +607,14 @@ Item {
         }
 
         onAccepted: {
-            resetContentAnimation.filePath = app.urlToLocalFile(fileUrl)
-            resetContentAnimation.callback = modes[mode].callback
-            resetContentAnimation.start()
+            var modeInfo = modes[mode]
+            if(modeInfo["reset"] === true) {
+                resetContentAnimation.filePath = app.urlToLocalFile(fileUrl)
+                resetContentAnimation.callback = modeInfo.callback
+                resetContentAnimation.start()
+            } else {
+                modeInfo.callback(app.urlToLocalFile(fileUrl))
+            }
         }
     }
 

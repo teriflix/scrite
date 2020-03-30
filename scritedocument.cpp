@@ -18,8 +18,10 @@
 #include "finaldraftexporter.h"
 #include "pdfexporter.h"
 #include "htmlexporter.h"
+#include "textexporter.h"
 #include "aggregation.h"
 #include "qobjectfactory.h"
+#include "hourglass.h"
 
 #include <QFileInfo>
 #include <QJsonDocument>
@@ -43,6 +45,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<PdfExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
     ExporterFactory.addClass<HtmlExporter>();
+    ExporterFactory.addClass<TextExporter>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()
@@ -73,6 +76,8 @@ ScriteDocument::~ScriteDocument()
 
 void ScriteDocument::reset()
 {
+    HourGlass hourGlass;
+
     if(m_structure != nullptr)
     {
         disconnect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
@@ -104,6 +109,8 @@ void ScriteDocument::reset()
 
 void ScriteDocument::open(const QString &fileName)
 {
+    HourGlass hourGlass;
+
     this->reset();
     if( this->load(fileName) )
         this->setFileName(fileName);
@@ -112,6 +119,8 @@ void ScriteDocument::open(const QString &fileName)
 
 void ScriteDocument::saveAs(const QString &fileName)
 {
+    HourGlass hourGlass;
+
     m_errorReport->clear();
     if(fileName.isEmpty())
         return;
@@ -205,6 +214,8 @@ QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
 
 bool ScriteDocument::importFile(const QString &fileName, const QString &format)
 {
+    HourGlass hourGlass;
+
     m_errorReport->clear();
 
     const QByteArray formatKey = format.toLatin1();
@@ -230,6 +241,8 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
 
 bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
 {
+    HourGlass hourGlass;
+
     m_errorReport->clear();
 
     const QByteArray formatKey = format.toLatin1();
