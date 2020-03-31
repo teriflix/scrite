@@ -52,6 +52,16 @@ public:
     qreal y() const { return m_y; }
     Q_SIGNAL void yChanged();
 
+    Q_PROPERTY(qreal width READ width WRITE setWidth NOTIFY widthChanged STORED false)
+    void setWidth(qreal val);
+    qreal width() const { return m_width; }
+    Q_SIGNAL void widthChanged();
+
+    Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged STORED false)
+    void setHeight(qreal val);
+    qreal height() const { return m_height; }
+    Q_SIGNAL void heightChanged();
+
     Q_PROPERTY(qreal xf READ xf WRITE setXf NOTIFY xChanged)
     void setXf(qreal val);
     qreal xf() const;
@@ -68,6 +78,8 @@ protected:
 private:
     qreal m_x;
     qreal m_y;
+    qreal m_width;
+    qreal m_height;
     Scene* m_scene;
     Structure *m_structure;
 };

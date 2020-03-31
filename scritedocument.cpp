@@ -366,6 +366,7 @@ void ScriteDocument::evaluateStructureElementSequence()
             m_structureElementSequence = array;
             emit structureElementSequenceChanged();
         }
+
         return;
     }
 

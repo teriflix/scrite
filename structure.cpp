@@ -18,11 +18,15 @@ StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
       m_x(0),
       m_y(0),
+      m_width(0),
+      m_height(0),
       m_scene(nullptr),
       m_structure(qobject_cast<Structure*>(parent))
 {
     connect(this, &StructureElement::xChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::elementChanged);
+    connect(this, &StructureElement::widthChanged, this, &StructureElement::elementChanged);
+    connect(this, &StructureElement::heightChanged, this, &StructureElement::elementChanged);
 }
 
 StructureElement::~StructureElement()
@@ -60,6 +64,24 @@ void StructureElement::setY(qreal val)
 
     m_y = val;
     emit yChanged();
+}
+
+void StructureElement::setWidth(qreal val)
+{
+    if( qFuzzyCompare(m_width, val) )
+        return;
+
+    m_width = val;
+    emit widthChanged();
+}
+
+void StructureElement::setHeight(qreal val)
+{
+    if( qFuzzyCompare(m_height, val) )
+        return;
+
+    m_height = val;
+    emit heightChanged();
 }
 
 void StructureElement::setXf(qreal val)
@@ -890,6 +912,8 @@ void StructureElementConnector::setFromElement(StructureElement *val)
     {
         disconnect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         disconnect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
+        disconnect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
+        disconnect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
         disconnect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_fromElement->scene();
@@ -902,6 +926,8 @@ void StructureElementConnector::setFromElement(StructureElement *val)
     {
         connect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         connect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
+        connect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
+        connect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
         connect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_fromElement->scene();
@@ -924,6 +950,8 @@ void StructureElementConnector::setToElement(StructureElement *val)
     {
         disconnect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         disconnect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
+        disconnect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
+        disconnect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
         disconnect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_toElement->scene();
@@ -936,6 +964,8 @@ void StructureElementConnector::setToElement(StructureElement *val)
     {
         connect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
         connect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
+        connect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
+        connect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
         connect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_toElement->scene();
@@ -966,63 +996,124 @@ QPainterPath StructureElementConnector::shape() const
     if(m_fromElement == nullptr || m_toElement == nullptr)
         return path;
 
-    const QLineF line(m_fromElement->x(), m_fromElement->y(),  m_toElement->x(), m_toElement->y());
+    auto getElementRect = [](StructureElement *e) {
+        QRectF r(e->x(), e->y(), e->width(), e->height());
+        r.moveCenter(QPointF(e->x(), e->y()));
+        return r;
+    };
 
-    if(m_lineType == StraightLine)
+    const QRectF  r1 = getElementRect(m_fromElement);
+    const QRectF  r2 = getElementRect(m_toElement);
+    const QLineF line(r1.center(), r2.center());
+    QPointF p1, p2;
+    Qt::Edge e1, e2;
+
+    if(r2.right() < r1.left())
     {
-        path.moveTo(line.p1());
-        path.lineTo(line.p2());
+        p1 = QLineF(r1.topLeft(), r1.bottomLeft()).center();
+        e1 = Qt::LeftEdge;
+
+        if(r2.top() > r1.bottom())
+        {
+            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
+            e2 = Qt::TopEdge;
+        }
+        else if(r1.top() > r2.bottom())
+        {
+            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
+            e2 = Qt::BottomEdge;
+        }
+        else
+        {
+            p2 = QLineF(r2.topRight(), r2.bottomRight()).center();
+            e2 = Qt::RightEdge;
+        }
+    }
+    else if(r2.left() > r1.right())
+    {
+        p1 = QLineF(r1.topRight(), r1.bottomRight()).center();
+        e1 = Qt::RightEdge;
+
+        if(r2.top() > r1.bottom())
+        {
+            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
+            e2 = Qt::TopEdge;
+        }
+        else if(r1.top() > r2.bottom())
+        {
+            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
+            e2 = Qt::BottomEdge;
+        }
+        else
+        {
+            p2 = QLineF(r2.topLeft(), r2.bottomLeft()).center();
+            e2 = Qt::LeftEdge;
+        }
     }
     else
     {
-        static const qreal minSize = 10.0;
-        const QPointF p1 = line.p1();
-        const QPointF p2 = line.p2();
-
-        QPointF cp;
-        if(p1 != p2)
+        if(r2.top() > r1.bottom())
         {
-            QRectF rect = QRectF(p1,p2).normalized();
-            QPointF rectCenter = rect.center();
-            rect.setWidth( qMax(rect.width(),minSize) );
-            rect.setHeight( qMax(rect.height(),minSize) );
-            rect.moveCenter(rectCenter);
+            p1 = QLineF(r1.bottomLeft(), r1.bottomRight()).center();
+            e1 = Qt::BottomEdge;
 
-            if(p2.y() > p1.y())
-            {
-                if(p1.x() < p2.x())
-                    cp = rect.bottomLeft();
-                else
-                    cp = rect.bottomRight();
-            }
-            else
-            {
-                if(p1.x() < p2.x())
-                    cp = rect.topLeft();
-                else
-                    cp = rect.topRight();
-            }
+            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
+            e2 = Qt::TopEdge;
         }
         else
-            cp = p1;
-
-        const qreal length = line.length();
-        const qreal dist = 20.0;
-        const qreal dt = dist / length;
-        const qreal maxdt = 1.0 - dt;
-        const QLineF l1(p1, cp);
-        const QLineF l2(cp, p2);
-        qreal t = dt;
-
-        path.moveTo(p1);
-        while(t < maxdt)
         {
-            const QLineF l( l1.pointAt(t), l2.pointAt(t) );
-            const QPointF p = l.pointAt(t);
-            path.lineTo(p);
-            t += dt;
+            p1 = QLineF(r1.topLeft(), r1.topRight()).center();
+            e1 = Qt::TopEdge;
+
+            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
+            e2 = Qt::BottomEdge;
         }
+    }
+
+    if(m_lineType == StraightLine)
+    {
+        path.moveTo(p1);
         path.lineTo(p2);
+    }
+    else
+    {
+        QPointF cp = p1;
+        switch(e1)
+        {
+        case Qt::LeftEdge:
+        case Qt::RightEdge:
+            cp = (e2 == Qt::BottomEdge || e2 == Qt::TopEdge) ? QPointF(p2.x(), p1.y()) : p1;
+            break;
+        default:
+            cp = p1;
+            break;
+        }
+
+        if(cp == p1)
+        {
+            path.moveTo(p1);
+            path.lineTo(p2);
+        }
+        else
+        {
+            const qreal length = line.length();
+            const qreal dist = 20.0;
+            const qreal dt = dist / length;
+            const qreal maxdt = 1.0 - dt;
+            const QLineF l1(p1, cp);
+            const QLineF l2(cp, p2);
+            qreal t = dt;
+
+            path.moveTo(p1);
+            while(t < maxdt)
+            {
+                const QLineF l( l1.pointAt(t), l2.pointAt(t) );
+                const QPointF p = l.pointAt(t);
+                path.lineTo(p);
+                t += dt;
+            }
+            path.lineTo(p2);
+        }
     }
 
     static const QList<QPointF> arrowPoints = QList<QPointF>()

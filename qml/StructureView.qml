@@ -420,6 +420,9 @@ Item {
                         element.y = (y + height/2)
                     }
 
+                    onWidthChanged: element.width = width
+                    onHeightChanged: element.height = height
+
                     // Drag to timeline support
                     Drag.active: dragMouseArea.drag.active
                     Drag.dragType: Drag.Automatic
