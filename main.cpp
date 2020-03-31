@@ -18,13 +18,14 @@
 #include <QQmlContext>
 
 #include "logger.h"
-#include "painterpathitem.h"
 #include "completer.h"
 #include "aggregation.h"
 #include "eventfilter.h"
 #include "notification.h"
+#include "standardpaths.h"
 #include "textshapeitem.h"
 #include "scritedocument.h"
+#include "painterpathitem.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 
@@ -33,6 +34,7 @@ int main(int argc, char **argv)
     const QVersionNumber applicationVersion(0, 1, 2);
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
+    Application::setOrganizationDomain("teriflix.com");
     Application::setApplicationVersion(applicationVersion.toString() + "-beta");
 
     qInstallMessageHandler(&Logger::qtMessageHandler);
@@ -47,6 +49,12 @@ int main(int argc, char **argv)
 
     qmlRegisterSingletonType<Aggregation>("Scrite", 1, 0, "Aggregation", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
         return new Aggregation(engine);
+    });
+
+    qmlRegisterSingletonType<StandardPaths>("Scrite", 1, 0, "StandardPaths", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+        Q_UNUSED(engine)
+        Q_UNUSED(scriptEngine)
+        return new StandardPaths(qApp);
     });
 
     const QString reason("Instantiation from QML not allowed.");

@@ -16,6 +16,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QFileInfo>
+#include <QMetaEnum>
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QJsonObject>
@@ -168,6 +169,33 @@ void Application::revealFileOnDesktop(const QString &pathIn)
             showGraphicalShellError(parent, app, error);
 #endif
     }
+}
+
+QJsonArray Application::enumerationModel(QObject *object, const QString &enumName) const
+{
+    QJsonArray ret;
+
+    if( object == nullptr || enumName.isEmpty() )
+        return ret;
+
+    const QMetaObject *mo = object->metaObject();
+    const int enumIndex = mo->indexOfEnumerator( qPrintable(enumName) );
+    if( enumIndex < 0 )
+        return ret;
+
+    const QMetaEnum enumInfo = mo->enumerator(enumIndex);
+    if( !enumInfo.isValid() )
+        return ret;
+
+    for(int i=0; i<enumInfo.keyCount(); i++)
+    {
+        QJsonObject item;
+        item.insert("key", QString::fromLatin1(enumInfo.key(i)));
+        item.insert("value", enumInfo.value(i));
+        ret.append(item);
+    }
+
+    return ret;
 }
 
 bool Application::notify(QObject *object, QEvent *event)

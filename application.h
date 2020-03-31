@@ -17,6 +17,7 @@
 #include <QUrl>
 #include <QRectF>
 #include <QColor>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QApplication>
 #include <QVersionNumber>
@@ -62,12 +63,10 @@ public:
     QVersionNumber versionNumber() const { return m_versionNumber; }
 
     Q_INVOKABLE QJsonObject systemFontInfo() const;
-
     Q_INVOKABLE QColor pickColor(const QColor &initial) const;
-
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
-
     Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
+    Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);

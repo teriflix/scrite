@@ -12,8 +12,10 @@
 ****************************************************************************/
 
 #include "formatting.h"
-#include "qobjectserializer.h"
+#include "application.h"
 #include "scritedocument.h"
+#include "qobjectserializer.h"
+#include "qobjectserializer.h"
 
 #include <QPointer>
 #include <QTextCursor>
@@ -207,8 +209,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
         SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);
-        connect(elementFormat, &SceneElementFormat::elementFormatChanged,
-                this, &ScreenplayFormat::formatChanged);
+        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayFormat::formatChanged);
         m_elementFormats.append(elementFormat);
     }
 
