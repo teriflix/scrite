@@ -98,6 +98,7 @@ void ScriteDocument::reset()
     this->setStructure(new Structure(this));
     this->setModified(false);
     this->setFileName(QString());
+    this->evaluateStructureElementSequence();
 
     connect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
     connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
@@ -358,6 +359,16 @@ void ScriteDocument::evaluateStructureElementSequence()
     QJsonArray array;
 
     const int nrElements = m_screenplay->elementCount();
+    if(nrElements == 0)
+    {
+        if(!m_structureElementSequence.isEmpty())
+        {
+            m_structureElementSequence = array;
+            emit structureElementSequenceChanged();
+        }
+        return;
+    }
+
     ScreenplayElement *fromElement = nullptr;
     ScreenplayElement *toElement = nullptr;
     int fromIndex = -1;
