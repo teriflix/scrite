@@ -70,6 +70,9 @@ public:
     Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
     Q_INVOKABLE QJsonObject fileInfo(const QString &path) const;
 
+    Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
+    QString settingsFilePath() const;
+
     QSettings *settings() const { return m_settings; }
 
     // QCoreApplication interface

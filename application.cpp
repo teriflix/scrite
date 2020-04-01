@@ -218,6 +218,11 @@ QJsonObject Application::fileInfo(const QString &path) const
     return ret;
 }
 
+QString Application::settingsFilePath() const
+{
+    return m_settings->fileName();
+}
+
 bool Application::notify(QObject *object, QEvent *event)
 {
     const bool ret = QtApplicationClass::notify(object, event);

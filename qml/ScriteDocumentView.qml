@@ -109,7 +109,7 @@ Item {
                         anchors.left: parent.left
 
                         Settings {
-                            fileName: StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/settings.ini"
+                            fileName: app.settingsFilePath
                             category: "RecentFiles"
                             property alias files: recentFilesMenu.recentFiles
                         }
@@ -381,17 +381,27 @@ Item {
         SplitView {
             orientation: Qt.Vertical
 
+            Settings {
+                id: workspaceSettings
+                fileName: app.settingsFilePath
+                category: "Workspace"
+                property var workspaceHeight
+                property var structureEditorWidth
+            }
+
             Rectangle {
-                SplitView.preferredHeight: documentUI.height * 0.75
+                SplitView.preferredHeight: workspaceSettings.workspaceHeight ? documentUI.height*workspaceSettings.workspaceHeight : documentUI.height*0.75
                 SplitView.minimumHeight: documentUI.height * 0.5
+                onHeightChanged: workspaceSettings.workspaceHeight = height/documentUI.height
 
                 SplitView {
                     anchors.fill: parent
                     orientation: Qt.Horizontal
 
                     Rectangle {
-                        SplitView.preferredWidth: documentUI.width * 0.4
+                        SplitView.preferredWidth: workspaceSettings.structureEditorWidth ? documentUI.width*workspaceSettings.structureEditorWidth : documentUI.width*0.4
                         color: "lightgray"
+                        onWidthChanged: workspaceSettings.structureEditorWidth = width/documentUI.width
 
                         Rectangle {
                             id: structureEditor
