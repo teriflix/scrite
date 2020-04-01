@@ -198,6 +198,22 @@ QJsonArray Application::enumerationModel(QObject *object, const QString &enumNam
     return ret;
 }
 
+QJsonObject Application::fileInfo(const QString &path) const
+{
+    QFileInfo fi(path);
+    QJsonObject ret;
+    ret.insert("exists", fi.exists());
+    if(!fi.exists())
+        return ret;
+
+    ret.insert("baseName", fi.baseName());
+    ret.insert("absoluteFilePath", fi.absoluteFilePath());
+    ret.insert("absolutePath", fi.absolutePath());
+    ret.insert("suffix", fi.suffix());
+    ret.insert("fileName", fi.fileName());
+    return ret;
+}
+
 bool Application::notify(QObject *object, QEvent *event)
 {
     const bool ret = QtApplicationClass::notify(object, event);

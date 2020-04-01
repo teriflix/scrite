@@ -88,9 +88,9 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     Screenplay *screenplay = this->document()->screenplay();
     Scene *scene = nullptr;
 
-    static const qreal elementX = 275;
+    static const qreal elementX = 225;
     static const qreal elementY = 100;
-    static const qreal elementXSpacing = 200;
+    static const qreal elementXSpacing = 275;
     static const qreal elementYSpacing = 120;
     static const qreal canvasSpaceBuffer = 500;
 

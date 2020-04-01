@@ -12,9 +12,11 @@
 ****************************************************************************/
 
 import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Layouts 1.13
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.13
+import Qt.labs.settings 1.0
+import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Item {
@@ -73,11 +75,14 @@ Item {
                 }
 
                 ToolButton2 {
+                    id: fileOpenButton
                     icon.source: "../icons/file/folder_open.png"
                     text: "Open"
                     shortcut: "Ctrl+O"
                     shortcutText: "O"
-                    onClicked: {
+                    down: recentFilesMenu.visible
+                    onClicked: recentFilesMenu.recentFiles.length > 0 ? recentFilesMenu.open() : doOpen()
+                    function doOpen(filePath) {
                         if(scriteDocument.modified)
                             askQuestion({
                                 "question": "Do you want to save your current project first?",
@@ -92,11 +97,60 @@ Item {
                                             return
                                         }
                                     }
-                                    fileDialog.launch("OPEN")
+                                    fileDialog.launch("OPEN", filePath)
                                 }
                             }, this)
                         else
-                            fileDialog.launch("OPEN")
+                            fileDialog.launch("OPEN", filePath)
+                    }
+
+                    Item {
+                        anchors.top: parent.bottom
+                        anchors.left: parent.left
+
+                        Settings {
+                            fileName: StandardPaths.writableLocation(StandardPaths.AppDataLocation) + "/settings.ini"
+                            category: "RecentFiles"
+                            property alias files: recentFilesMenu.recentFiles
+                        }
+
+                        Menu {
+                            id: recentFilesMenu
+                            property var recentFiles: []
+                            function add(filePath) {
+                                var r = recentFiles
+                                for(var i=0; i<r.length; i++) {
+                                    if(r[i] === filePath)
+                                        r.splice(i,1);
+                                }
+                                r.push(filePath)
+                                if(r.length > 10)
+                                    r.splice(0, r.length-10)
+                                recentFiles = r
+                            }
+
+                            MenuItem {
+                                text: "Open Another"
+                                onClicked: fileOpenButton.doOpen()
+                            }
+
+                            MenuSeparator {
+                                visible: true
+                            }
+
+                            Menu {
+                                title: "Recent Files"
+
+                                Repeater {
+                                    model: recentFilesMenu.recentFiles.reverse()
+
+                                    MenuItem {
+                                        text: "" + (index+1) + ". " + app.fileInfo(modelData).fileName
+                                        onClicked: fileOpenButton.doOpen(modelData)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -551,6 +605,7 @@ Item {
                     "selectExisting": true,
                     "callback": function(path) {
                         scriteDocument.open(path)
+                        recentFilesMenu.add(path)
                     },
                     "reset": true,
                     "notificationTitle": "Opening Scrite Project"
@@ -560,6 +615,7 @@ Item {
                     "selectExisting": false,
                     "callback": function(path) {
                         scriteDocument.saveAs(path)
+                        recentFilesMenu.add(path)
                     },
                     "reset": false,
                     "notificationTitle": "Saving Scrite Project"
@@ -596,20 +652,27 @@ Item {
 
         property var modes
 
-        function launch(launchMode) {
+        function launch(launchMode, filePath) {
             mode = launchMode
-            var modeInfo = modes[mode]
-            if(modeInfo["reset"] === true) {
-                resetContentAnimation.openFileDialog = true
-                resetContentAnimation.start()
-            } else
-                open()
+
+            if(filePath)
+                processFile(filePath)
+            else {
+                var modeInfo = modes[mode]
+                if(modeInfo["reset"] === true) {
+                    resetContentAnimation.openFileDialog = true
+                    resetContentAnimation.start()
+                } else
+                    open()
+            }
         }
 
-        onAccepted: {
+        onAccepted: processFile()
+
+        function processFile(filePath) {
             var modeInfo = modes[mode]
             if(modeInfo["reset"] === true) {
-                resetContentAnimation.filePath = app.urlToLocalFile(fileUrl)
+                resetContentAnimation.filePath = filePath ? filePath : app.urlToLocalFile(fileUrl)
                 resetContentAnimation.callback = modeInfo.callback
                 resetContentAnimation.start()
             } else {

@@ -51,10 +51,8 @@ int main(int argc, char **argv)
         return new Aggregation(engine);
     });
 
-    qmlRegisterSingletonType<StandardPaths>("Scrite", 1, 0, "StandardPaths", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
-        Q_UNUSED(engine)
-        Q_UNUSED(scriptEngine)
-        return new StandardPaths(qApp);
+    qmlRegisterSingletonType<StandardPaths>("Scrite", 1, 0, "StandardPaths", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
+        return new StandardPaths(engine);
     });
 
     const QString reason("Instantiation from QML not allowed.");

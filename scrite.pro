@@ -39,7 +39,8 @@ HEADERS += \
     structure.h \
     textexporter.h \
     textshapeitem.h \
-    timeprofiler.h
+    timeprofiler.h \
+    standardpaths.h
 
 SOURCES += \
     abstractdeviceio.cpp \
@@ -76,7 +77,8 @@ SOURCES += \
     structure.cpp \
     textexporter.cpp \
     textshapeitem.cpp \
-    timeprofiler.cpp
+    timeprofiler.cpp \
+    standardpaths.cpp
 
 RESOURCES += \
     scrite.qrc
