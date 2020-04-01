@@ -31,6 +31,16 @@ public:
     ScriteDocument(QObject *parent = nullptr);
     ~ScriteDocument();
 
+    Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)
+    void setAutoSaveDurationInSeconds(int val);
+    int autoSaveDurationInSeconds() const { return m_autoSaveDurationInSeconds; }
+    Q_SIGNAL void autoSaveDurationInSecondsChanged();
+
+    Q_PROPERTY(bool autoSave READ isAutoSave WRITE setAutoSave NOTIFY autoSaveChanged STORED false)
+    void setAutoSave(bool val);
+    bool isAutoSave() const { return m_autoSave; }
+    Q_SIGNAL void autoSaveChanged();
+
     Q_PROPERTY(QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
@@ -80,6 +90,7 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
+    void prepareAutoSave();
     void updateDocumentWindowTitle();
     void setDocumentWindowTitle(const QString &val);
     void setStructure(Structure* val);
@@ -95,6 +106,9 @@ private:
     void screenplayElementIndexChanged();
 
 private:
+    bool m_autoSave;
+    int m_autoSaveDurationInSeconds;
+    QBasicTimer m_autoSaveTimer;
     Screenplay* m_screenplay;
     Structure* m_structure;
     ScreenplayFormat* m_formatting;

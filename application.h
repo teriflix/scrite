@@ -25,6 +25,7 @@
 #include "errorreport.h"
 
 typedef QApplication QtApplicationClass;
+class QSettings;
 
 class Application : public QtApplicationClass
 {
@@ -69,10 +70,13 @@ public:
     Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
     Q_INVOKABLE QJsonObject fileInfo(const QString &path) const;
 
+    QSettings *settings() const { return m_settings; }
+
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
 
 private:
+    QSettings *m_settings;
     ErrorReport *m_errorReport;
     QString m_baseWindowTitle;
     QVersionNumber m_versionNumber;

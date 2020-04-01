@@ -22,8 +22,10 @@
 #include "aggregation.h"
 #include "qobjectfactory.h"
 #include "hourglass.h"
+#include "logger.h"
 
 #include <QFileInfo>
+#include <QSettings>
 #include <QJsonDocument>
 
 class DeviceIOFactories
@@ -56,6 +58,8 @@ static DeviceIOFactories deviceIOFactories;
 
 ScriteDocument::ScriteDocument(QObject *parent)
                 :QObject(parent),
+                  m_autoSave(true),
+                  m_autoSaveDurationInSeconds(60),
                   m_screenplay(nullptr),
                   m_structure(nullptr),
                   m_formatting(nullptr),
@@ -67,11 +71,44 @@ ScriteDocument::ScriteDocument(QObject *parent)
     this->updateDocumentWindowTitle();
     connect(this, &ScriteDocument::modifiedChanged, this, &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged, this, &ScriteDocument::updateDocumentWindowTitle);
+
+    const QVariant ase = Application::instance()->settings()->value("AutoSave/autoSaveEnabled");
+    this->setAutoSave( ase.isValid() ? ase.toBool() : m_autoSave );
+
+    const QVariant asd = Application::instance()->settings()->value("AutoSave/autoSaveInterval");
+    this->setAutoSaveDurationInSeconds( asd.isValid() ? asd.toInt() : m_autoSaveDurationInSeconds );
+
+    this->prepareAutoSave();
 }
 
 ScriteDocument::~ScriteDocument()
 {
 
+}
+
+void ScriteDocument::setAutoSaveDurationInSeconds(int val)
+{
+    val = qBound(1, val, 3600);
+    if(m_autoSaveDurationInSeconds == val)
+        return;
+
+    m_autoSaveDurationInSeconds = val;
+    Application::instance()->settings()->setValue("AutoSave/autoSaveInterval", val);
+    emit autoSaveDurationInSecondsChanged();
+
+    Logger::qtPropertyInfo(this, "autoSaveDurationInSeconds");
+}
+
+void ScriteDocument::setAutoSave(bool val)
+{
+    if(m_autoSave == val)
+        return;
+
+    m_autoSave = val;
+    Application::instance()->settings()->setValue("AutoSave/autoSaveEnabled", val);
+    emit autoSaveChanged();
+
+    Logger::qtPropertyInfo(this, "autoSave");
 }
 
 void ScriteDocument::reset()
@@ -276,7 +313,22 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
         return;
     }
 
+    if(event->timerId() == m_autoSaveTimer.timerId())
+    {
+        if(m_modified && !m_fileName.isEmpty())
+        {
+            Logger::qtInfo(this, QString("Auto saving to %1").arg(m_fileName));
+            this->save();
+        }
+    }
+
     QObject::timerEvent(event);
+}
+
+void ScriteDocument::prepareAutoSave()
+{
+    if(m_autoSave)
+        m_autoSaveTimer.start(m_autoSaveDurationInSeconds*1000, this);
 }
 
 void ScriteDocument::updateDocumentWindowTitle()

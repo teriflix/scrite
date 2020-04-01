@@ -40,6 +40,7 @@ Item {
             ListElement { name: "Parenthetical"; group: "Formatting"; elementType: SceneElement.Parenthetical }
             ListElement { name: "Shot"; group: "Formatting"; elementType: SceneElement.Shot }
             ListElement { name: "Transition"; group: "Formatting"; elementType: SceneElement.Transition }
+            ListElement { name: "Settings"; group: "Application"; }
         }
 
         ListView {
@@ -88,7 +89,15 @@ Item {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             active: pageList.currentIndex >= 0
-            sourceComponent: pageList.currentIndex === 0 ? screenplayOptionsComponent : elementFormatOptionsComponent
+            sourceComponent: {
+                if(pageList.currentIndex >= 1 && pageList.currentIndex <= 7)
+                    return elementFormatOptionsComponent
+
+                switch(pageList.currentIndex) {
+                case 0: return screenplayOptionsComponent
+                case 8: return applicationSettingsComponent
+                }
+            }
         }
 
     }
@@ -519,6 +528,47 @@ Item {
                             text: format.bottomMargin
                             validator: IntValidator { top: 100; bottom: 0 }
                             onTextChanged: format.bottomMargin = parseInt(text)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: applicationSettingsComponent
+
+        Item {
+            Column {
+                width: parent.width * 0.8
+                spacing: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                GroupBox {
+                    width: parent.width
+                    label: CheckBox {
+                        text: "Enable AutoSave"
+                        checked: scriteDocument.autoSave
+                        onToggled: scriteDocument.autoSave = checked
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: 10
+                        enabled: scriteDocument.autoSave
+
+                        Text {
+                            width: parent.width
+                            text: "Auto Save Interval (in seconds)"
+                        }
+
+                        TextField {
+                            width: parent.width
+                            text: scriteDocument.autoSaveDurationInSeconds
+                            validator: IntValidator {
+                                bottom: 1; top: 3600
+                            }
+                            onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
                         }
                     }
                 }

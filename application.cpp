@@ -15,6 +15,7 @@
 
 #include <QDir>
 #include <QProcess>
+#include <QSettings>
 #include <QFileInfo>
 #include <QMetaEnum>
 #include <QJsonArray>
@@ -35,6 +36,9 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
       m_versionNumber(version)
 {
     this->setBaseWindowTitle("scrite - build your screenplay");
+
+    const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
+    m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
 }
 
 Application::~Application()
