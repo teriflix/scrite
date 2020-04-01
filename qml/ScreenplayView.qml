@@ -16,6 +16,7 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Rectangle {
+    id: screenplayView
     signal requestEditor()
 
     color: Qt.tint("#8c9cb1", "#40FFFFFF")
@@ -32,6 +33,53 @@ Rectangle {
         }
     }
 
+    Item {
+        id: screenplayTools
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.margins: 1
+        width: screenplayToolsLayout.width + 20
+        z: 1
+
+        Rectangle {
+            width: parent.height
+            height: parent.width
+            anchors.centerIn: parent
+            transformOrigin: Item.Center
+            rotation: -90
+            gradient: Gradient {
+                GradientStop { position: 0; color: "#FF8c9cb1" }
+                GradientStop { position: 1; color: "#008c9cb1" }
+            }
+        }
+
+        Column {
+            id: screenplayToolsLayout
+            width: 40
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: 5
+
+            ToolButton2 {
+                icon.source: "../icons/content/clear_all.png"
+                suggestedWidth: parent.width; suggestedHeight: parent.width
+                ToolTip.text: "Clear the screenplay, while retaining the scenes."
+                onClicked: {
+                    askQuestion({
+                                    "question": "Are you sure you want to clear the screenplay?",
+                                    "okButtonText": "Yes",
+                                    "cancelButtonText": "No",
+                                    "callback": function(val) {
+                                        if(val)
+                                            scriteDocument.screenplay.clearElements()
+                                    }
+                                }, this)
+                }
+            }
+        }
+    }
+
     ListView {
         id: screenplayElementList
         anchors.fill: parent
@@ -40,6 +88,11 @@ Rectangle {
         property real idealDelegateWidth: 100
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
+        header: Item {
+            height: screenplayElementList.height
+            width: screenplayTools.width
+        }
+
         footer: Item {
             property bool highlightAsDropArea: false
             property real normalWidth: screenplayElementList.idealDelegateWidth * zoomLevel

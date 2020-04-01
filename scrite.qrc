@@ -49,5 +49,7 @@
         <file>qml/OptionsDialog.qml</file>
         <file>qml/AboutBox.qml</file>
         <file>qml/NotificationsView.qml</file>
+        <file>icons/content/clear_all.png</file>
+        <file>icons/content/clear_all_inverted.png</file>
     </qresource>
 </RCC>

@@ -20,7 +20,7 @@ ToolButton {
     property real suggestedWidth: 120
     property real suggestedHeight: 50
     property string shortcut
-    property string shortcutText: shortcuts
+    property string shortcutText: shortcut
 
     font.pixelSize: 16
     hoverEnabled: true
