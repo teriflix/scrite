@@ -138,6 +138,8 @@ Item {
                 width: sceneTextArea.cursorRectangle.width
                 height: sceneTextArea.cursorRectangle.height
                 visible: sceneTextArea.activeFocus
+                ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="gray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
+                ToolTip.visible: completer.hasSuggestion
 
                 Rectangle {
                     id: blinkingCursor
@@ -167,13 +169,6 @@ Item {
                             to: 0
                         }
                     }
-                }
-
-                Text {
-                    anchors.verticalCenter: blinkingCursor.verticalCenter
-                    font: sceneDocumentBinder.currentFont
-                    text: completer.suggestion
-                    opacity: 0.4
                 }
             }
             onActiveFocusChanged: {

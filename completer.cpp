@@ -13,7 +13,9 @@
 
 #include "completer.h"
 
+#include <QtDebug>
 #include <QStringListModel>
+#include <QEvent>
 
 Completer::Completer(QObject *parent)
           :QCompleter(parent),
@@ -27,10 +29,10 @@ Completer::Completer(QObject *parent)
     this->setModel(m_stringsModel);
 
     QAbstractItemModel *cmodel = this->completionModel();
-    connect(cmodel, &QAbstractItemModel::rowsInserted, this, &Completer::suggestionChanged);
-    connect(cmodel, &QAbstractItemModel::rowsRemoved, this, &Completer::suggestionChanged);
-    connect(cmodel, &QAbstractItemModel::modelReset, this, &Completer::suggestionChanged);
-    connect(cmodel, &QAbstractItemModel::dataChanged, this, &Completer::suggestionChanged);
+    connect(cmodel, &QAbstractItemModel::rowsInserted, this, &Completer::updateSuggestionLater);
+    connect(cmodel, &QAbstractItemModel::rowsRemoved, this, &Completer::updateSuggestionLater);
+    connect(cmodel, &QAbstractItemModel::modelReset, this, &Completer::updateSuggestionLater);
+    connect(cmodel, &QAbstractItemModel::dataChanged, this, &Completer::updateSuggestionLater);
 }
 
 Completer::~Completer()
@@ -59,18 +61,40 @@ void Completer::setSuggestionMode(Completer::SuggestionMode val)
     emit suggestionChanged();
 }
 
-QString Completer::suggestion() const
+void Completer::timerEvent(QTimerEvent *te)
+{
+    if(m_updateSuggestionTimer.timerId() == te->timerId())
+    {
+        this->updateSuggestion();
+        m_updateSuggestionTimer.stop();
+    }
+
+    QObject::timerEvent(te);
+}
+
+void Completer::updateSuggestion()
 {
     const QAbstractItemModel *cmodel = this->completionModel();
     const int rows = cmodel->rowCount();
-    if(rows == 0)
-        return QString();
+    QString val;
 
-    const QModelIndex index = cmodel->index(0, 0);
+    if(rows > 0)
+    {
+        const QModelIndex index = cmodel->index(0, 0);
 
-    QString ret = index.data(Qt::DisplayRole).toString();
-    if(m_suggestionMode == AutoCompleteSuggestion)
-        ret = ret.remove(0, this->completionPrefix().length());
+        val = index.data(Qt::DisplayRole).toString();
+        if(m_suggestionMode == AutoCompleteSuggestion)
+            val = val.remove(0, this->completionPrefix().length());
+    }
 
-    return ret;
+    if(m_suggestion == val)
+        return;
+
+    m_suggestion = val;
+    emit suggestionChanged();
+}
+
+void Completer::updateSuggestionLater()
+{
+    m_updateSuggestionTimer.start(0, this);
 }

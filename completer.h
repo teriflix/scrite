@@ -14,6 +14,7 @@
 #ifndef COMPLETER_H
 #define COMPLETER_H
 
+#include <QBasicTimer>
 #include <QCompleter>
 
 class QStringListModel;
@@ -33,21 +34,33 @@ public:
     // model() method is available in parent class.
     Q_PROPERTY(QAbstractItemModel* completionModel READ completionModel CONSTANT)
 
-    enum SuggestionMode { CompleteSuttion, AutoCompleteSuggestion };
+    enum SuggestionMode { CompleteSuggestion, AutoCompleteSuggestion };
     Q_ENUM(SuggestionMode)
     Q_PROPERTY(SuggestionMode suggestionMode READ suggestionMode WRITE setSuggestionMode NOTIFY suggestionModeChanged)
     void setSuggestionMode(SuggestionMode val);
     SuggestionMode suggestionMode() const { return m_suggestionMode; }
     Q_SIGNAL void suggestionModeChanged();
 
+    Q_PROPERTY(bool hasSuggestion READ hasSuggestion NOTIFY suggestionChanged)
+    bool hasSuggestion() const { return !m_suggestion.isEmpty(); }
+
     Q_PROPERTY(QString suggestion READ suggestion NOTIFY suggestionChanged)
-    QString suggestion() const;
+    QString suggestion() const { return m_suggestion; }
     Q_SIGNAL void suggestionChanged();
 
+protected:
+    void timerEvent(QTimerEvent *te);
+
 private:
+    void updateSuggestion();
+    void updateSuggestionLater();
+
+private:
+    QString m_suggestion;
     QStringList m_strings;
     SuggestionMode m_suggestionMode;
     QStringListModel *m_stringsModel;
+    QBasicTimer m_updateSuggestionTimer;
 };
 
 #endif // COMPLETER_H
