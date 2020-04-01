@@ -114,6 +114,8 @@ Item {
             background: Rectangle {
                 color: backgroundColor
             }
+            selectByMouse: true
+            selectByKeyboard: true
             EventFilter.events: [31] // Wheel
             EventFilter.onFilter: {
                 result.acceptEvent = false
