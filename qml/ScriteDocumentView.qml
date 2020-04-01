@@ -142,11 +142,12 @@ Item {
                                 title: "Recent Files"
 
                                 Repeater {
-                                    model: recentFilesMenu.recentFiles.reverse()
+                                    model: recentFilesMenu.recentFiles
 
                                     MenuItem {
-                                        text: "" + (index+1) + ". " + app.fileInfo(modelData).fileName
-                                        onClicked: fileOpenButton.doOpen(modelData)
+                                        property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
+                                        text: "" + (index+1) + ". " + app.fileInfo(filePath).fileName
+                                        onClicked: fileOpenButton.doOpen(filePath)
                                     }
                                 }
                             }

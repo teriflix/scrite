@@ -227,6 +227,10 @@ public:
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
 
+    Q_PROPERTY(QFont currentFont READ currentFont NOTIFY currentFontChanged)
+    QFont currentFont() const;
+    Q_SIGNAL void currentFontChanged();
+
     Q_SIGNAL void documentInitialized();
 
 protected:

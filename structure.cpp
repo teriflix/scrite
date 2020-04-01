@@ -1008,7 +1008,7 @@ QPainterPath StructureElementConnector::shape() const
     QPointF p1, p2;
     Qt::Edge e1, e2;
 
-    if(r2.right() < r1.left())
+    if(r2.center().x() < r1.left())
     {
         p1 = QLineF(r1.topLeft(), r1.bottomLeft()).center();
         e1 = Qt::LeftEdge;
@@ -1029,7 +1029,7 @@ QPainterPath StructureElementConnector::shape() const
             e2 = Qt::RightEdge;
         }
     }
-    else if(r2.left() > r1.right())
+    else if(r2.center().x() > r1.right())
     {
         p1 = QLineF(r1.topRight(), r1.bottomRight()).center();
         e1 = Qt::RightEdge;

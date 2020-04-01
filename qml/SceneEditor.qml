@@ -91,11 +91,9 @@ Item {
         ScrollView {
             id: scrollView
 
-            Loader {
-                width: scrollView.width
-                height: Math.max(scrollView.height, item.contentHeight)
-                sourceComponent: sceneContentEditorComponent
-                active: true
+            Repeater {
+                model: 1
+                delegate: sceneContentEditorComponent
             }
 
             Component.onCompleted: {
@@ -120,6 +118,20 @@ Item {
             EventFilter.onFilter: {
                 result.acceptEvent = false
                 result.filter = !scrollable
+            }
+
+            Completer {
+                id: completer
+                strings: sceneDocumentBinder.autoCompleteHints
+                completionPrefix: sceneDocumentBinder.completionPrefix
+            }
+
+            Keys.onReturnPressed: {
+                if(completer.suggestion !== "") {
+                    insert(cursorPosition, completer.suggestion)
+                    event.accepted = true
+                } else
+                    event.accepted = false
             }
 
             cursorDelegate: Item {
@@ -157,43 +169,11 @@ Item {
                     }
                 }
 
-                // TODO: Lets come back to this auto-complete bit later.
-                // I am feeling a bit stumped with this feature at this point.
-                Loader {
-                    anchors.top: blinkingCursor.bottom
-                    anchors.left: parent.left
-                    active: false // sceneDocumentBinder.autoCompleteHints.length > 0
-                    sourceComponent: Rectangle {
-                        id: completionListViewPopup
-                        width: completionListView.width + 10
-                        height: completionListView.height + 10
-                        visible: true
-                        focus: false
-                        color: "white"
-                        border { width: 1; color: "black" }
-                        radius: 2
-
-                        property SceneElementFormat format: scriteDocument.formatting.elementFormat(sceneDocumentBinder.currentElement.type)
-
-                        Completer {
-                            id: completer
-                            strings: sceneDocumentBinder.autoCompleteHints
-                            completionPrefix: sceneDocumentBinder.completionPrefix
-                        }
-
-                        Column {
-                            id: completionListView
-                            anchors.centerIn: parent
-                            spacing: 5
-                            Repeater {
-                                model: completer.completionModel
-                                delegate: Text {
-                                    text: display
-                                    font: format.font
-                                }
-                            }
-                        }
-                    }
+                Text {
+                    anchors.verticalCenter: blinkingCursor.verticalCenter
+                    font: sceneDocumentBinder.currentFont
+                    text: completer.suggestion
+                    opacity: 0.4
                 }
             }
             onActiveFocusChanged: {

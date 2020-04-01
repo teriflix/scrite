@@ -33,8 +33,20 @@ public:
     // model() method is available in parent class.
     Q_PROPERTY(QAbstractItemModel* completionModel READ completionModel CONSTANT)
 
+    enum SuggestionMode { CompleteSuttion, AutoCompleteSuggestion };
+    Q_ENUM(SuggestionMode)
+    Q_PROPERTY(SuggestionMode suggestionMode READ suggestionMode WRITE setSuggestionMode NOTIFY suggestionModeChanged)
+    void setSuggestionMode(SuggestionMode val);
+    SuggestionMode suggestionMode() const { return m_suggestionMode; }
+    Q_SIGNAL void suggestionModeChanged();
+
+    Q_PROPERTY(QString suggestion READ suggestion NOTIFY suggestionChanged)
+    QString suggestion() const;
+    Q_SIGNAL void suggestionChanged();
+
 private:
     QStringList m_strings;
+    SuggestionMode m_suggestionMode;
     QStringListModel *m_stringsModel;
 };
 

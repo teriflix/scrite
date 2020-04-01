@@ -225,7 +225,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
     m_elementFormats[SceneElement::Dialogue]->setTextAlignment(Qt::AlignJustify);
     m_elementFormats[SceneElement::Dialogue]->setTopMargin(0);
 
-    m_elementFormats[SceneElement::Parenthetical]->setBlockWidth(0.6);
+    m_elementFormats[SceneElement::Parenthetical]->setBlockWidth(0.5);
     m_elementFormats[SceneElement::Parenthetical]->setTextAlignment(Qt::AlignHCenter);
     m_elementFormats[SceneElement::Parenthetical]->fontRef().setItalic(true);
     m_elementFormats[SceneElement::Parenthetical]->setTopMargin(0);
@@ -560,6 +560,18 @@ void SceneDocumentBinder::backtab()
     // Do nothing. It doesnt work anyway!
 }
 
+QFont SceneDocumentBinder::currentFont() const
+{
+    if(this->document() == nullptr)
+        return QFont();
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(m_cursorPosition);
+
+    QTextCharFormat format = cursor.charFormat();
+    return format.font();
+}
+
 void SceneDocumentBinder::highlightBlock(const QString &text)
 {
     Q_UNUSED(text)
@@ -601,6 +613,9 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.setCharFormat(chrFormat);
+
+    if(m_currentElement == element)
+        emit currentFontChanged();
 }
 
 void SceneDocumentBinder::timerEvent(QTimerEvent *te)
@@ -662,6 +677,8 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
 
     m_tabHistory.clear();
     this->evaluateAutoCompleteHints();
+
+    emit currentFontChanged();
 }
 
 void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type)

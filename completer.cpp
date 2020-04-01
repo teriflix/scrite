@@ -16,7 +16,8 @@
 #include <QStringListModel>
 
 Completer::Completer(QObject *parent)
-          :QCompleter(parent)
+          :QCompleter(parent),
+           m_suggestionMode(AutoCompleteSuggestion)
 {
     this->setCompletionMode(QCompleter::PopupCompletion);
     this->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
@@ -24,6 +25,12 @@ Completer::Completer(QObject *parent)
 
     m_stringsModel = new QStringListModel(this);
     this->setModel(m_stringsModel);
+
+    QAbstractItemModel *cmodel = this->completionModel();
+    connect(cmodel, &QAbstractItemModel::rowsInserted, this, &Completer::suggestionChanged);
+    connect(cmodel, &QAbstractItemModel::rowsRemoved, this, &Completer::suggestionChanged);
+    connect(cmodel, &QAbstractItemModel::modelReset, this, &Completer::suggestionChanged);
+    connect(cmodel, &QAbstractItemModel::dataChanged, this, &Completer::suggestionChanged);
 }
 
 Completer::~Completer()
@@ -40,4 +47,30 @@ void Completer::setStrings(const QStringList &val)
     m_stringsModel->setStringList(m_strings);
 
     emit stringsChanged();
+}
+
+void Completer::setSuggestionMode(Completer::SuggestionMode val)
+{
+    if(m_suggestionMode == val)
+        return;
+
+    m_suggestionMode = val;
+    emit suggestionModeChanged();
+    emit suggestionChanged();
+}
+
+QString Completer::suggestion() const
+{
+    const QAbstractItemModel *cmodel = this->completionModel();
+    const int rows = cmodel->rowCount();
+    if(rows == 0)
+        return QString();
+
+    const QModelIndex index = cmodel->index(0, 0);
+
+    QString ret = index.data(Qt::DisplayRole).toString();
+    if(m_suggestionMode == AutoCompleteSuggestion)
+        ret = ret.remove(0, this->completionPrefix().length());
+
+    return ret;
 }
