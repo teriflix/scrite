@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "logger.h"
 #include "formatting.h"
 #include "application.h"
 #include "scritedocument.h"
@@ -18,6 +19,7 @@
 #include "qobjectserializer.h"
 
 #include <QPointer>
+#include <QMetaEnum>
 #include <QTextCursor>
 #include <QTextBlockUserData>
 
@@ -332,11 +334,14 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_scene(nullptr),
       m_textWidth(0),
       m_cursorPosition(-1),
+      m_transliterator(nullptr),
       m_forceSyncDocument(false),
       m_initializingDocument(false),
       m_currentElement(nullptr),
       m_textDocument(nullptr),
-      m_screenplayFormat(nullptr)
+      m_screenplayFormat(nullptr),
+      m_transliterationMode(SuggestionMode),
+      m_transliterationLanguage(English)
 {
 
 }
@@ -399,6 +404,8 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     {
         disconnect( this->document(), &QTextDocument::contentsChange,
                     this, &SceneDocumentBinder::onContentsChange);
+        disconnect( this->document(), &QTextDocument::contentsChange,
+                    this, &SceneDocumentBinder::processTransliteration);
         disconnect( this->document(), &QTextDocument::blockCountChanged,
                     this, &SceneDocumentBinder::syncSceneFromDocument);
 
@@ -425,6 +432,8 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     {
         connect(this->document(), &QTextDocument::contentsChange,
                 this, &SceneDocumentBinder::onContentsChange);
+        connect(this->document(), &QTextDocument::contentsChange,
+                this, &SceneDocumentBinder::processTransliteration);
         connect(this->document(), &QTextDocument::blockCountChanged,
                     this, &SceneDocumentBinder::syncSceneFromDocument);
 
@@ -570,6 +579,48 @@ QFont SceneDocumentBinder::currentFont() const
 
     QTextCharFormat format = cursor.charFormat();
     return format.font();
+}
+
+void SceneDocumentBinder::setTransliterationLanguage(SceneDocumentBinder::TransliterationLanguage val)
+{
+    if(m_transliterationLanguage == val)
+        return;
+
+    m_transliterator = nullptr; // Fetch it fresh, when required
+    m_transliterationLanguage = val;
+    emit transliterationLanguageChanged();
+}
+
+QString SceneDocumentBinder::transliterationLanguageAsString() const
+{
+    const QMetaObject *mo = this->metaObject();
+    const QMetaEnum metaEnum = mo->enumerator(mo->indexOfEnumerator("TransliterationLanguage"));
+    return QString::fromLatin1( metaEnum.key(m_transliterationLanguage) );
+}
+
+QString SceneDocumentBinder::transliterationLanguageAsMenuItemText(SceneDocumentBinder::TransliterationLanguage language) const
+{
+    if(language == Tamil)
+        return QString("Tami&l");
+
+    const QMetaObject *mo = this->metaObject();
+    const QMetaEnum metaEnum = mo->enumerator(mo->indexOfEnumerator("TransliterationLanguage"));
+    return "&" + QString::fromLatin1( metaEnum.key(language) );
+}
+
+void SceneDocumentBinder::setTransliterationMode(SceneDocumentBinder::TransliterationMode val)
+{
+    if(m_transliterationMode == val)
+        return;
+
+    m_transliterationMode = val;
+    emit transliterationModeChanged();
+}
+
+void SceneDocumentBinder::transliterate(int from, int to)
+{
+    Q_UNUSED(from)
+    Q_UNUSED(to)
 }
 
 void SceneDocumentBinder::highlightBlock(const QString &text)
@@ -930,4 +981,118 @@ void SceneDocumentBinder::setCompletionPrefix(const QString &val)
 
     m_completionPrefix = val;
     emit completionPrefixChanged();
+}
+
+void SceneDocumentBinder::processTransliteration(int from, int charsRemoved, int charsAdded)
+{
+    if(this->document() == nullptr)
+        return;
+
+    if(m_transliterationLanguage == English)
+        return; // We dont need English -> English transliteration
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(from);
+    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
+
+    const QString original = cursor.selectedText();
+
+    if(charsAdded == 1)
+    {
+        // Check if the char that was added was a space.
+        if(original.length() == 1 && !original.at(0).isLetter())
+        {
+            // Select the word that is just before the cursor.
+            cursor.setPosition(from);
+            cursor.movePosition(QTextCursor::PreviousWord, QTextCursor::MoveAnchor, 1);
+            cursor.movePosition(QTextCursor::NextWord, QTextCursor::KeepAnchor, 1);
+            this->transliterate(cursor);
+            return;
+        }
+    }
+    else
+    {
+        // Transliterate all the words that was just added.
+        this->transliterate(cursor);
+    }
+}
+
+#include <PhTranslateLib>
+
+void SceneDocumentBinder::transliterate(QTextCursor &cursor)
+{
+    if(m_transliterationLanguage == English)
+        return; // We dont need English -> English transliteration
+
+    switch(m_transliterationLanguage)
+    {
+    case English:
+        m_transliterator = nullptr;
+        break;
+    case Bengali:
+        m_transliterator = GetBengaliTranslator();
+        break;
+    case Gujarati:
+        m_transliterator = GetGujaratiTranslator();
+        break;
+    case Hindi:
+        m_transliterator = GetHindiTranslator();
+        break;
+    case Kannada:
+        m_transliterator = GetKannadaTranslator();
+        break;
+    case Malayalam:
+        m_transliterator = GetMalayalamTranslator();
+        break;
+    case Oriya:
+        m_transliterator = GetOriyaTranslator();
+        break;
+    case Punjabi:
+        m_transliterator = GetPunjabiTranslator();
+        break;
+    case Sanskrit:
+        m_transliterator = GetSanskritTranslator();
+        break;
+    case Tamil:
+        m_transliterator = GetTamilTranslator();
+        break;
+    case Telugu:
+        m_transliterator = GetTeluguTranslator();
+        break;
+    }
+
+    if(m_transliterator == nullptr)
+    {
+        Logger::qtInfo(this, QString("Could not fetch transliterator for language: %1").arg(m_transliterationLanguage));
+        return;
+    }
+
+    const QString original = cursor.selectedText();
+    QString replacement;
+    QString word;
+
+    auto transliteratedWord = [this](const QString &word) {
+        return QString::fromStdWString(Translate(m_transliterator, word.toStdWString().c_str()));
+    };
+
+    for(int i=0; i<original.length(); i++)
+    {
+        const QChar ch = original.at(i);
+        if(ch.isLetter())
+            word += ch;
+        else
+        {
+            replacement += transliteratedWord(word);
+            replacement += ch;
+            word.clear();
+        }
+    }
+
+    if(!word.isEmpty())
+        replacement += transliteratedWord(word);
+
+    if(m_transliterationMode == AutomaticMode)
+        cursor.insertText(replacement);
+    else
+        emit transliterationSuggestion(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
 }

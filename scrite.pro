@@ -1,7 +1,14 @@
 QT += gui qml quick widgets xml
 DESTDIR = $$PWD/../Release/
 
+DEFINES += PHTRANSLATE_STATICLIB
+
 HEADERS += \
+    3rdparty/phtranslator/LanguageCodes.h \
+    3rdparty/phtranslator/PhTranslateLib.h \
+    3rdparty/phtranslator/PhTranslator.h \
+    3rdparty/phtranslator/stdafx.h \
+    3rdparty/phtranslator/targetver.h \
     abstractdeviceio.h \
     abstractexporter.h \
     abstractimporter.h \
@@ -44,6 +51,9 @@ HEADERS += \
     standardpaths.h
 
 SOURCES += \
+    3rdparty/phtranslator/PhTranslateLib.cpp \
+    3rdparty/phtranslator/PhTranslator.cpp \
+    3rdparty/phtranslator/stdafx.cpp \
     abstractdeviceio.cpp \
     abstractexporter.cpp \
     abstractimporter.cpp \

@@ -69,6 +69,23 @@ Item {
             characterNames: scriteDocument.structure.characterNames
             onDocumentInitialized: sceneContentEditor.cursorPosition = 0
             forceSyncDocument: !sceneContentEditor.activeFocus
+            transliterationMode: SceneDocumentBinder.AutomaticMode
+        }
+
+        Repeater {
+            model: app.enumerationModel(sceneDocumentBinder, "TransliterationLanguage")
+
+            Item {
+                property string baseText: binder.transliterationLanguageAsMenuItemText(modelData.value)
+                property string shortcutKey: baseText[baseText.indexOf('&')+1].toUpperCase()
+
+                Shortcut {
+                    autoRepeat: false
+                    context: Qt.ApplicationShortcut
+                    sequence: "Ctrl+Alt+"+shortcutKey
+                    onActivated: binder.transliterationLanguage = modelData.value
+                }
+            }
         }
 
         Loader {
@@ -128,14 +145,6 @@ Item {
                 completionPrefix: sceneDocumentBinder.completionPrefix
             }
 
-            Keys.onReturnPressed: {
-                if(completer.suggestion !== "") {
-                    insert(cursorPosition, completer.suggestion)
-                    event.accepted = true
-                } else
-                    event.accepted = false
-            }
-
             cursorDelegate: Item {
                 width: sceneTextArea.cursorRectangle.width
                 height: sceneTextArea.cursorRectangle.height
@@ -177,7 +186,20 @@ Item {
                 if(activeFocus)
                     sceneHeadingLoader.viewOnly = true
             }
-            Keys.onTabPressed: sceneDocumentBinder.tab()
+            Keys.onReturnPressed: {
+                if(completer.suggestion !== "") {
+                    insert(cursorPosition, completer.suggestion)
+                    event.accepted = true
+                } else
+                    event.accepted = false
+            }
+            Keys.onTabPressed: {
+                if(completer.suggestion !== "") {
+                    insert(cursorPosition, completer.suggestion)
+                    event.accepted = true
+                } else
+                    sceneDocumentBinder.tab()
+            }
             Keys.onBackPressed: sceneDocumentBinder.backtab()
         }
     }

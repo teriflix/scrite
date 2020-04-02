@@ -52,7 +52,22 @@ Item {
             wrapMode: Text.WordWrap
             font.pixelSize: 14
             horizontalAlignment: Text.AlignHCenter
-            text: "Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd.\nDeveloped using Qt " + app.qtVersion
+            text: "Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd.\n" +
+                  "Developed using Qt " + app.qtVersion;
+        }
+
+        Text {
+            width: parent.width
+            wrapMode: Text.WordWrap
+            font.pixelSize: 14
+            horizontalAlignment: Text.AlignHCenter
+            text: "Using <strong>PhoneticTranslator</strong> for transliteration support.<br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
+            }
         }
 
         Button {

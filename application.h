@@ -48,7 +48,10 @@ public:
     Q_PROPERTY(QString controlKey READ controlKey CONSTANT)
     QString controlKey() const;
 
-    Q_INVOKABLE QString polishShortcutTextForDispaly(const QString &text) const;
+    Q_PROPERTY(QString altKey READ altKey CONSTANT)
+    QString altKey() const;
+
+    Q_INVOKABLE QString polishShortcutTextForDisplay(const QString &text) const;
 
     Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY baseWindowTitleChanged)
     void setBaseWindowTitle(const QString &val);

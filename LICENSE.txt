@@ -5,6 +5,9 @@ under this license, except for
 1. poly2tri: the license terms can be found below.
 2. images/teriflix_logo.png: All rights to this image rest with TERIFLIX Entertainment
    Spaces Pvt. Ltd. (https://www.teriflix.com)
+3. 3rdparty/phtranslator: This library is provided under LGPLv2 and is used as a
+   statically linked library in this project. For more information about this project
+   please visit: https://sourceforge.net/projects/phtranslator/
 
 The contents of 'poly2tri' folder are available under the following license
 

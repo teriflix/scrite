@@ -70,10 +70,16 @@ QString Application::controlKey() const
     return this->platform() == Application::MacOS ? "⌘" : "Ctrl";
 }
 
-QString Application::polishShortcutTextForDispaly(const QString &text) const
+QString Application::altKey() const
+{
+    return this->platform() == Application::MacOS ? "⌥" : "Alt";
+}
+
+QString Application::polishShortcutTextForDisplay(const QString &text) const
 {
     QString text2 = text;
     text2.replace("Ctrl", this->controlKey(), Qt::CaseInsensitive);
+    text2.replace("Alt", this->altKey(), Qt::CaseInsensitive);
     return text2;
 }
 

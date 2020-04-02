@@ -234,8 +234,8 @@ Item {
                 ToolButton2 {
                     icon.source: "../icons/file/file_upload.png"
                     text: "Export"
-                    shortcut: "Ctrl+Shift+E"
-                    shortcutText: "Shift+E"
+                    shortcut: "Ctrl+Shift+X"
+                    shortcutText: "Shift+X"
                     down: exportMenu.visible
                     onClicked: exportMenu.visible = true
 

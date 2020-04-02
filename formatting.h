@@ -231,6 +231,47 @@ public:
     QFont currentFont() const;
     Q_SIGNAL void currentFontChanged();
 
+    enum TransliterationLanguage
+    {
+        English,
+        Bengali,
+        Gujarati,
+        Hindi,
+        Kannada,
+        Malayalam,
+        Oriya,
+        Punjabi,
+        Sanskrit,
+        Tamil,
+        Telugu
+    };
+    Q_ENUM(TransliterationLanguage)
+    Q_PROPERTY(TransliterationLanguage transliterationLanguage READ transliterationLanguage WRITE setTransliterationLanguage NOTIFY transliterationLanguageChanged)
+    void setTransliterationLanguage(TransliterationLanguage val);
+    TransliterationLanguage transliterationLanguage() const { return m_transliterationLanguage; }
+    Q_SIGNAL void transliterationLanguageChanged();
+
+    Q_PROPERTY(QString transliterationLanguageAsString READ transliterationLanguageAsString NOTIFY transliterationLanguageChanged)
+    QString transliterationLanguageAsString() const;
+    Q_SIGNAL void transliterationLanguageAsStringChanged();
+
+    Q_INVOKABLE QString transliterationLanguageAsMenuItemText(TransliterationLanguage language) const;
+
+    enum TransliterationMode
+    {
+        AutomaticMode,
+        SuggestionMode
+    };
+    Q_ENUM(TransliterationMode)
+    Q_PROPERTY(TransliterationMode transliterationMode READ transliterationMode WRITE setTransliterationMode NOTIFY transliterationModeChanged)
+    void setTransliterationMode(TransliterationMode val);
+    TransliterationMode transliterationMode() const { return m_transliterationMode; }
+    Q_SIGNAL void transliterationModeChanged();
+
+    Q_INVOKABLE void transliterate(int from, int to);
+
+    Q_SIGNAL void transliterationSuggestion(int from, int to, const QString &replacement, const QString &original);
+
     Q_SIGNAL void documentInitialized();
 
 protected:
@@ -252,10 +293,14 @@ private:
     void setAutoCompleteHints(const QStringList &val);
     void setCompletionPrefix(const QString &val);
 
+    void processTransliteration(int from, int charsRemoved, int charsAdded);
+    void transliterate(QTextCursor &cursor);
+
 private:
     Scene* m_scene;
     qreal m_textWidth;
     int m_cursorPosition;
+    void *m_transliterator;
     bool m_forceSyncDocument;
     QString m_completionPrefix;
     bool m_initializingDocument;
@@ -266,6 +311,8 @@ private:
     ScreenplayFormat* m_screenplayFormat;
     QBasicTimer m_initializeDocumentTimer;
     QList<SceneElement::Type> m_tabHistory;
+    TransliterationMode m_transliterationMode;
+    TransliterationLanguage m_transliterationLanguage;
 };
 
 #endif // FORMATTING_H

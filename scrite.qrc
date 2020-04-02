@@ -51,5 +51,7 @@
         <file>qml/NotificationsView.qml</file>
         <file>icons/content/clear_all.png</file>
         <file>icons/content/clear_all_inverted.png</file>
+        <file>icons/content/language_inverted.png</file>
+        <file>icons/content/language.png</file>
     </qresource>
 </RCC>
