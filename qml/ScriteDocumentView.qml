@@ -506,7 +506,9 @@ Item {
                                     }
                                 }
 
-                                NotebookView { }
+                                NotebookView {
+                                    id: notebookView
+                                }
                             }
                         }
                     }

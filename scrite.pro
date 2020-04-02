@@ -18,6 +18,7 @@ HEADERS += \
     hourglass.h \
     htmlexporter.h \
     logger.h \
+    note.h \
     notification.h \
     notificationmanager.h \
     painterpathitem.h \
@@ -59,6 +60,7 @@ SOURCES += \
     htmlexporter.cpp \
     logger.cpp \
     main.cpp \
+    note.cpp \
     notification.cpp \
     notificationmanager.cpp \
     painterpathitem.cpp \

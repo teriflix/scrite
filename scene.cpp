@@ -209,7 +209,7 @@ Scene::Scene(QObject *parent)
     connect(m_heading, &SceneHeading::momentChanged, this, &Scene::headingChanged);
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
-    connect(this, &Scene::notesChanged, this, &Scene::sceneChanged);
+    connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::headingChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
 }
@@ -236,6 +236,14 @@ QString Scene::id() const
     return m_id;
 }
 
+QString Scene::name() const
+{
+    if(m_title.length() > 15)
+        return QString("Scene: %1...").arg(m_title.left(13));
+
+    return QString("Scene: %1").arg(m_title);
+}
+
 void Scene::setTitle(const QString &val)
 {
     if(m_title == val)
@@ -252,15 +260,6 @@ void Scene::setColor(const QColor &val)
 
     m_color = val;
     emit colorChanged();
-}
-
-void Scene::setNotes(const QString &val)
-{
-    if(m_notes == val)
-        return;
-
-    m_notes = val;
-    emit notesChanged();
 }
 
 void Scene::setEnabled(bool val)
@@ -386,6 +385,62 @@ void Scene::clearElements()
         this->removeElement(m_elements.first());
 }
 
+QQmlListProperty<Note> Scene::notes()
+{
+    return QQmlListProperty<Note>(
+                reinterpret_cast<QObject*>(this),
+                static_cast<void*>(this),
+                &Scene::staticAppendNote,
+                &Scene::staticNoteCount,
+                &Scene::staticNoteAt,
+                &Scene::staticClearNotes);
+}
+
+void Scene::addNote(Note *ptr)
+{
+    if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
+        return;
+
+    ptr->setParent(this);
+
+    connect(ptr, &Note::aboutToDelete, this, &Scene::removeNote);
+    connect(ptr, &Note::noteChanged, this, &Scene::sceneChanged);
+
+    m_notes.append(ptr);
+    emit noteCountChanged();
+}
+
+void Scene::removeNote(Note *ptr)
+{
+    if(ptr == nullptr)
+        return;
+
+    const int index = m_notes.indexOf(ptr);
+    if(index < 0)
+        return ;
+
+    m_notes.removeAt(index);
+
+    disconnect(ptr, &Note::aboutToDelete, this, &Scene::removeNote);
+    disconnect(ptr, &Note::noteChanged, this, &Scene::sceneChanged);
+
+    emit noteCountChanged();
+
+    if(ptr->parent() == this)
+        ptr->deleteLater();
+}
+
+Note *Scene::noteAt(int index) const
+{
+    return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
+}
+
+void Scene::clearNotes()
+{
+    while(m_notes.size())
+        this->removeNote(m_notes.first());
+}
+
 int Scene::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_elements.size();
@@ -453,5 +508,25 @@ SceneElement *Scene::staticElementAt(QQmlListProperty<SceneElement> *list, int i
 int Scene::staticElementCount(QQmlListProperty<SceneElement> *list)
 {
     return reinterpret_cast< Scene* >(list->data)->elementCount();
+}
+
+void Scene::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
+{
+    reinterpret_cast< Scene* >(list->data)->addNote(ptr);
+}
+
+void Scene::staticClearNotes(QQmlListProperty<Note> *list)
+{
+    reinterpret_cast< Scene* >(list->data)->clearNotes();
+}
+
+Note *Scene::staticNoteAt(QQmlListProperty<Note> *list, int index)
+{
+    return reinterpret_cast< Scene* >(list->data)->noteAt(index);
+}
+
+int Scene::staticNoteCount(QQmlListProperty<Note> *list)
+{
+    return reinterpret_cast< Scene* >(list->data)->noteCount();
 }
 

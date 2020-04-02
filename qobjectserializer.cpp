@@ -395,7 +395,8 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                 const QByteArray className(listRef.listElementType()->className());
 
                 QObjectFactory listItemFactory;
-                listItemFactory.add(listRef.listElementType());
+                if(listRef.canAppend())
+                    listItemFactory.add(listRef.listElementType());
 
                 for(int i=0; i<list.size(); i++)
                 {

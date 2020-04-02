@@ -18,7 +18,7 @@ import Scrite 1.0
 Item {
     property Item currentSceneEditor
     property TextArea currentSceneContentEditor: currentSceneEditor ? currentSceneEditor.editor : null
-    signal requestEditor();
+    signal requestEditor()
 
     ScrollView {
         anchors.fill: parent

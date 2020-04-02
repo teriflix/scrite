@@ -20,6 +20,8 @@
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
 
+#include "note.h"
+
 class Scene;
 class SceneHeading;
 class SceneElement;
@@ -146,6 +148,9 @@ public:
     QString id() const;
     Q_SIGNAL void idChanged();
 
+    Q_PROPERTY(QString name READ name NOTIFY titleChanged)
+    QString name() const;
+
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     void setTitle(const QString &val);
     QString title() const { return m_title; }
@@ -155,11 +160,6 @@ public:
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
-
-    Q_PROPERTY(QString notes READ notes WRITE setNotes NOTIFY notesChanged)
-    void setNotes(const QString &val);
-    QString notes() const { return m_notes; }
-    Q_SIGNAL void notesChanged();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     void setEnabled(bool val);
@@ -189,6 +189,16 @@ public:
     Q_SIGNAL void aboutToRemoveSceneElement(SceneElement *element);
     Q_SIGNAL void sceneChanged();
 
+    Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
+    QQmlListProperty<Note> notes();
+    Q_INVOKABLE void addNote(Note *ptr);
+    Q_INVOKABLE void removeNote(Note *ptr);
+    Q_INVOKABLE Note *noteAt(int index) const;
+    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
+    int noteCount() const { return m_notes.size(); }
+    Q_INVOKABLE void clearNotes();
+    Q_SIGNAL void noteCountChanged();
+
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
@@ -206,8 +216,8 @@ private:
     mutable QString m_id;
     QString m_title;
     QColor m_color;
-    QString m_notes;
     bool m_enabled;
+    char m_padding[7];
     SceneHeading* m_heading;
     QQuickTextDocument* m_textDocument;
 
@@ -216,6 +226,12 @@ private:
     static SceneElement* staticElementAt(QQmlListProperty<SceneElement> *list, int index);
     static int staticElementCount(QQmlListProperty<SceneElement> *list);
     QList<SceneElement *> m_elements;
+
+    static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
+    static void staticClearNotes(QQmlListProperty<Note> *list);
+    static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
+    static int staticNoteCount(QQmlListProperty<Note> *list);
+    QList<Note *> m_notes;
 };
 
 #endif // SCENE_H

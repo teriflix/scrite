@@ -33,7 +33,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.margins: 3
         width: 50
-        model: scriteDocument.structure.characterCount + 1
+        model: noteSources
         spacing: 3
         currentIndex: 0
         footer: Item {
@@ -57,19 +57,16 @@ Item {
         delegate: Rectangle {
             width: notebookTabsView.width
             height: textItem.width + 20
-            color: selected ? tabColor : Qt.tint(tabColor, "#C0FFFFFF")
+            color: selected ? modelData.color : Qt.tint(modelData.color, "#C0FFFFFF")
             border { width: 1; color: "lightgray" }
             radius: 8
 
-            property color tabColor: tabColors[ index%tabColors.length ]
             property bool selected: notebookTabsView.currentIndex === index
-            property Character character: index === 0 ? null : scriteDocument.structure.characterAt(index-1)
-            property string label: index === 0 ? "Story" : character.name
 
             Text {
                 id: textItem
                 rotation: 90
-                text: parent.label
+                text: modelData.label.length > 20 ? (modelData.label.substr(0,17)+"...") : modelData.label
                 anchors.centerIn: parent
                 font.pixelSize: parent.selected ? 20 : 18
                 font.bold: parent.selected
@@ -79,18 +76,54 @@ Item {
             }
 
             MouseArea {
+                property bool allowRemove: app.typeName(modelData.source) === "Character"
                 anchors.fill: parent
-                acceptedButtons: index === 0 ? Qt.LeftButton : (Qt.LeftButton|Qt.RightButton)
+                acceptedButtons: allowRemove ? Qt.LeftButton : (Qt.LeftButton|Qt.RightButton)
+                hoverEnabled: modelData.label.length > 20
+                ToolTip.visible: hoverEnabled && containsMouse
+                ToolTip.text: modelData.label
                 onClicked: {
                     notebookTabsView.currentIndex = index
-                    if(mouse.button === Qt.RightButton) {
-                        characterItemMenu.character = character
+                    if(allowRemove && mouse.button === Qt.RightButton) {
+                        characterItemMenu.character = modelData.source
                         characterItemMenu.popup(this)
                     }
                 }
             }
         }
     }
+
+    property var noteSources: []
+    function evaluateNoteSources() {
+        var currentIndex = notebookTabsView.currentIndex
+        notebookTabsView.currentIndex = -1
+
+        var sources = []
+        sources.push( {"source": scriteDocument.structure, "label": "Story", "color": "purple" })
+
+        var activeScene = scriteDocument.screenplay.activeScene
+        if(activeScene)
+            sources.push({"source": activeScene, "label": activeScene.title, "color": activeScene.color})
+
+        var nrCharacters = scriteDocument.structure.characterCount
+        for(var i=0; i<nrCharacters; i++) {
+            var character = scriteDocument.structure.characterAt(i)
+            sources.push({"source":character, "label":character.name, "color": tabColors[i%tabColors.length]})
+        }
+
+        noteSources = sources
+        notebookTabsView.currentIndex = currentIndex
+    }
+
+    Connections {
+        target: scriteDocument.structure
+        onCharacterCountChanged: evaluateNoteSources()
+    }
+    Connections {
+        target: scriteDocument.screenplay
+        onActiveSceneChanged: evaluateNoteSources()
+    }
+    Component.onCompleted: evaluateNoteSources()
 
     Menu {
         id: characterItemMenu
@@ -105,7 +138,7 @@ Item {
         }
     }
 
-    property var notesPack: notebookTabsView.currentIndex <= 0 ? scriteDocument.structure : scriteDocument.structure.characterAt(notebookTabsView.currentIndex-1)
+    property var notesPack: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
 
     ScrollView {
         id: notesScrollView
@@ -127,14 +160,19 @@ Item {
             cellWidth: width/nrCells
             cellHeight: 400
 
-            model: notesPack.noteCount+1
+            model: notesPack ? notesPack.noteCount+1 : 0
 
-            delegate: Loader {
+            delegate: Item {
                 width: notesGrid.cellWidth
                 height: notesGrid.cellHeight
-                property int noteIndex: index < notesPack.noteCount ? index : -1
-                sourceComponent: noteIndex >= 0 ? noteDelegate : newNoteDelegate
-                active: true
+
+                Loader {
+                    anchors.fill: parent
+                    anchors.rightMargin: (index%notesGrid.nrCells) ? 20 : 5
+                    property int noteIndex: index < notesPack.noteCount ? index : -1
+                    sourceComponent: noteIndex >= 0 ? noteDelegate : newNoteDelegate
+                    active: true
+                }
             }
         }
     }
@@ -144,7 +182,7 @@ Item {
         anchors.right: notesScrollView.right
         anchors.bottom: notesScrollView.bottom
         anchors.top: notesScrollView.verticalCenter
-        active: notesPack.noteCount === 0
+        active: notesPack ? notesPack.noteCount === 0 : false
         sourceComponent: Item {
             Text {
                 anchors.fill: parent
@@ -154,7 +192,7 @@ Item {
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                lineHeight: 2
+                lineHeight: 1.2
                 text: {
                     if(notebookTabsView.currentIndex > 0)
                         return "You can capture your thoughts, ideas and research related to '<b>" + notesPack.name + "</b>' here.";

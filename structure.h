@@ -14,6 +14,7 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
+#include "note.h"
 #include "scene.h"
 #include "abstractshapeitem.h"
 
@@ -127,49 +128,6 @@ private:
     qreal m_width;
     qreal m_height;
     Structure *m_structure;
-};
-
-class Note : public QObject
-{
-    Q_OBJECT
-
-public:
-    Q_INVOKABLE Note(QObject *parent=nullptr);
-    ~Note();
-    Q_SIGNAL void aboutToDelete(Note *ptr);
-
-    Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
-    Structure *structure() const { return m_structure; }
-
-    Q_PROPERTY(Character* character READ character CONSTANT STORED false)
-    Character *character() const { return m_character; }
-
-    Q_PROPERTY(QString heading READ heading WRITE setHeading NOTIFY headingChanged)
-    void setHeading(const QString &val);
-    QString heading() const { return m_heading; }
-    Q_SIGNAL void headingChanged();
-
-    Q_PROPERTY(QString content READ content WRITE setContent NOTIFY contentChanged)
-    void setContent(const QString &val);
-    QString content() const { return m_content; }
-    Q_SIGNAL void contentChanged();
-
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-    void setColor(const QColor &val);
-    QColor color() const { return m_color; }
-    Q_SIGNAL void colorChanged();
-
-    Q_SIGNAL void noteChanged();
-
-protected:
-    bool event(QEvent *event);
-
-private:
-    QColor m_color;
-    QString m_heading;
-    QString m_content;
-    Structure *m_structure;
-    Character *m_character;
 };
 
 class Character : public QObject

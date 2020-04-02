@@ -190,61 +190,6 @@ bool StructureArea::event(QEvent *event)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Note::Note(QObject *parent)
-     : QObject(parent),
-       m_color(Qt::transparent),
-       m_structure(qobject_cast<Structure*>(parent)),
-       m_character(qobject_cast<Character*>(parent))
-{
-    connect(this, &Note::headingChanged, this, &Note::noteChanged);
-    connect(this, &Note::contentChanged, this, &Note::noteChanged);
-}
-
-Note::~Note()
-{
-
-}
-
-void Note::setHeading(const QString &val)
-{
-    if(m_heading == val)
-        return;
-
-    m_heading = val;
-    emit headingChanged();
-}
-
-void Note::setContent(const QString &val)
-{
-    if(m_content == val)
-        return;
-
-    m_content = val;
-    emit contentChanged();
-}
-
-void Note::setColor(const QColor &val)
-{
-    if(m_color == val)
-        return;
-
-    m_color = val;
-    emit colorChanged();
-}
-
-bool Note::event(QEvent *event)
-{
-    if(event->type() == QEvent::ParentChange)
-    {
-        m_structure = qobject_cast<Structure*>(this->parent());
-        m_character = qobject_cast<Character*>(this->parent());
-    }
-
-    return QObject::event(event);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 Character::Character(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
