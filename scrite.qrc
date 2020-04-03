@@ -53,5 +53,7 @@
         <file>icons/content/clear_all_inverted.png</file>
         <file>icons/content/language_inverted.png</file>
         <file>icons/content/language.png</file>
+        <file>icons/navigation/zoom_in.png</file>
+        <file>icons/navigation/zoom_out.png</file>
     </qresource>
 </RCC>

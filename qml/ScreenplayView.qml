@@ -39,7 +39,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 1
-        width: screenplayToolsLayout.width + 20
+        width: 60
         z: 1
 
         Rectangle {
@@ -54,27 +54,49 @@ Rectangle {
             }
         }
 
-        Column {
-            id: screenplayToolsLayout
-            width: 40
-            anchors.horizontalCenter: parent.horizontalCenter
+        ScrollView {
             anchors.top: parent.top
             anchors.topMargin: 5
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: screenplayToolsLayout.width
 
-            ToolButton2 {
-                icon.source: "../icons/content/clear_all.png"
-                suggestedWidth: parent.width; suggestedHeight: parent.width
-                ToolTip.text: "Clear the screenplay, while retaining the scenes."
-                onClicked: {
-                    askQuestion({
-                                    "question": "Are you sure you want to clear the screenplay?",
-                                    "okButtonText": "Yes",
-                                    "cancelButtonText": "No",
-                                    "callback": function(val) {
-                                        if(val)
-                                            scriteDocument.screenplay.clearElements()
-                                    }
-                                }, this)
+            Column {
+                id: screenplayToolsLayout
+                width: 40
+
+                ToolButton2 {
+                    icon.source: "../icons/content/clear_all.png"
+                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                    ToolTip.text: "Clear the screenplay, while retaining the scenes."
+                    onClicked: {
+                        askQuestion({
+                            "question": "Are you sure you want to clear the screenplay?",
+                            "okButtonText": "Yes",
+                            "cancelButtonText": "No",
+                            "callback": function(val) {
+                                if(val)
+                                    scriteDocument.screenplay.clearElements()
+                            }
+                        }, this)
+                    }
+                }
+
+                ToolButton2 {
+                    icon.source: "../icons/navigation/zoom_in.png"
+                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                    ToolTip.text: "Increase size of blocks in this view."
+                    onClicked: zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
+                    autoRepeat: true
+                }
+
+                ToolButton2 {
+                    icon.source: "../icons/navigation/zoom_out.png"
+                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                    ToolTip.text: "Decrease size of blocks in this view."
+                    onClicked: zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
+                    autoRepeat: true
                 }
             }
         }
@@ -126,7 +148,7 @@ Rectangle {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
             property bool active: element ? scriteDocument.screenplay.activeScene === element.scene : false
-            width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth) * zoomLevel
+            width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth*zoomLevel)
             height: screenplayElementList.height
 
             Loader {
