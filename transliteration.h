@@ -55,6 +55,8 @@ public:
     Q_PROPERTY(QString languageAsString READ languageAsString NOTIFY languageChanged)
     QString languageAsString() const;
 
+    Q_INVOKABLE QString shortcutLetter(Language val);
+
     Q_INVOKABLE void cycleLanguage();
 
     Q_INVOKABLE void markLanguage(Language language, bool active);
@@ -63,6 +65,8 @@ public:
     Q_PROPERTY(QJsonArray languages READ languages NOTIFY languagesChanged)
     QJsonArray languages() const;
     Q_SIGNAL void languagesChanged();
+
+    Q_INVOKABLE QJsonArray getLanguages() const { return this->languages(); }
 
     void *transliterator() const { return m_transliterator; }
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;

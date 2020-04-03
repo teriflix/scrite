@@ -51,6 +51,7 @@ Item {
                     text: "New"
                     shortcut: "Ctrl+N"
                     shortcutText: "N"
+                    // display: AbstractButton.IconOnly
                     onClicked: {
                         if(scriteDocument.modified)
                             askQuestion({
@@ -80,6 +81,7 @@ Item {
                     text: "Open"
                     shortcut: "Ctrl+O"
                     shortcutText: "O"
+                    display: AbstractButton.IconOnly
                     down: recentFilesMenu.visible
                     onClicked: recentFilesMenu.recentFiles.length > 0 ? recentFilesMenu.open() : doOpen()
                     function doOpen(filePath) {
@@ -161,6 +163,7 @@ Item {
                     text: "Save"
                     shortcut: "Ctrl+S"
                     shortcutText: "S"
+                    display: AbstractButton.IconOnly
                     onClicked: doClick()
                     function doClick() {
                         if(scriteDocument.fileName === "")
@@ -189,6 +192,7 @@ Item {
                     text: "Import"
                     shortcut: "Ctrl+Shift+I"
                     shortcutText: "Shift+I"
+                    // display: AbstractButton.IconOnly
                     down: importMenu.visible
                     onClicked: importMenu.visible = true
 
@@ -236,6 +240,7 @@ Item {
                     text: "Export"
                     shortcut: "Ctrl+Shift+X"
                     shortcutText: "Shift+X"
+                    // display: AbstractButton.IconOnly
                     down: exportMenu.visible
                     onClicked: exportMenu.visible = true
 
@@ -269,6 +274,7 @@ Item {
                     text: "Settings"
                     shortcut: "Ctrl+,"
                     shortcutText: ","
+                    // display: AbstractButton.IconOnly
                     onClicked: {
                         modalDialog.popupSource = this
                         modalDialog.sourceComponent = optionsDialogComponent
@@ -278,9 +284,10 @@ Item {
 
                 ToolButton2 {
                     icon.source: "../icons/content/language.png"
+                    text: app.transliterationSettings.languageAsString
                     shortcut: "Ctrl+L"
                     shortcutText: "L"
-                    text: app.transliterationSettings.languageAsString
+                    // display: AbstractButton.IconOnly
                     ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                     onClicked: languageMenu.visible = true
                     down: languageMenu.visible
@@ -297,13 +304,41 @@ Item {
 
                                 MenuItem {
                                     property string baseText: modelData.key
-                                    property string shortcutKey: baseText[baseText.indexOf('&')+1].toUpperCase()
-                                    text: baseText + " \t" + app.polishShortcutTextForDisplay("Ctrl+Alt+"+shortcutKey)
+                                    property string shortcutKey: app.transliterationSettings.shortcutLetter(modelData.value)
+                                    text: baseText + " \t" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
                                     onClicked: app.transliterationSettings.language = modelData.value
                                     checkable: true
                                     checked: app.transliterationSettings.language === modelData.value
                                 }
                             }
+
+                            MenuSeparator { }
+
+                            MenuItem {
+                                text: "Next-Language (F10)"
+                                checkable: true
+                                checked: false
+                                onClicked: app.transliterationSettings.cycleLanguage()
+                            }
+                        }
+
+                        Repeater {
+                            model: app.enumerationModel(app.transliterationSettings, "Language")
+
+                            Item {
+                                Shortcut {
+                                    property string shortcutKey: app.transliterationSettings.shortcutLetter(modelData.value)
+                                    context: Qt.ApplicationShortcut
+                                    sequence: "Alt+"+shortcutKey
+                                    onActivated: app.transliterationSettings.language = modelData.value
+                                }
+                            }
+                        }
+
+                        Shortcut {
+                            context: Qt.ApplicationShortcut
+                            sequence: "F10"
+                            onActivated: app.transliterationSettings.cycleLanguage()
                         }
                     }
                 }

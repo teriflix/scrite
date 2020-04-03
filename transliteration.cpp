@@ -130,6 +130,16 @@ QString TransliterationSettings::languageAsString() const
     return QString::fromLatin1(metaEnum.valueToKey(m_language));
 }
 
+QString TransliterationSettings::shortcutLetter(TransliterationSettings::Language val)
+{
+    if(val == Tamil)
+        return QString("L");
+
+    const QMetaObject *mo = this->metaObject();
+    const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
+    return QChar(metaEnum.valueToKey(val)[0]).toUpper();
+}
+
 void TransliterationSettings::cycleLanguage()
 {
     QMap<Language,bool>::const_iterator it = m_activeLanguages.constFind(m_language);
@@ -225,7 +235,7 @@ Transliterator::Transliterator(QObject *parent)
 
 Transliterator::~Transliterator()
 {
-
+    this->setTextDocument(nullptr);
 }
 
 Transliterator *Transliterator::qmlAttachedProperties(QObject *object)
@@ -248,6 +258,9 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
             disconnect( doc, &QTextDocument::contentsChange,
                         this, &Transliterator::processTransliteration);
         }
+
+        this->setCursorPosition(-1);
+        this->setHasActiveFocus(false);
     }
 
     m_textDocument = val;
@@ -285,7 +298,7 @@ void Transliterator::setHasActiveFocus(bool val)
 
     if(!m_hasActiveFocus)
     {
-        if(this->document() != nullptr)
+        if(this->document() != nullptr && m_cursorPosition >= 0)
         {
             // Transliterate the last word
             QTextCursor cursor(this->document());
@@ -322,7 +335,7 @@ void Transliterator::onTextDocumentDestroyed()
 void Transliterator::processTransliteration(int from, int charsRemoved, int charsAdded)
 {
     Q_UNUSED(charsRemoved)
-    if(this->document() == nullptr)
+    if(this->document() == nullptr || !m_hasActiveFocus)
         return;
 
     void *transliterator = TransliterationSettings::instance()->transliterator();

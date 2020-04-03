@@ -17,7 +17,11 @@ import QtQuick.Controls 2.13
 ToolButton {
     id: toolButton
 
-    property real suggestedWidth: 120
+    property real suggestedWidth: {
+        if(display === AbstractButton.IconOnly || text.length === 0)
+            return suggestedHeight
+        return 120
+    }
     property real suggestedHeight: 50
     property string shortcut
     property string shortcutText: shortcut
@@ -54,6 +58,7 @@ ToolButton {
                 font.bold: toolButton.down
                 anchors.verticalCenter: parent.verticalCenter
                 Behavior on color { ColorAnimation { duration: 250 } }
+                visible: toolButton.display !== AbstractButton.IconOnly
             }
         }
 

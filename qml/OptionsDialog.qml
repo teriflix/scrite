@@ -539,36 +539,79 @@ Item {
         id: applicationSettingsComponent
 
         Item {
-            Column {
-                width: parent.width * 0.8
-                spacing: 20
-                anchors.horizontalCenter: parent.horizontalCenter
+            id: appSettingsPage
 
-                GroupBox {
-                    width: parent.width
-                    label: CheckBox {
-                        text: "Enable AutoSave"
-                        checked: scriteDocument.autoSave
-                        onToggled: scriteDocument.autoSave = checked
-                    }
+            ScrollView {
+                id: appSettingsScrollView
+                anchors.fill: parent
+                anchors.margins: 5
+                contentWidth: width
+                contentHeight: appSettingsPageContent.height
+
+                Item {
+                    width: appSettingsScrollView.width
+                    height: appSettingsPageContent.height
 
                     Column {
-                        width: parent.width
-                        spacing: 10
-                        enabled: scriteDocument.autoSave
+                        id: appSettingsPageContent
+                        width: appSettingsPage.width * 0.8
+                        spacing: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
 
-                        Text {
+                        GroupBox {
                             width: parent.width
-                            text: "Auto Save Interval (in seconds)"
+                            label: CheckBox {
+                                text: "Enable AutoSave"
+                                checked: scriteDocument.autoSave
+                                onToggled: scriteDocument.autoSave = checked
+                            }
+
+                            Column {
+                                width: parent.width
+                                spacing: 10
+                                enabled: scriteDocument.autoSave
+
+                                Text {
+                                    width: parent.width
+                                    text: "Auto Save Interval (in seconds)"
+                                }
+
+                                TextField {
+                                    width: parent.width
+                                    text: scriteDocument.autoSaveDurationInSeconds
+                                    validator: IntValidator {
+                                        bottom: 1; top: 3600
+                                    }
+                                    onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
+                                }
+                            }
                         }
 
-                        TextField {
+                        GroupBox {
                             width: parent.width
-                            text: scriteDocument.autoSaveDurationInSeconds
-                            validator: IntValidator {
-                                bottom: 1; top: 3600
+                            label: Text {
+                                text: "Active Languages"
                             }
-                            onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
+                            height: activeLanguagesView.height+45
+
+                            Grid {
+                                id: activeLanguagesView
+                                width: parent.width-10
+                                anchors.top: parent.top
+                                spacing: 5
+                                columns: 3
+
+                                Repeater {
+                                    model: app.transliterationSettings.getLanguages()
+                                    delegate: CheckBox {
+                                        width: activeLanguagesView.width/activeLanguagesView.columns
+                                        checkable: true
+                                        checked: modelData.active
+                                        text: modelData.key
+                                        onToggled: app.transliterationSettings.markLanguage(modelData.value,checked)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
