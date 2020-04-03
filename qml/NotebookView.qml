@@ -259,6 +259,9 @@ Item {
                                         }
                                         anchors.verticalCenter: parent.verticalCenter
                                         KeyNavigation.tab: contentEdit
+                                        Transliterator.textDocument: textDocument
+                                        Transliterator.cursorPosition: cursorPosition
+                                        Transliterator.hasActiveFocus: activeFocus
                                     }
 
                                     ToolButton {
@@ -311,6 +314,9 @@ Item {
                                 }
                                 placeholderText: "type the contents of your note here.."
                                 KeyNavigation.tab: headingEdit
+                                Transliterator.textDocument: textDocument
+                                Transliterator.cursorPosition: cursorPosition
+                                Transliterator.hasActiveFocus: activeFocus
                             }
                         }
                     }

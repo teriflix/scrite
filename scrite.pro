@@ -48,7 +48,8 @@ HEADERS += \
     textexporter.h \
     textshapeitem.h \
     timeprofiler.h \
-    standardpaths.h
+    standardpaths.h \
+    transliteration.h
 
 SOURCES += \
     3rdparty/phtranslator/PhTranslateLib.cpp \
@@ -90,7 +91,8 @@ SOURCES += \
     textexporter.cpp \
     textshapeitem.cpp \
     timeprofiler.cpp \
-    standardpaths.cpp
+    standardpaths.cpp \
+    transliteration.cpp
 
 RESOURCES += \
     scrite.qrc

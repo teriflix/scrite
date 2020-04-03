@@ -23,6 +23,7 @@
 #include <QVersionNumber>
 
 #include "errorreport.h"
+#include "transliteration.h"
 
 typedef QApplication QtApplicationClass;
 class QSettings;
@@ -75,6 +76,9 @@ public:
 
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
+
+    Q_PROPERTY(TransliterationSettings* transliterationSettings READ transliterationSettings CONSTANT)
+    TransliterationSettings* transliterationSettings() const { return TransliterationSettings::instance(); }
 
     QSettings *settings() const { return m_settings; }
 

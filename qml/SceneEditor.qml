@@ -69,23 +69,6 @@ Item {
             characterNames: scriteDocument.structure.characterNames
             onDocumentInitialized: sceneContentEditor.cursorPosition = 0
             forceSyncDocument: !sceneContentEditor.activeFocus
-            transliterationMode: SceneDocumentBinder.AutomaticMode
-        }
-
-        Repeater {
-            model: app.enumerationModel(sceneDocumentBinder, "TransliterationLanguage")
-
-            Item {
-                property string baseText: binder.transliterationLanguageAsMenuItemText(modelData.value)
-                property string shortcutKey: baseText[baseText.indexOf('&')+1].toUpperCase()
-
-                Shortcut {
-                    autoRepeat: false
-                    context: Qt.ApplicationShortcut
-                    sequence: "Ctrl+Alt+"+shortcutKey
-                    onActivated: binder.transliterationLanguage = modelData.value
-                }
-            }
         }
 
         Loader {
@@ -138,6 +121,9 @@ Item {
                 result.acceptEvent = false
                 result.filter = !scrollable
             }
+            Transliterator.textDocument: textDocument
+            Transliterator.cursorPosition: cursorPosition
+            Transliterator.hasActiveFocus: activeFocus
 
             Completer {
                 id: completer
@@ -245,8 +231,8 @@ Item {
                 onActivated: scene.heading.locationType = model.get(index).value
             }
 
-            TextField {
-                id: locationCombo
+            TextEdit {
+                id: locationEdit
                 width: parent.width - locationTypeCombo.width - momentCombo.width - 2*parent.spacing
                 text: scene.heading.location
                 anchors.verticalCenter: parent.verticalCenter
@@ -255,7 +241,11 @@ Item {
                     if(activeFocus)
                         selectAll()
                 }
-                onTextEdited: scene.heading.location = text
+                onTextChanged: scene.heading.location = text
+                Transliterator.textDocument: textDocument
+                Transliterator.cursorPosition: cursorPosition
+                Transliterator.hasActiveFocus: activeFocus
+                Keys.onReturnPressed: editingFinished()
             }
 
             ComboBox {

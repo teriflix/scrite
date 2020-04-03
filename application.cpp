@@ -39,6 +39,8 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
+
+    TransliterationSettings::instance(this);
 }
 
 Application::~Application()

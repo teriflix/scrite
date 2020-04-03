@@ -275,6 +275,38 @@ Item {
                         modalDialog.active = true
                     }
                 }
+
+                ToolButton2 {
+                    icon.source: "../icons/content/language.png"
+                    shortcut: "Ctrl+L"
+                    shortcutText: "L"
+                    text: app.transliterationSettings.languageAsString
+                    ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
+                    onClicked: languageMenu.visible = true
+                    down: languageMenu.visible
+
+                    Item {
+                        anchors.top: parent.bottom
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        Menu {
+                            id: languageMenu
+
+                            Repeater {
+                                model: app.enumerationModel(app.transliterationSettings, "Language")
+
+                                MenuItem {
+                                    property string baseText: modelData.key
+                                    property string shortcutKey: baseText[baseText.indexOf('&')+1].toUpperCase()
+                                    text: baseText + " \t" + app.polishShortcutTextForDisplay("Ctrl+Alt+"+shortcutKey)
+                                    onClicked: app.transliterationSettings.language = modelData.value
+                                    checkable: true
+                                    checked: app.transliterationSettings.language === modelData.value
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

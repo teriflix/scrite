@@ -28,6 +28,7 @@
 #include "painterpathitem.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
+#include "transliteration.h"
 
 int main(int argc, char **argv)
 {
@@ -100,6 +101,9 @@ int main(int argc, char **argv)
 
     qmlRegisterUncreatableType<ErrorReport>("Scrite", 1, 0, "ErrorReport", reason);
     qmlRegisterUncreatableType<ProgressReport>("Scrite", 1, 0, "ProgressReport", reason);
+
+    qmlRegisterUncreatableType<TransliterationSettings>("Scrite", 1, 0, "TransliterationSettings", "Use app.transliterationSettings instead.");
+    qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", "Use as attached property.");
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;

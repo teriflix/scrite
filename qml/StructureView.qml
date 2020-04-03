@@ -327,6 +327,9 @@ Item {
                         onTextChanged: element.scene.title = text
                         onEditingFinished: canvas.editIndex = -1
                         Keys.onReturnPressed: editingFinished()
+                        Transliterator.textDocument: textDocument
+                        Transliterator.cursorPosition: cursorPosition
+                        Transliterator.hasActiveFocus: activeFocus
                     }
 
                     ToolButton {
