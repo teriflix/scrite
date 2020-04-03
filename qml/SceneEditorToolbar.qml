@@ -96,7 +96,7 @@ ScrollView {
                         shortcut: "Ctrl+" + (index+1)
                         shortcutText: (index+1)
                         ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
-                        enabled: binder && editor ? (binder.currentElement !== null && editor.activeFocus) : false
+                        enabled: binder ? binder.currentElement !== null : false
                         down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
                         onClicked: {
                             binder.currentElement.type = modelData.value
