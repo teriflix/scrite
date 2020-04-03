@@ -23,6 +23,8 @@
 #include "errorreport.h"
 #include "progressreport.h"
 
+class AbstractReportGenerator;
+
 class ScriteDocument : public QObject
 {
     Q_OBJECT
@@ -84,8 +86,15 @@ public:
     QStringList supportedExportFormats() const;
     Q_INVOKABLE QString exportFormatFileSuffix(const QString &format) const;
 
+    Q_PROPERTY(QStringList supportedReports READ supportedReports CONSTANT)
+    QStringList supportedReports() const;
+
+    Q_INVOKABLE QString reportFileSuffix() const;
+
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
     Q_INVOKABLE bool exportFile(const QString &fileName, const QString &format);
+    Q_INVOKABLE bool generateReport(const QString &fileName, const QString &report);
+    Q_SIGNAL void requestReportGeneratorConfiguration(AbstractReportGenerator *reportGenerator);
 
     Q_PROPERTY(QJsonArray structureElementSequence READ structureElementSequence NOTIFY structureElementSequenceChanged)
     QJsonArray structureElementSequence() const { return m_structureElementSequence; }

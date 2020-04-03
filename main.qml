@@ -11,9 +11,9 @@
 **
 ****************************************************************************/
 
+import Scrite 1.0
 import QtQuick 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
 import QtGraphicalEffects 1.0
 
 import "./qml" as UI
@@ -87,7 +87,10 @@ Rectangle {
     UI.DialogOverlay {
         id: modalDialog
         active: false
-        onCloseRequest: active = false
+        onCloseRequest: {
+            active = false
+            initItemCallback = undefined
+        }
         backgroundColor: "gray"
 
         property var initItemCallback

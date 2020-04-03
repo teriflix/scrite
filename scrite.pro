@@ -12,9 +12,11 @@ HEADERS += \
     abstractdeviceio.h \
     abstractexporter.h \
     abstractimporter.h \
+    abstractreportgenerator.h \
     abstractshapeitem.h \
     aggregation.h \
     application.h \
+    characterreportgenerator.h \
     completer.h \
     errorreport.h \
     eventfilter.h \
@@ -58,9 +60,11 @@ SOURCES += \
     abstractdeviceio.cpp \
     abstractexporter.cpp \
     abstractimporter.cpp \
+    abstractreportgenerator.cpp \
     abstractshapeitem.cpp \
     aggregation.cpp \
     application.cpp \
+    characterreportgenerator.cpp \
     completer.cpp \
     errorreport.cpp \
     eventfilter.cpp \

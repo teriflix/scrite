@@ -11,18 +11,20 @@
 **
 ****************************************************************************/
 
-#include "application.h"
 #include "scritedocument.h"
-#include "qobjectserializer.h"
-#include "finaldraftimporter.h"
-#include "finaldraftexporter.h"
+
+#include "logger.h"
+#include "hourglass.h"
+#include "aggregation.h"
+#include "application.h"
 #include "pdfexporter.h"
 #include "htmlexporter.h"
 #include "textexporter.h"
-#include "aggregation.h"
 #include "qobjectfactory.h"
-#include "hourglass.h"
-#include "logger.h"
+#include "qobjectserializer.h"
+#include "finaldraftimporter.h"
+#include "finaldraftexporter.h"
+#include "characterreportgenerator.h"
 
 #include <QFileInfo>
 #include <QSettings>
@@ -36,11 +38,13 @@ public:
 
     QObjectFactory ImporterFactory;
     QObjectFactory ExporterFactory;
+    QObjectFactory ReportGeneratorFactory;
 };
 
 DeviceIOFactories::DeviceIOFactories()
     : ImporterFactory("Format"),
-      ExporterFactory("Format")
+      ExporterFactory("Format"),
+      ReportGeneratorFactory("Title")
 {
     ImporterFactory.addClass<FinalDraftImporter>();
 
@@ -48,6 +52,8 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<FinalDraftExporter>();
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
+
+    ReportGeneratorFactory.addClass<CharacterReportGenerator>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()
@@ -303,6 +309,20 @@ QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
     return QString::fromLatin1(classInfo.value());
 }
 
+QStringList ScriteDocument::supportedReports() const
+{
+    static QList<QByteArray> keys = deviceIOFactories.ReportGeneratorFactory.keys();
+    static QStringList reports;
+    if(reports.isEmpty())
+        Q_FOREACH(QByteArray key, keys) reports << key;
+    return reports;
+}
+
+QString ScriteDocument::reportFileSuffix() const
+{
+    return QString("Adobe PDF (*.pdf)");
+}
+
 bool ScriteDocument::importFile(const QString &fileName, const QString &format)
 {
     HourGlass hourGlass;
@@ -355,6 +375,42 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
         return true;
 
     return false;
+}
+
+bool ScriteDocument::generateReport(const QString &fileName, const QString &report)
+{
+    m_errorReport->clear();
+
+    const QByteArray reportKey = report.toLatin1();
+    QScopedPointer<AbstractReportGenerator> reportGenerator( deviceIOFactories.ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this) );
+
+    if(reportGenerator.isNull())
+    {
+        m_errorReport->setErrorMessage("Cannot export to this format.");
+        return false;
+    }
+
+    Aggregation aggregation;
+    m_errorReport->setProxyFor(aggregation.findErrorReport(reportGenerator.data()));
+    m_progressReport->setProxyFor(aggregation.findProgressReport(reportGenerator.data()));
+
+    reportGenerator->setFileName(fileName);
+    reportGenerator->setDocument(this);
+
+    if(reportGenerator->requiresConfiguration())
+    {
+        emit requestReportGeneratorConfiguration(reportGenerator.data());
+        if(!reportGenerator->exec())
+            return false;
+    }
+
+    HourGlass hourGlass;
+    if(!reportGenerator->generate())
+        return false;
+
+    Application::instance()->revealFileOnDesktop(reportGenerator->fileName());
+
+    return true;
 }
 
 void ScriteDocument::timerEvent(QTimerEvent *event)

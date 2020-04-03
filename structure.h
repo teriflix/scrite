@@ -218,7 +218,7 @@ public:
     Q_INVOKABLE void clearCharacters();
     Q_SIGNAL void characterCountChanged();
 
-    Q_INVOKABLE QStringList allCharacterNames() const;
+    Q_INVOKABLE QStringList allCharacterNames() const { return m_characterNames; }
     Q_INVOKABLE QJsonArray detectCharacters() const;
     Q_INVOKABLE void addCharacters(const QStringList &names);
 

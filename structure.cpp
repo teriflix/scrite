@@ -442,14 +442,6 @@ void Structure::clearCharacters()
         this->removeCharacter(m_characters.first());
 }
 
-QStringList Structure::allCharacterNames() const
-{
-    QStringList names = m_characterElementNameMap.values();
-    std::sort(names.begin(), names.end());
-    names.removeDuplicates();
-    return names;
-}
-
 QJsonArray Structure::detectCharacters() const
 {
     QJsonArray ret;
@@ -815,6 +807,7 @@ void Structure::evaluateCharacterNames()
     m_characterNames = m_characterElementNameMap.values();
     std::sort(m_characterNames.begin(), m_characterNames.end());
     m_characterNames.removeDuplicates();
+    m_characterNames.removeAll(QString());
     emit characterNamesChanged();
 }
 

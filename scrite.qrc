@@ -55,5 +55,6 @@
         <file>icons/content/language.png</file>
         <file>icons/navigation/zoom_in.png</file>
         <file>icons/navigation/zoom_out.png</file>
+        <file>qml/ReportGeneratorConfiguration.qml</file>
     </qresource>
 </RCC>

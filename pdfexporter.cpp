@@ -53,7 +53,6 @@ bool PdfExporter::doExport(QIODevice *device)
     QTextCursor cursor(&textDocument);
 
     // Title Page
-    if( !screenplay->title().isEmpty() )
     {
         // Title
         {
@@ -68,8 +67,11 @@ bool PdfExporter::doExport(QIODevice *device)
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
 
+            QString title = screenplay->title();
+            if(title.isEmpty())
+                title = "Untitled Screenplay";
             cursor.insertBlock();
-            cursor.insertText(screenplay->title());
+            cursor.insertText(title);
         }
 
         // Author
@@ -84,7 +86,11 @@ bool PdfExporter::doExport(QIODevice *device)
             cursor.insertBlock();
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
-            cursor.insertText(screenplay->author());
+
+            QString author = screenplay->author();
+            if(author.isEmpty())
+                author = "Unknown Author";
+            cursor.insertText(author);
         }
 
         // Contact
@@ -99,7 +105,11 @@ bool PdfExporter::doExport(QIODevice *device)
             cursor.insertBlock();
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
-            cursor.insertText(screenplay->contact());
+
+            QString contact = screenplay->contact();
+            if(contact.isEmpty())
+                contact = "No Contact Information";
+            cursor.insertText(contact);
         }
 
         // Version
@@ -114,10 +124,14 @@ bool PdfExporter::doExport(QIODevice *device)
             cursor.insertBlock();
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
-            cursor.insertText("Version: " + screenplay->version());
+
+            QString version = screenplay->version();
+            if(version.isEmpty())
+                version = "First Version";
+            cursor.insertText("Version: " + version);
         }
 
-        // Version
+        // Generator
         {
             QTextBlockFormat blockFormat;
             blockFormat.setAlignment(Qt::AlignHCenter);
@@ -130,7 +144,7 @@ bool PdfExporter::doExport(QIODevice *device)
             cursor.insertBlock();
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
-            cursor.insertText("This PDF was generated using scrite (https://scrite.teriflix.com)");
+            cursor.insertHtml("This screenplay was generated using <strong>scrite</strong><br/>(<a href=\"https://scrite.teriflix.com\">https://scrite.teriflix.com</a>)");
         }
 
         cursor.insertBlock();

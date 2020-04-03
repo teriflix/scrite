@@ -41,6 +41,7 @@ public:
 
     qreal progressStep() const;
     void setProgressStep(qreal val);
+    void setProgressStepFromCount(int count);
     void tick();
 
     void start() {

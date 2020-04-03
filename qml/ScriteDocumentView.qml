@@ -263,6 +263,51 @@ Item {
                     }
                 }
 
+                ToolButton2 {
+                    id: reportsButton
+                    icon.source: "../icons/file/file_pdf.png"
+                    text: "Reports"
+                    shortcut: "Ctrl+Shift+R"
+                    shortcutText: "Shift+R"
+                    // display: AbstractButton.IconOnly
+                    down: reportsMenu.visible
+                    onClicked: reportsMenu.visible = true
+
+                    Item {
+                        anchors.top: parent.bottom
+                        anchors.left: parent.left
+
+                        Menu {
+                            id: reportsMenu
+
+                            Repeater {
+                                model: scriteDocument.supportedReports
+
+                                MenuItem {
+                                    text: modelData
+                                    onTriggered: reportGeneratorTimer.reportName = modelData
+                                }
+                            }
+                        }
+
+                        Timer {
+                            id: reportGeneratorTimer
+                            property string reportName
+                            repeat: false
+                            interval: 10
+                            onReportNameChanged: {
+                                if(reportName !== "")
+                                    start()
+                            }
+                            onTriggered: {
+                                if(reportName !== "")
+                                    scriteDocument.generateReport("", reportName)
+                                reportName = ""
+                            }
+                        }
+                    }
+                }
+
                 Rectangle {
                     width: 1
                     height: parent.height
@@ -667,7 +712,14 @@ Item {
         nameFilters: modes[mode].nameFilters
         selectFolder: false
         selectMultiple: false
-        folder: shortcuts.home
+        folder: {
+            if(scriteDocument.fileName !== "") {
+                var fileInfo = app.fileInfo(scriteDocument.fileName)
+                if(fileInfo.exists)
+                    return "file:///" + fileInfo.absolutePath
+            }
+            return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        }
         sidebarVisible: true
         selectExisting: modes[mode].selectExisting
         property string mode: "OPEN"
@@ -766,4 +818,23 @@ Item {
     Notification.title: "Scrite Error"
     Notification.text: applicationErrors ? applicationErrors.hasError : ""
     Notification.autoClose: false
+
+    Connections {
+        target: scriteDocument
+        onRequestReportGeneratorConfiguration: {
+            modalDialog.initItemCallback = function(item) {
+                if(item)
+                    item.generator = reportGenerator
+            }
+            modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+            modalDialog.popupSource = reportsButton
+            modalDialog.active = true
+        }
+    }
+
+    Component {
+        id: reportGeneratorConfigurationComponent
+
+        ReportGeneratorConfiguration {  }
+    }
 }

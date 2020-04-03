@@ -105,6 +105,11 @@ void ProgressReport::setProgressStep(qreal val)
     m_progressStep = val;
 }
 
+void ProgressReport::setProgressStepFromCount(int count)
+{
+    this->setProgressStep(1.0/qreal(count));
+}
+
 void ProgressReport::tick()
 {
     if(m_progressStep > 0)

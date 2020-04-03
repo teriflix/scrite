@@ -26,9 +26,10 @@
 #include "textshapeitem.h"
 #include "scritedocument.h"
 #include "painterpathitem.h"
+#include "transliteration.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
-#include "transliteration.h"
+#include "abstractreportgenerator.h"
 
 int main(int argc, char **argv)
 {
@@ -104,6 +105,8 @@ int main(int argc, char **argv)
 
     qmlRegisterUncreatableType<TransliterationSettings>("Scrite", 1, 0, "TransliterationSettings", "Use app.transliterationSettings instead.");
     qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", "Use as attached property.");
+
+    qmlRegisterUncreatableType<AbstractReportGenerator>("Scrite", 1, 0, "AbstractReportGenerator", reason);
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;
