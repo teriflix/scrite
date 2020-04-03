@@ -184,6 +184,17 @@ QString SceneElement::text() const
         return text;
     }
 
+    switch(m_type)
+    {
+    case SceneElement::Character:
+    case SceneElement::Shot:
+    case SceneElement::Transition:
+    case SceneElement::Heading:
+        return m_text.toUpper();
+    default:
+        break;
+    }
+
     return m_text;
 }
 
