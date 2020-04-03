@@ -85,7 +85,8 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: 10
         model: scriteDocument.screenplay
-        property real idealDelegateWidth: 100
+        property real minimumDelegateWidth: 100
+        property real perElementWidth: 2.5
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
         header: Item {
@@ -95,7 +96,7 @@ Rectangle {
 
         footer: Item {
             property bool highlightAsDropArea: false
-            property real normalWidth: screenplayElementList.idealDelegateWidth * zoomLevel
+            property real normalWidth: screenplayElementList.minimumDelegateWidth * zoomLevel
             property real availableWidth: screenplayElementList.width - screenplayElementList.count*normalWidth
             width: Math.max(normalWidth, availableWidth)
             height: screenplayElementList.height
@@ -125,7 +126,7 @@ Rectangle {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
             property bool active: element ? scriteDocument.screenplay.activeScene === element.scene : false
-            width: screenplayElementList.idealDelegateWidth * zoomLevel
+            width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth) * zoomLevel
             height: screenplayElementList.height
 
             Loader {
@@ -147,7 +148,7 @@ Rectangle {
                         anchors.bottom: dragTriggerButton.top
                         anchors.margins: 5
                         horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        verticalAlignment: Text.AlignTop
                         wrapMode: Text.WrapAnywhere
                         elide: Text.ElideRight
                         font.pixelSize: 15
