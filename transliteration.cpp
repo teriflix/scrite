@@ -51,7 +51,7 @@ TransliterationSettings::TransliterationSettings(QObject *parent)
         Q_FOREACH(QString lang, activeLanguages)
         {
             bool ok = false;
-            int val = metaEnum.keyToValue(qPrintable(lang), &ok);
+            int val = metaEnum.keyToValue(qPrintable(lang.trimmed()), &ok);
             m_activeLanguages[Language(val)] = true;
         }
     }
@@ -172,7 +172,7 @@ void TransliterationSettings::cycleLanguage()
 
 void TransliterationSettings::markLanguage(TransliterationSettings::Language language, bool active)
 {
-    if(m_activeLanguages.value(m_language,false) == active)
+    if(m_activeLanguages.value(language,false) == active)
         return;
 
     m_activeLanguages[language] = active;
@@ -180,11 +180,13 @@ void TransliterationSettings::markLanguage(TransliterationSettings::Language lan
     QSettings *settings = Application::instance()->settings();
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
-    QStringList activeLanguages = settings->value("Transliteration/activeLanguages").toStringList();
-    if(active)
-        activeLanguages.append(QString::fromLatin1(metaEnum.valueToKey(m_language)));
-    else
-        activeLanguages.removeOne(QString::fromLatin1(metaEnum.valueToKey(m_language)));
+    QStringList activeLanguages;
+    for(int i=0; i<metaEnum.keyCount(); i++)
+    {
+        Language lang = Language(metaEnum.value(i));
+        if(m_activeLanguages.value(lang))
+            activeLanguages.append(QString::fromLatin1(metaEnum.valueToKey(lang)));
+    }
     settings->setValue("Transliteration/activeLanguages", activeLanguages);
 
     emit languagesChanged();
