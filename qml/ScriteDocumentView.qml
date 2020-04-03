@@ -366,7 +366,7 @@ Item {
                 anchors.right: appLogo.left
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
-                enabled: sceneEditor ? true : false
+                // enabled: sceneEditor ? true : false
                 property Item sceneEditor
             }
 

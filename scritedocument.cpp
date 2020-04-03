@@ -111,6 +111,59 @@ void ScriteDocument::setAutoSave(bool val)
     Logger::qtPropertyInfo(this, "autoSave");
 }
 
+Scene *ScriteDocument::createNewScene()
+{
+    StructureElement *structureElement = nullptr;
+    if(m_structure->currentElementIndex() > 0)
+        structureElement = m_structure->elementAt(m_structure->currentElementIndex());
+    else
+        structureElement = m_structure->elementAt(m_structure->elementCount()-1);
+
+    const qreal xOffset = m_structure->elementCount()%2 ? 275 : -275;
+    const qreal x = structureElement ? (structureElement->x() + xOffset) : 225;
+    const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 100) : 100;
+
+    Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
+
+    Scene *scene = new Scene(m_structure);
+    scene->setColor(activeScene ? activeScene->color() : QColor("blue"));
+    scene->setTitle("[" + QString::number(m_structure->elementCount()+1) + "] - Scene");
+    scene->heading()->setEnabled(true);
+    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : SceneHeading::Interior);
+    scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "Somewhere");
+    scene->heading()->setMoment(activeScene ? activeScene->heading()->moment() : SceneHeading::Day);
+
+    StructureElement *newStructureElement = new StructureElement(m_structure);
+    newStructureElement->setScene(scene);
+    newStructureElement->setX(x);
+    newStructureElement->setY(y);
+    m_structure->addElement(newStructureElement);
+
+    ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
+    newScreenplayElement->setScene(scene);
+    int newScreenplayElementIndex = -1;
+    if(m_screenplay->currentElementIndex() >= 0)
+    {
+        newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
+        m_screenplay->insertAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
+    }
+    else
+    {
+        newScreenplayElementIndex = m_screenplay->elementCount();
+        m_screenplay->addElement(newScreenplayElement);
+    }
+
+    if(m_screenplay->elementAt(newScreenplayElementIndex) != newScreenplayElement)
+        newScreenplayElementIndex = m_screenplay->indexOfElement(newScreenplayElement);
+
+    m_structure->setCurrentElementIndex(m_structure->elementCount()-1);
+    m_screenplay->setCurrentElementIndex(newScreenplayElementIndex);
+
+    emit newSceneCreated(scene, newScreenplayElementIndex);
+
+    return scene;
+}
+
 void ScriteDocument::reset()
 {
     HourGlass hourGlass;

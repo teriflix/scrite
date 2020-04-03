@@ -116,6 +116,14 @@ Item {
                             currentSceneEditor = sceneEditor
                         }
                     }
+
+                    Connections {
+                        target: scriteDocument
+                        onNewSceneCreated: {
+                            if(screenplayIndex === index)
+                                sceneEditor.assumeFocus()
+                        }
+                    }
                 }
             }
         }

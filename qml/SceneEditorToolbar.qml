@@ -52,6 +52,16 @@ ScrollView {
                 spacing: toolbar.toolButtonSpacing
                 anchors.horizontalCenter: parent.horizontalCenter
 
+                ToolButton2 {
+                    icon.source: "../icons/content/add_box.png"
+                    suggestedWidth: toolbar.toolButtonWidth
+                    suggestedHeight: toolbar.toolButtonHeight
+                    shortcut: "Ctrl+Shift+N"
+                    shortcutText: "Shift+N"
+                    ToolTip.text: "Creates a new scene and adds it to both structure and screenplay."
+                    onClicked: scriteDocument.createNewScene()
+                }
+
                 Repeater {
                     model: toolbar.tools
 

@@ -57,6 +57,11 @@ public:
     ScreenplayFormat* formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
+    // This function adds a new scene to both structure and screenplay
+    // and inserts it right after the current element in both.
+    Q_INVOKABLE Scene *createNewScene();
+    Q_SIGNAL void newSceneCreated(Scene *scene, int screenplayIndex);
+
     Q_PROPERTY(bool modified READ isModified NOTIFY modifiedChanged)
     bool isModified() const { return m_modified; }
     Q_SIGNAL void modifiedChanged();

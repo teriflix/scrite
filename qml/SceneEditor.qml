@@ -28,6 +28,7 @@ Item {
     property color backgroundColor: scene ? Qt.tint(scene.color, "#E0FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
+    signal assumeFocus()
 
     Rectangle {
         id: sceneHeadingArea
@@ -129,6 +130,11 @@ Item {
                 id: completer
                 strings: sceneDocumentBinder.autoCompleteHints
                 completionPrefix: sceneDocumentBinder.completionPrefix
+            }
+
+            Connections {
+                target: sceneEditor
+                onAssumeFocus: sceneTextArea.forceActiveFocus()
             }
 
             cursorDelegate: Item {
