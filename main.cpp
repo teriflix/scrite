@@ -99,6 +99,7 @@ int main(int argc, char **argv)
     qmlRegisterType<TextShapeItem>("Scrite", 1, 0, "TextShapeItem");
 
     qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
+    qmlRegisterType<TextDocumentSearch>("Scrite", 1, 0, "TextDocumentSearch");
     qmlRegisterUncreatableType<SearchAgent>("Scrite", 1, 0, "SearchAgent", "Use as attached property.");
 
     qmlRegisterUncreatableType<Notification>("Scrite", 1, 0, "Notification", "Use as attached property.");

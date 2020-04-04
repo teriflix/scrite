@@ -68,7 +68,7 @@ ToolButton {
             anchors.right: parent.right
             color: toolButton.down ? "white" : "black"
             text: "[" + toolButton.shortcutText + "]"
-            visible: toolButton.shortcut !== ""
+            visible: toolButton.shortcutText !== ""
         }
     }
     action: Action {

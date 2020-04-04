@@ -358,9 +358,8 @@ Item {
                             select(start, end)
                             scriteDocument.structure.currentElementIndex = index
                         }
-                        SearchAgent.onClearSearchRequest: {
-                            deselect()
-                        }
+                        SearchAgent.onClearSearchRequest: deselect()
+                        SearchAgent.onClearHighlight: deselect()
                     }
 
                     ToolButton {

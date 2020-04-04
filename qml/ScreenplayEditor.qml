@@ -16,12 +16,63 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
+    id: screenplayEditor
     property Item currentSceneEditor
     property TextArea currentSceneContentEditor: currentSceneEditor ? currentSceneEditor.editor : null
     signal requestEditor()
 
+    SearchBar {
+        id: searchBar
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+    }
+
+    Repeater {
+        id: searchAgents
+        model: scriteDocument.screenplay.elementCount
+
+        Item {
+            property ScreenplayElement screenplayElement: scriteDocument.screenplay.elementAt(index)
+            property Scene scene: screenplayElement ? screenplayElement.scene : null
+            property string searchString
+            SearchAgent.engine: searchBar.searchEngine
+            SearchAgent.sequenceNumber: index
+            SearchAgent.onSearchRequest: {
+                searchString = string
+                var nrElements = scene.elementCount
+                var nrResults = 0
+                for(var i=0; i<nrElements; i++) {
+                    var element = scene.elementAt(i)
+                    var posList = SearchAgent.indexesOf(string, element.text)
+                    nrResults += posList.length
+                }
+                SearchAgent.searchResultCount = nrResults
+            }
+            SearchAgent.onCurrentSearchResultIndexChanged: {
+                if(SearchAgent.currentSearchResultIndex >= 0) {
+                    var data = {
+                        "searchString": searchString,
+                        "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
+                        "searchResultCount": SearchAgent.searchResultCount
+                    }
+                    screenplayElement.userData = data
+                    scriteDocument.screenplay.currentElementIndex = index
+                }
+            }
+            SearchAgent.onClearSearchRequest: {
+                searchString = ""
+                screenplayElement.userData = undefined
+            }
+        }
+    }
+
     ScrollView {
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.top: searchBar.bottom
+        clip: true
 
         ListView {
             id: screenplayListView
@@ -33,23 +84,28 @@ Item {
 
             Connections {
                 target: currentSceneContentEditor
-                onCursorRectangleChanged: {
-                    var rect = currentSceneContentEditor.cursorRectangle
-                    var pt = currentSceneContentEditor.mapToItem(screenplayListView.contentItem, rect.x, rect.y)
-                    var startY = screenplayListView.contentY
-                    var endY = screenplayListView.contentY + screenplayListView.height
-                    if( startY < pt.y && pt.y < endY )
-                        return
+                ignoreUnknownSignals: true
+                onCursorRectangleChanged: screenplayListView.adjustScroll()
+            }
 
-                    endY = endY-40
-                    if( pt.y < startY )
-                        screenplayListView.contentY = pt.y
-                    else if( pt.y > endY )
-                        screenplayListView.contentY = (pt.y + 40) - screenplayListView.height
-                }
+            function adjustScroll() {
+                var rect = currentSceneContentEditor.cursorRectangle
+                var pt = currentSceneContentEditor.mapToItem(screenplayListView.contentItem, rect.x, rect.y)
+                var startY = screenplayListView.contentY
+                var endY = screenplayListView.contentY + screenplayListView.height
+                if( startY < pt.y && pt.y < endY )
+                    return
+
+                endY = endY-40
+                if( pt.y < startY )
+                    screenplayListView.contentY = pt.y
+                else if( pt.y > endY )
+                    screenplayListView.contentY = (pt.y + 40) - screenplayListView.height
             }
         }
     }
+
+    onCurrentSceneContentEditorChanged: screenplayListView.adjustScroll()
 
     Component {
         id: screenplayElementDelegate
@@ -129,6 +185,20 @@ Item {
                         if(index < scriteDocument.screenplay.elementCount) {
                             var item = screenplayListView.itemAtIndex(index+1)
                             item.assumeFocusAt(0)
+                        }
+                    }
+
+                    TextDocumentSearch {
+                        textDocument: sceneEditor.editor.textDocument
+                        searchString: sceneEditor.binder.documentLoadCount > 0 ? (element.userData ? element.userData.searchString : "") : ""
+                        currentResultIndex: searchResultCount > 0 ? (element.userData ? element.userData.currentSearchResultIndex : -1) : -1
+                        onHighlightText: {
+                            currentSceneEditor = sceneEditor
+                            sceneEditor.editor.cursorPosition = start
+                            sceneEditor.editor.select(start, end)
+                        }
+                        onClearHighlight: {
+                            sceneEditor.editor.deselect()
                         }
                     }
 

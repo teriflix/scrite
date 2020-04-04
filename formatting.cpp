@@ -334,6 +334,7 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_scene(nullptr),
       m_textWidth(0),
       m_cursorPosition(-1),
+      m_documentLoadCount(0),
       m_forceSyncDocument(false),
       m_initializingDocument(false),
       m_currentElement(nullptr),
@@ -692,12 +693,23 @@ void SceneDocumentBinder::initializeDocument()
 
     m_initializingDocument = false;
 
+    this->setDocumentLoadCount(m_documentLoadCount+1);
+
     this->QSyntaxHighlighter::rehighlight();
 }
 
 void SceneDocumentBinder::initializeDocumentLater()
 {
     m_initializeDocumentTimer.start(100, this);
+}
+
+void SceneDocumentBinder::setDocumentLoadCount(int val)
+{
+    if(m_documentLoadCount == val)
+        return;
+
+    m_documentLoadCount = val;
+    emit documentLoadCountChanged();
 }
 
 void SceneDocumentBinder::setCurrentElement(SceneElement *val)

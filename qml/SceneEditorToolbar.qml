@@ -57,8 +57,8 @@ ScrollView {
                     suggestedWidth: toolbar.toolButtonWidth
                     suggestedHeight: toolbar.toolButtonHeight
                     shortcut: "Ctrl+Shift+N"
-                    shortcutText: "Shift+N"
-                    ToolTip.text: "Creates a new scene and adds it to both structure and screenplay."
+                    shortcutText: ""
+                    ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
                     onClicked: scriteDocument.createNewScene()
                 }
 

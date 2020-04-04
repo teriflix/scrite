@@ -16,6 +16,7 @@
 
 #include "scene.h"
 
+#include <QJsonValue>
 #include <QQmlListProperty>
 
 class Screenplay;
@@ -49,6 +50,11 @@ public:
     bool isExpanded() const { return m_expanded; }
     Q_SIGNAL void expandedChanged();
 
+    Q_PROPERTY(QJsonValue userData READ userData WRITE setUserData NOTIFY userDataChanged STORED false)
+    void setUserData(const QJsonValue &val);
+    QJsonValue userData() const { return m_userData; }
+    Q_SIGNAL void userDataChanged();
+
     Q_SIGNAL void elementChanged();
 
 protected:
@@ -58,6 +64,7 @@ private:
     Scene* m_scene;
     bool m_expanded;
     QString m_sceneID;
+    QJsonValue m_userData;
     Screenplay* m_screenplay;
 };
 

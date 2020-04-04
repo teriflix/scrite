@@ -235,6 +235,10 @@ public:
     QFont currentFont() const;
     Q_SIGNAL void currentFontChanged();
 
+    Q_PROPERTY(int documentLoadCount READ documentLoadCount NOTIFY documentLoadCountChanged)
+    int documentLoadCount() const { return m_documentLoadCount; }
+    Q_SIGNAL void documentLoadCountChanged();
+
     Q_SIGNAL void documentInitialized();
 
 protected:
@@ -247,6 +251,7 @@ protected:
 private:
     void initializeDocument();
     void initializeDocumentLater();
+    void setDocumentLoadCount(int val);
     void setCurrentElement(SceneElement* val);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onContentsChange(int from, int charsRemoved, int charsAdded);
@@ -260,6 +265,7 @@ private:
     Scene* m_scene;
     qreal m_textWidth;
     int m_cursorPosition;
+    int m_documentLoadCount;
     bool m_forceSyncDocument;
     QString m_completionPrefix;
     bool m_initializingDocument;

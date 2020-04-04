@@ -85,6 +85,15 @@ void ScreenplayElement::setExpanded(bool val)
     emit expandedChanged();
 }
 
+void ScreenplayElement::setUserData(const QJsonValue &val)
+{
+    if(m_userData == val)
+        return;
+
+    m_userData = val;
+    emit userDataChanged();
+}
+
 bool ScreenplayElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
