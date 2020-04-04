@@ -218,6 +218,10 @@ public:
 
     Q_INVOKABLE void tab();
     Q_INVOKABLE void backtab();
+    Q_INVOKABLE bool canGoUp();
+    Q_INVOKABLE bool canGoDown();
+
+    Q_INVOKABLE int lastCursorPosition() const;
 
     Q_PROPERTY(QStringList autoCompleteHints READ autoCompleteHints NOTIFY autoCompleteHintsChanged)
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }

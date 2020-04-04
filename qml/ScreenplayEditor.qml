@@ -59,6 +59,8 @@ Item {
             property ScreenplayElement element: screenplayElement
             property color sceneColor: element.scene.color
             property bool selected: scriteDocument.screenplay.currentElementIndex === index
+            signal assumeFocusAt(int pos)
+            onAssumeFocusAt: sceneEditor.assumeFocusAt(pos)
 
             width: screenplayListView.width
             height: layout.height + 20
@@ -114,6 +116,19 @@ Item {
                             scriteDocument.screenplay.currentElementIndex = index
                             currentElementIndexConnections.enabled = true
                             currentSceneEditor = sceneEditor
+                        }
+                    }
+                    onRequestScrollUp: {
+                        if(index > 0) {
+                            var item = screenplayListView.itemAtIndex(index-1)
+                            item.assumeFocusAt(-1)
+                        }
+                    }
+
+                    onRequestScrollDown: {
+                        if(index < scriteDocument.screenplay.elementCount) {
+                            var item = screenplayListView.itemAtIndex(index+1)
+                            item.assumeFocusAt(0)
                         }
                     }
 

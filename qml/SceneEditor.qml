@@ -29,6 +29,9 @@ Item {
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
     signal assumeFocus()
+    signal assumeFocusAt(int pos)
+    signal requestScrollUp()
+    signal requestScrollDown()
 
     Rectangle {
         id: sceneHeadingArea
@@ -135,6 +138,13 @@ Item {
             Connections {
                 target: sceneEditor
                 onAssumeFocus: sceneTextArea.forceActiveFocus()
+                onAssumeFocusAt: {
+                    sceneTextArea.forceActiveFocus()
+                    if(pos < 0)
+                        sceneTextArea.cursorPosition = sceneDocumentBinder.lastCursorPosition()
+                    else
+                        sceneTextArea.cursorPosition = pos
+                }
             }
 
             cursorDelegate: Item {
@@ -193,6 +203,22 @@ Item {
                     sceneDocumentBinder.tab()
             }
             Keys.onBackPressed: sceneDocumentBinder.backtab()
+            Keys.onUpPressed: {
+                if(sceneDocumentBinder.canGoUp())
+                    event.accepted = false
+                else {
+                    event.accepted = true
+                    requestScrollUp()
+                }
+            }
+            Keys.onDownPressed: {
+                if(sceneDocumentBinder.canGoDown())
+                    event.accepted = false
+                else {
+                    event.accepted = true
+                    requestScrollDown()
+                }
+            }
         }
     }
 

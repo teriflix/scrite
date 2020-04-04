@@ -823,9 +823,9 @@ Item {
 
     Item {
         property ProgressReport progressReport: Aggregation.findProgressReport(app)
-        Notification.active: progressReport.progress < 1
-        Notification.title: progressReport.progressText
-        Notification.text: "Progress: " + Math.floor(progressReport.progress*100) + "%"
+        Notification.active: progressReport ? progressReport.progress < 1 : false
+        Notification.title: progressReport ? progressReport.progressText : ""
+        Notification.text: progressReport ? ("Progress: " + Math.floor(progressReport.progress*100) + "%") : ""
         Notification.autoCloseDelay: 1000
         Notification.autoClose: true
     }

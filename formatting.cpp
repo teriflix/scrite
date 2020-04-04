@@ -562,6 +562,37 @@ void SceneDocumentBinder::backtab()
     // Do nothing. It doesnt work anyway!
 }
 
+bool SceneDocumentBinder::canGoUp()
+{
+    if(m_cursorPosition < 0 || this->document() == nullptr)
+        return false;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(m_cursorPosition);
+    return cursor.movePosition(QTextCursor::Up);
+}
+
+bool SceneDocumentBinder::canGoDown()
+{
+    if(m_cursorPosition < 0 || this->document() == nullptr)
+        return false;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(m_cursorPosition);
+    return cursor.movePosition(QTextCursor::Down);
+}
+
+int SceneDocumentBinder::lastCursorPosition() const
+{
+    if(m_cursorPosition < 0 || this->document() == nullptr)
+        return 0;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(m_cursorPosition);
+    cursor.movePosition(QTextCursor::End);
+    return cursor.position();
+}
+
 QFont SceneDocumentBinder::currentFont() const
 {
     if(this->document() == nullptr)
