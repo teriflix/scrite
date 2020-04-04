@@ -46,6 +46,7 @@ HEADERS += \
     scene.h \
     screenplay.h \
     scritedocument.h \
+    searchengine.h \
     structure.h \
     textexporter.h \
     textshapeitem.h \
@@ -91,6 +92,7 @@ SOURCES += \
     scene.cpp \
     screenplay.cpp \
     scritedocument.cpp \
+    searchengine.cpp \
     structure.cpp \
     textexporter.cpp \
     textshapeitem.cpp \

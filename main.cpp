@@ -22,6 +22,7 @@
 #include "aggregation.h"
 #include "eventfilter.h"
 #include "notification.h"
+#include "searchengine.h"
 #include "standardpaths.h"
 #include "textshapeitem.h"
 #include "scritedocument.h"
@@ -96,6 +97,9 @@ int main(int argc, char **argv)
     qmlRegisterType<CubicToElement>("Scrite", 1, 0, "CubicTo");
     qmlRegisterType<QuadToElement>("Scrite", 1, 0, "QuadTo");
     qmlRegisterType<TextShapeItem>("Scrite", 1, 0, "TextShapeItem");
+
+    qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
+    qmlRegisterUncreatableType<SearchAgent>("Scrite", 1, 0, "SearchAgent", "Use as attached property.");
 
     qmlRegisterUncreatableType<Notification>("Scrite", 1, 0, "Notification", "Use as attached property.");
     qmlRegisterUncreatableType<NotificationManager>("Scrite", 1, 0, "NotificationManager", "Use notificationManager instead.");

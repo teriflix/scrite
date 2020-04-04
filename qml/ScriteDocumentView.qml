@@ -51,7 +51,7 @@ Item {
                     text: "New"
                     shortcut: "Ctrl+N"
                     shortcutText: "N"
-                    // display: AbstractButton.IconOnly
+                    display: AbstractButton.IconOnly
                     onClicked: {
                         if(scriteDocument.modified)
                             askQuestion({
@@ -686,11 +686,25 @@ Item {
             id: sceneEditorView
             color: sceneEditor.backgroundColor
 
+            SearchEngine {
+                id: searchEngine
+            }
+
             SceneEditor {
                 id: sceneEditor
                 anchors.fill: parent
                 property StructureElement element: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
                 scene: element ? element.scene : null
+
+                SearchAgent.engine: searchEngine
+                SearchAgent.textDocument: editor.textDocument
+                SearchAgent.onHighlightText: {
+                    assumeFocusAt(start)
+                    editor.select(start, end)
+                }
+                SearchAgent.onClearSearchRequest: {
+                    editor.deselect()
+                }
             }
 
             Component.onCompleted: globalSceneEditorToolbar.sceneEditor = sceneEditor

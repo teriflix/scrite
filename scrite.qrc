@@ -56,5 +56,14 @@
         <file>icons/navigation/zoom_in.png</file>
         <file>icons/navigation/zoom_out.png</file>
         <file>qml/ReportGeneratorConfiguration.qml</file>
+        <file>qml/SearchBar.qml</file>
+        <file>icons/action/search.png</file>
+        <file>icons/action/search_inverted.png</file>
+        <file>icons/action/keyboard_arrow_up_inverted.png</file>
+        <file>icons/action/keyboard_arrow_up.png</file>
+        <file>icons/action/keyboard_arrow_down.png</file>
+        <file>icons/action/keyboard_arrow_down_inverted.png</file>
+        <file>icons/navigation/close.png</file>
+        <file>icons/navigation/close_inverted.png</file>
     </qresource>
 </RCC>

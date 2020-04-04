@@ -18,40 +18,57 @@ import Scrite 1.0
 Item {
     signal requestEditor()
 
-    ToolBar {
+    Rectangle {
         id: toolbar
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 1
+        color: "lightgray"
+        height: toolbarLayout.height+4
 
-        ToolButton {
-            icon.source: "../icons/content/add_box.png"
-            text: "New Scene"
-            display: ToolButton.TextBesideIcon
-            down: newSceneColorMenuLoader.active
-            onClicked: newSceneColorMenuLoader.active = true
+        Row {
+            id: toolbarLayout
+            spacing: 10
+            width: parent.width-4
+            anchors.verticalCenter: parent.verticalCenter
 
-            Loader {
-                id: newSceneColorMenuLoader
-                width: parent.width; height: 1
-                anchors.top: parent.bottom
-                sourceComponent: ColorMenu { }
-                active: false
-                onItemChanged: {
-                    if(item)
-                        item.open()
-                }
+            ToolButton {
+                id: newSceneButton
+                icon.source: "../icons/content/add_box.png"
+                text: "New Scene"
+                display: ToolButton.TextBesideIcon
+                down: newSceneColorMenuLoader.active
+                onClicked: newSceneColorMenuLoader.active = true
+                anchors.verticalCenter: parent.verticalCenter
 
-                Connections {
-                    target: newSceneColorMenuLoader.item
-                    onAboutToHide: newSceneColorMenuLoader.active = false
-                    onMenuItemClicked: {
-                        canvas.newElementColor = color
-                        canvas.newElementMode = true
-                        newSceneColorMenuLoader.active = false
+                Loader {
+                    id: newSceneColorMenuLoader
+                    width: parent.width; height: 1
+                    anchors.top: parent.bottom
+                    sourceComponent: ColorMenu { }
+                    active: false
+                    onItemChanged: {
+                        if(item)
+                            item.open()
+                    }
+
+                    Connections {
+                        target: newSceneColorMenuLoader.item
+                        onAboutToHide: newSceneColorMenuLoader.active = false
+                        onMenuItemClicked: {
+                            canvas.newElementColor = color
+                            canvas.newElementMode = true
+                            newSceneColorMenuLoader.active = false
+                        }
                     }
                 }
+            }
+
+            SearchBar {
+                id: searchBar
+                width: parent.width-newSceneButton.width-parent.spacing
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
     }
@@ -325,11 +342,25 @@ Item {
                             }
                         }
                         onTextChanged: element.scene.title = text
-                        onEditingFinished: canvas.editIndex = -1
+                        onEditingFinished: {
+                            canvas.editIndex = -1
+                            searchBar.searchEngine.clearSearch()
+                        }
                         Keys.onReturnPressed: editingFinished()
                         Transliterator.textDocument: textDocument
                         Transliterator.cursorPosition: cursorPosition
                         Transliterator.hasActiveFocus: activeFocus
+
+                        SearchAgent.engine: searchBar.searchEngine
+                        SearchAgent.sequenceNumber: index
+                        SearchAgent.textDocument: textDocument
+                        SearchAgent.onHighlightText: {
+                            select(start, end)
+                            scriteDocument.structure.currentElementIndex = index
+                        }
+                        SearchAgent.onClearSearchRequest: {
+                            deselect()
+                        }
                     }
 
                     ToolButton {

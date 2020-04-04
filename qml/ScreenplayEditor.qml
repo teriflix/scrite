@@ -26,7 +26,7 @@ Item {
         ListView {
             id: screenplayListView
             model: scriteDocument.screenplay
-            delegate: expandedDelegate
+            delegate: screenplayElementDelegate
             currentIndex: -1
             boundsBehavior: Flickable.StopAtBounds
             boundsMovement: Flickable.StopAtBounds
@@ -52,7 +52,7 @@ Item {
     }
 
     Component {
-        id: expandedDelegate
+        id: screenplayElementDelegate
 
         Rectangle {
             id: delegateItem
@@ -141,14 +141,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    Component {
-        id: collapsedDelegate
-
-        Item {
-            // TODO
         }
     }
 
