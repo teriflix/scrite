@@ -46,12 +46,14 @@ public:
 
     void start() {
         this->setProgress(0);
-        this->setProgressText("Started");
+        if(m_progressText.isEmpty())
+            this->setProgressText("Started");
     }
 
     void finish() {
         this->setProgress(1);
-        this->setProgressText("Finished");
+        if(m_progressText.isEmpty() || m_progressText == "Started")
+            this->setProgressText("Finished");
     }
 
     Q_SIGNAL void progressStarted();

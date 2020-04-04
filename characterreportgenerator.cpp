@@ -21,8 +21,8 @@
 
 CharacterReportGenerator::CharacterReportGenerator(QObject *parent)
     : AbstractReportGenerator(parent),
-      m_includeDialogues(false),
-      m_includeSceneHeadings(false)
+      m_includeDialogues(true),
+      m_includeSceneHeadings(true)
 {
 
 }
@@ -172,7 +172,7 @@ bool CharacterReportGenerator::doGenerate(QPdfWriter *pdfWriter)
                         if(element == nullptr || element->type() != SceneElement::Dialogue)
                             continue;
 
-                        if(sceneInfoWritten == false)
+                        if(sceneInfoWritten == false && m_includeSceneHeadings)
                         {
                             // Write Scene Information First
                             QTextBlockFormat blockFormat = defaultBlockFormat;
@@ -191,37 +191,40 @@ bool CharacterReportGenerator::doGenerate(QPdfWriter *pdfWriter)
                             sceneInfoWritten = true;
                         }
 
-                        // Write dialogue information next
-                        if(dialogueTable == nullptr)
+                        if(m_includeDialogues)
                         {
-                            QTextTableFormat tableFormat;
-                            tableFormat.setLeftMargin(20);
-                            tableFormat.setCellSpacing(0);
-                            tableFormat.setCellPadding(5);
-                            tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+                            // Write dialogue information next
+                            if(dialogueTable == nullptr)
+                            {
+                                QTextTableFormat tableFormat;
+                                tableFormat.setLeftMargin(20);
+                                tableFormat.setCellSpacing(0);
+                                tableFormat.setCellPadding(5);
+                                tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
 
-                            dialogueTable = cursor.insertTable(1, 2, tableFormat);
+                                dialogueTable = cursor.insertTable(1, 2, tableFormat);
+                            }
+                            else
+                                dialogueTable->appendRows(1);
+
+                            QTextBlockFormat blockFormat = defaultBlockFormat;
+
+                            QTextCharFormat charFormat = defaultCharFormat;
+                            charFormat.setFontCapitalization(QFont::AllUppercase);
+                            charFormat.setFontWeight(QFont::Bold);
+
+                            cursor = dialogueTable->cellAt(dialogueTable->rows()-1,0).firstCursorPosition();
+                            cursor.setCharFormat(charFormat);
+                            cursor.setBlockFormat(blockFormat);
+                            cursor.insertText(characterName);
+
+                            cursor = dialogueTable->cellAt(dialogueTable->rows()-1,1).firstCursorPosition();
+                            blockFormat.setAlignment(Qt::AlignJustify);
+                            charFormat = defaultCharFormat;
+                            cursor.setCharFormat(charFormat);
+                            cursor.setBlockFormat(blockFormat);
+                            cursor.insertText(element->text());
                         }
-                        else
-                            dialogueTable->appendRows(1);
-
-                        QTextBlockFormat blockFormat = defaultBlockFormat;
-
-                        QTextCharFormat charFormat = defaultCharFormat;
-                        charFormat.setFontCapitalization(QFont::AllUppercase);
-                        charFormat.setFontWeight(QFont::Bold);
-
-                        cursor = dialogueTable->cellAt(dialogueTable->rows()-1,0).firstCursorPosition();
-                        cursor.setCharFormat(charFormat);
-                        cursor.setBlockFormat(blockFormat);
-                        cursor.insertText(characterName);
-
-                        cursor = dialogueTable->cellAt(dialogueTable->rows()-1,1).firstCursorPosition();
-                        blockFormat.setAlignment(Qt::AlignJustify);
-                        charFormat = defaultCharFormat;
-                        cursor.setCharFormat(charFormat);
-                        cursor.setBlockFormat(blockFormat);
-                        cursor.insertText(element->text());
 
                         dialogCount[characterName] = dialogCount.value(characterName,0)+1;
                     }

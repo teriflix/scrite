@@ -15,7 +15,7 @@
 
 ProgressReport::ProgressReport(QObject *parent)
                :QObject(parent),
-                m_progress(0.0),
+                m_progress(1.0),
                 m_progressStep(0.0),
                 m_proxyFor(nullptr)
 {
@@ -46,6 +46,14 @@ void ProgressReport::setProxyFor(ProgressReport *val)
         connect(m_proxyFor, &ProgressReport::aboutToDelete, this, &ProgressReport::clearProxyFor);
         connect(m_proxyFor, &ProgressReport::progressTextChanged, this, &ProgressReport::updateProgressTextFromProxy);
         connect(m_proxyFor, &ProgressReport::progressChanged, this, &ProgressReport::updateProgressFromProxy);
+
+        this->setProgressText(m_proxyFor->progressText());
+        this->setProgress(m_proxyFor->progress());
+    }
+    else
+    {
+        this->setProgressText(QString());
+        this->setProgress(1.0);
     }
 
     emit proxyForChanged();

@@ -813,11 +813,22 @@ Item {
         }
     }
 
-    property ErrorReport applicationErrors: Aggregation.findErrorReport(app)
-    Notification.active: applicationErrors ? applicationErrors.hasError : false
-    Notification.title: "Scrite Error"
-    Notification.text: applicationErrors ? applicationErrors.hasError : ""
-    Notification.autoClose: false
+    Item {
+        property ErrorReport applicationErrors: Aggregation.findErrorReport(app)
+        Notification.active: applicationErrors ? applicationErrors.hasError : false
+        Notification.title: "Scrite Error"
+        Notification.text: applicationErrors ? applicationErrors.hasError : ""
+        Notification.autoClose: false
+    }
+
+    Item {
+        property ProgressReport progressReport: Aggregation.findProgressReport(app)
+        Notification.active: progressReport.progress < 1
+        Notification.title: progressReport.progressText
+        Notification.text: "Progress: " + Math.floor(progressReport.progress*100) + "%"
+        Notification.autoCloseDelay: 1000
+        Notification.autoClose: true
+    }
 
     Connections {
         target: scriteDocument

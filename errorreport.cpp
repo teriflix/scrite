@@ -44,7 +44,15 @@ void ErrorReport::setProxyFor(ErrorReport *val)
         connect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::clearProxyFor);
         connect(m_proxyFor, &ErrorReport::errorMessageChanged, this, &ErrorReport::updateErrorMessageFromProxy);
         connect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this, &ErrorReport::updateWarningMessageFromProxy);
+
+        this->setErrorMessage(m_proxyFor->errorMessage());
+        this->beginResetModel();
+        m_warningMessages = m_proxyFor->warningMessages();
+        this->endResetModel();
+        emit warningMessageCountChanged();
     }
+    else
+        this->clear();
 
     emit proxyForChanged();
 }

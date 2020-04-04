@@ -53,6 +53,10 @@ bool AbstractImporter::read()
         return false;
     }
 
+    const QMetaObject *mo = this->metaObject();
+    const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
+    this->progress()->setProgressText( QString("Importing from \"%1\"").arg(classInfo.value()));
+
     this->progress()->start();
     const bool ret = this->doImport(&file);
     this->progress()->finish();

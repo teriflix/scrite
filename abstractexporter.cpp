@@ -50,6 +50,10 @@ bool AbstractExporter::write()
         return false;
     }
 
+    const QMetaObject *mo = this->metaObject();
+    const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
+    this->progress()->setProgressText( QString("Generating \"%1\"").arg(classInfo.value()));
+
     this->progress()->start();
     const bool ret = this->doExport(&file);
     this->progress()->finish();
