@@ -89,6 +89,9 @@ Item {
             }
 
             function adjustScroll() {
+                if(currentSceneContentEditor == null)
+                    return
+
                 var rect = currentSceneContentEditor.cursorRectangle
                 var pt = currentSceneContentEditor.mapToItem(screenplayListView.contentItem, rect.x, rect.y)
                 var startY = screenplayListView.contentY
