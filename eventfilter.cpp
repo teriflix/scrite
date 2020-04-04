@@ -16,7 +16,9 @@
 #include <QEvent>
 #include <QtDebug>
 #include <QMetaEnum>
+#include <QKeyEvent>
 #include <QMetaObject>
+#include <QMouseEvent>
 
 EventFilterResult::EventFilterResult(QObject *parent)
                   :QObject(parent),
@@ -52,7 +54,7 @@ void EventFilterResult::setAcceptEvent(bool val)
 ///////////////////////////////////////////////////////////////////////////////
 
 EventFilter::EventFilter(QObject *parent)
-    :QObject(parent)
+    :QObject(parent), m_target(parent)
 {
     parent->installEventFilter(this);
 }
@@ -67,6 +69,22 @@ EventFilter *EventFilter::qmlAttachedProperties(QObject *object)
     return new EventFilter(object);
 }
 
+void EventFilter::setTarget(QObject *val)
+{
+    if(m_target == val || val == nullptr)
+        return;
+
+    if(m_target)
+        m_target->removeEventFilter(this);
+
+    m_target = val;
+
+    if(m_target)
+        m_target->installEventFilter(this);
+
+    emit targetChanged();
+}
+
 void EventFilter::setEvents(const QList<int> &val)
 {
     if(m_events == val)
@@ -74,6 +92,35 @@ void EventFilter::setEvents(const QList<int> &val)
 
     m_events = val;
     emit eventsChanged();
+}
+
+inline void packIntoJson(QMouseEvent *event, QJsonObject &object)
+{
+    auto pointToJson = [](const QPointF &pos) {
+        QJsonObject ret;
+        ret.insert("x", pos.x());
+        ret.insert("y", pos.y());
+        return ret;
+    };
+
+    object.insert("button", int(event->button()));
+    object.insert("buttons", int(event->buttons()));
+    object.insert("flags", int(event->flags()));
+    object.insert("globalPos", pointToJson(event->globalPos()));
+    object.insert("localPos", pointToJson(event->localPos()));
+    object.insert("screenPos", pointToJson(event->screenPos()));
+    object.insert("pos", pointToJson(event->pos()));
+    object.insert("windowPos", pointToJson(event->windowPos()));
+    object.insert("source", int(event->source()));
+}
+
+inline void packIntoJson(QKeyEvent *event, QJsonObject &object)
+{
+    object.insert("count", event->count());
+    object.insert("isAutoRepeat", event->isAutoRepeat());
+    object.insert("key", event->key());
+    object.insert("modifiers", int(event->modifiers()));
+    object.insert("text", event->text());
 }
 
 inline bool eventToJson(QEvent *event, QJsonObject &object)
@@ -95,6 +142,23 @@ inline bool eventToJson(QEvent *event, QJsonObject &object)
     object.insert("type", int(event->type()));
     object.insert("typeName", eventName);
     object.insert("spontaneous", event->spontaneous());
+
+    switch(event->type())
+    {
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::MouseMove:
+        packIntoJson(static_cast<QMouseEvent*>(event), object);
+        break;
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease:
+        packIntoJson(static_cast<QKeyEvent*>(event), object);
+        break;
+    default:
+        break;
+    }
+
     return true;
 }
 

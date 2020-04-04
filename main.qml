@@ -61,12 +61,14 @@ Rectangle {
         var okCallback = function() {
             if(params.callback)
                 params.callback(true)
+            modalDialog.closeable = true
             modalDialog.initItemCallback = undefined
         }
 
         var cancelCallback = function() {
             if(params.callback)
                 params.callback(false)
+            modalDialog.closeable = true
             modalDialog.initItemCallback = undefined
         }
 
@@ -81,6 +83,7 @@ Rectangle {
         modalDialog.sourceComponent = okCancelDialogComponent
         if(popupSource)
             modalDialog.popupSource = popupSource
+        modalDialog.closeable = false
         modalDialog.active = true
     }
 

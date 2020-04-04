@@ -56,6 +56,11 @@ public:
 
     static EventFilter *qmlAttachedProperties(QObject *object);
 
+    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
+    void setTarget(QObject* val);
+    QObject* target() const { return m_target; }
+    Q_SIGNAL void targetChanged();
+
     Q_PROPERTY(QList<int> events READ events WRITE setEvents NOTIFY eventsChanged)
     void setEvents(const QList<int> &val);
     QList<int> events() const { return m_events; }
@@ -67,6 +72,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
+    QObject* m_target;
     QList<int> m_events;
 };
 

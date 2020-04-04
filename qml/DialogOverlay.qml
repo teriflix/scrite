@@ -13,6 +13,7 @@
 
 import QtQuick 2.5
 import QtGraphicalEffects 1.0
+import Scrite 1.0
 
 Rectangle {
     id: dialogOverlay
@@ -60,14 +61,24 @@ Rectangle {
     visible: t > 0
     onVisibleChanged: blur.visible = visible
 
+    EventFilter.target: app
+    EventFilter.events: [6] // KeyPress
+    EventFilter.onFilter: {
+        if(closeable && event.key === Qt.Key_Escape) {
+            result.acceptEvent = true
+            result.filter = true
+            close()
+        }
+    }
+
     Behavior on t {
         SequentialAnimation {
             ScriptAction {
                 script: animationComplete = false
             }
             NumberAnimation {
-                duration: 500
-                easing.type: Easing.InOutBack
+                duration: 250
+                easing.type: Easing.Linear
             }
             ScriptAction {
                 script: animationComplete = true

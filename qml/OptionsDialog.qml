@@ -49,6 +49,7 @@ Item {
             width: 170
             model: pageModel
             spacing: 5
+            highlightMoveDuration: 50
             section.property: "group"
             section.criteria: ViewSection.FullString
             section.delegate: Rectangle {
@@ -67,7 +68,6 @@ Item {
                 color: "lightgray"
                 radius: 5
             }
-
             delegate: Text {
                 width: pageList.width
                 verticalAlignment: Text.AlignVCenter
