@@ -686,20 +686,26 @@ Item {
             id: sceneEditorView
             color: sceneEditor.backgroundColor
 
-            SearchEngine {
-                id: searchEngine
+            SearchBar {
+                id: searchBar
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
             }
 
             SceneEditor {
                 id: sceneEditor
-                anchors.fill: parent
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.top: searchBar.bottom
                 property StructureElement element: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
                 scene: element ? element.scene : null
 
-                SearchAgent.engine: searchEngine
+                SearchAgent.engine: searchBar.searchEngine
                 SearchAgent.textDocument: editor.textDocument
                 SearchAgent.onHighlightText: {
-                    assumeFocusAt(start)
+                    editor.cursorPosition = start
                     editor.select(start, end)
                 }
                 SearchAgent.onClearSearchRequest: {

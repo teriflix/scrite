@@ -40,16 +40,17 @@ Item {
             anchors.right: buttonsRow.left
             anchors.margins: 5
             Keys.onReturnPressed:triggerSearch()
-            Keys.onEscapePressed: {
-                clear()
-                theSearchEngine.clearSearch()
-            }
-            placeholderText: "search within " + theSearchEngine.searchAgentCount + " scenes."
+            Keys.onEscapePressed: clearSearch()
+            placeholderText: "search"
             function triggerSearch() {
                 if(theSearchEngine.searchString !== text)
                     theSearchEngine.searchString = text
                 else
                     theSearchEngine.cycleSearchResult()
+            }
+            function clearSearch() {
+                clear()
+                theSearchEngine.clearSearch()
             }
         }
 
@@ -99,7 +100,7 @@ Item {
                 icon.source: "../icons/navigation/close.png"
                 anchors.verticalCenter: parent.verticalCenter
                 enabled: theSearchEngine.searchResultCount > 0
-                onClicked: theSearchEngine.clearSearch()
+                onClicked: txtSearch.clearSearch()
                 suggestedHeight: 40
                 hoverEnabled: false
             }
