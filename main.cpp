@@ -35,7 +35,7 @@
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 1, 6);
+    const QVersionNumber applicationVersion(0, 1, 7);
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
