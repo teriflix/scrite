@@ -18,6 +18,7 @@
 #include "aggregation.h"
 #include "application.h"
 #include "pdfexporter.h"
+#include "odtexporter.h"
 #include "htmlexporter.h"
 #include "textexporter.h"
 #include "qobjectfactory.h"
@@ -54,6 +55,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
     ExporterFactory.addClass<StructureExporter>();
+    // ExporterFactory.addClass<OdtExporter>();
 
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
 }

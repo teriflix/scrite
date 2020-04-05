@@ -13,16 +13,15 @@
 
 #include "pdfexporter.h"
 
-#include <QPainter>
+#include <QFileInfo>
 #include <QPdfWriter>
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QFontMetrics>
 #include <QAbstractTextDocumentLayout>
-#include <QFileInfo>
 
 PdfExporter::PdfExporter(QObject *parent)
-            : AbstractExporter(parent)
+            : AbstractTextDocumentExporter(parent)
 {
 
 }
@@ -34,9 +33,7 @@ PdfExporter::~PdfExporter()
 
 bool PdfExporter::doExport(QIODevice *device)
 {
-    const ScreenplayFormat *screenplayFormat = this->document()->formatting();
     const Screenplay *screenplay = this->document()->screenplay();
-    const int nrScreenplayElements = screenplay->elementCount();
 
     QPdfWriter pdfWriter(device);
     pdfWriter.setTitle(screenplay->title());
@@ -45,154 +42,8 @@ bool PdfExporter::doExport(QIODevice *device)
     pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
 
     const qreal pageWidth = pdfWriter.width();
-
-    const QFont defaultFont = screenplayFormat->defaultFont();
-
     QTextDocument textDocument;
-    textDocument.setDefaultFont(defaultFont);
-    QTextCursor cursor(&textDocument);
-
-    // Title Page
-    {
-        // Title
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-            blockFormat.setBottomMargin(100);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(36);
-
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString title = screenplay->title();
-            if(title.isEmpty())
-                title = "Untitled Screenplay";
-            cursor.insertBlock();
-            cursor.insertText(title);
-        }
-
-        // Author
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(defaultFont.pointSize());
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString author = screenplay->author();
-            if(author.isEmpty())
-                author = "Unknown Author";
-            cursor.insertText(author);
-        }
-
-        // Contact
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(defaultFont.pointSize());
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString contact = screenplay->contact();
-            if(contact.isEmpty())
-                contact = "No Contact Information";
-            cursor.insertText(contact);
-        }
-
-        // Version
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(defaultFont.pointSize());
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString version = screenplay->version();
-            if(version.isEmpty())
-                version = "First Version";
-            cursor.insertText("Version: " + version);
-        }
-
-        // Generator
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-            blockFormat.setTopMargin(100);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(9);
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-            cursor.insertHtml("This screenplay was generated using <strong>scrite</strong><br/>(<a href=\"https://scrite.teriflix.com\">https://scrite.teriflix.com</a>)");
-        }
-
-        cursor.insertBlock();
-    }
-
-    int nrBlocks = 0, nrSceneHeadings=0;
-    auto createNewTextBlock = [&nrBlocks,pageWidth,screenplayFormat](QTextCursor &cursor, SceneElement::Type type) {
-        if(nrBlocks > 0)
-            cursor.insertBlock();
-
-        const SceneElementFormat *format = screenplayFormat->elementFormat(type);
-        QTextBlockFormat blkFormat = format->createBlockFormat(&pageWidth);
-        if(nrBlocks == 0)
-            blkFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
-
-        QTextCharFormat chrFormat = format->createCharFormat(&pageWidth);
-
-        cursor.setBlockFormat(blkFormat);
-        cursor.setCharFormat(chrFormat);
-    };
-
-    for(int i=0; i<nrScreenplayElements; i++)
-    {
-        const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
-        const Scene *scene = screenplayElement->scene();
-        const int nrSceneElements = scene->elementCount();
-
-        // Scene heading
-        SceneHeading *heading = scene->heading();
-        if(heading->isEnabled())
-        {
-            ++nrSceneHeadings;
-            const QString sceneNr = QString("[%1] ").arg(nrSceneHeadings);
-            createNewTextBlock(cursor,SceneElement::Heading);
-            cursor.insertText(sceneNr + heading->toString());
-
-            ++nrBlocks;
-        }
-
-        for(int j=0; j<nrSceneElements; j++)
-        {
-            SceneElement *element = scene->elementAt(j);
-            createNewTextBlock(cursor, element->type());
-            cursor.insertText(element->text());
-
-            ++nrBlocks;
-        }
-    }
+    this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);
 
     textDocument.print(&pdfWriter);
     return true;

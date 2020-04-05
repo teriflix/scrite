@@ -11,24 +11,24 @@
 **
 ****************************************************************************/
 
-#ifndef PDFEXPORTER_H
-#define PDFEXPORTER_H
+#ifndef ODTEXPORTER_H
+#define ODTEXPORTER_H
 
 #include "abstracttextdocumentexporter.h"
 
-class PdfExporter : public AbstractTextDocumentExporter
+class OdtExporter : public AbstractTextDocumentExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Adobe PDF")
-    Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
+    Q_CLASSINFO("Format", "Open Document Format")
+    Q_CLASSINFO("NameFilters", "Open Document Format (*.odt)")
 
 public:
-    Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
-    ~PdfExporter();
+    Q_INVOKABLE OdtExporter(QObject *parent=nullptr);
+    ~OdtExporter();
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 };
 
-#endif // PDFEXPORTER_H
+#endif // ODTEXPORTER_H

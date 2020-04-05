@@ -59,7 +59,7 @@ void CharacterReportGenerator::setIncludeDialogues(bool val)
     emit includeDialoguesChanged();
 }
 
-bool CharacterReportGenerator::doGenerate(QPdfWriter *pdfWriter)
+bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
 {
     if(m_characterNames.isEmpty())
     {
@@ -69,7 +69,7 @@ bool CharacterReportGenerator::doGenerate(QPdfWriter *pdfWriter)
 
     Screenplay *screenplay = this->document()->screenplay();
 
-    QTextDocument document;
+    QTextDocument &document = *textDocument;
     QTextCursor cursor(&document);
 
     const QFont defaultFont = this->document()->formatting()->defaultFont();
@@ -275,8 +275,6 @@ bool CharacterReportGenerator::doGenerate(QPdfWriter *pdfWriter)
         }
     }
     this->progress()->tick();
-
-    document.print(pdfWriter);
 
     return true;
 }

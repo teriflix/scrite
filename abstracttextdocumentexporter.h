@@ -11,24 +11,22 @@
 **
 ****************************************************************************/
 
-#ifndef PDFEXPORTER_H
-#define PDFEXPORTER_H
+#ifndef ABSTRACTTEXTDOCUMENTEXPORTER_H
+#define ABSTRACTTEXTDOCUMENTEXPORTER_H
 
-#include "abstracttextdocumentexporter.h"
+#include "abstractexporter.h"
 
-class PdfExporter : public AbstractTextDocumentExporter
+class AbstractTextDocumentExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Adobe PDF")
-    Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
-    Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
-    ~PdfExporter();
+    ~AbstractTextDocumentExporter();
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+    AbstractTextDocumentExporter(QObject *parent=nullptr);
+
+    void generate(QTextDocument *textDocument, const qreal pageWidth);
 };
 
-#endif // PDFEXPORTER_H
+#endif // ABSTRACTTEXTDOCUMENTEXPORTER_H

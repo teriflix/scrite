@@ -16,8 +16,8 @@
 
 #include "abstractdeviceio.h"
 
-#include <QPdfWriter>
 #include <QEventLoop>
+#include <QTextDocument>
 
 class AbstractReportGenerator : public AbstractDeviceIO
 {
@@ -25,6 +25,17 @@ class AbstractReportGenerator : public AbstractDeviceIO
 
 public:
     ~AbstractReportGenerator();
+
+    enum Format
+    {
+        AdobePDF,
+        OpenDocumentFormat
+    };
+    Q_ENUM(Format)
+    Q_PROPERTY(Format format READ format WRITE setFormat NOTIFY formatChanged STORED false)
+    void setFormat(Format val);
+    Format format() const { return m_format; }
+    Q_SIGNAL void formatChanged();
 
     Q_INVOKABLE bool generate();
 
@@ -58,9 +69,10 @@ protected:
 
 protected:
     AbstractReportGenerator(QObject *parent=nullptr);
-    virtual bool doGenerate(QPdfWriter *pdfWriter) = 0;
+    virtual bool doGenerate(QTextDocument *document) = 0;
 
 private:
+    Format m_format;
     QEventLoop m_eventLoop;
 };
 

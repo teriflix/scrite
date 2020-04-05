@@ -50,7 +50,7 @@ public:
 
 protected:
     // AbstractReportGenerator interface
-    bool doGenerate(QPdfWriter *pdfWriter);
+    bool doGenerate(QTextDocument *textDocument);
 
 private:
     bool m_includeDialogues;

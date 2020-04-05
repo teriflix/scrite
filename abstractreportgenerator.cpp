@@ -18,9 +18,12 @@
 #include <QJsonObject>
 #include <QMetaObject>
 #include <QMetaClassInfo>
+#include <QTextDocumentWriter>
+#include <QPdfWriter>
 
 AbstractReportGenerator::AbstractReportGenerator(QObject *parent)
-                        :AbstractDeviceIO(parent)
+                        :AbstractDeviceIO(parent),
+                         m_format(AdobePDF)
 {
 
 }
@@ -30,11 +33,19 @@ AbstractReportGenerator::~AbstractReportGenerator()
 
 }
 
+void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
+{
+    if(m_format == val)
+        return;
+
+    m_format = val;
+    emit formatChanged();
+}
+
 bool AbstractReportGenerator::generate()
 {
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();
-    Screenplay *screenplay = document->screenplay();
 
     this->error()->clear();
 
@@ -57,18 +68,32 @@ bool AbstractReportGenerator::generate()
         return false;
     }
 
-    QPdfWriter pdfWriter(&file);
-    pdfWriter.setTitle(screenplay->title().isEmpty() ? "Untitled Screenplay" : screenplay->title());
-    pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
-    pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+    QTextDocument textDocument;
 
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Title"));
     this->progress()->setProgressText( QString("Generating \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
-    const bool ret = this->doGenerate(&pdfWriter);
+    const bool ret = this->doGenerate(&textDocument);
+
+    if(m_format == OpenDocumentFormat)
+    {
+        QTextDocumentWriter writer;
+        writer.setFormat("ODF");
+        writer.setDevice(&file);
+        writer.write(&textDocument);
+    }
+    else
+    {
+        QPdfWriter pdfWriter(&file);
+        pdfWriter.setTitle("Scrite Character Report");
+        pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
+        pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+        pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+        textDocument.print(&pdfWriter);
+    }
+
     this->progress()->finish();
 
     return ret;
@@ -97,7 +122,7 @@ QJsonObject AbstractReportGenerator::configurationFormInfo() const
     for(int i=AbstractReportGenerator::staticMetaObject.propertyOffset(); i<mo->propertyCount(); i++)
     {
         const QMetaProperty prop = mo->property(i);
-        if(!prop.isWritable())
+        if(!prop.isWritable() || !prop.isStored())
             continue;
 
         QJsonObject field;
@@ -115,7 +140,17 @@ QJsonObject AbstractReportGenerator::configurationFormInfo() const
 QString AbstractReportGenerator::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if(fi.suffix().toLower() != "pdf")
-        return fileName + ".pdf";
+    switch(m_format)
+    {
+    case AdobePDF:
+        if(fi.suffix().toLower() != "pdf")
+            return fileName + ".pdf";
+        break;
+    case OpenDocumentFormat:
+        if(fi.suffix().toLower() != "odt")
+            return fileName + ".odt";
+        break;
+    }
+
     return fileName;
 }

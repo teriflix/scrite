@@ -14,6 +14,7 @@ HEADERS += \
     abstractimporter.h \
     abstractreportgenerator.h \
     abstractshapeitem.h \
+    abstracttextdocumentexporter.h \
     aggregation.h \
     application.h \
     characterreportgenerator.h \
@@ -31,6 +32,7 @@ HEADERS += \
     note.h \
     notification.h \
     notificationmanager.h \
+    odtexporter.h \
     painterpathitem.h \
     pdfexporter.h \
     poly2tri/common/shapes.h \
@@ -65,6 +67,7 @@ SOURCES += \
     abstractimporter.cpp \
     abstractreportgenerator.cpp \
     abstractshapeitem.cpp \
+    abstracttextdocumentexporter.cpp \
     aggregation.cpp \
     application.cpp \
     characterreportgenerator.cpp \
@@ -82,6 +85,7 @@ SOURCES += \
     note.cpp \
     notification.cpp \
     notificationmanager.cpp \
+    odtexporter.cpp \
     painterpathitem.cpp \
     pdfexporter.cpp \
     poly2tri/common/shapes.cc \

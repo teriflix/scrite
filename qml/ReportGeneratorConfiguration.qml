@@ -22,7 +22,7 @@ Item {
     property var formInfo: generator ? generator.configurationFormInfo() : {"title": "Unknown", "fields": []}
 
     width: 700
-    height: 600
+    height: 700
 
     Loader {
         anchors.fill: parent
@@ -41,7 +41,12 @@ Item {
                 selectFolder: false
                 selectMultiple: false
                 selectExisting: false
-                nameFilters: scriteDocument.reportFileSuffix()
+                nameFilters: {
+                    if(generator.format === AbstractReportGenerator.AdobePDF)
+                        return "Adobe PDF (*.pdf)"
+                    return "Open Document Format (*.odt)"
+                }
+
                 onAccepted: filePathField.text = app.urlToLocalFile(fileUrl)
             }
 
@@ -70,7 +75,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: "Select a PDF file to export into"
+                            text: "Select a file to export into"
                         }
 
                         Row {
@@ -81,13 +86,14 @@ Item {
                                 id: filePathField
                                 readOnly: true
                                 width: parent.width - filePathDialogButton.width - parent.spacing
+                                property string suffix: "." + (generator.format === AbstractReportGenerator.AdobePDF ? "pdf" : "odt")
                                 text: {
                                     if(scriteDocument.fileName !== "") {
                                         var fileInfo = app.fileInfo(scriteDocument.fileName)
                                         if(fileInfo.exists)
-                                            return fileInfo.absolutePath + "/" + fileInfo.baseName + "-Report-" + (new Date()).getTime() + ".pdf"
+                                            return fileInfo.absolutePath + "/" + fileInfo.baseName + "-Report-" + (new Date()).getTime() + suffix
                                     }
-                                    return StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/scrite-Report-" + (new Date()).getTime() + ".pdf"
+                                    return StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/scrite-Report-" + (new Date()).getTime() + suffix
                                 }
                             }
 
@@ -98,6 +104,22 @@ Item {
                                 suggestedHeight: 35
                                 onClicked: filePathDialog.open()
                                 hoverEnabled: false
+                            }
+                        }
+
+                        Row {
+                            spacing: 20
+
+                            RadioButton {
+                                text: "Adobe PDF Format"
+                                checked: generator.format === AbstractReportGenerator.AdobePDF
+                                onClicked: generator.format = AbstractReportGenerator.AdobePDF
+                            }
+
+                            RadioButton {
+                                text: "Open Document Format"
+                                checked: generator.format === AbstractReportGenerator.OpenDocumentFormat
+                                onClicked: generator.format = AbstractReportGenerator.OpenDocumentFormat
                             }
                         }
                     }
