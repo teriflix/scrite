@@ -203,6 +203,9 @@ public:
     Q_INVOKABLE qreal snapToGrid(qreal val) const;
     static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize=10.0);
 
+    void captureStructureAsImage(const QString &fileName);
+    Q_SIGNAL void captureStructureAsImageRequest(const QString &fileName);
+
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 

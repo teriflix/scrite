@@ -165,7 +165,7 @@ bool HtmlExporter::doExport(QIODevice *device)
 QString HtmlExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if(fi.suffix() != "html")
+    if(fi.suffix().toLower() != "html")
         return fileName + ".html";
     return fileName;
 }

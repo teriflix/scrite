@@ -21,6 +21,7 @@
 #include "htmlexporter.h"
 #include "textexporter.h"
 #include "qobjectfactory.h"
+#include "structureexporter.h"
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
@@ -52,6 +53,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<FinalDraftExporter>();
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
+    ExporterFactory.addClass<StructureExporter>();
 
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
 }
@@ -596,9 +598,8 @@ bool ScriteDocument::load(const QString &fileName)
 {
     m_errorReport->clear();
 
-    m_fileName = fileName;
 
-    QFile file(m_fileName);
+    QFile file(fileName);
     if( !file.open(QFile::ReadOnly) )
     {
         m_errorReport->setErrorMessage( QString("Cannot open %1 for writing.").arg(fileName));
@@ -628,6 +629,9 @@ bool ScriteDocument::load(const QString &fileName)
         m_errorReport->setErrorMessage(QString("Scrite document '%1' was created using an updated version.").arg(fileName));
         return false;
     }
+
+    m_fileName = fileName;
+    emit fileNameChanged();
 
     m_progressReport->start();
     static QObjectFactory scriteFactory;

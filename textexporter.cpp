@@ -137,7 +137,7 @@ bool TextExporter::doExport(QIODevice *device)
 QString TextExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if(fi.suffix() != "txt")
+    if(fi.suffix().toLower() != "txt")
         return fileName + ".txt";
     return fileName;
 }

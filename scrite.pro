@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml
+QT += gui qml quick widgets xml concurrent
 DESTDIR = $$PWD/../Release/
 
 DEFINES += PHTRANSLATE_STATICLIB
@@ -26,6 +26,7 @@ HEADERS += \
     gridbackgrounditem.h \
     hourglass.h \
     htmlexporter.h \
+    itemsboundingbox.h \
     logger.h \
     note.h \
     notification.h \
@@ -48,6 +49,7 @@ HEADERS += \
     scritedocument.h \
     searchengine.h \
     structure.h \
+    structureexporter.h \
     textexporter.h \
     textshapeitem.h \
     timeprofiler.h \
@@ -74,6 +76,7 @@ SOURCES += \
     formatting.cpp \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \
+    itemsboundingbox.cpp \
     logger.cpp \
     main.cpp \
     note.cpp \
@@ -94,6 +97,7 @@ SOURCES += \
     scritedocument.cpp \
     searchengine.cpp \
     structure.cpp \
+    structureexporter.cpp \
     textexporter.cpp \
     textshapeitem.cpp \
     timeprofiler.cpp \

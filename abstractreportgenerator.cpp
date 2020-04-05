@@ -115,7 +115,7 @@ QJsonObject AbstractReportGenerator::configurationFormInfo() const
 QString AbstractReportGenerator::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if(fi.suffix() != "pdf")
+    if(fi.suffix().toLower() != "pdf")
         return fileName + ".pdf";
     return fileName;
 }

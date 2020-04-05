@@ -345,9 +345,17 @@ qreal Structure::snapToGrid(qreal val) const
 
 qreal Structure::snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize)
 {
+    if(val < 0)
+        return 0;
+
     const qreal cgs = structure == nullptr ? defaultGridSize : structure->canvasGridSize();
     int nrGrids = qRound(val/cgs);
     return nrGrids * cgs;
+}
+
+void Structure::captureStructureAsImage(const QString &fileName)
+{
+    emit captureStructureAsImageRequest(fileName);
 }
 
 QQmlListProperty<StructureArea> Structure::areas()

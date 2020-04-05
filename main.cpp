@@ -28,6 +28,7 @@
 #include "scritedocument.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
+#include "itemsboundingbox.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 #include "abstractreportgenerator.h"
@@ -106,6 +107,9 @@ int main(int argc, char **argv)
     qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
     qmlRegisterType<TextDocumentSearch>("Scrite", 1, 0, "TextDocumentSearch");
     qmlRegisterUncreatableType<SearchAgent>("Scrite", 1, 0, "SearchAgent", "Use as attached property.");
+
+    qmlRegisterType<ItemsBoundingBox>("Scrite", 1, 0, "ItemsBoundingBox");
+    qmlRegisterUncreatableType<BoundingBoxItem>("Scrite", 1, 0, "BoundingBoxItem", "Use as attached property.");
 
     qmlRegisterUncreatableType<Notification>("Scrite", 1, 0, "Notification", "Use as attached property.");
     qmlRegisterUncreatableType<NotificationManager>("Scrite", 1, 0, "NotificationManager", "Use notificationManager instead.");
