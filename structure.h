@@ -195,6 +195,14 @@ public:
     qreal canvasHeight() const { return m_canvasHeight; }
     Q_SIGNAL void canvasHeightChanged();
 
+    Q_PROPERTY(qreal canvasGridSize READ canvasGridSize WRITE setCanvasGridSize NOTIFY canvasGridSizeChanged)
+    void setCanvasGridSize(qreal val);
+    qreal canvasGridSize() const { return m_canvasGridSize; }
+    Q_SIGNAL void canvasGridSizeChanged();
+
+    Q_INVOKABLE qreal snapToGrid(qreal val) const;
+    static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize=10.0);
+
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 
@@ -274,6 +282,7 @@ private:
     ScriteDocument *m_scriteDocument;
     qreal m_canvasWidth;
     qreal m_canvasHeight;
+    qreal m_canvasGridSize;
 
     static void staticAppendArea(QQmlListProperty<StructureArea> *list, StructureArea *ptr);
     static void staticClearAreas(QQmlListProperty<StructureArea> *list);

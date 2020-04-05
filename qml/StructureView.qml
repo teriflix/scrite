@@ -94,10 +94,13 @@ Item {
 
             property int currentIndex: scriteDocument.structure.currentElementIndex
             property int editIndex: -1    // index of item being edited
+            property bool ensureCurrentItemIsVisible: true
             onCurrentIndexChanged: {
                 if(currentIndex !== editIndex)
                     editIndex = -1
                 if(currentIndex >= 0) {
+                    if(!ensureCurrentItemIsVisible)
+                        return
                     var element = scriteDocument.structure.elementAt(currentIndex)
                     var rect = Qt.rect(element.x-150,element.y-50,300,100)
                     var flick = canvasScroll.contentItem
@@ -114,8 +117,11 @@ Item {
                 }
             }
             onEditIndexChanged: {
-                if(editIndex >= 0)
+                if(editIndex >= 0) {
+                    ensureCurrentItemIsVisible = false
                     scriteDocument.structure.currentElementIndex = editIndex
+                    ensureCurrentItemIsVisible = true
+                }
             }
 
             property color newElementColor: "blue"
@@ -129,12 +135,12 @@ Item {
 
             GridBackground {
                 anchors.fill: parent
-                opacity: 0.5
+                opacity: 0.5 * scriteDocument.structure.zoomLevel
                 majorTickColor: "darkgray"
                 minorTickColor: "gray"
                 majorTickLineWidth: 5
                 minorTickLineWidth: 1
-                tickDistance: 10
+                tickDistance: scriteDocument.structure.canvasGridSize
             }
 
             MouseArea {
@@ -198,13 +204,18 @@ Item {
             }
 
             function createElement(x, y, c) {
-                var props = {"x": x, "y": y}
+                var props = {
+                    "x": scriteDocument.structure.snapToGrid(x),
+                    "y": scriteDocument.structure.snapToGrid(y)
+                }
                 var element = structureElementComponent.createObject(scriteDocument.structure, props)
                 element.scene.color = c
                 scriteDocument.structure.addElement(element)
                 editIndex = scriteDocument.structure.elementCount-1
+                canvas.ensureCurrentItemIsVisible = false
                 scriteDocument.structure.currentElementIndex = editIndex
                 requestEditor()
+                canvas.ensureCurrentItemIsVisible = true
             }
 
             Rectangle {
@@ -430,7 +441,9 @@ Item {
                             if(mouse.button === Qt.RightButton)
                                 elementOptionsMenuLoader.active = true
                             else if(mouse.button === Qt.LeftButton) {
+                                canvas.ensureCurrentItemIsVisible = false
                                 scriteDocument.structure.currentElementIndex = index
+                                canvas.ensureCurrentItemIsVisible = true
                                 requestEditor()
                             }
                         }
@@ -442,8 +455,12 @@ Item {
                         drag.target: parent
                         drag.axis: Drag.XAndYAxis
                         drag.onActiveChanged: {
+                            canvas.ensureCurrentItemIsVisible = false
                             scriteDocument.structure.currentElementIndex = index
+                            canvas.ensureCurrentItemIsVisible = true
                             requestEditor()
+                            parent.x = scriteDocument.structure.snapToGrid(parent.x)
+                            parent.y = scriteDocument.structure.snapToGrid(parent.y)
                         }
                     }
 

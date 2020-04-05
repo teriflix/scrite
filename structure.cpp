@@ -299,6 +299,7 @@ Structure::Structure(QObject *parent)
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
       m_canvasWidth(10000),
       m_canvasHeight(10000),
+      m_canvasGridSize(10),
       m_currentElementIndex(-1),
       m_zoomLevel(1.0)
 {
@@ -326,6 +327,27 @@ void Structure::setCanvasHeight(qreal val)
 
     m_canvasHeight = val;
     emit canvasHeightChanged();
+}
+
+void Structure::setCanvasGridSize(qreal val)
+{
+    if( qFuzzyCompare(m_canvasGridSize, val) )
+        return;
+
+    m_canvasGridSize = val;
+    emit canvasGridSizeChanged();
+}
+
+qreal Structure::snapToGrid(qreal val) const
+{
+    return Structure::snapToGrid(val, this);
+}
+
+qreal Structure::snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize)
+{
+    const qreal cgs = structure == nullptr ? defaultGridSize : structure->canvasGridSize();
+    int nrGrids = qRound(val/cgs);
+    return nrGrids * cgs;
 }
 
 QQmlListProperty<StructureArea> Structure::areas()
