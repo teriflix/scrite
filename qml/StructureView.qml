@@ -341,6 +341,7 @@ Item {
                                 forceActiveFocus()
                             }
                         }
+                        palette: app.palette
                         onTextChanged: element.scene.title = text
                         onEditingFinished: {
                             canvas.editIndex = -1

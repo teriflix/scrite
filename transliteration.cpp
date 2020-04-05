@@ -300,15 +300,8 @@ void Transliterator::setHasActiveFocus(bool val)
 
     if(!m_hasActiveFocus)
     {
-        if(this->document() != nullptr && m_cursorPosition >= 0)
-        {
-            // Transliterate the last word
-            QTextCursor cursor(this->document());
-            cursor.setPosition(m_cursorPosition);
-            cursor.select(QTextCursor::WordUnderCursor);
-            cursor.insertText( TransliterationSettings::instance()->transliteratedWord(cursor.selectedText()) );
-            this->setCursorPosition(-1);
-        }
+        this->transliterateLastWord();
+        this->setCursorPosition(-1);
     }
 
     emit hasActiveFocusChanged();
@@ -321,6 +314,18 @@ void Transliterator::setMode(Transliterator::Mode val)
 
     m_mode = val;
     emit modeChanged();
+}
+
+void Transliterator::transliterateLastWord()
+{
+    if(this->document() != nullptr && m_cursorPosition >= 0)
+    {
+        // Transliterate the last word
+        QTextCursor cursor(this->document());
+        cursor.setPosition(m_cursorPosition);
+        cursor.select(QTextCursor::WordUnderCursor);
+        cursor.insertText( TransliterationSettings::instance()->transliteratedWord(cursor.selectedText()) );
+    }
 }
 
 QTextDocument *Transliterator::document() const

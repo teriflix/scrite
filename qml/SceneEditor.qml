@@ -118,6 +118,7 @@ Item {
             background: Rectangle {
                 color: backgroundColor
             }
+            palette: app.palette
             selectByMouse: true
             selectByKeyboard: true
             EventFilter.events: [31] // Wheel

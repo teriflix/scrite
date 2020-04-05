@@ -27,24 +27,29 @@ Item {
     Rectangle {
         anchors.fill: parent
         anchors.margins: 4
-        color: "lightgray"
+        color: enabled ? "white" : "lightgray"
         border.width: 1
         border.color: "gray"
         radius: 5
         enabled: theSearchEngine.searchAgentCount > 0
 
-        TextField {
+        TextArea {
             id: txtSearch
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.right: buttonsRow.left
             anchors.margins: 5
-            Keys.onReturnPressed:triggerSearch()
+            palette: app.palette
+            Keys.onReturnPressed: {
+                Transliterator.transliterateLastWord()
+                triggerSearch()
+            }
             Keys.onEscapePressed: clearSearch()
             placeholderText: "search"
             function triggerSearch() {
-                if(theSearchEngine.searchString !== text)
-                    theSearchEngine.searchString = text
+                var ss = text.trim()
+                if(theSearchEngine.searchString !== ss)
+                    theSearchEngine.searchString = ss
                 else
                     theSearchEngine.cycleSearchResult()
             }
@@ -52,6 +57,9 @@ Item {
                 clear()
                 theSearchEngine.clearSearch()
             }
+            Transliterator.textDocument: textDocument
+            Transliterator.cursorPosition: cursorPosition
+            Transliterator.hasActiveFocus: activeFocus
         }
 
         Row {

@@ -50,6 +50,11 @@ int main(int argc, char **argv)
 
     Application a(argc, argv, applicationVersion);
 
+    QPalette palette = Application::palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0,0.4,1));
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor("white"));
+    Application::setPalette(palette);
+
     qmlRegisterSingletonType<Aggregation>("Scrite", 1, 0, "Aggregation", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
         return new Aggregation(engine);
     });

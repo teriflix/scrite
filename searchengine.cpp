@@ -13,6 +13,7 @@
 
 #include "searchengine.h"
 
+#include <QJsonObject>
 #include <QSet>
 #include <QTextCursor>
 #include <QTimerEvent>
@@ -143,6 +144,7 @@ void SearchAgent::setTextDocument(QQuickTextDocument *val)
 
 QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 {
+#if 1
     SearchEngine::SearchFlags flags;
     Qt::CaseSensitivity cs = Qt::CaseInsensitive;
 
@@ -172,6 +174,33 @@ QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
     }
 
     return ret;
+#else
+    QTextDocument::FindFlags flags;
+    if(m_engine != nullptr)
+        flags &= int(m_engine->searchFlags());
+
+    QTextDocument document;
+    document.setPlainText(in);
+
+    QJsonArray array;
+
+    QTextCursor cursor(&document);
+    while(1)
+    {
+        cursor = document.find(of, cursor, flags);
+        if(cursor.isNull())
+            break;
+
+        QJsonObject item;
+        item.insert("start", cursor.selectionStart());
+        item.insert("end", cursor.selectionEnd());
+        array.append(item);
+
+        cursor.setPosition(cursor.selectionEnd());
+    }
+
+    return array;
+#endif
 }
 
 void SearchAgent::onTextDocumentDestroyed()
@@ -302,7 +331,10 @@ void SearchEngine::previousSearchResult()
 
 void SearchEngine::cycleSearchResult()
 {
-    this->setCurrentSearchResultIndex( (m_currentSearchResultIndex+1)%m_searchResults.size() );
+    if(!m_searchResults.isEmpty())
+        this->setCurrentSearchResultIndex( (m_currentSearchResultIndex+1)%m_searchResults.size() );
+    else
+        this->setCurrentSearchResultIndex(-1);
 }
 
 void SearchEngine::timerEvent(QTimerEvent *event)
@@ -579,7 +611,10 @@ void TextDocumentSearch::previousSearchResult()
 
 void TextDocumentSearch::cycleSearchResult()
 {
-    this->setCurrentResultIndex((m_currentResultIndex+1)%m_searchResults.size());
+    if(!m_searchResults.isEmpty())
+        this->setCurrentResultIndex((m_currentResultIndex+1)%m_searchResults.size());
+    else
+        this->setCurrentResultIndex(-1);
 }
 
 void TextDocumentSearch::onTextDocumentDestroyed()

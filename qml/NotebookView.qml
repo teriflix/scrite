@@ -246,7 +246,7 @@ Item {
                                     width: parent.width-4
                                     anchors.centerIn: parent
 
-                                    TextEdit {
+                                    TextArea {
                                         id: headingEdit
                                         width: parent.width-menuButton.width-deleteButton.width-2*parent.spacing
                                         wrapMode: Text.WordWrap
@@ -257,6 +257,8 @@ Item {
                                             if(activeFocus)
                                                 note.heading = text
                                         }
+                                        palette: app.palette
+                                        Keys.onReturnPressed: editingFinished()
                                         anchors.verticalCenter: parent.verticalCenter
                                         KeyNavigation.tab: contentEdit
                                         Transliterator.textDocument: textDocument
@@ -312,6 +314,7 @@ Item {
                                     if(activeFocus)
                                         note.content = text
                                 }
+                                palette: app.palette
                                 placeholderText: "type the contents of your note here.."
                                 KeyNavigation.tab: headingEdit
                                 Transliterator.textDocument: textDocument

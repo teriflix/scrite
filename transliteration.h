@@ -115,6 +115,8 @@ public:
     Mode mode() const { return m_mode; }
     Q_SIGNAL void modeChanged();
 
+    Q_INVOKABLE void transliterateLastWord();
+
     Q_SIGNAL void transliterationSuggestion(int from, int to, const QString &replacement, const QString &original);
 
 private:

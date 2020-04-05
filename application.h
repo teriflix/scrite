@@ -17,6 +17,7 @@
 #include <QUrl>
 #include <QRectF>
 #include <QColor>
+#include <QPalette>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QApplication>
@@ -36,6 +37,8 @@ public:
     static Application *instance();
     Application(int &argc, char **argv, const QVersionNumber &version);
     ~Application();
+
+    Q_PROPERTY(QPalette palette READ palette CONSTANT)
 
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) {
         return url.toLocalFile();
