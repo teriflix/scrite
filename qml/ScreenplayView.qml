@@ -269,6 +269,7 @@ Rectangle {
         anchors.centerIn: parent
         wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignHCenter
+        renderType: Text.NativeRendering
         font.pixelSize: 30
         enabled: false
         visible: scriteDocument.screenplay.elementCount === 0

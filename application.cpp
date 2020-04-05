@@ -79,7 +79,7 @@ QString Application::altKey() const
 
 QString Application::polishShortcutTextForDisplay(const QString &text) const
 {
-    QString text2 = text;
+    QString text2 = text.trimmed();
     text2.replace("Ctrl", this->controlKey(), Qt::CaseInsensitive);
     text2.replace("Alt", this->altKey(), Qt::CaseInsensitive);
     return text2;

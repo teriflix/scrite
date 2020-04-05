@@ -40,6 +40,7 @@ Item {
             anchors.right: buttonsRow.left
             anchors.margins: 5
             palette: app.palette
+            renderType: Text.NativeRendering
             Keys.onReturnPressed: {
                 Transliterator.transliterateLastWord()
                 triggerSearch()

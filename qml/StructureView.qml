@@ -557,6 +557,7 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 30
         enabled: false
+        renderType: Text.NativeRendering
         visible: scriteDocument.structure.elementCount === 0
         text: "Double click on an empty area in the canvas to create a scene. Hold the command key and drag lines from one scene to another to create a sequence."
     }

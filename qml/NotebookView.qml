@@ -253,6 +253,7 @@ Item {
                                         text: note.heading
                                         font.bold: true
                                         font.pixelSize: 18
+                                        renderType: Text.NativeRendering
                                         onTextChanged: {
                                             if(activeFocus)
                                                 note.heading = text
@@ -309,6 +310,7 @@ Item {
                                 wrapMode: Text.WordWrap
                                 text: note.content
                                 textFormat: TextArea.PlainText
+                                renderType: Text.NativeRendering
                                 font.pixelSize: 16
                                 onTextChanged: {
                                     if(activeFocus)

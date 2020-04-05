@@ -638,6 +638,7 @@ Item {
                             font.pixelSize: 30
                             enabled: false
                             visible: editorLoader.item == null
+                            renderType: Text.NativeRendering
                             text: "Select a scene on the canvas or in the screenplay to edit its content here."
                         }
 

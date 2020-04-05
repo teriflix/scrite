@@ -220,6 +220,66 @@ Item {
                     requestScrollDown()
                 }
             }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                enabled: !editorContextMenu.visible && sceneTextArea.activeFocus
+                onClicked: {
+                    sceneTextArea.persistentSelection = true
+                    editorContextMenu.popup()
+                    mouse.accept = true
+                }
+                cursorShape: Qt.IBeamCursor
+            }
+
+            Menu {
+                id: editorContextMenu
+                onAboutToHide: sceneTextArea.persistentSelection = false
+
+                MenuItem {
+                    text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
+                    enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
+                    onClicked: sceneTextArea.cut()
+                }
+
+                MenuItem {
+                    text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
+                    enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
+                    onClicked: sceneTextArea.copy()
+                }
+
+                MenuItem {
+                    text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
+                    enabled: sceneTextArea.canPaste
+                    onClicked: sceneTextArea.paste()
+                }
+
+                MenuSeparator {
+
+                }
+
+                Menu {
+                    title: "Format"
+
+                    Repeater {
+                        model: [
+                            { "value": SceneElement.Action, "display": "Action" },
+                            { "value": SceneElement.Character, "display": "Character" },
+                            { "value": SceneElement.Dialogue, "display": "Dialogue" },
+                            { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
+                            { "value": SceneElement.Shot, "display": "Shot" },
+                            { "value": SceneElement.Transition, "display": "Transition" }
+                        ]
+
+                        MenuItem {
+                            text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
+                            enabled: sceneEditorComponent.currentElement !== null
+                            onClicked: sceneDocumentBinder.currentElement.type = modelData.value
+                        }
+                    }
+                }
+            }
         }
     }
 
