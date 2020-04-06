@@ -81,6 +81,13 @@ Item {
             currentIndex: -1
             boundsBehavior: Flickable.StopAtBounds
             boundsMovement: Flickable.StopAtBounds
+            Transition {
+                id: moveAndDisplace
+                NumberAnimation { properties: "x,y"; duration: 250 }
+            }
+
+            moveDisplaced: moveAndDisplace
+            move: moveAndDisplace
 
             Connections {
                 target: currentSceneContentEditor

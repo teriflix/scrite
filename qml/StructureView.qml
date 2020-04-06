@@ -518,9 +518,13 @@ Item {
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 1
                             anchors.rightMargin: 3
+                            opacity: dragMouseArea.containsMouse ? 1 : 0.25
+                            scale: dragMouseArea.containsMouse ? 2 : 1
+                            Behavior on scale { NumberAnimation { duration: 250 } }
 
                             MouseArea {
                                 id: dragMouseArea
+                                hoverEnabled: true
                                 anchors.fill: parent
                                 drag.target: parent
                                 cursorShape: Qt.SizeAllCursor

@@ -108,15 +108,24 @@ Rectangle {
 
         ListView {
             id: screenplayElementList
-            model: scriteDocument.screenplay.elementCount
+            model: scriteDocument.screenplay
             property real minimumDelegateWidth: 100
             property real perElementWidth: 2.5
+            property bool moveMode: false
             orientation: Qt.Horizontal
             currentIndex: scriteDocument.screenplay.currentElementIndex
             header: Item {
                 height: screenplayElementList.height
                 width: screenplayTools.width
             }
+
+            Transition {
+                id: moveAndDisplace
+                NumberAnimation { properties: "x,y"; duration: 250 }
+            }
+
+            moveDisplaced: moveAndDisplace
+            move: moveAndDisplace
 
             footer: Item {
                 property bool highlightAsDropArea: false
@@ -140,14 +149,15 @@ Rectangle {
                         parent.highlightAsDropArea = false
                         dropSceneAt(drop.source, -1)
                         drop.acceptProposedAction()
-                        screenplayElementList.positionViewAtEnd()
+                        if(!screenplayElementList.moveMode)
+                            screenplayElementList.positionViewAtEnd()
                     }
                 }
             }
 
             delegate: Item {
                 id: elementItemDelegate
-                property ScreenplayElement element: scriteDocument.screenplay.elementAt(index)
+                property ScreenplayElement element: screenplayElement
                 property bool active: element ? scriteDocument.screenplay.activeScene === element.scene : false
                 width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth*zoomLevel)
                 height: screenplayElementList.height
@@ -210,6 +220,10 @@ Rectangle {
                             "scrite/sceneID": element.scene.id
                         }
                         Drag.source: element
+                        Drag.onActiveChanged: {
+                            scriteDocument.screenplay.currentElementIndex = index
+                            screenplayElementList.moveMode = Drag.active
+                        }
 
                         Image {
                             id: dragTriggerButton
@@ -219,9 +233,13 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 1
                             anchors.rightMargin: 3
+                            opacity: dragMouseArea.containsMouse ? 1 : 0.25
+                            scale: dragMouseArea.containsMouse ? 2 : 1
+                            Behavior on scale { NumberAnimation { duration: 250 } }
 
                             MouseArea {
                                 id: dragMouseArea
+                                hoverEnabled: true
                                 anchors.fill: parent
                                 drag.target: parent
                                 cursorShape: Qt.SizeAllCursor
@@ -246,7 +264,8 @@ Rectangle {
                         dropAreaIndicator.highlightAsDropArea = false
                         dropSceneAt(drop.source, index)
                         drop.acceptProposedAction()
-                        screenplayElementList.positionViewAtIndex(index,ListView.Contain)
+                        if(!screenplayElementList.moveMode)
+                            screenplayElementList.positionViewAtIndex(index,ListView.Contain)
                     }
                 }
 
