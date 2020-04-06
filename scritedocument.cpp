@@ -29,6 +29,8 @@
 #include "finaldraftexporter.h"
 #include "characterreportgenerator.h"
 
+#include <QDir>
+#include <QDateTime>
 #include <QFileInfo>
 #include <QSettings>
 #include <QJsonDocument>
@@ -266,6 +268,15 @@ void ScriteDocument::saveAs(const QString &fileName)
 
 void ScriteDocument::save()
 {
+    QFileInfo fi(m_fileName);
+    if(fi.exists())
+    {
+        const QString backupDirPath(fi.absolutePath() + "/" + fi.baseName() + " Backups");
+        QDir().mkpath(backupDirPath);
+        const QString backupFileName = backupDirPath + "/" + fi.baseName() + " [" + QString::number(QDateTime::currentSecsSinceEpoch()) + "].scrite";
+        QFile::copy(m_fileName, backupFileName);
+    }
+
     this->saveAs(m_fileName);
 }
 
