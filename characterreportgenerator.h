@@ -48,11 +48,19 @@ public:
     bool isIncludeDialogues() const { return m_includeDialogues; }
     Q_SIGNAL void includeDialoguesChanged();
 
+    Q_CLASSINFO("includeNotes_FieldLabel", "Include character notes")
+    Q_CLASSINFO("includeNotes_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeNotes READ includeNotes WRITE setIncludeNotes NOTIFY includeNotesChanged)
+    void setIncludeNotes(bool val);
+    bool includeNotes() const { return m_includeNotes; }
+    Q_SIGNAL void includeNotesChanged();
+
 protected:
     // AbstractReportGenerator interface
     bool doGenerate(QTextDocument *textDocument);
 
 private:
+    bool m_includeNotes;
     bool m_includeDialogues;
     bool m_includeSceneHeadings;
     QStringList m_characterNames;

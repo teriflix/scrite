@@ -21,6 +21,7 @@
 
 CharacterReportGenerator::CharacterReportGenerator(QObject *parent)
     : AbstractReportGenerator(parent),
+      m_includeNotes(false),
       m_includeDialogues(true),
       m_includeSceneHeadings(true)
 {
@@ -59,6 +60,15 @@ void CharacterReportGenerator::setIncludeDialogues(bool val)
     emit includeDialoguesChanged();
 }
 
+void CharacterReportGenerator::setIncludeNotes(bool val)
+{
+    if(m_includeNotes == val)
+        return;
+
+    m_includeNotes = val;
+    emit includeNotesChanged();
+}
+
 bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
 {
     if(m_characterNames.isEmpty())
@@ -67,7 +77,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         return false;
     }
 
-    Screenplay *screenplay = this->document()->screenplay();
+    const Screenplay *screenplay = this->document()->screenplay();
 
     QTextDocument &document = *textDocument;
     QTextCursor cursor(&document);
@@ -89,7 +99,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         cursor.setBlockFormat(blockFormat);
 
         QTextCharFormat charFormat = defaultCharFormat;
-        charFormat.setFontPointSize(18);
+        charFormat.setFontPointSize(24);
         charFormat.setFontCapitalization(QFont::AllUppercase);
         charFormat.setFontWeight(QFont::Bold);
         charFormat.setFontUnderline(true);
@@ -126,6 +136,75 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
     this->progress()->tick();
 
     const int reportSummaryPosition = cursor.position();
+
+    if(m_includeNotes)
+    {
+        QTextBlockFormat blockFormat = defaultBlockFormat;
+        blockFormat.setAlignment(Qt::AlignLeft);
+        blockFormat.setTopMargin(20);
+
+        QTextCharFormat charFormat = defaultCharFormat;
+        charFormat.setFontPointSize(20);
+        charFormat.setFontCapitalization(QFont::AllUppercase);
+        charFormat.setFontWeight(QFont::Bold);
+        charFormat.setFontItalic(true);
+
+        cursor.insertBlock(blockFormat, charFormat);
+        cursor.insertText("NOTES:");
+
+        const Structure *structure = this->document()->structure();
+        Q_FOREACH(QString characterName, m_characterNames)
+        {
+            blockFormat = defaultBlockFormat;
+            blockFormat.setIndent(1);
+
+            charFormat = defaultCharFormat;
+            charFormat.setFontWeight(QFont::Bold);
+
+            cursor.insertBlock(blockFormat, charFormat);
+            cursor.insertText(characterName);
+
+            charFormat.setFontWeight(QFont::Normal);
+            cursor.setCharFormat(charFormat);
+
+            const Character *character = structure->findCharacter(characterName);
+            if(character == nullptr || character->noteCount() == 0)
+            {
+                cursor.insertText(": no notes available.");
+                continue;
+            }
+
+            cursor.insertText(": " + QString::number(character->noteCount()) + " note(s) available.");
+
+            for(int i=0; i<character->noteCount(); i++)
+            {
+                const Note *note = character->noteAt(i);
+                QString heading = note->heading().trimmed();
+                if(heading.isEmpty())
+                    heading = "Note #" + QString::number(i+1);
+
+                blockFormat = defaultBlockFormat;
+                blockFormat.setIndent(2);
+                blockFormat.setTopMargin(10);
+
+                charFormat = defaultCharFormat;
+                charFormat.setFontWeight(QFont::Bold);
+
+                cursor.insertBlock(blockFormat, charFormat);
+                cursor.insertText(heading);
+
+                blockFormat.setTopMargin(0);
+                if(i == character->noteCount()-1 || characterName != m_characterNames.last())
+                    blockFormat.setBottomMargin(10);
+                blockFormat.setAlignment(Qt::AlignJustify);
+
+                charFormat.setFontWeight(QFont::Normal);
+                cursor.insertBlock(blockFormat, charFormat);
+                cursor.insertText(note->content());
+            }
+        }
+    }
+
     QMap<QString,int> dialogCount;
 
     // Report Detail
@@ -135,7 +214,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         blockFormat.setTopMargin(20);
 
         QTextCharFormat charFormat = defaultCharFormat;
-        charFormat.setFontPointSize(15);
+        charFormat.setFontPointSize(20);
         charFormat.setFontCapitalization(QFont::AllUppercase);
         charFormat.setFontWeight(QFont::Bold);
         charFormat.setFontItalic(true);
@@ -159,29 +238,15 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                     characterName = characterName.section('(', 0, 0).trimmed();
                     if(m_characterNames.contains(characterName))
                     {
-                        while(1)
-                        {
-                            ++j;
-                            element = scene->elementAt(j);
-                            if(element == nullptr || element->type() == SceneElement::Dialogue)
-                                break;
-                            if(element->type() != SceneElement::Parenthetical)
-                                continue;
-                        }
-
-                        if(element == nullptr || element->type() != SceneElement::Dialogue)
-                            continue;
-
                         if(sceneInfoWritten == false && m_includeSceneHeadings)
                         {
                             // Write Scene Information First
                             QTextBlockFormat blockFormat = defaultBlockFormat;
-                            blockFormat.setLeftMargin(10);
                             if(!dialogCount.isEmpty())
                                 blockFormat.setTopMargin(20);
 
                             QTextCharFormat charFormat = defaultCharFormat;
-                            charFormat.setFontPointSize(12);
+                            charFormat.setFontPointSize(14);
                             charFormat.setFontCapitalization(QFont::AllUppercase);
                             charFormat.setFontWeight(QFont::Bold);
                             charFormat.setFontItalic(false);
@@ -197,7 +262,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                             if(dialogueTable == nullptr)
                             {
                                 QTextTableFormat tableFormat;
-                                tableFormat.setLeftMargin(20);
+                                tableFormat.setLeftMargin(40);
                                 tableFormat.setCellSpacing(0);
                                 tableFormat.setCellPadding(5);
                                 tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
@@ -221,9 +286,34 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                             cursor = dialogueTable->cellAt(dialogueTable->rows()-1,1).firstCursorPosition();
                             blockFormat.setAlignment(Qt::AlignJustify);
                             charFormat = defaultCharFormat;
-                            cursor.setCharFormat(charFormat);
-                            cursor.setBlockFormat(blockFormat);
-                            cursor.insertText(element->text());
+
+                            int nr = 0;
+                            while(1)
+                            {
+                                ++j;
+                                element = scene->elementAt(j);
+                                if(element == nullptr)
+                                    break;
+
+                                if(element->type() != SceneElement::Parenthetical && element->type() != SceneElement::Dialogue)
+                                {
+                                    --j;
+                                    break;
+                                }
+
+                                charFormat.setFontItalic(element->type() == SceneElement::Parenthetical);
+                                blockFormat.setBottomMargin(element->type() == SceneElement::Dialogue ? 10 : 0);
+
+                                if(nr == 0)
+                                {
+                                    cursor.setCharFormat(charFormat);
+                                    cursor.setBlockFormat(blockFormat);
+                                }
+                                else
+                                    cursor.insertBlock(blockFormat, charFormat);
+                                cursor.insertText(element->text());
+                                ++nr;
+                            }
                         }
 
                         dialogCount[characterName] = dialogCount.value(characterName,0)+1;
@@ -245,7 +335,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         blockFormat.setTopMargin(20);
 
         QTextCharFormat charFormat = defaultCharFormat;
-        charFormat.setFontPointSize(15);
+        charFormat.setFontPointSize(20);
         charFormat.setFontCapitalization(QFont::AllUppercase);
         charFormat.setFontWeight(QFont::Bold);
         charFormat.setFontItalic(true);
@@ -254,7 +344,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         cursor.insertText("SUMMARY:");
 
         blockFormat = defaultBlockFormat;
-        blockFormat.setLeftMargin(10);
+        blockFormat.setIndent(1);
 
         QMap<QString,int>::const_iterator it = dialogCount.constBegin();
         QMap<QString,int>::const_iterator end = dialogCount.constEnd();
