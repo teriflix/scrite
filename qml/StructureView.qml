@@ -102,18 +102,20 @@ Item {
                     if(!ensureCurrentItemIsVisible)
                         return
                     var element = scriteDocument.structure.elementAt(currentIndex)
-                    var rect = Qt.rect(element.x-150,element.y-50,300,100)
+                    var rect = Qt.rect(element.x-element.width/2,element.y-element.height/2,element.width,element.height)
+                    rect = Qt.rect(rect.x*scale, rect.y*scale, rect.width*scale, rect.height*scale)
                     var flick = canvasScroll.contentItem
+                    var space = Qt.size(canvasScroll.width/scale, canvasScroll.height/scale)
 
                     if(rect.left < flick.contentX)
                         flick.contentX = rect.left
-                    else if(rect.right > flick.contentX+canvasScroll.width)
-                        flick.contentX = rect.right-canvasScroll.width
+                    else if(rect.right > flick.contentX+space.width)
+                        flick.contentX = rect.right-space.width
 
                     if(rect.top < flick.contentY)
                         flick.contentY = rect.top
-                    else if(rect.bottom > flick.contentY+canvasScroll.height)
-                        flick.contentY = rect.bottom-canvasScroll.height
+                    else if(rect.bottom > flick.contentY+space.height)
+                        flick.contentY = rect.bottom-space.height
                 }
             }
             onEditIndexChanged: {
