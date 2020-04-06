@@ -11,24 +11,24 @@
 **
 ****************************************************************************/
 
-#ifndef FINALDRAFTIMPORTER_H
-#define FINALDRAFTIMPORTER_H
+#ifndef HTMLIMPORTER_H
+#define HTMLIMPORTER_H
 
 #include <QDomDocument>
 #include "abstractimporter.h"
 
-class FinalDraftImporter : public AbstractImporter
+class HtmlImporter : public AbstractImporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Final Draft")
-    Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
+    Q_CLASSINFO("Format", "HTML")
+    Q_CLASSINFO("NameFilters", "HTML (*.html)")
 
 public:
-    Q_INVOKABLE FinalDraftImporter(QObject *parent=nullptr);
-    ~FinalDraftImporter();
+    Q_INVOKABLE HtmlImporter(QObject *parent=nullptr);
+    ~HtmlImporter();
 
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
 };
 
-#endif // FINALDRAFTIMPORTER_H
+#endif // CELTXHTMLIMPORTER_H

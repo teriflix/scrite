@@ -21,6 +21,7 @@
 #include "odtexporter.h"
 #include "htmlexporter.h"
 #include "textexporter.h"
+#include "htmlimporter.h"
 #include "qobjectfactory.h"
 #include "structureexporter.h"
 #include "qobjectserializer.h"
@@ -49,6 +50,7 @@ DeviceIOFactories::DeviceIOFactories()
       ReportGeneratorFactory("Title")
 {
     ImporterFactory.addClass<FinalDraftImporter>();
+    ImporterFactory.addClass<HtmlImporter>();
 
     ExporterFactory.addClass<PdfExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();

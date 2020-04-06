@@ -27,6 +27,7 @@ HEADERS += \
     gridbackgrounditem.h \
     hourglass.h \
     htmlexporter.h \
+    htmlimporter.h \
     itemsboundingbox.h \
     logger.h \
     note.h \
@@ -79,6 +80,7 @@ SOURCES += \
     formatting.cpp \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \
+    htmlimporter.cpp \
     itemsboundingbox.cpp \
     logger.cpp \
     main.cpp \

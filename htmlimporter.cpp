@@ -11,76 +11,70 @@
 **
 ****************************************************************************/
 
-#include "finaldraftimporter.h"
+#include "htmlimporter.h"
 
-
-FinalDraftImporter::FinalDraftImporter(QObject *parent)
-    : AbstractImporter(parent)
+HtmlImporter::HtmlImporter(QObject *parent)
+                  :AbstractImporter(parent)
 {
 
 }
 
-FinalDraftImporter::~FinalDraftImporter()
+HtmlImporter::~HtmlImporter()
 {
 
 }
 
-bool FinalDraftImporter::doImport(QIODevice *device)
+bool HtmlImporter::doImport(QIODevice *device)
 {
     QString errMsg;
     int errLine = -1;
     int errCol = -1;
 
-    QDomDocument doc;
-    if( !doc.setContent(device, &errMsg, &errLine, &errCol) )
+    QDomDocument htmlDoc;
+    if( !htmlDoc.setContent(device, &errMsg, &errLine, &errCol) )
     {
         const QString msg = QString("Parse Error: %1 at Line %2, Column %3").arg(errMsg).arg(errLine).arg(errCol);
         this->error()->setErrorMessage(msg);
         return false;
     }
 
-    QDomElement rootE = doc.documentElement();
-    if(rootE.tagName() != "FinalDraft")
+    const QDomElement rootE = htmlDoc.documentElement();
+    const QDomElement bodyE = rootE.firstChildElement("body");
+    if(bodyE.isNull())
     {
-        this->error()->setErrorMessage("Not a Final-Draft file.");
+        this->error()->setErrorMessage("Could not find <BODY> tag.");
         return false;
     }
 
-    const int fdxVersion = rootE.attribute("Version").toInt();
-    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 2 || fdxVersion >4)
-    {
-        this->error()->setErrorMessage("Unrecognised Final Draft file version.");
-        return false;
-    }
-
-    QDomElement contentE = rootE.firstChildElement("Content");
-    QDomNodeList paragraphs = contentE.elementsByTagName("Paragraph");
-    if(paragraphs.isEmpty())
+    const QDomNodeList pList = bodyE.elementsByTagName("p");
+    if(pList.isEmpty())
     {
         this->error()->setErrorMessage("No paragraphs to import.");
         return false;
     }
 
-
-    Scene *scene = nullptr;
-    this->progress()->setProgressStep(1.0 / qreal(paragraphs.size()+1));
-    this->configureCanvas(paragraphs.size());
+    this->progress()->setProgressStep(1.0 / qreal(pList.size()+1));
+    this->configureCanvas(pList.size());
 
     static const QStringList types = QStringList()
-            << "Scene Heading" << "Action" << "Character"
-            << "Dialogue" << "Parenthetical" << "Shot"
-            << "Transition";
-    QDomElement paragraphE = contentE.firstChildElement("Paragraph");
+            << "heading" << "action" << "character"
+            << "dialog" << "parenthetical" << "shot"
+            << "transition";
+
+    Scene *scene = nullptr;
+    QDomElement paragraphE = bodyE.firstChildElement("p");
     while(!paragraphE.isNull())
     {
         TraverseDomElement tde(paragraphE, this->progress());
 
-        const QString type = paragraphE.attribute("Type");
+        const QString type = paragraphE.attribute("class");
         const int typeIndex = types.indexOf(type);
         if(typeIndex < 0)
             continue;
 
-        const QString text = paragraphE.firstChildElement("Text").text();
+        QString text = paragraphE.text().trimmed();
+        text = text.replace("\r\n", " ");
+        text = text.replace("\n", " ");
         if(text.isEmpty())
             continue;
 
@@ -112,3 +106,4 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
     return true;
 }
+

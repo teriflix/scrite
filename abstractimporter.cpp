@@ -13,6 +13,7 @@
 
 #include "abstractimporter.h"
 #include <QFile>
+#include <QRegularExpression>
 
 AbstractImporter::AbstractImporter(QObject *parent)
                  :AbstractDeviceIO(parent)
@@ -62,4 +63,74 @@ bool AbstractImporter::read()
     this->progress()->finish();
 
     return ret;
+}
+
+static const qreal elementX = 225;
+static const qreal elementY = 100;
+static const qreal elementXSpacing = 275;
+static const qreal elementYSpacing = 120;
+static const qreal canvasSpaceBuffer = 500;
+
+void AbstractImporter::configureCanvas(int nrBlocks)
+{
+    Structure *structure = this->document()->structure();
+    const qreal requiredSpace = nrBlocks*elementYSpacing + canvasSpaceBuffer;
+    if(structure->canvasHeight() < requiredSpace)
+    {
+        structure->setCanvasWidth(requiredSpace);
+        structure->setCanvasHeight(requiredSpace);
+    }
+}
+
+Scene *AbstractImporter::createScene(const QString &heading)
+{
+    static const QList<QColor> sceneColors = QList<QColor>() <<
+            QColor("purple") << QColor("blue") << QColor("orange") <<
+            QColor("red") << QColor("brown") << QColor("gray");
+    Structure *structure = this->document()->structure();
+    Screenplay *screenplay = this->document()->screenplay();
+    Scene *scene = nullptr;
+
+    const int sceneIndex = structure->elementCount();
+
+    StructureElement *structureElement = new StructureElement(structure);
+    scene = new Scene(structureElement);
+    scene->setColor(sceneColors.at(sceneIndex%sceneColors.length()));
+    structureElement->setScene(scene);
+    structureElement->setX(elementX + (sceneIndex%2 ? elementXSpacing : 0));
+    structureElement->setY(elementY + elementYSpacing*sceneIndex);
+    structure->addElement(structureElement);
+
+    ScreenplayElement *screenplayElement = new ScreenplayElement(screenplay);
+    screenplayElement->setScene(scene);
+    screenplay->addElement(screenplayElement);
+
+    const int field1SepLoc = heading.indexOf(' ');
+    const int field2SepLoc = heading.lastIndexOf('-');
+    const QString locationType = heading.left(field1SepLoc).trimmed();
+    const QString moment = heading.mid(field2SepLoc+1).trimmed();
+    const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+
+    scene->heading()->setEnabled(true);
+    scene->heading()->setLocationType(SceneHeading::locationTypeStringMap().key(locationType));
+    scene->heading()->setLocation(location);
+
+    const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
+    scene->setTitle( QString("[%1] %2").arg(sceneIndex+1).arg(titleBit.toLower()) );
+
+    scene->heading()->setMoment(SceneHeading::momentStringMap().key(moment));
+
+    return scene;
+}
+
+SceneElement *AbstractImporter::addSceneElement(Scene *scene, SceneElement::Type type, const QString &text)
+{
+    if(scene == nullptr || type == SceneElement::Heading || text.isEmpty())
+        return nullptr;
+
+    SceneElement *element = new SceneElement(scene);
+    element->setType(type);
+    element->setText(text);
+    scene->addElement(element);
+    return element;
 }

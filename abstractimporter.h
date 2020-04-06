@@ -30,6 +30,29 @@ public:
 protected:
     AbstractImporter(QObject *parent=nullptr);
     virtual bool doImport(QIODevice *device) = 0;
+
+    void configureCanvas(int nrBlocks);
+    Scene *createScene(const QString &heading);
+    SceneElement *addSceneElement(Scene *scene, SceneElement::Type type, const QString &text);
 };
+
+#ifdef QDOM_H
+
+class TraverseDomElement
+{
+public:
+    TraverseDomElement(QDomElement &element, ProgressReport *progress)
+        : m_element(&element), m_progress(progress) { }
+    ~TraverseDomElement() {
+        *m_element = m_element->nextSiblingElement(m_element->tagName());
+        m_progress->tick();
+    }
+
+private:
+    QDomElement *m_element;
+    ProgressReport *m_progress;
+};
+
+#endif
 
 #endif // ABSTRACTIMPORTER_H
