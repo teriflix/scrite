@@ -142,6 +142,19 @@ Item {
 
                             Menu {
                                 title: "Recent Files"
+                                onAboutToShow: {
+                                    var newFiles = []
+                                    var filesDropped = false
+                                    recentFilesMenu.recentFiles.forEach(function(filePath) {
+                                        var fi = app.fileInfo(filePath)
+                                        if(fi.exists)
+                                            newFiles.push(filePath)
+                                        else
+                                            filesDropped = true
+                                    })
+                                    if(filesDropped)
+                                        recentFilesMenu.recentFiles = newFiles
+                                }
 
                                 Repeater {
                                     model: recentFilesMenu.recentFiles
@@ -268,8 +281,8 @@ Item {
                     icon.source: "../icons/file/file_pdf.png"
                     text: "Reports"
                     shortcut: "Ctrl+Shift+R"
-                    shortcutText: "Shift+R"
-                    // display: AbstractButton.IconOnly
+                    shortcutText: display === AbstractButton.TextBesideIcon ? "Shift+R" : ""
+                    display: appToolBar.width < 1490 ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
                     down: reportsMenu.visible
                     onClicked: reportsMenu.visible = true
 
@@ -318,8 +331,8 @@ Item {
                     icon.source: "../icons/action/settings_applications.png"
                     text: "Settings"
                     shortcut: "Ctrl+,"
-                    shortcutText: ","
-                    // display: AbstractButton.IconOnly
+                    shortcutText: display === AbstractButton.TextBesideIcon ? "," : ""
+                    display: appToolBar.width < 1560 ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
                     onClicked: {
                         modalDialog.popupSource = this
                         modalDialog.sourceComponent = optionsDialogComponent
