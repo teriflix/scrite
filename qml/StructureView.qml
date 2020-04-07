@@ -117,19 +117,6 @@ Item {
                 opacity: 0.4
             }
 
-            Connections {
-                target: scriteDocument.structure
-                onCaptureStructureAsImageRequest: {
-                    var ci = scriteDocument.structure.currentElementIndex
-                    scriteDocument.structure.currentElementIndex = -1
-                    elementsContainer.grabToImage(function(result) {
-                        result.saveToFile(fileName)
-                        scriteDocument.structure.currentElementIndex = ci
-                        app.revealFileOnDesktop(fileName)
-                    })
-                }
-            }
-
             GridBackground {
                 id: gridBackground
                 anchors.fill: parent
@@ -139,6 +126,7 @@ Item {
                 majorTickLineWidth: 5
                 minorTickLineWidth: 1
                 tickDistance: scriteDocument.structure.canvasGridSize
+                antialiasing: false
             }
 
             MouseArea {
@@ -319,7 +307,6 @@ Item {
                         height: titleText.height + 10
                         x: element.x - width/2
                         y: element.y - height/2
-                        focus: selected && !editing
 
                         Keys.onPressed: {
                             if(event.key === Qt.Key_F2)

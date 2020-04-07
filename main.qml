@@ -91,7 +91,10 @@ Rectangle {
         id: modalDialog
         active: false
         backgroundColor: "gray"
-        onCloseRequest: { active = false }
+        onCloseRequest: {
+            active = false
+            closeable = true
+        }
         property var initItemCallback
         onDialogItemChanged: {
             if(initItemCallback)

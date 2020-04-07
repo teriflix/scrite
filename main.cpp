@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     ScriteDocument scriteDocument;
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
-    format.setSamples(4);
+    format.setSamples(2);
 
     QQuickView qmlView;
     qmlView.setFormat(format);
@@ -131,9 +131,10 @@ int main(int argc, char **argv)
     qmlView.setTitle(scriteDocument.documentWindowTitle());
     QObject::connect(&scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
+    qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
+    qmlView.engine()->rootContext()->setContextProperty("logger", Logger::instance());
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", &scriteDocument);
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
-    qmlView.engine()->rootContext()->setContextProperty("logger", Logger::instance());
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(1470, 865));

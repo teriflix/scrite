@@ -40,9 +40,7 @@ public:
 
     Q_PROPERTY(QPalette palette READ palette CONSTANT)
 
-    Q_INVOKABLE QString urlToLocalFile(const QUrl &url) {
-        return url.toLocalFile();
-    }
+    Q_INVOKABLE QString urlToLocalFile(const QUrl &url) { return url.toLocalFile(); }
 
     enum Platform { LinuxDesktop, WindowsDesktop, MacOS };
     Q_ENUM(Platform)
