@@ -69,6 +69,7 @@ public:
     Q_INVOKABLE QJsonArray getLanguages() const { return this->languages(); }
 
     void *transliterator() const { return m_transliterator; }
+    void *transliteratorFor(Language language) const;
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
 
 private:
@@ -116,6 +117,8 @@ public:
     Q_SIGNAL void modeChanged();
 
     Q_INVOKABLE void transliterateLastWord();
+    Q_INVOKABLE void transliterate(int from, int to);
+    Q_INVOKABLE void transliterateToLanguage(int from, int to, int language);
 
     Q_SIGNAL void transliterationSuggestion(int from, int to, const QString &replacement, const QString &original);
 
@@ -124,7 +127,7 @@ private:
     QTextDocument *document() const;
     void onTextDocumentDestroyed();
     void processTransliteration(int from, int charsRemoved, int charsAdded);
-    void transliterate(QTextCursor &cursor);
+    void transliterate(QTextCursor &cursor, void *transliterator=nullptr);
 
 private:
     Mode m_mode;

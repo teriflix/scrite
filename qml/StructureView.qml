@@ -73,7 +73,7 @@ Item {
         }
     }
 
-    ScrollView {
+    ScrollArea {
         id: canvasScroll
         anchors.left: parent.left
         anchors.top: toolbar.bottom
@@ -82,41 +82,23 @@ Item {
         anchors.margins: 1
         contentWidth: canvas.width * canvas.scale
         contentHeight: canvas.height * canvas.scale
+        initialContentWidth: canvas.width
+        initialContentHeight: canvas.height
         clip: true
 
         Item {
             id: canvas
             width: scriteDocument.structure.canvasWidth
             height: scriteDocument.structure.canvasHeight
-            scale: scriteDocument.structure.zoomLevel
+            scale: canvasScroll.suggestedScale
             transformOrigin: Item.TopLeft
-            onScaleChanged: canvasScroll.contentItem.returnToBounds()
 
             property int currentIndex: scriteDocument.structure.currentElementIndex
             property int editIndex: -1    // index of item being edited
             property bool ensureCurrentItemIsVisible: true
             onCurrentIndexChanged: {
-                if(currentIndex !== editIndex)
-                    editIndex = -1
-                if(currentIndex >= 0) {
-                    if(!ensureCurrentItemIsVisible)
-                        return
-                    var element = scriteDocument.structure.elementAt(currentIndex)
-                    var rect = Qt.rect(element.x-element.width/2,element.y-element.height/2,element.width,element.height)
-                    rect = Qt.rect(rect.x*scale, rect.y*scale, rect.width*scale, rect.height*scale)
-                    var flick = canvasScroll.contentItem
-                    var space = Qt.size(canvasScroll.width/scale, canvasScroll.height/scale)
-
-                    if(rect.left < flick.contentX)
-                        flick.contentX = rect.left
-                    else if(rect.right > flick.contentX+space.width)
-                        flick.contentX = rect.right-space.width
-
-                    if(rect.top < flick.contentY)
-                        flick.contentY = rect.top
-                    else if(rect.bottom > flick.contentY+space.height)
-                        flick.contentY = rect.bottom-space.height
-                }
+                if(ensureCurrentItemIsVisible)
+                    canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), scale)
             }
             onEditIndexChanged: {
                 if(editIndex >= 0) {
@@ -313,15 +295,10 @@ Item {
                 }
             }
 
-            ItemsBoundingBox {
-                id: elementBoundingBox
-                margins: createMargins(50, 50, 50, 50)
-            }
-
             Item {
                 id: elementsContainer
-                width: elementBoundingBox.right
-                height: elementBoundingBox.bottom
+                width: childrenRect.width
+                height: childrenRect.height
 
                 Loader {
                     anchors.fill: parent
@@ -343,7 +320,6 @@ Item {
                         x: element.x - width/2
                         y: element.y - height/2
                         focus: selected && !editing
-                        BoundingBoxItem.belongsTo: elementBoundingBox
 
                         Keys.onPressed: {
                             if(event.key === Qt.Key_F2)
@@ -541,18 +517,6 @@ Item {
                 }
             }
         }
-    }
-
-    Slider {
-        id: zoomSlider
-        anchors.bottom: canvasScroll.bottom
-        anchors.right: canvasScroll.right
-        anchors.rightMargin: 20
-        width: 150
-        from: Math.min(canvasScroll.width/canvas.width, canvasScroll.height/canvas.height)
-        to: 2
-        value: 1
-        onValueChanged: scriteDocument.structure.zoomLevel = value
     }
 
     TextArea {

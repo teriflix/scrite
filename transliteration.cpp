@@ -78,42 +78,7 @@ void TransliterationSettings::setLanguage(TransliterationSettings::Language val)
         return;
 
     m_language = val;
-    switch(m_language)
-    {
-    case English:
-        m_transliterator = nullptr;
-        break;
-    case Bengali:
-        m_transliterator = GetBengaliTranslator();
-        break;
-    case Gujarati:
-        m_transliterator = GetGujaratiTranslator();
-        break;
-    case Hindi:
-        m_transliterator = GetHindiTranslator();
-        break;
-    case Kannada:
-        m_transliterator = GetKannadaTranslator();
-        break;
-    case Malayalam:
-        m_transliterator = GetMalayalamTranslator();
-        break;
-    case Oriya:
-        m_transliterator = GetOriyaTranslator();
-        break;
-    case Punjabi:
-        m_transliterator = GetPunjabiTranslator();
-        break;
-    case Sanskrit:
-        m_transliterator = GetSanskritTranslator();
-        break;
-    case Tamil:
-        m_transliterator = GetTamilTranslator();
-        break;
-    case Telugu:
-        m_transliterator = GetTeluguTranslator();
-        break;
-    }
+    m_transliterator = transliteratorFor(m_language);
 
     QSettings *settings = Application::instance()->settings();
     const QMetaObject *mo = this->metaObject();
@@ -213,6 +178,37 @@ QJsonArray TransliterationSettings::languages() const
     }
 
     return ret;
+}
+
+void *TransliterationSettings::transliteratorFor(TransliterationSettings::Language language) const
+{
+    switch(m_language)
+    {
+    case English:
+        return nullptr;
+    case Bengali:
+        return GetBengaliTranslator();
+    case Gujarati:
+        return GetGujaratiTranslator();
+    case Hindi:
+        return GetHindiTranslator();
+    case Kannada:
+        return GetKannadaTranslator();
+    case Malayalam:
+        return GetMalayalamTranslator();
+    case Oriya:
+        return GetOriyaTranslator();
+    case Punjabi:
+        return GetPunjabiTranslator();
+    case Sanskrit:
+        return GetSanskritTranslator();
+    case Tamil:
+        return GetTamilTranslator();
+    case Telugu:
+        return GetTeluguTranslator();
+    }
+
+    return nullptr;
 }
 
 QString TransliterationSettings::transliteratedWord(const QString &word) const
@@ -328,6 +324,36 @@ void Transliterator::transliterateLastWord()
     }
 }
 
+void Transliterator::transliterate(int from, int to)
+{
+    if(this->document() == nullptr || to-from <= 0)
+        return;
+
+    void *transliterator = TransliterationSettings::instance()->transliterator();
+    if(transliterator == nullptr)
+        return;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(from);
+    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, to-from);
+    this->transliterate(cursor);
+}
+
+void Transliterator::transliterateToLanguage(int from, int to, int language)
+{
+    if(this->document() == nullptr || to-from <= 0)
+        return;
+
+    void *transliterator = TransliterationSettings::instance()->transliteratorFor(TransliterationSettings::Language(language));
+    if(transliterator == nullptr)
+        return;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(from);
+    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, to-from);
+    this->transliterate(cursor, transliterator);
+}
+
 QTextDocument *Transliterator::document() const
 {
     return m_textDocument ? m_textDocument->textDocument() : nullptr;
@@ -375,12 +401,13 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
     }
 }
 
-void Transliterator::transliterate(QTextCursor &cursor)
+void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
 {
     if(this->document() == nullptr || cursor.document() != this->document())
         return;
 
-    void *transliterator = TransliterationSettings::instance()->transliterator();
+    if(transliterator == nullptr)
+        transliterator = TransliterationSettings::instance()->transliterator();
     if(transliterator == nullptr)
         return;
 

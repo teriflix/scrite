@@ -65,5 +65,6 @@
         <file>icons/action/keyboard_arrow_down_inverted.png</file>
         <file>icons/navigation/close.png</file>
         <file>icons/navigation/close_inverted.png</file>
+        <file>qml/ScrollArea.qml</file>
     </qresource>
 </RCC>

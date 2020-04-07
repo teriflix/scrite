@@ -255,9 +255,7 @@ Item {
                     onClicked: sceneTextArea.paste()
                 }
 
-                MenuSeparator {
-
-                }
+                MenuSeparator {  }
 
                 Menu {
                     title: "Format"
@@ -274,8 +272,23 @@ Item {
 
                         MenuItem {
                             text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
-                            enabled: sceneEditorComponent.currentElement !== null
+                            enabled: sceneDocumentBinder.currentElement !== null
                             onClicked: sceneDocumentBinder.currentElement.type = modelData.value
+                        }
+                    }
+                }
+
+                Menu {
+                    title: "Translate"
+                    enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
+
+                    Repeater {
+                        model: app.enumerationModel(app.transliterationSettings, "Language")
+
+                        MenuItem {
+                            visible: index > 0
+                            text: modelData.key
+                            onClicked: sceneTextArea.Transliterator.transliterateToLanguage(sceneTextArea.selectionStart, sceneTextArea.selectionEnd, modelData.value)
                         }
                     }
                 }

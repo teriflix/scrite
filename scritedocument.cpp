@@ -617,7 +617,7 @@ bool ScriteDocument::load(const QString &fileName)
     QFile file(fileName);
     if( !file.open(QFile::ReadOnly) )
     {
-        m_errorReport->setErrorMessage( QString("Cannot open %1 for writing.").arg(fileName));
+        m_errorReport->setErrorMessage( QString("Cannot open %1 for reading.").arg(fileName));
         return false;
     }
 
