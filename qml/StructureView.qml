@@ -97,6 +97,7 @@ Item {
             property int editIndex: -1    // index of item being edited
             property bool ensureCurrentItemIsVisible: true
             onCurrentIndexChanged: {
+                editIndex = -1
                 if(ensureCurrentItemIsVisible)
                     canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), scale)
             }
@@ -406,7 +407,7 @@ Item {
                         MouseArea {
                             id: elementItemMouseArea
                             anchors.fill: parent
-                            enabled: !titleText.activeFocus && !selectionRect.visible
+                            enabled: !titleText.hasFocus && !selectionRect.visible
                             hoverEnabled: true
                             cursorShape: enabled ? (pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.ArrowCursor
                             acceptedButtons: Qt.LeftButton|Qt.RightButton

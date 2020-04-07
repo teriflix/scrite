@@ -441,12 +441,14 @@ void SearchEngine::doSearch()
 
     if(!m_searchResults.isEmpty())
     {
-        QSet<SearchAgent*> agents;
         QPair<SearchAgent*,int> result;
         Q_FOREACH(result, m_searchResults)
-            agents += result.first;
-        Q_FOREACH(SearchAgent *agent, agents)
-            agent->clearSearchRequest();
+        {
+            result.first->clearHighlight();
+            result.first->clearSearchRequest();
+            result.first->setSearchResultCount(0);
+            result.first->setCurrentSearchResultIndex(-1);
+        }
 
         m_searchResults.clear();
         emit searchResultCountChanged();

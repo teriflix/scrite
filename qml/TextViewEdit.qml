@@ -26,6 +26,7 @@ Loader {
     property var elide: Text.ElideNone
     property SearchEngine searchEngine
     property int searchSequenceNumber: -1
+    property bool hasFocus: item.activeFocus
 
     signal textEdited(string text)
     signal editingFinished()
