@@ -67,51 +67,49 @@ Item {
         }
     }
 
-    ScrollView {
+    ListView {
+        id: screenplayListView
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: searchBar.bottom
         clip: true
+        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+        model: scriteDocument.screenplay
+        delegate: screenplayElementDelegate
+        currentIndex: -1
+        boundsBehavior: Flickable.StopAtBounds
+        boundsMovement: Flickable.StopAtBounds
+        Transition {
+            id: moveAndDisplace
+            NumberAnimation { properties: "x,y"; duration: 250 }
+        }
 
-        ListView {
-            id: screenplayListView
-            model: scriteDocument.screenplay
-            delegate: screenplayElementDelegate
-            currentIndex: -1
-            boundsBehavior: Flickable.StopAtBounds
-            boundsMovement: Flickable.StopAtBounds
-            Transition {
-                id: moveAndDisplace
-                NumberAnimation { properties: "x,y"; duration: 250 }
-            }
+        moveDisplaced: moveAndDisplace
+        move: moveAndDisplace
 
-            moveDisplaced: moveAndDisplace
-            move: moveAndDisplace
+        Connections {
+            target: currentSceneContentEditor
+            ignoreUnknownSignals: true
+            onCursorRectangleChanged: screenplayListView.adjustScroll()
+        }
 
-            Connections {
-                target: currentSceneContentEditor
-                ignoreUnknownSignals: true
-                onCursorRectangleChanged: screenplayListView.adjustScroll()
-            }
+        function adjustScroll() {
+            if(currentSceneContentEditor == null)
+                return
 
-            function adjustScroll() {
-                if(currentSceneContentEditor == null)
-                    return
+            var rect = currentSceneContentEditor.cursorRectangle
+            var pt = currentSceneContentEditor.mapToItem(screenplayListView.contentItem, rect.x, rect.y)
+            var startY = screenplayListView.contentY
+            var endY = screenplayListView.contentY + screenplayListView.height
+            if( startY < pt.y && pt.y < endY )
+                return
 
-                var rect = currentSceneContentEditor.cursorRectangle
-                var pt = currentSceneContentEditor.mapToItem(screenplayListView.contentItem, rect.x, rect.y)
-                var startY = screenplayListView.contentY
-                var endY = screenplayListView.contentY + screenplayListView.height
-                if( startY < pt.y && pt.y < endY )
-                    return
-
-                endY = endY-40
-                if( pt.y < startY )
-                    screenplayListView.contentY = pt.y
-                else if( pt.y > endY )
-                    screenplayListView.contentY = (pt.y + 40) - screenplayListView.height
-            }
+            endY = endY-40
+            if( pt.y < startY )
+                screenplayListView.contentY = pt.y
+            else if( pt.y > endY )
+                screenplayListView.contentY = (pt.y + 40) - screenplayListView.height
         }
     }
 

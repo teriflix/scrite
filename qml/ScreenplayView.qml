@@ -72,14 +72,14 @@ Rectangle {
                     ToolTip.text: "Clear the screenplay, while retaining the scenes."
                     onClicked: {
                         askQuestion({
-                            "question": "Are you sure you want to clear the screenplay?",
-                            "okButtonText": "Yes",
-                            "cancelButtonText": "No",
-                            "callback": function(val) {
-                                if(val)
-                                    scriteDocument.screenplay.clearElements()
-                            }
-                        }, this)
+                                        "question": "Are you sure you want to clear the screenplay?",
+                                        "okButtonText": "Yes",
+                                        "cancelButtonText": "No",
+                                        "callback": function(val) {
+                                            if(val)
+                                                scriteDocument.screenplay.clearElements()
+                                        }
+                                    }, this)
                     }
                 }
 
@@ -102,182 +102,180 @@ Rectangle {
         }
     }
 
-    ScrollView {
+    ListView {
+        id: screenplayElementList
         anchors.fill: parent
         anchors.margins: 10
+        model: scriteDocument.screenplay
+        property real minimumDelegateWidth: 100
+        property real perElementWidth: 2.5
+        property bool moveMode: false
+        orientation: Qt.Horizontal
+        currentIndex: scriteDocument.screenplay.currentElementIndex
+        header: Item {
+            height: screenplayElementList.height
+            width: screenplayTools.width
+        }
+        ScrollBar.horizontal: ScrollBar { }
 
-        ListView {
-            id: screenplayElementList
-            model: scriteDocument.screenplay
-            property real minimumDelegateWidth: 100
-            property real perElementWidth: 2.5
-            property bool moveMode: false
-            orientation: Qt.Horizontal
-            currentIndex: scriteDocument.screenplay.currentElementIndex
-            header: Item {
-                height: screenplayElementList.height
-                width: screenplayTools.width
+        Transition {
+            id: moveAndDisplace
+            NumberAnimation { properties: "x,y"; duration: 250 }
+        }
+
+        moveDisplaced: moveAndDisplace
+        move: moveAndDisplace
+
+        footer: Item {
+            property bool highlightAsDropArea: false
+            width: screenplayElementList.width-2*screenplayElementList.minimumDelegateWidth
+            height: screenplayElementList.height
+
+            Rectangle {
+                width: 5
+                height: parent.height
+                color: parent.highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
             }
 
-            Transition {
-                id: moveAndDisplace
-                NumberAnimation { properties: "x,y"; duration: 250 }
-            }
+            DropArea {
+                anchors.fill: parent
+                keys: [dropAreaKey]
 
-            moveDisplaced: moveAndDisplace
-            move: moveAndDisplace
+                onEntered: parent.highlightAsDropArea = true
+                onExited: parent.highlightAsDropArea = false
 
-            footer: Item {
-                property bool highlightAsDropArea: false
-                width: screenplayElementList.width-2*screenplayElementList.minimumDelegateWidth
-                height: screenplayElementList.height
-
-                Rectangle {
-                    width: 5
-                    height: parent.height
-                    color: parent.highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
+                onDropped: {
+                    parent.highlightAsDropArea = false
+                    dropSceneAt(drop.source, -1)
+                    drop.acceptProposedAction()
+                    if(!screenplayElementList.moveMode)
+                        screenplayElementList.positionViewAtEnd()
                 }
+            }
+        }
 
-                DropArea {
-                    anchors.fill: parent
-                    keys: [dropAreaKey]
+        delegate: Item {
+            id: elementItemDelegate
+            property ScreenplayElement element: screenplayElement
+            property bool active: element ? scriteDocument.screenplay.activeScene === element.scene : false
+            width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth*zoomLevel)
+            height: screenplayElementList.height
 
-                    onEntered: parent.highlightAsDropArea = true
-                    onExited: parent.highlightAsDropArea = false
+            Loader {
+                anchors.fill: parent
+                anchors.leftMargin: 7.5
+                anchors.rightMargin: 2.5
+                active: element !== null && element.scene !== null
+                sourceComponent: Rectangle {
+                    radius: 8
+                    color: Qt.tint(element.scene.color, "#C0FFFFFF")
+                    border.color: color === Qt.rgba(1,1,1,1) ? "black" : element.scene.color
+                    border.width: elementItemDelegate.active ? 4 : 1
+                    Behavior on border.width { NumberAnimation { duration: 400 } }
 
-                    onDropped: {
-                        parent.highlightAsDropArea = false
-                        dropSceneAt(drop.source, -1)
-                        drop.acceptProposedAction()
-                        if(!screenplayElementList.moveMode)
-                            screenplayElementList.positionViewAtEnd()
+                    Text {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: menuButton.bottom
+                        anchors.bottom: dragTriggerButton.top
+                        anchors.margins: 5
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
+                        wrapMode: Text.WrapAnywhere
+                        elide: Text.ElideRight
+                        font.pixelSize: 15
+                        lineHeight: 1.25
+                        text: element.scene.title
+                        visible: width >= 80
                     }
-                }
-            }
 
-            delegate: Item {
-                id: elementItemDelegate
-                property ScreenplayElement element: screenplayElement
-                property bool active: element ? scriteDocument.screenplay.activeScene === element.scene : false
-                width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth*zoomLevel)
-                height: screenplayElementList.height
-
-                Loader {
-                    anchors.fill: parent
-                    anchors.leftMargin: 7.5
-                    anchors.rightMargin: 2.5
-                    active: element !== null && element.scene !== null
-                    sourceComponent: Rectangle {
-                        radius: 8
-                        color: Qt.tint(element.scene.color, "#C0FFFFFF")
-                        border.color: color === Qt.rgba(1,1,1,1) ? "black" : element.scene.color
-                        border.width: elementItemDelegate.active ? 4 : 1
-                        Behavior on border.width { NumberAnimation { duration: 400 } }
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: menuButton.bottom
-                            anchors.bottom: dragTriggerButton.top
-                            anchors.margins: 5
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignTop
-                            wrapMode: Text.WrapAnywhere
-                            elide: Text.ElideRight
-                            font.pixelSize: 15
-                            lineHeight: 1.25
-                            text: element.scene.title
-                            visible: width >= 80
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            scriteDocument.screenplay.currentElementIndex = index
+                            requestEditor()
                         }
+                    }
+
+                    RoundButton {
+                        id: menuButton
+                        icon.source: "../icons/navigation/menu.png"
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.margins: 5
+                        onClicked: {
+                            elementItemMenu.element = element
+                            elementItemMenu.popup(this)
+                        }
+                    }
+
+                    // Drag to timeline support
+                    Drag.active: dragMouseArea.drag.active
+                    Drag.dragType: Drag.Automatic
+                    Drag.supportedActions: Qt.MoveAction
+                    Drag.hotSpot.x: width/2
+                    Drag.hotSpot.y: height/2
+                    Drag.mimeData: {
+                        "scrite/sceneID": element.scene.id
+                    }
+                    Drag.source: element
+                    Drag.onActiveChanged: {
+                        scriteDocument.screenplay.currentElementIndex = index
+                        screenplayElementList.moveMode = Drag.active
+                    }
+
+                    Image {
+                        id: dragTriggerButton
+                        source: "../icons/action/view_array.png"
+                        width: 24; height: 24
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 1
+                        anchors.rightMargin: 3
+                        opacity: dragMouseArea.containsMouse ? 1 : 0.25
+                        scale: dragMouseArea.containsMouse ? 2 : 1
+                        Behavior on scale { NumberAnimation { duration: 250 } }
 
                         MouseArea {
+                            id: dragMouseArea
+                            hoverEnabled: true
                             anchors.fill: parent
-                            onClicked: {
-                                scriteDocument.screenplay.currentElementIndex = index
-                                requestEditor()
-                            }
-                        }
-
-                        RoundButton {
-                            id: menuButton
-                            icon.source: "../icons/navigation/menu.png"
-                            anchors.top: parent.top
-                            anchors.right: parent.right
-                            anchors.margins: 5
-                            onClicked: {
-                                elementItemMenu.element = element
-                                elementItemMenu.popup(this)
-                            }
-                        }
-
-                        // Drag to timeline support
-                        Drag.active: dragMouseArea.drag.active
-                        Drag.dragType: Drag.Automatic
-                        Drag.supportedActions: Qt.MoveAction
-                        Drag.hotSpot.x: width/2
-                        Drag.hotSpot.y: height/2
-                        Drag.mimeData: {
-                            "scrite/sceneID": element.scene.id
-                        }
-                        Drag.source: element
-                        Drag.onActiveChanged: {
-                            scriteDocument.screenplay.currentElementIndex = index
-                            screenplayElementList.moveMode = Drag.active
-                        }
-
-                        Image {
-                            id: dragTriggerButton
-                            source: "../icons/action/view_array.png"
-                            width: 24; height: 24
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 1
-                            anchors.rightMargin: 3
-                            opacity: dragMouseArea.containsMouse ? 1 : 0.25
-                            scale: dragMouseArea.containsMouse ? 2 : 1
-                            Behavior on scale { NumberAnimation { duration: 250 } }
-
-                            MouseArea {
-                                id: dragMouseArea
-                                hoverEnabled: true
-                                anchors.fill: parent
-                                drag.target: parent
-                                cursorShape: Qt.SizeAllCursor
-                                onPressed: {
-                                    elementItemDelegate.grabToImage(function(result) {
-                                        elementItemDelegate.Drag.imageSource = result.url
-                                    })
-                                }
+                            drag.target: parent
+                            cursorShape: Qt.SizeAllCursor
+                            onPressed: {
+                                elementItemDelegate.grabToImage(function(result) {
+                                    elementItemDelegate.Drag.imageSource = result.url
+                                })
                             }
                         }
                     }
                 }
+            }
 
-                DropArea {
-                    anchors.fill: parent
-                    keys: [dropAreaKey]
+            DropArea {
+                anchors.fill: parent
+                keys: [dropAreaKey]
 
-                    onEntered: dropAreaIndicator.highlightAsDropArea = true
-                    onExited: dropAreaIndicator.highlightAsDropArea = false
+                onEntered: dropAreaIndicator.highlightAsDropArea = true
+                onExited: dropAreaIndicator.highlightAsDropArea = false
 
-                    onDropped: {
-                        dropAreaIndicator.highlightAsDropArea = false
-                        dropSceneAt(drop.source, index)
-                        drop.acceptProposedAction()
-                        if(!screenplayElementList.moveMode)
-                            screenplayElementList.positionViewAtIndex(index,ListView.Contain)
-                    }
+                onDropped: {
+                    dropAreaIndicator.highlightAsDropArea = false
+                    dropSceneAt(drop.source, index)
+                    drop.acceptProposedAction()
+                    if(!screenplayElementList.moveMode)
+                        screenplayElementList.positionViewAtIndex(index,ListView.Contain)
                 }
+            }
 
-                Rectangle {
-                    id: dropAreaIndicator
-                    width: 5
-                    height: parent.height
-                    anchors.left: parent.left
+            Rectangle {
+                id: dropAreaIndicator
+                width: 5
+                height: parent.height
+                anchors.left: parent.left
 
-                    property bool highlightAsDropArea: false
-                    color: highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
-                }
+                property bool highlightAsDropArea: false
+                color: highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
             }
         }
     }

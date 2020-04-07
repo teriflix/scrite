@@ -298,7 +298,9 @@ Item {
 
                                 MenuItem {
                                     text: modelData
-                                    onTriggered: reportGeneratorTimer.reportName = modelData
+                                    onTriggered: {
+                                        reportGeneratorTimer.reportName = modelData
+                                    }
                                 }
                             }
                         }
@@ -871,6 +873,7 @@ Item {
                 if(item)
                     item.generator = reportGenerator
             }
+            modalDialog.closeable = false
             modalDialog.sourceComponent = reportGeneratorConfigurationComponent
             modalDialog.popupSource = reportsButton
             modalDialog.active = true

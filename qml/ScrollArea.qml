@@ -27,8 +27,8 @@ Flickable {
     Behavior on contentX { NumberAnimation { duration: 250 } }
     Behavior on contentY { NumberAnimation { duration: 250 } }
 
-    ScrollBar.horizontal: ScrollBar { }
-    ScrollBar.vertical: ScrollBar { }
+    ScrollBar.horizontal: ScrollBar { policy: ScrollBar.AlwaysOn }
+    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
 
     function ensureItemVisible(item, scaling, leaveMargin) {
         if(item === null)

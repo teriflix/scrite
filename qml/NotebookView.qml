@@ -140,48 +140,44 @@ Item {
 
     property var notesPack: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
 
-    ScrollView {
-        id: notesScrollView
+    GridView {
+        id: notesGrid
+        width: notesGrid.width
         anchors.left: parent.left
         anchors.right: notebookTabsView.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 5
         clip: true
-        ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
 
-        GridView {
-            id: notesGrid
-            width: notesScrollView.width
+        property real minimumCellWidth: 340
+        property int nrCells: Math.floor(width/minimumCellWidth)
 
-            property real minimumCellWidth: 340
-            property int nrCells: Math.floor(width/minimumCellWidth)
+        cellWidth: width/nrCells
+        cellHeight: 400
 
-            cellWidth: width/nrCells
-            cellHeight: 400
+        model: notesPack ? notesPack.noteCount+1 : 0
 
-            model: notesPack ? notesPack.noteCount+1 : 0
+        delegate: Item {
+            width: notesGrid.cellWidth
+            height: notesGrid.cellHeight
 
-            delegate: Item {
-                width: notesGrid.cellWidth
-                height: notesGrid.cellHeight
-
-                Loader {
-                    anchors.fill: parent
-                    anchors.rightMargin: (index%notesGrid.nrCells) ? 20 : 5
-                    property int noteIndex: index < notesPack.noteCount ? index : -1
-                    sourceComponent: noteIndex >= 0 ? noteDelegate : newNoteDelegate
-                    active: true
-                }
+            Loader {
+                anchors.fill: parent
+                anchors.rightMargin: (index%notesGrid.nrCells) ? 20 : 5
+                property int noteIndex: index < notesPack.noteCount ? index : -1
+                sourceComponent: noteIndex >= 0 ? noteDelegate : newNoteDelegate
+                active: true
             }
         }
     }
 
     Loader {
-        anchors.left: notesScrollView.left
-        anchors.right: notesScrollView.right
-        anchors.bottom: notesScrollView.bottom
-        anchors.top: notesScrollView.verticalCenter
+        anchors.left: notesGrid.left
+        anchors.right: notesGrid.right
+        anchors.bottom: notesGrid.bottom
+        anchors.top: notesGrid.verticalCenter
         active: notesPack ? notesPack.noteCount === 0 : false
         sourceComponent: Item {
             Text {
@@ -414,13 +410,13 @@ Item {
                 }
 
                 Rectangle {
-                    anchors.fill: charactersScrollView
+                    anchors.fill: charactersListView
                     anchors.margins: -2
                     border { width: 1; color: "black" }
                 }
 
-                ScrollView {
-                    id: charactersScrollView
+                ListView {
+                    id: charactersListView
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.top: title.bottom
@@ -428,38 +424,36 @@ Item {
                     anchors.topMargin: 20
                     anchors.bottomMargin: 10
                     clip: true
+                    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
 
-                    ListView {
-                        id: charactersListView
-                        property var detectedCharacters: scriteDocument.structure.detectCharacters()
-                        property var newCharacters: []
+                    property var detectedCharacters: scriteDocument.structure.detectCharacters()
+                    property var newCharacters: []
 
-                        model: detectedCharacters
+                    model: detectedCharacters
+                    spacing: 10
+                    delegate: Row {
+                        width: charactersListView.width
                         spacing: 10
-                        delegate: Row {
-                            width: charactersListView.width
-                            spacing: 10
 
-                            CheckBox {
-                                checkable: true
-                                checked: modelData.added
-                                anchors.verticalCenter: parent.verticalCenter
-                                enabled: modelData.added === false
-                                onToggled: {
-                                    var chs = charactersListView.newCharacters
-                                    if(checked)
-                                        chs.push(modelData.name)
-                                    else
-                                        chs.splice( chs.indexOf(modelData.name), 1 )
-                                    charactersListView.newCharacters = chs
-                                }
+                        CheckBox {
+                            checkable: true
+                            checked: modelData.added
+                            anchors.verticalCenter: parent.verticalCenter
+                            enabled: modelData.added === false
+                            onToggled: {
+                                var chs = charactersListView.newCharacters
+                                if(checked)
+                                    chs.push(modelData.name)
+                                else
+                                    chs.splice( chs.indexOf(modelData.name), 1 )
+                                charactersListView.newCharacters = chs
                             }
+                        }
 
-                            Text {
-                                font.pixelSize: 15
-                                text: modelData.name
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
+                        Text {
+                            font.pixelSize: 15
+                            text: modelData.name
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
                 }

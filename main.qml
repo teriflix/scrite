@@ -90,16 +90,13 @@ Rectangle {
     UI.DialogOverlay {
         id: modalDialog
         active: false
-        onCloseRequest: {
-            active = false
-            initItemCallback = undefined
-        }
         backgroundColor: "gray"
-
+        onCloseRequest: { active = false }
         property var initItemCallback
         onDialogItemChanged: {
             if(initItemCallback)
                 initItemCallback(dialogItem)
+            initItemCallback = undefined
         }
     }
 

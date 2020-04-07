@@ -55,7 +55,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.bottom: generateButton.top
+                anchors.bottom: buttonRow.top
                 anchors.margins: 20
                 anchors.bottomMargin: 10
 
@@ -142,19 +142,32 @@ Item {
                 }
             }
 
-            Button {
-                id: generateButton
-                text: "Generate"
+            Row {
+                id: buttonRow
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 20
-                enabled: filePathField.text !== ""
-                onClicked: {
-                    modalDialog.close()
-                    generator.fileName = filePathField.text
-                    generator.accept()
+                spacing: 20
+
+                Button {
+                    text: "Cancel"
+                    onClicked: {
+                        generator.reject()
+                        modalDialog.close()
+                    }
+                }
+
+                Button {
+                    enabled: filePathField.text !== ""
+                    text: "Generate"
+                    onClicked: {
+                        generator.fileName = filePathField.text
+                        generator.accept()
+                        modalDialog.close()
+                    }
                 }
             }
+
         }
     }
 
@@ -186,13 +199,13 @@ Item {
             }
 
             Rectangle {
-                anchors.fill: characterNameScrollView
+                anchors.fill: characterNameListView
                 anchors.margins: -1
                 border { width: 1; color: "black" }
             }
 
-            ScrollView {
-                id: characterNameScrollView
+            ListView {
+                id: characterNameListView
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: fieldTitleText.bottom
@@ -200,32 +213,29 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.rightMargin: 30
                 anchors.leftMargin: 5
+                clip: true
+                model: scriteDocument.structure.characterNames
+                spacing: 5
+                currentIndex: -1
+                ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+                delegate: Item {
+                    width: characterNameListView.width
+                    height: 35
 
-                ListView {
-                    id: characterNameListView
-                    clip: true
-                    model: scriteDocument.structure.characterNames
-                    spacing: 5
-                    currentIndex: -1
-                    delegate: Item {
-                        width: characterNameListView.width
-                        height: 35
-
-                        CheckBox {
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.margins: 5
-                            font.pixelSize: 15
-                            text: modelData
-                            onToggled: {
-                                var names = characterNames
-                                if(checked)
-                                    names.push(modelData)
-                                else
-                                    names.splice(names.indexOf(modelData),1)
-                                characterNames = names
-                            }
+                    CheckBox {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.margins: 5
+                        font.pixelSize: 15
+                        text: modelData
+                        onToggled: {
+                            var names = characterNames
+                            if(checked)
+                                names.push(modelData)
+                            else
+                                names.splice(names.indexOf(modelData),1)
+                            characterNames = names
                         }
                     }
                 }
@@ -255,10 +265,5 @@ Item {
             textFormat: Text.RichText
             text: "Do not know how to configure <strong>" + fieldName + "</strong>"
         }
-    }
-
-    Connections {
-        target: modalDialog
-        onCloseRequest: generator.reject()
     }
 }

@@ -50,18 +50,10 @@ public:
     }
 
     Q_INVOKABLE QJsonObject configurationFormInfo() const;
-
-    Q_INVOKABLE void accept() {
-        m_eventLoop.exit(0);
-    }
-
-    Q_INVOKABLE void reject() {
-        m_eventLoop.exit(1);
-    }
-
-    Q_INVOKABLE bool exec() {
-        return m_eventLoop.exec() == 0;
-    }
+    Q_INVOKABLE void accept() { m_eventLoop.exit(0); }
+    Q_INVOKABLE void reject() { m_eventLoop.exit(1); }
+    Q_INVOKABLE bool isInExec() const { return m_eventLoop.isRunning(); }
+    Q_INVOKABLE bool exec() { return m_eventLoop.exec() == 0; }
 
 protected:
     // AbstractDeviceIO interface
