@@ -66,5 +66,6 @@
         <file>icons/navigation/close.png</file>
         <file>icons/navigation/close_inverted.png</file>
         <file>qml/ScrollArea.qml</file>
+        <file>qml/TextViewEdit.qml</file>
     </qresource>
 </RCC>

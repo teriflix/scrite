@@ -92,10 +92,11 @@ void SearchAgent::setCurrentSearchResultIndex(int val)
     {
         if(m_currentSearchResultIndex != -1)
         {
+            emit clearHighlight();
+
             m_currentSearchResultIndex = -1;
             emit currentSearchResultIndexChanged();
 
-            emit clearHighlight();
         }
 
         return;
@@ -105,14 +106,13 @@ void SearchAgent::setCurrentSearchResultIndex(int val)
     if(m_currentSearchResultIndex == val)
         return;
 
+    emit clearHighlight();
+
     m_currentSearchResultIndex = val;
     emit currentSearchResultIndexChanged();
 
     if(val < 0 || val >= m_textDocumentSearchResults.size())
-    {
-        emit clearHighlight();
         return;
-    }
 
     const QPair<int,int> result = m_textDocumentSearchResults.at(val);
     emit highlightText(result.first, result.second);
@@ -154,6 +154,13 @@ QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
     if(flags.testFlag(SearchEngine::SearchCaseSensitively))
         cs = Qt::CaseSensitive;
 
+    auto createResultItem = [](int from, int to) {
+        QJsonObject item;
+        item.insert("from", from);
+        item.insert("to", to);
+        return item;
+    };
+
     QJsonArray ret;
     int from = 0;
     while(1)
@@ -165,10 +172,10 @@ QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
         if(flags.testFlag(SearchEngine::SearchWholeWords))
         {
             if(pos + of.length() >= in.length() || in.at(pos+of.length()).isSpace())
-                ret.append( QJsonValue(pos) );
+                ret.append( createResultItem(pos,pos+of.length()-1) );
         }
         else
-            ret.append( QJsonValue(pos) );
+            ret.append( createResultItem(pos,pos+of.length()-1) );
 
         from = pos + of.length();
     }
@@ -201,6 +208,14 @@ QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 
     return array;
 #endif
+}
+
+QString SearchAgent::createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const
+{
+    QString ret = text;
+    ret.insert(to+1, "</span>");
+    ret.insert(from, QString("<span style=\"background-color: %1; color: %2;\">").arg(bg.name()).arg(fg.name()));
+    return ret;
 }
 
 void SearchAgent::onTextDocumentDestroyed()
@@ -556,10 +571,10 @@ void TextDocumentSearch::setCurrentResultIndex(int val)
     {
         if(m_currentResultIndex != -1)
         {
+            emit clearHighlight();
+
             m_currentResultIndex = -1;
             emit currentResultIndexChanged();
-
-            emit clearHighlight();
         }
 
         return;
@@ -569,14 +584,13 @@ void TextDocumentSearch::setCurrentResultIndex(int val)
     if(m_currentResultIndex == val)
         return;
 
+    emit clearHighlight();
+
     m_currentResultIndex = val;
     emit currentResultIndexChanged();
 
     if(val < 0 || val >= m_searchResults.size())
-    {
-        emit clearHighlight();
         return;
-    }
 
     const QPair<int,int> result = m_searchResults.at(val);
     emit highlightText(result.first, result.second);

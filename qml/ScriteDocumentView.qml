@@ -644,17 +644,19 @@ Item {
                         SplitView.preferredWidth: documentUI.width * 0.6
                         color: "lightgray"
 
-                        TextArea {
-                            readOnly: true
+                        Loader {
                             width: parent.width*0.7
                             anchors.centerIn: parent
-                            wrapMode: Text.WordWrap
-                            horizontalAlignment: Text.AlignHCenter
-                            font.pixelSize: 30
-                            enabled: false
-                            visible: editorLoader.item == null
-                            renderType: Text.NativeRendering
-                            text: "Select a scene on the canvas or in the screenplay to edit its content here."
+                            active: editorLoader.item == null
+                            sourceComponent: TextArea {
+                                readOnly: true
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignHCenter
+                                font.pixelSize: 30
+                                enabled: false
+                                renderType: Text.NativeRendering
+                                text: "Select a scene on the canvas or in the screenplay to edit its content here."
+                            }
                         }
 
                         Loader {

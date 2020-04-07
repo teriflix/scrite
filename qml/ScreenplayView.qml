@@ -280,17 +280,19 @@ Rectangle {
         }
     }
 
-    TextArea {
-        readOnly: true
+    Loader {
+        active: scriteDocument.screenplay.elementCount === 0
         width: parent.width*0.7
         anchors.centerIn: parent
-        wrapMode: Text.WordWrap
-        horizontalAlignment: Text.AlignHCenter
-        renderType: Text.NativeRendering
-        font.pixelSize: 30
-        enabled: false
-        visible: scriteDocument.screenplay.elementCount === 0
-        text: "Once you create a scene in the canvas, you can drag and drop them here to insert them into the timeline of your screenplay."
+        sourceComponent: TextArea {
+            readOnly: true
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
+            renderType: Text.NativeRendering
+            font.pixelSize: 30
+            enabled: false
+            text: "Once you create a scene in the canvas, you can drag and drop them here to insert them into the timeline of your screenplay."
+        }
     }
 
     Menu {

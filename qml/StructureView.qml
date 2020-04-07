@@ -327,7 +327,7 @@ Item {
                             Behavior on border.width { NumberAnimation { duration: 400 } }
                         }
 
-                        TextArea {
+                        TextViewEdit {
                             id: titleText
                             width: 250
                             wrapMode: Text.WordWrap
@@ -336,32 +336,15 @@ Item {
                             font.pixelSize: 20
                             horizontalAlignment: Text.AlignHCenter
                             readOnly: !parent.editing
-                            onReadOnlyChanged: {
-                                if(readOnly === false) {
-                                    selectAll()
-                                    forceActiveFocus()
-                                }
-                            }
-                            palette: app.palette
-                            onTextChanged: element.scene.title = text
+                            onTextEdited: element.scene.title = text
                             onEditingFinished: {
                                 canvas.editIndex = -1
                                 searchBar.searchEngine.clearSearch()
                             }
+                            onHighlightRequest: scriteDocument.structure.currentElementIndex = index
                             Keys.onReturnPressed: editingFinished()
-                            Transliterator.textDocument: textDocument
-                            Transliterator.cursorPosition: cursorPosition
-                            Transliterator.hasActiveFocus: activeFocus
-
-                            SearchAgent.engine: searchBar.searchEngine
-                            SearchAgent.sequenceNumber: index
-                            SearchAgent.textDocument: textDocument
-                            SearchAgent.onHighlightText: {
-                                select(start, end)
-                                scriteDocument.structure.currentElementIndex = index
-                            }
-                            SearchAgent.onClearSearchRequest: deselect()
-                            SearchAgent.onClearHighlight: deselect()
+                            searchEngine: searchBar.searchEngine
+                            searchSequenceNumber: index
                         }
 
                         ToolButton {
@@ -506,17 +489,19 @@ Item {
         }
     }
 
-    TextArea {
-        readOnly: true
+    Loader {
         width: parent.width*0.7
         anchors.centerIn: parent
-        wrapMode: Text.WordWrap
-        horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 30
-        enabled: false
-        renderType: Text.NativeRendering
-        visible: scriteDocument.structure.elementCount === 0
-        text: "Double click on an empty area in the canvas to create a scene. Hold the command key and drag lines from one scene to another to create a sequence."
+        active: scriteDocument.structure.elementCount === 0
+        sourceComponent: TextArea {
+            readOnly: true
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 30
+            enabled: false
+            renderType: Text.NativeRendering
+            text: "Double click on an empty area in the canvas to create a scene. Hold the command key and drag lines from one scene to another to create a sequence."
+        }
     }
 
     Component {

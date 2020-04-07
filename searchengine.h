@@ -70,6 +70,7 @@ public:
 
     // Helper function
     Q_INVOKABLE QJsonArray indexesOf(const QString &of, const QString &in) const;
+    Q_INVOKABLE QString createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const;
 
 protected:
     SearchAgent(QObject *parent=nullptr);
