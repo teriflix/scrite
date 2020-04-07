@@ -155,6 +155,17 @@ Item {
                         generator.reject()
                         modalDialog.close()
                     }
+
+                    EventFilter.target: app
+                    EventFilter.events: [6]
+                    EventFilter.onFilter: {
+                        if(event.key === Qt.Key_Escape) {
+                            generator.reject()
+                            modalDialog.close()
+                            result.acceptEvent = true
+                            result.filter = true
+                        }
+                    }
                 }
 
                 Button {

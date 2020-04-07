@@ -205,7 +205,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
       m_screen(nullptr),
       m_pageWidth(750),
-      m_defaultFont(QFont("Courier New", 12)),
+      m_defaultFont(QFont("Courier New", 10)),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
