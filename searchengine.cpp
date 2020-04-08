@@ -144,78 +144,15 @@ void SearchAgent::setTextDocument(QQuickTextDocument *val)
 
 QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 {
-#if 1
     SearchEngine::SearchFlags flags;
-    Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-
     if(m_engine != nullptr)
         flags = m_engine->searchFlags();
-
-    if(flags.testFlag(SearchEngine::SearchCaseSensitively))
-        cs = Qt::CaseSensitive;
-
-    auto createResultItem = [](int from, int to) {
-        QJsonObject item;
-        item.insert("from", from);
-        item.insert("to", to);
-        return item;
-    };
-
-    QJsonArray ret;
-    int from = 0;
-    while(1)
-    {
-        int pos = in.indexOf(of, from, cs);
-        if(pos < 0)
-            break;
-
-        if(flags.testFlag(SearchEngine::SearchWholeWords))
-        {
-            if(pos + of.length() >= in.length() || in.at(pos+of.length()).isSpace())
-                ret.append( createResultItem(pos,pos+of.length()-1) );
-        }
-        else
-            ret.append( createResultItem(pos,pos+of.length()-1) );
-
-        from = pos + of.length();
-    }
-
-    return ret;
-#else
-    QTextDocument::FindFlags flags;
-    if(m_engine != nullptr)
-        flags &= int(m_engine->searchFlags());
-
-    QTextDocument document;
-    document.setPlainText(in);
-
-    QJsonArray array;
-
-    QTextCursor cursor(&document);
-    while(1)
-    {
-        cursor = document.find(of, cursor, flags);
-        if(cursor.isNull())
-            break;
-
-        QJsonObject item;
-        item.insert("start", cursor.selectionStart());
-        item.insert("end", cursor.selectionEnd());
-        array.append(item);
-
-        cursor.setPosition(cursor.selectionEnd());
-    }
-
-    return array;
-#endif
+    return SearchEngine::indexesOf(of, in, int(flags));
 }
 
 QString SearchAgent::createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const
 {
-    QString ret = text;
-    ret.insert(to+1, "</span>");
-    ret.insert(from, QString("<span style=\"background-color: %1; color: %2;\">").arg(bg.name()).arg(fg.name()));
-    return ret;
+    return SearchEngine::createMarkupText(text, from, to, QBrush(bg), QBrush(fg));
 }
 
 void SearchAgent::onTextDocumentDestroyed()
@@ -350,6 +287,51 @@ void SearchEngine::cycleSearchResult()
         this->setCurrentSearchResultIndex( (m_currentSearchResultIndex+1)%m_searchResults.size() );
     else
         this->setCurrentSearchResultIndex(-1);
+}
+
+QJsonArray SearchEngine::indexesOf(const QString &of, const QString &in, int givenFlags)
+{
+    SearchEngine::SearchFlags flags(givenFlags);
+    Qt::CaseSensitivity cs = Qt::CaseInsensitive;
+
+    if(flags.testFlag(SearchEngine::SearchCaseSensitively))
+        cs = Qt::CaseSensitive;
+
+    auto createResultItem = [](int from, int to) {
+        QJsonObject item;
+        item.insert("from", from);
+        item.insert("to", to);
+        return item;
+    };
+
+    QJsonArray ret;
+    int from = 0;
+    while(1)
+    {
+        int pos = in.indexOf(of, from, cs);
+        if(pos < 0)
+            break;
+
+        if(flags.testFlag(SearchEngine::SearchWholeWords))
+        {
+            if(pos + of.length() >= in.length() || in.at(pos+of.length()).isSpace())
+                ret.append( createResultItem(pos,pos+of.length()-1) );
+        }
+        else
+            ret.append( createResultItem(pos,pos+of.length()-1) );
+
+        from = pos + of.length();
+    }
+
+    return ret;
+}
+
+QString SearchEngine::createMarkupText(const QString &text, int from, int to, const QBrush &bg, const QBrush &fg)
+{
+    QString ret = text;
+    ret.insert(to+1, "</span>");
+    ret.insert(from, QString("<span style=\"background-color: %1; color: %2;\">").arg(bg.color().name()).arg(fg.color().name()));
+    return ret;
 }
 
 void SearchEngine::timerEvent(QTimerEvent *event)

@@ -12,8 +12,12 @@
 ****************************************************************************/
 
 #include "scene.h"
+#include "searchengine.h"
 
 #include <QUuid>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QTextDocument>
 
 SceneHeading::SceneHeading(QObject *parent)
     : QObject(parent),
@@ -196,6 +200,11 @@ QString SceneElement::text() const
     }
 
     return m_text;
+}
+
+QJsonArray SceneElement::find(const QString &text, int flags) const
+{
+    return SearchEngine::indexesOf(text, m_text, flags);
 }
 
 bool SceneElement::event(QEvent *event)

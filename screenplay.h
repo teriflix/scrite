@@ -16,6 +16,7 @@
 
 #include "scene.h"
 
+#include <QJsonArray>
 #include <QJsonValue>
 #include <QQmlListProperty>
 
@@ -126,6 +127,8 @@ public:
     void setActiveScene(Scene* val);
     Scene* activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
+
+    Q_INVOKABLE QJsonArray search(const QString &text, int flags=0) const;
 
     // QAbstractItemModel interface
     enum Roles { ScreenplayElementRole = Qt::UserRole };

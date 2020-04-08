@@ -30,39 +30,50 @@ Item {
 
     Repeater {
         id: searchAgents
-        model: scriteDocument.screenplay.elementCount
+        model: scriteDocument.screenplay.elementCount > 0 ? 1 : 0
 
         Item {
-            property ScreenplayElement screenplayElement: scriteDocument.screenplay.elementAt(index)
-            property Scene scene: screenplayElement ? screenplayElement.scene : null
             property string searchString
+            property var searchResults: []
+            property int previousSearchResultIndex: -1
+
             SearchAgent.engine: searchBar.searchEngine
-            SearchAgent.sequenceNumber: index
+
             SearchAgent.onSearchRequest: {
                 searchString = string
-                var nrElements = scene.elementCount
-                var nrResults = 0
-                for(var i=0; i<nrElements; i++) {
-                    var element = scene.elementAt(i)
-                    var posList = SearchAgent.indexesOf(string, element.text)
-                    nrResults += posList.length
-                }
-                SearchAgent.searchResultCount = nrResults
+                searchResults = scriteDocument.screenplay.search(string, 0)
+                SearchAgent.searchResultCount = searchResults.length
             }
+
             SearchAgent.onCurrentSearchResultIndexChanged: {
+                clearPreviousSearchResultUserData()
                 if(SearchAgent.currentSearchResultIndex >= 0) {
+                    var searchResult = searchResults[SearchAgent.currentSearchResultIndex]
+                    var sceneIndex = searchResult["sceneIndex"]
+                    var screenplayElement = scriteDocument.screenplay.elementAt(sceneIndex)
                     var data = {
                         "searchString": searchString,
                         "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
                         "searchResultCount": SearchAgent.searchResultCount
                     }
                     screenplayElement.userData = data
-                    scriteDocument.screenplay.currentElementIndex = index
+                    scriteDocument.screenplay.currentElementIndex = sceneIndex
+                    previousSearchResultIndex = sceneIndex
                 }
             }
+
             SearchAgent.onClearSearchRequest: {
                 searchString = ""
-                screenplayElement.userData = undefined
+                clearPreviousSearchResultUserData()
+            }
+
+            function clearPreviousSearchResultUserData() {
+                if(previousSearchResultIndex >= 0) {
+                    var screenplayElement = scriteDocument.screenplay.elementAt(previousSearchResultIndex)
+                    if(screenplayElement)
+                        screenplayElement.userData = undefined
+                }
+                previousSearchResultIndex = -1
             }
         }
     }

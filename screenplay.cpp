@@ -344,6 +344,41 @@ void Screenplay::setActiveScene(Scene *val)
     this->setCurrentElementIndex(index);
 }
 
+QJsonArray Screenplay::search(const QString &text, int flags) const
+{
+    QJsonArray ret;
+
+    const int nrScenes = m_elements.size();
+    for(int i=0; i<nrScenes; i++)
+    {
+        Scene *scene = m_elements.at(i)->scene();
+
+        const int nrElements = scene->elementCount();
+        for(int j=0; j<nrElements; j++)
+        {
+            SceneElement *element = scene->elementAt(j);
+
+            const QJsonArray results = element->find(text, flags);
+            if(!results.isEmpty())
+            {
+                for(int r=0; r<results.size(); r++)
+                {
+                    const QJsonObject result = results.at(i).toObject();
+
+                    QJsonObject item;
+                    item.insert("sceneIndex", i);
+                    item.insert("elementIndex", j);
+                    item.insert("from", result.value("from"));
+                    item.insert("to", result.value("to"));
+                    ret.append(item);
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
 int Screenplay::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_elements.size();

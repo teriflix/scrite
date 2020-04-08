@@ -137,6 +137,9 @@ public:
     Q_INVOKABLE void previousSearchResult();
     Q_INVOKABLE void cycleSearchResult();
 
+    static QJsonArray indexesOf(const QString &of, const QString &in, int flags);
+    static QString createMarkupText(const QString &text, int from, int to, const QBrush &bg, const QBrush &fg);
+
 protected:
     void timerEvent(QTimerEvent *event);
 

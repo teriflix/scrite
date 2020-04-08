@@ -16,6 +16,7 @@
 
 #include <QMap>
 #include <QColor>
+#include <QJsonArray>
 #include <QQmlListProperty>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
@@ -119,6 +120,8 @@ public:
     Q_SIGNAL void textChanged();
 
     Q_SIGNAL void elementChanged();
+
+    Q_INVOKABLE QJsonArray find(const QString &text, int flags) const;
 
 protected:
     bool event(QEvent *event);
