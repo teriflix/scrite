@@ -379,14 +379,26 @@ void SceneDocumentBinder::setScene(Scene *val)
         return;
 
     if(m_scene != nullptr)
+    {
         disconnect(m_scene, &Scene::sceneElementChanged,
                    this, &SceneDocumentBinder::onSceneElementChanged);
+        disconnect(m_scene, &Scene::sceneAboutToReset,
+                   this, &SceneDocumentBinder::onSceneAboutToReset);
+        disconnect(m_scene, &Scene::sceneReset,
+                   this, &SceneDocumentBinder::onSceneReset);
+    }
 
     m_scene = val;
 
     if(m_scene != nullptr && this->document() != nullptr)
+    {
         connect(m_scene, &Scene::sceneElementChanged,
                 this, &SceneDocumentBinder::onSceneElementChanged);
+        connect(m_scene, &Scene::sceneAboutToReset,
+                this, &SceneDocumentBinder::onSceneAboutToReset);
+        connect(m_scene, &Scene::sceneReset,
+                this, &SceneDocumentBinder::onSceneReset);
+    }
 
     emit sceneChanged();
 
@@ -400,6 +412,8 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
 
     if(this->document() != nullptr)
     {
+        this->document()->setUndoRedoEnabled(true);
+
         disconnect( this->document(), &QTextDocument::contentsChange,
                     this, &SceneDocumentBinder::onContentsChange);
         disconnect( this->document(), &QTextDocument::blockCountChanged,
@@ -426,6 +440,8 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
 
     if(m_textDocument != nullptr)
     {
+        this->document()->setUndoRedoEnabled(false);
+
         connect(this->document(), &QTextDocument::contentsChange,
                 this, &SceneDocumentBinder::onContentsChange);
         connect(this->document(), &QTextDocument::blockCountChanged,
@@ -594,6 +610,20 @@ int SceneDocumentBinder::lastCursorPosition() const
     return cursor.position();
 }
 
+int SceneDocumentBinder::cursorPositionAtBlock(int blockNumber) const
+{
+    if(this->document() != nullptr)
+    {
+        const QTextBlock block = this->document()->findBlockByNumber(blockNumber);
+        if( m_cursorPosition >= block.position() && m_cursorPosition < block.position()+block.length() )
+            return m_cursorPosition;
+
+        return block.position()+block.length()-1;
+    }
+
+    return -1;
+}
+
 QFont SceneDocumentBinder::currentFont() const
 {
     if(this->document() == nullptr)
@@ -670,10 +700,12 @@ void SceneDocumentBinder::initializeDocument()
 
     m_tabHistory.clear();
 
+    const QFont defaultFont = m_screenplayFormat->defaultFont();
+
     QTextDocument *document = m_textDocument->textDocument();
     document->blockSignals(true);
     document->clear();
-    document->setDefaultFont(m_screenplayFormat->defaultFont());
+    document->setDefaultFont(defaultFont);
 
     const int nrElements = m_scene->elementCount();
 
@@ -689,13 +721,11 @@ void SceneDocumentBinder::initializeDocument()
         cursor.insertText(element->text());
     }
     document->blockSignals(false);
-    emit documentInitialized();
-
-    m_initializingDocument = false;
 
     this->setDocumentLoadCount(m_documentLoadCount+1);
-
+    m_initializingDocument = false;
     this->QSyntaxHighlighter::rehighlight();
+    emit documentInitialized();
 }
 
 void SceneDocumentBinder::initializeDocumentLater()
@@ -775,7 +805,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
 
 void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int charsAdded)
 {
-    if(m_initializingDocument)
+    if(m_initializingDocument || m_sceneIsBeingReset)
         return;
 
     Q_UNUSED(charsRemoved)
@@ -814,7 +844,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
 void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 {
-    if(m_initializingDocument)
+    if(m_initializingDocument || m_sceneIsBeingReset)
         return;
 
     if(m_textDocument == nullptr || m_scene == nullptr)
@@ -874,12 +904,12 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
                     break;
                 }
 
-                m_scene->insertAfter(newElement, prevElement);
+                m_scene->insertElementAfter(newElement, prevElement);
             }
             else
             {
                 newElement->setType(SceneElement::Action);
-                m_scene->insertAt(newElement, 0);
+                m_scene->insertElementAt(newElement, 0);
             }
 
             userData = new SceneDocumentBlockUserData(newElement);
@@ -977,4 +1007,28 @@ void SceneDocumentBinder::setCompletionPrefix(const QString &val)
     emit completionPrefixChanged();
 }
 
+void SceneDocumentBinder::onSceneAboutToReset()
+{
+    m_sceneIsBeingReset = true;
+}
+
+void SceneDocumentBinder::onSceneReset(int)
+{
+    this->initializeDocument();
+    this->rehighlight();
+
+#if 0
+    if(this->document() != nullptr)
+    {
+        const QTextBlock block = this->document()->findBlockByNumber(elementIndex);
+        if( m_cursorPosition >= block.position() && m_cursorPosition < block.position()+block.length() )
+            emit requestCursorPosition(m_cursorPosition);
+        else
+            emit requestCursorPosition(block.position()+block.length()-1);
+    }
+#else
+#endif
+
+    m_sceneIsBeingReset = false;
+}
 

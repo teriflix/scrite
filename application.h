@@ -17,12 +17,16 @@
 #include <QUrl>
 #include <QRectF>
 #include <QColor>
+#include <QAction>
 #include <QPalette>
+#include <QUndoGroup>
+#include <QUndoStack>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QApplication>
 #include <QVersionNumber>
 
+#include "undostack.h"
 #include "errorreport.h"
 #include "transliteration.h"
 
@@ -68,6 +72,27 @@ public:
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
     QVersionNumber versionNumber() const { return m_versionNumber; }
 
+    Q_PROPERTY(QUndoGroup* undoGroup READ undoGroup CONSTANT)
+    QUndoGroup *undoGroup() const { return m_undoGroup; }
+
+    Q_INVOKABLE UndoStack *findUndoStack(const QString &objectName) const;
+
+    Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
+    bool canUndo() const { return m_undoGroup->canUndo(); }
+    Q_SIGNAL void canUndoChanged();
+
+    Q_PROPERTY(bool canRedo READ canRedo NOTIFY canRedoChanged)
+    bool canRedo() const { return m_undoGroup->canRedo(); }
+    Q_SIGNAL void canRedoChanged();
+
+    Q_PROPERTY(QString undoText READ undoText NOTIFY undoTextChanged)
+    QString undoText() const { return m_undoGroup->undoText(); }
+    Q_SIGNAL void undoTextChanged();
+
+    Q_PROPERTY(QString redoText READ redoText NOTIFY redoTextChanged)
+    QString redoText() const { return m_undoGroup->redoText(); }
+    Q_SIGNAL void redoTextChanged();
+
     Q_INVOKABLE QJsonObject systemFontInfo() const;
     Q_INVOKABLE QColor pickColor(const QColor &initial) const;
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
@@ -86,10 +111,14 @@ public:
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
 
+signals:
+    void minimizeWindowRequest();
+
 private:
     QSettings *m_settings;
-    ErrorReport *m_errorReport;
+    QUndoGroup *m_undoGroup;
     QString m_baseWindowTitle;
+    ErrorReport *m_errorReport;
     QVersionNumber m_versionNumber;
 };
 

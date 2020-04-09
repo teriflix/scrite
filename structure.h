@@ -19,12 +19,15 @@
 #include "abstractshapeitem.h"
 
 #include <QColor>
+#include <QPointer>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QUndoCommand>
 
 class Structure;
 class Character;
 class ScriteDocument;
+class StructurePositionCommand;
 
 class StructureElement : public QObject
 {
@@ -71,63 +74,25 @@ public:
     void setYf(qreal val);
     qreal yf() const;
 
+    Q_PROPERTY(QPointF position READ position WRITE setPosition STORED false)
+    void setPosition(const QPointF &pos);
+    QPointF position() const { return QPointF(m_x,m_y); }
+
     Q_SIGNAL void elementChanged();
 
 protected:
     bool event(QEvent *event);
 
 private:
+    friend class StructurePositionCommand;
     qreal m_x;
     qreal m_y;
+    bool m_placed;
     qreal m_width;
     qreal m_height;
     Scene* m_scene;
     Structure *m_structure;
-};
-
-class StructureArea : public QObject
-{
-    Q_OBJECT
-
-public:
-    Q_INVOKABLE StructureArea(QObject *parent=nullptr);
-    ~StructureArea();
-    Q_SIGNAL void aboutToDelete(StructureArea *area);
-
-    Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
-    Structure* structure() const { return m_structure; }
-
-    Q_PROPERTY(qreal x READ x WRITE setX NOTIFY xChanged)
-    void setX(qreal val);
-    qreal x() const { return m_x; }
-    Q_SIGNAL void xChanged();
-
-    Q_PROPERTY(qreal y READ y WRITE setY NOTIFY yChanged)
-    void setY(qreal val);
-    qreal y() const { return m_y; }
-    Q_SIGNAL void yChanged();
-
-    Q_PROPERTY(qreal width READ width WRITE setWidth NOTIFY widthChanged)
-    void setWidth(qreal val);
-    qreal width() const { return m_width; }
-    Q_SIGNAL void widthChanged();
-
-    Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged)
-    void setHeight(qreal val);
-    qreal height() const { return m_height; }
-    Q_SIGNAL void heightChanged();
-
-    Q_SIGNAL void areaChanged();
-
-protected:
-    bool event(QEvent *event);
-
-private:
-    qreal m_x;
-    qreal m_y;
-    qreal m_width;
-    qreal m_height;
-    Structure *m_structure;
+    QBasicTimer m_undoCmdTimer;
 };
 
 class Character : public QObject
@@ -209,16 +174,6 @@ public:
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QQmlListProperty<StructureArea> areas READ areas)
-    QQmlListProperty<StructureArea> areas();
-    Q_INVOKABLE void addArea(StructureArea *ptr);
-    Q_INVOKABLE void removeArea(StructureArea *ptr);
-    Q_INVOKABLE StructureArea *areaAt(int index) const;
-    Q_PROPERTY(int areaCount READ areaCount NOTIFY areaCountChanged)
-    int areaCount() const { return m_areas.size(); }
-    Q_INVOKABLE void clearAreas();
-    Q_SIGNAL void areaCountChanged();
-
     Q_PROPERTY(QQmlListProperty<Character> characters READ characters)
     QQmlListProperty<Character> characters();
     Q_INVOKABLE void addCharacter(Character *ptr);
@@ -250,6 +205,7 @@ public:
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
     Q_INVOKABLE void removeElement(StructureElement *ptr);
+    Q_INVOKABLE void insertElement(StructureElement *ptr, int index);
     Q_INVOKABLE void moveElement(StructureElement *ptr, int toRow);
     Q_INVOKABLE StructureElement *elementAt(int index) const;
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
@@ -286,12 +242,6 @@ private:
     qreal m_canvasWidth;
     qreal m_canvasHeight;
     qreal m_canvasGridSize;
-
-    static void staticAppendArea(QQmlListProperty<StructureArea> *list, StructureArea *ptr);
-    static void staticClearAreas(QQmlListProperty<StructureArea> *list);
-    static StructureArea* staticAreaAt(QQmlListProperty<StructureArea> *list, int index);
-    static int staticAreaCount(QQmlListProperty<StructureArea> *list);
-    QList<StructureArea *> m_areas;
 
     static void staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr);
     static void staticClearCharacters(QQmlListProperty<Character> *list);
@@ -363,7 +313,11 @@ public:
 
     QPainterPath shape() const;
 
+protected:
+    void timerEvent(QTimerEvent *te);
+
 private:
+    void requestUpdateLater();
     void requestUpdate() { this->update(); }
     void onElementDestroyed(StructureElement *element);
     void pickElementColor();
@@ -373,6 +327,7 @@ private:
 
 private:
     LineType m_lineType;
+    QBasicTimer m_updateTimer;
     StructureElement* m_toElement;
     StructureElement* m_fromElement;
     qreal m_arrowAndLabelSpacing;

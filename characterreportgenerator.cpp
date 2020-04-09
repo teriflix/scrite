@@ -234,7 +234,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                 SceneElement *element = scene->elementAt(j);
                 if(element->type() == SceneElement::Character)
                 {
-                    QString characterName = element->text();
+                    QString characterName = element->formattedText();
                     characterName = characterName.section('(', 0, 0).trimmed();
                     if(m_characterNames.contains(characterName))
                     {
@@ -311,7 +311,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                                 }
                                 else
                                     cursor.insertBlock(blockFormat, charFormat);
-                                cursor.insertText(element->text());
+                                cursor.insertText(element->formattedText());
                                 ++nr;
                             }
                         }

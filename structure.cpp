@@ -12,12 +12,15 @@
 ****************************************************************************/
 
 #include "structure.h"
+#include "undostack.h"
 #include "scritedocument.h"
+#include "garbagecollector.h"
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
       m_x(0),
       m_y(0),
+      m_placed(false),
       m_width(0),
       m_height(0),
       m_scene(nullptr),
@@ -53,6 +56,14 @@ void StructureElement::setX(qreal val)
     if( qFuzzyCompare(m_x, val) )
         return;
 
+    if(!m_placed)
+        m_placed = !qFuzzyIsNull(m_x) && !qFuzzyIsNull(m_y);
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property, m_placed));
+
     m_x = val;
     emit xChanged();
 }
@@ -61,6 +72,14 @@ void StructureElement::setY(qreal val)
 {
     if( qFuzzyCompare(m_y, val) )
         return;
+
+    if(!m_placed)
+        m_placed = !qFuzzyIsNull(m_x) && !qFuzzyIsNull(m_y);
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property, m_placed));
 
     m_y = val;
     emit yChanged();
@@ -112,6 +131,15 @@ qreal StructureElement::yf() const
     return m_structure==nullptr ? 0 : m_y / m_structure->canvasHeight();
 }
 
+void StructureElement::setPosition(const QPointF &pos)
+{
+    if(QPointF(m_x,m_y) == pos)
+        return;
+
+    this->setX(pos.x());
+    this->setY(pos.y());
+}
+
 bool StructureElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -120,70 +148,6 @@ bool StructureElement::event(QEvent *event)
         emit xChanged();
         emit yChanged();
     }
-
-    return QObject::event(event);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-StructureArea::StructureArea(QObject *parent)
-    : QObject(parent),
-      m_x(0),
-      m_y(0),
-      m_width(0),
-      m_height(0),
-      m_structure(qobject_cast<Structure*>(parent))
-{
-    connect(this, &StructureArea::xChanged, &StructureArea::areaChanged);
-    connect(this, &StructureArea::yChanged, &StructureArea::areaChanged);
-    connect(this, &StructureArea::widthChanged, &StructureArea::areaChanged);
-    connect(this, &StructureArea::heightChanged, &StructureArea::areaChanged);
-}
-
-StructureArea::~StructureArea()
-{
-    emit aboutToDelete(this);
-}
-
-void StructureArea::setX(qreal val)
-{
-    if( qFuzzyCompare(m_x, val) )
-        return;
-    m_x = val;
-    emit xChanged();
-}
-
-void StructureArea::setY(qreal val)
-{
-    if( qFuzzyCompare(m_y, val) )
-        return;
-
-    m_y = val;
-    emit yChanged();
-}
-
-void StructureArea::setWidth(qreal val)
-{
-    if( qFuzzyCompare(m_width, val) )
-        return;
-
-    m_width = val;
-    emit widthChanged();
-}
-
-void StructureArea::setHeight(qreal val)
-{
-    if( qFuzzyCompare(m_height, val) )
-        return;
-
-    m_height = val;
-    emit heightChanged();
-}
-
-bool StructureArea::event(QEvent *event)
-{
-    if(event->type() == QEvent::ParentChange)
-        m_structure = qobject_cast<Structure*>(this->parent());
 
     return QObject::event(event);
 }
@@ -358,56 +322,6 @@ void Structure::captureStructureAsImage(const QString &fileName)
     emit captureStructureAsImageRequest(fileName);
 }
 
-QQmlListProperty<StructureArea> Structure::areas()
-{
-    return QQmlListProperty<StructureArea>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Structure::staticAppendArea,
-                &Structure::staticAreaCount,
-                &Structure::staticAreaAt,
-                &Structure::staticClearAreas);
-}
-
-void Structure::addArea(StructureArea *ptr)
-{
-    if(ptr == nullptr || m_areas.indexOf(ptr) >= 0)
-        return;
-
-    m_areas.append(ptr);
-    ptr->setParent(this);
-    connect(ptr, &StructureArea::areaChanged, this, &Structure::structureChanged);
-    emit areaCountChanged();
-}
-
-void Structure::removeArea(StructureArea *ptr)
-{
-    if(ptr == nullptr)
-        return;
-
-    const int index = m_areas.indexOf(ptr);
-    if(index < 0)
-        return ;
-
-    m_areas.removeAt(index);
-    disconnect(ptr, &StructureArea::areaChanged, this, &Structure::structureChanged);
-    emit areaCountChanged();
-
-    if(ptr->parent() == this)
-        ptr->deleteLater();
-}
-
-StructureArea *Structure::areaAt(int index) const
-{
-    return index < 0 || index >= m_areas.size() ? nullptr : m_areas.at(index);
-}
-
-void Structure::clearAreas()
-{
-    while(m_areas.size())
-        this->removeArea(m_areas.first());
-}
-
 QQmlListProperty<Character> Structure::characters()
 {
     return QQmlListProperty<Character>(
@@ -428,7 +342,7 @@ void Structure::addCharacter(Character *ptr)
     if(!ptr->isValid() || ch != nullptr)
     {
         if(ptr->parent() == this)
-            ptr->deleteLater();
+            GarbageCollector::instance()->add(ptr);
         return;
     }
 
@@ -458,7 +372,7 @@ void Structure::removeCharacter(Character *ptr)
     emit characterCountChanged();
 
     if(ptr->parent() == this)
-        ptr->deleteLater();
+        GarbageCollector::instance()->add(ptr);
 }
 
 Character *Structure::characterAt(int index) const
@@ -559,7 +473,7 @@ void Structure::removeNote(Note *ptr)
     emit noteCountChanged();
 
     if(ptr->parent() == this)
-        ptr->deleteLater();
+        GarbageCollector::instance()->add(ptr);
 }
 
 Note *Structure::noteAt(int index) const
@@ -586,21 +500,14 @@ QQmlListProperty<StructureElement> Structure::elements()
 
 void Structure::addElement(StructureElement *ptr)
 {
-    if(ptr == nullptr || m_elements.indexOf(ptr) >= 0)
-        return;
-
-    m_elements.append(ptr);
-
-    ptr->setParent(this);
-
-    connect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
-    connect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
-
-    this->onStructureElementSceneChanged(ptr);
-
-    emit elementCountChanged();
-    emit elementsChanged();
+    this->insertElement(ptr, -1);
 }
+
+static void structureAppendElement(Structure *structure, StructureElement *ptr) { structure->addElement(ptr); }
+static void structureRemoveElement(Structure *structure, StructureElement *ptr) { structure->removeElement(ptr); }
+static void structureInsertElement(Structure *structure, StructureElement *ptr, int index) { structure->insertElement(ptr, index); }
+static StructureElement *structureElementAt(Structure *structure, int index) { return structure->elementAt(index); }
+static int structureIndexOfElement(Structure *structure, StructureElement *ptr) { return structure->indexOfElement(ptr); }
 
 void Structure::removeElement(StructureElement *ptr)
 {
@@ -609,7 +516,15 @@ void Structure::removeElement(StructureElement *ptr)
 
     const int index = m_elements.indexOf(ptr);
     if(index < 0)
-        return ;
+        return;
+
+    QScopedPointer< PushObjectListCommand<Structure,StructureElement> > cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
+    if(!info->isLocked())
+    {
+        ObjectListPropertyMethods<Structure,StructureElement> methods(&structureAppendElement, &structureRemoveElement, &structureInsertElement, &structureElementAt, structureIndexOfElement);
+        cmd.reset( new PushObjectListCommand<Structure,StructureElement>(ptr, this, "elements", ObjectList::RemoveOperation, methods) );
+    }
 
     m_elements.removeAt(index);
 
@@ -620,7 +535,36 @@ void Structure::removeElement(StructureElement *ptr)
     emit elementsChanged();
 
     if(ptr->parent() == this)
-        ptr->deleteLater();
+        GarbageCollector::instance()->add(ptr);
+}
+
+void Structure::insertElement(StructureElement *ptr, int index)
+{
+    if(ptr == nullptr || m_elements.indexOf(ptr) >= 0)
+        return;
+
+    QScopedPointer< PushObjectListCommand<Structure,StructureElement> > cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
+    if(!info->isLocked())
+    {
+        ObjectListPropertyMethods<Structure,StructureElement> methods(&structureAppendElement, &structureRemoveElement, &structureInsertElement, &structureElementAt, structureIndexOfElement);
+        cmd.reset( new PushObjectListCommand<Structure,StructureElement>(ptr, this, "elements", ObjectList::InsertOperation, methods) );
+    }
+
+    if(index < 0 || index >= m_elements.size())
+        m_elements.append(ptr);
+    else
+        m_elements.insert(index, ptr);
+
+    ptr->setParent(this);
+
+    connect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
+    connect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
+
+    this->onStructureElementSceneChanged(ptr);
+
+    emit elementCountChanged();
+    emit elementsChanged();
 }
 
 void Structure::moveElement(StructureElement *ptr, int toRow)
@@ -708,26 +652,6 @@ bool Structure::event(QEvent *event)
     return QObject::event(event);
 }
 
-void Structure::staticAppendArea(QQmlListProperty<StructureArea> *list, StructureArea *ptr)
-{
-    reinterpret_cast< Structure* >(list->data)->addArea(ptr);
-}
-
-void Structure::staticClearAreas(QQmlListProperty<StructureArea> *list)
-{
-    reinterpret_cast< Structure* >(list->data)->clearAreas();
-}
-
-StructureArea *Structure::staticAreaAt(QQmlListProperty<StructureArea> *list, int index)
-{
-    return reinterpret_cast< Structure* >(list->data)->areaAt(index);
-}
-
-int Structure::staticAreaCount(QQmlListProperty<StructureArea> *list)
-{
-    return reinterpret_cast< Structure* >(list->data)->areaCount();
-}
-
 void Structure::staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr)
 {
     reinterpret_cast< Structure* >(list->data)->addCharacter(ptr);
@@ -811,7 +735,7 @@ void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElement
 
     if(element->type() == SceneElement::Character)
     {
-        QString characterName = element->text();
+        QString characterName = element->formattedText();
         characterName = characterName.section('(', 0, 0).trimmed();
         m_characterElementNameMap[element] = characterName;
         this->evaluateCharacterNames();
@@ -878,10 +802,10 @@ void StructureElementConnector::setFromElement(StructureElement *val)
 
     if(m_fromElement != nullptr)
     {
-        disconnect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
-        disconnect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
-        disconnect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
-        disconnect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
+        disconnect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_fromElement->scene();
@@ -892,10 +816,10 @@ void StructureElementConnector::setFromElement(StructureElement *val)
 
     if(m_fromElement != nullptr)
     {
-        connect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
-        connect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
-        connect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
-        connect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
+        connect(m_fromElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_fromElement->scene();
@@ -916,10 +840,10 @@ void StructureElementConnector::setToElement(StructureElement *val)
 
     if(m_toElement != nullptr)
     {
-        disconnect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
-        disconnect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
-        disconnect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
-        disconnect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
+        disconnect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_toElement->scene();
@@ -930,10 +854,10 @@ void StructureElementConnector::setToElement(StructureElement *val)
 
     if(m_toElement != nullptr)
     {
-        connect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdate);
-        connect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdate);
-        connect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::widthChanged);
-        connect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::heightChanged);
+        connect(m_toElement, &StructureElement::xChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_toElement->scene();
@@ -966,7 +890,7 @@ QPainterPath StructureElementConnector::shape() const
 
     auto getElementRect = [](StructureElement *e) {
         QRectF r(e->x(), e->y(), e->width(), e->height());
-        r.moveCenter(QPointF(e->x(), e->y()));
+        // r.moveCenter(QPointF(e->x(), e->y()));
         return r;
     };
 
@@ -1100,6 +1024,23 @@ QPainterPath StructureElementConnector::shape() const
     return path;
 }
 
+void StructureElementConnector::timerEvent(QTimerEvent *te)
+{
+    if(m_updateTimer.timerId() == te->timerId())
+    {
+        this->requestUpdate();
+        m_updateTimer.stop();
+        return;
+    }
+
+    AbstractShapeItem::timerEvent(te);
+}
+
+void StructureElementConnector::requestUpdateLater()
+{
+    m_updateTimer.start(0, this);
+}
+
 void StructureElementConnector::onElementDestroyed(StructureElement *element)
 {
     if(element == m_fromElement)
@@ -1158,3 +1099,4 @@ void StructureElementConnector::setSuggestedLabelPosition(const QPointF &val)
     m_suggestedLabelPosition = val;
     emit suggestedLabelPositionChanged();
 }
+

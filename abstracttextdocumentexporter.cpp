@@ -173,7 +173,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
         {
             SceneElement *element = scene->elementAt(j);
             createNewTextBlock(cursor, element->type());
-            cursor.insertText(element->text());
+            cursor.insertText(element->formattedText());
 
             ++nrBlocks;
         }

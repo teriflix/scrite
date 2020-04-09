@@ -11,8 +11,10 @@
 **
 ****************************************************************************/
 
+#include "undostack.h"
 #include "screenplay.h"
 #include "scritedocument.h"
+#include "garbagecollector.h"
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent),
@@ -73,6 +75,9 @@ void ScreenplayElement::setScene(Scene *val)
 
     m_scene = val;
     connect(m_scene, &Scene::aboutToDelete, this, &ScreenplayElement::deleteLater);
+    connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
+    connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
+
     emit sceneChanged();
 }
 
@@ -178,15 +183,29 @@ QQmlListProperty<ScreenplayElement> Screenplay::elements()
 
 void Screenplay::addElement(ScreenplayElement *ptr)
 {
-    this->insertAt(ptr, -1);
+    this->insertElementAt(ptr, -1);
 }
 
-void Screenplay::insertAt(ScreenplayElement *ptr, int index)
+static void screenplayAppendElement(Screenplay *screenplay, ScreenplayElement *ptr) { screenplay->addElement(ptr); }
+static void screenplayRemoveElement(Screenplay *screenplay, ScreenplayElement *ptr) { screenplay->removeElement(ptr); }
+static void screenplayInsertElement(Screenplay *screenplay, ScreenplayElement *ptr, int index) { screenplay->insertElementAt(ptr, index); }
+static ScreenplayElement *screenplayElementAt(Screenplay *screenplay, int index) { return screenplay->elementAt(index); }
+static int screenplayIndexOfElement(Screenplay *screenplay, ScreenplayElement *ptr) { return screenplay->indexOfElement(ptr); }
+
+void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
 {
     if(ptr == nullptr || m_elements.indexOf(ptr) >= 0)
         return;
 
     index = (index < 0 || index >= m_elements.size()) ? m_elements.size() : index;
+
+    QScopedPointer< PushObjectListCommand<Screenplay,ScreenplayElement> > cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
+    if(!info->isLocked())
+    {
+        ObjectListPropertyMethods<Screenplay,ScreenplayElement> methods(&screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement, &screenplayElementAt, screenplayIndexOfElement);
+        cmd.reset( new PushObjectListCommand<Screenplay,ScreenplayElement> (ptr, this, info->property, ObjectList::InsertOperation, methods) );
+    }
 
     this->beginInsertRows(QModelIndex(), index, index);
     if(index == m_elements.size())
@@ -197,6 +216,7 @@ void Screenplay::insertAt(ScreenplayElement *ptr, int index)
     ptr->setParent(this);
     connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
+    connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
 
     this->endInsertRows();
 
@@ -213,11 +233,20 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     if(row < 0)
         return;
 
+    QScopedPointer< PushObjectListCommand<Screenplay,ScreenplayElement> > cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
+    if(!info->isLocked())
+    {
+        ObjectListPropertyMethods<Screenplay,ScreenplayElement> methods(&screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement, &screenplayElementAt, screenplayIndexOfElement);
+        cmd.reset( new PushObjectListCommand<Screenplay,ScreenplayElement> (ptr, this, info->property, ObjectList::RemoveOperation, methods) );
+    }
+
     this->beginRemoveRows(QModelIndex(), row, row);
     m_elements.removeAt(row);
 
     disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
+    disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
 
     this->endRemoveRows();
 
@@ -227,7 +256,75 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     this->setCurrentElementIndex(-1);
 
     if(ptr->parent() == this)
-        ptr->deleteLater();
+        GarbageCollector::instance()->add(ptr);
+}
+
+class ScreenplayElementMoveCommand : public QUndoCommand
+{
+public:
+    ScreenplayElementMoveCommand(Screenplay *screenplay, ScreenplayElement *element, int fromRow, int toRow);
+    ~ScreenplayElementMoveCommand();
+
+    static bool lock;
+
+    // QUndoCommand interface
+    void undo();
+    void redo();
+
+private:
+    int m_toRow;
+    int m_fromRow;
+    Screenplay *m_screenplay;
+    ScreenplayElement *m_element;
+    QMetaObject::Connection m_connection1;
+    QMetaObject::Connection m_connection2;
+};
+
+bool ScreenplayElementMoveCommand::lock = false;
+
+ScreenplayElementMoveCommand::ScreenplayElementMoveCommand(Screenplay *screenplay, ScreenplayElement *element, int fromRow, int toRow)
+    : QUndoCommand(),
+      m_toRow(toRow),
+      m_fromRow(fromRow),
+      m_screenplay(screenplay),
+      m_element(element)
+{
+    m_connection1 = QObject::connect(m_screenplay, &QObject::destroyed, [this]() {
+        m_screenplay = nullptr;
+        m_element = nullptr;
+        this->setObsolete(true);
+    });
+    m_connection2 = QObject::connect(m_element, &QObject::destroyed, [this]() {
+        m_screenplay = nullptr;
+        m_element = nullptr;
+        this->setObsolete(true);
+    });
+}
+
+ScreenplayElementMoveCommand::~ScreenplayElementMoveCommand()
+{
+    QObject::disconnect(m_connection1);
+    QObject::disconnect(m_connection2);
+}
+
+void ScreenplayElementMoveCommand::undo()
+{
+    if(m_screenplay == nullptr || m_element == nullptr)
+        return;
+
+    lock = true;
+    m_screenplay->moveElement(m_element, m_fromRow);
+    lock = false;
+}
+
+void ScreenplayElementMoveCommand::redo()
+{
+    if(m_screenplay == nullptr || m_element == nullptr)
+        return;
+
+    lock = true;
+    m_screenplay->moveElement(m_element, m_toRow);
+    lock = false;
 }
 
 void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
@@ -253,6 +350,9 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
         this->setCurrentElementIndex(toRow);
 
     emit elementsChanged();
+
+    if(UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
+        UndoStack::active()->push(new ScreenplayElementMoveCommand(this, ptr, fromRow, toRow));
 }
 
 ScreenplayElement *Screenplay::elementAt(int index) const
@@ -265,10 +365,91 @@ int Screenplay::elementCount() const
     return m_elements.size();
 }
 
+class UndoClearScreenplayCommand : public QUndoCommand
+{
+public:
+    UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds);
+    ~UndoClearScreenplayCommand();
+
+    // QUndoCommand interface
+    void undo();
+    void redo();
+
+private:
+    bool m_firstRedoDone;
+    QStringList m_sceneIds;
+    Screenplay *m_screenplay;
+    QMetaObject::Connection m_connection;
+};
+
+UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds)
+    : QUndoCommand(), m_firstRedoDone(false), m_sceneIds(sceneIds), m_screenplay(screenplay)
+{
+    m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed, [this]() {
+        this->setObsolete(true);
+    });
+}
+
+UndoClearScreenplayCommand::~UndoClearScreenplayCommand()
+{
+    QObject::disconnect(m_connection);
+}
+
+void UndoClearScreenplayCommand::undo()
+{
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(m_screenplay, "elements");
+    if(info) info->lock();
+
+    ScriteDocument *document = m_screenplay->scriteDocument();
+    Structure *structure = document->structure();
+    Q_FOREACH(QString sceneId, m_sceneIds)
+    {
+        StructureElement *element = structure->findElementBySceneID(sceneId);
+        if(element == nullptr)
+            continue;
+
+        Scene *scene = element->scene();
+        ScreenplayElement *screenplayElement = new ScreenplayElement(m_screenplay);
+        screenplayElement->setScene(scene);
+        m_screenplay->addElement(screenplayElement);
+    }
+
+    if(info) info->unlock();
+}
+
+void UndoClearScreenplayCommand::redo()
+{
+    if(!m_firstRedoDone)
+    {
+        m_firstRedoDone = true;
+        return;
+    }
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(m_screenplay, "elements");
+    if(info) info->lock();
+
+    while(m_screenplay->elementCount())
+        m_screenplay->removeElement( m_screenplay->elementAt(0) );
+
+    if(info) info->unlock();
+}
+
 void Screenplay::clearElements()
 {
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
+    if(info) info->lock();
+
+    QStringList sceneIds;
     while(m_elements.size())
+    {
+        sceneIds << m_elements.first()->sceneID();
         this->removeElement(m_elements.first());
+    }
+
+    if(UndoStack::active())
+        UndoStack::active()->push(new UndoClearScreenplayCommand(this, sceneIds));
+
+    if(info) info->unlock();
 }
 
 int Screenplay::indexOfScene(Scene *scene) const
@@ -407,6 +588,19 @@ bool Screenplay::event(QEvent *event)
     return QObject::event(event);
 }
 
+void Screenplay::onSceneReset(int elementIndex)
+{
+    ScreenplayElement *element = qobject_cast<ScreenplayElement*>(this->sender());
+    if(element == nullptr)
+        return;
+
+    int sceneIndex = this->indexOfElement(element);
+    if(sceneIndex < 0)
+        return;
+
+    emit sceneReset(sceneIndex, elementIndex);
+}
+
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)
 {
     reinterpret_cast< Screenplay* >(list->data)->addElement(ptr);
@@ -426,5 +620,4 @@ int Screenplay::staticElementCount(QQmlListProperty<ScreenplayElement> *list)
 {
     return reinterpret_cast< Screenplay* >(list->data)->elementCount();
 }
-
 

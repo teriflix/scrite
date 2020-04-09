@@ -132,7 +132,6 @@ private:
     QJsonArray m_structureElementSequence;
     QBasicTimer m_evaluateStructureElementSequenceTimer;
 
-
     ErrorReport *m_errorReport;
     ProgressReport *m_progressReport;
 };

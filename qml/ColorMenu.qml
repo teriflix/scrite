@@ -16,7 +16,7 @@ import QtQuick.Controls 2.13
 
 Menu {
     id: colorMenu
-    property var colors: ["blue", "magenta", "purple", "yellow", "orange", "red", "brown", "gray", "white"]
+    property var colors: ["blue", "magenta", "darkgreen", "purple", "yellow", "orange", "red", "brown", "gray", "white"]
 
     signal menuItemClicked(string color)
 

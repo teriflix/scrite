@@ -73,13 +73,20 @@ Item {
         }
     }
 
+    FocusIndicator {
+        id: focusIndicator
+        active: structureScreenplayUndoStack.active
+        anchors.fill: canvasScroll
+        anchors.margins: -3
+    }
+
     ScrollArea {
         id: canvasScroll
         anchors.left: parent.left
         anchors.top: toolbar.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: 1
+        anchors.margins: 3
         contentWidth: canvas.width * canvas.scale
         contentHeight: canvas.height * canvas.scale
         initialContentWidth: canvas.width
@@ -92,6 +99,10 @@ Item {
             height: scriteDocument.structure.canvasHeight
             scale: canvasScroll.suggestedScale
             transformOrigin: Item.TopLeft
+
+            FocusTracker.window: qmlWindow
+            FocusTracker.indicator.target: structureScreenplayUndoStack
+            FocusTracker.indicator.property: "structureViewHasFocus"
 
             property int currentIndex: scriteDocument.structure.currentElementIndex
             property int editIndex: -1    // index of item being edited
@@ -121,7 +132,7 @@ Item {
             GridBackground {
                 id: gridBackground
                 anchors.fill: parent
-                opacity: 0.5 * scriteDocument.structure.zoomLevel
+                opacity: 0.5 * canvas.scale
                 majorTickColor: "darkgray"
                 minorTickColor: "gray"
                 majorTickLineWidth: 5
@@ -135,9 +146,10 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: parent.newElementMode
                 cursorShape: parent.newElementMode ? Qt.DragMoveCursor : Qt.ArrowCursor
-                onDoubleClicked: canvas.createElement(mouse.x, mouse.y, parent.newElementColor)
+                onDoubleClicked: canvas.createElement(mouse.x-130, mouse.y-22, parent.newElementColor)
                 preventStealing: true
                 onClicked: {
+                    parent.forceActiveFocus()
                     if(selectionRect.visible) {
                         var dist = Math.max(
                                     Math.max( mouse.x - selectionRect.area.right,
@@ -150,7 +162,7 @@ Item {
                     }
 
                     if(parent.newElementMode) {
-                        canvas.createElement(mouse.x, mouse.y, parent.newElementColor)
+                        canvas.createElement(mouse.x-130, mouse.y-22, parent.newElementColor)
                         parent.newElementMode = false
                     } else {
                         scriteDocument.structure.currentElementIndex = -1
@@ -284,204 +296,204 @@ Item {
                 }
             }
 
-            Item {
-                id: elementsContainer
-                width: childrenRect.width
-                height: childrenRect.height
+            Loader {
+                anchors.fill: parent
+                sourceComponent: elementSequenceVisualizerComponent
+                active: elementItems.count === scriteDocument.structure.elementCount
+            }
 
-                Loader {
-                    anchors.fill: parent
-                    sourceComponent: elementSequenceVisualizerComponent
-                    active: elementItems.count === scriteDocument.structure.elementCount
-                }
+            Repeater {
+                id: elementItems
+                model: scriteDocument.structure.elementCount
 
-                Repeater {
-                    id: elementItems
-                    model: scriteDocument.structure.elementCount
+                Item {
+                    id: elementItem
+                    property StructureElement element: scriteDocument.structure.elementAt(index)
+                    property bool selected: canvas.currentIndex === index
+                    property bool editing: canvas.editIndex === index
+                    property real elementX: element.x
+                    property real elementY: element.y
+                    width: titleText.width + 10
+                    height: titleText.height + 10
+                    x: elementX // - width/2
+                    y: elementY // - height/2
 
-                    Item {
-                        id: elementItem
-                        property StructureElement element: scriteDocument.structure.elementAt(index)
-                        property bool selected: canvas.currentIndex === index
-                        property bool editing: canvas.editIndex === index
-                        width: titleText.width + 10
-                        height: titleText.height + 10
-                        x: element.x - width/2
-                        y: element.y - height/2
+                    // This happens when element is dragged
+                    onXChanged: element.x = x // width/2
+                    onYChanged: element.y = y // height/2
 
-                        Keys.onPressed: {
-                            if(event.key === Qt.Key_F2)
-                                canvas.editIndex = index
+                    // This happens when unto/redo happens
+                    onElementXChanged: x = elementX // - width/2
+                    onElementYChanged: y = elementY // - height/2
+
+                    // This happens when text is edited
+                    onWidthChanged: element.width = width
+                    onHeightChanged: element.height = height
+
+                    Keys.onPressed: {
+                        if(event.key === Qt.Key_F2)
+                            canvas.editIndex = index
+                    }
+
+                    onSelectedChanged: {
+                        if(selected)
+                            scriteDocument.structure.currentElementIndex = index
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 8
+                        border.width: parent.selected ? 4 : 1
+                        border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "lightgray" : element.scene.color)
+                        color: Qt.tint(element.scene.color, "#C0FFFFFF")
+                        Behavior on border.width { NumberAnimation { duration: 400 } }
+                    }
+
+                    TextViewEdit {
+                        id: titleText
+                        width: 250
+                        wrapMode: Text.WordWrap
+                        text: element.scene.title
+                        anchors.centerIn: parent
+                        font.pixelSize: 20
+                        horizontalAlignment: Text.AlignHCenter
+                        readOnly: !parent.editing
+                        onTextEdited: element.scene.title = text
+                        onEditingFinished: {
+                            canvas.editIndex = -1
+                            searchBar.searchEngine.clearSearch()
                         }
+                        onHighlightRequest: scriteDocument.structure.currentElementIndex = index
+                        Keys.onReturnPressed: editingFinished()
+                        searchEngine: searchBar.searchEngine
+                        searchSequenceNumber: index
+                    }
 
-                        onSelectedChanged: {
-                            if(selected)
-                                scriteDocument.structure.currentElementIndex = index
-                        }
+                    ToolButton {
+                        id: elementOptionsButton
+                        icon.source: "../icons/navigation/menu.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.right
+                        anchors.leftMargin: 10
+                        visible: parent.selected
+                        down: elementOptionsMenuLoader.active
+                        onClicked: elementOptionsMenuLoader.active = true
+                    }
 
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: 8
-                            border.width: parent.selected ? 4 : 1
-                            border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "lightgray" : element.scene.color)
-                            color: Qt.tint(element.scene.color, "#C0FFFFFF")
-                            Behavior on border.width { NumberAnimation { duration: 400 } }
-                        }
+                    Loader {
+                        id: elementOptionsMenuLoader
+                        anchors.top: elementOptionsButton.bottom
+                        anchors.right: parent.right
+                        anchors.topMargin: 10
+                        anchors.rightMargin: -elementOptionsButton.width-10
+                        width: parent.width; height: 1
+                        sourceComponent: Menu {
+                            signal colorMenuItemClicked(string color)
+                            onAboutToHide: elementOptionsMenuLoader.active = false
 
-                        TextViewEdit {
-                            id: titleText
-                            width: 250
-                            wrapMode: Text.WordWrap
-                            text: element.scene.title
-                            anchors.centerIn: parent
-                            font.pixelSize: 20
-                            horizontalAlignment: Text.AlignHCenter
-                            readOnly: !parent.editing
-                            onTextEdited: element.scene.title = text
-                            onEditingFinished: {
-                                canvas.editIndex = -1
-                                searchBar.searchEngine.clearSearch()
-                            }
-                            onHighlightRequest: scriteDocument.structure.currentElementIndex = index
-                            Keys.onReturnPressed: editingFinished()
-                            searchEngine: searchBar.searchEngine
-                            searchSequenceNumber: index
-                        }
-
-                        ToolButton {
-                            id: elementOptionsButton
-                            icon.source: "../icons/navigation/menu.png"
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.right
-                            anchors.leftMargin: 10
-                            visible: parent.selected
-                            down: elementOptionsMenuLoader.active
-                            onClicked: elementOptionsMenuLoader.active = true
-                        }
-
-                        Loader {
-                            id: elementOptionsMenuLoader
-                            anchors.top: elementOptionsButton.bottom
-                            anchors.right: parent.right
-                            anchors.topMargin: 10
-                            anchors.rightMargin: -elementOptionsButton.width-10
-                            width: parent.width; height: 1
-                            sourceComponent: Menu {
-                                signal colorMenuItemClicked(string color)
-                                onAboutToHide: elementOptionsMenuLoader.active = false
-
-                                MenuItem {
-                                    action: Action {
-                                        text: "Scene Heading"
-                                        checkable: true
-                                        checked: element.scene.heading.enabled
-                                    }
-                                    onTriggered: element.scene.heading.enabled = action.checked
+                            MenuItem {
+                                action: Action {
+                                    text: "Scene Heading"
+                                    checkable: true
+                                    checked: element.scene.heading.enabled
                                 }
-
-                                ColorMenu {
-                                    title: "Colors"
-                                    onMenuItemClicked: colorMenuItemClicked(color)
-                                }
-
-                                MenuItem {
-                                    text: "Delete"
-                                    onClicked: scriteDocument.structure.removeElement(element)
-                                }
-                            }
-                            active: false
-                            onItemChanged: {
-                                if(item)
-                                    item.open()
+                                onTriggered: element.scene.heading.enabled = action.checked
                             }
 
-                            Connections {
-                                target: elementOptionsMenuLoader.item
-                                onColorMenuItemClicked: {
-                                    element.scene.color = color
-                                    elementOptionsMenuLoader.active = false
-                                }
+                            ColorMenu {
+                                title: "Colors"
+                                onMenuItemClicked: colorMenuItemClicked(color)
+                            }
+
+                            MenuItem {
+                                text: "Delete"
+                                onClicked: scriteDocument.structure.removeElement(element)
                             }
                         }
+                        active: false
+                        onItemChanged: {
+                            if(item)
+                                item.open()
+                        }
 
-                        MouseArea {
-                            id: elementItemMouseArea
-                            anchors.fill: parent
-                            enabled: !titleText.hasFocus && !selectionRect.visible
-                            hoverEnabled: true
-                            cursorShape: enabled ? (pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.ArrowCursor
-                            acceptedButtons: Qt.LeftButton|Qt.RightButton
-                            onClicked: {
-                                if(mouse.button === Qt.RightButton)
-                                    elementOptionsMenuLoader.active = true
-                                else if(mouse.button === Qt.LeftButton) {
-                                    canvas.ensureCurrentItemIsVisible = false
-                                    scriteDocument.structure.currentElementIndex = index
-                                    canvas.ensureCurrentItemIsVisible = true
-                                    requestEditor()
-                                }
+                        Connections {
+                            target: elementOptionsMenuLoader.item
+                            onColorMenuItemClicked: {
+                                element.scene.color = color
+                                elementOptionsMenuLoader.active = false
                             }
-                            onDoubleClicked: {
-                                if(mouse.button === Qt.LeftButton)
-                                    canvas.editIndex = index
-                            }
+                        }
+                    }
 
-                            drag.target: parent
-                            drag.axis: Drag.XAndYAxis
-                            drag.onActiveChanged: {
+                    MouseArea {
+                        id: elementItemMouseArea
+                        anchors.fill: parent
+                        enabled: !titleText.hasFocus && !selectionRect.visible
+                        hoverEnabled: true
+                        cursorShape: enabled ? (pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.ArrowCursor
+                        acceptedButtons: Qt.LeftButton|Qt.RightButton
+                        onClicked: {
+                            parent.forceActiveFocus()
+                            if(mouse.button === Qt.RightButton)
+                                elementOptionsMenuLoader.active = true
+                            else if(mouse.button === Qt.LeftButton) {
                                 canvas.ensureCurrentItemIsVisible = false
                                 scriteDocument.structure.currentElementIndex = index
                                 canvas.ensureCurrentItemIsVisible = true
                                 requestEditor()
-                                parent.x = scriteDocument.structure.snapToGrid(parent.x)
-                                parent.y = scriteDocument.structure.snapToGrid(parent.y)
                             }
                         }
-
-                        onXChanged: updatePosition()
-                        onYChanged: updatePosition()
-                        function updatePosition() {
-                            element.x = (x + width/2)
-                            element.y = (y + height/2)
+                        onDoubleClicked: {
+                            if(mouse.button === Qt.LeftButton)
+                                canvas.editIndex = index
                         }
 
-                        onWidthChanged: element.width = width
-                        onHeightChanged: element.height = height
-
-                        // Drag to timeline support
-                        Drag.active: dragMouseArea.drag.active
-                        Drag.dragType: Drag.Automatic
-                        Drag.supportedActions: Qt.LinkAction
-                        Drag.hotSpot.x: width/2
-                        Drag.hotSpot.y: height/2
-                        Drag.mimeData: {
-                            "scrite/sceneID": element.scene.id
+                        drag.target: parent
+                        drag.axis: Drag.XAndYAxis
+                        drag.onActiveChanged: {
+                            parent.forceActiveFocus()
+                            canvas.ensureCurrentItemIsVisible = false
+                            scriteDocument.structure.currentElementIndex = index
+                            canvas.ensureCurrentItemIsVisible = true
+                            requestEditor()
+                            parent.x = scriteDocument.structure.snapToGrid(parent.x)
+                            parent.y = scriteDocument.structure.snapToGrid(parent.y)
                         }
-                        Drag.source: element.scene
+                    }
 
-                        Image {
-                            visible: !parent.editing
-                            source: "../icons/action/view_array.png"
-                            width: 24; height: 24
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 1
-                            anchors.rightMargin: 3
-                            opacity: dragMouseArea.containsMouse ? 1 : 0.25
-                            scale: dragMouseArea.containsMouse ? 2 : 1
-                            Behavior on scale { NumberAnimation { duration: 250 } }
+                    // Drag to timeline support
+                    Drag.active: dragMouseArea.drag.active
+                    Drag.dragType: Drag.Automatic
+                    Drag.supportedActions: Qt.LinkAction
+                    Drag.hotSpot.x: width/2
+                    Drag.hotSpot.y: height/2
+                    Drag.mimeData: {
+                        "scrite/sceneID": element.scene.id
+                    }
+                    Drag.source: element.scene
 
-                            MouseArea {
-                                id: dragMouseArea
-                                hoverEnabled: true
-                                anchors.fill: parent
-                                drag.target: parent
-                                cursorShape: Qt.SizeAllCursor
-                                onPressed: {
-                                    elementItem.grabToImage(function(result) {
-                                        elementItem.Drag.imageSource = result.url
-                                    })
-                                }
+                    Image {
+                        visible: !parent.editing
+                        source: "../icons/action/view_array.png"
+                        width: 24; height: 24
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 1
+                        anchors.rightMargin: 3
+                        opacity: dragMouseArea.containsMouse ? 1 : 0.25
+                        scale: dragMouseArea.containsMouse ? 2 : 1
+                        Behavior on scale { NumberAnimation { duration: 250 } }
+
+                        MouseArea {
+                            id: dragMouseArea
+                            hoverEnabled: true
+                            anchors.fill: parent
+                            drag.target: parent
+                            cursorShape: Qt.SizeAllCursor
+                            onPressed: {
+                                elementItem.grabToImage(function(result) {
+                                    elementItem.Drag.imageSource = result.url
+                                })
                             }
                         }
                     }

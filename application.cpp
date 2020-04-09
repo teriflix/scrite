@@ -14,9 +14,11 @@
 #include "application.h"
 
 #include <QDir>
+#include <QtDebug>
 #include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
+#include <QKeyEvent>
 #include <QMetaEnum>
 #include <QJsonArray>
 #include <QMessageBox>
@@ -32,9 +34,15 @@ Application *Application::instance()
 
 Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
+      m_undoGroup(new QUndoGroup(this)),
       m_errorReport(new ErrorReport(this)),
       m_versionNumber(version)
 {
+    connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
+    connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
+    connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);
+    connect(m_undoGroup, &QUndoGroup::redoTextChanged, this, &Application::redoTextChanged);
+
     this->setBaseWindowTitle("scrite - build your screenplay");
 
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
@@ -100,6 +108,21 @@ QString Application::typeName(QObject *object) const
         return QString();
 
     return QString::fromLatin1(object->metaObject()->className());
+}
+
+UndoStack *Application::findUndoStack(const QString &objectName) const
+{
+    const QList<QUndoStack*> stacks = m_undoGroup->stacks();
+    Q_FOREACH(QUndoStack *stack, stacks)
+    {
+        if(stack->objectName() == objectName)
+        {
+            UndoStack *ret = qobject_cast<UndoStack*>(stack);
+            return ret;
+        }
+    }
+
+    return nullptr;
 }
 
 QJsonObject Application::systemFontInfo() const
@@ -233,6 +256,16 @@ QString Application::settingsFilePath() const
 
 bool Application::notify(QObject *object, QEvent *event)
 {
+    if(event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+        if(ke->modifiers() & Qt::ControlModifier && ke->key() == Qt::Key_M)
+        {
+            emit minimizeWindowRequest();
+            return true;
+        }
+    }
+
     const bool ret = QtApplicationClass::notify(object, event);
 
     if(event->type() == QEvent::ChildAdded)

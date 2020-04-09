@@ -67,5 +67,10 @@
         <file>icons/navigation/close_inverted.png</file>
         <file>qml/ScrollArea.qml</file>
         <file>qml/TextViewEdit.qml</file>
+        <file>icons/content/redo.png</file>
+        <file>icons/content/redo_inverted.png</file>
+        <file>icons/content/undo.png</file>
+        <file>icons/content/undo_inverted.png</file>
+        <file>qml/FocusIndicator.qml</file>
     </qresource>
 </RCC>

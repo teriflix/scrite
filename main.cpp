@@ -13,14 +13,18 @@
 
 #include "application.h"
 
+#include <QShortcut>
+#include <QUndoStack>
 #include <QQuickView>
 #include <QQmlEngine>
 #include <QQmlContext>
 
 #include "logger.h"
+#include "undostack.h"
 #include "completer.h"
 #include "aggregation.h"
 #include "eventfilter.h"
+#include "focustracker.h"
 #include "notification.h"
 #include "searchengine.h"
 #include "standardpaths.h"
@@ -77,7 +81,6 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Structure>("Scrite", 1, 0, "Structure", reason);
     qmlRegisterType<StructureElement>("Scrite", 1, 0, "StructureElement");
     qmlRegisterType<StructureElementConnector>("Scrite", 1, 0, "StructureElementConnector");
-    qmlRegisterUncreatableType<StructureArea>("Scrite", 1, 0, "StructureArea", reason);
 
     qmlRegisterType<Note>("Scrite", 1, 0, "Note");
     qmlRegisterUncreatableType<Character>("Scrite", 1, 0, "Character", reason);
@@ -103,6 +106,7 @@ int main(int argc, char **argv)
     qmlRegisterType<CubicToElement>("Scrite", 1, 0, "CubicTo");
     qmlRegisterType<QuadToElement>("Scrite", 1, 0, "QuadTo");
     qmlRegisterType<TextShapeItem>("Scrite", 1, 0, "TextShapeItem");
+    qmlRegisterType<UndoStack>("Scrite", 1, 0, "UndoStack");
 
     qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
     qmlRegisterType<TextDocumentSearch>("Scrite", 1, 0, "TextDocumentSearch");
@@ -118,6 +122,9 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", "Use as attached property.");
 
     qmlRegisterUncreatableType<AbstractReportGenerator>("Scrite", 1, 0, "AbstractReportGenerator", reason);
+
+    qmlRegisterUncreatableType<FocusTracker>("Scrite", 1, 0, "FocusTracker", reason);
+    qmlRegisterUncreatableType<FocusTrackerIndicator>("Scrite", 1, 0, "FocusTrackerIndicator", reason);
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;
@@ -139,6 +146,8 @@ int main(int argc, char **argv)
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(1470, 865));
     qmlView.showMaximized();
+
+    QObject::connect(&a, &Application::minimizeWindowRequest, &qmlView, &QQuickView::showMinimized);
 
     return a.exec();
 }

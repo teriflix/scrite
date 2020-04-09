@@ -56,9 +56,9 @@ Rectangle {
 
         ScrollView {
             anchors.top: parent.top
-            anchors.topMargin: 5
+            anchors.topMargin: 10
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
+            anchors.bottomMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             width: screenplayToolsLayout.width
 
@@ -76,8 +76,10 @@ Rectangle {
                                         "okButtonText": "Yes",
                                         "cancelButtonText": "No",
                                         "callback": function(val) {
-                                            if(val)
+                                            if(val) {
+                                                screenplayElementList.forceActiveFocus()
                                                 scriteDocument.screenplay.clearElements()
+                                            }
                                         }
                                     }, this)
                     }
@@ -102,21 +104,55 @@ Rectangle {
         }
     }
 
+    FocusIndicator {
+        id: focusIndicator
+        active: structureScreenplayUndoStack.active
+        anchors.fill: screenplayElementList
+        anchors.margins: -10
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: screenplayElementList.forceActiveFocus()
+        }
+    }
+
+    DropArea {
+        anchors.fill: parent
+        keys: [dropAreaKey]
+
+        onEntered: {
+            screenplayElementList.forceActiveFocus()
+            screenplayElementList.footerItem.highlightAsDropArea = true
+        }
+        onExited: screenplayElementList.footerItem.highlightAsDropArea = false
+
+        onDropped: {
+            screenplayElementList.footerItem.highlightAsDropArea = false
+            dropSceneAt(drop.source, -1)
+            drop.acceptProposedAction()
+        }
+    }
+
     ListView {
         id: screenplayElementList
-        anchors.fill: parent
+        anchors.left: screenplayTools.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         anchors.margins: 10
+        anchors.leftMargin: 3
+        clip: true
+        visible: count > 0
         model: scriteDocument.screenplay
         property real minimumDelegateWidth: 100
         property real perElementWidth: 2.5
         property bool moveMode: false
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
-        header: Item {
-            height: screenplayElementList.height
-            width: screenplayTools.width
-        }
         ScrollBar.horizontal: ScrollBar { }
+        FocusTracker.window: qmlWindow
+        FocusTracker.indicator.target: structureScreenplayUndoStack
+        FocusTracker.indicator.property: "screenplayViewHasFocus"
 
         Transition {
             id: moveAndDisplace
@@ -135,22 +171,6 @@ Rectangle {
                 width: 5
                 height: parent.height
                 color: parent.highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
-            }
-
-            DropArea {
-                anchors.fill: parent
-                keys: [dropAreaKey]
-
-                onEntered: parent.highlightAsDropArea = true
-                onExited: parent.highlightAsDropArea = false
-
-                onDropped: {
-                    parent.highlightAsDropArea = false
-                    dropSceneAt(drop.source, -1)
-                    drop.acceptProposedAction()
-                    if(!screenplayElementList.moveMode)
-                        screenplayElementList.positionViewAtEnd()
-                }
             }
         }
 
@@ -192,6 +212,7 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
+                            elementItemDelegate.forceActiveFocus()
                             scriteDocument.screenplay.currentElementIndex = index
                             requestEditor()
                         }
@@ -256,7 +277,10 @@ Rectangle {
                 anchors.fill: parent
                 keys: [dropAreaKey]
 
-                onEntered: dropAreaIndicator.highlightAsDropArea = true
+                onEntered: {
+                    screenplayElementList.forceActiveFocus()
+                    dropAreaIndicator.highlightAsDropArea = true
+                }
                 onExited: dropAreaIndicator.highlightAsDropArea = false
 
                 onDropped: {
@@ -329,7 +353,8 @@ Rectangle {
 
         var element = screenplayElementComponent.createObject()
         element.sceneID = sceneID
-        scriteDocument.screenplay.insertAt(element, index)
+        scriteDocument.screenplay.insertElementAt(element, index)
+        scriteDocument.screenplay.currentElementIndex = index
     }
 
     Component {

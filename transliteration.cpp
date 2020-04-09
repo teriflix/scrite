@@ -182,7 +182,7 @@ QJsonArray TransliterationSettings::languages() const
 
 void *TransliterationSettings::transliteratorFor(TransliterationSettings::Language language) const
 {
-    switch(m_language)
+    switch(language)
     {
     case English:
         return nullptr;
@@ -249,6 +249,8 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
     if(m_textDocument != nullptr)
     {
         QTextDocument *doc = m_textDocument->textDocument();
+        doc->setUndoRedoEnabled(true);
+
         if(doc != nullptr)
         {
             disconnect( doc, &QQuickTextDocument::destroyed,
@@ -266,6 +268,8 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
     if(m_textDocument != nullptr)
     {
         QTextDocument *doc = m_textDocument->textDocument();
+        doc->setUndoRedoEnabled(false);
+
         if(doc != nullptr)
         {
             connect( doc, &QQuickTextDocument::destroyed,

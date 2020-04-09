@@ -121,11 +121,17 @@ Item {
             palette: app.palette
             selectByMouse: true
             selectByKeyboard: true
-            EventFilter.events: [31] // Wheel
+            EventFilter.events: [31,51] // Wheel, ShortcutOverride
             EventFilter.onFilter: {
-                result.acceptEvent = false
-                result.filter = !scrollable
+                if(event.type === 31) {
+                    result.acceptEvent = false
+                    result.filter = !scrollable
+                } else if(event.type === 51) {
+                    result.acceptEvent = false
+                    result.filter = true
+                }
             }
+            font: scriteDocument.formatting.defaultFont
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus

@@ -16,6 +16,7 @@
 
 #include "scene.h"
 
+#include <QBasicTimer>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QQmlListProperty>
@@ -57,6 +58,9 @@ public:
     Q_SIGNAL void userDataChanged();
 
     Q_SIGNAL void elementChanged();
+
+    Q_SIGNAL void sceneAboutToReset();
+    Q_SIGNAL void sceneReset(int elementIndex);
 
 protected:
     bool event(QEvent *event);
@@ -103,7 +107,7 @@ public:
     Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<ScreenplayElement> elements();
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
-    Q_INVOKABLE void insertAt(ScreenplayElement *ptr, int index);
+    Q_INVOKABLE void insertElementAt(ScreenplayElement *ptr, int index);
     Q_INVOKABLE void removeElement(ScreenplayElement *ptr);
     Q_INVOKABLE void moveElement(ScreenplayElement *ptr, int toRow);
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
@@ -128,6 +132,8 @@ public:
     Scene* activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
 
+    Q_SIGNAL void sceneReset(int sceneIndex, int sceneElementIndex);
+
     Q_INVOKABLE QJsonArray search(const QString &text, int flags=0) const;
 
     // QAbstractItemModel interface
@@ -138,6 +144,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void onSceneReset(int elementIndex);
 
 private:
     QString m_title;

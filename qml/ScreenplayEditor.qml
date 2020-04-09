@@ -78,12 +78,22 @@ Item {
         }
     }
 
+
+    FocusIndicator {
+        id: focusIndicator
+        active: sceneEditorUndoStack.active
+        anchors.fill: screenplayListView
+        anchors.margins: -3
+    }
+
     ListView {
         id: screenplayListView
+        property var lastSceneResetInfo
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: searchBar.bottom
+        anchors.margins: 3
         clip: true
         ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
         model: scriteDocument.screenplay
@@ -95,6 +105,9 @@ Item {
             id: moveAndDisplace
             NumberAnimation { properties: "x,y"; duration: 250 }
         }
+
+        FocusTracker.window: qmlWindow
+        FocusTracker.indicator.target: sceneEditorUndoStack
 
         moveDisplaced: moveAndDisplace
         move: moveAndDisplace
@@ -112,15 +125,14 @@ Item {
             var rect = currentSceneContentEditor.cursorRectangle
             var pt = currentSceneContentEditor.mapToItem(screenplayListView.contentItem, rect.x, rect.y)
             var startY = screenplayListView.contentY
-            var endY = screenplayListView.contentY + screenplayListView.height
+            var endY = screenplayListView.contentY + screenplayListView.height - rect.height
             if( startY < pt.y && pt.y < endY )
                 return
 
-            endY = endY-40
             if( pt.y < startY )
                 screenplayListView.contentY = pt.y
             else if( pt.y > endY )
-                screenplayListView.contentY = (pt.y + 40) - screenplayListView.height
+                screenplayListView.contentY = (pt.y + 2*rect.height) - screenplayListView.height
         }
     }
 
@@ -185,6 +197,15 @@ Item {
                     width: parent.width - sceneTitle.width - parent.spacing
                     scrollable: false
                     showOnlyEnabledSceneHeadings: true
+                    binder.onDocumentInitialized: {
+                        var info = screenplayListView.lastSceneResetInfo
+                        screenplayListView.lastSceneResetInfo = undefined
+                        if(info) {
+                            var position = binder.cursorPositionAtBlock(info.sceneElementIndex)
+                            assumeFocusAt(position)
+                        }
+                    }
+
                     onEditorHasActiveFocusChanged: {
                         if(editorHasActiveFocus) {
                             currentElementIndexConnections.enabled = false
@@ -196,14 +217,16 @@ Item {
                     onRequestScrollUp: {
                         if(index > 0) {
                             var item = screenplayListView.itemAtIndex(index-1)
-                            item.assumeFocusAt(-1)
+                            if(item)
+                                item.assumeFocusAt(-1)
                         }
                     }
 
                     onRequestScrollDown: {
                         if(index < scriteDocument.screenplay.elementCount) {
                             var item = screenplayListView.itemAtIndex(index+1)
-                            item.assumeFocusAt(0)
+                            if(item)
+                                item.assumeFocusAt(0)
                         }
                     }
 
@@ -237,6 +260,10 @@ Item {
         id: currentElementIndexConnections
         target: scriteDocument.screenplay
         onCurrentElementIndexChanged: screenplayListView.positionViewAtIndex(scriteDocument.screenplay.currentElementIndex, ListView.Beginning)
+        onSceneReset: {
+            screenplayListView.lastSceneResetInfo = {"sceneIndex": sceneIndex, "sceneElementIndex": sceneElementIndex}
+            scriteDocument.screenplay.currentElementIndex = sceneIndex
+        }
     }
 
     Component.onCompleted: screenplayListView.positionViewAtIndex(scriteDocument.screenplay.currentElementIndex, ListView.Beginning)

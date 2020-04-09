@@ -15,6 +15,7 @@
 
 #include "logger.h"
 #include "hourglass.h"
+#include "undostack.h"
 #include "aggregation.h"
 #include "application.h"
 #include "pdfexporter.h"
@@ -159,7 +160,7 @@ Scene *ScriteDocument::createNewScene()
     if(m_screenplay->currentElementIndex() >= 0)
     {
         newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
-        m_screenplay->insertAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
+        m_screenplay->insertElementAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
     }
     else
     {
@@ -196,6 +197,8 @@ void ScriteDocument::reset()
 
     if(m_formatting != nullptr)
         disconnect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+
+    UndoStack::clearAllStacks();
 
     this->setFormatting(new ScreenplayFormat(this));
     this->setScreenplay(new Screenplay(this));
@@ -613,7 +616,6 @@ bool ScriteDocument::load(const QString &fileName)
 {
     m_errorReport->clear();
 
-
     QFile file(fileName);
     if( !file.open(QFile::ReadOnly) )
     {
@@ -649,10 +651,12 @@ bool ScriteDocument::load(const QString &fileName)
     emit fileNameChanged();
 
     m_progressReport->start();
-    static QObjectFactory scriteFactory;
-    if(scriteFactory.isEmpty())
-        scriteFactory.addClass<Scene>();
-    const bool ret = QObjectSerializer::fromJson(json, this, &scriteFactory);
+
+    UndoStack::ignoreUndoCommands = true;
+    const bool ret = QObjectSerializer::fromJson(json, this);
+    UndoStack::ignoreUndoCommands = false;
+    UndoStack::clearAllStacks();
+
     m_progressReport->finish();
 
     return ret;

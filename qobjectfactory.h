@@ -35,10 +35,12 @@ public:
     bool isEmpty() const { return m_metaObjects.isEmpty(); }
 
     void add(const QMetaObject *mo) {
+#ifndef QT_NO_DEBUG
         if(mo->constructorCount() == 0) {
             qDebug("QtFactory: Trying to register class '%s' with no invokable constructor.", mo->className());
             return;
         }
+#endif
         QList<QByteArray> keys;
         const int ciIndex = mo->indexOfClassInfo(m_classInfoKey.constData());
         if(ciIndex >= 0) {

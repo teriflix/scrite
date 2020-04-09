@@ -11,7 +11,9 @@
 **
 ****************************************************************************/
 
+#include "undostack.h"
 #include "abstractimporter.h"
+
 #include <QFile>
 #include <QRegularExpression>
 
@@ -59,13 +61,16 @@ bool AbstractImporter::read()
     this->progress()->setProgressText( QString("Importing from \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
+    UndoStack::ignoreUndoCommands = true;
     const bool ret = this->doImport(&file);
+    UndoStack::ignoreUndoCommands = false;
+    UndoStack::clearAllStacks();
     this->progress()->finish();
 
     return ret;
 }
 
-static const qreal elementX = 225;
+static const qreal elementX = 100;
 static const qreal elementY = 100;
 static const qreal elementXSpacing = 275;
 static const qreal elementYSpacing = 120;

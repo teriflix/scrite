@@ -23,7 +23,9 @@ HEADERS += \
     eventfilter.h \
     finaldraftexporter.h \
     finaldraftimporter.h \
+    focustracker.h \
     formatting.h \
+    garbagecollector.h \
     gridbackgrounditem.h \
     hourglass.h \
     htmlexporter.h \
@@ -56,7 +58,8 @@ HEADERS += \
     textshapeitem.h \
     timeprofiler.h \
     standardpaths.h \
-    transliteration.h
+    transliteration.h \
+    undostack.h
 
 SOURCES += \
     3rdparty/phtranslator/PhTranslateLib.cpp \
@@ -76,7 +79,9 @@ SOURCES += \
     eventfilter.cpp \
     finaldraftexporter.cpp \
     finaldraftimporter.cpp \
+    focustracker.cpp \
     formatting.cpp \
+    garbagecollector.cpp \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \
     htmlimporter.cpp \
@@ -106,7 +111,8 @@ SOURCES += \
     textshapeitem.cpp \
     timeprofiler.cpp \
     standardpaths.cpp \
-    transliteration.cpp
+    transliteration.cpp \
+    undostack.cpp
 
 RESOURCES += \
     scrite.qrc

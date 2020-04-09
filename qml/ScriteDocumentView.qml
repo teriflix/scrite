@@ -177,6 +177,7 @@ Item {
                     shortcut: "Ctrl+S"
                     shortcutText: "S"
                     display: AbstractButton.IconOnly
+                    enabled: scriteDocument.structure.elementCount > 0
                     onClicked: doClick()
                     function doClick() {
                         if(scriteDocument.fileName === "")
@@ -191,7 +192,32 @@ Item {
                     text: "Save As"
                     shortcut: "Ctrl+Shift+S"
                     shortcutText: "Shift+S"
+                    enabled: scriteDocument.structure.elementCount > 0
                     onClicked: fileDialog.launch("SAVE")
+                }
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    color: "black"
+                }
+
+                ToolButton2 {
+                    shortcut: "Ctrl+Z"
+                    shortcutText: "Z"
+                    icon.source: "../icons/content/undo.png"
+                    enabled: app.canUndo
+                    onClicked: app.undoGroup.undo()
+                    ToolTip.text: app.undoText + "\t" + app.polishShortcutTextForDisplay(shortcut)
+                }
+
+                ToolButton2 {
+                    shortcut: app.platform === Application.MacOS ? "Ctrl+Shift+Z" : "Ctrl+Y"
+                    shortcutText: app.platform === Application.MacOS ? "Shift+Z" : "Y"
+                    icon.source: "../icons/content/redo.png"
+                    enabled: app.canRedo
+                    onClicked: app.undoGroup.redo()
+                    ToolTip.text: app.redoText + "\t" + app.polishShortcutTextForDisplay(shortcut)
                 }
 
                 Rectangle {
@@ -205,7 +231,7 @@ Item {
                     text: "Import"
                     shortcut: "Ctrl+Shift+I"
                     shortcutText: "Shift+I"
-                    // display: AbstractButton.IconOnly
+                    display: AbstractButton.IconOnly
                     down: importMenu.visible
                     onClicked: importMenu.visible = true
 
@@ -253,8 +279,9 @@ Item {
                     text: "Export"
                     shortcut: "Ctrl+Shift+X"
                     shortcutText: "Shift+X"
-                    // display: AbstractButton.IconOnly
+                    display: AbstractButton.IconOnly
                     down: exportMenu.visible
+                    enabled: scriteDocument.screenplay.elementCount > 0
                     onClicked: exportMenu.visible = true
 
                     Item {
@@ -281,9 +308,10 @@ Item {
                     icon.source: "../icons/file/file_pdf.png"
                     text: "Reports"
                     shortcut: "Ctrl+Shift+R"
-                    shortcutText: display === AbstractButton.TextBesideIcon ? "Shift+R" : ""
-                    display: appToolBar.width < 1490 ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
+                    shortcutText: "Shift+R"
+                    display: AbstractButton.IconOnly
                     down: reportsMenu.visible
+                    enabled: scriteDocument.screenplay.elementCount > 0
                     onClicked: reportsMenu.visible = true
 
                     Item {
@@ -333,8 +361,8 @@ Item {
                     icon.source: "../icons/action/settings_applications.png"
                     text: "Settings"
                     shortcut: "Ctrl+,"
-                    shortcutText: display === AbstractButton.TextBesideIcon ? "," : ""
-                    display: appToolBar.width < 1560 ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
+                    shortcutText: ","
+                    display: AbstractButton.IconOnly
                     onClicked: {
                         modalDialog.popupSource = this
                         modalDialog.sourceComponent = optionsDialogComponent
@@ -347,7 +375,7 @@ Item {
                     text: app.transliterationSettings.languageAsString
                     shortcut: "Ctrl+L"
                     shortcutText: "L"
-                    // display: AbstractButton.IconOnly
+                    display: AbstractButton.IconOnly
                     ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                     onClicked: languageMenu.visible = true
                     down: languageMenu.visible
@@ -663,6 +691,16 @@ Item {
                             id: editorLoader
                             anchors.fill: parent
                             sourceComponent: scriteDocument.screenplay.elementCount > 0 ? screenplayEditorComponent : null
+                            property bool emptyDocument: scriteDocument.structure.elementCount === 0
+                            onEmptyDocumentChanged: {
+                                if(emptyDocument)
+                                    sourceComponent = null
+                            }
+                        }
+
+                        Connections {
+                            target: globalSceneEditorToolbar
+                            onRequestScreenplayEditor: editorLoader.sourceComponent = screenplayEditorComponent
                         }
                     }
                 }
@@ -679,6 +717,19 @@ Item {
                 }
             }
         }
+    }
+
+    UndoStack {
+        id: sceneEditorUndoStack
+        objectName: "SceneEditor_UndoStack"
+    }
+
+    UndoStack {
+        id: structureScreenplayUndoStack
+        objectName: "StructureScreenplay_UndoStack"
+        property bool structureViewHasFocus: false
+        property bool screenplayViewHasFocus: false
+        active: structureViewHasFocus || screenplayViewHasFocus
     }
 
     Component {
@@ -711,12 +762,21 @@ Item {
                 anchors.top: parent.top
             }
 
+            FocusIndicator {
+                id: focusIndicator
+                active: sceneEditorUndoStack.active
+                anchors.fill: sceneEditor
+                anchors.margins: -3
+            }
+
             SceneEditor {
                 id: sceneEditor
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.top: searchBar.bottom
+                anchors.margins: 3
+                clip: true
                 property StructureElement element: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
                 scene: element ? element.scene : null
 
@@ -729,6 +789,9 @@ Item {
                 SearchAgent.onClearSearchRequest: {
                     editor.deselect()
                 }
+
+                FocusTracker.window: qmlWindow
+                FocusTracker.indicator.target: sceneEditorUndoStack
             }
 
             Component.onCompleted: globalSceneEditorToolbar.sceneEditor = sceneEditor

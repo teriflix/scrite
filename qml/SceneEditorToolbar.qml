@@ -21,6 +21,8 @@ ScrollView {
     property SceneDocumentBinder binder
     property TextArea editor
 
+    signal requestScreenplayEditor()
+
     height: 45
     clip: true
     contentWidth: toolbarContainer.width
@@ -59,7 +61,10 @@ ScrollView {
                     shortcut: "Ctrl+Shift+N"
                     shortcutText: ""
                     ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-                    onClicked: scriteDocument.createNewScene()
+                    onClicked: {
+                        requestScreenplayEditor()
+                        scriteDocument.createNewScene()
+                    }
                 }
 
                 Repeater {

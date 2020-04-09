@@ -17,9 +17,11 @@
 #include <QMap>
 #include <QColor>
 #include <QJsonArray>
+#include <QUndoCommand>
 #include <QQmlListProperty>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
+#include <QPointer>
 
 #include "note.h"
 
@@ -116,8 +118,10 @@ public:
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     void setText(const QString &val);
-    QString text() const;
+    QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
+
+    QString formattedText() const;
 
     Q_SIGNAL void elementChanged();
 
@@ -176,9 +180,9 @@ public:
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements)
     QQmlListProperty<SceneElement> elements();
     Q_INVOKABLE void addElement(SceneElement *ptr);
-    Q_INVOKABLE void insertAfter(SceneElement *ptr, SceneElement *after);
-    Q_INVOKABLE void insertBefore(SceneElement *ptr, SceneElement *before);
-    Q_INVOKABLE void insertAt(SceneElement *ptr, int index);
+    Q_INVOKABLE void insertElementAfter(SceneElement *ptr, SceneElement *after);
+    Q_INVOKABLE void insertElementBefore(SceneElement *ptr, SceneElement *before);
+    Q_INVOKABLE void insertElementAt(SceneElement *ptr, int index);
     Q_INVOKABLE void removeElement(SceneElement *ptr);
     Q_INVOKABLE int  indexOfElement(SceneElement *ptr) { return m_elements.indexOf(ptr); }
     Q_INVOKABLE SceneElement *elementAt(int index) const;
@@ -191,6 +195,8 @@ public:
     Q_SIGNAL void sceneElementChanged(SceneElement *element, SceneElementChangeType type);
     Q_SIGNAL void aboutToRemoveSceneElement(SceneElement *element);
     Q_SIGNAL void sceneChanged();
+    Q_SIGNAL void sceneAboutToReset();
+    Q_SIGNAL void sceneReset(int elementIndex);
 
     Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
     QQmlListProperty<Note> notes();
@@ -222,7 +228,6 @@ private:
     bool m_enabled;
     char m_padding[7];
     SceneHeading* m_heading;
-    QQuickTextDocument* m_textDocument;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);

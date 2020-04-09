@@ -223,6 +223,8 @@ public:
 
     Q_INVOKABLE int lastCursorPosition() const;
 
+    Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;
+
     Q_PROPERTY(QStringList autoCompleteHints READ autoCompleteHints NOTIFY autoCompleteHintsChanged)
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }
     Q_SIGNAL void autoCompleteHintsChanged();
@@ -261,11 +263,15 @@ private:
     void setAutoCompleteHints(const QStringList &val);
     void setCompletionPrefix(const QString &val);
 
+    void onSceneAboutToReset();
+    void onSceneReset(int elementIndex);
+
 private:
     Scene* m_scene;
     qreal m_textWidth;
     int m_cursorPosition;
     int m_documentLoadCount;
+    bool m_sceneIsBeingReset;
     bool m_forceSyncDocument;
     QString m_completionPrefix;
     bool m_initializingDocument;

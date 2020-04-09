@@ -33,6 +33,8 @@
 #include <QMargins>
 #include <QMarginsF>
 
+// #define SERIALIZE_DYNAMIC_PROPERTIES
+
 class QMarginsFHelper : public QObjectSerializer::Helper
 {
 public:
@@ -313,6 +315,7 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
         }
     }
 
+#ifdef SERIALIZE_DYNAMIC_PROPERTIES
     const QList<QByteArray> dynPropNames = object->dynamicPropertyNames();
     Q_FOREACH(QByteArray propName, dynPropNames)
     {
@@ -321,6 +324,7 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
         const QJsonValue value = QJsonValue::fromVariant(propValue);
         ret.insert(key, value);
     }
+#endif
 
     if(interface != nullptr)
         interface->serializeToJson(ret);
@@ -431,14 +435,25 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
 
             if( propType.flags() & QMetaType::PointerToQObject )
             {
+                QObjectFactory *usableFactory = factory;
+                QObjectFactory stopGapFactory;
+
                 const QVariant propValue = prop.read(object);
                 QObject *propObject = propValue.value<QObject*>();
                 if( propObject == nullptr )
                 {
-                    if(prop.isWritable() && factory != nullptr)
+                    if(factory == nullptr)
+                    {
+                        stopGapFactory.add( QMetaType::metaObjectForType(prop.userType()) );
+                        usableFactory = &stopGapFactory;
+                    }
+                    else
+                        factory->add( QMetaType::metaObjectForType(prop.userType()) );
+
+                    if(prop.isWritable() && usableFactory != nullptr)
                     {
                         const QByteArray className = QByteArray(prop.typeName()).replace('*', "");
-                        propObject = factory->create(className, object);
+                        propObject = usableFactory->create(className, object);
                         if( propObject == nullptr )
                             continue;
 
@@ -449,7 +464,7 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                 }
 
                 const QJsonObject propJson = jsonPropValue.toObject();
-                QObjectSerializer::fromJson(propJson, propObject, factory);
+                QObjectSerializer::fromJson(propJson, propObject, usableFactory);
                 continue;
             }
 
@@ -475,6 +490,7 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
         }
     }
 
+#ifdef SERIALIZE_DYNAMIC_PROPERTIES
     QJsonObject::const_iterator it = json.constBegin();
     QJsonObject::const_iterator end = json.constEnd();
     while(it != end)
@@ -533,6 +549,7 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
 
         ++it;
     }
+#endif
 
     if(interface != nullptr)
         interface->deserializeFromJson(json);
