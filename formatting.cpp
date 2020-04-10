@@ -268,7 +268,7 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
 
     m_defaultFont = val;
 
-    static const int minPixelSize = 22; // Fonts should be atleast 22pixels tall on screen.
+    static const int minPixelSize = 21; // Fonts should be atleast 22pixels tall on screen.
     QFont font = m_defaultFont;
     QFontInfo fontInfo(font);
     while(fontInfo.pixelSize() < minPixelSize)

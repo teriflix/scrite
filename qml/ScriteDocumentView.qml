@@ -375,7 +375,7 @@ Item {
                     text: app.transliterationSettings.languageAsString
                     shortcut: "Ctrl+L"
                     shortcutText: "L"
-                    display: AbstractButton.IconOnly
+                    // display: AbstractButton.IconOnly
                     ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                     onClicked: languageMenu.visible = true
                     down: languageMenu.visible
