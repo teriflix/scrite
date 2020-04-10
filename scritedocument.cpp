@@ -242,23 +242,7 @@ void ScriteDocument::saveAs(const QString &fileName)
 
     m_progressReport->start();
 
-    QJsonObject metaInfo;
-    metaInfo.insert("appName", qApp->applicationName());
-    metaInfo.insert("orgName", qApp->organizationName());
-    metaInfo.insert("orgDomain", qApp->organizationDomain());
-    metaInfo.insert("appVersion", Application::instance()->versionNumber().toString());
-
-    QJsonObject systemInfo;
-    systemInfo.insert("machineHostName", QSysInfo::machineHostName());
-    systemInfo.insert("machineUniqueId", QString::fromLatin1(QSysInfo::machineUniqueId()));
-    systemInfo.insert("prettyProductName", QSysInfo::prettyProductName());
-    systemInfo.insert("productType", QSysInfo::productType());
-    systemInfo.insert("productVersion", QSysInfo::productVersion());
-    metaInfo.insert("system", systemInfo);
-
-    QJsonObject json = QObjectSerializer::toJson(this);
-    json.insert("meta", metaInfo);
-
+    const QJsonObject json = QObjectSerializer::toJson(this);
     const QByteArray bytes = QJsonDocument(json).toBinaryData();
 
     file.write(bytes);
@@ -689,5 +673,59 @@ void ScriteDocument::screenplayElementIndexChanged()
     {
         int index = m_structure->indexOfScene(element->scene());
         m_structure->setCurrentElementIndex(index);
+    }
+}
+
+void ScriteDocument::prepareForSerialization()
+{
+    // Nothing to do
+}
+
+void ScriteDocument::prepareForDeserialization()
+{
+    // Nothing to do
+}
+
+bool ScriteDocument::canSerialize(const QMetaObject *, const QMetaProperty &) const
+{
+    return true;
+}
+
+void ScriteDocument::serializeToJson(QJsonObject &json) const
+{
+    QJsonObject metaInfo;
+    metaInfo.insert("appName", qApp->applicationName());
+    metaInfo.insert("orgName", qApp->organizationName());
+    metaInfo.insert("orgDomain", qApp->organizationDomain());
+    metaInfo.insert("appVersion", Application::instance()->versionNumber().toString());
+
+    QJsonObject systemInfo;
+    systemInfo.insert("machineHostName", QSysInfo::machineHostName());
+    systemInfo.insert("machineUniqueId", QString::fromLatin1(QSysInfo::machineUniqueId()));
+    systemInfo.insert("prettyProductName", QSysInfo::prettyProductName());
+    systemInfo.insert("productType", QSysInfo::productType());
+    systemInfo.insert("productVersion", QSysInfo::productVersion());
+    metaInfo.insert("system", systemInfo);
+
+    json.insert("meta", metaInfo);
+}
+
+void ScriteDocument::deserializeFromJson(const QJsonObject &json)
+{
+    const QJsonObject metaInfo = json.value("meta").toObject();
+    const QString appVersion = metaInfo.value("appVersion").toString();
+    const QVersionNumber version = QVersionNumber::fromString(appVersion);
+    if( version <= QVersionNumber(0,1,9) )
+    {
+        const qreal dx = -130;
+        const qreal dy = -22;
+
+        const int nrElements = m_structure->elementCount();
+        for(int i=0; i<nrElements; i++)
+        {
+            StructureElement *element = m_structure->elementAt(i);
+            element->setX( element->x()+dx );
+            element->setY( element->y()+dy );
+        }
     }
 }

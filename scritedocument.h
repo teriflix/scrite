@@ -22,12 +22,14 @@
 #include "formatting.h"
 #include "errorreport.h"
 #include "progressreport.h"
+#include "qobjectserializer.h"
 
 class AbstractReportGenerator;
 
-class ScriteDocument : public QObject
+class ScriteDocument : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     ScriteDocument(QObject *parent = nullptr);
@@ -134,6 +136,14 @@ private:
 
     ErrorReport *m_errorReport;
     ProgressReport *m_progressReport;
+
+    // Interface interface
+public:
+    void prepareForSerialization();
+    void prepareForDeserialization();
+    bool canSerialize(const QMetaObject *, const QMetaProperty &) const;
+    void serializeToJson(QJsonObject &) const;
+    void deserializeFromJson(const QJsonObject &);
 };
 
 #endif // SCRITEDOCUMENT_H
