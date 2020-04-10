@@ -1014,8 +1014,7 @@ void SceneDocumentBinder::onSceneAboutToReset()
 
 void SceneDocumentBinder::onSceneReset(int)
 {
-    this->initializeDocument();
-    this->rehighlight();
+    m_initializeDocumentTimer.start(0, this);
 
 #if 0
     if(this->document() != nullptr)
