@@ -205,9 +205,10 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
       m_screen(nullptr),
       m_pageWidth(750),
-      m_defaultFont(QFont("Courier New", 10)),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
+    this->setDefaultFont(QFont("Courier New", 10));
+
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
         SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);
@@ -266,6 +267,18 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
         return;
 
     m_defaultFont = val;
+
+    static const int minPixelSize = 22; // Fonts should be atleast 22pixels tall on screen.
+    QFont font = m_defaultFont;
+    QFontInfo fontInfo(font);
+    while(fontInfo.pixelSize() < minPixelSize)
+    {
+        font.setPointSize(font.pointSize()+1);
+        fontInfo = QFontInfo(font);
+    }
+
+    m_fontPointSizeDelta = qMax(fontInfo.pointSize()-m_defaultFont.pointSize(),0);
+
     emit defaultFontChanged();
 }
 
@@ -667,10 +680,11 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         return;
     }
 
+
     SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
     QTextBlockFormat blkFormat = format->createBlockFormat();
     QTextCharFormat chrFormat = format->createCharFormat();
-    chrFormat.setFontPointSize(format->font().pointSize()+8);
+    chrFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
 
     QTextCursor cursor(block);
     cursor.setBlockFormat(blkFormat);

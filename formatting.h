@@ -133,6 +133,9 @@ public:
     QFont defaultFont() const { return m_defaultFont; }
     Q_SIGNAL void defaultFontChanged();
 
+    Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY defaultFontChanged)
+    int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
+
     Q_INVOKABLE SceneElementFormat *elementFormat(SceneElement::Type type) const;
     Q_INVOKABLE SceneElementFormat *elementFormat(int type) const {
         return this->elementFormat(SceneElement::Type(type));
@@ -157,6 +160,7 @@ private:
     QScreen* m_screen;
     qreal m_pageWidth;
     QFont m_defaultFont;
+    int m_fontPointSizeDelta;
     ScriteDocument *m_scriteDocument;
     QStringList m_suggestionsAtCursor;
 

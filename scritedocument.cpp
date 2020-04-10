@@ -69,7 +69,7 @@ DeviceIOFactories::~DeviceIOFactories()
 {
 }
 
-static DeviceIOFactories deviceIOFactories;
+Q_GLOBAL_STATIC(DeviceIOFactories, deviceIOFactories)
 
 ScriteDocument::ScriteDocument(QObject *parent)
                 :QObject(parent),
@@ -269,7 +269,7 @@ void ScriteDocument::save()
 
 QStringList ScriteDocument::supportedImportFormats() const
 {
-    static QList<QByteArray> keys = deviceIOFactories.ImporterFactory.keys();
+    static QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
     static QStringList formats;
     if(formats.isEmpty())
         Q_FOREACH(QByteArray key, keys) formats << key;
@@ -278,7 +278,7 @@ QStringList ScriteDocument::supportedImportFormats() const
 
 QString ScriteDocument::importFormatFileSuffix(const QString &format) const
 {
-    const QMetaObject *mo = deviceIOFactories.ImporterFactory.find(format.toLatin1());
+    const QMetaObject *mo = deviceIOFactories->ImporterFactory.find(format.toLatin1());
     if(mo == nullptr)
         return QString();
 
@@ -292,7 +292,7 @@ QString ScriteDocument::importFormatFileSuffix(const QString &format) const
 
 QStringList ScriteDocument::supportedExportFormats() const
 {
-    static QList<QByteArray> keys = deviceIOFactories.ExporterFactory.keys();
+    static QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
     static QStringList formats;
     if(formats.isEmpty())
         Q_FOREACH(QByteArray key, keys) formats << key;
@@ -301,7 +301,7 @@ QStringList ScriteDocument::supportedExportFormats() const
 
 QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
 {
-    const QMetaObject *mo = deviceIOFactories.ExporterFactory.find(format.toLatin1());
+    const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(format.toLatin1());
     if(mo == nullptr)
         return QString();
 
@@ -315,7 +315,7 @@ QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
 
 QStringList ScriteDocument::supportedReports() const
 {
-    static QList<QByteArray> keys = deviceIOFactories.ReportGeneratorFactory.keys();
+    static QList<QByteArray> keys = deviceIOFactories->ReportGeneratorFactory.keys();
     static QStringList reports;
     if(reports.isEmpty())
         Q_FOREACH(QByteArray key, keys) reports << key;
@@ -334,7 +334,7 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
     m_errorReport->clear();
 
     const QByteArray formatKey = format.toLatin1();
-    QScopedPointer<AbstractImporter> importer( deviceIOFactories.ImporterFactory.create<AbstractImporter>(formatKey, this) );
+    QScopedPointer<AbstractImporter> importer( deviceIOFactories->ImporterFactory.create<AbstractImporter>(formatKey, this) );
 
     if(importer.isNull())
     {
@@ -361,7 +361,7 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     m_errorReport->clear();
 
     const QByteArray formatKey = format.toLatin1();
-    QScopedPointer<AbstractExporter> exporter( deviceIOFactories.ExporterFactory.create<AbstractExporter>(formatKey, this) );
+    QScopedPointer<AbstractExporter> exporter( deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this) );
 
     if(exporter.isNull())
     {
@@ -386,7 +386,7 @@ bool ScriteDocument::generateReport(const QString &fileName, const QString &repo
     m_errorReport->clear();
 
     const QByteArray reportKey = report.toLatin1();
-    QScopedPointer<AbstractReportGenerator> reportGenerator( deviceIOFactories.ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this) );
+    QScopedPointer<AbstractReportGenerator> reportGenerator( deviceIOFactories->ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this) );
 
     if(reportGenerator.isNull())
     {
