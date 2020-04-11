@@ -38,7 +38,7 @@
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 2, 0);
+    const QVersionNumber applicationVersion(0, 2, 1);
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
@@ -125,6 +125,8 @@ int main(int argc, char **argv)
 
     qmlRegisterUncreatableType<FocusTracker>("Scrite", 1, 0, "FocusTracker", reason);
     qmlRegisterUncreatableType<FocusTrackerIndicator>("Scrite", 1, 0, "FocusTrackerIndicator", reason);
+
+    qmlRegisterType<Annotation>("Scrite", 1, 0, "Annotation");
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;

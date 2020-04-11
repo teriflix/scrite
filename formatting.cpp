@@ -348,6 +348,7 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_textWidth(0),
       m_cursorPosition(-1),
       m_documentLoadCount(0),
+      m_sceneIsBeingReset(false),
       m_forceSyncDocument(false),
       m_initializingDocument(false),
       m_currentElement(nullptr),
