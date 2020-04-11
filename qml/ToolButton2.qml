@@ -22,7 +22,7 @@ ToolButton {
             return suggestedHeight
         return 120
     }
-    property real suggestedHeight: 50
+    property real suggestedHeight: 55
     property string shortcut
     property string shortcutText: shortcut
 

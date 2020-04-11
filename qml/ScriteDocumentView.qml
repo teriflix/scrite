@@ -24,6 +24,8 @@ Item {
     width: 1470
     height: 865
 
+    // onWidthChanged: console.log(width)
+
     Rectangle {
         id: appToolBarArea
         anchors.left: parent.left
@@ -81,7 +83,7 @@ Item {
                     text: "Open"
                     shortcut: "Ctrl+O"
                     shortcutText: "O"
-                    display: AbstractButton.IconOnly
+                    display: documentUI.width > 1590 ? AbstractButton.TextBesideIcon : AbstractButton.IconOnly
                     down: recentFilesMenu.visible
                     onClicked: recentFilesMenu.recentFiles.length > 0 ? recentFilesMenu.open() : doOpen()
                     function doOpen(filePath) {
@@ -362,7 +364,7 @@ Item {
                     text: "Settings"
                     shortcut: "Ctrl+,"
                     shortcutText: ","
-                    display: AbstractButton.IconOnly
+                    display: documentUI.width > 1528 ? AbstractButton.TextBesideIcon : AbstractButton.IconOnly
                     onClicked: {
                         modalDialog.popupSource = this
                         modalDialog.sourceComponent = optionsDialogComponent
