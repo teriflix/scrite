@@ -49,7 +49,7 @@ Item {
                 spacing: 5
 
                 ToolButton2 {
-                    icon.source: "../icons/content/create.png"
+                    icon.source: "../icons/action/description.png"
                     text: "New"
                     shortcut: "Ctrl+N"
                     shortcutText: "N"

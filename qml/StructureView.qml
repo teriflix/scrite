@@ -122,11 +122,28 @@ Item {
                     canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), scale)
             }
             onEditIndexChanged: {
-                if(editIndex >= 0) {
+                if(editIndex >= 0 && currentIndex !== editIndex) {
                     ensureCurrentItemIsVisible = false
                     scriteDocument.structure.currentElementIndex = editIndex
                     ensureCurrentItemIsVisible = true
                 }
+            }
+
+            function createElement(x, y, c) {
+                var props = {
+                    "x": Math.max(scriteDocument.structure.snapToGrid(x), 130),
+                    "y": Math.max(scriteDocument.structure.snapToGrid(y), 50)
+                }
+
+                var element = structureElementComponent.createObject(scriteDocument.structure, props)
+                element.scene.color = c
+                scriteDocument.structure.addElement(element)
+
+                canvas.ensureCurrentItemIsVisible = false
+                scriteDocument.structure.currentElementIndex = scriteDocument.structure.elementCount-1
+                requestEditor()
+                canvas.editIndex = scriteDocument.structure.elementCount-1
+                canvas.ensureCurrentItemIsVisible = true
             }
 
             property color newElementColor: "blue"
@@ -209,21 +226,6 @@ Item {
                         selectionRect.visible = false
                     }
                 }
-            }
-
-            function createElement(x, y, c) {
-                var props = {
-                    "x": Math.max(scriteDocument.structure.snapToGrid(x), 130),
-                    "y": Math.max(scriteDocument.structure.snapToGrid(y), 50)
-                }
-                var element = structureElementComponent.createObject(scriteDocument.structure, props)
-                element.scene.color = c
-                scriteDocument.structure.addElement(element)
-                editIndex = scriteDocument.structure.elementCount-1
-                canvas.ensureCurrentItemIsVisible = false
-                scriteDocument.structure.currentElementIndex = editIndex
-                requestEditor()
-                canvas.ensureCurrentItemIsVisible = true
             }
 
             Rectangle {
@@ -313,11 +315,11 @@ Item {
 
             Repeater {
                 id: elementItems
-                model: scriteDocument.structure.elementCount
+                model: scriteDocument.structure.elements
 
                 Item {
                     id: elementItem
-                    property StructureElement element: scriteDocument.structure.elementAt(index)
+                    property StructureElement element: modelData
                     property bool selected: canvas.currentIndex === index
                     property bool editing: canvas.editIndex === index
                     property real elementX: element.x
@@ -346,7 +348,7 @@ Item {
 
                     onSelectedChanged: {
                         if(selected)
-                            scriteDocument.structure.currentElementIndex = index
+                            forceActiveFocus()
                     }
 
                     Rectangle {

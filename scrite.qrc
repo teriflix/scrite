@@ -72,5 +72,7 @@
         <file>icons/content/undo.png</file>
         <file>icons/content/undo_inverted.png</file>
         <file>qml/FocusIndicator.qml</file>
+        <file>icons/action/description.png</file>
+        <file>icons/action/description_inverted.png</file>
     </qresource>
 </RCC>

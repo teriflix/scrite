@@ -89,6 +89,10 @@ Loader {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
+            Keys.onPressed: {
+                if(event.key === Qt.Key_Escape)
+                    editingFinished()
+            }
         }
     }
 }

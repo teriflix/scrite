@@ -69,6 +69,7 @@ void Logger::log(const QString &message)
 
 void Logger::qtMessageHandler(QtMsgType type, const QMessageLogContext & context, const QString &message)
 {
+#ifndef QT_NO_DEBUG
     QString logMessage;
 
     QTextStream ts(&logMessage, QIODevice::WriteOnly);
@@ -94,6 +95,8 @@ void Logger::qtMessageHandler(QtMsgType type, const QMessageLogContext & context
 
 #ifndef QT_NO_DEBUG
     fprintf(stderr, "%s\n", qPrintable(logMessage));
+#endif
+
 #endif
 }
 

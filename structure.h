@@ -115,7 +115,7 @@ public:
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
-    Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
+    Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
     QQmlListProperty<Note> notes();
     Q_INVOKABLE void addNote(Note *ptr);
     Q_INVOKABLE void removeNote(Note *ptr);
@@ -174,7 +174,7 @@ public:
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QQmlListProperty<Character> characters READ characters)
+    Q_PROPERTY(QQmlListProperty<Character> characters READ characters NOTIFY characterCountChanged)
     QQmlListProperty<Character> characters();
     Q_INVOKABLE void addCharacter(Character *ptr);
     Q_INVOKABLE void removeCharacter(Character *ptr);
@@ -190,7 +190,7 @@ public:
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
 
-    Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
+    Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
     QQmlListProperty<Note> notes();
     Q_INVOKABLE void addNote(Note *ptr);
     Q_INVOKABLE void removeNote(Note *ptr);
