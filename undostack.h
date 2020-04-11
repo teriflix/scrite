@@ -51,12 +51,13 @@ struct ObjectPropertyInfo
     const QObject *object;
     const QByteArray property;
     const QMetaObject *metaObject;
+    const QList<QByteArray> propertyBundle;
 
     void lock() { recursionLock = true; }
     void unlock() { recursionLock = false; }
     bool isLocked() const { return recursionLock; }
 
-    QVariant read() const { return object->property(property); }
+    QVariant read() const;
     bool write(const QVariant &val);
 
     static ObjectPropertyInfo *get(QObject *object, const QByteArray &property);

@@ -112,7 +112,6 @@ Item {
 
         TextArea {
             id: sceneTextArea
-            Component.onCompleted: sceneContentEditor = sceneTextArea
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             renderType: Text.NativeRendering
             readOnly: sceneEditor.readOnly
@@ -136,6 +135,10 @@ Item {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
+            Component.onCompleted: {
+                sceneContentEditor = sceneTextArea
+                // scene.undoRedoEnabled = Qt.binding(function() { return sceneTextArea.activeFocus })
+            }
 
             Completer {
                 id: completer

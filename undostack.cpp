@@ -68,8 +68,30 @@ Q_GLOBAL_STATIC(ObjectPropertyInfoList, GlobalObjectPropertyInfoList);
 
 int ObjectPropertyInfo::counter = 1000;
 
+static inline QList<QByteArray> queryPropertyBundle(QObject *object, const QByteArray &property)
+{
+    QList<QByteArray> propertyBundle;
+
+    const QMetaObject *metaObject = object->metaObject();
+    const QByteArray bundle = "UndoBundleFor_" + property;
+    const int ciIndex = metaObject->indexOfClassInfo(bundle);
+    if(ciIndex >= 0)
+    {
+        const QMetaClassInfo classInfo = metaObject->classInfo(ciIndex);
+        const QByteArray value(classInfo.value());
+        propertyBundle = value.split(',');
+        for(int i=propertyBundle.size()-1; i>=0; i--) {
+            QByteArray &prop = propertyBundle[i];
+            prop = prop.trimmed();
+        }
+    }
+
+    return propertyBundle;
+}
+
 ObjectPropertyInfo::ObjectPropertyInfo(QObject *o, const QMetaObject *mo, const QByteArray &prop)
-    : id(++ObjectPropertyInfo::counter), object(o), property(prop), metaObject(mo), recursionLock(false)
+    : id(++ObjectPropertyInfo::counter), object(o), property(prop),
+      metaObject(mo), propertyBundle(queryPropertyBundle(o,prop)), recursionLock(false)
 {
     m_connection = QObject::connect(o, &QObject::destroyed, [this]() {
         this->deleteSelf();
@@ -83,11 +105,27 @@ ObjectPropertyInfo::~ObjectPropertyInfo()
     QObject::disconnect(m_connection);
 }
 
+QVariant ObjectPropertyInfo::read() const
+{
+    QVariantList ret;
+    ret << object->property(property);
+    Q_FOREACH(QByteArray prop, propertyBundle)
+        ret << object->property(prop);
+    return ret;
+}
+
 bool ObjectPropertyInfo::write(const QVariant &val)
 {
     this->lock();
     QObject *o = const_cast<QObject*>(object);
-    const bool ret = o->setProperty(property, val);
+    QVariantList list = val.toList();
+    const bool ret = o->setProperty(property, list.takeFirst());
+    Q_FOREACH(QByteArray prop, propertyBundle)
+    {
+        if(list.isEmpty())
+            break;
+        o->setProperty(prop, list.takeFirst());
+    }
     this->unlock();
     return ret;
 }

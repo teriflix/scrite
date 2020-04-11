@@ -227,9 +227,9 @@ void SceneElement::setType(SceneElement::Type val)
     if(m_type == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "type");
+    ObjectPropertyInfo *info = m_scene->isUndoRedoEnabled() ? ObjectPropertyInfo::get(this, "type") : nullptr;
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info->isLocked())
+    if(info == nullptr || info->isLocked())
     {
         // This happens when a scene element text is reset because of a
         // undo or redo command. It is best if we allow SceneDocumentBinder
@@ -245,7 +245,7 @@ void SceneElement::setType(SceneElement::Type val)
     if(m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
 
-    if(info->isLocked())
+    if(info == nullptr || info->isLocked())
     {
         // This happens when a scene element text is reset because of a
         // undo or redo command. It is best if we allow SceneDocumentBinder
@@ -275,9 +275,9 @@ void SceneElement::setText(const QString &val)
     if(m_text == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "text");
+    ObjectPropertyInfo *info = m_scene->isUndoRedoEnabled() ? ObjectPropertyInfo::get(this, "text") : nullptr;
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info->isLocked())
+    if(info == nullptr || info->isLocked())
     {
         // This happens when a scene element text is reset because of a
         // undo or redo command. It is best if we allow SceneDocumentBinder
@@ -293,13 +293,23 @@ void SceneElement::setText(const QString &val)
     if(m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
 
-    if(info->isLocked())
+    if(info == nullptr || info->isLocked())
     {
         // This happens when a scene element text is reset because of a
         // undo or redo command. It is best if we allow SceneDocumentBinder
         // an opportunity to know about this in advance.
         emit m_scene->sceneReset(m_scene->indexOfElement(this));
     }
+}
+
+void SceneElement::setCursorPosition(int val)
+{
+    m_scene->setCursorPosition(val);
+}
+
+int SceneElement::cursorPosition() const
+{
+    return m_scene->cursorPosition();
 }
 
 QString SceneElement::formattedText() const
@@ -347,7 +357,9 @@ Scene::Scene(QObject *parent)
     : QAbstractListModel(parent),
       m_color(Qt::white),
       m_enabled(true),
-      m_heading(new SceneHeading(this))
+      m_heading(new SceneHeading(this)),
+      m_cursorPosition(-1),
+      m_undoRedoEnabled(true)
 {
     connect(m_heading, &SceneHeading::enabledChanged, this, &Scene::headingChanged);
     connect(m_heading, &SceneHeading::locationTypeChanged, this, &Scene::headingChanged);
@@ -432,6 +444,24 @@ void Scene::setEnabled(bool val)
     emit enabledChanged();
 }
 
+void Scene::setUndoRedoEnabled(bool val)
+{
+    if(m_undoRedoEnabled == val)
+        return;
+
+    m_undoRedoEnabled = val;
+    emit undoRedoEnabledChanged();
+}
+
+void Scene::setCursorPosition(int val)
+{
+    if(m_cursorPosition == val)
+        return;
+
+    m_cursorPosition = val;
+    emit cursorPositionChanged();
+}
+
 QQmlListProperty<SceneElement> Scene::elements()
 {
     return QQmlListProperty<SceneElement>(
@@ -485,6 +515,7 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     m_elements.insert(index, ptr);
     connect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
     connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
+    connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
     // START HERE
     // 3. sceneAboutToReset() and sceneReset() to be used to reload documents from scene in binder.
@@ -548,6 +579,7 @@ void Scene::removeElement(SceneElement *ptr)
 
     disconnect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
     disconnect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
+    disconnect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
     this->endRemoveRows();
 

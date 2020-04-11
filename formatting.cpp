@@ -714,7 +714,8 @@ void SceneDocumentBinder::initializeDocument()
 
     m_tabHistory.clear();
 
-    const QFont defaultFont = m_screenplayFormat->defaultFont();
+    QFont defaultFont = m_screenplayFormat->defaultFont();
+    defaultFont.setPointSize(defaultFont.pointSize()+m_screenplayFormat->fontPointSizeDelta());
 
     QTextDocument *document = m_textDocument->textDocument();
     document->blockSignals(true);

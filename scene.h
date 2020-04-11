@@ -109,6 +109,7 @@ public:
     enum Type { Action, Character, Dialogue, Parenthetical, Shot, Transition, Heading, Min=Action, Max=Heading };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    Q_CLASSINFO("UndoBundleFor_type", "cursorPosition")
     void setType(Type val);
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
@@ -117,9 +118,15 @@ public:
     QString typeAsString() const;
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    Q_CLASSINFO("UndoBundleFor_text", "cursorPosition")
     void setText(const QString &val);
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
+
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged STORED false)
+    void setCursorPosition(int val);
+    int cursorPosition() const;
+    Q_SIGNAL void cursorPositionChanged();
 
     QString formattedText() const;
 
@@ -172,6 +179,17 @@ public:
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
+
+    // This affects only scene elements
+    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY undoRedoEnabledChanged STORED false)
+    void setUndoRedoEnabled(bool val);
+    bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
+    Q_SIGNAL void undoRedoEnabledChanged();
+
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged STORED false)
+    void setCursorPosition(int val);
+    int cursorPosition() const { return m_cursorPosition; }
+    Q_SIGNAL void cursorPositionChanged();
 
     Q_PROPERTY(SceneHeading* heading READ heading NOTIFY headingChanged)
     SceneHeading* heading() const { return m_heading; }
@@ -228,6 +246,8 @@ private:
     bool m_enabled;
     char m_padding[7];
     SceneHeading* m_heading;
+    int m_cursorPosition;
+    bool m_undoRedoEnabled;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);
