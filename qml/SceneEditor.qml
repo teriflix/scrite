@@ -94,6 +94,7 @@ Item {
 
         ScrollView {
             id: scrollView
+            ScrollBar.vertical.minimumSize: 0.1
 
             Repeater {
                 model: 1

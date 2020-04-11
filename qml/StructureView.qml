@@ -92,6 +92,15 @@ Item {
         initialContentWidth: canvas.width
         initialContentHeight: canvas.height
         clip: true
+        onWidthChanged: prepare()
+        onHeightChanged: prepare()
+
+        function prepare() {
+            if(width > 0 && height > 0 && scriteDocument.structure.elementCount === 0) {
+                var area = Qt.rect(0, (initialContentHeight-height)/2, width, height)
+                ensureVisible(area)
+            }
+        }
 
         Item {
             id: canvas

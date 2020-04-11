@@ -32,6 +32,7 @@
 
 typedef QApplication QtApplicationClass;
 class QSettings;
+class QQuickItem;
 
 class Application : public QtApplicationClass
 {
@@ -105,6 +106,9 @@ public:
 
     Q_PROPERTY(TransliterationSettings* transliterationSettings READ transliterationSettings CONSTANT)
     TransliterationSettings* transliterationSettings() const { return TransliterationSettings::instance(); }
+
+    Q_INVOKABLE QPointF cursorPosition() const;
+    Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
 
     QSettings *settings() const { return m_settings; }
 

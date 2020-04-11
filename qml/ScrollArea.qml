@@ -27,8 +27,14 @@ Flickable {
     Behavior on contentX { NumberAnimation { duration: 250 } }
     Behavior on contentY { NumberAnimation { duration: 250 } }
 
-    ScrollBar.horizontal: ScrollBar { policy: ScrollBar.AlwaysOn }
-    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+    ScrollBar.horizontal: ScrollBar {
+        policy: ScrollBar.AlwaysOn
+        minimumSize: 0.1
+    }
+    ScrollBar.vertical: ScrollBar {
+        policy: ScrollBar.AlwaysOn
+        minimumSize: 0.1
+    }
 
     function ensureItemVisible(item, scaling, leaveMargin) {
         if(item === null)
@@ -98,11 +104,10 @@ Flickable {
                 return
 
             var visibleArea = Qt.rect(flickable.contentX, flickable.contentY, flickable.width, flickable.height)
-            var visibleCenter = Qt.point( (visibleArea.left+visibleArea.right)/2,
-                                          (visibleArea.top+visibleArea.bottom)/2 )
+            var mousePoint = app.mapGlobalPositionToItem(flickable.contentItem, app.cursorPosition())
             var newWidth = flickable.initialContentWidth * activeScale
             var newHeight = flickable.initialContentWidth * activeScale
-            flickable.resizeContent(newWidth, newHeight, visibleCenter)
+            flickable.resizeContent(newWidth, newHeight, mousePoint)
             flickable.returnToBounds()
         }
     }

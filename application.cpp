@@ -26,6 +26,7 @@
 #include <QColorDialog>
 #include <QFontDatabase>
 #include <QStandardPaths>
+#include <QQuickItem>
 
 Application *Application::instance()
 {
@@ -252,6 +253,19 @@ QJsonObject Application::fileInfo(const QString &path) const
 QString Application::settingsFilePath() const
 {
     return m_settings->fileName();
+}
+
+QPointF Application::cursorPosition() const
+{
+    return QCursor::pos();
+}
+
+QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const
+{
+    if(item == nullptr)
+        return pos;
+
+    return item->mapFromGlobal(pos);
 }
 
 bool Application::notify(QObject *object, QEvent *event)

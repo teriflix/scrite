@@ -95,7 +95,10 @@ Item {
         anchors.top: searchBar.bottom
         anchors.margins: 3
         clip: true
-        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AlwaysOn
+            minimumSize: 0.1
+        }
         model: scriteDocument.screenplay
         delegate: screenplayElementDelegate
         currentIndex: -1

@@ -728,4 +728,12 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             element->setY( element->y()+dy );
         }
     }
+
+    if(m_screenplay->currentElementIndex() < 0)
+    {
+        if(m_screenplay->elementCount() > 0)
+            m_screenplay->setCurrentElementIndex(0);
+        else if(m_structure->elementCount() > 0)
+            m_structure->setCurrentElementIndex(0);
+    }
 }
