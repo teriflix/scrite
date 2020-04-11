@@ -258,6 +258,53 @@ int Character::staticNoteCount(QQmlListProperty<Note> *list)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+Annotation::Annotation(QObject *parent)
+    : QObject(parent),
+      m_type(QJsonValue::Undefined),
+      m_structure(qobject_cast<Structure*>(parent)),
+      m_attributes(QJsonValue::Undefined)
+{
+
+}
+
+Annotation::~Annotation()
+{
+    emit aboutToDelete(this);
+}
+
+void Annotation::setType(const QJsonValue &val)
+{
+    if(m_type == val || !m_type.isUndefined())
+        return;
+
+    m_type = val;
+    emit typeChanged();
+}
+
+void Annotation::setAttributes(const QJsonValue &val)
+{
+    if(m_attributes == val)
+        return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "type");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
+    m_attributes = val;
+    emit attributesChanged();
+}
+
+bool Annotation::event(QEvent *event)
+{
+    if(event->type() == QEvent::ParentChange)
+        m_structure = qobject_cast<Structure*>(this->parent());
+
+    return QObject::event(event);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Structure::Structure(QObject *parent)
     : QObject(parent),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
@@ -644,6 +691,85 @@ void Structure::setZoomLevel(qreal val)
     emit zoomLevelChanged();
 }
 
+QQmlListProperty<Annotation> Structure::annotations()
+{
+    return QQmlListProperty<Annotation>(
+                reinterpret_cast<QObject*>(this),
+                static_cast<void*>(this),
+                &Structure::staticAppendAnnotation,
+                &Structure::staticAnnotationCount,
+                &Structure::staticAnnotationAt,
+                &Structure::staticClearAnnotations);
+}
+
+static void structureAppendAnnotation(Structure *structure, Annotation *ptr) { structure->addAnnotation(ptr); }
+static void structureRemoveAnnotation(Structure *structure, Annotation *ptr) { structure->removeAnnotation(ptr); }
+static void structureInsertAnnotation(Structure *structure, Annotation *ptr, int) { structure->addAnnotation(ptr); }
+static Annotation *structureAnnotationAt(Structure *structure, int index) { return structure->annotationAt(index); }
+static int structureIndexOfAnnotation(Structure *, Annotation *) { return -1; }
+
+void Structure::addAnnotation(Annotation *ptr)
+{
+    if(ptr == nullptr || m_annotations.indexOf(ptr) >= 0)
+        return;
+
+    QScopedPointer< PushObjectListCommand<Structure,Annotation> > cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "annotations");
+    if(!info->isLocked())
+    {
+        ObjectListPropertyMethods<Structure,Annotation> methods(&structureAppendAnnotation, &structureRemoveAnnotation, &structureInsertAnnotation, &structureAnnotationAt, structureIndexOfAnnotation);
+        cmd.reset( new PushObjectListCommand<Structure,Annotation>(ptr, this, info->property, ObjectList::InsertOperation, methods) );
+    }
+
+    m_annotations.append(ptr);
+
+    ptr->setParent(this);
+    connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
+    connect(ptr, &Annotation::typeChanged, this, &Structure::structureChanged);
+    connect(ptr, &Annotation::attributesChanged, this, &Structure::structureChanged);
+
+    emit annotationCountChanged();
+}
+
+void Structure::removeAnnotation(Annotation *ptr)
+{
+    if(ptr == nullptr)
+        return;
+
+    const int index = m_annotations.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    QScopedPointer< PushObjectListCommand<Structure,Annotation> > cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "annotations");
+    if(!info->isLocked())
+    {
+        ObjectListPropertyMethods<Structure,Annotation> methods(&structureAppendAnnotation, &structureRemoveAnnotation, &structureInsertAnnotation, &structureAnnotationAt, structureIndexOfAnnotation);
+        cmd.reset( new PushObjectListCommand<Structure,Annotation>(ptr, this, info->property, ObjectList::RemoveOperation, methods) );
+    }
+
+    m_annotations.removeAt(index);
+
+    disconnect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
+    disconnect(ptr, &Annotation::typeChanged, this, &Structure::structureChanged);
+    disconnect(ptr, &Annotation::attributesChanged, this, &Structure::structureChanged);
+
+    emit annotationCountChanged();
+
+    GarbageCollector::instance()->add(ptr);
+}
+
+Annotation *Structure::annotationAt(int index) const
+{
+    return index < 0 || index >= m_annotations.size() ? nullptr : m_annotations.at(index);
+}
+
+void Structure::clearAnnotations()
+{
+    while(m_annotations.size())
+        this->removeAnnotation(m_annotations.first());
+}
+
 bool Structure::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -765,10 +891,30 @@ void Structure::evaluateCharacterNames()
     emit characterNamesChanged();
 }
 
+void Structure::staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr)
+{
+    reinterpret_cast< Structure* >(list->data)->addAnnotation(ptr);
+}
+
+void Structure::staticClearAnnotations(QQmlListProperty<Annotation> *list)
+{
+    reinterpret_cast< Structure* >(list->data)->clearAnnotations();
+}
+
+Annotation *Structure::staticAnnotationAt(QQmlListProperty<Annotation> *list, int index)
+{
+    return reinterpret_cast< Structure* >(list->data)->annotationAt(index);
+}
+
+int Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
+{
+    return reinterpret_cast< Structure* >(list->data)->annotationCount();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementConnector::StructureElementConnector(QQuickItem *parent)
-                          :AbstractShapeItem(parent),
+    :AbstractShapeItem(parent),
                             m_lineType(StraightLine),
                             m_toElement(nullptr),
                             m_fromElement(nullptr),
@@ -1099,4 +1245,5 @@ void StructureElementConnector::setSuggestedLabelPosition(const QPointF &val)
     m_suggestedLabelPosition = val;
     emit suggestedLabelPositionChanged();
 }
+
 

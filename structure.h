@@ -142,6 +142,37 @@ private:
     Structure* m_structure;
 };
 
+class Annotation : public QObject
+{
+    Q_OBJECT
+
+public:
+    Q_INVOKABLE Annotation(QObject *parent=nullptr);
+    ~Annotation();
+    Q_SIGNAL void aboutToDelete(Annotation *ptr);
+
+    Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
+    Structure* structure() const { return m_structure; }
+
+    Q_PROPERTY(QJsonValue type READ type WRITE setType NOTIFY typeChanged)
+    void setType(const QJsonValue &val);
+    QJsonValue type() const { return m_type; }
+    Q_SIGNAL void typeChanged();
+
+    Q_PROPERTY(QJsonValue attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
+    void setAttributes(const QJsonValue &val);
+    QJsonValue attributes() const { return m_attributes; }
+    Q_SIGNAL void attributesChanged();
+
+protected:
+    bool event(QEvent *event);
+
+private:
+    QJsonValue m_type;
+    Structure *m_structure;
+    QJsonValue m_attributes;
+};
+
 class Structure : public QObject
 {
     Q_OBJECT
@@ -232,6 +263,16 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_PROPERTY(QQmlListProperty<Annotation> annotations READ annotations NOTIFY annotationCountChanged)
+    QQmlListProperty<Annotation> annotations();
+    Q_INVOKABLE void addAnnotation(Annotation *ptr);
+    Q_INVOKABLE void removeAnnotation(Annotation *ptr);
+    Q_INVOKABLE Annotation *annotationAt(int index) const;
+    Q_PROPERTY(int annotationCount READ annotationCount NOTIFY annotationCountChanged)
+    int annotationCount() const { return m_annotations.size(); }
+    Q_INVOKABLE void clearAnnotations();
+    Q_SIGNAL void annotationCountChanged();
+
     Q_SIGNAL void structureChanged();
 
 protected:
@@ -269,6 +310,12 @@ private:
     void evaluateCharacterNames();
     QMap<SceneElement*,QString> m_characterElementNameMap;
     QStringList m_characterNames;
+
+    static void staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr);
+    static void staticClearAnnotations(QQmlListProperty<Annotation> *list);
+    static Annotation* staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
+    static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
+    QList<Annotation *> m_annotations;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
