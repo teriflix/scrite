@@ -128,7 +128,11 @@ bool HtmlExporter::doExport(QIODevice *device)
     int nrHeadings = 0;
     for(int i=0; i<nrScenes; i++)
     {
-        const Scene *scene = screenplay->elementAt(i)->scene();
+        const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
+        if(screenplayElement->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
+        const Scene *scene = screenplayElement->scene();
         const QColor sceneColor = scene->color();
         const QString sceneColorText = "rgba(" + QString::number(sceneColor.red()) + "," +
                                                  QString::number(sceneColor.green()) + "," +

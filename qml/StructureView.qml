@@ -131,8 +131,16 @@ Item {
 
             property int documentProgressStatus: Aggregation.findProgressReport(scriteDocument).status
             onDocumentProgressStatusChanged: {
-                if(documentProgressStatus === ProgressReport.Finished)
-                    app.execLater(100, function() { canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), canvasScroll.scale) })
+                if(documentProgressStatus === ProgressReport.Started) {
+                    ensureCurrentItemIsVisible = scriteDocument.structure.elementCount === 0
+                    return
+                }
+
+                if(documentProgressStatus === ProgressReport.Finished) {
+                    if(ensureCurrentItemIsVisible)
+                        app.execLater(100, function() { canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), canvasScroll.scale) })
+                    ensureCurrentItemIsVisible = true
+                }
             }
 
             function createElement(x, y, c) {

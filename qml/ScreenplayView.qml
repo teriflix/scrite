@@ -100,6 +100,30 @@ Rectangle {
                     onClicked: zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
                     autoRepeat: true
                 }
+
+                ToolButton2 {
+                    icon.source: "../icons/content/add_box.png"
+                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                    ToolTip.text: "Add a act, chapter or interval break."
+                    autoRepeat: false
+                    enabled: scriteDocument.screenplay.elementCount === 0 ||
+                             scriteDocument.screenplay.currentElementIndex >= 0
+                    onClicked: breakElementMenu.popup()
+                    down: breakElementMenu.visible
+
+                    Menu {
+                        id: breakElementMenu
+
+                        Repeater {
+                            model: app.enumerationModel(scriteDocument.screenplay, "BreakType")
+
+                            MenuItem {
+                                text: modelData.key
+                                onClicked: scriteDocument.screenplay.insertBreakElement(modelData.value, scriteDocument.screenplay.currentElementIndex+1)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -177,39 +201,55 @@ Rectangle {
         delegate: Item {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
-            property bool active: element ? scriteDocument.screenplay.activeScene === element.scene : false
-            width: Math.max(screenplayElementList.minimumDelegateWidth, element.scene.elementCount*screenplayElementList.perElementWidth*zoomLevel)
+            property bool isBreakElement: element.elementType === ScreenplayElement.BreakElementType
+            property bool active: element.scene ? scriteDocument.screenplay.activeScene === element.scene : false
+            property int sceneElementCount: element.scene ? element.scene.elementCount : 1
+            property string sceneTitle: element.scene ? element.scene.title : element.sceneID
+            property color sceneColor: element.scene ? element.scene.color : "white"
+            width: isBreakElement ? 60 :
+                                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
             height: screenplayElementList.height
 
             Loader {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                active: element !== null && element.scene !== null
+                active: element !== null // && (isBreakElement || element.scene !== null)
                 sourceComponent: Rectangle {
-                    radius: 8
-                    color: Qt.tint(element.scene.color, "#C0FFFFFF")
-                    border.color: color === Qt.rgba(1,1,1,1) ? "black" : element.scene.color
+                    radius: isBreakElement ? 0 : 8
+                    color: Qt.tint(sceneColor, "#C0FFFFFF")
+                    border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 4 : 1
                     Behavior on border.width { NumberAnimation { duration: 400 } }
 
-                    Text {
+                    Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.top: menuButton.bottom
                         anchors.bottom: dragTriggerButton.top
                         anchors.margins: 5
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        wrapMode: Text.WrapAnywhere
-                        elide: Text.ElideRight
-                        font.pixelSize: 15
-                        lineHeight: 1.25
-                        text: element.scene.title
-                        visible: width >= 80
+
+                        Text {
+                            width: elementItemDelegate.isBreakElement ? parent.height : parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignTop
+                            wrapMode: isBreakElement ? Text.NoWrap : Text.WrapAnywhere
+                            elide: Text.ElideRight
+                            font.pixelSize: isBreakElement ? 18 : 15
+                            font.bold: isBreakElement
+                            font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
+                            lineHeight: 1.25
+                            text: sceneTitle
+                            visible: isBreakElement ? true : width >= 80
+                            anchors.centerIn: parent
+                            rotation: isBreakElement ? -90 : 0
+                            transformOrigin: Item.Center
+                            maximumLineCount: isBreakElement ? 1 : 4
+                        }
                     }
 
                     MouseArea {
+                        enabled: !isBreakElement
                         anchors.fill: parent
                         onClicked: {
                             elementItemDelegate.forceActiveFocus()
@@ -237,11 +277,12 @@ Rectangle {
                     Drag.hotSpot.x: width/2
                     Drag.hotSpot.y: height/2
                     Drag.mimeData: {
-                        "scrite/sceneID": element.scene.id
+                        "scrite/sceneID": element.sceneID
                     }
                     Drag.source: element
                     Drag.onActiveChanged: {
-                        scriteDocument.screenplay.currentElementIndex = index
+                        if(!isBreakElement)
+                            scriteDocument.screenplay.currentElementIndex = index
                         screenplayElementList.moveMode = Drag.active
                     }
 
@@ -354,7 +395,8 @@ Rectangle {
         var element = screenplayElementComponent.createObject()
         element.sceneID = sceneID
         scriteDocument.screenplay.insertElementAt(element, index)
-        scriteDocument.screenplay.currentElementIndex = index
+        if(element.elementType === ScreenplayElement.SceneElementType)
+            scriteDocument.screenplay.currentElementIndex = index
     }
 
     Component {

@@ -154,6 +154,9 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     for(int i=0; i<nrScreenplayElements; i++)
     {
         const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
+        if(screenplayElement->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
         const Scene *scene = screenplayElement->scene();
         const int nrSceneElements = scene->elementCount();
 

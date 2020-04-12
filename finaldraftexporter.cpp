@@ -62,6 +62,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     for(int i=0; i<nrElements; i++)
     {
         const ScreenplayElement *element = screenplay->elementAt(i);
+        if(element->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
         const Scene *scene = element->scene();
         const SceneHeading *heading = scene->heading();
 

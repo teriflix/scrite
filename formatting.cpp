@@ -503,6 +503,8 @@ void SceneDocumentBinder::setCursorPosition(int val)
         return;
 
     m_cursorPosition = val;
+    if(this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount())
+        return;
 
     QTextCursor cursor(this->document());
     cursor.setPosition(val);
@@ -510,7 +512,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     QTextBlock block = cursor.block();
     if(!block.isValid())
     {
-        qDebug("[%d] There is no block at the cursor position.", __LINE__);
+        qDebug("[%d] There is no block at the cursor position %d.", __LINE__, val);
         return;
     }
 
@@ -524,7 +526,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if(userData == nullptr)
     {
         this->setCurrentElement(nullptr);
-        qWarning("[%d] TextDocument has a block that isnt backed by a SceneElement!!", __LINE__);
+        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, val);
     }
     else
     {
@@ -848,14 +850,14 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
     if(userData == nullptr)
     {
-        qWarning("[%d] TextDocument has a block that isnt backed by a SceneElement!!", __LINE__);
+        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, from);
         return;
     }
 
     SceneElement *sceneElement = userData->sceneElement();
     if(sceneElement == nullptr)
     {
-        qWarning("[%d] TextDocument has a block that isnt backed by a SceneElement!!", __LINE__);
+        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, from);
         return;
     }
 

@@ -29,6 +29,59 @@ ScreenplayElement::~ScreenplayElement()
     emit aboutToDelete(this);
 }
 
+void ScreenplayElement::setElementType(ScreenplayElement::ElementType val)
+{
+    if(m_elementType == val || m_elementTypeIsSet)
+        return;
+
+    m_elementType = val;
+    emit elementTypeChanged();
+}
+
+void ScreenplayElement::setBreakType(int val)
+{
+    if(m_breakType == val || m_elementType != BreakElementType)
+        return;
+
+    m_breakType = val;
+
+    if(m_sceneID.isEmpty())
+    {
+        QString id;
+        int chapter = 1;
+        for(int i=0; i<m_screenplay->elementCount(); i++)
+        {
+            ScreenplayElement *element = m_screenplay->elementAt(i);
+            if(element->elementType() == BreakElementType)
+            {
+                if(element->breakType() == m_breakType)
+                    ++chapter;
+            }
+        }
+
+        switch(m_breakType)
+        {
+        case Screenplay::Act:
+            id = "Act ";
+            break;
+        case Screenplay::Chapter:
+            id = "Chapter ";
+            break;
+        case Screenplay::Interval:
+            id = "Interval";
+            break;
+        default:
+            id = "Break";
+        }
+
+        if(m_breakType != Screenplay::Interval)
+            id += QString::number(chapter);
+        this->setSceneFromID(id);
+    }
+
+    emit breakTypeChanged();
+}
+
 void ScreenplayElement::setScreenplay(Screenplay *val)
 {
     if(m_screenplay != nullptr || m_screenplay == val)
@@ -41,6 +94,9 @@ void ScreenplayElement::setScreenplay(Screenplay *val)
 void ScreenplayElement::setSceneFromID(const QString &val)
 {
     m_sceneID = val;
+    if(m_elementType == BreakElementType)
+        return;
+
     if(m_screenplay == nullptr)
         return;
 
@@ -56,6 +112,7 @@ void ScreenplayElement::setSceneFromID(const QString &val)
     if(element == nullptr)
         return;
 
+    m_elementTypeIsSet = true;
     this->setScene(element->scene());
     if(m_scene != nullptr)
         m_sceneID.clear();
@@ -63,6 +120,23 @@ void ScreenplayElement::setSceneFromID(const QString &val)
 
 QString ScreenplayElement::sceneID() const
 {
+    if(m_elementType == BreakElementType)
+    {
+        if(m_sceneID.isEmpty())
+        {
+            switch(m_breakType)
+            {
+            case Screenplay::Act: return "Act";
+            case Screenplay::Chapter: return "Chapter";
+            case Screenplay::Interval: return "Interval";
+            default: break;
+            }
+            return "Break";
+        }
+
+        return m_sceneID;
+    }
+
     return m_scene ? m_scene->id() : QString();
 }
 
@@ -467,6 +541,19 @@ int Screenplay::indexOfScene(Scene *scene) const
 int Screenplay::indexOfElement(ScreenplayElement *element) const
 {
     return m_elements.indexOf(element);
+}
+
+void Screenplay::addBreakElement(Screenplay::BreakType type)
+{
+    this->insertBreakElement(type, -1);
+}
+
+void Screenplay::insertBreakElement(Screenplay::BreakType type, int index)
+{
+    ScreenplayElement *element = new ScreenplayElement(this);
+    element->setElementType(ScreenplayElement::BreakElementType);
+    element->setBreakType(type);
+    this->insertElementAt(element, index);
 }
 
 void Screenplay::setCurrentElementIndex(int val)

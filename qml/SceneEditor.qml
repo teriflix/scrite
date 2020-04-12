@@ -148,9 +148,13 @@ Item {
 
             Connections {
                 target: sceneEditor
-                onAssumeFocus: sceneTextArea.forceActiveFocus()
+                onAssumeFocus: {
+                    if(!sceneTextArea.activeFocus)
+                        sceneTextArea.forceActiveFocus()
+                }
                 onAssumeFocusAt: {
-                    sceneTextArea.forceActiveFocus()
+                    if(!sceneTextArea.activeFocus)
+                        sceneTextArea.forceActiveFocus()
                     if(pos < 0)
                         sceneTextArea.cursorPosition = sceneDocumentBinder.lastCursorPosition()
                     else

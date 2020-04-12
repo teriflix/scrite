@@ -545,10 +545,16 @@ void ScriteDocument::evaluateStructureElementSequence()
             item.insert("from", fromIndex);
             item.insert("to", toIndex);
             array.append(item);
+
+            fromElement = toElement;
+            fromIndex = toIndex;
+        }
+        else
+        {
+            fromElement = nullptr;
+            fromIndex = -1;
         }
 
-        fromElement = toElement;
-        fromIndex = toIndex;
         toElement = nullptr;
         toIndex = -1;
     }

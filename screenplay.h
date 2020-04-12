@@ -33,6 +33,22 @@ public:
     ~ScreenplayElement();
     Q_SIGNAL void aboutToDelete(ScreenplayElement *element);
 
+    enum ElementType
+    {
+        SceneElementType,
+        BreakElementType
+    };
+    Q_ENUM(ElementType)
+    Q_PROPERTY(ElementType elementType READ elementType WRITE setElementType NOTIFY elementTypeChanged)
+    void setElementType(ElementType val);
+    ElementType elementType() const { return m_elementType; }
+    Q_SIGNAL void elementTypeChanged();
+
+    Q_PROPERTY(int breakType READ breakType WRITE setBreakType NOTIFY breakTypeChanged)
+    void setBreakType(int val);
+    int breakType() const { return m_breakType; }
+    Q_SIGNAL void breakTypeChanged();
+
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged STORED false)
     void setScreenplay(Screenplay *val);
     Screenplay* screenplay() const { return m_screenplay; }
@@ -66,11 +82,15 @@ protected:
     bool event(QEvent *event);
 
 private:
+    friend class Screenplay;
     Scene* m_scene = nullptr;
     bool m_expanded = true;
+    int m_breakType = -1;
     QString m_sceneID;
     QJsonValue m_userData;
     Screenplay* m_screenplay = nullptr;
+    bool m_elementTypeIsSet = false;
+    ElementType m_elementType = SceneElementType;
 };
 
 class Screenplay : public QAbstractListModel
@@ -119,6 +139,16 @@ public:
 
     Q_INVOKABLE int indexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
+
+    enum BreakType
+    {
+        Act,
+        Chapter,
+        Interval
+    };
+    Q_ENUM(BreakType)
+    Q_INVOKABLE void addBreakElement(BreakType type);
+    Q_INVOKABLE void insertBreakElement(BreakType type, int index);
 
     Q_SIGNAL void screenplayChanged();
 

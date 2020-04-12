@@ -100,7 +100,17 @@ Item {
             minimumSize: 0.1
         }
         model: scriteDocument.screenplay
-        delegate: screenplayElementDelegate
+        delegate: Loader {
+            property bool hasSceneContent: screenplayElement.elementType === ScreenplayElement.SceneElementType
+            width: screenplayListView.width
+            sourceComponent: hasSceneContent ? screenplayElementDelegate : breakElementDelegate
+            onItemChanged: {
+                if(item) {
+                    item.index = index
+                    item.element = screenplayElement
+                }
+            }
+        }
         currentIndex: -1
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement: Flickable.StopAtBounds
@@ -142,17 +152,34 @@ Item {
     onCurrentSceneContentEditorChanged: screenplayListView.adjustScroll()
 
     Component {
+        id: breakElementDelegate
+
+        Rectangle {
+            property ScreenplayElement element
+            property int index: -1
+            height: 50
+            color: "white"
+
+            Text {
+                anchors.centerIn: parent
+                font.pixelSize: 30
+                font.bold: true
+                text: element.sceneID
+            }
+        }
+    }
+
+    Component {
         id: screenplayElementDelegate
 
         Rectangle {
             id: delegateItem
-            property ScreenplayElement element: screenplayElement
+            property ScreenplayElement element
+            property int index: -1
             property color sceneColor: element.scene.color
             property bool selected: scriteDocument.screenplay.currentElementIndex === index
             signal assumeFocusAt(int pos)
             onAssumeFocusAt: sceneEditor.assumeFocusAt(pos)
-
-            width: screenplayListView.width
             height: layout.height + 20
             color: selected ? sceneColor : Qt.tint(sceneColor, "#C0FFFFFF")
 
@@ -218,18 +245,28 @@ Item {
                         }
                     }
                     onRequestScrollUp: {
-                        if(index > 0) {
-                            var item = screenplayListView.itemAtIndex(index-1)
-                            if(item)
-                                item.assumeFocusAt(-1)
+                        var item = null
+                        var idx = index
+                        while(idx > 0) {
+                            item = screenplayListView.itemAtIndex(idx-1)
+                            if(item && item.hasSceneContent) {
+                                item.item.assumeFocusAt(-1)
+                                break
+                            }
+                            idx = idx-1
                         }
                     }
 
                     onRequestScrollDown: {
-                        if(index < scriteDocument.screenplay.elementCount) {
-                            var item = screenplayListView.itemAtIndex(index+1)
-                            if(item)
-                                item.assumeFocusAt(0)
+                        var item = null
+                        var idx = index
+                        while(idx < scriteDocument.screenplay.elementCount) {
+                            item = screenplayListView.itemAtIndex(idx+1)
+                            if(item && item.hasSceneContent) {
+                                item.item.assumeFocusAt(0)
+                                break
+                            }
+                            idx = idx+1
                         }
                     }
 
