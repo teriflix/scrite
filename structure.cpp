@@ -302,6 +302,10 @@ Structure::Structure(QObject *parent)
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
     connect(this, &Structure::noteCountChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::characterCountChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::elementCountChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::currentElementIndexChanged, this, &Structure::structureChanged);
 }
 
 Structure::~Structure()
