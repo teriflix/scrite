@@ -316,7 +316,7 @@ Item {
         Rectangle {
             color: Qt.tint(scene.color, "#D9FFFFFF")
             property font headingFont: sceneHeadingFormat.font
-            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+8
+            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
 
             Text {
                 text: "inherited from previous scene"
@@ -333,7 +333,7 @@ Item {
         Row {
             spacing: 10
             property font headingFont: sceneHeadingFormat.font
-            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+8
+            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
 
             ComboBox {
                 id: locationTypeCombo
