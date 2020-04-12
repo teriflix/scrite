@@ -20,10 +20,7 @@
 #include <QTextBlockFormat>
 
 CharacterReportGenerator::CharacterReportGenerator(QObject *parent)
-    : AbstractReportGenerator(parent),
-      m_includeNotes(false),
-      m_includeDialogues(true),
-      m_includeSceneHeadings(true)
+    : AbstractReportGenerator(parent)
 {
 
 }

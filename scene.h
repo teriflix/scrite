@@ -87,11 +87,12 @@ public:
     QString toString() const;
 
 private:
-    Scene* m_scene;
-    bool m_enabled;
-    Moment m_moment;
-    QString m_location;
-    LocationType m_locationType;
+    Scene* m_scene = nullptr;
+    bool m_enabled = true;
+    char m_padding[3];
+    Moment m_moment = Day;
+    QString m_location = "Somewhere";
+    LocationType m_locationType = Exterior;
 };
 
 class SceneElement : public QObject
@@ -138,9 +139,9 @@ protected:
     bool event(QEvent *event);
 
 private:
-    Type m_type;
+    Type m_type = Action;
     QString m_text;
-    Scene* m_scene;
+    Scene* m_scene = nullptr;
 };
 
 class Scene : public QAbstractListModel
@@ -240,14 +241,14 @@ private:
     friend class SceneElement;
     friend class SceneDocumentBinder;
 
-    mutable QString m_id;
+    QColor m_color = QColor(Qt::white);
     QString m_title;
-    QColor m_color;
-    bool m_enabled;
+    bool m_enabled = true;
     char m_padding[7];
-    SceneHeading* m_heading;
-    int m_cursorPosition;
-    bool m_undoRedoEnabled;
+    mutable QString m_id;
+    int m_cursorPosition = -1;
+    SceneHeading* m_heading = new SceneHeading(this);
+    bool m_undoRedoEnabled = true;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);

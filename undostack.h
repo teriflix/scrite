@@ -47,10 +47,10 @@ struct ObjectPropertyInfo
 {
     ~ObjectPropertyInfo();
 
-    const int id;
-    const QObject *object;
+    const int id = -1;
+    const QObject *object = nullptr;
     const QByteArray property;
-    const QMetaObject *metaObject;
+    const QMetaObject *metaObject = nullptr;
     const QList<QByteArray> propertyBundle;
 
     void lock() { recursionLock = true; }
@@ -69,7 +69,7 @@ private:
     void deleteSelf();
 
     static int counter;
-    bool recursionLock;
+    bool recursionLock = false;
     QMetaObject::Connection m_connection;
 };
 
@@ -94,8 +94,8 @@ private:
 private:
     QVariant m_oldValue;
     QVariant m_newValue;
-    bool m_firstRedoDone;
-    ObjectPropertyInfo *m_propertyInfo;
+    bool m_firstRedoDone = false;
+    ObjectPropertyInfo *m_propertyInfo = nullptr;
     QMetaObject::Connection m_connection;
 };
 
@@ -106,7 +106,7 @@ public:
     ~PushObjectPropertyUndoCommand();
 
 private:
-    ObjectPropertyUndoCommand *m_command;
+    ObjectPropertyUndoCommand *m_command = nullptr;
 };
 
 template <class ParentClass, class ChildClass>
@@ -151,15 +151,17 @@ struct ObjectListPropertyMethods
                indexOfMethod == other.indexOfMethod;
     }
 
-    void (*appendMethod)(ParentClass*,ChildClass*);
-    void (*removeMethod)(ParentClass*,ChildClass*);
-    void (*insertMethod)(ParentClass*,ChildClass*,int);
-    ChildClass *(*atMethod)(ParentClass*,int);
-    int (*indexOfMethod)(ParentClass*,ChildClass*);
+    void (*appendMethod)(ParentClass*,ChildClass*) = nullptr;
+    void (*removeMethod)(ParentClass*,ChildClass*) = nullptr;
+    void (*insertMethod)(ParentClass*,ChildClass*,int) = nullptr;
+    ChildClass *(*atMethod)(ParentClass*,int) = nullptr;
+    int (*indexOfMethod)(ParentClass*,ChildClass*) = nullptr;
 };
 
-namespace ObjectList {
-    enum Operation {
+namespace ObjectList
+{
+    enum Operation
+    {
         InsertOperation,
         RemoveOperation
     };
@@ -281,15 +283,15 @@ private:
     }
 
 private:
-    int m_childIndex;
-    bool m_firstRedoDone;
+    int m_childIndex = -1;
+    bool m_firstRedoDone = false;
     QJsonObject m_childInfo;
     QPointer<ChildClass> m_child;
     QPointer<ParentClass> m_parent;
-    ObjectList::Operation m_operation;
-    const QMetaObject *m_childMetaObject;
+    ObjectList::Operation m_operation = ObjectList::InsertOperation;
+    const QMetaObject *m_childMetaObject = nullptr;
     QMetaObject::Connection m_connection;
-    ObjectPropertyInfo *m_parentPropertyInfo;
+    ObjectPropertyInfo *m_parentPropertyInfo = nullptr;
     ObjectListPropertyMethods<ParentClass,ChildClass> m_methods;
 };
 
@@ -299,7 +301,7 @@ class PushObjectListCommand // WE need ObjectCreationAndDeletionCommand
 public:
     PushObjectListCommand(ChildClass *child, ParentClass *parent, const QByteArray &propertyName,
                           ObjectList::Operation operation,
-                          const ObjectListPropertyMethods<ParentClass,ChildClass> &methods) : m_command(nullptr) {
+                          const ObjectListPropertyMethods<ParentClass,ChildClass> &methods) {
         if(UndoStack::active())
             m_command = new ObjectListCommand<ParentClass,ChildClass>(child, parent, propertyName, operation, methods);
     }
@@ -309,7 +311,7 @@ public:
     }
 
 private:
-    ObjectListCommand<ParentClass,ChildClass> *m_command;
+    ObjectListCommand<ParentClass,ChildClass> *m_command = nullptr;
 };
 
 #endif // UNDOSTACK_H

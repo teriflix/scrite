@@ -60,9 +60,9 @@ protected:
     bool doGenerate(QTextDocument *textDocument);
 
 private:
-    bool m_includeNotes;
-    bool m_includeDialogues;
-    bool m_includeSceneHeadings;
+    bool m_includeNotes = false;
+    bool m_includeDialogues = true;
+    bool m_includeSceneHeadings = true;
     QStringList m_characterNames;
 
 };

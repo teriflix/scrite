@@ -53,12 +53,12 @@ private:
     void apply();
 
 private:
-    QObject* m_target;
+    QObject* m_target = nullptr;
     QVariant m_onValue;
-    QQuickItem* m_item;
+    QQuickItem* m_item = nullptr;
     QString m_property;
     QVariant m_offValue;
-    FocusTracker *m_tracker;
+    FocusTracker *m_tracker = nullptr;
 };
 
 class FocusTracker : public QObject
@@ -91,10 +91,10 @@ private:
     void evaluateHasFocus();
 
 private:
-    bool m_hasFocus;
-    QQuickItem *m_item;
-    QQuickWindow* m_window;
-    FocusTrackerIndicator* m_indicator;
+    bool m_hasFocus = false;
+    QQuickItem *m_item = nullptr;
+    QQuickWindow* m_window = nullptr;
+    FocusTrackerIndicator* m_indicator = new FocusTrackerIndicator(this);
 };
 Q_DECLARE_METATYPE(FocusTracker*)
 QML_DECLARE_TYPEINFO(FocusTracker, QML_HAS_ATTACHED_PROPERTIES)

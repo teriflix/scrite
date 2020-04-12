@@ -63,9 +63,6 @@ public:
     Q_INVOKABLE QString resolvePath(const QString &path) const;
 
     static QString resolvedPath(const QString &path);
-
-private:
-    QString m_resourcesPath;
 };
 
 #endif // STANDARDPATHS_H

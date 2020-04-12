@@ -14,10 +14,7 @@
 #include "progressreport.h"
 
 ProgressReport::ProgressReport(QObject *parent)
-               :QObject(parent),
-                m_progress(1.0),
-                m_progressStep(0.0),
-                m_proxyFor(nullptr)
+               :QObject(parent)
 {
 
 }

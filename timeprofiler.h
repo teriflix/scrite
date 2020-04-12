@@ -122,9 +122,9 @@ private:
         this->computeAverageTime();
     }
     QString m_context;
-    qint64 m_time;
-    qint64 m_avgTime;
-    int m_counter;
+    qint64 m_time = 0;
+    qint64 m_avgTime = 0;
+    int m_counter = 1;
 };
 
 #ifdef ENABLE_TIME_PROFILING
@@ -139,8 +139,8 @@ public:
 
 private:
     QString m_context;
-    bool m_printInDestructor;
     QElapsedTimer m_timer;
+    bool m_printInDestructor = false;
 };
 
 #define PROFILE_THIS_FUNCTION TimeProfiler profiler##__LINE__(Q_FUNC_INFO, false)

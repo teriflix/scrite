@@ -21,13 +21,7 @@
 #include <QtMath>
 
 GridBackgroundItem::GridBackgroundItem(QQuickItem *parent)
-    : QQuickItem(parent),
-      m_tickDistance(10),
-      m_majorTickStride(10),
-      m_minorTickLineWidth(1),
-      m_majorTickLineWidth(2),
-      m_minorTickColor(QColor("lightsteelblue")),
-      m_majorTickColor(QColor("blue"))
+    : QQuickItem(parent)
 {
     this->setFlag(ItemHasContents);
 

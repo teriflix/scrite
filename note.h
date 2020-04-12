@@ -57,11 +57,11 @@ protected:
     bool event(QEvent *event);
 
 private:
-    QColor m_color;
+    QColor m_color = QColor(Qt::white);
     QString m_heading;
     QString m_content;
-    Structure *m_structure;
-    Character *m_character;
+    Structure *m_structure = nullptr;
+    Character *m_character = nullptr;
 };
 
 #endif // NOTE_H

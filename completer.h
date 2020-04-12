@@ -58,8 +58,8 @@ private:
 private:
     QString m_suggestion;
     QStringList m_strings;
-    SuggestionMode m_suggestionMode;
-    QStringListModel *m_stringsModel;
+    SuggestionMode m_suggestionMode = AutoCompleteSuggestion;
+    QStringListModel *m_stringsModel = nullptr;
     QBasicTimer m_updateSuggestionTimer;
 };
 

@@ -23,11 +23,7 @@
 
 SceneHeading::SceneHeading(QObject *parent)
     : QObject(parent),
-      m_scene(qobject_cast<Scene*>(parent)),
-      m_enabled(true),
-      m_moment(Day),
-      m_location("SOMEWHERE"),
-      m_locationType(Interior)
+      m_scene(qobject_cast<Scene*>(parent))
 {
 
 }
@@ -207,7 +203,6 @@ QString SceneHeading::toString() const
 
 SceneElement::SceneElement(QObject *parent)
     : QObject(parent),
-      m_type(Action),
       m_scene(qobject_cast<Scene*>(parent))
 {
     connect(this, &SceneElement::typeChanged, this, &SceneElement::elementChanged);
@@ -354,12 +349,7 @@ bool SceneElement::event(QEvent *event)
 ///////////////////////////////////////////////////////////////////////////////
 
 Scene::Scene(QObject *parent)
-    : QAbstractListModel(parent),
-      m_color(Qt::white),
-      m_enabled(true),
-      m_heading(new SceneHeading(this)),
-      m_cursorPosition(-1),
-      m_undoRedoEnabled(true)
+    : QAbstractListModel(parent)
 {
     connect(m_heading, &SceneHeading::enabledChanged, this, &Scene::headingChanged);
     connect(m_heading, &SceneHeading::locationTypeChanged, this, &Scene::headingChanged);

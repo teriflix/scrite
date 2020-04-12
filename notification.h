@@ -80,15 +80,15 @@ private:
     void timerEvent(QTimerEvent *te);
 
 private:
-    QString m_title;
+    bool m_active = false;
+    QColor m_color = QColor(Qt::white);
     QString m_text;
-    QColor m_color;
-    QColor m_textColor;
-    bool m_active;
-    bool m_autoClose;
-    int m_autoCloseDelay;
-    QBasicTimer m_autoCloseTimer;
+    QString m_title;
+    bool m_autoClose = true;
+    QColor m_textColor = QColor(Qt::black);
+    int m_autoCloseDelay = 2000;
     QStringList m_buttons;
+    QBasicTimer m_autoCloseTimer;
 };
 Q_DECLARE_METATYPE(Notification*)
 QML_DECLARE_TYPEINFO(Notification, QML_HAS_ATTACHED_PROPERTIES)

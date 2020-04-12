@@ -66,11 +66,11 @@ protected:
     bool event(QEvent *event);
 
 private:
-    Scene* m_scene;
-    bool m_expanded;
+    Scene* m_scene = nullptr;
+    bool m_expanded = true;
     QString m_sceneID;
     QJsonValue m_userData;
-    Screenplay* m_screenplay;
+    Screenplay* m_screenplay = nullptr;
 };
 
 class Screenplay : public QAbstractListModel
@@ -151,15 +151,15 @@ private:
     QString m_author;
     QString m_contact;
     QString m_version;
-    ScriteDocument *m_scriteDocument;
+    ScriteDocument *m_scriteDocument = nullptr;
 
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);
     static ScreenplayElement* staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index);
     static int staticElementCount(QQmlListProperty<ScreenplayElement> *list);
     QList<ScreenplayElement *> m_elements;
-    int m_currentElementIndex;
-    Scene* m_activeScene;
+    int m_currentElementIndex = -1;
+    Scene* m_activeScene = nullptr;
 };
 
 #endif // SCREENPLAY_H

@@ -21,9 +21,7 @@
 #include <QMouseEvent>
 
 EventFilterResult::EventFilterResult(QObject *parent)
-                  :QObject(parent),
-                   m_filter(false),
-                   m_acceptEvent(true)
+                  :QObject(parent)
 {
 
 }

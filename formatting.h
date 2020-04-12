@@ -97,16 +97,16 @@ private:
 
 private:
     QFont m_font;
-    qreal m_topMargin;
-    qreal m_blockWidth;
-    qreal m_lineHeight;
-    QColor m_textColor;
-    qreal m_bottomMargin;
-    QColor m_backgroundColor;
-    ScreenplayFormat *m_format;
-    Qt::Alignment m_textAlignment;
-    Qt::Alignment m_blockAlignment;
-    SceneElement::Type m_elementType;
+    qreal m_topMargin = 20;
+    qreal m_blockWidth = 1.0;
+    qreal m_lineHeight = 1.0;
+    QColor m_textColor = QColor(Qt::black);
+    qreal m_bottomMargin = 0;
+    QColor m_backgroundColor = QColor(Qt::transparent);
+    ScreenplayFormat *m_format = nullptr;
+    Qt::Alignment m_textAlignment = Qt::AlignLeft;
+    Qt::Alignment m_blockAlignment = Qt::AlignHCenter;
+    SceneElement::Type m_elementType = SceneElement::Action;
 };
 
 class ScreenplayFormat : public QAbstractListModel
@@ -137,19 +137,11 @@ public:
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
 
     Q_INVOKABLE SceneElementFormat *elementFormat(SceneElement::Type type) const;
-    Q_INVOKABLE SceneElementFormat *elementFormat(int type) const {
-        return this->elementFormat(SceneElement::Type(type));
-    }
+    Q_INVOKABLE SceneElementFormat *elementFormat(int type) const;
     Q_SIGNAL void formatChanged();
 
     Q_PROPERTY(QQmlListProperty<SceneElementFormat> elementFormats READ elementFormats)
-    QQmlListProperty<SceneElementFormat> elementFormats() {
-        return QQmlListProperty<SceneElementFormat>(
-                    reinterpret_cast<QObject*>(this),
-                    static_cast<void*>(this),
-                    &ScreenplayFormat::staticElementFormatCount,
-                    &ScreenplayFormat::staticElementFormatAt);
-    }
+    QQmlListProperty<SceneElementFormat> elementFormats();
 
     enum Role { SceneElementFomat=Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
@@ -157,19 +149,16 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    QScreen* m_screen;
-    qreal m_pageWidth;
+    char  m_padding[4];
     QFont m_defaultFont;
-    int m_fontPointSizeDelta;
-    ScriteDocument *m_scriteDocument;
+    qreal m_pageWidth = 750.0;
+    int   m_fontPointSizeDelta = 0;
+    QScreen* m_screen = nullptr;
     QStringList m_suggestionsAtCursor;
+    ScriteDocument *m_scriteDocument = nullptr;
 
-    static SceneElementFormat* staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index) {
-        return reinterpret_cast< ScreenplayFormat* >(list->data)->m_elementFormats.at(index);
-    }
-    static int staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list) {
-        return reinterpret_cast< ScreenplayFormat* >(list->data)->m_elementFormats.size();
-    }
+    static SceneElementFormat* staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index);
+    static int staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list);
     QList<SceneElementFormat*> m_elementFormats;
 };
 
@@ -271,19 +260,19 @@ private:
     void onSceneReset(int elementIndex);
 
 private:
-    Scene* m_scene;
-    qreal m_textWidth;
-    int m_cursorPosition;
-    int m_documentLoadCount;
-    bool m_sceneIsBeingReset;
-    bool m_forceSyncDocument;
+    Scene* m_scene = nullptr;
+    qreal m_textWidth = 0;
+    int m_cursorPosition = -1;
+    int m_documentLoadCount = 0;
+    bool m_sceneIsBeingReset = false;
+    bool m_forceSyncDocument = false;
     QString m_completionPrefix;
-    bool m_initializingDocument;
+    bool m_initializingDocument = false;
     QStringList m_characterNames;
-    SceneElement* m_currentElement;
+    SceneElement* m_currentElement = nullptr;
     QStringList m_autoCompleteHints;
-    QQuickTextDocument* m_textDocument;
-    ScreenplayFormat* m_screenplayFormat;
+    QQuickTextDocument* m_textDocument = nullptr;
+    ScreenplayFormat* m_screenplayFormat = nullptr;
     QBasicTimer m_initializeDocumentTimer;
     QList<SceneElement::Type> m_tabHistory;
 };

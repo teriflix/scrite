@@ -49,8 +49,8 @@ public:
     }
 
 private:
-    QDomElement *m_element;
-    ProgressReport *m_progress;
+    QDomElement *m_element = nullptr;
+    ProgressReport *m_progress = nullptr;
 };
 
 #endif

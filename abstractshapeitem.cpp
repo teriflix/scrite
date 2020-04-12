@@ -22,12 +22,7 @@
 #include <QPainter>
 
 AbstractShapeItem::AbstractShapeItem(QQuickItem *parent)
-    : QQuickPaintedItem(parent),
-      m_fillColor(Qt::black),
-      m_outlineWidth(1.0),
-      m_outlineColor(Qt::black),
-      m_renderType(OutlineAndFill),
-      m_renderingMechanism(UseOpenGL)
+    : QQuickPaintedItem(parent)
 {
     this->setFlag(ItemHasContents);
 

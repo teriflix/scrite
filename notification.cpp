@@ -18,12 +18,7 @@
 #include <QEvent>
 
 Notification::Notification(QObject *parent)
-    : QObject(parent),
-      m_color(Qt::white),
-      m_textColor(Qt::black),
-      m_active(false),
-      m_autoClose(true),
-      m_autoCloseDelay(2000)
+    : QObject(parent)
 {
 
 }

@@ -14,8 +14,7 @@
 #include "errorreport.h"
 
 ErrorReport::ErrorReport(QObject *parent)
-            :QAbstractListModel(parent),
-             m_proxyFor(nullptr)
+            :QAbstractListModel(parent)
 {
 
 }

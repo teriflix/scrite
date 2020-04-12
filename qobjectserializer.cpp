@@ -46,8 +46,8 @@ public:
     QVariant fromJson(const QJsonValue &value, int type) const override;
 
 private:
-    int m_QMarginsF_type;
-    int m_QMargins_type;
+    int m_QMarginsF_type = -1;
+    int m_QMargins_type = -1;
 };
 
 class QListHelper : public QObjectSerializer::Helper
@@ -61,10 +61,10 @@ public:
     QVariant fromJson(const QJsonValue &value, int type) const override;
 
 private:
-    int m_QListInt_type;
-    int m_QListReal_type;
-    int m_QListColor_type;
-    int m_unused;
+    int m_QListInt_type = -1;
+    int m_QListReal_type = -1;
+    int m_QListColor_type = -1;
+    int m_unused = 0;
 };
 
 class QRealHelper : public QObjectSerializer::Helper

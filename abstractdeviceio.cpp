@@ -16,10 +16,7 @@
 #include <QFile>
 
 AbstractDeviceIO::AbstractDeviceIO(QObject *parent)
-    : QObject(parent),
-      m_document(nullptr),
-      m_errorReport(new ErrorReport(this)),
-      m_progressReport(new ProgressReport(this))
+    : QObject(parent)
 {
 
 }

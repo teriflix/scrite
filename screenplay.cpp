@@ -18,8 +18,6 @@
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent),
-      m_scene(nullptr),
-      m_expanded(true),
       m_screenplay(qobject_cast<Screenplay*>(parent))
 {
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
@@ -115,9 +113,7 @@ bool ScreenplayElement::event(QEvent *event)
 
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
-      m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
-      m_currentElementIndex(-1),
-      m_activeScene(nullptr)
+      m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);
@@ -272,10 +268,10 @@ public:
     void redo();
 
 private:
-    int m_toRow;
-    int m_fromRow;
-    Screenplay *m_screenplay;
-    ScreenplayElement *m_element;
+    int m_toRow = -1;
+    int m_fromRow = -1;
+    Screenplay *m_screenplay = nullptr;
+    ScreenplayElement *m_element = nullptr;
     QMetaObject::Connection m_connection1;
     QMetaObject::Connection m_connection2;
 };
@@ -376,14 +372,15 @@ public:
     void redo();
 
 private:
-    bool m_firstRedoDone;
+    bool m_firstRedoDone = false;
+    char m_padding[7];
     QStringList m_sceneIds;
-    Screenplay *m_screenplay;
+    Screenplay *m_screenplay = nullptr;
     QMetaObject::Connection m_connection;
 };
 
 UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds)
-    : QUndoCommand(), m_firstRedoDone(false), m_sceneIds(sceneIds), m_screenplay(screenplay)
+    : QUndoCommand(), m_sceneIds(sceneIds), m_screenplay(screenplay)
 {
     m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed, [this]() {
         this->setObsolete(true);

@@ -76,8 +76,8 @@ private:
     TransliterationSettings(QObject *parent=nullptr);
 
 private:
-    void *m_transliterator;
-    Language m_language;
+    void *m_transliterator = nullptr;
+    Language m_language = English;
     QMap<Language,bool> m_activeLanguages;
 };
 
@@ -130,10 +130,10 @@ private:
     void transliterate(QTextCursor &cursor, void *transliterator=nullptr);
 
 private:
-    Mode m_mode;
-    int m_cursorPosition;
-    bool m_hasActiveFocus;
-    QQuickTextDocument* m_textDocument;
+    Mode m_mode = AutomaticMode;
+    int m_cursorPosition = -1;
+    bool m_hasActiveFocus = false;
+    QQuickTextDocument* m_textDocument = nullptr;
 };
 Q_DECLARE_METATYPE(Transliterator*)
 QML_DECLARE_TYPEINFO(Transliterator, QML_HAS_ATTACHED_PROPERTIES)

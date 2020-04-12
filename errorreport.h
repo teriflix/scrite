@@ -63,7 +63,7 @@ private:
     void updateWarningMessageFromProxy();
 
 private:
-    ErrorReport* m_proxyFor;
+    ErrorReport* m_proxyFor = nullptr;
     QString m_errorMessage;
     QStringList m_warningMessages;
 };

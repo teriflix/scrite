@@ -66,10 +66,10 @@ private:
     void updateProgressFromProxy();
 
 private:
-    qreal m_progress;
-    qreal m_progressStep;
+    qreal m_progress = 1.0;
+    qreal m_progressStep = 0.0;
     QString m_progressText;
-    ProgressReport* m_proxyFor;
+    ProgressReport* m_proxyFor = nullptr;
 };
 
 #endif // PROGRESSREPORT_H

@@ -36,7 +36,7 @@ public:
     QPainterPath shape() const;
 
 protected:
-    PainterPath *m_path;
+    PainterPath *m_path = nullptr;
 };
 
 class AbstractPathElement : public QObject
@@ -58,7 +58,7 @@ signals:
     void updated();
 
 private:
-    bool m_enabled;
+    bool m_enabled = true;
 };
 
 class PainterPath : public QObject
@@ -93,7 +93,7 @@ private:
     static void elements_clear(QQmlListProperty<AbstractPathElement> *);
 
 private:
-    bool m_dirty;
+    bool m_dirty = false;
     QPainterPath m_path;
     QList<AbstractPathElement*> m_pathElements;
 };
@@ -119,8 +119,8 @@ public:
     void apply(QPainterPath &path);
 
 protected:
-    qreal m_x;
-    qreal m_y;
+    qreal m_x = 0;
+    qreal m_y = 0;
 };
 
 class LineToElement : public MoveToElement

@@ -40,8 +40,8 @@ private:
     Logger();
 
 private:
+    QFile  *m_logFile = nullptr;
     QString m_logFilePath;
-    QFile *m_logFile;
 };
 
 #endif // LOGGER_H

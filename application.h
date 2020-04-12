@@ -119,10 +119,10 @@ signals:
     void minimizeWindowRequest();
 
 private:
-    QSettings *m_settings;
-    QUndoGroup *m_undoGroup;
+    QSettings *m_settings = nullptr;
+    QUndoGroup *m_undoGroup = new QUndoGroup(this);
     QString m_baseWindowTitle;
-    ErrorReport *m_errorReport;
+    ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;
 };
 

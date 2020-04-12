@@ -17,7 +17,6 @@
 
 Note::Note(QObject *parent)
      : QObject(parent),
-       m_color(Qt::transparent),
        m_structure(qobject_cast<Structure*>(parent)),
        m_character(qobject_cast<Character*>(parent))
 {

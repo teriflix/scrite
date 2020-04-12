@@ -35,8 +35,6 @@ Application *Application::instance()
 
 Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
-      m_undoGroup(new QUndoGroup(this)),
-      m_errorReport(new ErrorReport(this)),
       m_versionNumber(version)
 {
     connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);

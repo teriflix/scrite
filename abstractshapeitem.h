@@ -86,11 +86,11 @@ protected:
 
 private:
     QPainterPath m_path;
-    QColor m_fillColor;
-    qreal m_outlineWidth;
-    QColor m_outlineColor;
-    RenderType m_renderType;
-    RenderingMechanism m_renderingMechanism;
+    QColor m_fillColor = QColor(Qt::white);
+    qreal m_outlineWidth = 1.0;
+    QColor m_outlineColor = QColor(Qt::black);
+    RenderType m_renderType = OutlineAndFill;
+    RenderingMechanism m_renderingMechanism = UseOpenGL;
 };
 
 #endif // ABSTRACTSHAPEITEM_H

@@ -47,10 +47,9 @@ protected:
 
 private:
     QString m_fileName;
-    ScriteDocument* m_document;
-
-    ErrorReport *m_errorReport;
-    ProgressReport *m_progressReport;
+    ScriteDocument* m_document = nullptr;
+    ErrorReport *m_errorReport = new ErrorReport(this);
+    ProgressReport *m_progressReport = new ProgressReport(this);
 };
 
 #endif // ABSTRACTDEVICEIO_H

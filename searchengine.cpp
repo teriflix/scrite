@@ -19,12 +19,7 @@
 #include <QTimerEvent>
 
 SearchAgent::SearchAgent(QObject *parent)
-            :QObject(parent),
-              m_sequenceNumber(-1),
-              m_engine(nullptr),
-              m_searchResultCount(0),
-              m_currentSearchResultIndex(-1),
-              m_textDocument(nullptr)
+            :QObject(parent)
 {
 
 }
@@ -214,9 +209,7 @@ void SearchAgent::onClearSearchRequest()
 ///////////////////////////////////////////////////////////////////////////////
 
 SearchEngine::SearchEngine(QObject *parent)
-    :QObject(parent),
-      m_errorReport(new ErrorReport(this)),
-              m_progressReport(new ProgressReport(this))
+    :QObject(parent)
 {
 
 }
@@ -503,9 +496,7 @@ void SearchEngine::setCurrentSearchResultIndex(int val)
 ///////////////////////////////////////////////////////////////////////////////
 
 TextDocumentSearch::TextDocumentSearch(QObject *parent)
-                   : QObject(parent),
-                     m_currentResultIndex(-1),
-                     m_textDocument(nullptr)
+                   : QObject(parent)
 {
 
 }

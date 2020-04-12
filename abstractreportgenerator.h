@@ -64,7 +64,7 @@ protected:
     virtual bool doGenerate(QTextDocument *document) = 0;
 
 private:
-    Format m_format;
+    Format m_format = AdobePDF;
     QEventLoop m_eventLoop;
 };
 

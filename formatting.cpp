@@ -26,15 +26,7 @@
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
                    : QObject(parent),
                      m_font(parent->defaultFont()),
-                     m_topMargin(20),
-                     m_blockWidth(1.0),
-                     m_lineHeight(1.0),
-                     m_textColor(Qt::black),
-                     m_bottomMargin(0),
-                     m_backgroundColor(Qt::transparent),
                      m_format(parent),
-                     m_textAlignment(Qt::AlignLeft),
-                     m_blockAlignment(Qt::AlignHCenter),
                      m_elementType(type)
 {
     CACHE_DEFAULT_PROPERTY_VALUES
@@ -203,7 +195,6 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
 
 ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
-      m_screen(nullptr),
       m_pageWidth(750),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
@@ -287,6 +278,20 @@ SceneElementFormat *ScreenplayFormat::elementFormat(SceneElement::Type type) con
     return m_elementFormats.at(int(type));
 }
 
+SceneElementFormat *ScreenplayFormat::elementFormat(int type) const
+{
+    return this->elementFormat(SceneElement::Type(type));
+}
+
+QQmlListProperty<SceneElementFormat> ScreenplayFormat::elementFormats()
+{
+    return QQmlListProperty<SceneElementFormat>(
+                reinterpret_cast<QObject*>(this),
+                static_cast<void*>(this),
+                &ScreenplayFormat::staticElementFormatCount,
+                &ScreenplayFormat::staticElementFormatAt);
+}
+
 int ScreenplayFormat::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_elementFormats.size();
@@ -305,6 +310,16 @@ QHash<int, QByteArray> ScreenplayFormat::roleNames() const
     QHash<int,QByteArray> roles;
     roles[SceneElementFomat] = "sceneElementFormat";
     return roles;
+}
+
+SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)
+{
+    return reinterpret_cast< ScreenplayFormat* >(list->data)->m_elementFormats.at(index);
+}
+
+int ScreenplayFormat::staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list)
+{
+    return reinterpret_cast< ScreenplayFormat* >(list->data)->m_elementFormats.size();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -343,17 +358,7 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 }
 
 SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
-    : QSyntaxHighlighter(parent),
-      m_scene(nullptr),
-      m_textWidth(0),
-      m_cursorPosition(-1),
-      m_documentLoadCount(0),
-      m_sceneIsBeingReset(false),
-      m_forceSyncDocument(false),
-      m_initializingDocument(false),
-      m_currentElement(nullptr),
-      m_textDocument(nullptr),
-      m_screenplayFormat(nullptr)
+    : QSyntaxHighlighter(parent)
 {
 
 }

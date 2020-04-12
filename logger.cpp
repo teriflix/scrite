@@ -33,7 +33,6 @@ Logger *Logger::instance()
 }
 
 Logger::Logger()
-    : m_logFile(nullptr)
 {
     const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(appData);

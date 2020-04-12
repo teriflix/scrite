@@ -85,13 +85,13 @@ protected:
 
 private:
     friend class StructurePositionCommand;
-    qreal m_x;
-    qreal m_y;
-    bool m_placed;
-    qreal m_width;
-    qreal m_height;
-    Scene* m_scene;
-    Structure *m_structure;
+    qreal m_x = 0;
+    qreal m_y = 0;
+    bool m_placed = false;
+    qreal m_width = 0;
+    qreal m_height = 0;
+    Scene* m_scene = nullptr;
+    Structure *m_structure = nullptr;
     QBasicTimer m_undoCmdTimer;
 };
 
@@ -139,7 +139,7 @@ private:
 private:
     QString m_name;
     QList<Note *> m_notes;
-    Structure* m_structure;
+    Structure* m_structure = nullptr;
 };
 
 class Annotation : public QObject
@@ -168,9 +168,9 @@ protected:
     bool event(QEvent *event);
 
 private:
-    QJsonValue m_type;
-    Structure *m_structure;
-    QJsonValue m_attributes;
+    QJsonValue m_type = QJsonValue(QJsonValue::Undefined);
+    Structure *m_structure = nullptr;
+    QJsonValue m_attributes = QJsonValue(QJsonValue::Undefined);
 };
 
 class Structure : public QObject
@@ -279,10 +279,10 @@ protected:
     bool event(QEvent *event);
 
 private:
-    ScriteDocument *m_scriteDocument;
-    qreal m_canvasWidth;
-    qreal m_canvasHeight;
-    qreal m_canvasGridSize;
+    qreal m_canvasWidth = 10000;
+    qreal m_canvasHeight = 10000;
+    qreal m_canvasGridSize = 10;
+    ScriteDocument *m_scriteDocument = nullptr;
 
     static void staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr);
     static void staticClearCharacters(QQmlListProperty<Character> *list);
@@ -302,7 +302,7 @@ private:
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     QList<StructureElement *> m_elements;
     int m_currentElementIndex;
-    qreal m_zoomLevel;
+    qreal m_zoomLevel = 1.0;
 
     void onStructureElementSceneChanged(StructureElement *element=nullptr);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
@@ -373,12 +373,12 @@ private:
     void setSuggestedLabelPosition(const QPointF &val);
 
 private:
-    LineType m_lineType;
-    QBasicTimer m_updateTimer;
-    StructureElement* m_toElement;
-    StructureElement* m_fromElement;
-    qreal m_arrowAndLabelSpacing;
+    LineType m_lineType = StraightLine;
     QPointF m_arrowPosition;
+    QBasicTimer m_updateTimer;
+    qreal m_arrowAndLabelSpacing = 30;
+    StructureElement* m_toElement = nullptr;
+    StructureElement* m_fromElement = nullptr;
     QPointF m_suggestedLabelPosition;
 };
 

@@ -22,8 +22,7 @@
 #include <QPdfWriter>
 
 AbstractReportGenerator::AbstractReportGenerator(QObject *parent)
-                        :AbstractDeviceIO(parent),
-                         m_format(AdobePDF)
+                        :AbstractDeviceIO(parent)
 {
 
 }

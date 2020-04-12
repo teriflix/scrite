@@ -17,9 +17,7 @@
 #include <QQuickItem>
 
 FocusTrackerIndicator::FocusTrackerIndicator(FocusTracker *parent)
-                      :QObject(parent),
-                       m_target(nullptr),
-                       m_tracker(parent)
+                      :QObject(parent), m_tracker(parent)
 {
     connect(m_tracker, &FocusTracker::hasFocusChanged, this, &FocusTrackerIndicator::apply);
 }
@@ -97,10 +95,7 @@ Q_GLOBAL_STATIC(FocusTrackerList, GlobalFocusTrackerList);
 
 FocusTracker::FocusTracker(QObject *parent)
     :QObject(parent),
-      m_hasFocus(false),
-      m_item(qobject_cast<QQuickItem*>(parent)),
-              m_window(nullptr),
-              m_indicator(new FocusTrackerIndicator(this))
+      m_item(qobject_cast<QQuickItem*>(parent))
 {
     ::GlobalFocusTrackerList->append(this);
 }

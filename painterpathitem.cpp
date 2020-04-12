@@ -14,8 +14,7 @@
 #include "painterpathitem.h"
 
 PainterPathItem::PainterPathItem(QQuickItem *parent)
-    : AbstractShapeItem(parent),
-      m_path(nullptr)
+    : AbstractShapeItem(parent)
 {
 }
 
@@ -47,7 +46,7 @@ QPainterPath PainterPathItem::shape() const
 ///////////////////////////////////////////////////////////////////////////////
 
 AbstractPathElement::AbstractPathElement(QObject *parent)
-    : QObject(parent), m_enabled(true)
+    : QObject(parent)
 {
 
 }
@@ -71,8 +70,7 @@ void AbstractPathElement::setEnabled(bool val)
 ///////////////////////////////////////////////////////////////////////////////
 
 PainterPath::PainterPath(QObject *parent)
-    : QObject(parent),
-      m_dirty(false)
+    : QObject(parent)
 {
 
 }

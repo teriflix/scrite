@@ -38,8 +38,8 @@ protected:
     QPainterPath shape() const;
 
 private:
-    QString m_text;
     QFont m_font;
+    QString m_text;
 };
 
 

@@ -80,11 +80,11 @@ protected:
     void onClearSearchRequest();
 
 private:
-    int m_sequenceNumber;
-    SearchEngine* m_engine;
-    int m_searchResultCount;
-    int m_currentSearchResultIndex;
-    QQuickTextDocument* m_textDocument;
+    int m_sequenceNumber = -1;
+    SearchEngine* m_engine = nullptr;
+    int m_searchResultCount = 0;
+    int m_currentSearchResultIndex = -1;
+    QQuickTextDocument* m_textDocument = nullptr;
     QList< QPair<int,int> > m_textDocumentSearchResults;
 };
 Q_DECLARE_METATYPE(SearchAgent*)
@@ -160,9 +160,9 @@ private:
     friend class SearchAgent;
     SearchFlags m_searchFlags;
     QBasicTimer m_searchTimer;
-    ErrorReport *m_errorReport;
-    int m_currentSearchResultIndex;
-    ProgressReport *m_progressReport;
+    ErrorReport *m_errorReport = new ErrorReport(this);
+    int m_currentSearchResultIndex = -1;
+    ProgressReport *m_progressReport = new ProgressReport(this);
     QBasicTimer m_searchAgentSortTimer;
     QList<SearchAgent *> m_searchAgents;
     QList< QPair<SearchAgent*,int> > m_searchResults;
@@ -215,8 +215,8 @@ private:
 
 private:
     QString m_searchString;
-    int m_currentResultIndex;
-    QQuickTextDocument* m_textDocument;
+    int m_currentResultIndex = -1;
+    QQuickTextDocument* m_textDocument = nullptr;
     SearchEngine::SearchFlags m_searchFlags;
     QList< QPair<int,int> > m_searchResults;
 };

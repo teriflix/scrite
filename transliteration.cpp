@@ -31,7 +31,7 @@ TransliterationSettings *TransliterationSettings::instance(QCoreApplication *app
 }
 
 TransliterationSettings::TransliterationSettings(QObject *parent)
-    : QObject(parent), m_transliterator(nullptr), m_language(English)
+    : QObject(parent)
 {
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
@@ -222,11 +222,7 @@ QString TransliterationSettings::transliteratedWord(const QString &word) const
 ///////////////////////////////////////////////////////////////////////////////
 
 Transliterator::Transliterator(QObject *parent)
-    : QObject(parent),
-      m_mode(AutomaticMode),
-      m_cursorPosition(-1),
-      m_hasActiveFocus(false),
-      m_textDocument(nullptr)
+    : QObject(parent)
 {
 
 }

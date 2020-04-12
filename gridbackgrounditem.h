@@ -59,12 +59,12 @@ protected:
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData);
 
 private:
-    qreal m_tickDistance;
-    int m_majorTickStride;
-    qreal m_minorTickLineWidth;
-    qreal m_majorTickLineWidth;
-    QColor m_minorTickColor;
-    QColor m_majorTickColor;
+    qreal m_tickDistance = 10;
+    int   m_majorTickStride = 10;
+    qreal m_minorTickLineWidth = 1;
+    qreal m_majorTickLineWidth = 1;
+    QColor m_minorTickColor = QColor("lightsteelblue");
+    QColor m_majorTickColor = QColor("blue");
 };
 
 #endif // GRIDBACKGROUNDITEM_H

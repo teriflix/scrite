@@ -18,12 +18,6 @@
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
-      m_x(0),
-      m_y(0),
-      m_placed(false),
-      m_width(0),
-      m_height(0),
-      m_scene(nullptr),
       m_structure(qobject_cast<Structure*>(parent))
 {
     connect(this, &StructureElement::xChanged, this, &StructureElement::elementChanged);
@@ -260,9 +254,7 @@ int Character::staticNoteCount(QQmlListProperty<Note> *list)
 
 Annotation::Annotation(QObject *parent)
     : QObject(parent),
-      m_type(QJsonValue::Undefined),
-      m_structure(qobject_cast<Structure*>(parent)),
-      m_attributes(QJsonValue::Undefined)
+      m_structure(qobject_cast<Structure*>(parent))
 {
 
 }
@@ -307,12 +299,7 @@ bool Annotation::event(QEvent *event)
 
 Structure::Structure(QObject *parent)
     : QObject(parent),
-      m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
-      m_canvasWidth(10000),
-      m_canvasHeight(10000),
-      m_canvasGridSize(10),
-      m_currentElementIndex(-1),
-      m_zoomLevel(1.0)
+      m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
     connect(this, &Structure::noteCountChanged, this, &Structure::structureChanged);
 }
@@ -914,11 +901,7 @@ int Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementConnector::StructureElementConnector(QQuickItem *parent)
-    :AbstractShapeItem(parent),
-                            m_lineType(StraightLine),
-                            m_toElement(nullptr),
-                            m_fromElement(nullptr),
-                            m_arrowAndLabelSpacing(30)
+    :AbstractShapeItem(parent)
 {
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);

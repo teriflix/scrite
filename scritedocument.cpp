@@ -72,15 +72,7 @@ DeviceIOFactories::~DeviceIOFactories()
 Q_GLOBAL_STATIC(DeviceIOFactories, deviceIOFactories)
 
 ScriteDocument::ScriteDocument(QObject *parent)
-                :QObject(parent),
-                  m_autoSave(true),
-                  m_autoSaveDurationInSeconds(60),
-                  m_screenplay(nullptr),
-                  m_structure(nullptr),
-                  m_formatting(nullptr),
-                  m_modified(false),
-                  m_errorReport(new ErrorReport(this)),
-                  m_progressReport(new ProgressReport(this))
+                :QObject(parent)
 {
     this->reset();
     this->updateDocumentWindowTitle();

@@ -121,29 +121,30 @@ private:
     void structureElementIndexChanged();
     void screenplayElementIndexChanged();
 
-private:
-    bool m_autoSave;
-    int m_autoSaveDurationInSeconds;
-    QBasicTimer m_autoSaveTimer;
-    Screenplay* m_screenplay;
-    Structure* m_structure;
-    ScreenplayFormat* m_formatting;
-    bool m_modified;
-    QString m_fileName;
-    QString m_documentWindowTitle;
-    QJsonArray m_structureElementSequence;
-    QBasicTimer m_evaluateStructureElementSequenceTimer;
-
-    ErrorReport *m_errorReport;
-    ProgressReport *m_progressReport;
-
-    // Interface interface
 public:
+    // QObjectSerializer::Interface implementation
     void prepareForSerialization();
     void prepareForDeserialization();
     bool canSerialize(const QMetaObject *, const QMetaProperty &) const;
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
+
+private:
+    bool m_modified = false;
+    bool m_autoSave = true;
+    QString m_fileName;
+    QBasicTimer m_autoSaveTimer;
+    QString m_documentWindowTitle;
+    Structure* m_structure = nullptr;
+    Screenplay* m_screenplay = nullptr;
+    ScreenplayFormat* m_formatting = nullptr;
+    int m_autoSaveDurationInSeconds = 60;
+    QJsonArray m_structureElementSequence;
+    QBasicTimer m_evaluateStructureElementSequenceTimer;
+
+    ErrorReport *m_errorReport = new ErrorReport(this);
+    ProgressReport *m_progressReport = new ProgressReport(this);
+
 };
 
 #endif // SCRITEDOCUMENT_H

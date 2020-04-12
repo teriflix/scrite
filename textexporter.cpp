@@ -17,8 +17,7 @@
 #include <QFileInfo>
 
 TextExporter::TextExporter(QObject *parent)
-             :AbstractExporter(parent),
-              m_maxLettersPerLine(80)
+             :AbstractExporter(parent)
 {
 
 }

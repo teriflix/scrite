@@ -42,8 +42,8 @@ private:
     EventFilterResult(QObject *parent=nullptr);
 
 private:
-    bool m_filter;
-    bool m_acceptEvent;
+    bool m_filter = false;
+    bool m_acceptEvent = true;
 };
 
 class EventFilter : public QObject
@@ -72,7 +72,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    QObject* m_target;
+    QObject* m_target = nullptr;
     QList<int> m_events;
 };
 

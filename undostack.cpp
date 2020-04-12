@@ -91,7 +91,7 @@ static inline QList<QByteArray> queryPropertyBundle(QObject *object, const QByte
 
 ObjectPropertyInfo::ObjectPropertyInfo(QObject *o, const QMetaObject *mo, const QByteArray &prop)
     : id(++ObjectPropertyInfo::counter), object(o), property(prop),
-      metaObject(mo), propertyBundle(queryPropertyBundle(o,prop)), recursionLock(false)
+      metaObject(mo), propertyBundle(queryPropertyBundle(o,prop))
 {
     m_connection = QObject::connect(o, &QObject::destroyed, [this]() {
         this->deleteSelf();
@@ -183,9 +183,7 @@ void ObjectPropertyInfo::deleteSelf()
 }
 
 ObjectPropertyUndoCommand::ObjectPropertyUndoCommand(QObject *object, const QByteArray &property)
-    : QUndoCommand(),
-      m_firstRedoDone(false),
-      m_propertyInfo(nullptr)
+    : QUndoCommand()
 {
     if(object != nullptr)
     {
@@ -252,7 +250,6 @@ bool ObjectPropertyUndoCommand::mergeWith(const QUndoCommand *other)
 }
 
 PushObjectPropertyUndoCommand::PushObjectPropertyUndoCommand(QObject *object, const QByteArray &property, bool flag)
-    : m_command(nullptr)
 {
     const int counter = ObjectPropertyInfo::querySetCounter(object, property);
     if(flag && UndoStack::active() && counter > 0)
