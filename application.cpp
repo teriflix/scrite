@@ -266,6 +266,48 @@ QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &po
     return item->mapFromGlobal(pos);
 }
 
+class ExecLater : public QObject
+{
+public:
+    ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &arg, QObject *parent=nullptr);
+    ~ExecLater();
+
+    void timerEvent(QTimerEvent *event);
+
+private:
+    char m_padding[4];
+    QBasicTimer m_timer;
+    QJSValue m_function;
+    QJSValueList m_arguments;
+};
+
+ExecLater::ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &args, QObject *parent)
+    : QObject(parent), m_function(function), m_arguments(args)
+{
+    howMuchLater = qBound(0, howMuchLater, 60*60*1000);
+    m_timer.start(howMuchLater, this);
+}
+
+ExecLater::~ExecLater()
+{
+}
+
+void ExecLater::timerEvent(QTimerEvent *event)
+{
+    if(m_timer.timerId() == event->timerId())
+    {
+        m_function.call(m_arguments);
+        m_timer.stop();
+
+        GarbageCollector::instance()->add(this);
+    }
+}
+
+void Application::execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args)
+{
+    new ExecLater(howMuchLater, function, args, this);
+}
+
 bool Application::notify(QObject *object, QEvent *event)
 {
     if(event->type() == QEvent::KeyPress)

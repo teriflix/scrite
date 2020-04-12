@@ -110,6 +110,8 @@ public:
     Q_INVOKABLE QPointF cursorPosition() const;
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
 
+    Q_INVOKABLE void execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
+
     QSettings *settings() const { return m_settings; }
 
     // QCoreApplication interface

@@ -39,33 +39,39 @@ public:
     qreal progress() const { return m_progress; }
     Q_SIGNAL void progressChanged();
 
+    enum Status
+    {
+        NotStarted = -1,
+        Started,
+        InProgress,
+        Finished,
+    };
+    Q_ENUM(Status)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Status status() const { return m_status; }
+    Q_SIGNAL void statusChanged();
+
     qreal progressStep() const;
     void setProgressStep(qreal val);
     void setProgressStepFromCount(int count);
     void tick();
 
-    void start() {
-        this->setProgress(0);
-        if(m_progressText.isEmpty())
-            this->setProgressText("Started");
-    }
-
-    void finish() {
-        this->setProgress(1);
-        if(m_progressText.isEmpty() || m_progressText == "Started")
-            this->setProgressText("Finished");
-    }
+    void start();
+    void finish();
 
     Q_SIGNAL void progressStarted();
     Q_SIGNAL void progressFinished();
 
 private:
+    void setStatus(Status val);
     void setProgress(qreal val);
     void clearProxyFor();
     void updateProgressTextFromProxy();
     void updateProgressFromProxy();
+    void updateStatusFromProxy();
 
 private:
+    Status m_status = NotStarted;
     qreal m_progress = 1.0;
     qreal m_progressStep = 0.0;
     QString m_progressText;

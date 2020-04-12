@@ -129,6 +129,12 @@ Item {
                 }
             }
 
+            property int documentProgressStatus: Aggregation.findProgressReport(scriteDocument).status
+            onDocumentProgressStatusChanged: {
+                if(documentProgressStatus === ProgressReport.Finished)
+                    app.execLater(100, function() { canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), canvasScroll.scale) })
+            }
+
             function createElement(x, y, c) {
                 var props = {
                     "x": Math.max(scriteDocument.structure.snapToGrid(x), 130),

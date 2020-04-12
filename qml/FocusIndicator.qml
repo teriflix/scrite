@@ -17,6 +17,7 @@ Rectangle {
     id: focusIndicator
     property bool active: false
     border.width: active ? 3 : 0
+    border.color: app.palette.highlight
     color: Qt.rgba(0,0,0,0)
 
     SequentialAnimation {
