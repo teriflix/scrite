@@ -198,42 +198,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
       m_pageWidth(750),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
-    // Standard font names, sizes, margins etc picked from the URL below.
-    // https://johnaugust.com/2007/hollywood-standard
-    this->setDefaultFont(QFont("Courier", 12));
-
-    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-    {
-        SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);
-        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayFormat::formatChanged);
-        m_elementFormats.append(elementFormat);
-    }
-
-    m_elementFormats[SceneElement::Action]->setTextAlignment(Qt::AlignJustify);
-
-    m_elementFormats[SceneElement::Character]->setBlockWidth(0.6);
-    m_elementFormats[SceneElement::Character]->setTextAlignment(Qt::AlignHCenter);
-    m_elementFormats[SceneElement::Character]->fontRef().setBold(true);
-    m_elementFormats[SceneElement::Character]->fontRef().setCapitalization(QFont::AllUppercase);
-
-    m_elementFormats[SceneElement::Dialogue]->setBlockWidth(0.6);
-    m_elementFormats[SceneElement::Dialogue]->setTextAlignment(Qt::AlignJustify);
-    m_elementFormats[SceneElement::Dialogue]->setTopMargin(0);
-
-    m_elementFormats[SceneElement::Parenthetical]->setBlockWidth(0.5);
-    m_elementFormats[SceneElement::Parenthetical]->setTextAlignment(Qt::AlignHCenter);
-    m_elementFormats[SceneElement::Parenthetical]->fontRef().setItalic(true);
-    m_elementFormats[SceneElement::Parenthetical]->setTopMargin(0);
-
-    m_elementFormats[SceneElement::Shot]->setTextAlignment(Qt::AlignRight);
-    m_elementFormats[SceneElement::Shot]->fontRef().setCapitalization(QFont::AllUppercase);
-
-    m_elementFormats[SceneElement::Transition]->setTextAlignment(Qt::AlignRight);
-    m_elementFormats[SceneElement::Transition]->fontRef().setCapitalization(QFont::AllUppercase);
-
-    m_elementFormats[SceneElement::Heading]->fontRef().setBold(true);
-    m_elementFormats[SceneElement::Heading]->fontRef().setPointSize(m_defaultFont.pointSize()+2);
-    m_elementFormats[SceneElement::Heading]->fontRef().setCapitalization(QFont::AllUppercase);
+    this->resetToDefaults();
 }
 
 ScreenplayFormat::~ScreenplayFormat()
@@ -311,6 +276,50 @@ QHash<int, QByteArray> ScreenplayFormat::roleNames() const
     QHash<int,QByteArray> roles;
     roles[SceneElementFomat] = "sceneElementFormat";
     return roles;
+}
+
+void ScreenplayFormat::resetToDefaults()
+{
+    // Standard font names, sizes, margins etc picked from the URL below.
+    // https://johnaugust.com/2007/hollywood-standard
+    this->setDefaultFont(QFont("Courier Prime", 12));
+
+    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+    {
+        SceneElementFormat *elementFormat = i >= m_elementFormats.size() ?
+                    new SceneElementFormat(SceneElement::Type(i), this) :
+                    m_elementFormats.at(i);
+        elementFormat->setFont(m_defaultFont);
+        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayFormat::formatChanged);
+        m_elementFormats.append(elementFormat);
+    }
+
+    m_elementFormats[SceneElement::Action]->setTextAlignment(Qt::AlignJustify);
+
+    m_elementFormats[SceneElement::Character]->setBlockWidth(0.6);
+    m_elementFormats[SceneElement::Character]->setTextAlignment(Qt::AlignHCenter);
+    m_elementFormats[SceneElement::Character]->fontRef().setBold(true);
+    m_elementFormats[SceneElement::Character]->fontRef().setCapitalization(QFont::AllUppercase);
+
+    m_elementFormats[SceneElement::Dialogue]->setBlockWidth(0.6);
+    m_elementFormats[SceneElement::Dialogue]->setTextAlignment(Qt::AlignJustify);
+    m_elementFormats[SceneElement::Dialogue]->setTopMargin(0);
+
+    m_elementFormats[SceneElement::Parenthetical]->setBlockWidth(0.5);
+    m_elementFormats[SceneElement::Parenthetical]->setTextAlignment(Qt::AlignHCenter);
+    m_elementFormats[SceneElement::Parenthetical]->fontRef().setItalic(true);
+    m_elementFormats[SceneElement::Parenthetical]->setTopMargin(0);
+
+    m_elementFormats[SceneElement::Shot]->setTextAlignment(Qt::AlignRight);
+    m_elementFormats[SceneElement::Shot]->fontRef().setCapitalization(QFont::AllUppercase);
+
+    m_elementFormats[SceneElement::Transition]->setTextAlignment(Qt::AlignRight);
+    m_elementFormats[SceneElement::Transition]->fontRef().setCapitalization(QFont::AllUppercase);
+
+    m_elementFormats[SceneElement::Heading]->fontRef().setBold(true);
+    m_elementFormats[SceneElement::Heading]->fontRef().setPointSize(m_defaultFont.pointSize()+2);
+    m_elementFormats[SceneElement::Heading]->fontRef().setCapitalization(QFont::AllUppercase);
+
 }
 
 SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)

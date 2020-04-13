@@ -8,6 +8,12 @@ under this license, except for
 3. 3rdparty/phtranslator: This library is provided under LGPLv2 and is used as a
    statically linked library in this project. For more information about this project
    please visit: https://sourceforge.net/projects/phtranslator/
+4. The TrueType "Courier Prime" fonts in fonts folder are downloaded from
+   https://fonts.google.com/download?family=Courier%20Prime
+   These fonts are provided under "Open Font License". We are simply bundling the fonts
+   with the binary for use in the software. The detailed license terms under which the
+   fonts are made available can be read at:
+   https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
 
 The contents of 'poly2tri' folder are available under the following license
 

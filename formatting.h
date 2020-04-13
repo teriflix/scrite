@@ -148,6 +148,8 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
+    Q_INVOKABLE void resetToDefaults();
+
 private:
     char  m_padding[4];
     QFont m_defaultFont;

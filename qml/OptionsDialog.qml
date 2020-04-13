@@ -204,6 +204,12 @@ Item {
                         font.pixelSize: 14
                     }
                 }
+
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Reset Paragraph Formats"
+                    onClicked: scriteDocument.formatting.resetToDefaults()
+                }
             }
         }
     }

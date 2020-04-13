@@ -20,13 +20,13 @@
 #include <QFileInfo>
 #include <QKeyEvent>
 #include <QMetaEnum>
+#include <QQuickItem>
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QColorDialog>
 #include <QFontDatabase>
 #include <QStandardPaths>
-#include <QQuickItem>
 
 Application *Application::instance()
 {
@@ -37,6 +37,11 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
       m_versionNumber(version)
 {
+    QFontDatabase::addApplicationFont(":/font/CourierPrime-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/font/CourierPrime-Italic.ttf");
+    QFontDatabase::addApplicationFont(":/font/CourierPrime-BoldItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/CourierPrime-Regular.ttf");
+
     connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
     connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
     connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);

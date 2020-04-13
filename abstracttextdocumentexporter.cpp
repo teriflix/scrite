@@ -137,9 +137,6 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
 
     int nrBlocks = 0, nrSceneHeadings=0;
     auto createNewTextBlock = [&nrBlocks,pageWidth,screenplayFormat](QTextCursor &cursor, SceneElement::Type type) {
-        if(nrBlocks > 0)
-            cursor.insertBlock();
-
         const SceneElementFormat *format = screenplayFormat->elementFormat(type);
         QTextBlockFormat blkFormat = format->createBlockFormat(&pageWidth);
         if(nrBlocks == 0)
@@ -147,8 +144,12 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
 
         QTextCharFormat chrFormat = format->createCharFormat(&pageWidth);
 
-        cursor.setBlockFormat(blkFormat);
-        cursor.setCharFormat(chrFormat);
+        if(nrBlocks > 0)
+            cursor.insertBlock(blkFormat, chrFormat);
+        else {
+            cursor.setBlockFormat(blkFormat);
+            cursor.setCharFormat(chrFormat);
+        }
     };
 
     for(int i=0; i<nrScreenplayElements; i++)

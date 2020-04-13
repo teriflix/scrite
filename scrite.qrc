@@ -75,5 +75,9 @@
         <file>icons/action/description.png</file>
         <file>icons/action/description_inverted.png</file>
         <file>images/appicon.png</file>
+        <file>font/CourierPrime-Bold.ttf</file>
+        <file>font/CourierPrime-BoldItalic.ttf</file>
+        <file>font/CourierPrime-Italic.ttf</file>
+        <file>font/CourierPrime-Regular.ttf</file>
     </qresource>
 </RCC>
