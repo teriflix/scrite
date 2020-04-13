@@ -198,7 +198,9 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
       m_pageWidth(750),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
-    this->setDefaultFont(QFont("Courier New", 10));
+    // Standard font names, sizes, margins etc picked from the URL below.
+    // https://johnaugust.com/2007/hollywood-standard
+    this->setDefaultFont(QFont("Courier", 12));
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
@@ -211,7 +213,6 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
 
     m_elementFormats[SceneElement::Character]->setBlockWidth(0.6);
     m_elementFormats[SceneElement::Character]->setTextAlignment(Qt::AlignHCenter);
-    m_elementFormats[SceneElement::Character]->setTopMargin(30);
     m_elementFormats[SceneElement::Character]->fontRef().setBold(true);
     m_elementFormats[SceneElement::Character]->fontRef().setCapitalization(QFont::AllUppercase);
 

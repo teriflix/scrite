@@ -512,7 +512,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: format.topMargin
                             validator: IntValidator { top: 100; bottom: 0 }
-                            onTextChanged: format.topMargin = parseInt(text)
+                            onTextChanged: format.topMargin = text === "" ? 0 : parseInt(text)
                         }
 
                         Text {
@@ -527,7 +527,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: format.bottomMargin
                             validator: IntValidator { top: 100; bottom: 0 }
-                            onTextChanged: format.bottomMargin = parseInt(text)
+                            onTextChanged: format.bottomMargin = text === "" ? 0 : parseInt(text)
                         }
                     }
                 }

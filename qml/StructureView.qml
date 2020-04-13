@@ -360,11 +360,6 @@ Item {
                             canvas.editIndex = index
                     }
 
-                    onSelectedChanged: {
-                        if(selected)
-                            forceActiveFocus()
-                    }
-
                     Rectangle {
                         anchors.fill: parent
                         radius: 8

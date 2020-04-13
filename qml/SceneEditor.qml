@@ -23,7 +23,7 @@ Item {
     property SceneElementFormat sceneHeadingFormat: scriteDocument.formatting.elementFormat(SceneElement.Heading)
     property alias binder: sceneDocumentBinder
     property Item  editor: sceneContentEditor
-    property bool  editorHasActiveFocus: sceneContentEditor.activeFocus
+    property bool  editorHasActiveFocus: activeFocusBinder.get
     property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+10) : 0) + 10
     property color backgroundColor: scene ? Qt.tint(scene.color, "#E0FFFFFF") : "white"
     property bool  scrollable: true
@@ -32,6 +32,12 @@ Item {
     signal assumeFocusAt(int pos)
     signal requestScrollUp()
     signal requestScrollDown()
+
+    DelayedPropertyBinder {
+        id: activeFocusBinder
+        initial: false
+        set: sceneContentEditor.activeFocus
+    }
 
     Rectangle {
         id: sceneHeadingArea
@@ -316,7 +322,10 @@ Item {
         Rectangle {
             color: Qt.tint(scene.color, "#D9FFFFFF")
             property font headingFont: sceneHeadingFormat.font
-            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+            onHeadingFontChanged: {
+                if(headingFont.pointSize === sceneHeadingFormat.font.pointSize)
+                    headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+            }
 
             Text {
                 text: "inherited from previous scene"
@@ -333,7 +342,10 @@ Item {
         Row {
             spacing: 10
             property font headingFont: sceneHeadingFormat.font
-            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+            onHeadingFontChanged: {
+                if(headingFont.pointSize === sceneHeadingFormat.font.pointSize)
+                    headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+            }
 
             ComboBox {
                 id: locationTypeCombo

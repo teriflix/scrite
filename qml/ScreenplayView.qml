@@ -72,16 +72,16 @@ Rectangle {
                     ToolTip.text: "Clear the screenplay, while retaining the scenes."
                     onClicked: {
                         askQuestion({
-                                        "question": "Are you sure you want to clear the screenplay?",
-                                        "okButtonText": "Yes",
-                                        "cancelButtonText": "No",
-                                        "callback": function(val) {
-                                            if(val) {
-                                                screenplayElementList.forceActiveFocus()
-                                                scriteDocument.screenplay.clearElements()
-                                            }
-                                        }
-                                    }, this)
+                            "question": "Are you sure you want to clear the screenplay?",
+                            "okButtonText": "Yes",
+                            "cancelButtonText": "No",
+                            "callback": function(val) {
+                                if(val) {
+                                    screenplayElementList.forceActiveFocus()
+                                    scriteDocument.screenplay.clearElements()
+                                }
+                            }
+                        }, this)
                     }
                 }
 

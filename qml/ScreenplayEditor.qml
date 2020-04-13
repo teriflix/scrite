@@ -238,9 +238,11 @@ Item {
 
                     onEditorHasActiveFocusChanged: {
                         if(editorHasActiveFocus) {
-                            currentElementIndexConnections.enabled = false
-                            scriteDocument.screenplay.currentElementIndex = index
-                            currentElementIndexConnections.enabled = true
+                            if(scriteDocument.screenplay.currentElementIndex !== index) {
+                                currentElementIndexConnections.enabled = false
+                                scriteDocument.screenplay.currentElementIndex = index
+                                currentElementIndexConnections.enabled = true
+                            }
                             currentSceneEditor = sceneEditor
                         }
                     }

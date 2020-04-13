@@ -97,7 +97,7 @@ private:
 
 private:
     QFont m_font;
-    qreal m_topMargin = 20;
+    qreal m_topMargin = 10;
     qreal m_blockWidth = 1.0;
     qreal m_lineHeight = 1.0;
     QColor m_textColor = QColor(Qt::black);

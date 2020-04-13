@@ -34,6 +34,7 @@
 #include "transliteration.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
+#include "delayedpropertybinder.h"
 #include "abstractreportgenerator.h"
 
 int main(int argc, char **argv)
@@ -127,6 +128,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<FocusTrackerIndicator>("Scrite", 1, 0, "FocusTrackerIndicator", reason);
 
     qmlRegisterType<Annotation>("Scrite", 1, 0, "Annotation");
+    qmlRegisterType<DelayedPropertyBinder>("Scrite", 1, 0, "DelayedPropertyBinder");
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;
