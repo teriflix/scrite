@@ -920,7 +920,7 @@ Item {
         property ErrorReport applicationErrors: Aggregation.findErrorReport(app)
         Notification.active: applicationErrors ? applicationErrors.hasError : false
         Notification.title: "Scrite Error"
-        Notification.text: applicationErrors ? applicationErrors.hasError : ""
+        Notification.text: applicationErrors ? applicationErrors.errorMessage : ""
         Notification.autoClose: false
     }
 

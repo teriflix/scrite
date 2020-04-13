@@ -164,7 +164,7 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     // Mac, Windows support folder or file.
     if (this->platform() == WindowsDesktop)
     {
-        const QString explorer = QStandardPaths::locate(QStandardPaths::AppDataLocation, "explorer.exe");
+        const QString explorer = QStandardPaths::findExecutable("explorer.exe");
         if (explorer.isEmpty())
         {
             m_errorReport->setErrorMessage("Could not find explorer.exe in path to launch Windows Explorer.");
