@@ -318,6 +318,22 @@ bool Application::notify(QObject *object, QEvent *event)
             emit minimizeWindowRequest();
             return true;
         }
+
+        if(ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Z)
+        {
+            m_undoGroup->undo();
+            return true;
+        }
+
+        if( (ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Y)
+#ifdef Q_OS_MAC
+           || (ke->modifiers()&Qt::ControlModifier && ke->modifiers()&Qt::ShiftModifier && ke->key() == Qt::Key_Z)
+#endif
+                )
+        {
+            m_undoGroup->redo();
+            return true;
+        }
     }
 
     const bool ret = QtApplicationClass::notify(object, event);
