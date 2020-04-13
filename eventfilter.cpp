@@ -19,6 +19,7 @@
 #include <QKeyEvent>
 #include <QMetaObject>
 #include <QMouseEvent>
+#include <QWheelEvent>
 
 EventFilterResult::EventFilterResult(QObject *parent)
                   :QObject(parent)
@@ -121,6 +122,27 @@ inline void packIntoJson(QKeyEvent *event, QJsonObject &object)
     object.insert("text", event->text());
 }
 
+inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
+{
+    auto pointToJson = [](const QPointF &pos) {
+        QJsonObject ret;
+        ret.insert("x", pos.x());
+        ret.insert("y", pos.y());
+        return ret;
+    };
+
+    object.insert("modifiers", int(event->modifiers()));
+    object.insert("pixelDelta", pointToJson(event->pixelDelta()));
+    object.insert("angleDelta", pointToJson(event->angleDelta()));
+    object.insert("delta", event->delta());
+    object.insert("orientation", event->orientation());
+    object.insert("pos", pointToJson(event->posF()));
+    object.insert("globalPos", pointToJson(event->globalPosF()));
+    object.insert("buttons", int(event->buttons()));
+    object.insert("phase", int(event->phase()));
+    object.insert("inverted", event->inverted());
+}
+
 inline bool eventToJson(QEvent *event, QJsonObject &object)
 {
     const QMetaObject *eventMetaObject = &QEvent::staticMetaObject;
@@ -152,6 +174,9 @@ inline bool eventToJson(QEvent *event, QJsonObject &object)
     case QEvent::KeyPress:
     case QEvent::KeyRelease:
         packIntoJson(static_cast<QKeyEvent*>(event), object);
+        break;
+    case QEvent::Wheel:
+        packIntoJson(static_cast<QWheelEvent*>(event), object);
         break;
     default:
         break;

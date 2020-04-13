@@ -13,13 +13,14 @@
 
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import Scrite 1.0
 
 Flickable {
     id: flickable
     readonly property rect visibleRect: Qt.rect(contentX, contentY, width, height)
     property real initialContentWidth: 100
     property real initialContentHeight: 100
-    property alias suggestedScale: pinchHandler.activeScale
+    property real suggestedScale: zoomScale
     property alias handlePinchZoom: pinchHandler.enabled
     boundsBehavior: Flickable.StopAtBounds
     clip: true
@@ -87,6 +88,16 @@ Flickable {
             contentY = Math.max(Math.min(cy, contentHeight-height-1),0)
     }
 
+    property real zoomScale: 1
+    onZoomScaleChanged: {
+        var visibleArea = Qt.rect(contentX, contentY, width, height)
+        var mousePoint = app.mapGlobalPositionToItem(contentItem, app.cursorPosition())
+        var newWidth = initialContentWidth * zoomScale
+        var newHeight = initialContentHeight * zoomScale
+        resizeContent(newWidth, newHeight, mousePoint)
+        returnToBounds()
+    }
+
     PinchHandler {
         id: pinchHandler
         target: null
@@ -102,13 +113,19 @@ Flickable {
         onScaleChanged: {
             if(flickable === null)
                 return
+            zoomScale = activeScale
+        }
+    }
 
-            var visibleArea = Qt.rect(flickable.contentX, flickable.contentY, flickable.width, flickable.height)
-            var mousePoint = app.mapGlobalPositionToItem(flickable.contentItem, app.cursorPosition())
-            var newWidth = flickable.initialContentWidth * activeScale
-            var newHeight = flickable.initialContentHeight * activeScale
-            flickable.resizeContent(newWidth, newHeight, mousePoint)
-            flickable.returnToBounds()
+    EventFilter.events: [31]
+    EventFilter.onFilter: {
+        if(event.modifiers & Qt.AltModifier) {
+            if(event.delta > 0)
+                zoomScale = zoomScale*0.99
+            else
+                zoomScale = zoomScale*1.01
+            result.acceptEvent = true
+            result.filter = true
         }
     }
 }
