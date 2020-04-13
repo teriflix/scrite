@@ -106,7 +106,7 @@ Flickable {
             var visibleArea = Qt.rect(flickable.contentX, flickable.contentY, flickable.width, flickable.height)
             var mousePoint = app.mapGlobalPositionToItem(flickable.contentItem, app.cursorPosition())
             var newWidth = flickable.initialContentWidth * activeScale
-            var newHeight = flickable.initialContentWidth * activeScale
+            var newHeight = flickable.initialContentHeight * activeScale
             flickable.resizeContent(newWidth, newHeight, mousePoint)
             flickable.returnToBounds()
         }

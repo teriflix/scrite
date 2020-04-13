@@ -92,22 +92,27 @@ Item {
         initialContentWidth: canvas.width
         initialContentHeight: canvas.height
         clip: true
-        onWidthChanged: prepare()
-        onHeightChanged: prepare()
-
-        function prepare() {
-            if(width > 0 && height > 0 && scriteDocument.structure.elementCount === 0) {
-                var area = Qt.rect(0, (initialContentHeight-height)/2, width, height)
-                ensureVisible(area)
-            }
-        }
 
         Item {
             id: canvas
-            width: scriteDocument.structure.canvasWidth
-            height: scriteDocument.structure.canvasHeight
+            width: widthBinder.get
+            height: heightBinder.get
             scale: canvasScroll.suggestedScale
             transformOrigin: Item.TopLeft
+
+            DelayedPropertyBinder{
+                id: widthBinder
+                initial: 1000
+                set: Math.max((Math.ceil(canvas.childrenRect.right / 100) * 100), initial)
+                onGetChanged: scriteDocument.structure.canvasWidth = get
+            }
+
+            DelayedPropertyBinder {
+                id: heightBinder
+                initial: 1000
+                set: Math.max((Math.ceil(canvas.childrenRect.bottom / 100) * 100), initial)
+                onGetChanged: scriteDocument.structure.canvasHeight = get
+            }
 
             FocusTracker.window: qmlWindow
             FocusTracker.indicator.target: structureScreenplayUndoStack
@@ -470,6 +475,8 @@ Item {
 
                         drag.target: parent
                         drag.axis: Drag.XAndYAxis
+                        drag.minimumX: 0
+                        drag.minimumY: 0
                         drag.onActiveChanged: {
                             parent.forceActiveFocus()
                             canvas.ensureCurrentItemIsVisible = false

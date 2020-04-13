@@ -66,13 +66,15 @@ public:
     qreal height() const { return m_height; }
     Q_SIGNAL void heightChanged();
 
-    Q_PROPERTY(qreal xf READ xf WRITE setXf NOTIFY xChanged)
+    Q_PROPERTY(qreal xf READ xf WRITE setXf NOTIFY xfChanged)
     void setXf(qreal val);
     qreal xf() const;
+    Q_SIGNAL void xfChanged();
 
-    Q_PROPERTY(qreal yf READ yf WRITE setYf NOTIFY yChanged)
+    Q_PROPERTY(qreal yf READ yf WRITE setYf NOTIFY yfChanged)
     void setYf(qreal val);
     qreal yf() const;
+    Q_SIGNAL void yfChanged();
 
     Q_PROPERTY(QPointF position READ position WRITE setPosition STORED false)
     void setPosition(const QPointF &pos);
@@ -279,8 +281,8 @@ protected:
     bool event(QEvent *event);
 
 private:
-    qreal m_canvasWidth = 10000;
-    qreal m_canvasHeight = 10000;
+    qreal m_canvasWidth = 1000;
+    qreal m_canvasHeight = 1000;
     qreal m_canvasGridSize = 10;
     ScriteDocument *m_scriteDocument = nullptr;
 

@@ -22,8 +22,16 @@ StructureElement::StructureElement(QObject *parent)
 {
     connect(this, &StructureElement::xChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::elementChanged);
+    connect(this, &StructureElement::xChanged, this, &StructureElement::xfChanged);
+    connect(this, &StructureElement::yChanged, this, &StructureElement::yfChanged);
     connect(this, &StructureElement::widthChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::heightChanged, this, &StructureElement::elementChanged);
+
+    if(m_structure)
+    {
+        connect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
+        connect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
+    }
 }
 
 StructureElement::~StructureElement()
@@ -138,9 +146,22 @@ bool StructureElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
     {
+        if(m_structure)
+        {
+            disconnect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
+            disconnect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
+        }
+
         m_structure = qobject_cast<Structure*>(this->parent());
-        emit xChanged();
-        emit yChanged();
+
+        if(m_structure)
+        {
+            connect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
+            connect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
+        }
+
+        emit xfChanged();
+        emit yfChanged();
     }
 
     return QObject::event(event);
