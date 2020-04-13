@@ -119,7 +119,7 @@ Flickable {
 
     EventFilter.events: [31]
     EventFilter.onFilter: {
-        if(event.modifiers & Qt.AltModifier) {
+        if(event.modifiers & Qt.AltModifier || event.modifiers & Qt.ControlModifier) {
             if(event.delta > 0)
                 zoomScale = zoomScale*0.99
             else

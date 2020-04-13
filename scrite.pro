@@ -134,6 +134,6 @@ DISTFILES += \
     License.txt \
     packaging/windows/package.bat \
     packaging/windows/installer.nsi \
-    packaging/mac/package.sh
+    packaging/mac/packaging.sh
 
 
