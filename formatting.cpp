@@ -198,6 +198,13 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
       m_pageWidth(750),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
+    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+    {
+        SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);
+        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayFormat::formatChanged);
+        m_elementFormats.append(elementFormat);
+    }
+
     this->resetToDefaults();
 }
 
@@ -241,11 +248,14 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
 
 SceneElementFormat *ScreenplayFormat::elementFormat(SceneElement::Type type) const
 {
-    return m_elementFormats.at(int(type));
+    int itype = int(type);
+    itype = itype%(SceneElement::Max+1);
+    return m_elementFormats.at(itype);
 }
 
 SceneElementFormat *ScreenplayFormat::elementFormat(int type) const
 {
+    type = type%(SceneElement::Max+1);
     return this->elementFormat(SceneElement::Type(type));
 }
 
@@ -285,14 +295,7 @@ void ScreenplayFormat::resetToDefaults()
     this->setDefaultFont(QFont("Courier Prime", 12));
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-    {
-        SceneElementFormat *elementFormat = i >= m_elementFormats.size() ?
-                    new SceneElementFormat(SceneElement::Type(i), this) :
-                    m_elementFormats.at(i);
-        elementFormat->setFont(m_defaultFont);
-        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayFormat::formatChanged);
-        m_elementFormats.append(elementFormat);
-    }
+        m_elementFormats.at(i)->setFont(m_defaultFont);
 
     m_elementFormats[SceneElement::Action]->setTextAlignment(Qt::AlignJustify);
 
@@ -324,6 +327,7 @@ void ScreenplayFormat::resetToDefaults()
 
 SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)
 {
+    index = index%(SceneElement::Max+1);
     return reinterpret_cast< ScreenplayFormat* >(list->data)->m_elementFormats.at(index);
 }
 
