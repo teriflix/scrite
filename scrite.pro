@@ -124,10 +124,16 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
 }
 
+win32 {
+    RC_ICONS = appicon.ico
+}
+
 DISTFILES += \
     GPLv3.txt \
     Info.plist \
-    License.txt
+    License.txt \
+    packaging/windows/package.bat \
+    packaging/windows/installer.nsi
 
 # ~/Qt5.13.2/5.13.2/clang_64/bin/macdeployqt scrite.app -qmldir=/Users/prashanthudupa/GitHubCode/scrite/qml -verbose=1 -appstore-compliant -dmg
 

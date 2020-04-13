@@ -42,6 +42,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);
     connect(m_undoGroup, &QUndoGroup::redoTextChanged, this, &Application::redoTextChanged);
 
+    this->setWindowIcon( QIcon(":/images/appicon.png") );
     this->setBaseWindowTitle("scrite - build your screenplay");
 
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");

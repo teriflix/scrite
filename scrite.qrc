@@ -74,5 +74,6 @@
         <file>qml/FocusIndicator.qml</file>
         <file>icons/action/description.png</file>
         <file>icons/action/description_inverted.png</file>
+        <file>images/appicon.png</file>
     </qresource>
 </RCC>
