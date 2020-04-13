@@ -133,7 +133,7 @@ DISTFILES += \
     Info.plist \
     License.txt \
     packaging/windows/package.bat \
-    packaging/windows/installer.nsi
+    packaging/windows/installer.nsi \
+    packaging/mac/package.sh
 
-# ~/Qt5.13.2/5.13.2/clang_64/bin/macdeployqt scrite.app -qmldir=/Users/prashanthudupa/GitHubCode/scrite/qml -verbose=1 -appstore-compliant -dmg
 
