@@ -9,6 +9,8 @@
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+SetCompressor /SOLID lzma
+
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 
@@ -39,7 +41,7 @@
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}-Setup.exe"
-InstallDir "$PROGRAMFILES\Scrite"
+InstallDir "$PROGRAMFILES64\Scrite"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
