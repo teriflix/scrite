@@ -28,13 +28,16 @@
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
+#include "locationreportgenerator.h"
 #include "characterreportgenerator.h"
 
 #include <QDir>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QSettings>
+#include <QDateTime>
 #include <QJsonDocument>
+#include <QStandardPaths>
 
 class DeviceIOFactories
 {
@@ -63,6 +66,7 @@ DeviceIOFactories::DeviceIOFactories()
     // ExporterFactory.addClass<OdtExporter>();
 
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
+    ReportGeneratorFactory.addClass<LocationReportGenerator>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()
@@ -398,6 +402,15 @@ bool ScriteDocument::generateReport(const QString &fileName, const QString &repo
         emit requestReportGeneratorConfiguration(reportGenerator.data());
         if(!reportGenerator->exec())
             return false;
+    }
+    else if(reportGenerator->fileName().isEmpty())
+    {
+        const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
+        QFileInfo fi(m_fileName);
+        if(fi.exists())
+            reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + "-Report-" + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix) );
+        else
+            reportGenerator->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + fi.baseName() + "-Report-" + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix );
     }
 
     HourGlass hourGlass;

@@ -16,6 +16,9 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QFutureWatcher>
+#include <QtConcurrentRun>
+
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
@@ -49,6 +52,9 @@ void StructureElement::setScene(Scene *val)
     connect(m_scene, &Scene::sceneChanged, this, &StructureElement::elementChanged);
     connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
     connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
+
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &StructureElement::sceneHeadingLocationChanged);
+    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneHeadingLocationChanged);
 
     emit sceneChanged();
 }
@@ -589,6 +595,8 @@ void Structure::removeElement(StructureElement *ptr)
 
     disconnect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
     disconnect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
+    disconnect(ptr, &StructureElement::sceneHeadingLocationChanged, this, &Structure::updateLocationHeadingsMapLater);
+    this->updateLocationHeadingsMapLater();
 
     emit elementCountChanged();
     emit elementsChanged();
@@ -619,6 +627,8 @@ void Structure::insertElement(StructureElement *ptr, int index)
 
     connect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
     connect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
+    connect(ptr, &StructureElement::sceneHeadingLocationChanged, this, &Structure::updateLocationHeadingsMapLater);
+    this->updateLocationHeadingsMapLater();
 
     this->onStructureElementSceneChanged(ptr);
 
@@ -790,6 +800,18 @@ bool Structure::event(QEvent *event)
     return QObject::event(event);
 }
 
+void Structure::timerEvent(QTimerEvent *event)
+{
+    if(m_locationHeadingsMapTimer.timerId() == event->timerId())
+    {
+        this->updateLocationHeadingsMap();
+        m_locationHeadingsMapTimer.stop();
+        return;
+    }
+
+    QObject::timerEvent(event);
+}
+
 void Structure::staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr)
 {
     reinterpret_cast< Structure* >(list->data)->addCharacter(ptr);
@@ -850,6 +872,26 @@ int Structure::staticElementCount(QQmlListProperty<StructureElement> *list)
     return reinterpret_cast< Structure* >(list->data)->elementCount();
 }
 
+void Structure::updateLocationHeadingsMap()
+{
+    QMap< QString, QList<SceneHeading*> > map;
+    Q_FOREACH(StructureElement *element, m_elements)
+    {
+        Scene *scene = element->scene();
+        if(scene == nullptr || !scene->heading()->isEnabled())
+            continue;
+
+        map[scene->heading()->location()].append(scene->heading());
+    }
+
+    m_locationHeadingsMap = map;
+}
+
+void Structure::updateLocationHeadingsMapLater()
+{
+    m_locationHeadingsMapTimer.start(0, this);
+}
+
 void Structure::onStructureElementSceneChanged(StructureElement *element)
 {
     if(element == nullptr)
@@ -864,6 +906,8 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
     const int nrSceneElements = element->scene()->elementCount();
     for(int i=0; i<nrSceneElements; i++)
         this->onSceneElementChanged(element->scene()->elementAt(i), Scene::ElementTextChange);
+
+    this->updateLocationHeadingsMapLater();
 }
 
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)

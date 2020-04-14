@@ -37,6 +37,9 @@ public:
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
+    Q_PROPERTY(QString name READ name CONSTANT)
+    QString name() const;
+
     Q_INVOKABLE bool generate();
 
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)

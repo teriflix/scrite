@@ -41,6 +41,15 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
     emit formatChanged();
 }
 
+QString AbstractReportGenerator::name() const
+{
+    const int ciIndex = this->metaObject()->indexOfClassInfo("Title");
+    if(ciIndex >= 0)
+        return QString::fromLatin1(this->metaObject()->classInfo(ciIndex).name());
+
+    return QString("Report");
+}
+
 bool AbstractReportGenerator::generate()
 {
     QString fileName = this->fileName();

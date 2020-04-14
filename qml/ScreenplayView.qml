@@ -132,7 +132,7 @@ Rectangle {
         id: focusIndicator
         active: structureScreenplayUndoStack.active
         anchors.fill: screenplayElementList
-        anchors.margins: -10
+        anchors.margins: -3
 
         MouseArea {
             anchors.fill: parent
@@ -163,9 +163,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.leftMargin: 3
-        anchors.topMargin: 10
-        anchors.rightMargin: 10
+        anchors.margins: 3
         clip: true
         visible: count > 0
         model: scriteDocument.screenplay
@@ -235,6 +233,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
+                anchors.topMargin: 2
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 sourceComponent: Rectangle {
                     radius: isBreakElement ? 0 : 8

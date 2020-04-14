@@ -31,6 +31,7 @@ HEADERS += \
     hourglass.h \
     htmlexporter.h \
     htmlimporter.h \
+    locationreportgenerator.h \
     logger.h \
     note.h \
     notification.h \
@@ -87,6 +88,7 @@ SOURCES += \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \
     htmlimporter.cpp \
+    locationreportgenerator.cpp \
     logger.cpp \
     main.cpp \
     note.cpp \

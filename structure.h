@@ -26,6 +26,7 @@
 
 class Structure;
 class Character;
+class SceneHeading;
 class ScriteDocument;
 class StructurePositionCommand;
 
@@ -81,6 +82,7 @@ public:
     QPointF position() const { return QPointF(m_x,m_y); }
 
     Q_SIGNAL void elementChanged();
+    Q_SIGNAL void sceneHeadingLocationChanged();
 
 protected:
     bool event(QEvent *event);
@@ -251,6 +253,9 @@ public:
     Q_INVOKABLE int indexOfElement(StructureElement *element) const;
     Q_INVOKABLE StructureElement *findElementBySceneID(const QString &id) const;
 
+    Q_INVOKABLE QStringList allLocations() const { return m_locationHeadingsMap.keys(); }
+    QMap< QString, QList<SceneHeading*> > locationHeadingsMap() const { return m_locationHeadingsMap; }
+
     Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY currentElementIndexChanged STORED false)
     void setCurrentElementIndex(int val);
     int currentElementIndex() const { return m_currentElementIndex; }
@@ -279,6 +284,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void timerEvent(QTimerEvent *event);
 
 private:
     qreal m_canvasWidth = 1000;
@@ -305,6 +311,11 @@ private:
     QList<StructureElement *> m_elements;
     int m_currentElementIndex;
     qreal m_zoomLevel = 1.0;
+
+    void updateLocationHeadingsMap();
+    void updateLocationHeadingsMapLater();
+    QBasicTimer m_locationHeadingsMapTimer;
+    QMap< QString, QList<SceneHeading*> > m_locationHeadingsMap;
 
     void onStructureElementSceneChanged(StructureElement *element=nullptr);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);

@@ -91,9 +91,9 @@ Item {
                                     if(scriteDocument.fileName !== "") {
                                         var fileInfo = app.fileInfo(scriteDocument.fileName)
                                         if(fileInfo.exists)
-                                            return fileInfo.absolutePath + "/" + fileInfo.baseName + "-Report-" + (new Date()).getTime() + suffix
+                                            return fileInfo.absolutePath + "/" + fileInfo.baseName + "-" + generator.name + "-" + (new Date()).getTime() + suffix
                                     }
-                                    return StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/scrite-Report-" + (new Date()).getTime() + suffix
+                                    return StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/scrite-" + generator.name + "-" + (new Date()).getTime() + suffix
                                 }
                             }
 

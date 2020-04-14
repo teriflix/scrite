@@ -93,6 +93,7 @@ private:
     Moment m_moment = Day;
     QString m_location = "Somewhere";
     LocationType m_locationType = Exterior;
+    char m_padding2[4];
 };
 
 class SceneElement : public QObject

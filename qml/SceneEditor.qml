@@ -347,6 +347,8 @@ Item {
                     headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
             }
 
+            Component.onDestruction: scene.heading.location = locationEdit.text
+
             ComboBox {
                 id: locationTypeCombo
                 model: ListModel {
@@ -373,11 +375,36 @@ Item {
                     if(activeFocus)
                         selectAll()
                 }
-                onTextChanged: scene.heading.location = text
+                onEditingFinished: scene.heading.location = text
                 Transliterator.textDocument: textDocument
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
                 Keys.onReturnPressed: editingFinished()
+
+                Item {
+                    x: parent.cursorRectangle.x
+                    y: parent.cursorRectangle.y
+                    width: parent.cursorRectangle.width
+                    height: parent.cursorRectangle.height
+                    ToolTip.visible: locationCompleter.hasSuggestion
+                    ToolTip.text: locationCompleter.suggestion
+                    visible: parent.cursorVisible
+                }
+
+                Keys.onTabPressed: {
+                    if(locationCompleter.hasSuggestion) {
+                        locationEdit.text = locationCompleter.suggestion
+                        locationEdit.cursorPosition = locationEdit.length
+                        editingFinished()
+                    }
+                }
+
+                Completer {
+                    id: locationCompleter
+                    strings: scriteDocument.structure.allLocations()
+                    suggestionMode: Completer.CompleteSuggestion
+                    completionPrefix: locationEdit.text
+                }
             }
 
             ComboBox {

@@ -109,8 +109,9 @@ QMap<SceneHeading::LocationType, QString> SceneHeading::locationTypeStringMap()
     return map;
 }
 
-void SceneHeading::setLocation(const QString &val)
+void SceneHeading::setLocation(const QString &val2)
 {
+    const QString val = val2.toUpper();
     if(m_location == val)
         return;
 
