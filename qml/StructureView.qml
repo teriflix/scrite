@@ -80,6 +80,12 @@ Item {
         anchors.margins: -3
     }
 
+    Rectangle {
+        anchors.fill: canvasScroll
+        color: "#F8ECC2"
+        opacity: 0.4
+    }
+
     ScrollArea {
         id: canvasScroll
         anchors.left: parent.left
@@ -93,11 +99,19 @@ Item {
         initialContentHeight: canvas.height
         clip: true
 
-        Item {
+        GridBackground {
             id: canvas
             width: widthBinder.get
             height: heightBinder.get
             scale: canvasScroll.suggestedScale
+            majorTickColor: "darkgray"
+            minorTickColor: "gray"
+            majorTickLineWidth: 5
+            minorTickLineWidth: 1
+            tickDistance: scriteDocument.structure.canvasGridSize
+            antialiasing: false
+            tickColorOpacity: 0.5 * scale
+
             transformOrigin: Item.TopLeft
 
             DelayedPropertyBinder{
@@ -168,24 +182,6 @@ Item {
             property color newElementColor: "blue"
             property bool newElementMode: false
 
-            Rectangle {
-                anchors.fill: parent
-                color: "#F8ECC2"
-                opacity: 0.4
-            }
-
-            GridBackground {
-                id: gridBackground
-                anchors.fill: parent
-                opacity: 0.5 * canvas.scale
-                majorTickColor: "darkgray"
-                minorTickColor: "gray"
-                majorTickLineWidth: 5
-                minorTickLineWidth: 1
-                tickDistance: scriteDocument.structure.canvasGridSize
-                antialiasing: false
-            }
-
             MouseArea {
                 id: canvasMouseArea
                 anchors.fill: parent
@@ -216,27 +212,35 @@ Item {
                 }
 
                 onPressed: {
+                    parent.forceActiveFocus()
                     if(parent.newElementMode || selectionRect.enabled)
-                        return;
+                        return
 
-                    scriteDocument.structure.currentElementIndex = -1
-                    selectionRect.from = Qt.point(mouse.x, mouse.y)
-                    selectionRect.to = Qt.point(mouse.x, mouse.y)
-                    selectionRect.enabled = false
-                    selectionRect.visible = true
+                    if(mouse.modifiers & Qt.ControlModifier) {
+                        scriteDocument.structure.currentElementIndex = -1
+                        selectionRect.from = Qt.point(mouse.x, mouse.y)
+                        selectionRect.to = Qt.point(mouse.x, mouse.y)
+                        selectionRect.enabled = false
+                        selectionRect.visible = true
+                    } else
+                        mouse.accepted = false
                 }
 
                 onPositionChanged: {
-                    if(!selectionRect.visible || selectionRect.enabled)
+                    if(!selectionRect.visible || selectionRect.enabled) {
+                        mouse.accepted = false
                         return;
+                    }
 
                     selectionRect.to = Qt.point(mouse.x, mouse.y)
                     selectionRect.enabled = false
                 }
 
                 onReleased: {
-                    if(!selectionRect.visible || selectionRect.enabled)
+                    if(!selectionRect.visible || selectionRect.enabled) {
+                        mouse.accepted = false
                         return;
+                    }
 
                     selectionRect.to = Qt.point(mouse.x, mouse.y)
                     selectionRect.enabled = true
@@ -252,12 +256,14 @@ Item {
                 visible: false
                 enabled: false
                 color: systemPalette.highlight
-                border { width: 2; color: "black" }
+                border { width: 0; color: "black" }
                 radius: 8                    
                 onVisibleChanged: {
                     if(!visible)
                         enabled = false
                 }
+                opacity: 0.5
+                z: 10
 
                 property point from: Qt.point(0,0)
                 property point to: Qt.point(0,0)

@@ -25,7 +25,8 @@ GridBackgroundItem::GridBackgroundItem(QQuickItem *parent)
 {
     this->setFlag(ItemHasContents);
 
-    connect(this, SIGNAL(opacityChanged()), this, SLOT(update()));
+    connect(this, &GridBackgroundItem::tickColorOpacityChanged,
+            this, &GridBackgroundItem::update);
 }
 
 GridBackgroundItem::~GridBackgroundItem()
@@ -97,6 +98,15 @@ void GridBackgroundItem::setMajorTickColor(const QColor &val)
     emit majorTickColorChanged();
 
     this->update();
+}
+
+void GridBackgroundItem::setTickColorOpacity(qreal val)
+{
+    if( qFuzzyCompare(m_tickColorOpacity, val) )
+        return;
+
+    m_tickColorOpacity = val;
+    emit tickColorOpacityChanged();
 }
 
 QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *nodeData)
@@ -181,7 +191,7 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         geometryNode->setMaterial(material);
 
         QColor color = m_minorTickColor;
-        color.setAlphaF(color.alphaF() * this->opacity());
+        color.setAlphaF(color.alphaF() * m_tickColorOpacity);
         material->setFlag(QSGMaterial::Blending);
         material->setColor(color);
 
@@ -236,7 +246,7 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         geometryNode->setMaterial(material);
 
         QColor color = m_majorTickColor;
-        color.setAlphaF(color.alphaF() * this->opacity());
+        color.setAlphaF(color.alphaF() * m_tickColorOpacity);
         material->setFlag(QSGMaterial::Blending);
         material->setColor(color);
 

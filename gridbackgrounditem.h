@@ -54,6 +54,11 @@ public:
     QColor majorTickColor() const { return m_majorTickColor; }
     Q_SIGNAL void majorTickColorChanged();
 
+    Q_PROPERTY(qreal tickColorOpacity READ tickColorOpacity WRITE setTickColorOpacity NOTIFY tickColorOpacityChanged)
+    void setTickColorOpacity(qreal val);
+    qreal tickColorOpacity() const { return m_tickColorOpacity; }
+    Q_SIGNAL void tickColorOpacityChanged();
+
 protected:
     // QQuickItem interface
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData);
@@ -61,6 +66,7 @@ protected:
 private:
     qreal m_tickDistance = 10;
     int   m_majorTickStride = 10;
+    qreal m_tickColorOpacity = 1.0;
     qreal m_minorTickLineWidth = 1;
     qreal m_majorTickLineWidth = 1;
     QColor m_minorTickColor = QColor("lightsteelblue");
