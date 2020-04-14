@@ -175,11 +175,9 @@ Rectangle {
         ScrollBar.horizontal: ScrollBar {
             policy: ScrollBar.AlwaysOn
             minimumSize: 0.1
-            property color handleNormalColor: Qt.rgba(0,0,0,0.5)
-            property color handlePressedColor: "black"
             palette {
-                mid: handleNormalColor
-                dark: handlePressedColor
+                mid: Qt.rgba(0,0,0,0.5)
+                dark: "black"
             }
         }
         FocusTracker.window: qmlWindow
@@ -198,9 +196,9 @@ Rectangle {
         EventFilter.events: [31]
         EventFilter.onFilter: {
             if(event.delta < 0)
-                contentX = Math.min(contentX+10, contentWidth-width)
+                contentX = Math.min(contentX+20, contentWidth-width)
             else
-                contentX = Math.max(contentX-10, 0)
+                contentX = Math.max(contentX-20, 0)
             result.acceptEvent = true
             result.filter = true
         }

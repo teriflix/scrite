@@ -98,6 +98,10 @@ Item {
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AlwaysOn
             minimumSize: 0.1
+            palette {
+                mid: Qt.rgba(0,0,0,0.5)
+                dark: "black"
+            }
         }
         model: scriteDocument.screenplay
         delegate: Loader {
@@ -185,7 +189,7 @@ Item {
 
             Row {
                 id: layout
-                width: parent.width-10
+                width: parent.width-20
                 height: Math.max(sceneTitleText.height, sceneEditor.height)
                 anchors.verticalCenter: parent.verticalCenter
 

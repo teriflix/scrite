@@ -27,6 +27,9 @@ AbstractTextDocumentExporter::~AbstractTextDocumentExporter()
 
 void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal pageWidth)
 {
+    // Refer to the following link to know about the standard formatting rules
+    // https://screenwriting.io/what-is-standard-screenplay-format/
+
     const ScreenplayFormat *screenplayFormat = this->document()->formatting();
     const Screenplay *screenplay = this->document()->screenplay();
     const int nrScreenplayElements = screenplay->elementCount();

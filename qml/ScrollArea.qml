@@ -31,10 +31,18 @@ Flickable {
     ScrollBar.horizontal: ScrollBar {
         policy: ScrollBar.AlwaysOn
         minimumSize: 0.1
+        palette {
+            mid: Qt.rgba(0,0,0,0.25)
+            dark: Qt.rgba(0,0,0,0.75)
+        }
     }
     ScrollBar.vertical: ScrollBar {
         policy: ScrollBar.AlwaysOn
         minimumSize: 0.1
+        palette {
+            mid: Qt.rgba(0,0,0,0.25)
+            dark: Qt.rgba(0,0,0,0.75)
+        }
     }
 
     function ensureItemVisible(item, scaling, leaveMargin) {
