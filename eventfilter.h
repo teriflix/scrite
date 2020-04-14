@@ -56,6 +56,12 @@ public:
 
     static EventFilter *qmlAttachedProperties(QObject *object);
 
+    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+    void setActive(bool val);
+    bool isActive() const { return m_active; }
+    Q_SIGNAL void activeChanged();
+
+
     Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
     void setTarget(QObject* val);
     QObject* target() const { return m_target; }
@@ -72,6 +78,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
+    bool m_active = true;
     QObject* m_target = nullptr;
     QList<int> m_events;
 };

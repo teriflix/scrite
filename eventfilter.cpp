@@ -53,9 +53,10 @@ void EventFilterResult::setAcceptEvent(bool val)
 ///////////////////////////////////////////////////////////////////////////////
 
 EventFilter::EventFilter(QObject *parent)
-    :QObject(parent), m_target(parent)
+    : QObject(parent), m_target(parent)
 {
-    parent->installEventFilter(this);
+    if(m_active)
+        parent->installEventFilter(this);
 }
 
 EventFilter::~EventFilter()
@@ -68,6 +69,23 @@ EventFilter *EventFilter::qmlAttachedProperties(QObject *object)
     return new EventFilter(object);
 }
 
+void EventFilter::setActive(bool val)
+{
+    if(m_active == val)
+        return;
+
+    m_active = val;
+    emit activeChanged();
+
+    if(m_target)
+    {
+        if(m_active)
+            m_target->installEventFilter(this);
+        else
+            m_target->removeEventFilter(this);
+    }
+}
+
 void EventFilter::setTarget(QObject *val)
 {
     if(m_target == val || val == nullptr)
@@ -78,7 +96,7 @@ void EventFilter::setTarget(QObject *val)
 
     m_target = val;
 
-    if(m_target)
+    if(m_target && m_active)
         m_target->installEventFilter(this);
 
     emit targetChanged();
@@ -141,6 +159,7 @@ inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
     object.insert("buttons", int(event->buttons()));
     object.insert("phase", int(event->phase()));
     object.insert("inverted", event->inverted());
+    object.insert("source", int(event->source()));
 }
 
 inline bool eventToJson(QEvent *event, QJsonObject &object)
@@ -186,7 +205,7 @@ inline bool eventToJson(QEvent *event, QJsonObject &object)
 }
 
 bool EventFilter::eventFilter(QObject *watched, QEvent *event)
-{
+{    
     const bool doFilter = m_events.isEmpty() || m_events.contains(event->type());
 
     if(doFilter)

@@ -118,10 +118,11 @@ Flickable {
         }
     }
 
+    // EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
     EventFilter.events: [31]
     EventFilter.onFilter: {
         if(event.modifiers & Qt.AltModifier || event.modifiers & Qt.ControlModifier) {
-            if(event.delta > 0)
+            if(event.delta < 0)
                 zoomScale = zoomScale*(1-scrollAreaSettings.zoomFactor)
             else
                 zoomScale = zoomScale*(1+scrollAreaSettings.zoomFactor)

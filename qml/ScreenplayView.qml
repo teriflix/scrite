@@ -196,6 +196,17 @@ Rectangle {
         moveDisplaced: moveAndDisplace
         move: moveAndDisplace
 
+        EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
+        EventFilter.events: [31]
+        EventFilter.onFilter: {
+            if(event.delta < 0)
+                contentX = Math.min(contentX+10, contentWidth-width)
+            else
+                contentX = Math.max(contentX-10, 0)
+            result.acceptEvent = true
+            result.filter = true
+        }
+
         footer: Item {
             property bool highlightAsDropArea: false
             width: screenplayElementList.width-2*screenplayElementList.minimumDelegateWidth
