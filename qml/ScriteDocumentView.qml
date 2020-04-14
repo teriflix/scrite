@@ -346,7 +346,7 @@ Item {
                             }
                             onTriggered: {
                                 if(reportName !== "")
-                                    scriteDocument.generateReport("", reportName)
+                                    scriteDocument.generateReport(reportName)
                                 reportName = ""
                             }
                         }
@@ -935,12 +935,9 @@ Item {
 
     Connections {
         target: scriteDocument
-        onRequestReportGeneratorConfiguration: {
-            modalDialog.initItemCallback = function(item) {
-                if(item)
-                    item.generator = reportGenerator
-            }
+        onGenerateReportRequest: {
             modalDialog.closeable = false
+            modalDialog.arguments = reportName
             modalDialog.sourceComponent = reportGeneratorConfigurationComponent
             modalDialog.popupSource = reportsButton
             modalDialog.active = true
@@ -950,6 +947,6 @@ Item {
     Component {
         id: reportGeneratorConfigurationComponent
 
-        ReportGeneratorConfiguration {  }
+        ReportGeneratorConfiguration { }
     }
 }

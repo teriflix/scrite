@@ -225,6 +225,9 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
             QTextTable *dialogueTable = nullptr;
             bool sceneInfoWritten = false;
             Scene *scene = screenplay->elementAt(i)->scene();
+            if(scene == nullptr)
+                continue;
+
             const int nrElements = scene->elementCount();
             for(int j=0; j<nrElements; j++)
             {

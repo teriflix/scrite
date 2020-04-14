@@ -29,7 +29,7 @@ AbstractReportGenerator::AbstractReportGenerator(QObject *parent)
 
 AbstractReportGenerator::~AbstractReportGenerator()
 {
-
+    emit aboutToDelete(this);
 }
 
 void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
@@ -45,7 +45,7 @@ QString AbstractReportGenerator::name() const
 {
     const int ciIndex = this->metaObject()->indexOfClassInfo("Title");
     if(ciIndex >= 0)
-        return QString::fromLatin1(this->metaObject()->classInfo(ciIndex).name());
+        return QString::fromLatin1(this->metaObject()->classInfo(ciIndex).value());
 
     return QString("Report");
 }
@@ -103,6 +103,10 @@ bool AbstractReportGenerator::generate()
     }
 
     this->progress()->finish();
+
+    m_success = true;
+
+    GarbageCollector::instance()->add(this);
 
     return ret;
 }

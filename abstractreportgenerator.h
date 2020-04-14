@@ -15,6 +15,7 @@
 #define ABSTRACTREPORTGENERATOR_H
 
 #include "abstractdeviceio.h"
+#include "garbagecollector.h"
 
 #include <QEventLoop>
 #include <QTextDocument>
@@ -25,6 +26,7 @@ class AbstractReportGenerator : public AbstractDeviceIO
 
 public:
     ~AbstractReportGenerator();
+    Q_SIGNAL void aboutToDelete(AbstractReportGenerator *gen);
 
     enum Format
     {
@@ -40,6 +42,8 @@ public:
     Q_PROPERTY(QString name READ name CONSTANT)
     QString name() const;
 
+    bool isReportGenerated() const { return m_success; }
+
     Q_INVOKABLE bool generate();
 
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
@@ -53,10 +57,8 @@ public:
     }
 
     Q_INVOKABLE QJsonObject configurationFormInfo() const;
-    Q_INVOKABLE void accept() { m_eventLoop.exit(0); }
-    Q_INVOKABLE void reject() { m_eventLoop.exit(1); }
-    Q_INVOKABLE bool isInExec() const { return m_eventLoop.isRunning(); }
-    Q_INVOKABLE bool exec() { return m_eventLoop.exec() == 0; }
+
+    Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
 
 protected:
     // AbstractDeviceIO interface
@@ -67,6 +69,7 @@ protected:
     virtual bool doGenerate(QTextDocument *document) = 0;
 
 private:
+    bool m_success = false;
     Format m_format = AdobePDF;
     QEventLoop m_eventLoop;
 };

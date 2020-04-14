@@ -25,7 +25,7 @@ public:
     Q_INVOKABLE LocationReportGenerator(QObject *parent=nullptr);
     ~LocationReportGenerator();
 
-    bool requiresConfiguration() const { return false; }
+    bool requiresConfiguration() const { return true; }
 
 protected:
     // AbstractReportGenerator interface

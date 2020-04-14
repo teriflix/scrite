@@ -377,49 +377,26 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     return false;
 }
 
-bool ScriteDocument::generateReport(const QString &fileName, const QString &report)
+AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)
 {
-    m_errorReport->clear();
-
     const QByteArray reportKey = report.toLatin1();
-    QScopedPointer<AbstractReportGenerator> reportGenerator( deviceIOFactories->ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this) );
-
-    if(reportGenerator.isNull())
+    AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this);
+    if(reportGenerator && reportGenerator->fileName().isEmpty())
     {
-        m_errorReport->setErrorMessage("Cannot export to this format.");
-        return false;
-    }
+        reportGenerator->setDocument(this);
 
-    Aggregation aggregation;
-    m_errorReport->setProxyFor(aggregation.findErrorReport(reportGenerator.data()));
-    m_progressReport->setProxyFor(aggregation.findProgressReport(reportGenerator.data()));
-
-    reportGenerator->setFileName(fileName);
-    reportGenerator->setDocument(this);
-
-    if(reportGenerator->requiresConfiguration())
-    {
-        emit requestReportGeneratorConfiguration(reportGenerator.data());
-        if(!reportGenerator->exec())
-            return false;
-    }
-    else if(reportGenerator->fileName().isEmpty())
-    {
+        const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
+        const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString("d MMM yyyy, hh:mm") + suffix;
+
         QFileInfo fi(m_fileName);
         if(fi.exists())
-            reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + "-Report-" + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix) );
+            reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + " - " + suggestedName) );
         else
-            reportGenerator->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + fi.baseName() + "-Report-" + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix );
+            reportGenerator->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
     }
 
-    HourGlass hourGlass;
-    if(!reportGenerator->generate())
-        return false;
-
-    Application::instance()->revealFileOnDesktop(reportGenerator->fileName());
-
-    return true;
+    return reportGenerator;
 }
 
 void ScriteDocument::timerEvent(QTimerEvent *event)

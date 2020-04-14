@@ -22,7 +22,26 @@ Item {
     property var formInfo: generator ? generator.configurationFormInfo() : {"title": "Unknown", "fields": []}
 
     width: 700
-    height: 700
+    height: formInfo.fields.length > 0 ? 700 : 275
+
+    Component.onCompleted: {
+        generator = scriteDocument.createReportGenerator(modalDialog.arguments)
+        if(generator === null) {
+            modalDialog.closeable = true
+            notice.text = "Report generator for '" + modalDialog.arguments + "' could not be created."
+        }
+        modalDialog.arguments = undefined
+    }
+
+    Text {
+        id: notice
+        anchors.centerIn: parent
+        visible: generator === null
+        font.pixelSize: 32
+        width: parent.width*0.85
+        wrapMode: Text.WordWrap
+        horizontalAlignment: Text.AlignHCenter
+    }
 
     Loader {
         anchors.fill: parent
@@ -46,8 +65,7 @@ Item {
                         return "Adobe PDF (*.pdf)"
                     return "Open Document Format (*.odt)"
                 }
-
-                onAccepted: filePathField.text = app.urlToLocalFile(fileUrl)
+                onAccepted: generator.fileName = app.urlToLocalFile(fileUrl)
             }
 
             ScrollView {
@@ -64,7 +82,8 @@ Item {
                     spacing: 10
 
                     Text {
-                        font.pointSize: 20
+                        font.pointSize: 30
+                        font.bold: true
                         text: formInfo.title
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -86,15 +105,7 @@ Item {
                                 id: filePathField
                                 readOnly: true
                                 width: parent.width - filePathDialogButton.width - parent.spacing
-                                property string suffix: "." + (generator.format === AbstractReportGenerator.AdobePDF ? "pdf" : "odt")
-                                text: {
-                                    if(scriteDocument.fileName !== "") {
-                                        var fileInfo = app.fileInfo(scriteDocument.fileName)
-                                        if(fileInfo.exists)
-                                            return fileInfo.absolutePath + "/" + fileInfo.baseName + "-" + generator.name + "-" + (new Date()).getTime() + suffix
-                                    }
-                                    return StandardPaths.writableLocation(StandardPaths.DocumentsLocation) + "/scrite-" + generator.name + "-" + (new Date()).getTime() + suffix
-                                }
+                                text: generator.fileName
                             }
 
                             ToolButton2 {
@@ -152,7 +163,7 @@ Item {
                 Button {
                     text: "Cancel"
                     onClicked: {
-                        generator.reject()
+                        generator.discard()
                         modalDialog.close()
                     }
 
@@ -160,10 +171,10 @@ Item {
                     EventFilter.events: [6]
                     EventFilter.onFilter: {
                         if(event.key === Qt.Key_Escape) {
-                            generator.reject()
-                            modalDialog.close()
                             result.acceptEvent = true
                             result.filter = true
+                            generator.discard()
+                            modalDialog.close()
                         }
                     }
                 }
@@ -172,13 +183,12 @@ Item {
                     enabled: filePathField.text !== ""
                     text: "Generate"
                     onClicked: {
-                        generator.fileName = filePathField.text
-                        generator.accept()
+                        if(generator.generate())
+                            app.revealFileOnDesktop(generator.fileName)
                         modalDialog.close()
                     }
                 }
             }
-
         }
     }
 

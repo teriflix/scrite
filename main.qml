@@ -103,6 +103,7 @@ Rectangle {
             active = false
             closeable = true
         }
+        property var arguments
         property var initItemCallback
         onDialogItemChanged: {
             if(initItemCallback)

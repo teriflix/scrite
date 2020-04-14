@@ -95,8 +95,12 @@ public:
 
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
     Q_INVOKABLE bool exportFile(const QString &fileName, const QString &format);
-    Q_INVOKABLE bool generateReport(const QString &fileName, const QString &report);
-    Q_SIGNAL void requestReportGeneratorConfiguration(AbstractReportGenerator *reportGenerator);
+    Q_INVOKABLE void generateReport(const QString &report) {
+        emit generateReportRequest(report);
+    }
+    Q_SIGNAL void generateReportRequest(const QString &reportName);
+
+    Q_INVOKABLE AbstractReportGenerator *createReportGenerator(const QString &report);
 
     Q_PROPERTY(QJsonArray structureElementSequence READ structureElementSequence NOTIFY structureElementSequenceChanged)
     QJsonArray structureElementSequence() const { return m_structureElementSequence; }
