@@ -214,8 +214,8 @@ Item {
                 }
 
                 ToolButton2 {
-                    shortcut: app.platform === Application.MacOS ? "Ctrl+Shift+Z" : "Ctrl+Y"
-                    shortcutText: app.platform === Application.MacOS ? "Shift+Z" : "Y"
+                    shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y"
+                    shortcutText: app.isMacOSPlatform ? "Shift+Z" : "Y"
                     icon.source: "../icons/content/redo.png"
                     enabled: app.canRedo
                     onClicked: app.undoGroup.redo()
