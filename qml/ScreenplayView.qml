@@ -163,8 +163,9 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.margins: 10
         anchors.leftMargin: 3
+        anchors.topMargin: 10
+        anchors.rightMargin: 10
         clip: true
         visible: count > 0
         model: scriteDocument.screenplay
@@ -173,7 +174,16 @@ Rectangle {
         property bool moveMode: false
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
-        ScrollBar.horizontal: ScrollBar { }
+        ScrollBar.horizontal: ScrollBar {
+            policy: ScrollBar.AlwaysOn
+            minimumSize: 0.1
+            property color handleNormalColor: Qt.rgba(0,0,0,0.5)
+            property color handlePressedColor: "black"
+            palette {
+                mid: handleNormalColor
+                dark: handlePressedColor
+            }
+        }
         FocusTracker.window: qmlWindow
         FocusTracker.indicator.target: structureScreenplayUndoStack
         FocusTracker.indicator.property: "screenplayViewHasFocus"
@@ -208,7 +218,7 @@ Rectangle {
             property color sceneColor: element.scene ? element.scene.color : "white"
             width: isBreakElement ? 60 :
                                     Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
-            height: screenplayElementList.height
+            height: screenplayElementList.height-10
 
             Loader {
                 anchors.fill: parent
@@ -230,21 +240,22 @@ Rectangle {
                         anchors.margins: 5
 
                         Text {
-                            width: elementItemDelegate.isBreakElement ? parent.height : parent.width
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignTop
-                            wrapMode: isBreakElement ? Text.NoWrap : Text.WrapAnywhere
-                            elide: Text.ElideRight
-                            font.pixelSize: isBreakElement ? 18 : 15
-                            font.bold: isBreakElement
-                            font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
                             lineHeight: 1.25
                             text: sceneTitle
-                            visible: isBreakElement ? true : width >= 80
+                            elide: Text.ElideRight
                             anchors.centerIn: parent
-                            rotation: isBreakElement ? -90 : 0
+                            font.bold: isBreakElement
                             transformOrigin: Item.Center
+                            verticalAlignment: Text.AlignTop
+                            rotation: isBreakElement ? -90 : 0
+                            horizontalAlignment: Text.AlignHCenter
                             maximumLineCount: isBreakElement ? 1 : 4
+                            font.pixelSize: isBreakElement ? 18 : 15
+                            visible: isBreakElement ? true : width >= 80
+                            wrapMode: isBreakElement ? Text.NoWrap : Text.WrapAnywhere
+                            font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
+                            width: elementItemDelegate.isBreakElement ? parent.height : parent.width
+                            height: elementItemDelegate.isBreakElement ? contentHeight : parent.height
                         }
                     }
 
