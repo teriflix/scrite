@@ -89,6 +89,7 @@ Flickable {
     }
 
     property real zoomScale: 1
+
     onZoomScaleChanged: {
         var visibleArea = Qt.rect(contentX, contentY, width, height)
         var mousePoint = app.mapGlobalPositionToItem(contentItem, app.cursorPosition())
@@ -121,9 +122,9 @@ Flickable {
     EventFilter.onFilter: {
         if(event.modifiers & Qt.AltModifier || event.modifiers & Qt.ControlModifier) {
             if(event.delta > 0)
-                zoomScale = zoomScale*0.99
+                zoomScale = zoomScale*(1-scrollAreaSettings.zoomFactor)
             else
-                zoomScale = zoomScale*1.01
+                zoomScale = zoomScale*(1+scrollAreaSettings.zoomFactor)
             result.acceptEvent = true
             result.filter = true
         }

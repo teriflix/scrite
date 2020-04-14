@@ -127,6 +127,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<FocusTracker>("Scrite", 1, 0, "FocusTracker", reason);
     qmlRegisterUncreatableType<FocusTrackerIndicator>("Scrite", 1, 0, "FocusTrackerIndicator", reason);
 
+    qmlRegisterUncreatableType<Application>("Scrite", 1, 0, "Application", reason);
     qmlRegisterType<Annotation>("Scrite", 1, 0, "Annotation");
     qmlRegisterType<DelayedPropertyBinder>("Scrite", 1, 0, "DelayedPropertyBinder");
 

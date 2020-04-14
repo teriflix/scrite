@@ -13,6 +13,7 @@
 
 import Scrite 1.0
 import QtQuick 2.13
+import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtGraphicalEffects 1.0
 
@@ -55,6 +56,13 @@ Rectangle {
             color: parent.color
             opacity: 0.6 * (parent.radius/parent.maxRadius)
         }
+    }
+
+    Settings {
+        id: scrollAreaSettings
+        fileName: app.settingsFilePath
+        category: "ScrollArea"
+        property real zoomFactor: 0.05
     }
 
     function askQuestion(params, popupSource) {

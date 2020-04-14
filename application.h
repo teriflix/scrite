@@ -52,6 +52,31 @@ public:
     Q_PROPERTY(Platform platform READ platform CONSTANT)
     Platform platform() const;
 
+    Q_PROPERTY(bool isMacOSPlatform READ isMacOSPlatform CONSTANT)
+#ifdef Q_OS_MAC
+    bool isMacOSPlatform() const { return true; }
+#else
+    bool isMacOSPlatform() const { return false; }
+#endif
+
+    Q_PROPERTY(bool isWindowsPlatform READ isWindowsPlatform CONSTANT)
+#ifdef Q_OS_WIN
+    bool isWindowsPlatform() const { return true; }
+#else
+    bool isWindowsPlatform() const { return false; }
+#endif
+
+    Q_PROPERTY(bool isLinuxPlatform READ isLinuxPlatform CONSTANT)
+#ifdef Q_OS_MAC
+    bool isLinuxPlatform() const { return false; }
+#else
+#ifdef Q_OS_UNIX
+    bool isLinuxPlatform() const { return true; }
+#else
+    bool isLinuxPlatform() const { return false; }
+#endif
+#endif
+
     Q_PROPERTY(QString controlKey READ controlKey CONSTANT)
     QString controlKey() const;
 

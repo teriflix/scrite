@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
@@ -590,6 +591,29 @@ Item {
                                     }
                                     onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
                                 }
+                            }
+                        }
+
+                        Row {
+                            spacing: 10
+                            width: parent.width
+                            visible: app.isWindowsPlatform || app.isLinuxPlatform
+
+                            Text {
+                                id: wzfText
+                                text: "Zoom Speed"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Slider {
+                                anchors.verticalCenter: parent.verticalCenter
+                                from: 1
+                                to: 20
+                                snapMode: Slider.SnapAlways
+                                value: scrollAreaSettings.zoomFactor * 100
+                                orientation: Qt.Horizontal
+                                width: parent.width-wzfText.width-parent.spacing
+                                onMoved: scrollAreaSettings.zoomFactor = value / 100
                             }
                         }
 
