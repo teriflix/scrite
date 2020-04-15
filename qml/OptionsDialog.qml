@@ -623,26 +623,90 @@ Item {
                             }
                         }
 
-                        Row {
-                            spacing: 10
+                        GroupBox {
                             width: parent.width
-                            visible: app.isWindowsPlatform || app.isLinuxPlatform
 
-                            Text {
-                                id: wzfText
-                                text: "Zoom Speed"
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
+                            Column {
+                                width: parent.width
+                                spacing: 10
 
-                            Slider {
-                                anchors.verticalCenter: parent.verticalCenter
-                                from: 1
-                                to: 20
-                                snapMode: Slider.SnapAlways
-                                value: scrollAreaSettings.zoomFactor * 100
-                                orientation: Qt.Horizontal
-                                width: parent.width-wzfText.width-parent.spacing
-                                onMoved: scrollAreaSettings.zoomFactor = value / 100
+                                CheckBox {
+                                    checkable: true
+                                    checked: structureCanvasSettings.showGrid
+                                    text: "Show Grid in Structure Tab"
+                                    onToggled: structureCanvasSettings.showGrid = checked
+                                }
+
+                                // Colors
+                                Row {
+                                    spacing: 10
+                                    width: parent.width
+
+                                    Text {
+                                        font.pixelSize: 14
+                                        text: "Background Color"
+                                        horizontalAlignment: Text.AlignRight
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Rectangle {
+                                        border.width: 1
+                                        border.color: "black"
+                                        width: 30; height: 30
+                                        color: structureCanvasSettings.canvasColor
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: structureCanvasSettings.canvasColor = app.pickColor(structureCanvasSettings.canvasColor)
+                                        }
+                                    }
+
+                                    Text {
+                                        text: "Grid Color"
+                                        font.pixelSize: 14
+                                        horizontalAlignment: Text.AlignRight
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Rectangle {
+                                        border.width: 1
+                                        border.color: "black"
+                                        width: 30; height: 30
+                                        color: structureCanvasSettings.gridColor
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: structureCanvasSettings.gridColor = app.pickColor(structureCanvasSettings.gridColor)
+                                        }
+                                    }
+                                }
+
+                                Row {
+                                    spacing: 10
+                                    width: parent.width
+                                    visible: app.isWindowsPlatform || app.isLinuxPlatform
+
+                                    Text {
+                                        id: wzfText
+                                        text: "Zoom Speed"
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Slider {
+                                        from: 1
+                                        to: 20
+                                        orientation: Qt.Horizontal
+                                        snapMode: Slider.SnapAlways
+                                        value: scrollAreaSettings.zoomFactor * 100
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width-wzfText.width-parent.spacing
+                                        onMoved: scrollAreaSettings.zoomFactor = value / 100
+                                    }
+                                }
                             }
                         }
 

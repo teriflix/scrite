@@ -59,11 +59,17 @@ public:
     qreal tickColorOpacity() const { return m_tickColorOpacity; }
     Q_SIGNAL void tickColorOpacityChanged();
 
+    Q_PROPERTY(bool gridIsVisible READ gridIsVisible WRITE setGridIsVisible NOTIFY gridIsVisibleChanged)
+    void setGridIsVisible(bool val);
+    bool gridIsVisible() const { return m_gridIsVisible; }
+    Q_SIGNAL void gridIsVisibleChanged();
+
 protected:
     // QQuickItem interface
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData);
 
 private:
+    bool m_gridIsVisible = true;
     qreal m_tickDistance = 10;
     int   m_majorTickStride = 10;
     qreal m_tickColorOpacity = 1.0;

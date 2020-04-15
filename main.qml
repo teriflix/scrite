@@ -65,6 +65,16 @@ Rectangle {
         property real zoomFactor: 0.05
     }
 
+    Settings {
+        id: structureCanvasSettings
+        fileName: app.settingsFilePath
+        category: "Structure Canvas"
+
+        property bool showGrid: true
+        property color gridColor: "darkgray"
+        property color canvasColor: "#F8ECC2"
+    }
+
     function askQuestion(params, popupSource) {
         var okCallback = function() {
             if(params.callback)

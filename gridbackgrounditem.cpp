@@ -107,6 +107,19 @@ void GridBackgroundItem::setTickColorOpacity(qreal val)
 
     m_tickColorOpacity = val;
     emit tickColorOpacityChanged();
+
+    this->update();
+}
+
+void GridBackgroundItem::setGridIsVisible(bool val)
+{
+    if(m_gridIsVisible == val)
+        return;
+
+    m_gridIsVisible = val;
+    emit gridIsVisibleChanged();
+
+    this->update();
 }
 
 QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *nodeData)
@@ -114,6 +127,10 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
     if(oldNode)
         delete oldNode;
     Q_UNUSED(nodeData)
+
+    QSGNode *rootNode = new QSGNode;
+    if( !m_gridIsVisible || qFuzzyIsNull(m_tickColorOpacity) )
+        return rootNode;
 
     const qreal w = this->width();
     const qreal h = this->height();
@@ -125,8 +142,6 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
     const int nrYMinorTicks = nrYTicks - nrYMajorTicks;
     const int nrMinorTicks = nrXMinorTicks + nrYMinorTicks;
     const int nrMajorTicks = nrXMajorTicks + nrYMajorTicks;
-
-    QSGNode *rootNode = new QSGNode;
 
     {
         QSGNode *minorTicksNode = new QSGOpacityNode;

@@ -82,7 +82,7 @@ Item {
 
     Rectangle {
         anchors.fill: canvasScroll
-        color: "#F8ECC2"
+        color: structureCanvasSettings.canvasColor
         opacity: 0.4
     }
 
@@ -101,16 +101,17 @@ Item {
 
         GridBackground {
             id: canvas
-            width: widthBinder.get
-            height: heightBinder.get
-            scale: canvasScroll.suggestedScale
-            majorTickColor: "darkgray"
-            minorTickColor: "gray"
+            antialiasing: false
             majorTickLineWidth: 5
             minorTickLineWidth: 1
-            tickDistance: scriteDocument.structure.canvasGridSize
-            antialiasing: false
+            width: widthBinder.get
+            height: heightBinder.get
             tickColorOpacity: 0.5 * scale
+            scale: canvasScroll.suggestedScale
+            gridIsVisible: structureCanvasSettings.showGrid
+            majorTickColor: structureCanvasSettings.gridColor
+            tickDistance: scriteDocument.structure.canvasGridSize
+            minorTickColor: structureCanvasSettings.gridColor
 
             transformOrigin: Item.TopLeft
 
