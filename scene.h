@@ -46,54 +46,32 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    enum LocationType { NoLocationType=-1, Interior, Exterior, Both };
-    Q_ENUMS(LocationType)
-    Q_PROPERTY(LocationType locationType READ locationType WRITE setLocationType NOTIFY locationTypeChanged)
-    void setLocationType(LocationType val);
-    LocationType locationType() const { return m_locationType; }
+    Q_PROPERTY(QString locationType READ locationType WRITE setLocationType NOTIFY locationTypeChanged)
+    void setLocationType(const QString &val);
+    QString locationType() const { return m_locationType; }
     Q_SIGNAL void locationTypeChanged();
-
-    Q_PROPERTY(QString locationTypeAsString READ locationTypeAsString NOTIFY locationTypeChanged)
-    QString locationTypeAsString() const;
-
-    static QMap<LocationType,QString> locationTypeStringMap();
 
     Q_PROPERTY(QString location READ location WRITE setLocation NOTIFY locationChanged)
     void setLocation(const QString &val);
     QString location() const { return m_location; }
     Q_SIGNAL void locationChanged();
 
-    enum Moment
-    {
-        NoMoment=-1,
-        Day, Night,
-        Morning, Afternoon, Evening,
-        Later, MomentsLater,
-        Continuous, TheNextDay,
-        Earlier, MomentsEarlier,
-        ThePreviousDay
-    };
-    Q_ENUM(Moment)
-    Q_PROPERTY(Moment moment READ moment WRITE setMoment NOTIFY momentChanged)
-    void setMoment(Moment val);
-    Moment moment() const { return m_moment; }
+    Q_PROPERTY(QString moment READ moment WRITE setMoment NOTIFY momentChanged)
+    void setMoment(const QString &val);
+    QString moment() const { return m_moment; }
     Q_SIGNAL void momentChanged();
 
-    Q_PROPERTY(QString momentAsString READ momentAsString NOTIFY momentChanged)
-    QString momentAsString() const;
-
-    static QMap<Moment,QString> momentStringMap();
-
+    Q_PROPERTY(QString text READ toString NOTIFY textChanged)
     QString toString() const;
+    Q_SIGNAL void textChanged();
 
 private:
-    Scene* m_scene = nullptr;
     bool m_enabled = true;
-    char m_padding[3];
-    Moment m_moment = Day;
+    char m_padding[7];
+    Scene* m_scene = nullptr;
+    QString m_moment = "DAY";
     QString m_location = "Somewhere";
-    LocationType m_locationType = Exterior;
-    char m_padding2[4];
+    QString m_locationType = "EXT";
 };
 
 class SceneElement : public QObject

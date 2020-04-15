@@ -349,88 +349,52 @@ Item {
 
             Component.onDestruction: scene.heading.location = locationEdit.text
 
-            ComboBox {
-                id: locationTypeCombo
-                model: ListModel {
-                    ListElement { value: SceneHeading.NoLocationType; display: "NONE" }
-                    ListElement { value: SceneHeading.Interior; display: "INT" }
-                    ListElement { value: SceneHeading.Exterior; display: "EXT" }
-                    ListElement { value: SceneHeading.Both; display: "I/E" }
-                }
-                textRole: "display"
-                editable: false
-                currentIndex: scene.heading.locationType+1
-                anchors.verticalCenter: parent.verticalCenter
+            TextViewEdit {
+                id: locationTypeEdit
+                text: scene.heading.locationType
                 font: headingFont
-                onActivated: scene.heading.locationType = model.get(index).value
+                width: Math.max(contentWidth, 80)
+                readOnly: false
+                frameVisible: true
+                completionStrings: scriteDocument.structure.standardLocationTypes()
+                onEditingFinished: scene.heading.locationType = text
+                horizontalAlignment: Qt.AlignLeft
+                anchors.verticalCenter: parent.verticalCenter
+                KeyNavigation.priority: KeyNavigation.BeforeItem
+                KeyNavigation.tab: locationEdit.item
+                KeyNavigation.backtab: momentEdit.item
             }
 
-            TextEdit {
+            TextViewEdit {
                 id: locationEdit
-                width: parent.width - locationTypeCombo.width - momentCombo.width - 2*parent.spacing
-                text: scene.heading.location
-                anchors.verticalCenter: parent.verticalCenter
                 font: headingFont
-                onActiveFocusChanged: {
-                    if(activeFocus)
-                        selectAll()
-                }
+                text: scene.heading.location
+                width: parent.width - locationTypeEdit.width - momentEdit.width - 2*parent.spacing
+                readOnly: false
+                frameVisible: true
+                completionStrings: scriteDocument.structure.allLocations()
                 onEditingFinished: scene.heading.location = text
-                Transliterator.textDocument: textDocument
-                Transliterator.cursorPosition: cursorPosition
-                Transliterator.hasActiveFocus: activeFocus
-                Keys.onReturnPressed: editingFinished()
-
-                Item {
-                    x: parent.cursorRectangle.x
-                    y: parent.cursorRectangle.y
-                    width: parent.cursorRectangle.width
-                    height: parent.cursorRectangle.height
-                    ToolTip.visible: locationCompleter.hasSuggestion
-                    ToolTip.text: locationCompleter.suggestion
-                    visible: parent.cursorVisible
-                }
-
-                Keys.onTabPressed: {
-                    if(locationCompleter.hasSuggestion) {
-                        locationEdit.text = locationCompleter.suggestion
-                        locationEdit.cursorPosition = locationEdit.length
-                        editingFinished()
-                    }
-                }
-
-                Completer {
-                    id: locationCompleter
-                    strings: scriteDocument.structure.allLocations()
-                    suggestionMode: Completer.CompleteSuggestion
-                    completionPrefix: locationEdit.text
-                }
+                horizontalAlignment: Qt.AlignLeft
+                anchors.verticalCenter: parent.verticalCenter
+                KeyNavigation.priority: KeyNavigation.BeforeItem
+                KeyNavigation.tab: momentEdit.item
+                KeyNavigation.backtab: locationTypeEdit.item
             }
 
-            ComboBox {
-                id: momentCombo
-                model: ListModel {
-                    ListElement { value: SceneHeading.NoMoment; display: "NONE" }
-                    ListElement { value: SceneHeading.Day; display: "DAY" }
-                    ListElement { value: SceneHeading.Night; display: "NIGHT" }
-                    ListElement { value: SceneHeading.Morning; display: "MORNING" }
-                    ListElement { value: SceneHeading.Afternoon; display: "AFTERNOON" }
-                    ListElement { value: SceneHeading.Evening; display: "EVENING" }
-                    ListElement { value: SceneHeading.Later; display: "LATER" }
-                    ListElement { value: SceneHeading.MomentsLater; display: "MOMENTS LATER" }
-                    ListElement { value: SceneHeading.Continuous; display: "CONTINUOUS" }
-                    ListElement { value: SceneHeading.TheNextDay; display: "THE NEXT DAY" }
-                    ListElement { value: SceneHeading.Earlier; display: "EARLIER" }
-                    ListElement { value: SceneHeading.MomentsEarlier; display: "MOMENTS EARLIER" }
-                    ListElement { value: SceneHeading.ThePreviousDay; display: "THE PREVIOUS DAY" }
-                }
-                textRole: "display"
-                editable: false
-                currentIndex: scene.heading.moment+1
-                anchors.verticalCenter: parent.verticalCenter
+            TextViewEdit {
+                id: momentEdit
                 font: headingFont
-                onActivated: scene.heading.moment = model.get(index).value
-                width: app.textBoundingRect("THE PREVIOUS DAY", font).width + 50
+                text: scene.heading.moment
+                width: Math.max(contentWidth, 150)
+                readOnly: false
+                frameVisible: true
+                anchors.verticalCenter: parent.verticalCenter
+                horizontalAlignment: Qt.AlignLeft
+                completionStrings: scriteDocument.structure.standardMoments()
+                onEditingFinished: scene.heading.moment = text
+                KeyNavigation.priority: KeyNavigation.BeforeItem
+                KeyNavigation.tab: locationTypeEdit.item
+                KeyNavigation.backtab: locationEdit.item
             }
         }
     }
@@ -443,32 +407,14 @@ Item {
             property font headingFont: sceneHeadingFormat.font
             Component.onCompleted: headingFont.pointSize = headingFont.pointSize+8
 
-            Row {
-                anchors.fill: parent
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
-                spacing: 30
-
-                Text {
-                    id: locationTypeText
-                    text: scene.heading.locationTypeAsString
-                    font: headingFont
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    text: scene.heading.location
-                    font: headingFont
-                    width: parent.width - locationTypeText.width - momentText.width - 2*parent.spacing
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    id: momentText
-                    text: scene.heading.momentAsString
-                    font: headingFont
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+                font: parent.headingFont
+                text: scene.heading.text
+                anchors.verticalCenter: parent.verticalCenter
             }
 
             MouseArea {

@@ -32,6 +32,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
     const Structure *structure = this->document()->structure();
+    QStringList moments = structure->standardMoments();
+    QStringList locationTypes = structure->standardLocationTypes();
+
     const int nrElements = screenplay->elementCount();
     if(screenplay->elementCount() == 0)
     {
@@ -76,6 +79,12 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             paragraphE.setAttribute("Type", "Scene Heading");
             addTextToParagraph(paragraphE, heading->toString());
             locations.append(heading->location());
+
+            if(!locationTypes.contains(heading->locationType()))
+                locationTypes.append(heading->locationType());
+
+            if(!moments.contains(heading->moment()))
+                moments.append(heading->moment());
         }
 
         const int nrSceneElements = scene->elementCount();
@@ -115,7 +124,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement timesOfDayE = doc.createElement("TimesOfDay");
     smartTypeE.appendChild(timesOfDayE);
     timesOfDayE.setAttribute("Separator", " - ");
-    const QStringList moments = SceneHeading::momentStringMap().values();
+    std::sort(moments.begin(), moments.end());
     Q_FOREACH(QString moment, moments)
     {
         QDomElement timeOfDayE = doc.createElement("TimeOfDay");
@@ -123,7 +132,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         timeOfDayE.appendChild(doc.createTextNode(moment));
     }
 
-    static const QStringList locationTypes = QStringList() << "INT" << "EXT" << "I/E";
+    std::sort(locationTypes.begin(), locationTypes.end());
     QDomElement sceneIntrosE = doc.createElement("SceneIntros");
     smartTypeE.appendChild(sceneIntrosE);
     sceneIntrosE.setAttribute("Separator", ". ");

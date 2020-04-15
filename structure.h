@@ -82,7 +82,8 @@ public:
     QPointF position() const { return QPointF(m_x,m_y); }
 
     Q_SIGNAL void elementChanged();
-    Q_SIGNAL void sceneHeadingLocationChanged();
+    Q_SIGNAL void sceneHeadingChanged();
+    Q_SIGNAL void sceneLocationChanged();
 
 protected:
     bool event(QEvent *event);
@@ -253,6 +254,9 @@ public:
     Q_INVOKABLE int indexOfElement(StructureElement *element) const;
     Q_INVOKABLE StructureElement *findElementBySceneID(const QString &id) const;
 
+    Q_INVOKABLE QStringList standardLocationTypes() const;
+    Q_INVOKABLE QStringList standardMoments() const;
+
     Q_INVOKABLE QStringList allLocations() const { return m_locationHeadingsMap.keys(); }
     QMap< QString, QList<SceneHeading*> > locationHeadingsMap() const { return m_locationHeadingsMap; }
 
@@ -312,8 +316,8 @@ private:
     int m_currentElementIndex;
     qreal m_zoomLevel = 1.0;
 
-    void updateLocationHeadingsMap();
-    void updateLocationHeadingsMapLater();
+    void updateLocationHeadingMap();
+    void updateLocationHeadingMapLater();
     QBasicTimer m_locationHeadingsMapTimer;
     QMap< QString, QList<SceneHeading*> > m_locationHeadingsMap;
 

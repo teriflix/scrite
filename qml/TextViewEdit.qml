@@ -27,6 +27,9 @@ Loader {
     property SearchEngine searchEngine
     property int searchSequenceNumber: -1
     property bool hasFocus: item.activeFocus
+    property var completionStrings: []
+    property real contentWidth: fontMetrics.advanceWidth(text)
+    property bool frameVisible: false
 
     signal textEdited(string text)
     signal editingFinished()
@@ -73,6 +76,7 @@ Loader {
         id: textEditComponent
 
         TextArea {
+            id: textArea
             text: textViewEdit.text
             font: textViewEdit.font
             palette: app.palette
@@ -80,18 +84,59 @@ Loader {
             horizontalAlignment: textViewEdit.horizontalAlignment
             verticalAlignment: textViewEdit.verticalAlignment
             onTextChanged: textViewEdit.textEdited(text)
-            Keys.onReturnPressed: editingFinished()
+            background: Rectangle {
+                visible: frameVisible
+                border.width: 1
+                border.color: "black"
+            }
+            opacity: activeFocus ? 1 : 0.5
+
             Component.onCompleted: {
                 selectAll()
                 forceActiveFocus()
             }
-            onEditingFinished: textViewEdit.editingFinished()
+
+            Component.onDestruction: {
+                textViewEdit.text = text
+                textViewEdit.editingFinished()
+            }
+
+            onEditingFinished: {
+                textViewEdit.text = text
+                textViewEdit.editingFinished()
+            }
+
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
-            Keys.onPressed: {
-                if(event.key === Qt.Key_Escape)
-                    editingFinished()
+
+            Completer {
+                id: completer
+                strings: completionStrings
+                suggestionMode: Completer.CompleteSuggestion
+                completionPrefix: textArea.text
+            }
+
+            Item {
+                x: parent.cursorRectangle.x
+                y: parent.cursorRectangle.y
+                width: parent.cursorRectangle.width
+                height: parent.cursorRectangle.height
+                ToolTip.visible: completer.hasSuggestion && parent.cursorVisible
+                ToolTip.text: completer.suggestion
+                visible: parent.cursorVisible
+            }
+
+            Keys.onEscapePressed: {
+                editingFinished()
+            }
+
+            Keys.onReturnPressed: {
+                if(completer.hasSuggestion) {
+                    textArea.text = completer.suggestion
+                    textArea.cursorPosition = textArea.length
+                }
+                editingFinished()
             }
         }
     }

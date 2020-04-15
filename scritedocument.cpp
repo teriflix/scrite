@@ -140,9 +140,9 @@ Scene *ScriteDocument::createNewScene()
     scene->setColor(activeScene ? activeScene->color() : QColor("blue"));
     scene->setTitle("[" + QString::number(m_structure->elementCount()+1) + "] - Scene");
     scene->heading()->setEnabled(true);
-    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : SceneHeading::Interior);
-    scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "Somewhere");
-    scene->heading()->setMoment(activeScene ? activeScene->heading()->moment() : SceneHeading::Day);
+    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : "EXT");
+    scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "SOMEWHERE");
+    scene->heading()->setMoment(activeScene ? activeScene->heading()->moment() : "DAY");
 
     StructureElement *newStructureElement = new StructureElement(m_structure);
     newStructureElement->setScene(scene);
@@ -733,6 +733,28 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             StructureElement *element = m_structure->elementAt(i);
             element->setX( element->x()+dx );
             element->setY( element->y()+dy );
+        }
+    }
+
+    if( version <= QVersionNumber(0,2,6) )
+    {
+        const int nrElements = m_structure->elementCount();
+        for(int i=0; i<nrElements; i++)
+        {
+            StructureElement *element = m_structure->elementAt(i);
+            Scene *scene = element->scene();
+            if(scene == nullptr)
+                continue;
+
+            SceneHeading *heading = scene->heading();
+            QString val = heading->locationType();
+            if(val == "INTERIOR")
+                val = "INT";
+            if(val == "EXTERIOR")
+                val = "EXT";
+            if(val == "BOTH")
+                val = "I/E";
+            heading->setLocationType(val);
         }
     }
 

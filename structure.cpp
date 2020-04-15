@@ -53,8 +53,11 @@ void StructureElement::setScene(Scene *val)
     connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
     connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
 
-    connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &StructureElement::sceneHeadingLocationChanged);
-    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneHeadingLocationChanged);
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::locationTypeChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::momentChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneLocationChanged);
 
     emit sceneChanged();
 }
@@ -595,8 +598,8 @@ void Structure::removeElement(StructureElement *ptr)
 
     disconnect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
     disconnect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
-    disconnect(ptr, &StructureElement::sceneHeadingLocationChanged, this, &Structure::updateLocationHeadingsMapLater);
-    this->updateLocationHeadingsMapLater();
+    disconnect(ptr, &StructureElement::sceneLocationChanged, this, &Structure::updateLocationHeadingMapLater);
+    this->updateLocationHeadingMapLater();
 
     emit elementCountChanged();
     emit elementsChanged();
@@ -627,8 +630,8 @@ void Structure::insertElement(StructureElement *ptr, int index)
 
     connect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
     connect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
-    connect(ptr, &StructureElement::sceneHeadingLocationChanged, this, &Structure::updateLocationHeadingsMapLater);
-    this->updateLocationHeadingsMapLater();
+    connect(ptr, &StructureElement::sceneLocationChanged, this, &Structure::updateLocationHeadingMapLater);
+    this->updateLocationHeadingMapLater();
 
     this->onStructureElementSceneChanged(ptr);
 
@@ -692,6 +695,20 @@ StructureElement *Structure::findElementBySceneID(const QString &id) const
     }
 
     return nullptr;
+}
+
+QStringList Structure::standardLocationTypes() const
+{
+    static const QStringList list = QStringList() << "INT" << "EXT" << "I/E";
+    return list;
+}
+
+QStringList Structure::standardMoments() const
+{
+    static const QStringList list = QStringList() << "DAY" << "NIGHT" << "MORNING" << "AFTERNOON"
+        << "EVENING" << "LATER" << "MOMENTS LATER" << "CONTINUOUS" << "THE NEXT DAY" << "EARLIER"
+        << "MOMENTS EARLIER" << "THE PREVIOUS DAY";
+    return list;
 }
 
 void Structure::setCurrentElementIndex(int val)
@@ -804,7 +821,7 @@ void Structure::timerEvent(QTimerEvent *event)
 {
     if(m_locationHeadingsMapTimer.timerId() == event->timerId())
     {
-        this->updateLocationHeadingsMap();
+        this->updateLocationHeadingMap();
         m_locationHeadingsMapTimer.stop();
         return;
     }
@@ -872,7 +889,7 @@ int Structure::staticElementCount(QQmlListProperty<StructureElement> *list)
     return reinterpret_cast< Structure* >(list->data)->elementCount();
 }
 
-void Structure::updateLocationHeadingsMap()
+void Structure::updateLocationHeadingMap()
 {
     QMap< QString, QList<SceneHeading*> > map;
     Q_FOREACH(StructureElement *element, m_elements)
@@ -887,7 +904,7 @@ void Structure::updateLocationHeadingsMap()
     m_locationHeadingsMap = map;
 }
 
-void Structure::updateLocationHeadingsMapLater()
+void Structure::updateLocationHeadingMapLater()
 {
     m_locationHeadingsMapTimer.start(0, this);
 }
@@ -907,7 +924,7 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
     for(int i=0; i<nrSceneElements; i++)
         this->onSceneElementChanged(element->scene()->elementAt(i), Scene::ElementTextChange);
 
-    this->updateLocationHeadingsMapLater();
+    this->updateLocationHeadingMapLater();
 }
 
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)

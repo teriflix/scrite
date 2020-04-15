@@ -25,7 +25,10 @@ SceneHeading::SceneHeading(QObject *parent)
     : QObject(parent),
       m_scene(qobject_cast<Scene*>(parent))
 {
-
+    connect(this, &SceneHeading::momentChanged, this, &SceneHeading::textChanged);
+    connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
+    connect(this, &SceneHeading::locationChanged, this, &SceneHeading::textChanged);
+    connect(this, &SceneHeading::locationTypeChanged, this, &SceneHeading::textChanged);
 }
 
 SceneHeading::~SceneHeading()
@@ -62,8 +65,9 @@ void SceneHeading::setEnabled(bool val)
     }
 }
 
-void SceneHeading::setLocationType(SceneHeading::LocationType val)
+void SceneHeading::setLocationType(const QString &val2)
 {
+    const QString val = val2.toUpper().trimmed();
     if(m_locationType == val)
         return;
 
@@ -91,27 +95,9 @@ void SceneHeading::setLocationType(SceneHeading::LocationType val)
     }
 }
 
-QString SceneHeading::locationTypeAsString() const
-{
-    return this->locationTypeStringMap().value(m_locationType, "NONE");
-}
-
-QMap<SceneHeading::LocationType, QString> SceneHeading::locationTypeStringMap()
-{
-    static QMap<LocationType,QString> map;
-    if(map.isEmpty())
-    {
-        map[Interior] = "INT.";
-        map[Exterior] = "EXT.";
-        map[Both] = "I/E.";
-    }
-
-    return map;
-}
-
 void SceneHeading::setLocation(const QString &val2)
 {
-    const QString val = val2.toUpper();
+    const QString val = val2.toUpper().trimmed();
     if(m_location == val)
         return;
 
@@ -139,8 +125,9 @@ void SceneHeading::setLocation(const QString &val2)
     }
 }
 
-void SceneHeading::setMoment(SceneHeading::Moment val)
+void SceneHeading::setMoment(const QString &val2)
 {
+    const QString val = val2.toUpper().trimmed();
     if(m_moment == val)
         return;
 
@@ -168,36 +155,9 @@ void SceneHeading::setMoment(SceneHeading::Moment val)
     }
 }
 
-QString SceneHeading::momentAsString() const
-{
-    return this->momentStringMap().value(m_moment, "NONE");
-}
-
-QMap<SceneHeading::Moment, QString> SceneHeading::momentStringMap()
-{
-    static QMap<SceneHeading::Moment,QString> map;
-    if(map.isEmpty())
-    {
-        map[Day] = "DAY";
-        map[Night] = "NIGHT";
-        map[Morning] = "MORNING";
-        map[Afternoon] = "AFTERNOON";
-        map[Evening] = "EVENING";
-        map[Later] = "LATER";
-        map[MomentsLater] = "MOMENTS LATER";
-        map[Continuous] = "CONTINUOUS";
-        map[TheNextDay] = "THE NEXT DAY";
-        map[Earlier] = "EARLIER";
-        map[MomentsEarlier] = "MOMENTS LATER";
-        map[ThePreviousDay] = "THE PREVIOUS DAY";
-    }
-
-    return map;
-}
-
 QString SceneHeading::toString() const
 {
-    return this->locationTypeAsString() + " " + this->location() + " - " + this->momentAsString();
+    return m_locationType + ". " + m_location + " - " + m_moment;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

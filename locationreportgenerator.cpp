@@ -74,9 +74,6 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
     }
     this->progress()->tick();
 
-    const QMap<SceneHeading::LocationType,QString> locTypeNameMap = SceneHeading::locationTypeStringMap();
-    const QMap<SceneHeading::Moment,QString> momentNameMap = SceneHeading::momentStringMap();
-
     const QMap< QString, QList<SceneHeading*> > locationHeadingsMap = structure->locationHeadingsMap();
     this->progress()->setProgressStepFromCount(locationHeadingsMap.size()+2);
 
@@ -85,7 +82,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
     while(it != end)
     {
         this->progress()->tick();
-        QMap< SceneHeading::LocationType, QMap< SceneHeading::Moment,QList<SceneHeading*> > > map;
+        QMap< QString, QMap< QString,QList<SceneHeading*> > > map;
         QList<SceneHeading*> headings = it.value();
         for(int i=headings.size()-1; i>=0; i--)
         {
@@ -114,12 +111,12 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
         cursor.insertText(it.key());
         cursor.insertText(" (" + QString::number(headings.size()) + " occurances)");
 
-        const QList<SceneHeading::LocationType> locTypes = map.keys();
-        Q_FOREACH(SceneHeading::LocationType locType, locTypes)
+        const QStringList locTypes = map.keys();
+        Q_FOREACH(QString locType, locTypes)
         {
-            const QMap< SceneHeading::Moment,QList<SceneHeading*> > momentMap = map.value(locType);
-            QMap< SceneHeading::Moment,QList<SceneHeading*> >::const_iterator it2 = momentMap.constBegin();
-            QMap< SceneHeading::Moment,QList<SceneHeading*> >::const_iterator end2 = momentMap.constEnd();
+            const QMap< QString,QList<SceneHeading*> > momentMap = map.value(locType);
+            QMap< QString,QList<SceneHeading*> >::const_iterator it2 = momentMap.constBegin();
+            QMap< QString,QList<SceneHeading*> >::const_iterator end2 = momentMap.constEnd();
             int counter = 0;
             while(it2 != end2)
             {
@@ -134,7 +131,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
             charFormat.setFontWeight(QFont::Bold);
 
             cursor.insertBlock(blockFormat, charFormat);
-            cursor.insertText(locTypeNameMap.value(locType) + " (" + QString::number(counter) + ")");
+            cursor.insertText(locType + " (" + QString::number(counter) + ")");
 
             it2 = momentMap.constBegin();
             while(it2 != end2)
