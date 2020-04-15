@@ -194,9 +194,13 @@ void ScriteDocument::reset()
     if(m_formatting != nullptr)
         disconnect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
 
+    if(m_printFormat != nullptr)
+        disconnect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+
     UndoStack::clearAllStacks();
 
     this->setFormatting(new ScreenplayFormat(this));
+    this->setPrintFormat(new ScreenplayFormat(this));
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
     this->setModified(false);
@@ -209,6 +213,7 @@ void ScriteDocument::reset()
     connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::evaluateStructureElementSequenceLater);
     connect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
     connect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+    connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
 }
 
 void ScriteDocument::open(const QString &fileName)
@@ -488,6 +493,20 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
     m_formatting->setParent(this);
 
     emit formattingChanged();
+}
+
+void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
+{
+    if(m_printFormat == val)
+        return;
+
+    if(m_printFormat != nullptr)
+        m_printFormat->deleteLater();
+
+    m_printFormat = val;
+    m_printFormat->setParent(this);
+
+    emit printFormatChanged();
 }
 
 void ScriteDocument::evaluateStructureElementSequence()

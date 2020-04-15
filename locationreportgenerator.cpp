@@ -35,7 +35,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
 
     QTextCursor cursor(&document);
 
-    const QFont defaultFont = this->document()->formatting()->defaultFont();
+    const QFont defaultFont = this->document()->printFormat()->defaultFont();
 
     QTextBlockFormat defaultBlockFormat;
 

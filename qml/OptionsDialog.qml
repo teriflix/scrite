@@ -33,15 +33,24 @@ Item {
 
         ListModel {
             id: pageModel
-            ListElement { name: "Title Page"; group: "Screenplay" }
-            ListElement { name: "Heading"; group: "Formatting"; elementType: SceneElement.Heading }
-            ListElement { name: "Action"; group: "Formatting"; elementType: SceneElement.Action }
-            ListElement { name: "Character"; group: "Formatting"; elementType: SceneElement.Character }
-            ListElement { name: "Dialogue"; group: "Formatting"; elementType: SceneElement.Dialogue }
-            ListElement { name: "Parenthetical"; group: "Formatting"; elementType: SceneElement.Parenthetical }
-            ListElement { name: "Shot"; group: "Formatting"; elementType: SceneElement.Shot }
-            ListElement { name: "Transition"; group: "Formatting"; elementType: SceneElement.Transition }
             ListElement { name: "Settings"; group: "Application"; }
+            ListElement { name: "Title Page"; group: "Screenplay" }
+
+            ListElement { name: "Heading"; group: "On Screen Format"; elementType: SceneElement.Heading }
+            ListElement { name: "Action"; group: "On Screen Format"; elementType: SceneElement.Action }
+            ListElement { name: "Character"; group: "On Screen Format"; elementType: SceneElement.Character }
+            ListElement { name: "Dialogue"; group: "On Screen Format"; elementType: SceneElement.Dialogue }
+            ListElement { name: "Parenthetical"; group: "On Screen Format"; elementType: SceneElement.Parenthetical }
+            ListElement { name: "Shot"; group: "On Screen Format"; elementType: SceneElement.Shot }
+            ListElement { name: "Transition"; group: "On Screen Format"; elementType: SceneElement.Transition }
+
+            ListElement { name: "Heading"; group: "Print Format"; elementType: SceneElement.Heading }
+            ListElement { name: "Action"; group: "Print Format"; elementType: SceneElement.Action }
+            ListElement { name: "Character"; group: "Print Format"; elementType: SceneElement.Character }
+            ListElement { name: "Dialogue"; group: "Print Format"; elementType: SceneElement.Dialogue }
+            ListElement { name: "Parenthetical"; group: "Print Format"; elementType: SceneElement.Parenthetical }
+            ListElement { name: "Shot"; group: "Print Format"; elementType: SceneElement.Shot }
+            ListElement { name: "Transition"; group: "Print Format"; elementType: SceneElement.Transition }
         }
 
         ListView {
@@ -50,7 +59,8 @@ Item {
             width: 170
             model: pageModel
             spacing: 5
-            highlightMoveDuration: 50
+            clip: true
+            highlightMoveDuration: 0
             section.property: "group"
             section.criteria: ViewSection.FullString
             section.delegate: Rectangle {
@@ -91,16 +101,18 @@ Item {
             anchors.bottom: parent.bottom
             active: pageList.currentIndex >= 0
             sourceComponent: {
-                if(pageList.currentIndex >= 1 && pageList.currentIndex <= 7)
+                if(pageList.currentIndex >= 2 && pageList.currentIndex <= 8)
+                    return elementFormatOptionsComponent
+
+                if(pageList.currentIndex >= 9 && pageList.currentIndex <= 15)
                     return elementFormatOptionsComponent
 
                 switch(pageList.currentIndex) {
-                case 0: return screenplayOptionsComponent
-                case 8: return applicationSettingsComponent
+                case 0: return applicationSettingsComponent
+                case 1: return screenplayOptionsComponent
                 }
             }
         }
-
     }
 
     Component {
@@ -206,10 +218,26 @@ Item {
                     }
                 }
 
-                Button {
+                Column {
+                    spacing: parent.spacing/2
+                    width: parent.width-20
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Reset Paragraph Formats"
-                    onClicked: scriteDocument.formatting.resetToDefaults()
+
+                    Button {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Reset Paragraph Formats"
+                        onClicked: scriteDocument.formatting.resetToDefaults()
+                    }
+
+                    Text {
+                        color: "red"
+                        width: parent.width
+                        font.pixelSize: 10
+                        text: "<strong>NOTE:</strong> Clicking this button will reset both print and on-screen paragraph formats."
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
                 }
             }
         }
@@ -224,7 +252,8 @@ Item {
             id: scrollView
             property real labelWidth: 125
             property var pageData: pageModel.get(pageList.currentIndex)
-            property SceneElementFormat format: scriteDocument.formatting.elementFormat(pageData.elementType)
+            property ScreenplayFormat format: pageData.group === "On Screen Format" ? scriteDocument.formatting : scriteDocument.printFormat
+            property SceneElementFormat elementFormat: format.elementFormat(pageData.elementType)
 
             Column {
                 width: scrollView.width
@@ -233,7 +262,7 @@ Item {
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
-                    text: pageData.name + " - Element Format"
+                    text: "<strong>" + pageData.name + "</strong> (" + pageData.group + ")"
                     font.pixelSize: 24
                 }
 
@@ -253,8 +282,8 @@ Item {
                     ComboBox {
                         width: parent.width-parent.spacing-labelWidth
                         model: systemFontInfo.families
-                        currentIndex: systemFontInfo.families.indexOf(format.font.family)
-                        onCurrentIndexChanged: format.font.family = systemFontInfo.families[currentIndex]
+                        currentIndex: systemFontInfo.families.indexOf(elementFormat.font.family)
+                        onCurrentIndexChanged: elementFormat.font.family = systemFontInfo.families[currentIndex]
                     }
                 }
 
@@ -277,8 +306,8 @@ Item {
                         to: 62
                         stepSize: 1
                         editable: true
-                        value: format.font.pointSize
-                        onValueModified: format.font.pointSize = value
+                        value: elementFormat.font.pointSize
+                        onValueModified: elementFormat.font.pointSize = value
                     }
                 }
 
@@ -303,21 +332,21 @@ Item {
                             text: "Bold"
                             font.bold: true
                             checkable: true
-                            checked: format.font.bold
+                            checked: elementFormat.font.bold
                         }
 
                         CheckBox {
                             text: "Italics"
                             font.italic: true
                             checkable: true
-                            checked: format.font.italic
+                            checked: elementFormat.font.italic
                         }
 
                         CheckBox {
                             text: "Underline"
                             font.underline: true
                             checkable: true
-                            checked: format.font.underline
+                            checked: elementFormat.font.underline
                         }
                     }
                 }
@@ -338,13 +367,13 @@ Item {
                     Rectangle {
                         border.width: 1
                         border.color: "black"
-                        color: format.textColor
+                        color: elementFormat.textColor
                         width: 30; height: 30
                         anchors.verticalCenter: parent.verticalCenter
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: format.textColor = app.pickColor(format.textColor)
+                            onClicked: elementFormat.textColor = app.pickColor(elementFormat.textColor)
                         }
                     }
 
@@ -358,13 +387,13 @@ Item {
                     Rectangle {
                         border.width: 1
                         border.color: "black"
-                        color: format.backgroundColor
+                        color: elementFormat.backgroundColor
                         width: 30; height: 30
                         anchors.verticalCenter: parent.verticalCenter
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: format.backgroundColor = app.pickColor(format.backgroundColor)
+                            onClicked: elementFormat.backgroundColor = app.pickColor(elementFormat.backgroundColor)
                         }
                     }
                 }
@@ -389,40 +418,40 @@ Item {
                         RadioButton {
                             text: "Left"
                             checkable: true
-                            checked: format.textAlignment === Qt.AlignLeft
+                            checked: elementFormat.textAlignment === Qt.AlignLeft
                             onCheckedChanged: {
                                 if(checked)
-                                    format.textAlignment = Qt.AlignLeft
+                                    elementFormat.textAlignment = Qt.AlignLeft
                             }
                         }
 
                         RadioButton {
                             text: "Center"
                             checkable: true
-                            checked: format.textAlignment === Qt.AlignHCenter
+                            checked: elementFormat.textAlignment === Qt.AlignHCenter
                             onCheckedChanged: {
                                 if(checked)
-                                    format.textAlignment = Qt.AlignHCenter
+                                    elementFormat.textAlignment = Qt.AlignHCenter
                             }
                         }
 
                         RadioButton {
                             text: "Right"
                             checkable: true
-                            checked: format.textAlignment === Qt.AlignRight
+                            checked: elementFormat.textAlignment === Qt.AlignRight
                             onCheckedChanged: {
                                 if(checked)
-                                    format.textAlignment = Qt.AlignRight
+                                    elementFormat.textAlignment = Qt.AlignRight
                             }
                         }
 
                         RadioButton {
                             text: "Justify"
                             checkable: true
-                            checked: format.textAlignment === Qt.AlignJustify
+                            checked: elementFormat.textAlignment === Qt.AlignJustify
                             onCheckedChanged: {
                                 if(checked)
-                                    format.textAlignment = Qt.AlignJustify
+                                    elementFormat.textAlignment = Qt.AlignJustify
                             }
                         }
                     }
@@ -446,8 +475,8 @@ Item {
                         from: 0
                         to: 100
                         stepSize: 1
-                        value: format.blockWidth * 100
-                        onValueModified: format.blockWidth = value/100
+                        value: elementFormat.blockWidth * 100
+                        onValueModified: elementFormat.blockWidth = value/100
                         textFromValue: function(value,locale) {
                             return value + "%"
                         }
@@ -474,19 +503,19 @@ Item {
                         RadioButton {
                             text: "Left"
                             checkable: true
-                            checked: format.blockAlignment === Qt.AlignLeft
+                            checked: elementFormat.blockAlignment === Qt.AlignLeft
                         }
 
                         RadioButton {
                             text: "Center"
                             checkable: true
-                            checked: format.blockAlignment === Qt.AlignHCenter
+                            checked: elementFormat.blockAlignment === Qt.AlignHCenter
                         }
 
                         RadioButton {
                             text: "Right"
                             checkable: true
-                            checked: format.blockAlignment === Qt.AlignRight
+                            checked: elementFormat.blockAlignment === Qt.AlignRight
                         }
                     }
                 }
@@ -517,9 +546,9 @@ Item {
                             width: 100
                             font.pixelSize: 14
                             anchors.verticalCenter: parent.verticalCenter
-                            text: format.topMargin
+                            text: elementFormat.topMargin
                             validator: IntValidator { top: 100; bottom: 0 }
-                            onTextChanged: format.topMargin = text === "" ? 0 : parseInt(text)
+                            onTextChanged: elementFormat.topMargin = text === "" ? 0 : parseInt(text)
                         }
 
                         Text {
@@ -532,9 +561,9 @@ Item {
                             width: 100
                             font.pixelSize: 14
                             anchors.verticalCenter: parent.verticalCenter
-                            text: format.bottomMargin
+                            text: elementFormat.bottomMargin
                             validator: IntValidator { top: 100; bottom: 0 }
-                            onTextChanged: format.bottomMargin = text === "" ? 0 : parseInt(text)
+                            onTextChanged: elementFormat.bottomMargin = text === "" ? 0 : parseInt(text)
                         }
                     }
                 }

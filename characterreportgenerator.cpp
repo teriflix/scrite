@@ -79,7 +79,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
     QTextDocument &document = *textDocument;
     QTextCursor cursor(&document);
 
-    const QFont defaultFont = this->document()->formatting()->defaultFont();
+    const QFont defaultFont = this->document()->printFormat()->defaultFont();
 
     QTextBlockFormat defaultBlockFormat;
 

@@ -61,6 +61,10 @@ public:
     ScreenplayFormat* formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
+    Q_PROPERTY(ScreenplayFormat* printFormat READ printFormat NOTIFY printFormatChanged)
+    ScreenplayFormat* printFormat() const { return m_printFormat; }
+    Q_SIGNAL void printFormatChanged();
+
     // This function adds a new scene to both structure and screenplay
     // and inserts it right after the current element in both.
     Q_INVOKABLE Scene *createNewScene();
@@ -116,6 +120,7 @@ private:
     void setStructure(Structure* val);
     void setScreenplay(Screenplay* val);
     void setFormatting(ScreenplayFormat* val);
+    void setPrintFormat(ScreenplayFormat *val);
     void evaluateStructureElementSequence();
     void evaluateStructureElementSequenceLater();
     void markAsModified() { this->setModified(true); }
@@ -142,6 +147,7 @@ private:
     Structure* m_structure = nullptr;
     Screenplay* m_screenplay = nullptr;
     ScreenplayFormat* m_formatting = nullptr;
+    ScreenplayFormat* m_printFormat = nullptr;
     int m_autoSaveDurationInSeconds = 60;
     QJsonArray m_structureElementSequence;
     QBasicTimer m_evaluateStructureElementSequenceTimer;

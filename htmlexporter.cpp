@@ -29,7 +29,7 @@ HtmlExporter::~HtmlExporter()
 bool HtmlExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
-    const ScreenplayFormat *formatting = this->document()->formatting();
+    const ScreenplayFormat *formatting = this->document()->printFormat();
     QMap<SceneElement::Type,QString> typeStringMap;
     typeStringMap[SceneElement::Heading] = "heading";
     typeStringMap[SceneElement::Action] = "action";
