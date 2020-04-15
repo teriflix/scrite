@@ -33,10 +33,14 @@ Item {
             width: parent.width-4
             anchors.verticalCenter: parent.verticalCenter
 
-            ToolButton {
+            ToolButton2 {
                 id: newSceneButton
                 icon.source: "../icons/content/add_box.png"
-                text: "New Scene"
+                text: "Add Scene"
+                shortcutText: "N"
+                ToolTip.text: "Press " + shortcutText + " to create a new scene under the mouse on the canvas."
+                suggestedWidth: 130
+                suggestedHeight: 50
                 display: ToolButton.TextBesideIcon
                 down: newSceneColorMenuLoader.active
                 onClicked: newSceneColorMenuLoader.active = true
@@ -180,8 +184,15 @@ Item {
                 canvas.ensureCurrentItemIsVisible = true
             }
 
-            property color newElementColor: "blue"
             property bool newElementMode: false
+            property color newElementColor: "blue"
+
+            Keys.onPressed: {
+                if(event.key === Qt.Key_N || event.key === Qt.Key_Plus) {
+                    var pos = app.mapGlobalPositionToItem(canvas, app.cursorPosition())
+                    createElement(pos.x-130, pos.y-22, newElementColor)
+                }
+            }
 
             MouseArea {
                 id: canvasMouseArea
@@ -557,9 +568,9 @@ Item {
         StructureElement {
             scene: Scene {
                 title: "New Scene"
-                heading.locationType: SceneHeading.Interior
-                heading.location: "Somewhere"
-                heading.moment: SceneHeading.Day
+                heading.locationType: "INT"
+                heading.location: "SOMEWHERE"
+                heading.moment: "DAY"
             }
         }
     }
