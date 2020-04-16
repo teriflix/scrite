@@ -137,6 +137,7 @@ win32 {
 DISTFILES += \
     Info.plist \
     License.txt \
+    README \
     packaging/windows/package.bat \
     packaging/windows/installer.nsi \
     packaging/mac/packaging.sh \

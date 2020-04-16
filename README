@@ -1,0 +1,19 @@
+Scrite is a free and open-source screenplay writing app from TERIFLIX.
+https://scrite.teriflix.com
+https://www.teriflix.com
+
+FEATURES
+-----------
+1. Create screenplays and format elements appropriately.
+2. Import screenplays from FinalDraft and HTML formats.
+3. Export screenplays to PDF, FinalDraft, Text and HTML formats.
+4. Generate Character and Location Reports (more reports coming)
+5. Capture character and scene notes.
+
+Building from source
+------------
+Scrite is developed using Qt 5.13.2. To build scrite, simply install
+Qt on your computer (Windows, macOS or Linux).
+
+Open scrite.pro in Qt Creator and build.
+
