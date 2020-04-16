@@ -83,6 +83,18 @@ public:
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();
 
+    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
+    void setOpacity(qreal val);
+    qreal opacity() const { return m_opacity; }
+    Q_SIGNAL void opacityChanged();
+
+
+    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY visibleFromPageOneChanged)
+    void setVisibleFromPageOne(bool val);
+    bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
+    Q_SIGNAL void visibleFromPageOneChanged();
+
+
 private:
     void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect);
     void paint(QPainter *paint, const QRectF &rect, int pageNr, int pageCount);
@@ -96,7 +108,7 @@ private:
     Field m_left = Nothing;
     Field m_center = Nothing;
     Field m_right = Nothing;
-    char m_padding2[4];
+    bool m_visibleFromPageOne = false;
 
     struct ColumnContent
     {
@@ -104,7 +116,9 @@ private:
         QString content;
         int flags;
     };
+    char m_padding2[3];
     QVector<ColumnContent> m_columns;
+    qreal m_opacity = 0.5;
 };
 
 class QTextDocumentPagedPrinter : public QObject

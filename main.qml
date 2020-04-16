@@ -190,6 +190,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width * 0.7
+        onVisibleChanged: blur.visible = visible
     }
 }
 

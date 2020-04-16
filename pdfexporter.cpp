@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "pdfexporter.h"
+#include "qtextdocumentpagedprinter.h"
 
 #include <QFileInfo>
 #include <QPdfWriter>
@@ -45,14 +46,10 @@ bool PdfExporter::doExport(QIODevice *device)
     QTextDocument textDocument;
     this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);
 
-#if 0
-    const bool ret = true;
-    textDocument.print(&pdfWriter);
-#else
-    const bool ret = m_printer->print(&textDocument, &pdfWriter);
-#endif
-
-    return ret;
+    QTextDocumentPagedPrinter printer;
+    printer.header()->setVisibleFromPageOne(false);
+    printer.footer()->setVisibleFromPageOne(false);
+    return printer.print(&textDocument, &pdfWriter);
 }
 
 QString PdfExporter::polishFileName(const QString &fileName) const

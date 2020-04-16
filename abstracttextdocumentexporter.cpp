@@ -65,8 +65,12 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
             QString title = screenplay->title();
             if(title.isEmpty())
                 title = "Untitled Screenplay";
-            cursor.insertBlock();
             cursor.insertText(title);
+            if(!screenplay->subtitle().isEmpty())
+            {
+                cursor.insertText(" - ");
+                cursor.insertText(screenplay->subtitle());
+            }
         }
 
         // Author

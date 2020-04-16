@@ -279,9 +279,11 @@ Item {
                 property var headerLeft: HeaderFooter.Title
                 property var headerCenter: HeaderFooter.Subtitle
                 property var headerRight: HeaderFooter.PageNumber
+                property real headerOpacity: 0.5
                 property var footerLeft: HeaderFooter.Author
                 property var footerCenter: HeaderFooter.Version
                 property var footerRight: HeaderFooter.Contact
+                property real footerOpacity: 0.5
             }
 
             Column {

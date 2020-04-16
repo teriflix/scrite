@@ -106,6 +106,11 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         if(title.isEmpty())
             title = "Untitled Screenplay";
         cursor.insertText(title);
+        if(!screenplay->subtitle().isEmpty())
+        {
+            cursor.insertBlock();
+            cursor.insertText(screenplay->subtitle());
+        }
 
         blockFormat.setBottomMargin(20);
 

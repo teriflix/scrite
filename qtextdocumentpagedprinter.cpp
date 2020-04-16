@@ -71,6 +71,24 @@ void HeaderFooter::setFont(const QFont &val)
     emit fontChanged();
 }
 
+void HeaderFooter::setOpacity(qreal val)
+{
+    if( qFuzzyCompare(m_opacity, val) )
+        return;
+
+    m_opacity = val;
+    emit opacityChanged();
+}
+
+void HeaderFooter::setVisibleFromPageOne(bool val)
+{
+    if(m_visibleFromPageOne == val)
+        return;
+
+    m_visibleFromPageOne = val;
+    emit visibleFromPageOneChanged();
+}
+
 void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF &rect)
 {
     m_columns.resize(3);
@@ -118,6 +136,15 @@ void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF
 
 void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCount)
 {
+    if(!m_visibleFromPageOne)
+    {
+        --pageNr;
+        --pageCount;
+    }
+
+    if(pageNr == 0)
+        return;
+
     auto updateContent = [pageNr,pageCount](ColumnContent &content, Field field) {
         if(field == PageNumber)
             content.content = QString::number(pageNr) + ".";
@@ -134,6 +161,7 @@ void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCo
         if(m_columns.at(i).content.isEmpty())
             continue;
         paint->save();
+        paint->setOpacity(m_opacity);
         paint->setFont(m_font);
         paint->drawText(m_columns.at(i).columnRect, m_columns.at(i).flags, m_columns.at(i).content);
         paint->restore();
@@ -154,7 +182,6 @@ QTextDocumentPagedPrinter::QTextDocumentPagedPrinter(QObject *parent)
     auto fetchField = [settings](const QString &key, HeaderFooter::Field defaultValue) {
         const QString settingsKey = "PageSetup/" + key;
         const QVariant val = settings->value(settingsKey);
-        qDebug() << settingsKey << val;
         const int min = HeaderFooter::Nothing;
         const int max = HeaderFooter::PageNumberOfCount;
         if(!val.isValid() || val.toInt() < min || val.toInt() > max)
@@ -169,6 +196,18 @@ QTextDocumentPagedPrinter::QTextDocumentPagedPrinter(QObject *parent)
     m_footer->setLeft(fetchField("footerLeft", HeaderFooter::Author));
     m_footer->setCenter(fetchField("footerCenter", HeaderFooter::Version));
     m_footer->setRight(fetchField("footerRight", HeaderFooter::Contact));
+
+    {
+        const QVariant val = settings->value("PageSetup/headerOpacity");
+        if(val.isValid())
+            m_header->setOpacity( qBound(0.0,val.toDouble(),1.0) );
+    }
+
+    {
+        const QVariant val = settings->value("PageSetup/footerOpacity");
+        if(val.isValid())
+            m_header->setOpacity( qBound(0.0,val.toDouble(),1.0) );
+    }
 }
 
 QTextDocumentPagedPrinter::~QTextDocumentPagedPrinter()
@@ -309,17 +348,14 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
 
 void QTextDocumentPagedPrinter::printPage(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body)
 {
-    if(pageNr > 1)
-    {
-        m_header->paint(painter, m_headerRect, pageNr-1, pageCount-1);
-        m_footer->paint(painter, m_footerRect, pageNr-1, pageCount-1);
+    m_header->paint(painter, m_headerRect, pageNr, pageCount);
+    m_footer->paint(painter, m_footerRect, pageNr, pageCount);
 
 #if 0
-        painter->setPen(Qt::black);
-        painter->drawLine(QLineF(body.left(), m_headerRect.bottom(), body.right(), m_headerRect.bottom()));
-        painter->drawLine(QLineF(body.left(), m_footerRect.top(), body.right(), m_footerRect.top()));
+    painter->setPen(Qt::black);
+    painter->drawLine(QLineF(body.left(), m_headerRect.bottom(), body.right(), m_headerRect.bottom()));
+    painter->drawLine(QLineF(body.left(), m_footerRect.top(), body.right(), m_footerRect.top()));
 #endif
-    }
 
     painter->save();
     painter->translate(body.left(), body.top() - (pageNr - 1) * body.height());

@@ -12,14 +12,15 @@
 ****************************************************************************/
 
 #include "abstractreportgenerator.h"
+#include "qtextdocumentpagedprinter.h"
 
 #include <QFileInfo>
+#include <QPdfWriter>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMetaObject>
 #include <QMetaClassInfo>
 #include <QTextDocumentWriter>
-#include <QPdfWriter>
 
 AbstractReportGenerator::AbstractReportGenerator(QObject *parent)
                         :AbstractDeviceIO(parent)
@@ -54,6 +55,8 @@ bool AbstractReportGenerator::generate()
 {
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();
+    Screenplay *screenplay = document->screenplay();
+    ScreenplayFormat *format = document->printFormat();
 
     this->error()->clear();
 
@@ -78,6 +81,13 @@ bool AbstractReportGenerator::generate()
 
     QTextDocument textDocument;
 
+    textDocument.setDefaultFont(format->defaultFont());
+    textDocument.setProperty("#title", screenplay->title());
+    textDocument.setProperty("#subtitle", screenplay->subtitle());
+    textDocument.setProperty("#author", screenplay->author());
+    textDocument.setProperty("#contact", screenplay->contact());
+    textDocument.setProperty("#version", screenplay->version());
+
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Title"));
     this->progress()->setProgressText( QString("Generating \"%1\"").arg(classInfo.value()));
@@ -99,7 +109,11 @@ bool AbstractReportGenerator::generate()
         pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
         pdfWriter.setPageSize(QPageSize(QPageSize::A4));
         pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
-        textDocument.print(&pdfWriter);
+
+        QTextDocumentPagedPrinter printer;
+        printer.header()->setVisibleFromPageOne(true);
+        printer.footer()->setVisibleFromPageOne(true);
+        printer.print(&textDocument, &pdfWriter);
     }
 
     this->progress()->finish();
