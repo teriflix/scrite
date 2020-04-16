@@ -685,7 +685,7 @@ Item {
                                 font.pixelSize: 30
                                 enabled: false
                                 renderType: Text.NativeRendering
-                                text: "Select a scene on the canvas or in the screenplay to edit its content here."
+                                text: "Select a scene on the structure canvas or in the timeline to edit its content here."
                             }
                         }
 

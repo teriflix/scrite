@@ -558,7 +558,7 @@ Item {
             font.pixelSize: 30
             enabled: false
             renderType: Text.NativeRendering
-            text: "Double click on an empty area in the canvas to create a scene. Hold the command key and drag lines from one scene to another to create a sequence."
+            text: "Create scenes by clicking on the 'Add Scene' button OR click on an empty area in this canvas and press the 'N' key."
         }
     }
 

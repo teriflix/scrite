@@ -59,7 +59,7 @@ public:
         DateTime,
 
         PageNumber,
-        PageNumberOfCount,
+        PageNumberOfCount
     };
     Q_ENUM(Field)
 

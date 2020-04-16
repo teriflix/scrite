@@ -366,7 +366,7 @@ Rectangle {
 
     Loader {
         active: scriteDocument.screenplay.elementCount === 0
-        width: parent.width*0.7
+        width: parent.width*0.5
         anchors.centerIn: parent
         sourceComponent: TextArea {
             readOnly: true
@@ -375,7 +375,7 @@ Rectangle {
             renderType: Text.NativeRendering
             font.pixelSize: 30
             enabled: false
-            text: "Once you create a scene in the canvas, you can drag and drop them here to insert them into the timeline of your screenplay."
+            text: "Drag scenes on the structure canvas from their bottom right corner to this timeline view here."
         }
     }
 
