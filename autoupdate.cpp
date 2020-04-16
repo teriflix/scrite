@@ -77,8 +77,6 @@ void AutoUpdate::checkForUpdates()
     connect(reply, &QNetworkReply::finished, [reply,this]() {
         GarbageCollector::instance()->add(reply);
 
-        qDebug() << reply->errorString();
-
         const QByteArray bytes = reply->readAll();
         if(bytes.isEmpty()) {
             this->checkForUpdatesAfterSometime();

@@ -70,10 +70,24 @@ Item {
             }
         }
 
-        Button {
+        Row {
+            spacing: 10
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Visit Website"
-            onClicked: Qt.openUrlExternally("https://www.teriflix.com")
+
+            Button {
+                text: "Website"
+                onClicked: Qt.openUrlExternally("https://scrite.teriflix.com")
+            }
+
+            Button {
+                text: "Help"
+                onClicked: Qt.openUrlExternally("https://scrite.teriflix.com/releases/help.html")
+            }
+
+            Button {
+                text: "Feedback"
+                onClicked: Qt.openUrlExternally("https://forms.gle/bjrabbcX8hYEaePa7")
+            }
         }
     }
 }
