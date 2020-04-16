@@ -138,6 +138,7 @@ DISTFILES += \
     GPLv3.txt \
     Info.plist \
     License.txt \
+    README \
     packaging/windows/package.bat \
     packaging/windows/installer.nsi \
     packaging/mac/packaging.sh
