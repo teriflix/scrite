@@ -77,6 +77,8 @@ void AutoUpdate::checkForUpdates()
     connect(reply, &QNetworkReply::finished, [reply,this]() {
         GarbageCollector::instance()->add(reply);
 
+        qDebug() << reply->errorString();
+
         const QByteArray bytes = reply->readAll();
         if(bytes.isEmpty()) {
             this->checkForUpdatesAfterSometime();
@@ -127,10 +129,10 @@ void AutoUpdate::lookForUpdates(const QJsonObject &json)
         info = json.value("macos").toObject();
         break;
     case Application::LinuxDesktop:
-        info = json.value("windows").toObject();
+        info = json.value("linux").toObject();
         break;
     case Application::WindowsDesktop:
-        info = json.value("linux").toObject();
+        info = json.value("windows").toObject();
         break;
     }
 
