@@ -50,6 +50,7 @@ HEADERS += \
     progressreport.h \
     qobjectfactory.h \
     qobjectserializer.h \
+    qtextdocumentpagedprinter.h \
     scene.h \
     screenplay.h \
     scritedocument.h \
@@ -105,6 +106,7 @@ SOURCES += \
     polygontesselator.cpp \
     progressreport.cpp \
     qobjectserializer.cpp \
+    qtextdocumentpagedprinter.cpp \
     scene.cpp \
     screenplay.cpp \
     scritedocument.cpp \

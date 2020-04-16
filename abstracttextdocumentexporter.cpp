@@ -37,7 +37,14 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     const QFont defaultFont = screenplayFormat->defaultFont();
 
     QTextDocument &textDocument = *textDoc;
+
     textDocument.setDefaultFont(defaultFont);
+    textDocument.setProperty("#title", screenplay->title());
+    textDocument.setProperty("#subtitle", screenplay->subtitle());
+    textDocument.setProperty("#author", screenplay->author());
+    textDocument.setProperty("#contact", screenplay->contact());
+    textDocument.setProperty("#version", screenplay->version());
+
     QTextCursor cursor(&textDocument);
 
     // Title Page

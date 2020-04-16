@@ -36,6 +36,7 @@
 #include "notificationmanager.h"
 #include "delayedpropertybinder.h"
 #include "abstractreportgenerator.h"
+#include "qtextdocumentpagedprinter.h"
 
 int main(int argc, char **argv)
 {
@@ -130,6 +131,9 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Application>("Scrite", 1, 0, "Application", reason);
     qmlRegisterType<Annotation>("Scrite", 1, 0, "Annotation");
     qmlRegisterType<DelayedPropertyBinder>("Scrite", 1, 0, "DelayedPropertyBinder");
+
+    qmlRegisterUncreatableType<HeaderFooter>("Scrite", 1, 0, "HeaderFooter", reason);
+    qmlRegisterUncreatableType<QTextDocumentPagedPrinter>("Scrite", 1, 0, "QTextDocumentPagedPrinter", reason);
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;

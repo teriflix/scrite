@@ -213,6 +213,15 @@ void Screenplay::setTitle(const QString &val)
     emit titleChanged();
 }
 
+void Screenplay::setSubtitle(const QString &val)
+{
+    if(m_subtitle == val)
+        return;
+
+    m_subtitle = val;
+    emit subtitleChanged();
+}
+
 void Screenplay::setAuthor(const QString &val)
 {
     if(m_author == val)

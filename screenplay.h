@@ -109,6 +109,11 @@ public:
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
+    Q_PROPERTY(QString subtitle READ subtitle WRITE setSubtitle NOTIFY subtitleChanged)
+    void setSubtitle(const QString &val);
+    QString subtitle() const { return m_subtitle; }
+    Q_SIGNAL void subtitleChanged();
+
     Q_PROPERTY(QString author READ author WRITE setAuthor NOTIFY authorChanged)
     void setAuthor(const QString &val);
     QString author() const { return m_author; }
@@ -181,6 +186,7 @@ private:
     QString m_author;
     QString m_contact;
     QString m_version;
+    QString m_subtitle;
     ScriteDocument *m_scriteDocument = nullptr;
 
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);

@@ -14,6 +14,7 @@
 #ifndef PDFEXPORTER_H
 #define PDFEXPORTER_H
 
+#include "qtextdocumentpagedprinter.h"
 #include "abstracttextdocumentexporter.h"
 
 class PdfExporter : public AbstractTextDocumentExporter
@@ -26,9 +27,18 @@ public:
     Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
     ~PdfExporter();
 
+    Q_PROPERTY(HeaderFooter* header READ header CONSTANT)
+    HeaderFooter* header() const { return m_printer->header(); }
+
+    Q_PROPERTY(HeaderFooter* footer READ footer CONSTANT)
+    HeaderFooter* footer() const { return m_printer->footer(); }
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+
+private:
+    QTextDocumentPagedPrinter *m_printer = new QTextDocumentPagedPrinter(this);
 };
 
 #endif // PDFEXPORTER_H

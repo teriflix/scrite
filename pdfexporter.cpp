@@ -45,8 +45,14 @@ bool PdfExporter::doExport(QIODevice *device)
     QTextDocument textDocument;
     this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);
 
+#if 0
+    const bool ret = true;
     textDocument.print(&pdfWriter);
-    return true;
+#else
+    const bool ret = m_printer->print(&textDocument, &pdfWriter);
+#endif
+
+    return ret;
 }
 
 QString PdfExporter::polishFileName(const QString &fileName) const

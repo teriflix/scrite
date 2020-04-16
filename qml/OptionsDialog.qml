@@ -35,6 +35,7 @@ Item {
             id: pageModel
             ListElement { name: "Settings"; group: "Application"; }
             ListElement { name: "Title Page"; group: "Screenplay" }
+            ListElement { name: "Page Setup"; group: "Screenplay" }
 
             ListElement { name: "Heading"; group: "On Screen Format"; elementType: SceneElement.Heading }
             ListElement { name: "Action"; group: "On Screen Format"; elementType: SceneElement.Action }
@@ -101,15 +102,16 @@ Item {
             anchors.bottom: parent.bottom
             active: pageList.currentIndex >= 0
             sourceComponent: {
-                if(pageList.currentIndex >= 2 && pageList.currentIndex <= 8)
+                if(pageList.currentIndex >= 3 && pageList.currentIndex <= 9)
                     return elementFormatOptionsComponent
 
-                if(pageList.currentIndex >= 9 && pageList.currentIndex <= 15)
+                if(pageList.currentIndex >= 10 && pageList.currentIndex <= 16)
                     return elementFormatOptionsComponent
 
                 switch(pageList.currentIndex) {
                 case 0: return applicationSettingsComponent
                 case 1: return screenplayOptionsComponent
+                case 2: return pageSetupComponent
                 }
             }
         }
@@ -151,6 +153,27 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.title
                         onTextEdited: scriteDocument.screenplay.title = text
+                        font.pixelSize: 14
+                    }
+                }
+
+                // Subtitle field
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Subtitle"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextField {
+                        width: parent.width-parent.spacing-labelWidth
+                        text: scriteDocument.screenplay.subtitle
+                        onTextEdited: scriteDocument.screenplay.subtitle = text
                         font.pixelSize: 14
                     }
                 }
@@ -237,6 +260,223 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
                         anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: pageSetupComponent
+
+        Item {
+            property var fieldsModel: app.enumerationModelForType("HeaderFooter", "Field")
+
+            Settings {
+                id: pageSetupSettings
+                fileName: app.settingsFilePath
+                category: "PageSetup"
+                property var headerLeft: HeaderFooter.Title
+                property var headerCenter: HeaderFooter.Subtitle
+                property var headerRight: HeaderFooter.PageNumber
+                property var footerLeft: HeaderFooter.Author
+                property var footerCenter: HeaderFooter.Version
+                property var footerRight: HeaderFooter.Contact
+            }
+
+            Column {
+                spacing: 20
+                width: parent.width-20
+                anchors.right: parent.right
+
+                Text {
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "Page Setup"
+                    font.pixelSize: 24
+                }
+
+                Text {
+                    width: parent.width
+                    text: "PDFs are always generated in A4 size."
+                }
+
+                GroupBox {
+                    width: parent.width
+                    label: Text {
+                        text: "Header"
+                        font.pixelSize: 15
+                        font.bold: true
+                    }
+
+                    Row {
+                        width: parent.width
+                        height: 80
+
+                        Item {
+                            width: parent.width/3
+                            height: childrenRect.height
+
+                            Column {
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+
+                                Text {
+                                    text: "Left"
+                                }
+
+                                ComboBox {
+                                    width: parent.width
+                                    model: fieldsModel
+                                    textRole: "key"
+                                    currentIndex: pageSetupSettings.headerLeft
+                                    onActivated: pageSetupSettings.headerLeft = currentIndex
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width/3
+                            height: childrenRect.height
+
+                            Column {
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+
+                                Text {
+                                    text: "Center"
+                                }
+
+                                ComboBox {
+                                    width: parent.width
+                                    model: fieldsModel
+                                    textRole: "key"
+                                    currentIndex: pageSetupSettings.headerCenter
+                                    onActivated: pageSetupSettings.headerCenter = currentIndex
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width/3
+                            height: childrenRect.height
+
+                            Column {
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+
+                                Text {
+                                    text: "Right"
+                                }
+
+                                ComboBox {
+                                    width: parent.width
+                                    model: fieldsModel
+                                    textRole: "key"
+                                    currentIndex: pageSetupSettings.headerRight
+                                    onActivated: pageSetupSettings.headerRight = currentIndex
+                                }
+                            }
+                        }
+                    }
+                }
+
+                GroupBox {
+                    width: parent.width
+                    label: Text {
+                        text: "Footer"
+                        font.pixelSize: 15
+                        font.bold: true
+                    }
+
+                    Row {
+                        width: parent.width
+                        height: 80
+
+                        Item {
+                            width: parent.width/3
+                            height: childrenRect.height
+
+                            Column {
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+
+                                Text {
+                                    text: "Left"
+                                }
+
+                                ComboBox {
+                                    width: parent.width
+                                    model: fieldsModel
+                                    textRole: "key"
+                                    currentIndex: pageSetupSettings.footerLeft
+                                    onActivated: pageSetupSettings.footerLeft = currentIndex
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width/3
+                            height: childrenRect.height
+
+                            Column {
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+
+                                Text {
+                                    text: "Center"
+                                }
+
+                                ComboBox {
+                                    width: parent.width
+                                    model: fieldsModel
+                                    textRole: "key"
+                                    currentIndex: pageSetupSettings.footerCenter
+                                    onActivated: pageSetupSettings.footerCenter = currentIndex
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: parent.width/3
+                            height: childrenRect.height
+
+                            Column {
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: 10
+
+                                Text {
+                                    text: "Right"
+                                }
+
+                                ComboBox {
+                                    width: parent.width
+                                    model: fieldsModel
+                                    textRole: "key"
+                                    currentIndex: pageSetupSettings.footerRight
+                                    onActivated: pageSetupSettings.footerRight = currentIndex
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Restore Defaults"
+                    onClicked: {
+                        pageSetupSettings.headerLeft = HeaderFooter.Title
+                        pageSetupSettings.headerCenter = HeaderFooter.Subtitle
+                        pageSetupSettings.headerRight = HeaderFooter.PageNumber
+                        pageSetupSettings.footerLeft = HeaderFooter.Author
+                        pageSetupSettings.footerCenter = HeaderFooter.Version
+                        pageSetupSettings.footerRight = HeaderFooter.Contact
                     }
                 }
             }

@@ -211,19 +211,18 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     }
 }
 
-QJsonArray Application::enumerationModel(QObject *object, const QString &enumName) const
+QJsonArray enumerationModel(const QMetaObject *metaObject, const QString &enumName)
 {
     QJsonArray ret;
 
-    if( object == nullptr || enumName.isEmpty() )
+    if( metaObject == nullptr || enumName.isEmpty() )
         return ret;
 
-    const QMetaObject *mo = object->metaObject();
-    const int enumIndex = mo->indexOfEnumerator( qPrintable(enumName) );
+    const int enumIndex = metaObject->indexOfEnumerator( qPrintable(enumName) );
     if( enumIndex < 0 )
         return ret;
 
-    const QMetaEnum enumInfo = mo->enumerator(enumIndex);
+    const QMetaEnum enumInfo = metaObject->enumerator(enumIndex);
     if( !enumInfo.isValid() )
         return ret;
 
@@ -236,6 +235,19 @@ QJsonArray Application::enumerationModel(QObject *object, const QString &enumNam
     }
 
     return ret;
+}
+
+QJsonArray Application::enumerationModel(QObject *object, const QString &enumName) const
+{
+    const QMetaObject *mo = object ? object->metaObject() : nullptr;
+    return ::enumerationModel(mo, enumName);
+}
+
+QJsonArray Application::enumerationModelForType(const QString &typeName, const QString &enumName) const
+{
+    const int typeId = QMetaType::type(qPrintable(typeName+"*"));
+    const QMetaObject *mo = typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    return ::enumerationModel(mo, enumName);
 }
 
 QJsonObject Application::fileInfo(const QString &path) const
