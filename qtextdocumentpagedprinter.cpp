@@ -42,8 +42,6 @@ void HeaderFooter::setLeft(HeaderFooter::Field val)
 
     m_left = val;
     emit leftChanged();
-
-    Logger::qtPropertyInfo(this, "left");
 }
 
 void HeaderFooter::setCenter(HeaderFooter::Field val)
@@ -53,8 +51,6 @@ void HeaderFooter::setCenter(HeaderFooter::Field val)
 
     m_center = val;
     emit centerChanged();
-
-    Logger::qtPropertyInfo(this, "center");
 }
 
 void HeaderFooter::setRight(HeaderFooter::Field val)
@@ -64,8 +60,6 @@ void HeaderFooter::setRight(HeaderFooter::Field val)
 
     m_right = val;
     emit rightChanged();
-
-    Logger::qtPropertyInfo(this, "right");
 }
 
 void HeaderFooter::setFont(const QFont &val)

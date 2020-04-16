@@ -173,6 +173,19 @@ Rectangle {
         }
     }
 
+    Item {
+        property AutoUpdate autoUpdate: app.autoUpdate
+
+        Notification.active: autoUpdate.updateAvailable
+        Notification.title: "Update Available"
+        Notification.text: "Scrite " + autoUpdate.updateInfo.versionString + " is now available for download. <font size=\"-1\"><i>[<strong>What's new?</strong> " + autoUpdate.updateInfo.changeLog + "]</i></font>"
+        Notification.buttons: ["Download", "Ignore"]
+        Notification.onButtonClicked: {
+            if(index === 0)
+                Qt.openUrlExternally(autoUpdate.updateDownloadUrl)
+        }
+    }
+
     UI.NotificationsView {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter

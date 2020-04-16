@@ -33,6 +33,7 @@
 typedef QApplication QtApplicationClass;
 class QSettings;
 class QQuickItem;
+class AutoUpdate;
 
 class Application : public QtApplicationClass
 {
@@ -139,6 +140,9 @@ public:
     Q_INVOKABLE void execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
 
     QSettings *settings() const { return m_settings; }
+
+    Q_PROPERTY(AutoUpdate* autoUpdate READ autoUpdate CONSTANT)
+    AutoUpdate *autoUpdate() const;
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);

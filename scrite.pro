@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml concurrent
+QT += gui qml quick widgets xml concurrent network
 DESTDIR = $$PWD/../Release/
 
 DEFINES += PHTRANSLATE_STATICLIB
@@ -17,6 +17,7 @@ HEADERS += \
     abstracttextdocumentexporter.h \
     aggregation.h \
     application.h \
+    autoupdate.h \
     characterreportgenerator.h \
     completer.h \
     delayedpropertybinder.h \
@@ -76,6 +77,7 @@ SOURCES += \
     abstracttextdocumentexporter.cpp \
     aggregation.cpp \
     application.cpp \
+    autoupdate.cpp \
     characterreportgenerator.cpp \
     completer.cpp \
     delayedpropertybinder.cpp \

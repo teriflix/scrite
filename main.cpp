@@ -22,6 +22,7 @@
 #include "logger.h"
 #include "undostack.h"
 #include "completer.h"
+#include "autoupdate.h"
 #include "aggregation.h"
 #include "eventfilter.h"
 #include "focustracker.h"
@@ -134,6 +135,8 @@ int main(int argc, char **argv)
 
     qmlRegisterUncreatableType<HeaderFooter>("Scrite", 1, 0, "HeaderFooter", reason);
     qmlRegisterUncreatableType<QTextDocumentPagedPrinter>("Scrite", 1, 0, "QTextDocumentPagedPrinter", reason);
+
+    qmlRegisterUncreatableType<AutoUpdate>("Scrite", 1, 0, "AutoUpdate", reason);
 
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;

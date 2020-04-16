@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "application.h"
+#include "autoupdate.h"
 
 #include <QDir>
 #include <QtDebug>
@@ -324,6 +325,11 @@ void ExecLater::timerEvent(QTimerEvent *event)
 void Application::execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args)
 {
     new ExecLater(howMuchLater, function, args, this);
+}
+
+AutoUpdate *Application::autoUpdate() const
+{
+    return AutoUpdate::instance();
 }
 
 bool Application::notify(QObject *object, QEvent *event)
