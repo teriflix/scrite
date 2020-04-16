@@ -135,11 +135,11 @@ win32 {
 }
 
 DISTFILES += \
-    GPLv3.txt \
     Info.plist \
     License.txt \
     packaging/windows/package.bat \
     packaging/windows/installer.nsi \
-    packaging/mac/packaging.sh
+    packaging/mac/packaging.sh \
+    poly2tri/License.txt
 
 

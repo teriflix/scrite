@@ -141,6 +141,9 @@ int main(int argc, char **argv)
     NotificationManager notificationManager;
     ScriteDocument scriteDocument;
 
+    if(a.arguments().size() == 2)
+        scriteDocument.open( a.arguments().last() );
+
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     format.setSamples(2);
 

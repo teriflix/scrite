@@ -4,7 +4,7 @@
 !define PRODUCT_NAME "Scrite"
 !define PRODUCT_VERSION "0.2.6-Beta"
 !define PRODUCT_PUBLISHER "TERIFLIX Entertainment Spaces Pvt. Ltd."
-!define PRODUCT_WEB_SITE "https://www.teriflix.com"
+!define PRODUCT_WEB_SITE "https://scrite.teriflix.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\scrite.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -16,13 +16,13 @@ SetCompressor /SOLID lzma
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_ICON "..\..\appicon.ico"
+!define MUI_UNICON "..\..\appicon.ico"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "..\..\GPLv3.txt"
+!insertmacro MUI_PAGE_LICENSE "..\..\LICENSE.txt"
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Instfiles page
@@ -37,6 +37,9 @@ SetCompressor /SOLID lzma
 ; Language files
 !insertmacro MUI_LANGUAGE "English"
 
+; Reserve files
+!insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
@@ -47,6 +50,11 @@ ShowInstDetails show
 ShowUnInstDetails show
 
 Section "MainSection" SEC01
+  ; Uninstall previous version
+  ClearErrors
+  IfFileExists "$INSTDIR\uninst.exe" +1 +2
+  ExecWait '"$INSTDIR\uninst.exe" /S'
+
   SetOutPath "$INSTDIR\bearer"
   SetOverwrite try
   File "bearer\qgenericbearer.dll"
@@ -902,11 +910,13 @@ SectionEnd
 
 
 Function un.onUninstSuccess
+  IfSilent +3
   HideWindow
   MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer."
 FunctionEnd
 
 Function un.onInit
+  IfSilent +3
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
   Abort
 FunctionEnd
@@ -1735,7 +1745,7 @@ Section Uninstall
   RMDir "$INSTDIR\imageformats"
   RMDir "$INSTDIR\iconengines"
   RMDir "$INSTDIR\bearer"
-  RMDir "$INSTDIR"
+  RMDir /r "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
