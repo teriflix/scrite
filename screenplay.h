@@ -80,6 +80,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void sceneWasDeleted();
 
 private:
     friend class Screenplay;
@@ -142,7 +143,8 @@ public:
     Q_SIGNAL void elementCountChanged();
     Q_SIGNAL void elementsChanged();
 
-    Q_INVOKABLE int indexOfScene(Scene *scene) const;
+    Q_INVOKABLE void removeSceneElements(Scene *scene);
+    Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
 
     enum BreakType

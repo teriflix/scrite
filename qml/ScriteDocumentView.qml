@@ -661,6 +661,7 @@ Item {
                                         else
                                             editorLoader.sourceComponent = screenplayEditorComponent
                                     }
+                                    onReleaseEditor: editorLoader.sourceComponent = screenplayEditorComponent
                                 }
 
                                 NotebookView {

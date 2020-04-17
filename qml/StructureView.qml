@@ -17,6 +17,7 @@ import Scrite 1.0
 
 Item {
     signal requestEditor()
+    signal releaseEditor()
 
     Rectangle {
         id: toolbar
@@ -450,7 +451,11 @@ Item {
 
                             MenuItem {
                                 text: "Delete"
-                                onClicked: scriteDocument.structure.removeElement(element)
+                                onClicked: {
+                                    releaseEditor()
+                                    scriteDocument.screenplay.removeSceneElements(element.scene)
+                                    scriteDocument.structure.removeElement(element)
+                                }
                             }
                         }
                         active: false

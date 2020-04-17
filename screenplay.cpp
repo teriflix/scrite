@@ -137,7 +137,7 @@ QString ScreenplayElement::sceneID() const
         return m_sceneID;
     }
 
-    return m_scene ? m_scene->id() : QString();
+    return m_scene ? m_scene->id() : m_sceneID;
 }
 
 void ScreenplayElement::setScene(Scene *val)
@@ -146,7 +146,8 @@ void ScreenplayElement::setScene(Scene *val)
         return;
 
     m_scene = val;
-    connect(m_scene, &Scene::aboutToDelete, this, &ScreenplayElement::deleteLater);
+    m_sceneID = m_scene->id();
+    connect(m_scene, &Scene::aboutToDelete, this, &ScreenplayElement::sceneWasDeleted);
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
 
@@ -181,6 +182,19 @@ bool ScreenplayElement::event(QEvent *event)
     }
 
     return QObject::event(event);
+}
+
+void ScreenplayElement::sceneWasDeleted()
+{
+    if(m_screenplay != nullptr)
+        m_screenplay->removeElement(this);
+    else
+    {
+        if(m_sceneID.isEmpty())
+            m_sceneID = m_scene->id();
+        m_scene = nullptr;
+        this->deleteLater();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -532,7 +546,20 @@ void Screenplay::clearElements()
     if(info) info->unlock();
 }
 
-int Screenplay::indexOfScene(Scene *scene) const
+void Screenplay::removeSceneElements(Scene *scene)
+{
+    if(scene == nullptr)
+        return;
+
+    for(int i=m_elements.size()-1; i>=0; i--)
+    {
+        ScreenplayElement *ptr = m_elements.at(i);
+        if(ptr->scene() == scene)
+            this->removeElement(ptr);
+    }
+}
+
+int Screenplay::firstIndexOfScene(Scene *scene) const
 {
     if(scene == nullptr)
         return -1;
@@ -600,7 +627,7 @@ void Screenplay::setActiveScene(Scene *val)
         }
     }
 
-    const int index = this->indexOfScene(val);
+    const int index = this->firstIndexOfScene(val);
     if(index < 0)
     {
         if(m_activeScene != nullptr)

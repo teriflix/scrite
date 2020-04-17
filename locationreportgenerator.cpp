@@ -94,7 +94,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
         {
             SceneHeading *heading = headings.at(i);
             Scene *scene = heading->scene();
-            if(screenplay->indexOfScene(scene) < 0)
+            if(screenplay->firstIndexOfScene(scene) < 0)
                 headings.removeAt(i);
             else
                 map[heading->locationType()][heading->moment()].append(heading);
@@ -152,7 +152,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
                 Q_FOREACH(SceneHeading *heading, it2.value())
                 {
                     Scene *scene = heading->scene();
-                    int sceneNr = screenplay->indexOfScene(scene)+1;
+                    int sceneNr = screenplay->firstIndexOfScene(scene)+1;
                     QString snippet = scene->title();
                     if(snippet.length() > snippetLength)
                         snippet = snippet.left(snippetLength-3) + "...";
