@@ -52,7 +52,9 @@ ShowUnInstDetails show
 Section "MainSection" SEC01
   ; Uninstall previous version
   ClearErrors
-  IfFileExists "$INSTDIR\uninst.exe" +1 +2
+  IfFileExists "$INSTDIR\uninst.exe" +1 +4
+  MessageBox MB_ICONINFORMATION|MB_OK "Please close any launched instances of Scrite before you continue."
+  ExecWait "TaskKill /IM scrite.exe /F"
   ExecWait '"$INSTDIR\uninst.exe" /S'
 
   SetOutPath "$INSTDIR\bearer"
@@ -922,6 +924,7 @@ Function un.onInit
 FunctionEnd
 
 Section Uninstall
+  ExecWait "TaskKill /IM scrite.exe /F"
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\vcredist_x64.exe"
