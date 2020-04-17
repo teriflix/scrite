@@ -468,10 +468,15 @@ Item {
                 fillMode: Image.PreserveAspectFit
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
+                transformOrigin: Item.Right
+                ToolTip.text: "Click here to provide feedback"
 
                 MouseArea {
+                    hoverEnabled: true
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
+                    onEntered: parent.ToolTip.visible = true
+                    onExited: parent.ToolTip.visible = false
                     onClicked: {
                         modalDialog.sourceComponent = aboutBoxComponent
                         modalDialog.popupSource = parent
@@ -949,5 +954,42 @@ Item {
         id: reportGeneratorConfigurationComponent
 
         ReportGeneratorConfiguration { }
+    }
+
+    Loader {
+        id: openingAnimationLoader
+        active: true
+        sourceComponent: SequentialAnimation {
+            running: true
+
+            PauseAnimation {
+                duration: 500
+            }
+
+            ScriptAction {
+                script: appLogo.ToolTip.visible = true
+            }
+
+            PropertyAnimation {
+                target: appLogo
+                properties: "scale"
+                from: 1; to: 1.5
+                duration: 1000
+            }
+
+            PropertyAnimation {
+                target: appLogo
+                properties: "scale"
+                from: 1.5; to: 1
+                duration: 1000
+            }
+
+            ScriptAction {
+                script: {
+                    appLogo.ToolTip.visible = false
+                    openingAnimationLoader.active = false
+                }
+            }
+        }
     }
 }
