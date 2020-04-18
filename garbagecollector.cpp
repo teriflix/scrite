@@ -27,7 +27,6 @@ GarbageCollector::GarbageCollector(QObject *parent)
 
 }
 
-
 GarbageCollector::~GarbageCollector()
 {
     m_timer.stop();
@@ -36,7 +35,7 @@ GarbageCollector::~GarbageCollector()
 
 void GarbageCollector::add(QObject *ptr)
 {
-    if(ptr == nullptr || m_objects.contains(ptr))
+    if(ptr == nullptr || m_objects.contains(ptr) || m_shredder.contains(ptr))
         return;
 
     connect(ptr, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
@@ -50,14 +49,17 @@ void GarbageCollector::timerEvent(QTimerEvent *event)
     {
         m_timer.stop();
 
-        QObjectList copy(m_objects);
+        m_shredder = m_objects;
         m_objects.clear();
-        qDeleteAll(copy);
+
+        while(!m_shredder.isEmpty())
+            delete m_shredder.takeFirst();
     }
 }
 
 void GarbageCollector::onObjectDestroyed(QObject *obj)
 {
     m_objects.removeOne(obj);
+    m_shredder.removeOne(obj);
     m_timer.start(100, this);
 }

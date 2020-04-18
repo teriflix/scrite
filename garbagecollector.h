@@ -38,6 +38,7 @@ protected:
 
 private:
     QObjectList m_objects;
+    QObjectList m_shredder;
     QBasicTimer m_timer;
 };
 
