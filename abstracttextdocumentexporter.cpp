@@ -182,7 +182,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
             ++nrSceneHeadings;
             const QString sceneNr = QString("[%1] ").arg(nrSceneHeadings);
             createNewTextBlock(cursor,SceneElement::Heading);
-            cursor.insertText(sceneNr + heading->toString());
+            cursor.insertText(sceneNr + heading->text());
 
             ++nrBlocks;
         }

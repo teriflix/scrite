@@ -77,7 +77,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             contentE.appendChild(paragraphE);
 
             paragraphE.setAttribute("Type", "Scene Heading");
-            addTextToParagraph(paragraphE, heading->toString());
+            addTextToParagraph(paragraphE, heading->text());
             locations.append(heading->location());
 
             if(!locationTypes.contains(heading->locationType()))

@@ -147,7 +147,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
                 charFormat = defaultCharFormat;
 
                 cursor.insertBlock(blockFormat, charFormat);
-                cursor.insertText(it2.value().first()->toString() + " (" + QString::number(it.value().size()) + ")");
+                cursor.insertText(it2.value().first()->text() + " (" + QString::number(it.value().size()) + ")");
 
                 Q_FOREACH(SceneHeading *heading, it2.value())
                 {

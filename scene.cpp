@@ -155,7 +155,7 @@ void SceneHeading::setMoment(const QString &val2)
     }
 }
 
-QString SceneHeading::toString() const
+QString SceneHeading::text() const
 {
     return m_locationType + ". " + m_location + " - " + m_moment;
 }
@@ -312,15 +312,12 @@ bool SceneElement::event(QEvent *event)
 Scene::Scene(QObject *parent)
     : QAbstractListModel(parent)
 {
-    connect(m_heading, &SceneHeading::enabledChanged, this, &Scene::headingChanged);
-    connect(m_heading, &SceneHeading::locationTypeChanged, this, &Scene::headingChanged);
-    connect(m_heading, &SceneHeading::locationChanged, this, &Scene::headingChanged);
-    connect(m_heading, &SceneHeading::momentChanged, this, &Scene::headingChanged);
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::headingChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
+    connect(m_heading, &SceneHeading::textChanged, this, &Scene::headingChanged);
 }
 
 Scene::~Scene()

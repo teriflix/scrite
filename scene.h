@@ -61,8 +61,8 @@ public:
     QString moment() const { return m_moment; }
     Q_SIGNAL void momentChanged();
 
-    Q_PROPERTY(QString text READ toString NOTIFY textChanged)
-    QString toString() const;
+    Q_PROPERTY(QString text READ text NOTIFY textChanged)
+    QString text() const;
     Q_SIGNAL void textChanged();
 
 private:

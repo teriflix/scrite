@@ -120,7 +120,7 @@ bool TextExporter::doExport(QIODevice *device)
         if(heading->isEnabled())
         {
             ++nrHeadings;
-            ts << "\n[" << nrHeadings << "] " << heading->toString() << "\n";
+            ts << "\n[" << nrHeadings << "] " << heading->text() << "\n";
         }
 
         const int nrElements = scene->elementCount();

@@ -257,7 +257,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                             charFormat.setFontItalic(false);
 
                             cursor.insertBlock(blockFormat, charFormat);
-                            cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->toString());
+                            cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
                             sceneInfoWritten = true;
                         }
 

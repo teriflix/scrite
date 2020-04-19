@@ -143,7 +143,7 @@ bool HtmlExporter::doExport(QIODevice *device)
         if(heading->isEnabled())
         {
             ++nrHeadings;
-            writeParagraph(SceneElement::Heading, "[" + QString::number(nrHeadings) + "] " + heading->toString());
+            writeParagraph(SceneElement::Heading, "[" + QString::number(nrHeadings) + "] " + heading->text());
         }
 
         const int nrElements = scene->elementCount();
