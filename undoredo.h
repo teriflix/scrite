@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef UNDOSTACK_H
-#define UNDOSTACK_H
+#ifndef UNDOREDO_H
+#define UNDOREDO_H
 
 #include <QVariant>
 #include <QPointer>
@@ -314,4 +314,4 @@ private:
     ObjectListCommand<ParentClass,ChildClass> *m_command = nullptr;
 };
 
-#endif // UNDOSTACK_H
+#endif // UNDOREDO_H

@@ -63,7 +63,7 @@ HEADERS += \
     timeprofiler.h \
     standardpaths.h \
     transliteration.h \
-    undostack.h
+    undoredo.h
 
 SOURCES += \
     3rdparty/phtranslator/PhTranslateLib.cpp \
@@ -120,7 +120,7 @@ SOURCES += \
     timeprofiler.cpp \
     standardpaths.cpp \
     transliteration.cpp \
-    undostack.cpp
+    undoredo.cpp
 
 RESOURCES += \
     scrite.qrc

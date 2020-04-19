@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "focustracker.h"
-#include "undostack.h"
+#include "undoredo.h"
 
 #include <QQuickItem>
 

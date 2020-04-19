@@ -26,7 +26,7 @@
 #include <QApplication>
 #include <QVersionNumber>
 
-#include "undostack.h"
+#include "undoredo.h"
 #include "errorreport.h"
 #include "transliteration.h"
 

@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "structure.h"
-#include "undostack.h"
+#include "undoredo.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 

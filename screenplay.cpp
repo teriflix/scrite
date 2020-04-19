@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "undostack.h"
+#include "undoredo.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"

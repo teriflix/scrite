@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "undostack.h"
+#include "undoredo.h"
 #include "abstractimporter.h"
 
 #include <QFile>

@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "scene.h"
-#include "undostack.h"
+#include "undoredo.h"
 #include "searchengine.h"
 #include "garbagecollector.h"
 
