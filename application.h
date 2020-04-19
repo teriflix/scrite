@@ -151,6 +151,9 @@ signals:
     void minimizeWindowRequest();
 
 private:
+    bool loadScript();
+
+private:
     QSettings *m_settings = nullptr;
     QUndoGroup *m_undoGroup = new QUndoGroup(this);
     QString m_baseWindowTitle;

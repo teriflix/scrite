@@ -75,6 +75,12 @@ DeviceIOFactories::~DeviceIOFactories()
 
 Q_GLOBAL_STATIC(DeviceIOFactories, deviceIOFactories)
 
+ScriteDocument *ScriteDocument::instance()
+{
+    static ScriteDocument *theInstance = new ScriteDocument(qApp);
+    return theInstance;
+}
+
 ScriteDocument::ScriteDocument(QObject *parent)
                 :QObject(parent)
 {

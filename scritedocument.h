@@ -31,8 +31,10 @@ class ScriteDocument : public QObject, public QObjectSerializer::Interface
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
 
-public:
     ScriteDocument(QObject *parent = nullptr);
+
+public:
+    static ScriteDocument *instance();
     ~ScriteDocument();
 
     Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)

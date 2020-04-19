@@ -29,6 +29,8 @@
 #include <QFontDatabase>
 #include <QStandardPaths>
 
+#define ENABLE_SCRIPT_HOTKEY
+
 Application *Application::instance()
 {
     return qobject_cast<Application*>(qApp);
@@ -358,6 +360,12 @@ bool Application::notify(QObject *object, QEvent *event)
             m_undoGroup->redo();
             return true;
         }
+
+        if( (ke->modifiers()&(Qt::ControlModifier|Qt::ShiftModifier)) && ke->key() == Qt::Key_T )
+        {
+            if(this->loadScript())
+                return true;
+        }
     }
 
     const bool ret = QtApplicationClass::notify(object, event);
@@ -387,3 +395,62 @@ bool Application::notify(QObject *object, QEvent *event)
 
     return ret;
 }
+
+#ifdef ENABLE_SCRIPT_HOTKEY
+
+#include <QJSEngine>
+#include <QFileDialog>
+#include "scritedocument.h"
+
+bool Application::loadScript()
+{
+    QMessageBox::StandardButton answer = QMessageBox::question(nullptr, "Warning", "Executing scripts on a scrite project is an experimental feature. Are you sure you want to use it?", QMessageBox::Yes|QMessageBox::No);
+    if(answer == QMessageBox::No)
+        return true;
+
+    ScriteDocument *document = ScriteDocument::instance();
+
+    QString scriptPath = QDir::homePath();
+    if( !document->fileName().isEmpty() )
+    {
+        QFileInfo fi(document->fileName());
+        scriptPath = fi.absolutePath();
+    }
+
+    const QString caption("Select a JavaScript file to load");
+    const QString filter("JavaScript File (*.js)");
+    const QString scriptFile = QFileDialog::getOpenFileName(nullptr, caption, scriptPath, filter);
+    if(scriptFile.isEmpty())
+        return true;
+
+    auto loadProgram = [](const QString &fileName) {
+        QFile file(fileName);
+        if(!file.open(QFile::ReadOnly))
+            return QString();
+        return QString::fromLatin1(file.readAll());
+    };
+    const QString program = loadProgram(scriptFile);
+    if(program.isEmpty())
+    {
+        QMessageBox::information(nullptr, "Script", "No code was found in the selected file.");
+        return true;
+    }
+
+    QJSEngine jsEngine;
+    QJSValue globalObject = jsEngine.globalObject();
+    globalObject.setProperty("document", jsEngine.newQObject(document));
+    const QJSValue result = jsEngine.evaluate(program, scriptFile);
+    if(result.isError())
+    {
+        const QString msg = "Uncaught exception at line " +
+                result.property("lineNumber").toString() + ": " +
+                result.toString();
+        QMessageBox::warning(nullptr, "Script", msg);
+    }
+
+    return true;
+}
+
+#else
+bool Application::loadScript() { return false; }
+#endif

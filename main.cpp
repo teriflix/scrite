@@ -139,23 +139,23 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<AutoUpdate>("Scrite", 1, 0, "AutoUpdate", reason);
 
     NotificationManager notificationManager;
-    ScriteDocument scriteDocument;
+    ScriteDocument *scriteDocument = ScriteDocument::instance();
 
     if(a.arguments().size() == 2)
-        scriteDocument.open( a.arguments().last() );
+        scriteDocument->open( a.arguments().last() );
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     format.setSamples(2);
 
     QQuickView qmlView;
     qmlView.setFormat(format);
-    scriteDocument.formatting()->setScreen(qmlView.screen());
-    qmlView.setTitle(scriteDocument.documentWindowTitle());
-    QObject::connect(&scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
+    scriteDocument->formatting()->setScreen(qmlView.screen());
+    qmlView.setTitle(scriteDocument->documentWindowTitle());
+    QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
     qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
     qmlView.engine()->rootContext()->setContextProperty("logger", Logger::instance());
-    qmlView.engine()->rootContext()->setContextProperty("scriteDocument", &scriteDocument);
+    qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
