@@ -19,8 +19,8 @@
 class StructureExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Structure Snapshot")
-    Q_CLASSINFO("NameFilters", "Image File (*.png)")
+    Q_CLASSINFO("Format", "Screenplay Structure")
+    Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
     Q_INVOKABLE StructureExporter(QObject *parent=nullptr);

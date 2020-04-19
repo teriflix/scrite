@@ -361,7 +361,7 @@ bool Application::notify(QObject *object, QEvent *event)
             return true;
         }
 
-        if( (ke->modifiers()&(Qt::ControlModifier|Qt::ShiftModifier)) && ke->key() == Qt::Key_T )
+        if( ke->modifiers()&Qt::ControlModifier && ke->modifiers()&Qt::ShiftModifier && ke->key() == Qt::Key_T )
         {
             if(this->loadScript())
                 return true;
