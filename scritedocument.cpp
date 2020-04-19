@@ -14,8 +14,8 @@
 #include "scritedocument.h"
 
 #include "logger.h"
+#include "undoredo.h"
 #include "hourglass.h"
-#include "undostack.h"
 #include "aggregation.h"
 #include "application.h"
 #include "pdfexporter.h"

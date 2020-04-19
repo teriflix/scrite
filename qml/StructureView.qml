@@ -30,49 +30,75 @@ Item {
 
         Row {
             id: toolbarLayout
-            spacing: 10
+            spacing: 3
             width: parent.width-4
             anchors.verticalCenter: parent.verticalCenter
 
-            ToolButton2 {
-                id: newSceneButton
-                icon.source: "../icons/content/add_box.png"
-                text: "Add Scene"
-                shortcutText: "N"
-                ToolTip.text: "Press " + shortcutText + " to create a new scene under the mouse on the canvas."
-                suggestedWidth: 130
-                suggestedHeight: 50
-                display: ToolButton.TextBesideIcon
-                down: newSceneColorMenuLoader.active
-                onClicked: newSceneColorMenuLoader.active = true
+            Row {
+                id: toolbarButtons
+                spacing: parent.spacing
                 anchors.verticalCenter: parent.verticalCenter
 
-                Loader {
-                    id: newSceneColorMenuLoader
-                    width: parent.width; height: 1
-                    anchors.top: parent.bottom
-                    sourceComponent: ColorMenu { }
-                    active: false
-                    onItemChanged: {
-                        if(item)
-                            item.open()
-                    }
+                ToolButton2 {
+                    id: newSceneButton
+                    icon.source: "../icons/content/add_box.png"
+                    text: "Add Scene"
+                    shortcutText: "N"
+                    ToolTip.text: "Press " + shortcutText + " to create a new scene under the mouse on the canvas."
+                    suggestedWidth: 130
+                    suggestedHeight: 50
+                    display: ToolButton.TextBesideIcon
+                    down: newSceneColorMenuLoader.active
+                    onClicked: newSceneColorMenuLoader.active = true
+                    anchors.verticalCenter: parent.verticalCenter
 
-                    Connections {
-                        target: newSceneColorMenuLoader.item
-                        onAboutToHide: newSceneColorMenuLoader.active = false
-                        onMenuItemClicked: {
-                            canvas.newElementColor = color
-                            canvas.newElementMode = true
-                            newSceneColorMenuLoader.active = false
+                    Loader {
+                        id: newSceneColorMenuLoader
+                        width: parent.width; height: 1
+                        anchors.top: parent.bottom
+                        sourceComponent: ColorMenu { }
+                        active: false
+                        onItemChanged: {
+                            if(item)
+                                item.open()
+                        }
+
+                        Connections {
+                            target: newSceneColorMenuLoader.item
+                            onAboutToHide: newSceneColorMenuLoader.active = false
+                            onMenuItemClicked: {
+                                canvas.newElementColor = color
+                                canvas.newElementMode = true
+                                newSceneColorMenuLoader.active = false
+                            }
                         }
                     }
+                }
+
+                ToolButton2 {
+                    icon.source: "../icons/navigation/zoom_in.png"
+                    text: "Zoom In"
+                    display: ToolButton.IconOnly
+                    suggestedHeight: 45
+                    anchors.verticalCenter: parent.verticalCenter
+                    autoRepeat: true
+                    onClicked: canvasScroll.zoomIn()
+                }
+
+                ToolButton2 {
+                    icon.source: "../icons/navigation/zoom_out.png"
+                    text: "Zoom Out"
+                    display: ToolButton.IconOnly
+                    suggestedHeight: 45
+                    anchors.verticalCenter: parent.verticalCenter
+                    autoRepeat: true
+                    onClicked: canvasScroll.zoomOut()
                 }
             }
 
             SearchBar {
                 id: searchBar
-                width: parent.width-newSceneButton.width-parent.spacing
+                width: parent.width-toolbarButtons.width-parent.spacing
                 anchors.verticalCenter: parent.verticalCenter
             }
         }

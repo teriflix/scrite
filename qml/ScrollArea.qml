@@ -25,6 +25,18 @@ Flickable {
     boundsBehavior: Flickable.StopAtBounds
     clip: true
 
+    function zoomIn() {
+        zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), 4)
+    }
+
+    function zoomOut() {
+        zoomScale = zoomScale*(1-scrollAreaSettings.zoomFactor)
+    }
+
+    function zoomOne() {
+        zoomScale = 1
+    }
+
     Behavior on contentX { NumberAnimation { duration: 250 } }
     Behavior on contentY { NumberAnimation { duration: 250 } }
 
@@ -99,8 +111,13 @@ Flickable {
     property real zoomScale: 1
 
     onZoomScaleChanged: {
+        var cursorPos = app.cursorPosition()
+        var fCursorPos = app.mapGlobalPositionToItem(flickable, cursorPos)
+        var fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
         var visibleArea = Qt.rect(contentX, contentY, width, height)
-        var mousePoint = app.mapGlobalPositionToItem(contentItem, app.cursorPosition())
+        var mousePoint = fContainsCursor ?
+                    app.mapGlobalPositionToItem(contentItem, app.cursorPosition()) :
+                    Qt.point(contentX+width/2, contentY+height/2)
         var newWidth = initialContentWidth * zoomScale
         var newHeight = initialContentHeight * zoomScale
         resizeContent(newWidth, newHeight, mousePoint)
@@ -131,9 +148,9 @@ Flickable {
     EventFilter.onFilter: {
         if(event.modifiers & Qt.AltModifier || event.modifiers & Qt.ControlModifier) {
             if(event.delta < 0)
-                zoomScale = zoomScale*(1-scrollAreaSettings.zoomFactor)
+                zoomOut()
             else
-                zoomScale = zoomScale*(1+scrollAreaSettings.zoomFactor)
+                zoomIn()
             result.acceptEvent = true
             result.filter = true
         }

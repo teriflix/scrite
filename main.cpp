@@ -20,7 +20,7 @@
 #include <QQmlContext>
 
 #include "logger.h"
-#include "undostack.h"
+#include "undoredo.h"
 #include "completer.h"
 #include "autoupdate.h"
 #include "aggregation.h"

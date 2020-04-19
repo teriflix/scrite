@@ -102,6 +102,7 @@ void GridBackgroundItem::setMajorTickColor(const QColor &val)
 
 void GridBackgroundItem::setTickColorOpacity(qreal val)
 {
+    val = qBound(0.0, val, 1.0);
     if( qFuzzyCompare(m_tickColorOpacity, val) )
         return;
 
