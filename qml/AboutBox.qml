@@ -22,7 +22,7 @@ Item {
     Column {
         width: parent.width * 0.75
         anchors.centerIn: parent
-        spacing: 40
+        spacing: 30
 
         Column {
             spacing: 10
@@ -43,6 +43,7 @@ Item {
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: 24
                 text: "Version " + app.applicationVersion
             }
         }
@@ -50,23 +51,46 @@ Item {
         Text {
             width: parent.width
             wrapMode: Text.WordWrap
-            font.pixelSize: 14
+            font.pixelSize: 16
             horizontalAlignment: Text.AlignHCenter
-            text: "Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd.\n" +
-                  "Developed using Qt " + app.qtVersion;
-        }
-
-        Text {
-            width: parent.width
-            wrapMode: Text.WordWrap
-            font.pixelSize: 14
-            horizontalAlignment: Text.AlignHCenter
-            text: "Using <strong>PhoneticTranslator</strong> for transliteration support.<br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
-
+            text: "© TERIFLIX Entertainment Spaces Pvt. Ltd.<br/><font color=\"blue\">https://www.teriflix.com</font>"
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
+                onClicked: Qt.openUrlExternally("https://www.teriflix.com")
+            }
+        }
+
+        Column {
+            width: parent.width
+            spacing: parent.spacing/3
+
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                font.pixelSize: 14
+                horizontalAlignment: Text.AlignHCenter
+                text: "Developed using Qt " + app.qtVersion + " LGPL<br/><font color=\"blue\">https://www.qt.io</font>"
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Qt.openUrlExternally("https://www.qt.io")
+                }
+            }
+
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                font.pixelSize: 14
+                horizontalAlignment: Text.AlignHCenter
+                text: "Using <strong>PhoneticTranslator</strong> for transliteration support.<br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
+                }
             }
         }
 
