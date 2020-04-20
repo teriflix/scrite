@@ -169,8 +169,9 @@ Item {
             property bool ensureCurrentItemIsVisible: true
             onCurrentIndexChanged: {
                 editIndex = -1
-                if(ensureCurrentItemIsVisible)
+                if(ensureCurrentItemIsVisible) {
                     canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), scale)
+                }
             }
             onEditIndexChanged: {
                 if(editIndex >= 0 && currentIndex !== editIndex) {

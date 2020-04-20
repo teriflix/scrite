@@ -64,6 +64,8 @@ Flickable {
         ensureVisible(area, scaling, leaveMargin)
     }
 
+    property var ensureVisibleParams
+
     function ensureVisible(area, scaling, leaveMargin) {
         if(leaveMargin === undefined)
             leaveMargin = 20
@@ -72,6 +74,18 @@ Flickable {
 
         area = Qt.rect( area.x*scaling, area.y*scaling,
                         area.width*scaling, area.height*scaling )
+
+        if(area.right > contentWidth || area.bottom > contentHeight) {
+            ensureVisibleParams = {
+                "area": area, "scaling": scaling, "leaveMargin": leaveMargin
+            }
+            app.execLater(500, function() {
+                var params = ensureVisibleParams
+                ensureVisibleParams = undefined
+                ensureVisible(params.area, params.scaling, params.leaveMargin)
+            })
+            return
+        }
 
         // Check if the areaangle can be contained within the viewport
         if(area.width > visibleRect.width || area.height > visibleRect.height) {
