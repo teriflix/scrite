@@ -90,6 +90,11 @@ public:
 
     static Transliterator *qmlAttachedProperties(QObject *object);
 
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
     Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
     void setTextDocument(QQuickTextDocument* val);
     QQuickTextDocument* textDocument() const { return m_textDocument; }
@@ -130,6 +135,7 @@ private:
     void transliterate(QTextCursor &cursor, void *transliterator=nullptr);
 
 private:
+    bool m_enabled = true;
     Mode m_mode = AutomaticMode;
     int m_cursorPosition = -1;
     bool m_hasActiveFocus = false;

@@ -400,7 +400,10 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
 
                 QObjectFactory listItemFactory;
                 if(listRef.canAppend())
+                {
+                    listRef.clear();
                     listItemFactory.add(listRef.listElementType());
+                }
 
                 for(int i=0; i<list.size(); i++)
                 {

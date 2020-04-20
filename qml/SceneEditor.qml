@@ -79,6 +79,7 @@ Item {
             characterNames: scriteDocument.structure.characterNames
             onDocumentInitialized: sceneContentEditor.cursorPosition = 0
             forceSyncDocument: !sceneContentEditor.activeFocus
+            onRequestCursorPosition: app.execLater(100, function() { assumeFocusAt(position) })
         }
 
         Loader {
@@ -138,13 +139,11 @@ Item {
                 }
             }
             font: scriteDocument.formatting.defaultFont
+            Transliterator.enabled: scene && !scene.isBeingReset
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
-            Component.onCompleted: {
-                sceneContentEditor = sceneTextArea
-                // scene.undoRedoEnabled = Qt.binding(function() { return sceneTextArea.activeFocus })
-            }
+            Component.onCompleted: sceneContentEditor = sceneTextArea
 
             Completer {
                 id: completer
@@ -208,6 +207,8 @@ Item {
             onActiveFocusChanged: {
                 if(activeFocus)
                     sceneHeadingLoader.viewOnly = true
+                if(scene)
+                    scene.undoRedoEnabled = activeFocus
             }
             Keys.onReturnPressed: {
                 if(completer.suggestion !== "") {

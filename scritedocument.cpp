@@ -178,6 +178,7 @@ Scene *ScriteDocument::createNewScene()
 
     emit newSceneCreated(scene, newScreenplayElementIndex);
 
+    scene->setUndoRedoEnabled(true);
     return scene;
 }
 

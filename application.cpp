@@ -13,6 +13,7 @@
 
 #include "application.h"
 #include "autoupdate.h"
+#include "undoredo.h"
 
 #include <QDir>
 #include <QtDebug>

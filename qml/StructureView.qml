@@ -106,7 +106,7 @@ Item {
 
     FocusIndicator {
         id: focusIndicator
-        active: structureScreenplayUndoStack.active
+        active: mainUndoStack.active
         anchors.fill: canvasScroll
         anchors.margins: -3
     }
@@ -161,8 +161,8 @@ Item {
             }
 
             FocusTracker.window: qmlWindow
-            FocusTracker.indicator.target: structureScreenplayUndoStack
-            FocusTracker.indicator.property: "structureViewHasFocus"
+            FocusTracker.indicator.target: mainUndoStack
+            FocusTracker.indicator.property: "structureEditorActive"
 
             property int currentIndex: scriteDocument.structure.currentElementIndex
             property int editIndex: -1    // index of item being edited
@@ -209,6 +209,8 @@ Item {
                 requestEditor()
                 canvas.editIndex = scriteDocument.structure.elementCount-1
                 canvas.ensureCurrentItemIsVisible = true
+
+                element.scene.undoRedoEnabled = true
             }
 
             property bool newElementMode: false

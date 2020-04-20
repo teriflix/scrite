@@ -25,6 +25,16 @@ Rectangle {
     height: 768
     color: "lightgray"
 
+    UndoStack {
+        id: mainUndoStack
+        objectName: "MainUndoStack"
+        property bool screenplayEditorActive: false
+        property bool timelineEditorActive: false
+        property bool structureEditorActive: false
+        property bool sceneEditorActive: false
+        active: screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive
+    }
+
     UI.ScriteDocumentView {
         id: ui
         anchors.fill: parent

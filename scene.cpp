@@ -13,13 +13,241 @@
 
 #include "scene.h"
 #include "undoredo.h"
+#include "application.h"
 #include "searchengine.h"
+#include "timeprofiler.h"
+#include "scritedocument.h"
 #include "garbagecollector.h"
+#include "qobjectserializer.h"
 
 #include <QUuid>
+#include <QDateTime>
+#include <QByteArray>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QUndoCommand>
 #include <QTextDocument>
+#include <QJsonDocument>
+
+class PushSceneUndoCommand;
+class SceneUndoCommand : public QUndoCommand
+{
+public:
+    static SceneUndoCommand *current;
+
+    SceneUndoCommand(Scene *scene);
+    ~SceneUndoCommand();
+
+    // QUndoCommand interface
+    enum { ID = 100 };
+    void undo();
+    void redo();
+    int id() const { return ID; }
+    bool mergeWith(const QUndoCommand *other);
+
+private:
+    QByteArray toByteArray(Scene *scene) const;
+    Scene *fromByteArray(const QByteArray &bytes) const;
+
+private:
+    friend class PushSceneUndoCommand;
+    Scene *m_scene = nullptr;
+    QString m_sceneId;
+    QByteArray m_after;
+    QByteArray m_before;
+    QDateTime m_timestamp;
+};
+
+SceneUndoCommand *SceneUndoCommand::current = nullptr;
+
+SceneUndoCommand::SceneUndoCommand(Scene *scene)
+    : m_scene(scene), m_timestamp(QDateTime::currentDateTime())
+{
+    m_sceneId = m_scene->id();
+    m_before = this->toByteArray(scene);
+}
+
+SceneUndoCommand::~SceneUndoCommand()
+{
+
+}
+
+void SceneUndoCommand::undo()
+{
+    SceneUndoCommand::current = this;
+    Scene *scene = this->fromByteArray(m_before);
+    SceneUndoCommand::current = nullptr;
+
+    if(scene == nullptr)
+        this->setObsolete(true);
+}
+
+void SceneUndoCommand::redo()
+{
+    if(m_scene != nullptr)
+    {
+        m_after = this->toByteArray(m_scene);
+        m_scene = nullptr;
+        return;
+    }
+
+    SceneUndoCommand::current = this;
+    Scene *scene = this->fromByteArray(m_after);
+    SceneUndoCommand::current = nullptr;
+
+    if(scene == nullptr)
+        this->setObsolete(true);
+}
+
+bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
+{
+    if(this->id() == other->id())
+    {
+        const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand*>(other);
+        if(cmd->m_sceneId != m_sceneId)
+            return false;
+
+        const qint64 timegap = qAbs(m_timestamp.msecsTo(cmd->m_timestamp));
+        static qint64 minTimegap = 1000;
+        if(timegap < minTimegap)
+        {
+            m_after = cmd->m_after;
+            m_timestamp = cmd->m_timestamp;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+QByteArray SceneUndoCommand::toByteArray(Scene *scene) const
+{
+    QByteArray bytes;
+    QDataStream ds(&bytes, QIODevice::WriteOnly);
+    ds << scene->id();
+    ds << scene->title();
+    ds << scene->color();
+    ds << scene->cursorPosition();
+    ds << scene->heading()->locationType();
+    ds << scene->heading()->location();
+    ds << scene->heading()->moment();
+    ds << scene->elementCount();
+    for(int i=0; i<scene->elementCount(); i++)
+    {
+        SceneElement *element = scene->elementAt(i);
+        ds << int(element->type());
+        ds << element->text();
+    }
+
+    return bytes;
+}
+
+Scene *SceneUndoCommand::fromByteArray(const QByteArray &bytes) const
+{
+    QDataStream ds(bytes);
+
+    QString sceneId;
+    ds >> sceneId;
+
+    const Structure *structure = ScriteDocument::instance()->structure();
+    const StructureElement *element = structure->findElementBySceneID(sceneId);
+    if(element == nullptr || element->scene() == nullptr)
+        return nullptr;
+
+    Scene *scene = element->scene();
+    scene->sceneAboutToReset();
+    scene->clearElements();
+
+    QString title;
+    ds >> title;
+    scene->setTitle(title);
+
+    QColor color;
+    ds >> color;
+    scene->setColor(color);
+
+    int curPosition = -1;
+    ds >> curPosition;
+    scene->setCursorPosition(curPosition);
+
+    QString locType;
+    ds >> locType;
+    scene->heading()->setLocationType(locType);
+
+    QString loc;
+    ds >> loc;
+    scene->heading()->setLocation(loc);
+
+    QString moment;
+    ds >> moment;
+    scene->heading()->setMoment(moment);
+
+    int nrScenes = 0;
+    ds >> nrScenes;
+
+    for(int i=0; i<nrScenes; i++)
+    {
+        SceneElement *element = new SceneElement(scene);
+
+        int type = SceneElement::Action;
+        ds >> type;
+        element->setType( SceneElement::Type(type) );
+
+        QString text;
+        ds >> text;
+        element->setText(text);
+
+        scene->addElement(element);
+    }
+
+    scene->sceneReset(curPosition);
+
+    return scene;
+}
+
+class PushSceneUndoCommand
+{
+    static UndoStack *allowedStack;
+
+public:
+    PushSceneUndoCommand(Scene *scene);
+    ~PushSceneUndoCommand();
+
+private:
+    SceneUndoCommand *m_command = nullptr;
+};
+
+UndoStack *PushSceneUndoCommand::allowedStack = nullptr;
+
+PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene)
+{
+    if(allowedStack == nullptr)
+        allowedStack = Application::instance()->findUndoStack("MainUndoStack");
+
+    if(SceneUndoCommand::current == nullptr &&
+       allowedStack != nullptr &&
+       UndoStack::active() != nullptr &&
+       UndoStack::active() == allowedStack &&
+       scene != nullptr && scene->isUndoRedoEnabled())
+    {
+        if(scene != nullptr)
+            m_command = new SceneUndoCommand(scene);
+    }
+}
+
+PushSceneUndoCommand::~PushSceneUndoCommand()
+{
+    if(m_command != nullptr &&
+        SceneUndoCommand::current == nullptr &&
+        allowedStack != nullptr &&
+        UndoStack::active() != nullptr &&
+        UndoStack::active() == allowedStack)
+        UndoStack::active()->push(m_command);
+    else
+        delete m_command;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 SceneHeading::SceneHeading(QObject *parent)
     : QObject(parent),
@@ -41,28 +269,10 @@ void SceneHeading::setEnabled(bool val)
     if(m_enabled == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "enabled");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneAboutToReset();
-    }
-    else
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(m_scene);
 
     m_enabled = val;
     emit enabledChanged();
-
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneReset(-1);
-    }
 }
 
 void SceneHeading::setLocationType(const QString &val2)
@@ -71,28 +281,10 @@ void SceneHeading::setLocationType(const QString &val2)
     if(m_locationType == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "locationType");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneAboutToReset();
-    }
-    else
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(m_scene);
 
     m_locationType = val;
     emit locationTypeChanged();
-
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneReset(-1);
-    }
 }
 
 void SceneHeading::setLocation(const QString &val2)
@@ -101,28 +293,10 @@ void SceneHeading::setLocation(const QString &val2)
     if(m_location == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "location");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneAboutToReset();
-    }
-    else
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(m_scene);
 
     m_location = val;
     emit locationChanged();
-
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneReset(-1);
-    }
 }
 
 void SceneHeading::setMoment(const QString &val2)
@@ -131,28 +305,10 @@ void SceneHeading::setMoment(const QString &val2)
     if(m_moment == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "moment");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneAboutToReset();
-    }
-    else
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(m_scene);
 
     m_moment = val;
     emit momentChanged();
-
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneReset(-1);
-    }
 }
 
 QString SceneHeading::text() const
@@ -168,9 +324,6 @@ SceneElement::SceneElement(QObject *parent)
 {
     connect(this, &SceneElement::typeChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::textChanged, this, &SceneElement::elementChanged);
-
-    ObjectPropertyInfo::querySetCounter(this, "type");
-    ObjectPropertyInfo::querySetCounter(this, "text");
 }
 
 SceneElement::~SceneElement()
@@ -183,31 +336,13 @@ void SceneElement::setType(SceneElement::Type val)
     if(m_type == val)
         return;
 
-    ObjectPropertyInfo *info = m_scene->isUndoRedoEnabled() ? ObjectPropertyInfo::get(this, "type") : nullptr;
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info == nullptr || info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneAboutToReset();
-    }
-    else
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(m_scene);
 
     m_type = val;
     emit typeChanged();
 
     if(m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
-
-    if(info == nullptr || info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneReset(m_scene->indexOfElement(this));
-    }
 }
 
 QString SceneElement::typeAsString() const
@@ -231,31 +366,13 @@ void SceneElement::setText(const QString &val)
     if(m_text == val)
         return;
 
-    ObjectPropertyInfo *info = m_scene->isUndoRedoEnabled() ? ObjectPropertyInfo::get(this, "text") : nullptr;
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(info == nullptr || info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneAboutToReset();
-    }
-    else
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));        
+    PushSceneUndoCommand cmd(m_scene);
 
     m_text = val.trimmed();
     emit textChanged();
 
     if(m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
-
-    if(info == nullptr || info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        emit m_scene->sceneReset(m_scene->indexOfElement(this));
-    }
 }
 
 void SceneElement::setCursorPosition(int val)
@@ -318,6 +435,15 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::headingChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::headingChanged);
+
+    connect(this, &Scene::sceneAboutToReset, [this]() {
+        m_isBeingReset = true;
+        emit resetStateChanged();
+    });
+    connect(this, &Scene::sceneReset, [this]() {
+        m_isBeingReset = false;
+        emit resetStateChanged();
+    });
 }
 
 Scene::~Scene()
@@ -355,10 +481,7 @@ void Scene::setTitle(const QString &val)
     if(m_title == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "title");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(this);
 
     m_title = val;
     emit titleChanged();
@@ -369,10 +492,7 @@ void Scene::setColor(const QColor &val)
     if(m_color == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "color");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+    PushSceneUndoCommand cmd(this);
 
     m_color = val;
     emit colorChanged();
@@ -382,11 +502,6 @@ void Scene::setEnabled(bool val)
 {
     if(m_enabled == val)
         return;
-
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "enabled");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_enabled = val;
     emit enabledChanged();
@@ -444,12 +559,6 @@ void Scene::insertElementBefore(SceneElement *ptr, SceneElement *before)
     this->insertElementAt(ptr, index);
 }
 
-static void sceneAppendElement(Scene *scene, SceneElement *ptr) { scene->addElement(ptr); }
-static void sceneRemoveElement(Scene *scene, SceneElement *ptr) { scene->removeElement(ptr); }
-static void sceneInsertElement(Scene *scene, SceneElement *ptr, int index) { scene->insertElementAt(ptr, index); }
-static SceneElement *sceneElementAt(Scene *scene, int index) { return scene->elementAt(index); }
-static int sceneIndexOfElement(Scene *scene, SceneElement *ptr) { return scene->indexOfElement(ptr); }
-
 void Scene::insertElementAt(SceneElement *ptr, int index)
 {
     if(ptr == nullptr || m_elements.indexOf(ptr) >= 0)
@@ -458,6 +567,8 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     if(index < 0 || index > m_elements.size())
         return;
 
+    PushSceneUndoCommand cmd(this);
+
     this->beginInsertRows(QModelIndex(), index, index);
 
     m_elements.insert(index, ptr);
@@ -465,35 +576,9 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
     connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
-    // START HERE
-    // 3. sceneAboutToReset() and sceneReset() to be used to reload documents from scene in binder.
-
-    QScopedPointer< PushObjectListCommand<Scene,SceneElement> > cmd;
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        this->sceneAboutToReset();
-    }
-    else
-    {
-        ObjectListPropertyMethods<Scene,SceneElement> methods(&sceneAppendElement, &sceneRemoveElement, &sceneInsertElement, &sceneElementAt, sceneIndexOfElement);
-        cmd.reset( new PushObjectListCommand<Scene,SceneElement> (ptr, this, info->property, ObjectList::InsertOperation, methods) );
-    }
-
     this->endInsertRows();
 
     emit elementCountChanged();
-
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        this->sceneReset(index);
-    }
 }
 
 void Scene::removeElement(SceneElement *ptr)
@@ -505,20 +590,7 @@ void Scene::removeElement(SceneElement *ptr)
     if(row < 0)
         return;
 
-    QScopedPointer< PushObjectListCommand<Scene,SceneElement> > cmd;
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        this->sceneAboutToReset();
-    }
-    else
-    {
-        ObjectListPropertyMethods<Scene,SceneElement> methods(&sceneAppendElement, &sceneRemoveElement, &sceneInsertElement, &sceneElementAt, sceneIndexOfElement);
-        cmd.reset( new PushObjectListCommand<Scene,SceneElement> (ptr, this, info->property, ObjectList::RemoveOperation, methods) );
-    }
+    PushSceneUndoCommand cmd(this);
 
     this->beginRemoveRows(QModelIndex(), row, row);
 
@@ -535,14 +607,6 @@ void Scene::removeElement(SceneElement *ptr)
 
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
-
-    if(info->isLocked())
-    {
-        // This happens when a scene element text is reset because of a
-        // undo or redo command. It is best if we allow SceneDocumentBinder
-        // an opportunity to know about this in advance.
-        this->sceneReset(qBound(0, row, m_elements.size()-1));
-    }
 }
 
 SceneElement *Scene::elementAt(int index) const
@@ -615,6 +679,23 @@ void Scene::clearNotes()
 {
     while(m_notes.size())
         this->removeNote(m_notes.first());
+}
+
+void Scene::beginUndoCapture()
+{
+    if(m_pushUndoCommand != nullptr)
+        return;
+
+    m_pushUndoCommand = new PushSceneUndoCommand(this);
+}
+
+void Scene::endUndoCapture()
+{
+    if(m_pushUndoCommand == nullptr)
+        return;
+
+    delete m_pushUndoCommand;
+    m_pushUndoCommand = nullptr;
 }
 
 int Scene::rowCount(const QModelIndex &parent) const

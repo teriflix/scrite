@@ -42,26 +42,6 @@ StructureElement::~StructureElement()
     emit aboutToDelete(this);
 }
 
-void StructureElement::setScene(Scene *val)
-{
-    if(m_scene == val || m_scene != nullptr || val == nullptr)
-        return;
-
-    m_scene = val;
-    m_scene->setParent(this);
-    connect(m_scene, &Scene::sceneChanged, this, &StructureElement::elementChanged);
-    connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
-    connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
-
-    connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &StructureElement::sceneHeadingChanged);
-    connect(m_scene->heading(), &SceneHeading::locationTypeChanged, this, &StructureElement::sceneHeadingChanged);
-    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneHeadingChanged);
-    connect(m_scene->heading(), &SceneHeading::momentChanged, this, &StructureElement::sceneHeadingChanged);
-    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneLocationChanged);
-
-    emit sceneChanged();
-}
-
 void StructureElement::setX(qreal val)
 {
     if( qFuzzyCompare(m_x, val) )
@@ -149,6 +129,26 @@ void StructureElement::setPosition(const QPointF &pos)
 
     this->setX(pos.x());
     this->setY(pos.y());
+}
+
+void StructureElement::setScene(Scene *val)
+{
+    if(m_scene == val || m_scene != nullptr || val == nullptr)
+        return;
+
+    m_scene = val;
+    m_scene->setParent(this);
+    connect(m_scene, &Scene::sceneChanged, this, &StructureElement::elementChanged);
+    connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
+    connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
+
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::locationTypeChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::momentChanged, this, &StructureElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::locationChanged, this, &StructureElement::sceneLocationChanged);
+
+    emit sceneChanged();
 }
 
 bool StructureElement::event(QEvent *event)
@@ -588,7 +588,7 @@ void Structure::removeElement(StructureElement *ptr)
 
     QScopedPointer< PushObjectListCommand<Structure,StructureElement> > cmd;
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(!info->isLocked())
+    if(!info->isLocked() && /* DISABLES CODE */ (false))
     {
         ObjectListPropertyMethods<Structure,StructureElement> methods(&structureAppendElement, &structureRemoveElement, &structureInsertElement, &structureElementAt, structureIndexOfElement);
         cmd.reset( new PushObjectListCommand<Structure,StructureElement>(ptr, this, "elements", ObjectList::RemoveOperation, methods) );
@@ -615,7 +615,7 @@ void Structure::insertElement(StructureElement *ptr, int index)
 
     QScopedPointer< PushObjectListCommand<Structure,StructureElement> > cmd;
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(!info->isLocked())
+    if(!info->isLocked() && /* DISABLES CODE */ (false))
     {
         ObjectListPropertyMethods<Structure,StructureElement> methods(&structureAppendElement, &structureRemoveElement, &structureInsertElement, &structureElementAt, structureIndexOfElement);
         cmd.reset( new PushObjectListCommand<Structure,StructureElement>(ptr, this, "elements", ObjectList::InsertOperation, methods) );
@@ -754,7 +754,7 @@ void Structure::addAnnotation(Annotation *ptr)
 
     QScopedPointer< PushObjectListCommand<Structure,Annotation> > cmd;
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "annotations");
-    if(!info->isLocked())
+    if(!info->isLocked() && /* DISABLES CODE */ (false))
     {
         ObjectListPropertyMethods<Structure,Annotation> methods(&structureAppendAnnotation, &structureRemoveAnnotation, &structureInsertAnnotation, &structureAnnotationAt, structureIndexOfAnnotation);
         cmd.reset( new PushObjectListCommand<Structure,Annotation>(ptr, this, info->property, ObjectList::InsertOperation, methods) );
@@ -781,7 +781,7 @@ void Structure::removeAnnotation(Annotation *ptr)
 
     QScopedPointer< PushObjectListCommand<Structure,Annotation> > cmd;
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "annotations");
-    if(!info->isLocked())
+    if(!info->isLocked() && /* DISABLES CODE */ (false))
     {
         ObjectListPropertyMethods<Structure,Annotation> methods(&structureAppendAnnotation, &structureRemoveAnnotation, &structureInsertAnnotation, &structureAnnotationAt, structureIndexOfAnnotation);
         cmd.reset( new PushObjectListCommand<Structure,Annotation>(ptr, this, info->property, ObjectList::RemoveOperation, methods) );

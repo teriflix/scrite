@@ -81,7 +81,7 @@ Item {
 
     FocusIndicator {
         id: focusIndicator
-        active: sceneEditorUndoStack.active
+        active: mainUndoStack.active
         anchors.fill: screenplayListView
         anchors.margins: -3
     }
@@ -124,7 +124,8 @@ Item {
         }
 
         FocusTracker.window: qmlWindow
-        FocusTracker.indicator.target: sceneEditorUndoStack
+        FocusTracker.indicator.target: mainUndoStack
+        FocusTracker.indicator.property: "screenplayEditorActive"
 
         moveDisplaced: moveAndDisplace
         move: moveAndDisplace

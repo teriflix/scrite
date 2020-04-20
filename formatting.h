@@ -197,6 +197,8 @@ public:
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
+    Q_SIGNAL void requestCursorPosition(int position);
+
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
@@ -259,7 +261,7 @@ private:
     void setCompletionPrefix(const QString &val);
 
     void onSceneAboutToReset();
-    void onSceneReset(int elementIndex);
+    void onSceneReset(int position);
 
 private:
     Scene* m_scene = nullptr;

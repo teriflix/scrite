@@ -237,6 +237,15 @@ Transliterator *Transliterator::qmlAttachedProperties(QObject *object)
     return new Transliterator(object);
 }
 
+void Transliterator::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}
+
 void Transliterator::setTextDocument(QQuickTextDocument *val)
 {
     if(m_textDocument == val)
@@ -296,7 +305,8 @@ void Transliterator::setHasActiveFocus(bool val)
 
     if(!m_hasActiveFocus)
     {
-        this->transliterateLastWord();
+        if(m_enabled)
+            this->transliterateLastWord();
         this->setCursorPosition(-1);
     }
 
@@ -368,7 +378,7 @@ void Transliterator::onTextDocumentDestroyed()
 void Transliterator::processTransliteration(int from, int charsRemoved, int charsAdded)
 {
     Q_UNUSED(charsRemoved)
-    if(this->document() == nullptr || !m_hasActiveFocus)
+    if(this->document() == nullptr)
         return;
 
     void *transliterator = TransliterationSettings::instance()->transliterator();
@@ -403,7 +413,7 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
 
 void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
 {
-    if(this->document() == nullptr || cursor.document() != this->document())
+    if(this->document() == nullptr || cursor.document() != this->document() || !m_hasActiveFocus || !m_enabled)
         return;
 
     if(transliterator == nullptr)

@@ -14,6 +14,7 @@
 #ifndef UNDOREDO_H
 #define UNDOREDO_H
 
+#include <QtDebug>
 #include <QVariant>
 #include <QPointer>
 #include <QUndoStack>
@@ -53,9 +54,9 @@ struct ObjectPropertyInfo
     const QMetaObject *metaObject = nullptr;
     const QList<QByteArray> propertyBundle;
 
-    void lock() { recursionLock = true; }
-    void unlock() { recursionLock = false; }
-    bool isLocked() const { return recursionLock; }
+    void lock() { m_locked = true; }
+    void unlock() { m_locked = false; }
+    bool isLocked() const { return m_locked; }
 
     QVariant read() const;
     bool write(const QVariant &val);
@@ -69,7 +70,7 @@ private:
     void deleteSelf();
 
     static int counter;
-    bool recursionLock = false;
+    bool m_locked = false;
     QMetaObject::Connection m_connection;
 };
 

@@ -130,7 +130,7 @@ Rectangle {
 
     FocusIndicator {
         id: focusIndicator
-        active: structureScreenplayUndoStack.active
+        active: mainUndoStack.active
         anchors.fill: screenplayElementList
         anchors.margins: -3
 
@@ -181,8 +181,8 @@ Rectangle {
             }
         }
         FocusTracker.window: qmlWindow
-        FocusTracker.indicator.target: structureScreenplayUndoStack
-        FocusTracker.indicator.property: "screenplayViewHasFocus"
+        FocusTracker.indicator.target: mainUndoStack
+        FocusTracker.indicator.property: "timelineEditorActive"
 
         Transition {
             id: moveAndDisplace

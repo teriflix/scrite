@@ -727,19 +727,6 @@ Item {
         }
     }
 
-    UndoStack {
-        id: sceneEditorUndoStack
-        objectName: "SceneEditor_UndoStack"
-    }
-
-    UndoStack {
-        id: structureScreenplayUndoStack
-        objectName: "StructureScreenplay_UndoStack"
-        property bool structureViewHasFocus: false
-        property bool screenplayViewHasFocus: false
-        active: structureViewHasFocus || screenplayViewHasFocus
-    }
-
     Component {
         id: screenplayEditorComponent
 
@@ -772,7 +759,7 @@ Item {
 
             FocusIndicator {
                 id: focusIndicator
-                active: sceneEditorUndoStack.active
+                active: mainUndoStack.active
                 anchors.fill: sceneEditor
                 anchors.margins: -3
             }
@@ -799,7 +786,8 @@ Item {
                 }
 
                 FocusTracker.window: qmlWindow
-                FocusTracker.indicator.target: sceneEditorUndoStack
+                FocusTracker.indicator.target: mainUndoStack
+                FocusTracker.indicator.property: "sceneEditorActive"
             }
 
             Component.onCompleted: globalSceneEditorToolbar.sceneEditor = sceneEditor

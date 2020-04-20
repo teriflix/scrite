@@ -29,6 +29,7 @@ class Scene;
 class SceneHeading;
 class SceneElement;
 class SceneDocumentBinder;
+class PushSceneUndoCommand;
 
 class SceneHeading : public QObject
 {
@@ -67,7 +68,7 @@ public:
 
 private:
     bool m_enabled = true;
-    char m_padding[7];
+    char m_padding1[7];
     Scene* m_scene = nullptr;
     QString m_moment = "DAY";
     QString m_location = "Somewhere";
@@ -160,7 +161,10 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    // This affects only scene elements
+    Q_PROPERTY(bool isBeingReset READ isBeingReset NOTIFY resetStateChanged)
+    bool isBeingReset() const { return m_isBeingReset; }
+    Q_SIGNAL void resetStateChanged();
+
     Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY undoRedoEnabledChanged STORED false)
     void setUndoRedoEnabled(bool val);
     bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
@@ -206,6 +210,9 @@ public:
     Q_INVOKABLE void clearNotes();
     Q_SIGNAL void noteCountChanged();
 
+    void beginUndoCapture();
+    void endUndoCapture();
+
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
@@ -227,7 +234,9 @@ private:
     mutable QString m_id;
     int m_cursorPosition = -1;
     SceneHeading* m_heading = new SceneHeading(this);
-    bool m_undoRedoEnabled = true;
+    bool m_isBeingReset = false;
+    bool m_undoRedoEnabled = false;
+    PushSceneUndoCommand *m_pushUndoCommand = nullptr;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);

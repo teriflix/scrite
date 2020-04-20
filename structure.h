@@ -42,11 +42,6 @@ public:
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
     Structure* structure() const { return m_structure; }
 
-    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
-    void setScene(Scene* val);
-    Scene* scene() const { return m_scene; }
-    Q_SIGNAL void sceneChanged();
-
     Q_PROPERTY(qreal x READ x WRITE setX NOTIFY xChanged STORED false)
     void setX(qreal val);
     qreal x() const { return m_x; }
@@ -80,6 +75,11 @@ public:
     Q_PROPERTY(QPointF position READ position WRITE setPosition STORED false)
     void setPosition(const QPointF &pos);
     QPointF position() const { return QPointF(m_x,m_y); }
+
+    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
+    void setScene(Scene* val);
+    Scene* scene() const { return m_scene; }
+    Q_SIGNAL void sceneChanged();
 
     Q_SIGNAL void elementChanged();
     Q_SIGNAL void sceneHeadingChanged();

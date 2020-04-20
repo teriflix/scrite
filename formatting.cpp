@@ -423,7 +423,7 @@ void SceneDocumentBinder::setScene(Scene *val)
 
     m_scene = val;
 
-    if(m_scene != nullptr && this->document() != nullptr)
+    if(m_scene != nullptr)
     {
         connect(m_scene, &Scene::sceneElementChanged,
                 this, &SceneDocumentBinder::onSceneElementChanged);
@@ -517,6 +517,10 @@ void SceneDocumentBinder::setCursorPosition(int val)
         return;
 
     m_cursorPosition = val;
+    if(m_scene != nullptr)
+        m_scene->setCursorPosition(m_cursorPosition);
+    emit cursorPositionChanged();
+
     if(this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount())
         return;
 
@@ -548,8 +552,6 @@ void SceneDocumentBinder::setCursorPosition(int val)
         if(!m_autoCompleteHints.isEmpty())
             this->setCompletionPrefix(block.text());
     }
-
-    emit cursorPositionChanged();
 }
 
 void SceneDocumentBinder::setCharacterNames(const QStringList &val)
@@ -900,6 +902,8 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
      * So its better we sync it like this.
      */
 
+    m_scene->beginUndoCapture();
+
     QList<SceneElement*> elementList;
     elementList.reserve(nrBlocks);
 
@@ -961,6 +965,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     }
 
     m_scene->setElementsList(elementList);
+    m_scene->endUndoCapture();
 }
 
 void SceneDocumentBinder::evaluateAutoCompleteHints()
@@ -1049,21 +1054,12 @@ void SceneDocumentBinder::onSceneAboutToReset()
     m_sceneIsBeingReset = true;
 }
 
-void SceneDocumentBinder::onSceneReset(int)
+void SceneDocumentBinder::onSceneReset(int position)
 {
-    m_initializeDocumentTimer.start(0, this);
+    this->initializeDocument();
 
-#if 0
-    if(this->document() != nullptr)
-    {
-        const QTextBlock block = this->document()->findBlockByNumber(elementIndex);
-        if( m_cursorPosition >= block.position() && m_cursorPosition < block.position()+block.length() )
-            emit requestCursorPosition(m_cursorPosition);
-        else
-            emit requestCursorPosition(block.position()+block.length()-1);
-    }
-#else
-#endif
+    if(position >= 0)
+        emit requestCursorPosition(position);
 
     m_sceneIsBeingReset = false;
 }
