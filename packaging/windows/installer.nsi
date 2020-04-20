@@ -52,11 +52,16 @@ ShowUnInstDetails show
 Section "MainSection" SEC01
   ; Uninstall previous version
   ClearErrors
-  IfFileExists "$INSTDIR\uninst.exe" +1 +4
+  IfFileExists "$INSTDIR\uninst.exe" +1 beginInsallation
   MessageBox MB_ICONINFORMATION|MB_OK "Please close any launched instances of Scrite before you continue."
   ExecWait "TaskKill /IM scrite.exe /F"
   ExecWait '"$INSTDIR\uninst.exe" /S'
 
+  Sleep 500
+  IfFileExists "$INSTDIR\uninst.exe" -1 +1
+  Sleep 5000
+
+beginInsallation:
   SetOutPath "$INSTDIR\bearer"
   SetOverwrite try
   File "bearer\qgenericbearer.dll"
