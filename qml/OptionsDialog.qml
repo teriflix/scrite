@@ -284,201 +284,302 @@ Item {
                 property var footerCenter: HeaderFooter.Version
                 property var footerRight: HeaderFooter.Contact
                 property real footerOpacity: 0.5
+                property bool watermarkEnabled: false
+                property string watermarkText: "Scrite"
+                property string watermarkFont: "Courier Prime"
+                property int watermarkFontSize: 120
+                property color watermarkColor: "lightgray"
+                property real watermarkOpacity: 0.5
+                property real watermarkRotation: -45
+                property int watermarkAlignment: Qt.AlignCenter
             }
 
-            Column {
-                spacing: 20
+            ScrollView {
+                id: pageSetupScroll
                 width: parent.width-20
+                height: parent.height
                 anchors.right: parent.right
 
-                Text {
-                    width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Page Setup"
-                    font.pixelSize: 24
-                }
+                Column {
+                    spacing: 20
+                    width: pageSetupScroll.width
 
-                Text {
-                    width: parent.width
-                    text: "PDFs are always generated in A4 size."
-                }
-
-                GroupBox {
-                    width: parent.width
-                    label: Text {
-                        text: "Header"
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
-
-                    Row {
+                    Text {
                         width: parent.width
-                        height: 80
-
-                        Item {
-                            width: parent.width/3
-                            height: childrenRect.height
-
-                            Column {
-                                width: parent.width-10
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
-
-                                Text {
-                                    text: "Left"
-                                }
-
-                                ComboBox {
-                                    width: parent.width
-                                    model: fieldsModel
-                                    textRole: "key"
-                                    currentIndex: pageSetupSettings.headerLeft
-                                    onActivated: pageSetupSettings.headerLeft = currentIndex
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: parent.width/3
-                            height: childrenRect.height
-
-                            Column {
-                                width: parent.width-10
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
-
-                                Text {
-                                    text: "Center"
-                                }
-
-                                ComboBox {
-                                    width: parent.width
-                                    model: fieldsModel
-                                    textRole: "key"
-                                    currentIndex: pageSetupSettings.headerCenter
-                                    onActivated: pageSetupSettings.headerCenter = currentIndex
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: parent.width/3
-                            height: childrenRect.height
-
-                            Column {
-                                width: parent.width-10
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
-
-                                Text {
-                                    text: "Right"
-                                }
-
-                                ComboBox {
-                                    width: parent.width
-                                    model: fieldsModel
-                                    textRole: "key"
-                                    currentIndex: pageSetupSettings.headerRight
-                                    onActivated: pageSetupSettings.headerRight = currentIndex
-                                }
-                            }
-                        }
-                    }
-                }
-
-                GroupBox {
-                    width: parent.width
-                    label: Text {
-                        text: "Footer"
-                        font.pixelSize: 15
-                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        text: "Page Setup"
+                        font.pixelSize: 24
                     }
 
-                    Row {
+                    Text {
                         width: parent.width
-                        height: 80
+                        text: "PDFs are always generated in A4 size."
+                    }
 
-                        Item {
-                            width: parent.width/3
-                            height: childrenRect.height
-
-                            Column {
-                                width: parent.width-10
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
-
-                                Text {
-                                    text: "Left"
-                                }
-
-                                ComboBox {
-                                    width: parent.width
-                                    model: fieldsModel
-                                    textRole: "key"
-                                    currentIndex: pageSetupSettings.footerLeft
-                                    onActivated: pageSetupSettings.footerLeft = currentIndex
-                                }
-                            }
+                    GroupBox {
+                        width: parent.width
+                        label: Text {
+                            text: "Header"
+                            font.pixelSize: 15
+                            font.bold: true
                         }
 
-                        Item {
-                            width: parent.width/3
-                            height: childrenRect.height
+                        Row {
+                            width: parent.width
+                            height: 80
 
-                            Column {
-                                width: parent.width-10
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
+                            Item {
+                                width: parent.width/3
+                                height: childrenRect.height
 
-                                Text {
-                                    text: "Center"
-                                }
+                                Column {
+                                    width: parent.width-10
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
 
-                                ComboBox {
-                                    width: parent.width
-                                    model: fieldsModel
-                                    textRole: "key"
-                                    currentIndex: pageSetupSettings.footerCenter
-                                    onActivated: pageSetupSettings.footerCenter = currentIndex
+                                    Text {
+                                        text: "Left"
+                                    }
+
+                                    ComboBox {
+                                        width: parent.width
+                                        model: fieldsModel
+                                        textRole: "key"
+                                        currentIndex: pageSetupSettings.headerLeft
+                                        onActivated: pageSetupSettings.headerLeft = currentIndex
+                                    }
                                 }
                             }
-                        }
 
-                        Item {
-                            width: parent.width/3
-                            height: childrenRect.height
+                            Item {
+                                width: parent.width/3
+                                height: childrenRect.height
 
-                            Column {
-                                width: parent.width-10
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                spacing: 10
+                                Column {
+                                    width: parent.width-10
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
 
-                                Text {
-                                    text: "Right"
+                                    Text {
+                                        text: "Center"
+                                    }
+
+                                    ComboBox {
+                                        width: parent.width
+                                        model: fieldsModel
+                                        textRole: "key"
+                                        currentIndex: pageSetupSettings.headerCenter
+                                        onActivated: pageSetupSettings.headerCenter = currentIndex
+                                    }
                                 }
+                            }
 
-                                ComboBox {
-                                    width: parent.width
-                                    model: fieldsModel
-                                    textRole: "key"
-                                    currentIndex: pageSetupSettings.footerRight
-                                    onActivated: pageSetupSettings.footerRight = currentIndex
+                            Item {
+                                width: parent.width/3
+                                height: childrenRect.height
+
+                                Column {
+                                    width: parent.width-10
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
+
+                                    Text {
+                                        text: "Right"
+                                    }
+
+                                    ComboBox {
+                                        width: parent.width
+                                        model: fieldsModel
+                                        textRole: "key"
+                                        currentIndex: pageSetupSettings.headerRight
+                                        onActivated: pageSetupSettings.headerRight = currentIndex
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                Button {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Restore Defaults"
-                    onClicked: {
-                        pageSetupSettings.headerLeft = HeaderFooter.Title
-                        pageSetupSettings.headerCenter = HeaderFooter.Subtitle
-                        pageSetupSettings.headerRight = HeaderFooter.PageNumber
-                        pageSetupSettings.footerLeft = HeaderFooter.Author
-                        pageSetupSettings.footerCenter = HeaderFooter.Version
-                        pageSetupSettings.footerRight = HeaderFooter.Contact
+                    GroupBox {
+                        width: parent.width
+                        label: Text {
+                            text: "Footer"
+                            font.pixelSize: 15
+                            font.bold: true
+                        }
+
+                        Row {
+                            width: parent.width
+                            height: 80
+
+                            Item {
+                                width: parent.width/3
+                                height: childrenRect.height
+
+                                Column {
+                                    width: parent.width-10
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
+
+                                    Text {
+                                        text: "Left"
+                                    }
+
+                                    ComboBox {
+                                        width: parent.width
+                                        model: fieldsModel
+                                        textRole: "key"
+                                        currentIndex: pageSetupSettings.footerLeft
+                                        onActivated: pageSetupSettings.footerLeft = currentIndex
+                                    }
+                                }
+                            }
+
+                            Item {
+                                width: parent.width/3
+                                height: childrenRect.height
+
+                                Column {
+                                    width: parent.width-10
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
+
+                                    Text {
+                                        text: "Center"
+                                    }
+
+                                    ComboBox {
+                                        width: parent.width
+                                        model: fieldsModel
+                                        textRole: "key"
+                                        currentIndex: pageSetupSettings.footerCenter
+                                        onActivated: pageSetupSettings.footerCenter = currentIndex
+                                    }
+                                }
+                            }
+
+                            Item {
+                                width: parent.width/3
+                                height: childrenRect.height
+
+                                Column {
+                                    width: parent.width-10
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 10
+
+                                    Text {
+                                        text: "Right"
+                                    }
+
+                                    ComboBox {
+                                        width: parent.width
+                                        model: fieldsModel
+                                        textRole: "key"
+                                        currentIndex: pageSetupSettings.footerRight
+                                        onActivated: pageSetupSettings.footerRight = currentIndex
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    GroupBox {
+                        width: parent.width
+                        label: CheckBox {
+                            text: "Watermark"
+                            checked: pageSetupSettings.watermarkEnabled
+                            onToggled: pageSetupSettings.watermarkEnabled = checked
+                        }
+
+                        Grid {
+                            width: parent.width
+                            columns: 2
+                            spacing: 10
+                            verticalItemAlignment: Grid.AlignVCenter
+                            enabled: pageSetupSettings.watermarkEnabled
+
+                            Text {
+                                text: "Text"
+                            }
+
+                            TextField {
+                                width: 300
+                                text: pageSetupSettings.watermarkText
+                                onTextEdited: pageSetupSettings.watermarkText = text
+                            }
+
+                            Text {
+                                text: "Font Family"
+                            }
+
+                            ComboBox {
+                                width: 300
+                                model: systemFontInfo.families
+                                currentIndex: systemFontInfo.families.indexOf(pageSetupSettings.watermarkFont)
+                                onCurrentIndexChanged: pageSetupSettings.watermarkFont = systemFontInfo.families[currentIndex]
+                            }
+
+                            Text {
+                                text: "Font Size"
+                            }
+
+                            SpinBox {
+                                width: 300
+                                from: 9; to: 200; stepSize: 1
+                                editable: true
+                                value: pageSetupSettings.watermarkFontSize
+                                onValueModified: pageSetupSettings.watermarkFontSize = value
+                            }
+
+                            Text {
+                                text: "Rotation"
+                            }
+
+                            SpinBox {
+                                width: 300
+                                from: -180; to: 180
+                                value: pageSetupSettings.watermarkRotation
+                                textFromValue: function(value,locale) { return value + " degrees" }
+                                validator: IntValidator { top: 360; bottom: 0 }
+                                onValueModified: pageSetupSettings.watermarkRotation = value
+                            }
+
+                            Text {
+                                text: "Color"
+                            }
+
+                            Rectangle {
+                                border.width: 1
+                                border.color: "black"
+                                color: pageSetupSettings.watermarkColor
+                                width: 30; height: 30
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: pageSetupSettings.watermarkColor = app.pickColor(pageSetupSettings.watermarkColor)
+                                }
+                            }
+                        }
+                    }
+
+                    Button {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Restore Defaults"
+                        onClicked: {
+                            pageSetupSettings.headerLeft = HeaderFooter.Title
+                            pageSetupSettings.headerCenter = HeaderFooter.Subtitle
+                            pageSetupSettings.headerRight = HeaderFooter.PageNumber
+                            pageSetupSettings.footerLeft = HeaderFooter.Author
+                            pageSetupSettings.footerCenter = HeaderFooter.Version
+                            pageSetupSettings.footerRight = HeaderFooter.Contact
+                            pageSetupSettings.watermarkEnabled = false
+                            pageSetupSettings.watermarkText = "Scrite"
+                            pageSetupSettings.watermarkFont = "Courier Prime"
+                            pageSetupSettings.watermarkFontSize = 120
+                            pageSetupSettings.watermarkColor = "lightgray"
+                            pageSetupSettings.watermarkOpacity = 0.5
+                            pageSetupSettings.watermarkRotation = -45
+                            pageSetupSettings.watermarkAlignment = Qt.AlignCenter
+                        }
                     }
                 }
             }

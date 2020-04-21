@@ -175,6 +175,146 @@ void HeaderFooter::finish()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+Watermark::Watermark(QObject *parent)
+          :QObject(parent)
+{
+
+}
+
+Watermark::~Watermark()
+{
+
+}
+
+void Watermark::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}
+
+void Watermark::setText(const QString &val)
+{
+    if(m_text == val)
+        return;
+
+    m_text = val;
+    emit textChanged();
+}
+
+void Watermark::setFont(const QFont &val)
+{
+    if(m_font == val)
+        return;
+
+    m_font = val;
+    emit fontChanged();
+}
+
+void Watermark::setColor(const QColor &val)
+{
+    if(m_color == val)
+        return;
+
+    m_color = val;
+    emit colorChanged();
+}
+
+void Watermark::setOpacity(qreal val)
+{
+    if( qFuzzyCompare(m_opacity, val) )
+        return;
+
+    m_opacity = val;
+    emit opacityChanged();
+}
+
+void Watermark::setRotation(qreal val)
+{
+    if( qFuzzyCompare(m_rotation, val) )
+        return;
+
+    m_rotation = val;
+    emit rotationChanged();
+}
+
+void Watermark::setAlignment(Qt::Alignment val)
+{
+    if(m_alignment == val)
+        return;
+
+    m_alignment = val;
+    emit alignmentChanged();
+}
+
+void Watermark::setVisibleFromPageOne(bool val)
+{
+    if(m_visibleFromPageOne == val)
+        return;
+
+    m_visibleFromPageOne = val;
+    emit visibleFromPageOneChanged();
+}
+
+void Watermark::paint(QPainter *painter, const QRectF &pageRect, int pageNr, int pageCount)
+{
+    if(!m_enabled)
+        return;
+
+    Q_UNUSED(pageCount)
+    if(!m_visibleFromPageOne && pageNr == 1)
+        return;
+
+    const QPointF pageCenter = pageRect.center();
+
+    QFontMetricsF fm(m_font);
+    QRectF textRect = fm.boundingRect( m_text );
+
+    QTransform tx;
+    tx.translate( textRect.center().x(), textRect.center().y() );
+    tx.rotate( m_rotation );
+    tx.translate( -textRect.center().x(), -textRect.center().y() );
+    QRectF rotatedTextRect = tx.mapRect(textRect);
+
+    if( m_alignment.testFlag(Qt::AlignLeft) )
+        rotatedTextRect.moveLeft( pageRect.left() );
+    else if( m_alignment.testFlag(Qt::AlignRight) )
+        rotatedTextRect.moveRight( pageRect.right() );
+    else
+    {
+        const QPointF textCenter = rotatedTextRect.center();
+        rotatedTextRect.moveCenter( QPointF(pageCenter.x(), textCenter.y()) );
+    }
+
+    if( m_alignment.testFlag(Qt::AlignTop) )
+        rotatedTextRect.moveTop( pageRect.top() );
+    else if( m_alignment.testFlag(Qt::AlignBottom) )
+        rotatedTextRect.moveBottom( pageRect.bottom() );
+    else
+    {
+        const QPointF textCenter = rotatedTextRect.center();
+        rotatedTextRect.moveCenter( QPointF(textCenter.x(), pageCenter.y()) );
+    }
+
+    textRect.moveCenter( rotatedTextRect.center() );
+
+    painter->save();
+
+    painter->setFont( m_font );
+    painter->setPen( QPen(m_color) );
+    painter->setOpacity( m_opacity );
+    painter->translate( textRect.center() );
+    painter->rotate( m_rotation );
+    painter->translate( -textRect.center() );
+    painter->drawText( textRect, Qt::AlignCenter|Qt::TextDontClip, m_text );
+
+    painter->restore();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 QTextDocumentPagedPrinter::QTextDocumentPagedPrinter(QObject *parent)
     : QObject(parent)
 {
@@ -208,6 +348,24 @@ QTextDocumentPagedPrinter::QTextDocumentPagedPrinter(QObject *parent)
         if(val.isValid())
             m_header->setOpacity( qBound(0.0,val.toDouble(),1.0) );
     }
+
+    auto fetchSetting = [settings](const QString &key, const QVariant &defaultValue) {
+        const QVariant val = settings->value("PageSetup/" + key);
+        return val.isValid() ? val : defaultValue;
+    };
+
+    m_watermark->setEnabled( fetchSetting("watermarkEnabled", m_watermark->isEnabled()).toBool() );
+    m_watermark->setText( fetchSetting("watermarkText", m_watermark->text()).toString() );
+
+    QFont watermarkFont;
+    watermarkFont.setFamily( fetchSetting("watermarkFont", "Courier Prime").toString() );
+    watermarkFont.setPointSize( fetchSetting("watermarkFontSize", 120).toInt() );
+    m_watermark->setFont(watermarkFont);
+
+    m_watermark->setColor( QColor(fetchSetting("watermarkColor", "lightgray").toString()) );
+    m_watermark->setOpacity( fetchSetting("watermarkOpacity", 0.5).toDouble() );
+    m_watermark->setRotation( fetchSetting("watermarkRotation", 0.5).toDouble() );
+    m_watermark->setAlignment( Qt::Alignment(fetchSetting("watermarkAlignment", Qt::AlignCenter).toInt()) );
 }
 
 QTextDocumentPagedPrinter::~QTextDocumentPagedPrinter()
@@ -350,6 +508,7 @@ void QTextDocumentPagedPrinter::printPage(int pageNr, int pageCount, QPainter *p
 {
     m_header->paint(painter, m_headerRect, pageNr, pageCount);
     m_footer->paint(painter, m_footerRect, pageNr, pageCount);
+    m_watermark->paint(painter, QRectF(m_headerRect.bottomLeft(), m_footerRect.topRight()), pageNr, pageCount);
 
 #if 0
     painter->setPen(Qt::black);

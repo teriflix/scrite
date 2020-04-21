@@ -113,6 +113,7 @@ bool AbstractReportGenerator::generate()
         QTextDocumentPagedPrinter printer;
         printer.header()->setVisibleFromPageOne(true);
         printer.footer()->setVisibleFromPageOne(true);
+        printer.watermark()->setVisibleFromPageOne(true);
         printer.print(&textDocument, &pdfWriter);
     }
 

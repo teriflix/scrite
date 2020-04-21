@@ -216,7 +216,7 @@ bool StructureExporter::doExport(QIODevice *device)
         paint.drawRoundedRect(currentElementRect, radius, radius, Qt::AbsoluteSize);
 
         paint.setPen(Qt::black);
-        paint.drawText( currentElementRect.adjusted(radius,radius,-radius,-radius),
+        paint.drawText( currentElementRect.adjusted(10,10,-10,-10),
                         Qt::AlignCenter|Qt::TextWordWrap, currentElement->scene()->title() );
 
         if(previousElement != nullptr)

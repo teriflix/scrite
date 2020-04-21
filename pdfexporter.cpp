@@ -49,6 +49,7 @@ bool PdfExporter::doExport(QIODevice *device)
     QTextDocumentPagedPrinter printer;
     printer.header()->setVisibleFromPageOne(false);
     printer.footer()->setVisibleFromPageOne(false);
+    printer.watermark()->setVisibleFromPageOne(false);
     return printer.print(&textDocument, &pdfWriter);
 }
 

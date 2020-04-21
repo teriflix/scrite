@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QTextDocument>
 #include <QPagedPaintDevice>
+#include <QColor>
 
 #include "errorreport.h"
 #include "progressreport.h"
@@ -88,12 +89,10 @@ public:
     qreal opacity() const { return m_opacity; }
     Q_SIGNAL void opacityChanged();
 
-
     Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY visibleFromPageOneChanged)
     void setVisibleFromPageOne(bool val);
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
-
 
 private:
     void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect);
@@ -121,6 +120,69 @@ private:
     qreal m_opacity = 0.5;
 };
 
+class Watermark : public QObject
+{
+    Q_OBJECT
+
+public:
+    Watermark(QObject *parent=nullptr);
+    ~Watermark();
+
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    void setText(const QString &val);
+    QString text() const { return m_text; }
+    Q_SIGNAL void textChanged();
+
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    void setFont(const QFont &val);
+    QFont font() const { return m_font; }
+    Q_SIGNAL void fontChanged();
+
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    void setColor(const QColor &val);
+    QColor color() const { return m_color; }
+    Q_SIGNAL void colorChanged();
+
+    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
+    void setOpacity(qreal val);
+    qreal opacity() const { return m_opacity; }
+    Q_SIGNAL void opacityChanged();
+
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
+    void setRotation(qreal val);
+    qreal rotation() const { return m_rotation; }
+    Q_SIGNAL void rotationChanged();
+
+    Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY alignmentChanged)
+    void setAlignment(Qt::Alignment val);
+    Qt::Alignment alignment() const { return m_alignment; }
+    Q_SIGNAL void alignmentChanged();
+
+    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY visibleFromPageOneChanged)
+    void setVisibleFromPageOne(bool val);
+    bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
+    Q_SIGNAL void visibleFromPageOneChanged();
+
+private:
+    friend class QTextDocumentPagedPrinter;
+    void paint(QPainter *paint, const QRectF &pageRect, int pageNr, int pageCount);
+
+private:
+    QFont m_font = QFont("Courier Prime", 120, QFont::Bold);
+    QString m_text = "Scrite";
+    QColor m_color = QColor(Qt::lightGray);
+    qreal m_opacity = 0.5;
+    qreal m_rotation = -45;
+    Qt::Alignment m_alignment = Qt::AlignCenter;
+    bool m_enabled = true;
+    bool m_visibleFromPageOne = false;
+};
+
 class QTextDocumentPagedPrinter : public QObject
 {
     Q_OBJECT
@@ -135,6 +197,9 @@ public:
     Q_PROPERTY(HeaderFooter* footer READ footer CONSTANT)
     HeaderFooter* footer() const { return m_footer; }
 
+    Q_PROPERTY(Watermark* watermark READ watermark CONSTANT)
+    Watermark *watermark() const { return m_watermark; }
+
     Q_INVOKABLE bool print(QTextDocument *document, QPagedPaintDevice *device);
 
 private:
@@ -143,6 +208,7 @@ private:
 private:
     HeaderFooter* m_header = new HeaderFooter(HeaderFooter::Header, this);
     HeaderFooter* m_footer = new HeaderFooter(HeaderFooter::Footer, this);
+    Watermark *m_watermark = new Watermark(this);
     ErrorReport *m_errorReport = new ErrorReport(this);
     ProgressReport *m_progressReport = new ProgressReport(this);
     QPagedPaintDevice* m_printer = nullptr;
