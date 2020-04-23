@@ -148,7 +148,7 @@ Scene *ScriteDocument::createNewScene()
     scene->heading()->setEnabled(true);
     scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : "EXT");
     scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "SOMEWHERE");
-    scene->heading()->setMoment(activeScene ? activeScene->heading()->moment() : "DAY");
+    scene->heading()->setMoment(activeScene ? "LATER" : "DAY");
 
     StructureElement *newStructureElement = new StructureElement(m_structure);
     newStructureElement->setScene(scene);

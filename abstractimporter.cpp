@@ -110,17 +110,10 @@ Scene *AbstractImporter::createScene(const QString &heading)
     screenplayElement->setScene(scene);
     screenplay->addElement(screenplayElement);
 
-    const int field1SepLoc = heading.indexOf('.');
-    const int field2SepLoc = heading.lastIndexOf('-');
-    const QString locationType = heading.left(field1SepLoc).trimmed();
-    const QString moment = heading.mid(field2SepLoc+1).trimmed();
-    const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
-
     scene->heading()->setEnabled(true);
-    scene->heading()->setMoment(moment);
-    scene->heading()->setLocation(location);
-    scene->heading()->setLocationType(locationType);
+    scene->heading()->parseFrom(heading);
 
+    const QString location = scene->heading()->location();
     const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
     scene->setTitle( QString("[%1] %2").arg(sceneIndex+1).arg(titleBit.toLower()) );
 

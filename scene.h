@@ -66,6 +66,12 @@ public:
     QString text() const;
     Q_SIGNAL void textChanged();
 
+    Q_PROPERTY(QRegExp regularExpression READ regularExpression CONSTANT)
+    QRegExp regularExpression() const { return m_regularExpression; }
+    Q_SIGNAL void regularExpressionChanged();
+
+    Q_INVOKABLE QString parseFrom(const QString &text);
+
 private:
     bool m_enabled = true;
     char m_padding1[7];
@@ -73,6 +79,7 @@ private:
     QString m_moment = "DAY";
     QString m_location = "Somewhere";
     QString m_locationType = "EXT";
+    const QRegExp m_regularExpression = QRegExp("\\w+\\. ?\\w+ ?- ?\\w+", Qt::CaseInsensitive);
 };
 
 class SceneElement : public QObject

@@ -53,10 +53,16 @@ Item {
             height: 40
             property bool viewOnly: true
             active: scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
-            sourceComponent: {
-                if(scene !== null && scene.heading !== null && scene.heading.enabled)
-                    return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
-                return sceneHeadingDisabled
+            sourceComponent: sceneHeadingComponent.get
+
+            DelayedPropertyBinder {
+                id: sceneHeadingComponent
+                initial: sceneHeadingDisabled
+                set: {
+                    if(scene !== null && scene.heading !== null && scene.heading.enabled)
+                        return sceneHeadingLoader.viewOnly ? sceneHeadingViewer : sceneHeadingEditor
+                    return sceneHeadingDisabled
+                }
             }
         }
     }
@@ -94,6 +100,9 @@ Item {
     onSceneChanged: {
         contentEditorLoader.active = false
         contentEditorLoader.active = true
+        scene.undoRedoEnabled = Qt.binding( function() {
+            return editorHasActiveFocus || sceneHeadingLoader.viewOnly === false
+        })
     }
 
     Component {
@@ -207,8 +216,6 @@ Item {
             onActiveFocusChanged: {
                 if(activeFocus)
                     sceneHeadingLoader.viewOnly = true
-                if(scene)
-                    scene.undoRedoEnabled = activeFocus
             }
             Keys.onReturnPressed: {
                 if(completer.suggestion !== "") {
@@ -340,62 +347,84 @@ Item {
     Component {
         id: sceneHeadingEditor
 
-        Row {
-            spacing: 10
-            property font headingFont: sceneHeadingFormat.font
-            onHeadingFontChanged: {
-                if(headingFont.pointSize === sceneHeadingFormat.font.pointSize)
-                    headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+        TextField {
+            id: sceneHeadingField
+            width: 600
+            anchors.centerIn: parent
+            placeholderText: "INT. LOCATION - DAY"
+            text: scene.heading.text
+            validator: RegExpValidator {
+                regExp: /\w+\. ?\w+?- ?\w+/i
+            }
+            selectionColor: app.palette.highlight
+            selectedTextColor: app.palette.highlightedText
+            Component.onCompleted: {
+                font = sceneHeadingFormat.font
+                font.pointSize = font.pointSize+scriteDocument.formatting.fontPointSizeDelta
+                selectAll()
+                forceActiveFocus()
+            }
+            Component.onDestruction: applyChanges()
+            onEditingFinished: {
+                if(applyChanges())
+                    app.execLater(0, function() { sceneHeadingLoader.viewOnly = true })
+            }
+            Keys.onReturnPressed: editingFinished()
+
+            Item {
+                id: errorDisplay
+                x: parent.cursorRectangle.x
+                y: parent.cursorRectangle.y
+                ToolTip.text: parseError
+                ToolTip.timeout: 4000
+                property string parseError
             }
 
-            Component.onDestruction: scene.heading.location = locationEdit.text
+            Item {
+                x: parent.cursorRectangle.x
+                y: parent.cursorRectangle.y
+                width: 2
+                height: parent.cursorRectangle.height
 
-            TextViewEdit {
-                id: locationTypeEdit
-                text: scene.heading.locationType
-                font: headingFont
-                width: Math.max(contentWidth, 80)
-                readOnly: false
-                frameVisible: true
-                completionStrings: scriteDocument.structure.standardLocationTypes()
-                onEditingFinished: scene.heading.locationType = text
-                horizontalAlignment: Qt.AlignLeft
-                anchors.verticalCenter: parent.verticalCenter
-                KeyNavigation.priority: KeyNavigation.BeforeItem
-                KeyNavigation.tab: locationEdit.item
-                KeyNavigation.backtab: momentEdit.item
+                ToolTip.visible: completer.hasSuggestion
+                ToolTip.text: '<font name="' + font.family + '"><font color="gray">' + completer.prefix + '</font>' + completer.suggestion + '</font>'
             }
 
-            TextViewEdit {
-                id: locationEdit
-                font: headingFont
-                text: scene.heading.location
-                width: parent.width - locationTypeEdit.width - momentEdit.width - 2*parent.spacing
-                readOnly: false
-                frameVisible: true
-                completionStrings: scriteDocument.structure.allLocations()
-                onEditingFinished: scene.heading.location = text
-                horizontalAlignment: Qt.AlignLeft
-                anchors.verticalCenter: parent.verticalCenter
-                KeyNavigation.priority: KeyNavigation.BeforeItem
-                KeyNavigation.tab: momentEdit.item
-                KeyNavigation.backtab: locationTypeEdit.item
+            Keys.onTabPressed: {
+                if(completer.hasSuggestion) {
+                    insert(cursorPosition, completer.suggestion)
+                    event.accepted = true
+                }
             }
 
-            TextViewEdit {
-                id: momentEdit
-                font: headingFont
-                text: scene.heading.moment
-                width: Math.max(contentWidth, 150)
-                readOnly: false
-                frameVisible: true
-                anchors.verticalCenter: parent.verticalCenter
-                horizontalAlignment: Qt.AlignLeft
-                completionStrings: scriteDocument.structure.standardMoments()
-                onEditingFinished: scene.heading.moment = text
-                KeyNavigation.priority: KeyNavigation.BeforeItem
-                KeyNavigation.tab: locationTypeEdit.item
-                KeyNavigation.backtab: locationEdit.item
+            Completer {
+                id: completer
+                property int dotIndex: sceneHeadingField.text.indexOf(".")
+                property int dashIndex: sceneHeadingField.text.indexOf("-")
+                suggestionMode: Completer.AutoCompleteSuggestion
+                strings: {
+                    if(dotIndex < 0 || sceneHeadingField.cursorPosition < dotIndex)
+                        return scriteDocument.structure.standardLocationTypes()
+                    if(dashIndex < 0 || sceneHeadingField.cursorPosition < dashIndex)
+                        return scriteDocument.structure.allLocations()
+                    return scriteDocument.structure.standardMoments()
+                }
+
+                property string prefix: {
+                    if(dotIndex < 0 || sceneHeadingField.cursorPosition < dotIndex)
+                        return text.substring(0, sceneHeadingField.cursorPosition).trim().toUpperCase()
+                    if(dashIndex < 0 || sceneHeadingField.cursorPosition < dashIndex)
+                        return text.substring(dotIndex+1,sceneHeadingField.cursorPosition).trim().toUpperCase()
+                    return text.substring(dashIndex+1,sceneHeadingField.cursorPosition).trim().toUpperCase()
+                }
+
+                completionPrefix: prefix
+            }
+
+            function applyChanges() {
+                errorDisplay.parseError = scene.heading.parseFrom(text)
+                errorDisplay.ToolTip.visible = (errorDisplay.parseError !== "")
+                return errorDisplay.parseError === ""
             }
         }
     }
@@ -423,7 +452,7 @@ Item {
                 onClicked: {
                     if(readOnly)
                         return
-                    sceneHeadingLoader.viewOnly = false
+                    app.execLater(0, function() { sceneHeadingLoader.viewOnly = false })
                 }
             }
         }
