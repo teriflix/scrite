@@ -179,7 +179,7 @@ Rectangle {
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
         ScrollBar.horizontal: ScrollBar {
-            policy: ScrollBar.AlwaysOn
+            policy: screenplayElementList.width < screenplayElementList.contentWidth ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
             palette {
                 mid: Qt.rgba(0,0,0,0.5)
