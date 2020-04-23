@@ -25,6 +25,8 @@ StructureElement::StructureElement(QObject *parent)
 {
     connect(this, &StructureElement::xChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::elementChanged);
+    connect(this, &StructureElement::xChanged, this, &StructureElement::positionChanged);
+    connect(this, &StructureElement::yChanged, this, &StructureElement::positionChanged);
     connect(this, &StructureElement::xChanged, this, &StructureElement::xfChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::yfChanged);
     connect(this, &StructureElement::widthChanged, this, &StructureElement::elementChanged);

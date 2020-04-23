@@ -139,6 +139,12 @@ public:
 
     Q_INVOKABLE void execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
 
+    Q_INVOKABLE QColor translucent(const QColor &input, qreal alpha=0.5) const {
+        QColor ret = input;
+        ret.setAlphaF(qBound(0.0, ret.alphaF() * alpha, 1.0));
+        return ret;
+    }
+
     QSettings *settings() const { return m_settings; }
 
     Q_PROPERTY(AutoUpdate* autoUpdate READ autoUpdate CONSTANT)

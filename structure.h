@@ -72,9 +72,10 @@ public:
     qreal yf() const;
     Q_SIGNAL void yfChanged();
 
-    Q_PROPERTY(QPointF position READ position WRITE setPosition STORED false)
+    Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged STORED false)
     void setPosition(const QPointF &pos);
     QPointF position() const { return QPointF(m_x,m_y); }
+    Q_SIGNAL void positionChanged();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
     void setScene(Scene* val);

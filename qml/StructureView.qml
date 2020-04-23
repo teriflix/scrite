@@ -231,18 +231,13 @@ Item {
                 cursorShape: parent.newElementMode ? Qt.DragMoveCursor : Qt.ArrowCursor
                 onDoubleClicked: canvas.createElement(mouse.x-130, mouse.y-22, parent.newElementColor)
                 preventStealing: true
+                property bool selectRectWasJustCreated: false
                 onClicked: {
                     parent.forceActiveFocus()
-                    if(selectionRect.visible) {
-                        var dist = Math.max(
-                                    Math.max( mouse.x - selectionRect.area.right,
-                                             selectionRect.area.left - mouse.x ),
-                                    Math.max( mouse.y - selectionRect.area.bottom,
-                                             selectionRect.area.top - mouse.y )
-                                    )
-                        if(dist > 10)
-                            selectionRect.visible = false
-                    }
+                    if(selectRectWasJustCreated)
+                        return
+
+                    selectionRect.visible = false
 
                     if(parent.newElementMode) {
                         canvas.createElement(mouse.x-130, mouse.y-22, parent.newElementColor)
@@ -289,6 +284,9 @@ Item {
                     if(selectionRect.width < 50 && selectionRect.height < 50) {
                         selectionRect.enabled = false
                         selectionRect.visible = false
+                    } else {
+                        selectRectWasJustCreated = true
+                        app.execLater(250, function() { selectRectWasJustCreated=false })
                     }
                 }
             }
@@ -297,25 +295,25 @@ Item {
                 id: selectionRect
                 visible: false
                 enabled: false
-                color: systemPalette.highlight
-                border { width: 0; color: "black" }
+                color: app.translucent(systemPalette.highlight,0.2)
+                border { width: 2; color: systemPalette.highlight }
                 radius: 8                    
                 onVisibleChanged: {
                     if(!visible)
                         enabled = false
                 }
-                opacity: 0.5
                 z: 10
 
                 property point from: Qt.point(0,0)
                 property point to: Qt.point(0,0)
                 property rect area: {
                     if(enabled)
-                        return Qt.rect(x, y, width, height)
+                        return tightRect
                     if(from === to)
                         return Qt.rect(from.x, from.y, 1, 1)
                     return Qt.rect( Math.min(from.x,to.x), Math.min(from.y,to.y), Math.abs(to.x-from.x), Math.abs(to.y-from.y) )
                 }
+                property rect tightRect: Qt.rect(0,0,0,0)
                 property point topLeft
 
                 x: area.x
@@ -327,47 +325,108 @@ Item {
                     anchors.fill: parent
                     drag.target: parent
                     drag.axis: Drag.XAndYAxis
+                    drag.minimumX: 0
+                    drag.minimumY: 0
                 }
 
                 onXChanged: shiftElements()
                 onYChanged: shiftElements()
 
+                function prepare() {
+                    var items = []
+                    var count = elementItems.count
+                    for(var i=0; i<count; i++) {
+                        var item = elementItems.itemAt(i)
+                        var p1 = Qt.point(item.x, item.y)
+                        var p2 = Qt.point(item.x+item.width, item.y+item.height)
+                        var areaContainsPoint = function(p) {
+                            return area.left <= p.x && p.x <= area.right &&
+                                    area.top <= p.y && p.y <= area.bottom;
+                        }
+                        if(areaContainsPoint(p1) || areaContainsPoint(p2))
+                            items.push(item)
+                    }
+                    elements = items
+                    tightRect = Qt.rect(x,y,width,height)
+                    topLeft = Qt.point(tightRect.x, tightRect.y)
+                }
+
+                function cleanup() {
+                    for(var i=0; i<elements.length; i++) {
+                        var item = elements[i]
+                        item.element.x = scriteDocument.structure.snapToGrid(item.x)
+                        item.element.y = scriteDocument.structure.snapToGrid(item.y)
+                    }
+                    elements = []
+                    from = Qt.point(0,0)
+                    to = Qt.point(0,0)
+                    topLeft = Qt.point(0,0)
+                }
+
+                function computeTightRect() {
+                    var bounds = {
+                        "p1": { x: -1, y: -1 },
+                        "p2": { x: -1, y: -1 },
+                        "unite": function(pt) {
+                            if(this.p1.x < 0 || this.p1.y < 0) {
+                                this.p1.x = pt.x
+                                this.p1.y = pt.y
+                            } else {
+                                this.p1.x = Math.min(this.p1.x, pt.x)
+                                this.p1.y = Math.min(this.p1.y, pt.y)
+                            }
+                            if(this.p2.x < 0 || this.p2.y < 0) {
+                                this.p2.x = pt.x
+                                this.p2.y = pt.y
+                            } else {
+                                this.p2.x = Math.max(this.p2.x, pt.x)
+                                this.p2.y = Math.max(this.p2.y, pt.y)
+                            }
+
+                            this.p1.x = Math.round(this.p1.x)
+                            this.p2.x = Math.round(this.p2.x)
+                            this.p1.y = Math.round(this.p1.y)
+                            this.p2.y = Math.round(this.p2.y)
+                        }
+                    }
+
+                    for(var i=0; i<elements.length; i++) {
+                        var item = elements[i]
+                        var p1 = Qt.point(item.x, item.y)
+                        var p2 = Qt.point(item.x+item.width, item.y+item.height)
+                        bounds.unite(p1)
+                        bounds.unite(p2)
+                    }
+
+                    pauseShifting = true
+                    tightRect = Qt.rect(bounds.p1.x-10, bounds.p1.y-10,
+                                        (bounds.p2.x-bounds.p1.x+20),
+                                        (bounds.p2.y-bounds.p1.y+20))
+                    topLeft = Qt.point(tightRect.x, tightRect.y)
+                    app.execLater(100, function() { pauseShifting=false })
+                }
+
                 onEnabledChanged: {
                     if(enabled) {
-                        var items = []
-                        var count = elementItems.count
-                        for(var i=0; i<count; i++) {
-                            var item = elementItems.itemAt(i)
-                            var p1 = Qt.point(item.x, item.y)
-                            var p2 = Qt.point(item.x+item.width, item.y+item.height)
-                            var areaContainsPoint = function(p) {
-                                return area.left <= p.x && p.x <= area.right &&
-                                        area.top <= p.y && p.y <= area.bottom;
-                            }
-                            if(areaContainsPoint(p1) || areaContainsPoint(p2))
-                                items.push(item)
-                        }
-                        elements = items
-                        topLeft = Qt.point(area.x, area.y)
-                    } else {
-                        elements = []
-                        from = Qt.point(0,0)
-                        to = Qt.point(0,0)
-                        topLeft = Qt.point(0,0)
-                    }
+                        prepare()
+                        app.execLater(100, computeTightRect)
+                    } else
+                        cleanup()
                 }
 
                 property var elements: []
 
-                function shiftElements() {
-                    if(!enabled || elements.length === 0)
+                property bool pauseShifting: false
+                function shiftElements(snapToGrid) {
+                    if(!enabled || pauseShifting || elements.length === 0)
                         return
 
+                    var i, item
                     var dx = x - topLeft.x
                     var dy = y - topLeft.y
                     topLeft = Qt.point(x,y)
-                    for(var i=0; i<elements.length; i++) {
-                        var item = elements[i]
+                    for(i=0; i<elements.length; i++) {
+                        item = elements[i].element
                         item.x = item.x + dx
                         item.y = item.y + dy
                     }
@@ -393,16 +452,22 @@ Item {
                     property real elementY: element.y
                     width: titleText.width + 10
                     height: titleText.height + 10
-                    x: elementX // - width/2
-                    y: elementY // - height/2
+                    x: positionBinder.get.x
+                    y: positionBinder.get.y
+
+                    DelayedPropertyBinder {
+                        id: positionBinder
+                        initial: Qt.point(element.x, element.y)
+                        set: element.position
+                        onGetChanged: {
+                            elementItem.x = get.x
+                            elementItem.y = get.y
+                        }
+                    }
 
                     // This happens when element is dragged
                     onXChanged: element.x = x // width/2
                     onYChanged: element.y = y // height/2
-
-                    // This happens when unto/redo happens
-                    onElementXChanged: x = elementX // - width/2
-                    onElementYChanged: y = elementY // - height/2
 
                     // This happens when text is edited
                     onWidthChanged: element.width = width
