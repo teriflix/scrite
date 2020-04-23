@@ -16,25 +16,29 @@ import QtQuick 2.13
 Rectangle {
     id: focusIndicator
     property bool active: false
-    border.width: active ? 3 : 0
-    border.color: app.palette.highlight
+    border.width: active ? 2 : 0
+    border.color: color1
     color: Qt.rgba(0,0,0,0)
+
+    // Addressing https://github.com/teriflix/scrite/issues/57
+    property color color1: app.translucent(app.palette.highlight, 0.55)
+    property color color2: app.translucent(app.palette.highlight, 0.45)
 
     SequentialAnimation {
         running: focusIndicator.active
         loops: Animation.Infinite
 
         ColorAnimation {
-            from: app.palette.highlight
-            to: app.palette.alternateBase // Qt.lighter(app.palette.highlight,1.25)
+            from: focusIndicator.color1
+            to: focusIndicator.color2
             duration: 1000
             target: focusIndicator.border
             properties: "color"
         }
 
         ColorAnimation {
-            from: app.palette.alternateBase // Qt.lighter(app.palette.highlight,1.25)
-            to: app.palette.highlight
+            from: focusIndicator.color2
+            to: focusIndicator.color1
             duration: 1000
             target: focusIndicator.border
             properties: "color"
