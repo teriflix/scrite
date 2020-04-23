@@ -146,9 +146,14 @@ Rectangle {
 
         onEntered: {
             screenplayElementList.forceActiveFocus()
+            screenplayElementList.somethingIsBeingDropped = true
             screenplayElementList.footerItem.highlightAsDropArea = true
         }
-        onExited: screenplayElementList.footerItem.highlightAsDropArea = false
+
+        onExited: {
+            screenplayElementList.somethingIsBeingDropped = false
+            screenplayElementList.footerItem.highlightAsDropArea = false
+        }
 
         onDropped: {
             screenplayElementList.footerItem.highlightAsDropArea = false
@@ -165,7 +170,8 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.margins: 3
         clip: true
-        visible: count > 0
+        property bool somethingIsBeingDropped: false
+        visible: count > 0 || somethingIsBeingDropped
         model: scriteDocument.screenplay
         property real minimumDelegateWidth: 100
         property real perElementWidth: 2.5
@@ -205,7 +211,7 @@ Rectangle {
 
         footer: Item {
             property bool highlightAsDropArea: false
-            width: screenplayElementList.width-2*screenplayElementList.minimumDelegateWidth
+            width: screenplayElementList.minimumDelegateWidth
             height: screenplayElementList.height
 
             Rectangle {
