@@ -29,6 +29,8 @@ public:
 
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
+    QByteArray preprocess(QIODevice *device) const;
+    bool importFrom(const QByteArray &bytes);
 };
 
 #endif // CELTXHTMLIMPORTER_H

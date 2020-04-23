@@ -26,12 +26,37 @@ HtmlImporter::~HtmlImporter()
 
 bool HtmlImporter::doImport(QIODevice *device)
 {
+    const QByteArray bytes = this->preprocess(device);
+    return this->importFrom(bytes);
+}
+
+QByteArray HtmlImporter::preprocess(QIODevice *device) const
+{
+    QByteArray bytes = device->readAll();
+
+    // Check for celtx HTML format
+    static const QByteArray celtxSignature("chrome://celtx/");
+    if( bytes.indexOf(celtxSignature) >= 0 )
+    {
+        const int index = bytes.indexOf("<body>");
+        bytes.remove(0, index);
+        bytes.prepend("<html>");
+
+        bytes.replace("<br>", "");
+        bytes.replace("class=\"sceneheading\"", "class=\"heading\"");
+    }
+
+    return bytes;
+}
+
+bool HtmlImporter::importFrom(const QByteArray &bytes)
+{
     QString errMsg;
     int errLine = -1;
     int errCol = -1;
 
     QDomDocument htmlDoc;
-    if( !htmlDoc.setContent(device, &errMsg, &errLine, &errCol) )
+    if( !htmlDoc.setContent(bytes, &errMsg, &errLine, &errCol) )
     {
         const QString msg = QString("Parse Error: %1 at Line %2, Column %3").arg(errMsg).arg(errLine).arg(errCol);
         this->error()->setErrorMessage(msg);
