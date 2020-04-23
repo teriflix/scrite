@@ -316,30 +316,54 @@ QString SceneHeading::text() const
     return m_locationType + ". " + m_location + " - " + m_moment;
 }
 
-QString SceneHeading::parseFrom(const QString &text)
+void SceneHeading::parseFrom(const QString &text)
 {
     if(!m_enabled || this->text() == text)
-        return QString();
+        return;
 
-    const bool exact = m_regularExpression.exactMatch(text);
-    if(exact)
+    const Structure *structure = ScriteDocument::instance()->structure();
+    const QString heading = text.toUpper().trimmed();
+    const int field1SepLoc = heading.indexOf('.');
+    const int field2SepLoc = heading.lastIndexOf('-');
+
+    if(field1SepLoc < 0 && field2SepLoc < 0)
     {
-        const QString heading = text.toUpper();
-        const int field1SepLoc = heading.indexOf('.');
-        const int field2SepLoc = heading.lastIndexOf('-');
-        const QString locationType = heading.left(field1SepLoc).trimmed();
+        if( structure->standardLocationTypes().contains(heading) )
+            this->setLocationType(heading);
+        else if( structure->standardMoments().contains(heading) )
+            this->setMoment(heading);
+        else
+            this->setLocation(heading);
+        return;
+    }
+
+    if(field1SepLoc < 0)
+    {
         const QString moment = heading.mid(field2SepLoc+1).trimmed();
         const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
 
         this->setMoment(moment);
         this->setLocation(location);
-        this->setLocationType(locationType);
-
-        return QString();
+        return;
     }
 
-    static const QString errorMessage("Scene headings format: XXX. XXXXXXXX - XXXX");
-    return errorMessage;
+    if(field2SepLoc < 0)
+    {
+        const QString locationType = heading.left(field1SepLoc).trimmed();
+        const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+
+        this->setLocationType(locationType);
+        this->setLocation(location);
+        return;
+    }
+
+    const QString locationType = heading.left(field1SepLoc).trimmed();
+    const QString moment = heading.mid(field2SepLoc+1).trimmed();
+    const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+
+    this->setMoment(moment);
+    this->setLocation(location);
+    this->setLocationType(locationType);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

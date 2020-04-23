@@ -79,5 +79,6 @@
         <file>font/CourierPrime-BoldItalic.ttf</file>
         <file>font/CourierPrime-Italic.ttf</file>
         <file>font/CourierPrime-Regular.ttf</file>
+        <file>qml/TextField2.qml</file>
     </qresource>
 </RCC>

@@ -219,6 +219,21 @@ QString TransliterationSettings::transliteratedWord(const QString &word) const
     return QString::fromStdWString(Translate(m_transliterator, word.toStdWString().c_str()));
 }
 
+QString TransliterationSettings::transliteratedSentence(const QString &sentence, bool includingLastWord) const
+{
+    if(m_transliterator == nullptr)
+        return sentence;
+
+    QStringList words = sentence.split(" ");
+    for(int i=0; i<words.length(); i++)
+    {
+        if(i < words.length()-1 || includingLastWord)
+            words[i] = this->transliteratedWord(words[i]);
+    }
+
+    return words.join(" ");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Transliterator::Transliterator(QObject *parent)

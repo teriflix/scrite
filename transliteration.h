@@ -71,6 +71,7 @@ public:
     void *transliterator() const { return m_transliterator; }
     void *transliteratorFor(Language language) const;
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
+    Q_INVOKABLE QString transliteratedSentence(const QString &sentence, bool includingLastWord=true) const;
 
 private:
     TransliterationSettings(QObject *parent=nullptr);

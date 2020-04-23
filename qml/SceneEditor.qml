@@ -347,84 +347,67 @@ Item {
     Component {
         id: sceneHeadingEditor
 
-        TextField {
-            id: sceneHeadingField
-            width: 600
-            anchors.centerIn: parent
-            placeholderText: "INT. LOCATION - DAY"
-            text: scene.heading.text
-            validator: RegExpValidator {
-                regExp: /\w+\. ?\w+?- ?\w+/i
-            }
-            selectionColor: app.palette.highlight
-            selectedTextColor: app.palette.highlightedText
+        Rectangle {
+            property font headingFont: sceneHeadingFormat.font
             Component.onCompleted: {
-                font = sceneHeadingFormat.font
-                font.pointSize = font.pointSize+scriteDocument.formatting.fontPointSizeDelta
-                selectAll()
-                forceActiveFocus()
+                headingFont.pointSize = headingFont.pointSize+8
+                locTypeEdit.forceActiveFocus()
             }
-            Component.onDestruction: applyChanges()
-            onEditingFinished: {
-                if(applyChanges())
-                    app.execLater(0, function() { sceneHeadingLoader.viewOnly = true })
-            }
-            Keys.onReturnPressed: editingFinished()
+            color: "white"
+            height: layout.height + 4
 
-            Item {
-                id: errorDisplay
-                x: parent.cursorRectangle.x
-                y: parent.cursorRectangle.y
-                ToolTip.text: parseError
-                ToolTip.timeout: 4000
-                property string parseError
-            }
+            Row {
+                id: layout
+                width: parent.width-4
+                anchors.centerIn: parent
 
-            Item {
-                x: parent.cursorRectangle.x
-                y: parent.cursorRectangle.y
-                width: 2
-                height: parent.cursorRectangle.height
-
-                ToolTip.visible: completer.hasSuggestion
-                ToolTip.text: '<font name="' + font.family + '"><font color="gray">' + completer.prefix + '</font>' + completer.suggestion + '</font>'
-            }
-
-            Keys.onTabPressed: {
-                if(completer.hasSuggestion) {
-                    insert(cursorPosition, completer.suggestion)
-                    event.accepted = true
-                }
-            }
-
-            Completer {
-                id: completer
-                property int dotIndex: sceneHeadingField.text.indexOf(".")
-                property int dashIndex: sceneHeadingField.text.indexOf("-")
-                suggestionMode: Completer.AutoCompleteSuggestion
-                strings: {
-                    if(dotIndex < 0 || sceneHeadingField.cursorPosition < dotIndex)
-                        return scriteDocument.structure.standardLocationTypes()
-                    if(dashIndex < 0 || sceneHeadingField.cursorPosition < dashIndex)
-                        return scriteDocument.structure.allLocations()
-                    return scriteDocument.structure.standardMoments()
+                TextField2 {
+                    id: locTypeEdit
+                    font: headingFont
+                    width: Math.max(contentWidth, 80)
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: scene.heading.locationType
+                    completionStrings: scriteDocument.structure.standardLocationTypes()
+                    onEditingComplete: scene.heading.locationType = text
+                    tabItem: locEdit
                 }
 
-                property string prefix: {
-                    if(dotIndex < 0 || sceneHeadingField.cursorPosition < dotIndex)
-                        return text.substring(0, sceneHeadingField.cursorPosition).trim().toUpperCase()
-                    if(dashIndex < 0 || sceneHeadingField.cursorPosition < dashIndex)
-                        return text.substring(dotIndex+1,sceneHeadingField.cursorPosition).trim().toUpperCase()
-                    return text.substring(dashIndex+1,sceneHeadingField.cursorPosition).trim().toUpperCase()
+                Text {
+                    id: sep1Text
+                    font: headingFont
+                    text: ". "
+                    anchors.verticalCenter: parent.verticalCenter
                 }
 
-                completionPrefix: prefix
-            }
+                TextField2 {
+                    id: locEdit
+                    font: headingFont
+                    width: parent.width - locTypeEdit.width - sep1Text.width - momentEdit.width - sep2Text.width
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: scene.heading.location
+                    enableTransliteration: true
+                    completionStrings: scriteDocument.structure.allLocations()
+                    onEditingComplete: scene.heading.location = text
+                    tabItem: momentEdit
+                }
 
-            function applyChanges() {
-                errorDisplay.parseError = scene.heading.parseFrom(text)
-                errorDisplay.ToolTip.visible = (errorDisplay.parseError !== "")
-                return errorDisplay.parseError === ""
+                Text {
+                    id: sep2Text
+                    font: headingFont
+                    text: "- "
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                TextField2 {
+                    id: momentEdit
+                    font: headingFont
+                    width: Math.max(contentWidth, 150);
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: scene.heading.moment
+                    completionStrings: scriteDocument.structure.standardMoments()
+                    onEditingComplete: scene.heading.moment = text
+                    tabItem: sceneContentEditor
+                }
             }
         }
     }

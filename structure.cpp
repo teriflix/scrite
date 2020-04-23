@@ -709,7 +709,7 @@ QStringList Structure::standardMoments() const
 {
     static const QStringList list = QStringList() << "DAY" << "NIGHT" << "MORNING" << "AFTERNOON"
         << "EVENING" << "LATER" << "MOMENTS LATER" << "CONTINUOUS" << "THE NEXT DAY" << "EARLIER"
-        << "MOMENTS EARLIER" << "THE PREVIOUS DAY";
+        << "MOMENTS EARLIER" << "THE PREVIOUS DAY" << "DAWN" << "DUSK";
     return list;
 }
 
