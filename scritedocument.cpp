@@ -111,6 +111,7 @@ void ScriteDocument::setAutoSaveDurationInSeconds(int val)
 
     m_autoSaveDurationInSeconds = val;
     Application::instance()->settings()->setValue("AutoSave/autoSaveInterval", val);
+    this->prepareAutoSave();
     emit autoSaveDurationInSecondsChanged();
 
     Logger::qtPropertyInfo(this, "autoSaveDurationInSeconds");
@@ -123,6 +124,7 @@ void ScriteDocument::setAutoSave(bool val)
 
     m_autoSave = val;
     Application::instance()->settings()->setValue("AutoSave/autoSaveEnabled", val);
+    this->prepareAutoSave();
     emit autoSaveChanged();
 
     Logger::qtPropertyInfo(this, "autoSave");
@@ -436,6 +438,8 @@ void ScriteDocument::prepareAutoSave()
 {
     if(m_autoSave)
         m_autoSaveTimer.start(m_autoSaveDurationInSeconds*1000, this);
+    else
+        m_autoSaveTimer.stop();
 }
 
 void ScriteDocument::updateDocumentWindowTitle()
