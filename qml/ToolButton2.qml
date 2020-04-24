@@ -25,19 +25,13 @@ ToolButton {
     property real suggestedHeight: 55
     property string shortcut
     property string shortcutText: shortcut
+    implicitWidth: suggestedWidth
+    implicitHeight: suggestedHeight
 
     font.pixelSize: 16
     hoverEnabled: true
     display: AbstractButton.TextBesideIcon
     opacity: enabled ? 1 : 0.5
-    background: Rectangle {
-        implicitWidth: toolButton.suggestedWidth
-        implicitHeight: toolButton.suggestedHeight
-        color: toolButton.down ? "gray" : "lightgray"
-        border { width: 1; color: "gray" }
-        radius: 3
-        Behavior on color { ColorAnimation { duration: 250 } }
-    }
     contentItem: Item {
         Row {
             anchors.centerIn: parent
@@ -53,7 +47,6 @@ ToolButton {
 
             Text {
                 text: toolButton.action.text
-                color: toolButton.down ? "white" : "black"
                 font.pixelSize: toolButton.font.pixelSize
                 font.bold: toolButton.down
                 anchors.verticalCenter: parent.verticalCenter
@@ -66,7 +59,6 @@ ToolButton {
             font.pixelSize: 9
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            color: toolButton.down ? "white" : "black"
             text: "[" + toolButton.shortcutText + "]"
             visible: toolButton.shortcutText !== ""
         }

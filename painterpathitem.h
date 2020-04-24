@@ -17,6 +17,7 @@
 #include "abstractshapeitem.h"
 #include <QQmlListProperty>
 #include <QPainterPath>
+#include <QJsonObject>
 
 class PainterPath;
 
@@ -73,6 +74,12 @@ public:
     Q_PROPERTY(QQmlListProperty<AbstractPathElement> elements READ elements NOTIFY elementsChanged STORED false)
     QQmlListProperty<AbstractPathElement> elements();
     Q_SIGNAL void elementsChanged();
+
+    Q_PROPERTY(QJsonObject itemRect READ itemRect NOTIFY itemRectChanged)
+    QJsonObject itemRect() const;
+    Q_SIGNAL void itemRectChanged();
+
+    Q_INVOKABLE QPointF pointInLine(const QPointF &p1, const QPointF &p2, qreal t, bool absolute=false) const;
 
     Q_INVOKABLE QPointF pointAtPercent(qreal t) const;
     Q_INVOKABLE qreal length() const;

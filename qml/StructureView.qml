@@ -297,7 +297,6 @@ Item {
                 enabled: false
                 color: app.translucent(systemPalette.highlight,0.2)
                 border { width: 2; color: systemPalette.highlight }
-                radius: 8                    
                 onVisibleChanged: {
                     if(!visible)
                         enabled = false
@@ -433,6 +432,18 @@ Item {
                 }
             }
 
+            BorderImage {
+                property Item currentElementItem: elementItems.itemAt(canvas.currentIndex)
+                source: "../icons/content/shadow.png"
+                anchors.fill: currentElementItem
+                horizontalTileMode: BorderImage.Stretch
+                verticalTileMode: BorderImage.Stretch
+                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                border { left: 21; top: 21; right: 21; bottom: 21 }
+                visible: currentElementItem !== null
+                opacity: 0.55
+            }
+
             Loader {
                 anchors.fill: parent
                 sourceComponent: elementSequenceVisualizerComponent
@@ -479,9 +490,10 @@ Item {
                     }
 
                     Rectangle {
+                        id: background
+                        radius: 3
                         anchors.fill: parent
-                        radius: 8
-                        border.width: parent.selected ? 4 : 1
+                        border.width: parent.selected ? 2 : 1
                         border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "lightgray" : element.scene.color)
                         color: Qt.tint(element.scene.color, "#C0FFFFFF")
                         Behavior on border.width { NumberAnimation { duration: 400 } }

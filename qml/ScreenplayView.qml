@@ -178,14 +178,13 @@ Rectangle {
         property bool moveMode: false
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
+
+        property bool scrollBarRequired: screenplayElementList.width < screenplayElementList.contentWidth
         ScrollBar.horizontal: ScrollBar {
-            policy: screenplayElementList.width < screenplayElementList.contentWidth ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            policy: screenplayElementList.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.5)
-                dark: "black"
-            }
         }
+
         FocusTracker.window: qmlWindow
         FocusTracker.indicator.target: mainUndoStack
         FocusTracker.indicator.property: "timelineEditorActive"
@@ -221,6 +220,29 @@ Rectangle {
             }
         }
 
+        highlight: Item {
+            Item {
+                anchors.leftMargin: 7.5
+                anchors.rightMargin: 2.5
+                anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
+                anchors.fill: parent
+
+                BorderImage {
+                    source: "../icons/content/shadow.png"
+                    anchors.fill: parent
+                    horizontalTileMode: BorderImage.Stretch
+                    verticalTileMode: BorderImage.Stretch
+                    anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                    border { left: 21; top: 21; right: 21; bottom: 21 }
+                    opacity: 0.75
+                }
+            }
+        }
+        highlightFollowsCurrentItem: true
+        highlightMoveDuration: 0
+        highlightResizeDuration: 0
+
         delegate: Item {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
@@ -229,21 +251,21 @@ Rectangle {
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
             property string sceneTitle: element.scene ? element.scene.title : element.sceneID
             property color sceneColor: element.scene ? element.scene.color : "white"
-            width: isBreakElement ? 60 :
-                                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
-            height: screenplayElementList.height-10
+            width: isBreakElement ? 70 :
+                   Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
+            height: screenplayElementList.height
 
             Loader {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                anchors.topMargin: 2
+                anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 sourceComponent: Rectangle {
-                    radius: isBreakElement ? 0 : 8
                     color: Qt.tint(sceneColor, "#C0FFFFFF")
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
-                    border.width: elementItemDelegate.active ? 4 : 1
+                    border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width { NumberAnimation { duration: 400 } }
 
                     Item {
@@ -317,8 +339,8 @@ Rectangle {
                         width: 24; height: 24
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 1
-                        anchors.rightMargin: 3
+                        anchors.bottomMargin: 5
+                        anchors.rightMargin: 5
                         opacity: dragMouseArea.containsMouse ? 1 : 0.25
                         scale: dragMouseArea.containsMouse ? 2 : 1
                         Behavior on scale { NumberAnimation { duration: 250 } }

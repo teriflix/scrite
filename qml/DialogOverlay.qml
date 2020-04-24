@@ -71,21 +71,6 @@ Rectangle {
         }
     }
 
-//    Behavior on t {
-//        SequentialAnimation {
-//            ScriptAction {
-//                script: animationComplete = false
-//            }
-//            NumberAnimation {
-//                duration: 250
-//                easing.type: Easing.Linear
-//            }
-//            ScriptAction {
-//                script: animationComplete = true
-//            }
-//        }
-//    }
-
     onTChanged: blur.radius = blur.maxRadius * t
 
     MouseArea {

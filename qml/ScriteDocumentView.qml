@@ -143,7 +143,14 @@ Item {
                             }
 
                             Menu {
+                                id: recentFilesSubMenu
                                 title: "Recent Files"
+                                width: 400
+
+                                FontMetrics {
+                                    id: recentFilesFontMetrics
+                                }
+
                                 onAboutToShow: {
                                     var newFiles = []
                                     var filesDropped = false
@@ -163,7 +170,9 @@ Item {
 
                                     MenuItem {
                                         property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
-                                        text: "" + (index+1) + ". " + app.fileInfo(filePath).fileName
+                                        text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesSubMenu.width)
+                                        ToolTip.text: filePath
+                                        ToolTip.visible: hovered
                                         onClicked: fileOpenButton.doOpen(filePath)
                                     }
                                 }
@@ -196,12 +205,13 @@ Item {
                     shortcutText: "Shift+S"
                     enabled: scriteDocument.structure.elementCount > 0
                     onClicked: fileDialog.launch("SAVE")
+                    visible: documentUI.width > 1460
                 }
 
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: "black"
+                    color: app.palette.mid
                 }
 
                 ToolButton2 {
@@ -225,7 +235,7 @@ Item {
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: "black"
+                    color: app.palette.mid
                 }
 
                 ToolButton2 {
@@ -356,7 +366,7 @@ Item {
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: "black"
+                    color: app.palette.mid
                 }
 
                 ToolButton2 {
@@ -582,14 +592,14 @@ Item {
                                 anchors.top: parent.top
                                 anchors.right: parent.right
                                 anchors.margins: 5
-                                height: 45
+                                height: 28
                                 property int currentIndex: 0
 
                                 Rectangle {
                                     width: parent.width
-                                    height: 1
+                                    height: 2
                                     anchors.bottom: parent.bottom
-                                    color: "black"
+                                    color: "gray"
                                 }
 
                                 Row {
@@ -601,28 +611,53 @@ Item {
                                         model: structureEditor.tabs
 
                                         Item {
+                                            id: tabItem
                                             width: tabLabel.width + 120
                                             height: structureEditorTabs.height
                                             property bool isActiveTab: structureEditorTabs.currentIndex === index
 
-                                            Rectangle {
+                                            PainterPathItem {
                                                 anchors.fill: parent
-                                                anchors.margins: isActiveTab ? 0 : 3
-                                                color: isActiveTab ? "white" : "lightgray"
-                                                border.width: 1
-                                                border.color: "black"
+                                                anchors.margins: isActiveTab ? 0 : 1
+                                                fillColor: isActiveTab ? "white" : "lightgray"
+                                                outlineColor: "gray"
+                                                outlineWidth: 2
+                                                renderingMechanism: PainterPathItem.UseQPainter
+                                                renderType: isActiveTab ? PainterPathItem.FillOnly : PainterPathItem.OutlineAndFill
+                                                antialiasing: true
+                                                painterPath: PainterPath {
+                                                    id: tabPath
+                                                    property real radius: Math.min(itemRect.width, itemRect.height)*0.2
+                                                    property point c1: Qt.point(itemRect.left+itemRect.width*0.1, itemRect.top+1)
+                                                    property point c2: Qt.point(itemRect.right-1-itemRect.width*0.1, itemRect.top+1)
+
+                                                    property point p1: Qt.point(itemRect.left, itemRect.bottom)
+                                                    property point p2: pointInLine(c1, p1, radius, true)
+                                                    property point p3: pointInLine(c1, c2, radius, true)
+                                                    property point p4: pointInLine(c2, c1, radius, true)
+                                                    property point p5: pointInLine(c2, p6, radius, true)
+                                                    property point p6: Qt.point(itemRect.right-1, itemRect.bottom)
+
+                                                    MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
+                                                    LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
+                                                    QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
+                                                    LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
+                                                    QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
+                                                    LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
+                                                    CloseSubpath { }
+                                                }
 
                                                 Text {
                                                     id: tabLabel
                                                     text: modelData
                                                     anchors.centerIn: parent
-                                                    font.pixelSize: isActiveTab ? 18 : 14
+                                                    font.pixelSize: isActiveTab ? 16 : 14
                                                     font.bold: isActiveTab
                                                 }
 
                                                 Rectangle {
-                                                    width: parent.width-2
-                                                    height: 3
+                                                    width: parent.width-3
+                                                    height: 2
                                                     anchors.horizontalCenter: parent.horizontalCenter
                                                     anchors.verticalCenter: parent.bottom
                                                     color: "white"

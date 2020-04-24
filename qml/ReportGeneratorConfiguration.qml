@@ -77,8 +77,11 @@ Item {
                 anchors.margins: 20
                 anchors.bottomMargin: 10
 
+                property bool scrollBarRequired: formView.height < formView.contentHeight
+                ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+
                 Column {
-                    width: formView.width
+                    width: formView.width - (formView.scrollBarRequired ? 17 : 0)
                     spacing: 10
 
                     Text {

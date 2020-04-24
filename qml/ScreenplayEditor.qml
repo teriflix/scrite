@@ -78,12 +78,12 @@ Item {
         }
     }
 
-
     FocusIndicator {
         id: focusIndicator
         active: mainUndoStack.active
         anchors.fill: screenplayListView
         anchors.margins: -3
+        color: active ? "white" : Qt.rgba(0,0,0,0)
     }
 
     ListView {
@@ -185,118 +185,84 @@ Item {
             property bool selected: scriteDocument.screenplay.currentElementIndex === index
             signal assumeFocusAt(int pos)
             onAssumeFocusAt: sceneEditor.assumeFocusAt(pos)
-            height: layout.height + 20
-            color: selected ? sceneColor : Qt.tint(sceneColor, "#C0FFFFFF")
+            height: sceneEditor.height + 20
+            color: selected ? app.translucent(sceneColor,0.75) : app.translucent(sceneColor,0.5)
 
-            Row {
-                id: layout
-                width: parent.width-20
-                height: Math.max(sceneTitleText.height, sceneEditor.height)
+            SceneEditor {
+                id: sceneEditor
+                scene: element.scene
+                height: fullHeight
                 anchors.verticalCenter: parent.verticalCenter
-
-                Rectangle {
-                    id: sceneTitle
-                    implicitHeight: sceneTitleText.width
-                    height: parent.height
-                    width: 50
-                    color: selected ? sceneColor : Qt.rgba(0,0,0,0)
-                    clip: true
-
-                    Text {
-                        id: sceneTitleText
-                        text: element.scene.title
-                        anchors.top: parent.top
-                        anchors.topMargin: width/2
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        rotation: -90
-                        font.pixelSize: 24
-                        font.bold: delegateItem.selected
-                        font.letterSpacing: 2
-                        color: {
-                            if(sceneColor === "white" || sceneColor === "yellow")
-                                return "black"
-                            delegateItem.selected ? "white" : "black"
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: scriteDocument.screenplay.currentElementIndex = index
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 10
+                anchors.rightMargin: 17
+                scrollable: false
+                showOnlyEnabledSceneHeadings: true
+                binder.onDocumentInitialized: {
+                    var info = screenplayListView.lastSceneResetInfo
+                    screenplayListView.lastSceneResetInfo = undefined
+                    if(info) {
+                        var position = binder.cursorPositionAtBlock(info.sceneElementIndex)
+                        assumeFocusAt(position)
                     }
                 }
 
-                SceneEditor {
-                    id: sceneEditor
-                    scene: element.scene
-                    height: fullHeight
-                    width: parent.width - sceneTitle.width - parent.spacing
-                    scrollable: false
-                    showOnlyEnabledSceneHeadings: true
-                    binder.onDocumentInitialized: {
-                        var info = screenplayListView.lastSceneResetInfo
-                        screenplayListView.lastSceneResetInfo = undefined
-                        if(info) {
-                            var position = binder.cursorPositionAtBlock(info.sceneElementIndex)
-                            assumeFocusAt(position)
+                onEditorHasActiveFocusChanged: {
+                    if(editorHasActiveFocus) {
+                        if(scriteDocument.screenplay.currentElementIndex !== index) {
+                            currentElementIndexConnections.enabled = false
+                            scriteDocument.screenplay.currentElementIndex = index
+                            currentElementIndexConnections.enabled = true
                         }
+                        currentSceneEditor = sceneEditor
                     }
+                }
+                onRequestScrollUp: {
+                    var item = null
+                    var idx = index
+                    while(idx > 0) {
+                        item = screenplayListView.itemAtIndex(idx-1)
+                        if(item && item.hasSceneContent) {
+                            item.item.assumeFocusAt(-1)
+                            break
+                        }
+                        idx = idx-1
+                    }
+                }
 
-                    onEditorHasActiveFocusChanged: {
-                        if(editorHasActiveFocus) {
-                            if(scriteDocument.screenplay.currentElementIndex !== index) {
-                                currentElementIndexConnections.enabled = false
-                                scriteDocument.screenplay.currentElementIndex = index
-                                currentElementIndexConnections.enabled = true
-                            }
-                            currentSceneEditor = sceneEditor
+                onRequestScrollDown: {
+                    var item = null
+                    var idx = index
+                    while(idx < scriteDocument.screenplay.elementCount) {
+                        item = screenplayListView.itemAtIndex(idx+1)
+                        if(item && item.hasSceneContent) {
+                            item.item.assumeFocusAt(0)
+                            break
                         }
+                        idx = idx+1
                     }
-                    onRequestScrollUp: {
-                        var item = null
-                        var idx = index
-                        while(idx > 0) {
-                            item = screenplayListView.itemAtIndex(idx-1)
-                            if(item && item.hasSceneContent) {
-                                item.item.assumeFocusAt(-1)
-                                break
-                            }
-                            idx = idx-1
-                        }
-                    }
+                }
 
-                    onRequestScrollDown: {
-                        var item = null
-                        var idx = index
-                        while(idx < scriteDocument.screenplay.elementCount) {
-                            item = screenplayListView.itemAtIndex(idx+1)
-                            if(item && item.hasSceneContent) {
-                                item.item.assumeFocusAt(0)
-                                break
-                            }
-                            idx = idx+1
-                        }
+                TextDocumentSearch {
+                    textDocument: sceneEditor.editor.textDocument
+                    searchString: sceneEditor.binder.documentLoadCount > 0 ? (element.userData ? element.userData.searchString : "") : ""
+                    currentResultIndex: searchResultCount > 0 ? (element.userData ? element.userData.currentSearchResultIndex : -1) : -1
+                    onHighlightText: {
+                        currentSceneEditor = sceneEditor
+                        sceneEditor.editor.cursorPosition = start
+                        sceneEditor.editor.select(start, end)
                     }
-
-                    TextDocumentSearch {
-                        textDocument: sceneEditor.editor.textDocument
-                        searchString: sceneEditor.binder.documentLoadCount > 0 ? (element.userData ? element.userData.searchString : "") : ""
-                        currentResultIndex: searchResultCount > 0 ? (element.userData ? element.userData.currentSearchResultIndex : -1) : -1
-                        onHighlightText: {
-                            currentSceneEditor = sceneEditor
-                            sceneEditor.editor.cursorPosition = start
-                            sceneEditor.editor.select(start, end)
-                        }
-                        onClearHighlight: {
-                            sceneEditor.editor.deselect()
-                        }
+                    onClearHighlight: {
+                        sceneEditor.editor.deselect()
                     }
+                }
 
-                    Connections {
-                        target: scriteDocument
-                        onNewSceneCreated: {
-                            if(screenplayIndex === index)
-                                sceneEditor.assumeFocus()
-                        }
+                Connections {
+                    target: scriteDocument
+                    onNewSceneCreated: {
+                        if(screenplayIndex === index)
+                            sceneEditor.assumeFocus()
                     }
                 }
             }

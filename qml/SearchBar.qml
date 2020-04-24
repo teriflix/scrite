@@ -28,9 +28,6 @@ Item {
         anchors.fill: parent
         anchors.margins: 4
         color: enabled ? "white" : "lightgray"
-        border.width: 1
-        border.color: "gray"
-        radius: 5
         enabled: theSearchEngine.searchAgentCount > 0
 
         TextArea {

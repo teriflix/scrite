@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml concurrent network
+QT += gui qml quick widgets xml concurrent network quickcontrols2
 DESTDIR = $$PWD/../Release/
 
 DEFINES += PHTRANSLATE_STATICLIB

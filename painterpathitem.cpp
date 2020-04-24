@@ -29,11 +29,21 @@ void PainterPathItem::setPainterPath(PainterPath *val)
         return;
 
     if(m_path)
+    {
         disconnect(m_path, SIGNAL(updated()), this, SLOT(update()));
+        disconnect(this, SIGNAL(widthChanged()), m_path, SIGNAL(itemRectChanged()));
+        disconnect(this, SIGNAL(heightChanged()), m_path, SIGNAL(itemRectChanged()));
+    }
 
     m_path = val;
+
     if(m_path)
+    {
+        m_path->setParent(this);
         connect(m_path, SIGNAL(updated()), this, SLOT(update()));
+        connect(this, SIGNAL(widthChanged()), m_path, SIGNAL(itemRectChanged()));
+        connect(this, SIGNAL(heightChanged()), m_path, SIGNAL(itemRectChanged()));
+    }
 
     emit painterPathChanged();
 }
@@ -83,7 +93,37 @@ PainterPath::~PainterPath()
 QQmlListProperty<AbstractPathElement> PainterPath::elements()
 {
     return QQmlListProperty<AbstractPathElement>(this,
-        nullptr, elements_append, elements_count, elements_at, elements_clear);
+                                                 nullptr, elements_append, elements_count, elements_at, elements_clear);
+}
+
+QJsonObject PainterPath::itemRect() const
+{
+    auto createJson = [](const QRectF &rect) {
+        QJsonObject ret;
+        ret.insert("x", rect.x());
+        ret.insert("y", rect.y());
+        ret.insert("width", rect.width());
+        ret.insert("height", rect.height());
+        ret.insert("left", rect.left());
+        ret.insert("top", rect.top());
+        ret.insert("right", rect.right());
+        ret.insert("bottom", rect.bottom());
+        return ret;
+    };
+
+    PainterPathItem *item = qobject_cast<PainterPathItem*>(this->parent());
+    if(item)
+        return createJson(item->boundingRect());
+
+    return createJson(QRectF());
+}
+
+QPointF PainterPath::pointInLine(const QPointF &p1, const QPointF &p2, qreal t, bool absolute) const
+{
+    const QLineF line(p1, p2);
+    if(absolute)
+        t = qBound(0.0, t / line.length(), 1.0);
+    return line.pointAt(t);
 }
 
 QPointF PainterPath::pointAtPercent(qreal t) const
@@ -135,6 +175,7 @@ void PainterPath::elements_append(QQmlListProperty<AbstractPathElement> *list, A
         return;
 
     connect(element, SIGNAL(updated()), path, SLOT(markDirty()));
+    element->setParent(path);
     path->m_pathElements.append(element);
     path->markDirty();
     emit path->elementsChanged();

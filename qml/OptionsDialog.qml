@@ -17,8 +17,8 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
-    width: 700
-    height: 500
+    width: 850
+    height: 700
 
     Item {
         anchors.fill: parent
@@ -65,7 +65,7 @@ Item {
             section.property: "group"
             section.criteria: ViewSection.FullString
             section.delegate: Rectangle {
-                width: pageList.width
+                width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
                 height: 30
                 color: "lightsteelblue"
 
@@ -76,12 +76,23 @@ Item {
                     text: section
                 }
             }
+
+            property bool scrollBarRequired: pageList.height < pageList.contentHeight
+            ScrollBar.vertical: ScrollBar {
+                policy: pageList.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                minimumSize: 0.1
+                palette {
+                    mid: Qt.rgba(0,0,0,0.25)
+                    dark: Qt.rgba(0,0,0,0.75)
+                }
+            }
             highlight: Rectangle {
+                width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
                 color: "lightgray"
                 radius: 5
             }
             delegate: Text {
-                width: pageList.width
+                width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 height: 32
@@ -153,7 +164,7 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.title
                         onTextEdited: scriteDocument.screenplay.title = text
-                        font.pixelSize: 14
+                        font.pixelSize: 20
                     }
                 }
 
@@ -174,7 +185,7 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.subtitle
                         onTextEdited: scriteDocument.screenplay.subtitle = text
-                        font.pixelSize: 14
+                        font.pixelSize: 20
                     }
                 }
 
@@ -195,7 +206,7 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.author
                         onTextEdited: scriteDocument.screenplay.author = text
-                        font.pixelSize: 14
+                        font.pixelSize: 20
                     }
                 }
 
@@ -216,7 +227,7 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.contact
                         onTextEdited: scriteDocument.screenplay.contact = text
-                        font.pixelSize: 14
+                        font.pixelSize: 20
                     }
                 }
 
@@ -237,7 +248,7 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.version
                         onTextEdited: scriteDocument.screenplay.version = text
-                        font.pixelSize: 14
+                        font.pixelSize: 20
                     }
                 }
 
@@ -299,10 +310,11 @@ Item {
                 width: parent.width-20
                 height: parent.height
                 anchors.right: parent.right
+                ScrollBar.vertical.policy: ScrollBar.AlwaysOn
 
                 Column {
                     spacing: 20
-                    width: pageSetupScroll.width
+                    width: pageSetupScroll.width-20
 
                     Text {
                         width: parent.width

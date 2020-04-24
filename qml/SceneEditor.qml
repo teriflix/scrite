@@ -24,7 +24,7 @@ Item {
     property alias binder: sceneDocumentBinder
     property Item  editor: sceneContentEditor
     property bool  editorHasActiveFocus: activeFocusBinder.get
-    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+10) : 0) + 10
+    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+10+contentEditorArea.anchors.topMargin) : 0) + 10
     property color backgroundColor: scene ? Qt.tint(scene.color, "#E0FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
@@ -39,13 +39,12 @@ Item {
         set: sceneContentEditor.activeFocus
     }
 
-    Rectangle {
+    Item {
         id: sceneHeadingArea
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
         height: sceneHeadingLoader.active ? sceneHeadingLoader.height : 0
-        border { width: 1; color: "lightgray" }
 
         Loader {
             id: sceneHeadingLoader
@@ -70,11 +69,14 @@ Item {
     property TextArea sceneContentEditor
 
     Rectangle {
+        id: contentEditorArea
         anchors.left: parent.left
         anchors.top: sceneHeadingArea.bottom
+        anchors.topMargin: sceneHeadingLoader.active ? radius/2 : 0
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         color: backgroundColor
+        radius: 0
 
         SceneDocumentBinder {
             id: sceneDocumentBinder
@@ -91,6 +93,8 @@ Item {
         Loader {
             id: contentEditorLoader
             anchors.fill: parent
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
             clip: true
             active: true
             sourceComponent: scrollable ? scrollableSceneContentEditorComponent : sceneContentEditorComponent
@@ -419,6 +423,7 @@ Item {
             color: Qt.tint(scene.color, "#D9FFFFFF")
             property font headingFont: sceneHeadingFormat.font
             Component.onCompleted: headingFont.pointSize = headingFont.pointSize+8
+            radius: contentEditorArea.radius
 
             Text {
                 anchors.left: parent.left

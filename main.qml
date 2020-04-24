@@ -16,6 +16,7 @@ import QtQuick 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtGraphicalEffects 1.0
+import QtQuick.Controls.Material 2.12
 
 import "./qml" as UI
 
@@ -24,6 +25,9 @@ Rectangle {
     width: 1024
     height: 768
     color: "lightgray"
+
+    Material.accent: Material.DeepPurple
+    Material.theme: Material.Light
 
     UndoStack {
         id: mainUndoStack

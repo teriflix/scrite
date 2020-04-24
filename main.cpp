@@ -18,6 +18,7 @@
 #include <QQuickView>
 #include <QQmlEngine>
 #include <QQmlContext>
+#include <QQuickStyle>
 
 #include "logger.h"
 #include "undoredo.h"
@@ -147,6 +148,8 @@ int main(int argc, char **argv)
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     format.setSamples(2);
 
+    QQuickStyle::setStyle("Material");
+
     QQuickView qmlView;
     qmlView.setFormat(format);
     scriteDocument->formatting()->setScreen(qmlView.screen());
@@ -159,7 +162,7 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
-    qmlView.setMinimumSize(QSize(1470, 865));
+    qmlView.setMinimumSize(QSize(1366, 768));
     qmlView.showMaximized();
 
     QObject::connect(&a, &Application::minimizeWindowRequest, &qmlView, &QQuickView::showMinimized);

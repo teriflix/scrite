@@ -288,5 +288,6 @@ void AbstractShapeItem::paint(QPainter *paint)
 {
     paint->setBrush(m_fillColor);
     paint->setPen( QPen(m_outlineColor,m_outlineWidth) );
+    paint->setRenderHint(QPainter::Antialiasing, this->antialiasing());
     paint->drawPath(m_path);
 }
