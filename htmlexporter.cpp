@@ -53,8 +53,12 @@ bool HtmlExporter::doExport(QIODevice *device)
 
         SceneElement::Type elementType = SceneElement::Type(i);
         SceneElementFormat *format = formatting->elementFormat(elementType);
-        ts << "    div." << typeStringMap.value(elementType) << " {\n";
+        ts << "    p.scrite-" << typeStringMap.value(elementType) << " {\n";
+#if 0
         ts << "      font-family: \"" << format->font().family() << "\";\n";
+#else
+        ts << "      font-family: \"Courier New\", Courier, monospace;\n";
+#endif
         ts << "      font-size: " << format->font().pointSize() << "pt;\n";
         if(format->font().bold())
             ts << "      font-weight: bold;\n";
@@ -81,35 +85,39 @@ bool HtmlExporter::doExport(QIODevice *device)
             break;
         }
 
+        const int blockWidth = int(format->blockWidth()*100);
+        int leftMargin = 0;
+        int rightMargin = 0;
+
         ts << "      width: " << int(format->blockWidth()*100.0) << "%;\n";
         if(format->blockWidth() < 1)
         {
-            ts << "      display: inline-block;\n";
             switch(format->blockAlignment())
             {
             case Qt::AlignLeft:
-                ts << "      margin-left: 0px;\n";
-                ts << "      margin-right: auto;\n";
+                rightMargin = 100 - blockWidth;
                 break;
             default:
-            case Qt::AlignHCenter: {
-                const int margin = int(((1.0-format->blockWidth())/2.0)*100.0);
-                ts << "      margin-left: " << margin << "%;\n";
-                } break;
+            case Qt::AlignHCenter:
+                leftMargin = (100 - blockWidth) >> 1;
+                rightMargin = 100 - blockWidth - leftMargin;
+                break;
             case Qt::AlignRight:
-                ts << "      margin-left: auto;\n";
-                ts << "      margin-right: 0px;\n";
+                leftMargin = 100 - blockWidth;
                 break;
             }
         }
 
+        ts << "      margin-left: " << leftMargin << "%;\n";
+        ts << "      margin-right: " << rightMargin << "%;\n";
         ts << "      margin-top: " << format->topMargin() << "px;\n";
         ts << "      margin-bottom: " << format->bottomMargin() << "px;\n";
-        ts << "      line-height: " << format->lineHeight() << "em;\n";
+        ts << "      line-height: " << format->lineHeight()*1.1 << "em;\n";
         ts << "    }\n";
     }
 
-    ts << "    div.scene {\n";
+    ts << "\n";
+    ts << "    div.scrite-scene {\n";
     ts << "      padding-top: 10px;\n";
     ts << "      padding-bottom: 10px;\n";
     ts << "      padding-left: 10px;\n";
@@ -118,10 +126,11 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     ts << "    </style>\n\n";
 
-    ts << "    <div class=\"screenplay\">\n";
+    ts << "    <div class=\"scrite-screenplay\">\n";
 
     auto writeParagraph = [&ts,typeStringMap](SceneElement::Type type, const QString &text) {
-        ts << "        <div class=\"" << typeStringMap.value(type) << "\">" << text << "</div>\n";
+        const QString styleName = "scrite-" + typeStringMap.value(type);
+        ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">" << text << "</p>\n";
     };
 
     const int nrScenes = screenplay->elementCount();
@@ -138,7 +147,7 @@ bool HtmlExporter::doExport(QIODevice *device)
                                                  QString::number(sceneColor.green()) + "," +
                                                  QString::number(sceneColor.blue()) + ",0.1)";
 
-        ts << "      <div class=\"scene\" style=\"background-color: " << sceneColorText << ";\">\n";
+        ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\" style=\"background-color: " << sceneColorText << ";\">\n";
         const SceneHeading *heading = scene->heading();
         if(heading->isEnabled())
         {
@@ -150,7 +159,7 @@ bool HtmlExporter::doExport(QIODevice *device)
         for(int j=0; j<nrElements; j++)
         {
             SceneElement *element = scene->elementAt(j);
-            writeParagraph(element->type(), element->text());
+            writeParagraph(element->type(), element->formattedText());
         }
 
         ts << "      </div>\n";

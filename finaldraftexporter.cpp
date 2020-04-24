@@ -95,7 +95,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             contentE.appendChild(paragraphE);
 
             paragraphE.setAttribute("Type", sceneElement->typeAsString());
-            addTextToParagraph(paragraphE, sceneElement->text());
+            addTextToParagraph(paragraphE, sceneElement->formattedText());
         }
 
         this->progress()->tick();

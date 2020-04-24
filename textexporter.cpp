@@ -128,7 +128,7 @@ bool TextExporter::doExport(QIODevice *device)
         {
             const SceneElement *element = scene->elementAt(j);
             const SceneElementFormat *format = screenplayFormat->elementFormat(element->type());
-            writeParagraph(format, element->text());
+            writeParagraph(format, element->formattedText());
         }
     }
 

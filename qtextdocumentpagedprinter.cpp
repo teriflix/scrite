@@ -120,18 +120,9 @@ void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF
     }
 
     // Set text-flags for each cell
-    if(m_type == Header)
-    {
-        m_columns[0].flags = Qt::AlignLeft|Qt::AlignVCenter|Qt::TextWordWrap;
-        m_columns[1].flags = Qt::AlignHCenter|Qt::AlignVCenter|Qt::TextWordWrap;
-        m_columns[2].flags = Qt::AlignRight|Qt::AlignVCenter|Qt::TextWordWrap;
-    }
-    else if(m_type == Footer)
-    {
-        m_columns[0].flags = Qt::AlignLeft|Qt::AlignVCenter|Qt::TextWordWrap;
-        m_columns[1].flags = Qt::AlignHCenter|Qt::AlignVCenter|Qt::TextWordWrap;
-        m_columns[2].flags = Qt::AlignRight|Qt::AlignVCenter|Qt::TextWordWrap;
-    }
+    m_columns[0].flags = Qt::AlignLeft|Qt::AlignVCenter|Qt::TextWordWrap;
+    m_columns[1].flags = Qt::AlignHCenter|Qt::AlignVCenter|Qt::TextWordWrap;
+    m_columns[2].flags = Qt::AlignRight|Qt::AlignVCenter|Qt::TextWordWrap;
 }
 
 void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCount)
