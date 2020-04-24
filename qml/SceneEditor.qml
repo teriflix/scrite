@@ -141,7 +141,7 @@ Item {
             palette: app.palette
             selectByMouse: true
             selectByKeyboard: true
-            EventFilter.events: [31,51] // Wheel, ShortcutOverride
+            EventFilter.events: [31,51,6] // Wheel, ShortcutOverride
             EventFilter.onFilter: {
                 if(event.type === 31) {
                     result.acceptEvent = false
@@ -149,13 +149,25 @@ Item {
                 } else if(event.type === 51) {
                     result.acceptEvent = false
                     result.filter = true
-                }
+                } else if(event.type === 6)
+                    sceneTextArea.userIsTyping = event.hasText
             }
             font: scriteDocument.formatting.defaultFont
-            Transliterator.enabled: scene && !scene.isBeingReset
+            property bool userIsTyping: false
+            Transliterator.enabled: scene && !scene.isBeingReset && userIsTyping
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
+            Transliterator.onAboutToTransliterate: {
+                scene.beginUndoCapture(false)
+                scene.undoRedoEnabled = false
+            }
+            Transliterator.onFinishedTransliterating: {
+                app.execLater(0, function() {
+                    scene.endUndoCapture()
+                    scene.undoRedoEnabled = true
+                })
+            }
             Component.onCompleted: sceneContentEditor = sceneTextArea
 
             Completer {

@@ -126,6 +126,9 @@ public:
     Q_INVOKABLE void transliterate(int from, int to);
     Q_INVOKABLE void transliterateToLanguage(int from, int to, int language);
 
+    Q_SIGNAL void aboutToTransliterate(int from, int to, const QString &replacement, const QString &original);
+    Q_SIGNAL void finishedTransliterating(int from, int to, const QString &replacement, const QString &original);
+
     Q_SIGNAL void transliterationSuggestion(int from, int to, const QString &replacement, const QString &original);
 
 private:

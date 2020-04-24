@@ -393,7 +393,7 @@ void Transliterator::onTextDocumentDestroyed()
 void Transliterator::processTransliteration(int from, int charsRemoved, int charsAdded)
 {
     Q_UNUSED(charsRemoved)
-    if(this->document() == nullptr)
+    if(this->document() == nullptr || !m_hasActiveFocus || !m_enabled)
         return;
 
     void *transliterator = TransliterationSettings::instance()->transliterator();
@@ -457,7 +457,11 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
         replacement += TransliterationSettings::instance()->transliteratedWord(word);
 
     if(m_mode == AutomaticMode)
+    {
+        emit aboutToTransliterate(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
         cursor.insertText(replacement);
+        emit finishedTransliterating(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
+    }
     else
         emit transliterationSuggestion(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
 }

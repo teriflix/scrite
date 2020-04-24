@@ -83,7 +83,7 @@ Item {
         active: mainUndoStack.active
         anchors.fill: screenplayListView
         anchors.margins: -3
-        color: active ? "white" : Qt.rgba(0,0,0,0)
+        color: active && screenplayListView.height < screenplayListView.contentHeight ? "white" : Qt.rgba(0,0,0,0)
     }
 
     ListView {

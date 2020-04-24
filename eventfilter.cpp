@@ -138,6 +138,7 @@ inline void packIntoJson(QKeyEvent *event, QJsonObject &object)
     object.insert("key", event->key());
     object.insert("modifiers", int(event->modifiers()));
     object.insert("text", event->text());
+    object.insert("hasText", !event->text().isEmpty());
 }
 
 inline void packIntoJson(QWheelEvent *event, QJsonObject &object)

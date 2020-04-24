@@ -212,8 +212,8 @@ public:
     Q_INVOKABLE void clearNotes();
     Q_SIGNAL void noteCountChanged();
 
-    void beginUndoCapture();
-    void endUndoCapture();
+    Q_INVOKABLE void beginUndoCapture(bool allowMerging=true);
+    Q_INVOKABLE void endUndoCapture();
 
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };

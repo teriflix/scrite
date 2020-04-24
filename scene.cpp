@@ -35,7 +35,7 @@ class SceneUndoCommand : public QUndoCommand
 public:
     static SceneUndoCommand *current;
 
-    SceneUndoCommand(Scene *scene);
+    SceneUndoCommand(Scene *scene, bool allowMerging=true);
     ~SceneUndoCommand();
 
     // QUndoCommand interface
@@ -55,13 +55,16 @@ private:
     QString m_sceneId;
     QByteArray m_after;
     QByteArray m_before;
+    bool m_allowMerging = true;
+    char m_padding[7];
     QDateTime m_timestamp;
 };
 
 SceneUndoCommand *SceneUndoCommand::current = nullptr;
 
-SceneUndoCommand::SceneUndoCommand(Scene *scene)
-    : m_scene(scene), m_timestamp(QDateTime::currentDateTime())
+SceneUndoCommand::SceneUndoCommand(Scene *scene, bool allowMerging)
+    : m_scene(scene), m_allowMerging(allowMerging),
+      m_timestamp(QDateTime::currentDateTime())
 {
     m_sceneId = m_scene->id();
     m_before = this->toByteArray(scene);
@@ -101,9 +104,12 @@ void SceneUndoCommand::redo()
 
 bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
 {
-    if(this->id() == other->id())
+    if(m_allowMerging && this->id() == other->id())
     {
         const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand*>(other);
+        if(cmd->m_allowMerging == false)
+            return false;
+
         if(cmd->m_sceneId != m_sceneId)
             return false;
 
@@ -182,10 +188,10 @@ Scene *SceneUndoCommand::fromByteArray(const QByteArray &bytes) const
     ds >> moment;
     scene->heading()->setMoment(moment);
 
-    int nrScenes = 0;
-    ds >> nrScenes;
+    int nrElements = 0;
+    ds >> nrElements;
 
-    for(int i=0; i<nrScenes; i++)
+    for(int i=0; i<nrElements; i++)
     {
         SceneElement *element = new SceneElement(scene);
 
@@ -210,7 +216,7 @@ class PushSceneUndoCommand
     static UndoStack *allowedStack;
 
 public:
-    PushSceneUndoCommand(Scene *scene);
+    PushSceneUndoCommand(Scene *scene, bool allowMerging=true);
     ~PushSceneUndoCommand();
 
 private:
@@ -219,7 +225,7 @@ private:
 
 UndoStack *PushSceneUndoCommand::allowedStack = nullptr;
 
-PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene)
+PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, bool allowMerging)
 {
     if(allowedStack == nullptr)
         allowedStack = Application::instance()->findUndoStack("MainUndoStack");
@@ -231,7 +237,7 @@ PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene)
        scene != nullptr && scene->isUndoRedoEnabled())
     {
         if(scene != nullptr)
-            m_command = new SceneUndoCommand(scene);
+            m_command = new SceneUndoCommand(scene, allowMerging);
     }
 }
 
@@ -731,12 +737,12 @@ void Scene::clearNotes()
         this->removeNote(m_notes.first());
 }
 
-void Scene::beginUndoCapture()
+void Scene::beginUndoCapture(bool allowMerging)
 {
     if(m_pushUndoCommand != nullptr)
         return;
 
-    m_pushUndoCommand = new PushSceneUndoCommand(this);
+    m_pushUndoCommand = new PushSceneUndoCommand(this, allowMerging);
 }
 
 void Scene::endUndoCapture()
