@@ -24,6 +24,7 @@ Flickable {
     property alias handlePinchZoom: pinchHandler.enabled
     boundsBehavior: Flickable.StopAtBounds
     clip: true
+    property bool showScrollBars: true
 
     function zoomIn() {
         zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), 4)
@@ -41,7 +42,7 @@ Flickable {
     Behavior on contentY { NumberAnimation { duration: 250 } }
 
     ScrollBar.horizontal: ScrollBar {
-        policy: ScrollBar.AlwaysOn
+        policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
         minimumSize: 0.1
         palette {
             mid: Qt.rgba(0,0,0,0.25)
@@ -49,7 +50,7 @@ Flickable {
         }
     }
     ScrollBar.vertical: ScrollBar {
-        policy: ScrollBar.AlwaysOn
+        policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
         minimumSize: 0.1
         palette {
             mid: Qt.rgba(0,0,0,0.25)

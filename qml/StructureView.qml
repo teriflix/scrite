@@ -129,6 +129,7 @@ Item {
         initialContentWidth: canvas.width
         initialContentHeight: canvas.height
         clip: true
+        showScrollBars: scriteDocument.structure.elementCount >= 1
 
         GridBackground {
             id: canvas
