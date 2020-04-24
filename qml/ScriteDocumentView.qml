@@ -398,6 +398,7 @@ Item {
 
                         Menu {
                             id: languageMenu
+                            width: 250
 
                             Repeater {
                                 model: app.enumerationModel(app.transliterationSettings, "Language")
@@ -405,7 +406,7 @@ Item {
                                 MenuItem {
                                     property string baseText: modelData.key
                                     property string shortcutKey: app.transliterationSettings.shortcutLetter(modelData.value)
-                                    text: baseText + " \t" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
+                                    text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
                                     onClicked: app.transliterationSettings.language = modelData.value
                                     checkable: true
                                     checked: app.transliterationSettings.language === modelData.value
