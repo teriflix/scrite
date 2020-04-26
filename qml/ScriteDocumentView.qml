@@ -583,7 +583,7 @@ Item {
                             anchors.margins: 2
                             border { width: 1; color: "gray" }
                             radius: 5
-                            color: Qt.rgba(1,1,1,0.5)
+                            color: "#EEEEEE"
 
                             property var tabs: ["Structure", "Notebook"]
 
@@ -606,6 +606,7 @@ Item {
                                 Row {
                                     height: parent.height
                                     anchors.centerIn: parent
+                                    spacing: -height*0.75
 
                                     Repeater {
                                         id: structureEditorTabGenerator
@@ -616,15 +617,15 @@ Item {
                                             width: tabLabel.width + 120
                                             height: structureEditorTabs.height
                                             property bool isActiveTab: structureEditorTabs.currentIndex === index
+                                            z: isActiveTab ? structureEditor.tabs.length+1 : index
 
                                             PainterPathItem {
                                                 anchors.fill: parent
-                                                anchors.margins: isActiveTab ? 0 : 1
-                                                fillColor: isActiveTab ? "white" : "lightgray"
+                                                anchors.topMargin: isActiveTab ? 0 : parent.height*0.1
+                                                fillColor: isActiveTab ? structureEditor.color : "#BDBDBD"
                                                 outlineColor: "gray"
                                                 outlineWidth: 2
                                                 renderingMechanism: PainterPathItem.UseQPainter
-                                                renderType: isActiveTab ? PainterPathItem.FillOnly : PainterPathItem.OutlineAndFill
                                                 antialiasing: true
                                                 painterPath: PainterPath {
                                                     id: tabPath
@@ -657,11 +658,13 @@ Item {
                                                 }
 
                                                 Rectangle {
-                                                    width: parent.width-3
-                                                    height: 2
-                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                    height: 1.5
+                                                    anchors.left: parent.left
+                                                    anchors.right: parent.right
+                                                    anchors.leftMargin: 2
+                                                    anchors.rightMargin: 2
                                                     anchors.verticalCenter: parent.bottom
-                                                    color: "white"
+                                                    color: parent.fillColor
                                                     visible: isActiveTab
                                                 }
                                             }

@@ -80,5 +80,7 @@
         <file>font/CourierPrime-Italic.ttf</file>
         <file>font/CourierPrime-Regular.ttf</file>
         <file>qml/TextField2.qml</file>
+        <file>icons/content/person_add.png</file>
+        <file>icons/content/person_add_inverted.png</file>
     </qresource>
 </RCC>

@@ -23,7 +23,6 @@ Item {
         source: "../images/notebookpage.jpg"
         fillMode: Image.Stretch
         smooth: true
-        opacity: 0.5
     }
 
     ListView {
@@ -31,10 +30,13 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.margins: 3
-        width: 50
+        anchors.rightMargin: 3
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
+        clip: true
+        width: 45
         model: noteSources
-        spacing: 3
+        spacing: -width*0.3
         currentIndex: 0
         footer: Item {
             width: notebookTabsView.width
@@ -43,7 +45,7 @@ Item {
             RoundButton {
                 anchors.centerIn: parent
                 hoverEnabled: true
-                icon.source: "../icons/navigation/refresh.png"
+                icon.source: "../icons/content/person_add.png"
                 onClicked: {
                     modalDialog.popupSource = this
                     modalDialog.sourceComponent = newCharactersDialogUi
@@ -54,21 +56,47 @@ Item {
             }
         }
 
-        delegate: Rectangle {
-            width: notebookTabsView.width
-            height: textItem.width + 20
-            color: selected ? modelData.color : Qt.tint(modelData.color, "#C0FFFFFF")
-            border { width: 1; color: "lightgray" }
-            radius: 8
-
+        delegate: Item {
+            width: selected ? 40 : 35
+            height: textItem.width + 40
             property bool selected: notebookTabsView.currentIndex === index
+            z: selected ? notebookTabsView.count+1 : notebookTabsView.count-index
+
+            PainterPathItem {
+                anchors.fill: parent
+                fillColor: selected ? modelData.color : Qt.tint(modelData.color, "#C0FFFFFF")
+                outlineColor: modelData.color
+                outlineWidth: 1.5
+                renderingMechanism: PainterPathItem.UseQPainter
+                painterPath: PainterPath {
+                    id: tabPath
+                    property real radius: Math.min(itemRect.width, itemRect.height)*0.2
+                    property point c1: Qt.point(itemRect.right-1, itemRect.top+itemRect.height*0.1)
+                    property point c2: Qt.point(itemRect.right-1, itemRect.bottom-1-itemRect.height*0.1)
+
+                    property point p1: Qt.point(itemRect.left, itemRect.top)
+                    property point p2: pointInLine(c1, p1, radius, true)
+                    property point p3: pointInLine(c1, c2, radius, true)
+                    property point p4: pointInLine(c2, c1, radius, true)
+                    property point p5: pointInLine(c2, p6, radius, true)
+                    property point p6: Qt.point(itemRect.left, itemRect.bottom)
+
+                    MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
+                    LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
+                    QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
+                    LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
+                    QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
+                    LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
+                    CloseSubpath { }
+                }
+            }
 
             Text {
                 id: textItem
                 rotation: 90
                 text: modelData.label.length > 20 ? (modelData.label.substr(0,17)+"...") : modelData.label
                 anchors.centerIn: parent
-                font.pixelSize: parent.selected ? 20 : 18
+                font.pixelSize: parent.selected ? 20 : 16
                 font.bold: parent.selected
                 color: parent.selected ? "white" : "black"
                 Behavior on font.pixelSize { NumberAnimation { duration: 250 } }
@@ -82,6 +110,7 @@ Item {
                 hoverEnabled: modelData.label.length > 20
                 ToolTip.visible: hoverEnabled && containsMouse
                 ToolTip.text: modelData.label
+                ToolTip.delay: 3000
                 onClicked: {
                     notebookTabsView.currentIndex = index
                     if(allowRemove && mouse.button === Qt.RightButton) {
@@ -139,6 +168,21 @@ Item {
     }
 
     property var notesPack: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
+
+    Rectangle {
+        anchors.left: notesGrid.left
+        anchors.top: notesGrid.top
+        anchors.bottom: notesGrid.bottom
+        anchors.right: notebookTabsView.left
+        anchors.leftMargin: -2
+        anchors.topMargin: -2
+        anchors.bottomMargin: -2
+        anchors.rightMargin: -1
+        color: app.translucent(border.color, 0.04)
+        radius: 4
+        border.width: 2
+        border.color: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].color : "black"
+    }
 
     GridView {
         id: notesGrid

@@ -286,8 +286,16 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
 
 void AbstractShapeItem::paint(QPainter *paint)
 {
-    paint->setBrush(m_fillColor);
-    paint->setPen( QPen(m_outlineColor,m_outlineWidth) );
+    if(m_renderType&FillAlso)
+        paint->setBrush(m_fillColor);
+    else
+        paint->setBrush(Qt::NoBrush);
+
+    if(m_renderType&OutlineAlso)
+        paint->setPen( QPen(m_outlineColor,m_outlineWidth) );
+    else
+        paint->setPen(Qt::NoPen);
+
     paint->setRenderHint(QPainter::Antialiasing, this->antialiasing());
     paint->drawPath(m_path);
 }
