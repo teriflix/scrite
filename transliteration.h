@@ -111,6 +111,8 @@ public:
     bool hasActiveFocus() const { return m_hasActiveFocus; }
     Q_SIGNAL void hasActiveFocusChanged();
 
+    Q_INVOKABLE void enableFromNextWord() { m_enableFromNextWord = true; }
+
     enum Mode
     {
         AutomaticMode,
@@ -140,6 +142,7 @@ private:
 
 private:
     bool m_enabled = true;
+    bool m_enableFromNextWord = false;
     Mode m_mode = AutomaticMode;
     int m_cursorPosition = -1;
     bool m_hasActiveFocus = false;

@@ -24,7 +24,7 @@ Item {
     property alias binder: sceneDocumentBinder
     property Item  editor: sceneContentEditor
     property bool  editorHasActiveFocus: activeFocusBinder.get
-    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+10+contentEditorArea.anchors.topMargin) : 0) + 10
+    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+contentEditorArea.anchors.topMargin+15) : 0) + 10
     property color backgroundColor: scene ? Qt.tint(scene.color, "#E0FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
@@ -261,14 +261,20 @@ Item {
                 }
 
                 if(completer.suggestion !== "") {
+                    userIsTyping = false
                     insert(cursorPosition, completer.suggestion)
+                    userIsTyping = true
+                    Transliterator.enableFromNextWord()
                     event.accepted = true
                 } else
                     event.accepted = false
             }
             Keys.onTabPressed: {
                 if(completer.suggestion !== "") {
+                    userIsTyping = false
                     insert(cursorPosition, completer.suggestion)
+                    userIsTyping = true
+                    Transliterator.enableFromNextWord()
                     event.accepted = true
                 } else
                     sceneDocumentBinder.tab()

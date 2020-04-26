@@ -396,6 +396,12 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
     if(this->document() == nullptr || !m_hasActiveFocus || !m_enabled)
         return;
 
+    if(m_enableFromNextWord == true)
+    {
+        m_enableFromNextWord = false;
+        return;
+    }
+
     void *transliterator = TransliterationSettings::instance()->transliterator();
     if(transliterator == nullptr)
         return;
