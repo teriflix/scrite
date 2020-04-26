@@ -79,12 +79,8 @@ ScrollView {
                         ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
                         enabled: binder ? binder.currentElement !== null : false
                         down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
-                        onClicked: {
-                            binder.currentElement.type = modelData.value
-                            var pos = editor.cursorPosition
-                            editor.cursorPosition = pos-1
-                            editor.cursorPosition = pos
-                        }
+                        onClicked: binder.currentElement.type = modelData.value
+                        focusPolicy: Qt.NoFocus
                     }
                 }
             }

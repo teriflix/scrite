@@ -225,9 +225,15 @@ Item {
                 }
 
                 onRequestScrollUp: {
+                    if(index === 0) {
+                        screenplayListView.positionViewAtBeginning()
+                        return
+                    }
+
                     var item = null
                     var idx = index
                     while(idx > 0) {
+                        screenplayListView.positionViewAtIndex(idx-1, ListView.visible)
                         item = screenplayListView.itemAtIndex(idx-1)
                         if(item && item.hasSceneContent) {
                             item.item.assumeFocusAt(-1)
@@ -238,6 +244,11 @@ Item {
                 }
 
                 onRequestScrollDown: {
+                    if(index === scriteDocument.screenplay.elementCount-1) {
+                        screenplayListView.positionViewAtEnd()
+                        return
+                    }
+
                     var item = null
                     var idx = index
                     while(idx < scriteDocument.screenplay.elementCount) {
