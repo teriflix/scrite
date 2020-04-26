@@ -12,9 +12,12 @@
 ****************************************************************************/
 
 #include "undoredo.h"
+#include "hourglass.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
+
+#include <QScopedValueRollback>
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent),
@@ -319,6 +322,8 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
 
 void Screenplay::removeElement(ScreenplayElement *ptr)
 {
+    HourGlass hourGlass;
+
     if(ptr == nullptr)
         return;
 
@@ -544,6 +549,272 @@ void Screenplay::clearElements()
         UndoStack::active()->push(new UndoClearScreenplayCommand(this, sceneIds));
 
     if(info) info->unlock();
+}
+
+class SplitElementUndoCommand : public QUndoCommand
+{
+public:
+    SplitElementUndoCommand(ScreenplayElement *ptr);
+    ~SplitElementUndoCommand();
+
+    void prepare();
+    void commit(Scene *splitScene);
+
+    // QUndoCommand interface
+    void undo();
+    void redo();
+
+private:
+    QByteArray captureScreenplayElements() const;
+    void applyScreenplayElements(const QByteArray &bytes);
+
+    QPair<StructureElement*,StructureElement*> findStructureElements() const;
+
+private:
+    QByteArray m_after;
+    QByteArray m_before;
+    QString m_splitSceneID;
+    QString m_originalSceneID;
+    QByteArray m_splitScenesData[2];
+    QByteArray m_originalSceneData;
+    Screenplay *m_screenplay = nullptr;
+    ScreenplayElement *m_screenplayElement = nullptr;
+};
+
+SplitElementUndoCommand::SplitElementUndoCommand(ScreenplayElement *ptr)
+    : QUndoCommand(), m_screenplayElement(ptr)
+{
+
+}
+
+SplitElementUndoCommand::~SplitElementUndoCommand()
+{
+
+}
+
+void SplitElementUndoCommand::prepare()
+{
+    if(m_screenplayElement == nullptr)
+    {
+        this->setObsolete(true);
+        return;
+    }
+
+    m_screenplay = m_screenplayElement->screenplay();
+
+    Scene *originalScene = m_screenplayElement->scene();
+    m_originalSceneID = originalScene->id();
+    m_originalSceneData = originalScene->toByteArray();
+    m_before = this->captureScreenplayElements();
+}
+
+void SplitElementUndoCommand::commit(Scene *splitScene)
+{
+    if(m_screenplayElement == nullptr || splitScene == nullptr || m_screenplay == nullptr)
+    {
+        this->setObsolete(true);
+        return;
+    }
+
+    m_splitSceneID = splitScene->id();
+    m_splitScenesData[0] = m_screenplayElement->scene()->toByteArray();
+    m_splitScenesData[1] = splitScene->toByteArray();
+    UndoStack::active()->push(this);
+}
+
+void SplitElementUndoCommand::undo()
+{
+    QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+
+    QPair<StructureElement*,StructureElement*> pair = this->findStructureElements();
+    if(pair.first == nullptr || pair.second == nullptr)
+    {
+        this->setObsolete(true);
+        return;
+    }
+
+    Structure *structure = m_screenplay->scriteDocument()->structure();
+    Scene *splitScene = pair.second->scene();
+    Scene *originalScene = pair.first->scene();
+
+    // Reset our screenplay first, one of the scenes that it refers to is about to be destroyed.
+    this->applyScreenplayElements(m_before);
+
+    // Destroy the split scene
+    GarbageCollector::instance()->add(splitScene);
+    structure->removeElement(pair.second);
+
+    // Restore Original Scene to its original state
+    originalScene->resetFromByteArray(m_originalSceneData);
+}
+
+void SplitElementUndoCommand::redo()
+{
+    if(m_after.isEmpty())
+    {
+        if(m_screenplayElement == nullptr)
+        {
+            this->setObsolete(true);
+            return;
+        }
+
+        m_after = this->captureScreenplayElements();
+        m_screenplayElement = nullptr;
+
+        return;
+    }
+
+    QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+
+    QPair<StructureElement*,StructureElement*> pair = this->findStructureElements();
+    if(pair.first == nullptr || pair.second != nullptr)
+    {
+        this->setObsolete(true);
+        return;
+    }
+
+    Structure *structure = m_screenplay->scriteDocument()->structure();
+
+    // Create the split scene first
+    StructureElement *splitStructureElement = new StructureElement(structure);
+    splitStructureElement->setX(pair.first->x() + 300);
+    splitStructureElement->setY(pair.first->y() + 80);
+    Scene *splitScene = new Scene(splitStructureElement);
+    splitScene->setId(m_splitSceneID);
+    splitScene->resetFromByteArray(m_splitScenesData[1]);
+    splitStructureElement->setScene(splitScene);
+    structure->insertElement(splitStructureElement, structure->indexOfElement(pair.first)+1);
+
+    // Update original scene with its split data
+    Scene *originalScene = pair.first->scene();
+    originalScene->resetFromByteArray(m_splitScenesData[0]);
+
+    // Reset our screenplay now
+    this->applyScreenplayElements(m_after);
+}
+
+QByteArray SplitElementUndoCommand::captureScreenplayElements() const
+{
+    QByteArray bytes;
+
+    QDataStream ds(&bytes, QIODevice::WriteOnly);
+    ds << m_screenplay->elementCount();
+    for(int i=0; i<m_screenplay->elementCount(); i++)
+    {
+        ScreenplayElement *element = m_screenplay->elementAt(i);
+        ds << int(element->elementType());
+        ds << element->sceneID();
+    }
+
+    ds << m_screenplay->currentElementIndex();
+    return bytes;
+}
+
+void SplitElementUndoCommand::applyScreenplayElements(const QByteArray &bytes)
+{
+    if(bytes.isEmpty())
+    {
+        this->setObsolete(true);
+        return;
+    }
+
+    QDataStream ds(bytes);
+
+    int nrElements = 0;
+    ds >> nrElements;
+
+    m_screenplay->clearElements();
+
+    for(int i=0; i<nrElements; i++)
+    {
+        ScreenplayElement *element = new ScreenplayElement(m_screenplay);
+
+        int type = -1;
+        ds >> type;
+        element->setElementType( ScreenplayElement::ElementType(type) );
+
+        QString sceneID;
+        ds >> sceneID;
+        element->setSceneFromID(sceneID);
+
+        m_screenplay->addElement(element);
+    }
+
+    int currentIndex = -1;
+    ds >> currentIndex;
+    m_screenplay->setCurrentElementIndex(currentIndex);
+}
+
+QPair<StructureElement *, StructureElement *> SplitElementUndoCommand::findStructureElements() const
+{
+    Structure *structure = m_screenplay->scriteDocument()->structure();
+
+    StructureElement *splitSceneStructureElement = structure->findElementBySceneID(m_splitSceneID);
+    if(splitSceneStructureElement == nullptr || splitSceneStructureElement->scene() == nullptr)
+        splitSceneStructureElement = nullptr;
+
+    StructureElement *originalSceneStructureElement = structure->findElementBySceneID(m_originalSceneID);
+    if(originalSceneStructureElement == nullptr || originalSceneStructureElement->scene() == nullptr)
+        originalSceneStructureElement = nullptr;
+
+    return qMakePair(originalSceneStructureElement, splitSceneStructureElement);
+}
+
+ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition)
+{
+    ScreenplayElement *ret = nullptr;
+    QScopedPointer<SplitElementUndoCommand> undoCommand( new SplitElementUndoCommand(ptr) );
+
+    {
+        QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+
+        if(ptr == nullptr)
+            return ret;
+
+        const int index = this->indexOfElement(ptr);
+        if(index < 0)
+            return ret;
+
+        if(ptr->elementType() == ScreenplayElement::BreakElementType)
+            return ret;
+
+        Scene *scene = ptr->scene();
+        if(scene == nullptr)
+            return ret;
+
+        undoCommand->prepare();
+
+        Structure *structure = this->scriteDocument()->structure();
+        StructureElement *structureElement = structure->findElementBySceneID(scene->id());
+        if(structureElement == nullptr)
+            return ret;
+
+        StructureElement *newStructureElement = structure->splitElement(structureElement, element, textPosition);
+        if(newStructureElement == nullptr)
+            return ret;
+
+        for(int i=this->elementCount()-1; i>=0; i--)
+        {
+            ScreenplayElement *screenplayElement = this->elementAt(i);
+            if(screenplayElement->scene() == scene)
+            {
+                ScreenplayElement *newScreenplayElement = new ScreenplayElement(this);
+                newScreenplayElement->setScene(newStructureElement->scene());
+                this->insertElementAt(newScreenplayElement, i+1);
+
+                if(screenplayElement == ptr)
+                    ret = newScreenplayElement;
+            }
+        }
+    }
+
+    if(ret != nullptr)
+    {
+        undoCommand->commit(ret->scene());
+        undoCommand.take();
+    }
+
+    return ret;
 }
 
 void Screenplay::removeSceneElements(Scene *scene)

@@ -123,6 +123,30 @@ Flickable {
             contentY = Math.max(Math.min(cy, contentHeight-height-1),0)
     }
 
+    function ensureVisibleFast(area) {
+        // Check if item is already visible
+        if(area.left >= visibleRect.left && area.top >= visibleRect.top &&
+           area.right <= visibleRect.right && area.bottom <= visibleRect.bottom)
+            return; // already visible
+
+        var cx = undefined
+        var cy = undefined
+        if(area.left >= visibleRect.right || area.right >= visibleRect.right)
+            cx = area.right - width
+        else if(area.right <= visibleArea.left || area.left <= visibleRect.left)
+            cx = area.left
+
+        if(area.top >= visibleRect.bottom || area.bottom >= visibleRect.bottom)
+            cy = area.bottom - height
+        else if(area.bottom <= visibleRect.top || area.top <= visibleRect.top)
+            cy = area.top
+
+        if(cx !== undefined)
+            contentX = Math.max(Math.min(cx, contentWidth-width-1),0)
+        if(cy !== undefined)
+            contentY = Math.max(Math.min(cy, contentHeight-height-1),0)
+    }
+
     property real zoomScale: 1
 
     onZoomScaleChanged: {

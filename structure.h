@@ -26,6 +26,7 @@
 
 class Structure;
 class Character;
+class Screenplay;
 class SceneHeading;
 class ScriteDocument;
 class StructurePositionCommand;
@@ -290,6 +291,10 @@ public:
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *event);
+
+private:
+    friend class Screenplay;
+    StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
 
 private:
     qreal m_canvasWidth = 1000;

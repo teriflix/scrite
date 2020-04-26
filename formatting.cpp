@@ -513,16 +513,26 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if(m_initializingDocument)
         return;
 
-    if(m_cursorPosition == val || m_textDocument == nullptr || this->document() == nullptr)
+    if(m_cursorPosition >= 0 && (m_textDocument == nullptr || this->document() == nullptr))
+    {
+        m_cursorPosition = -1;
+        m_currentElementCursorPosition = -1;
+        emit cursorPositionChanged();
+    }
+
+    if(m_cursorPosition == val)
         return;
 
     m_cursorPosition = val;
+    m_currentElementCursorPosition = -1;
     if(m_scene != nullptr)
         m_scene->setCursorPosition(m_cursorPosition);
-    emit cursorPositionChanged();
 
     if(this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount())
+    {
+        emit cursorPositionChanged();
         return;
+    }
 
     QTextCursor cursor(this->document());
     cursor.setPosition(val);
@@ -531,6 +541,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if(!block.isValid())
     {
         qDebug("[%d] There is no block at the cursor position %d.", __LINE__, val);
+        emit cursorPositionChanged();
         return;
     }
 
@@ -552,6 +563,9 @@ void SceneDocumentBinder::setCursorPosition(int val)
         if(!m_autoCompleteHints.isEmpty())
             this->setCompletionPrefix(block.text());
     }
+
+    m_currentElementCursorPosition = m_cursorPosition - block.position();
+    emit cursorPositionChanged();
 }
 
 void SceneDocumentBinder::setCharacterNames(const QStringList &val)

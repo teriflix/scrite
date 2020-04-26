@@ -28,10 +28,13 @@ Item {
     property color backgroundColor: scene ? Qt.tint(scene.color, "#E0FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
+    property bool  allowSplitSceneRequest: false
+
     signal assumeFocus()
     signal assumeFocusAt(int pos)
     signal requestScrollUp()
     signal requestScrollDown()
+    signal splitSceneRequest(SceneElement sceneElement, int textPosition)
 
     DelayedPropertyBinder {
         id: activeFocusBinder
@@ -95,7 +98,6 @@ Item {
             anchors.fill: parent
             anchors.leftMargin: 10
             anchors.rightMargin: 10
-            clip: true
             active: true
             sourceComponent: scrollable ? scrollableSceneContentEditorComponent : sceneContentEditorComponent
         }
@@ -112,13 +114,31 @@ Item {
     Component {
         id: scrollableSceneContentEditorComponent
 
-        ScrollView {
+        ScrollArea {
             id: scrollView
             ScrollBar.vertical.minimumSize: 0.1
+            contentWidth: width
+            contentHeight: loader.height
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: height < contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
 
-            Repeater {
-                model: 1
-                delegate: sceneContentEditorComponent
+            Item {
+                width: scrollView.width
+                height: loader.height
+
+                Loader {
+                    id: loader
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.rightMargin: 20
+                    anchors.leftMargin: 10
+                    sourceComponent: sceneContentEditorComponent
+
+                    Connections {
+                        target: loader.item
+                        onCursorRectangleChanged: scrollView.ensureVisibleFast(loader.item.cursorRectangle)
+                    }
+                }
             }
 
             Component.onCompleted: {
@@ -234,6 +254,12 @@ Item {
                     sceneHeadingLoader.viewOnly = true
             }
             Keys.onReturnPressed: {
+                if(event.modifiers & Qt.ControlModifier && allowSplitSceneRequest) {
+                    sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                    event.accepted = true
+                    return
+                }
+
                 if(completer.suggestion !== "") {
                     insert(cursorPosition, completer.suggestion)
                     event.accepted = true
@@ -297,6 +323,14 @@ Item {
                     text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
                     enabled: sceneTextArea.canPaste
                     onClicked: sceneTextArea.paste()
+                }
+
+                MenuSeparator {  }
+
+                MenuItem {
+                    text: "Split Scene"
+                    enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && allowSplitSceneRequest
+                    onClicked: sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
                 }
 
                 MenuSeparator {  }

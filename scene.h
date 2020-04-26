@@ -101,7 +101,6 @@ public:
     QString typeAsString() const;
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_CLASSINFO("UndoBundleFor_text", "cursorPosition")
     void setText(const QString &val);
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
@@ -215,11 +214,18 @@ public:
     Q_INVOKABLE void beginUndoCapture(bool allowMerging=true);
     Q_INVOKABLE void endUndoCapture();
 
+    Scene *splitScene(SceneElement *element, int textPosition, QObject *parent=nullptr);
+
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int,QByteArray> roleNames() const;
+
+    // Serializing functions for use with Undo/Redo
+    QByteArray toByteArray() const;
+    bool resetFromByteArray(const QByteArray &bytes);
+    static Scene *fromByteArray(const QByteArray &bytes);
 
 private:
     QList<SceneElement *> elementsList() const { return m_elements; }

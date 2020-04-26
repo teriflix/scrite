@@ -22,10 +22,12 @@ class HourGlass
 public:
     HourGlass(const QCursor &cursor=QCursor(Qt::WaitCursor)) {
         qApp->setOverrideCursor(cursor);
+        qApp->processEvents();
     }
 
     ~HourGlass() {
         qApp->restoreOverrideCursor();
+        qApp->processEvents();
     }
 };
 

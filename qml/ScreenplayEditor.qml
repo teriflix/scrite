@@ -199,6 +199,7 @@ Item {
                 anchors.rightMargin: 17
                 scrollable: false
                 showOnlyEnabledSceneHeadings: true
+                allowSplitSceneRequest: true
                 binder.onDocumentInitialized: {
                     var info = screenplayListView.lastSceneResetInfo
                     screenplayListView.lastSceneResetInfo = undefined
@@ -218,6 +219,11 @@ Item {
                         currentSceneEditor = sceneEditor
                     }
                 }
+
+                onSplitSceneRequest: {
+                    scriteDocument.screenplay.splitElement(parent.element, sceneElement, textPosition)
+                }
+
                 onRequestScrollUp: {
                     var item = null
                     var idx = index

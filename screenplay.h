@@ -143,6 +143,8 @@ public:
     Q_SIGNAL void elementCountChanged();
     Q_SIGNAL void elementsChanged();
 
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+
     Q_INVOKABLE void removeSceneElements(Scene *scene);
     Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;

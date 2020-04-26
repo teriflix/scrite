@@ -831,6 +831,31 @@ void Structure::timerEvent(QTimerEvent *event)
     QObject::timerEvent(event);
 }
 
+StructureElement *Structure::splitElement(StructureElement *ptr, SceneElement *element, int textPosition)
+{
+    /*
+     * Never call this function directly. This function __must__ be called as a part of
+     * Screenplay::splitElement() call.
+     */
+    if(ptr == nullptr)
+        return nullptr;
+
+    const int index = this->indexOfElement(ptr);
+    if(index < 0)
+        return nullptr;
+
+    Scene *newScene = ptr->scene()->splitScene(element, textPosition);
+    if(newScene == nullptr)
+        return nullptr;
+
+    StructureElement *newElement = new StructureElement(this);
+    newElement->setScene(newScene);
+    newElement->setX( ptr->x() + 300 );
+    newElement->setY( ptr->y() + 80 );
+    this->insertElement(newElement, index+1);
+    return newElement;
+}
+
 void Structure::staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr)
 {
     reinterpret_cast< Structure* >(list->data)->addCharacter(ptr);

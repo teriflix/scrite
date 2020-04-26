@@ -208,6 +208,9 @@ public:
     SceneElement* currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
+    Q_PROPERTY(int currentElementCursorPosition READ currentElementCursorPosition NOTIFY cursorPositionChanged)
+    int currentElementCursorPosition() const { return m_currentElementCursorPosition; }
+
     Q_PROPERTY(bool forceSyncDocument READ isForceSyncDocument WRITE setForceSyncDocument NOTIFY forceSyncDocumentChanged)
     void setForceSyncDocument(bool val);
     bool isForceSyncDocument() const { return m_forceSyncDocument; }
@@ -275,6 +278,7 @@ private:
     QStringList m_characterNames;
     SceneElement* m_currentElement = nullptr;
     QStringList m_autoCompleteHints;
+    int m_currentElementCursorPosition = -1;
     QQuickTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_screenplayFormat = nullptr;
     QBasicTimer m_initializeDocumentTimer;

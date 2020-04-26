@@ -128,87 +128,12 @@ bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
 
 QByteArray SceneUndoCommand::toByteArray(Scene *scene) const
 {
-    QByteArray bytes;
-    QDataStream ds(&bytes, QIODevice::WriteOnly);
-    ds << scene->id();
-    ds << scene->title();
-    ds << scene->color();
-    ds << scene->cursorPosition();
-    ds << scene->heading()->locationType();
-    ds << scene->heading()->location();
-    ds << scene->heading()->moment();
-    ds << scene->elementCount();
-    for(int i=0; i<scene->elementCount(); i++)
-    {
-        SceneElement *element = scene->elementAt(i);
-        ds << int(element->type());
-        ds << element->text();
-    }
-
-    return bytes;
+    return scene->toByteArray();
 }
 
 Scene *SceneUndoCommand::fromByteArray(const QByteArray &bytes) const
 {
-    QDataStream ds(bytes);
-
-    QString sceneId;
-    ds >> sceneId;
-
-    const Structure *structure = ScriteDocument::instance()->structure();
-    const StructureElement *element = structure->findElementBySceneID(sceneId);
-    if(element == nullptr || element->scene() == nullptr)
-        return nullptr;
-
-    Scene *scene = element->scene();
-    scene->sceneAboutToReset();
-    scene->clearElements();
-
-    QString title;
-    ds >> title;
-    scene->setTitle(title);
-
-    QColor color;
-    ds >> color;
-    scene->setColor(color);
-
-    int curPosition = -1;
-    ds >> curPosition;
-    scene->setCursorPosition(curPosition);
-
-    QString locType;
-    ds >> locType;
-    scene->heading()->setLocationType(locType);
-
-    QString loc;
-    ds >> loc;
-    scene->heading()->setLocation(loc);
-
-    QString moment;
-    ds >> moment;
-    scene->heading()->setMoment(moment);
-
-    int nrElements = 0;
-    ds >> nrElements;
-
-    for(int i=0; i<nrElements; i++)
-    {
-        SceneElement *element = new SceneElement(scene);
-
-        int type = SceneElement::Action;
-        ds >> type;
-        element->setType( SceneElement::Type(type) );
-
-        QString text;
-        ds >> text;
-        element->setText(text);
-
-        scene->addElement(element);
-    }
-
-    scene->sceneReset(curPosition);
-
-    return scene;
+    return Scene::fromByteArray(bytes);
 }
 
 class PushSceneUndoCommand
@@ -627,6 +552,8 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
 
     this->beginInsertRows(QModelIndex(), index, index);
 
+    ptr->setParent(this);
+
     m_elements.insert(index, ptr);
     connect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
     connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
@@ -754,6 +681,160 @@ void Scene::endUndoCapture()
     m_pushUndoCommand = nullptr;
 }
 
+Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *parent)
+{
+    if(element == nullptr)
+        return nullptr;
+
+    const int index = this->indexOfElement(element);
+    if(index < 0 || index == this->elementCount()-1)
+        return nullptr;
+
+    // We cannot split the scene across these types.
+    static const QList<SceneElement::Type> unsplittableTypes = QList<SceneElement::Type>()
+            << SceneElement::Heading << SceneElement::Parenthetical;
+    if(element->type() == SceneElement::Heading || element->type() == SceneElement::Parenthetical)
+        return nullptr;
+
+    PushSceneUndoCommand cmd(this);
+
+    emit sceneAboutToReset();
+
+    Scene *newScene = new Scene(parent);
+    newScene->setTitle("2nd Part Of " + this->title());
+    newScene->setColor(this->color());
+    newScene->heading()->setEnabled( this->heading()->isEnabled() );
+    newScene->heading()->setLocationType( this->heading()->locationType() );
+    newScene->heading()->setLocation( this->heading()->location() );
+    newScene->heading()->setMoment("LATER");
+    newScene->id(); // trigger creation of new Scene ID
+
+    this->setTitle("1st Part Of " + this->title());
+
+    // Move all elements from index+1 onwards to the new scene.
+    for(int i=this->elementCount()-1; i>=index+1; i--)
+    {
+        SceneElement *oldElement = this->elementAt(i);
+
+        SceneElement *newElement = new SceneElement(newScene);
+        newElement->setType( oldElement->type() );
+        newElement->setText( oldElement->text() );
+        newScene->insertElementAt(newElement, 0);
+
+        this->removeElement(oldElement);
+    }
+
+    auto splitText = [](const QString &text, int position) {
+        if(position <= 0)
+            return qMakePair<QString,QString>(QString(), text);
+
+        if(position >= text.length())
+            return qMakePair<QString,QString>(text, QString());
+
+        // Go to the previous word.
+        while(position >= 1) {
+            if(text.at(position-1).isSpace())
+                break;
+            --position;
+        }
+
+        if(position <= 0)
+            return qMakePair<QString,QString>(QString(), text);
+
+        return qMakePair<QString,QString>( text.left(position).trimmed() + ".",
+                                           text.mid(position) );
+    };
+
+    switch(element->type())
+    {
+    case SceneElement::Action:
+        {
+            const QPair<QString,QString> texts = splitText(element->text(), textPosition);
+            if(texts.first.isEmpty())
+                this->removeElement(element);
+            else
+                element->setText(texts.first);
+
+            if(!texts.second.isEmpty())
+            {
+                SceneElement *newElement = new SceneElement(newScene);
+                newElement->setType(SceneElement::Action);
+                newElement->setText(texts.second);
+                newScene->insertElementAt(newElement, 0);
+            }
+        } break;
+    case SceneElement::Character:
+        {
+            // We cannot split the character element into two, we have to move
+            // everything from the character element and down to the new scene
+            newScene->insertElementAt(element, 0);
+        } break;
+    case SceneElement::Dialogue:
+        {
+            const QPair<QString,QString> texts = splitText(element->text(), textPosition);
+            if(!texts.second.isEmpty())
+            {
+                // Dialogue cannot be split independently. We have to split carry
+                // over the character element for which it was created to the
+                // next scene.
+                SceneElement *characterElement = nullptr;
+                SceneElement *newCharacterElement = nullptr;
+                int characterElementIndex = index-1;
+                while(characterElementIndex >= 0)
+                {
+                    characterElement = this->elementAt(characterElementIndex);
+                    if(characterElement->type() == SceneElement::Character)
+                    {
+                        newCharacterElement = new SceneElement(newScene);
+                        newCharacterElement->setType(SceneElement::Character);
+                        newCharacterElement->setText(characterElement->text());
+                        break;
+                    }
+
+                    --characterElementIndex;
+                    characterElement = nullptr;
+                }
+
+                if(texts.first.isEmpty())
+                    this->removeElement(element);
+                else
+                    element->setText(texts.first);
+
+                SceneElement *newElement = new SceneElement(newScene);
+                newElement->setType(newCharacterElement ? SceneElement::Dialogue : SceneElement::Action);
+                newElement->setText(texts.second);
+                newScene->insertElementAt(newElement, 0);
+                if(newCharacterElement)
+                    newScene->insertElementAt(newCharacterElement, 0);
+            }
+        } break;
+    default:
+        {
+            if(textPosition <= 0)
+                newScene->insertElementAt(element, 0);
+        } break;
+    }
+
+    while(1)
+    {
+        SceneElement *newSceneElement = newScene->elementAt(0);
+        if(newSceneElement == nullptr)
+            break;
+
+        if(newSceneElement->text().isEmpty())
+        {
+            newScene->removeElement(newSceneElement);
+            break;
+        }
+
+        break;
+    }
+
+    emit sceneReset(textPosition);
+
+    return newScene;
+}
+
 int Scene::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_elements.size();
@@ -772,6 +853,107 @@ QHash<int, QByteArray> Scene::roleNames() const
     QHash<int,QByteArray> roles;
     roles[SceneElementRole] = "sceneElement";
     return roles;
+}
+
+QByteArray Scene::toByteArray() const
+{
+    QByteArray bytes;
+    QDataStream ds(&bytes, QIODevice::WriteOnly);
+    ds << m_id;
+    ds << m_title;
+    ds << m_color;
+    ds << m_cursorPosition;
+    ds << m_heading->locationType();
+    ds << m_heading->location();
+    ds << m_heading->moment();
+    ds << m_elements.size();
+    Q_FOREACH(SceneElement *element, m_elements)
+    {
+        ds << int(element->type());
+        ds << element->text();
+    }
+
+    return bytes;
+}
+
+bool Scene::resetFromByteArray(const QByteArray &bytes)
+{
+    QDataStream ds(bytes);
+
+    QString sceneID;
+    ds >> sceneID;
+    if(m_id.isEmpty())
+        this->setId(sceneID);
+    else if(sceneID != m_id)
+        return false;
+
+    this->sceneAboutToReset();
+    this->clearElements();
+
+    QString title;
+    ds >> title;
+    this->setTitle(title);
+
+    QColor color;
+    ds >> color;
+    this->setColor(color);
+
+    int curPosition = -1;
+    ds >> curPosition;
+    this->setCursorPosition(curPosition);
+
+    QString locType;
+    ds >> locType;
+    this->heading()->setLocationType(locType);
+
+    QString loc;
+    ds >> loc;
+    this->heading()->setLocation(loc);
+
+    QString moment;
+    ds >> moment;
+    this->heading()->setMoment(moment);
+
+    int nrElements = 0;
+    ds >> nrElements;
+
+    for(int i=0; i<nrElements; i++)
+    {
+        SceneElement *element = new SceneElement(this);
+
+        int type = SceneElement::Action;
+        ds >> type;
+        element->setType( SceneElement::Type(type) );
+
+        QString text;
+        ds >> text;
+        element->setText(text);
+
+        this->addElement(element);
+    }
+
+    this->sceneReset(curPosition);
+
+    return true;
+}
+
+Scene *Scene::fromByteArray(const QByteArray &bytes)
+{
+    QDataStream ds(bytes);
+
+    QString sceneId;
+    ds >> sceneId;
+
+    const Structure *structure = ScriteDocument::instance()->structure();
+    const StructureElement *element = structure->findElementBySceneID(sceneId);
+    if(element == nullptr || element->scene() == nullptr)
+        return nullptr;
+
+    Scene *scene = element->scene();
+    if(scene->resetFromByteArray(bytes))
+        return scene;
+
+    return nullptr;
 }
 
 void Scene::setElementsList(const QList<SceneElement *> &list)

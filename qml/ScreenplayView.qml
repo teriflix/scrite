@@ -178,6 +178,8 @@ Rectangle {
         property bool moveMode: false
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
+        Keys.onRightPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex+1
+        Keys.onLeftPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex-1
 
         property bool scrollBarRequired: screenplayElementList.width < screenplayElementList.contentWidth
         ScrollBar.horizontal: ScrollBar {
