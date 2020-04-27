@@ -16,6 +16,34 @@
 
 #include <QQuickItem>
 
+class GridBackgroundItem;
+
+class GridBackgroundItemBorder : public QObject
+{
+    Q_OBJECT
+
+public:
+    ~GridBackgroundItemBorder();
+
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    void setColor(const QColor &val);
+    QColor color() const { return m_color; }
+    Q_SIGNAL void colorChanged();
+
+    Q_PROPERTY(qreal width READ width WRITE setWidth NOTIFY widthChanged)
+    void setWidth(qreal val);
+    qreal width() const { return m_width; }
+    Q_SIGNAL void widthChanged();
+
+private:
+    friend class GridBackgroundItem;
+    GridBackgroundItemBorder(QObject *parent=nullptr);
+
+private:
+    qreal m_width = 2.0;
+    QColor m_color = QColor("blue");
+};
+
 class GridBackgroundItem : public QQuickItem
 {
     Q_OBJECT
@@ -64,6 +92,10 @@ public:
     bool gridIsVisible() const { return m_gridIsVisible; }
     Q_SIGNAL void gridIsVisibleChanged();
 
+    Q_PROPERTY(GridBackgroundItemBorder* border READ border CONSTANT)
+    GridBackgroundItemBorder* border() const { return m_border; }
+    Q_SIGNAL void borderChanged();
+
 protected:
     // QQuickItem interface
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData);
@@ -74,9 +106,10 @@ private:
     int   m_majorTickStride = 10;
     qreal m_tickColorOpacity = 1.0;
     qreal m_minorTickLineWidth = 1;
-    qreal m_majorTickLineWidth = 1;
+    qreal m_majorTickLineWidth = 2;
     QColor m_minorTickColor = QColor("lightsteelblue");
     QColor m_majorTickColor = QColor("blue");
+    GridBackgroundItemBorder *m_border = new GridBackgroundItemBorder(this);
 };
 
 #endif // GRIDBACKGROUNDITEM_H

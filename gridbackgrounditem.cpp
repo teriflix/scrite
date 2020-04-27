@@ -20,12 +20,47 @@
 
 #include <QtMath>
 
+GridBackgroundItemBorder::GridBackgroundItemBorder(QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+GridBackgroundItemBorder::~GridBackgroundItemBorder()
+{
+
+}
+
+void GridBackgroundItemBorder::setColor(const QColor &val) {
+    if(m_color == val)
+        return;
+
+    m_color = val;
+    emit colorChanged();
+}
+
+void GridBackgroundItemBorder::setWidth(qreal val)
+{
+    val = qBound(0.0, val, 10.0);
+    if( qFuzzyCompare(m_width, val) )
+        return;
+
+    m_width = val;
+    emit widthChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 GridBackgroundItem::GridBackgroundItem(QQuickItem *parent)
     : QQuickItem(parent)
 {
     this->setFlag(ItemHasContents);
 
     connect(this, &GridBackgroundItem::tickColorOpacityChanged,
+            this, &GridBackgroundItem::update);
+    connect(m_border, &GridBackgroundItemBorder::colorChanged,
+            this, &GridBackgroundItem::update);
+    connect(m_border, &GridBackgroundItemBorder::widthChanged,
             this, &GridBackgroundItem::update);
 }
 
@@ -269,5 +304,45 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         majorTicksNode->appendChildNode(geometryNode);
     }
 
+    if( !qFuzzyIsNull(m_border->width()) )
+    {
+        QSGNode *borderNode = new QSGOpacityNode;
+        borderNode->setFlags(QSGNode::OwnedByParent);
+        rootNode->appendChildNode(borderNode);
+
+        QSGGeometryNode *geometryNode = new QSGGeometryNode;
+        geometryNode->setFlags(QSGNode::OwnsGeometry|QSGNode::OwnsMaterial|QSGNode::OwnedByParent);
+
+        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 4);
+        geometry->setDrawingMode(QSGGeometry::DrawLineLoop);
+        geometry->setLineWidth(float(m_majorTickLineWidth));
+        geometryNode->setGeometry(geometry);
+
+        QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
+
+        points[0].x = 0.0f;
+        points[0].y = 0.0f;
+
+        points[1].x = float(w)-1.0f;
+        points[1].y = 0.0f;
+
+        points[2].x = float(w)-1.0f;
+        points[2].y = float(h)-1.0f;
+
+        points[3].x = 0.0f;
+        points[3].y = float(h)-1.0f;
+
+        QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
+        geometryNode->setMaterial(material);
+
+        QColor color = m_majorTickColor;
+        color.setAlphaF(color.alphaF() * m_tickColorOpacity);
+        material->setFlag(QSGMaterial::Blending);
+        material->setColor(color);
+
+        borderNode->appendChildNode(geometryNode);
+    }
+
     return rootNode;
 }
+

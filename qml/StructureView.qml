@@ -134,16 +134,18 @@ Item {
         GridBackground {
             id: canvas
             antialiasing: false
-            majorTickLineWidth: 5
+            majorTickLineWidth: 2
             minorTickLineWidth: 1
             width: widthBinder.get
             height: heightBinder.get
             tickColorOpacity: 0.5 * scale
             scale: canvasScroll.suggestedScale
+            border.width: 2
+            border.color: structureCanvasSettings.gridColor
             gridIsVisible: structureCanvasSettings.showGrid
             majorTickColor: structureCanvasSettings.gridColor
-            tickDistance: scriteDocument.structure.canvasGridSize
             minorTickColor: structureCanvasSettings.gridColor
+            tickDistance: scriteDocument.structure.canvasGridSize
 
             transformOrigin: Item.TopLeft
 

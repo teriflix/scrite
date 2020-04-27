@@ -96,6 +96,7 @@ int main(int argc, char **argv)
     qmlRegisterType<SceneDocumentBinder>("Scrite", 1, 0, "SceneDocumentBinder");
 
     qmlRegisterType<GridBackgroundItem>("Scrite", 1, 0, "GridBackground");
+    qmlRegisterUncreatableType<GridBackgroundItemBorder>("Scrite", 1, 0, "GridBackgroundItemBorder", reason);
     qmlRegisterType<Completer>("Scrite", 1, 0, "Completer");
 
     qmlRegisterUncreatableType<EventFilterResult>("Scrite", 1, 0, "EventFilterResult", "Use the instance provided by EventFilter.onFilter signal.");
