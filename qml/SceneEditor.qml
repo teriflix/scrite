@@ -141,9 +141,7 @@ Item {
                 }
             }
 
-            Component.onCompleted: {
-                scrollView.ScrollBar.vertical.setPosition(0)
-            }
+            Component.onCompleted: scrollView.ensureVisible( Qt.rect(0,0,10,10), 1.0, 0 )
         }
     }
 
