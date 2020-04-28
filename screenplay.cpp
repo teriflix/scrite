@@ -633,6 +633,8 @@ void SplitElementUndoCommand::undo()
         return;
     }
 
+    m_screenplay->scriteDocument()->setBusy(true);
+
     Structure *structure = m_screenplay->scriteDocument()->structure();
     Scene *splitScene = pair.second->scene();
     Scene *originalScene = pair.first->scene();
@@ -646,6 +648,8 @@ void SplitElementUndoCommand::undo()
 
     // Restore Original Scene to its original state
     originalScene->resetFromByteArray(m_originalSceneData);
+
+    m_screenplay->scriteDocument()->setBusy(false);
 }
 
 void SplitElementUndoCommand::redo()
@@ -673,6 +677,8 @@ void SplitElementUndoCommand::redo()
         return;
     }
 
+    m_screenplay->scriteDocument()->setBusy(true);
+
     Structure *structure = m_screenplay->scriteDocument()->structure();
 
     // Create the split scene first
@@ -691,6 +697,8 @@ void SplitElementUndoCommand::redo()
 
     // Reset our screenplay now
     this->applyScreenplayElements(m_after);
+
+    m_screenplay->scriteDocument()->setBusy(false);
 }
 
 QByteArray SplitElementUndoCommand::captureScreenplayElements() const

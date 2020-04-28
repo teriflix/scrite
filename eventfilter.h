@@ -61,7 +61,6 @@ public:
     bool isActive() const { return m_active; }
     Q_SIGNAL void activeChanged();
 
-
     Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
     void setTarget(QObject* val);
     QObject* target() const { return m_target; }

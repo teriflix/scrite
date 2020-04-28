@@ -52,10 +52,16 @@ Item {
         Loader {
             id: sceneHeadingLoader
             width: parent.width
-            height: 40
+            height: loaderHeight.get
             property bool viewOnly: true
             active: scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
             sourceComponent: sceneHeadingComponent.get
+
+            DelayedPropertyBinder {
+                id: loaderHeight
+                initial: 40
+                set: Math.max(sceneHeadingLoader.viewOnly && sceneHeadingLoader.item ? sceneHeadingLoader.item.height : initial, initial)
+            }
 
             DelayedPropertyBinder {
                 id: sceneHeadingComponent
@@ -483,6 +489,7 @@ Item {
                 font: parent.headingFont
                 text: scene.heading.text
                 anchors.verticalCenter: parent.verticalCenter
+                wrapMode: Text.WordWrap
             }
 
             MouseArea {

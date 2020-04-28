@@ -130,6 +130,15 @@ void ScriteDocument::setAutoSave(bool val)
     Logger::qtPropertyInfo(this, "autoSave");
 }
 
+void ScriteDocument::setBusy(bool val)
+{
+    if(m_busy == val)
+        return;
+
+    m_busy = val;
+    emit busyChanged();
+}
+
 Scene *ScriteDocument::createNewScene()
 {
     StructureElement *structureElement = nullptr;
@@ -229,10 +238,12 @@ void ScriteDocument::open(const QString &fileName)
 {
     HourGlass hourGlass;
 
+    this->setBusy(true);
     this->reset();
     if( this->load(fileName) )
         this->setFileName(fileName);
     this->setModified(false);
+    this->setBusy(false);
 }
 
 void ScriteDocument::saveAs(const QString &fileName)
@@ -358,10 +369,11 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
 
     importer->setFileName(fileName);
     importer->setDocument(this);
-    if( importer->read() )
-        return true;
+    this->setBusy(true);
+    const bool success = importer->read();
+    this->setBusy(false);
 
-    return false;
+    return success;
 }
 
 bool ScriteDocument::exportFile(const QString &fileName, const QString &format)

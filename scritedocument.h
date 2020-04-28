@@ -47,6 +47,11 @@ public:
     bool isAutoSave() const { return m_autoSave; }
     Q_SIGNAL void autoSaveChanged();
 
+    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged STORED false)
+    void setBusy(bool val);
+    bool isBusy() const { return m_busy; }
+    Q_SIGNAL void busyChanged();
+
     Q_PROPERTY(QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
@@ -141,6 +146,7 @@ public:
     void deserializeFromJson(const QJsonObject &);
 
 private:
+    bool m_busy = false;
     bool m_modified = false;
     bool m_autoSave = true;
     QString m_fileName;

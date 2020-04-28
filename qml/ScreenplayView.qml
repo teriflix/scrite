@@ -108,7 +108,7 @@ Rectangle {
                     autoRepeat: false
                     enabled: scriteDocument.screenplay.elementCount === 0 ||
                              scriteDocument.screenplay.currentElementIndex >= 0
-                    onClicked: breakElementMenu.popup()
+                    onClicked: breakElementMenu.popup(width,height/2)
                     down: breakElementMenu.visible
 
                     Menu {
