@@ -325,7 +325,7 @@ Item {
 
                     Text {
                         width: parent.width
-                        text: "PDFs are always generated in A4 size."
+                        text: "PDFs are always generated in US Letter size."
                     }
 
                     GroupBox {

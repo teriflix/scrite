@@ -143,7 +143,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
             cursor.insertBlock();
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
-            cursor.insertHtml("This screenplay was generated using <strong>scrite</strong><br/>(<a href=\"https://scrite.teriflix.com\">https://scrite.teriflix.com</a>)");
+            cursor.insertHtml("This screenplay was generated using <strong>scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
         }
 
         cursor.insertBlock();

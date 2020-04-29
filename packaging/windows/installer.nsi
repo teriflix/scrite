@@ -4,7 +4,7 @@
 !define PRODUCT_NAME "Scrite"
 !define PRODUCT_VERSION "0.2.13-Beta"
 !define PRODUCT_PUBLISHER "TERIFLIX Entertainment Spaces Pvt. Ltd."
-!define PRODUCT_WEB_SITE "https://scrite.teriflix.com"
+!define PRODUCT_WEB_SITE "https://www.scrite.io"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\scrite.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"

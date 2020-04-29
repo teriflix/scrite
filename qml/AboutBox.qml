@@ -100,12 +100,12 @@ Item {
 
             Button {
                 text: "Website"
-                onClicked: Qt.openUrlExternally("https://scrite.teriflix.com")
+                onClicked: Qt.openUrlExternally("https://www.scrite.io")
             }
 
             Button {
                 text: "Help"
-                onClicked: Qt.openUrlExternally("https://scrite.teriflix.com/releases/help.html")
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/releases/help.html")
             }
 
             Button {

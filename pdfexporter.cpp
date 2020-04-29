@@ -39,7 +39,7 @@ bool PdfExporter::doExport(QIODevice *device)
     QPdfWriter pdfWriter(device);
     pdfWriter.setTitle(screenplay->title());
     pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
     pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
 
     const qreal pageWidth = pdfWriter.width();

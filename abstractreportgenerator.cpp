@@ -107,7 +107,7 @@ bool AbstractReportGenerator::generate()
         QPdfWriter pdfWriter(&file);
         pdfWriter.setTitle("Scrite Character Report");
         pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-        pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+        pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
         pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
 
         QTextDocumentPagedPrinter printer;
