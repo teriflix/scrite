@@ -298,8 +298,8 @@ Item {
                 id: selectionRect
                 visible: false
                 enabled: false
-                color: app.translucent(systemPalette.highlight,0.2)
-                border { width: 2; color: systemPalette.highlight }
+                color: app.translucent(app.palette.highlight,0.2)
+                border { width: 2; color: app.palette.highlight }
                 onVisibleChanged: {
                     if(!visible)
                         enabled = false

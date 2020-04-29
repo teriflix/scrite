@@ -44,19 +44,17 @@ Rectangle {
         anchors.fill: parent
     }
 
-    property SystemPalette systemPalette: SystemPalette { }
-
     Item {
         id: blur
         anchors.fill: ui
-        property color color: systemPalette.window
+        property color color: "lightgray"
 
         property real maxRadius: 32
         property real radius: maxRadius
         visible: false
         onVisibleChanged: {
             if(!visible)
-                color = systemPalette.window
+                color = "lightgray"
         }
 
         FastBlur {
@@ -69,6 +67,51 @@ Rectangle {
             anchors.fill: parent
             color: parent.color
             opacity: 0.6 * (parent.radius/parent.maxRadius)
+        }
+    }
+
+    Item {
+        anchors.fill: blur
+        visible: scriteDocument.busy
+        opacity: 0.9
+        onVisibleChanged: {
+            if(visible) {
+                blur.radius = blur.maxRadius
+                blur.visible = true
+            } else {
+                blur.visible = false
+            }
+        }
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 30
+            width: parent.width * 0.6
+
+            BusyIndicator {
+                anchors.horizontalCenter: parent.horizontalCenter
+                running: scriteDocument.busy
+            }
+
+            Text {
+                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
+                text: "Your scrite document is being updated. Please wait..."
+                font.pixelSize: 32
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+        }
+
+        EventFilter.active: scriteDocument.busy
+        EventFilter.target: app
+        EventFilter.events: [6,7]
+        EventFilter.onFilter: {
+            result.filter = true
         }
     }
 
