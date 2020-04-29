@@ -571,12 +571,11 @@ private:
     QPair<StructureElement*,StructureElement*> findStructureElements() const;
 
 private:
-    QByteArray m_after;
-    QByteArray m_before;
     QString m_splitSceneID;
     QString m_originalSceneID;
     QByteArray m_splitScenesData[2];
     QByteArray m_originalSceneData;
+    QList<int> m_splitElementIndexes;
     Screenplay *m_screenplay = nullptr;
     ScreenplayElement *m_screenplayElement = nullptr;
 };
@@ -605,7 +604,6 @@ void SplitElementUndoCommand::prepare()
     Scene *originalScene = m_screenplayElement->scene();
     m_originalSceneID = originalScene->id();
     m_originalSceneData = originalScene->toByteArray();
-    m_before = this->captureScreenplayElements();
 }
 
 void SplitElementUndoCommand::commit(Scene *splitScene)
@@ -640,7 +638,8 @@ void SplitElementUndoCommand::undo()
     Scene *originalScene = pair.first->scene();
 
     // Reset our screenplay first, one of the scenes that it refers to is about to be destroyed.
-    this->applyScreenplayElements(m_before);
+    Q_FOREACH(int index, m_splitElementIndexes)
+        m_screenplay->removeElement( m_screenplay->elementAt(index) );
 
     // Destroy the split scene
     GarbageCollector::instance()->add(splitScene);
@@ -654,7 +653,7 @@ void SplitElementUndoCommand::undo()
 
 void SplitElementUndoCommand::redo()
 {
-    if(m_after.isEmpty())
+    if(m_splitElementIndexes.isEmpty())
     {
         if(m_screenplayElement == nullptr)
         {
@@ -662,7 +661,13 @@ void SplitElementUndoCommand::redo()
             return;
         }
 
-        m_after = this->captureScreenplayElements();
+        for(int i=m_screenplay->elementCount()-1; i>=0; i--)
+        {
+            ScreenplayElement *element = m_screenplay->elementAt(i);
+            if(element->sceneID() == m_splitSceneID)
+                m_splitElementIndexes.append(i);
+        }
+
         m_screenplayElement = nullptr;
 
         return;
@@ -696,7 +701,13 @@ void SplitElementUndoCommand::redo()
     originalScene->resetFromByteArray(m_splitScenesData[0]);
 
     // Reset our screenplay now
-    this->applyScreenplayElements(m_after);
+    Q_FOREACH(int index, m_splitElementIndexes)
+    {
+        ScreenplayElement *element = new ScreenplayElement(m_screenplay);
+        element->setElementType(ScreenplayElement::SceneElementType);
+        element->setScene(splitScene);
+        m_screenplay->insertElementAt(element, index);
+    }
 
     m_screenplay->scriteDocument()->setBusy(false);
 }
