@@ -52,7 +52,10 @@ private:
     void timerEvent(QTimerEvent *event);
 
 private:
-    QUrl m_url = QUrl("https://www.scrite.io/latest_release.json");
+    // URL has to be a http location always. Otherwise we will have to bundle
+    // SSL libraries along with the installer and there are some legal bits
+    // to consider before we are able to do that.
+    QUrl m_url = QUrl("http://www.teriflix.in/scrite/latest_release.json");
     QJsonObject m_updateInfo;
     QBasicTimer m_updateTimer;
 };

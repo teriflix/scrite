@@ -42,7 +42,7 @@
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 2, 13);
+    const QVersionNumber applicationVersion(0, 2, 14);
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
-    qmlView.setMinimumSize(QSize(1366, 768));
+    qmlView.setMinimumSize(QSize(1350, 700));
     qmlView.showMaximized();
 
     QObject::connect(&a, &Application::minimizeWindowRequest, &qmlView, &QQuickView::showMinimized);
