@@ -52,7 +52,7 @@ private:
     void timerEvent(QTimerEvent *event);
 
 private:
-    QUrl m_url = QUrl("http://www.teriflix.in/scrite/release.json");
+    QUrl m_url = QUrl("https://www.scrite.io/latest_release.json");
     QJsonObject m_updateInfo;
     QBasicTimer m_updateTimer;
 };

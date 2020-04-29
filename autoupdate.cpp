@@ -15,9 +15,11 @@
 #include "application.h"
 #include "garbagecollector.h"
 
+#include <QUuid>
+#include <QSettings>
+#include <QJsonDocument>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
-#include <QJsonDocument>
 
 AutoUpdate *AutoUpdate::instance()
 {
@@ -69,7 +71,26 @@ void AutoUpdate::checkForUpdates()
     if(m_url.isEmpty() || !m_url.isValid())
         return;
 
+    static QString userAgentString;
+    if(userAgentString.isEmpty())
+    {
+        userAgentString = "scrite-";
+        userAgentString += Application::instance()->applicationVersion() + " ";
+        userAgentString += QSysInfo::prettyProductName() + " ";
+
+        QSettings *settings = Application::instance()->settings();
+        QString clientID = settings->value("Installation/ClientID").toString();
+        if(clientID.isEmpty())
+        {
+            clientID = QUuid::createUuid().toString();
+            settings->setValue("Installation/ClientID", clientID);
+        }
+
+        userAgentString += clientID;
+    }
+
     QNetworkRequest request(m_url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, userAgentString);
     QNetworkReply *reply = nam.get(request);
     if(reply == nullptr)
         return;
