@@ -105,12 +105,12 @@ Item {
 
             Button {
                 text: "Help"
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/releases/help.html")
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
             }
 
             Button {
                 text: "Feedback"
-                onClicked: Qt.openUrlExternally("https://forms.gle/bjrabbcX8hYEaePa7")
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/#feedback")
             }
         }
     }
