@@ -97,7 +97,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
             if(screenplay->firstIndexOfScene(scene) < 0)
                 headings.removeAt(i);
             else
-                map[heading->locationType()][heading->moment()].append(heading);
+                map[heading->locationType()][heading->moment()].prepend(heading);
         }
 
         if(headings.isEmpty())
