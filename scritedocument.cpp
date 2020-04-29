@@ -142,7 +142,7 @@ void ScriteDocument::setBusy(bool val)
 Scene *ScriteDocument::createNewScene()
 {
     StructureElement *structureElement = nullptr;
-    if(m_structure->currentElementIndex() > 0)
+    if(m_structure->currentElementIndex() >= 0)
         structureElement = m_structure->elementAt(m_structure->currentElementIndex());
     else
         structureElement = m_structure->elementAt(m_structure->elementCount()-1);
