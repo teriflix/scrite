@@ -19,7 +19,7 @@
 class StructureExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Screenplay Structure")
+    Q_CLASSINFO("Format", "Structure/Screenplay Structure")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:

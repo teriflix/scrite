@@ -316,7 +316,25 @@ QStringList ScriteDocument::supportedExportFormats() const
     static QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
     static QStringList formats;
     if(formats.isEmpty())
+    {
         Q_FOREACH(QByteArray key, keys) formats << key;
+        std::sort(formats.begin(), formats.end());
+
+        if(formats.size() >= 2)
+        {
+            QList<int> seps;
+            for(int i=formats.size()-2; i>=0; i--)
+            {
+                QString thisFormat = formats.at(i);
+                QString previousFormat = formats.at(i+1);
+                if(thisFormat.split("/").first() != previousFormat.split("/").first())
+                    seps << i+1;
+            }
+
+            Q_FOREACH(int sep, seps)
+                formats.insert(sep, QString());
+        }
+    }
     return formats;
 }
 

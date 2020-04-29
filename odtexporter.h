@@ -19,7 +19,7 @@
 class OdtExporter : public AbstractTextDocumentExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Open Document Format")
+    Q_CLASSINFO("Format", "Screenplay/Open Document Format")
     Q_CLASSINFO("NameFilters", "Open Document Format (*.odt)")
 
 public:

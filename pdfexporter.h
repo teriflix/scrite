@@ -19,7 +19,7 @@
 class PdfExporter : public AbstractTextDocumentExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Adobe PDF")
+    Q_CLASSINFO("Format", "Screenplay/Adobe PDF")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:

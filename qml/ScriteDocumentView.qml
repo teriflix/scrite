@@ -303,12 +303,31 @@ Item {
                         Menu {
                             id: exportMenu
 
-                            Repeater {
-                                model: scriteDocument.supportedExportFormats
-
+                            Component {
+                                id: menuItemComponent
                                 MenuItem {
-                                    text: modelData
-                                    onClicked: fileDialog.launch("EXPORT " + modelData)
+                                    property string format
+                                    text: {
+                                        var fields = format.split("/")
+                                        return fields[fields.length-1]
+                                    }
+                                    onClicked: fileDialog.launch("EXPORT " + format)
+                                }
+                            }
+
+                            Component {
+                                id: menuSeparatorComponent
+                                MenuSeparator { }
+                            }
+
+                            Component.onCompleted: {
+                                var formats = scriteDocument.supportedExportFormats
+                                for(var i=0; i<formats.length; i++) {
+                                    var format = formats[i]
+                                    if(format === "")
+                                        exportMenu.addItem(menuSeparatorComponent.createObject(exportMenu))
+                                    else
+                                        exportMenu.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
                                 }
                             }
                         }

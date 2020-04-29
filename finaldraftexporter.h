@@ -19,7 +19,7 @@
 class FinalDraftExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Final Draft")
+    Q_CLASSINFO("Format", "Screenplay/Final Draft")
     Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
 
 public:

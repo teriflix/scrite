@@ -19,7 +19,7 @@
 class TextExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Text File")
+    Q_CLASSINFO("Format", "Screenplay/Text File")
     Q_CLASSINFO("NameFilters", "Text File (*.txt)")
 
 public:

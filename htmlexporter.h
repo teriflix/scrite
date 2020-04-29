@@ -19,7 +19,7 @@
 class HtmlExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "HTML")
+    Q_CLASSINFO("Format", "Screenplay/HTML")
     Q_CLASSINFO("NameFilters", "HTML (*.html)")
 
 public:
