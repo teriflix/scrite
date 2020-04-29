@@ -36,7 +36,7 @@ protected:
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
-    int m_maxLettersPerLine = 80;
+    int m_maxLettersPerLine = 60;
 };
 
 #endif // TEXTEXPORTER_H
