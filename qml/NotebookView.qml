@@ -106,7 +106,7 @@ Item {
             MouseArea {
                 property bool allowRemove: app.typeName(modelData.source) === "Character"
                 anchors.fill: parent
-                acceptedButtons: allowRemove ? Qt.LeftButton : (Qt.LeftButton|Qt.RightButton)
+                acceptedButtons: allowRemove ? (Qt.LeftButton|Qt.RightButton) : Qt.LeftButton
                 hoverEnabled: modelData.label.length > 20
                 ToolTip.visible: hoverEnabled && containsMouse
                 ToolTip.text: modelData.label
@@ -137,7 +137,7 @@ Item {
         var nrCharacters = scriteDocument.structure.characterCount
         for(var i=0; i<nrCharacters; i++) {
             var character = scriteDocument.structure.characterAt(i)
-            sources.push({"source":character, "label":character.name, "color": tabColors[i%tabColors.length]})
+            sources.push({"source": character, "label":character.name, "color": tabColors[i%tabColors.length]})
         }
 
         noteSources = sources
