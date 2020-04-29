@@ -36,6 +36,7 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QStandardPaths>
 
@@ -137,6 +138,25 @@ void ScriteDocument::setBusy(bool val)
 
     m_busy = val;
     emit busyChanged();
+
+    if(val)
+    {
+        QElapsedTimer timer;
+        timer.start();
+        while(timer.elapsed() < 100)
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
+}
+
+void ScriteDocument::setBusyMessage(const QString &val)
+{
+    if(m_busyMessage == val)
+        return;
+
+    m_busyMessage = val;
+    emit busyMessageChanged();
+
+    this->setBusy(!m_busyMessage.isEmpty());
 }
 
 Scene *ScriteDocument::createNewScene()
@@ -238,12 +258,12 @@ void ScriteDocument::open(const QString &fileName)
 {
     HourGlass hourGlass;
 
-    this->setBusy(true);
+    this->setBusyMessage("Loading " + QFileInfo(fileName).baseName() + " ...");
     this->reset();
     if( this->load(fileName) )
         this->setFileName(fileName);
     this->setModified(false);
-    this->setBusy(false);
+    this->clearBusyMessage();
 }
 
 void ScriteDocument::saveAs(const QString &fileName)
@@ -261,6 +281,8 @@ void ScriteDocument::saveAs(const QString &fileName)
         return;
     }
 
+    this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
+
     m_progressReport->start();
 
     const QJsonObject json = QObjectSerializer::toJson(this);
@@ -272,6 +294,8 @@ void ScriteDocument::saveAs(const QString &fileName)
     this->setModified(false);
 
     m_progressReport->finish();
+
+    this->clearBusyMessage();
 }
 
 void ScriteDocument::save()
@@ -387,9 +411,9 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
 
     importer->setFileName(fileName);
     importer->setDocument(this);
-    this->setBusy(true);
+    this->setBusyMessage("Importing from " + QFileInfo(fileName).fileName() + " ...");
     const bool success = importer->read();
-    this->setBusy(false);
+    this->clearBusyMessage();
 
     return success;
 }
@@ -415,10 +439,11 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
 
     exporter->setFileName(fileName);
     exporter->setDocument(this);
-    if( exporter->write() )
-        return true;
+    this->setBusyMessage("Exporting to " + QFileInfo(fileName).fileName() + " ...");
+    const bool ret = exporter->write();
+    this->clearBusyMessage();
 
-    return false;
+    return ret;
 }
 
 AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)

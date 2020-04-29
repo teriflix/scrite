@@ -536,13 +536,6 @@ Item {
         property var callback
         property bool openFileDialog: false
 
-        PropertyAnimation {
-            target: contentLoader
-            properties: "opacity"
-            from: 1; to: 0
-            duration: 100
-        }
-
         ScriptAction {
             script: {
                 contentLoader.active = false
@@ -558,13 +551,6 @@ Item {
                     fileDialog.open()
                 resetContentAnimation.openFileDialog = false
             }
-        }
-
-        PropertyAnimation {
-            target: contentLoader
-            properties: "opacity"
-            from: 0; to: 1
-            duration: 100
         }
     }
 

@@ -47,14 +47,14 @@ Rectangle {
     Item {
         id: blur
         anchors.fill: ui
-        property color color: "lightgray"
+        property color color: "white"
 
         property real maxRadius: 32
         property real radius: maxRadius
         visible: false
         onVisibleChanged: {
             if(!visible)
-                color = "lightgray"
+                color = "white"
         }
 
         FastBlur {
@@ -85,12 +85,13 @@ Rectangle {
 
         Column {
             anchors.centerIn: parent
+            anchors.verticalCenterOffset: -parent.height*0.2
             spacing: 30
             width: parent.width * 0.6
 
             BusyIndicator {
                 anchors.horizontalCenter: parent.horizontalCenter
-                running: scriteDocument.busy
+                running: true
             }
 
             Text {
@@ -98,7 +99,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
-                text: "Your scrite document is being updated. Please wait..."
+                text: scriteDocument.busyMessage
                 font.pixelSize: 32
             }
         }
@@ -165,7 +166,7 @@ Rectangle {
     UI.DialogOverlay {
         id: modalDialog
         active: false
-        backgroundColor: "gray"
+        backgroundColor: "white"
         onCloseRequest: {
             active = false
             closeable = true

@@ -631,7 +631,7 @@ void SplitElementUndoCommand::undo()
         return;
     }
 
-    m_screenplay->scriteDocument()->setBusy(true);
+    m_screenplay->scriteDocument()->setBusyMessage("Performing undo of split-scene operation...");
 
     Structure *structure = m_screenplay->scriteDocument()->structure();
     Scene *splitScene = pair.second->scene();
@@ -648,7 +648,7 @@ void SplitElementUndoCommand::undo()
     // Restore Original Scene to its original state
     originalScene->resetFromByteArray(m_originalSceneData);
 
-    m_screenplay->scriteDocument()->setBusy(false);
+    m_screenplay->scriteDocument()->clearBusyMessage();
 }
 
 void SplitElementUndoCommand::redo()
@@ -682,7 +682,7 @@ void SplitElementUndoCommand::redo()
         return;
     }
 
-    m_screenplay->scriteDocument()->setBusy(true);
+    m_screenplay->scriteDocument()->setBusyMessage("Performing redo of split-scene operation...");
 
     Structure *structure = m_screenplay->scriteDocument()->structure();
 
@@ -709,7 +709,7 @@ void SplitElementUndoCommand::redo()
         m_screenplay->insertElementAt(element, index);
     }
 
-    m_screenplay->scriteDocument()->setBusy(false);
+    m_screenplay->scriteDocument()->clearBusyMessage();
 }
 
 QByteArray SplitElementUndoCommand::captureScreenplayElements() const

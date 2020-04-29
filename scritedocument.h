@@ -52,6 +52,13 @@ public:
     bool isBusy() const { return m_busy; }
     Q_SIGNAL void busyChanged();
 
+    Q_PROPERTY(QString busyMessage READ busyMessage NOTIFY busyMessageChanged STORED false)
+    void setBusyMessage(const QString &val);
+    QString busyMessage() const { return m_busyMessage; }
+    Q_SIGNAL void busyMessageChanged();
+
+    void clearBusyMessage() { this->setBusyMessage(QString()); }
+
     Q_PROPERTY(QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
@@ -150,6 +157,7 @@ private:
     bool m_modified = false;
     bool m_autoSave = true;
     QString m_fileName;
+    QString m_busyMessage;
     QBasicTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     Structure* m_structure = nullptr;
