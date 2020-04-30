@@ -51,6 +51,8 @@ private:
     void lookForUpdates(const QJsonObject &json);
     void timerEvent(QTimerEvent *event);
 
+    QString getClientId() const;
+
 private:
     // URL has to be a http location always. Otherwise we will have to bundle
     // SSL libraries along with the installer and there are some legal bits

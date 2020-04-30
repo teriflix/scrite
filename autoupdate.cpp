@@ -20,6 +20,7 @@
 #include <QJsonDocument>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include <QUrlQuery>
 
 AutoUpdate *AutoUpdate::instance()
 {
@@ -58,6 +59,17 @@ void AutoUpdate::setUpdateInfo(const QJsonObject &val)
         return;
 
     m_updateInfo = val;
+
+    const QString link = m_updateInfo.value("link").toString();
+    if(!link.isEmpty())
+    {
+        QUrl url(link);
+        QUrlQuery uq;
+        uq.addQueryItem("client", this->getClientId());
+        url.setQuery(uq);
+        m_updateInfo.insert("link", url.toString());
+    }
+
     emit updateInfoChanged();
 }
 
@@ -71,23 +83,7 @@ void AutoUpdate::checkForUpdates()
     if(m_url.isEmpty() || !m_url.isValid())
         return;
 
-    static QString userAgentString;
-    if(userAgentString.isEmpty())
-    {
-        userAgentString = "scrite-";
-        userAgentString += Application::instance()->applicationVersion() + " ";
-        userAgentString += QSysInfo::prettyProductName() + " ";
-
-        QSettings *settings = Application::instance()->settings();
-        QString clientID = settings->value("Installation/ClientID").toString();
-        if(clientID.isEmpty())
-        {
-            clientID = QUuid::createUuid().toString();
-            settings->setValue("Installation/ClientID", clientID);
-        }
-
-        userAgentString += clientID;
-    }
+    static QString userAgentString = this->getClientId();
 
     QNetworkRequest request(m_url);
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgentString);
@@ -188,6 +184,32 @@ void AutoUpdate::timerEvent(QTimerEvent *event)
     }
 
     QObject::timerEvent(event);
+}
+
+QString AutoUpdate::getClientId() const
+{
+    static QString ret;
+    if(ret.isEmpty())
+    {
+        ret = "scrite-";
+        ret += Application::instance()->applicationVersion() + " ";
+
+        QString prodName = QSysInfo::prettyProductName();
+        prodName.replace(" ", "_");
+        ret += prodName + " ";
+
+        QSettings *settings = Application::instance()->settings();
+        QString clientID = settings->value("Installation/ClientID").toString();
+        if(clientID.isEmpty())
+        {
+            clientID = QUuid::createUuid().toString();
+            settings->setValue("Installation/ClientID", clientID);
+        }
+
+        ret += clientID;
+    }
+
+    return ret;
 }
 
 
