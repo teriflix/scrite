@@ -429,6 +429,9 @@ Rectangle {
         var sourceType = app.typeName(source)
 
         if(sourceType === "ScreenplayElement") {
+            var fromIndex = scriteDocument.screenplay.indexOfElement(source)
+            if(fromIndex < index)
+                --index
             scriteDocument.screenplay.moveElement(source, index)
             return
         }

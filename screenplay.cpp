@@ -369,13 +369,13 @@ public:
     void undo();
     void redo();
 
+    void markAsObselete();
+
 private:
     int m_toRow = -1;
     int m_fromRow = -1;
-    Screenplay *m_screenplay = nullptr;
-    ScreenplayElement *m_element = nullptr;
-    QMetaObject::Connection m_connection1;
-    QMetaObject::Connection m_connection2;
+    QPointer<Screenplay> m_screenplay;
+    QPointer<ScreenplayElement> m_element;
 };
 
 bool ScreenplayElementMoveCommand::lock = false;
@@ -387,28 +387,21 @@ ScreenplayElementMoveCommand::ScreenplayElementMoveCommand(Screenplay *screenpla
       m_screenplay(screenplay),
       m_element(element)
 {
-    m_connection1 = QObject::connect(m_screenplay, &QObject::destroyed, [this]() {
-        m_screenplay = nullptr;
-        m_element = nullptr;
-        this->setObsolete(true);
-    });
-    m_connection2 = QObject::connect(m_element, &QObject::destroyed, [this]() {
-        m_screenplay = nullptr;
-        m_element = nullptr;
-        this->setObsolete(true);
-    });
+
 }
 
 ScreenplayElementMoveCommand::~ScreenplayElementMoveCommand()
 {
-    QObject::disconnect(m_connection1);
-    QObject::disconnect(m_connection2);
+
 }
 
 void ScreenplayElementMoveCommand::undo()
 {
-    if(m_screenplay == nullptr || m_element == nullptr)
+    if(m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0)
+    {
+        this->setObsolete(true);
         return;
+    }
 
     lock = true;
     m_screenplay->moveElement(m_element, m_fromRow);
@@ -417,8 +410,11 @@ void ScreenplayElementMoveCommand::undo()
 
 void ScreenplayElementMoveCommand::redo()
 {
-    if(m_screenplay == nullptr || m_element == nullptr)
+    if(m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0)
+    {
+        this->setObsolete(true);
         return;
+    }
 
     lock = true;
     m_screenplay->moveElement(m_element, m_toRow);
