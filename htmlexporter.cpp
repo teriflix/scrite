@@ -42,6 +42,9 @@ bool HtmlExporter::doExport(QIODevice *device)
     typeStringMap[SceneElement::Transition] = "transition";
 
     QTextStream ts(device);
+    ts.setCodec("utf-8");
+    ts.setAutoDetectUnicode(true);
+
     ts << "<!DOCTYPE html>\n";
     ts << "<html>\n";
     ts << "  <head>\n";

@@ -718,12 +718,10 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         return;
     }
 
-
     SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
     QTextBlockFormat blkFormat = format->createBlockFormat();
     QTextCharFormat chrFormat = format->createCharFormat();
     chrFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
-
 
     QTextCursor cursor(block);
     cursor.setBlockFormat(blkFormat);

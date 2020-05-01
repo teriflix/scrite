@@ -43,6 +43,8 @@ bool TextExporter::doExport(QIODevice *device)
     const int nrScenes = screenplay->elementCount();
 
     QTextStream ts(device);
+    ts.setCodec("utf-8");
+    ts.setAutoDetectUnicode(true);
 
     auto writeParagraph = [&ts,this](const SceneElementFormat *format, const QString &text) {
         if(format->topMargin() > 0)
