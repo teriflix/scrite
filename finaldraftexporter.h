@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE FinalDraftExporter(QObject *parent=nullptr);
     ~FinalDraftExporter();
 
+    bool canBundleFonts() const { return false; }
+
 protected:
     bool doExport(QIODevice *device);
 };

@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE TextExporter(QObject *parent=nullptr);
     ~TextExporter();
 
+    bool canBundleFonts() const { return false; }
+
     Q_PROPERTY(int maxLettersPerLine READ maxLettersPerLine WRITE setMaxLettersPerLine NOTIFY maxLettersPerLineChanged)
     void setMaxLettersPerLine(int val);
     int maxLettersPerLine() const { return m_maxLettersPerLine; }

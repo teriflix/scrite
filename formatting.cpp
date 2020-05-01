@@ -724,11 +724,22 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     QTextCharFormat chrFormat = format->createCharFormat();
     chrFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
 
+
     QTextCursor cursor(block);
     cursor.setBlockFormat(blkFormat);
     cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.setCharFormat(chrFormat);
+
+    int start = 0;
+    QList<TransliterationEngine::Breakup> breakup = TransliterationEngine::instance()->breakupText(block.text());
+    Q_FOREACH(TransliterationEngine::Breakup item, breakup)
+    {
+        QTextCharFormat fmt;
+        fmt.setFontFamily(item.font.family());
+        setFormat(start, item.string.length(), fmt);
+        start += item.string.length();
+    }
 
     if(m_currentElement == element)
         emit currentFontChanged();

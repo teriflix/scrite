@@ -75,12 +75,33 @@
         <file>icons/action/description.png</file>
         <file>icons/action/description_inverted.png</file>
         <file>images/appicon.png</file>
-        <file>font/CourierPrime-Bold.ttf</file>
-        <file>font/CourierPrime-BoldItalic.ttf</file>
-        <file>font/CourierPrime-Italic.ttf</file>
-        <file>font/CourierPrime-Regular.ttf</file>
         <file>qml/TextField2.qml</file>
         <file>icons/content/person_add.png</file>
         <file>icons/content/person_add_inverted.png</file>
+        <file>font/English/CourierPrime-Bold.ttf</file>
+        <file>font/English/CourierPrime-BoldItalic.ttf</file>
+        <file>font/English/CourierPrime-Italic.ttf</file>
+        <file>font/English/CourierPrime-Regular.ttf</file>
+        <file>qml/ExporterConfiguration.qml</file>
+        <file>font/Hindi/Mukta-Bold.ttf</file>
+        <file>font/Hindi/Mukta-Regular.ttf</file>
+        <file>font/Kannada/BalooTamma2-Regular.ttf</file>
+        <file>font/Kannada/BalooTamma2-Bold.ttf</file>
+        <file>font/Bengali/HindSiliguri-Regular.ttf</file>
+        <file>font/Bengali/HindSiliguri-Bold.ttf</file>
+        <file>font/Tamil/HindMadurai-Regular.ttf</file>
+        <file>font/Tamil/HindMadurai-Bold.ttf</file>
+        <file>font/Sanskrit/Mukta-Regular.ttf</file>
+        <file>font/Sanskrit/Mukta-Bold.ttf</file>
+        <file>font/Telugu/HindGuntur-Regular.ttf</file>
+        <file>font/Telugu/HindGuntur-Bold.ttf</file>
+        <file>font/Malayalam/BalooChettan2-Regular.ttf</file>
+        <file>font/Malayalam/BalooChettan2-Bold.ttf</file>
+        <file>font/Punjabi/BalooPaaji2-Regular.ttf</file>
+        <file>font/Punjabi/BalooPaaji2-Bold.ttf</file>
+        <file>font/Oriya/BalooBhaina2-Bold.ttf</file>
+        <file>font/Oriya/BalooBhaina2-Regular.ttf</file>
+        <file>font/Gujarati/HindVadodara-Bold.ttf</file>
+        <file>font/Gujarati/HindVadodara-Regular.ttf</file>
     </qresource>
 </RCC>

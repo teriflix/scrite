@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "locationreportgenerator.h"
+#include "transliteration.h"
 
 LocationReportGenerator::LocationReportGenerator(QObject *parent)
     : AbstractReportGenerator(parent)
@@ -147,7 +148,8 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
                 charFormat = defaultCharFormat;
 
                 cursor.insertBlock(blockFormat, charFormat);
-                cursor.insertText(it2.value().first()->text() + " (" + QString::number(it.value().size()) + ")");
+                TransliterationEngine::instance()->insertBreakupText(cursor, it2.value().first()->text());
+                cursor.insertText(" (" + QString::number(it.value().size()) + ")");
 
                 Q_FOREACH(SceneHeading *heading, it2.value())
                 {
@@ -162,7 +164,8 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
                     charFormat = defaultCharFormat;
 
                     cursor.insertBlock(blockFormat, charFormat);
-                    cursor.insertText( "Scene #" + QString::number(sceneNr) + + ": " + snippet);
+                    cursor.insertText( "Scene #" + QString::number(sceneNr) + + ": ");
+                    TransliterationEngine::instance()->insertBreakupText(cursor, snippet);
                 }
 
                 ++it2;

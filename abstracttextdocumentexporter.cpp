@@ -182,7 +182,8 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
             ++nrSceneHeadings;
             const QString sceneNr = QString("[%1] ").arg(nrSceneHeadings);
             createNewTextBlock(cursor,SceneElement::Heading);
-            cursor.insertText(sceneNr + heading->text());
+            // cursor.insertText(sceneNr + heading->text());
+            TransliterationEngine::instance()->insertBreakupText(cursor, sceneNr + heading->text());
 
             ++nrBlocks;
         }
@@ -191,7 +192,8 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
         {
             SceneElement *element = scene->elementAt(j);
             createNewTextBlock(cursor, element->type());
-            cursor.insertText(element->formattedText());
+            // cursor.insertText(element->formattedText());
+            TransliterationEngine::instance()->insertBreakupText(cursor, element->formattedText());
 
             ++nrBlocks;
         }

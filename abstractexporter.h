@@ -15,6 +15,8 @@
 #define ABSTRACTEXPORTER_H
 
 #include "abstractdeviceio.h"
+#include "garbagecollector.h"
+#include "transliteration.h"
 
 class AbstractExporter : public AbstractDeviceIO
 {
@@ -23,11 +25,39 @@ class AbstractExporter : public AbstractDeviceIO
 public:
     ~AbstractExporter();
 
+    Q_PROPERTY(QString format READ format CONSTANT)
+    QString format() const;
+
+    Q_PROPERTY(QString formatName READ formatName CONSTANT)
+    QString formatName() const;
+
+    Q_PROPERTY(QString nameFilters READ nameFilters CONSTANT)
+    QString nameFilters() const;
+
+    Q_PROPERTY(bool canBundleFonts READ canBundleFonts CONSTANT)
+    virtual bool canBundleFonts() const { return false; }
+
+    Q_INVOKABLE void bundleFontForLanguage(int language, bool on=true) {
+        m_languageBundleMap[TransliterationEngine::Language(language)] = on;
+    }
+    Q_INVOKABLE bool isFontForLanguageBundled(int language) const {
+        return m_languageBundleMap.value(TransliterationEngine::Language(language), false);
+    }
+
     Q_INVOKABLE bool write();
+
+    Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
 
 protected:
     AbstractExporter(QObject *parent=nullptr);
     virtual bool doExport(QIODevice *device) = 0;
+
+    QMap<TransliterationEngine::Language,bool> languageBundleMap() const {
+        return m_languageBundleMap;
+    }
+
+private:
+    QMap<TransliterationEngine::Language,bool> m_languageBundleMap;
 };
 
 #endif // ABSTRACTEXPORTER_H

@@ -82,38 +82,6 @@ Rectangle {
                 blur.visible = false
             }
         }
-
-        Column {
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: -parent.height*0.2
-            spacing: 30
-            width: parent.width * 0.6
-
-            BusyIndicator {
-                anchors.horizontalCenter: parent.horizontalCenter
-                running: true
-            }
-
-            Text {
-                width: parent.width
-                anchors.horizontalCenter: parent.horizontalCenter
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                text: scriteDocument.busyMessage
-                font.pixelSize: 32
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-        }
-
-        EventFilter.active: scriteDocument.busy
-        EventFilter.target: app
-        EventFilter.events: [6,7]
-        EventFilter.onFilter: {
-            result.filter = true
-        }
     }
 
     Settings {
@@ -178,6 +146,7 @@ Rectangle {
                 initItemCallback(dialogItem)
             initItemCallback = undefined
         }
+        opacity: scriteDocument.busy ? 0.5 : 1
     }
 
     Component {
@@ -227,6 +196,53 @@ Rectangle {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    Loader {
+        active: scriteDocument.busy
+        anchors.fill: parent
+        sourceComponent: Item {
+
+            Rectangle {
+                anchors.fill: indication
+                anchors.margins: -30
+                radius: 10
+                color: "white"
+                border { width: 2; color: "gray" }
+            }
+
+            Column {
+                id: indication
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: -parent.height*0.2
+                spacing: 30
+                width: parent.width * 0.6
+
+                BusyIndicator {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    running: true
+                }
+
+                Text {
+                    width: parent.width
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    text: scriteDocument.busyMessage
+                    font.pixelSize: 32
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+            }
+
+            EventFilter.target: app
+            EventFilter.events: [6,7]
+            EventFilter.onFilter: {
+                result.filter = true
             }
         }
     }

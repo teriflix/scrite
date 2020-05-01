@@ -16,12 +16,30 @@
 AbstractExporter::AbstractExporter(QObject *parent)
                  :AbstractDeviceIO(parent)
 {
-
+    m_languageBundleMap = TransliterationEngine::instance()->activeLanguages();
 }
 
 AbstractExporter::~AbstractExporter()
 {
 
+}
+
+QString AbstractExporter::format() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("Format");
+    return QString::fromLatin1(this->metaObject()->classInfo(cii).value());
+}
+
+QString AbstractExporter::formatName() const
+{
+    const QStringList fields = this->format().split("/");
+    return fields.last();
+}
+
+QString AbstractExporter::nameFilters() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("NameFilters");
+    return QString::fromLatin1(this->metaObject()->classInfo(cii).value());
 }
 
 bool AbstractExporter::write()
@@ -57,6 +75,8 @@ bool AbstractExporter::write()
     this->progress()->start();
     const bool ret = this->doExport(&file);
     this->progress()->finish();
+
+    GarbageCollector::instance()->add(this);
 
     return ret;
 }

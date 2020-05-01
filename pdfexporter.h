@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
     ~PdfExporter();
 
+    bool canBundleFonts() const { return false; }
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface

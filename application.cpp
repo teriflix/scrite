@@ -41,11 +41,6 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
       m_versionNumber(version)
 {
-    QFontDatabase::addApplicationFont(":/font/CourierPrime-Bold.ttf");
-    QFontDatabase::addApplicationFont(":/font/CourierPrime-Italic.ttf");
-    QFontDatabase::addApplicationFont(":/font/CourierPrime-BoldItalic.ttf");
-    QFontDatabase::addApplicationFont(":/font/CourierPrime-Regular.ttf");
-
     connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
     connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
     connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);
@@ -57,7 +52,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
 
-    TransliterationSettings::instance(this);
+    TransliterationEngine::instance(this);
 }
 
 Application::~Application()

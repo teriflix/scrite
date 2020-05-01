@@ -446,6 +446,46 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     return ret;
 }
 
+static const QString dateTimeFormat("d MMM yyyy, hh:mm");
+
+AbstractExporter *ScriteDocument::createExporter(const QString &format)
+{
+    const QByteArray formatKey = format.toLatin1();
+    AbstractExporter *exporter = deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this);
+    if(exporter && exporter->fileName().isEmpty())
+    {
+        exporter->setDocument(this);
+
+        QString suggestedName = m_screenplay->title();
+        if(suggestedName.isEmpty())
+            suggestedName = QFileInfo(m_fileName).baseName();
+        else if(!m_screenplay->subtitle().isEmpty())
+            suggestedName = " " + m_screenplay->subtitle();
+        if(suggestedName.isEmpty())
+            suggestedName = "Scrite Screenplay";
+        suggestedName += " " + QDateTime::currentDateTime().toString(dateTimeFormat);
+
+        QFileInfo fi(m_fileName);
+        if(fi.exists())
+            exporter->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + " - " + suggestedName) );
+        else
+            exporter->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
+    }
+
+    ProgressReport *progressReport = exporter->findChild<ProgressReport*>();
+    if(progressReport)
+    {
+        connect(progressReport, &ProgressReport::statusChanged, [progressReport,this,exporter]() {
+            if(progressReport->status() == ProgressReport::Started)
+                this->setBusyMessage("Exporting into \"" + exporter->fileName() + "\" ...");
+            else if(progressReport->status() == ProgressReport::Finished)
+                this->clearBusyMessage();
+        });
+    }
+
+    return exporter;
+}
+
 AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)
 {
     const QByteArray reportKey = report.toLatin1();
@@ -456,13 +496,24 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 
         const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
-        const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString("d MMM yyyy, hh:mm") + suffix;
+        const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString(dateTimeFormat) + suffix;
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
             reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + " - " + suggestedName) );
         else
             reportGenerator->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
+    }
+
+    ProgressReport *progressReport = reportGenerator->findChild<ProgressReport*>();
+    if(progressReport)
+    {
+        connect(progressReport, &ProgressReport::statusChanged, [progressReport,this,reportGenerator]() {
+            if(progressReport->status() == ProgressReport::Started)
+                this->setBusyMessage("Generating \"" + reportGenerator->fileName() + "\" ...");
+            else if(progressReport->status() == ProgressReport::Finished)
+                this->clearBusyMessage();
+        });
     }
 
     return reportGenerator;

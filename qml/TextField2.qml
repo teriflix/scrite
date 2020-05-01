@@ -28,12 +28,12 @@ TextField {
 
     onEditingFinished: {
         if(enableTransliteration)
-            text = app.transliterationSettings.transliteratedSentence(text, true)
+            text = app.transliterationEngine.transliteratedSentence(text, true)
         editingComplete()
     }
     Component.onDestruction: {
         if(enableTransliteration)
-            text = app.transliterationSettings.transliteratedSentence(text, true)
+            text = app.transliterationEngine.transliteratedSentence(text, true)
         editingComplete()
     }
 
@@ -60,7 +60,7 @@ TextField {
 
     onTextEdited: {
         if(enableTransliteration)
-            text = app.transliterationSettings.transliteratedSentence(text, false)
+            text = app.transliterationEngine.transliteratedSentence(text, false)
     }
 
     Keys.onReturnPressed: {

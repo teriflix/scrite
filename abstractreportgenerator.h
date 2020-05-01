@@ -42,8 +42,6 @@ public:
     Q_PROPERTY(QString name READ name CONSTANT)
     QString name() const;
 
-    bool isReportGenerated() const { return m_success; }
-
     Q_INVOKABLE bool generate();
 
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
@@ -69,7 +67,6 @@ protected:
     virtual bool doGenerate(QTextDocument *document) = 0;
 
 private:
-    bool m_success = false;
     Format m_format = AdobePDF;
     QEventLoop m_eventLoop;
 };

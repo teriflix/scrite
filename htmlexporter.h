@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE HtmlExporter(QObject *parent=nullptr);
     ~HtmlExporter();
 
+    bool canBundleFonts() const { return true; }
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface

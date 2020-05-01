@@ -371,7 +371,7 @@ Item {
                     enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
 
                     Repeater {
-                        model: app.enumerationModel(app.transliterationSettings, "Language")
+                        model: app.enumerationModel(app.transliterationEngine, "Language")
 
                         MenuItem {
                             visible: index > 0

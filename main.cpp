@@ -34,6 +34,7 @@
 #include "scritedocument.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
+#include "abstractexporter.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 #include "delayedpropertybinder.h"
@@ -123,9 +124,10 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<ErrorReport>("Scrite", 1, 0, "ErrorReport", reason);
     qmlRegisterUncreatableType<ProgressReport>("Scrite", 1, 0, "ProgressReport", reason);
 
-    qmlRegisterUncreatableType<TransliterationSettings>("Scrite", 1, 0, "TransliterationSettings", "Use app.transliterationSettings instead.");
+    qmlRegisterUncreatableType<TransliterationEngine>("Scrite", 1, 0, "TransliterationSettings", "Use app.transliterationEngine instead.");
     qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", "Use as attached property.");
 
+    qmlRegisterUncreatableType<AbstractExporter>("Scrite", 1, 0, "AbstractExporter", reason);
     qmlRegisterUncreatableType<AbstractReportGenerator>("Scrite", 1, 0, "AbstractReportGenerator", reason);
 
     qmlRegisterUncreatableType<FocusTracker>("Scrite", 1, 0, "FocusTracker", reason);

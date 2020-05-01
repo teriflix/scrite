@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "characterreportgenerator.h"
+#include "transliteration.h"
 
 #include <QTextTable>
 #include <QTextCursor>
@@ -257,7 +258,8 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                             charFormat.setFontItalic(false);
 
                             cursor.insertBlock(blockFormat, charFormat);
-                            cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
+                            // cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
+                            TransliterationEngine::instance()->insertBreakupText(cursor, "Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
                             sceneInfoWritten = true;
                         }
 
@@ -316,7 +318,8 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                                 }
                                 else
                                     cursor.insertBlock(blockFormat, charFormat);
-                                cursor.insertText(element->formattedText());
+                                // cursor.insertText(element->formattedText());
+                                TransliterationEngine::instance()->insertBreakupText(cursor, element->formattedText());
                                 ++nr;
                             }
                         }

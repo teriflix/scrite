@@ -1,0 +1,192 @@
+/****************************************************************************
+**
+** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+import Scrite 1.0
+import QtQuick 2.13
+import QtQuick.Dialogs 1.3
+import QtQuick.Controls 2.13
+
+Item {
+    id: configurationBox
+    property AbstractExporter exporter
+
+    width: 700
+    height: exporter && exporter.canBundleFonts ? 500 : 250
+
+    Component.onCompleted: {
+        exporter = scriteDocument.createExporter(modalDialog.arguments)
+        if(exporter === null) {
+            modalDialog.closeable = true
+            var exportKind = modalDialog.arguments.split("/").last()
+            notice.text = exportKind + " Export"
+        }
+        modalDialog.arguments = undefined
+    }
+
+    Text {
+        id: notice
+        anchors.centerIn: parent
+        visible: exporter === null
+        font.pixelSize: 32
+        width: parent.width*0.85
+        wrapMode: Text.WordWrap
+        horizontalAlignment: Text.AlignHCenter
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: exporter
+        sourceComponent: Item {
+            FileDialog {
+                id: filePathDialog
+                folder: {
+                    if(scriteDocument.fileName !== "") {
+                        var fileInfo = app.fileInfo(scriteDocument.fileName)
+                        if(fileInfo.exists)
+                            return "file:///" + fileInfo.absolutePath
+                    }
+                    return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+                }
+                selectFolder: false
+                selectMultiple: false
+                selectExisting: false
+                nameFilters: exporter.nameFilters
+                onAccepted: exporter.fileName = app.urlToLocalFile(fileUrl)
+            }
+
+            ScrollView {
+                id: formView
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: buttonRow.top
+                anchors.margins: 20
+                anchors.bottomMargin: 10
+
+                property bool scrollBarRequired: formView.height < formView.contentHeight
+                ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+
+                Column {
+                    width: formView.width - (formView.scrollBarRequired ? 17 : 0)
+                    spacing: 10
+
+                    Text {
+                        font.pointSize: 30
+                        font.bold: true
+                        text: exporter.formatName + " - Export"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: parent.spacing/2
+
+                        Text {
+                            width: parent.width
+                            text: "Select a file to export into"
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: parent.spacing
+
+                            TextField {
+                                id: filePathField
+                                readOnly: true
+                                width: parent.width - filePathDialogButton.width - parent.spacing
+                                text: exporter.fileName
+                            }
+
+                            ToolButton2 {
+                                id: filePathDialogButton
+                                text: "..."
+                                suggestedWidth: 35
+                                suggestedHeight: 35
+                                onClicked: filePathDialog.open()
+                                hoverEnabled: false
+                            }
+                        }
+                    }
+
+                    Loader {
+                        width: parent.width
+                        active: exporter.canBundleFonts
+                        sourceComponent: GroupBox {
+                            width: parent.width
+                            label: Text {
+                                text: "Export fonts for the following languages"
+                            }
+                            height: languageBundleView.height+45
+
+                            Grid {
+                                id: languageBundleView
+                                width: parent.width-10
+                                anchors.top: parent.top
+                                spacing: 5
+                                columns: 3
+
+                                Repeater {
+                                    model: app.enumerationModel(app.transliterationEngine, "Language")
+                                    delegate: CheckBox {
+                                        width: languageBundleView.width/languageBundleView.columns
+                                        checkable: true
+                                        checked: exporter.isFontForLanguageBundled(modelData.value)
+                                        text: modelData.key
+                                        onToggled: exporter.bundleFontForLanguage(modelData.value,checked)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Row {
+                id: buttonRow
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 20
+                spacing: 20
+
+                Button {
+                    text: "Cancel"
+                    onClicked: {
+                        exporter.discard()
+                        modalDialog.close()
+                    }
+
+                    EventFilter.target: app
+                    EventFilter.events: [6]
+                    EventFilter.onFilter: {
+                        if(event.key === Qt.Key_Escape) {
+                            result.acceptEvent = true
+                            result.filter = true
+                            exporter.discard()
+                            modalDialog.close()
+                        }
+                    }
+                }
+
+                Button {
+                    enabled: filePathField.text !== ""
+                    text: "Export"
+                    onClicked: {
+                        if(exporter.write())
+                            app.revealFileOnDesktop(exporter.fileName)
+                        modalDialog.close()
+                    }
+                }
+            }
+        }
+    }
+}

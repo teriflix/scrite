@@ -119,8 +119,6 @@ bool AbstractReportGenerator::generate()
 
     this->progress()->finish();
 
-    m_success = true;
-
     GarbageCollector::instance()->add(this);
 
     return ret;

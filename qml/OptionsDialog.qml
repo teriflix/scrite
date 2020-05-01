@@ -1080,13 +1080,13 @@ Item {
                                 columns: 3
 
                                 Repeater {
-                                    model: app.transliterationSettings.getLanguages()
+                                    model: app.transliterationEngine.getLanguages()
                                     delegate: CheckBox {
                                         width: activeLanguagesView.width/activeLanguagesView.columns
                                         checkable: true
                                         checked: modelData.active
                                         text: modelData.key
-                                        onToggled: app.transliterationSettings.markLanguage(modelData.value,checked)
+                                        onToggled: app.transliterationEngine.markLanguage(modelData.value,checked)
                                     }
                                 }
                             }

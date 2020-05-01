@@ -131,8 +131,8 @@ public:
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
 
-    Q_PROPERTY(TransliterationSettings* transliterationSettings READ transliterationSettings CONSTANT)
-    TransliterationSettings* transliterationSettings() const { return TransliterationSettings::instance(); }
+    Q_PROPERTY(TransliterationEngine* transliterationEngine READ transliterationEngine CONSTANT)
+    TransliterationEngine* transliterationEngine() const { return TransliterationEngine::instance(); }
 
     Q_INVOKABLE QPointF cursorPosition() const;
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;

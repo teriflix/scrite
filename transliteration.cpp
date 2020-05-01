@@ -20,23 +20,66 @@
 #include <QJsonObject>
 #include <QTextCursor>
 #include <QTextDocument>
+#include <QFontDatabase>
 #include <QQuickTextDocument>
 
 #include <PhTranslateLib>
 
-TransliterationSettings *TransliterationSettings::instance(QCoreApplication *app)
+static QStringList getCustomFontFilePaths()
 {
-    static TransliterationSettings *newInstance = new TransliterationSettings(app ? app : qApp);
+    const QStringList customFonts = QStringList() <<
+         ":/font/Gujarati/HindVadodara-Regular.ttf" <<
+         ":/font/Gujarati/HindVadodara-Bold.ttf" <<
+         ":/font/Oriya/BalooBhaina2-Regular.ttf" <<
+         ":/font/Oriya/BalooBhaina2-Bold.ttf" <<
+         ":/font/Punjabi/BalooPaaji2-Regular.ttf" <<
+         ":/font/Punjabi/BalooPaaji2-Bold.ttf" <<
+         ":/font/Malayalam/BalooChettan2-Regular.ttf" <<
+         ":/font/Malayalam/BalooChettan2-Bold.ttf" <<
+         ":/font/Hindi/Mukta-Regular.ttf" <<
+         ":/font/Hindi/Mukta-Bold.ttf" <<
+         ":/font/Telugu/HindGuntur-Regular.ttf" <<
+         ":/font/Telugu/HindGuntur-Bold.ttf" <<
+         ":/font/Sanskrit/Mukta-Regular.ttf" <<
+         ":/font/Sanskrit/Mukta-Bold.ttf" <<
+         ":/font/English/CourierPrime-BoldItalic.ttf" <<
+         ":/font/English/CourierPrime-Bold.ttf" <<
+         ":/font/English/CourierPrime-Italic.ttf" <<
+         ":/font/English/CourierPrime-Regular.ttf" <<
+         ":/font/Kannada/BalooTamma2-Regular.ttf" <<
+         ":/font/Kannada/BalooTamma2-Bold.ttf" <<
+         ":/font/Tamil/HindMadurai-Regular.ttf" <<
+         ":/font/Tamil/HindMadurai-Bold.ttf" <<
+         ":/font/Bengali/HindSiliguri-Regular.ttf" <<
+         ":/font/Bengali/HindSiliguri-Bold.ttf";
+    return customFonts;
+}
+
+TransliterationEngine *TransliterationEngine::instance(QCoreApplication *app)
+{
+    static TransliterationEngine *newInstance = new TransliterationEngine(app ? app : qApp);
     return newInstance;
 }
 
-TransliterationSettings::TransliterationSettings(QObject *parent)
+TransliterationEngine::TransliterationEngine(QObject *parent)
     : QObject(parent)
 {
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
+    Q_FOREACH(QString customFont, getCustomFontFilePaths())
+    {
+        const int id = QFontDatabase::addApplicationFont(customFont);
+        const QString language = customFont.split("/", QString::SkipEmptyParts).at(2);
+        Language lang = Language(metaEnum.keyToValue(qPrintable(language)));
+        m_languageFontIdMap[lang] = id;
+        m_languageFontFilePaths[lang].append(customFont);
+    }
+
     for(int i=0; i<metaEnum.keyCount(); i++)
-        m_activeLanguages[Language(metaEnum.value(i))] = false;
+    {
+        Language lang = Language(metaEnum.value(i));
+        m_activeLanguages[lang] = false;
+    }
 
     const QSettings *settings = Application::instance()->settings();
     const QStringList activeLanguages = settings->value("Transliteration/activeLanguages").toStringList();
@@ -67,12 +110,12 @@ TransliterationSettings::TransliterationSettings(QObject *parent)
     this->setLanguage(lang);
 }
 
-TransliterationSettings::~TransliterationSettings()
+TransliterationEngine::~TransliterationEngine()
 {
 
 }
 
-void TransliterationSettings::setLanguage(TransliterationSettings::Language val)
+void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
 {
     if(m_language == val)
         return;
@@ -88,14 +131,14 @@ void TransliterationSettings::setLanguage(TransliterationSettings::Language val)
     emit languageChanged();
 }
 
-QString TransliterationSettings::languageAsString() const
+QString TransliterationEngine::languageAsString() const
 {
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
     return QString::fromLatin1(metaEnum.valueToKey(m_language));
 }
 
-QString TransliterationSettings::shortcutLetter(TransliterationSettings::Language val)
+QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language val)
 {
     if(val == Tamil)
         return QString("L");
@@ -105,7 +148,7 @@ QString TransliterationSettings::shortcutLetter(TransliterationSettings::Languag
     return QChar(metaEnum.valueToKey(val)[0]).toUpper();
 }
 
-void TransliterationSettings::cycleLanguage()
+void TransliterationEngine::cycleLanguage()
 {
     QMap<Language,bool>::const_iterator it = m_activeLanguages.constFind(m_language);
     QMap<Language,bool>::const_iterator end = m_activeLanguages.constEnd();
@@ -135,7 +178,7 @@ void TransliterationSettings::cycleLanguage()
     }
 }
 
-void TransliterationSettings::markLanguage(TransliterationSettings::Language language, bool active)
+void TransliterationEngine::markLanguage(TransliterationEngine::Language language, bool active)
 {
     if(m_activeLanguages.value(language,false) == active)
         return;
@@ -157,12 +200,12 @@ void TransliterationSettings::markLanguage(TransliterationSettings::Language lan
     emit languagesChanged();
 }
 
-bool TransliterationSettings::queryLanguage(TransliterationSettings::Language language) const
+bool TransliterationEngine::queryLanguage(TransliterationEngine::Language language) const
 {
     return m_activeLanguages.value(language, false);
 }
 
-QJsonArray TransliterationSettings::languages() const
+QJsonArray TransliterationEngine::languages() const
 {
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
@@ -180,7 +223,7 @@ QJsonArray TransliterationSettings::languages() const
     return ret;
 }
 
-void *TransliterationSettings::transliteratorFor(TransliterationSettings::Language language) const
+void *TransliterationEngine::transliteratorFor(TransliterationEngine::Language language) const
 {
     switch(language)
     {
@@ -211,7 +254,26 @@ void *TransliterationSettings::transliteratorFor(TransliterationSettings::Langua
     return nullptr;
 }
 
-QString TransliterationSettings::transliteratedWord(const QString &word) const
+TransliterationEngine::Language TransliterationEngine::languageOf(void *transliterator) const
+{
+#define CHECK(x) if(transliterator == transliteratorFor(TransliterationEngine::x)) return TransliterationEngine::x
+    CHECK(English);
+    CHECK(Bengali);
+    CHECK(Gujarati);
+    CHECK(Hindi);
+    CHECK(Kannada);
+    CHECK(Malayalam);
+    CHECK(Oriya);
+    CHECK(Punjabi);
+    CHECK(Sanskrit);
+    CHECK(Tamil);
+    CHECK(Telugu);
+#undef CHECK
+
+    return English;
+}
+
+QString TransliterationEngine::transliteratedWord(const QString &word) const
 {
     if(m_transliterator == nullptr)
         return word;
@@ -219,7 +281,7 @@ QString TransliterationSettings::transliteratedWord(const QString &word) const
     return QString::fromStdWString(Translate(m_transliterator, word.toStdWString().c_str()));
 }
 
-QString TransliterationSettings::transliteratedSentence(const QString &sentence, bool includingLastWord) const
+QString TransliterationEngine::transliteratedSentence(const QString &sentence, bool includingLastWord) const
 {
     if(m_transliterator == nullptr)
         return sentence;
@@ -232,6 +294,108 @@ QString TransliterationSettings::transliteratedSentence(const QString &sentence,
     }
 
     return words.join(" ");
+}
+
+QFont TransliterationEngine::languageFont(TransliterationEngine::Language language) const
+{
+    static QMap<Language,QFontDatabase::WritingSystem> languageSystemMap;
+    if(languageSystemMap.isEmpty())
+    {
+        languageSystemMap[English] = QFontDatabase::Latin;
+        languageSystemMap[Bengali] = QFontDatabase::Bengali;
+        languageSystemMap[Gujarati] = QFontDatabase::Gujarati;
+        languageSystemMap[Hindi] = QFontDatabase::Devanagari;
+        languageSystemMap[Kannada] = QFontDatabase::Kannada;
+        languageSystemMap[Malayalam] = QFontDatabase::Malayalam;
+        languageSystemMap[Oriya] = QFontDatabase::Oriya;
+        languageSystemMap[Punjabi] = QFontDatabase::Gurmukhi;
+        languageSystemMap[Sanskrit] = QFontDatabase::Devanagari;
+        languageSystemMap[Tamil] = QFontDatabase::Tamil;
+        languageSystemMap[Telugu] = QFontDatabase::Telugu;
+    }
+
+    QFontDatabase fontDb;
+    const int id = m_languageFontIdMap.value(language, -1);
+    const QStringList families = id < 0 ? fontDb.families(languageSystemMap.value(language)) : fontDb.applicationFontFamilies(id);
+    if(families.isEmpty())
+        return Application::instance()->font();
+
+    return QFont( families.first() );
+}
+
+QStringList TransliterationEngine::languageFontFilePaths(TransliterationEngine::Language language) const
+{
+    return m_languageFontFilePaths.value(language, QStringList());
+}
+
+QList<TransliterationEngine::Breakup> TransliterationEngine::breakupText(const QString &text) const
+{
+    QList<Breakup> ret;
+
+    static QMap<QChar::Script,Language> scriptLanguageMap;
+    if(scriptLanguageMap.isEmpty())
+    {
+        scriptLanguageMap[QChar::Script_Latin] = English;
+        scriptLanguageMap[QChar::Script_Devanagari] = Hindi;
+        scriptLanguageMap[QChar::Script_Bengali] = Bengali;
+        scriptLanguageMap[QChar::Script_Gurmukhi] = Punjabi;
+        scriptLanguageMap[QChar::Script_Gujarati] = Gujarati;
+        scriptLanguageMap[QChar::Script_Oriya] = Oriya;
+        scriptLanguageMap[QChar::Script_Tamil] = Tamil;
+        scriptLanguageMap[QChar::Script_Telugu] = Telugu;
+        scriptLanguageMap[QChar::Script_Kannada] = Kannada;
+        scriptLanguageMap[QChar::Script_Malayalam] = Malayalam;
+    }
+
+    QChar::Script lastScript = QChar::Script_Latin;
+
+    Breakup item;
+    for(int i=0; i<text.length(); i++)
+    {
+        const QChar ch = text.at(i);
+        if( (ch.script() != lastScript && ch.isLetterOrNumber()) ||
+            (ch.category() == QChar::Separator_Line || ch.category() == QChar::Separator_Paragraph) )
+        {
+            if(!item.string.isEmpty())
+            {
+                item.language = scriptLanguageMap.value(lastScript, English);
+                item.font = this->languageFont(item.language);
+                ret.append(item);
+            }
+
+            item = Breakup();
+        }
+
+        item.string.append(ch);
+
+        if(ch.isLetterOrNumber())
+            lastScript = ch.script();
+    }
+
+    if(!item.string.isEmpty())
+    {
+        item.language = scriptLanguageMap.value(lastScript, English);
+        item.font = this->languageFont(item.language);
+        ret.append(item);
+    }
+
+    return ret;
+}
+
+void TransliterationEngine::insertBreakupText(QTextCursor &cursor, const QString &text) const
+{
+    const QTextCharFormat givenFormat = cursor.charFormat();
+    const QList<Breakup> breakup = this->breakupText(text);
+    Q_FOREACH(Breakup item, breakup)
+    {
+        QTextCharFormat charFormat;
+        if(item.language == English)
+            charFormat.setFontFamily(givenFormat.fontFamily());
+        else
+            charFormat.setFontFamily(item.font.family());
+        cursor.insertText(item.string);
+    }
+    cursor.setCharFormat(givenFormat);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -345,7 +509,7 @@ void Transliterator::transliterateLastWord()
         QTextCursor cursor(this->document());
         cursor.setPosition(m_cursorPosition);
         cursor.select(QTextCursor::WordUnderCursor);
-        cursor.insertText( TransliterationSettings::instance()->transliteratedWord(cursor.selectedText()) );
+        this->transliterate(cursor);
     }
 }
 
@@ -354,7 +518,7 @@ void Transliterator::transliterate(int from, int to)
     if(this->document() == nullptr || to-from <= 0)
         return;
 
-    void *transliterator = TransliterationSettings::instance()->transliterator();
+    void *transliterator = TransliterationEngine::instance()->transliterator();
     if(transliterator == nullptr)
         return;
 
@@ -369,7 +533,7 @@ void Transliterator::transliterateToLanguage(int from, int to, int language)
     if(this->document() == nullptr || to-from <= 0)
         return;
 
-    void *transliterator = TransliterationSettings::instance()->transliteratorFor(TransliterationSettings::Language(language));
+    void *transliterator = TransliterationEngine::instance()->transliteratorFor(TransliterationEngine::Language(language));
     if(transliterator == nullptr)
         return;
 
@@ -402,7 +566,7 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
         return;
     }
 
-    void *transliterator = TransliterationSettings::instance()->transliterator();
+    void *transliterator = TransliterationEngine::instance()->transliterator();
     if(transliterator == nullptr)
         return;
 
@@ -438,7 +602,7 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
         return;
 
     if(transliterator == nullptr)
-        transliterator = TransliterationSettings::instance()->transliterator();
+        transliterator = TransliterationEngine::instance()->transliterator();
     if(transliterator == nullptr)
         return;
 
@@ -453,14 +617,14 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
             word += ch;
         else
         {
-            replacement += TransliterationSettings::instance()->transliteratedWord(word);
+            replacement += TransliterationEngine::instance()->transliteratedWord(word);
             replacement += ch;
             word.clear();
         }
     }
 
     if(!word.isEmpty())
-        replacement += TransliterationSettings::instance()->transliteratedWord(word);
+        replacement += TransliterationEngine::instance()->transliteratedWord(word);
 
     if(m_mode == AutomaticMode)
     {

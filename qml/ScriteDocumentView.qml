@@ -101,11 +101,14 @@ Item {
                                             return
                                         }
                                     }
+                                    recentFilesMenu.close()
                                     fileDialog.launch("OPEN", filePath)
                                 }
                             }, this)
-                        else
+                        else {
+                            recentFilesMenu.close()
                             fileDialog.launch("OPEN", filePath)
+                        }
                     }
 
                     Item {
@@ -287,6 +290,7 @@ Item {
                 }
 
                 ToolButton2 {
+                    id: exportButton
                     icon.source: "../icons/file/file_upload.png"
                     text: "Export"
                     shortcut: "Ctrl+Shift+X"
@@ -311,7 +315,7 @@ Item {
                                         var fields = format.split("/")
                                         return fields[fields.length-1]
                                     }
-                                    onClicked: fileDialog.launch("EXPORT " + format)
+                                    onClicked: exportTimer.formatName = format
                                 }
                             }
 
@@ -329,6 +333,27 @@ Item {
                                     else
                                         exportMenu.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
                                 }
+                            }
+                        }
+
+                        Timer {
+                            id: exportTimer
+                            property string formatName
+                            repeat: false
+                            interval: 10
+                            onFormatNameChanged: {
+                                if(formatName !== "")
+                                    start()
+                            }
+                            onTriggered: {
+                                if(formatName !== "") {
+                                    modalDialog.closeable = false
+                                    modalDialog.arguments = formatName
+                                    modalDialog.sourceComponent = exporterConfigurationComponent
+                                    modalDialog.popupSource = exportButton
+                                    modalDialog.active = true
+                                }
+                                formatName = ""
                             }
                         }
                     }
@@ -374,8 +399,13 @@ Item {
                                     start()
                             }
                             onTriggered: {
-                                if(reportName !== "")
-                                    scriteDocument.generateReport(reportName)
+                                if(reportName !== "") {
+                                    modalDialog.closeable = false
+                                    modalDialog.arguments = reportName
+                                    modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+                                    modalDialog.popupSource = reportsButton
+                                    modalDialog.active = true
+                                }
                                 reportName = ""
                             }
                         }
@@ -403,7 +433,7 @@ Item {
 
                 ToolButton2 {
                     icon.source: "../icons/content/language.png"
-                    text: app.transliterationSettings.languageAsString
+                    text: app.transliterationEngine.languageAsString
                     shortcut: "Ctrl+L"
                     shortcutText: "L"
                     // display: AbstractButton.IconOnly
@@ -420,15 +450,15 @@ Item {
                             width: 250
 
                             Repeater {
-                                model: app.enumerationModel(app.transliterationSettings, "Language")
+                                model: app.enumerationModel(app.transliterationEngine, "Language")
 
                                 MenuItem {
                                     property string baseText: modelData.key
-                                    property string shortcutKey: app.transliterationSettings.shortcutLetter(modelData.value)
+                                    property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
-                                    onClicked: app.transliterationSettings.language = modelData.value
+                                    onClicked: app.transliterationEngine.language = modelData.value
                                     checkable: true
-                                    checked: app.transliterationSettings.language === modelData.value
+                                    checked: app.transliterationEngine.language === modelData.value
                                 }
                             }
 
@@ -438,19 +468,19 @@ Item {
                                 text: "Next-Language (F10)"
                                 checkable: true
                                 checked: false
-                                onClicked: app.transliterationSettings.cycleLanguage()
+                                onClicked: app.transliterationEngine.cycleLanguage()
                             }
                         }
 
                         Repeater {
-                            model: app.enumerationModel(app.transliterationSettings, "Language")
+                            model: app.enumerationModel(app.transliterationEngine, "Language")
 
                             Item {
                                 Shortcut {
-                                    property string shortcutKey: app.transliterationSettings.shortcutLetter(modelData.value)
+                                    property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     context: Qt.ApplicationShortcut
                                     sequence: "Alt+"+shortcutKey
-                                    onActivated: app.transliterationSettings.language = modelData.value
+                                    onActivated: app.transliterationEngine.language = modelData.value
                                 }
                             }
                         }
@@ -458,7 +488,7 @@ Item {
                         Shortcut {
                             context: Qt.ApplicationShortcut
                             sequence: "F10"
-                            onActivated: app.transliterationSettings.cycleLanguage()
+                            onActivated: app.transliterationEngine.cycleLanguage()
                         }
                     }
                 }
@@ -907,19 +937,6 @@ Item {
                 }
             })
 
-            scriteDocument.supportedExportFormats.forEach(function(format) {
-                availableModes["EXPORT " + format] = {
-                    "nameFilters": scriteDocument.exportFormatFileSuffix(format),
-                    "selectExisting": false,
-                    "callback": function(path) {
-                        scriteDocument.exportFile(path, format)
-                        app.revealFileOnDesktop(path)
-                    },
-                    "reset": false,
-                    "notificationTitle": "Exporting Scrite project to " + format
-                }
-            })
-
             modes = availableModes
         }
 
@@ -971,21 +988,16 @@ Item {
         Notification.autoClose: true
     }
 
-    Connections {
-        target: scriteDocument
-        onGenerateReportRequest: {
-            modalDialog.closeable = false
-            modalDialog.arguments = reportName
-            modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-            modalDialog.popupSource = reportsButton
-            modalDialog.active = true
-        }
-    }
-
     Component {
         id: reportGeneratorConfigurationComponent
 
         ReportGeneratorConfiguration { }
+    }
+
+    Component {
+        id: exporterConfigurationComponent
+
+        ExporterConfiguration { }
     }
 
     Loader {

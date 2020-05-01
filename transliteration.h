@@ -15,6 +15,7 @@
 #define TRANSLITERATION_H
 
 #include <QMap>
+#include <QFont>
 #include <QObject>
 #include <QJsonArray>
 #include <QQmlEngine>
@@ -24,13 +25,13 @@ class QTextDocument;
 class QCoreApplication;
 class QQuickTextDocument;
 
-class TransliterationSettings : public QObject
+class TransliterationEngine : public QObject
 {
     Q_OBJECT
 
 public:
-    static TransliterationSettings *instance(QCoreApplication *app=nullptr);
-    ~TransliterationSettings();
+    static TransliterationEngine *instance(QCoreApplication *app=nullptr);
+    ~TransliterationEngine();
 
     enum Language
     {
@@ -61,6 +62,7 @@ public:
 
     Q_INVOKABLE void markLanguage(Language language, bool active);
     Q_INVOKABLE bool queryLanguage(Language language) const;
+    QMap<Language,bool> activeLanguages() const { return m_activeLanguages; }
 
     Q_PROPERTY(QJsonArray languages READ languages NOTIFY languagesChanged)
     QJsonArray languages() const;
@@ -70,16 +72,34 @@ public:
 
     void *transliterator() const { return m_transliterator; }
     void *transliteratorFor(Language language) const;
+    Language languageOf(void *transliterator) const;
+
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
     Q_INVOKABLE QString transliteratedSentence(const QString &sentence, bool includingLastWord=true) const;
 
+    QFont languageFont(Language language) const;
+    QStringList languageFontFilePaths(Language language) const;
+
+    struct Breakup
+    {
+        Breakup() : language(TransliterationEngine::English) { }
+        QString string;
+        QFont font;
+        TransliterationEngine::Language language;
+    };
+    QList<Breakup> breakupText(const QString &text) const;
+
+    void insertBreakupText(QTextCursor &cursor, const QString &text) const;
+
 private:
-    TransliterationSettings(QObject *parent=nullptr);
+    TransliterationEngine(QObject *parent=nullptr);
 
 private:
     void *m_transliterator = nullptr;
     Language m_language = English;
     QMap<Language,bool> m_activeLanguages;
+    QMap<Language,int> m_languageFontIdMap;
+    QMap<Language,QStringList> m_languageFontFilePaths;
 };
 
 class Transliterator : public QObject

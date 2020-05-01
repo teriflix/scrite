@@ -24,6 +24,7 @@
 #include "progressreport.h"
 #include "qobjectserializer.h"
 
+class AbstractExporter;
 class AbstractReportGenerator;
 
 class ScriteDocument : public QObject, public QObjectSerializer::Interface
@@ -113,11 +114,8 @@ public:
 
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
     Q_INVOKABLE bool exportFile(const QString &fileName, const QString &format);
-    Q_INVOKABLE void generateReport(const QString &report) {
-        emit generateReportRequest(report);
-    }
-    Q_SIGNAL void generateReportRequest(const QString &reportName);
 
+    Q_INVOKABLE AbstractExporter *createExporter(const QString &format);
     Q_INVOKABLE AbstractReportGenerator *createReportGenerator(const QString &report);
 
     Q_PROPERTY(QJsonArray structureElementSequence READ structureElementSequence NOTIFY structureElementSequenceChanged)
