@@ -27,6 +27,7 @@ public:
     ~PdfExporter();
 
     bool canBundleFonts() const { return false; }
+    bool requiresConfiguration() const { return false; }
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface

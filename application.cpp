@@ -330,6 +330,53 @@ AutoUpdate *Application::autoUpdate() const
     return AutoUpdate::instance();
 }
 
+QJsonObject Application::objectConfigurationFormInfo(const QObject *object, const QMetaObject *from=nullptr) const
+{
+    QJsonObject ret;
+    if(object == nullptr)
+            return ret;
+
+    if(from == nullptr)
+        from = object->metaObject();
+
+    const QMetaObject *mo = object->metaObject();
+    auto queryClassInfo = [mo](const char *key) {
+        const int ciIndex = mo->indexOfClassInfo(key);
+        if(ciIndex < 0)
+            return QString();
+        const QMetaClassInfo ci = mo->classInfo(ciIndex);
+        return QString::fromLatin1(ci.value());
+    };
+
+    auto queryPropertyInfo = [queryClassInfo](const QMetaProperty &prop, const char *key) {
+        const QString ciKey = QString::fromLatin1(prop.name()) + "_" + QString::fromLatin1(key);
+        return queryClassInfo(qPrintable(ciKey));
+    };
+
+    ret.insert("title", queryClassInfo("Title"));
+
+    QJsonArray fields;
+    for(int i=from->propertyOffset(); i<mo->propertyCount(); i++)
+    {
+        const QMetaProperty prop = mo->property(i);
+        if(!prop.isWritable() || !prop.isStored())
+            continue;
+
+        QJsonObject field;
+        field.insert("name", QString::fromLatin1(prop.name()));
+        field.insert("label", queryPropertyInfo(prop, "FieldLabel"));
+        field.insert("editor", queryPropertyInfo(prop, "FieldEditor"));
+        field.insert("min", queryPropertyInfo(prop, "FieldMinValue"));
+        field.insert("max", queryPropertyInfo(prop, "FieldMaxValue"));
+        field.insert("ideal", queryPropertyInfo(prop, "FieldDefaultValue"));
+        fields.append(field);
+    }
+
+    ret.insert("fields", fields);
+
+    return ret;
+}
+
 bool Application::notify(QObject *object, QEvent *event)
 {
     if(event->type() == QEvent::KeyPress)

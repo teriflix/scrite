@@ -41,18 +41,19 @@ bool TextExporter::doExport(QIODevice *device)
     const ScreenplayFormat *screenplayFormat = this->document()->formatting();
     const Screenplay *screenplay = this->document()->screenplay();
     const int nrScenes = screenplay->elementCount();
+    const int maxChars = m_maxLettersPerLine-1;
 
     QTextStream ts(device);
     ts.setCodec("utf-8");
     ts.setAutoDetectUnicode(true);
 
-    auto writeParagraph = [&ts,this](const SceneElementFormat *format, const QString &text) {
+    auto writeParagraph = [&ts,maxChars](const SceneElementFormat *format, const QString &text) {
         if(format->topMargin() > 0)
             ts << "\n";
 
-        const int maxCharsInBlock = int(qreal(m_maxLettersPerLine)*format->blockWidth());
-        const QString rightAlignPrefix(m_maxLettersPerLine-maxCharsInBlock, ' ');
-        const QString centerAlignPrefix(int(qreal(m_maxLettersPerLine-maxCharsInBlock)/2.0), ' ');
+        const int maxCharsInBlock = int(qreal(maxChars)*format->blockWidth());
+        const QString rightAlignPrefix(maxChars-maxCharsInBlock, ' ');
+        const QString centerAlignPrefix(int(qreal(maxChars-maxCharsInBlock)/2.0), ' ');
 
         QStringList words = text.trimmed().split(" ", QString::SkipEmptyParts);
         QStringList lines;

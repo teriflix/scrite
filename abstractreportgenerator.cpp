@@ -12,6 +12,8 @@
 ****************************************************************************/
 
 #include "abstractreportgenerator.h"
+
+#include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
 #include <QFileInfo>
@@ -126,40 +128,7 @@ bool AbstractReportGenerator::generate()
 
 QJsonObject AbstractReportGenerator::configurationFormInfo() const
 {
-    const QMetaObject *mo = this->metaObject();
-    auto queryClassInfo = [mo](const char *key) {
-        const int ciIndex = mo->indexOfClassInfo(key);
-        if(ciIndex < 0)
-            return QString();
-        const QMetaClassInfo ci = mo->classInfo(ciIndex);
-        return QString::fromLatin1(ci.value());
-    };
-
-    auto queryPropertyInfo = [queryClassInfo](const QMetaProperty &prop, const char *key) {
-        const QString ciKey = QString::fromLatin1(prop.name()) + "_" + QString::fromLatin1(key);
-        return queryClassInfo(qPrintable(ciKey));
-    };
-
-    QJsonObject ret;
-    ret.insert("title", queryClassInfo("Title"));
-
-    QJsonArray fields;
-    for(int i=AbstractReportGenerator::staticMetaObject.propertyOffset(); i<mo->propertyCount(); i++)
-    {
-        const QMetaProperty prop = mo->property(i);
-        if(!prop.isWritable() || !prop.isStored())
-            continue;
-
-        QJsonObject field;
-        field.insert("name", QString::fromLatin1(prop.name()));
-        field.insert("label", queryPropertyInfo(prop, "FieldLabel"));
-        field.insert("editor", queryPropertyInfo(prop, "FieldEditor"));
-        fields.append(field);
-    }
-
-    ret.insert("fields", fields);
-
-    return ret;
+    return Application::instance()->objectConfigurationFormInfo(this, &AbstractReportGenerator::staticMetaObject);
 }
 
 QString AbstractReportGenerator::polishFileName(const QString &fileName) const

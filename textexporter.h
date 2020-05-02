@@ -27,7 +27,13 @@ public:
     ~TextExporter();
 
     bool canBundleFonts() const { return false; }
+    bool requiresConfiguration() const { return true; }
 
+    Q_CLASSINFO("maxLettersPerLine_FieldLabel", "Number of characters per line")
+    Q_CLASSINFO("maxLettersPerLine_FieldEditor", "IntegerSpinBox")
+    Q_CLASSINFO("maxLettersPerLine_FieldMinValue", "30")
+    Q_CLASSINFO("maxLettersPerLine_FieldMaxValue", "150")
+    Q_CLASSINFO("maxLettersPerLine_FieldDefaultValue", "60")
     Q_PROPERTY(int maxLettersPerLine READ maxLettersPerLine WRITE setMaxLettersPerLine NOTIFY maxLettersPerLineChanged)
     void setMaxLettersPerLine(int val);
     int maxLettersPerLine() const { return m_maxLettersPerLine; }

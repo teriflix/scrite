@@ -27,6 +27,7 @@ public:
     ~HtmlExporter();
 
     bool canBundleFonts() const { return true; }
+    bool requiresConfiguration() const { return false; }
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface

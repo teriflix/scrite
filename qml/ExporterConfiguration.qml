@@ -19,9 +19,10 @@ import QtQuick.Controls 2.13
 Item {
     id: configurationBox
     property AbstractExporter exporter
+    property var formInfo: exporter ? exporter.configurationFormInfo() : {"title": "Unknown", "fields": []}
 
     width: 700
-    height: exporter && exporter.canBundleFonts ? 500 : 250
+    height: exporter && (exporter.requiresConfiguration || exporter.canBundleFonts) ? 500 : 250
 
     Component.onCompleted: {
         exporter = scriteDocument.createExporter(modalDialog.arguments)
@@ -78,7 +79,7 @@ Item {
 
                 Column {
                     width: formView.width - (formView.scrollBarRequired ? 17 : 0)
-                    spacing: 10
+                    spacing: 20
 
                     Text {
                         font.pointSize: 30
@@ -148,6 +149,20 @@ Item {
                             }
                         }
                     }
+
+                    Repeater {
+                        model: formInfo.fields
+
+                        Loader {
+                            width: formView.width
+                            active: true
+                            sourceComponent: loadFieldEditor(modelData.editor)
+                            onItemChanged: {
+                                if(item)
+                                    item.fieldInfo = modelData
+                            }
+                        }
+                    }
                 }
             }
 
@@ -187,6 +202,49 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    function loadFieldEditor(kind) {
+        if(kind === "IntegerSpinBox")
+            return editor_IntegerSpinBox
+        return editor_Unknown
+    }
+
+    Component {
+        id: editor_IntegerSpinBox
+
+        Column {
+            property var fieldInfo
+            spacing: 10
+
+            Text {
+                text: fieldInfo.label
+                width: parent.width
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
+            }
+
+            SpinBox {
+                from: fieldInfo.min
+                to: fieldInfo.max
+                value: exporter ? exporter.getConfigurationValue(fieldInfo.name) : 0
+                onValueModified: {
+                    if(exporter)
+                        exporter.setConfigurationValue(fieldInfo.name, value)
+                }
+            }
+        }
+    }
+
+    Component {
+        id: editor_Unknown
+
+        Text {
+            property var fieldInfo
+            textFormat: Text.RichText
+            text: "Do not know how to configure <strong>" + fieldInfo.name + "</strong>"
         }
     }
 }

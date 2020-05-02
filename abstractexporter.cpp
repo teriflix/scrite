@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "abstractexporter.h"
+#include "application.h"
 
 AbstractExporter::AbstractExporter(QObject *parent)
                  :AbstractDeviceIO(parent)
@@ -40,6 +41,11 @@ QString AbstractExporter::nameFilters() const
 {
     const int cii = this->metaObject()->indexOfClassInfo("NameFilters");
     return QString::fromLatin1(this->metaObject()->classInfo(cii).value());
+}
+
+QJsonObject AbstractExporter::configurationFormInfo() const
+{
+    return Application::instance()->objectConfigurationFormInfo(this, &AbstractExporter::staticMetaObject);
 }
 
 bool AbstractExporter::write()

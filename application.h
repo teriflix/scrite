@@ -150,6 +150,8 @@ public:
     Q_PROPERTY(AutoUpdate* autoUpdate READ autoUpdate CONSTANT)
     AutoUpdate *autoUpdate() const;
 
+    Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object, const QMetaObject *from) const;
+
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
 
