@@ -22,7 +22,8 @@ Item {
     property var formInfo: exporter ? exporter.configurationFormInfo() : {"title": "Unknown", "fields": []}
 
     width: 700
-    height: exporter && (exporter.requiresConfiguration || exporter.canBundleFonts) ? 500 : 250
+    height: exporter && (exporter.requiresConfiguration || exporter.canBundleFonts) ?
+            Math.min(700, contentLoader.item.idealHeight) : 250
 
     Component.onCompleted: {
         exporter = scriteDocument.createExporter(modalDialog.arguments)
@@ -45,9 +46,11 @@ Item {
     }
 
     Loader {
+        id: contentLoader
         anchors.fill: parent
         active: exporter
         sourceComponent: Item {
+            property real idealHeight: formView.contentHeight + buttonRow.height + 50
             FileDialog {
                 id: filePathDialog
                 folder: {
@@ -73,6 +76,7 @@ Item {
                 anchors.bottom: buttonRow.top
                 anchors.margins: 20
                 anchors.bottomMargin: 10
+                clip: true
 
                 property bool scrollBarRequired: formView.height < formView.contentHeight
                 ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -208,6 +212,8 @@ Item {
     function loadFieldEditor(kind) {
         if(kind === "IntegerSpinBox")
             return editor_IntegerSpinBox
+        if(kind === "CheckBox")
+            return editor_CheckBox
         return editor_Unknown
     }
 
@@ -235,6 +241,18 @@ Item {
                         exporter.setConfigurationValue(fieldInfo.name, value)
                 }
             }
+        }
+    }
+
+    Component {
+        id: editor_CheckBox
+
+        CheckBox {
+            property var fieldInfo
+            text: fieldInfo.label
+            checkable: true
+            checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
+            onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
         }
     }
 

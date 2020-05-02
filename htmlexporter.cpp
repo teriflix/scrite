@@ -28,6 +28,15 @@ HtmlExporter::~HtmlExporter()
 
 }
 
+void HtmlExporter::setExportWithSceneColors(bool val)
+{
+    if(m_exportWithSceneColors == val)
+        return;
+
+    m_exportWithSceneColors = val;
+    emit exportWithSceneColorsChanged();
+}
+
 bool HtmlExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
@@ -211,12 +220,16 @@ bool HtmlExporter::doExport(QIODevice *device)
             continue;
 
         const Scene *scene = screenplayElement->scene();
-        const QColor sceneColor = scene->color();
-        const QString sceneColorText = "rgba(" + QString::number(sceneColor.red()) + "," +
-                                                 QString::number(sceneColor.green()) + "," +
-                                                 QString::number(sceneColor.blue()) + ",0.1)";
 
-        ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\" style=\"background-color: " << sceneColorText << ";\">\n";
+        if(m_exportWithSceneColors)
+        {
+            const QColor sceneColor = scene->color();
+            const QString sceneColorText = "rgba(" + QString::number(sceneColor.red()) + "," +
+                    QString::number(sceneColor.green()) + "," +
+                    QString::number(sceneColor.blue()) + ",0.1)";
+            ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\" style=\"background-color: " << sceneColorText << ";\">\n";
+        }
+
         const SceneHeading *heading = scene->heading();
         if(heading->isEnabled())
         {
@@ -231,7 +244,8 @@ bool HtmlExporter::doExport(QIODevice *device)
             writeParagraph(element->type(), element->formattedText());
         }
 
-        ts << "      </div>\n";
+        if(m_exportWithSceneColors)
+            ts << "      </div>\n";
     }
 
     ts << "    </div>\n\n";

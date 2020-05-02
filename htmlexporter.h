@@ -26,12 +26,22 @@ public:
     Q_INVOKABLE HtmlExporter(QObject *parent=nullptr);
     ~HtmlExporter();
 
+    Q_CLASSINFO("exportWithSceneColors_FieldLabel", "Export with scene colors")
+    Q_CLASSINFO("exportWithSceneColors_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool exportWithSceneColors READ isExportWithSceneColors WRITE setExportWithSceneColors NOTIFY exportWithSceneColorsChanged)
+    void setExportWithSceneColors(bool val);
+    bool isExportWithSceneColors() const { return m_exportWithSceneColors; }
+    Q_SIGNAL void exportWithSceneColorsChanged();
+
     bool canBundleFonts() const { return true; }
-    bool requiresConfiguration() const { return false; }
+    bool requiresConfiguration() const { return true; }
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+
+private:
+    bool m_exportWithSceneColors = true;
 };
 
 #endif // HTMLEXPORTER_H
