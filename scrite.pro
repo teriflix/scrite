@@ -27,6 +27,8 @@ HEADERS += \
     finaldraftimporter.h \
     focustracker.h \
     formatting.h \
+    fountainexporter.h \
+    fountainimporter.h \
     garbagecollector.h \
     gridbackgrounditem.h \
     hourglass.h \
@@ -87,6 +89,8 @@ SOURCES += \
     finaldraftimporter.cpp \
     focustracker.cpp \
     formatting.cpp \
+    fountainexporter.cpp \
+    fountainimporter.cpp \
     garbagecollector.cpp \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \

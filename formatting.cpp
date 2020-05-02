@@ -322,7 +322,6 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Heading]->fontRef().setBold(true);
     m_elementFormats[SceneElement::Heading]->fontRef().setPointSize(m_defaultFont.pointSize()+2);
     m_elementFormats[SceneElement::Heading]->fontRef().setCapitalization(QFont::AllUppercase);
-
 }
 
 SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)

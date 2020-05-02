@@ -24,6 +24,8 @@
 #include "textexporter.h"
 #include "htmlimporter.h"
 #include "qobjectfactory.h"
+#include "fountainimporter.h"
+#include "fountainexporter.h"
 #include "structureexporter.h"
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
@@ -58,12 +60,14 @@ DeviceIOFactories::DeviceIOFactories()
 {
     ImporterFactory.addClass<FinalDraftImporter>();
     ImporterFactory.addClass<HtmlImporter>();
+    ImporterFactory.addClass<FountainImporter>();
 
     ExporterFactory.addClass<PdfExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
     ExporterFactory.addClass<StructureExporter>();
+    ExporterFactory.addClass<FountainExporter>();
     // ExporterFactory.addClass<OdtExporter>();
 
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
@@ -607,7 +611,16 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
         m_formatting->deleteLater();
 
     m_formatting = val;
-    m_formatting->setParent(this);
+    if(m_formatting != nullptr)
+    {
+        m_formatting->setParent(this);
+
+        // Hack to ensure that onscreen top-margin is 25px by default
+        m_formatting->elementFormat(SceneElement::Action)->setTopMargin(25);
+        m_formatting->elementFormat(SceneElement::Character)->setTopMargin(25);
+        m_formatting->elementFormat(SceneElement::Shot)->setTopMargin(25);
+        m_formatting->elementFormat(SceneElement::Transition)->setTopMargin(25);
+    }
 
     emit formattingChanged();
 }
@@ -621,7 +634,16 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
         m_printFormat->deleteLater();
 
     m_printFormat = val;
-    m_printFormat->setParent(this);
+    if(m_formatting != nullptr)
+    {
+        m_printFormat->setParent(this);
+
+        // Hack to ensure that onscreen top-margin is 10px by default
+        m_printFormat->elementFormat(SceneElement::Action)->setTopMargin(10);
+        m_printFormat->elementFormat(SceneElement::Character)->setTopMargin(10);
+        m_printFormat->elementFormat(SceneElement::Shot)->setTopMargin(10);
+        m_printFormat->elementFormat(SceneElement::Transition)->setTopMargin(10);
+    }
 
     emit printFormatChanged();
 }
