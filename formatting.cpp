@@ -313,7 +313,9 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Parenthetical]->fontRef().setItalic(true);
     m_elementFormats[SceneElement::Parenthetical]->setTopMargin(0);
 
-    m_elementFormats[SceneElement::Shot]->setTextAlignment(Qt::AlignRight);
+    m_elementFormats[SceneElement::Shot]->setTextAlignment(Qt::AlignLeft);
+    m_elementFormats[SceneElement::Shot]->setBlockWidth(0.85);
+    m_elementFormats[SceneElement::Shot]->setBlockAlignment(Qt::AlignCenter);
     m_elementFormats[SceneElement::Shot]->fontRef().setCapitalization(QFont::AllUppercase);
 
     m_elementFormats[SceneElement::Transition]->setTextAlignment(Qt::AlignRight);

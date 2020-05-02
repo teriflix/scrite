@@ -28,6 +28,8 @@ FountainExporter::~FountainExporter()
 
 bool FountainExporter::doExport(QIODevice *device)
 {
+    // Have tried to generate the Fountain file as closely as possible to
+    // the syntax described here: https://fountain.io/syntax
     const Screenplay *screenplay = this->document()->screenplay();
     const int nrElements = screenplay->elementCount();
 
@@ -83,14 +85,12 @@ bool FountainExporter::doExport(QIODevice *device)
             for(int j=0; j<nrParas; j++)
             {
                 const SceneElement *para = scene->elementAt(j);
+                if(para->type() == SceneElement::Transition)
+                    ts << "> ";
                 ts << para->formattedText();
                 switch(para->type())
                 {
                 case SceneElement::Transition:
-                    ts << ":";
-#ifdef Q_OS_MAC
-                    [[clang::fallthrough]];
-#endif
                 case SceneElement::Heading:
                 case SceneElement::Shot:
                 case SceneElement::Action:

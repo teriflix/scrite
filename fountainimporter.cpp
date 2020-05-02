@@ -26,16 +26,24 @@ FountainImporter::~FountainImporter()
 
 bool FountainImporter::doImport(QIODevice *device)
 {
+    // Have tried to parse the Fountain file as closely as possible to
+    // the syntax described here: https://fountain.io/syntax
     ScriteDocument *doc = this->document();
     Screenplay *screenplay = doc->screenplay();
 
     int sceneCounter = 0;
+    Scene *previousScene = nullptr;
     Scene *currentScene = nullptr;
     static const QStringList headerhints = QStringList() <<
-            "INT" << "EXT" << "EST" << "INT./EXT" << "INT/EXT" << "I/E";
+            "." << "INT" << "EXT" << "EST" << "INT./EXT" << "INT/EXT" << "I/E";
     bool inCharacter = false;
     bool hasParaBreaks = false;
-    auto maybeCharacter = [](const QString &text) {
+    auto maybeCharacter = [](QString &text) {
+        if(text.startsWith("@")) {
+            text = text.mid(1).trimmed();
+            return true;
+        }
+
         for(int i=0; i<text.length(); i++) {
             const QChar ch = text.at(i);
             if(ch.isLetter()) {
@@ -43,6 +51,7 @@ bool FountainImporter::doImport(QIODevice *device)
                     return  false;
             }
         }
+
         return true;
     };
 
@@ -85,12 +94,23 @@ bool FountainImporter::doImport(QIODevice *device)
             line = line.mid(bcIndex+1).trimmed();
         }
 
+        // We do not support other formatting features from the fountain syntax
+        line = line.remove("_");
+        line = line.remove("*");
+        line = line.remove("^");
+
         // detect if ths line contains a header.
         bool isHeader = false;
         Q_FOREACH(QString hint, headerhints)
         {
             if(line.startsWith(hint))
             {
+                if(hint == headerhints.first())
+                {
+                    isHeader = true;
+                    break;
+                }
+
                 const QChar sep = line.at(hint.length());
                 if(sep.isSpace() || sep == '.')
                 {
@@ -104,10 +124,25 @@ bool FountainImporter::doImport(QIODevice *device)
         {
             ++sceneCounter;
             screenplay->setCurrentElementIndex(-1);
+            previousScene = currentScene;
             currentScene = doc->createNewScene();
+
             SceneHeading *heading = currentScene->heading();
-            heading->parseFrom(line);
-            currentScene->setTitle("[" + QString::number(sceneCounter) + "]: Scene at " + heading->location());
+            if(line.startsWith("."))
+            {
+                line = line.mid(1).trimmed();
+                heading->setLocationType( previousScene ? previousScene->heading()->locationType() : "I/E" );
+                heading->setLocation(line);
+                heading->setMoment( previousScene ? previousScene->heading()->moment() : "DAY" );
+            }
+            else
+                heading->parseFrom(line);
+
+            QString locationForTitle = heading->location();
+            if(locationForTitle.length() > 25)
+                locationForTitle = locationForTitle.left(22) + "...";
+
+            currentScene->setTitle("[" + QString::number(sceneCounter) + "]: Scene at " + locationForTitle);
 
             static const QList<QColor> sceneColors = QList<QColor>() <<
                     QColor("purple") << QColor("blue") << QColor("orange") <<
@@ -150,6 +185,17 @@ bool FountainImporter::doImport(QIODevice *device)
         if(line.endsWith("TO:", Qt::CaseInsensitive))
         {
             para->setType(SceneElement::Transition);
+            currentScene->addElement(para);
+            continue;
+        }
+
+        if(line.startsWith(">"))
+        {
+            line = line.mid(1).trimmed();
+            if(line.endsWith("<"))
+                line = line.left(line.length()-1);
+            para->setText(line);
+            para->setType(SceneElement::Shot);
             currentScene->addElement(para);
             continue;
         }
