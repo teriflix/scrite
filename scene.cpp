@@ -687,7 +687,7 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
         return nullptr;
 
     const int index = this->indexOfElement(element);
-    if(index < 0 || index == this->elementCount()-1)
+    if(index < 0)
         return nullptr;
 
     // We cannot split the scene across these types.
