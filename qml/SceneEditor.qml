@@ -56,11 +56,12 @@ Item {
             property bool viewOnly: true
             active: scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
             sourceComponent: sceneHeadingComponent.get
+            clip: true
 
             DelayedPropertyBinder {
                 id: loaderHeight
                 initial: 40
-                set: Math.max(sceneHeadingLoader.viewOnly && sceneHeadingLoader.item ? sceneHeadingLoader.item.height : initial, initial)
+                set: Math.max(sceneHeadingLoader.viewOnly && sceneHeadingLoader.item ? sceneHeadingLoader.item.contentHeight : initial, initial)
             }
 
             DelayedPropertyBinder {
@@ -410,7 +411,7 @@ Item {
         Rectangle {
             property font headingFont: sceneHeadingFormat.font
             Component.onCompleted: {
-                headingFont.pointSize = headingFont.pointSize+8
+                headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
                 locTypeEdit.forceActiveFocus()
             }
             color: "white"
@@ -478,10 +479,12 @@ Item {
         Rectangle {
             color: Qt.tint(scene.color, "#D9FFFFFF")
             property font headingFont: sceneHeadingFormat.font
-            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+8
+            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
             radius: contentEditorArea.radius
+            property real contentHeight: sceneHeadingText.contentHeight
 
             Text {
+                id: sceneHeadingText
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: 20
