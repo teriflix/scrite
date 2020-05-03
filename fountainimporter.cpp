@@ -108,13 +108,18 @@ bool FountainImporter::doImport(QIODevice *device)
         line = line.remove("*");
         line = line.remove("^");
 
+        if(line=="THE KEY TO THE CITY.")
+            qDebug("Pay attention.");
+
         // detect if ths line contains a header.
         bool isHeader = false;
-        if(!inCharacter)
+        if(!inCharacter && !isHeader)
         {
-            const QChar sep = line.at(0);
-            if(sep == '.')
-                isHeader = true;
+            if(line.length() >= 2)
+            {
+                if(line.at(0) == '.' && line.at(1) != ".")
+                    isHeader = true;
+            }
 
             if(isHeader == false)
             {
@@ -122,11 +127,8 @@ bool FountainImporter::doImport(QIODevice *device)
                 {
                     if(line.startsWith(hint))
                     {
-                        if(hint == headerhints.first())
-                        {
-                            isHeader = true;
-                            break;
-                        }
+                        isHeader = true;
+                        break;
                     }
                 }
             }
@@ -211,7 +213,6 @@ bool FountainImporter::doImport(QIODevice *device)
                     character = new Character(structure);
                 character->setName(line.trimmed());
                 structure->addCharacter(character);
-                continue;
             }
             else if(character != nullptr)
             {
