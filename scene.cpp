@@ -562,6 +562,11 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     this->endInsertRows();
 
     emit elementCountChanged();
+
+    // To ensure that character names are collected under all-character names
+    // while an import is being done.
+    if(ptr->type() == SceneElement::Character)
+        emit sceneElementChanged(ptr, ElementTypeChange);
 }
 
 void Scene::removeElement(SceneElement *ptr)

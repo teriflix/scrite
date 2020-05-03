@@ -292,7 +292,7 @@ Item {
                                         wrapMode: Text.WordWrap
                                         text: note.heading
                                         font.bold: true
-                                        font.pixelSize: 18
+                                        font.pixelSize: 20
                                         renderType: Text.NativeRendering
                                         onTextChanged: {
                                             if(activeFocus)
@@ -351,7 +351,7 @@ Item {
                                 text: note.content
                                 textFormat: TextArea.PlainText
                                 renderType: Text.NativeRendering
-                                font.pixelSize: 16
+                                font.pixelSize: 18
                                 onTextChanged: {
                                     if(activeFocus)
                                         note.content = text
