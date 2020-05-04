@@ -79,23 +79,43 @@ bool FountainExporter::doExport(QIODevice *device)
             const Scene *scene = element->scene();
             const SceneHeading *heading = scene->heading();
             if(heading->isEnabled())
-                ts << heading->text() << "\n\n";
+                ts << "." << heading->text() << "\n\n";
 
             const int nrParas = scene->elementCount();
             for(int j=0; j<nrParas; j++)
             {
                 const SceneElement *para = scene->elementAt(j);
-                if(para->type() == SceneElement::Transition)
+
+                switch(para->type())
+                {
+                case SceneElement::Shot:
+                case SceneElement::Transition:
                     ts << "> ";
+                    break;
+                case SceneElement::Heading:
+                    ts << ".";
+                    break;
+                case SceneElement::Character:
+                    ts << "@";
+                    break;
+                case SceneElement::Action:
+                case SceneElement::Dialogue:
+                case SceneElement::Parenthetical:
+                    break;
+                }
+
                 ts << para->formattedText();
+
                 switch(para->type())
                 {
                 case SceneElement::Transition:
                 case SceneElement::Heading:
-                case SceneElement::Shot:
                 case SceneElement::Action:
                 case SceneElement::Dialogue:
                     ts << "\n\n";
+                    break;
+                case SceneElement::Shot:
+                    ts << "<\n\n";
                     break;
                 case SceneElement::Character:
                 case SceneElement::Parenthetical:
