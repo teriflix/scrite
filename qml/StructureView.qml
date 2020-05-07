@@ -149,7 +149,14 @@ Item {
 
             transformOrigin: Item.TopLeft
 
-            DelayedPropertyBinder{
+            Image {
+                anchors.fill: parent
+                fillMode: Image.Tile
+                source: "../images/notebookpage.jpg"
+                opacity: 0.5
+            }
+
+            DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
                 set: Math.max((Math.ceil(canvas.childrenRect.right / 100) * 100), initial)
@@ -707,6 +714,7 @@ Item {
                     fromElement: scriteDocument.structure.elementAt(modelData.from)
                     toElement: scriteDocument.structure.elementAt(modelData.to)
                     arrowAndLabelSpacing: labelBg.width
+                    outlineWidth: app.devicePixelRatio*2
 
                     Rectangle {
                         id: labelBg

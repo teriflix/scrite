@@ -45,6 +45,7 @@ public:
     ~Application();
 
     Q_PROPERTY(QPalette palette READ palette CONSTANT)
+    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio CONSTANT)
 
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) { return url.toLocalFile(); }
 

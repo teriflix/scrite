@@ -97,8 +97,8 @@ Rectangle {
         category: "Structure Canvas"
 
         property bool showGrid: true
-        property color gridColor: "darkgray"
-        property color canvasColor: "#F8ECC2"
+        property color gridColor: "lightgray"
+        property color canvasColor: "#cfd8dc"
     }
 
     function askQuestion(params, popupSource) {
