@@ -450,7 +450,7 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     return ret;
 }
 
-static const QString dateTimeFormat("d MMM yyyy, hh:mm");
+// static const QString dateTimeFormat("d MMM yyyy, hh:mm");
 
 AbstractExporter *ScriteDocument::createExporter(const QString &format)
 {
@@ -467,7 +467,8 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
             suggestedName = " " + m_screenplay->subtitle();
         if(suggestedName.isEmpty())
             suggestedName = "Scrite Screenplay";
-        suggestedName += " " + QDateTime::currentDateTime().toString(dateTimeFormat);
+        // suggestedName += " " + QDateTime::currentDateTime().toString(dateTimeFormat);
+        suggestedName += " " + QString::number(QDateTime::currentSecsSinceEpoch());
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
@@ -500,7 +501,8 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 
         const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
-        const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString(dateTimeFormat) + suffix;
+        // const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString(dateTimeFormat) + suffix;
+        const QString suggestedName = reportName + " - " + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix;
 
         QFileInfo fi(m_fileName);
         if(fi.exists())

@@ -79,6 +79,7 @@ Item {
 
                 property bool scrollBarRequired: formView.height < formView.contentHeight
                 ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
                 Column {
                     width: formView.width - (formView.scrollBarRequired ? 17 : 0)

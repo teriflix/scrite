@@ -313,6 +313,7 @@ Item {
                 height: parent.height
                 anchors.right: parent.right
                 ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
                 Column {
                     spacing: 20
@@ -611,6 +612,7 @@ Item {
             property var pageData: pageModel.get(pageList.currentIndex)
             property ScreenplayFormat format: pageData.group === "On Screen Format" ? scriteDocument.formatting : scriteDocument.printFormat
             property SceneElementFormat elementFormat: format.elementFormat(pageData.elementType)
+            ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
             Column {
                 width: scrollView.width
@@ -940,6 +942,7 @@ Item {
                 anchors.margins: 5
                 contentWidth: width
                 contentHeight: appSettingsPageContent.height
+                ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
                 Item {
                     width: appSettingsScrollView.width
