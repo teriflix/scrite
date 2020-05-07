@@ -105,8 +105,9 @@ Item {
             id: contentEditorLoader
             anchors.fill: parent
             anchors.leftMargin: 10
-            anchors.rightMargin: 10
+            anchors.rightMargin: scrollable ? 0 : 10
             active: true
+            clip: true
             sourceComponent: scrollable ? scrollableSceneContentEditorComponent : sceneContentEditorComponent
         }
     }
@@ -122,17 +123,18 @@ Item {
     Component {
         id: scrollableSceneContentEditorComponent
 
-        ScrollArea {
+        ScrollView {
             id: scrollView
             ScrollBar.vertical.minimumSize: 0.1
             contentWidth: width
             contentHeight: loader.height
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-            ScrollBar.vertical.policy: height < contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
             Item {
                 width: scrollView.width
-                height: loader.height
+                height: loader.item ? loader.item.contentHeight : loader.height
 
                 Loader {
                     id: loader
@@ -149,7 +151,7 @@ Item {
                 }
             }
 
-            Component.onCompleted: scrollView.ensureVisible( Qt.rect(0,0,10,10), 1.0, 0 )
+            Component.onCompleted: ScrollBar.vertical.position = 0
         }
     }
 
