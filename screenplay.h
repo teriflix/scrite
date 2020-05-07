@@ -166,6 +166,9 @@ public:
     int currentElementIndex() const { return m_currentElementIndex; }
     Q_SIGNAL void currentElementIndexChanged();
 
+    Q_INVOKABLE int previousSceneElementIndex();
+    Q_INVOKABLE int nextSceneElementIndex();
+
     Q_PROPERTY(Scene* activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged STORED false)
     void setActiveScene(Scene* val);
     Scene* activeScene() const { return m_activeScene; }

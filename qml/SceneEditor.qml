@@ -48,7 +48,6 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.margins: headerMargins
         height: sceneHeadingLoader.active ? sceneHeadingLoader.height : 0
 
         Loader {
@@ -302,6 +301,16 @@ Item {
                     event.accepted = true
                     requestScrollDown()
                 }
+            }
+            Keys.onPressed: {
+                if(event.key === Qt.Key_PageUp) {
+                    requestScrollUp()
+                    event.accepted = true
+                } else if(event.key === Qt.Key_PageDown) {
+                    requestScrollDown()
+                    event.accepted = true
+                } else
+                    event.accepted = false
             }
 
             MouseArea {

@@ -896,6 +896,48 @@ void Screenplay::setCurrentElementIndex(int val)
         this->setActiveScene(nullptr);
 }
 
+int Screenplay::nextSceneElementIndex()
+{
+    int index = m_currentElementIndex+1;
+    while(index < m_elements.size()-1)
+    {
+        ScreenplayElement *element = m_elements.at(index);
+        if(element->elementType() == ScreenplayElement::BreakElementType)
+        {
+            ++index;
+            continue;
+        }
+
+        break;
+    }
+
+    if(index < m_elements.size())
+        return index;
+
+    return m_elements.size()-1;
+}
+
+int Screenplay::previousSceneElementIndex()
+{
+    int index = m_currentElementIndex-1;
+    while(index >= 0)
+    {
+        ScreenplayElement *element = m_elements.at(index);
+        if(element->elementType() == ScreenplayElement::BreakElementType)
+        {
+            --index;
+            continue;
+        }
+
+        break;
+    }
+
+    if(index >= 0)
+        return index;
+
+    return 0;
+}
+
 void Screenplay::setActiveScene(Scene *val)
 {
     if(m_activeScene == val)

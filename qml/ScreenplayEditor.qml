@@ -236,40 +236,29 @@ Item {
                 }
 
                 onRequestScrollUp: {
-                    if(index === 0) {
+                    var idx = scriteDocument.screenplay.previousSceneElementIndex()
+                    if(idx === 0 && idx === index) {
                         screenplayListView.positionViewAtBeginning()
+                        assumeFocusAt(0)
                         return
                     }
 
-                    var item = null
-                    var idx = index
-                    while(idx > 0) {
-                        screenplayListView.positionViewAtIndex(idx-1, ListView.visible)
-                        item = screenplayListView.itemAtIndex(idx-1)
-                        if(item && item.hasSceneContent) {
-                            item.item.assumeFocusAt(-1)
-                            break
-                        }
-                        idx = idx-1
-                    }
+                    screenplayListView.positionViewAtIndex(idx, ListView.Visible)
+                    var item = screenplayListView.itemAtIndex(idx)
+                    item.item.assumeFocusAt(-1)
                 }
 
                 onRequestScrollDown: {
-                    if(index === scriteDocument.screenplay.elementCount-1) {
+                    var idx = scriteDocument.screenplay.nextSceneElementIndex()
+                    if(idx === scriteDocument.screenplay.elementCount-1 && idx === index) {
                         screenplayListView.positionViewAtEnd()
+                        assumeFocusAt(-1)
                         return
                     }
 
-                    var item = null
-                    var idx = index
-                    while(idx < scriteDocument.screenplay.elementCount) {
-                        item = screenplayListView.itemAtIndex(idx+1)
-                        if(item && item.hasSceneContent) {
-                            item.item.assumeFocusAt(0)
-                            break
-                        }
-                        idx = idx+1
-                    }
+                    screenplayListView.positionViewAtIndex(idx, ListView.Visible)
+                    var item = screenplayListView.itemAtIndex(idx)
+                    item.item.assumeFocusAt(0)
                 }
 
                 TextDocumentSearch {
