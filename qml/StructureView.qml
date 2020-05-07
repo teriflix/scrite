@@ -232,12 +232,16 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: parent.newElementMode
                 cursorShape: parent.newElementMode ? Qt.DragMoveCursor : Qt.ArrowCursor
-                onDoubleClicked: canvas.createElement(mouse.x-130, mouse.y-22, parent.newElementColor)
                 preventStealing: true
                 property bool selectRectWasJustCreated: false
+
+                onDoubleClicked: {
+                    canvas.createElement(mouse.x-130, mouse.y-22, parent.newElementColor)
+                }
+
                 onClicked: {
                     parent.forceActiveFocus()
-                    if(selectRectWasJustCreated)
+                    if(selectRectWasJustCreated || mouse.modifiers & Qt.ControlModifier)
                         return
 
                     selectionRect.visible = false
@@ -251,9 +255,19 @@ Item {
                     }
                 }
 
+                onPositionChanged: {
+                    if(!selectionRect.visible || selectionRect.enabled) {
+                        mouse.accepted = false
+                        return;
+                    }
+
+                    selectionRect.to = Qt.point(mouse.x, mouse.y)
+                    selectionRect.enabled = false
+                }
+
                 onPressed: {
                     parent.forceActiveFocus()
-                    if(parent.newElementMode || selectionRect.enabled)
+                    if(parent.newElementMode || selectionRect.enabled || mouse.modifiers & Qt.ControlModifier)
                         return
 
                     if(mouse.modifiers & Qt.ControlModifier) {
@@ -266,20 +280,10 @@ Item {
                         mouse.accepted = false
                 }
 
-                onPositionChanged: {
-                    if(!selectionRect.visible || selectionRect.enabled) {
-                        mouse.accepted = false
-                        return;
-                    }
-
-                    selectionRect.to = Qt.point(mouse.x, mouse.y)
-                    selectionRect.enabled = false
-                }
-
                 onReleased: {
-                    if(!selectionRect.visible || selectionRect.enabled) {
+                    if(!selectionRect.visible || selectionRect.enabled || mouse.modifiers & Qt.ControlModifier) {
                         mouse.accepted = false
-                        return;
+                        return
                     }
 
                     selectionRect.to = Qt.point(mouse.x, mouse.y)
@@ -672,7 +676,7 @@ Item {
             font.pixelSize: 30
             enabled: false
             renderType: Text.NativeRendering
-            text: "Create scenes by clicking on the 'Add Scene' button OR click on an empty area in this canvas and press the 'N' key."
+            text: "Create scenes by clicking on the 'Add Scene' button OR double-click while holding the " + app.polishShortcutTextForDisplay("Ctrl") + " key."
         }
     }
 
