@@ -849,6 +849,12 @@ Item {
                 property StructureElement element: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
                 scene: element ? element.scene : null
 
+                onSplitSceneRequest: {
+                    showInformation({
+                            "message": "You can split a scene only when its edited in the context of a screenplay, not when edited as an independent scene.",
+                        }, this)
+                }
+
                 SearchAgent.engine: searchBar.searchEngine
                 SearchAgent.textDocument: editor.textDocument
                 SearchAgent.onHighlightText: {

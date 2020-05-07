@@ -746,8 +746,12 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
         if(position <= 0)
             return qMakePair<QString,QString>(QString(), text);
 
-        return qMakePair<QString,QString>( text.left(position).trimmed() + ".",
-                                           text.mid(position) );
+        QString first = text.left(position).trimmed();
+        QString second = text.mid(position);
+        if(!first.endsWith("."))
+            first += ".";
+
+        return qMakePair<QString,QString>(first, second);
     };
 
     switch(element->type())

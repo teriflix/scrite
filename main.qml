@@ -101,6 +101,29 @@ Rectangle {
         property color canvasColor: "#cfd8dc"
     }
 
+    function showInformation(params, popupSource) {
+        var okCallback = function() {
+            if(params.callback)
+                params.callback(true)
+            modalDialog.closeable = true
+            modalDialog.initItemCallback = undefined
+        }
+
+        modalDialog.initItemCallback = function(item) {
+            if(params.message)
+                item.message = params.message
+            if(params.okButtonText)
+                item.okButtonText = params.okButtonText
+            item.okCallback = okCallback
+        }
+
+        modalDialog.sourceComponent = infoDialogComponent
+        if(popupSource)
+            modalDialog.popupSource = popupSource
+        modalDialog.closeable = false
+        modalDialog.active = true
+    }
+
     function askQuestion(params, popupSource) {
         var okCallback = function() {
             if(params.callback)
@@ -117,9 +140,12 @@ Rectangle {
         }
 
         modalDialog.initItemCallback = function(item) {
-            item.question = params.question
-            item.okButtonText = params.okButtonText
-            item.cancelButtonText = params.cancelButtonText
+            if(params.question)
+                item.question = params.question
+            if(params.okButtonText)
+                item.okButtonText = params.okButtonText
+            if(params.cancelButtonText)
+                item.cancelButtonText = params.cancelButtonText
             item.okCallback = okCallback
             item.cancelCallback = cancelCallback
         }
@@ -192,6 +218,46 @@ Rectangle {
                         onClicked: {
                             if(cancelCallback)
                                 cancelCallback()
+                            modalDialog.closeRequest()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: infoDialogComponent
+
+        Item {
+            width: 500
+            height: 250
+            property string message: "Press Ok to continue."
+            property string okButtonText: "Ok"
+            property var    okCallback
+
+            Column {
+                width: parent.width*0.8
+                spacing: 40
+                anchors.centerIn: parent
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: 16
+                    text: message
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                Row {
+                    spacing: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Button {
+                        text: okButtonText
+                        onClicked: {
+                            if(okCallback)
+                                okCallback()
                             modalDialog.closeRequest()
                         }
                     }

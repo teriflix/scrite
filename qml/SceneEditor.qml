@@ -260,7 +260,7 @@ Item {
                     sceneHeadingLoader.viewOnly = true
             }
             Keys.onReturnPressed: {
-                if(event.modifiers & Qt.ControlModifier && allowSplitSceneRequest) {
+                if(event.modifiers & Qt.ControlModifier) {
                     sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
                     event.accepted = true
                     return
