@@ -39,9 +39,9 @@ Item {
         id: notice
         anchors.centerIn: parent
         visible: exporter === null
-        font.pixelSize: 32
+        font.pixelSize: 20
         width: parent.width*0.85
-        wrapMode: Text.WordWrap
+        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         horizontalAlignment: Text.AlignHCenter
     }
 
@@ -86,7 +86,7 @@ Item {
                     spacing: 20
 
                     Text {
-                        font.pointSize: 30
+                        font.pointSize: 24
                         font.bold: true
                         text: exporter.formatName + " - Export"
                         anchors.horizontalCenter: parent.horizontalCenter
