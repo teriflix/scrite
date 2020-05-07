@@ -85,6 +85,8 @@ Item {
                     mid: Qt.rgba(0,0,0,0.25)
                     dark: Qt.rgba(0,0,0,0.75)
                 }
+                opacity: active ? 1 : 0.2
+                Behavior on opacity { NumberAnimation { duration: 250 } }
             }
             highlight: Rectangle {
                 width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width

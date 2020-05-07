@@ -185,6 +185,8 @@ Rectangle {
         ScrollBar.horizontal: ScrollBar {
             policy: screenplayElementList.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
+            opacity: active ? 1 : 0.2
+            Behavior on opacity { NumberAnimation { duration: 250 } }
         }
 
         FocusTracker.window: qmlWindow

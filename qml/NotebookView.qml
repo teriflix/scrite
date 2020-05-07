@@ -193,7 +193,11 @@ Item {
         anchors.bottom: parent.bottom
         anchors.margins: 5
         clip: true
-        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AlwaysOn
+            opacity: active ? 1 : 0.2
+            Behavior on opacity { NumberAnimation { duration: 250 } }
+        }
 
         property real minimumCellWidth: 340
         property int nrCells: Math.floor(width/minimumCellWidth)
@@ -468,7 +472,11 @@ Item {
                     anchors.topMargin: 20
                     anchors.bottomMargin: 10
                     clip: true
-                    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AlwaysOn
+                        opacity: active ? 1 : 0.2
+                        Behavior on opacity { NumberAnimation { duration: 250 } }
+                    }
 
                     property var detectedCharacters: scriteDocument.structure.detectCharacters()
                     property var newCharacters: []

@@ -102,6 +102,8 @@ Item {
                 mid: Qt.rgba(0,0,0,0.5)
                 dark: "black"
             }
+            opacity: active ? 1 : 0.2
+            Behavior on opacity { NumberAnimation { duration: 250 } }
         }
         model: scriteDocument.screenplay
         delegate: Loader {
@@ -186,7 +188,16 @@ Item {
             signal assumeFocusAt(int pos)
             onAssumeFocusAt: sceneEditor.assumeFocusAt(pos)
             height: sceneEditor.height + 20
-            color: selected ? app.translucent(sceneColor,0.75) : app.translucent(sceneColor,0.5)
+            color: selected ? Qt.tint(sceneColor, "#B0FFFFFF") : Qt.tint(sceneColor, "#F0FFFFFF")
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                color: Qt.tint(sceneColor, "#D9FFFFFF")
+                height: sceneEditor.sceneHeadingHeight + 10
+                visible: !parent.selected
+            }
 
             SceneEditor {
                 id: sceneEditor

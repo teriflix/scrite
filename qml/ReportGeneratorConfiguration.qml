@@ -241,7 +241,11 @@ Item {
                 model: scriteDocument.structure.characterNames
                 spacing: 5
                 currentIndex: -1
-                ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AlwaysOn
+                    opacity: active ? 1 : 0.2
+                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                }
                 delegate: Item {
                     width: characterNameListView.width
                     height: 35

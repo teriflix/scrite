@@ -48,6 +48,8 @@ Flickable {
             mid: Qt.rgba(0,0,0,0.25)
             dark: Qt.rgba(0,0,0,0.75)
         }
+        opacity: active ? 1 : 0.2
+        Behavior on opacity { NumberAnimation { duration: 250 } }
     }
     ScrollBar.vertical: ScrollBar {
         policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -56,6 +58,8 @@ Flickable {
             mid: Qt.rgba(0,0,0,0.25)
             dark: Qt.rgba(0,0,0,0.75)
         }
+        opacity: active ? 1 : 0.2
+        Behavior on opacity { NumberAnimation { duration: 250 } }
     }
 
     function ensureItemVisible(item, scaling, leaveMargin) {

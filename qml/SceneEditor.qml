@@ -25,10 +25,11 @@ Item {
     property Item  editor: sceneContentEditor
     property bool  editorHasActiveFocus: activeFocusBinder.get
     property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+contentEditorArea.anchors.topMargin+15) : 0) + 10
-    property color backgroundColor: scene ? Qt.tint(scene.color, "#E0FFFFFF") : "white"
+    property color backgroundColor: scene ? Qt.tint(scene.color, "#F0FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
     property bool  allowSplitSceneRequest: false
+    property real  sceneHeadingHeight: sceneHeadingArea.height
 
     signal assumeFocus()
     signal assumeFocusAt(int pos)
@@ -47,6 +48,7 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
+        anchors.margins: headerMargins
         height: sceneHeadingLoader.active ? sceneHeadingLoader.height : 0
 
         Loader {
