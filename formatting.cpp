@@ -725,20 +725,47 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     chrFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
 
     QTextCursor cursor(block);
-    cursor.setBlockFormat(blkFormat);
     cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
     cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.setCharFormat(chrFormat);
+    cursor.setBlockFormat(blkFormat);
+    cursor.clearSelection();
+    cursor.setPosition(block.position());
 
-    int start = 0;
-    QList<TransliterationEngine::Breakup> breakup = TransliterationEngine::instance()->breakupText(block.text());
-    Q_FOREACH(TransliterationEngine::Breakup item, breakup)
+    auto applyFormatChanges = [](QTextCursor &cursor, QChar::Script script) {
+        if(cursor.hasSelection()) {
+            TransliterationEngine::Language language = TransliterationEngine::languageForScript(script);
+            const QFont font = TransliterationEngine::instance()->languageFont(language);
+
+            QTextCharFormat format;
+            format.setFontFamily(font.family());
+            // format.setForeground(script == QChar::Script_Latin ? Qt::black : Qt::red);
+            cursor.mergeCharFormat(format);
+            cursor.clearSelection();
+        }
+    };
+
+    auto isEnglishChar = [](const QChar &ch) {
+        return ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line || ch.script() == QChar::Script_Latin;
+    };
+
+    QChar::Script script = QChar::Script_Unknown;
+
+    while(!cursor.atBlockEnd())
     {
-        QTextCharFormat fmt;
-        fmt.setFontFamily(item.font.family());
-        setFormat(start, item.string.length(), fmt);
-        start += item.string.length();
+        const int index = cursor.position()-block.position();
+        const QChar ch = text.at(index);
+        const QChar::Script chScript = isEnglishChar(ch) ? QChar::Script_Latin : ch.script();
+        if(script != chScript)
+        {
+            applyFormatChanges(cursor, script);
+            script = chScript;
+        }
+
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
     }
+
+    applyFormatChanges(cursor, script);
 
     if(m_currentElement == element)
         emit currentFontChanged();
@@ -788,6 +815,7 @@ void SceneDocumentBinder::initializeDocument()
     this->setDocumentLoadCount(m_documentLoadCount+1);
     m_initializingDocument = false;
     this->QSyntaxHighlighter::rehighlight();
+
     emit documentInitialized();
 }
 

@@ -79,17 +79,29 @@ public:
 
     QFont languageFont(Language language) const;
     QStringList languageFontFilePaths(Language language) const;
+    static Language languageForScript(QChar::Script script);
 
-    struct Breakup
+    struct Boundary
     {
-        Breakup() : language(TransliterationEngine::English) { }
-        QString string;
+        int end = -1;
+        int start = -1;
         QFont font;
-        TransliterationEngine::Language language;
-    };
-    QList<Breakup> breakupText(const QString &text) const;
+        QString string;
+        TransliterationEngine::Language language = TransliterationEngine::English;
 
-    void insertBreakupText(QTextCursor &cursor, const QString &text) const;
+        void append(const QChar &ch, int pos) {
+            string.append(ch);
+            if(start < 0)
+                start = pos;
+            end = pos+1;
+        }
+
+        bool isEmpty() const {
+            return end < 0 || start < 0 || start == end;
+        }
+    };
+    QList<Boundary> evaluateBoundaries(const QString &text) const;
+    void evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const;
 
 private:
     TransliterationEngine(QObject *parent=nullptr);

@@ -328,10 +328,8 @@ QStringList TransliterationEngine::languageFontFilePaths(TransliterationEngine::
     return m_languageFontFilePaths.value(language, QStringList());
 }
 
-QList<TransliterationEngine::Breakup> TransliterationEngine::breakupText(const QString &text) const
+TransliterationEngine::Language TransliterationEngine::languageForScript(QChar::Script script)
 {
-    QList<Breakup> ret;
-
     static QMap<QChar::Script,Language> scriptLanguageMap;
     if(scriptLanguageMap.isEmpty())
     {
@@ -347,55 +345,92 @@ QList<TransliterationEngine::Breakup> TransliterationEngine::breakupText(const Q
         scriptLanguageMap[QChar::Script_Malayalam] = Malayalam;
     }
 
-    QChar::Script lastScript = QChar::Script_Latin;
+    return scriptLanguageMap.value(script, English);
+}
 
-    Breakup item;
-    for(int i=0; i<text.length(); i++)
-    {
-        const QChar ch = text.at(i);
-        if( (ch.script() != lastScript && ch.isLetterOrNumber()) ||
-            (ch.category() == QChar::Separator_Line || ch.category() == QChar::Separator_Paragraph) )
-        {
-            if(!item.string.isEmpty())
-            {
-                item.language = scriptLanguageMap.value(lastScript, English);
-                item.font = this->languageFont(item.language);
-                ret.append(item);
-            }
+QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries(const QString &text) const
+{
+    QList<Boundary> ret;
+    if(text.isEmpty())
+        return ret;
 
-            item = Breakup();
+    QChar::Script script = QChar::Script_Unknown;
+
+    Boundary item;
+    auto captureBoundary = [&ret,this](Boundary &item, QChar::Script script) {
+        if(!item.string.isEmpty()) {
+            item.language = languageForScript(script);
+            item.font = this->languageFont(item.language);
+            ret.append(item);
         }
 
-        item.string.append(ch);
+        item = Boundary();
+    };
 
-        if(ch.isLetterOrNumber())
-            lastScript = ch.script();
-    }
+    auto isEnglishChar = [](const QChar &ch) {
+        return ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line || ch.script() == QChar::Script_Latin;
+    };
 
-    if(!item.string.isEmpty())
+    for(int index=0; index<text.length(); index++)
     {
-        item.language = scriptLanguageMap.value(lastScript, English);
-        item.font = this->languageFont(item.language);
-        ret.append(item);
+        const QChar ch = text.at(index);
+        const QChar::Script chScript = isEnglishChar(ch) ? QChar::Script_Latin : ch.script();
+        if(script != chScript)
+        {
+            captureBoundary(item, script);
+            script = chScript;
+        }
+
+        item.append(ch, index);
     }
+
+    captureBoundary(item, script);
 
     return ret;
 }
 
-void TransliterationEngine::insertBreakupText(QTextCursor &cursor, const QString &text) const
+void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const
 {
     const QTextCharFormat givenFormat = cursor.charFormat();
-    const QList<Breakup> breakup = this->breakupText(text);
-    Q_FOREACH(Breakup item, breakup)
+    const int givenPosition = cursor.position();
+
+    cursor.insertText(text);
+    cursor.setPosition(givenPosition);
+
+    auto applyFormatChanges = [this](QTextCursor &cursor, QChar::Script script) {
+        if(cursor.hasSelection()) {
+            TransliterationEngine::Language language = this->languageForScript(script);
+            const QFont font = this->languageFont(language);
+
+            QTextCharFormat format;
+            format.setFontFamily(font.family());
+            // format.setForeground(script == QChar::Script_Latin ? Qt::black : Qt::red);
+            cursor.mergeCharFormat(format);
+            cursor.clearSelection();
+        }
+    };
+
+    auto isEnglishChar = [](const QChar &ch) {
+        return ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line || ch.script() == QChar::Script_Latin;
+    };
+
+    QChar::Script script = QChar::Script_Unknown;
+
+    while(!cursor.atBlockEnd())
     {
-        QTextCharFormat charFormat;
-        if(item.language == English)
-            charFormat.setFontFamily(givenFormat.fontFamily());
-        else
-            charFormat.setFontFamily(item.font.family());
-        cursor.insertText(item.string);
+        const int index = cursor.position()-givenPosition;
+        const QChar ch = text.at(index);
+        const QChar::Script chScript = isEnglishChar(ch) ? QChar::Script_Latin : ch.script();
+        if(script != chScript)
+        {
+            applyFormatChanges(cursor, script);
+            script = chScript;
+        }
+
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
     }
-    cursor.setCharFormat(givenFormat);
+
+    applyFormatChanges(cursor, script);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

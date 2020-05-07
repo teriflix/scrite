@@ -148,7 +148,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
                 charFormat = defaultCharFormat;
 
                 cursor.insertBlock(blockFormat, charFormat);
-                TransliterationEngine::instance()->insertBreakupText(cursor, it2.value().first()->text());
+                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, it2.value().first()->text());
                 cursor.insertText(" (" + QString::number(it.value().size()) + ")");
 
                 Q_FOREACH(SceneHeading *heading, it2.value())
@@ -165,7 +165,7 @@ bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
 
                     cursor.insertBlock(blockFormat, charFormat);
                     cursor.insertText( "Scene #" + QString::number(sceneNr) + + ": ");
-                    TransliterationEngine::instance()->insertBreakupText(cursor, snippet);
+                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, snippet);
                 }
 
                 ++it2;

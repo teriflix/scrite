@@ -259,7 +259,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
 
                             cursor.insertBlock(blockFormat, charFormat);
                             // cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
-                            TransliterationEngine::instance()->insertBreakupText(cursor, "Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
+                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, "Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
                             sceneInfoWritten = true;
                         }
 
@@ -319,7 +319,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                                 else
                                     cursor.insertBlock(blockFormat, charFormat);
                                 // cursor.insertText(element->formattedText());
-                                TransliterationEngine::instance()->insertBreakupText(cursor, element->formattedText());
+                                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, element->formattedText());
                                 ++nr;
                             }
                         }

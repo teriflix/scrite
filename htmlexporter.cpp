@@ -200,9 +200,8 @@ bool HtmlExporter::doExport(QIODevice *device)
     auto writeParagraph = [&ts,typeStringMap,langBundleMap](SceneElement::Type type, const QString &text) {
         const QString styleName = "scrite-" + typeStringMap.value(type);
         ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">";
-        QList<TransliterationEngine::Breakup> breakup = TransliterationEngine::instance()->breakupText(text);
-        Q_FOREACH(TransliterationEngine::Breakup item, breakup)
-        {
+        QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
+        Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
             if(item.language == TransliterationEngine::English || !langBundleMap.value(item.language,false))
                 ts << "<span>" << item.string << "</span>";
             else
