@@ -160,7 +160,7 @@ Flickable {
         var newWidth = initialContentWidth * zoomScale
         var newHeight = initialContentHeight * zoomScale
         resizeContent(newWidth, newHeight, mousePoint)
-        returnToBounds()
+        returnToBoundsTimer.start()
     }
 
     PinchHandler {
@@ -182,16 +182,22 @@ Flickable {
         }
     }
 
-    // EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
+    EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
     EventFilter.events: [31]
     EventFilter.onFilter: {
-        if(event.modifiers & Qt.AltModifier || event.modifiers & Qt.ControlModifier) {
-            if(event.delta < 0)
-                zoomOut()
-            else
-                zoomIn()
-            result.acceptEvent = true
-            result.filter = true
-        }
+        if(event.delta < 0)
+            zoomOut()
+        else
+            zoomIn()
+        result.acceptEvent = true
+        result.filter = true
+    }
+
+    Timer {
+        id: returnToBoundsTimer
+        running: false
+        repeat: false
+        interval: 500
+        onTriggered: parent.returnToBounds()
     }
 }
