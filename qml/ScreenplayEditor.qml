@@ -166,6 +166,8 @@ Item {
             property int index: -1
             height: 50
             color: "white"
+            border.width: 1
+            border.color: "#37474F"
 
             Text {
                 anchors.centerIn: parent

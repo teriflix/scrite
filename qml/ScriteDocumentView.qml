@@ -28,13 +28,17 @@ Item {
 
     FontMetrics {
         id: sceneEditorFontMetrics
-        font: format.font
         readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
-        readonly property int letterPerLine: 80
+        readonly property int lettersPerLine: 60
         readonly property int marginLetters: 5
-        readonly property real paragraphWidth: Math.ceil(letterPerLine*averageCharacterWidth)
+        readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
         readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
         readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
+
+        Component.onCompleted: {
+            font = format.font
+            font.pointSize = font.pointSize + scriteDocument.formatting.fontPointSizeDelta
+        }
     }
 
     Rectangle {
