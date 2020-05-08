@@ -103,5 +103,11 @@
         <file>font/Oriya/BalooBhaina2-Regular.ttf</file>
         <file>font/Gujarati/HindVadodara-Bold.ttf</file>
         <file>font/Gujarati/HindVadodara-Regular.ttf</file>
+        <file>icons/file/import_export.png</file>
+        <file>icons/file/import_export_inverted.png</file>
+        <file>icons/navigation/fullscreen_exit_inverted.png</file>
+        <file>icons/navigation/fullscreen_exit.png</file>
+        <file>icons/navigation/fullscreen_inverted.png</file>
+        <file>icons/navigation/fullscreen.png</file>
     </qresource>
 </RCC>

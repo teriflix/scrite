@@ -29,7 +29,7 @@ Item {
     FontMetrics {
         id: sceneEditorFontMetrics
         readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
-        readonly property int lettersPerLine: 60
+        readonly property int lettersPerLine: globalSceneEditorToolbar.editInFullscreen ? 70 : 60
         readonly property int marginLetters: 5
         readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
         readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
@@ -39,6 +39,15 @@ Item {
             font = format.font
             font.pointSize = font.pointSize + scriteDocument.formatting.fontPointSizeDelta
         }
+    }
+
+    Settings {
+        id: workspaceSettings
+        fileName: app.settingsFilePath
+        category: "Workspace"
+        property var workspaceHeight
+        property var structureEditorWidth
+        property bool editInFullscreen: false
     }
 
     Rectangle {
@@ -72,21 +81,21 @@ Item {
                     onClicked: {
                         if(scriteDocument.modified)
                             askQuestion({
-                                "question": "Do you want to save your current project first?",
-                                "okButtonText": "Yes",
-                                "cancelButtonText": "No",
-                                "callback": function(val) {
-                                    if(val) {
-                                        if(scriteDocument.fileName !== "")
-                                            scriteDocument.save()
-                                        else {
-                                            cmdSave.doClick()
-                                            return
-                                        }
-                                    }
-                                    resetContentAnimation.start()
-                                }
-                            }, this)
+                                            "question": "Do you want to save your current project first?",
+                                            "okButtonText": "Yes",
+                                            "cancelButtonText": "No",
+                                            "callback": function(val) {
+                                                if(val) {
+                                                    if(scriteDocument.fileName !== "")
+                                                        scriteDocument.save()
+                                                    else {
+                                                        cmdSave.doClick()
+                                                        return
+                                                    }
+                                                }
+                                                resetContentAnimation.start()
+                                            }
+                                        }, this)
                         else
                             resetContentAnimation.start()
                     }
@@ -104,22 +113,22 @@ Item {
                     function doOpen(filePath) {
                         if(scriteDocument.modified)
                             askQuestion({
-                                "question": "Do you want to save your current project first?",
-                                "okButtonText": "Yes",
-                                "cancelButtonText": "No",
-                                "callback": function(val) {
-                                    if(val) {
-                                        if(scriteDocument.fileName !== "")
-                                            scriteDocument.save()
-                                        else {
-                                            cmdSave.doClick()
-                                            return
-                                        }
-                                    }
-                                    recentFilesMenu.close()
-                                    fileDialog.launch("OPEN", filePath)
-                                }
-                            }, this)
+                                            "question": "Do you want to save your current project first?",
+                                            "okButtonText": "Yes",
+                                            "cancelButtonText": "No",
+                                            "callback": function(val) {
+                                                if(val) {
+                                                    if(scriteDocument.fileName !== "")
+                                                        scriteDocument.save()
+                                                    else {
+                                                        cmdSave.doClick()
+                                                        return
+                                                    }
+                                                }
+                                                recentFilesMenu.close()
+                                                fileDialog.launch("OPEN", filePath)
+                                            }
+                                        }, this)
                         else {
                             recentFilesMenu.close()
                             fileDialog.launch("OPEN", filePath)
@@ -257,96 +266,102 @@ Item {
                 }
 
                 ToolButton2 {
-                    icon.source: "../icons/file/file_download.png"
-                    text: "Import"
-                    shortcut: "Ctrl+Shift+I"
-                    shortcutText: "Shift+I"
+                    id: importExportButton
+                    icon.source: "../icons/file/import_export.png"
+                    text: "Import, Export & Reports"
                     display: AbstractButton.IconOnly
-                    down: importMenu.visible
-                    onClicked: importMenu.visible = true
+                    onClicked: importExportMenu.visible = true
+                    down: importExportMenu.visible
 
                     Item {
                         anchors.top: parent.bottom
                         anchors.left: parent.left
+                        anchors.right: parent.right
 
                         Menu {
-                            id: importMenu
+                            id: importExportMenu
 
-                            Repeater {
-                                model: scriteDocument.supportedImportFormats
+                            Menu {
+                                id: importMenu
+                                title: "Import"
 
-                                MenuItem {
-                                    text: modelData
-                                    onClicked: {
-                                        if(scriteDocument.modified)
-                                            askQuestion({
-                                                "question": "Do you want to save your current project first?",
-                                                "okButtonText": "Yes",
-                                                "cancelButtonText": "No",
-                                                "callback": function(val) {
-                                                    if(val) {
-                                                        if(scriteDocument.fileName !== "")
-                                                            scriteDocument.save()
-                                                        else {
-                                                            cmdSave.doClick()
-                                                            return
-                                                        }
-                                                    }
-                                                    fileDialog.launch("IMPORT " + modelData)
-                                                }
-                                            }, this)
+                                Repeater {
+                                    model: scriteDocument.supportedImportFormats
+
+                                    MenuItem {
+                                        text: modelData
+                                        onClicked: {
+                                            if(scriteDocument.modified)
+                                                askQuestion({
+                                                                "question": "Do you want to save your current project first?",
+                                                                "okButtonText": "Yes",
+                                                                "cancelButtonText": "No",
+                                                                "callback": function(val) {
+                                                                    if(val) {
+                                                                        if(scriteDocument.fileName !== "")
+                                                                            scriteDocument.save()
+                                                                        else {
+                                                                            cmdSave.doClick()
+                                                                            return
+                                                                        }
+                                                                    }
+                                                                    fileDialog.launch("IMPORT " + modelData)
+                                                                }
+                                                            }, this)
+                                            else
+                                                fileDialog.launch("IMPORT " + modelData)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Menu {
+                                id: exportMenu
+                                title: "Export"
+
+                                Component {
+                                    id: menuItemComponent
+                                    MenuItem {
+                                        property string format
+                                        text: {
+                                            var fields = format.split("/")
+                                            return fields[fields.length-1]
+                                        }
+                                        onClicked: exportTimer.formatName = format
+                                    }
+                                }
+
+                                Component {
+                                    id: menuSeparatorComponent
+                                    MenuSeparator { }
+                                }
+
+                                Component.onCompleted: {
+                                    var formats = scriteDocument.supportedExportFormats
+                                    for(var i=0; i<formats.length; i++) {
+                                        var format = formats[i]
+                                        if(format === "")
+                                            exportMenu.addItem(menuSeparatorComponent.createObject(exportMenu))
                                         else
-                                            fileDialog.launch("IMPORT " + modelData)
+                                            exportMenu.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
                                     }
                                 }
                             }
-                        }
-                    }
-                }
 
-                ToolButton2 {
-                    id: exportButton
-                    icon.source: "../icons/file/file_upload.png"
-                    text: "Export"
-                    shortcut: "Ctrl+Shift+X"
-                    shortcutText: "Shift+X"
-                    display: AbstractButton.IconOnly
-                    down: exportMenu.visible
-                    enabled: scriteDocument.screenplay.elementCount > 0
-                    onClicked: exportMenu.visible = true
+                            Menu {
+                                id: reportsMenu
+                                title: "Reports"
+                                enabled: scriteDocument.screenplay.elementCount > 0
 
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
+                                Repeater {
+                                    model: scriteDocument.supportedReports
 
-                        Menu {
-                            id: exportMenu
-
-                            Component {
-                                id: menuItemComponent
-                                MenuItem {
-                                    property string format
-                                    text: {
-                                        var fields = format.split("/")
-                                        return fields[fields.length-1]
+                                    MenuItem {
+                                        text: modelData
+                                        onTriggered: {
+                                            reportGeneratorTimer.reportName = modelData
+                                        }
                                     }
-                                    onClicked: exportTimer.formatName = format
-                                }
-                            }
-
-                            Component {
-                                id: menuSeparatorComponent
-                                MenuSeparator { }
-                            }
-
-                            Component.onCompleted: {
-                                var formats = scriteDocument.supportedExportFormats
-                                for(var i=0; i<formats.length; i++) {
-                                    var format = formats[i]
-                                    if(format === "")
-                                        exportMenu.addItem(menuSeparatorComponent.createObject(exportMenu))
-                                    else
-                                        exportMenu.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
                                 }
                             }
                         }
@@ -365,42 +380,10 @@ Item {
                                     modalDialog.closeable = false
                                     modalDialog.arguments = formatName
                                     modalDialog.sourceComponent = exporterConfigurationComponent
-                                    modalDialog.popupSource = exportButton
+                                    modalDialog.popupSource = importExportButton
                                     modalDialog.active = true
                                 }
                                 formatName = ""
-                            }
-                        }
-                    }
-                }
-
-                ToolButton2 {
-                    id: reportsButton
-                    icon.source: "../icons/file/file_pdf.png"
-                    text: "Reports"
-                    shortcut: "Ctrl+Shift+R"
-                    shortcutText: "Shift+R"
-                    display: AbstractButton.IconOnly
-                    down: reportsMenu.visible
-                    enabled: scriteDocument.screenplay.elementCount > 0
-                    onClicked: reportsMenu.visible = true
-
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-
-                        Menu {
-                            id: reportsMenu
-
-                            Repeater {
-                                model: scriteDocument.supportedReports
-
-                                MenuItem {
-                                    text: modelData
-                                    onTriggered: {
-                                        reportGeneratorTimer.reportName = modelData
-                                    }
-                                }
                             }
                         }
 
@@ -418,7 +401,7 @@ Item {
                                     modalDialog.closeable = false
                                     modalDialog.arguments = reportName
                                     modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-                                    modalDialog.popupSource = reportsButton
+                                    modalDialog.popupSource = importExportButton
                                     modalDialog.active = true
                                 }
                                 reportName = ""
@@ -533,6 +516,8 @@ Item {
                 editor: sceneEditor ? sceneEditor.editor : null
                 // enabled: sceneEditor ? true : false
                 property Item sceneEditor
+                editInFullscreen: workspaceSettings.editInFullscreen
+                onEditInFullscreenChanged: workspaceSettings.editInFullscreen = editInFullscreen
             }
 
             Image {
@@ -565,7 +550,7 @@ Item {
     Loader {
         id: contentLoader
         active: true
-        sourceComponent: documentUiContentComponent
+        sourceComponent: globalSceneEditorToolbar.editInFullscreen ? screenplayEditorComponent : documentUiContentComponent
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: appToolBarArea.bottom
@@ -604,14 +589,6 @@ Item {
 
         SplitView {
             orientation: Qt.Vertical
-
-            Settings {
-                id: workspaceSettings
-                fileName: app.settingsFilePath
-                category: "Workspace"
-                property var workspaceHeight
-                property var structureEditorWidth
-            }
 
             Rectangle {
                 SplitView.preferredHeight: workspaceSettings.workspaceHeight ? documentUI.height*workspaceSettings.workspaceHeight : documentUI.height*0.75
@@ -824,6 +801,21 @@ Item {
             clip: true
             color: "lightgray"
 
+            Loader {
+                width: parent.width*0.7
+                anchors.centerIn: parent
+                active: globalSceneEditorToolbar.editInFullscreen && scriteDocument.screenplay.elementCount === 0
+                sourceComponent: TextArea {
+                    readOnly: true
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: 30
+                    enabled: false
+                    renderType: Text.NativeRendering
+                    text: "Click on the add new scene button on the toolbar or press " + app.polishShortcutTextForDisplay("Ctrl+Shift+N") + " to create a new scene."
+                }
+            }
+
             ScreenplayEditor {
                 id: screenplayEditor
                 anchors.fill: parent
@@ -866,8 +858,8 @@ Item {
 
                 onSplitSceneRequest: {
                     showInformation({
-                            "message": "You can split a scene only when its edited in the context of a screenplay, not when edited as an independent scene.",
-                        }, this)
+                                        "message": "You can split a scene only when its edited in the context of a screenplay, not when edited as an independent scene.",
+                                    }, this)
                 }
 
                 SearchAgent.engine: searchBar.searchEngine

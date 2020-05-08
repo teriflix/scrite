@@ -20,6 +20,7 @@ ScrollView {
     id: toolbarArea
     property SceneDocumentBinder binder
     property TextArea editor
+    property alias editInFullscreen: editInFullscreenButton.checked
 
     signal requestScreenplayEditor()
 
@@ -53,6 +54,18 @@ ScrollView {
             RowLayout {
                 spacing: toolbar.toolButtonSpacing
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                ToolButton2 {
+                    id: editInFullscreenButton
+                    icon.source: checked ? "../icons/navigation/fullscreen_exit.png" : "../icons/navigation/fullscreen.png"
+                    suggestedWidth: toolbar.toolButtonWidth
+                    suggestedHeight: toolbar.toolButtonHeight
+                    shortcut: app.isMacOSPlatform ? "F2" : "F11"
+                    shortcutText: ""
+                    checkable: true
+                    checked: false
+                    ToolTip.text: "Toggles between fullscreen and paneled edit mode.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                }
 
                 ToolButton2 {
                     icon.source: "../icons/content/add_box.png"

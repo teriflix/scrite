@@ -461,8 +461,10 @@ Item {
 
             Row {
                 id: layout
-                width: parent.width-4
-                anchors.centerIn: parent
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: sceneEditor.padding
+                anchors.rightMargin: sceneEditor.padding
 
                 TextField2 {
                     id: locTypeEdit

@@ -74,7 +74,7 @@ bool AbstractImporter::read()
 static const qreal elementX = 100;
 static const qreal elementY = 100;
 static const qreal elementXSpacing = 275;
-static const qreal elementYSpacing = 120;
+static const qreal elementYSpacing = 75;
 static const qreal canvasSpaceBuffer = 500;
 
 void AbstractImporter::configureCanvas(int nrBlocks)

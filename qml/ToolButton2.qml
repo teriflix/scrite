@@ -32,6 +32,9 @@ ToolButton {
     hoverEnabled: true
     display: AbstractButton.TextBesideIcon
     opacity: enabled ? 1 : 0.5
+    background: Rectangle {
+        color: (down || (checkable && checked)) ? "#9E9E9E" : Qt.rgba(0,0,0,0)
+    }
     contentItem: Item {
         Row {
             anchors.centerIn: parent
