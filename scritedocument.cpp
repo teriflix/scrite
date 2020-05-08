@@ -615,6 +615,13 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
     {
         m_formatting->setParent(this);
 
+        QFont font = m_formatting->defaultFont();
+        font.setPointSize(10);
+        m_formatting->setDefaultFont(font);
+
+        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+            m_formatting->elementFormat(i)->fontRef().setPointSize(10);
+
         // Hack to ensure that onscreen top-margin is 25px by default
         m_formatting->elementFormat(SceneElement::Action)->setTopMargin(25);
         m_formatting->elementFormat(SceneElement::Character)->setTopMargin(25);
@@ -952,5 +959,24 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
                 note->setColor( evalNewColor(note->color()) );
             }
         }
+    }
+
+    if( version <= QVersionNumber(0,2,16) )
+    {
+        if( m_formatting->defaultFont().pointSize() == 12 )
+        {
+            QFont font = m_formatting->defaultFont();
+            font.setPointSize(10);
+            m_formatting->setDefaultFont(font);
+        }
+
+        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+        {
+            if(m_formatting->elementFormat(i)->font().pointSize() == 12)
+                m_formatting->elementFormat(i)->fontRef().setPointSize(10);
+        }
+
+        if(m_formatting->elementFormat(SceneElement::Heading)->font().pointSize() == 12)
+            m_formatting->elementFormat(SceneElement::Heading)->fontRef().setPointSize(10);
     }
 }

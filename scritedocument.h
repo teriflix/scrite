@@ -168,7 +168,6 @@ private:
 
     ErrorReport *m_errorReport = new ErrorReport(this);
     ProgressReport *m_progressReport = new ProgressReport(this);
-
 };
 
 #endif // SCRITEDOCUMENT_H

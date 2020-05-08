@@ -519,7 +519,7 @@ Item {
                         wrapMode: Text.WordWrap
                         text: element.scene.title
                         anchors.centerIn: parent
-                        font.pixelSize: 20
+                        font.pixelSize: 15
                         horizontalAlignment: Text.AlignHCenter
                         readOnly: !parent.editing
                         onTextEdited: element.scene.title = text

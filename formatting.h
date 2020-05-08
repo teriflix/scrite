@@ -131,6 +131,7 @@ public:
     Q_PROPERTY(QFont defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
     void setDefaultFont(const QFont &val);
     QFont defaultFont() const { return m_defaultFont; }
+    QFont &defaultFontRef() { return m_defaultFont; }
     Q_SIGNAL void defaultFontChanged();
 
     Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY defaultFontChanged)

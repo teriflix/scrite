@@ -24,8 +24,8 @@ Item {
     property alias binder: sceneDocumentBinder
     property Item  editor: sceneContentEditor
     property bool  editorHasActiveFocus: activeFocusBinder.get
-    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.contentHeight+contentEditorArea.anchors.topMargin+15) : 0) + 10
-    property color backgroundColor: scene ? Qt.tint(scene.color, "#F0FFFFFF") : "white"
+    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.totalHeight+contentEditorArea.anchors.topMargin+15) : 0) + 10
+    property color backgroundColor: scene ? Qt.tint(scene.color, "#FBFFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
     property bool  allowSplitSceneRequest: false
@@ -36,6 +36,9 @@ Item {
     signal requestScrollUp()
     signal requestScrollDown()
     signal splitSceneRequest(SceneElement sceneElement, int textPosition)
+
+    readonly property real margin: Math.max( Math.round((width-sceneEditorFontMetrics.pageWidth)/2), sceneEditorFontMetrics.height*2 )
+    readonly property real padding: sceneEditorFontMetrics.paragraphMargin + margin
 
     DelayedPropertyBinder {
         id: activeFocusBinder
@@ -134,7 +137,7 @@ Item {
             Loader {
                 id: editorLoader
                 width: sceneContentScrollView.width-20
-                height: item ? item.contentHeight+50 : 0
+                height: item ? item.totalHeight : 0
                 sourceComponent: sceneContentEditorComponent
             }
 
@@ -161,9 +164,37 @@ Item {
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             renderType: Text.NativeRendering
             readOnly: sceneEditor.readOnly
+            property real totalHeight: contentHeight + topPadding + bottomPadding
             background: Rectangle {
                 color: backgroundColor
+
+                BorderImage {
+                    source: "../icons/content/shadow.png"
+                    anchors.fill: contentArea
+                    horizontalTileMode: BorderImage.Stretch
+                    verticalTileMode: BorderImage.Stretch
+                    anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                    border { left: 21; top: 21; right: 21; bottom: 21 }
+                    opacity: sceneTextArea.activeFocus ? 0.25 : 0.1
+                }
+
+                Rectangle {
+                    id: contentArea
+                    radius: 8
+                    border.width: 1
+                    border.color: sceneTextArea.activeFocus ? backgroundColor : "#cfd8dc"
+                    anchors.fill: parent
+                    anchors.leftMargin: sceneEditor.margin
+                    anchors.rightMargin: sceneEditor.margin
+                    anchors.topMargin: sceneEditorFontMetrics.height
+                    anchors.bottomMargin: sceneEditorFontMetrics.height
+                    color: sceneTextArea.activeFocus ? "white" : Qt.rgba(0,0,0,0)
+                }
             }
+            leftPadding: sceneEditor.padding
+            rightPadding: sceneEditor.padding
+            topPadding: sceneEditorFontMetrics.height*2
+            bottomPadding: sceneEditorFontMetrics.height*2
             palette: app.palette
             selectByMouse: true
             selectByKeyboard: true
@@ -498,8 +529,8 @@ Item {
                 id: sceneHeadingText
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: 20
-                anchors.rightMargin: 20
+                anchors.leftMargin: sceneEditor.padding
+                anchors.rightMargin: sceneEditor.padding
                 font: parent.headingFont
                 text: scene.heading.text
                 anchors.verticalCenter: parent.verticalCenter

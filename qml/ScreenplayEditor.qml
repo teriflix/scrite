@@ -187,7 +187,7 @@ Item {
             property bool selected: scriteDocument.screenplay.currentElementIndex === index
             signal assumeFocusAt(int pos)
             onAssumeFocusAt: sceneEditor.assumeFocusAt(pos)
-            height: sceneEditor.height + 20
+            height: sceneEditor.height + 4
             color: selected ? Qt.tint(sceneColor, "#B0FFFFFF") : Qt.tint(sceneColor, "#F0FFFFFF")
 
             Rectangle {
@@ -195,7 +195,7 @@ Item {
                 anchors.right: parent.right
                 anchors.top: parent.top
                 color: Qt.tint(sceneColor, "#D9FFFFFF")
-                height: sceneEditor.sceneHeadingHeight + 10
+                height: sceneEditor.sceneHeadingHeight + 4
                 visible: !parent.selected
             }
 
@@ -206,8 +206,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: 10
-                anchors.rightMargin: 17
+                anchors.leftMargin: 2
+                anchors.rightMargin: 2
                 scrollable: false
                 showOnlyEnabledSceneHeadings: true
                 allowSplitSceneRequest: true

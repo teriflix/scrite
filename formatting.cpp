@@ -218,7 +218,7 @@ void ScreenplayFormat::setScreen(QScreen *val)
     if(m_screen == val || m_screen != nullptr)
         return;
 
-    const qreal a4PageWidthInInches = 8.3;
+    const qreal a4PageWidthInInches = 8.5;
 
     m_screen = val;
     m_pageWidth = m_screen->logicalDotsPerInchX() * a4PageWidthInInches;

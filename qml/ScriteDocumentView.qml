@@ -26,6 +26,17 @@ Item {
 
     // onWidthChanged: console.log(width)
 
+    FontMetrics {
+        id: sceneEditorFontMetrics
+        font: format.font
+        readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
+        readonly property int letterPerLine: 80
+        readonly property int marginLetters: 5
+        readonly property real paragraphWidth: Math.ceil(letterPerLine*averageCharacterWidth)
+        readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
+        readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
+    }
+
     Rectangle {
         id: appToolBarArea
         anchors.left: parent.left
