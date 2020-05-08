@@ -173,7 +173,7 @@ Scene *ScriteDocument::createNewScene()
 
     const qreal xOffset = m_structure->elementCount()%2 ? 275 : -275;
     const qreal x = structureElement ? (structureElement->x() + xOffset) : 225;
-    const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 100) : 100;
+    const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 50) : 50;
 
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 

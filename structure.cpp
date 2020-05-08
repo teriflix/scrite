@@ -1300,6 +1300,8 @@ void StructureElementConnector::pickElementColor()
         QColor mix = QColor::fromRgbF( (c1.redF()+c2.redF())/2.0,
                                        (c1.greenF()+c2.greenF())/2.0,
                                        (c1.blueF()+c2.blueF())/2.0 );
+        if(mix == Qt::white)
+            mix = Qt::black;
         this->setOutlineColor(mix);
     }
 }
