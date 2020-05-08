@@ -225,7 +225,7 @@ Item {
             }
 
             property bool newElementMode: false
-            property color newElementColor: app.standardColors[0]
+            property color newElementColor: "white"
 
             Keys.onPressed: {
                 if(event.key === Qt.Key_N || event.key === Qt.Key_Plus) {

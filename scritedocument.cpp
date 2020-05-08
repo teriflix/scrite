@@ -178,7 +178,7 @@ Scene *ScriteDocument::createNewScene()
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
     Scene *scene = new Scene(m_structure);
-    scene->setColor(activeScene ? activeScene->color() : QColor("blue"));
+    scene->setColor(activeScene ? activeScene->color() : QColor("white"));
     scene->setTitle("[" + QString::number(m_structure->elementCount()+1) + "] - Scene");
     scene->heading()->setEnabled(true);
     scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : "EXT");
