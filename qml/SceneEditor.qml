@@ -24,8 +24,8 @@ Item {
     property alias binder: sceneDocumentBinder
     property Item  editor: sceneContentEditor
     property bool  editorHasActiveFocus: activeFocusBinder.get
-    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.totalHeight+contentEditorArea.anchors.topMargin+15) : 0) + 10
-    property color backgroundColor: scene ? Qt.tint(scene.color, "#FBFFFFFF") : "white"
+    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.totalHeight+contentEditorArea.anchors.topMargin+(sceneContentEditor.length===0 ? 10 : 0)) : 0)
+    property color backgroundColor: scene ? Qt.tint(scene.color, "#F7FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
     property bool  allowSplitSceneRequest: false
