@@ -450,8 +450,6 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     return ret;
 }
 
-// static const QString dateTimeFormat("d MMM yyyy, hh:mm");
-
 AbstractExporter *ScriteDocument::createExporter(const QString &format)
 {
     const QByteArray formatKey = format.toLatin1();

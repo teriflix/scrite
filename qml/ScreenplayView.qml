@@ -61,6 +61,7 @@ Rectangle {
             anchors.bottomMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             width: screenplayToolsLayout.width
+            ScrollBar.vertical.policy: ScrolBar.AlwaysOff
 
             Column {
                 id: screenplayToolsLayout
@@ -275,8 +276,9 @@ Rectangle {
                     Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        anchors.top: menuButton.bottom
+                        anchors.top: parent.top
                         anchors.bottom: dragTriggerButton.top
+                        anchors.topMargin: 10
                         anchors.margins: 5
 
                         Text {
@@ -302,22 +304,16 @@ Rectangle {
                     MouseArea {
                         enabled: !isBreakElement
                         anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton|Qt.RightButton
                         onClicked: {
-                            elementItemDelegate.forceActiveFocus()
+                            parent.forceActiveFocus()
                             scriteDocument.screenplay.currentElementIndex = index
                             requestEditor()
-                        }
-                    }
 
-                    RoundButton {
-                        id: menuButton
-                        icon.source: "../icons/navigation/menu.png"
-                        anchors.top: parent.top
-                        anchors.right: parent.right
-                        anchors.margins: 5
-                        onClicked: {
-                            elementItemMenu.element = element
-                            elementItemMenu.popup(this)
+                            if(mouse.button === Qt.RightButton) {
+                                elementItemMenu.element = element
+                                elementItemMenu.popup(this)
+                            }
                         }
                     }
 

@@ -533,17 +533,6 @@ Item {
                         searchSequenceNumber: index
                     }
 
-                    ToolButton {
-                        id: elementOptionsButton
-                        icon.source: "../icons/navigation/menu.png"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.right
-                        anchors.leftMargin: 10
-                        visible: parent.selected
-                        down: elementOptionsMenuLoader.active
-                        onClicked: elementOptionsMenuLoader.active = true
-                    }
-
                     Loader {
                         id: elementOptionsMenuLoader
                         anchors.top: elementOptionsButton.bottom
