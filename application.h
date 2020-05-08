@@ -153,6 +153,18 @@ public:
 
     Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object, const QMetaObject *from) const;
 
+    Q_PROPERTY(QVariantList standardColors READ standardColorsVariantList NOTIFY standardColorsChanged STORED false)
+    QVariantList standardColorsVariantList() const { return m_standardColors; }
+    Q_SIGNAL void standardColorsChanged();
+
+    Q_INVOKABLE QColor pickStandardColor(int counter) const;
+    const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
+
+    // Must be called from main.cpp
+    void initializeStandardColors(QQmlEngine *);
+
+    static QVector<QColor> standardColors(const QVersionNumber &version);
+
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
 
@@ -168,6 +180,7 @@ private:
     QString m_baseWindowTitle;
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;
+    QVariantList m_standardColors;
 };
 
 #endif // APPLICATION_H

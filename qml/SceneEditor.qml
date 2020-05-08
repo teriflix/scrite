@@ -124,34 +124,32 @@ Item {
         id: scrollableSceneContentEditorComponent
 
         ScrollView {
-            id: scrollView
-            ScrollBar.vertical.minimumSize: 0.1
-            contentWidth: width
-            contentHeight: loader.height
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            id: sceneContentScrollView
             ScrollBar.vertical.policy: ScrollBar.AlwaysOn
             ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            contentWidth: width
+            contentHeight: editorLoader.height
 
-            Item {
-                width: scrollView.width
-                height: loader.item ? loader.item.contentHeight : loader.height
-
-                Loader {
-                    id: loader
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.rightMargin: 20
-                    anchors.leftMargin: 10
-                    sourceComponent: sceneContentEditorComponent
-
-                    Connections {
-                        target: loader.item
-                        onCursorRectangleChanged: scrollView.ensureVisibleFast(loader.item.cursorRectangle)
-                    }
-                }
+            Loader {
+                id: editorLoader
+                width: sceneContentScrollView.width-20
+                height: item ? item.contentHeight+50 : 0
+                sourceComponent: sceneContentEditorComponent
             }
 
-            Component.onCompleted: ScrollBar.vertical.position = 0
+            DelayedPropertyBinder {
+                initial: Qt.rect(0,0,0,0)
+                set: editorLoader.item ? editorLoader.item.cursorRectangle : initial
+                onGetChanged: sceneContentScrollView.adjustScroll(get)
+            }
+
+            function adjustScroll(rect) {
+                if(rect.top < contentItem.contentY)
+                    contentItem.contentY = Math.max(rect.top - rect.height, 0)
+                else if(rect.bottom > contentItem.contentY + height)
+                    contentItem.contentY = Math.min(rect.bottom + rect.height - height, contentHeight)
+            }
         }
     }
 

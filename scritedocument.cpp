@@ -904,4 +904,53 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
         else if(m_structure->elementCount() > 0)
             m_structure->setCurrentElementIndex(0);
     }
+
+    const QVector<QColor> versionColors = Application::standardColors(version);
+    const QVector<QColor> newColors     = Application::standardColors(QVersionNumber());
+    if(versionColors != newColors)
+    {
+        auto evalNewColor = [versionColors,newColors](const QColor &color) {
+            const int oldColorIndex = versionColors.indexOf(color);
+            const QColor newColor = oldColorIndex < 0 ? newColors.last() : newColors.at( oldColorIndex%newColors.size() );
+            return newColor;
+        };
+
+        const int nrElements = m_structure->elementCount();
+        for(int i=0; i<nrElements; i++)
+        {
+            StructureElement *element = m_structure->elementAt(i);
+            Scene *scene = element->scene();
+            if(scene == nullptr)
+                continue;
+
+            scene->setColor( evalNewColor(scene->color()) );
+
+            const int nrNotes = scene->noteCount();
+            for(int n=0; n<nrNotes; n++)
+            {
+                Note *note = scene->noteAt(n);
+                note->setColor( evalNewColor(note->color()) );
+            }
+        }
+
+        const int nrNotes = m_structure->noteCount();
+        for(int n=0; n<nrNotes; n++)
+        {
+            Note *note = m_structure->noteAt(n);
+            note->setColor( evalNewColor(note->color()) );
+        }
+
+        const int nrChars = m_structure->characterCount();
+        for(int c=0; c<nrChars; c++)
+        {
+            Character *character = m_structure->characterAt(c);
+
+            const int nrNotes = character->noteCount();
+            for(int n=0; n<nrNotes; n++)
+            {
+                Note *note = character->noteAt(n);
+                note->setColor( evalNewColor(note->color()) );
+            }
+        }
+    }
 }

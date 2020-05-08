@@ -23,7 +23,7 @@ Rectangle {
     clip: true
 
     property real zoomLevel: 1
-    property color dropAreaHighlightColor: "gray"
+    property color dropAreaHighlightColor: "#cfd8dc"
     property string dropAreaKey: "scrite/sceneID"
 
     Connections {
@@ -61,7 +61,7 @@ Rectangle {
             anchors.bottomMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             width: screenplayToolsLayout.width
-            ScrollBar.vertical.policy: ScrolBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
 
             Column {
                 id: screenplayToolsLayout

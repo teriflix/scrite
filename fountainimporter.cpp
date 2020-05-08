@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "fountainimporter.h"
+#include "application.h"
 
 FountainImporter::FountainImporter(QObject *parent)
     : AbstractImporter(parent)
@@ -31,9 +32,6 @@ bool FountainImporter::doImport(QIODevice *device)
     ScriteDocument *doc = this->document();
     Structure *structure = doc->structure();
     Screenplay *screenplay = doc->screenplay();
-    static const QList<QColor> colorPalette = QList<QColor>() <<
-            QColor("purple") << QColor("blue") << QColor("orange") <<
-            QColor("red") << QColor("brown") << QColor("gray");
 
     int sceneCounter = 0;
     Scene *previousScene = nullptr;
@@ -139,7 +137,7 @@ bool FountainImporter::doImport(QIODevice *device)
             ++sceneCounter;
             screenplay->setCurrentElementIndex(-1);
             previousScene = currentScene;
-            currentScene = doc->createNewScene();
+            currentScene = this->createScene(QString());
 
             SceneHeading *heading = currentScene->heading();
             if(line.at(0) == QChar('.'))
@@ -176,7 +174,6 @@ bool FountainImporter::doImport(QIODevice *device)
                 locationForTitle = locationForTitle.left(22) + "...";
 
             currentScene->setTitle("[" + QString::number(sceneCounter) + "]: @ " + locationForTitle);
-            currentScene->setColor( colorPalette.at( sceneCounter%colorPalette.length()) );
             continue;
         }
 
@@ -280,7 +277,7 @@ bool FountainImporter::doImport(QIODevice *device)
             Note *note = new Note(currentScene);
             note->setHeading("Note #" + QString::number(currentScene->noteCount()+1));
             note->setContent(line);
-            note->setColor( colorPalette.at( currentScene->noteCount()%colorPalette.length()) );
+            note->setColor( Application::instance()->pickStandardColor(currentScene->noteCount()) );
             currentScene->addNote(note);
 
             delete para;

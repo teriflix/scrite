@@ -439,6 +439,44 @@ bool Application::notify(QObject *object, QEvent *event)
     return ret;
 }
 
+QColor Application::pickStandardColor(int counter) const
+{
+    const QVector<QColor> colors = this->standardColors();
+    if(colors.isEmpty())
+        return QColor("white");
+
+    return colors.at( counter%colors.size() );
+}
+
+void Application::initializeStandardColors(QQmlEngine *)
+{
+    if(!m_standardColors.isEmpty())
+        return;
+
+    const QVector<QColor> colors = this->standardColors();
+    for(int i=0; i<colors.size(); i++)
+        m_standardColors << QVariant::fromValue<QColor>(colors.at(i));
+
+    emit standardColorsChanged();
+}
+
+QVector<QColor> Application::standardColors(const QVersionNumber &version)
+{
+    // Up-until version 0.2.17 Beta
+    if( !version.isNull() && version <= QVersionNumber(0,2,17) )
+        return QVector<QColor>() <<
+            QColor("blue") << QColor("magenta") << QColor("darkgreen") <<
+            QColor("purple") << QColor("yellow") << QColor("orange") <<
+            QColor("red") << QColor("brown") << QColor("gray") << QColor("white");
+
+    // New set of colors
+    return QVector<QColor>() <<
+        QColor("#2196f3") << QColor("#e91e63") << QColor("#009688") <<
+        QColor("#9c27b0") << QColor("#ffeb3b") << QColor("#ff9800") <<
+        QColor("#f44336") << QColor("#795548") << QColor("#9e9e9e") <<
+        QColor("#fafafa") << QColor("#3f51b5") << QColor("#cddc39");
+}
+
 #ifdef ENABLE_SCRIPT_HOTKEY
 
 #include <QJSEngine>

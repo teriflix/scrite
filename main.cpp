@@ -43,7 +43,7 @@
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 2, 17);
+    const QVersionNumber applicationVersion(0, 2, 18);
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
@@ -156,6 +156,7 @@ int main(int argc, char **argv)
     QQuickView qmlView;
     qmlView.setFormat(format);
     scriteDocument->formatting()->setScreen(qmlView.screen());
+    a.initializeStandardColors(qmlView.engine());
     qmlView.setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);

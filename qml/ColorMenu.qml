@@ -16,38 +16,55 @@ import QtQuick.Controls 2.13
 
 Menu {
     id: colorMenu
-    property var colors: ["blue", "magenta", "darkgreen", "purple", "yellow", "orange", "red", "brown", "gray", "white"]
+    width: minCellSize * 5 + 10
+    height: minCellSize * 4 + 10
 
     signal menuItemClicked(string color)
+    readonly property real minCellSize: 50
 
-    Repeater {
-        model: colors
+    MenuItem {
+        width: colorMenu.width
+        height: colorGrid.height
 
-        MenuItem {
-            height: 33
+        background: Item { }
+        contentItem: Grid {
+            id: colorGrid
+            width: colorMenu.width
+            property int currentIndex: -1
 
-            Row {
-                spacing: 10
-                anchors.verticalCenter: parent.verticalCenter
+            property real cellSize: width / columns
+            columns: Math.floor(width / minCellSize)
 
-                Item { width: 10; height: 10 }
+            Repeater {
+                model: app.standardColors
 
                 Rectangle {
-                    width: 25
-                    height: 25
-                    border { width: 1; color: "lightgray" }
-                    color: modelData
-                    opacity: 0.75
-                }
+                    width: parent.cellSize
+                    height: parent.cellSize
+                    color: (colorGrid.currentIndex === index) ? app.translucent(app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: modelData
-                    font.capitalization: Font.Capitalize
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        border {
+                            width: (colorGrid.currentIndex === index) ? 3 : 1;
+                            color: Qt.darker(modelData)
+                        }
+                        color: modelData
+                    }
+
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            colorMenu.menuItemClicked(modelData)
+                            colorMenu.close()
+                        }
+                        onEntered: colorGrid.currentIndex = index
+                    }
                 }
             }
-
-            onClicked: colorMenu.menuItemClicked(modelData)
         }
     }
 }

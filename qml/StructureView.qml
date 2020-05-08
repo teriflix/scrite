@@ -225,7 +225,7 @@ Item {
             }
 
             property bool newElementMode: false
-            property color newElementColor: "blue"
+            property color newElementColor: app.standardColors[0]
 
             Keys.onPressed: {
                 if(event.key === Qt.Key_N || event.key === Qt.Key_Plus) {
@@ -535,10 +535,9 @@ Item {
 
                     Loader {
                         id: elementOptionsMenuLoader
-                        anchors.top: elementOptionsButton.bottom
+                        anchors.top: background.bottom
                         anchors.right: parent.right
                         anchors.topMargin: 10
-                        anchors.rightMargin: -elementOptionsButton.width-10
                         width: parent.width; height: 1
                         sourceComponent: Menu {
                             signal colorMenuItemClicked(string color)
