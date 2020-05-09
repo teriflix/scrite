@@ -613,6 +613,20 @@ void Scene::clearElements()
         this->removeElement(m_elements.first());
 }
 
+void Scene::removeLastElementIfEmpty()
+{
+    if(m_elements.isEmpty())
+        return;
+
+    SceneElement *element = m_elements.last();
+    if(element->text().isEmpty())
+    {
+        emit sceneAboutToReset();
+        this->removeElement(element);
+        emit sceneReset(-1);
+    }
+}
+
 QQmlListProperty<Note> Scene::notes()
 {
     return QQmlListProperty<Note>(

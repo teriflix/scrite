@@ -162,6 +162,9 @@ public:
 
     Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
 
+    Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
+    Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

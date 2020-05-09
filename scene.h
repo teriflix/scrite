@@ -194,6 +194,8 @@ public:
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
 
+    Q_INVOKABLE void removeLastElementIfEmpty();
+
     enum SceneElementChangeType { ElementTypeChange, ElementTextChange };
     Q_SIGNAL void sceneElementChanged(SceneElement *element, SceneElementChangeType type);
     Q_SIGNAL void aboutToRemoveSceneElement(SceneElement *element);

@@ -185,6 +185,10 @@ Scene *ScriteDocument::createNewScene()
     scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "SOMEWHERE");
     scene->heading()->setMoment(activeScene ? "LATER" : "DAY");
 
+    SceneElement *firstPara = new SceneElement(scene);
+    firstPara->setType(SceneElement::Action);
+    scene->addElement(firstPara);
+
     StructureElement *newStructureElement = new StructureElement(m_structure);
     newStructureElement->setScene(scene);
     newStructureElement->setX(x);

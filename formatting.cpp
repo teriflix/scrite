@@ -458,6 +458,7 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
                        this, &SceneDocumentBinder::onSceneElementChanged);
 
         this->setCurrentElement(nullptr);
+        this->setCursorPosition(-1);
     }
 
     m_textDocument = val;
@@ -528,6 +529,12 @@ void SceneDocumentBinder::setCursorPosition(int val)
     m_currentElementCursorPosition = -1;
     if(m_scene != nullptr)
         m_scene->setCursorPosition(m_cursorPosition);
+
+    if(m_cursorPosition < 0)
+    {
+        emit cursorPositionChanged();
+        return;
+    }
 
     if(this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount())
     {
@@ -807,10 +814,18 @@ void SceneDocumentBinder::initializeDocument()
             cursor.insertBlock();
 
         QTextBlock block = cursor.block();
+        if(!block.isValid() && i == 0)
+        {
+            cursor.insertBlock();
+            block = cursor.block();
+        }
         block.setUserData(new SceneDocumentBlockUserData(element));
         cursor.insertText(element->text());
     }
     document->blockSignals(false);
+
+    if(m_cursorPosition <= 0 && m_currentElement == nullptr && nrElements == 1)
+        this->setCurrentElement(m_scene->elementAt(0));
 
     this->setDocumentLoadCount(m_documentLoadCount+1);
     m_initializingDocument = false;
@@ -847,6 +862,50 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
     emit currentFontChanged();
 }
 
+class ForceCursorPositionHack : public QObject
+{
+public:
+    ForceCursorPositionHack(SceneElement *element);
+    ~ForceCursorPositionHack();
+
+    void timerEvent(QTimerEvent *event);
+
+private:
+    QBasicTimer m_timer;
+};
+
+
+ForceCursorPositionHack::ForceCursorPositionHack(SceneElement *element)
+    : QObject(element)
+{
+    if(!element->text().isEmpty()) {
+        GarbageCollector::instance()->add(this);
+        return;
+    }
+
+    Scene *scene = element->scene();
+    scene->sceneAboutToReset();
+    element->setText(QString("."));
+    scene->sceneReset(scene->cursorPosition());
+
+    m_timer.start(50, this);
+}
+
+ForceCursorPositionHack::~ForceCursorPositionHack() {  }
+
+void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
+{
+    if(event->timerId() == m_timer.timerId()) {
+        m_timer.stop();
+        SceneElement *element = qobject_cast<SceneElement*>(this->parent());
+        Scene *scene = element->scene();
+        scene->sceneAboutToReset();
+        element->setText(QString());
+        scene->sceneReset(scene->cursorPosition());
+        GarbageCollector::instance()->add(this);
+    }
+}
+
 void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type)
 {
     if(m_initializingDocument)
@@ -869,6 +928,8 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
             // Text changes from scene element to block are not applied
             // Only element type changes can be applied.
             this->rehighlightBlock(block);
+            if(element->text().isEmpty())
+                new ForceCursorPositionHack(element);
             return true;
         }
         return false;
@@ -1111,7 +1172,10 @@ void SceneDocumentBinder::onSceneReset(int position)
     this->initializeDocument();
 
     if(position >= 0)
+    {
+        position = qBound(0, position, this->document()->characterCount()-1);
         emit requestCursorPosition(position);
+    }
 
     m_sceneIsBeingReset = false;
 }

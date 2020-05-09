@@ -254,13 +254,13 @@ Item {
                     id: contentArea
                     radius: 8
                     border.width: 1
-                    border.color: sceneTextArea.activeFocus ? backgroundColor : "#cfd8dc"
+                    border.color: sceneTextArea.activeFocus ? backgroundColor : primaryColors.borderColor
                     anchors.fill: parent
                     anchors.leftMargin: sceneEditor.margin
                     anchors.rightMargin: sceneEditor.margin
                     anchors.topMargin: sceneEditorFontMetrics.height
                     anchors.bottomMargin: sceneEditorFontMetrics.height
-                    color: sceneTextArea.activeFocus ? "white" : Qt.rgba(0,0,0,0)
+                    color: sceneTextArea.activeFocus ? "white" : primaryColors.c10.background
                 }
             }
             leftPadding: sceneEditor.padding
@@ -322,10 +322,12 @@ Item {
             }
 
             cursorDelegate: Item {
+                x: sceneTextArea.cursorRectangle.x
+                y: sceneTextArea.cursorRectangle.y
                 width: sceneTextArea.cursorRectangle.width
                 height: sceneTextArea.cursorRectangle.height
                 visible: sceneTextArea.activeFocus
-                ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="gray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
+                ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="lightgray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
                 ToolTip.visible: completer.hasSuggestion
 
                 Rectangle {
@@ -369,12 +371,8 @@ Item {
                     return
                 }
 
-                if(completer.suggestion !== "") {
-                    userIsTyping = false
-                    insert(cursorPosition, completer.suggestion)
-                    userIsTyping = true
-                    Transliterator.enableFromNextWord()
-                    event.accepted = true
+                if(binder.currentElement === null || binder.currentElement.text === "") {
+                    doubleEnterMenu.showup()
                 } else
                     event.accepted = false
             }
@@ -429,33 +427,162 @@ Item {
             }
 
             Menu2 {
+                id: doubleEnterMenu
+
+                property point mousePosition: app.mouseCursorPosition()
+
+                function showup() {
+                    mousePosition = app.mouseCursorPosition()
+                    app.moveMouseCursor( Qt.point(0,0) )
+                    popup(sceneTextArea.cursorRectangle.x, sceneTextArea.cursorRectangle.y+sceneTextArea.cursorRectangle.height)
+                }
+
+                onAboutToShow: sceneTextArea.persistentSelection = true
+                onAboutToHide: {
+                    sceneTextArea.persistentSelection = false
+                    app.moveMouseCursor( mousePosition )
+                }
+                width: 200
+
+                EventFilter.active: visible
+                EventFilter.target: app
+                EventFilter.events: [6]
+                EventFilter.onFilter: {
+                    result.filter = true
+                    result.acceptEvent = true
+
+                    if(allowSplitSceneRequest && event.key === Qt.Key_N) {
+                        newSceneMenuItem.handle()
+                        return
+                    }
+
+                    if(event.key === Qt.Key_H) {
+                        editHeadingMenuItem.handle()
+                        return
+                    }
+
+                    if(sceneDocumentBinder.currentElement === null) {
+                        result.filter = false
+                        result.acceptEvent = false
+                        sceneTextArea.forceActiveFocus()
+                        doubleEnterMenu.close()
+                        return
+                    }
+
+                    switch(event.key) {
+                    case Qt.Key_A:
+                        sceneDocumentBinder.currentElement.type = SceneElement.Action
+                        break;
+                    case Qt.Key_C:
+                        sceneDocumentBinder.currentElement.type = SceneElement.Character
+                        break;
+                    case Qt.Key_D:
+                        sceneDocumentBinder.currentElement.type = SceneElement.Dialogue
+                        break;
+                    case Qt.Key_P:
+                        sceneDocumentBinder.currentElement.type = SceneElement.Parenthetical
+                        break;
+                    case Qt.Key_S:
+                        sceneDocumentBinder.currentElement.type = SceneElement.Shot
+                        break;
+                    case Qt.Key_T:
+                        sceneDocumentBinder.currentElement.type = SceneElement.Transition
+                        break;
+                    default:
+                        result.filter = false
+                        result.acceptEvent = false
+                    }
+
+                    sceneTextArea.forceActiveFocus()
+                    doubleEnterMenu.close()
+                }
+
+                MenuItem2 {
+                    id: editHeadingMenuItem
+                    text: "&Heading (H)"
+                    onClicked: handle()
+
+                    function handle() {
+                        if(scene.heading.enabled === false)
+                            scene.heading.enabled = true
+                        sceneHeadingLoader.viewOnly = false
+                        doubleEnterMenu.close()
+                    }
+                }
+
+                Repeater {
+                    model: [
+                        { "value": SceneElement.Action, "display": "Action" },
+                        { "value": SceneElement.Character, "display": "Character" },
+                        { "value": SceneElement.Dialogue, "display": "Dialogue" },
+                        { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
+                        { "value": SceneElement.Shot, "display": "Shot" },
+                        { "value": SceneElement.Transition, "display": "Transition" }
+                    ]
+
+                    MenuItem2 {
+                        text: modelData.display + " (" + modelData.display[0] + ")"
+                        onClicked: {
+                            if(sceneDocumentBinder.currentElement)
+                                sceneDocumentBinder.currentElement.type = modelData.value
+                            sceneTextArea.forceActiveFocus()
+                            doubleEnterMenu.close()
+                        }
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem2 {
+                    id: newSceneMenuItem
+                    text: "&New Scene (N)"
+                    onClicked: handle()
+                    enabled: allowSplitSceneRequest
+
+                    function handle() {
+                        scene.removeLastElementIfEmpty()
+                        scriteDocument.createNewScene()
+                        doubleEnterMenu.close()
+                    }
+                }
+            }
+
+            Menu2 {
                 id: editorContextMenu
+                onAboutToShow: sceneTextArea.persistentSelection = true
                 onAboutToHide: sceneTextArea.persistentSelection = false
 
                 MenuItem2 {
+                    focusPolicy: Qt.NoFocus
                     text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
                     enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
-                    onClicked: sceneTextArea.cut()
+                    onClicked: { sceneTextArea.cut(); editorContextMenu.close() }
                 }
 
                 MenuItem2 {
+                    focusPolicy: Qt.NoFocus
                     text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
                     enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
-                    onClicked: sceneTextArea.copy()
+                    onClicked: { sceneTextArea.copy(); editorContextMenu.close() }
                 }
 
                 MenuItem2 {
+                    focusPolicy: Qt.NoFocus
                     text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
                     enabled: sceneTextArea.canPaste
-                    onClicked: sceneTextArea.paste()
+                    onClicked: { sceneTextArea.paste(); editorContextMenu.close() }
                 }
 
                 MenuSeparator {  }
 
                 MenuItem2 {
+                    focusPolicy: Qt.NoFocus
                     text: "Split Scene"
                     enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && allowSplitSceneRequest
-                    onClicked: sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                    onClicked: {
+                        sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                        editorContextMenu.close()
+                    }
                 }
 
                 MenuSeparator {  }
@@ -474,9 +601,13 @@ Item {
                         ]
 
                         MenuItem2 {
+                            focusPolicy: Qt.NoFocus
                             text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
                             enabled: sceneDocumentBinder.currentElement !== null
-                            onClicked: sceneDocumentBinder.currentElement.type = modelData.value
+                            onClicked: {
+                                sceneDocumentBinder.currentElement.type = modelData.value
+                                editorContextMenu.close()
+                            }
                         }
                     }
                 }
@@ -489,9 +620,13 @@ Item {
                         model: app.enumerationModel(app.transliterationEngine, "Language")
 
                         MenuItem2 {
+                            focusPolicy: Qt.NoFocus
                             visible: index > 0
                             text: modelData.key
-                            onClicked: sceneTextArea.Transliterator.transliterateToLanguage(sceneTextArea.selectionStart, sceneTextArea.selectionEnd, modelData.value)
+                            onClicked: {
+                                sceneTextArea.Transliterator.transliterateToLanguage(sceneTextArea.selectionStart, sceneTextArea.selectionEnd, modelData.value)
+                                editorContextMenu.close()
+                            }
                         }
                     }
                 }
