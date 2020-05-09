@@ -217,7 +217,7 @@ Item {
                 scrollable: false
                 showOnlyEnabledSceneHeadings: !screenplayEditor.displaySceneMenu
                 allowSplitSceneRequest: true
-                sceneNumber: parent.index
+                sceneNumber: parent.index+1
                 displaySceneNumber: screenplayEditor.displaySceneNumbers
                 displaySceneMenu: screenplayEditor.displaySceneMenu
                 binder.onDocumentInitialized: {

@@ -140,13 +140,10 @@ Item {
                         }
 
                         MenuItem2 {
-                            text: "Delete"
+                            text: "Remove"
                             onClicked: {
                                 sceneMenu.close()
                                 scriteDocument.screenplay.removeSceneElements(scene)
-                                var elementIndex = scriteDocument.structure.indexOfScene(scene)
-                                var element = scriteDocument.structure.elementAt(elementIndex)
-                                scriteDocument.structure.removeElement(element)
                             }
                         }
                     }
