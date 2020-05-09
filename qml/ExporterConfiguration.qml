@@ -142,7 +142,7 @@ Item {
 
                                 Repeater {
                                     model: app.enumerationModel(app.transliterationEngine, "Language")
-                                    delegate: CheckBox {
+                                    delegate: CheckBox2 {
                                         width: languageBundleView.width/languageBundleView.columns
                                         checkable: true
                                         checked: exporter.isFontForLanguageBundled(modelData.value)
@@ -177,7 +177,7 @@ Item {
                 anchors.margins: 20
                 spacing: 20
 
-                Button {
+                Button2 {
                     text: "Cancel"
                     onClicked: {
                         exporter.discard()
@@ -196,7 +196,7 @@ Item {
                     }
                 }
 
-                Button {
+                Button2 {
                     enabled: filePathField.text !== ""
                     text: "Export"
                     onClicked: {
@@ -247,7 +247,7 @@ Item {
     Component {
         id: editor_CheckBox
 
-        CheckBox {
+        CheckBox2 {
             property var fieldInfo
             text: fieldInfo.label
             checkable: true

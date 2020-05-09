@@ -160,6 +160,8 @@ public:
     Q_INVOKABLE QColor pickStandardColor(int counter) const;
     const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
 
+    Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

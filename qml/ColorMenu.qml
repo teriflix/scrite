@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-Menu {
+Menu2 {
     id: colorMenu
     width: minCellSize * 5 + 10
     height: minCellSize * 4 + 10
@@ -22,7 +22,7 @@ Menu {
     signal menuItemClicked(string color)
     readonly property real minCellSize: 50
 
-    MenuItem {
+    MenuItem2 {
         width: colorMenu.width
         height: colorGrid.height
 

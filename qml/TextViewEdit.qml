@@ -87,7 +87,7 @@ Loader {
             background: Rectangle {
                 visible: frameVisible
                 border.width: 1
-                border.color: "black"
+                border.color: primaryColors.borderColor
             }
             opacity: activeFocus ? 1 : 0.5
 

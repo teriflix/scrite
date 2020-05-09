@@ -39,12 +39,14 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "scrite"
                 font.pixelSize: 80
+                color: accentColors.c50.text
             }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: 24
                 text: "Version " + app.applicationVersion
+                color: accentColors.c50.text
             }
         }
 
@@ -54,6 +56,7 @@ Item {
             font.pixelSize: 16
             horizontalAlignment: Text.AlignHCenter
             text: "© TERIFLIX Entertainment Spaces Pvt. Ltd.<br/><font color=\"blue\">https://www.teriflix.com</font>"
+            color: accentColors.c50.text
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
@@ -71,6 +74,7 @@ Item {
                 font.pixelSize: 14
                 horizontalAlignment: Text.AlignHCenter
                 text: "Developed using Qt " + app.qtVersion + " LGPL<br/><font color=\"blue\">https://www.qt.io</font>"
+                color: accentColors.c50.text
 
                 MouseArea {
                     anchors.fill: parent
@@ -85,6 +89,7 @@ Item {
                 font.pixelSize: 14
                 horizontalAlignment: Text.AlignHCenter
                 text: "Using <strong>PhoneticTranslator</strong> for transliteration support.<br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
+                color: accentColors.c50.text
 
                 MouseArea {
                     anchors.fill: parent
@@ -98,17 +103,17 @@ Item {
             spacing: 10
             anchors.horizontalCenter: parent.horizontalCenter
 
-            Button {
+            Button2 {
                 text: "Website"
                 onClicked: Qt.openUrlExternally("https://www.scrite.io")
             }
 
-            Button {
+            Button2 {
                 text: "Help"
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
             }
 
-            Button {
+            Button2 {
                 text: "Feedback"
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/#feedback")
             }

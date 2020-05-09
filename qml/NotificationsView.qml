@@ -34,7 +34,7 @@ Flickable {
                 width: notificationsView.width-1
                 height: Math.max(100, ntextLayout.implicitHeight+20)
                 color: notification.color
-                border { width: 2; color: "gray" }
+                border { width: 2; color: primaryColors.borderColor }
                 property Notification notification: notificationManager.notificationAt(index)
 
                 Column {
@@ -76,7 +76,7 @@ Flickable {
                                 width: button.width
                                 height: button.height * 2
 
-                                Button {
+                                Button2 {
                                     id: button
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: Math.max(75, implicitWidth)
@@ -88,7 +88,7 @@ Flickable {
                     }
                 }
 
-                Button {
+                Button2 {
                     id: dismissButton
                     visible: notification.autoClose === false
                     anchors.verticalCenter: parent.verticalCenter

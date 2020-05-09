@@ -13,6 +13,7 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.12
 
 ToolButton {
     id: toolButton
@@ -28,13 +29,13 @@ ToolButton {
     implicitWidth: suggestedWidth
     implicitHeight: suggestedHeight
 
+    Material.background: accentColors.key
+    Material.foreground: primaryColors.key
+
     font.pixelSize: 16
     hoverEnabled: true
     display: AbstractButton.TextBesideIcon
     opacity: enabled ? 1 : 0.5
-    background: Rectangle {
-        color: (down || (checkable && checked)) ? "#9E9E9E" : Qt.rgba(0,0,0,0)
-    }
     contentItem: Item {
         Row {
             anchors.centerIn: parent

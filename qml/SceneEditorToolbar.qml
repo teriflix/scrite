@@ -34,10 +34,9 @@ ScrollView {
         width: Math.max(toolbarArea.width, toolbar.toolButtonsWidth)
         height: toolbar.height
 
-        Rectangle {
+        Item {
             id: toolbar
             anchors.centerIn: parent
-            color: binder && binder.scene ? Qt.tint(binder.scene.color, "#C0FFFFFF") : "lightgray"
             property var tools: [
                 { "value": SceneElement.Action, "display": "Action", "icon": "../icons/screenplay/action.png" },
                 { "value": SceneElement.Character, "display": "Character", "icon": "../icons/screenplay/character.png" },

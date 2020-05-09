@@ -15,11 +15,9 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
-Rectangle {
+Item {
     id: screenplayView
     signal requestEditor()
-
-    color: Qt.tint("#8c9cb1", "#40FFFFFF")
     clip: true
 
     property real zoomLevel: 1
@@ -41,18 +39,6 @@ Rectangle {
         anchors.margins: 1
         width: 60
         z: 1
-
-        Rectangle {
-            width: parent.height
-            height: parent.width
-            anchors.centerIn: parent
-            transformOrigin: Item.Center
-            rotation: -90
-            gradient: Gradient {
-                GradientStop { position: 0; color: "#FF8c9cb1" }
-                GradientStop { position: 1; color: "#008c9cb1" }
-            }
-        }
 
         ScrollView {
             anchors.top: parent.top
@@ -112,13 +98,13 @@ Rectangle {
                     onClicked: breakElementMenu.popup(width,height/2)
                     down: breakElementMenu.visible
 
-                    Menu {
+                    Menu2 {
                         id: breakElementMenu
 
                         Repeater {
                             model: app.enumerationModel(scriteDocument.screenplay, "BreakType")
 
-                            MenuItem {
+                            MenuItem2 {
                                 text: modelData.key
                                 onClicked: scriteDocument.screenplay.insertBreakElement(modelData.value, scriteDocument.screenplay.currentElementIndex+1)
                             }
@@ -129,17 +115,17 @@ Rectangle {
         }
     }
 
-    FocusIndicator {
-        id: focusIndicator
-        active: mainUndoStack.active
-        anchors.fill: screenplayElementList
-        anchors.margins: -3
+//    FocusIndicator {
+//        id: focusIndicator
+//        active: mainUndoStack.active
+//        anchors.fill: screenplayElementList
+//        anchors.margins: -3
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: screenplayElementList.forceActiveFocus()
-        }
-    }
+//        MouseArea {
+//            anchors.fill: parent
+//            onClicked: screenplayElementList.forceActiveFocus()
+//        }
+//    }
 
     DropArea {
         anchors.fill: parent
@@ -170,6 +156,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 3
+        anchors.bottomMargin: 0
         clip: true
         property bool somethingIsBeingDropped: false
         visible: count > 0 || somethingIsBeingDropped
@@ -271,6 +258,7 @@ Rectangle {
                     color: Qt.tint(sceneColor, "#C0FFFFFF")
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
+                    radius: 3
                     Behavior on border.width { NumberAnimation { duration: 400 } }
 
                     Item {
@@ -407,11 +395,11 @@ Rectangle {
         }
     }
 
-    Menu {
+    Menu2 {
         id: elementItemMenu
         property ScreenplayElement element
 
-        MenuItem {
+        MenuItem2 {
             text: "Remove"
             onClicked: {
                 scriteDocument.screenplay.removeElement(elementItemMenu.element)

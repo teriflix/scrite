@@ -24,10 +24,31 @@ Rectangle {
     id: window
     width: 1024
     height: 768
-    color: "lightgray"
+    color: primaryColors.windowColor
 
-    Material.accent: Material.DeepPurple
+    MaterialColors {
+        id: primaryColors
+        name: "Gray"
+        property var key: Material.Grey
+        property color windowColor: c300.background
+        property color borderColor: c400.background
+        property var highlight: c400
+        property var button: c200
+    }
+
+    MaterialColors {
+        id: accentColors
+        name: "Blue Gray"
+        property var key: Material.BlueGrey
+        property color windowColor: c300.background
+        property color borderColor: c400.background
+        property var button: c200
+    }
+
+    Material.primary: primaryColors.key
+    Material.accent: accentColors.key
     Material.theme: Material.Light
+    Material.background: accentColors.c700.background
 
     UndoStack {
         id: mainUndoStack
@@ -47,14 +68,14 @@ Rectangle {
     Item {
         id: blur
         anchors.fill: ui
-        property color color: "white"
+        property color color: primaryColors.windowColor
 
         property real maxRadius: 32
         property real radius: maxRadius
         visible: false
         onVisibleChanged: {
             if(!visible)
-                color = "white"
+                color = primaryColors.windowColor
         }
 
         FastBlur {
@@ -97,8 +118,8 @@ Rectangle {
         category: "Structure Canvas"
 
         property bool showGrid: true
-        property color gridColor: "lightgray"
-        property color canvasColor: "#cfd8dc"
+        property color gridColor: primaryColors.c900.background
+        property color canvasColor: primaryColors.windowColor
     }
 
     function showInformation(params, popupSource) {
@@ -160,7 +181,7 @@ Rectangle {
     UI.DialogOverlay {
         id: modalDialog
         active: false
-        backgroundColor: "white"
+        anchors.fill: parent
         onCloseRequest: {
             active = false
             closeable = true
@@ -198,13 +219,14 @@ Rectangle {
                     font.pixelSize: 16
                     text: question
                     horizontalAlignment: Text.AlignHCenter
+                    color: accentColors.c50.text
                 }
 
                 Row {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Button {
+                    UI.Button2 {
                         text: okButtonText
                         onClicked: {
                             if(okCallback)
@@ -213,7 +235,7 @@ Rectangle {
                         }
                     }
 
-                    Button {
+                    UI.Button2 {
                         text: cancelButtonText
                         onClicked: {
                             if(cancelCallback)
@@ -247,13 +269,14 @@ Rectangle {
                     font.pixelSize: 16
                     text: message
                     horizontalAlignment: Text.AlignHCenter
+                    color: accentColors.c50.text
                 }
 
                 Row {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Button {
+                    UI.Button2 {
                         text: okButtonText
                         onClicked: {
                             if(okCallback)
@@ -270,13 +293,12 @@ Rectangle {
         active: scriteDocument.busy
         anchors.fill: parent
         sourceComponent: Item {
-
             Rectangle {
                 anchors.fill: indication
                 anchors.margins: -30
                 radius: 10
-                color: "white"
-                border { width: 2; color: "gray" }
+                color: accentColors.c50.background
+                border { width: 2; color: accentColors.c900.background }
             }
 
             Column {
@@ -298,6 +320,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     text: scriteDocument.busyMessage
                     font.pixelSize: 32
+                    color: accentColors.c50.text
                 }
             }
 

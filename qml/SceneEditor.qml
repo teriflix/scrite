@@ -258,7 +258,7 @@ Item {
 
                 Rectangle {
                     id: blinkingCursor
-                    color: "black"
+                    color: primaryColors.borderColor
                     width: 2
                     height: parent.height
 
@@ -356,23 +356,23 @@ Item {
                 cursorShape: Qt.IBeamCursor
             }
 
-            Menu {
+            Menu2 {
                 id: editorContextMenu
                 onAboutToHide: sceneTextArea.persistentSelection = false
 
-                MenuItem {
+                MenuItem2 {
                     text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
                     enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
                     onClicked: sceneTextArea.cut()
                 }
 
-                MenuItem {
+                MenuItem2 {
                     text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
                     enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
                     onClicked: sceneTextArea.copy()
                 }
 
-                MenuItem {
+                MenuItem2 {
                     text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
                     enabled: sceneTextArea.canPaste
                     onClicked: sceneTextArea.paste()
@@ -380,7 +380,7 @@ Item {
 
                 MenuSeparator {  }
 
-                MenuItem {
+                MenuItem2 {
                     text: "Split Scene"
                     enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && allowSplitSceneRequest
                     onClicked: sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
@@ -388,7 +388,7 @@ Item {
 
                 MenuSeparator {  }
 
-                Menu {
+                Menu2 {
                     title: "Format"
 
                     Repeater {
@@ -401,7 +401,7 @@ Item {
                             { "value": SceneElement.Transition, "display": "Transition" }
                         ]
 
-                        MenuItem {
+                        MenuItem2 {
                             text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
                             enabled: sceneDocumentBinder.currentElement !== null
                             onClicked: sceneDocumentBinder.currentElement.type = modelData.value
@@ -409,14 +409,14 @@ Item {
                     }
                 }
 
-                Menu {
+                Menu2 {
                     title: "Translate"
                     enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
 
                     Repeater {
                         model: app.enumerationModel(app.transliterationEngine, "Language")
 
-                        MenuItem {
+                        MenuItem2 {
                             visible: index > 0
                             text: modelData.key
                             onClicked: sceneTextArea.Transliterator.transliterateToLanguage(sceneTextArea.selectionStart, sceneTextArea.selectionEnd, modelData.value)
@@ -441,8 +441,9 @@ Item {
             Text {
                 text: "inherited from previous scene"
                 anchors.centerIn: parent
-                color: "gray"
+                color: primaryColors.c10.text
                 font: headingFont
+                opacity: 0.5
             }
         }
     }
@@ -456,7 +457,7 @@ Item {
                 headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
                 locTypeEdit.forceActiveFocus()
             }
-            color: "white"
+            color: primaryColors.c100.background
             height: layout.height + 4
 
             Row {

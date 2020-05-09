@@ -18,11 +18,9 @@ Rectangle {
     property bool active: false
     border.width: active ? 2 : 0
     border.color: color1
-    color: Qt.rgba(0,0,0,0)
-
-    // Addressing https://github.com/teriflix/scrite/issues/57
-    property color color1: app.translucent(app.palette.highlight, 0.55)
-    property color color2: app.translucent(app.palette.highlight, 0.45)
+    color: accentColors.c10.background
+    property color color1: app.translucent(accentColors.c800.background, 0.55)
+    property color color2: app.translucent(accentColors.c500.background, 0.45)
 
     SequentialAnimation {
         running: focusIndicator.active

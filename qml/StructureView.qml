@@ -25,7 +25,8 @@ Item {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 1
-        color: "lightgray"
+        color: primaryColors.c100.background
+        radius: 3
         height: toolbarLayout.height+4
 
         Row {
@@ -104,12 +105,12 @@ Item {
         }
     }
 
-    FocusIndicator {
-        id: focusIndicator
-        active: mainUndoStack.active
-        anchors.fill: canvasScroll
-        anchors.margins: -3
-    }
+//    FocusIndicator {
+//        id: focusIndicator
+//        active: mainUndoStack.active
+//        anchors.fill: canvasScroll
+//        anchors.margins: -3
+//    }
 
     Rectangle {
         anchors.fill: canvasScroll
@@ -539,11 +540,11 @@ Item {
                         anchors.right: parent.right
                         anchors.topMargin: 10
                         width: parent.width; height: 1
-                        sourceComponent: Menu {
+                        sourceComponent: Menu2 {
                             signal colorMenuItemClicked(string color)
                             onAboutToHide: elementOptionsMenuLoader.active = false
 
-                            MenuItem {
+                            MenuItem2 {
                                 action: Action {
                                     text: "Scene Heading"
                                     checkable: true
@@ -557,7 +558,7 @@ Item {
                                 onMenuItemClicked: colorMenuItemClicked(color)
                             }
 
-                            MenuItem {
+                            MenuItem2 {
                                 text: "Delete"
                                 onClicked: {
                                     releaseEditor()
@@ -708,7 +709,7 @@ Item {
                         id: labelBg
                         width: Math.max(label.width,label.height)+20
                         height: width; radius: width/2
-                        border.width: 1; border.color: "black"
+                        border.width: 1; border.color: primaryColors.borderColor
                         x: parent.suggestedLabelPosition.x - radius
                         y: parent.suggestedLabelPosition.y - radius
                         color: Qt.tint(parent.outlineColor, "#E0FFFFFF")

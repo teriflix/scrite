@@ -36,6 +36,7 @@ HEADERS += \
     htmlimporter.h \
     locationreportgenerator.h \
     logger.h \
+    materialcolors.h \
     note.h \
     notification.h \
     notificationmanager.h \
@@ -98,6 +99,7 @@ SOURCES += \
     locationreportgenerator.cpp \
     logger.cpp \
     main.cpp \
+    materialcolors.cpp \
     note.cpp \
     notification.cpp \
     notificationmanager.cpp \
@@ -127,7 +129,8 @@ SOURCES += \
     undoredo.cpp
 
 RESOURCES += \
-    scrite.qrc
+    scrite.qrc \
+    scrite_ui.qrc
 
 macx {
     ICON = appicon.icns

@@ -16,6 +16,7 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.12
 
 import Scrite 1.0
 
@@ -55,18 +56,20 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: appToolBar.height + 10
-        color: "lightgray"
+        // color: primaryColors.windowColor
+        gradient: Gradient {
+            GradientStop { position: 0; color: primaryColors.c50.background }
+            GradientStop { position: 1; color: primaryColors.windowColor }
+        }
 
-        ToolBar {
+        Item {
             id: appToolBar
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.margins: 10
-            background: Rectangle {
-                color: appToolBarArea.color
-            }
+            height: appFileTools.height
 
             Row {
                 id: appFileTools
@@ -145,7 +148,7 @@ Item {
                             property alias files: recentFilesMenu.recentFiles
                         }
 
-                        Menu {
+                        Menu2 {
                             id: recentFilesMenu
                             property var recentFiles: []
                             function add(filePath) {
@@ -160,7 +163,7 @@ Item {
                                 recentFiles = r
                             }
 
-                            MenuItem {
+                            MenuItem2 {
                                 text: "Open Another"
                                 onClicked: fileOpenButton.doOpen()
                             }
@@ -169,7 +172,7 @@ Item {
                                 visible: true
                             }
 
-                            Menu {
+                            Menu2 {
                                 id: recentFilesSubMenu
                                 title: "Recent Files"
                                 width: 400
@@ -195,7 +198,7 @@ Item {
                                 Repeater {
                                     model: recentFilesMenu.recentFiles
 
-                                    MenuItem {
+                                    MenuItem2 {
                                         property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
                                         text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesSubMenu.width)
                                         ToolTip.text: filePath
@@ -278,17 +281,17 @@ Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
 
-                        Menu {
+                        Menu2 {
                             id: importExportMenu
 
-                            Menu {
+                            Menu2 {
                                 id: importMenu
                                 title: "Import"
 
                                 Repeater {
                                     model: scriteDocument.supportedImportFormats
 
-                                    MenuItem {
+                                    MenuItem2 {
                                         text: modelData
                                         onClicked: {
                                             if(scriteDocument.modified)
@@ -315,13 +318,13 @@ Item {
                                 }
                             }
 
-                            Menu {
+                            Menu2 {
                                 id: exportMenu
                                 title: "Export"
 
                                 Component {
                                     id: menuItemComponent
-                                    MenuItem {
+                                    MenuItem2 {
                                         property string format
                                         text: {
                                             var fields = format.split("/")
@@ -348,7 +351,7 @@ Item {
                                 }
                             }
 
-                            Menu {
+                            Menu2 {
                                 id: reportsMenu
                                 title: "Reports"
                                 enabled: scriteDocument.screenplay.elementCount > 0
@@ -356,7 +359,7 @@ Item {
                                 Repeater {
                                     model: scriteDocument.supportedReports
 
-                                    MenuItem {
+                                    MenuItem2 {
                                         text: modelData
                                         onTriggered: {
                                             reportGeneratorTimer.reportName = modelData
@@ -443,14 +446,14 @@ Item {
                         anchors.top: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
 
-                        Menu {
+                        Menu2 {
                             id: languageMenu
                             width: 250
 
                             Repeater {
                                 model: app.enumerationModel(app.transliterationEngine, "Language")
 
-                                MenuItem {
+                                MenuItem2 {
                                     property string baseText: modelData.key
                                     property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
@@ -462,7 +465,7 @@ Item {
 
                             MenuSeparator { }
 
-                            MenuItem {
+                            MenuItem2 {
                                 text: "Next-Language (F10)"
                                 checkable: true
                                 checked: false
@@ -501,10 +504,9 @@ Item {
             Rectangle {
                 anchors.fill: globalSceneEditorToolbar
                 anchors.margins: -5
-                opacity: 0.25
-                radius: 8
-                border { width: 1; color: "black" }
-                color: globalSceneEditorToolbar.enabled ? "white" : "black"
+                radius: 5
+                border { width: 1; color: primaryColors.borderColor }
+                color: app.translucent(primaryColors.c300.background, 0.25)
             }
 
             SceneEditorToolbar {
@@ -514,7 +516,6 @@ Item {
                 anchors.right: appLogo.left
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
-                // enabled: sceneEditor ? true : false
                 property Item sceneEditor
                 editInFullscreen: workspaceSettings.editInFullscreen
                 onEditInFullscreenChanged: workspaceSettings.editInFullscreen = editInFullscreen
@@ -589,28 +590,31 @@ Item {
 
         SplitView {
             orientation: Qt.Vertical
+            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
 
-            Rectangle {
+            Item {
                 SplitView.preferredHeight: workspaceSettings.workspaceHeight ? documentUI.height*workspaceSettings.workspaceHeight : documentUI.height*0.75
                 SplitView.minimumHeight: documentUI.height * 0.5
                 onHeightChanged: workspaceSettings.workspaceHeight = height/documentUI.height
 
                 SplitView {
                     anchors.fill: parent
+                    anchors.margins: 2
                     orientation: Qt.Horizontal
 
                     Rectangle {
                         SplitView.preferredWidth: workspaceSettings.structureEditorWidth ? documentUI.width*workspaceSettings.structureEditorWidth : documentUI.width*0.4
-                        color: "lightgray"
                         onWidthChanged: workspaceSettings.structureEditorWidth = width/documentUI.width
+                        border {
+                            width: 1
+                            color: primaryColors.borderColor
+                        }
+                        radius: 5
+                        color: primaryColors.windowColor
 
-                        Rectangle {
+                        Item {
                             id: structureEditor
                             anchors.fill: parent
-                            anchors.margins: 2
-                            border { width: 1; color: "gray" }
-                            radius: 5
-                            color: "#EEEEEE"
 
                             property var tabs: ["Structure", "Notebook"]
 
@@ -627,7 +631,7 @@ Item {
                                     width: parent.width
                                     height: 2
                                     anchors.bottom: parent.bottom
-                                    color: "gray"
+                                    color: primaryColors.borderColor
                                 }
 
                                 Row {
@@ -649,8 +653,8 @@ Item {
                                             PainterPathItem {
                                                 anchors.fill: parent
                                                 anchors.topMargin: isActiveTab ? 0 : parent.height*0.1
-                                                fillColor: isActiveTab ? structureEditor.color : "#BDBDBD"
-                                                outlineColor: "gray"
+                                                fillColor: isActiveTab ? primaryColors.windowColor : primaryColors.c200.background
+                                                outlineColor: primaryColors.borderColor
                                                 outlineWidth: 2
                                                 renderingMechanism: PainterPathItem.UseQPainter
                                                 antialiasing: true
@@ -705,13 +709,6 @@ Item {
                                 }
                             }
 
-                            Rectangle {
-                                anchors.fill: structureEditorContent
-                                anchors.margins: -1
-                                border { width: 1; color: "lightgray" }
-                                radius: 5
-                            }
-
                             SwipeView {
                                 id: structureEditorContent
                                 anchors.left: parent.left
@@ -744,7 +741,12 @@ Item {
 
                     Rectangle {
                         SplitView.preferredWidth: documentUI.width * 0.6
-                        color: "lightgray"
+                        color: primaryColors.windowColor
+                        border {
+                            width: 1
+                            color: primaryColors.borderColor
+                        }
+                        radius: 5
 
                         Loader {
                             width: parent.width*0.7
@@ -781,13 +783,19 @@ Item {
             }
 
             Item {
-                ScreenplayView {
-                    id: screenplayView
+                Rectangle {
                     anchors.fill: parent
-                    anchors.margins: 5
-                    border { width: 1; color: "lightgray" }
-                    radius: 5
-                    onRequestEditor: editorLoader.sourceComponent = screenplayEditorComponent
+                    anchors.margins: 2
+                    color: accentColors.c200.background
+                    border { width: 1; color: accentColors.borderColor }
+                    radius: 6
+
+                    ScreenplayView {
+                        id: screenplayView
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        onRequestEditor: editorLoader.sourceComponent = screenplayEditorComponent
+                    }
                 }
             }
         }
@@ -799,7 +807,7 @@ Item {
         Rectangle {
             id: screenplayEditorItem
             clip: true
-            color: "lightgray"
+            color: globalSceneEditorToolbar.editInFullscreen && scriteDocument.screenplay.elementCount === 0 ? primaryColors.windowColor : primaryColors.c50.background
 
             Loader {
                 width: parent.width*0.7
@@ -838,12 +846,12 @@ Item {
                 anchors.top: parent.top
             }
 
-            FocusIndicator {
-                id: focusIndicator
-                active: mainUndoStack.active
-                anchors.fill: sceneEditor
-                anchors.margins: -3
-            }
+//            FocusIndicator {
+//                id: focusIndicator
+//                active: mainUndoStack.active
+//                anchors.fill: sceneEditor
+//                anchors.margins: -3
+//            }
 
             SceneEditor {
                 id: sceneEditor

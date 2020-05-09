@@ -125,13 +125,13 @@ Item {
                         Row {
                             spacing: 20
 
-                            RadioButton {
+                            RadioButton2 {
                                 text: "Adobe PDF Format"
                                 checked: generator.format === AbstractReportGenerator.AdobePDF
                                 onClicked: generator.format = AbstractReportGenerator.AdobePDF
                             }
 
-                            RadioButton {
+                            RadioButton2 {
                                 text: "Open Document Format"
                                 checked: generator.format === AbstractReportGenerator.OpenDocumentFormat
                                 onClicked: generator.format = AbstractReportGenerator.OpenDocumentFormat
@@ -164,7 +164,7 @@ Item {
                 anchors.margins: 20
                 spacing: 20
 
-                Button {
+                Button2 {
                     text: "Cancel"
                     onClicked: {
                         generator.discard()
@@ -183,7 +183,7 @@ Item {
                     }
                 }
 
-                Button {
+                Button2 {
                     enabled: filePathField.text !== ""
                     text: "Generate"
                     onClicked: {
@@ -226,7 +226,7 @@ Item {
             Rectangle {
                 anchors.fill: characterNameListView
                 anchors.margins: -1
-                border { width: 1; color: "black" }
+                border { width: 1; color: primaryColors.borderColor }
             }
 
             ListView {
@@ -251,7 +251,7 @@ Item {
                     width: characterNameListView.width
                     height: 35
 
-                    CheckBox {
+                    CheckBox2 {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -275,7 +275,7 @@ Item {
     Component {
         id: editor_CheckBox
 
-        CheckBox {
+        CheckBox2 {
             property string fieldName
             property string fieldTitle
             text: fieldTitle

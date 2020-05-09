@@ -13,22 +13,27 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.12
 import Scrite 1.0
 
 Item {
     width: 300
     height: 55
     property alias searchEngine: theSearchEngine
+    property real borderWidth: 0
 
     SearchEngine {
         id: theSearchEngine
     }
 
     Rectangle {
+        id: rect
         anchors.fill: parent
         anchors.margins: 4
-        color: enabled ? "white" : "lightgray"
+        color: primaryColors.c10.background
         enabled: theSearchEngine.searchAgentCount > 0
+        border.width: borderWidth
+        border.color: primaryColors.borderColor
 
         TextArea {
             id: txtSearch
@@ -38,6 +43,18 @@ Item {
             anchors.margins: 5
             palette: app.palette
             renderType: Text.NativeRendering
+            Material.primary: primaryColors.key
+            Material.accent: accentColors.key
+            background: Item {
+                Rectangle {
+                    width: parent.width
+                    height: txtSearch.activeFocus ? 2 : 1
+                    color: accentColors.c700.background
+                    visible: txtSearch.enabled
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 4
+                }
+            }
             Keys.onReturnPressed: {
                 Transliterator.transliterateLastWord()
                 triggerSearch()

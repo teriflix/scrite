@@ -154,11 +154,11 @@ Item {
     }
     Component.onCompleted: evaluateNoteSources()
 
-    Menu {
+    Menu2 {
         id: characterItemMenu
         property Character character
 
-        MenuItem {
+        MenuItem2 {
             text: "Remove Section"
             onClicked: {
                 scriteDocument.structure.removeCharacter(characterItemMenu.character)
@@ -388,7 +388,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 10
                 radius: 5
-                color: "lightgray"
+                color: primaryColors.windowColor
                 opacity: 0.25
             }
 
@@ -441,7 +441,7 @@ Item {
         Rectangle {
             width: 400
             height: 600
-            color: "white"
+            color: primaryColors.windowColor
 
             Item {
                 anchors.fill: parent
@@ -460,7 +460,7 @@ Item {
                 Rectangle {
                     anchors.fill: charactersListView
                     anchors.margins: -2
-                    border { width: 1; color: "black" }
+                    border { width: 1; color: primaryColors.borderColor }
                 }
 
                 ListView {
@@ -487,7 +487,7 @@ Item {
                         width: charactersListView.width
                         spacing: 10
 
-                        CheckBox {
+                        CheckBox2 {
                             checkable: true
                             checked: modelData.added
                             anchors.verticalCenter: parent.verticalCenter
@@ -510,7 +510,7 @@ Item {
                     }
                 }
 
-                Button {
+                Button2 {
                     id: createSectionsButton
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right

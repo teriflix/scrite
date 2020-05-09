@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>material_colors_db.json</file>
+        <file>qml/AboutBox.qml</file>
+        <file>qml/Button2.qml</file>
+        <file>qml/ColorMenu.qml</file>
+        <file>qml/DialogOverlay.qml</file>
+        <file>qml/ExporterConfiguration.qml</file>
+        <file>qml/FocusIndicator.qml</file>
+        <file>qml/NotebookView.qml</file>
+        <file>qml/NotificationsView.qml</file>
+        <file>qml/OptionsDialog.qml</file>
+        <file>qml/ReportGeneratorConfiguration.qml</file>
+        <file>qml/SceneEditor.qml</file>
+        <file>qml/SceneEditorToolbar.qml</file>
+        <file>qml/ScreenplayEditor.qml</file>
+        <file>qml/ScreenplayView.qml</file>
+        <file>qml/ScriteDocumentView.qml</file>
+        <file>qml/ScrollArea.qml</file>
+        <file>qml/SearchBar.qml</file>
+        <file>qml/StructureView.qml</file>
+        <file>qml/TextField2.qml</file>
+        <file>qml/TextViewEdit.qml</file>
+        <file>qml/ToolButton2.qml</file>
+        <file>qml/ComboBox2.qml</file>
+        <file>qml/RadioButton2.qml</file>
+        <file>qml/CheckBox2.qml</file>
+        <file>qml/Menu2.qml</file>
+        <file>qml/MenuItem2.qml</file>
+    </qresource>
+</RCC>

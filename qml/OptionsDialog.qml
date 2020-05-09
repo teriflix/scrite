@@ -14,6 +14,7 @@
 import QtQuick 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.12
 import Scrite 1.0
 
 Item {
@@ -28,7 +29,7 @@ Item {
             anchors.fill: pageList
             anchors.margins: -4
             radius: 5
-            border { width: 1; color: "black" }
+            border { width: 1; color: primaryColors.borderColor }
         }
 
         ListModel {
@@ -67,13 +68,14 @@ Item {
             section.delegate: Rectangle {
                 width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
                 height: 30
-                color: "lightsteelblue"
+                color: accentColors.c600.background
 
                 Text {
                     anchors.centerIn: parent
                     font.pixelSize: 14
                     font.letterSpacing: 2
                     text: section
+                    color: accentColors.c600.text
                 }
             }
 
@@ -90,7 +92,7 @@ Item {
             }
             highlight: Rectangle {
                 width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
-                color: "lightgray"
+                color: primaryColors.highlight.background
                 radius: 5
             }
             delegate: Text {
@@ -101,6 +103,7 @@ Item {
                 font.pixelSize: 18
                 font.bold: pageList.currentIndex === index
                 text: name
+                color: pageList.currentIndex === index ? primaryColors.highlight.text : primaryColors.c10.text
                 MouseArea {
                     anchors.fill: parent
                     onClicked: pageList.currentIndex = index
@@ -259,14 +262,14 @@ Item {
                     width: parent.width-20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Button {
+                    Button2 {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Reset Paragraph Formats"
                         onClicked: scriteDocument.formatting.resetToDefaults()
                     }
 
                     Text {
-                        color: "red"
+                        color: accentColors.c600.background
                         width: parent.width
                         font.pixelSize: 10
                         text: "<strong>NOTE:</strong> Clicking this button will reset both print and on-screen paragraph formats."
@@ -356,7 +359,7 @@ Item {
                                         text: "Left"
                                     }
 
-                                    ComboBox {
+                                    ComboBox2 {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -379,7 +382,7 @@ Item {
                                         text: "Center"
                                     }
 
-                                    ComboBox {
+                                    ComboBox2 {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -402,7 +405,7 @@ Item {
                                         text: "Right"
                                     }
 
-                                    ComboBox {
+                                    ComboBox2 {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -439,7 +442,7 @@ Item {
                                         text: "Left"
                                     }
 
-                                    ComboBox {
+                                    ComboBox2 {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -462,7 +465,7 @@ Item {
                                         text: "Center"
                                     }
 
-                                    ComboBox {
+                                    ComboBox2 {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -485,7 +488,7 @@ Item {
                                         text: "Right"
                                     }
 
-                                    ComboBox {
+                                    ComboBox2 {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -499,7 +502,7 @@ Item {
 
                     GroupBox {
                         width: parent.width
-                        label: CheckBox {
+                        label: CheckBox2 {
                             text: "Watermark"
                             checked: pageSetupSettings.watermarkEnabled
                             onToggled: pageSetupSettings.watermarkEnabled = checked
@@ -526,7 +529,7 @@ Item {
                                 text: "Font Family"
                             }
 
-                            ComboBox {
+                            ComboBox2 {
                                 width: 300
                                 model: systemFontInfo.families
                                 currentIndex: systemFontInfo.families.indexOf(pageSetupSettings.watermarkFont)
@@ -564,7 +567,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: "black"
+                                border.color: primaryColors.borderColor
                                 color: pageSetupSettings.watermarkColor
                                 width: 30; height: 30
                                 MouseArea {
@@ -576,7 +579,7 @@ Item {
                         }
                     }
 
-                    Button {
+                    Button2 {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Restore Defaults"
                         onClicked: {
@@ -638,7 +641,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    ComboBox {
+                    ComboBox2 {
                         width: parent.width-parent.spacing-labelWidth
                         model: systemFontInfo.families
                         currentIndex: systemFontInfo.families.indexOf(elementFormat.font.family)
@@ -687,21 +690,21 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
-                        CheckBox {
+                        CheckBox2 {
                             text: "Bold"
                             font.bold: true
                             checkable: true
                             checked: elementFormat.font.bold
                         }
 
-                        CheckBox {
+                        CheckBox2 {
                             text: "Italics"
                             font.italic: true
                             checkable: true
                             checked: elementFormat.font.italic
                         }
 
-                        CheckBox {
+                        CheckBox2 {
                             text: "Underline"
                             font.underline: true
                             checkable: true
@@ -725,7 +728,7 @@ Item {
 
                     Rectangle {
                         border.width: 1
-                        border.color: "black"
+                        border.color: primaryColors.borderColor
                         color: elementFormat.textColor
                         width: 30; height: 30
                         anchors.verticalCenter: parent.verticalCenter
@@ -745,7 +748,7 @@ Item {
 
                     Rectangle {
                         border.width: 1
-                        border.color: "black"
+                        border.color: primaryColors.borderColor
                         color: elementFormat.backgroundColor
                         width: 30; height: 30
                         anchors.verticalCenter: parent.verticalCenter
@@ -774,7 +777,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Left"
                             checkable: true
                             checked: elementFormat.textAlignment === Qt.AlignLeft
@@ -784,7 +787,7 @@ Item {
                             }
                         }
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Center"
                             checkable: true
                             checked: elementFormat.textAlignment === Qt.AlignHCenter
@@ -794,7 +797,7 @@ Item {
                             }
                         }
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Right"
                             checkable: true
                             checked: elementFormat.textAlignment === Qt.AlignRight
@@ -804,7 +807,7 @@ Item {
                             }
                         }
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Justify"
                             checkable: true
                             checked: elementFormat.textAlignment === Qt.AlignJustify
@@ -859,19 +862,19 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Left"
                             checkable: true
                             checked: elementFormat.blockAlignment === Qt.AlignLeft
                         }
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Center"
                             checkable: true
                             checked: elementFormat.blockAlignment === Qt.AlignHCenter
                         }
 
-                        RadioButton {
+                        RadioButton2 {
                             text: "Right"
                             checkable: true
                             checked: elementFormat.blockAlignment === Qt.AlignRight
@@ -956,7 +959,7 @@ Item {
 
                         GroupBox {
                             width: parent.width
-                            label: CheckBox {
+                            label: CheckBox2 {
                                 text: "Enable AutoSave"
                                 checked: scriteDocument.autoSave
                                 onToggled: scriteDocument.autoSave = checked
@@ -990,7 +993,7 @@ Item {
                                 width: parent.width
                                 spacing: 10
 
-                                CheckBox {
+                                CheckBox2 {
                                     checkable: true
                                     checked: structureCanvasSettings.showGrid
                                     text: "Show Grid in Structure Tab"
@@ -1011,7 +1014,7 @@ Item {
 
                                     Rectangle {
                                         border.width: 1
-                                        border.color: "black"
+                                        border.color: primaryColors.borderColor
                                         width: 30; height: 30
                                         color: structureCanvasSettings.canvasColor
                                         anchors.verticalCenter: parent.verticalCenter
@@ -1032,7 +1035,7 @@ Item {
 
                                     Rectangle {
                                         border.width: 1
-                                        border.color: "black"
+                                        border.color: primaryColors.borderColor
                                         width: 30; height: 30
                                         color: structureCanvasSettings.gridColor
                                         anchors.verticalCenter: parent.verticalCenter
@@ -1086,7 +1089,7 @@ Item {
 
                                 Repeater {
                                     model: app.transliterationEngine.getLanguages()
-                                    delegate: CheckBox {
+                                    delegate: CheckBox2 {
                                         width: activeLanguagesView.width/activeLanguagesView.columns
                                         checkable: true
                                         checked: modelData.active

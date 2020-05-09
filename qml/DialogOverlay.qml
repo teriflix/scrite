@@ -17,8 +17,7 @@ import Scrite 1.0
 
 Rectangle {
     id: dialogOverlay
-    anchors.fill: parent
-    color: Qt.rgba(1,1,1,t*0.4)
+    color: app.translucent(accentColors.c50.background, t*0.4)
     property alias sourceComponent: contentsLoader.sourceComponent
     property alias active: contentsLoader.active
     property alias dialogItem: contentsLoader.item
@@ -27,8 +26,6 @@ Rectangle {
     property rect defaultPopupSourceArea: Qt.rect( (parent.x+(parent.width-10)/2), (parent.y+(parent.height-10)/2), 10, 10 )
     property bool animationComplete: false
     property alias closeable: closeButton.visible
-    property alias backgroundColor: contentsAreaBackground.color
-    onBackgroundColorChanged: blur.color = Qt.tint(backgroundColor, Qt.rgba(1,1,1,0.75))
     signal closeRequest()
 
     function close() {
@@ -111,6 +108,7 @@ Rectangle {
         anchors.fill: contentsArea
         anchors.margins: -4
         radius: 6
+        color: "white"
         Behavior on color { ColorAnimation { duration: 500 } }
     }
 
@@ -140,10 +138,6 @@ Rectangle {
             onItemChanged: {
                 if(item)
                     item.focus = true
-            }
-            onActiveChanged: {
-                if(!active)
-                    backgroundColor = Qt.rgba(1,1,1,0)
             }
         }
     }

@@ -448,6 +448,12 @@ QColor Application::pickStandardColor(int counter) const
     return colors.at( counter%colors.size() );
 }
 
+QRectF Application::boundingRect(const QString &text, const QFont &font) const
+{
+    const QFontMetricsF fm(font);
+    return fm.boundingRect(text);
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())

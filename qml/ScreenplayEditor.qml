@@ -26,6 +26,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        borderWidth: 1
     }
 
     Repeater {
@@ -78,13 +79,13 @@ Item {
         }
     }
 
-    FocusIndicator {
-        id: focusIndicator
-        active: mainUndoStack.active
-        anchors.fill: screenplayListView
-        anchors.margins: -3
-        color: active && screenplayListView.height < screenplayListView.contentHeight ? "white" : Qt.rgba(0,0,0,0)
-    }
+//    FocusIndicator {
+//        id: focusIndicator
+//        active: mainUndoStack.active
+//        anchors.fill: screenplayListView
+//        anchors.margins: -3
+//        color: active && screenplayListView.height < screenplayListView.contentHeight ? "white" : Qt.rgba(0,0,0,0)
+//    }
 
     ListView {
         id: screenplayListView
@@ -165,9 +166,9 @@ Item {
             property ScreenplayElement element
             property int index: -1
             height: 50
-            color: "white"
+            color: primaryColors.windowColor
             border.width: 1
-            border.color: "#37474F"
+            border.color: primaryColors.borderColor
 
             Text {
                 anchors.centerIn: parent

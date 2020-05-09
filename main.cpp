@@ -32,6 +32,7 @@
 #include "standardpaths.h"
 #include "textshapeitem.h"
 #include "scritedocument.h"
+#include "materialcolors.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
 #include "abstractexporter.h"
@@ -142,6 +143,8 @@ int main(int argc, char **argv)
 
     qmlRegisterUncreatableType<AutoUpdate>("Scrite", 1, 0, "AutoUpdate", reason);
 
+    qmlRegisterType<MaterialColors>("Scrite", 1, 0, "MaterialColors");
+
     NotificationManager notificationManager;
     ScriteDocument *scriteDocument = ScriteDocument::instance();
 
@@ -164,6 +167,8 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("logger", Logger::instance());
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
+//    qmlView.engine()->rootContext()->setContextProperty("primaryColors", new MaterialColors("Deep Purple", qmlView.engine()));
+//    qmlView.engine()->rootContext()->setContextProperty("secondaryColors", new MaterialColors("Amber", qmlView.engine()));
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(1350, 700));
