@@ -171,7 +171,7 @@ Scene *ScriteDocument::createNewScene()
     else
         structureElement = m_structure->elementAt(m_structure->elementCount()-1);
 
-    const qreal xOffset = m_structure->elementCount()%2 ? 275 : -275;
+    const qreal xOffset = (structureElement && structureElement->x() > 275) ? -275 : 275;
     const qreal x = structureElement ? (structureElement->x() + xOffset) : 100;
     const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 50) : 50;
 

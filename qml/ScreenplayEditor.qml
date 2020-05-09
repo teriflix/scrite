@@ -17,6 +17,9 @@ import Scrite 1.0
 
 Item {
     id: screenplayEditor
+    property bool  displaySceneNumbers: false
+    property bool  displaySceneMenu: false
+
     property Item currentSceneEditor
     property TextArea currentSceneContentEditor: currentSceneEditor ? currentSceneEditor.editor : null
     signal requestEditor()
@@ -212,8 +215,11 @@ Item {
                 anchors.leftMargin: 2
                 anchors.rightMargin: 2
                 scrollable: false
-                showOnlyEnabledSceneHeadings: true
+                showOnlyEnabledSceneHeadings: !screenplayEditor.displaySceneMenu
                 allowSplitSceneRequest: true
+                sceneNumber: parent.index
+                displaySceneNumber: screenplayEditor.displaySceneNumbers
+                displaySceneMenu: screenplayEditor.displaySceneMenu
                 binder.onDocumentInitialized: {
                     var info = screenplayListView.lastSceneResetInfo
                     screenplayListView.lastSceneResetInfo = undefined

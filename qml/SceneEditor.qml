@@ -30,6 +30,9 @@ Item {
     property bool  showOnlyEnabledSceneHeadings: false
     property bool  allowSplitSceneRequest: false
     property real  sceneHeadingHeight: sceneHeadingArea.height
+    property int   sceneNumber: -1
+    property bool  displaySceneNumber: false
+    property bool  displaySceneMenu: false
 
     signal assumeFocus()
     signal assumeFocusAt(int pos)
@@ -55,8 +58,11 @@ Item {
 
         Loader {
             id: sceneHeadingLoader
-            width: parent.width
             height: loaderHeight.get
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: sceneEditor.padding
+            anchors.rightMargin: sceneEditor.padding
             property bool viewOnly: true
             active: scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
             sourceComponent: sceneHeadingComponent.get
@@ -75,6 +81,75 @@ Item {
                     if(scene !== null && scene.heading !== null && scene.heading.enabled)
                         return sceneHeadingLoader.viewOnly ? sceneHeadingViewer : sceneHeadingEditor
                     return sceneHeadingDisabled
+                }
+            }
+        }
+
+        Loader {
+            active: displaySceneNumber
+            anchors.right: sceneHeadingLoader.left
+            anchors.verticalCenter: sceneHeadingLoader.verticalCenter
+            anchors.rightMargin: sceneEditorFontMetrics.paragraphMargin
+
+            sourceComponent: Text {
+                property font headingFont: sceneHeadingFormat.font
+                Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+                text: "[" + sceneNumber + "]"
+                font: headingFont
+            }
+        }
+
+        Loader {
+            active: displaySceneMenu
+            anchors.left: sceneHeadingLoader.right
+            anchors.verticalCenter: sceneHeadingLoader.verticalCenter
+            anchors.leftMargin: sceneEditorFontMetrics.paragraphMargin
+
+            sourceComponent: ToolButton2 {
+                icon.source: "../icons/navigation/menu.png"
+                ToolTip.text: "Click here to view scene options menu."
+                ToolTip.delay: 1000
+                onClicked: sceneMenu.visible = true
+                down: sceneMenu.visible
+
+                Item {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    Menu2 {
+                        id: sceneMenu
+                        MenuItem2 {
+                            action: Action {
+                                text: "Scene Heading"
+                                checkable: true
+                                checked: scene.heading.enabled
+                            }
+                            onTriggered: {
+                                scene.heading.enabled = action.checked
+                                sceneMenu.close()
+                            }
+                        }
+
+                        ColorMenu {
+                            title: "Colors"
+                            onMenuItemClicked: {
+                                scene.color = color
+                                sceneMenu.close()
+                            }
+                        }
+
+                        MenuItem2 {
+                            text: "Delete"
+                            onClicked: {
+                                sceneMenu.close()
+                                scriteDocument.screenplay.removeSceneElements(scene)
+                                var elementIndex = scriteDocument.structure.indexOfScene(scene)
+                                var element = scriteDocument.structure.elementAt(elementIndex)
+                                scriteDocument.structure.removeElement(element)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -258,7 +333,7 @@ Item {
 
                 Rectangle {
                     id: blinkingCursor
-                    color: primaryColors.borderColor
+                    color: primaryColors.c900.background
                     width: 2
                     height: parent.height
 
@@ -464,8 +539,6 @@ Item {
                 id: layout
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: sceneEditor.padding
-                anchors.rightMargin: sceneEditor.padding
 
                 TextField2 {
                     id: locTypeEdit
@@ -522,7 +595,7 @@ Item {
         id: sceneHeadingViewer
 
         Rectangle {
-            color: Qt.tint(scene.color, "#D9FFFFFF")
+            color: primaryColors.c10.background
             property font headingFont: sceneHeadingFormat.font
             Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
             radius: contentEditorArea.radius
@@ -532,8 +605,6 @@ Item {
                 id: sceneHeadingText
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: sceneEditor.padding
-                anchors.rightMargin: sceneEditor.padding
                 font: parent.headingFont
                 text: scene.heading.text
                 anchors.verticalCenter: parent.verticalCenter

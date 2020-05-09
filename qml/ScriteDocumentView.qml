@@ -501,14 +501,6 @@ Item {
             width: parent.width - appFileTools.width - 20
             height: parent.height
 
-            Rectangle {
-                anchors.fill: globalSceneEditorToolbar
-                anchors.margins: -5
-                radius: 5
-                border { width: 1; color: primaryColors.borderColor }
-                color: app.translucent(primaryColors.c300.background, 0.25)
-            }
-
             SceneEditorToolbar {
                 id: globalSceneEditorToolbar
                 anchors.verticalCenter: parent.verticalCenter
@@ -828,6 +820,8 @@ Item {
                 id: screenplayEditor
                 anchors.fill: parent
                 onCurrentSceneEditorChanged: globalSceneEditorToolbar.sceneEditor = currentSceneEditor
+                displaySceneNumbers: globalSceneEditorToolbar.editInFullscreen
+                displaySceneMenu: globalSceneEditorToolbar.editInFullscreen
             }
         }
     }
