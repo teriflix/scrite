@@ -543,7 +543,7 @@ Item {
     Loader {
         id: contentLoader
         active: true
-        sourceComponent: globalSceneEditorToolbar.editInFullscreen ? screenplayEditorComponent : documentUiContentComponent
+        sourceComponent: globalSceneEditorToolbar.editInFullscreen ? uiLayout2Component : uiLayout1Component
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: appToolBarArea.bottom
@@ -578,7 +578,7 @@ Item {
     }
 
     Component {
-        id: documentUiContentComponent
+        id: uiLayout1Component
 
         SplitView {
             orientation: Qt.Vertical
@@ -787,6 +787,181 @@ Item {
                         anchors.fill: parent
                         anchors.margins: 5
                         onRequestEditor: editorLoader.sourceComponent = screenplayEditorComponent
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: uiLayout2Component
+
+        Item {
+            Item {
+                id: uiLayout2TabBar
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 5
+                height: 28
+                property int currentIndex: 0
+                property var tabs: ["Screenplay Only", "Structure, Timeline & Notes"]
+
+                Rectangle {
+                    width: parent.width
+                    height: 2
+                    anchors.bottom: parent.bottom
+                    color: primaryColors.borderColor
+                }
+
+                Row {
+                    height: parent.height
+                    anchors.centerIn: parent
+                    spacing: -height*0.75
+
+                    Repeater {
+                        model: uiLayout2TabBar.tabs
+
+                        Item {
+                            id: tabItem
+                            width: tabLabel.width + 120
+                            height: uiLayout2TabBar.height
+                            property bool isActiveTab: uiLayout2TabBar.currentIndex === index
+                            z: isActiveTab ? uiLayout2TabBar.tabs.length+1 : index
+
+                            PainterPathItem {
+                                anchors.fill: parent
+                                anchors.topMargin: isActiveTab ? 0 : parent.height*0.1
+                                fillColor: isActiveTab ? primaryColors.windowColor : primaryColors.c200.background
+                                outlineColor: primaryColors.borderColor
+                                outlineWidth: 2
+                                renderingMechanism: PainterPathItem.UseQPainter
+                                antialiasing: true
+                                painterPath: PainterPath {
+                                    id: tabPath
+                                    property real radius: Math.min(itemRect.width, itemRect.height)*0.2
+                                    property point c1: Qt.point(itemRect.left+itemRect.width*0.1, itemRect.top+1)
+                                    property point c2: Qt.point(itemRect.right-1-itemRect.width*0.1, itemRect.top+1)
+
+                                    property point p1: Qt.point(itemRect.left, itemRect.bottom)
+                                    property point p2: pointInLine(c1, p1, radius, true)
+                                    property point p3: pointInLine(c1, c2, radius, true)
+                                    property point p4: pointInLine(c2, c1, radius, true)
+                                    property point p5: pointInLine(c2, p6, radius, true)
+                                    property point p6: Qt.point(itemRect.right-1, itemRect.bottom)
+
+                                    MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
+                                    LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
+                                    QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
+                                    LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
+                                    QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
+                                    LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
+                                    CloseSubpath { }
+                                }
+
+                                Text {
+                                    id: tabLabel
+                                    text: modelData
+                                    anchors.centerIn: parent
+                                    font.pixelSize: isActiveTab ? 16 : 14
+                                    font.bold: isActiveTab
+                                }
+
+                                Rectangle {
+                                    height: 1.5
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.leftMargin: 2
+                                    anchors.rightMargin: 2
+                                    anchors.verticalCenter: parent.bottom
+                                    color: parent.fillColor
+                                    visible: isActiveTab
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: uiLayout2TabBar.currentIndex = index
+                            }
+                        }
+                    }
+                }
+            }
+
+            SwipeView {
+                id: uiLayout2TabView
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: uiLayout2TabBar.bottom
+                anchors.bottom: parent.bottom
+                anchors.margins: 5
+                clip: true
+
+                interactive: false
+                currentIndex: uiLayout2TabBar.currentIndex
+
+                Loader {
+                    sourceComponent: screenplayEditorComponent
+                }
+
+                SplitView {
+                    orientation: Qt.Vertical
+                    Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+
+                    Item {
+                        SplitView.fillHeight: true
+
+                        SplitView {
+                            anchors.fill: parent
+                            orientation: Qt.Horizontal
+
+                            Rectangle {
+                                SplitView.preferredWidth: uiLayout2TabView.width * 0.5
+                                color: primaryColors.c10.background
+                                border {
+                                    width: 1
+                                    color: primaryColors.borderColor
+                                }
+                                radius: 4
+
+                                StructureView {
+                                    anchors.fill: parent
+                                    anchors.margins: 2
+
+                                    onRequestEditor: {
+                                        if(scriteDocument.structure.currentElementIndex >= 0) {
+                                            var selement = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
+                                            var index = scriteDocument.screenplay.firstIndexOfScene(selement.scene)
+                                            scriteDocument.screenplay.currentElementIndex = index
+                                        }
+                                    }
+                                }
+                            }
+
+                            NotebookView {
+                                SplitView.fillWidth: true
+                            }
+                        }
+                    }
+
+                    Item {
+                        SplitView.preferredHeight: screenplayView.preferredHeight + 40
+                        SplitView.minimumHeight: SplitView.preferredHeight
+                        SplitView.maximumHeight: SplitView.preferredHeight
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: 2
+                            color: accentColors.c200.background
+                            border { width: 1; color: accentColors.borderColor }
+                            radius: 6
+
+                            ScreenplayView {
+                                id: screenplayView
+                                anchors.fill: parent
+                                anchors.margins: 5
+                            }
+                        }
                     }
                 }
             }

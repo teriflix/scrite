@@ -23,6 +23,7 @@ Item {
     property real zoomLevel: 1
     property color dropAreaHighlightColor: "#cfd8dc"
     property string dropAreaKey: "scrite/sceneID"
+    property real preferredHeight: screenplayToolsLayout.height
 
     Connections {
         target: scriteDocument.screenplay
