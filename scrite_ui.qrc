@@ -28,5 +28,7 @@
         <file>qml/CheckBox2.qml</file>
         <file>qml/Menu2.qml</file>
         <file>qml/MenuItem2.qml</file>
+        <file>qml/TagText.qml</file>
+        <file>qml/CharactersView.qml</file>
     </qresource>
 </RCC>

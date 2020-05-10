@@ -115,7 +115,6 @@ Item {
     Rectangle {
         anchors.fill: canvasScroll
         color: structureCanvasSettings.canvasColor
-        opacity: 0.4
     }
 
     ScrollArea {
@@ -147,15 +146,7 @@ Item {
             majorTickColor: structureCanvasSettings.gridColor
             minorTickColor: structureCanvasSettings.gridColor
             tickDistance: scriteDocument.structure.canvasGridSize
-
             transformOrigin: Item.TopLeft
-
-            Image {
-                anchors.fill: parent
-                fillMode: Image.Tile
-                source: "../images/notebookpage.jpg"
-                opacity: 0.5
-            }
 
             DelayedPropertyBinder {
                 id: widthBinder

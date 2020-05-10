@@ -24,6 +24,14 @@ AbstractTextDocumentExporter::~AbstractTextDocumentExporter()
 
 }
 
+void AbstractTextDocumentExporter::setListSceneCharacters(bool val)
+{
+    if(m_listSceneCharacters == val)
+        return;
+
+    m_listSceneCharacters = val;
+    emit listSceneCharactersChanged();
+}
 
 void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal pageWidth)
 {
@@ -186,6 +194,18 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
             TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, sceneNr + heading->text());
 
             ++nrBlocks;
+        }
+
+        // Characters in the scene.
+        const QStringList characterNames = scene->characterNames();
+        if(m_listSceneCharacters && !characterNames.isEmpty())
+        {
+            SceneElementFormat *format = screenplayFormat->elementFormat(SceneElement::Action);
+            const QTextBlockFormat blockFormat = format->createBlockFormat();
+            QTextCharFormat charFormat = format->createCharFormat();
+            charFormat.setBackground(QBrush(QColor("yellow")));
+            cursor.insertBlock(blockFormat, charFormat);
+            cursor.insertText("{ " + characterNames.join(", ") + " }");
         }
 
         for(int j=0; j<nrSceneElements; j++)

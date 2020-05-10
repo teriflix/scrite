@@ -15,15 +15,17 @@
 #define SCENE_H
 
 #include <QMap>
+#include <QList>
 #include <QColor>
+#include <QPointer>
 #include <QJsonArray>
 #include <QUndoCommand>
 #include <QQmlListProperty>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
-#include <QPointer>
 
 #include "note.h"
+#include "qobjectserializer.h"
 
 class Scene;
 class SceneHeading;
@@ -125,9 +127,71 @@ private:
     Scene* m_scene = nullptr;
 };
 
-class Scene : public QAbstractListModel
+class CharacterElementMap
+{
+public:
+    CharacterElementMap() { }
+    ~CharacterElementMap() { }
+
+    // This function returns true if characterNames() would return
+    // a different list after this function returns
+    bool include(SceneElement *element) {
+        if(element == nullptr)
+            return false;
+
+        if(element->type() == SceneElement::Character) {
+            this->remove(element);
+
+            QString newName = element->formattedText();
+            newName = newName.section('(', 0, 0).trimmed();
+            if(newName.isEmpty())
+                return false;
+
+            m_forwardMap[element] = newName;
+            m_reverseMap[newName].append(element);
+            return true;
+        }
+
+        if(m_forwardMap.contains(element))
+            return this->remove(element);
+
+        return false;
+    }
+
+    // This function returns true if characterNames() would return
+    // a different list after this function returns
+    bool remove(SceneElement *element) {
+        const QString oldName = m_forwardMap.value(element);
+        if(!oldName.isEmpty()) {
+            QList<SceneElement*> &list = m_reverseMap[oldName];
+            if(list.removeOne(element)) {
+                if(list.isEmpty()) {
+                    m_reverseMap.remove(oldName);
+                    return true;
+                }
+                if(list.size() == 1) {
+                    const QVariant value = list.first()->property("#invisible");
+                    if(value.isValid() && value.toBool())
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    QStringList characterNames() const { return m_reverseMap.keys(); }
+    QList<SceneElement*> characterElements() const { return m_forwardMap.keys(); }
+    QList<SceneElement*> characterElements(const QString &name) const { return m_reverseMap.value(name.toUpper()); }
+
+private:
+    QMap<SceneElement*,QString> m_forwardMap;
+    QMap< QString, QList<SceneElement*> > m_reverseMap;
+};
+
+class Scene : public QAbstractListModel, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Q_INVOKABLE Scene(QObject *parent=nullptr);
@@ -180,6 +244,14 @@ public:
     SceneHeading* heading() const { return m_heading; }
     Q_SIGNAL void headingChanged();
 
+    Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
+    QStringList characterNames() const { return m_characterElementMap.characterNames(); }
+    Q_SIGNAL void characterNamesChanged();
+
+    Q_INVOKABLE void addInvisibleCharacter(const QString &characterName);
+    Q_INVOKABLE void removeInvisibleCharacter(const QString &characterName);
+    Q_INVOKABLE bool isCharacterInvisible(const QString &characterName) const;
+
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements)
     QQmlListProperty<SceneElement> elements();
     Q_INVOKABLE void addElement(SceneElement *ptr);
@@ -229,9 +301,15 @@ public:
     bool resetFromByteArray(const QByteArray &bytes);
     static Scene *fromByteArray(const QByteArray &bytes);
 
+    // QObjectSerializer::Interface interface
+    void serializeToJson(QJsonObject &json) const;
+    void deserializeFromJson(const QJsonObject &json);
+
 private:
     QList<SceneElement *> elementsList() const { return m_elements; }
     void setElementsList(const QList<SceneElement*> &list);
+    void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
+    void onAboutToRemoveSceneElement(SceneElement *element);
 
 private:
     friend class SceneElement;
@@ -246,7 +324,9 @@ private:
     SceneHeading* m_heading = new SceneHeading(this);
     bool m_isBeingReset = false;
     bool m_undoRedoEnabled = false;
+    bool m_inSetElementsList = false;
     PushSceneUndoCommand *m_pushUndoCommand = nullptr;
+    CharacterElementMap m_characterElementMap;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);

@@ -987,10 +987,10 @@ ForceCursorPositionHack::ForceCursorPositionHack(SceneElement *element)
 
     Scene *scene = element->scene();
     scene->sceneAboutToReset();
-    element->setText(QString("."));
+    element->setText(QString("("));
     scene->sceneReset(scene->cursorPosition());
 
-    m_timer.start(50, this);
+    m_timer.start(0, this);
 }
 
 ForceCursorPositionHack::~ForceCursorPositionHack() {  }

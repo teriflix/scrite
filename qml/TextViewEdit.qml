@@ -28,8 +28,11 @@ Loader {
     property int searchSequenceNumber: -1
     property bool hasFocus: item.activeFocus
     property var completionStrings: []
-    property real contentWidth: fontMetrics.advanceWidth(text)
+    property real contentWidth: item ? item.contentWidth : fontMetrics.advanceWidth(text)
     property bool frameVisible: false
+    property alias fontAscent: fontMetrics.ascent
+    property alias fontDescent: fontMetrics.descent
+    property alias fontHeight: fontMetrics.height
 
     signal textEdited(string text)
     signal editingFinished()

@@ -956,39 +956,14 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
 
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
 {
-    if(element == nullptr)
-        return;
-
-    if(element->type() == SceneElement::Character)
-    {
-        QString characterName = element->formattedText();
-        characterName = characterName.section('(', 0, 0).trimmed();
-        m_characterElementNameMap[element] = characterName;
-        this->evaluateCharacterNames();
-    }
-    else if(m_characterElementNameMap.contains(element))
-    {
-        m_characterElementNameMap.remove(element);
-        this->evaluateCharacterNames();
-    }
+    if( m_characterElementMap.include(element) )
+        emit characterNamesChanged();
 }
 
 void Structure::onAboutToRemoveSceneElement(SceneElement *element)
 {
-    if(m_characterElementNameMap.contains(element))
-    {
-        m_characterElementNameMap.remove(element);
-        this->evaluateCharacterNames();
-    }
-}
-
-void Structure::evaluateCharacterNames()
-{
-    m_characterNames = m_characterElementNameMap.values();
-    std::sort(m_characterNames.begin(), m_characterNames.end());
-    m_characterNames.removeDuplicates();
-    m_characterNames.removeAll(QString());
-    emit characterNamesChanged();
+    if( m_characterElementMap.remove(element) )
+        emit characterNamesChanged();
 }
 
 void Structure::staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr)

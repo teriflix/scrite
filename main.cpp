@@ -36,6 +36,7 @@
 #include "painterpathitem.h"
 #include "transliteration.h"
 #include "abstractexporter.h"
+#include "genericarraymodel.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 #include "delayedpropertybinder.h"
@@ -144,6 +145,9 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<AutoUpdate>("Scrite", 1, 0, "AutoUpdate", reason);
 
     qmlRegisterType<MaterialColors>("Scrite", 1, 0, "MaterialColors");
+
+    qmlRegisterType<GenericArrayModel>("Scrite", 1, 0, "GenericArrayModel");
+    qmlRegisterType<GenericArraySortFilterProxyModel>("Scrite", 1, 0, "GenericArraySortFilterProxyModel");
 
     NotificationManager notificationManager;
     ScriteDocument *scriteDocument = ScriteDocument::instance();

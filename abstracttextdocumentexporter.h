@@ -23,10 +23,21 @@ class AbstractTextDocumentExporter : public AbstractExporter
 public:
     ~AbstractTextDocumentExporter();
 
+    Q_CLASSINFO("listSceneCharacters_FieldLabel", "List characters for each scene")
+    Q_CLASSINFO("listSceneCharacters_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters NOTIFY listSceneCharactersChanged)
+    void setListSceneCharacters(bool val);
+    bool isListSceneCharacters() const { return m_listSceneCharacters; }
+    Q_SIGNAL void listSceneCharactersChanged();
+
+    bool requiresConfiguration() const { return true; }
+
 protected:
     AbstractTextDocumentExporter(QObject *parent=nullptr);
-
     void generate(QTextDocument *textDocument, const qreal pageWidth);
+
+private:
+    bool m_listSceneCharacters = false;
 };
 
 #endif // ABSTRACTTEXTDOCUMENTEXPORTER_H

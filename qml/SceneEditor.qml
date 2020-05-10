@@ -24,7 +24,8 @@ Item {
     property alias binder: sceneDocumentBinder
     property Item  editor: sceneContentEditor
     property bool  editorHasActiveFocus: activeFocusBinder.get
-    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) + (sceneContentEditor ? (sceneContentEditor.totalHeight+contentEditorArea.anchors.topMargin+(sceneContentEditor.length===0 ? 10 : 0)) : 0)
+    property real  fullHeight: (sceneHeadingLoader.active ? sceneHeadingArea.height : 0) +
+                               (sceneContentEditor ? (sceneContentEditor.totalHeight+contentEditorArea.anchors.topMargin+(sceneContentEditor.length===0 ? 10 : 0)) : 0)
     property color backgroundColor: scene ? Qt.tint(scene.color, "#F7FFFFFF") : "white"
     property bool  scrollable: true
     property bool  showOnlyEnabledSceneHeadings: false
@@ -33,12 +34,15 @@ Item {
     property int   sceneNumber: -1
     property bool  displaySceneNumber: false
     property bool  displaySceneMenu: false
+    property bool  showCharacterNames: false
+    property bool  active: false
 
     signal assumeFocus()
     signal assumeFocusAt(int pos)
     signal requestScrollUp()
     signal requestScrollDown()
     signal splitSceneRequest(SceneElement sceneElement, int textPosition)
+    signal requestCharacterMenu(string characterName)
 
     readonly property real margin: Math.max( Math.round((width-sceneEditorFontMetrics.pageWidth)/2), sceneEditorFontMetrics.height*2 )
     readonly property real padding: sceneEditorFontMetrics.paragraphMargin + margin
@@ -160,13 +164,125 @@ Item {
         }
     }
 
+    Loader {
+        id: sceneCharactersList
+        anchors.top: sceneHeadingArea.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: sceneEditor.padding
+        anchors.rightMargin: sceneEditor.padding
+        active: showCharacterNames && enabled
+        enabled: true
+
+        Connections {
+            target: scene
+            enabled: sceneCharactersList.enabled
+            onSceneChanged: {
+                sceneCharactersList.enabled = false
+                sceneCharactersList.enabled = true
+            }
+        }
+
+        sourceComponent: Flow {
+            spacing: 5
+            flow: Flow.LeftToRight
+
+            Text {
+                id: sceneCharactersListHeading
+                text: "Characters in scene: "
+                font.bold: true
+                font.pointSize: 12
+                topPadding: 5
+                bottomPadding: 5
+            }
+
+            Repeater {
+                model: scene.characterNames
+
+                TagText {
+                    property var colors: {
+                        if(containsMouse)
+                            return accentColors.c900
+                        return sceneEditor.active ? accentColors.c600 : accentColors.c10
+                    }
+                    border.width: editorHasActiveFocus ? 0 : 1
+                    border.color: colors.text
+                    color: colors.background
+                    textColor: colors.text
+                    id: characterNameLabel
+                    text: modelData
+                    leftPadding: 10
+                    rightPadding: 10
+                    topPadding: 5
+                    bottomPadding: 5
+                    font.pointSize: 12
+                    closable: scene.isCharacterInvisible(modelData)
+                    onClicked: requestCharacterMenu(modelData)
+                    onCloseRequest: scene.removeInvisibleCharacter(modelData)
+                }
+            }
+
+            Loader {
+                id: newCharacterInput
+                width: active && item ? Math.max(item.contentWidth, 100) : 0
+                active: false
+                sourceComponent: Item {
+                    property alias contentWidth: textViewEdit.contentWidth
+                    height: textViewEdit.height
+
+                    TextViewEdit {
+                        id: textViewEdit
+                        width: parent.width
+                        y: -fontDescent
+                        readOnly: false
+                        font.capitalization: Font.AllUppercase
+                        font.pointSize: 12
+                        horizontalAlignment: Text.AlignLeft
+                        wrapMode: Text.NoWrap
+                        completionStrings: scriteDocument.structure.characterNames
+                        onEditingFinished: {
+                            scene.addInvisibleCharacter(text)
+                            newCharacterInput.active = false
+                        }
+
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: parent.fontAscent
+                            height: 1
+                            color: accentColors.borderColor
+                        }
+                    }
+                }
+            }
+
+            Image {
+                source: "../icons/content/add_box.png"
+                width: sceneCharactersListHeading.height
+                height: sceneCharactersListHeading.height
+                opacity: 0.5
+
+                MouseArea {
+                    ToolTip.text: "Click here to capture characters who don't have any dialogues in this scene, but are still required for the scene."
+                    ToolTip.delay: 1000
+                    ToolTip.visible: containsMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
+                    onClicked: newCharacterInput.active = true
+                }
+            }
+        }
+    }
+
     property TextArea sceneContentEditor
 
     Rectangle {
         id: contentEditorArea
         anchors.left: parent.left
         anchors.top: sceneHeadingArea.bottom
-        anchors.topMargin: sceneHeadingLoader.active ? radius/2 : 0
+        anchors.topMargin: (sceneHeadingLoader.active ? radius/2 : 0) + (sceneCharactersList.active ? (sceneCharactersList.height+5) : 0)
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         color: backgroundColor

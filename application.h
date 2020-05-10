@@ -46,6 +46,9 @@ public:
 
     Q_PROPERTY(QPalette palette READ palette CONSTANT)
     Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio CONSTANT)
+    Q_PROPERTY(QFont font READ applicationFont NOTIFY applicationFontChanged)
+    QFont applicationFont() const { return this->font(); }
+    Q_SIGNAL void applicationFontChanged();
 
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) { return url.toLocalFile(); }
 

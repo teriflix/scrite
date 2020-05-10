@@ -209,6 +209,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
     }
 
     QMap<QString,int> dialogCount;
+    QMap<QString,int> sceneCount;
 
     // Report Detail
     {
@@ -234,6 +235,41 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
             if(scene == nullptr)
                 continue;
 
+            bool sceneHasSaidCharacters = false;
+            Q_FOREACH(QString characterName, m_characterNames)
+            {
+                if( scene->characterNames().contains(characterName) )
+                {
+                    sceneCount[characterName] = sceneCount.value(characterName,0)+1;
+
+                    if(sceneInfoWritten == false && m_includeSceneHeadings)
+                    {
+                        // Write Scene Information First
+                        QTextBlockFormat blockFormat = defaultBlockFormat;
+                        if(!dialogCount.isEmpty())
+                            blockFormat.setTopMargin(20);
+
+                        QTextCharFormat charFormat = defaultCharFormat;
+                        charFormat.setFontPointSize(14);
+                        charFormat.setFontCapitalization(QFont::AllUppercase);
+                        charFormat.setFontWeight(QFont::Bold);
+                        charFormat.setFontItalic(false);
+
+                        cursor.insertBlock(blockFormat, charFormat);
+                        // cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
+                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, "Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
+                        sceneInfoWritten = true;
+                    }
+
+                    sceneHasSaidCharacters = true;
+                }
+            }
+
+            if(!sceneHasSaidCharacters)
+                continue;
+
+            QMap<QString,bool> characterHasDialogue;
+
             const int nrElements = scene->elementCount();
             for(int j=0; j<nrElements; j++)
             {
@@ -244,24 +280,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                     characterName = characterName.section('(', 0, 0).trimmed();
                     if(m_characterNames.contains(characterName))
                     {
-                        if(sceneInfoWritten == false && m_includeSceneHeadings)
-                        {
-                            // Write Scene Information First
-                            QTextBlockFormat blockFormat = defaultBlockFormat;
-                            if(!dialogCount.isEmpty())
-                                blockFormat.setTopMargin(20);
-
-                            QTextCharFormat charFormat = defaultCharFormat;
-                            charFormat.setFontPointSize(14);
-                            charFormat.setFontCapitalization(QFont::AllUppercase);
-                            charFormat.setFontWeight(QFont::Bold);
-                            charFormat.setFontItalic(false);
-
-                            cursor.insertBlock(blockFormat, charFormat);
-                            // cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
-                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, "Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
-                            sceneInfoWritten = true;
-                        }
+                        characterHasDialogue[characterName] = true;
 
                         if(m_includeDialogues)
                         {
@@ -329,6 +348,21 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
                 }
             }
 
+            Q_FOREACH(QString characterName, m_characterNames)
+            {
+                if(characterHasDialogue.value(characterName, false) == false)
+                {
+                    QTextBlockFormat blockFormat = defaultBlockFormat;
+                    blockFormat.setIndent(1);
+                    blockFormat.setBottomMargin(20);
+
+                    QTextCharFormat charFormat = defaultCharFormat;
+
+                    cursor.insertBlock(blockFormat, charFormat);
+                    cursor.insertText(characterName + " is in this scene.");
+                }
+            }
+
             cursor.movePosition(QTextCursor::End);
             this->progress()->tick();
         }
@@ -358,6 +392,8 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
         QMap<QString,int>::const_iterator end = dialogCount.constEnd();
         while(it != end)
         {
+            const int nrScenes = sceneCount.value(it.key(), 1);
+
             charFormat = defaultCharFormat;
             charFormat.setFontWeight(QFont::Bold);
             charFormat.setFontCapitalization(QFont::AllUppercase);
@@ -367,7 +403,7 @@ bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
 
             charFormat = defaultCharFormat;
             cursor.setCharFormat(charFormat);
-            cursor.insertText(" speaks " + QString::number(it.value()) + " times ");
+            cursor.insertText(" speaks " + QString::number(it.value()) + " times and is present in " + QString::number(nrScenes) + " scene(s).");
 
             ++it;
         }

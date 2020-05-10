@@ -30,6 +30,7 @@ HEADERS += \
     fountainexporter.h \
     fountainimporter.h \
     garbagecollector.h \
+    genericarraymodel.h \
     gridbackgrounditem.h \
     hourglass.h \
     htmlexporter.h \
@@ -93,6 +94,7 @@ SOURCES += \
     fountainexporter.cpp \
     fountainimporter.cpp \
     garbagecollector.cpp \
+    genericarraymodel.cpp \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \
     htmlimporter.cpp \

@@ -19,7 +19,7 @@ import Scrite 1.0
 
 Item {
     width: 1050
-    height: 700
+    height: 680
 
     Item {
         anchors.fill: parent
@@ -755,7 +755,7 @@ Item {
 
                     SpinBox {
                         width: parent.width-2*parent.spacing-labelWidth-parent.height
-                        from: 9
+                        from: 6
                         to: 62
                         stepSize: 1
                         editable: true
@@ -841,7 +841,7 @@ Item {
                         width: parent.width-2*parent.spacing-labelWidth-parent.height
                         from: 25
                         to: 300
-                        stepSize: 10
+                        stepSize: 5
                         value: elementFormat.lineHeight * 100
                         onValueModified: elementFormat.lineHeight = value/100
                         textFromValue: function(value,locale) {

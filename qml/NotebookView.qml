@@ -161,6 +161,7 @@ Item {
         MenuItem2 {
             text: "Remove Section"
             onClicked: {
+                notebookTabsView.currentIndex = 0
                 scriteDocument.structure.removeCharacter(characterItemMenu.character)
                 characterItemMenu.close()
             }
@@ -439,9 +440,9 @@ Item {
         id: newCharactersDialogUi
 
         Rectangle {
-            width: 400
-            height: 600
-            color: primaryColors.windowColor
+            width: Math.max(Math.min(charactersListView.implicitWidth+20, 1050), 400)
+            height: 680
+            color: primaryColors.c10.background
 
             Item {
                 anchors.fill: parent
@@ -453,17 +454,11 @@ Item {
                     anchors.top: parent.top
                     font.pixelSize: 18
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Create sections in your notebook for characters in your screenplay"
+                    text: "Check the characters for which you want to create sections in the notebook"
                     wrapMode: Text.WordWrap
                 }
 
-                Rectangle {
-                    anchors.fill: charactersListView
-                    anchors.margins: -2
-                    border { width: 1; color: primaryColors.borderColor }
-                }
-
-                ListView {
+                CharactersView {
                     id: charactersListView
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -471,43 +466,9 @@ Item {
                     anchors.bottom: createSectionsButton.top
                     anchors.topMargin: 20
                     anchors.bottomMargin: 10
-                    clip: true
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity { NumberAnimation { duration: 250 } }
-                    }
-
-                    property var detectedCharacters: scriteDocument.structure.detectCharacters()
-                    property var newCharacters: []
-
-                    model: detectedCharacters
-                    spacing: 10
-                    delegate: Row {
-                        width: charactersListView.width
-                        spacing: 10
-
-                        CheckBox2 {
-                            checkable: true
-                            checked: modelData.added
-                            anchors.verticalCenter: parent.verticalCenter
-                            enabled: modelData.added === false
-                            onToggled: {
-                                var chs = charactersListView.newCharacters
-                                if(checked)
-                                    chs.push(modelData.name)
-                                else
-                                    chs.splice( chs.indexOf(modelData.name), 1 )
-                                charactersListView.newCharacters = chs
-                            }
-                        }
-
-                        Text {
-                            font.pixelSize: 15
-                            text: modelData.name
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+                    charactersModel.array: scriteDocument.structure.detectCharacters()
+                    charactersModel.objectMembers: ["name", "added"]
+                    sortFilterRole: charactersModel.objectMemberRole("name")
                 }
 
                 Button2 {
@@ -516,7 +477,7 @@ Item {
                     anchors.right: parent.right
                     text: "Create Sections"
                     onClicked: {
-                        scriteDocument.structure.addCharacters(charactersListView.newCharacters)
+                        scriteDocument.structure.addCharacters(charactersListView.selectedCharacters)
                         modalDialog.closeRequest()
                     }
                 }

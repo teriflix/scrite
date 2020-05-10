@@ -19,17 +19,24 @@ import QtQuick.Controls 2.13
 Item {
     id: configurationBox
     property AbstractReportGenerator generator
-    property var formInfo: generator ? generator.configurationFormInfo() : {"title": "Unknown", "fields": []}
+    property var formInfo: {"title": "Unknown", "fields": []}
 
     width: 700
     height: formInfo.fields.length > 0 ? 700 : 275
 
     Component.onCompleted: {
-        generator = scriteDocument.createReportGenerator(modalDialog.arguments)
+        var reportName = typeof modalDialog.arguments === "string" ? modalDialog.arguments : modalDialog.arguments.reportName
+        generator = scriteDocument.createReportGenerator(reportName)
         if(generator === null) {
             modalDialog.closeable = true
-            notice.text = "Report generator for '" + modalDialog.arguments + "' could not be created."
+            notice.text = "Report generator for '" + JSON.stringify(modalDialog.arguments) + "' could not be created."
+        } else if(typeof modalDialog.arguments !== "string") {
+            var config = modalDialog.arguments.configuration
+            for(var member in config)
+                generator.setConfigurationValue(member, config[member])
+            formInfo = generator.configurationFormInfo()
         }
+
         modalDialog.arguments = undefined
     }
 
@@ -210,26 +217,68 @@ Item {
         Item {
             property string fieldName
             property string fieldTitle
-            property var characterNames: []
-            height: 300
+            property alias characterNames: characterNameListView.selectedCharacters
             onCharacterNamesChanged: generator.setConfigurationValue(fieldName, characterNames)
+            height: characterNameListView.visible ? 300 : fieldTitleText.height
 
-            Text {
+            onFieldNameChanged: {
+                characterNameListView.selectedCharacters = generator.getConfigurationValue(fieldName)
+                characterNameListView.visible = characterNameListView.selectedCharacters.length === 0
+                console.log(fieldName + ", " + generator.getConfigurationValue(fieldName))
+            }
+
+            Loader {
                 id: fieldTitleText
                 width: parent.width
-                text: fieldTitle + ": " + (characterNames.length > 0 ? characterNames.join(', ') : '')
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                elide: Text.ElideRight
+                sourceComponent: Flow {
+                    spacing: 5
+                    flow: Flow.LeftToRight
+
+                    Text {
+                        id: sceneCharactersListHeading
+                        text: fieldTitle + ": "
+                        font.bold: true
+                        font.pointSize: characterNameListView.visible ? 12 : 15
+                        topPadding: 5
+                        bottomPadding: 5
+                    }
+
+                    Repeater {
+                        model: characterNames
+
+                        TagText {
+                            property var colors: accentColors.c600
+                            border.width: 1
+                            border.color: colors.text
+                            color: colors.background
+                            textColor: colors.text
+                            text: modelData
+                            leftPadding: 10
+                            rightPadding: 10
+                            topPadding: 5
+                            bottomPadding: 5
+                            font.pointSize: characterNameListView.visible ? 12 : 15
+                        }
+                    }
+
+                    Image {
+                        source: "../icons/content/add_box.png"
+                        width: sceneCharactersListHeading.height
+                        height: sceneCharactersListHeading.height
+                        opacity: 0.5
+                        visible: !characterNameListView.visible
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
+                            onClicked: characterNameListView.visible = true
+                        }
+                    }
+                }
             }
 
-            Rectangle {
-                anchors.fill: characterNameListView
-                anchors.margins: -1
-                border { width: 1; color: primaryColors.borderColor }
-            }
-
-            ListView {
+            CharactersView {
                 id: characterNameListView
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -238,36 +287,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.rightMargin: 30
                 anchors.leftMargin: 5
-                clip: true
-                model: scriteDocument.structure.characterNames
-                spacing: 5
-                currentIndex: -1
-                ScrollBar.vertical: ScrollBar {
-                    policy: ScrollBar.AlwaysOn
-                    opacity: active ? 1 : 0.2
-                    Behavior on opacity { NumberAnimation { duration: 250 } }
-                }
-                delegate: Item {
-                    width: characterNameListView.width
-                    height: 35
-
-                    CheckBox2 {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.margins: 5
-                        font.pixelSize: 15
-                        text: modelData
-                        onToggled: {
-                            var names = characterNames
-                            if(checked)
-                                names.push(modelData)
-                            else
-                                names.splice(names.indexOf(modelData),1)
-                            characterNames = names
-                        }
-                    }
-                }
+                charactersModel.array: charactersModel.stringListArray(scriteDocument.structure.characterNames)
             }
         }
     }

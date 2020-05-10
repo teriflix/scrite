@@ -28,6 +28,7 @@
 #include <QUndoCommand>
 #include <QTextDocument>
 #include <QJsonDocument>
+#include <QScopedValueRollback>
 
 class PushSceneUndoCommand;
 class SceneUndoCommand : public QUndoCommand
@@ -417,6 +418,9 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::headingChanged);
 
+    connect(this, &Scene::sceneElementChanged, this, &Scene::onSceneElementChanged);
+    connect(this, &Scene::aboutToRemoveSceneElement, this, &Scene::onAboutToRemoveSceneElement);
+
     connect(this, &Scene::sceneAboutToReset, [this]() {
         m_isBeingReset = true;
         emit resetStateChanged();
@@ -506,6 +510,45 @@ void Scene::setCursorPosition(int val)
     emit cursorPositionChanged();
 }
 
+void Scene::addInvisibleCharacter(const QString &characterName)
+{
+    const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
+    if(!elements.isEmpty())
+        return;
+
+    SceneElement *element = new SceneElement(this);
+    element->setProperty("#invisible", true);
+    element->setType(SceneElement::Character);
+    element->setText(characterName);
+
+    emit sceneChanged();
+}
+
+void Scene::removeInvisibleCharacter(const QString &characterName)
+{
+    const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
+    if(elements.isEmpty() || elements.size() > 1)
+        return;
+
+    const QVariant value = elements.first()->property("#invisible");
+    if(value.isValid() && value.toBool())
+    {
+        emit aboutToRemoveSceneElement(elements.first());
+        GarbageCollector::instance()->add(elements.first());
+        emit sceneChanged();
+    }
+}
+
+bool Scene::isCharacterInvisible(const QString &characterName) const
+{
+    const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
+    if(elements.isEmpty() || elements.size() > 1)
+        return false;
+
+    const QVariant value = elements.first()->property("#invisible");
+    return (value.isValid() && value.toBool());
+}
+
 QQmlListProperty<SceneElement> Scene::elements()
 {
     return QQmlListProperty<SceneElement>(
@@ -550,7 +593,8 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
 
     PushSceneUndoCommand cmd(this);
 
-    this->beginInsertRows(QModelIndex(), index, index);
+    if(!m_inSetElementsList)
+        this->beginInsertRows(QModelIndex(), index, index);
 
     ptr->setParent(this);
 
@@ -559,7 +603,8 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
     connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
-    this->endInsertRows();
+    if(!m_inSetElementsList)
+        this->endInsertRows();
 
     emit elementCountChanged();
 
@@ -580,7 +625,8 @@ void Scene::removeElement(SceneElement *ptr)
 
     PushSceneUndoCommand cmd(this);
 
-    this->beginRemoveRows(QModelIndex(), row, row);
+    if(!m_inSetElementsList)
+        this->beginRemoveRows(QModelIndex(), row, row);
 
     emit aboutToRemoveSceneElement(ptr);
     m_elements.removeAt(row);
@@ -589,7 +635,8 @@ void Scene::removeElement(SceneElement *ptr)
     disconnect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
     disconnect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
-    this->endRemoveRows();
+    if(!m_inSetElementsList)
+        this->endRemoveRows();
 
     emit elementCountChanged();
 
@@ -979,8 +1026,35 @@ Scene *Scene::fromByteArray(const QByteArray &bytes)
     return nullptr;
 }
 
+void Scene::serializeToJson(QJsonObject &json) const
+{
+    const QStringList names = m_characterElementMap.characterNames();
+    QJsonArray invisibleCharacters;
+
+    Q_FOREACH(QString name, names)
+    {
+        if(this->isCharacterInvisible(name))
+            invisibleCharacters.append(name);
+    }
+
+    if(!invisibleCharacters.isEmpty())
+        json.insert("#invisibleCharacters", invisibleCharacters);
+}
+
+void Scene::deserializeFromJson(const QJsonObject &json)
+{
+    const QJsonArray invisibleCharacters = json.value("#invisibleCharacters").toArray();
+    if(invisibleCharacters.isEmpty())
+        return;
+
+    for(int i=0; i<invisibleCharacters.size(); i++)
+        this->addInvisibleCharacter(invisibleCharacters.at(i).toString());
+}
+
 void Scene::setElementsList(const QList<SceneElement *> &list)
 {
+    QScopedValueRollback<bool> isel(m_inSetElementsList, true);
+
     Q_FOREACH(SceneElement *item, list)
     {
         if(item->scene() != this)
@@ -991,21 +1065,42 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
     QList<SceneElement*> oldElements = m_elements;
 
     this->beginResetModel();
+
     m_elements.clear();
     m_elements.reserve(list.size());
     Q_FOREACH(SceneElement *item, list)
     {
-        m_elements.append(item);
-        oldElements.removeOne(item);
+        if( !oldElements.removeOne(item) )
+            this->addElement(item);
+        else
+            m_elements.append(item);
     }
+
+    while(!oldElements.isEmpty())
+    {
+        SceneElement *ptr = oldElements.takeFirst();
+        emit aboutToRemoveSceneElement(ptr);
+        GarbageCollector::instance()->add(ptr);
+    }
+
     this->endResetModel();
 
     if(sizeChanged)
         emit elementCountChanged();
 
     emit sceneChanged();
+}
 
-    qDeleteAll(oldElements);
+void Scene::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
+{
+    if( m_characterElementMap.include(element) )
+        emit characterNamesChanged();
+}
+
+void Scene::onAboutToRemoveSceneElement(SceneElement *element)
+{
+    if( m_characterElementMap.remove(element) )
+        emit characterNamesChanged();
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)

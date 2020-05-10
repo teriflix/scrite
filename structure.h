@@ -222,7 +222,7 @@ public:
     Q_INVOKABLE void clearCharacters();
     Q_SIGNAL void characterCountChanged();
 
-    Q_INVOKABLE QStringList allCharacterNames() const { return m_characterNames; }
+    Q_INVOKABLE QStringList allCharacterNames() const { return this->characterNames(); }
     Q_INVOKABLE QJsonArray detectCharacters() const;
     Q_INVOKABLE void addCharacters(const QStringList &names);
 
@@ -273,7 +273,7 @@ public:
     Q_SIGNAL void zoomLevelChanged();
 
     Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
-    QStringList characterNames() const { return m_characterNames; }
+    QStringList characterNames() const { return m_characterElementMap.characterNames(); }
     Q_SIGNAL void characterNamesChanged();
 
     Q_PROPERTY(QQmlListProperty<Annotation> annotations READ annotations NOTIFY annotationCountChanged)
@@ -330,9 +330,7 @@ private:
     void onStructureElementSceneChanged(StructureElement *element=nullptr);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
-    void evaluateCharacterNames();
-    QMap<SceneElement*,QString> m_characterElementNameMap;
-    QStringList m_characterNames;
+    CharacterElementMap m_characterElementMap;
 
     static void staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr);
     static void staticClearAnnotations(QQmlListProperty<Annotation> *list);

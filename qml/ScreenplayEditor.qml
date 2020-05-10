@@ -121,6 +121,10 @@ Item {
                 }
             }
         }
+        onMovingChanged: {
+            if(moving)
+                characterMenu.close()
+        }
         currentIndex: -1
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement: Flickable.StopAtBounds
@@ -196,15 +200,6 @@ Item {
             height: sceneEditor.height + 4
             color: selected ? Qt.tint(sceneColor, "#B0FFFFFF") : Qt.tint(sceneColor, "#F0FFFFFF")
 
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                color: Qt.tint(sceneColor, "#D9FFFFFF")
-                height: sceneEditor.sceneHeadingHeight + 4
-                visible: !parent.selected
-            }
-
             SceneEditor {
                 id: sceneEditor
                 scene: element.scene
@@ -218,8 +213,10 @@ Item {
                 showOnlyEnabledSceneHeadings: !screenplayEditor.displaySceneMenu
                 allowSplitSceneRequest: true
                 sceneNumber: parent.index+1
+                active: parent.selected
                 displaySceneNumber: screenplayEditor.displaySceneNumbers
                 displaySceneMenu: screenplayEditor.displaySceneMenu
+                showCharacterNames: true
                 binder.onDocumentInitialized: {
                     var info = screenplayListView.lastSceneResetInfo
                     screenplayListView.lastSceneResetInfo = undefined
@@ -270,6 +267,11 @@ Item {
                     item.item.assumeFocusAt(0)
                 }
 
+                onRequestCharacterMenu: {
+                    characterMenu.characterName = characterName
+                    characterMenu.popup()
+                }
+
                 TextDocumentSearch {
                     textDocument: sceneEditor.editor.textDocument
                     searchString: sceneEditor.binder.documentLoadCount > 0 ? (element.userData ? element.userData.searchString : "") : ""
@@ -291,6 +293,22 @@ Item {
                             sceneEditor.assumeFocus()
                     }
                 }
+            }
+        }
+    }
+
+    Menu {
+        id: characterMenu
+        width: 300
+        property string characterName
+
+        MenuItem {
+            text: "Generate Character Report"
+            enabled: characterMenu.characterName !== ""
+            onClicked: {
+                reportGeneratorTimer.reportArgs = {"reportName": "Character Report", "configuration": {"characterNames": [characterMenu.characterName]}}
+                characterMenu.close()
+                characterMenu.characterName = ""
             }
         }
     }

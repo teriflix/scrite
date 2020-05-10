@@ -45,6 +45,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
     connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);
     connect(m_undoGroup, &QUndoGroup::redoTextChanged, this, &Application::redoTextChanged);
+    connect(this, &QGuiApplication::fontChanged, this, &Application::applicationFontChanged);
 
     this->setWindowIcon( QIcon(":/images/appicon.png") );
     this->setBaseWindowTitle("scrite - build your screenplay");

@@ -48,7 +48,7 @@ Item {
         category: "Workspace"
         property var workspaceHeight
         property var structureEditorWidth
-        property bool editInFullscreen: false
+        property bool editInFullscreen: true
     }
 
     Rectangle {
@@ -296,21 +296,21 @@ Item {
                                         onClicked: {
                                             if(scriteDocument.modified)
                                                 askQuestion({
-                                                                "question": "Do you want to save your current project first?",
-                                                                "okButtonText": "Yes",
-                                                                "cancelButtonText": "No",
-                                                                "callback": function(val) {
-                                                                    if(val) {
-                                                                        if(scriteDocument.fileName !== "")
-                                                                            scriteDocument.save()
-                                                                        else {
-                                                                            cmdSave.doClick()
-                                                                            return
-                                                                        }
-                                                                    }
-                                                                    fileDialog.launch("IMPORT " + modelData)
+                                                        "question": "Do you want to save your current project first?",
+                                                        "okButtonText": "Yes",
+                                                        "cancelButtonText": "No",
+                                                        "callback": function(val) {
+                                                            if(val) {
+                                                                if(scriteDocument.fileName !== "")
+                                                                    scriteDocument.save()
+                                                                else {
+                                                                    cmdSave.doClick()
+                                                                    return
                                                                 }
-                                                            }, this)
+                                                            }
+                                                            fileDialog.launch("IMPORT " + modelData)
+                                                        }
+                                                    }, this)
                                             else
                                                 fileDialog.launch("IMPORT " + modelData)
                                         }
@@ -362,7 +362,7 @@ Item {
                                     MenuItem2 {
                                         text: modelData
                                         onTriggered: {
-                                            reportGeneratorTimer.reportName = modelData
+                                            reportGeneratorTimer.reportArgs = modelData
                                         }
                                     }
                                 }
@@ -392,22 +392,22 @@ Item {
 
                         Timer {
                             id: reportGeneratorTimer
-                            property string reportName
+                            property var reportArgs
                             repeat: false
                             interval: 10
-                            onReportNameChanged: {
-                                if(reportName !== "")
+                            onReportArgsChanged: {
+                                if(reportArgs !== "")
                                     start()
                             }
                             onTriggered: {
-                                if(reportName !== "") {
+                                if(reportArgs !== "") {
                                     modalDialog.closeable = false
-                                    modalDialog.arguments = reportName
+                                    modalDialog.arguments = reportArgs
                                     modalDialog.sourceComponent = reportGeneratorConfigurationComponent
                                     modalDialog.popupSource = importExportButton
                                     modalDialog.active = true
                                 }
-                                reportName = ""
+                                reportArgs = ""
                             }
                         }
                     }

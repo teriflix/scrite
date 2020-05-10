@@ -59,7 +59,12 @@ Item {
                 Transliterator.transliterateLastWord()
                 triggerSearch()
             }
-            Keys.onEscapePressed: clearSearch()
+            Keys.onEscapePressed: {
+                if(searchEngine.searchResultCount > 0) {
+                    clearSearch()
+                    event.accepted = true
+                }
+            }
             placeholderText: "search"
             function triggerSearch() {
                 var ss = text.trim()

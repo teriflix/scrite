@@ -27,7 +27,7 @@ public:
 
     bool requiresConfiguration() const { return true; }
 
-    Q_CLASSINFO("characterNames_FieldLabel", "Select one or more characters")
+    Q_CLASSINFO("characterNames_FieldLabel", "Character names")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);

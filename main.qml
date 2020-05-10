@@ -115,11 +115,11 @@ Rectangle {
     Settings {
         id: structureCanvasSettings
         fileName: app.settingsFilePath
-        category: "Structure Canvas"
+        category: "Structure Tab"
 
         property bool showGrid: false
         property color gridColor: primaryColors.c900.background
-        property color canvasColor: primaryColors.windowColor
+        property color canvasColor: accentColors.c50.background
     }
 
     function showInformation(params, popupSource) {
