@@ -49,6 +49,14 @@ Item {
         set: sceneContentEditor.activeFocus
     }
 
+    Connections {
+        target: scriteDocument.formatting
+        onFormatChanged: {
+            sceneHeadingLoader.enabled = false
+            sceneHeadingLoader.enabled = true
+        }
+    }
+
     Item {
         id: sceneHeadingArea
         anchors.left: parent.left
@@ -64,7 +72,7 @@ Item {
             anchors.leftMargin: sceneEditor.padding
             anchors.rightMargin: sceneEditor.padding
             property bool viewOnly: true
-            active: scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
+            active: enabled && scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
             sourceComponent: sceneHeadingComponent.get
             clip: true
 
@@ -86,7 +94,7 @@ Item {
         }
 
         Loader {
-            active: displaySceneNumber
+            active: displaySceneNumber && sceneHeadingLoader.active
             anchors.right: sceneHeadingLoader.left
             anchors.verticalCenter: sceneHeadingLoader.verticalCenter
             anchors.rightMargin: sceneEditorFontMetrics.paragraphMargin
@@ -100,7 +108,7 @@ Item {
         }
 
         Loader {
-            active: displaySceneMenu
+            active: displaySceneMenu && sceneHeadingLoader.active
             anchors.left: sceneHeadingLoader.right
             anchors.verticalCenter: sceneHeadingLoader.verticalCenter
             anchors.leftMargin: sceneEditorFontMetrics.paragraphMargin

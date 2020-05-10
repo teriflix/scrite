@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 
     qmlRegisterType<Scene>("Scrite", 1, 0, "Scene");
     qmlRegisterUncreatableType<SceneHeading>("Scrite", 1, 0, "SceneHeading", reason);
-    qmlRegisterUncreatableType<SceneElement>("Scrite", 1, 0, "SceneElement", reason);
+    qmlRegisterType<SceneElement>("Scrite", 1, 0, "SceneElement");
 
     qmlRegisterUncreatableType<Screenplay>("Scrite", 1, 0, "Screenplay", reason);
     qmlRegisterType<ScreenplayElement>("Scrite", 1, 0, "ScreenplayElement");

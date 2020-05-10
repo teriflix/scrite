@@ -106,29 +106,44 @@ Item {
                 color: pageList.currentIndex === index ? primaryColors.highlight.text : primaryColors.c10.text
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: pageList.currentIndex = index
+                    onClicked: {
+                        pageList.currentIndex = index
+                        pageLoader.loadPage()
+                    }
                 }
             }
         }
 
         Loader {
+            id: pageLoader
             anchors.left: pageList.right
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            active: pageList.currentIndex >= 0
-            sourceComponent: {
+            anchors.leftMargin: 20
+            active: true
+            sourceComponent: applicationSettingsComponent
+
+            function loadPage() {
+                pageLoader.active = false
                 if(pageList.currentIndex >= 3 && pageList.currentIndex <= 9)
-                    return elementFormatOptionsComponent
-
-                if(pageList.currentIndex >= 10 && pageList.currentIndex <= 16)
-                    return elementFormatOptionsComponent
-
-                switch(pageList.currentIndex) {
-                case 0: return applicationSettingsComponent
-                case 1: return screenplayOptionsComponent
-                case 2: return pageSetupComponent
+                    pageLoader.sourceComponent = elementFormatOptionsComponent
+                else if(pageList.currentIndex >= 10 && pageList.currentIndex <= 16)
+                    pageLoader.sourceComponent = elementFormatOptionsComponent
+                else {
+                    switch(pageList.currentIndex) {
+                    case 0:
+                        pageLoader.sourceComponent = applicationSettingsComponent
+                        break
+                    case 1:
+                        pageLoader.sourceComponent = screenplayOptionsComponent
+                        break
+                    case 2:
+                        pageLoader.sourceComponent = pageSetupComponent
+                        break
+                    }
                 }
+                pageLoader.active = true
             }
         }
     }
@@ -618,7 +633,7 @@ Item {
             ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
             Column {
-                width: scrollView.width
+                width: scrollView.width - 20
                 spacing: 10
 
                 Text {
@@ -626,6 +641,42 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     text: "<strong>" + pageData.name + "</strong> (" + pageData.group + ")"
                     font.pixelSize: 24
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 120
+                    color: primaryColors.c200.background
+                    border.width: 1
+                    border.color: primaryColors.borderColor
+                    radius: 8
+
+                    TextArea {
+                        id: previewText
+                        font: scriteDocument.formatting.defaultFont
+                        readOnly: true
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        wrapMode: Text.WordWrap
+                        background: Rectangle {
+                            color: primaryColors.c200.background
+                        }
+
+                        SceneDocumentBinder {
+                            screenplayFormat: elementFormat.format
+                            scene: Scene {
+                                elements: [
+                                    SceneElement {
+                                        type: elementFormat.elementType
+                                        text: elementFormat.sampleText
+                                    }
+                                ]
+                            }
+                            textDocument: previewText.textDocument
+                            cursorPosition: -1
+                            forceSyncDocument: true
+                        }
+                    }
                 }
 
                 // Font Family
@@ -645,7 +696,7 @@ Item {
                         width: parent.width-parent.spacing-labelWidth
                         model: systemFontInfo.families
                         currentIndex: systemFontInfo.families.indexOf(elementFormat.font.family)
-                        onCurrentIndexChanged: elementFormat.font.family = systemFontInfo.families[currentIndex]
+                        onCurrentIndexChanged: elementFormat.setFontFamily( systemFontInfo.families[currentIndex] )
                     }
                 }
 
@@ -669,7 +720,7 @@ Item {
                         stepSize: 1
                         editable: true
                         value: elementFormat.font.pointSize
-                        onValueModified: elementFormat.font.pointSize = value
+                        onValueModified: elementFormat.setFontPointSize(value)
                     }
                 }
 
@@ -695,6 +746,7 @@ Item {
                             font.bold: true
                             checkable: true
                             checked: elementFormat.font.bold
+                            onToggled: elementFormat.setFontBold(checked)
                         }
 
                         CheckBox2 {
@@ -702,6 +754,7 @@ Item {
                             font.italic: true
                             checkable: true
                             checked: elementFormat.font.italic
+                            onToggled: elementFormat.setFontItalics(checked)
                         }
 
                         CheckBox2 {
@@ -709,6 +762,7 @@ Item {
                             font.underline: true
                             checkable: true
                             checked: elementFormat.font.underline
+                            onToggled: elementFormat.setFontUnderline(checked)
                         }
                     }
                 }
@@ -968,7 +1022,6 @@ Item {
             ScrollView {
                 id: appSettingsScrollView
                 anchors.fill: parent
-                anchors.margins: 5
                 contentWidth: width
                 contentHeight: appSettingsPageContent.height
                 ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2

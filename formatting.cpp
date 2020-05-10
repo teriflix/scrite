@@ -47,6 +47,56 @@ void SceneElementFormat::setFont(const QFont &val)
     emit elementFormatChanged();
 }
 
+void SceneElementFormat::setFontFamily(const QString &val)
+{
+    if(m_font.family() == val)
+        return;
+
+    m_font.setFamily(val);
+    emit fontChanged();
+    emit elementFormatChanged();
+}
+
+void SceneElementFormat::setFontBold(bool val)
+{
+    if(m_font.bold() == val)
+        return;
+
+    m_font.setBold(val);
+    emit fontChanged();
+    emit elementFormatChanged();
+}
+
+void SceneElementFormat::setFontItalics(bool val)
+{
+    if(m_font.italic() == val)
+        return;
+
+    m_font.setItalic(val);
+    emit fontChanged();
+    emit elementFormatChanged();
+}
+
+void SceneElementFormat::setFontUnderline(bool val)
+{
+    if(m_font.underline() == val)
+        return;
+
+    m_font.setUnderline(val);
+    emit fontChanged();
+    emit elementFormatChanged();
+}
+
+void SceneElementFormat::setFontPointSize(int val)
+{
+    if(m_font.pointSize() == val)
+        return;
+
+    m_font.setPointSize(val);
+    emit fontChanged();
+    emit elementFormatChanged();
+}
+
 void SceneElementFormat::setTextColor(const QColor &val)
 {
     if(m_textColor == val)
@@ -133,6 +183,23 @@ void SceneElementFormat::setLineHeight(qreal val)
     m_lineHeight = val;
     emit lineHeightChanged();
     emit elementFormatChanged();
+}
+
+QString SceneElementFormat::sampleText() const
+{
+    static QMap<SceneElement::Type, QString> sampleTextMap;
+    if(sampleTextMap.isEmpty())
+    {
+        sampleTextMap[SceneElement::Heading] = QStringLiteral("INT. SOMEPLACE - DAY");
+        sampleTextMap[SceneElement::Action] = QStringLiteral("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+        sampleTextMap[SceneElement::Character] = QStringLiteral("RAJKUMAR");
+        sampleTextMap[SceneElement::Parenthetical] = QStringLiteral("(lost in deep thought)");
+        sampleTextMap[SceneElement::Dialogue] = QStringLiteral("If you come today, its too early. If you come tomorrow, its too late.");
+        sampleTextMap[SceneElement::Shot] = QStringLiteral("EXTREME CLOSEUP");
+        sampleTextMap[SceneElement::Transition] = QStringLiteral("CUT TO");
+    }
+
+    return sampleTextMap.value(m_elementType, QString("Unknown"));
 }
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenPageWidth) const
@@ -1092,39 +1159,39 @@ void SceneDocumentBinder::evaluateAutoCompleteHints()
     }
 
     static QStringList transitions = QStringList() <<
-            "CUT TO" <<
-            "DISSOLVE TO" <<
-            "FADE IN" <<
-            "FADE OUT" <<
-            "FADE TO" <<
-            "FLASH CUT TO" <<
-            "FREEZE FRAME" <<
-            "IRIS IN" <<
-            "IRIS OUT" <<
-            "JUMP CUT TO" <<
-            "MATCH CUT TO" <<
-            "MATCH DISSOLVE TO" <<
-            "SMASH CUT TO" <<
-            "STOCK SHOT" <<
-            "TIME CUT" <<
-            "WIPE TO";
+            QStringLiteral("CUT TO") <<
+            QStringLiteral("DISSOLVE TO") <<
+            QStringLiteral("FADE IN") <<
+            QStringLiteral("FADE OUT") <<
+            QStringLiteral("FADE TO") <<
+            QStringLiteral("FLASH CUT TO") <<
+            QStringLiteral("FREEZE FRAME") <<
+            QStringLiteral("IRIS IN") <<
+            QStringLiteral("IRIS OUT") <<
+            QStringLiteral("JUMP CUT TO") <<
+            QStringLiteral("MATCH CUT TO") <<
+            QStringLiteral("MATCH DISSOLVE TO") <<
+            QStringLiteral("SMASH CUT TO") <<
+            QStringLiteral("STOCK SHOT") <<
+            QStringLiteral("TIME CUT") <<
+            QStringLiteral("WIPE TO");
 
     static QStringList shots = QStringList() <<
-            "AIR" <<
-            "CLOSE ON" <<
-            "CLOSER ON" <<
-            "CLOSEUP" <<
-            "ESTABLISHING" <<
-            "EXTREME CLOSEUP" <<
-            "INSERT" <<
-            "POV" <<
-            "SURFACE" <<
-            "THREE SHOT" <<
-            "TWO SHOT" <<
-            "UNDERWATER" <<
-            "WIDE" <<
-            "WIDE ON" <<
-            "WIDER ANGLE";
+            QStringLiteral("AIR") <<
+            QStringLiteral("CLOSE ON") <<
+            QStringLiteral("CLOSER ON") <<
+            QStringLiteral("CLOSEUP") <<
+            QStringLiteral("ESTABLISHING") <<
+            QStringLiteral("EXTREME CLOSEUP") <<
+            QStringLiteral("INSERT") <<
+            QStringLiteral("POV") <<
+            QStringLiteral("SURFACE") <<
+            QStringLiteral("THREE SHOT") <<
+            QStringLiteral("TWO SHOT") <<
+            QStringLiteral("UNDERWATER") <<
+            QStringLiteral("WIDE") <<
+            QStringLiteral("WIDE ON") <<
+            QStringLiteral("WIDER ANGLE");
 
     switch(m_currentElement->type())
     {

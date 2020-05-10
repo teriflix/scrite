@@ -46,6 +46,12 @@ public:
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();
 
+    Q_INVOKABLE void setFontFamily(const QString &val);
+    Q_INVOKABLE void setFontBold(bool val);
+    Q_INVOKABLE void setFontItalics(bool val);
+    Q_INVOKABLE void setFontUnderline(bool val);
+    Q_INVOKABLE void setFontPointSize(int val);
+
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
@@ -85,6 +91,9 @@ public:
     void setLineHeight(qreal val);
     qreal lineHeight() const { return m_lineHeight; }
     Q_SIGNAL void lineHeightChanged();
+
+    Q_PROPERTY(QString sampleText READ sampleText CONSTANT)
+    QString sampleText() const;
 
     QTextBlockFormat createBlockFormat(const qreal *pageWidth=nullptr) const;
     QTextCharFormat createCharFormat(const qreal *pageWidth=nullptr) const;
