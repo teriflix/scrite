@@ -167,8 +167,6 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("logger", Logger::instance());
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
-//    qmlView.engine()->rootContext()->setContextProperty("primaryColors", new MaterialColors("Deep Purple", qmlView.engine()));
-//    qmlView.engine()->rootContext()->setContextProperty("secondaryColors", new MaterialColors("Amber", qmlView.engine()));
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(1350, 700));

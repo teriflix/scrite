@@ -275,7 +275,7 @@ Item {
 
                 onPressed: {
                     parent.forceActiveFocus()
-                    if(parent.newElementMode || selectionRect.enabled || mouse.modifiers & Qt.ControlModifier)
+                    if(parent.newElementMode || selectionRect.enabled)
                         return
 
                     if(mouse.modifiers & Qt.ControlModifier) {
@@ -289,7 +289,7 @@ Item {
                 }
 
                 onReleased: {
-                    if(!selectionRect.visible || selectionRect.enabled || mouse.modifiers & Qt.ControlModifier) {
+                    if(!selectionRect.visible || selectionRect.enabled) {
                         mouse.accepted = false
                         return
                     }
