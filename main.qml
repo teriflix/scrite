@@ -117,7 +117,7 @@ Rectangle {
         fileName: app.settingsFilePath
         category: "Structure Canvas"
 
-        property bool showGrid: true
+        property bool showGrid: false
         property color gridColor: primaryColors.c900.background
         property color canvasColor: primaryColors.windowColor
     }

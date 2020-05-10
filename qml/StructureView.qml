@@ -139,7 +139,7 @@ Item {
             minorTickLineWidth: 1
             width: widthBinder.get
             height: heightBinder.get
-            tickColorOpacity: 0.5 * scale
+            tickColorOpacity: 0.25 * scale
             scale: canvasScroll.suggestedScale
             border.width: 2
             border.color: structureCanvasSettings.gridColor
@@ -639,7 +639,7 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 1
                         anchors.rightMargin: 3
-                        opacity: dragMouseArea.containsMouse ? 1 : 0.25
+                        opacity: dragMouseArea.containsMouse ? 1 : 0.1
                         scale: dragMouseArea.containsMouse ? 2 : 1
                         Behavior on scale { NumberAnimation { duration: 250 } }
 

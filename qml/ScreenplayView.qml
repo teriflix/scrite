@@ -330,7 +330,7 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
                         anchors.rightMargin: 5
-                        opacity: dragMouseArea.containsMouse ? 1 : 0.25
+                        opacity: dragMouseArea.containsMouse ? 1 : 0.1
                         scale: dragMouseArea.containsMouse ? 2 : 1
                         Behavior on scale { NumberAnimation { duration: 250 } }
 
