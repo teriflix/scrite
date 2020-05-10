@@ -713,6 +713,32 @@ Item {
                     }
                 }
 
+                // Line Height
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Line Height"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    SpinBox {
+                        width: parent.width-parent.spacing-labelWidth
+                        from: 25
+                        to: 300
+                        stepSize: 10
+                        value: elementFormat.lineHeight * 100
+                        onValueModified: elementFormat.lineHeight = value/100
+                        textFromValue: function(value,locale) {
+                            return value + "%"
+                        }
+                    }
+                }
+
                 // Colors
                 Row {
                     spacing: 10
