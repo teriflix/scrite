@@ -389,7 +389,7 @@ Item {
             readOnly: true
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
-            renderType: Text.NativeRendering
+            // renderType: Text.NativeRendering
             font.pixelSize: 30
             enabled: false
             text: "Drag scenes on the structure canvas from their bottom right corner to this timeline view here."

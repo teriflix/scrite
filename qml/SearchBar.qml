@@ -42,7 +42,7 @@ Item {
             anchors.right: buttonsRow.left
             anchors.margins: 5
             palette: app.palette
-            renderType: Text.NativeRendering
+            // renderType: Text.NativeRendering
             Material.primary: primaryColors.key
             Material.accent: accentColors.key
             background: Item {

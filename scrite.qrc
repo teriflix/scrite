@@ -88,5 +88,7 @@
         <file>images/appicon.png</file>
         <file>images/notebookpage.jpg</file>
         <file>images/teriflix_logo.png</file>
+        <file>icons/action/done_all.png</file>
+        <file>icons/action/done_all_inverted.png</file>
     </qresource>
 </RCC>

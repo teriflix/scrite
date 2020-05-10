@@ -242,7 +242,7 @@ Item {
         TextArea {
             id: sceneTextArea
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            renderType: Text.NativeRendering
+            // renderType: Text.NativeRendering
             readOnly: sceneEditor.readOnly
             property real totalHeight: contentHeight + topPadding + bottomPadding
             background: Rectangle {
@@ -735,7 +735,7 @@ Item {
         id: sceneHeadingViewer
 
         Rectangle {
-            color: primaryColors.c10.background
+            color: sceneHeadingFormat.backgroundColor
             property font headingFont: sceneHeadingFormat.font
             Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
             radius: contentEditorArea.radius
@@ -749,6 +749,7 @@ Item {
                 text: scene.heading.text
                 anchors.verticalCenter: parent.verticalCenter
                 wrapMode: Text.WordWrap
+                color: sceneHeadingFormat.textColor
             }
 
             MouseArea {

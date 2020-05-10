@@ -671,7 +671,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 30
             enabled: false
-            renderType: Text.NativeRendering
+            // renderType: Text.NativeRendering
             text: "Create scenes by clicking on the 'Add Scene' button OR double-click while holding the " + app.polishShortcutTextForDisplay("Ctrl") + " key."
         }
     }

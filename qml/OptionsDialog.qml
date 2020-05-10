@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.12
 import Scrite 1.0
 
 Item {
-    width: 850
+    width: 1050
     height: 700
 
     Item {
@@ -120,7 +120,7 @@ Item {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.leftMargin: 20
+            anchors.leftMargin: 30
             active: true
             sourceComponent: applicationSettingsComponent
 
@@ -152,7 +152,7 @@ Item {
         id: screenplayOptionsComponent
 
         Item {
-            property real labelWidth: 100
+            property real labelWidth: 60
 
             Column {
                 width: parent.width
@@ -327,9 +327,7 @@ Item {
 
             ScrollView {
                 id: pageSetupScroll
-                width: parent.width-20
-                height: parent.height
-                anchors.right: parent.right
+                anchors.fill: parent
                 ScrollBar.vertical.policy: ScrollBar.AlwaysOn
                 ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
@@ -631,10 +629,11 @@ Item {
             property ScreenplayFormat format: pageData.group === "On Screen Format" ? scriteDocument.formatting : scriteDocument.printFormat
             property SceneElementFormat elementFormat: format.elementFormat(pageData.elementType)
             ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
 
             Column {
                 width: scrollView.width - 20
-                spacing: 10
+                spacing: 0
 
                 Text {
                     width: parent.width
@@ -645,44 +644,77 @@ Item {
 
                 Rectangle {
                     width: parent.width
-                    height: 120
-                    color: primaryColors.c200.background
+                    height: Math.min(300, previewText.contentHeight)
+                    color: primaryColors.c10.background
                     border.width: 1
                     border.color: primaryColors.borderColor
                     radius: 8
 
-                    TextArea {
-                        id: previewText
-                        font: scriteDocument.formatting.defaultFont
-                        readOnly: true
+                    ScrollView {
                         anchors.fill: parent
-                        anchors.margins: 10
-                        wrapMode: Text.WordWrap
-                        background: Rectangle {
-                            color: primaryColors.c200.background
-                        }
+                        anchors.margins: 8
+                        ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        Component.onCompleted: ScrollBar.vertical.position = (elementFormat.elementType === SceneElement.Shot || elementFormat.elementType === SceneElement.Transition) ? 0.2 : 0
 
-                        SceneDocumentBinder {
-                            screenplayFormat: elementFormat.format
-                            scene: Scene {
-                                elements: [
-                                    SceneElement {
-                                        type: elementFormat.elementType
-                                        text: elementFormat.sampleText
-                                    }
-                                ]
+                        TextArea {
+                            id: previewText
+                            font: scriteDocument.formatting.defaultFont
+                            readOnly: true
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            background: Rectangle {
+                                color: primaryColors.c10.background
                             }
-                            textDocument: previewText.textDocument
-                            cursorPosition: -1
-                            forceSyncDocument: true
+
+                            SceneDocumentBinder {
+                                screenplayFormat: elementFormat.format
+                                scene: Scene {
+                                    elements: [
+                                        SceneElement {
+                                            type: SceneElement.Heading
+                                            text: "INT. SOMEPLACE - DAY"
+                                        },
+                                        SceneElement {
+                                            type: SceneElement.Action
+                                            text: "Dr. Rajkumar enters the club house like a boss. He looks around at everybody in their eyes."
+                                        },
+                                        SceneElement {
+                                            type: SceneElement.Character
+                                            text: "Dr. Rajkumar"
+                                        },
+                                        SceneElement {
+                                            type: SceneElement.Parenthetical
+                                            text: "(singing)"
+                                        },
+                                        SceneElement {
+                                            type: SceneElement.Dialogue
+                                            text: "If you come today, its too early. If you come tomorrow, its too late."
+                                        },
+                                        SceneElement {
+                                            type: SceneElement.Shot
+                                            text: "EXTREME CLOSEUP on Dr. Rajkumar's smiling face."
+                                        },
+                                        SceneElement {
+                                            type: SceneElement.Transition
+                                            text: "CUT TO"
+                                        }
+                                    ]
+                                }
+                                textDocument: previewText.textDocument
+                                cursorPosition: -1
+                                forceSyncDocument: true
+                            }
                         }
                     }
                 }
+
+                Item { width: parent.width; height: 10 }
 
                 // Font Family
                 Row {
                     spacing: 10
                     width: parent.width
+                    visible: false
 
                     Text {
                         width: labelWidth
@@ -693,10 +725,18 @@ Item {
                     }
 
                     ComboBox2 {
-                        width: parent.width-parent.spacing-labelWidth
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         model: systemFontInfo.families
                         currentIndex: systemFontInfo.families.indexOf(elementFormat.font.family)
                         onCurrentIndexChanged: elementFormat.setFontFamily( systemFontInfo.families[currentIndex] )
+                    }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this font family to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.FontFamily)
                     }
                 }
 
@@ -714,13 +754,21 @@ Item {
                     }
 
                     SpinBox {
-                        width: parent.width-parent.spacing-labelWidth
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         from: 9
                         to: 62
                         stepSize: 1
                         editable: true
                         value: elementFormat.font.pointSize
                         onValueModified: elementFormat.setFontPointSize(value)
+                    }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this font size to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.FontSize)
                     }
                 }
 
@@ -738,6 +786,7 @@ Item {
                     }
 
                     Row {
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
@@ -765,6 +814,14 @@ Item {
                             onToggled: elementFormat.setFontUnderline(checked)
                         }
                     }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this font style to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.FontStyle)
+                    }
                 }
 
                 // Line Height
@@ -781,7 +838,7 @@ Item {
                     }
 
                     SpinBox {
-                        width: parent.width-parent.spacing-labelWidth
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         from: 25
                         to: 300
                         stepSize: 10
@@ -790,6 +847,14 @@ Item {
                         textFromValue: function(value,locale) {
                             return value + "%"
                         }
+                    }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this line height to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.LineHeight)
                     }
                 }
 
@@ -806,37 +871,51 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    Rectangle {
-                        border.width: 1
-                        border.color: primaryColors.borderColor
-                        color: elementFormat.textColor
-                        width: 30; height: 30
+                    Row {
+                        spacing: parent.spacing
+                        width: parent.width - 2*parent.spacing - labelWidth - parent.height
                         anchors.verticalCenter: parent.verticalCenter
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: elementFormat.textColor = app.pickColor(elementFormat.textColor)
+
+                        Rectangle {
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+                            color: elementFormat.textColor
+                            width: 30; height: 30
+                            anchors.verticalCenter: parent.verticalCenter
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: elementFormat.textColor = app.pickColor(elementFormat.textColor)
+                            }
+                        }
+
+                        Text {
+                            horizontalAlignment: Text.AlignRight
+                            text: "Background Color"
+                            font.pixelSize: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Rectangle {
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+                            color: elementFormat.backgroundColor
+                            width: 30; height: 30
+                            anchors.verticalCenter: parent.verticalCenter
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: elementFormat.backgroundColor = app.pickColor(elementFormat.backgroundColor)
+                            }
                         }
                     }
 
-                    Text {
-                        horizontalAlignment: Text.AlignRight
-                        text: "Background Color"
-                        font.pixelSize: 14
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Rectangle {
-                        border.width: 1
-                        border.color: primaryColors.borderColor
-                        color: elementFormat.backgroundColor
-                        width: 30; height: 30
-                        anchors.verticalCenter: parent.verticalCenter
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: elementFormat.backgroundColor = app.pickColor(elementFormat.backgroundColor)
-                        }
+                        ToolTip.text: "Apply these colors to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.TextAndBackgroundColors)
                     }
                 }
 
@@ -854,6 +933,7 @@ Item {
                     }
 
                     Row {
+                        width: parent.width - 2*parent.spacing - labelWidth - parent.height
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
@@ -897,6 +977,14 @@ Item {
                             }
                         }
                     }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this alignment to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.TextAlignment)
+                    }
                 }
 
                 // Block Margin
@@ -913,7 +1001,7 @@ Item {
                     }
 
                     SpinBox {
-                        width: parent.width-parent.spacing-labelWidth
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         from: 0
                         to: 100
                         stepSize: 1
@@ -922,6 +1010,14 @@ Item {
                         textFromValue: function(value,locale) {
                             return value + "%"
                         }
+                    }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this block width to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.BlockWidth)
                     }
                 }
 
@@ -939,6 +1035,7 @@ Item {
                     }
 
                     Row {
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
@@ -960,6 +1057,14 @@ Item {
                             checked: elementFormat.blockAlignment === Qt.AlignRight
                         }
                     }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply this block alignment to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.BlockAlignment)
+                    }
                 }
 
                 Row {
@@ -975,6 +1080,7 @@ Item {
                     }
 
                     Row {
+                        width: parent.width-2*parent.spacing-labelWidth-parent.height
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 10
 
@@ -1007,6 +1113,14 @@ Item {
                             validator: IntValidator { top: 100; bottom: 0 }
                             onTextChanged: elementFormat.bottomMargin = text === "" ? 0 : parseInt(text)
                         }
+                    }
+
+                    ToolButton2 {
+                        icon.source: "../icons/action/done_all.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        ToolTip.text: "Apply these margins to all '" + pageData.group + "' paragraphs."
+                        ToolTip.delay: 1000
+                        onClicked: elementFormat.applyToAll(SceneElementFormat.Margins)
                     }
                 }
             }

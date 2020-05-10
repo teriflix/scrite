@@ -92,13 +92,25 @@ public:
     qreal lineHeight() const { return m_lineHeight; }
     Q_SIGNAL void lineHeightChanged();
 
-    Q_PROPERTY(QString sampleText READ sampleText CONSTANT)
-    QString sampleText() const;
-
     QTextBlockFormat createBlockFormat(const qreal *pageWidth=nullptr) const;
     QTextCharFormat createCharFormat(const qreal *pageWidth=nullptr) const;
 
     Q_SIGNAL void elementFormatChanged();
+
+    enum Properties
+    {
+        FontFamily,
+        FontSize,
+        FontStyle,
+        LineHeight,
+        TextAndBackgroundColors,
+        TextAlignment,
+        BlockWidth,
+        BlockAlignment,
+        Margins
+    };
+    Q_ENUM(Properties)
+    Q_INVOKABLE void applyToAll(Properties properties);
 
 private:
     friend class ScreenplayFormat;
@@ -152,6 +164,8 @@ public:
 
     Q_PROPERTY(QQmlListProperty<SceneElementFormat> elementFormats READ elementFormats)
     QQmlListProperty<SceneElementFormat> elementFormats();
+
+    void applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties);
 
     enum Role { SceneElementFomat=Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;

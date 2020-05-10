@@ -185,23 +185,6 @@ void SceneElementFormat::setLineHeight(qreal val)
     emit elementFormatChanged();
 }
 
-QString SceneElementFormat::sampleText() const
-{
-    static QMap<SceneElement::Type, QString> sampleTextMap;
-    if(sampleTextMap.isEmpty())
-    {
-        sampleTextMap[SceneElement::Heading] = QStringLiteral("INT. SOMEPLACE - DAY");
-        sampleTextMap[SceneElement::Action] = QStringLiteral("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
-        sampleTextMap[SceneElement::Character] = QStringLiteral("RAJKUMAR");
-        sampleTextMap[SceneElement::Parenthetical] = QStringLiteral("(lost in deep thought)");
-        sampleTextMap[SceneElement::Dialogue] = QStringLiteral("If you come today, its too early. If you come tomorrow, its too late.");
-        sampleTextMap[SceneElement::Shot] = QStringLiteral("EXTREME CLOSEUP");
-        sampleTextMap[SceneElement::Transition] = QStringLiteral("CUT TO");
-    }
-
-    return sampleTextMap.value(m_elementType, QString("Unknown"));
-}
-
 QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenPageWidth) const
 {
     const qreal pageWidth = givenPageWidth ? *givenPageWidth : m_format->pageWidth();
@@ -256,6 +239,11 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     format.setForeground(QBrush(m_textColor));
 
     return format;
+}
+
+void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
+{
+    m_format->applyToAll(this, properties);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -333,6 +321,53 @@ QQmlListProperty<SceneElementFormat> ScreenplayFormat::elementFormats()
                 static_cast<void*>(this),
                 &ScreenplayFormat::staticElementFormatCount,
                 &ScreenplayFormat::staticElementFormatAt);
+}
+
+void ScreenplayFormat::applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties)
+{
+    if(from == nullptr)
+        return;
+
+    Q_FOREACH(SceneElementFormat *format, m_elementFormats)
+    {
+        if(from == format)
+            continue;
+
+        switch(properties)
+        {
+        case SceneElementFormat::FontFamily:
+            format->setFontFamily( from->font().family() );
+            break;
+        case SceneElementFormat::FontSize:
+            format->setFontPointSize( from->font().pointSize() );
+            break;
+        case SceneElementFormat::FontStyle:
+            format->setFontBold( from->font().bold() );
+            format->setFontItalics( from->font().italic() );
+            format->setFontUnderline( from->font().underline() );
+            break;
+        case SceneElementFormat::LineHeight:
+            format->setLineHeight( from->lineHeight() );
+            break;
+        case SceneElementFormat::TextAndBackgroundColors:
+            format->setTextColor( from->textColor() );
+            format->setBackgroundColor( from->backgroundColor() );
+            break;
+        case SceneElementFormat::TextAlignment:
+            format->setTextAlignment( from->textAlignment() );
+            break;
+        case SceneElementFormat::BlockWidth:
+            format->setBlockWidth( from->blockWidth() );
+            break;
+        case SceneElementFormat::BlockAlignment:
+            format->setBlockAlignment( from->blockAlignment() );
+            break;
+        case SceneElementFormat::Margins:
+            format->setTopMargin( from->topMargin() );
+            format->setBottomMargin( from->bottomMargin() );
+            break;
+        }
+    }
 }
 
 int ScreenplayFormat::rowCount(const QModelIndex &parent) const

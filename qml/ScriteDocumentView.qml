@@ -750,7 +750,7 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pixelSize: 30
                                 enabled: false
-                                renderType: Text.NativeRendering
+                                // renderType: Text.NativeRendering
                                 text: "Select a scene on the structure canvas or in the timeline to edit its content here."
                             }
                         }
@@ -986,7 +986,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: 30
                     enabled: false
-                    renderType: Text.NativeRendering
+                    // renderType: Text.NativeRendering
                     text: "Click on the add new scene button on the toolbar or press " + app.polishShortcutTextForDisplay("Ctrl+Shift+N") + " to create a new scene."
                 }
             }
