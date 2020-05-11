@@ -81,6 +81,28 @@ bool AbstractReportGenerator::generate()
         return false;
     }
 
+    if(m_format == AdobePDF)
+    {
+        if(this->canDirectPrintToPdf())
+        {
+            this->progress()->start();
+
+            QPdfWriter pdfWriter(&file);
+            pdfWriter.setTitle("Scrite Character Report");
+            pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
+            pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
+            pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+
+            const bool success = this->directPrintToPdf(&pdfWriter);
+
+            this->progress()->finish();
+
+            GarbageCollector::instance()->add(this);
+
+            return success;
+        }
+    }
+
     QTextDocument textDocument;
 
     textDocument.setDefaultFont(format->defaultFont());
@@ -102,6 +124,7 @@ bool AbstractReportGenerator::generate()
         QTextDocumentWriter writer;
         writer.setFormat("ODF");
         writer.setDevice(&file);
+        this->configureWriter(&writer, &textDocument);
         writer.write(&textDocument);
     }
     else
@@ -111,6 +134,7 @@ bool AbstractReportGenerator::generate()
         pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
         pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
         pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+        this->configureWriter(&pdfWriter, &textDocument);
 
         QTextDocumentPagedPrinter printer;
         printer.header()->setVisibleFromPageOne(true);
@@ -124,6 +148,16 @@ bool AbstractReportGenerator::generate()
     GarbageCollector::instance()->add(this);
 
     return ret;
+}
+
+bool AbstractReportGenerator::setConfigurationValue(const QString &name, const QVariant &value)
+{
+    return this->setProperty(qPrintable(name),value);
+}
+
+QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) const
+{
+    return this->property(qPrintable(name));
 }
 
 QJsonObject AbstractReportGenerator::configurationFormInfo() const

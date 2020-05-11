@@ -57,6 +57,7 @@ HEADERS += \
     qobjectserializer.h \
     qtextdocumentpagedprinter.h \
     scene.h \
+    scenecharactermatrixreportgenerator.h \
     screenplay.h \
     scritedocument.h \
     searchengine.h \
@@ -118,6 +119,7 @@ SOURCES += \
     qobjectserializer.cpp \
     qtextdocumentpagedprinter.cpp \
     scene.cpp \
+    scenecharactermatrixreportgenerator.cpp \
     screenplay.cpp \
     scritedocument.cpp \
     searchengine.cpp \

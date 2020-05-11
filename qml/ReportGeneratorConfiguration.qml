@@ -34,8 +34,10 @@ Item {
             var config = modalDialog.arguments.configuration
             for(var member in config)
                 generator.setConfigurationValue(member, config[member])
-            formInfo = generator.configurationFormInfo()
         }
+
+        if(generator !== null)
+            formInfo = generator.configurationFormInfo()
 
         modalDialog.arguments = undefined
     }
@@ -75,6 +77,15 @@ Item {
                 onAccepted: generator.fileName = app.urlToLocalFile(fileUrl)
             }
 
+            Rectangle {
+                anchors.fill: formView
+                anchors.margins: -3
+                visible: formView.contentHeight > formView.height
+                color: primaryColors.c10.background
+                border.width: 1
+                border.color: primaryColors.borderColor
+            }
+
             ScrollView {
                 id: formView
                 anchors.left: parent.left
@@ -83,6 +94,7 @@ Item {
                 anchors.bottom: buttonRow.top
                 anchors.margins: 20
                 anchors.bottomMargin: 10
+                clip: true
 
                 property bool scrollBarRequired: formView.height < formView.contentHeight
                 ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -136,12 +148,14 @@ Item {
                                 text: "Adobe PDF Format"
                                 checked: generator.format === AbstractReportGenerator.AdobePDF
                                 onClicked: generator.format = AbstractReportGenerator.AdobePDF
+                                enabled: generator.supportsFormat(AbstractReportGenerator.AdobePDF)
                             }
 
                             RadioButton2 {
                                 text: "Open Document Format"
                                 checked: generator.format === AbstractReportGenerator.OpenDocumentFormat
                                 onClicked: generator.format = AbstractReportGenerator.OpenDocumentFormat
+                                enabled: generator.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
                             }
                         }
                     }
@@ -154,10 +168,8 @@ Item {
                             active: true
                             sourceComponent: loadFieldEditor(modelData.editor)
                             onItemChanged: {
-                                if(item) {
-                                    item.fieldName = modelData.name
-                                    item.fieldTitle = modelData.label
-                                }
+                                if(item)
+                                    item.fieldInfo = modelData
                             }
                         }
                     }
@@ -208,6 +220,8 @@ Item {
             return editor_MultipleCharacterNameSelector
         if(kind === "CheckBox")
             return editor_CheckBox
+        if(kind === "EnumSelector")
+            return editor_EnumSelector
         return editor_Unknown
     }
 
@@ -215,16 +229,17 @@ Item {
         id: editor_MultipleCharacterNameSelector
 
         Item {
-            property string fieldName
-            property string fieldTitle
+            property var fieldInfo
             property alias characterNames: characterNameListView.selectedCharacters
-            onCharacterNamesChanged: generator.setConfigurationValue(fieldName, characterNames)
-            height: characterNameListView.visible ? 300 : fieldTitleText.height
+            onCharacterNamesChanged: {
+                if(fieldInfo)
+                    generator.setConfigurationValue(fieldInfo.name, characterNames)
+            }
+            height: fieldTitleText.height + (characterNameListView.visible ? 300 : 0)
 
-            onFieldNameChanged: {
-                characterNameListView.selectedCharacters = generator.getConfigurationValue(fieldName)
+            onFieldInfoChanged: {
+                characterNameListView.selectedCharacters = generator.getConfigurationValue(fieldInfo.name)
                 characterNameListView.visible = characterNameListView.selectedCharacters.length === 0
-                console.log(fieldName + ", " + generator.getConfigurationValue(fieldName))
             }
 
             Loader {
@@ -236,7 +251,7 @@ Item {
 
                     Text {
                         id: sceneCharactersListHeading
-                        text: fieldTitle + ": "
+                        text: fieldInfo.label + ": "
                         font.bold: true
                         font.pointSize: characterNameListView.visible ? 12 : 15
                         topPadding: 5
@@ -296,12 +311,35 @@ Item {
         id: editor_CheckBox
 
         CheckBox2 {
-            property string fieldName
-            property string fieldTitle
-            text: fieldTitle
+            property var fieldInfo
+            text: fieldInfo.label
             checkable: true
-            checked: generator ? generator.getConfigurationValue(fieldName) : false
-            onToggled: generator ? generator.setConfigurationValue(fieldName, checked) : false
+            checked: generator ? generator.getConfigurationValue(fieldInfo.name) : false
+            onToggled: generator ? generator.setConfigurationValue(fieldInfo.name, checked) : false
+        }
+    }
+
+    Component {
+        id: editor_EnumSelector
+
+        Column {
+            property var fieldInfo
+            spacing: 5
+
+            Text {
+                text: fieldInfo.label + ": "
+                width: parent.width
+            }
+
+            ComboBox2 {
+                model: fieldInfo.choices
+                textRole: "key"
+                width: parent.width
+                onCurrentIndexChanged: {
+                    if(generator)
+                        generator.setConfigurationValue(fieldInfo.name, fieldInfo.choices[currentIndex].value)
+                }
+            }
         }
     }
 
@@ -309,10 +347,9 @@ Item {
         id: editor_Unknown
 
         Text {
-            property string fieldName
-            property string fieldTitle
+            property var fieldInfo
             textFormat: Text.RichText
-            text: "Do not know how to configure <strong>" + fieldName + "</strong>"
+            text: "Do not know how to configure <strong>" + fieldInfo.name + "</strong>"
         }
     }
 }

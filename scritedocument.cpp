@@ -32,6 +32,7 @@
 #include "finaldraftexporter.h"
 #include "locationreportgenerator.h"
 #include "characterreportgenerator.h"
+#include "scenecharactermatrixreportgenerator.h"
 
 #include <QDir>
 #include <QDateTime>
@@ -72,6 +73,7 @@ DeviceIOFactories::DeviceIOFactories()
 
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
     ReportGeneratorFactory.addClass<LocationReportGenerator>();
+    ReportGeneratorFactory.addClass<SceneCharacterMatrixReportGenerator>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()
@@ -538,7 +540,7 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
 
     if(event->timerId() == m_autoSaveTimer.timerId())
     {
-        if(m_modified && !m_fileName.isEmpty())
+        if(m_modified && !m_fileName.isEmpty() && QFileInfo(m_fileName).isWritable())
         {
             Logger::qtInfo(this, QString("Auto saving to %1").arg(m_fileName));
             this->save();

@@ -20,6 +20,9 @@
 #include <QEventLoop>
 #include <QTextDocument>
 
+class QPdfWriter;
+class QTextDocumentWriter;
+
 class AbstractReportGenerator : public AbstractDeviceIO
 {
     Q_OBJECT
@@ -39,23 +42,19 @@ public:
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
+    Q_INVOKABLE virtual bool supportsFormat(Format) const { return true; }
+
     Q_PROPERTY(QString name READ name CONSTANT)
     QString name() const;
-
-    Q_INVOKABLE bool generate();
 
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
     virtual bool requiresConfiguration() const { return false; }
 
-    Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value) {
-        return this->setProperty(qPrintable(name),value);
-    }
-    Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const {
-        return this->property(qPrintable(name));
-    }
-
+    Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
+    Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
     Q_INVOKABLE QJsonObject configurationFormInfo() const;
 
+    Q_INVOKABLE bool generate();
     Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
 
 protected:
@@ -64,7 +63,12 @@ protected:
 
 protected:
     AbstractReportGenerator(QObject *parent=nullptr);
-    virtual bool doGenerate(QTextDocument *document) = 0;
+    virtual bool doGenerate(QTextDocument *) { return false; }
+    virtual void configureWriter(QTextDocumentWriter *, const QTextDocument *) const { }
+    virtual void configureWriter(QPdfWriter *, const QTextDocument *) const { }
+
+    virtual bool canDirectPrintToPdf() const { return false; }
+    virtual bool directPrintToPdf(QPdfWriter *) { return false; }
 
 private:
     Format m_format = AdobePDF;

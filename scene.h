@@ -130,58 +130,20 @@ private:
 class CharacterElementMap
 {
 public:
-    CharacterElementMap() { }
-    ~CharacterElementMap() { }
+    CharacterElementMap();
+    ~CharacterElementMap();
 
-    // This function returns true if characterNames() would return
+    // These functions returns true if characterNames() would return
     // a different list after this function returns
-    bool include(SceneElement *element) {
-        if(element == nullptr)
-            return false;
+    bool include(SceneElement *element);
+    bool remove(SceneElement *element);
+    bool remove(const QString &name);
 
-        if(element->type() == SceneElement::Character) {
-            this->remove(element);
+    QStringList characterNames() const;
+    QList<SceneElement*> characterElements() const;
+    QList<SceneElement*> characterElements(const QString &name) const;
 
-            QString newName = element->formattedText();
-            newName = newName.section('(', 0, 0).trimmed();
-            if(newName.isEmpty())
-                return false;
-
-            m_forwardMap[element] = newName;
-            m_reverseMap[newName].append(element);
-            return true;
-        }
-
-        if(m_forwardMap.contains(element))
-            return this->remove(element);
-
-        return false;
-    }
-
-    // This function returns true if characterNames() would return
-    // a different list after this function returns
-    bool remove(SceneElement *element) {
-        const QString oldName = m_forwardMap.value(element);
-        if(!oldName.isEmpty()) {
-            QList<SceneElement*> &list = m_reverseMap[oldName];
-            if(list.removeOne(element)) {
-                if(list.isEmpty()) {
-                    m_reverseMap.remove(oldName);
-                    return true;
-                }
-                if(list.size() == 1) {
-                    const QVariant value = list.first()->property("#invisible");
-                    if(value.isValid() && value.toBool())
-                        return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    QStringList characterNames() const { return m_reverseMap.keys(); }
-    QList<SceneElement*> characterElements() const { return m_forwardMap.keys(); }
-    QList<SceneElement*> characterElements(const QString &name) const { return m_reverseMap.value(name.toUpper()); }
+    void include(const CharacterElementMap &other);
 
 private:
     QMap<SceneElement*,QString> m_forwardMap;
@@ -272,6 +234,7 @@ public:
     Q_SIGNAL void sceneElementChanged(SceneElement *element, SceneElementChangeType type);
     Q_SIGNAL void aboutToRemoveSceneElement(SceneElement *element);
     Q_SIGNAL void sceneChanged();
+    Q_SIGNAL void sceneRefreshed();
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
 
@@ -310,8 +273,10 @@ private:
     void setElementsList(const QList<SceneElement*> &list);
     void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
+    const CharacterElementMap & characterElementMap() const { return m_characterElementMap; }
 
 private:
+    friend class Structure;
     friend class SceneElement;
     friend class SceneDocumentBinder;
 

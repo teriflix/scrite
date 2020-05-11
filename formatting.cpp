@@ -1002,7 +1002,10 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
         SceneElement *element = qobject_cast<SceneElement*>(this->parent());
         Scene *scene = element->scene();
         scene->sceneAboutToReset();
-        element->setText(QString());
+        if(element->type() == SceneElement::Parenthetical)
+            element->setText(QStringLiteral("()"));
+        else
+            element->setText(QString());
         scene->sceneReset(scene->cursorPosition());
         GarbageCollector::instance()->add(this);
     }

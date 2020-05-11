@@ -424,9 +424,9 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     layout->setPaintDevice(painter.device());
     clonedDoc->setPageSize(QSizeF(m_printer->width(), m_printer->height()));
 
-    int dpiy = painter.device()->logicalDpiY();
-    int margin = int((2.0/2.54)*dpiy); // 2 cm margins
-    int padding = int((0.2/2.54)*dpiy); // 2 mm padding
+    const int dpiy = painter.device()->logicalDpiY();
+    const int margin = int((2.0/2.54)*dpiy); // 2 cm margins
+    const int padding = int((0.2/2.54)*dpiy); // 2 mm padding
     QTextFrameFormat fmt = doc->rootFrame()->frameFormat();
     fmt.setMargin(margin);
     doc->rootFrame()->setFrameFormat(fmt);

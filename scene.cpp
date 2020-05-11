@@ -408,6 +408,103 @@ bool SceneElement::event(QEvent *event)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+CharacterElementMap::CharacterElementMap() { }
+CharacterElementMap::~CharacterElementMap() { }
+
+bool CharacterElementMap::include(SceneElement *element)
+{
+    // This function returns true if characterNames() would return
+    // a different list after this function returns
+    if(element == nullptr)
+        return false;
+
+    if(element->type() == SceneElement::Character)
+    {
+        this->remove(element);
+
+        QString newName = element->formattedText();
+        newName = newName.section('(', 0, 0).trimmed();
+        if(newName.isEmpty())
+            return false;
+
+        m_forwardMap[element] = newName;
+        m_reverseMap[newName].append(element);
+        return true;
+    }
+
+    if(m_forwardMap.contains(element))
+        return this->remove(element);
+
+    return false;
+}
+
+bool CharacterElementMap::remove(SceneElement *element)
+{
+    // This function returns true if characterNames() would return
+    // a different list after this function returns
+    const QString oldName = m_forwardMap.take(element);
+    if(!oldName.isEmpty())
+    {
+        QList<SceneElement*> &list = m_reverseMap[oldName];
+        if(list.removeOne(element))
+        {
+            if(list.isEmpty())
+            {
+                m_reverseMap.remove(oldName);
+                return true;
+            }
+
+            if(list.size() == 1)
+            {
+                const QVariant value = list.first()->property("#invisible");
+                if(value.isValid() && value.toBool())
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool CharacterElementMap::remove(const QString &name)
+{
+    if(name.isEmpty())
+        return false;
+
+    const QList<SceneElement*> elements = m_reverseMap.take(name);
+    if(elements.isEmpty())
+        return false;
+
+    Q_FOREACH(SceneElement *element, elements)
+        m_forwardMap.take(element);
+
+    return true;
+}
+
+QStringList CharacterElementMap::characterNames() const
+{
+    return m_reverseMap.keys();
+}
+
+QList<SceneElement *> CharacterElementMap::characterElements() const
+{
+    return m_forwardMap.keys();
+}
+
+QList<SceneElement *> CharacterElementMap::characterElements(const QString &name) const
+{
+    return m_reverseMap.value(name.toUpper());
+}
+
+void CharacterElementMap::include(const CharacterElementMap &other)
+{
+    const QList<SceneElement*> elements = other.characterElements();
+    Q_FOREACH(SceneElement *element, elements)
+        this->include(element);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Scene::Scene(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -520,6 +617,7 @@ void Scene::addInvisibleCharacter(const QString &characterName)
     element->setProperty("#invisible", true);
     element->setType(SceneElement::Character);
     element->setText(characterName);
+    emit sceneElementChanged(element, ElementTypeChange);
 
     emit sceneChanged();
 }
@@ -1089,6 +1187,7 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
         emit elementCountChanged();
 
     emit sceneChanged();
+    emit sceneRefreshed();
 }
 
 void Scene::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)

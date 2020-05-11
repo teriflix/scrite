@@ -366,10 +366,36 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         QJsonObject field;
         field.insert("name", QString::fromLatin1(prop.name()));
         field.insert("label", queryPropertyInfo(prop, "FieldLabel"));
+        field.insert("note", queryPropertyInfo(prop, "FieldNote"));
         field.insert("editor", queryPropertyInfo(prop, "FieldEditor"));
         field.insert("min", queryPropertyInfo(prop, "FieldMinValue"));
         field.insert("max", queryPropertyInfo(prop, "FieldMaxValue"));
         field.insert("ideal", queryPropertyInfo(prop, "FieldDefaultValue"));
+
+        const QString fieldEnum = queryPropertyInfo(prop, "FieldEnum");
+        if( !fieldEnum.isEmpty() )
+        {
+            const int enumIndex = mo->indexOfEnumerator(qPrintable(fieldEnum));
+            const QMetaEnum enumerator = mo->enumerator(enumIndex);
+
+            QJsonArray choices;
+            for(int j=0; j<enumerator.keyCount(); j++)
+            {
+                QJsonObject choice;
+                choice.insert("key", QString::fromLatin1(enumerator.key(j)));
+                choice.insert("value", enumerator.value(j));
+
+                const QByteArray ciKey = QByteArray(enumerator.name()) + "_" + QByteArray(enumerator.key(j));
+                const QString text = queryClassInfo(ciKey);
+                if(!text.isEmpty())
+                    choice.insert("key", text);
+
+                choices.append(choice);
+            }
+
+            field.insert("choices", choices);
+        }
+
         fields.append(field);
     }
 

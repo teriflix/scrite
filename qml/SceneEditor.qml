@@ -177,7 +177,7 @@ Item {
         Connections {
             target: scene
             enabled: sceneCharactersList.enabled
-            onSceneChanged: {
+            onSceneRefreshed: {
                 sceneCharactersList.enabled = false
                 sceneCharactersList.enabled = true
             }

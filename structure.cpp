@@ -946,10 +946,7 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
 
     connect(element->scene(), &Scene::sceneElementChanged, this, &Structure::onSceneElementChanged);
     connect(element->scene(), &Scene::aboutToRemoveSceneElement, this, &Structure::onAboutToRemoveSceneElement);
-
-    const int nrSceneElements = element->scene()->elementCount();
-    for(int i=0; i<nrSceneElements; i++)
-        this->onSceneElementChanged(element->scene()->elementAt(i), Scene::ElementTextChange);
+    m_characterElementMap.include(element->scene()->characterElementMap());
 
     this->updateLocationHeadingMapLater();
 }
