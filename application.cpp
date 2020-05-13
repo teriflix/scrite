@@ -13,6 +13,7 @@
 
 #include "application.h"
 #include "autoupdate.h"
+#include "logger.h"
 #include "undoredo.h"
 
 #include <QDir>
@@ -472,7 +473,15 @@ QColor Application::pickStandardColor(int counter) const
     if(colors.isEmpty())
         return QColor("white");
 
-    return colors.at( counter%colors.size() );
+    QColor ret = colors.at( counter%colors.size() );
+    return ret;
+}
+
+QColor Application::textColorFor(const QColor &bgColor) const
+{
+    // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
+    double luma = ((0.299 * bgColor.redF()) + (0.587 * bgColor.greenF()) + (0.114 * bgColor.blueF()));
+    return luma > 0.5 ? Qt::black : Qt::white;
 }
 
 QRectF Application::boundingRect(const QString &text, const QFont &font) const

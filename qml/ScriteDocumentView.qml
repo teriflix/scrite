@@ -828,7 +828,7 @@ Item {
                             width: tabLabel.width + 120
                             height: uiLayout2TabBar.height
                             property bool isActiveTab: uiLayout2TabBar.currentIndex === index
-                            z: isActiveTab ? uiLayout2TabBar.tabs.length+1 : index
+                            z: isActiveTab ? uiLayout2TabBar.tabs.length+1 : (uiLayout2TabBar.currentIndex < index ? uiLayout2TabBar.tabs.length-index-1 : index)
 
                             PainterPathItem {
                                 anchors.fill: parent

@@ -58,7 +58,7 @@ Item {
             width: selected ? 40 : 35
             height: textItem.width + 40
             property bool selected: notebookTabsView.currentIndex === index
-            z: selected ? notebookTabsView.count+1 : notebookTabsView.count-index
+            z: selected ? notebookTabsView.count+1 : (notebookTabsView.currentIndex < index ? notebookTabsView.count-index-1 : index)
 
             PainterPathItem {
                 anchors.fill: parent
@@ -96,7 +96,7 @@ Item {
                 anchors.centerIn: parent
                 font.pixelSize: parent.selected ? 20 : 16
                 font.bold: parent.selected
-                color: parent.selected ? "white" : "black"
+                color: parent.selected ? app.textColorFor(modelData.color) : "black"
                 Behavior on font.pixelSize { NumberAnimation { duration: 250 } }
                 Behavior on color { ColorAnimation { duration: 125 } }
             }

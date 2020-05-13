@@ -549,6 +549,14 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
             QScopedValueRollback<bool> autoSave(m_autoSaveMode, true);
             this->save();
         }
+        return;
+    }
+
+    if(event->timerId() == m_clearModifyTimer.timerId())
+    {
+        m_clearModifyTimer.stop();
+        this->setModified(false);
+        return;
     }
 
     QObject::timerEvent(event);
@@ -805,6 +813,15 @@ bool ScriteDocument::load(const QString &fileName)
     UndoStack::clearAllStacks();
 
     m_progressReport->finish();
+
+    // When we finish loading, QML begins lazy initialization of the UI
+    // for displaying the document. In the process even a small 1/2 pixel
+    // change in element location on the structure canvas for example,
+    // causes this document to marked as modified. Which is a bummer for the user
+    // who will notice that a document is marked as modified immediately after
+    // loading it. So, we set this timer here to ensure that modified flag is
+    // set to false after the QML UI has finished its lazy loading.
+    m_clearModifyTimer.start(100, this);
 
     return ret;
 }

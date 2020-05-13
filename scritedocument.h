@@ -159,6 +159,7 @@ private:
     QString m_busyMessage;
     QBasicTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
+    QBasicTimer m_clearModifyTimer;
     Structure* m_structure = nullptr;
     Screenplay* m_screenplay = nullptr;
     ScreenplayFormat* m_formatting = nullptr;
