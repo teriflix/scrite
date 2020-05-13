@@ -154,6 +154,7 @@ private:
     bool m_busy = false;
     bool m_modified = false;
     bool m_autoSave = true;
+    bool m_autoSaveMode = false;
     QString m_fileName;
     QString m_busyMessage;
     QBasicTimer m_autoSaveTimer;

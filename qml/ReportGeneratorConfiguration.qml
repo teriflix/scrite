@@ -258,7 +258,7 @@ Item {
                         id: sceneCharactersListHeading
                         text: fieldInfo.label + ": "
                         font.bold: true
-                        font.pointSize: characterNameListView.visible ? 12 : 15
+                        font.pointSize: 12
                         topPadding: 5
                         bottomPadding: 5
                     }
@@ -277,7 +277,7 @@ Item {
                             rightPadding: 10
                             topPadding: 5
                             bottomPadding: 5
-                            font.pointSize: characterNameListView.visible ? 12 : 15
+                            font.pointSize: 12
                             closable: true
                             onCloseRequest: {
                                 var list = characterNameListView.selectedCharacters
@@ -299,6 +299,9 @@ Item {
                             hoverEnabled: true
                             onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                             onClicked: characterNameListView.visible = true
+                            ToolTip.visible: containsMouse
+                            ToolTip.text: "Add another character."
+                            ToolTip.delay: 1000
                         }
                     }
 
@@ -317,6 +320,9 @@ Item {
                                 characterNameListView.selectedCharacters = []
                                 characterNameListView.visible = true
                             }
+                            ToolTip.visible: containsMouse
+                            ToolTip.text: "Remove all characters and start fresh."
+                            ToolTip.delay: 1000
                         }
                     }
                 }

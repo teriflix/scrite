@@ -42,6 +42,7 @@
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QScopedValueRollback>
 
 class DeviceIOFactories
 {
@@ -291,7 +292,8 @@ void ScriteDocument::saveAs(const QString &fileName)
         return;
     }
 
-    this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
+    if(!m_autoSaveMode)
+        this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
 
     m_progressReport->start();
 
@@ -305,7 +307,8 @@ void ScriteDocument::saveAs(const QString &fileName)
 
     m_progressReport->finish();
 
-    this->clearBusyMessage();
+    if(!m_autoSaveMode)
+        this->clearBusyMessage();
 }
 
 void ScriteDocument::save()
@@ -543,6 +546,7 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
         if(m_modified && !m_fileName.isEmpty() && QFileInfo(m_fileName).isWritable())
         {
             Logger::qtInfo(this, QString("Auto saving to %1").arg(m_fileName));
+            QScopedValueRollback<bool> autoSave(m_autoSaveMode, true);
             this->save();
         }
     }
