@@ -1247,4 +1247,36 @@ Item {
             }
         }
     }
+
+    property bool handleCloseEvent: true
+    Connections {
+        target: qmlWindow
+        onClosing: {
+            if(handleCloseEvent) {
+                if(!scriteDocument.modified) {
+                    close.accepted = true
+                    return
+                }
+                close.accepted = false
+                askQuestion({
+                    "question": "Do you want to save your current project before closing?",
+                    "okButtonText": "Yes",
+                    "cancelButtonText": "No",
+                    "callback": function(val) {
+                        if(val) {
+                            if(scriteDocument.fileName !== "")
+                                scriteDocument.save()
+                            else {
+                                cmdSave.doClick()
+                                return
+                            }
+                        }
+                        handleCloseEvent = false
+                        qmlWindow.close()
+                    }
+                }, documentUI)
+            } else
+                close.accepted = true
+        }
+    }
 }
