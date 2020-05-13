@@ -192,12 +192,12 @@ bool SceneCharacterMatrixReportGenerator::doGenerate(QTextDocument *document)
     }
 
     QTextTableFormat tableFormat;
-    tableFormat.setTopMargin(20);
     tableFormat.setCellSpacing(0);
     tableFormat.setCellPadding(5);
     tableFormat.setBorder(3);
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
     tableFormat.setHeaderRowCount(1);
+    tableFormat.setAlignment(Qt::AlignHCenter);
 
     CreateColumnHeadingImageFunctor headingImageFunctor(defaultFont);
 
