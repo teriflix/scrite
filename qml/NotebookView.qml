@@ -212,7 +212,7 @@ Item {
 
             Loader {
                 anchors.fill: parent
-                anchors.rightMargin: (index%notesGrid.nrCells) ? 20 : 5
+                anchors.rightMargin: ((index+1)%notesGrid.nrCells)===0 ? 20 : 5
                 property int noteIndex: index < notesPack.noteCount ? index : -1
                 sourceComponent: noteIndex >= 0 ? noteDelegate : newNoteDelegate
                 active: true
