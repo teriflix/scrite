@@ -256,6 +256,8 @@ public:
     Q_INVOKABLE int indexOfElement(StructureElement *element) const;
     Q_INVOKABLE StructureElement *findElementBySceneID(const QString &id) const;
 
+    Q_INVOKABLE void scanForMuteCharacters();
+
     Q_INVOKABLE QStringList standardLocationTypes() const;
     Q_INVOKABLE QStringList standardMoments() const;
 

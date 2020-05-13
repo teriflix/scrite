@@ -216,9 +216,9 @@ Item {
                     topPadding: 5
                     bottomPadding: 5
                     font.pointSize: 12
-                    closable: scene.isCharacterInvisible(modelData)
+                    closable: scene.isCharacterMute(modelData)
                     onClicked: requestCharacterMenu(modelData)
-                    onCloseRequest: scene.removeInvisibleCharacter(modelData)
+                    onCloseRequest: scene.removeMuteCharacter(modelData)
                 }
             }
 
@@ -241,7 +241,7 @@ Item {
                         wrapMode: Text.NoWrap
                         completionStrings: scriteDocument.structure.characterNames
                         onEditingFinished: {
-                            scene.addInvisibleCharacter(text)
+                            scene.addMuteCharacter(text)
                             newCharacterInput.active = false
                         }
 

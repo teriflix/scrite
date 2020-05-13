@@ -210,9 +210,10 @@ public:
     QStringList characterNames() const { return m_characterElementMap.characterNames(); }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_INVOKABLE void addInvisibleCharacter(const QString &characterName);
-    Q_INVOKABLE void removeInvisibleCharacter(const QString &characterName);
-    Q_INVOKABLE bool isCharacterInvisible(const QString &characterName) const;
+    Q_INVOKABLE void addMuteCharacter(const QString &characterName);
+    Q_INVOKABLE void removeMuteCharacter(const QString &characterName);
+    Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
+    void scanMuteCharacters(const QStringList &characterNames=QStringList());
 
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements)
     QQmlListProperty<SceneElement> elements();

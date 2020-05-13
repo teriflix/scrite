@@ -16,7 +16,8 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
-#include <QFutureWatcher>
+#include <QRunnable>
+#include <QThreadPool>
 #include <QtConcurrentRun>
 
 StructureElement::StructureElement(QObject *parent)
@@ -697,6 +698,17 @@ StructureElement *Structure::findElementBySceneID(const QString &id) const
     }
 
     return nullptr;
+}
+
+void Structure::scanForMuteCharacters()
+{
+    m_scriteDocument->setBusyMessage("Scanning for mute characters..");
+
+    const QStringList characterNames = this->characterNames();
+    Q_FOREACH(StructureElement *element, m_elements)
+        element->scene()->scanMuteCharacters(characterNames);
+
+    m_scriteDocument->clearBusyMessage();
 }
 
 QStringList Structure::standardLocationTypes() const

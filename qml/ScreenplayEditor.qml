@@ -12,7 +12,9 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Item {
@@ -24,12 +26,81 @@ Item {
     property TextArea currentSceneContentEditor: currentSceneEditor ? currentSceneEditor.editor : null
     signal requestEditor()
 
-    SearchBar {
-        id: searchBar
+    Settings {
+        id: screenplayEditorSettings
+        fileName: app.settingsFilePath
+        category: "Screenplay Editor"
+        property bool displaySceneCharacters: true
+    }
+
+    Rectangle {
+        id: toolbar
         anchors.left: parent.left
-        anchors.right: parent.right
         anchors.top: parent.top
-        borderWidth: 1
+        anchors.right: parent.right
+        anchors.margins: 1
+        color: primaryColors.c100.background
+        radius: 3
+        height: Math.max(toolbarLayout.height, searchBar.height)
+        visible: scriteDocument.screenplay.elementCount > 0
+        border.width: 1
+        border.color: primaryColors.borderColor
+        readonly property real margin: Math.max( Math.round((width-sceneEditorFontMetrics.pageWidth)/2), sceneEditorFontMetrics.height*2 )
+        readonly property real padding: sceneEditorFontMetrics.paragraphMargin + margin
+
+        Row {
+            id: toolbarLayout
+            anchors.left: parent.left
+            anchors.leftMargin: toolbar.margin
+
+            ToolButton2 {
+                icon.source: "../icons/screenplay/character.png"
+                ToolTip.text: "Toggle display of character names under scene headings and scan for hidden characters in each scene."
+                ToolTip.delay: 1000
+                down: sceneCharactersMenu.visible
+                onClicked: sceneCharactersMenu.visible = true
+
+                Item {
+                    width: parent.width
+                    height: 1
+                    anchors.top: parent.bottom
+
+                    Menu2 {
+                        id: sceneCharactersMenu
+                        width: 300
+
+                        MenuItem2 {
+                            text: "Display scene characters"
+                            checkable: true
+                            checked: screenplayEditorSettings.displaySceneCharacters
+                            onToggled: screenplayEditorSettings.displaySceneCharacters = checked
+                        }
+
+                        MenuItem2 {
+                            text: "Scan for mute characters"
+                            onClicked: scriteDocument.structure.scanForMuteCharacters()
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            anchors.left: toolbarLayout.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 1
+            color: primaryColors.borderColor
+        }
+
+        SearchBar {
+            id: searchBar
+            anchors.left: toolbarLayout.right
+            anchors.leftMargin: 5
+            anchors.right: parent.right
+            anchors.rightMargin: toolbar.margin
+            anchors.verticalCenter: parent.verticalCenter
+        }
     }
 
     Repeater {
@@ -96,7 +167,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.top: searchBar.bottom
+        anchors.top: toolbar.bottom
         anchors.margins: 3
         clip: true
         ScrollBar.vertical: ScrollBar {
@@ -216,7 +287,7 @@ Item {
                 active: parent.selected
                 displaySceneNumber: screenplayEditor.displaySceneNumbers
                 displaySceneMenu: screenplayEditor.displaySceneMenu
-                showCharacterNames: true
+                showCharacterNames: screenplayEditorSettings.displaySceneCharacters
                 binder.onDocumentInitialized: {
                     var info = screenplayListView.lastSceneResetInfo
                     screenplayListView.lastSceneResetInfo = undefined

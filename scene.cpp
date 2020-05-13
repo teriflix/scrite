@@ -456,7 +456,7 @@ bool CharacterElementMap::remove(SceneElement *element)
 
             if(list.size() == 1)
             {
-                const QVariant value = list.first()->property("#invisible");
+                const QVariant value = list.first()->property("#mute");
                 if(value.isValid() && value.toBool())
                     return true;
             }
@@ -607,14 +607,14 @@ void Scene::setCursorPosition(int val)
     emit cursorPositionChanged();
 }
 
-void Scene::addInvisibleCharacter(const QString &characterName)
+void Scene::addMuteCharacter(const QString &characterName)
 {
     const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
     if(!elements.isEmpty())
         return;
 
     SceneElement *element = new SceneElement(this);
-    element->setProperty("#invisible", true);
+    element->setProperty("#mute", true);
     element->setType(SceneElement::Character);
     element->setText(characterName);
     emit sceneElementChanged(element, ElementTypeChange);
@@ -622,13 +622,13 @@ void Scene::addInvisibleCharacter(const QString &characterName)
     emit sceneChanged();
 }
 
-void Scene::removeInvisibleCharacter(const QString &characterName)
+void Scene::removeMuteCharacter(const QString &characterName)
 {
     const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
     if(elements.isEmpty() || elements.size() > 1)
         return;
 
-    const QVariant value = elements.first()->property("#invisible");
+    const QVariant value = elements.first()->property("#mute");
     if(value.isValid() && value.toBool())
     {
         emit aboutToRemoveSceneElement(elements.first());
@@ -637,14 +637,73 @@ void Scene::removeInvisibleCharacter(const QString &characterName)
     }
 }
 
-bool Scene::isCharacterInvisible(const QString &characterName) const
+bool Scene::isCharacterMute(const QString &characterName) const
 {
     const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
     if(elements.isEmpty() || elements.size() > 1)
         return false;
 
-    const QVariant value = elements.first()->property("#invisible");
+    const QVariant value = elements.first()->property("#mute");
     return (value.isValid() && value.toBool());
+}
+
+void Scene::scanMuteCharacters(const QStringList &characterNames)
+{
+    QStringList names = characterNames;
+    if(names.isEmpty())
+    {
+        Structure *structure = qobject_cast<Structure*>(this->parent());
+        if(structure)
+            names = structure->characterNames();
+    }
+
+    const QStringList existingCharacters = this->characterNames();
+    Q_FOREACH(QString existingCharacter, existingCharacters)
+        names.removeAll(existingCharacter);
+
+    const QList<SceneElement::Type> skipTypes = QList<SceneElement::Type>()
+            << SceneElement::Character << SceneElement::Transition << SceneElement::Shot;
+
+    Q_FOREACH(SceneElement *element, m_elements)
+    {
+        if(skipTypes.contains(element->type()))
+            continue;
+
+        const QString text = element->text();
+
+        Q_FOREACH(QString name, names)
+        {
+            int pos = 0;
+            while(pos < text.length())
+            {
+                pos = text.indexOf(name, pos, Qt::CaseInsensitive);
+                if(pos < 0)
+                    break;
+
+                if(pos > 0)
+                {
+                    const QChar ch = text.at(pos-1);
+                    if( !ch.isPunct() && !ch.isSpace() )
+                    {
+                        pos += name.length();
+                        continue;
+                    }
+                }
+
+                bool found = (pos + name.length() >= text.length());
+                if(!found)
+                {
+                    const QChar ch = text.at(pos+name.length());
+                    found = ch.isPunct() || ch.isSpace();
+                }
+
+                if(found)
+                    this->addMuteCharacter(name);
+
+                pos += name.length();
+            }
+        }
+    }
 }
 
 QQmlListProperty<SceneElement> Scene::elements()
@@ -1131,7 +1190,7 @@ void Scene::serializeToJson(QJsonObject &json) const
 
     Q_FOREACH(QString name, names)
     {
-        if(this->isCharacterInvisible(name))
+        if(this->isCharacterMute(name))
             invisibleCharacters.append(name);
     }
 
@@ -1146,7 +1205,7 @@ void Scene::deserializeFromJson(const QJsonObject &json)
         return;
 
     for(int i=0; i<invisibleCharacters.size(); i++)
-        this->addInvisibleCharacter(invisibleCharacters.at(i).toString());
+        this->addMuteCharacter(invisibleCharacters.at(i).toString());
 }
 
 void Scene::setElementsList(const QList<SceneElement *> &list)

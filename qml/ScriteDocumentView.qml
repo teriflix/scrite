@@ -355,6 +355,7 @@ Item {
                                 id: reportsMenu
                                 title: "Reports"
                                 enabled: scriteDocument.screenplay.elementCount > 0
+                                width: 250
 
                                 Repeater {
                                     model: scriteDocument.supportedReports
