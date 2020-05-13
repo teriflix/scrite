@@ -68,6 +68,7 @@ struct CreateColumnHeadingImageFunctor
     QTransform transform;
     QFont font;
     QFontMetrics fontMetrics;
+    QBrush background = QBrush(Qt::white);
     typedef QImage result_type;
 
     QImage operator () (const QString &text) {
@@ -76,7 +77,7 @@ struct CreateColumnHeadingImageFunctor
 
         QImage image(textRect.size()*dpr, QImage::Format_ARGB32);
         image.setDevicePixelRatio(dpr);
-        image.fill(Qt::white);
+        image.fill(background.color());
 
         QPainter paint(&image);
         paint.setFont(font);
@@ -142,6 +143,7 @@ bool SceneCharacterMatrixReportGenerator::doGenerate(QTextDocument *document)
     const QFont defaultFont = this->document()->printFormat()->defaultFont();
 
     QTextCursor cursor(document);
+    document->setProperty("#rootFrameMarginNotRequired", true);
 
     QTextBlockFormat defaultBlockFormat;
 
@@ -193,6 +195,7 @@ bool SceneCharacterMatrixReportGenerator::doGenerate(QTextDocument *document)
     tableFormat.setTopMargin(20);
     tableFormat.setCellSpacing(0);
     tableFormat.setCellPadding(5);
+    tableFormat.setBorder(3);
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
     tableFormat.setHeaderRowCount(1);
 
@@ -214,6 +217,7 @@ bool SceneCharacterMatrixReportGenerator::doGenerate(QTextDocument *document)
     }
 
     headingImageFunctor.transform.rotate(90);
+
     for(int i=0; i<columnHeadings.size(); i++)
     {
         const QString text = columnHeadings.at(i);

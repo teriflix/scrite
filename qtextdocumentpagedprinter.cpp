@@ -427,9 +427,13 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     const int dpiy = painter.device()->logicalDpiY();
     const int margin = int((2.0/2.54)*dpiy); // 2 cm margins
     const int padding = int((0.2/2.54)*dpiy); // 2 mm padding
-    QTextFrameFormat fmt = doc->rootFrame()->frameFormat();
-    fmt.setMargin(margin);
-    doc->rootFrame()->setFrameFormat(fmt);
+
+    if(!doc->property("#rootFrameMarginNotRequired").toBool())
+    {
+        QTextFrameFormat fmt = doc->rootFrame()->frameFormat();
+        fmt.setMargin(margin);
+        doc->rootFrame()->setFrameFormat(fmt);
+    }
 
     QMap<HeaderFooter::Field,QString> fieldMap;
     fieldMap[HeaderFooter::AppName] = Application::instance()->applicationName();

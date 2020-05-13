@@ -173,6 +173,11 @@ Item {
                             }
                         }
                     }
+
+                    Item {
+                        width: parent.width
+                        height: 40
+                    }
                 }
             }
 
@@ -244,7 +249,7 @@ Item {
 
             Loader {
                 id: fieldTitleText
-                width: parent.width
+                width: parent.width-30
                 sourceComponent: Flow {
                     spacing: 5
                     flow: Flow.LeftToRight
@@ -273,6 +278,12 @@ Item {
                             topPadding: 5
                             bottomPadding: 5
                             font.pointSize: characterNameListView.visible ? 12 : 15
+                            closable: true
+                            onCloseRequest: {
+                                var list = characterNameListView.selectedCharacters
+                                list.splice( list.indexOf(text), 1 )
+                                characterNameListView.selectedCharacters = list
+                            }
                         }
                     }
 
@@ -288,6 +299,24 @@ Item {
                             hoverEnabled: true
                             onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                             onClicked: characterNameListView.visible = true
+                        }
+                    }
+
+                    Image {
+                        source: "../icons/content/clear_all.png"
+                        width: sceneCharactersListHeading.height
+                        height: sceneCharactersListHeading.height
+                        opacity: 0.5
+                        visible: characterNameListView.selectedCharacters.length > 0
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
+                            onClicked: {
+                                characterNameListView.selectedCharacters = []
+                                characterNameListView.visible = true
+                            }
                         }
                     }
                 }
@@ -328,13 +357,13 @@ Item {
 
             Text {
                 text: fieldInfo.label + ": "
-                width: parent.width
+                width: parent.width - 30
             }
 
             ComboBox2 {
                 model: fieldInfo.choices
                 textRole: "key"
-                width: parent.width
+                width: parent.width - 30
                 onCurrentIndexChanged: {
                     if(generator)
                         generator.setConfigurationValue(fieldInfo.name, fieldInfo.choices[currentIndex].value)
