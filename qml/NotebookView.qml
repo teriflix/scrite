@@ -16,8 +16,6 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
-    property var tabColors: ["#6600cc", "#ff3300", "#0000cc", "#993300", "#006600", "#660066", "#003300", "#6600ff", "#999966"]
-
     Image {
         anchors.fill: parent
         source: "../images/notebookpage.jpg"
@@ -137,7 +135,7 @@ Item {
         var nrCharacters = scriteDocument.structure.characterCount
         for(var i=0; i<nrCharacters; i++) {
             var character = scriteDocument.structure.characterAt(i)
-            sources.push({"source": character, "label":character.name, "color": tabColors[i%tabColors.length]})
+            sources.push({"source": character, "label":character.name, "color": app.pickStandardColor(i)})
         }
 
         noteSources = sources

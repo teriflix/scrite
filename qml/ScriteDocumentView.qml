@@ -806,7 +806,7 @@ Item {
                 anchors.margins: 5
                 height: 28
                 property int currentIndex: 0
-                property var tabs: ["Screenplay Only", "Structure, Timeline & Notes"]
+                property var tabs: ["Screenplay Only", "Structure & Timeline", "Notebook"]
 
                 Rectangle {
                     width: parent.width
@@ -912,35 +912,26 @@ Item {
                     Item {
                         SplitView.fillHeight: true
 
-                        SplitView {
+                        Rectangle {
                             anchors.fill: parent
-                            orientation: Qt.Horizontal
+                            color: primaryColors.c10.background
+                            border {
+                                width: 1
+                                color: primaryColors.borderColor
+                            }
+                            radius: 4
 
-                            Rectangle {
-                                SplitView.preferredWidth: uiLayout2TabView.width * 0.5
-                                color: primaryColors.c10.background
-                                border {
-                                    width: 1
-                                    color: primaryColors.borderColor
-                                }
-                                radius: 4
+                            StructureView {
+                                anchors.fill: parent
+                                anchors.margins: 2
 
-                                StructureView {
-                                    anchors.fill: parent
-                                    anchors.margins: 2
-
-                                    onRequestEditor: {
-                                        if(scriteDocument.structure.currentElementIndex >= 0) {
-                                            var selement = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
-                                            var index = scriteDocument.screenplay.firstIndexOfScene(selement.scene)
-                                            scriteDocument.screenplay.currentElementIndex = index
-                                        }
+                                onRequestEditor: {
+                                    if(scriteDocument.structure.currentElementIndex >= 0) {
+                                        var selement = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
+                                        var index = scriteDocument.screenplay.firstIndexOfScene(selement.scene)
+                                        scriteDocument.screenplay.currentElementIndex = index
                                     }
                                 }
-                            }
-
-                            NotebookView {
-                                SplitView.fillWidth: true
                             }
                         }
                     }
@@ -959,6 +950,35 @@ Item {
 
                             ScreenplayView {
                                 id: screenplayView
+                                anchors.fill: parent
+                                anchors.margins: 5
+                            }
+                        }
+                    }
+                }
+
+                SplitView {
+                    orientation: Qt.Vertical
+                    Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+
+                    NotebookView {
+                        SplitView.fillHeight: true
+                    }
+
+                    Item {
+                        SplitView.preferredHeight: screenplayView2.preferredHeight + 40
+                        SplitView.minimumHeight: SplitView.preferredHeight
+                        SplitView.maximumHeight: SplitView.preferredHeight
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: 2
+                            color: accentColors.c200.background
+                            border { width: 1; color: accentColors.borderColor }
+                            radius: 6
+
+                            ScreenplayView {
+                                id: screenplayView2
                                 anchors.fill: parent
                                 anchors.margins: 5
                             }
