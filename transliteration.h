@@ -16,6 +16,7 @@
 
 #include <QMap>
 #include <QFont>
+#include <QEvent>
 #include <QObject>
 #include <QJsonArray>
 #include <QQmlEngine>
@@ -182,5 +183,27 @@ private:
 };
 Q_DECLARE_METATYPE(Transliterator*)
 QML_DECLARE_TYPEINFO(Transliterator, QML_HAS_ATTACHED_PROPERTIES)
+
+class TransliterationEvent : public QEvent
+{
+public:
+    static QEvent::Type EventType();
+
+    TransliterationEvent(int start, int end, const QString &original, TransliterationEngine::Language language, const QString &replacement);
+    ~TransliterationEvent();
+
+    int start() const { return m_start; }
+    int end() const { return m_end; }
+    QString original() const { return m_original; }
+    QString replacement() const { return m_replacement; }
+    TransliterationEngine::Language language() const { return m_language; }
+
+private:
+    int m_start = 0;
+    int m_end = 0;
+    QString m_original;
+    QString m_replacement;
+    TransliterationEngine::Language m_language = TransliterationEngine::English;
+};
 
 #endif // TRANSLITERATION_H

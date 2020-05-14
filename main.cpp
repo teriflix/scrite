@@ -19,6 +19,7 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQuickStyle>
+#include <QFontDatabase>
 
 #include "logger.h"
 #include "undoredo.h"

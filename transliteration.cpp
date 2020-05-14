@@ -661,12 +661,37 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
     if(!word.isEmpty())
         replacement += TransliterationEngine::instance()->transliteratedWord(word);
 
+    if(replacement == original)
+        return;
+
     if(m_mode == AutomaticMode)
     {
+        const int start = cursor.selectionStart();
+
         emit aboutToTransliterate(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
         cursor.insertText(replacement);
         emit finishedTransliterating(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
+
+        const int end = cursor.position();
+
+        qApp->postEvent(cursor.document(), new TransliterationEvent(start, end, original, TransliterationEngine::instance()->language(), replacement));
     }
     else
         emit transliterationSuggestion(cursor.selectionStart(), cursor.selectionEnd(), replacement, original);
+}
+
+QEvent::Type TransliterationEvent::EventType()
+{
+    static const int type = QEvent::registerEventType();
+    return QEvent::Type(type);
+}
+
+TransliterationEvent::TransliterationEvent(int start, int end, const QString &original, TransliterationEngine::Language lang, const QString &replacement)
+    : QEvent(EventType()),
+      m_start(start), m_end(end), m_original(original), m_replacement(replacement), m_language(lang)
+{
+}
+
+TransliterationEvent::~TransliterationEvent()
+{
 }

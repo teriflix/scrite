@@ -28,7 +28,11 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
                      m_font(parent->defaultFont()),
                      m_format(parent),
                      m_elementType(type)
-{
+{        
+    QObject::connect(this, &SceneElementFormat::elementFormatChanged, [this]() {
+        this->markAsModified();
+    });
+
     CACHE_DEFAULT_PROPERTY_VALUES
 }
 
@@ -260,6 +264,10 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
         m_elementFormats.append(elementFormat);
     }
 
+    QObject::connect(this, &ScreenplayFormat::formatChanged, [this]() {
+        this->markAsModified();
+    });
+
     this->resetToDefaults();
 }
 
@@ -449,11 +457,49 @@ public:
 
     SceneElement *sceneElement() const { return m_sceneElement; }
 
+    void resetFormat() { m_formatMTime = QAtomicInt(); }
+    bool shouldUpdateFromFormat(const SceneElementFormat *format) {
+        return format->isModified(&m_formatMTime);
+    }
+
+    QTextBlockFormat blockFormat;
+    QTextCharFormat charFormat;
+
+    void setHighlightedText(const QString &text) {
+        m_highlightedText = text;
+    }
+    QString highlightedText() const { return m_highlightedText; }
+
+    void setTransliteratedSegment(int start, int end, TransliterationEngine::Language language) {
+        m_transliterationStart = start;
+        m_transliterationEnd = end;
+        m_translitrationLanguage = language;
+    }
+    QPair<int,int> transliteratedSegment() {
+        const QPair<int,int> ret = qMakePair(m_transliterationStart, m_transliterationEnd);
+        m_transliterationStart = -1;
+        m_transliterationEnd = -1;
+        return ret;
+    }
+    TransliterationEngine::Language transliterationLanguage() {
+        TransliterationEngine::Language ret = m_translitrationLanguage;
+        m_translitrationLanguage = TransliterationEngine::English;
+        return ret;
+    }
+    bool hasTransliteratedSegment() const {
+        return m_transliterationEnd >= 0 && m_transliterationStart >= 0 && m_transliterationEnd > m_transliterationStart;
+    }
+
     static SceneDocumentBlockUserData *get(const QTextBlock &block);
     static SceneDocumentBlockUserData *get(QTextBlockUserData *userData);
 
 private:
     QPointer<SceneElement> m_sceneElement;
+    QString m_highlightedText;
+    int m_formatMTime = 0;
+    int m_transliterationEnd = 0;
+    int m_transliterationStart = 0;
+    TransliterationEngine::Language m_translitrationLanguage = TransliterationEngine::English;
 };
 
 SceneDocumentBlockUserData::SceneDocumentBlockUserData(SceneElement *element)
@@ -549,6 +595,7 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     if(this->document() != nullptr)
     {
         this->document()->setUndoRedoEnabled(true);
+        this->document()->removeEventFilter(this);
 
         disconnect( this->document(), &QTextDocument::contentsChange,
                     this, &SceneDocumentBinder::onContentsChange);
@@ -578,6 +625,7 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     if(m_textDocument != nullptr)
     {
         this->document()->setUndoRedoEnabled(false);
+        this->document()->installEventFilter(this);
 
         connect(this->document(), &QTextDocument::contentsChange,
                 this, &SceneDocumentBinder::onContentsChange);
@@ -799,8 +847,6 @@ QFont SceneDocumentBinder::currentFont() const
 
 void SceneDocumentBinder::highlightBlock(const QString &text)
 {
-    Q_UNUSED(text)
-
     if(m_initializingDocument)
         return;
 
@@ -828,28 +874,54 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         return;
     }
 
-    SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
-    QTextBlockFormat blkFormat = format->createBlockFormat();
-    QTextCharFormat chrFormat = format->createCharFormat();
-    chrFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
-
+    const SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
+    const bool updateFromFormat = userData->shouldUpdateFromFormat(format) || userData->highlightedText().isEmpty();
     QTextCursor cursor(block);
-    cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
-    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    cursor.setCharFormat(chrFormat);
-    cursor.setBlockFormat(blkFormat);
-    cursor.clearSelection();
-    cursor.setPosition(block.position());
+
+    if(updateFromFormat)
+    {
+        userData->blockFormat = format->createBlockFormat();
+        userData->charFormat = format->createCharFormat();
+        userData->charFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
+
+        cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        cursor.setCharFormat(userData->charFormat);
+        cursor.setBlockFormat(userData->blockFormat);
+        cursor.clearSelection();
+    }
+
+    if(userData->hasTransliteratedSegment())
+    {
+        const QPair<int,int> range = userData->transliteratedSegment();
+        TransliterationEngine::Language language = userData->transliterationLanguage();
+        const QFont font = TransliterationEngine::instance()->languageFont(language);
+
+        cursor.setPosition(range.first + block.position());
+        cursor.setPosition(range.second + block.position(), QTextCursor::KeepAnchor);
+        QTextCharFormat format;
+        format.setFontFamily(font.family());
+        cursor.mergeCharFormat(format);
+        cursor.clearSelection();
+
+        if(m_currentElement == element)
+            emit currentFontChanged();
+
+        return;
+    }
 
     auto applyFormatChanges = [](QTextCursor &cursor, QChar::Script script) {
         if(cursor.hasSelection()) {
             TransliterationEngine::Language language = TransliterationEngine::languageForScript(script);
             const QFont font = TransliterationEngine::instance()->languageFont(language);
 
-            QTextCharFormat format;
-            format.setFontFamily(font.family());
-            // format.setForeground(script == QChar::Script_Latin ? Qt::black : Qt::red);
-            cursor.mergeCharFormat(format);
+            if(cursor.charFormat().fontFamily() != font.family())
+            {
+                QTextCharFormat format;
+                format.setFontFamily(font.family());
+                // format.setForeground(script == QChar::Script_Latin ? Qt::black : Qt::red);
+                cursor.mergeCharFormat(format);
+            }
             cursor.clearSelection();
         }
     };
@@ -858,12 +930,22 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         return ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line || ch.script() == QChar::Script_Latin;
     };
 
-    QChar::Script script = QChar::Script_Unknown;
+    const int charsAdded = updateFromFormat ? text.length() : (m_cursorPosition >= 0 ? qMax(text.length() - userData->highlightedText().length(), 0) : 0);
+    const int charsRemoved = updateFromFormat ? 0 : (m_cursorPosition >= 0 ? qMax(userData->highlightedText().length() - text.length(), 0) : 0);
+    const int cursorPositon = updateFromFormat ? 0 : (m_cursorPosition >= 0 ? qMax(m_cursorPosition - block.position(), 0) : 0);
+    const int from = charsAdded > 0 ? qMax(cursorPositon-1,0) : (charsRemoved > 0 ? cursorPositon : 0);
 
+    userData->setHighlightedText(text);
+    cursor.setPosition(block.position() + from);
+
+    QChar::Script script = QChar::Script_Unknown;
     while(!cursor.atBlockEnd())
     {
         const int index = cursor.position()-block.position();
-        const QChar ch = text.at(index);
+        const QChar ch = index < 0 || index >= text.length() ? QChar() : text.at(index);
+        if(ch.isNull())
+            break;
+
         const QChar::Script chScript = isEnglishChar(ch) ? QChar::Script_Latin : ch.script();
         if(script != chScript)
         {
@@ -1032,6 +1114,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
         if(userData != nullptr && userData->sceneElement() == element) {
             // Text changes from scene element to block are not applied
             // Only element type changes can be applied.
+            userData->resetFormat();
             this->rehighlightBlock(block);
             if(element->text().isEmpty())
                 new ForceCursorPositionHack(element);
@@ -1184,6 +1267,31 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     m_scene->setElementsList(elementList);
     m_scene->endUndoCapture();
+}
+
+bool SceneDocumentBinder::eventFilter(QObject *object, QEvent *event)
+{
+    if(object == this->document() && event->type() == TransliterationEvent::EventType())
+    {
+        TransliterationEvent *te = static_cast<TransliterationEvent*>(event);
+
+        QTextCursor cursor(this->document());
+        cursor.setPosition(te->start());
+
+        QTextBlock block = cursor.block();
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if(userData)
+        {
+            const int start = te->start()-block.position();
+            const int end = te->end()-block.position();
+            userData->setTransliteratedSegment(start, end, te->language());
+        }
+
+        this->rehighlightBlock(block);
+        return true;
+    }
+
+    return false;
 }
 
 void SceneDocumentBinder::evaluateAutoCompleteHints()

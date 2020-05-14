@@ -360,7 +360,7 @@ Item {
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             // renderType: Text.NativeRendering
             readOnly: sceneEditor.readOnly
-            property real totalHeight: contentHeight + topPadding + bottomPadding
+            property real totalHeight: contentHeight + topPadding + bottomPadding + 10
             background: Rectangle {
                 color: backgroundColor
 

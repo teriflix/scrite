@@ -38,6 +38,7 @@ HEADERS += \
     locationreportgenerator.h \
     logger.h \
     materialcolors.h \
+    modifiable.h \
     note.h \
     notification.h \
     notificationmanager.h \

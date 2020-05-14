@@ -15,6 +15,7 @@
 #define FORMATTING_H
 
 #include "scene.h"
+#include "modifiable.h"
 
 #include <QScreen>
 #include <QBasicTimer>
@@ -26,7 +27,7 @@
 class ScreenplayFormat;
 class ScriteDocument;
 
-class SceneElementFormat : public QObject
+class SceneElementFormat : public QObject, public Modifiable
 {
     Q_OBJECT
 
@@ -130,7 +131,7 @@ private:
     SceneElement::Type m_elementType = SceneElement::Action;
 };
 
-class ScreenplayFormat : public QAbstractListModel
+class ScreenplayFormat : public QAbstractListModel, public Modifiable
 {
     Q_OBJECT
 
@@ -282,6 +283,7 @@ private:
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onContentsChange(int from, int charsRemoved, int charsAdded);
     void syncSceneFromDocument(int nrBlocks=-1);
+    bool eventFilter(QObject *object, QEvent *event);
 
     void evaluateAutoCompleteHints();
     void setAutoCompleteHints(const QStringList &val);
