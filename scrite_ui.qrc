@@ -30,5 +30,6 @@
         <file>qml/MenuItem2.qml</file>
         <file>qml/TagText.qml</file>
         <file>qml/CharactersView.qml</file>
+        <file>qml/TabBarTab.qml</file>
     </qresource>
 </RCC>

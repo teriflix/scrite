@@ -636,67 +636,15 @@ Item {
                                         id: structureEditorTabGenerator
                                         model: structureEditor.tabs
 
-                                        Item {
+                                        TabBarTab {
                                             id: tabItem
-                                            width: tabLabel.width + 120
+                                            text: modelData
+                                            width: tabTextWidth + 120
                                             height: structureEditorTabs.height
-                                            property bool isActiveTab: structureEditorTabs.currentIndex === index
-                                            z: isActiveTab ? structureEditor.tabs.length+1 : index
-
-                                            PainterPathItem {
-                                                anchors.fill: parent
-                                                anchors.topMargin: isActiveTab ? 0 : parent.height*0.1
-                                                fillColor: isActiveTab ? primaryColors.windowColor : primaryColors.c200.background
-                                                outlineColor: primaryColors.borderColor
-                                                outlineWidth: 2
-                                                renderingMechanism: PainterPathItem.UseQPainter
-                                                antialiasing: true
-                                                painterPath: PainterPath {
-                                                    id: tabPath
-                                                    property real radius: Math.min(itemRect.width, itemRect.height)*0.2
-                                                    property point c1: Qt.point(itemRect.left+itemRect.width*0.1, itemRect.top+1)
-                                                    property point c2: Qt.point(itemRect.right-1-itemRect.width*0.1, itemRect.top+1)
-
-                                                    property point p1: Qt.point(itemRect.left, itemRect.bottom)
-                                                    property point p2: pointInLine(c1, p1, radius, true)
-                                                    property point p3: pointInLine(c1, c2, radius, true)
-                                                    property point p4: pointInLine(c2, c1, radius, true)
-                                                    property point p5: pointInLine(c2, p6, radius, true)
-                                                    property point p6: Qt.point(itemRect.right-1, itemRect.bottom)
-
-                                                    MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
-                                                    LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
-                                                    QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
-                                                    LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
-                                                    QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
-                                                    LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
-                                                    CloseSubpath { }
-                                                }
-
-                                                Text {
-                                                    id: tabLabel
-                                                    text: modelData
-                                                    anchors.centerIn: parent
-                                                    font.pixelSize: isActiveTab ? 16 : 14
-                                                    font.bold: isActiveTab
-                                                }
-
-                                                Rectangle {
-                                                    height: 1.5
-                                                    anchors.left: parent.left
-                                                    anchors.right: parent.right
-                                                    anchors.leftMargin: 2
-                                                    anchors.rightMargin: 2
-                                                    anchors.verticalCenter: parent.bottom
-                                                    color: parent.fillColor
-                                                    visible: isActiveTab
-                                                }
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: structureEditorTabs.currentIndex = index
-                                            }
+                                            tabIndex: index
+                                            tabCount: structureEditor.tabs.length
+                                            currentTabIndex: structureEditorTabs.currentIndex
+                                            onRequestActivation: structureEditorTabs.currentIndex = index
                                         }
                                     }
                                 }
@@ -823,67 +771,15 @@ Item {
                     Repeater {
                         model: uiLayout2TabBar.tabs
 
-                        Item {
+                        TabBarTab {
                             id: tabItem
-                            width: tabLabel.width + 120
+                            text: modelData
+                            width: tabTextWidth + 120
                             height: uiLayout2TabBar.height
-                            property bool isActiveTab: uiLayout2TabBar.currentIndex === index
-                            z: isActiveTab ? uiLayout2TabBar.tabs.length+1 : (uiLayout2TabBar.currentIndex < index ? uiLayout2TabBar.tabs.length-index-1 : index)
-
-                            PainterPathItem {
-                                anchors.fill: parent
-                                anchors.topMargin: isActiveTab ? 0 : parent.height*0.1
-                                fillColor: isActiveTab ? primaryColors.windowColor : primaryColors.c200.background
-                                outlineColor: primaryColors.borderColor
-                                outlineWidth: 2
-                                renderingMechanism: PainterPathItem.UseQPainter
-                                antialiasing: true
-                                painterPath: PainterPath {
-                                    id: tabPath
-                                    property real radius: Math.min(itemRect.width, itemRect.height)*0.2
-                                    property point c1: Qt.point(itemRect.left+itemRect.width*0.1, itemRect.top+1)
-                                    property point c2: Qt.point(itemRect.right-1-itemRect.width*0.1, itemRect.top+1)
-
-                                    property point p1: Qt.point(itemRect.left, itemRect.bottom)
-                                    property point p2: pointInLine(c1, p1, radius, true)
-                                    property point p3: pointInLine(c1, c2, radius, true)
-                                    property point p4: pointInLine(c2, c1, radius, true)
-                                    property point p5: pointInLine(c2, p6, radius, true)
-                                    property point p6: Qt.point(itemRect.right-1, itemRect.bottom)
-
-                                    MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
-                                    LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
-                                    QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
-                                    LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
-                                    QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
-                                    LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
-                                    CloseSubpath { }
-                                }
-
-                                Text {
-                                    id: tabLabel
-                                    text: modelData
-                                    anchors.centerIn: parent
-                                    font.pixelSize: isActiveTab ? 16 : 14
-                                    font.bold: isActiveTab
-                                }
-
-                                Rectangle {
-                                    height: 1.5
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.leftMargin: 2
-                                    anchors.rightMargin: 2
-                                    anchors.verticalCenter: parent.bottom
-                                    color: parent.fillColor
-                                    visible: isActiveTab
-                                }
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: uiLayout2TabBar.currentIndex = index
-                            }
+                            tabCount: uiLayout2TabBar.tabs.length
+                            tabIndex: index
+                            currentTabIndex: uiLayout2TabBar.currentIndex
+                            onRequestActivation: uiLayout2TabBar.currentIndex = index
                         }
                     }
                 }

@@ -34,7 +34,7 @@ Item {
         clip: true
         width: 45
         model: noteSources
-        spacing: -width*0.3
+        spacing: -width*0.4
         currentIndex: 0
         footer: Item {
             width: notebookTabsView.width
@@ -54,68 +54,36 @@ Item {
             }
         }
 
-        delegate: Item {
-            width: selected ? 40 : 35
-            height: textItem.width + 40
-            property bool selected: notebookTabsView.currentIndex === index
-            z: selected ? notebookTabsView.count+1 : (notebookTabsView.currentIndex < index ? notebookTabsView.count-index-1 : index)
+        delegate: TabBarTab {
+            width: active ? 40 : 35
+            height: implicitTabSize
+            alignment: Qt.AlignRight
 
-            PainterPathItem {
-                anchors.fill: parent
-                fillColor: selected ? modelData.color : Qt.tint(modelData.color, "#C0FFFFFF")
-                outlineColor: modelData.color
-                outlineWidth: 1.5
-                renderingMechanism: PainterPathItem.UseQPainter
-                painterPath: PainterPath {
-                    id: tabPath
-                    property real radius: Math.min(itemRect.width, itemRect.height)*0.2
-                    property point c1: Qt.point(itemRect.right-1, itemRect.top+itemRect.height*0.1)
-                    property point c2: Qt.point(itemRect.right-1, itemRect.bottom-1-itemRect.height*0.1)
+            tabIndex: index
+            tabCount: notebookTabsView.count
+            currentTabIndex: notebookTabsView.currentIndex
 
-                    property point p1: Qt.point(itemRect.left, itemRect.top)
-                    property point p2: pointInLine(c1, p1, radius, true)
-                    property point p3: pointInLine(c1, c2, radius, true)
-                    property point p4: pointInLine(c2, c1, radius, true)
-                    property point p5: pointInLine(c2, p6, radius, true)
-                    property point p6: Qt.point(itemRect.left, itemRect.bottom)
+            tabFillColor: active ? modelData.color : Qt.tint(modelData.color, "#C0FFFFFF")
+            tabBorderColor: modelData.color
 
-                    MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
-                    LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
-                    QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
-                    LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
-                    QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
-                    LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
-                    CloseSubpath { }
-                }
-            }
+            text: modelData.label.length > 20 ? (modelData.label.substr(0,17)+"...") : modelData.label
+            font.pixelSize: active ? 20 : 16
+            font.bold: active
+            textColor: active ? app.textColorFor(modelData.color) : "black"
 
-            Text {
-                id: textItem
-                rotation: 90
-                text: modelData.label.length > 20 ? (modelData.label.substr(0,17)+"...") : modelData.label
-                anchors.centerIn: parent
-                font.pixelSize: parent.selected ? 20 : 16
-                font.bold: parent.selected
-                color: parent.selected ? app.textColorFor(modelData.color) : "black"
-                Behavior on font.pixelSize { NumberAnimation { duration: 250 } }
-                Behavior on color { ColorAnimation { duration: 125 } }
-            }
+            property bool allowRemove: app.typeName(modelData.source) === "Character"
+            acceptedMouseButtons: allowRemove ? (Qt.LeftButton|Qt.RightButton) : Qt.LeftButton
 
-            MouseArea {
-                property bool allowRemove: app.typeName(modelData.source) === "Character"
-                anchors.fill: parent
-                acceptedButtons: allowRemove ? (Qt.LeftButton|Qt.RightButton) : Qt.LeftButton
-                hoverEnabled: modelData.label.length > 20
-                ToolTip.visible: hoverEnabled && containsMouse
-                ToolTip.text: modelData.label
-                ToolTip.delay: 3000
-                onClicked: {
-                    notebookTabsView.currentIndex = index
-                    if(allowRemove && mouse.button === Qt.RightButton) {
-                        characterItemMenu.character = modelData.source
-                        characterItemMenu.popup(this)
-                    }
-                }
+            hoverEnabled: true
+            ToolTip.visible: hoverEnabled && containsMouse
+            ToolTip.text: modelData.label
+            ToolTip.delay: 3000
+
+            onRequestActivation: notebookTabsView.currentIndex = index
+            onRequestContextMenu: {
+                notebookTabsView.currentIndex = index
+                characterItemMenu.character = modelData.source
+                characterItemMenu.popup(this)
             }
         }
     }
