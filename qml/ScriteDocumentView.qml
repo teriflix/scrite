@@ -497,30 +497,30 @@ Item {
 
                 ToolButton2 {
                     icon.source: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
-                    ToolTip.text: "Show keyboard layout"
+                    ToolTip.text: "Show English to " + app.transliterationEngine.languageAsString + " alphabet mappings.\t" + app.polishShortcutTextForDisplay(shortcut)
                     shortcut: "Ctrl+K"
                     shortcutText: "K"
                     display: AbstractButton.IconOnly
-                    onClicked: keyboardLayoutPopup.visible = true
-                    down: keyboardLayoutPopup.visible
+                    onClicked: alphabetMappingsPopup.visible = true
+                    down: alphabetMappingsPopup.visible
                     visible: app.transliterationEngine.language !== TransliterationEngine.English
                     enabled: visible
 
                     Item {
                         anchors.top: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: keyboardLayoutPopup.width
+                        width: alphabetMappingsPopup.width
 
                         Popup {
-                            id: keyboardLayoutPopup
-                            width: keyboardLayoutLoader.width + 30
-                            height: keyboardLayoutLoader.height + 30
+                            id: alphabetMappingsPopup
+                            width: alphabetMappingsLoader.width + 30
+                            height: alphabetMappingsLoader.height + 30
                             modal: false
                             focus: false
                             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
                             Loader {
-                                id: keyboardLayoutLoader
+                                id: alphabetMappingsLoader
                                 active: parent.visible
                                 width: item ? item.width : 0
                                 height: item ? item.height : 0
