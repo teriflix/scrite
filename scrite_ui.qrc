@@ -31,5 +31,6 @@
         <file>qml/TagText.qml</file>
         <file>qml/CharactersView.qml</file>
         <file>qml/TabBarTab.qml</file>
+        <file>qml/AlphabetMappings.qml</file>
     </qresource>
 </RCC>

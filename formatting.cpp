@@ -1079,16 +1079,18 @@ ForceCursorPositionHack::~ForceCursorPositionHack() {  }
 
 void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_timer.timerId()) {
+    if(event->timerId() == m_timer.timerId())
+    {
         m_timer.stop();
         SceneElement *element = qobject_cast<SceneElement*>(this->parent());
         Scene *scene = element->scene();
         scene->sceneAboutToReset();
+        const int cp = scene->cursorPosition();
         if(element->type() == SceneElement::Parenthetical)
             element->setText(QStringLiteral("()"));
         else
             element->setText(QString());
-        scene->sceneReset(scene->cursorPosition());
+        scene->sceneReset(cp);
         GarbageCollector::instance()->add(this);
     }
 }
@@ -1386,7 +1388,9 @@ void SceneDocumentBinder::onSceneReset(int position)
 
     if(position >= 0)
     {
-        position = qBound(0, position, this->document()->characterCount()-1);
+        QTextCursor cursor(this->document());
+        cursor.movePosition(QTextCursor::End);
+        position = qBound(0, position, cursor.position());
         emit requestCursorPosition(position);
     }
 

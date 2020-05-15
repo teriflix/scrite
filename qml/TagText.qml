@@ -30,6 +30,8 @@ Rectangle {
     property alias closable: closeButton.active
     property alias hoverEnabled: tagMouseArea.hoverEnabled
     property alias containsMouse: tagMouseArea.containsMouse
+    property alias verticalAlignment: textItem.verticalAlignment
+    property alias horizontalAlignment: textItem.horizontalAlignment
 
     width: textItem.width + (closeButton.active ? (height+2-textItem.rightPadding) : 0)
     height: textItem.height

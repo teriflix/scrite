@@ -138,7 +138,7 @@ QString TransliterationEngine::languageAsString() const
     return QString::fromLatin1(metaEnum.valueToKey(m_language));
 }
 
-QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language val)
+QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language val) const
 {
     if(val == Tamil)
         return QString("L");
@@ -146,6 +146,124 @@ QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language va
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
     return QChar(metaEnum.valueToKey(val)[0]).toUpper();
+}
+
+template <class T>
+class RawArray
+{
+public:
+    RawArray() { }
+    ~RawArray() { }
+
+    void load(const T *a, int s) {
+        m_array = a;
+        m_size = s;
+    }
+
+    const T *at(int index) const {
+        if(index < 0 || index >= m_size)
+            return nullptr;
+        return &m_array[index];
+    }
+
+    int size() const { return m_size; }
+
+    bool isEmpty() const { return m_size <= 0; }
+
+    QJsonObject toJson(int index, bool useIndexAsLatin=false) const {
+        QJsonObject ret;
+        const T *item = this->at(index);
+        if(item == nullptr)
+            return ret;
+        if(useIndexAsLatin)
+            ret.insert("latin", QString::number(index));
+        else
+            ret.insert("latin", QString::fromLatin1(item->phRep));
+        ret.insert("unicode", QString::fromWCharArray(&(item->uCode), 1));
+        return ret;
+    }
+
+    QJsonArray toJson(bool useIndexAsLatin=false) const {
+        QJsonArray ret;
+        for(int i=0; i<m_size; i++)
+            ret.append(this->toJson(i,useIndexAsLatin));
+        return ret;
+    }
+
+private:
+    const T *m_array = nullptr;
+    int m_size = 0;
+};
+
+QJsonObject TransliterationEngine::alphabetMappingsFor(TransliterationEngine::Language lang) const
+{
+    static QMap<Language,QJsonObject> alphabetMappings;
+
+    QJsonObject ret = alphabetMappings.value(lang, QJsonObject());
+    if(!ret.isEmpty())
+        return ret;
+
+    RawArray<PhTranslation::VowelDef> vowels;
+    RawArray<PhTranslation::ConsonantDef> consonants;
+    RawArray<PhTranslation::DigitDef> digits;
+    RawArray<PhTranslation::SpecialSymbolDef> symbols;
+
+#define NUMBER_OF_ITEMS_IN(x)    (sizeof(x) /  sizeof(x[0]))
+#define LOAD_ARRAYS(x) \
+    { \
+        vowels.load(PhTranslation::x::Vowels, NUMBER_OF_ITEMS_IN(PhTranslation::x::Vowels)); \
+        consonants.load(PhTranslation::x::Consonants, NUMBER_OF_ITEMS_IN(PhTranslation::x::Consonants)); \
+        digits.load(PhTranslation::x::Digits, NUMBER_OF_ITEMS_IN(PhTranslation::x::Digits)); \
+        symbols.load(PhTranslation::x::SpecialSymbols, NUMBER_OF_ITEMS_IN(PhTranslation::x::SpecialSymbols)); \
+    }
+
+    switch(lang)
+    {
+    case English:
+        return ret;
+    case Bengali:
+        LOAD_ARRAYS(Bengali)
+        break;
+    case Gujarati:
+        LOAD_ARRAYS(Gujarati)
+        break;
+    case Hindi:
+        LOAD_ARRAYS(Hindi)
+        break;
+    case Kannada:
+        LOAD_ARRAYS(Kannada)
+        break;
+    case Malayalam:
+        LOAD_ARRAYS(Malayalam)
+        break;
+    case Oriya:
+        LOAD_ARRAYS(Oriya)
+        break;
+    case Punjabi:
+        LOAD_ARRAYS(Punjabi)
+        break;
+    case Sanskrit:
+        LOAD_ARRAYS(Sanskrit)
+        break;
+    case Tamil:
+        LOAD_ARRAYS(Tamil)
+        break;
+    case Telugu:
+        LOAD_ARRAYS(Telugu)
+        break;
+    }
+
+#undef LOAD_ARRAYS
+#undef NUMBER_OF_ITEMS_IN
+
+    ret.insert("vowels", vowels.toJson());
+    ret.insert("consonants", consonants.toJson());
+    ret.insert("digits", digits.toJson(true));
+    ret.insert("symbols", symbols.toJson());
+
+    alphabetMappings.insert(lang, ret);
+
+    return ret;
 }
 
 void TransliterationEngine::cycleLanguage()
@@ -346,6 +464,20 @@ TransliterationEngine::Language TransliterationEngine::languageForScript(QChar::
     }
 
     return scriptLanguageMap.value(script, English);
+}
+
+
+void TransliterationEngine::Boundary::append(const QChar &ch, int pos)
+{
+    string.append(ch);
+    if(start < 0)
+        start = pos;
+    end = pos+1;
+}
+
+bool TransliterationEngine::Boundary::isEmpty() const
+{
+    return end < 0 || start < 0 || start == end;
 }
 
 QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries(const QString &text) const

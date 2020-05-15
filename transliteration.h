@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QJsonArray>
 #include <QQmlEngine>
+#include <QJsonObject>
 
 class QTextCursor;
 class QTextDocument;
@@ -57,7 +58,15 @@ public:
     Q_PROPERTY(QString languageAsString READ languageAsString NOTIFY languageChanged)
     QString languageAsString() const;
 
-    Q_INVOKABLE QString shortcutLetter(Language val);
+    Q_PROPERTY(QJsonObject alphabetMappings READ alphabetMappings NOTIFY languageChanged)
+    QJsonObject alphabetMappings() const { return this->alphabetMappingsFor(m_language); }
+
+    Q_PROPERTY(QFont font READ font NOTIFY languageChanged)
+    QFont font() const { return this->languageFont(m_language); }
+
+    Q_INVOKABLE QString shortcutLetter(Language val) const;
+
+    Q_INVOKABLE QJsonObject alphabetMappingsFor(Language val) const;
 
     Q_INVOKABLE void cycleLanguage();
 
@@ -78,7 +87,7 @@ public:
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
     Q_INVOKABLE QString transliteratedSentence(const QString &sentence, bool includingLastWord=true) const;
 
-    QFont languageFont(Language language) const;
+    Q_INVOKABLE QFont languageFont(Language language) const;
     QStringList languageFontFilePaths(Language language) const;
     static Language languageForScript(QChar::Script script);
 
@@ -89,17 +98,8 @@ public:
         QFont font;
         QString string;
         TransliterationEngine::Language language = TransliterationEngine::English;
-
-        void append(const QChar &ch, int pos) {
-            string.append(ch);
-            if(start < 0)
-                start = pos;
-            end = pos+1;
-        }
-
-        bool isEmpty() const {
-            return end < 0 || start < 0 || start == end;
-        }
+        void append(const QChar &ch, int pos);
+        bool isEmpty() const;
     };
     QList<Boundary> evaluateBoundaries(const QString &text) const;
     void evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const;

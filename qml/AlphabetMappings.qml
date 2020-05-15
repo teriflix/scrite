@@ -1,0 +1,108 @@
+/****************************************************************************
+**
+** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+import Scrite 1.0
+
+Rectangle {
+    property var mappings: app.transliterationEngine.alphabetMappings
+    property font languageFont: app.transliterationEngine.font
+    property int fontPointSize: scriteDocument.formatting.defaultFont.pointSize
+    Component.onCompleted: fontPointSize = fontPointSize + scriteDocument.formatting.fontPointSizeDelta
+
+    property var mappingModels: [
+        { "heading": "Vowels", "array": mappings.vowels },
+        { "heading": "Consonants", "array": mappings.consonants },
+        { "heading": "Digits", "array": mappings.digits },
+        { "heading": "Symbols", "array": mappings.symbols }
+    ]
+    width: layout.width + 20
+    height: layout.height + 20
+    color: primaryColors.c10.background
+    border { width: 1; color: primaryColors.borderColor }
+
+    readonly property real textCellWidth: 50
+
+    FontMetrics {
+        id: languageFontMetrics
+        font.family: languageFont.family
+        font.pointSize: fontPointSize
+    }
+
+    FontMetrics {
+        id: normalFontMetrics
+        font.pointSize: fontPointSize
+    }
+
+    Row {
+        id: layout
+        spacing: 10
+        anchors.centerIn: parent
+
+        Repeater {
+            model: mappingModels
+
+            Column {
+                spacing: 0
+
+                Rectangle {
+                    width: parent.width
+                    height: 30
+                    color: primaryColors.c600.background
+
+                    Text {
+                        text: modelData.heading
+                        padding: 8
+                        font.pointSize: fontPointSize
+                        anchors.centerIn: parent
+                        color: primaryColors.c600.text
+                    }
+                }
+
+                Grid {
+                    id: vowelsGrid
+                    rows: 10
+                    columns: Math.ceil(modelData.array.length/rows)
+                    flow: Grid.TopToBottom
+
+                    Repeater {
+                        model: modelData.array
+
+                        Row {
+                            Text {
+                                width: textCellWidth
+                                padding: 8
+                                font: normalFontMetrics.font
+                                text: modelData.latin
+                                horizontalAlignment: Text.AlignRight
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.verticalCenterOffset: (normalFontMetrics.height-languageFontMetrics.height)*0.3
+                            }
+                            Text {
+                                width: textCellWidth
+                                padding: 8
+                                font: languageFontMetrics.font
+                                text: modelData.unicode
+                                horizontalAlignment: Text.AlignLeft
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

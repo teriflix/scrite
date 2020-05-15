@@ -494,6 +494,41 @@ Item {
                         }
                     }
                 }
+
+                ToolButton2 {
+                    icon.source: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
+                    ToolTip.text: "Show keyboard layout"
+                    shortcut: "Ctrl+K"
+                    shortcutText: "K"
+                    display: AbstractButton.IconOnly
+                    onClicked: keyboardLayoutPopup.visible = true
+                    down: keyboardLayoutPopup.visible
+                    visible: app.transliterationEngine.language !== TransliterationEngine.English
+                    enabled: visible
+
+                    Item {
+                        anchors.top: parent.bottom
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: keyboardLayoutPopup.width
+
+                        Popup {
+                            id: keyboardLayoutPopup
+                            width: keyboardLayoutLoader.width + 30
+                            height: keyboardLayoutLoader.height + 30
+                            modal: false
+                            focus: false
+                            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+                            Loader {
+                                id: keyboardLayoutLoader
+                                active: parent.visible
+                                width: item ? item.width : 0
+                                height: item ? item.height : 0
+                                sourceComponent: AlphabetMappings { }
+                            }
+                        }
+                    }
+                }
             }
         }
 
