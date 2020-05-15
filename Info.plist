@@ -15,9 +15,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.teriflix.scrite</string>
 	<key>CFBundleVersion</key>
-        <string>0.3.2</string>
+        <string>0.3.3</string>
 	<key>CFBundleShortVersionString</key>
-        <string>0.3.2</string>
+        <string>0.3.3</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>Vendor</key>
