@@ -170,23 +170,20 @@ public:
 
     bool isEmpty() const { return m_size <= 0; }
 
-    QJsonObject toJson(int index, bool useIndexAsLatin=false) const {
+    QJsonObject toJson(int index) const {
         QJsonObject ret;
         const T *item = this->at(index);
         if(item == nullptr)
             return ret;
-        if(useIndexAsLatin)
-            ret.insert("latin", QString::number(index));
-        else
-            ret.insert("latin", QString::fromLatin1(item->phRep));
+        ret.insert("latin", QString::fromLatin1(item->phRep));
         ret.insert("unicode", QString::fromWCharArray(&(item->uCode), 1));
         return ret;
     }
 
-    QJsonArray toJson(bool useIndexAsLatin=false) const {
+    QJsonArray toJson() const {
         QJsonArray ret;
         for(int i=0; i<m_size; i++)
-            ret.append(this->toJson(i,useIndexAsLatin));
+            ret.append(this->toJson(i));
         return ret;
     }
 
@@ -258,7 +255,7 @@ QJsonObject TransliterationEngine::alphabetMappingsFor(TransliterationEngine::La
 
     ret.insert("vowels", vowels.toJson());
     ret.insert("consonants", consonants.toJson());
-    ret.insert("digits", digits.toJson(true));
+    ret.insert("digits", digits.toJson());
     ret.insert("symbols", symbols.toJson());
 
     alphabetMappings.insert(lang, ret);
@@ -746,7 +743,7 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
     if(charsAdded == 1)
     {
         // Check if the char that was added was a space.
-        if(original.length() == 1 && !original.at(0).isLetter())
+        if(original.length() == 1 && !original.at(0).isLetter() && !original.at(0).isDigit())
         {
             // Select the word that is just before the cursor.
             cursor.setPosition(from);
@@ -780,7 +777,7 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
     for(int i=0; i<original.length(); i++)
     {
         const QChar ch = original.at(i);
-        if(ch.isLetter())
+        if(ch.isLetter() || ch.isDigit())
             word += ch;
         else
         {
