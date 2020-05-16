@@ -1287,9 +1287,9 @@ bool SceneDocumentBinder::eventFilter(QObject *object, QEvent *event)
             const int start = te->start()-block.position();
             const int end = te->end()-block.position();
             userData->setTransliteratedSegment(start, end, te->language());
+            this->rehighlightBlock(block);
         }
 
-        this->rehighlightBlock(block);
         return true;
     }
 
