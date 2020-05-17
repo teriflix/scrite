@@ -279,13 +279,14 @@ Item {
                     }
 
                     MouseArea {
-                        enabled: !isBreakElement
                         anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton|Qt.RightButton
+                        acceptedButtons: isBreakElement ? Qt.RightButton : Qt.LeftButton|Qt.RightButton
                         onClicked: {
-                            parent.forceActiveFocus()
-                            scriteDocument.screenplay.currentElementIndex = index
-                            requestEditor()
+                            if(!isBreakElement) {
+                                parent.forceActiveFocus()
+                                scriteDocument.screenplay.currentElementIndex = index
+                                requestEditor()
+                            }
 
                             if(mouse.button === Qt.RightButton) {
                                 elementItemMenu.element = element
