@@ -314,9 +314,10 @@ Item {
     onSceneChanged: {
         contentEditorLoader.active = false
         contentEditorLoader.active = true
-        scene.undoRedoEnabled = Qt.binding( function() {
-            return editorHasActiveFocus || sceneHeadingLoader.viewOnly === false
-        })
+        if(scene)
+            scene.undoRedoEnabled = Qt.binding( function() {
+                return editorHasActiveFocus || sceneHeadingLoader.viewOnly === false
+            })
     }
 
     Component {

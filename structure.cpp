@@ -45,6 +45,22 @@ StructureElement::~StructureElement()
     emit aboutToDelete(this);
 }
 
+StructureElement *StructureElement::duplicate()
+{
+    if(m_structure == nullptr)
+        return nullptr;
+
+    const int newIndex = m_structure->indexOfElement(this)+1;
+
+    StructureElement *newElement = new StructureElement(m_structure);
+    newElement->setScene(m_scene->clone(newElement));
+    newElement->setX(m_x);
+    newElement->setY(m_y + (m_height > 0 ? m_height+100 : 200));
+    m_structure->insertElement(newElement, newIndex);
+
+    return newElement;
+}
+
 void StructureElement::setX(qreal val)
 {
     if( qFuzzyCompare(m_x, val) )
@@ -727,6 +743,8 @@ QStringList Structure::standardMoments() const
 
 void Structure::setCurrentElementIndex(int val)
 {
+    if(val < 0)
+        qDebug() << "Catch this guy..";
     val = qBound(-1, val, m_elements.size()-1);
     if(m_currentElementIndex == val)
         return;

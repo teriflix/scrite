@@ -847,9 +847,7 @@ void ScriteDocument::screenplayElementIndexChanged()
         return;
 
     ScreenplayElement *element = m_screenplay->elementAt(m_screenplay->currentElementIndex());
-    if(element == nullptr)
-        m_structure->setCurrentElementIndex(-1);
-    else
+    if(element != nullptr)
     {
         int index = m_structure->indexOfScene(element->scene());
         m_structure->setCurrentElementIndex(index);

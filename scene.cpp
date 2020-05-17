@@ -533,6 +533,27 @@ Scene::~Scene()
     emit aboutToDelete(this);
 }
 
+Scene *Scene::clone(QObject *parent) const
+{
+    Scene *newScene = new Scene(parent);
+    newScene->setTitle(m_title + QStringLiteral(" [Copy]"));
+    newScene->setColor(m_color);
+    newScene->setEnabled(m_enabled);
+    newScene->heading()->setMoment(m_heading->moment());
+    newScene->heading()->setLocation(m_heading->location());
+    newScene->heading()->setLocationType(m_heading->locationType());
+
+    Q_FOREACH(SceneElement *element, m_elements)
+    {
+        SceneElement *newElement = new SceneElement(newScene);
+        newElement->setType(element->type());
+        newElement->setText(element->text());
+        newScene->addElement(newElement);
+    }
+
+    return newScene;
+}
+
 void Scene::setId(const QString &val)
 {
     if(m_id == val || !m_id.isEmpty())

@@ -432,7 +432,7 @@ Item {
             }
 
             BorderImage {
-                property Item currentElementItem: elementItems.itemAt(canvas.currentIndex)
+                property Item currentElementItem: elementItems.count > canvas.currentIndex ? elementItems.itemAt(canvas.currentIndex) : null
                 source: "../icons/content/shadow.png"
                 anchors.fill: currentElementItem
                 horizontalTileMode: BorderImage.Stretch
@@ -543,6 +543,16 @@ Item {
                             }
 
                             MenuItem2 {
+                                text: "Duplicate"
+                                onClicked: {
+                                    releaseEditor()
+                                    element.duplicate()
+                                }
+                            }
+
+                            MenuSeparator { }
+
+                            MenuItem2 {
                                 text: "Delete"
                                 onClicked: {
                                     releaseEditor()
@@ -575,14 +585,14 @@ Item {
                         acceptedButtons: Qt.LeftButton|Qt.RightButton
                         onClicked: {
                             parent.forceActiveFocus()
+                            canvas.ensureCurrentItemIsVisible = false
+                            scriteDocument.structure.currentElementIndex = index
+                            canvas.ensureCurrentItemIsVisible = true
+
                             if(mouse.button === Qt.RightButton)
                                 elementOptionsMenuLoader.active = true
-                            else if(mouse.button === Qt.LeftButton) {
-                                canvas.ensureCurrentItemIsVisible = false
-                                scriteDocument.structure.currentElementIndex = index
-                                canvas.ensureCurrentItemIsVisible = true
+                            else if(mouse.button === Qt.LeftButton)
                                 requestEditor()
-                            }
                         }
                         onDoubleClicked: {
                             if(mouse.button === Qt.LeftButton)

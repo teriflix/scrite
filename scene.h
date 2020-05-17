@@ -160,6 +160,8 @@ public:
     ~Scene();
     Q_SIGNAL void aboutToDelete(Scene *scene);
 
+    Scene *clone(QObject *parent) const;
+
     /*
      * The 'id' is a special property. It can be set only once. If it is not
      * set an ID is automatically generated whenever the property value is

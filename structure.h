@@ -40,6 +40,8 @@ public:
     ~StructureElement();
     Q_SIGNAL void aboutToDelete(StructureElement *element);
 
+    Q_INVOKABLE StructureElement *duplicate();
+
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
     Structure* structure() const { return m_structure; }
 
