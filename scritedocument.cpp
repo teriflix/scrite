@@ -769,7 +769,11 @@ void ScriteDocument::setFileName(const QString &val)
     if(!m_fileName.isEmpty())
     {
         QFileInfo fi(m_fileName);
-        if(!fi.isDir() && !fi.baseName().isEmpty() && fi.suffix().isEmpty())
+        if(fi.isDir())
+            m_fileName = fi.absolutePath() + "/Screenplay-" + QString::number(QDateTime::currentSecsSinceEpoch()) + ".scrite";
+
+        fi = QFileInfo(m_fileName);
+        if(fi.suffix() != "scrite")
             m_fileName += ".scrite";
     }
 
