@@ -116,18 +116,6 @@ Item {
         }
     }
 
-//    FocusIndicator {
-//        id: focusIndicator
-//        active: mainUndoStack.active
-//        anchors.fill: screenplayElementList
-//        anchors.margins: -3
-
-//        MouseArea {
-//            anchors.fill: parent
-//            onClicked: screenplayElementList.forceActiveFocus()
-//        }
-//    }
-
     DropArea {
         anchors.fill: parent
         keys: [dropAreaKey]

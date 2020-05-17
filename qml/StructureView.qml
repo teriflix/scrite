@@ -105,13 +105,6 @@ Item {
         }
     }
 
-//    FocusIndicator {
-//        id: focusIndicator
-//        active: mainUndoStack.active
-//        anchors.fill: canvasScroll
-//        anchors.margins: -3
-//    }
-
     Rectangle {
         anchors.fill: canvasScroll
         color: structureCanvasSettings.canvasColor

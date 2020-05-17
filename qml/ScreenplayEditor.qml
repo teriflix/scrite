@@ -153,14 +153,6 @@ Item {
         }
     }
 
-//    FocusIndicator {
-//        id: focusIndicator
-//        active: mainUndoStack.active
-//        anchors.fill: screenplayListView
-//        anchors.margins: -3
-//        color: active && screenplayListView.height < screenplayListView.contentHeight ? "white" : Qt.rgba(0,0,0,0)
-//    }
-
     ListView {
         id: screenplayListView
         property var lastSceneResetInfo

@@ -967,13 +967,6 @@ Item {
                 anchors.top: parent.top
             }
 
-//            FocusIndicator {
-//                id: focusIndicator
-//                active: mainUndoStack.active
-//                anchors.fill: sceneEditor
-//                anchors.margins: -3
-//            }
-
             SceneEditor {
                 id: sceneEditor
                 anchors.left: parent.left
