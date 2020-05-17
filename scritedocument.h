@@ -151,6 +151,9 @@ public:
     void deserializeFromJson(const QJsonObject &);
 
 private:
+    QString polishFileName(const QString &fileName) const;
+
+private:
     bool m_busy = false;
     bool m_modified = false;
     bool m_autoSave = true;

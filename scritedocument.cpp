@@ -280,19 +280,11 @@ void ScriteDocument::open(const QString &fileName)
 void ScriteDocument::saveAs(const QString &givenFileName)
 {
     HourGlass hourGlass;
-    QString fileName = givenFileName.trimmed();
+    QString fileName = this->polishFileName(givenFileName.trimmed());
 
     m_errorReport->clear();
     if(fileName.isEmpty())
         return;
-
-    QFileInfo fi(fileName);
-    if(fi.isDir())
-        fileName = fi.absolutePath() + "/Screenplay-" + QString::number(QDateTime::currentSecsSinceEpoch()) + ".scrite";
-
-    fi = QFileInfo(fileName);
-    if(fi.suffix() != "scrite")
-        fileName += ".scrite";
 
     QFile file(fileName);
     if( !file.open(QFile::WriteOnly) )
@@ -764,19 +756,7 @@ void ScriteDocument::setFileName(const QString &val)
     if(m_fileName == val)
         return;        
 
-    m_fileName = val.trimmed();
-
-    if(!m_fileName.isEmpty())
-    {
-        QFileInfo fi(m_fileName);
-        if(fi.isDir())
-            m_fileName = fi.absolutePath() + "/Screenplay-" + QString::number(QDateTime::currentSecsSinceEpoch()) + ".scrite";
-
-        fi = QFileInfo(m_fileName);
-        if(fi.suffix() != "scrite")
-            m_fileName += ".scrite";
-    }
-
+    m_fileName = this->polishFileName(val);
     emit fileNameChanged();
 }
 
@@ -1017,4 +997,20 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
         if(m_formatting->elementFormat(SceneElement::Heading)->font().pointSize() == 12)
             m_formatting->elementFormat(SceneElement::Heading)->fontRef().setPointSize(10);
     }
+}
+
+QString ScriteDocument::polishFileName(const QString &givenFileName) const
+{
+    QString fileName = givenFileName.trimmed();
+
+    if(!fileName.isEmpty())
+    {
+        QFileInfo fi(fileName);
+        if(fi.isDir())
+            fileName = fi.absolutePath() + "/Screenplay-" + QString::number(QDateTime::currentSecsSinceEpoch()) + ".scrite";
+        else if(fi.suffix() != "scrite")
+            fileName += ".scrite";
+    }
+
+    return fileName;
 }
