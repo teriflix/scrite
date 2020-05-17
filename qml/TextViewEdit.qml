@@ -87,6 +87,8 @@ Loader {
             horizontalAlignment: textViewEdit.horizontalAlignment
             verticalAlignment: textViewEdit.verticalAlignment
             onTextChanged: textViewEdit.textEdited(text)
+            selectByMouse: true
+            selectByKeyboard: true
             background: Rectangle {
                 visible: frameVisible
                 border.width: 1
