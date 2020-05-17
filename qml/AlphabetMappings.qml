@@ -18,8 +18,7 @@ import Scrite 1.0
 Rectangle {
     property var mappings: app.transliterationEngine.alphabetMappings
     property font languageFont: app.transliterationEngine.font
-    property int fontPointSize: scriteDocument.formatting.defaultFont.pointSize
-    Component.onCompleted: fontPointSize = fontPointSize + scriteDocument.formatting.fontPointSizeDelta
+    property int fontPointSize: scriteDocument.formatting.defaultFont2.pointSize
 
     property var mappingModels: [
         { "heading": "Vowels", "array": mappings.vowels },

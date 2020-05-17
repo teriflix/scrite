@@ -35,11 +35,7 @@ Item {
         readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
         readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
         readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
-
-        Component.onCompleted: {
-            font = format.font
-            font.pointSize = font.pointSize + scriteDocument.formatting.fontPointSizeDelta
-        }
+        font: format ? format.font2 : scriteDocument.formatting.defaultFont2
     }
 
     Settings {

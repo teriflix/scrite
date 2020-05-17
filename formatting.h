@@ -47,6 +47,10 @@ public:
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();
 
+    Q_PROPERTY(QFont font2 READ font2 NOTIFY font2Changed)
+    QFont font2() const;
+    Q_SIGNAL void font2Changed();
+
     Q_INVOKABLE void setFontFamily(const QString &val);
     Q_INVOKABLE void setFontBold(bool val);
     Q_INVOKABLE void setFontItalics(bool val);
@@ -155,6 +159,9 @@ public:
     QFont defaultFont() const { return m_defaultFont; }
     QFont &defaultFontRef() { return m_defaultFont; }
     Q_SIGNAL void defaultFontChanged();
+
+    Q_PROPERTY(QFont defaultFont2 READ defaultFont2 NOTIFY defaultFontChanged)
+    QFont defaultFont2() const;
 
     Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY defaultFontChanged)
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }

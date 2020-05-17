@@ -32,6 +32,8 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
     QObject::connect(this, &SceneElementFormat::elementFormatChanged, [this]() {
         this->markAsModified();
     });
+    QObject::connect(this, &SceneElementFormat::fontChanged, this, &SceneElementFormat::font2Changed);
+    QObject::connect(m_format, &ScreenplayFormat::defaultFontChanged, this, &SceneElementFormat::font2Changed);
 
     CACHE_DEFAULT_PROPERTY_VALUES
 }
@@ -49,6 +51,13 @@ void SceneElementFormat::setFont(const QFont &val)
     m_font = val;
     emit fontChanged();
     emit elementFormatChanged();
+}
+
+QFont SceneElementFormat::font2() const
+{
+    QFont font = m_font;
+    font.setPointSize(font.pointSize() + m_format->fontPointSizeDelta());
+    return font;
 }
 
 void SceneElementFormat::setFontFamily(const QString &val)
@@ -307,6 +316,13 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
     m_fontPointSizeDelta = qMax(fontInfo.pointSize()-m_defaultFont.pointSize(),0);
 
     emit defaultFontChanged();
+}
+
+QFont ScreenplayFormat::defaultFont2() const
+{
+    QFont font = m_defaultFont;
+    font.setPointSize( font.pointSize()+m_fontPointSizeDelta );
+    return font;
 }
 
 SceneElementFormat *ScreenplayFormat::elementFormat(SceneElement::Type type) const

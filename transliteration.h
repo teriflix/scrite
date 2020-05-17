@@ -104,6 +104,8 @@ public:
     QList<Boundary> evaluateBoundaries(const QString &text) const;
     void evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const;
 
+    Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
+
 private:
     TransliterationEngine(QObject *parent=nullptr);
 

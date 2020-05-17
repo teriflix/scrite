@@ -272,7 +272,7 @@ Item {
                             border.color: colors.text
                             color: colors.background
                             textColor: colors.text
-                            text: modelData
+                            text: app.transliterationEngine.formattedHtmlOf(modelData)
                             leftPadding: 10
                             rightPadding: 10
                             topPadding: 5

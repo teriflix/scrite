@@ -562,6 +562,23 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
     applyFormatChanges(cursor, script);
 }
 
+QString TransliterationEngine::formattedHtmlOf(const QString &text) const
+{
+    QString html;
+    QTextStream ts(&html, QIODevice::WriteOnly);
+
+    QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
+    Q_FOREACH(TransliterationEngine::Boundary item, breakup)
+    {
+        if(item.language == TransliterationEngine::English)
+            ts << item.string;
+        else
+            ts << "<font family=\"" << item.font.family() << "\">" << item.string << "</font>";
+    }
+
+    return html;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Transliterator::Transliterator(QObject *parent)

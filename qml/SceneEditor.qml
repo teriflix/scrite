@@ -104,8 +104,7 @@ Item {
             anchors.rightMargin: sceneEditorFontMetrics.paragraphMargin
 
             sourceComponent: Text {
-                property font headingFont: sceneHeadingFormat.font
-                Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+                property font headingFont: sceneHeadingFormat.font2
                 text: "[" + sceneNumber + "]"
                 font: headingFont
             }
@@ -189,9 +188,9 @@ Item {
 
             Text {
                 id: sceneCharactersListHeading
-                text: "Characters in scene: "
+                text: "Characters: "
                 font.bold: true
-                font.pointSize: 12
+                font.pointSize: 10
                 topPadding: 5
                 bottomPadding: 5
             }
@@ -210,12 +209,12 @@ Item {
                     color: colors.background
                     textColor: colors.text
                     id: characterNameLabel
-                    text: modelData
+                    text: app.transliterationEngine.formattedHtmlOf(modelData)
                     leftPadding: 10
                     rightPadding: 10
                     topPadding: 5
                     bottomPadding: 5
-                    font.pointSize: 12
+                    font.pointSize: 10
                     closable: scene.isCharacterMute(modelData)
                     onClicked: requestCharacterMenu(modelData)
                     onCloseRequest: scene.removeMuteCharacter(modelData)
@@ -236,7 +235,7 @@ Item {
                         y: -fontDescent
                         readOnly: false
                         font.capitalization: Font.AllUppercase
-                        font.pointSize: 12
+                        font.pointSize: 10
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.NoWrap
                         completionStrings: scriteDocument.structure.characterNames
@@ -764,11 +763,7 @@ Item {
 
         Rectangle {
             color: Qt.tint(scene.color, "#D9FFFFFF")
-            property font headingFont: sceneHeadingFormat.font
-            onHeadingFontChanged: {
-                if(headingFont.pointSize === sceneHeadingFormat.font.pointSize)
-                    headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
-            }
+            property font headingFont: sceneHeadingFormat.font2
 
             Text {
                 text: "inherited from previous scene"
@@ -784,9 +779,8 @@ Item {
         id: sceneHeadingEditor
 
         Rectangle {
-            property font headingFont: sceneHeadingFormat.font
+            property font headingFont: sceneHeadingFormat.font2
             Component.onCompleted: {
-                headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
                 locTypeEdit.forceActiveFocus()
             }
             color: primaryColors.c100.background
@@ -853,8 +847,7 @@ Item {
 
         Rectangle {
             color: sceneHeadingFormat.backgroundColor
-            property font headingFont: sceneHeadingFormat.font
-            Component.onCompleted: headingFont.pointSize = headingFont.pointSize+scriteDocument.formatting.fontPointSizeDelta
+            property font headingFont: sceneHeadingFormat.font2
             radius: contentEditorArea.radius
             property real contentHeight: sceneHeadingText.contentHeight
 

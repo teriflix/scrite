@@ -12,6 +12,9 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Controls 2.12
+
+import Scrite 1.0
 
 Rectangle {
     color: primaryColors.c10.background
@@ -42,6 +45,7 @@ Rectangle {
     Text {
         id: textItem
         padding: 5
+        textFormat: Text.RichText
     }
 
     MouseArea {
