@@ -277,13 +277,22 @@ void ScriteDocument::open(const QString &fileName)
     this->clearBusyMessage();
 }
 
-void ScriteDocument::saveAs(const QString &fileName)
+void ScriteDocument::saveAs(const QString &givenFileName)
 {
     HourGlass hourGlass;
+    QString fileName = givenFileName.trimmed();
 
     m_errorReport->clear();
     if(fileName.isEmpty())
         return;
+
+    QFileInfo fi(fileName);
+    if(fi.isDir())
+        fileName = fi.absolutePath() + "/Screenplay-" + QString::number(QDateTime::currentSecsSinceEpoch()) + ".scrite";
+
+    fi = QFileInfo(fileName);
+    if(fi.suffix() != "scrite")
+        fileName += ".scrite";
 
     QFile file(fileName);
     if( !file.open(QFile::WriteOnly) )
