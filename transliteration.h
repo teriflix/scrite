@@ -21,6 +21,8 @@
 #include <QJsonArray>
 #include <QQmlEngine>
 #include <QJsonObject>
+#include <QQuickPaintedItem>
+#include <QBasicTimer>
 
 class QTextCursor;
 class QTextDocument;
@@ -207,5 +209,59 @@ private:
     QString m_replacement;
     TransliterationEngine::Language m_language = TransliterationEngine::English;
 };
+
+class TransliteratedText : public QQuickPaintedItem
+{
+    Q_OBJECT
+
+public:
+    TransliteratedText(QQuickItem *parent=nullptr);
+    ~TransliteratedText();
+
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    void setText(const QString &val);
+    QString text() const { return m_text; }
+    Q_SIGNAL void textChanged();
+
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    void setFont(const QFont &val);
+    QFont font() const { return m_font; }
+    Q_SIGNAL void fontChanged();
+
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    void setColor(const QColor &val);
+    QColor color() const { return m_color; }
+    Q_SIGNAL void colorChanged();
+
+    Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
+
+    qreal contentWidth() const { return m_contentWidth; }
+    Q_SIGNAL void contentWidthChanged();
+
+    Q_PROPERTY(qreal contentHeight READ contentHeight NOTIFY contentHeightChanged)
+    qreal contentHeight() const { return m_contentHeight; }
+    Q_SIGNAL void contentHeightChanged();
+
+    // QQuickPaintedItem interface
+    void paint(QPainter *painter);
+
+private:
+    void timerEvent(QTimerEvent *te);
+    void updateTextDocument();
+    void updateTextDocumentLater();
+
+    void setContentWidth(qreal val);
+    void setContentHeight(qreal val);
+
+private:
+    QFont m_font;
+    QColor m_color;
+    QString m_text;
+    qreal m_contentWidth = 0;
+    qreal m_contentHeight = 0;
+    QBasicTimer m_updateTimer;
+    QTextDocument *m_textDocument = nullptr;
+};
+
 
 #endif // TRANSLITERATION_H

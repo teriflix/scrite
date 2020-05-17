@@ -17,6 +17,7 @@ import QtQuick.Controls 2.12
 import Scrite 1.0
 
 Rectangle {
+    id: tagText
     color: primaryColors.c10.background
     border.width: 1
     border.color: primaryColors.borderColor
@@ -25,27 +26,40 @@ Rectangle {
     property alias text: textItem.text
     property alias font: textItem.font
     property alias textColor: textItem.color
-    property alias padding: textItem.padding
-    property alias topPadding: textItem.topPadding
-    property alias leftPadding: textItem.leftPadding
-    property alias rightPadding: textItem.rightPadding
-    property alias bottomPadding: textItem.bottomPadding
+    property real padding: 0
+    property real topPadding: 0
+    property real leftPadding: 0
+    property real rightPadding: 0
+    property real bottomPadding: 0
     property alias closable: closeButton.active
     property alias hoverEnabled: tagMouseArea.hoverEnabled
     property alias containsMouse: tagMouseArea.containsMouse
-    property alias verticalAlignment: textItem.verticalAlignment
-    property alias horizontalAlignment: textItem.horizontalAlignment
 
-    width: textItem.width + (closeButton.active ? (height+2-textItem.rightPadding) : 0)
-    height: textItem.height
+    width: textItemContainer.width + (closeButton.active ? (height+2-rightPadding) : 0)
+    height: textItemContainer.height
+    onPaddingChanged: {
+        leftPadding = padding
+        rightPadding = padding
+        topPadding = padding
+        bottomPadding = padding
+    }
 
     signal closeRequest()
     signal clicked()
 
-    Text {
-        id: textItem
-        padding: 5
-        textFormat: Text.RichText
+    Item {
+        id: textItemContainer
+        width: textItem.contentWidth + parent.leftPadding + parent.rightPadding
+        height: textItem.contentHeight + parent.topPadding + parent.bottomPadding
+
+        TransliteratedText {
+            id: textItem
+            x: tagText.leftPadding
+            y: tagText.topPadding
+            width: contentWidth
+            height: contentHeight
+            color: primaryColors.c10.text
+        }
     }
 
     MouseArea {

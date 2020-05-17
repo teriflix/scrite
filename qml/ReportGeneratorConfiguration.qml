@@ -259,8 +259,8 @@ Item {
                         text: fieldInfo.label + ": "
                         font.bold: true
                         font.pointSize: 12
-                        topPadding: 5
-                        bottomPadding: 5
+                        topPadding: 2
+                        bottomPadding: 2
                     }
 
                     Repeater {
@@ -272,11 +272,11 @@ Item {
                             border.color: colors.text
                             color: colors.background
                             textColor: colors.text
-                            text: app.transliterationEngine.formattedHtmlOf(modelData)
+                            text: modelData
                             leftPadding: 10
                             rightPadding: 10
-                            topPadding: 5
-                            bottomPadding: 5
+                            topPadding: 2
+                            bottomPadding: 2
                             font.pointSize: 12
                             closable: true
                             onCloseRequest: {

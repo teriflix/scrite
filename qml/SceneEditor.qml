@@ -190,9 +190,9 @@ Item {
                 id: sceneCharactersListHeading
                 text: "Characters: "
                 font.bold: true
-                font.pointSize: 10
                 topPadding: 5
                 bottomPadding: 5
+                font.pointSize: 12
             }
 
             Repeater {
@@ -209,12 +209,12 @@ Item {
                     color: colors.background
                     textColor: colors.text
                     id: characterNameLabel
-                    text: app.transliterationEngine.formattedHtmlOf(modelData)
+                    text: modelData
                     leftPadding: 10
                     rightPadding: 10
-                    topPadding: 5
-                    bottomPadding: 5
-                    font.pointSize: 10
+                    topPadding: 2
+                    bottomPadding: 2
+                    font.pointSize: 12
                     closable: scene.isCharacterMute(modelData)
                     onClicked: requestCharacterMenu(modelData)
                     onCloseRequest: scene.removeMuteCharacter(modelData)
@@ -235,7 +235,7 @@ Item {
                         y: -fontDescent
                         readOnly: false
                         font.capitalization: Font.AllUppercase
-                        font.pointSize: 10
+                        font.pointSize: 12
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.NoWrap
                         completionStrings: scriteDocument.structure.characterNames

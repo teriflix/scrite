@@ -14,6 +14,7 @@
 #include "transliteration.h"
 #include "application.h"
 
+#include <QPainter>
 #include <QMetaEnum>
 #include <QSettings>
 #include <QMetaObject>
@@ -22,6 +23,7 @@
 #include <QTextDocument>
 #include <QFontDatabase>
 #include <QQuickTextDocument>
+#include <QAbstractTextDocumentLayout>
 
 #include <PhTranslateLib>
 
@@ -840,4 +842,122 @@ TransliterationEvent::TransliterationEvent(int start, int end, const QString &or
 
 TransliterationEvent::~TransliterationEvent()
 {
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+TransliteratedText::TransliteratedText(QQuickItem *parent)
+    : QQuickPaintedItem(parent)
+{
+
+}
+
+TransliteratedText::~TransliteratedText()
+{
+
+}
+
+void TransliteratedText::setText(const QString &val)
+{
+    if(m_text == val)
+        return;
+
+    m_text = val;
+    emit textChanged();
+
+    this->updateTextDocumentLater();
+}
+
+void TransliteratedText::setFont(const QFont &val)
+{
+    if(m_font == val)
+        return;
+
+    m_font = val;
+    emit fontChanged();
+
+    this->updateTextDocumentLater();
+}
+
+void TransliteratedText::setColor(const QColor &val)
+{
+    if(m_color == val)
+        return;
+
+    m_color = val;
+    emit colorChanged();
+
+    this->updateTextDocumentLater();
+}
+
+void TransliteratedText::paint(QPainter *painter)
+{
+    m_textDocument->setTextWidth(this->width());
+
+    QAbstractTextDocumentLayout::PaintContext context;
+
+    QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+    layout->draw(painter, context);
+}
+
+void TransliteratedText::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_updateTimer.timerId())
+    {
+        m_updateTimer.stop();
+        this->updateTextDocument();
+    }
+}
+
+void TransliteratedText::updateTextDocument()
+{
+    if(m_textDocument == nullptr)
+        m_textDocument = new QTextDocument(this);
+
+    m_textDocument->clear();
+    m_textDocument->setDefaultFont(m_font);
+
+    QTextCursor cursor(m_textDocument);
+
+    QTextCharFormat charFormat;
+    charFormat.setFont(m_font);
+    charFormat.setForeground(m_color);
+    cursor.setCharFormat(charFormat);
+
+    QTextBlockFormat blockFormat;
+    blockFormat.setLeftMargin(0);
+    blockFormat.setTopMargin(0);
+    blockFormat.setRightMargin(0);
+    blockFormat.setBottomMargin(0);
+    cursor.setBlockFormat(blockFormat);
+
+    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, m_text);
+
+    const QSizeF size = m_textDocument->size();
+    this->setContentWidth(size.width());
+    this->setContentHeight(size.height());
+
+    this->update();
+}
+
+void TransliteratedText::updateTextDocumentLater()
+{
+    m_updateTimer.start(0, this);
+}
+
+void TransliteratedText::setContentWidth(qreal val)
+{
+    if( qFuzzyCompare(m_contentWidth, val) )
+        return;
+
+    m_contentWidth = val;
+    emit contentWidthChanged();
+}
+
+void TransliteratedText::setContentHeight(qreal val)
+{
+    if( qFuzzyCompare(m_contentHeight, val) )
+        return;
+    m_contentHeight = val;
+    emit contentHeightChanged();
 }
