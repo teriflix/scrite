@@ -306,6 +306,16 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     this->setFileName(fileName);
     this->setModified(false);
 
+#ifndef QT_NO_DEBUG
+    {
+        const QFileInfo fi(fileName);
+        const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";
+        QFile file2(fileName2);
+        file2.open(QFile::WriteOnly);
+        file2.write(QJsonDocument(json).toJson());
+    }
+#endif
+
     m_progressReport->finish();
 
     if(!m_autoSaveMode)
@@ -537,8 +547,8 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_evaluateStructureElementSequenceTimer.timerId())
     {
-        this->evaluateStructureElementSequence();
         m_evaluateStructureElementSequenceTimer.stop();
+        this->evaluateStructureElementSequence();
         return;
     }
 
@@ -773,6 +783,17 @@ bool ScriteDocument::load(const QString &fileName)
 
     const QByteArray bytes = file.readAll();
     const QJsonDocument jsonDoc = QJsonDocument::fromBinaryData(bytes);
+
+#ifndef QT_NO_DEBUG
+    {
+        const QFileInfo fi(fileName);
+        const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";
+        QFile file2(fileName2);
+        file2.open(QFile::WriteOnly);
+        file2.write(jsonDoc.toJson());
+    }
+#endif
+
     const QJsonObject json = jsonDoc.object();
     if(json.isEmpty())
     {
