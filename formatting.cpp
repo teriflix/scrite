@@ -34,8 +34,6 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
     });
     QObject::connect(this, &SceneElementFormat::fontChanged, this, &SceneElementFormat::font2Changed);
     QObject::connect(m_format, &ScreenplayFormat::defaultFontChanged, this, &SceneElementFormat::font2Changed);
-
-    CACHE_DEFAULT_PROPERTY_VALUES
 }
 
 SceneElementFormat::~SceneElementFormat()
@@ -982,8 +980,8 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
 {
     if(te->timerId() == m_initializeDocumentTimer.timerId())
     {
-        this->initializeDocument();
         m_initializeDocumentTimer.stop();
+        this->initializeDocument();
     }
 }
 
