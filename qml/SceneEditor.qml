@@ -296,7 +296,7 @@ Item {
             characterNames: scriteDocument.structure.characterNames
             onDocumentInitialized: sceneContentEditor.cursorPosition = 0
             forceSyncDocument: !sceneContentEditor.activeFocus
-            onRequestCursorPosition: app.execLater(100, function() { assumeFocusAt(position) })
+            onRequestCursorPosition: app.execLater(sceneEditor, 100, function() { assumeFocusAt(position) })
         }
 
         Loader {
@@ -416,7 +416,7 @@ Item {
                 scene.undoRedoEnabled = false
             }
             Transliterator.onFinishedTransliterating: {
-                app.execLater(0, function() {
+                app.execLater(sceneEditor, 0, function() {
                     scene.endUndoCapture()
                     scene.undoRedoEnabled = true
                 })
@@ -867,7 +867,7 @@ Item {
                 onClicked: {
                     if(readOnly)
                         return
-                    app.execLater(0, function() { sceneHeadingLoader.viewOnly = false })
+                    app.execLater(parent, 0, function() { sceneHeadingLoader.viewOnly = false })
                 }
             }
         }

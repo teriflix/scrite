@@ -84,7 +84,7 @@ Flickable {
             ensureVisibleParams = {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }
-            app.execLater(500, function() {
+            app.execLater(flickable, 500, function() {
                 var params = ensureVisibleParams
                 ensureVisibleParams = undefined
                 ensureVisible(params.area, params.scaling, params.leaveMargin)

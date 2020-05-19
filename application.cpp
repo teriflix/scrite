@@ -18,6 +18,7 @@
 
 #include <QDir>
 #include <QtDebug>
+#include <QPointer>
 #include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
@@ -309,22 +310,23 @@ ExecLater::ExecLater(int howMuchLater, const QJSValue &function, const QJSValueL
 
 ExecLater::~ExecLater()
 {
+    m_timer.stop();
 }
 
 void ExecLater::timerEvent(QTimerEvent *event)
 {
     if(m_timer.timerId() == event->timerId())
     {
-        m_function.call(m_arguments);
         m_timer.stop();
-
+        m_function.call(m_arguments);
         GarbageCollector::instance()->add(this);
     }
 }
 
-void Application::execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args)
+void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args)
 {
-    new ExecLater(howMuchLater, function, args, this);
+    QObject *parent = context ? context : this;
+    new ExecLater(howMuchLater, function, args, parent);
 }
 
 AutoUpdate *Application::autoUpdate() const
@@ -407,6 +409,8 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
 
 bool Application::notify(QObject *object, QEvent *event)
 {
+    QPointer<QObject> guard(object);
+
     if(event->type() == QEvent::KeyPress)
     {
         QKeyEvent *ke = static_cast<QKeyEvent*>(event);
@@ -439,9 +443,12 @@ bool Application::notify(QObject *object, QEvent *event)
         }
     }
 
+    if(guard.isNull())
+        return false;
+
     const bool ret = QtApplicationClass::notify(object, event);
 
-    if(event->type() == QEvent::ChildAdded)
+    if(event->type() == QEvent::ChildAdded && !guard.isNull())
     {
         QChildEvent *childEvent = reinterpret_cast<QChildEvent*>(event);
         QObject *childObject = childEvent->child();

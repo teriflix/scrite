@@ -185,7 +185,7 @@ Item {
 
                 if(documentProgressStatus === ProgressReport.Finished) {
                     if(ensureCurrentItemIsVisible)
-                        app.execLater(100, function() { canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), canvasScroll.scale) })
+                        app.execLater(canvasScroll, 100, function() { canvasScroll.ensureItemVisible(elementItems.itemAt(currentIndex), canvasScroll.scale) })
                     ensureCurrentItemIsVisible = true
                 }
             }
@@ -285,7 +285,7 @@ Item {
                         selectionRect.visible = false
                     } else {
                         selectRectWasJustCreated = true
-                        app.execLater(250, function() { selectRectWasJustCreated=false })
+                        app.execLater(canvasMouseArea, 250, function() { canvasMouseArea.selectRectWasJustCreated=false })
                     }
                 }
             }
@@ -401,13 +401,13 @@ Item {
                                         (bounds.p2.x-bounds.p1.x+20),
                                         (bounds.p2.y-bounds.p1.y+20))
                     topLeft = Qt.point(tightRect.x, tightRect.y)
-                    app.execLater(100, function() { pauseShifting=false })
+                    app.execLater(selectionRect, 100, function() { selectionRect.pauseShifting=false })
                 }
 
                 onEnabledChanged: {
                     if(enabled) {
                         prepare()
-                        app.execLater(100, computeTightRect)
+                        app.execLater(selectionRect, 100, selectionRect.computeTightRect)
                     } else
                         cleanup()
                 }
