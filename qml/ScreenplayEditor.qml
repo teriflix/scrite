@@ -275,7 +275,7 @@ Item {
                 scrollable: false
                 showOnlyEnabledSceneHeadings: !screenplayEditor.displaySceneMenu
                 allowSplitSceneRequest: true
-                sceneNumber: parent.index+1
+                sceneNumber: parent.element.sceneNumber
                 active: parent.selected
                 displaySceneNumber: screenplayEditor.displaySceneNumbers
                 displaySceneMenu: screenplayEditor.displaySceneMenu

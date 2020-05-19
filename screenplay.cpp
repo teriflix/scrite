@@ -154,6 +154,9 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
 
+    if(m_screenplay)
+        connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
+
     emit sceneChanged();
 }
 
@@ -187,6 +190,25 @@ bool ScreenplayElement::event(QEvent *event)
     return QObject::event(event);
 }
 
+void ScreenplayElement::evaluateSceneNumber(int &number)
+{
+    int sn = -1;
+
+    if(m_scene != nullptr && m_scene->heading()->isEnabled())
+    {
+        if(number <= 0)
+            number = 1;
+        sn = number++;
+    }
+
+    if(m_sceneNumber != sn)
+    {
+        m_sceneNumber = sn;
+        emit sceneNumberChanged();
+    }
+}
+
+
 void ScreenplayElement::sceneWasDeleted()
 {
     if(m_screenplay != nullptr)
@@ -211,6 +233,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::contactChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::versionChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
 
     m_author = QSysInfo::machineHostName();
     m_version = "0.1";
@@ -313,6 +336,7 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
+    connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
 
     this->endInsertRows();
 
@@ -345,6 +369,7 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
+    disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
 
     this->endRemoveRows();
 
@@ -1036,6 +1061,15 @@ bool Screenplay::event(QEvent *event)
     return QObject::event(event);
 }
 
+void Screenplay::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_sceneNumberEvaluationTimer.timerId())
+    {
+        m_sceneNumberEvaluationTimer.stop();
+        this->evaluateSceneNumbers();
+    }
+}
+
 void Screenplay::onSceneReset(int elementIndex)
 {
     ScreenplayElement *element = qobject_cast<ScreenplayElement*>(this->sender());
@@ -1047,6 +1081,18 @@ void Screenplay::onSceneReset(int elementIndex)
         return;
 
     emit sceneReset(sceneIndex, elementIndex);
+}
+
+void Screenplay::evaluateSceneNumbers()
+{
+    int number = 1;
+    Q_FOREACH(ScreenplayElement *element, m_elements)
+        element->evaluateSceneNumber(number);
+}
+
+void Screenplay::evaluateSceneNumbersLater()
+{
+    m_sceneNumberEvaluationTimer.start(0, this);
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)

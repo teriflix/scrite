@@ -58,6 +58,10 @@ public:
     void setSceneFromID(const QString &val);
     QString sceneID() const;
 
+    Q_PROPERTY(int sceneNumber READ sceneNumber NOTIFY sceneNumberChanged)
+    int sceneNumber() const { return m_sceneNumber; }
+    Q_SIGNAL void sceneNumberChanged();
+
     Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false)
     void setScene(Scene *val);
     Scene* scene() const { return m_scene; }
@@ -77,9 +81,11 @@ public:
 
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
+    Q_SIGNAL void evaluateSceneNumberRequest();
 
 protected:
     bool event(QEvent *event);
+    void evaluateSceneNumber(int &number);
     void sceneWasDeleted();
 
 private:
@@ -87,6 +93,7 @@ private:
     Scene* m_scene = nullptr;
     bool m_expanded = true;
     int m_breakType = -1;
+    int m_sceneNumber = -1;
     QString m_sceneID;
     QJsonValue m_userData;
     Screenplay* m_screenplay = nullptr;
@@ -186,7 +193,10 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void timerEvent(QTimerEvent *te);
     void onSceneReset(int elementIndex);
+    void evaluateSceneNumbers();
+    void evaluateSceneNumbersLater();
 
 private:
     QString m_title;
@@ -203,6 +213,8 @@ private:
     QList<ScreenplayElement *> m_elements;
     int m_currentElementIndex = -1;
     Scene* m_activeScene = nullptr;
+
+    QBasicTimer m_sceneNumberEvaluationTimer;
 };
 
 #endif // SCREENPLAY_H

@@ -98,7 +98,7 @@ Item {
         }
 
         Loader {
-            active: displaySceneNumber && sceneHeadingLoader.active
+            active: displaySceneNumber && sceneHeadingLoader.active && sceneNumber > 0
             anchors.right: sceneHeadingLoader.left
             anchors.verticalCenter: sceneHeadingLoader.verticalCenter
             anchors.rightMargin: sceneEditorFontMetrics.paragraphMargin
@@ -762,15 +762,15 @@ Item {
         id: sceneHeadingDisabled
 
         Rectangle {
-            color: Qt.tint(scene.color, "#D9FFFFFF")
+            color: primaryColors.c10.background
             property font headingFont: sceneHeadingFormat.font2
 
             Text {
-                text: "inherited from previous scene"
-                anchors.centerIn: parent
+                text: "no scene heading"
+                anchors.verticalCenter: parent.verticalCenter
                 color: primaryColors.c10.text
                 font: headingFont
-                opacity: 0.5
+                opacity: 0.25
             }
         }
     }
