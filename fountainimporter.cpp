@@ -61,6 +61,7 @@ bool FountainImporter::doImport(QIODevice *device)
         return true;
     };
 
+    const QChar space(' ');
     const QByteArray bytes = device->readAll();
 
     QTextStream ts(bytes);
@@ -105,9 +106,6 @@ bool FountainImporter::doImport(QIODevice *device)
         line = line.remove("_");
         line = line.remove("*");
         line = line.remove("^");
-
-        if(line=="THE KEY TO THE CITY.")
-            qDebug("Pay attention.");
 
         // detect if ths line contains a header.
         bool isHeader = false;
@@ -293,6 +291,7 @@ bool FountainImporter::doImport(QIODevice *device)
             continue;
         }
 
+
         if(inCharacter)
         {
             para->setType(SceneElement::Dialogue);
@@ -301,7 +300,16 @@ bool FountainImporter::doImport(QIODevice *device)
         }
         else
             para->setType(SceneElement::Action);
-        currentScene->addElement(para);
+
+        SceneElement *prevPara = currentScene->elementCount() > 0 ? currentScene->elementAt( currentScene->elementCount()-1 ) : nullptr;
+        if(prevPara && prevPara->type() == para->type())
+        {
+            prevPara->setText( prevPara->text() + space + para->text() );
+            delete para;
+            para = nullptr;
+        }
+        else
+            currentScene->addElement(para);
     }
 
     screenplay->setCurrentElementIndex(0);

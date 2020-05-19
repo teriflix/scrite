@@ -28,6 +28,7 @@ public:
 
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
+    void preprocess(QByteArray &bytes);
 };
 
 #endif // FOUNTAINIMPORTER_H
