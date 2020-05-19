@@ -331,14 +331,14 @@ void SearchEngine::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_searchAgentSortTimer.timerId())
     {
-        this->sortSearchAgents();
         m_searchAgentSortTimer.stop();
+        this->sortSearchAgents();
     }
 
     if(event->timerId() == m_searchTimer.timerId())
     {
-        this->doSearch();
         m_searchTimer.stop();
+        this->doSearch();
     }
 }
 

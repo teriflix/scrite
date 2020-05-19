@@ -178,8 +178,8 @@ void AutoUpdate::timerEvent(QTimerEvent *event)
 {
     if(m_updateTimer.timerId() == event->timerId())
     {
-        this->checkForUpdates();
         m_updateTimer.stop();
+        this->checkForUpdates();
         return;
     }
 

@@ -101,7 +101,6 @@ private:
     qreal m_height = 0;
     Scene* m_scene = nullptr;
     Structure *m_structure = nullptr;
-    QBasicTimer m_undoCmdTimer;
 };
 
 class Character : public QObject

@@ -64,8 +64,8 @@ void Completer::timerEvent(QTimerEvent *te)
 {
     if(m_updateSuggestionTimer.timerId() == te->timerId())
     {
-        this->updateSuggestion();
         m_updateSuggestionTimer.stop();
+        this->updateSuggestion();
     }
 
     QObject::timerEvent(te);

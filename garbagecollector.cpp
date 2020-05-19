@@ -20,7 +20,6 @@ GarbageCollector *GarbageCollector::instance()
     return theInstance;
 }
 
-
 GarbageCollector::GarbageCollector(QObject *parent)
     : QObject(parent)
 {
@@ -59,7 +58,8 @@ void GarbageCollector::timerEvent(QTimerEvent *event)
 
 void GarbageCollector::onObjectDestroyed(QObject *obj)
 {
-    m_objects.removeOne(obj);
+    if(m_objects.removeOne(obj))
+        m_timer.start(100, this);
+
     m_shredder.removeOne(obj);
-    m_timer.start(100, this);
 }

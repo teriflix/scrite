@@ -853,8 +853,8 @@ void Structure::timerEvent(QTimerEvent *event)
 {
     if(m_locationHeadingsMapTimer.timerId() == event->timerId())
     {
-        this->updateLocationHeadingMap();
         m_locationHeadingsMapTimer.stop();
+        this->updateLocationHeadingMap();
         return;
     }
 
@@ -1272,8 +1272,8 @@ void StructureElementConnector::timerEvent(QTimerEvent *te)
 {
     if(m_updateTimer.timerId() == te->timerId())
     {
-        this->requestUpdate();
         m_updateTimer.stop();
+        this->requestUpdate();
         return;
     }
 

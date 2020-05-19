@@ -141,7 +141,7 @@ public:
     Q_INVOKABLE QPointF cursorPosition() const;
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
 
-    Q_INVOKABLE void execLater(int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
+    Q_INVOKABLE void execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
 
     Q_INVOKABLE QColor translucent(const QColor &input, qreal alpha=0.5) const {
         QColor ret = input;
