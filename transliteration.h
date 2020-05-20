@@ -14,6 +14,8 @@
 #ifndef TRANSLITERATION_H
 #define TRANSLITERATION_H
 
+#include "basictimer.h"
+
 #include <QMap>
 #include <QFont>
 #include <QEvent>
@@ -22,7 +24,6 @@
 #include <QQmlEngine>
 #include <QJsonObject>
 #include <QQuickPaintedItem>
-#include <QBasicTimer>
 
 class QTextCursor;
 class QTextDocument;
@@ -259,7 +260,7 @@ private:
     QString m_text;
     qreal m_contentWidth = 0;
     qreal m_contentHeight = 0;
-    QBasicTimer m_updateTimer;
+    BasicTimer m_updateTimer;
     QTextDocument *m_textDocument = nullptr;
 };
 

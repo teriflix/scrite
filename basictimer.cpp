@@ -11,14 +11,37 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.12
+#include "basictimer.h"
+#include <QList>
 
-Menu {
-    Material.accent: primaryColors.key
-    Material.background: primaryColors.c100.background
-    Material.foreground: primaryColors.c50.text
-    objectName: title
+#ifndef QT_NO_DEBUG
+Q_GLOBAL_STATIC(QList<BasicTimer*>, BasicTimerList)
+#endif
+
+BasicTimer *BasicTimer::get(int timerId)
+{
+#ifndef QT_NO_DEBUG
+    Q_FOREACH(BasicTimer *timer, *BasicTimerList)
+    {
+        if(timer->timerId() == timerId)
+            return timer;
+    }
+#endif
+
+    return nullptr;
+}
+
+BasicTimer::BasicTimer(const QString &name)
+    : QBasicTimer(), m_name(name)
+{
+#ifndef QT_NO_DEBUG
+    BasicTimerList->append(this);
+#endif
+}
+
+BasicTimer::~BasicTimer()
+{
+#ifndef QT_NO_DEBUG
+    BasicTimerList->removeOne(this);
+#endif
 }

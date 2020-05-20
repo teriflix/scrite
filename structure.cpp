@@ -16,10 +16,6 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
-#include <QRunnable>
-#include <QThreadPool>
-#include <QtConcurrentRun>
-
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
@@ -348,7 +344,8 @@ bool Annotation::event(QEvent *event)
 
 Structure::Structure(QObject *parent)
     : QObject(parent),
-      m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
+      m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
+      m_locationHeadingsMapTimer("Structure.m_locationHeadingsMapTimer")
 {
     connect(this, &Structure::noteCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::characterCountChanged, this, &Structure::structureChanged);
@@ -1016,7 +1013,8 @@ int Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementConnector::StructureElementConnector(QQuickItem *parent)
-    :AbstractShapeItem(parent)
+    :AbstractShapeItem(parent),
+      m_updateTimer("StructureElementConnector.m_updateTimer")
 {
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);

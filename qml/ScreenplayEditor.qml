@@ -183,6 +183,14 @@ Item {
                     item.element = screenplayElement
                 }
             }
+
+            active: resetActiveOnIndexChange.value
+            ResetOnChange {
+                id: resetActiveOnIndexChange
+                trackChangesOn: index
+                from: false
+                to: true
+            }
         }
         onMovingChanged: {
             if(moving)
@@ -360,12 +368,12 @@ Item {
         }
     }
 
-    Menu {
+    Menu2 {
         id: characterMenu
         width: 300
         property string characterName
 
-        MenuItem {
+        MenuItem2 {
             text: "Generate Character Report"
             enabled: characterMenu.characterName !== ""
             onClicked: {

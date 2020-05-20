@@ -18,7 +18,8 @@
 #include <QEvent>
 
 Notification::Notification(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_autoCloseTimer("Notification.m_autoCloseTimer")
 {
 
 }

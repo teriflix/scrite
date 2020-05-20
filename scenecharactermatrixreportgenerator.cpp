@@ -17,7 +17,6 @@
 #include <QPainter>
 #include <QPdfWriter>
 #include <QTextTable>
-#include <QtConcurrentMap>
 
 SceneCharacterMatrixReportGenerator::SceneCharacterMatrixReportGenerator(QObject *parent)
     : AbstractReportGenerator(parent)

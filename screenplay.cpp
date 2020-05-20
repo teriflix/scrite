@@ -226,7 +226,8 @@ void ScreenplayElement::sceneWasDeleted()
 
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
-      m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
+      m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
+      m_sceneNumberEvaluationTimer("Screenplay.m_sceneNumberEvaluationTimer")
 {
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);

@@ -32,5 +32,6 @@
         <file>qml/CharactersView.qml</file>
         <file>qml/TabBarTab.qml</file>
         <file>qml/AlphabetMappings.qml</file>
+        <file>qml/MenuLoader.qml</file>
     </qresource>
 </RCC>

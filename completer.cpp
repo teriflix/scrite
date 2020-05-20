@@ -18,7 +18,8 @@
 #include <QEvent>
 
 Completer::Completer(QObject *parent)
-          :QCompleter(parent)
+          :QCompleter(parent),
+            m_updateSuggestionTimer("Completer.m_updateSuggestionTimer")
 {
     this->setCompletionMode(QCompleter::PopupCompletion);
     this->setModelSorting(QCompleter::CaseInsensitivelySortedModel);

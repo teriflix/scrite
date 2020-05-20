@@ -16,9 +16,9 @@
 
 #include "scene.h"
 #include "modifiable.h"
+#include "basictimer.h"
 
 #include <QScreen>
-#include <QBasicTimer>
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
 #include <QSyntaxHighlighter>
@@ -314,7 +314,7 @@ private:
     int m_currentElementCursorPosition = -1;
     QQuickTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_screenplayFormat = nullptr;
-    QBasicTimer m_initializeDocumentTimer;
+    BasicTimer m_initializeDocumentTimer;
     QList<SceneElement::Type> m_tabHistory;
 };
 

@@ -368,6 +368,7 @@ Item {
 
                         Timer {
                             id: exportTimer
+                            objectName: "ScriteDocumentView.exportTimer"
                             property string formatName
                             repeat: false
                             interval: 10
@@ -389,6 +390,7 @@ Item {
 
                         Timer {
                             id: reportGeneratorTimer
+                            objectName: "ScriteDocumentView.reportGeneratorTimer"
                             property var reportArgs
                             repeat: false
                             interval: 10

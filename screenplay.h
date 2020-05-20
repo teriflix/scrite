@@ -15,8 +15,8 @@
 #define SCREENPLAY_H
 
 #include "scene.h"
+#include "basictimer.h"
 
-#include <QBasicTimer>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QQmlListProperty>
@@ -214,7 +214,7 @@ private:
     int m_currentElementIndex = -1;
     Scene* m_activeScene = nullptr;
 
-    QBasicTimer m_sceneNumberEvaluationTimer;
+    BasicTimer m_sceneNumberEvaluationTimer;
 };
 
 #endif // SCREENPLAY_H

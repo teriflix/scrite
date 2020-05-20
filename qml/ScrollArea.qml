@@ -199,6 +199,7 @@ Flickable {
 
     Timer {
         id: returnToBoundsTimer
+        objectName: "ScrollArea.returnToBoundsTimer"
         running: false
         repeat: false
         interval: 500

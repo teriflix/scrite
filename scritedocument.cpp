@@ -90,7 +90,10 @@ ScriteDocument *ScriteDocument::instance()
 }
 
 ScriteDocument::ScriteDocument(QObject *parent)
-                :QObject(parent)
+                :QObject(parent),
+                  m_autoSaveTimer("ScriteDocument.m_autoSaveTimer"),
+                  m_clearModifyTimer("ScriteDocument.m_clearModifyTimer"),
+                  m_evaluateStructureElementSequenceTimer("ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
     this->reset();
     this->updateDocumentWindowTitle();

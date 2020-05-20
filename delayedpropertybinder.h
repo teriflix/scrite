@@ -14,8 +14,10 @@
 #ifndef DELAYEDPROPERTYBINDER_H
 #define DELAYEDPROPERTYBINDER_H
 
+
 #include <QQuickItem>
-#include <QBasicTimer>
+
+#include "basictimer.h"
 
 class DelayedPropertyBinder : public QQuickItem
 {
@@ -24,6 +26,11 @@ class DelayedPropertyBinder : public QQuickItem
 public:
     DelayedPropertyBinder(QQuickItem *parent=nullptr);
     ~DelayedPropertyBinder();
+
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    void setName(const QString &val);
+    QString name() const { return m_name; }
+    Q_SIGNAL void nameChanged();
 
     Q_PROPERTY(QVariant set READ set WRITE setSet NOTIFY setChanged)
     void setSet(const QVariant &val);
@@ -48,13 +55,15 @@ private:
     void setGet(const QVariant &val);
     void schedule();
     void timerEvent(QTimerEvent *te);
+    void parentHasChanged();
 
 private:
     int m_delay = 0;
+    QString m_name;
     QVariant m_set;
     QVariant m_get;
     QVariant m_initial;
-    QBasicTimer m_timer;
+    BasicTimer m_timer;
 };
 
 #endif // DELAYEDPROPERTYBINDER_H

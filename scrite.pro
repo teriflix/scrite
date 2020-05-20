@@ -18,6 +18,7 @@ HEADERS += \
     aggregation.h \
     application.h \
     autoupdate.h \
+    basictimer.h \
     characterreportgenerator.h \
     completer.h \
     delayedpropertybinder.h \
@@ -57,6 +58,7 @@ HEADERS += \
     qobjectfactory.h \
     qobjectserializer.h \
     qtextdocumentpagedprinter.h \
+    resetonchange.h \
     scene.h \
     scenecharactermatrixreportgenerator.h \
     screenplay.h \
@@ -84,6 +86,7 @@ SOURCES += \
     aggregation.cpp \
     application.cpp \
     autoupdate.cpp \
+    basictimer.cpp \
     characterreportgenerator.cpp \
     completer.cpp \
     delayedpropertybinder.cpp \
@@ -119,6 +122,7 @@ SOURCES += \
     progressreport.cpp \
     qobjectserializer.cpp \
     qtextdocumentpagedprinter.cpp \
+    resetonchange.cpp \
     scene.cpp \
     scenecharactermatrixreportgenerator.cpp \
     screenplay.cpp \

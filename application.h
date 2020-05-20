@@ -99,6 +99,7 @@ public:
     QString qtVersion() const { return QString::fromLatin1(QT_VERSION_STR); }
 
     Q_INVOKABLE QString typeName(QObject *object) const;
+    Q_INVOKABLE bool verifyType(QObject *object, const QString &name) const;
 
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
     QVersionNumber versionNumber() const { return m_versionNumber; }
@@ -176,6 +177,9 @@ public:
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
+
+    // Although public, please do not call it.
+    bool notifyInternal(QObject *object, QEvent *event);
 
 signals:
     void minimizeWindowRequest();

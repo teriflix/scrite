@@ -32,6 +32,7 @@
 #include "searchengine.h"
 #include "standardpaths.h"
 #include "textshapeitem.h"
+#include "resetonchange.h"
 #include "scritedocument.h"
 #include "materialcolors.h"
 #include "painterpathitem.h"
@@ -52,13 +53,14 @@ int main(int argc, char **argv)
     Application::setOrganizationDomain("teriflix.com");
     Application::setApplicationVersion(applicationVersion.toString() + "-beta");
 
+#ifdef QT_NO_DEBUG
     qInstallMessageHandler(&Logger::qtMessageHandler);
-
-    Logger::instance()->log(
-                QString("%1 %2 Version %3 Launched")
-                  .arg(QApplication::organizationName())
-                  .arg(QApplication::applicationName())
-                  .arg(QApplication::applicationVersion()));
+//    Logger::instance()->log(
+//                QString("%1 %2 Version %3 Launched")
+//                  .arg(QApplication::organizationName())
+//                  .arg(QApplication::applicationName())
+//                  .arg(QApplication::applicationVersion()));
+#endif
 
     Application a(argc, argv, applicationVersion);
 
@@ -140,6 +142,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Application>("Scrite", 1, 0, "Application", reason);
     qmlRegisterType<Annotation>("Scrite", 1, 0, "Annotation");
     qmlRegisterType<DelayedPropertyBinder>("Scrite", 1, 0, "DelayedPropertyBinder");
+    qmlRegisterType<ResetOnChange>("Scrite", 1, 0, "ResetOnChange");
 
     qmlRegisterUncreatableType<HeaderFooter>("Scrite", 1, 0, "HeaderFooter", reason);
     qmlRegisterUncreatableType<QTextDocumentPagedPrinter>("Scrite", 1, 0, "QTextDocumentPagedPrinter", reason);

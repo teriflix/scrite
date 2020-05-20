@@ -85,21 +85,12 @@ void Logger::qtMessageHandler(QtMsgType type, const QMessageLogContext & context
     case QtInfoMsg: ts << "Info: "; break;
     }
 
-#ifndef QT_NO_DEBUG
     ts << "[" << context.category << " / " << context.file << " / " << context.function << " / " << context.line << "] (" << context.version << ") - ";
-#else
-    Q_UNUSED(context);
-#endif
-
     ts << message;
     ts.flush();
 
     Logger::instance()->log(logMessage);
-
-#ifndef QT_NO_DEBUG
     fprintf(stderr, "%s\n", qPrintable(logMessage));
-#endif
-
 #endif
 }
 

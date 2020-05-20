@@ -20,4 +20,5 @@ MenuItem {
     Material.accent: primaryColors.key
     Material.background: primaryColors.c100.background
     Material.foreground: primaryColors.c100.text
+    objectName: text
 }

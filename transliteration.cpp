@@ -847,14 +847,15 @@ TransliterationEvent::~TransliterationEvent()
 ///////////////////////////////////////////////////////////////////////////////
 
 TransliteratedText::TransliteratedText(QQuickItem *parent)
-    : QQuickPaintedItem(parent)
+    : QQuickPaintedItem(parent),
+      m_updateTimer("TransliteratedText.m_updateTimer")
 {
 
 }
 
 TransliteratedText::~TransliteratedText()
 {
-
+    m_updateTimer.stop();
 }
 
 void TransliteratedText::setText(const QString &val)

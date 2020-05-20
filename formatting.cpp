@@ -535,7 +535,8 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 }
 
 SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
-    : QSyntaxHighlighter(parent)
+    : QSyntaxHighlighter(parent),
+      m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer")
 {
 
 }
@@ -1069,12 +1070,12 @@ public:
     void timerEvent(QTimerEvent *event);
 
 private:
-    QBasicTimer m_timer;
+    BasicTimer m_timer;
 };
 
-
 ForceCursorPositionHack::ForceCursorPositionHack(SceneElement *element)
-    : QObject(element)
+    : QObject(element),
+      m_timer("ForceCursorPositionHack.m_timer")
 {
     if(!element->text().isEmpty()) {
         GarbageCollector::instance()->add(this);

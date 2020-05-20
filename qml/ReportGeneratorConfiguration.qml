@@ -259,8 +259,8 @@ Item {
                         text: fieldInfo.label + ": "
                         font.bold: true
                         font.pointSize: 12
-                        topPadding: 2
-                        bottomPadding: 2
+                        topPadding: 5
+                        bottomPadding: 5
                     }
 
                     Repeater {

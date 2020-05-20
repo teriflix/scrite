@@ -14,10 +14,12 @@
 #ifndef NOTIFICATION_H
 #define NOTIFICATION_H
 
+
 #include <QObject>
 #include <QColor>
 #include <QQmlEngine>
-#include <QBasicTimer>
+
+#include "basictimer.h"
 
 class Notification : public QObject
 {
@@ -88,7 +90,7 @@ private:
     QColor m_textColor = QColor(Qt::black);
     int m_autoCloseDelay = 2000;
     QStringList m_buttons;
-    QBasicTimer m_autoCloseTimer;
+    BasicTimer m_autoCloseTimer;
 };
 Q_DECLARE_METATYPE(Notification*)
 QML_DECLARE_TYPEINFO(Notification, QML_HAS_ATTACHED_PROPERTIES)

@@ -12,9 +12,11 @@
 ****************************************************************************/
 
 #include "application.h"
-#include "autoupdate.h"
+
 #include "logger.h"
 #include "undoredo.h"
+#include "autoupdate.h"
+#include "basictimer.h"
 
 #include <QDir>
 #include <QtDebug>
@@ -33,6 +35,8 @@
 #include <QStandardPaths>
 
 #define ENABLE_SCRIPT_HOTKEY
+
+bool QtApplicationEventNotificationCallback(void **cbdata);
 
 Application *Application::instance()
 {
@@ -55,12 +59,18 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
 
+#ifndef QT_NO_DEBUG
+    QInternal::registerCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
+#endif
+
     TransliterationEngine::instance(this);
 }
 
 Application::~Application()
 {
-
+#ifndef QT_NO_DEBUG
+    QInternal::unregisterCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
+#endif
 }
 
 #ifdef Q_OS_MAC
@@ -115,6 +125,11 @@ QString Application::typeName(QObject *object) const
         return QString();
 
     return QString::fromLatin1(object->metaObject()->className());
+}
+
+bool Application::verifyType(QObject *object, const QString &name) const
+{
+    return object && object->inherits(qPrintable(name));
 }
 
 UndoStack *Application::findUndoStack(const QString &objectName) const
@@ -295,14 +310,13 @@ public:
     void timerEvent(QTimerEvent *event);
 
 private:
-    char m_padding[4];
-    QBasicTimer m_timer;
+    BasicTimer m_timer;
     QJSValue m_function;
     QJSValueList m_arguments;
 };
 
 ExecLater::ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &args, QObject *parent)
-    : QObject(parent), m_function(function), m_arguments(args)
+    : QObject(parent), m_timer("ExecLater.m_timer"), m_function(function), m_arguments(args)
 {
     howMuchLater = qBound(0, howMuchLater, 60*60*1000);
     m_timer.start(howMuchLater, this);
@@ -407,9 +421,30 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
     return ret;
 }
 
+bool QtApplicationEventNotificationCallback(void **cbdata)
+{
+#ifndef QT_NO_DEBUG
+    QObject *object = reinterpret_cast<QObject*>(cbdata[0]);
+    QEvent *event = reinterpret_cast<QEvent*>(cbdata[1]);
+    bool *result = reinterpret_cast<bool*>(cbdata[2]);
+
+    const bool ret = Application::instance()->notifyInternal(object, event);
+
+    if(result)
+        *result |= ret;
+
+    return ret;
+#else
+    Q_UNUSED(cbdata)
+    return false;
+#endif
+}
+
 bool Application::notify(QObject *object, QEvent *event)
 {
-    QPointer<QObject> guard(object);
+    // Note that notifyInternal() will be called first before we get here.
+    if(event->type() == QEvent::DeferredDelete)
+        return QtApplicationClass::notify(object, event);
 
     if(event->type() == QEvent::KeyPress)
     {
@@ -443,12 +478,12 @@ bool Application::notify(QObject *object, QEvent *event)
         }
     }
 
-    if(guard.isNull())
-        return false;
-
     const bool ret = QtApplicationClass::notify(object, event);
 
-    if(event->type() == QEvent::ChildAdded && !guard.isNull())
+    // The only reason we reimplement the notify() method is because we sometimes want to
+    // handle an event AFTER it is handled by the target object.
+
+    if(event->type() == QEvent::ChildAdded)
     {
         QChildEvent *childEvent = reinterpret_cast<QChildEvent*>(event);
         QObject *childObject = childEvent->child();
@@ -472,6 +507,47 @@ bool Application::notify(QObject *object, QEvent *event)
     }
 
     return ret;
+}
+
+bool Application::notifyInternal(QObject *object, QEvent *event)
+{
+#ifndef QT_NO_DEBUG
+    static QMap<QObject*,QString> objectNameMap;
+    auto evaluateObjectName = [](QObject *object, QMap<QObject*,QString> &from) {
+        QString objectName = from.value(object);
+        if(objectName.isEmpty()) {
+            QObject *parent = object->parent();
+            QString parentName = parent ? from.value(parent) : "No Parent";
+            if(parentName.isEmpty()) {
+                parentName = QString("%1 [%2] (%3)")
+                                    .arg(parent->metaObject()->className())
+                                    .arg((unsigned long)((void*)parent),0,16)
+                                    .arg(parent->objectName());
+            }
+            objectName = QString("%1 [%2] (%3) under %4")
+                    .arg(object->metaObject()->className())
+                    .arg((unsigned long)((void*)object),0,16)
+                    .arg(object->objectName())
+                    .arg(parentName);
+            from[object] = objectName;
+        }
+        return objectName;
+    };
+
+    if(event->type() == QEvent::DeferredDelete)
+        qDebug() << "DeferredDelete: " << evaluateObjectName(object, objectNameMap);
+    else if(event->type() == QEvent::Timer)
+    {
+        QTimerEvent *te = static_cast<QTimerEvent*>(event);
+        BasicTimer *timer = BasicTimer::get(te->timerId());
+        qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << evaluateObjectName(object, objectNameMap) << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
+    }
+#else
+    Q_UNUSED(object)
+    Q_UNUSED(event)
+#endif
+
+    return false;
 }
 
 QColor Application::pickStandardColor(int counter) const

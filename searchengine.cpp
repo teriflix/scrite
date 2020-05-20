@@ -209,7 +209,9 @@ void SearchAgent::onClearSearchRequest()
 ///////////////////////////////////////////////////////////////////////////////
 
 SearchEngine::SearchEngine(QObject *parent)
-    :QObject(parent)
+    :QObject(parent),
+      m_searchTimer("SearchEngine.m_searchTimer"),
+      m_searchAgentSortTimer("SearchEngine.m_searchAgentSortTimer")
 {
 
 }

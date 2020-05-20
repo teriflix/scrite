@@ -21,7 +21,8 @@ GarbageCollector *GarbageCollector::instance()
 }
 
 GarbageCollector::GarbageCollector(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_timer("GarbageCollector.m_timer")
 {
 
 }
@@ -52,7 +53,10 @@ void GarbageCollector::timerEvent(QTimerEvent *event)
         m_objects.clear();
 
         while(!m_shredder.isEmpty())
-            delete m_shredder.takeFirst();
+        {
+            QDeferredDeleteEvent dde;
+            Application::instance()->sendEvent(m_shredder.takeFirst(), &dde);
+        }
     }
 }
 

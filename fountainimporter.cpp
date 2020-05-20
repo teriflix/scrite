@@ -302,7 +302,7 @@ bool FountainImporter::doImport(QIODevice *device)
             para->setType(SceneElement::Action);
 
         SceneElement *prevPara = currentScene->elementCount() > 0 ? currentScene->elementAt( currentScene->elementCount()-1 ) : nullptr;
-        if(prevPara && prevPara->type() == para->type())
+        if(prevPara && prevPara->type() == para->type() && !hasParaBreaks)
         {
             prevPara->setText( prevPara->text() + space + para->text() );
             delete para;

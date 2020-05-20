@@ -296,7 +296,7 @@ Item {
             characterNames: scriteDocument.structure.characterNames
             onDocumentInitialized: sceneContentEditor.cursorPosition = 0
             forceSyncDocument: !sceneContentEditor.activeFocus
-            onRequestCursorPosition: app.execLater(sceneEditor, 100, function() { assumeFocusAt(position) })
+            onRequestCursorPosition: app.execLater(sceneDocumentBinder, 100, function() { assumeFocusAt(position) })
         }
 
         Loader {
@@ -341,6 +341,7 @@ Item {
                 initial: Qt.rect(0,0,0,0)
                 set: editorLoader.item ? editorLoader.item.cursorRectangle : initial
                 onGetChanged: sceneContentScrollView.adjustScroll(get)
+                enabled: scrollable
             }
 
             function adjustScroll(rect) {
@@ -416,7 +417,7 @@ Item {
                 scene.undoRedoEnabled = false
             }
             Transliterator.onFinishedTransliterating: {
-                app.execLater(sceneEditor, 0, function() {
+                app.execLater(Transliterator, 0, function() {
                     scene.endUndoCapture()
                     scene.undoRedoEnabled = true
                 })
@@ -445,45 +446,215 @@ Item {
                 }
             }
 
-            cursorDelegate: Item {
-                x: sceneTextArea.cursorRectangle.x
-                y: sceneTextArea.cursorRectangle.y
-                width: sceneTextArea.cursorRectangle.width
-                height: sceneTextArea.cursorRectangle.height
-                visible: sceneTextArea.activeFocus
+            Item {
+                x: parent.cursorRectangle.x
+                y: parent.cursorRectangle.y
+                width: parent.cursorRectangle.width
+                height: parent.cursorRectangle.height
+                visible: parent.cursorVisible
                 ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="lightgray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
                 ToolTip.visible: completer.hasSuggestion
 
-                Rectangle {
-                    id: blinkingCursor
-                    color: primaryColors.c900.background
-                    width: 2
-                    height: parent.height
+                MenuLoader {
+                    id: editorContextMenu
+                    anchors.bottom: parent.bottom
+                    menu: Menu2 {
+                        onAboutToShow: sceneTextArea.persistentSelection = true
+                        onAboutToHide: sceneTextArea.persistentSelection = false
 
-                    SequentialAnimation {
-                        loops: Animation.Infinite
-                        running: sceneTextArea.activeFocus
-
-                        NumberAnimation {
-                            target: blinkingCursor
-                            property: "opacity"
-                            duration: 400
-                            easing.type: Easing.Linear
-                            from: 0
-                            to: 1
+                        MenuItem2 {
+                            focusPolicy: Qt.NoFocus
+                            text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
+                            enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
+                            onClicked: { sceneTextArea.cut(); editorContextMenu.close() }
                         }
 
-                        NumberAnimation {
-                            target: blinkingCursor
-                            property: "opacity"
-                            duration: 400
-                            easing.type: Easing.Linear
-                            from: 1
-                            to: 0
+                        MenuItem2 {
+                            focusPolicy: Qt.NoFocus
+                            text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
+                            enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
+                            onClicked: { sceneTextArea.copy(); editorContextMenu.close() }
+                        }
+
+                        MenuItem2 {
+                            focusPolicy: Qt.NoFocus
+                            text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
+                            enabled: sceneTextArea.canPaste
+                            onClicked: { sceneTextArea.paste(); editorContextMenu.close() }
+                        }
+
+                        MenuSeparator {  }
+
+                        MenuItem2 {
+                            focusPolicy: Qt.NoFocus
+                            text: "Split Scene"
+                            enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && allowSplitSceneRequest
+                            onClicked: {
+                                sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                                editorContextMenu.close()
+                            }
+                        }
+
+                        MenuSeparator {  }
+
+                        Menu2 {
+                            title: "Format"
+                            width: 250
+
+                            Repeater {
+                                model: [
+                                    { "value": SceneElement.Action, "display": "Action" },
+                                    { "value": SceneElement.Character, "display": "Character" },
+                                    { "value": SceneElement.Dialogue, "display": "Dialogue" },
+                                    { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
+                                    { "value": SceneElement.Shot, "display": "Shot" },
+                                    { "value": SceneElement.Transition, "display": "Transition" }
+                                ]
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
+                                    enabled: sceneDocumentBinder.currentElement !== null
+                                    onClicked: {
+                                        sceneDocumentBinder.currentElement.type = modelData.value
+                                        editorContextMenu.close()
+                                    }
+                                }
+                            }
+                        }
+
+                        Menu2 {
+                            title: "Translate"
+                            enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
+
+                            Repeater {
+                                model: app.enumerationModel(app.transliterationEngine, "Language")
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    visible: index > 0
+                                    text: modelData.key
+                                    onClicked: {
+                                        sceneTextArea.Transliterator.transliterateToLanguage(sceneTextArea.selectionStart, sceneTextArea.selectionEnd, modelData.value)
+                                        editorContextMenu.close()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                MenuLoader {
+                    id: doubleEnterMenu
+                    anchors.bottom: parent.bottom
+                    menu: Menu2 {
+                        width: 200
+                        onAboutToShow: sceneTextArea.persistentSelection = true
+                        onAboutToHide: sceneTextArea.persistentSelection = false
+                        EventFilter.target: app
+                        EventFilter.events: [6]
+                        EventFilter.onFilter: {
+                            result.filter = true
+                            result.acceptEvent = true
+
+                            if(allowSplitSceneRequest && event.key === Qt.Key_N) {
+                                newSceneMenuItem.handle()
+                                return
+                            }
+
+                            if(event.key === Qt.Key_H) {
+                                editHeadingMenuItem.handle()
+                                return
+                            }
+
+                            if(sceneDocumentBinder.currentElement === null) {
+                                result.filter = false
+                                result.acceptEvent = false
+                                sceneTextArea.forceActiveFocus()
+                                doubleEnterMenu.close()
+                                return
+                            }
+
+                            switch(event.key) {
+                            case Qt.Key_A:
+                                sceneDocumentBinder.currentElement.type = SceneElement.Action
+                                break;
+                            case Qt.Key_C:
+                                sceneDocumentBinder.currentElement.type = SceneElement.Character
+                                break;
+                            case Qt.Key_D:
+                                sceneDocumentBinder.currentElement.type = SceneElement.Dialogue
+                                break;
+                            case Qt.Key_P:
+                                sceneDocumentBinder.currentElement.type = SceneElement.Parenthetical
+                                break;
+                            case Qt.Key_S:
+                                sceneDocumentBinder.currentElement.type = SceneElement.Shot
+                                break;
+                            case Qt.Key_T:
+                                sceneDocumentBinder.currentElement.type = SceneElement.Transition
+                                break;
+                            default:
+                                result.filter = false
+                                result.acceptEvent = false
+                            }
+
+                            sceneTextArea.forceActiveFocus()
+                            doubleEnterMenu.close()
+                        }
+
+                        MenuItem2 {
+                            id: editHeadingMenuItem
+                            text: "&Heading (H)"
+                            onClicked: handle()
+
+                            function handle() {
+                                if(scene.heading.enabled === false)
+                                    scene.heading.enabled = true
+                                sceneHeadingLoader.viewOnly = false
+                                doubleEnterMenu.close()
+                            }
+                        }
+
+                        Repeater {
+                            model: [
+                                { "value": SceneElement.Action, "display": "Action" },
+                                { "value": SceneElement.Character, "display": "Character" },
+                                { "value": SceneElement.Dialogue, "display": "Dialogue" },
+                                { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
+                                { "value": SceneElement.Shot, "display": "Shot" },
+                                { "value": SceneElement.Transition, "display": "Transition" }
+                            ]
+
+                            MenuItem2 {
+                                text: modelData.display + " (" + modelData.display[0] + ")"
+                                onClicked: {
+                                    if(sceneDocumentBinder.currentElement)
+                                        sceneDocumentBinder.currentElement.type = modelData.value
+                                    sceneTextArea.forceActiveFocus()
+                                    doubleEnterMenu.close()
+                                }
+                            }
+                        }
+
+                        MenuSeparator { }
+
+                        MenuItem2 {
+                            id: newSceneMenuItem
+                            text: "&New Scene (N)"
+                            onClicked: handle()
+                            enabled: allowSplitSceneRequest
+
+                            function handle() {
+                                scene.removeLastElementIfEmpty()
+                                scriteDocument.createNewScene()
+                                doubleEnterMenu.close()
+                            }
                         }
                     }
                 }
             }
+
             onActiveFocusChanged: {
                 if(activeFocus)
                     sceneHeadingLoader.viewOnly = true
@@ -496,7 +667,7 @@ Item {
                 }
 
                 if(binder.currentElement === null || binder.currentElement.text === "") {
-                    doubleEnterMenu.showup()
+                    doubleEnterMenu.show()
                 } else
                     event.accepted = false
             }
@@ -541,219 +712,13 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.RightButton
-                enabled: !editorContextMenu.visible && sceneTextArea.activeFocus
+                enabled: !editorContextMenu.active && sceneTextArea.activeFocus
                 onClicked: {
                     sceneTextArea.persistentSelection = true
                     editorContextMenu.popup()
                     mouse.accept = true
                 }
                 cursorShape: Qt.IBeamCursor
-            }
-
-            Menu2 {
-                id: doubleEnterMenu
-
-                property point mousePosition: app.mouseCursorPosition()
-
-                function showup() {
-                    mousePosition = app.mouseCursorPosition()
-                    app.moveMouseCursor( Qt.point(0,0) )
-                    popup(sceneTextArea.cursorRectangle.x, sceneTextArea.cursorRectangle.y+sceneTextArea.cursorRectangle.height)
-                }
-
-                onAboutToShow: sceneTextArea.persistentSelection = true
-                onAboutToHide: {
-                    sceneTextArea.persistentSelection = false
-                    app.moveMouseCursor( mousePosition )
-                }
-                width: 200
-
-                EventFilter.active: visible
-                EventFilter.target: app
-                EventFilter.events: [6]
-                EventFilter.onFilter: {
-                    result.filter = true
-                    result.acceptEvent = true
-
-                    if(allowSplitSceneRequest && event.key === Qt.Key_N) {
-                        newSceneMenuItem.handle()
-                        return
-                    }
-
-                    if(event.key === Qt.Key_H) {
-                        editHeadingMenuItem.handle()
-                        return
-                    }
-
-                    if(sceneDocumentBinder.currentElement === null) {
-                        result.filter = false
-                        result.acceptEvent = false
-                        sceneTextArea.forceActiveFocus()
-                        doubleEnterMenu.close()
-                        return
-                    }
-
-                    switch(event.key) {
-                    case Qt.Key_A:
-                        sceneDocumentBinder.currentElement.type = SceneElement.Action
-                        break;
-                    case Qt.Key_C:
-                        sceneDocumentBinder.currentElement.type = SceneElement.Character
-                        break;
-                    case Qt.Key_D:
-                        sceneDocumentBinder.currentElement.type = SceneElement.Dialogue
-                        break;
-                    case Qt.Key_P:
-                        sceneDocumentBinder.currentElement.type = SceneElement.Parenthetical
-                        break;
-                    case Qt.Key_S:
-                        sceneDocumentBinder.currentElement.type = SceneElement.Shot
-                        break;
-                    case Qt.Key_T:
-                        sceneDocumentBinder.currentElement.type = SceneElement.Transition
-                        break;
-                    default:
-                        result.filter = false
-                        result.acceptEvent = false
-                    }
-
-                    sceneTextArea.forceActiveFocus()
-                    doubleEnterMenu.close()
-                }
-
-                MenuItem2 {
-                    id: editHeadingMenuItem
-                    text: "&Heading (H)"
-                    onClicked: handle()
-
-                    function handle() {
-                        if(scene.heading.enabled === false)
-                            scene.heading.enabled = true
-                        sceneHeadingLoader.viewOnly = false
-                        doubleEnterMenu.close()
-                    }
-                }
-
-                Repeater {
-                    model: [
-                        { "value": SceneElement.Action, "display": "Action" },
-                        { "value": SceneElement.Character, "display": "Character" },
-                        { "value": SceneElement.Dialogue, "display": "Dialogue" },
-                        { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
-                        { "value": SceneElement.Shot, "display": "Shot" },
-                        { "value": SceneElement.Transition, "display": "Transition" }
-                    ]
-
-                    MenuItem2 {
-                        text: modelData.display + " (" + modelData.display[0] + ")"
-                        onClicked: {
-                            if(sceneDocumentBinder.currentElement)
-                                sceneDocumentBinder.currentElement.type = modelData.value
-                            sceneTextArea.forceActiveFocus()
-                            doubleEnterMenu.close()
-                        }
-                    }
-                }
-
-                MenuSeparator { }
-
-                MenuItem2 {
-                    id: newSceneMenuItem
-                    text: "&New Scene (N)"
-                    onClicked: handle()
-                    enabled: allowSplitSceneRequest
-
-                    function handle() {
-                        scene.removeLastElementIfEmpty()
-                        scriteDocument.createNewScene()
-                        doubleEnterMenu.close()
-                    }
-                }
-            }
-
-            Menu2 {
-                id: editorContextMenu
-                onAboutToShow: sceneTextArea.persistentSelection = true
-                onAboutToHide: sceneTextArea.persistentSelection = false
-
-                MenuItem2 {
-                    focusPolicy: Qt.NoFocus
-                    text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
-                    enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
-                    onClicked: { sceneTextArea.cut(); editorContextMenu.close() }
-                }
-
-                MenuItem2 {
-                    focusPolicy: Qt.NoFocus
-                    text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
-                    enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
-                    onClicked: { sceneTextArea.copy(); editorContextMenu.close() }
-                }
-
-                MenuItem2 {
-                    focusPolicy: Qt.NoFocus
-                    text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
-                    enabled: sceneTextArea.canPaste
-                    onClicked: { sceneTextArea.paste(); editorContextMenu.close() }
-                }
-
-                MenuSeparator {  }
-
-                MenuItem2 {
-                    focusPolicy: Qt.NoFocus
-                    text: "Split Scene"
-                    enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && allowSplitSceneRequest
-                    onClicked: {
-                        sceneEditor.splitSceneRequest(sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
-                        editorContextMenu.close()
-                    }
-                }
-
-                MenuSeparator {  }
-
-                Menu2 {
-                    title: "Format"
-
-                    Repeater {
-                        model: [
-                            { "value": SceneElement.Action, "display": "Action" },
-                            { "value": SceneElement.Character, "display": "Character" },
-                            { "value": SceneElement.Dialogue, "display": "Dialogue" },
-                            { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
-                            { "value": SceneElement.Shot, "display": "Shot" },
-                            { "value": SceneElement.Transition, "display": "Transition" }
-                        ]
-
-                        MenuItem2 {
-                            focusPolicy: Qt.NoFocus
-                            text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
-                            enabled: sceneDocumentBinder.currentElement !== null
-                            onClicked: {
-                                sceneDocumentBinder.currentElement.type = modelData.value
-                                editorContextMenu.close()
-                            }
-                        }
-                    }
-                }
-
-                Menu2 {
-                    title: "Translate"
-                    enabled: sceneTextArea.selectionEnd > sceneTextArea.selectionStart
-
-                    Repeater {
-                        model: app.enumerationModel(app.transliterationEngine, "Language")
-
-                        MenuItem2 {
-                            focusPolicy: Qt.NoFocus
-                            visible: index > 0
-                            text: modelData.key
-                            onClicked: {
-                                sceneTextArea.Transliterator.transliterateToLanguage(sceneTextArea.selectionStart, sceneTextArea.selectionEnd, modelData.value)
-                                editorContextMenu.close()
-                            }
-                        }
-                    }
-                }
             }
         }
     }

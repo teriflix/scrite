@@ -17,9 +17,9 @@
 #include <QObject>
 #include <QJsonArray>
 #include <QQmlEngine>
-#include <QBasicTimer>
 #include <QQuickTextDocument>
 
+#include "basictimer.h"
 #include "errorreport.h"
 #include "progressreport.h"
 
@@ -159,11 +159,11 @@ private:
     QString m_searchString;
     friend class SearchAgent;
     SearchFlags m_searchFlags;
-    QBasicTimer m_searchTimer;
+    BasicTimer m_searchTimer;
     ErrorReport *m_errorReport = new ErrorReport(this);
     int m_currentSearchResultIndex = -1;
     ProgressReport *m_progressReport = new ProgressReport(this);
-    QBasicTimer m_searchAgentSortTimer;
+    BasicTimer m_searchAgentSortTimer;
     QList<SearchAgent *> m_searchAgents;
     QList< QPair<SearchAgent*,int> > m_searchResults;
 };

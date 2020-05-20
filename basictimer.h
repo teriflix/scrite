@@ -11,14 +11,26 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.12
+#ifndef BASICTIMER_H
+#define BASICTIMER_H
 
-Menu {
-    Material.accent: primaryColors.key
-    Material.background: primaryColors.c100.background
-    Material.foreground: primaryColors.c50.text
-    objectName: title
-}
+#include <QString>
+#include <QBasicTimer>
+
+class BasicTimer : public QBasicTimer
+{
+public:
+    static BasicTimer *get(int timerId);
+
+    BasicTimer(const QString &name=QStringLiteral("Scrite Timer"));
+    ~BasicTimer();
+
+    QString name() const { return m_name; }
+    void setName(const QString &name) { m_name = name; }
+
+private:
+    QString m_name;
+};
+
+#endif // BASICTIMER_H
+
