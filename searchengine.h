@@ -19,7 +19,7 @@
 #include <QQmlEngine>
 #include <QQuickTextDocument>
 
-#include "basictimer.h"
+#include "simpletimer.h"
 #include "errorreport.h"
 #include "progressreport.h"
 
@@ -159,11 +159,11 @@ private:
     QString m_searchString;
     friend class SearchAgent;
     SearchFlags m_searchFlags;
-    BasicTimer m_searchTimer;
+    SimpleTimer m_searchTimer;
     ErrorReport *m_errorReport = new ErrorReport(this);
     int m_currentSearchResultIndex = -1;
     ProgressReport *m_progressReport = new ProgressReport(this);
-    BasicTimer m_searchAgentSortTimer;
+    SimpleTimer m_searchAgentSortTimer;
     QList<SearchAgent *> m_searchAgents;
     QList< QPair<SearchAgent*,int> > m_searchResults;
 };

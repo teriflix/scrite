@@ -15,7 +15,7 @@
 #define RESETONCHANGE_H
 
 #include <QQuickItem>
-#include "basictimer.h"
+#include "simpletimer.h"
 
 class ResetOnChange : public QQuickItem
 {
@@ -59,7 +59,7 @@ private:
     QVariant m_to = true;
     QVariant m_from = false;
     QVariant m_value = true;
-    BasicTimer m_timer;
+    SimpleTimer m_timer;
     QVariant m_trackChangesOn;
 };
 

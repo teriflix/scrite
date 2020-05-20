@@ -16,7 +16,7 @@
 
 #include <QObject>
 
-#include "basictimer.h"
+#include "simpletimer.h"
 
 /**
  * We need a class that deletes a QObject much later than what
@@ -40,7 +40,7 @@ protected:
 private:
     QObjectList m_objects;
     QObjectList m_shredder;
-    BasicTimer m_timer;
+    SimpleTimer m_timer;
 };
 
 #endif // GARBAGECOLLECTOR_H

@@ -14,7 +14,7 @@
 #ifndef TRANSLITERATION_H
 #define TRANSLITERATION_H
 
-#include "basictimer.h"
+#include "simpletimer.h"
 
 #include <QMap>
 #include <QFont>
@@ -260,7 +260,7 @@ private:
     QString m_text;
     qreal m_contentWidth = 0;
     qreal m_contentHeight = 0;
-    BasicTimer m_updateTimer;
+    SimpleTimer m_updateTimer;
     QTextDocument *m_textDocument = nullptr;
 };
 

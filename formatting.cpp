@@ -470,7 +470,7 @@ public:
 
     SceneElement *sceneElement() const { return m_sceneElement; }
 
-    void resetFormat() { m_formatMTime = QAtomicInt(); }
+    void resetFormat() { m_formatMTime = -1; }
     bool shouldUpdateFromFormat(const SceneElementFormat *format) {
         return format->isModified(&m_formatMTime);
     }
@@ -1069,7 +1069,7 @@ public:
     void timerEvent(QTimerEvent *event);
 
 private:
-    BasicTimer m_timer;
+    SimpleTimer m_timer;
 };
 
 ForceCursorPositionHack::ForceCursorPositionHack(SceneElement *element)

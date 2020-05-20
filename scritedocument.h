@@ -160,16 +160,16 @@ private:
     bool m_autoSaveMode = false;
     QString m_fileName;
     QString m_busyMessage;
-    BasicTimer m_autoSaveTimer;
+    SimpleTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
-    BasicTimer m_clearModifyTimer;
+    SimpleTimer m_clearModifyTimer;
     Structure* m_structure = nullptr;
     Screenplay* m_screenplay = nullptr;
     ScreenplayFormat* m_formatting = nullptr;
     ScreenplayFormat* m_printFormat = nullptr;
     int m_autoSaveDurationInSeconds = 60;
     QJsonArray m_structureElementSequence;
-    BasicTimer m_evaluateStructureElementSequenceTimer;
+    SimpleTimer m_evaluateStructureElementSequenceTimer;
 
     ErrorReport *m_errorReport = new ErrorReport(this);
     ProgressReport *m_progressReport = new ProgressReport(this);

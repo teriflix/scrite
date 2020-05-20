@@ -161,6 +161,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.top: toolbar.bottom
         anchors.margins: 3
+        cacheBuffer: Math.ceil(height / 300) * 2
         clip: true
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AlwaysOn

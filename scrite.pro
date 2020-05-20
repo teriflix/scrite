@@ -18,7 +18,6 @@ HEADERS += \
     aggregation.h \
     application.h \
     autoupdate.h \
-    basictimer.h \
     characterreportgenerator.h \
     completer.h \
     delayedpropertybinder.h \
@@ -63,6 +62,7 @@ HEADERS += \
     screenplay.h \
     scritedocument.h \
     searchengine.h \
+    simpletimer.h \
     structure.h \
     structureexporter.h \
     textexporter.h \
@@ -85,7 +85,6 @@ SOURCES += \
     aggregation.cpp \
     application.cpp \
     autoupdate.cpp \
-    basictimer.cpp \
     characterreportgenerator.cpp \
     completer.cpp \
     delayedpropertybinder.cpp \
@@ -126,6 +125,7 @@ SOURCES += \
     screenplay.cpp \
     scritedocument.cpp \
     searchengine.cpp \
+    simpletimer.cpp \
     structure.cpp \
     structureexporter.cpp \
     textexporter.cpp \

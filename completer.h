@@ -16,7 +16,7 @@
 
 #include <QCompleter>
 
-#include "basictimer.h"
+#include "simpletimer.h"
 
 class QStringListModel;
 class Completer : public QCompleter
@@ -61,7 +61,7 @@ private:
     QStringList m_strings;
     SuggestionMode m_suggestionMode = AutoCompleteSuggestion;
     QStringListModel *m_stringsModel = nullptr;
-    BasicTimer m_updateSuggestionTimer;
+    SimpleTimer m_updateSuggestionTimer;
 };
 
 #endif // COMPLETER_H

@@ -16,7 +16,7 @@
 
 #include "note.h"
 #include "scene.h"
-#include "basictimer.h"
+#include "simpletimer.h"
 #include "abstractshapeitem.h"
 
 #include <QColor>
@@ -328,7 +328,7 @@ private:
 
     void updateLocationHeadingMap();
     void updateLocationHeadingMapLater();
-    BasicTimer m_locationHeadingsMapTimer;
+    SimpleTimer m_locationHeadingsMapTimer;
     QMap< QString, QList<SceneHeading*> > m_locationHeadingsMap;
 
     void onStructureElementSceneChanged(StructureElement *element=nullptr);
@@ -400,7 +400,7 @@ private:
 private:
     LineType m_lineType = StraightLine;
     QPointF m_arrowPosition;
-    BasicTimer m_updateTimer;
+    SimpleTimer m_updateTimer;
     qreal m_arrowAndLabelSpacing = 30;
     StructureElement* m_toElement = nullptr;
     StructureElement* m_fromElement = nullptr;

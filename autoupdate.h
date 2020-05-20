@@ -19,7 +19,7 @@
 #include <QObject>
 #include <QJsonObject>
 
-#include "basictimer.h"
+#include "simpletimer.h"
 
 class AutoUpdate : public QObject
 {
@@ -61,7 +61,7 @@ private:
     // to consider before we are able to do that.
     QUrl m_url = QUrl("http://www.teriflix.in/scrite/latest_release.json");
     QJsonObject m_updateInfo;
-    BasicTimer m_updateTimer;
+    SimpleTimer m_updateTimer;
 };
 
 #endif // AUTOUPDATE_H

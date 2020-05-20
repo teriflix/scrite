@@ -14,7 +14,7 @@
 #include "application.h"
 #include "undoredo.h"
 #include "autoupdate.h"
-#include "basictimer.h"
+#include "simpletimer.h"
 
 #include <QDir>
 #include <QtDebug>
@@ -308,7 +308,7 @@ public:
     void timerEvent(QTimerEvent *event);
 
 private:
-    BasicTimer m_timer;
+    SimpleTimer m_timer;
     QJSValue m_function;
     QJSValueList m_arguments;
 };
@@ -528,8 +528,7 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
                     .arg((unsigned long)((void*)object),0,16)
                     .arg(object->objectName())
                     .arg(parentName);
-            if(!item || (item && item->parentItem()))
-                from[object] = objectName;
+            from[object] = objectName;
         }
         return objectName;
     };
@@ -543,7 +542,7 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
     {
         const QString objectName = evaluateObjectName(object, objectNameMap);
         QTimerEvent *te = static_cast<QTimerEvent*>(event);
-        BasicTimer *timer = BasicTimer::get(te->timerId());
+        SimpleTimer *timer = SimpleTimer::get(te->timerId());
         qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
     }
 #else
