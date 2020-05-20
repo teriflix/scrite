@@ -37,7 +37,6 @@ HEADERS += \
     htmlexporter.h \
     htmlimporter.h \
     locationreportgenerator.h \
-    logger.h \
     materialcolors.h \
     modifiable.h \
     note.h \
@@ -104,7 +103,6 @@ SOURCES += \
     htmlexporter.cpp \
     htmlimporter.cpp \
     locationreportgenerator.cpp \
-    logger.cpp \
     main.cpp \
     materialcolors.cpp \
     note.cpp \

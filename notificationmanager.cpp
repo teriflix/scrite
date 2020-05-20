@@ -13,7 +13,6 @@
 
 #include "notificationmanager.h"
 #include "notification.h"
-#include "logger.h"
 
 #include <QtDebug>
 
@@ -79,7 +78,6 @@ void NotificationManager::dismissNotification(int row)
         return;
 
     Notification *notification = m_notifications.at(row);
-    Logger::qtInfo(this, QString("dismissNotification %1 %2").arg(row).arg(Logger::objectInfo(notification)));
 
     // this->removeNotification(notification);, will be called by setActive(false) of Notification
     notification->setActive(false);
@@ -96,8 +94,6 @@ void NotificationManager::addNotification(Notification *notification)
     this->endInsertRows();
 
     emit countChanged();
-
-    Logger::qtInfo(this, QString("addNotification %1 %2").arg(size).arg(Logger::objectInfo(notification)));
 }
 
 void NotificationManager::removeNotification(Notification *notification)
@@ -111,6 +107,4 @@ void NotificationManager::removeNotification(Notification *notification)
     this->endRemoveRows();
 
     emit countChanged();
-
-    Logger::qtInfo(this, QString("removeNotification %1 %2").arg(row).arg(Logger::objectInfo(notification)));
 }

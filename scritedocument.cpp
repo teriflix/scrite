@@ -13,7 +13,6 @@
 
 #include "scritedocument.h"
 
-#include "logger.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "aggregation.h"
@@ -124,8 +123,6 @@ void ScriteDocument::setAutoSaveDurationInSeconds(int val)
     Application::instance()->settings()->setValue("AutoSave/autoSaveInterval", val);
     this->prepareAutoSave();
     emit autoSaveDurationInSecondsChanged();
-
-    Logger::qtPropertyInfo(this, "autoSaveDurationInSeconds");
 }
 
 void ScriteDocument::setAutoSave(bool val)
@@ -137,8 +134,6 @@ void ScriteDocument::setAutoSave(bool val)
     Application::instance()->settings()->setValue("AutoSave/autoSaveEnabled", val);
     this->prepareAutoSave();
     emit autoSaveChanged();
-
-    Logger::qtPropertyInfo(this, "autoSave");
 }
 
 void ScriteDocument::setBusy(bool val)
@@ -559,7 +554,6 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
     {
         if(m_modified && !m_fileName.isEmpty() && QFileInfo(m_fileName).isWritable())
         {
-            Logger::qtInfo(this, QString("Auto saving to %1").arg(m_fileName));
             QScopedValueRollback<bool> autoSave(m_autoSaveMode, true);
             this->save();
         }

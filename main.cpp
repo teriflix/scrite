@@ -21,7 +21,6 @@
 #include <QQuickStyle>
 #include <QFontDatabase>
 
-#include "logger.h"
 #include "undoredo.h"
 #include "completer.h"
 #include "autoupdate.h"
@@ -45,6 +44,38 @@
 #include "abstractreportgenerator.h"
 #include "qtextdocumentpagedprinter.h"
 
+void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, const QString &message)
+{
+#ifdef QT_NO_DEBUG
+    Q_UNUSED(type)
+    Q_UNUSED(context)
+    Q_UNUSED(message)
+#else
+    QString logMessage;
+
+    QTextStream ts(&logMessage, QIODevice::WriteOnly);
+    switch(type)
+    {
+    case QtDebugMsg: ts << "Debug: "; break;
+    case QtWarningMsg: ts << "Warning: "; break;
+    case QtCriticalMsg: ts << "Critical: "; break;
+    case QtFatalMsg: ts << "Fatal: "; break;
+    case QtInfoMsg: ts << "Info: "; break;
+    }
+
+    const char *where = context.function ? context.function : context.file;
+    static const char *somewhere = "Somewhere";
+    if(where == nullptr)
+        where = somewhere;
+
+    ts << "[" << where << " / " << context.line << "] - ";
+    ts << message;
+    ts.flush();
+
+    fprintf(stderr, "%s\n", qPrintable(logMessage));
+#endif
+}
+
 int main(int argc, char **argv)
 {
     const QVersionNumber applicationVersion(0, 3, 3);
@@ -53,14 +84,7 @@ int main(int argc, char **argv)
     Application::setOrganizationDomain("teriflix.com");
     Application::setApplicationVersion(applicationVersion.toString() + "-beta");
 
-#ifdef QT_NO_DEBUG
-    qInstallMessageHandler(&Logger::qtMessageHandler);
-//    Logger::instance()->log(
-//                QString("%1 %2 Version %3 Launched")
-//                  .arg(QApplication::organizationName())
-//                  .arg(QApplication::applicationName())
-//                  .arg(QApplication::applicationVersion()));
-#endif
+    qInstallMessageHandler(ScriteQtMessageHandler);
 
     Application a(argc, argv, applicationVersion);
 
@@ -173,7 +197,6 @@ int main(int argc, char **argv)
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
     qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
-    qmlView.engine()->rootContext()->setContextProperty("logger", Logger::instance());
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);

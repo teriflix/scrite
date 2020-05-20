@@ -13,7 +13,6 @@
 
 #include "notification.h"
 #include "notificationmanager.h"
-#include "logger.h"
 
 #include <QEvent>
 
@@ -42,9 +41,6 @@ void Notification::setTitle(const QString &val)
 
     m_title = val;
     emit titleChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "title");
 }
 
 void Notification::setText(const QString &val)
@@ -54,9 +50,6 @@ void Notification::setText(const QString &val)
 
     m_text = val;
     emit textChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "text");
 }
 
 void Notification::setColor(const QColor &val)
@@ -66,9 +59,6 @@ void Notification::setColor(const QColor &val)
 
     m_color = val;
     emit colorChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "color");
 }
 
 void Notification::setTextColor(const QColor &val)
@@ -78,9 +68,6 @@ void Notification::setTextColor(const QColor &val)
 
     m_textColor = val;
     emit textColorChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "textColor");
 }
 
 void Notification::setActive(bool val)
@@ -103,18 +90,6 @@ void Notification::setActive(bool val)
     }
 
     emit activeChanged();
-
-    Logger::qtPropertyInfo(this, "active");
-    if(m_active)
-    {
-        Logger::qtPropertyInfo(this, "title");
-        Logger::qtPropertyInfo(this, "text");
-        Logger::qtPropertyInfo(this, "buttons");
-        Logger::qtPropertyInfo(this, "autoClose");
-        Logger::qtPropertyInfo(this, "autoCloseDelay");
-        Logger::qtPropertyInfo(this, "color");
-        Logger::qtPropertyInfo(this, "textColor");
-    }
 }
 
 void Notification::setAutoClose(bool val)
@@ -129,9 +104,6 @@ void Notification::setAutoClose(bool val)
         m_autoCloseTimer.stop();
 
     emit autoCloseChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "autoClose");
 }
 
 void Notification::setAutoCloseDelay(int val)
@@ -144,9 +116,6 @@ void Notification::setAutoCloseDelay(int val)
         m_autoCloseTimer.start(m_autoCloseDelay, this);
 
     emit autoCloseDelayChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "autoCloseDelay");
 }
 
 void Notification::setButtons(const QStringList &val)
@@ -156,26 +125,16 @@ void Notification::setButtons(const QStringList &val)
 
     m_buttons = val;
     emit buttonsChanged();
-
-    if(m_active)
-        Logger::qtPropertyInfo(this, "buttons");
 }
 
 void Notification::notifyButtonClick(int index)
 {
     if( !m_active )
-    {
-        Logger::qtInfo(this, "Attempting to click on a notification button when not active.");
         return;
-    }
 
     if( index < 0 || index >= m_buttons.size() )
-    {
-        Logger::qtInfo(this, QString("Invalid button index set for notifyButtonClick(%1). Max = %2").arg(index).arg(m_buttons.size()-1));
         return;
-    }
 
-    Logger::qtInfo(this, QString("Buttion '%1' was clicked.").arg(m_buttons.at(index)));
     emit buttonClicked(index);
 
     this->setActive(false);
@@ -184,10 +143,7 @@ void Notification::notifyButtonClick(int index)
 void Notification::doAutoClose()
 {   
     if(m_active && m_autoClose)
-    {
-        Logger::qtPropertyInfo(this, "doAutoClose");
         this->setActive(false);
-    }
 }
 
 void Notification::timerEvent(QTimerEvent *te)

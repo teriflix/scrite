@@ -12,8 +12,6 @@
 ****************************************************************************/
 
 #include "application.h"
-
-#include "logger.h"
 #include "undoredo.h"
 #include "autoupdate.h"
 #include "basictimer.h"
@@ -516,7 +514,8 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
     auto evaluateObjectName = [](QObject *object, QMap<QObject*,QString> &from) {
         QString objectName = from.value(object);
         if(objectName.isEmpty()) {
-            QObject *parent = object->parent();
+            QQuickItem *item = qobject_cast<QQuickItem*>(object);
+            QObject* parent = item && item->parentItem() ? item->parentItem() : object->parent();
             QString parentName = parent ? from.value(parent) : "No Parent";
             if(parentName.isEmpty()) {
                 parentName = QString("%1 [%2] (%3)")
@@ -529,18 +528,23 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
                     .arg((unsigned long)((void*)object),0,16)
                     .arg(object->objectName())
                     .arg(parentName);
-            from[object] = objectName;
+            if(!item || (item && item->parentItem()))
+                from[object] = objectName;
         }
         return objectName;
     };
 
     if(event->type() == QEvent::DeferredDelete)
-        qDebug() << "DeferredDelete: " << evaluateObjectName(object, objectNameMap);
+    {
+        const QString objectName = evaluateObjectName(object, objectNameMap);
+        qDebug() << "DeferredDelete: " << objectName;
+    }
     else if(event->type() == QEvent::Timer)
     {
+        const QString objectName = evaluateObjectName(object, objectNameMap);
         QTimerEvent *te = static_cast<QTimerEvent*>(event);
         BasicTimer *timer = BasicTimer::get(te->timerId());
-        qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << evaluateObjectName(object, objectNameMap) << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
+        qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
     }
 #else
     Q_UNUSED(object)

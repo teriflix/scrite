@@ -11,7 +11,6 @@
 **
 ****************************************************************************/
 
-#include "logger.h"
 #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 

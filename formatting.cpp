@@ -11,7 +11,6 @@
 **
 ****************************************************************************/
 
-#include "logger.h"
 #include "formatting.h"
 #include "application.h"
 #include "scritedocument.h"
