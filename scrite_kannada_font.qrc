@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Kannada/BalooTamma2-Bold.ttf</file>
+        <file>font/Kannada/BalooTamma2-Regular.ttf</file>
+    </qresource>
+</RCC>

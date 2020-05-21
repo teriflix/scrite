@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/English/CourierPrime-Bold.ttf</file>
+        <file>font/English/CourierPrime-BoldItalic.ttf</file>
+        <file>font/English/CourierPrime-Italic.ttf</file>
+        <file>font/English/CourierPrime-Regular.ttf</file>
+    </qresource>
+</RCC>

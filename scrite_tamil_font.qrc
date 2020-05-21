@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Tamil/HindMadurai-Bold.ttf</file>
+        <file>font/Tamil/HindMadurai-Regular.ttf</file>
+    </qresource>
+</RCC>

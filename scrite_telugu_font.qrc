@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Telugu/HindGuntur-Bold.ttf</file>
+        <file>font/Telugu/HindGuntur-Regular.ttf</file>
+    </qresource>
+</RCC>

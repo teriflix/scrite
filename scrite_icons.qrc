@@ -1,34 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>font/Bengali/HindSiliguri-Bold.ttf</file>
-        <file>font/Bengali/HindSiliguri-Regular.ttf</file>
-        <file>font/English/CourierPrime-Bold.ttf</file>
-        <file>font/English/CourierPrime-BoldItalic.ttf</file>
-        <file>font/English/CourierPrime-Italic.ttf</file>
-        <file>font/English/CourierPrime-Regular.ttf</file>
-        <file>font/Gujarati/HindVadodara-Bold.ttf</file>
-        <file>font/Gujarati/HindVadodara-Regular.ttf</file>
-        <file>font/Hindi/Mukta-Bold.ttf</file>
-        <file>font/Hindi/Mukta-Regular.ttf</file>
-        <file>font/Kannada/BalooTamma2-Bold.ttf</file>
-        <file>font/Kannada/BalooTamma2-Regular.ttf</file>
-        <file>font/Malayalam/BalooChettan2-Bold.ttf</file>
-        <file>font/Malayalam/BalooChettan2-Regular.ttf</file>
-        <file>font/Oriya/BalooBhaina2-Bold.ttf</file>
-        <file>font/Oriya/BalooBhaina2-Regular.ttf</file>
-        <file>font/Punjabi/BalooPaaji2-Bold.ttf</file>
-        <file>font/Punjabi/BalooPaaji2-Regular.ttf</file>
-        <file>font/Sanskrit/Mukta-Bold.ttf</file>
-        <file>font/Sanskrit/Mukta-Regular.ttf</file>
-        <file>font/Tamil/HindMadurai-Bold.ttf</file>
-        <file>font/Tamil/HindMadurai-Regular.ttf</file>
-        <file>font/Telugu/HindGuntur-Bold.ttf</file>
-        <file>font/Telugu/HindGuntur-Regular.ttf</file>
         <file>icons/action/delete.png</file>
         <file>icons/action/delete_inverted.png</file>
         <file>icons/action/description.png</file>
         <file>icons/action/description_inverted.png</file>
         <file>icons/action/dialog_close_button.png</file>
+        <file>icons/action/done_all.png</file>
+        <file>icons/action/done_all_inverted.png</file>
         <file>icons/action/keyboard_arrow_down.png</file>
         <file>icons/action/keyboard_arrow_down_inverted.png</file>
         <file>icons/action/keyboard_arrow_up.png</file>
@@ -67,6 +45,10 @@
         <file>icons/file/folder_open_inverted.png</file>
         <file>icons/file/import_export.png</file>
         <file>icons/file/import_export_inverted.png</file>
+        <file>icons/hardware/keyboard.png</file>
+        <file>icons/hardware/keyboard_hide.png</file>
+        <file>icons/hardware/keyboard_hide_inverted.png</file>
+        <file>icons/hardware/keyboard_inverted.png</file>
         <file>icons/navigation/close.png</file>
         <file>icons/navigation/close_inverted.png</file>
         <file>icons/navigation/fullscreen.png</file>
@@ -85,14 +67,5 @@
         <file>icons/screenplay/paranthetical.png</file>
         <file>icons/screenplay/shot.png</file>
         <file>icons/screenplay/transition.png</file>
-        <file>images/appicon.png</file>
-        <file>images/notebookpage.jpg</file>
-        <file>images/teriflix_logo.png</file>
-        <file>icons/action/done_all.png</file>
-        <file>icons/action/done_all_inverted.png</file>
-        <file>icons/hardware/keyboard.png</file>
-        <file>icons/hardware/keyboard_inverted.png</file>
-        <file>icons/hardware/keyboard_hide.png</file>
-        <file>icons/hardware/keyboard_hide_inverted.png</file>
     </qresource>
 </RCC>

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Bengali/HindSiliguri-Bold.ttf</file>
+        <file>font/Bengali/HindSiliguri-Regular.ttf</file>
+    </qresource>
+</RCC>

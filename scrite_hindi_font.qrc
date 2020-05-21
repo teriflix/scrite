@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Hindi/Mukta-Bold.ttf</file>
+        <file>font/Hindi/Mukta-Regular.ttf</file>
+    </qresource>
+</RCC>

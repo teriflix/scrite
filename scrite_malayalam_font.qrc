@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Malayalam/BalooChettan2-Bold.ttf</file>
+        <file>font/Malayalam/BalooChettan2-Regular.ttf</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Punjabi/BalooPaaji2-Bold.ttf</file>
+        <file>font/Punjabi/BalooPaaji2-Regular.ttf</file>
+    </qresource>
+</RCC>

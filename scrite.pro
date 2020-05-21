@@ -136,7 +136,19 @@ SOURCES += \
     undoredo.cpp
 
 RESOURCES += \
-    scrite.qrc \
+    scrite_bengali_font.qrc \
+    scrite_english_font.qrc \
+    scrite_gujarati_font.qrc \
+    scrite_hindi_font.qrc \
+    scrite_kannada_font.qrc \
+    scrite_malayalam_font.qrc \
+    scrite_oriya_font.qrc \
+    scrite_punjabi_font.qrc \
+    scrite_sanskrit_font.qrc \
+    scrite_tamil_font.qrc \
+    scrite_telugu_font.qrc \
+    scrite_icons.qrc \
+    scrite_images.qrc \
     scrite_ui.qrc
 
 macx {
