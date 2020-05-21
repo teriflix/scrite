@@ -14,6 +14,8 @@
 #include "fountainimporter.h"
 #include "application.h"
 
+#include <QRegExp>
+
 FountainImporter::FountainImporter(QObject *parent)
     : AbstractImporter(parent)
 {
@@ -40,7 +42,8 @@ bool FountainImporter::doImport(QIODevice *device)
     static const QStringList headerhints = QStringList() <<
             "INT" << "EXT" << "EST" << "INT./EXT" << "INT/EXT" << "I/E";
     bool inCharacter = false;
-    bool hasParaBreaks = false;
+    bool hasParaBreak = false;
+    bool mergeWithLastPara = false;
     auto maybeCharacter = [](QString &text) {
         if(text.startsWith("@")) {
             text = text.remove(0, 1);
@@ -63,6 +66,8 @@ bool FountainImporter::doImport(QIODevice *device)
 
     const QChar space(' ');
     const QByteArray bytes = device->readAll();
+    const QRegExp multipleSpaces("\\s+");
+    const QString singleSpace(" ");
 
     QTextStream ts(bytes);
     ts.setCodec("utf-8");
@@ -72,12 +77,14 @@ bool FountainImporter::doImport(QIODevice *device)
     {
         QString line = ts.readLine();
         line = line.trimmed();
+        line.replace(multipleSpaces, singleSpace);
 
         if(line.isEmpty())
         {
             inCharacter = false;
-            hasParaBreaks = true;
+            hasParaBreak = true;
             character = nullptr;
+            mergeWithLastPara = false;
             continue;
         }
 
@@ -291,28 +298,28 @@ bool FountainImporter::doImport(QIODevice *device)
             continue;
         }
 
-
         if(inCharacter)
         {
             para->setType(SceneElement::Dialogue);
-            if(!hasParaBreaks)
+            if(!hasParaBreak)
                 inCharacter = false;
         }
         else
             para->setType(SceneElement::Action);
 
         SceneElement *prevPara = currentScene->elementCount() > 0 ? currentScene->elementAt( currentScene->elementCount()-1 ) : nullptr;
-        if(prevPara && prevPara->type() == para->type() && !hasParaBreaks)
+        if(prevPara && prevPara->type() == para->type() && mergeWithLastPara)
         {
             prevPara->setText( prevPara->text() + space + para->text() );
             delete para;
             para = nullptr;
         }
         else
+        {
             currentScene->addElement(para);
+            mergeWithLastPara = true;
+        }
     }
-
-    screenplay->setCurrentElementIndex(0);
 
     return true;
 }

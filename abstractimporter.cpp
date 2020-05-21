@@ -61,9 +61,13 @@ bool AbstractImporter::read()
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
     this->progress()->setProgressText( QString("Importing from \"%1\"").arg(classInfo.value()));
 
+    ScriteDocument *doc = this->document();
+    Screenplay *screenplay = doc->screenplay();
+
     this->progress()->start();
     UndoStack::ignoreUndoCommands = true;
     const bool ret = this->doImport(&file);
+    screenplay->setCurrentElementIndex(0);
     UndoStack::ignoreUndoCommands = false;
     UndoStack::clearAllStacks();
     this->progress()->finish();
