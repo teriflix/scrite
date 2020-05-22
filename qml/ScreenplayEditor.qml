@@ -193,6 +193,10 @@ Item {
                 to: true
             }
         }
+        footer: Item {
+            width: screenplayListView.width
+            height: scriteDocument.screenplay.elementCount > 0 ? screenplayListView.height/2 : 0
+        }
         onMovingChanged: {
             if(moving)
                 characterMenu.close()
