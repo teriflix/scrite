@@ -164,6 +164,9 @@ DISTFILES += \
     Info.plist \
     License.txt \
     README \
+    packaging/linux/install.sh \
+    packaging/linux/package.sh \
+    packaging/linux/scrite.desktop \
     packaging/windows/package.bat \
     packaging/windows/installer.nsi \
     packaging/mac/packaging.sh \
