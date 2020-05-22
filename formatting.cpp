@@ -1063,29 +1063,30 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
 class ForceCursorPositionHack : public QObject
 {
 public:
-    ForceCursorPositionHack(SceneElement *element);
+    ForceCursorPositionHack(const QTextBlock &block, SceneDocumentBinder *binder);
     ~ForceCursorPositionHack();
 
     void timerEvent(QTimerEvent *event);
 
 private:
+    QTextBlock m_block;
     SimpleTimer m_timer;
+    SceneDocumentBinder *m_binder = nullptr;
 };
 
-ForceCursorPositionHack::ForceCursorPositionHack(SceneElement *element)
-    : QObject(element),
-      m_timer("ForceCursorPositionHack.m_timer")
+ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, SceneDocumentBinder *binder)
+    : QObject(const_cast<QTextDocument*>(block.document())),
+      m_block(block),
+      m_timer("ForceCursorPositionHack.m_timer"),
+      m_binder(binder)
 {
-    if(!element->text().isEmpty()) {
+    if(!m_block.text().isEmpty()) {
         GarbageCollector::instance()->add(this);
         return;
     }
 
-    Scene *scene = element->scene();
-    scene->sceneAboutToReset();
-    element->setText(QString("("));
-    scene->sceneReset(scene->cursorPosition());
-
+    QTextCursor cursor(m_block);
+    cursor.insertText(QStringLiteral("("));
     m_timer.start(0, this);
 }
 
@@ -1096,15 +1097,21 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
     if(event->timerId() == m_timer.timerId())
     {
         m_timer.stop();
-        SceneElement *element = qobject_cast<SceneElement*>(this->parent());
-        Scene *scene = element->scene();
-        scene->sceneAboutToReset();
-        const int cp = scene->cursorPosition();
-        if(element->type() == SceneElement::Parenthetical)
-            element->setText(QStringLiteral("()"));
-        else
-            element->setText(QString());
-        scene->sceneReset(cp);
+        QTextCursor cursor(m_block);
+        cursor.deleteChar();
+
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(m_block);
+        if(userData && userData->sceneElement()->type() == SceneElement::Parenthetical)
+        {
+            if(m_block.text().isEmpty())
+            {
+                cursor.insertText(QStringLiteral("()"));
+                cursor.movePosition(QTextCursor::Left);
+            }
+        }
+
+        emit m_binder->requestCursorPosition(cursor.position());
+
         GarbageCollector::instance()->add(this);
     }
 }
@@ -1133,7 +1140,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
             userData->resetFormat();
             this->rehighlightBlock(block);
             if(element->text().isEmpty())
-                new ForceCursorPositionHack(element);
+                new ForceCursorPositionHack(block, this);
             return true;
         }
         return false;
