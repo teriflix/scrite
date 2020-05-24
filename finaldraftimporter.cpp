@@ -47,7 +47,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     }
 
     const int fdxVersion = rootE.attribute("Version").toInt();
-    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 2 || fdxVersion > 4)
+    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 1 || fdxVersion > 4)
     {
         this->error()->setErrorMessage("Unrecognised Final Draft file version.");
         return false;
