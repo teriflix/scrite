@@ -93,6 +93,11 @@ public:
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
+    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
+    bool isLoading() const { return m_loading; }
+    Q_SIGNAL void loadingChanged();
+    bool m_loading = false;
+
     Q_INVOKABLE void reset();
 
     Q_INVOKABLE void open(const QString &fileName);
@@ -126,6 +131,7 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
+    void setLoading(bool val);
     void prepareAutoSave();
     void updateDocumentWindowTitle();
     void setDocumentWindowTitle(const QString &val);

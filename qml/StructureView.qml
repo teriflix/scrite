@@ -217,7 +217,7 @@ Item {
 
             Repeater {
                 id: elementConnectorItems
-                model: displayContent ? scriteDocument.structureElementSequence : 0
+                model: scriteDocument.loading ? 0 : scriteDocument.structureElementSequence
                 delegate: elementConnectorComponent
             }
 
@@ -235,7 +235,7 @@ Item {
 
             Repeater {
                 id: elementItems
-                model: displayContent ? scriteDocument.structure.elements : 0
+                model: scriteDocument.loading ? 0 : scriteDocument.structure.elements
                 delegate: structureElementDelegate
             }
 
@@ -541,7 +541,4 @@ Item {
             }
         }
     }
-
-    readonly property ProgressReport documentProgress: Aggregation.findProgressReport(scriteDocument)
-    readonly property bool displayContent: documentProgress.status === ProgressReport.Finished || documentProgress.status === ProgressReport.NotStarted
 }

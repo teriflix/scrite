@@ -173,7 +173,7 @@ Item {
             opacity: active ? 1 : 0.2
             Behavior on opacity { NumberAnimation { duration: 250 } }
         }
-        model: scriteDocument.screenplay
+        model: scriteDocument.loading ? 0 : scriteDocument.screenplay
         delegate: Loader {
             property bool hasSceneContent: screenplayElement.elementType === ScreenplayElement.SceneElementType
             width: screenplayListView.width

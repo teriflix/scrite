@@ -570,6 +570,15 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
     QObject::timerEvent(event);
 }
 
+void ScriteDocument::setLoading(bool val)
+{
+    if(m_loading == val)
+        return;
+
+    m_loading = val;
+    emit loadingChanged();
+}
+
 void ScriteDocument::prepareAutoSave()
 {
     if(m_autoSave)
@@ -816,6 +825,7 @@ bool ScriteDocument::load(const QString &fileName)
     m_fileName = fileName;
     emit fileNameChanged();
 
+    this->setLoading(true);
     m_progressReport->start();
 
     UndoStack::ignoreUndoCommands = true;
@@ -824,6 +834,7 @@ bool ScriteDocument::load(const QString &fileName)
     UndoStack::clearAllStacks();
 
     m_progressReport->finish();
+    this->setLoading(false);
 
     // When we finish loading, QML begins lazy initialization of the UI
     // for displaying the document. In the process even a small 1/2 pixel

@@ -149,7 +149,7 @@ Item {
         clip: true
         property bool somethingIsBeingDropped: false
         visible: count > 0 || somethingIsBeingDropped
-        model: scriteDocument.screenplay
+        model: scriteDocument.loading ? 0 : scriteDocument.screenplay
         property real minimumDelegateWidth: 100
         property real perElementWidth: 2.5
         property bool moveMode: false
