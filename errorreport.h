@@ -48,7 +48,7 @@ public:
     Q_PROPERTY(QStringList warningMessages READ warningMessages NOTIFY warningMessageCountChanged)
     QStringList warningMessages() const { return m_warningMessages; }
 
-    void clear();
+    Q_INVOKABLE void clear();
     void addWarning(const QString &warning);
 
     // QAbstractItemModel interface

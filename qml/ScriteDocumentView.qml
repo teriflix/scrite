@@ -1050,6 +1050,7 @@ Item {
         Notification.text: errorReport.errorMessage
         Notification.active: errorReport.hasError
         Notification.autoClose: false
+        Notification.onDismissed: errorReport.clear()
 
         Component.onCompleted: {
             var availableModes = {

@@ -47,7 +47,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     }
 
     const int fdxVersion = rootE.attribute("Version").toInt();
-    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 2 || fdxVersion >4)
+    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 2 || fdxVersion > 4)
     {
         this->error()->setErrorMessage("Unrecognised Final Draft file version.");
         return false;
@@ -60,7 +60,6 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         this->error()->setErrorMessage("No paragraphs to import.");
         return false;
     }
-
 
     Scene *scene = nullptr;
     this->progress()->setProgressStep(1.0 / qreal(paragraphs.size()+1));

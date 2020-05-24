@@ -50,8 +50,6 @@ void ErrorReport::setProxyFor(ErrorReport *val)
         this->endResetModel();
         emit warningMessageCountChanged();
     }
-    else
-        this->clear();
 
     emit proxyForChanged();
 }
