@@ -620,6 +620,8 @@ void Structure::removeElement(StructureElement *ptr)
     emit elementCountChanged();
     emit elementsChanged();
 
+    this->resetCurentElementIndex();
+
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
 }
@@ -653,6 +655,8 @@ void Structure::insertElement(StructureElement *ptr, int index)
 
     emit elementCountChanged();
     emit elementsChanged();
+
+    this->setCurrentElementIndex(index);
 }
 
 void Structure::moveElement(StructureElement *ptr, int toRow)
@@ -669,6 +673,8 @@ void Structure::moveElement(StructureElement *ptr, int toRow)
 
     m_elements.move(fromRow, toRow);
     emit elementsChanged();
+
+    this->resetCurentElementIndex();
 }
 
 StructureElement *Structure::elementAt(int index) const
@@ -740,8 +746,6 @@ QStringList Structure::standardMoments() const
 
 void Structure::setCurrentElementIndex(int val)
 {
-    if(val < 0)
-        qDebug() << "Catch this guy..";
     val = qBound(-1, val, m_elements.size()-1);
     if(m_currentElementIndex == val)
         return;
@@ -856,6 +860,18 @@ void Structure::timerEvent(QTimerEvent *event)
     }
 
     QObject::timerEvent(event);
+}
+
+void Structure::resetCurentElementIndex()
+{
+    int val = m_currentElementIndex;
+    if(m_elements.isEmpty())
+        val = -1;
+    else
+        val = qBound(0, val, m_elements.size()-1);
+    m_currentElementIndex = -2;
+
+    this->setCurrentElementIndex(val);
 }
 
 StructureElement *Structure::splitElement(StructureElement *ptr, SceneElement *element, int textPosition)

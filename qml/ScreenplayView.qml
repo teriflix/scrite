@@ -423,8 +423,7 @@ Item {
         var element = screenplayElementComponent.createObject()
         element.sceneID = sceneID
         scriteDocument.screenplay.insertElementAt(element, index)
-        if(element.elementType === ScreenplayElement.SceneElementType)
-            scriteDocument.screenplay.currentElementIndex = index
+        requestEditor()
     }
 
     Component {

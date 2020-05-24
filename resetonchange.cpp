@@ -57,6 +57,7 @@ void ResetOnChange::setTo(const QVariant &val)
     m_to = val;
     m_value = m_to;
     emit toChanged();
+    emit valueChanged();
 }
 
 void ResetOnChange::setDelay(int val)
@@ -66,6 +67,11 @@ void ResetOnChange::setDelay(int val)
 
     m_delay = val;
     emit delayChanged();
+}
+
+void ResetOnChange::resetNow()
+{
+    this->reset();
 }
 
 void ResetOnChange::setValue(const QVariant &val)

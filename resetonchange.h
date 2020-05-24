@@ -49,6 +49,8 @@ public:
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();
 
+    Q_INVOKABLE void resetNow();
+
 private:
     void setValue(const QVariant &val);
     void reset();

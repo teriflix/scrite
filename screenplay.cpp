@@ -343,6 +343,9 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
 
     emit elementCountChanged();
     emit elementsChanged();
+
+    if(ptr->elementType() == ScreenplayElement::SceneElementType)
+        this->setCurrentElementIndex(index);
 }
 
 void Screenplay::removeElement(ScreenplayElement *ptr)
@@ -377,7 +380,7 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     emit elementCountChanged();
     emit elementsChanged();
 
-    this->setCurrentElementIndex(-1);
+    this->validateCurrentElementIndex();
 
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
@@ -1094,6 +1097,24 @@ void Screenplay::evaluateSceneNumbers()
 void Screenplay::evaluateSceneNumbersLater()
 {
     m_sceneNumberEvaluationTimer.start(0, this);
+}
+
+void Screenplay::validateCurrentElementIndex()
+{
+    int val = m_currentElementIndex;
+    if(m_elements.isEmpty())
+        val = -1;
+    else
+        val = qBound(0, val, m_elements.size()-1);
+
+    if(val >= 0)
+    {
+        Scene *currentScene = m_elements.at(val)->scene();
+        if(m_activeScene != currentScene)
+            m_currentElementIndex = -2;
+    }
+
+    this->setCurrentElementIndex(val);
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)

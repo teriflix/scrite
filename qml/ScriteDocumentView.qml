@@ -697,13 +697,8 @@ Item {
 
                                 StructureView {
                                     id: structureView
-                                    onRequestEditor: {
-                                        if(scriteDocument.structure.currentElementIndex >= 0)
-                                            editorLoader.sourceComponent = sceneEditorComponent
-                                        else
-                                            editorLoader.sourceComponent = screenplayEditorComponent
-                                    }
-                                    onReleaseEditor: editorLoader.sourceComponent = screenplayEditorComponent
+                                    onRequestEditor: editorLoaderReset.resetNow()
+                                    onReleaseEditor: editorLoaderReset.resetNow()
                                 }
 
                                 NotebookView {
@@ -740,11 +735,21 @@ Item {
                         Loader {
                             id: editorLoader
                             anchors.fill: parent
-                            sourceComponent: scriteDocument.screenplay.elementCount > 0 ? screenplayEditorComponent : null
-                            property bool emptyDocument: scriteDocument.structure.elementCount === 0
-                            onEmptyDocumentChanged: {
-                                if(emptyDocument)
-                                    sourceComponent = null
+                            property int currentStructureIndex: active ? scriteDocument.structure.currentElementIndex : -1
+                            property int currentScreenplayIndex: active ? scriteDocument.screenplay.currentElementIndex : -1
+                            sourceComponent: {
+                                if(currentScreenplayIndex >= 0)
+                                    return screenplayEditorComponent
+                                if(currentStructureIndex >= 0)
+                                    return sceneEditorComponent
+                                return null
+                            }
+                            active: editorLoaderReset.value
+
+                            ResetOnChange {
+                                id: editorLoaderReset
+                                from: false
+                                to: true
                             }
                         }
 
@@ -768,7 +773,7 @@ Item {
                         id: screenplayView
                         anchors.fill: parent
                         anchors.margins: 5
-                        onRequestEditor: editorLoader.sourceComponent = screenplayEditorComponent
+                        onRequestEditor: editorLoaderReset.resetNow()
                     }
                 }
             }
@@ -853,14 +858,7 @@ Item {
                             StructureView {
                                 anchors.fill: parent
                                 anchors.margins: 2
-
-                                onRequestEditor: {
-                                    if(scriteDocument.structure.currentElementIndex >= 0) {
-                                        var selement = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
-                                        var index = scriteDocument.screenplay.firstIndexOfScene(selement.scene)
-                                        scriteDocument.screenplay.currentElementIndex = index
-                                    }
-                                }
+                                onRequestEditor: editorLoaderReset.resetNow()
                             }
                         }
                     }

@@ -295,6 +295,7 @@ public:
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *event);
+    void resetCurentElementIndex();
 
 private:
     friend class Screenplay;
@@ -323,7 +324,7 @@ private:
     static StructureElement* staticElementAt(QQmlListProperty<StructureElement> *list, int index);
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     QList<StructureElement *> m_elements;
-    int m_currentElementIndex;
+    int m_currentElementIndex = -1;
     qreal m_zoomLevel = 1.0;
 
     void updateLocationHeadingMap();

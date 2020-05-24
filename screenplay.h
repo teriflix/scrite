@@ -197,6 +197,7 @@ protected:
     void onSceneReset(int elementIndex);
     void evaluateSceneNumbers();
     void evaluateSceneNumbersLater();
+    void validateCurrentElementIndex();
 
 private:
     QString m_title;
