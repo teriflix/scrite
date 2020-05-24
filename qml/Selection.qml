@@ -81,11 +81,14 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
         enabled: tightRect.visible
-        onClicked: {
+        onPressed: {
             var elements = selection.items
-            for(var i=0; i<elements.length; i++)
-                selection.placeItem(elements[i])
-            selection.items = []
+            if(elements.length > 0) {
+                for(var i=0; i<elements.length; i++)
+                    selection.placeItem(elements[i])
+                selection.items = []
+            }
+            mouse.accepted = false
         }
     }
 

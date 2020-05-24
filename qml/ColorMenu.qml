@@ -21,6 +21,7 @@ Menu2 {
 
     signal menuItemClicked(string color)
     readonly property real minCellSize: 50
+    property color selectedColor: "white"
 
     MenuItem2 {
         width: colorMenu.width
@@ -42,6 +43,10 @@ Menu2 {
                     width: parent.cellSize
                     height: parent.cellSize
                     color: (colorGrid.currentIndex === index) ? app.translucent(app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+                    Component.onCompleted: {
+                        if(modelData == selectedColor)
+                            colorGrid.currentIndex = index
+                    }
 
                     Rectangle {
                         anchors.fill: parent

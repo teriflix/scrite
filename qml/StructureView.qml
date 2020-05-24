@@ -58,7 +58,9 @@ Item {
                         id: newSceneColorMenuLoader
                         width: parent.width; height: 1
                         anchors.top: parent.bottom
-                        sourceComponent: ColorMenu { }
+                        sourceComponent: ColorMenu {
+                            selectedColor: newSceneButton.activeColor
+                        }
                         active: false
                         onItemChanged: {
                             if(item)
@@ -201,7 +203,6 @@ Item {
             }
 
             BorderImage {
-                property Item currentElementItem: elementItems.count > scriteDocument.structure.currentElementIndex ? elementItems.itemAt(scriteDocument.structure.currentElementIndex) : null
                 source: "../icons/content/shadow.png"
                 anchors.fill: currentElementItem
                 horizontalTileMode: BorderImage.Stretch
@@ -210,7 +211,7 @@ Item {
                 border { left: 21; top: 21; right: 21; bottom: 21 }
                 visible: currentElementItem !== null
                 opacity: 0.55
-
+                property Item currentElementItem: elementItems.count > scriteDocument.structure.currentElementIndex ? elementItems.itemAt(scriteDocument.structure.currentElementIndex) : null
                 onCurrentElementItemChanged: app.execLater(currentElementItem, 100, function() { canvasScroll.ensureItemVisible(currentElementItem, canvas.scale) })
             }
 
@@ -224,6 +225,12 @@ Item {
                 anchors.fill: parent
                 enabled: canvasScroll.editItem !== null
                 onClicked: canvasScroll.editItem.finishEditing()
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                onPressed: canvasContextMenu.popup()
             }
 
             Repeater {
@@ -245,17 +252,77 @@ Item {
                 }
             }
 
-            MouseArea {
-                anchors.fill: parent
-                acceptedButtons: Qt.RightButton
-                onPressed: contextMenu.popup()
+            Menu2 {
+                id: canvasContextMenu
 
-                Menu2 {
-                    id: contextMenu
+                MenuItem2 {
+                    text: "New Scene"
+                    onClicked: canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
+                }
 
-                    MenuItem2 {
-                        text: "Add Scene"
-                        onClicked: canvas.createElement(contextMenu.x-130, contextMenu.y-22, newSceneButton.activeColor)
+                ColorMenu {
+                    title: "Colored Scene"
+                    selectedColor: newSceneButton.activeColor
+                    onMenuItemClicked: {
+                        newSceneButton.activeColor = color
+                        canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
+                        canvasContextMenu.close()
+                    }
+                }
+            }
+
+            Menu2 {
+                id: elementContextMenu
+                property StructureElement element
+                onElementChanged: {
+                    if(element)
+                        popup()
+                    else
+                        close()
+                }
+
+                MenuItem2 {
+                    action: Action {
+                        text: "Scene Heading"
+                        checkable: true
+                        checked: elementContextMenu.element ? elementContextMenu.element.scene.heading.enabled : false
+                    }
+                    enabled: elementContextMenu.element !== null
+                    onTriggered: {
+                        elementContextMenu.element.scene.heading.enabled = action.checked
+                        elementContextMenu.element = null
+                    }
+                }
+
+                ColorMenu {
+                    title: "Color"
+                    enabled: elementContextMenu.element !== null
+                    onMenuItemClicked: {
+                        elementContextMenu.element.scene.color = color
+                        elementContextMenu.element = null
+                    }
+                }
+
+                MenuItem2 {
+                    text: "Duplicate"
+                    enabled: elementContextMenu.element !== null
+                    onClicked: {
+                        releaseEditor()
+                        elementContextMenu.element.duplicate()
+                        elementContextMenu.element = null
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem2 {
+                    text: "Delete"
+                    enabled: elementContextMenu.element !== null
+                    onClicked: {
+                        releaseEditor()
+                        scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
+                        scriteDocument.structure.removeElement(elementContextMenu.element)
+                        elementContextMenu.element = null
                     }
                 }
             }
@@ -395,18 +462,29 @@ Item {
                 }
             }
 
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                onClicked: {
+                    canvas.forceActiveFocus()
+                    scriteDocument.structure.currentElementIndex = index
+                    elementContextMenu.element = elementItem.element
+                }
+            }
+
             // Drag to timeline support
             Drag.active: dragMouseArea.drag.active
             Drag.dragType: Drag.Automatic
             Drag.supportedActions: Qt.LinkAction
-            Drag.hotSpot.x: width/2
-            Drag.hotSpot.y: height/2
+            Drag.hotSpot.x: dragHandle.x + dragHandle.width/2
+            Drag.hotSpot.y: dragHandle.y + dragHandle.height/2
             Drag.mimeData: {
                 "scrite/sceneID": element.scene.id
             }
             Drag.source: element.scene
 
             Image {
+                id: dragHandle
                 visible: !parent.editing
                 source: "../icons/action/view_array.png"
                 width: 24; height: 24
