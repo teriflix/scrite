@@ -808,7 +808,7 @@ bool SceneDocumentBinder::canGoUp()
         return false;
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(m_cursorPosition);
+    cursor.setPosition(qMax(m_cursorPosition,0));
     return cursor.movePosition(QTextCursor::Up);
 }
 
@@ -818,7 +818,7 @@ bool SceneDocumentBinder::canGoDown()
         return false;
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(m_cursorPosition);
+    cursor.setPosition(qMax(m_cursorPosition,0));
     return cursor.movePosition(QTextCursor::Down);
 }
 
@@ -828,7 +828,7 @@ int SceneDocumentBinder::lastCursorPosition() const
         return 0;
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(m_cursorPosition);
+    cursor.setPosition(qMax(m_cursorPosition,0));
     cursor.movePosition(QTextCursor::End);
     return cursor.position();
 }
@@ -853,7 +853,7 @@ QFont SceneDocumentBinder::currentFont() const
         return QFont();
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(m_cursorPosition);
+    cursor.setPosition(qMax(m_cursorPosition,0));
 
     QTextCharFormat format = cursor.charFormat();
     return format.font();

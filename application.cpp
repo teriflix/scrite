@@ -566,7 +566,7 @@ QColor Application::pickStandardColor(int counter) const
 QColor Application::textColorFor(const QColor &bgColor) const
 {
     // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
-    double luma = ((0.299 * bgColor.redF()) + (0.587 * bgColor.greenF()) + (0.114 * bgColor.blueF()));
+    const qreal luma = ((0.299 * bgColor.redF()) + (0.587 * bgColor.greenF()) + (0.114 * bgColor.blueF()));
     return luma > 0.5 ? Qt::black : Qt::white;
 }
 

@@ -33,5 +33,7 @@
         <file>qml/TabBarTab.qml</file>
         <file>qml/AlphabetMappings.qml</file>
         <file>qml/MenuLoader.qml</file>
+        <file>qml/RubberBand.qml</file>
+        <file>qml/Selection.qml</file>
     </qresource>
 </RCC>

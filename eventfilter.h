@@ -43,7 +43,7 @@ private:
 
 private:
     bool m_filter = false;
-    bool m_acceptEvent = true;
+    bool m_acceptEvent = false;
 };
 
 class EventFilter : public QObject

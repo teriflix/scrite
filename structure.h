@@ -66,6 +66,11 @@ public:
     qreal height() const { return m_height; }
     Q_SIGNAL void heightChanged();
 
+    Q_PROPERTY(QQuickItem* follow READ follow WRITE setFollow NOTIFY followChanged STORED false)
+    void setFollow(QQuickItem* val);
+    QQuickItem* follow() const { return m_follow; }
+    Q_SIGNAL void followChanged();
+
     Q_PROPERTY(qreal xf READ xf WRITE setXf NOTIFY xfChanged)
     void setXf(qreal val);
     qreal xf() const;
@@ -92,6 +97,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void syncWithFollowItem();
 
 private:
     friend class StructurePositionCommand;
@@ -101,6 +107,7 @@ private:
     qreal m_width = 0;
     qreal m_height = 0;
     Scene* m_scene = nullptr;
+    QPointer<QQuickItem> m_follow;
     Structure *m_structure = nullptr;
 };
 

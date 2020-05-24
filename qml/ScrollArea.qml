@@ -176,7 +176,6 @@ Flickable {
         maximumScale: 4
         minimumRotation: 0
         maximumRotation: 0
-        enabled: flickable !== null
         minimumPointCount: 2
 
         onScaleChanged: {

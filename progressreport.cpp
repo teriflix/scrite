@@ -153,9 +153,8 @@ void ProgressReport::start()
 {
     if(m_progressText.isEmpty())
         this->setProgressText("Started");
-    this->setProgress(0);
-
     this->setStatus(Started);
+    this->setProgress(0);
 }
 
 void ProgressReport::finish()
@@ -163,6 +162,5 @@ void ProgressReport::finish()
     if(m_progressText.isEmpty() || m_progressText == "Started")
         this->setProgressText("Finished");
     this->setProgress(1);
-
     this->setStatus(Finished);
 }

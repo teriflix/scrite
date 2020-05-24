@@ -697,8 +697,8 @@ Item {
 
                                 StructureView {
                                     id: structureView
-                                    onRequestEditor: editorLoaderReset.resetNow()
-                                    onReleaseEditor: editorLoaderReset.resetNow()
+                                    onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCENE_EDITOR)
+                                    onReleaseEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCENE_EDITOR)
                                 }
 
                                 NotebookView {
@@ -738,10 +738,17 @@ Item {
                             property int currentStructureIndex: active ? scriteDocument.structure.currentElementIndex : -1
                             property int currentScreenplayIndex: active ? scriteDocument.screenplay.currentElementIndex : -1
                             sourceComponent: {
-                                if(currentScreenplayIndex >= 0)
-                                    return screenplayEditorComponent
-                                if(currentStructureIndex >= 0)
-                                    return sceneEditorComponent
+                                if(editorLoaderReset.preference === editorLoaderReset.prefer_SCENE_EDITOR) {
+                                    if(currentStructureIndex >= 0)
+                                        return sceneEditorComponent
+                                    if(currentScreenplayIndex >= 0)
+                                        return screenplayEditorComponent
+                                } else {
+                                    if(currentScreenplayIndex >= 0)
+                                        return screenplayEditorComponent
+                                    if(currentStructureIndex >= 0)
+                                        return sceneEditorComponent
+                                }
                                 return null
                             }
                             active: editorLoaderReset.value
@@ -750,6 +757,18 @@ Item {
                                 id: editorLoaderReset
                                 from: false
                                 to: true
+
+                                readonly property int prefer_SCREENPLAY_EDITOR: 1
+                                readonly property int prefer_SCENE_EDITOR: 2
+                                property int preference: prefer_SCREENPLAY_EDITOR
+
+                                function prefer(val) {
+                                    if(val === prefer_SCREENPLAY_EDITOR || val === prefer_SCENE_EDITOR)
+                                        preference = val
+                                    else
+                                        preference = prefer_SCREENPLAY_EDITOR
+                                    resetNow()
+                                }
                             }
                         }
 
@@ -773,7 +792,7 @@ Item {
                         id: screenplayView
                         anchors.fill: parent
                         anchors.margins: 5
-                        onRequestEditor: editorLoaderReset.resetNow()
+                        onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCREENPLAY_EDITOR)
                     }
                 }
             }
@@ -858,7 +877,7 @@ Item {
                             StructureView {
                                 anchors.fill: parent
                                 anchors.margins: 2
-                                onRequestEditor: editorLoaderReset.resetNow()
+                                onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCREENPLAY_EDITOR)
                             }
                         }
                     }

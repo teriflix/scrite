@@ -526,7 +526,7 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
     const int givenPosition = cursor.position();
 
     cursor.insertText(text);
-    cursor.setPosition(givenPosition);
+    cursor.setPosition(qMax(givenPosition,0));
 
     auto applyFormatChanges = [this](QTextCursor &cursor, QChar::Script script) {
         if(cursor.hasSelection()) {

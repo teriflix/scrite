@@ -109,6 +109,33 @@ void StructureElement::setHeight(qreal val)
     emit heightChanged();
 }
 
+void StructureElement::setFollow(QQuickItem *val)
+{
+    if(m_follow == val)
+        return;
+
+    if(m_follow != nullptr)
+    {
+        disconnect(m_follow, &QQuickItem::xChanged, this, &StructureElement::syncWithFollowItem);
+        disconnect(m_follow, &QQuickItem::yChanged, this, &StructureElement::syncWithFollowItem);
+        disconnect(m_follow, &QQuickItem::widthChanged, this, &StructureElement::syncWithFollowItem);
+        disconnect(m_follow, &QQuickItem::heightChanged, this, &StructureElement::syncWithFollowItem);
+    }
+
+    m_follow = val;
+
+    if(m_follow)
+    {
+        this->syncWithFollowItem();
+        connect(m_follow, &QQuickItem::xChanged, this, &StructureElement::syncWithFollowItem);
+        connect(m_follow, &QQuickItem::yChanged, this, &StructureElement::syncWithFollowItem);
+        connect(m_follow, &QQuickItem::widthChanged, this, &StructureElement::syncWithFollowItem);
+        connect(m_follow, &QQuickItem::heightChanged, this, &StructureElement::syncWithFollowItem);
+    }
+
+    emit followChanged();
+}
+
 void StructureElement::setXf(qreal val)
 {
     if(m_structure == nullptr)
@@ -189,6 +216,17 @@ bool StructureElement::event(QEvent *event)
     }
 
     return QObject::event(event);
+}
+
+void StructureElement::syncWithFollowItem()
+{
+    if(m_follow.isNull())
+        return;
+
+    this->setX(m_follow->x());
+    this->setY(m_follow->y());
+    this->setWidth(m_follow->width());
+    this->setHeight(m_follow->height());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1316,8 +1354,10 @@ void StructureElementConnector::pickElementColor()
         QColor mix = QColor::fromRgbF( (c1.redF()+c2.redF())/2.0,
                                        (c1.greenF()+c2.greenF())/2.0,
                                        (c1.blueF()+c2.blueF())/2.0 );
-        if(mix == Qt::white)
-            mix = Qt::black;
+        const qreal luma = ((0.299 * mix.redF()) + (0.587 * mix.greenF()) + (0.114 * mix.blueF()));
+        if(luma > 0.5)
+            mix = mix.darker();
+
         this->setOutlineColor(mix);
     }
 }
