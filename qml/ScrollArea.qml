@@ -27,11 +27,11 @@ Flickable {
     property bool showScrollBars: true
 
     function zoomIn() {
-        zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), 4)
+        zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), pinchHandler.maximumScale)
     }
 
     function zoomOut() {
-        zoomScale = zoomScale*(1-scrollAreaSettings.zoomFactor)
+        zoomScale = Math.max(zoomScale*(1-scrollAreaSettings.zoomFactor), pinchHandler.minimumScale)
     }
 
     function zoomOne() {

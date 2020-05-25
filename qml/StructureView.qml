@@ -164,14 +164,14 @@ Item {
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.max((Math.ceil(canvas.childrenRect.right / 100) * 100), initial)
+                set: Math.max((Math.ceil(canvas.childrenRect.right / 100) * 100), canvasScroll.width/canvas.scale)
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.max((Math.ceil(canvas.childrenRect.bottom / 100) * 100), initial)
+                set: Math.max((Math.ceil(canvas.childrenRect.bottom / 100) * 100), canvasScroll.height/canvas.scale)
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -436,9 +436,10 @@ Item {
                 anchors.fill: titleText
                 enabled: titleText.readOnly === true
                 onPressedChanged: {
-                    if(pressed)
+                    if(pressed) {
                         canvasScroll.mouseOverItem = elementItem
-                    else if(canvasScroll.mouseOverItem === elementItem)
+                        scriteDocument.structure.currentElementIndex = index
+                    } else if(canvasScroll.mouseOverItem === elementItem)
                         canvasScroll.mouseOverItem = null
                 }
                 acceptedButtons: Qt.LeftButton
@@ -460,6 +461,7 @@ Item {
                 drag.minimumY: 0
                 drag.onActiveChanged: {
                     canvas.forceActiveFocus()
+                    scriteDocument.structure.currentElementIndex = index
                     if(drag.active === false) {
                         elementItem.x = scriteDocument.structure.snapToGrid(parent.x)
                         elementItem.y = scriteDocument.structure.snapToGrid(parent.y)

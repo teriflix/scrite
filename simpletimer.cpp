@@ -28,6 +28,8 @@ SimpleTimer *SimpleTimer::get(int timerId)
         if(timer->timerId() == timerId)
             return timer;
     }
+#else
+    Q_UNUSED(timerId)
 #endif
 
     return nullptr;
