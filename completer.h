@@ -42,23 +42,27 @@ public:
     SuggestionMode suggestionMode() const { return m_suggestionMode; }
     Q_SIGNAL void suggestionModeChanged();
 
-    Q_PROPERTY(bool hasSuggestion READ hasSuggestion NOTIFY suggestionChanged)
-    bool hasSuggestion() const { return !m_suggestion.isEmpty(); }
+    Q_PROPERTY(bool hasSuggestion READ hasSuggestion NOTIFY suggestionsChanged)
+    bool hasSuggestion() const { return !m_suggestions.isEmpty(); }
 
-    Q_PROPERTY(QString suggestion READ suggestion NOTIFY suggestionChanged)
-    QString suggestion() const { return m_suggestion; }
-    Q_SIGNAL void suggestionChanged();
+    Q_PROPERTY(QString suggestion READ suggestion NOTIFY suggestionsChanged)
+    QString suggestion() const { return m_suggestions.isEmpty() ? QString() : m_suggestions.first(); }
+
+    Q_PROPERTY(QStringList suggestions READ suggestions NOTIFY suggestionsChanged)
+    QStringList suggestions() const { return m_suggestions; }
+    Q_SIGNAL void suggestionsChanged();
 
 protected:
     void timerEvent(QTimerEvent *te);
 
 private:
-    void updateSuggestion();
-    void updateSuggestionLater();
+    void setSuggestions(const QStringList &val);
+    void updateSuggestions();
+    void updateSuggestionsLater();
 
 private:
-    QString m_suggestion;
     QStringList m_strings;
+    QStringList m_suggestions;
     SuggestionMode m_suggestionMode = AutoCompleteSuggestion;
     QStringListModel *m_stringsModel = nullptr;
     SimpleTimer m_updateSuggestionTimer;

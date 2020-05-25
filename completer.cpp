@@ -29,10 +29,10 @@ Completer::Completer(QObject *parent)
     this->setModel(m_stringsModel);
 
     QAbstractItemModel *cmodel = this->completionModel();
-    connect(cmodel, &QAbstractItemModel::rowsInserted, this, &Completer::updateSuggestionLater);
-    connect(cmodel, &QAbstractItemModel::rowsRemoved, this, &Completer::updateSuggestionLater);
-    connect(cmodel, &QAbstractItemModel::modelReset, this, &Completer::updateSuggestionLater);
-    connect(cmodel, &QAbstractItemModel::dataChanged, this, &Completer::updateSuggestionLater);
+    connect(cmodel, &QAbstractItemModel::rowsInserted, this, &Completer::updateSuggestionsLater);
+    connect(cmodel, &QAbstractItemModel::rowsRemoved, this, &Completer::updateSuggestionsLater);
+    connect(cmodel, &QAbstractItemModel::modelReset, this, &Completer::updateSuggestionsLater);
+    connect(cmodel, &QAbstractItemModel::dataChanged, this, &Completer::updateSuggestionsLater);
 }
 
 Completer::~Completer()
@@ -58,7 +58,8 @@ void Completer::setSuggestionMode(Completer::SuggestionMode val)
 
     m_suggestionMode = val;
     emit suggestionModeChanged();
-    emit suggestionChanged();
+
+    this->updateSuggestionsLater();
 }
 
 void Completer::timerEvent(QTimerEvent *te)
@@ -66,35 +67,41 @@ void Completer::timerEvent(QTimerEvent *te)
     if(m_updateSuggestionTimer.timerId() == te->timerId())
     {
         m_updateSuggestionTimer.stop();
-        this->updateSuggestion();
+        this->updateSuggestions();
     }
 
     QObject::timerEvent(te);
 }
 
-void Completer::updateSuggestion()
+void Completer::setSuggestions(const QStringList &val)
 {
-    const QAbstractItemModel *cmodel = this->completionModel();
-    const int rows = cmodel->rowCount();
-    QString val;
-
-    if(rows > 0)
-    {
-        const QModelIndex index = cmodel->index(0, 0);
-
-        val = index.data(Qt::DisplayRole).toString();
-        if(m_suggestionMode == AutoCompleteSuggestion)
-            val = val.remove(0, this->completionPrefix().length());
-    }
-
-    if(m_suggestion == val)
+    if(m_suggestions == val)
         return;
 
-    m_suggestion = val;
-    emit suggestionChanged();
+    m_suggestions = val;
+    emit suggestionsChanged();
 }
 
-void Completer::updateSuggestionLater()
+void Completer::updateSuggestions()
+{
+    const QAbstractItemModel *cmodel = this->completionModel();
+    const int rows = qMin(cmodel->rowCount(), this->maxVisibleItems());
+    QStringList vals;
+
+    for(int i=0; i<rows; i++)
+    {
+        const QModelIndex index = cmodel->index(i, 0);
+        QString val = index.data(Qt::DisplayRole).toString();
+        if(m_suggestionMode == AutoCompleteSuggestion)
+            val = val.remove(0, this->completionPrefix().length());
+        if(!val.isEmpty())
+            vals << val;
+    }
+
+    this->setSuggestions(vals);
+}
+
+void Completer::updateSuggestionsLater()
 {
     m_updateSuggestionTimer.start(0, this);
 }
