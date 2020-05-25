@@ -10,5 +10,5 @@ echo "Categories=Office;WordProcessor;" >> scrite.desktop
 chmod a+x scrite.desktop
 sudo desktop-file-install scrite.desktop
 cp -f scrite.desktop ~/Desktop
-mkdir ~/Applications
+mkdir -p ~/Applications
 cp -f scrite.desktop ~/Applications
