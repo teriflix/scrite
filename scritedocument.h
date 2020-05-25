@@ -166,6 +166,7 @@ private:
     bool m_autoSaveMode = false;
     QString m_fileName;
     QString m_busyMessage;
+    bool m_inCreateNewScene = false;
     SimpleTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     SimpleTimer m_clearModifyTimer;

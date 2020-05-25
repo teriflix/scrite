@@ -170,8 +170,15 @@ Item {
         anchors.right: parent.right
         anchors.leftMargin: sceneEditor.padding
         anchors.rightMargin: sceneEditor.padding
-        active: showCharacterNames && enabled
+        active: sceneCharactersListActiveBinder.get
         enabled: true
+
+        DelayedPropertyBinder {
+            id: sceneCharactersListActiveBinder
+            initial: false
+            set: showCharacterNames && sceneCharactersList.enabled
+            delay: 10
+        }
 
         Connections {
             target: scene

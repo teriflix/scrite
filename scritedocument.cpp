@@ -166,6 +166,8 @@ void ScriteDocument::setBusyMessage(const QString &val)
 
 Scene *ScriteDocument::createNewScene()
 {
+    QScopedValueRollback<bool> createNewSceneRollback(m_inCreateNewScene, true);
+
     StructureElement *structureElement = nullptr;
     if(m_structure->currentElementIndex() >= 0)
         structureElement = m_structure->elementAt(m_structure->currentElementIndex());
@@ -854,7 +856,7 @@ bool ScriteDocument::load(const QString &fileName)
 
 void ScriteDocument::structureElementIndexChanged()
 {
-    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex)
+    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex || m_inCreateNewScene)
         return;
 
     QScopedValueRollback<bool> rollback(m_syncingStructureScreenplayCurrentIndex, true);
@@ -871,7 +873,7 @@ void ScriteDocument::structureElementIndexChanged()
 
 void ScriteDocument::screenplayElementIndexChanged()
 {
-    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex)
+    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex || m_inCreateNewScene)
         return;
 
     QScopedValueRollback<bool> rollback(m_syncingStructureScreenplayCurrentIndex, true);
