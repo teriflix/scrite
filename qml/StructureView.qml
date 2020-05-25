@@ -224,11 +224,13 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 enabled: canvasScroll.editItem !== null
+                acceptedButtons: Qt.LeftButton
                 onClicked: canvasScroll.editItem.finishEditing()
             }
 
             MouseArea {
                 anchors.fill: parent
+                enabled: canvasScroll.editItem === null
                 acceptedButtons: Qt.RightButton
                 onPressed: canvasContextMenu.popup()
             }
@@ -257,7 +259,10 @@ Item {
 
                 MenuItem2 {
                     text: "New Scene"
-                    onClicked: canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
+                    onClicked: {
+                        canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
+                        canvasContextMenu.close()
+                    }
                 }
 
                 ColorMenu {
@@ -486,6 +491,7 @@ Item {
             Image {
                 id: dragHandle
                 visible: !parent.editing
+                enabled: canvasScroll.editItem === null
                 source: "../icons/action/view_array.png"
                 width: 24; height: 24
                 anchors.right: parent.right

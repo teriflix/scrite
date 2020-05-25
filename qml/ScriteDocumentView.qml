@@ -698,7 +698,7 @@ Item {
                                 StructureView {
                                     id: structureView
                                     onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCENE_EDITOR)
-                                    onReleaseEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCENE_EDITOR)
+                                    onReleaseEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCREENPLAY_EDITOR)
                                 }
 
                                 NotebookView {
@@ -877,7 +877,6 @@ Item {
                             StructureView {
                                 anchors.fill: parent
                                 anchors.margins: 2
-                                onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCREENPLAY_EDITOR)
                             }
                         }
                     }

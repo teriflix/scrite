@@ -427,6 +427,8 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
         return false;
     }
 
+    this->setLoading(true);
+
     Aggregation aggregation;
     m_errorReport->setProxyFor(aggregation.findErrorReport(importer.data()));
     m_progressReport->setProxyFor(aggregation.findProgressReport(importer.data()));
@@ -436,6 +438,8 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
     this->setBusyMessage("Importing from " + QFileInfo(fileName).fileName() + " ...");
     const bool success = importer->read();
     this->clearBusyMessage();
+
+    this->setLoading(false);
 
     return success;
 }
@@ -850,8 +854,10 @@ bool ScriteDocument::load(const QString &fileName)
 
 void ScriteDocument::structureElementIndexChanged()
 {
-    if(m_screenplay == nullptr || m_structure == nullptr)
+    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex)
         return;
+
+    QScopedValueRollback<bool> rollback(m_syncingStructureScreenplayCurrentIndex, true);
 
     StructureElement *element = m_structure->elementAt(m_structure->currentElementIndex());
     if(element == nullptr)
@@ -865,8 +871,10 @@ void ScriteDocument::structureElementIndexChanged()
 
 void ScriteDocument::screenplayElementIndexChanged()
 {
-    if(m_screenplay == nullptr || m_structure == nullptr)
+    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex)
         return;
+
+    QScopedValueRollback<bool> rollback(m_syncingStructureScreenplayCurrentIndex, true);
 
     ScreenplayElement *element = m_screenplay->elementAt(m_screenplay->currentElementIndex());
     if(element != nullptr)

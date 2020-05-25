@@ -176,6 +176,7 @@ private:
     int m_autoSaveDurationInSeconds = 60;
     QJsonArray m_structureElementSequence;
     SimpleTimer m_evaluateStructureElementSequenceTimer;
+    bool m_syncingStructureScreenplayCurrentIndex = false;
 
     ErrorReport *m_errorReport = new ErrorReport(this);
     ProgressReport *m_progressReport = new ProgressReport(this);
