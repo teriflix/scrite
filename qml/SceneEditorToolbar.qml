@@ -17,7 +17,7 @@ import QtQuick.Layouts 1.13
 import Scrite 1.0
 
 ScrollView {
-    id: toolbarArea
+    id: sceneEditorToolbar
     property SceneDocumentBinder binder
     property TextArea editor
     property alias editInFullscreen: editInFullscreenButton.checked
@@ -31,7 +31,7 @@ ScrollView {
 
     Item {
         id: toolbarContainer
-        width: Math.max(toolbarArea.width, toolbar.toolButtonsWidth)
+        width: Math.max(sceneEditorToolbar.width, toolbar.toolButtonsWidth)
         height: toolbar.height
 
         Item {
@@ -47,7 +47,7 @@ ScrollView {
             ]
             property real toolButtonWidth: 70
             property real toolButtonHeight: 45
-            property real toolButtonSpacing: 5
+            property real toolButtonSpacing: 0
             property real toolButtonsWidth: toolButtonWidth*tools.length + (tools.length-1)*toolButtonSpacing
 
             RowLayout {
@@ -77,6 +77,17 @@ ScrollView {
                         requestScreenplayEditor()
                         scriteDocument.createNewScene()
                     }
+                }
+
+                ToolButton2 {
+                    icon.source: "../icons/navigation/refresh.png"
+                    suggestedWidth: toolbar.toolButtonWidth
+                    suggestedHeight: toolbar.toolButtonHeight
+                    shortcut: "F5"
+                    shortcutText: ""
+                    ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                    enabled: binder ? true : false
+                    onClicked: binder.refresh()
                 }
 
                 Repeater {

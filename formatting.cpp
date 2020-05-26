@@ -822,6 +822,23 @@ bool SceneDocumentBinder::canGoDown()
     return cursor.movePosition(QTextCursor::Down);
 }
 
+void SceneDocumentBinder::refresh()
+{
+    if(this->document())
+    {
+        QTextBlock block = this->document()->firstBlock();
+        while(block.isValid())
+        {
+            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+            if(userData)
+                userData->resetFormat();
+            block = block.next();
+        }
+
+        this->rehighlight();
+    }
+}
+
 int SceneDocumentBinder::lastCursorPosition() const
 {
     if(m_cursorPosition < 0 || this->document() == nullptr)

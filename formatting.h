@@ -252,6 +252,7 @@ public:
     Q_INVOKABLE void backtab();
     Q_INVOKABLE bool canGoUp();
     Q_INVOKABLE bool canGoDown();
+    Q_INVOKABLE void refresh();
 
     Q_INVOKABLE int lastCursorPosition() const;
 
