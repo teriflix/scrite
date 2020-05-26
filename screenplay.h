@@ -184,6 +184,7 @@ public:
     Q_SIGNAL void sceneReset(int sceneIndex, int sceneElementIndex);
 
     Q_INVOKABLE QJsonArray search(const QString &text, int flags=0) const;
+    Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags=0);
 
     // QAbstractItemModel interface
     enum Roles { ScreenplayElementRole = Qt::UserRole };

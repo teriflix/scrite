@@ -1024,7 +1024,7 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
             {
                 for(int r=0; r<results.size(); r++)
                 {
-                    const QJsonObject result = results.at(i).toObject();
+                    const QJsonObject result = results.at(r).toObject();
 
                     QJsonObject item;
                     item.insert("sceneIndex", i);
@@ -1039,6 +1039,53 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
     }
 
     return ret;
+}
+
+int Screenplay::replace(const QString &text, const QString &replacementText, int flags)
+{
+    HourGlass hourGlass;
+
+    int counter = 0;
+
+    const int nrScenes = m_elements.size();
+    for(int i=0; i<nrScenes; i++)
+    {
+        Scene *scene = m_elements.at(i)->scene();
+        bool begunUndoCapture = false;
+
+        const int nrElements = scene->elementCount();
+        for(int j=0; j<nrElements; j++)
+        {
+            SceneElement *element = scene->elementAt(j);
+            const QJsonArray results = element->find(text, flags);
+            counter += results.size();
+
+            if(results.isEmpty())
+                continue;
+
+            if(!begunUndoCapture)
+            {
+                scene->beginUndoCapture();
+                begunUndoCapture = true;
+            }
+
+            QString elementText = element->text();
+            for(int r=results.size()-1; r>=0; r--)
+            {
+                const QJsonObject result = results.at(r).toObject();
+                const int from = result.value("from").toInt();
+                const int to = result.value("to").toInt();
+                elementText = elementText.replace(from, to-from+1, replacementText);
+            }
+
+            element->setText(elementText);
+        }
+
+        if(begunUndoCapture)
+            scene->endUndoCapture();
+    }
+
+    return counter;
 }
 
 int Screenplay::rowCount(const QModelIndex &parent) const

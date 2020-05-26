@@ -114,6 +114,12 @@ Item {
         color: structureCanvasSettings.canvasColor
     }
 
+    FocusTracker.window: qmlWindow
+    FocusTracker.indicator.target: searchBar
+    FocusTracker.indicator.property: "focusOnShortcut"
+    FocusTracker.indicator.onValue: true
+    FocusTracker.indicator.offValue: false
+
     ScrollArea {
         id: canvasScroll
         anchors.left: parent.left

@@ -35,5 +35,6 @@
         <file>qml/MenuLoader.qml</file>
         <file>qml/RubberBand.qml</file>
         <file>qml/Selection.qml</file>
+        <file>qml/TextAreaInput.qml</file>
     </qresource>
 </RCC>

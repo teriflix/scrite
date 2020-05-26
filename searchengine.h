@@ -62,6 +62,9 @@ public:
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
+    Q_SIGNAL void replaceCurrent(const QString &replacementText);
+    Q_SIGNAL void replaceAll(const QString &replacementText);
+
     // Emitted only if textDocument is set
     Q_SIGNAL void highlightText(int start, int end);
     Q_SIGNAL void clearHighlight();
@@ -118,6 +121,14 @@ public:
     SearchFlags searchFlags() const { return m_searchFlags; }
     Q_SIGNAL void searchFlagsChanged();
 
+    Q_PROPERTY(bool isSearchCaseSensitive READ isIsSearchCaseSensitive WRITE setIsSearchCaseSensitive NOTIFY searchFlagsChanged)
+    void setIsSearchCaseSensitive(bool val) { m_searchFlags.setFlag(SearchCaseSensitively, val); }
+    bool isIsSearchCaseSensitive() const { return m_searchFlags.testFlag(SearchCaseSensitively); }
+
+    Q_PROPERTY(bool isSearchWholeWords READ isIsSearchWholeWords WRITE setIsSearchWholeWords NOTIFY searchFlagsChanged)
+    void setIsSearchWholeWords(bool val) { m_searchFlags.setFlag(SearchWholeWords, val); }
+    bool isIsSearchWholeWords() const { return m_searchFlags.testFlag(SearchWholeWords); }
+
     Q_PROPERTY(QString searchString READ searchString WRITE setSearchString NOTIFY searchStringChanged)
     void setSearchString(const QString &val);
     QString searchString() const { return m_searchString; }
@@ -130,6 +141,9 @@ public:
     Q_PROPERTY(int currentSearchResultIndex READ currentSearchResultIndex NOTIFY currentSearchResultIndexChanged)
     int currentSearchResultIndex() const { return m_currentSearchResultIndex; }
     Q_SIGNAL void currentSearchResultIndexChanged();
+
+    Q_INVOKABLE void replace(const QString &string);
+    Q_INVOKABLE void replaceAll(const QString &string);
 
     Q_INVOKABLE void clearSearch();
     Q_INVOKABLE void nextSearchResult();
@@ -203,6 +217,9 @@ public:
     Q_INVOKABLE void nextSearchResult();
     Q_INVOKABLE void previousSearchResult();
     Q_INVOKABLE void cycleSearchResult();
+
+    Q_INVOKABLE void replace(const QString &replacementText);
+    Q_INVOKABLE void replaceAll(const QString &replacementText);
 
     Q_SIGNAL void clearHighlight();
     Q_SIGNAL void highlightText(int start, int end);

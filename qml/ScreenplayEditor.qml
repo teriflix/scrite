@@ -101,6 +101,7 @@ Item {
             anchors.rightMargin: toolbar.margin
             anchors.verticalCenter: parent.verticalCenter
             searchEngine.objectName: "Screenplay Search Engine"
+            allowReplace: true
         }
     }
 
@@ -111,7 +112,12 @@ Item {
         Item {
             property string searchString
             property var searchResults: []
-            property int previousSearchResultIndex: -1
+            property int previousSceneIndex: -1
+
+            signal replaceCurrentRequest(string replacementText)
+
+            SearchAgent.onReplaceAll: scriteDocument.screenplay.replace(searchString, replacementText, 0)
+            SearchAgent.onReplaceCurrent: replaceCurrentRequest(replacementText)
 
             SearchAgent.engine: screenplaySearchBar.searchEngine
 
@@ -122,10 +128,11 @@ Item {
             }
 
             SearchAgent.onCurrentSearchResultIndexChanged: {
-                clearPreviousSearchResultUserData()
                 if(SearchAgent.currentSearchResultIndex >= 0) {
                     var searchResult = searchResults[SearchAgent.currentSearchResultIndex]
                     var sceneIndex = searchResult["sceneIndex"]
+                    if(sceneIndex !== previousSceneIndex)
+                        clearPreviousElementUserData()
                     var sceneResultIndex = searchResult["sceneResultIndex"]
                     var screenplayElement = scriteDocument.screenplay.elementAt(sceneIndex)
                     var data = {
@@ -134,27 +141,35 @@ Item {
                         "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
                         "searchResultCount": SearchAgent.searchResultCount
                     }
-                    scriteDocument.screenplay.currentElementIndex = sceneIndex
+                    screenplayListView.positionViewAtIndex(sceneIndex, ListView.Contain)
                     screenplayElement.userData = data
-                    previousSearchResultIndex = sceneIndex
+                    previousSceneIndex = sceneIndex
                 }
             }
 
             SearchAgent.onClearSearchRequest: {
+                scriteDocument.screenplay.currentElementIndex = previousSceneIndex
                 searchString = ""
-                clearPreviousSearchResultUserData()
+                searchResults = []
+                clearPreviousElementUserData()
             }
 
-            function clearPreviousSearchResultUserData() {
-                if(previousSearchResultIndex >= 0) {
-                    var screenplayElement = scriteDocument.screenplay.elementAt(previousSearchResultIndex)
+            function clearPreviousElementUserData() {
+                if(previousSceneIndex >= 0) {
+                    var screenplayElement = scriteDocument.screenplay.elementAt(previousSceneIndex)
                     if(screenplayElement)
                         screenplayElement.userData = undefined
                 }
-                previousSearchResultIndex = -1
+                previousSceneIndex = -1
             }
         }
     }
+
+    FocusTracker.window: qmlWindow
+    FocusTracker.indicator.target: screenplaySearchBar
+    FocusTracker.indicator.property: "focusOnShortcut"
+    FocusTracker.indicator.onValue: true
+    FocusTracker.indicator.offValue: false
 
     ListView {
         id: screenplayListView
@@ -352,14 +367,28 @@ Item {
                 }
 
                 TextDocumentSearch {
+                    id: textDocumentSearch
                     textDocument: sceneEditor.editor.textDocument
                     searchString: sceneEditor.binder.documentLoadCount > 0 ? (element.userData ? element.userData.searchString : "") : ""
                     currentResultIndex: searchResultCount > 0 ? (element.userData ? element.userData.sceneResultIndex : -1) : -1
                     onHighlightText: {
                         currentSceneEditor = sceneEditor
                         sceneEditor.editor.select(start, end)
+                        sceneEditor.editor.update()
                     }
                     onClearHighlight: sceneEditor.editor.deselect()
+                }
+
+                Connections {
+                    target: searchAgents.count > 0 ? searchAgents.itemAt(0).SearchAgent : null
+                    ignoreUnknownSignals: true
+                    onReplaceCurrentRequest: {
+                        if(textDocumentSearch.currentResultIndex >= 0) {
+                            element.scene.beginUndoCapture()
+                            textDocumentSearch.replace(replacementText)
+                            element.scene.endUndoCapture()
+                        }
+                    }
                 }
 
                 Connections {
