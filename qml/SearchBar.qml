@@ -229,7 +229,7 @@ Item {
                     onClicked: click()
                     function click() {
                         searchEngine.replace(txtReplace.text)
-                        app.execLater(searchEngine, 100, function() { searchEngine.nextSearchResult() })
+                        app.execLater(searchEngine, 250, function() { searchEngine.nextSearchResult() })
                     }
                 }
 
