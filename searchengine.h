@@ -74,7 +74,6 @@ public:
 
 protected:
     SearchAgent(QObject *parent=nullptr);
-    void onTextDocumentDestroyed();
     void onSearchEngineDestroyed();
     void onSearchRequest(const QString &string);
     void onClearSearchRequest();
@@ -210,7 +209,6 @@ public:
 
 private:
     void setCurrentResultInternal(int val);
-    void onTextDocumentDestroyed();
     void doSearch(const QString &string);
 
 private:

@@ -34,6 +34,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        searchEngine.objectName: "Characters Search Engine"
     }
 
     ScrollArea {

@@ -104,6 +104,7 @@ Item {
                 id: searchBar
                 width: parent.width-toolbarButtons.width-parent.spacing
                 anchors.verticalCenter: parent.verticalCenter
+                searchEngine.objectName: "Structure Search Engine"
             }
         }
     }

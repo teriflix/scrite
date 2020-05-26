@@ -118,9 +118,6 @@ void SearchAgent::setTextDocument(QQuickTextDocument *val)
     if(m_textDocument == val)
         return;
 
-    if(m_textDocument != nullptr)
-        disconnect(m_textDocument, &QQuickTextDocument::destroyed, this, &SearchAgent::onTextDocumentDestroyed);
-
     m_textDocument = val;
     if(m_textDocument == nullptr)
     {
@@ -129,7 +126,6 @@ void SearchAgent::setTextDocument(QQuickTextDocument *val)
     }
     else
     {
-        connect(m_textDocument, &QQuickTextDocument::destroyed, this, &SearchAgent::onTextDocumentDestroyed);
         connect(this, &SearchAgent::searchRequest, this, &SearchAgent::onSearchRequest);
         connect(this, &SearchAgent::clearSearchRequest, this, &SearchAgent::onClearSearchRequest);
     }
@@ -148,17 +144,6 @@ QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 QString SearchAgent::createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const
 {
     return SearchEngine::createMarkupText(text, from, to, QBrush(bg), QBrush(fg));
-}
-
-void SearchAgent::onTextDocumentDestroyed()
-{
-    m_textDocument = nullptr;
-    disconnect(this, &SearchAgent::searchRequest, this, &SearchAgent::onSearchRequest);
-    disconnect(this, &SearchAgent::clearSearchRequest, this, &SearchAgent::onClearSearchRequest);
-
-    this->setSearchResultCount(0);
-    this->setCurrentSearchResultIndex(-1);
-    emit clearSearchRequest();
 }
 
 void SearchAgent::onSearchEngineDestroyed()
@@ -514,16 +499,8 @@ void TextDocumentSearch::setTextDocument(QQuickTextDocument *val)
         return;
 
     m_textDocument = val;
-
-    if(m_textDocument != nullptr)
-        disconnect(m_textDocument, &QQuickTextDocument::destroyed, this, &TextDocumentSearch::onTextDocumentDestroyed);
-
-    m_textDocument = val;
-
     if(m_textDocument != nullptr)
     {
-        connect(m_textDocument, &QQuickTextDocument::destroyed, this, &TextDocumentSearch::onTextDocumentDestroyed);
-
         if(!m_searchString.isEmpty())
             this->doSearch(m_searchString);
     }
@@ -536,10 +513,10 @@ void TextDocumentSearch::setSearchString(const QString &val)
     if(m_searchString == val)
         return;
 
-    m_searchString = val;
-    emit searchStringChanged();
-
     this->doSearch(val);
+
+    // This signal will be emitted by doSearch()
+    // emit searchStringChanged();
 }
 
 void TextDocumentSearch::setCurrentResultIndex(int val)
@@ -586,8 +563,17 @@ void TextDocumentSearch::clearSearch()
 {
     this->setCurrentResultIndex(-1);
 
-    m_searchResults.clear();
-    emit searchResultCountChanged();
+    if(!m_searchResults.isEmpty())
+    {
+        m_searchResults.clear();
+        emit searchResultCountChanged();
+    }
+
+    if(!m_searchString.isEmpty())
+    {
+        m_searchString.clear();
+        emit searchStringChanged();
+    }
 }
 
 void TextDocumentSearch::nextSearchResult()
@@ -606,16 +592,6 @@ void TextDocumentSearch::cycleSearchResult()
         this->setCurrentResultIndex((m_currentResultIndex+1)%m_searchResults.size());
     else
         this->setCurrentResultIndex(-1);
-}
-
-void TextDocumentSearch::onTextDocumentDestroyed()
-{
-    m_textDocument = nullptr;
-
-    this->setCurrentResultIndex(-1);
-
-    m_searchResults.clear();
-    emit searchResultCountChanged();
 }
 
 void TextDocumentSearch::doSearch(const QString &string)
@@ -641,6 +617,9 @@ void TextDocumentSearch::doSearch(const QString &string)
         m_searchResults << qMakePair<int,int>(cursor.selectionStart(),cursor.selectionEnd());
         cursor.setPosition(cursor.selectionEnd());
     }
+
+    m_searchString = string;
+    emit searchStringChanged();
 
     if(!m_searchResults.isEmpty())
         emit searchResultCountChanged();

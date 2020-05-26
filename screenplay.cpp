@@ -1004,12 +1004,15 @@ void Screenplay::setActiveScene(Scene *val)
 
 QJsonArray Screenplay::search(const QString &text, int flags) const
 {
+    HourGlass hourGlass;
+
     QJsonArray ret;
 
     const int nrScenes = m_elements.size();
     for(int i=0; i<nrScenes; i++)
     {
         Scene *scene = m_elements.at(i)->scene();
+        int sceneResultIndex = 0;
 
         const int nrElements = scene->elementCount();
         for(int j=0; j<nrElements; j++)
@@ -1026,6 +1029,7 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
                     QJsonObject item;
                     item.insert("sceneIndex", i);
                     item.insert("elementIndex", j);
+                    item.insert("sceneResultIndex", sceneResultIndex++);
                     item.insert("from", result.value("from"));
                     item.insert("to", result.value("to"));
                     ret.append(item);

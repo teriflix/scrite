@@ -19,19 +19,17 @@ import Scrite 1.0
 Item {
     width: 300
     height: 55
-    property alias searchEngine: theSearchEngine
     property real borderWidth: 0
+    property bool hasFocus: txtSearch.activeFocus
 
-    SearchEngine {
-        id: theSearchEngine
-    }
+    property SearchEngine searchEngine: SearchEngine { }
 
     Rectangle {
         id: rect
         anchors.fill: parent
         anchors.margins: 4
         color: primaryColors.c10.background
-        enabled: theSearchEngine.searchAgentCount > 0
+        enabled: searchEngine.searchAgentCount > 0
         border.width: borderWidth
         border.color: primaryColors.borderColor
 
@@ -68,14 +66,14 @@ Item {
             placeholderText: "search"
             function triggerSearch() {
                 var ss = text.trim()
-                if(theSearchEngine.searchString !== ss)
-                    theSearchEngine.searchString = ss
+                if(searchEngine.searchString !== ss)
+                    searchEngine.searchString = ss
                 else
-                    theSearchEngine.cycleSearchResult()
+                    searchEngine.cycleSearchResult()
             }
             function clearSearch() {
                 clear()
-                theSearchEngine.clearSearch()
+                searchEngine.clearSearch()
             }
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
@@ -99,8 +97,8 @@ Item {
 
             Text {
                 text: {
-                    if(theSearchEngine.searchResultCount > 0)
-                        return "  " +  (theSearchEngine.currentSearchResultIndex+1) + "/" + theSearchEngine.searchResultCount + "  "
+                    if(searchEngine.searchResultCount > 0)
+                        return "  " +  (searchEngine.currentSearchResultIndex+1) + "/" + searchEngine.searchResultCount + "  "
                     return ""
                 }
                 anchors.verticalCenter: parent.verticalCenter
@@ -109,8 +107,8 @@ Item {
             ToolButton2 {
                 icon.source: "../icons/action/keyboard_arrow_up.png"
                 anchors.verticalCenter: parent.verticalCenter
-                enabled: theSearchEngine.searchResultCount > 0 && theSearchEngine.currentSearchResultIndex > 0
-                onClicked: theSearchEngine.previousSearchResult()
+                enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex > 0
+                onClicked: searchEngine.previousSearchResult()
                 suggestedHeight: 40
                 hoverEnabled: false
             }
@@ -118,8 +116,8 @@ Item {
             ToolButton2 {
                 icon.source: "../icons/action/keyboard_arrow_down.png"
                 anchors.verticalCenter: parent.verticalCenter
-                enabled: theSearchEngine.searchResultCount > 0 && theSearchEngine.currentSearchResultIndex < theSearchEngine.searchResultCount
-                onClicked: theSearchEngine.nextSearchResult()
+                enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex < searchEngine.searchResultCount
+                onClicked: searchEngine.nextSearchResult()
                 suggestedHeight: 40
                 hoverEnabled: false
             }
@@ -127,7 +125,7 @@ Item {
             ToolButton2 {
                 icon.source: "../icons/navigation/close.png"
                 anchors.verticalCenter: parent.verticalCenter
-                enabled: theSearchEngine.searchResultCount > 0
+                enabled: searchEngine.searchResultCount > 0
                 onClicked: txtSearch.clearSearch()
                 suggestedHeight: 40
                 hoverEnabled: false

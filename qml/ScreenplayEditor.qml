@@ -41,7 +41,7 @@ Item {
         anchors.margins: 1
         color: primaryColors.c100.background
         radius: 3
-        height: Math.max(toolbarLayout.height, searchBar.height)
+        height: Math.max(toolbarLayout.height, screenplaySearchBar.height)
         visible: scriteDocument.screenplay.elementCount > 0
         border.width: 1
         border.color: primaryColors.borderColor
@@ -94,25 +94,26 @@ Item {
         }
 
         SearchBar {
-            id: searchBar
+            id: screenplaySearchBar
             anchors.left: toolbarLayout.right
             anchors.leftMargin: 5
             anchors.right: parent.right
             anchors.rightMargin: toolbar.margin
             anchors.verticalCenter: parent.verticalCenter
+            searchEngine.objectName: "Screenplay Search Engine"
         }
     }
 
     Repeater {
         id: searchAgents
-        model: scriteDocument.screenplay.elementCount > 0 ? 1 : 0
+        model: scriteDocument.loading ? 0 : 1
 
         Item {
             property string searchString
             property var searchResults: []
             property int previousSearchResultIndex: -1
 
-            SearchAgent.engine: searchBar.searchEngine
+            SearchAgent.engine: screenplaySearchBar.searchEngine
 
             SearchAgent.onSearchRequest: {
                 searchString = string
@@ -125,14 +126,16 @@ Item {
                 if(SearchAgent.currentSearchResultIndex >= 0) {
                     var searchResult = searchResults[SearchAgent.currentSearchResultIndex]
                     var sceneIndex = searchResult["sceneIndex"]
+                    var sceneResultIndex = searchResult["sceneResultIndex"]
                     var screenplayElement = scriteDocument.screenplay.elementAt(sceneIndex)
                     var data = {
                         "searchString": searchString,
+                        "sceneResultIndex": sceneResultIndex,
                         "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
                         "searchResultCount": SearchAgent.searchResultCount
                     }
-                    screenplayElement.userData = data
                     scriteDocument.screenplay.currentElementIndex = sceneIndex
+                    screenplayElement.userData = data
                     previousSearchResultIndex = sceneIndex
                 }
             }
@@ -161,7 +164,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.top: toolbar.bottom
         anchors.margins: 3
-        cacheBuffer: Math.ceil(height / 300) * 2
+        cacheBuffer: scriteDocument.loading && scriteDocument.screenplay.elementCount ? Math.ceil(height / 300) * 2 : 1
         clip: true
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AlwaysOn
@@ -351,15 +354,12 @@ Item {
                 TextDocumentSearch {
                     textDocument: sceneEditor.editor.textDocument
                     searchString: sceneEditor.binder.documentLoadCount > 0 ? (element.userData ? element.userData.searchString : "") : ""
-                    currentResultIndex: searchResultCount > 0 ? (element.userData ? element.userData.currentSearchResultIndex : -1) : -1
+                    currentResultIndex: searchResultCount > 0 ? (element.userData ? element.userData.sceneResultIndex : -1) : -1
                     onHighlightText: {
                         currentSceneEditor = sceneEditor
-                        sceneEditor.editor.cursorPosition = start
                         sceneEditor.editor.select(start, end)
                     }
-                    onClearHighlight: {
-                        sceneEditor.editor.deselect()
-                    }
+                    onClearHighlight: sceneEditor.editor.deselect()
                 }
 
                 Connections {

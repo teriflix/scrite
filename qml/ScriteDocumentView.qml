@@ -979,6 +979,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
+                searchEngine.objectName: "Scene Search Engine"
             }
 
             SceneEditor {
@@ -994,8 +995,8 @@ Item {
 
                 onSplitSceneRequest: {
                     showInformation({
-                                        "message": "You can split a scene only when its edited in the context of a screenplay, not when edited as an independent scene.",
-                                    }, this)
+                            "message": "You can split a scene only when its edited in the context of a screenplay, not when edited as an independent scene.",
+                        }, this)
                 }
 
                 SearchAgent.engine: searchBar.searchEngine
