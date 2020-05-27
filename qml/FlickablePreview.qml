@@ -61,6 +61,8 @@ Item {
         id: thumbImage
         anchors.fill: parent
         clip: true
+        smooth: true
+        mipmap: true
 
         Rectangle {
             id: viewportIndicator
@@ -127,10 +129,12 @@ Item {
         width = size.width
         height = size.height
 
+        var dpr = app.devicePixelRatio
+
         updatingThumbnail = true
         content.grabToImage(function(result) {
             thumbImage.source = result.url;
             flickablePreview.updatingThumbnail = false
-        }, size);
+        }, Qt.size(width*dpr,height*dpr));
     }
 }
