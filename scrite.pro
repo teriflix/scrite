@@ -69,6 +69,7 @@ HEADERS += \
     textshapeitem.h \
     timeprofiler.h \
     standardpaths.h \
+    trackobject.h \
     transliteration.h \
     undoredo.h
 
@@ -132,6 +133,7 @@ SOURCES += \
     textshapeitem.cpp \
     timeprofiler.cpp \
     standardpaths.cpp \
+    trackobject.cpp \
     transliteration.cpp \
     undoredo.cpp
 

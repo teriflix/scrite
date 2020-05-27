@@ -36,5 +36,6 @@
         <file>qml/RubberBand.qml</file>
         <file>qml/Selection.qml</file>
         <file>qml/TextAreaInput.qml</file>
+        <file>qml/FlickablePreview.qml</file>
     </qresource>
 </RCC>

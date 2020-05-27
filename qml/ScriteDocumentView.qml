@@ -683,7 +683,7 @@ Item {
                                 }
                             }
 
-                            SwipeView {
+                            StackLayout {
                                 id: structureEditorContent
                                 anchors.left: parent.left
                                 anchors.right: parent.right
@@ -691,8 +691,6 @@ Item {
                                 anchors.bottom: parent.bottom
                                 anchors.margins: 5
                                 clip: true
-
-                                interactive: false
                                 currentIndex: structureEditorTabs.currentIndex
 
                                 StructureView {
@@ -842,7 +840,7 @@ Item {
                 }
             }
 
-            SwipeView {
+            StackLayout {
                 id: uiLayout2TabView
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -850,8 +848,6 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.margins: 5
                 clip: true
-
-                interactive: false
                 currentIndex: uiLayout2TabBar.currentIndex
 
                 Loader {

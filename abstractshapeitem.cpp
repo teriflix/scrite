@@ -266,13 +266,16 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
     }
 
     QSGOpacityNode *outlinesNode = static_cast<QSGOpacityNode*>(rootNode->childAtIndex(1));
-    outlinesNode->setOpacity( m_renderType & OutlineAlso ? 1 : 0 );
+    outlinesNode->setOpacity(m_renderType & OutlineAlso ? 1 : 0);
 
     QSGGeometryNode *outlineNode = static_cast<QSGGeometryNode*>(outlinesNode->firstChild());
     if(outlineNode != nullptr)
     {
-        QSGFlatColorMaterial *outlineMaterial = static_cast<QSGFlatColorMaterial*>(outlineNode->material());
+        QSGGeometry *outlineGeometry = outlineNode->geometry();
+        if(outlineGeometry != nullptr)
+            outlineGeometry->setLineWidth( float(m_outlineWidth) );
 
+        QSGFlatColorMaterial *outlineMaterial = static_cast<QSGFlatColorMaterial*>(outlineNode->material());
         if(outlineMaterial != nullptr)
         {
             QColor outlineColor = m_outlineColor;
