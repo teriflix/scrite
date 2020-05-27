@@ -478,7 +478,10 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
 {
     const QByteArray formatKey = format.toLatin1();
     AbstractExporter *exporter = deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this);
-    if(exporter && exporter->fileName().isEmpty())
+    if(exporter == nullptr)
+        return nullptr;
+
+    if(exporter->fileName().isEmpty())
     {
         exporter->setDocument(this);
 
@@ -517,7 +520,10 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 {
     const QByteArray reportKey = report.toLatin1();
     AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this);
-    if(reportGenerator && reportGenerator->fileName().isEmpty())
+    if(reportGenerator == nullptr)
+        return nullptr;
+
+    if(reportGenerator->fileName().isEmpty())
     {
         reportGenerator->setDocument(this);
 
