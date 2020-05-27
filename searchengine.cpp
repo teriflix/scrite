@@ -661,9 +661,9 @@ void TextDocumentSearch::replace(const QString &replacementText)
     cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, result.second-result.first);
     if(cursor.selectedText() != replacementText)
     {
+        const int diff = replacementText.length() - cursor.selectedText().length();
         cursor.insertText(replacementText);
 
-        const int diff = cursor.position() - result.second;
         if(diff != 0 && m_currentResultIndex < m_searchResults.size()-1)
         {
             for(int i=m_currentResultIndex+1; i<m_searchResults.size(); i++)
