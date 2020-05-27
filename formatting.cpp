@@ -263,6 +263,8 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
       m_pageWidth(750),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
 {
+    m_padding[0] = 0; // just to get rid of the unused private variable warning.
+
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
         SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);

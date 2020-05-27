@@ -26,7 +26,8 @@
 HeaderFooter::HeaderFooter(Type type, QObject *parent)
     : QObject(parent), m_type(type)
 {
-
+    m_padding1[0] = 0; // just to get rid of the unused private variable warning.
+    m_padding2[0] = 0; // just to get rid of the unused private variable warning.
 }
 
 HeaderFooter::~HeaderFooter()

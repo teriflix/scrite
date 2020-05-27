@@ -72,7 +72,7 @@ public:
 
 private:
     bool m_enabled = true;
-    char m_padding1[7];
+    char m_padding[7];
     Scene* m_scene = nullptr;
     QString m_moment = "DAY";
     QString m_location = "Somewhere";

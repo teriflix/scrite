@@ -481,10 +481,10 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
     if(exporter == nullptr)
         return nullptr;
 
+    exporter->setDocument(this);
+
     if(exporter->fileName().isEmpty())
     {
-        exporter->setDocument(this);
-
         QString suggestedName = m_screenplay->title();
         if(suggestedName.isEmpty())
             suggestedName = QFileInfo(m_fileName).baseName();
@@ -523,10 +523,10 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
     if(reportGenerator == nullptr)
         return nullptr;
 
+    reportGenerator->setDocument(this);
+
     if(reportGenerator->fileName().isEmpty())
     {
-        reportGenerator->setDocument(this);
-
         const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
         // const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString(dateTimeFormat) + suffix;

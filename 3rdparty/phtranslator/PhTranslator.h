@@ -53,7 +53,7 @@ namespace PhTranslation
         // Returns if the given character is defined to a Vowel identifier
         inline bool IsVowel(char ch) const
         {
-            return m_Vowels[ch].size() > 0;
+            return m_Vowels[int(ch)].size() > 0;
         }
 
         unsigned int ExtractMatchingVowel(const char* sz, const VowelDef* &pRetVal) const;

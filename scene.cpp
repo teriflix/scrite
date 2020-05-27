@@ -67,6 +67,7 @@ SceneUndoCommand::SceneUndoCommand(Scene *scene, bool allowMerging)
     : m_scene(scene), m_allowMerging(allowMerging),
       m_timestamp(QDateTime::currentDateTime())
 {
+    m_padding[0] = 0; // just to get rid of the unused private variable warning.
     m_sceneId = m_scene->id();
     m_before = this->toByteArray(scene);
 }
@@ -185,6 +186,7 @@ SceneHeading::SceneHeading(QObject *parent)
     : QObject(parent),
       m_scene(qobject_cast<Scene*>(parent))
 {
+    m_padding[0] = 0; // just to get rid of the unused private variable warning.
     connect(this, &SceneHeading::momentChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationChanged, this, &SceneHeading::textChanged);
@@ -508,6 +510,8 @@ void CharacterElementMap::include(const CharacterElementMap &other)
 Scene::Scene(QObject *parent)
     : QAbstractListModel(parent)
 {
+    m_padding[0] = 0; // just to get rid of the unused private variable warning.
+
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);

@@ -509,6 +509,8 @@ private:
 UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds)
     : QUndoCommand(), m_sceneIds(sceneIds), m_screenplay(screenplay)
 {
+    m_padding[0] = 0; // just to get rid of the unused private variable warning.
+
     m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed, [this]() {
         this->setObsolete(true);
     });

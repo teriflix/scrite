@@ -7,7 +7,7 @@
 namespace PhTranslation
 {
 
-#define __iswascii(_c)    ( (unsigned)(_c) < 0x80 )
+#define ph_iswascii(_c)    ( unsigned(_c) < 0x80 )
 
     PhTranslator::PhTranslator(void)
     {
@@ -34,7 +34,7 @@ namespace PhTranslation
             const T& defObj = inputArr[i];
             const char chIndex = defObj.phRep[0];
             // Store the definition, indexed at its first character 
-            vec[chIndex].push_back(defObj);
+            vec[int(chIndex)].push_back(defObj);
         }
 
         // Sort each vector such that longer strings come first
@@ -62,16 +62,16 @@ namespace PhTranslation
                 const tUnicode Halant /*= 0*/)                
     {
         // Load the input Arrays into internal structures
-        if(pVowels != NULL &&  nVSize != 0)
+        if(pVowels != nullptr &&  nVSize != 0)
             LoadVector(this->m_Vowels, pVowels, nVSize);
 
-        if(pConsonants != NULL &&  nCSize != 0)
+        if(pConsonants != nullptr &&  nCSize != 0)
             LoadVector(this->m_Consonants, pConsonants, nCSize);
 
-        if(pDigits != NULL &&  nDSize != 0)
+        if(pDigits != nullptr &&  nDSize != 0)
             LoadVector(this->m_Digits, pDigits, nDSize);
 
-        if(pSpSymbols != NULL &&  nSPSize != 0)
+        if(pSpSymbols != nullptr &&  nSPSize != 0)
             LoadVector(this->m_SpecialSymbols, pSpSymbols, nSPSize);
 
         m_Halant = Halant;
@@ -91,7 +91,7 @@ namespace PhTranslation
             nMatched++;
         }
         
-        return (*pfx == NULL) ? nMatched : 0;
+        return (*pfx == 0) ? nMatched : 0;
     }
 
     // Searches the vectors to find the best prefix that matches the sequence of
@@ -101,7 +101,7 @@ namespace PhTranslation
     {
         const char chIndex =  sz[0];
 
-        const std::vector<T>& vecObjects = vec[chIndex];
+        const std::vector<T>& vecObjects = vec[int(chIndex)];
 
         unsigned int nMatched = 0;
 
@@ -113,7 +113,7 @@ namespace PhTranslation
                 return nMatched;
         }
 
-        retVal = NULL;
+        retVal = nullptr;
 
         return 0;
     }
@@ -151,14 +151,14 @@ namespace PhTranslation
 
     size_t PhTranslator::Translate(const char* sz, std::wstring& retStr) const
     {
-        if(sz == NULL || *sz == NULL) return 0;
+        if(sz == nullptr || *sz == 0) return 0;
 
         const char* psz = sz;
 
-        const VowelDef* pVowel = NULL;
-        const ConsonantDef* pConsonant = NULL;
-        const DigitDef* pDigit = NULL;
-        const SpecialSymbolDef* pSpecialSymbol = NULL;
+        const VowelDef* pVowel = nullptr;
+        const ConsonantDef* pConsonant = nullptr;
+        const DigitDef* pDigit = nullptr;
+        const SpecialSymbolDef* pSpecialSymbol = nullptr;
 
         bool bFollowingConsonant = false;
 
@@ -198,10 +198,10 @@ namespace PhTranslation
                     bFollowingConsonant = true;
 
                     // if the next character is not vowel, insert the Virama/Halant
-                    if(*psz != NULL && IsVowel(*psz) == false)
+                    if(*psz != 0 && IsVowel(*psz) == false)
                         AppendUCODE(retStr, this->m_Halant);
 
-                    if(*psz == NULL)
+                    if(*psz == 0)
                         AppendUCODE(retStr, this->m_Halant);
 
                     continue;
@@ -241,7 +241,7 @@ namespace PhTranslation
                 bFollowingConsonant = false;
             }
 
-        }while(*psz != NULL);
+        }while(*psz != 0);
 
         return retStr.length() - nRetStrInitialLength; // return the length of the newly generated portion
     }
@@ -252,9 +252,9 @@ namespace PhTranslation
 	{
 		retStr = "";
 		int nCount =0;
-		while(*pSz != NULL && __iswascii(*pSz))
+        while(*pSz != 0 && ph_iswascii(*pSz))
 		{
-			retStr += (char)*pSz++;
+            retStr += char(*pSz++);
 			++nCount;
 		}
 		return nCount;
@@ -265,7 +265,7 @@ namespace PhTranslation
 	{
 		retStr = L"";
 		int nCount =0;
-		while(*pSz != NULL && __iswascii(*pSz) == false)
+        while(*pSz != 0 && ph_iswascii(*pSz) == false)
 		{
 			retStr += *pSz++;
 			++nCount;
@@ -275,7 +275,7 @@ namespace PhTranslation
 
 	size_t PhTranslator::Translate(const wchar_t* sz, std::wstring& retStr) const
 	{		
-		if(sz == NULL) return 0;
+        if(sz == nullptr) return 0;
 
 		size_t nRetStrInitialLength = retStr.length(); // Store the initial length of the retStr
 
@@ -294,7 +294,7 @@ namespace PhTranslation
 			psz += ExtractUNICODECodes(psz, strNonAscii); 
 			retStr += strNonAscii;
 
-		}while(*psz != NULL);
+        }while(*psz != 0);
 
 		return retStr.length() - nRetStrInitialLength; // return the length of the newly generated portion
 	}
@@ -315,7 +315,7 @@ namespace PhTranslation
 	bool PhTranslator::SavePhoneticTable(const char* szFilePath) const
 	{
 		FILE* fp = fopen(szFilePath, "w");
-		if(fp != NULL)
+        if(fp != nullptr)
 		{
 			int nVowelCount=0, nConsonantCount = 0, nDigitCount =0, nSpecialSymbolCount=0;
 
@@ -345,10 +345,11 @@ namespace PhTranslation
 		return false;
 	}
 
-	bool PhTranslator::LoadPhoneticTable(const char* szFilePath)
+    bool PhTranslator::LoadPhoneticTable(const char* /*szFilePath*/)
 	{
+#if 0 // We dont need loading of language codes from external files as yet.
 		FILE* fp = fopen(szFilePath, "r");
-		if(fp != NULL)
+        if(fp != nullptr)
 		{
 			char szHeader[16];
 			int nVowelCount=0, nConsonantCount = 0, nDigitCount =0, nSpecialSymbolCount=0, nHalant=0;
@@ -357,7 +358,7 @@ namespace PhTranslation
 			
 			if(strcmp(szHeader, "PhTranslation")) return false;
 
-			VowelDef* pVowels = NULL; ConsonantDef* pConsonants = NULL; DigitDef* pDigits = NULL; SpecialSymbolDef* pSpecialSymbols = NULL; 
+            VowelDef* pVowels = nullptr; ConsonantDef* pConsonants = nullptr; DigitDef* pDigits = nullptr; SpecialSymbolDef* pSpecialSymbols = nullptr;
 
 			if(nVowelCount)			pVowels = new VowelDef[nVowelCount];
 			if(nConsonantCount)		pConsonants = new ConsonantDef[nConsonantCount];
@@ -382,16 +383,16 @@ namespace PhTranslation
 
 			// Load the read Arrays into internal structures
 			{
-				if(pVowels != NULL &&  nVowelCount != 0)
+                if(pVowels != nullptr &&  nVowelCount != 0)
 					LoadVector(this->m_Vowels, pVowels, nVowelCount);
 
-				if(pConsonants != NULL &&  nConsonantCount != 0)
+                if(pConsonants != nullptr &&  nConsonantCount != 0)
 					LoadVector(this->m_Consonants, pConsonants, nConsonantCount);
 
-				if(pDigits != NULL &&  nDigitCount != 0)
+                if(pDigits != nullptr &&  nDigitCount != 0)
 					LoadVector(this->m_Digits, pDigits, nDigitCount);
 
-				if(pSpecialSymbols != NULL &&  nSpecialSymbolCount != 0)
+                if(pSpecialSymbols != nullptr &&  nSpecialSymbolCount != 0)
 					LoadVector(this->m_SpecialSymbols, pSpecialSymbols, nSpecialSymbolCount);
 
 				m_Halant = nHalant;
@@ -404,6 +405,7 @@ namespace PhTranslation
 
 			return true;
 		}
+#endif // We dont need loading of language codes from external files as yet.
 		return false;
 	}
 
