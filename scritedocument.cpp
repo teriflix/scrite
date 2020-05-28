@@ -820,7 +820,7 @@ bool ScriteDocument::load(const QString &fileName)
     }
 
     const QJsonObject metaInfo = json.value("meta").toObject();
-    if(metaInfo.value("appName").toString() != qApp->applicationName())
+    if(metaInfo.value("appName").toString().toLower() != qApp->applicationName().toLower())
     {
         m_errorReport->setErrorMessage(QString("Scrite document '%1' was created using an unrecognised app.").arg(fileName));
         return false;
