@@ -44,7 +44,7 @@
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}-32bit-Setup.exe"
-InstallDir "$PROGRAMFILES64\Scrite"
+InstallDir "$PROGRAMFILES\Scrite"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
