@@ -69,5 +69,7 @@
         <file>icons/screenplay/transition.png</file>
         <file>icons/action/find_replace.png</file>
         <file>icons/action/find_replace_inverted.png</file>
+        <file>icons/content/select_all_inverted.png</file>
+        <file>icons/content/select_all.png</file>
     </qresource>
 </RCC>

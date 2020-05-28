@@ -44,11 +44,10 @@ Item {
                     id: newSceneButton
                     icon.source: "../icons/content/add_box.png"
                     text: "Add Scene"
-                    shortcutText: "N"
-                    ToolTip.text: "Press " + shortcutText + " to create a new scene under the mouse on the canvas."
-                    suggestedWidth: 130
-                    suggestedHeight: 50
-                    display: ToolButton.TextBesideIcon
+                    suggestedWidth: display === ToolButton.TextBesideIcon ? 130 : suggestedHeight
+                    suggestedHeight: 45
+                    display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
+                    ToolTip.visible: hovered && display === ToolButton.IconOnly
                     down: newSceneColorMenuLoader.active
                     onClicked: newSceneColorMenuLoader.active = true
                     anchors.verticalCenter: parent.verticalCenter
@@ -77,6 +76,19 @@ Item {
                             }
                         }
                     }
+                }
+
+                ToolButton2 {
+                    icon.source: "../icons/content/select_all.png"
+                    text: "Preview"
+                    display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
+                    suggestedHeight: 45
+                    anchors.verticalCenter: parent.verticalCenter
+                    checkable: true
+                    checked: canvasPreview.visible
+                    down: canvasPreview.visible
+                    onToggled: structureCanvasSettings.showPreview = checked
+                    ToolTip.visible: hovered && display === ToolButton.IconOnly
                 }
 
                 ToolButton2 {
@@ -133,7 +145,7 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: scriteDocument.structure.elementCount >= 1
-        interactive: !(rubberBand.active || selection.active) && mouseOverItem === null && editItem === null
+        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting) && mouseOverItem === null && editItem === null
         property Item mouseOverItem
         property Item editItem
 
@@ -148,7 +160,7 @@ Item {
             scale: canvasScroll.suggestedScale
             border.width: 2
             border.color: structureCanvasSettings.gridColor
-            gridIsVisible: structureCanvasSettings.showGrid
+            gridIsVisible: canvasPreview.updatingThumbnail ? false : structureCanvasSettings.showGrid
             majorTickColor: structureCanvasSettings.gridColor
             minorTickColor: structureCanvasSettings.gridColor
             tickDistance: scriteDocument.structure.canvasGridSize
@@ -171,14 +183,14 @@ Item {
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.max((Math.ceil(canvas.childrenRect.right / 100) * 100), canvasScroll.width/canvas.scale)
+                set: Math.ceil(canvas.childrenRect.right / 100) * 100
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.max((Math.ceil(canvas.childrenRect.bottom / 100) * 100), canvasScroll.height/canvas.scale)
+                set: Math.ceil(canvas.childrenRect.bottom / 100) * 100
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -337,6 +349,67 @@ Item {
                         elementContextMenu.element = null
                     }
                 }
+            }
+        }
+    }
+
+    FlickablePreview {
+        id: canvasPreview
+        anchors.right: canvasScroll.right
+        anchors.bottom: canvasScroll.bottom
+        anchors.margins: 30
+        flickable: canvasScroll
+        content: canvas
+        maximumWidth: 150
+        maximumHeight: 150
+        onViewportRectRequest: canvasScroll.ensureVisible(rect, canvas.scale, 0)
+        visible: structureCanvasSettings.showPreview
+
+        TrackObject {
+            delay: 100
+            enabled: !scriteDocument.loading && canvasPreview.visible
+
+            TrackProperty { target: scriteDocument; property: "modified" }
+            TrackProperty { target: canvas; property: "width" }
+            TrackProperty { target: canvas; property: "height" }
+            TrackProperty { target: canvasScroll; property: "width" }
+            TrackProperty { target: canvasScroll; property: "height" }
+            TrackSignal { target: scriteDocument.structure; signal: "structureChanged()" }
+
+            onTracked: {
+                var sh = 150
+                var mw = sh
+                var mh = sh
+                if(canvas.width != canvas.height) {
+                    var maxSize = Qt.size(canvasScroll.width-canvasPreview.anchors.rightMargin-12,canvasScroll.height-canvasPreview.anchors.bottomMargin-12)
+                    if(maxSize.width < 0 || maxSize.height < 0) {
+                        canvasPreview.maximumWidth = sh
+                        canvasPreview.maximumHeight = sh
+                        return // dont generate any preview yet.
+                    }
+                    var ar = Math.max(canvas.width,canvas.height)/Math.min(canvas.width,canvas.height)
+                    if(canvas.width > canvas.height)
+                        mw = ar * sh
+                    else
+                        mh = ar * sh
+                    var size = app.scaledSize( Qt.size(mw,mh), maxSize )
+                    mw = size.width
+                    mh = size.height
+
+                    if(mh > sh && mw > sh) {
+                        if(mh > sh) {
+                            mw *= sh/mh;
+                            mh = sh
+                        } else if(mw > sh) {
+                            mh *= sh/mw;
+                            mw = sh
+                        }
+                    }
+                }
+
+                canvasPreview.maximumWidth = mw
+                canvasPreview.maximumHeight = mh
+                canvasPreview.updateThumbnail()
             }
         }
     }
@@ -536,7 +609,7 @@ Item {
             fromElement: scriteDocument.structure.elementAt(modelData.from)
             toElement: scriteDocument.structure.elementAt(modelData.to)
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: app.devicePixelRatio*2
+            outlineWidth: canvasPreview.updatingThumbnail ? 0.1 : app.devicePixelRatio*2*canvas.scale
 
             Rectangle {
                 id: labelBg
@@ -546,6 +619,7 @@ Item {
                 x: parent.suggestedLabelPosition.x - radius
                 y: parent.suggestedLabelPosition.y - radius
                 color: Qt.tint(parent.outlineColor, "#E0FFFFFF")
+                visible: !canvasPreview.updatingThumbnail
 
                 Text {
                     id: label

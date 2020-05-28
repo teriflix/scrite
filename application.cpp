@@ -576,6 +576,16 @@ QRectF Application::boundingRect(const QString &text, const QFont &font) const
     return fm.boundingRect(text);
 }
 
+QRectF Application::intersectedRectangle(const QRectF &of, const QRectF &with) const
+{
+    return of.intersected(with);
+}
+
+QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into) const
+{
+    return of.scaled(into, Qt::KeepAspectRatio);
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())

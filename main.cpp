@@ -40,6 +40,7 @@
 #include "genericarraymodel.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
+#include "trackobject.h"
 #include "delayedpropertybinder.h"
 #include "abstractreportgenerator.h"
 #include "qtextdocumentpagedprinter.h"
@@ -177,6 +178,11 @@ int main(int argc, char **argv)
 
     qmlRegisterType<GenericArrayModel>("Scrite", 1, 0, "GenericArrayModel");
     qmlRegisterType<GenericArraySortFilterProxyModel>("Scrite", 1, 0, "GenericArraySortFilterProxyModel");
+
+    qmlRegisterUncreatableType<AbstractObjectTracker>("Scrite", 1, 0, "AbstractTracker", reason);
+    qmlRegisterType<TrackProperty>("Scrite", 1, 0, "TrackProperty");
+    qmlRegisterType<TrackSignal>("Scrite", 1, 0, "TrackSignal");
+    qmlRegisterType<TrackObject>("Scrite", 1, 0, "TrackObject");
 
     NotificationManager notificationManager;
     ScriteDocument *scriteDocument = ScriteDocument::instance();
