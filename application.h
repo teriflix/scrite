@@ -172,6 +172,8 @@ public:
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
 
+    Q_INVOKABLE QString fileContents(const QString &fileName) const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

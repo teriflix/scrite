@@ -37,5 +37,6 @@
         <file>qml/Selection.qml</file>
         <file>qml/TextAreaInput.qml</file>
         <file>qml/FlickablePreview.qml</file>
+        <file>LICENSE.txt</file>
     </qresource>
 </RCC>

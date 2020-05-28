@@ -586,6 +586,15 @@ QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into) const
     return of.scaled(into, Qt::KeepAspectRatio);
 }
 
+QString Application::fileContents(const QString &fileName) const
+{
+    QFile file(fileName);
+    if( !file.open(QFile::ReadOnly) )
+        return QString();
+
+    return QString::fromLatin1(file.readAll());
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())
