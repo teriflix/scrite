@@ -191,7 +191,15 @@ int main(int argc, char **argv)
         scriteDocument->open( a.arguments().last() );
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
-    format.setSamples(2);
+    const QByteArray envOpenGLMultisampling = qgetenv("SCRITE_OPENGL_MULTISAMPLING").toUpper().trimmed();
+    if(envOpenGLMultisampling == QByteArrayLiteral("FULL"))
+        format.setSamples(4);
+    else if(envOpenGLMultisampling == QByteArrayLiteral("EXTREME"))
+        format.setSamples(8);
+    else if(envOpenGLMultisampling == QByteArrayLiteral("NONE"))
+        format.setSamples(-1);
+    else
+        format.setSamples(2); // default
 
     QQuickStyle::setStyle("Material");
 

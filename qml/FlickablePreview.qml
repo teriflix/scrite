@@ -129,12 +129,10 @@ Item {
         width = size.width
         height = size.height
 
-        var dpr = app.devicePixelRatio
-
         updatingThumbnail = true
         content.grabToImage(function(result) {
             thumbImage.source = result.url;
             flickablePreview.updatingThumbnail = false
-        }, Qt.size(width*dpr,height*dpr));
+        }, Qt.size(width*2,height*2));
     }
 }
