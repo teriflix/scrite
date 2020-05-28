@@ -164,7 +164,7 @@ win32 {
 
 DISTFILES += \
     Info.plist \
-    License.txt \
+    LICENSE.txt \
     README \
     packaging/linux/install.sh \
     packaging/linux/package.sh \

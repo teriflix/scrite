@@ -8,8 +8,9 @@ licenses compatible with GPLv3.
    information about this project please visit:
    https://sourceforge.net/projects/phtranslator/
 
-3. The TrueType "Courier Prime" fonts in fonts folder are downloaded from
-   https://fonts.google.com/download?family=Courier%20Prime
+3. All the fonts found in the fonts/ directory have been downloaded from
+   Google Fonts. In each directory, there is a source.txt that specifically
+   states the URL from which it was downloaded.
    These fonts are provided under "Open Font License". We are simply
    bundling the fonts with the binary for use in the software. The detailed
    license terms under which the fonts are made available can be read at:
