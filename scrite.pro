@@ -169,8 +169,10 @@ DISTFILES += \
     packaging/linux/install.sh \
     packaging/linux/package.sh \
     packaging/linux/scrite.desktop \
-    packaging/windows/package.bat \
-    packaging/windows/installer.nsi \
+    packaging/windows/package-x86.bat \
+    packaging/windows/package-x64.bat \
+    packaging/windows/installer-x86.nsi \
+    packaging/windows/installer-x64.nsi \
     packaging/mac/packaging.sh \
     poly2tri/License.txt
 
