@@ -80,10 +80,17 @@ void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, 
 int main(int argc, char **argv)
 {
     const QVersionNumber applicationVersion(0, 3, 8);
-    Application::setApplicationName("scrite");
+    Application::setApplicationName("Scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
-    Application::setApplicationVersion(applicationVersion.toString() + "-" + QSysInfo::buildCpuArchitecture() + "-beta");
+#ifdef Q_OS_MAC
+    Application::setApplicationVersion(applicationVersion.toString() + "-beta");
+#else
+    if(QSysInfo::WordSize == 32)
+        Application::setApplicationVersion(applicationVersion.toString() + "-beta-x86");
+    else
+        Application::setApplicationVersion(applicationVersion.toString() + "-beta-x64");
+#endif
 
     qInstallMessageHandler(ScriteQtMessageHandler);
 

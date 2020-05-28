@@ -37,14 +37,15 @@ Item {
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "scrite"
+                text: app.applicationName
+                font.family: "Courier Prime"
                 font.pixelSize: 80
                 color: accentColors.c50.text
             }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: 24
+                font.pixelSize: 20
                 text: "Version " + app.applicationVersion
                 color: accentColors.c50.text
             }
@@ -73,7 +74,7 @@ Item {
                 wrapMode: Text.WordWrap
                 font.pixelSize: 14
                 horizontalAlignment: Text.AlignHCenter
-                text: "Developed using Qt " + app.qtVersion + " LGPL<br/><font color=\"blue\">https://www.qt.io</font>"
+                text: "Developed using Qt " + app.qtVersion + " <br/><font color=\"blue\">https://www.qt.io</font>"
                 color: accentColors.c50.text
 
                 MouseArea {

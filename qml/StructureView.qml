@@ -380,7 +380,7 @@ Item {
                 var sh = 150
                 var mw = sh
                 var mh = sh
-                if(canvas.width != canvas.height) {
+                if(canvas.width !== canvas.height) {
                     var maxSize = Qt.size(canvasScroll.width-canvasPreview.anchors.rightMargin-12,canvasScroll.height-canvasPreview.anchors.bottomMargin-12)
                     if(maxSize.width < 0 || maxSize.height < 0) {
                         canvasPreview.maximumWidth = sh

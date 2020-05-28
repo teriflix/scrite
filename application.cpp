@@ -52,7 +52,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     connect(this, &QGuiApplication::fontChanged, this, &Application::applicationFontChanged);
 
     this->setWindowIcon( QIcon(":/images/appicon.png") );
-    this->setBaseWindowTitle("Scrite " + Application::applicationVersion());
+    this->setBaseWindowTitle(Application::applicationName() + " " + Application::applicationVersion());
 
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
