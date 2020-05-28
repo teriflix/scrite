@@ -356,5 +356,7 @@ Rectangle {
         width: parent.width * 0.7
         onVisibleChanged: blur.visible = visible
     }
+
+    Component.onCompleted: qmlWindow.raise()
 }
 
