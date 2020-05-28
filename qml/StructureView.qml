@@ -44,11 +44,10 @@ Item {
                     id: newSceneButton
                     icon.source: "../icons/content/add_box.png"
                     text: "Add Scene"
-                    shortcutText: "N"
-                    ToolTip.text: "Press " + shortcutText + " to create a new scene under the mouse on the canvas."
-                    suggestedWidth: 130
-                    suggestedHeight: 50
-                    display: ToolButton.TextBesideIcon
+                    suggestedWidth: display === ToolButton.TextBesideIcon ? 130 : suggestedHeight
+                    suggestedHeight: 45
+                    display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
+                    ToolTip.visible: hovered && display === ToolButton.IconOnly
                     down: newSceneColorMenuLoader.active
                     onClicked: newSceneColorMenuLoader.active = true
                     anchors.verticalCenter: parent.verticalCenter
@@ -82,14 +81,14 @@ Item {
                 ToolButton2 {
                     icon.source: "../icons/content/select_all.png"
                     text: "Preview"
-                    display: ToolButton.TextBesideIcon
-                    shortcut: "F3"
+                    display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
                     suggestedHeight: 45
                     anchors.verticalCenter: parent.verticalCenter
                     checkable: true
                     checked: canvasPreview.visible
                     down: canvasPreview.visible
-                    onToggled: canvasPreview.visible = checked
+                    onToggled: structureCanvasSettings.showPreview = checked
+                    ToolTip.visible: hovered && display === ToolButton.IconOnly
                 }
 
                 ToolButton2 {
@@ -364,6 +363,7 @@ Item {
         maximumWidth: 150
         maximumHeight: 150
         onViewportRectRequest: canvasScroll.ensureVisible(rect, canvas.scale, 0)
+        visible: structureCanvasSettings.showPreview
 
         TrackObject {
             delay: 100
@@ -381,7 +381,7 @@ Item {
                 var mw = sh
                 var mh = sh
                 if(canvas.width != canvas.height) {
-                    var maxSize = Qt.size(canvasScroll.width-2*canvasPreview.anchors.rightMargin,canvasScroll.height-2*canvasPreview.anchors.bottomMargin)
+                    var maxSize = Qt.size(canvasScroll.width-canvasPreview.anchors.rightMargin-12,canvasScroll.height-canvasPreview.anchors.bottomMargin-12)
                     if(maxSize.width < 0 || maxSize.height < 0) {
                         canvasPreview.maximumWidth = sh
                         canvasPreview.maximumHeight = sh

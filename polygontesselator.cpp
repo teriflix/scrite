@@ -13,7 +13,7 @@
 
 #include "polygontesselator.h"
 
-#include "poly2tri/poly2tri.h"
+#include "3rdparty/poly2tri/poly2tri.h"
 
 QVector<QPointF> PolygonTessellator::tessellate(const QList<QPolygonF> &polygons)
 {

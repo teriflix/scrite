@@ -120,6 +120,7 @@ Rectangle {
         property bool showGrid: false
         property color gridColor: primaryColors.c900.background
         property color canvasColor: accentColors.c50.background
+        property bool showPreview: true
     }
 
     function showInformation(params, popupSource) {
@@ -355,5 +356,7 @@ Rectangle {
         width: parent.width * 0.7
         onVisibleChanged: blur.visible = visible
     }
+
+    Component.onCompleted: qmlWindow.raise()
 }
 

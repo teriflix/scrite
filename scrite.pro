@@ -44,13 +44,13 @@ HEADERS += \
     odtexporter.h \
     painterpathitem.h \
     pdfexporter.h \
-    poly2tri/common/shapes.h \
-    poly2tri/common/utils.h \
-    poly2tri/poly2tri.h \
-    poly2tri/sweep/advancing_front.h \
-    poly2tri/sweep/cdt.h \
-    poly2tri/sweep/sweep.h \
-    poly2tri/sweep/sweep_context.h \
+    3rdparty/poly2tri/common/shapes.h \
+    3rdparty/poly2tri/common/utils.h \
+    3rdparty/poly2tri/poly2tri.h \
+    3rdparty/poly2tri/sweep/advancing_front.h \
+    3rdparty/poly2tri/sweep/cdt.h \
+    3rdparty/poly2tri/sweep/sweep.h \
+    3rdparty/poly2tri/sweep/sweep_context.h \
     polygontesselator.h \
     progressreport.h \
     qobjectfactory.h \
@@ -111,11 +111,11 @@ SOURCES += \
     odtexporter.cpp \
     painterpathitem.cpp \
     pdfexporter.cpp \
-    poly2tri/common/shapes.cc \
-    poly2tri/sweep/advancing_front.cc \
-    poly2tri/sweep/cdt.cc \
-    poly2tri/sweep/sweep.cc \
-    poly2tri/sweep/sweep_context.cc \
+    3rdparty/poly2tri/common/shapes.cc \
+    3rdparty/poly2tri/sweep/advancing_front.cc \
+    3rdparty/poly2tri/sweep/cdt.cc \
+    3rdparty/poly2tri/sweep/sweep.cc \
+    3rdparty/poly2tri/sweep/sweep_context.cc \
     polygontesselator.cpp \
     progressreport.cpp \
     qobjectserializer.cpp \
@@ -164,7 +164,7 @@ win32 {
 
 DISTFILES += \
     Info.plist \
-    License.txt \
+    LICENSE.txt \
     README \
     packaging/linux/install.sh \
     packaging/linux/package.sh \
@@ -174,6 +174,6 @@ DISTFILES += \
     packaging/windows/installer-x86.nsi \
     packaging/windows/installer-x64.nsi \
     packaging/mac/packaging.sh \
-    poly2tri/License.txt
+    3rdparty/poly2tri/License.txt
 
 

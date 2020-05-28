@@ -61,6 +61,8 @@ Item {
         id: thumbImage
         anchors.fill: parent
         clip: true
+        smooth: true
+        mipmap: true
 
         Rectangle {
             id: viewportIndicator
@@ -131,6 +133,6 @@ Item {
         content.grabToImage(function(result) {
             thumbImage.source = result.url;
             flickablePreview.updatingThumbnail = false
-        }, size);
+        }, Qt.size(width*2,height*2));
     }
 }
