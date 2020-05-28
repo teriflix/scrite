@@ -265,7 +265,7 @@ QString AutoUpdate::getClientId() const
         ret = "scrite-";
         ret += Application::instance()->applicationVersion() + " ";
 
-        QString prodName = QSysInfo::prettyProductName();
+        QString prodName = QSysInfo::prettyProductName() + "-" + QSysInfo::currentCpuArchitecture();
         prodName.replace(" ", "_");
         ret += prodName + " ";
 

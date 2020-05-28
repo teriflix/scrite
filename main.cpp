@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     Application::setApplicationName("scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
-    Application::setApplicationVersion(applicationVersion.toString() + "-beta");
+    Application::setApplicationVersion(applicationVersion.toString() + "-" + QSysInfo::buildCpuArchitecture() + "-beta");
 
     qInstallMessageHandler(ScriteQtMessageHandler);
 
