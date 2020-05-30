@@ -25,6 +25,7 @@
 #include <QQuickTextDocument>
 
 #include "note.h"
+#include "modifiable.h"
 #include "qobjectserializer.h"
 
 class Scene;
@@ -33,7 +34,7 @@ class SceneElement;
 class SceneDocumentBinder;
 class PushSceneUndoCommand;
 
-class SceneHeading : public QObject
+class SceneHeading : public QObject, public Modifiable
 {
     Q_OBJECT
 
@@ -72,14 +73,14 @@ public:
 
 private:
     bool m_enabled = true;
-    char m_padding[7];
+    char m_padding[3];
     Scene* m_scene = nullptr;
     QString m_moment = "DAY";
     QString m_location = "Somewhere";
     QString m_locationType = "EXT";
 };
 
-class SceneElement : public QObject
+class SceneElement : public QObject, public Modifiable
 {
     Q_OBJECT
 
@@ -150,7 +151,7 @@ private:
     QMap< QString, QList<SceneElement*> > m_reverseMap;
 };
 
-class Scene : public QAbstractListModel, public QObjectSerializer::Interface
+class Scene : public QAbstractListModel, public QObjectSerializer::Interface, public Modifiable
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)

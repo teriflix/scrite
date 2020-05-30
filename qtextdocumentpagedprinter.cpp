@@ -127,6 +127,9 @@ void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF
 
 void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCount)
 {
+    if(m_left == Nothing && m_right == Nothing && m_center == Nothing)
+        return;
+
     if(!m_visibleFromPageOne)
     {
         --pageNr;
@@ -139,8 +142,12 @@ void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCo
     auto updateContent = [pageNr,pageCount](ColumnContent &content, Field field) {
         if(field == PageNumber)
             content.content = QString::number(pageNr) + ".";
-        else if(field == PageNumberOfCount)
-            content.content = QString::number(pageNr) + "/" + QString::number(pageCount);
+        else if(field == PageNumberOfCount) {
+            if(pageCount >= pageNr)
+                content.content = QString::number(pageNr) + "/" + QString::number(pageCount);
+            else
+                content.content = QString::number(pageNr) + ".";
+        }
     };
 
     updateContent(m_columns[0], m_left);
@@ -169,7 +176,7 @@ void HeaderFooter::finish()
 Watermark::Watermark(QObject *parent)
           :QObject(parent)
 {
-
+    m_padding[0] = 0;
 }
 
 Watermark::~Watermark()
@@ -309,54 +316,7 @@ void Watermark::paint(QPainter *painter, const QRectF &pageRect, int pageNr, int
 QTextDocumentPagedPrinter::QTextDocumentPagedPrinter(QObject *parent)
     : QObject(parent)
 {
-    const QSettings *settings = Application::instance()->settings();
-    auto fetchField = [settings](const QString &key, HeaderFooter::Field defaultValue) {
-        const QString settingsKey = "PageSetup/" + key;
-        const QVariant val = settings->value(settingsKey);
-        const int min = HeaderFooter::Nothing;
-        const int max = HeaderFooter::PageNumberOfCount;
-        if(!val.isValid() || val.toInt() < min || val.toInt() > max)
-            return defaultValue;
-        return HeaderFooter::Field(val.toInt());
-    };
-
-    m_header->setLeft(fetchField("headerLeft", HeaderFooter::Title));
-    m_header->setCenter(fetchField("headerCenter", HeaderFooter::Subtitle));
-    m_header->setRight(fetchField("headerRight", HeaderFooter::PageNumber));
-
-    m_footer->setLeft(fetchField("footerLeft", HeaderFooter::Author));
-    m_footer->setCenter(fetchField("footerCenter", HeaderFooter::Version));
-    m_footer->setRight(fetchField("footerRight", HeaderFooter::Contact));
-
-    {
-        const QVariant val = settings->value("PageSetup/headerOpacity");
-        if(val.isValid())
-            m_header->setOpacity( qBound(0.0,val.toDouble(),1.0) );
-    }
-
-    {
-        const QVariant val = settings->value("PageSetup/footerOpacity");
-        if(val.isValid())
-            m_header->setOpacity( qBound(0.0,val.toDouble(),1.0) );
-    }
-
-    auto fetchSetting = [settings](const QString &key, const QVariant &defaultValue) {
-        const QVariant val = settings->value("PageSetup/" + key);
-        return val.isValid() ? val : defaultValue;
-    };
-
-    m_watermark->setEnabled( fetchSetting("watermarkEnabled", m_watermark->isEnabled()).toBool() );
-    m_watermark->setText( fetchSetting("watermarkText", m_watermark->text()).toString() );
-
-    QFont watermarkFont;
-    watermarkFont.setFamily( fetchSetting("watermarkFont", "Courier Prime").toString() );
-    watermarkFont.setPointSize( fetchSetting("watermarkFontSize", 120).toInt() );
-    m_watermark->setFont(watermarkFont);
-
-    m_watermark->setColor( QColor(fetchSetting("watermarkColor", "lightgray").toString()) );
-    m_watermark->setOpacity( fetchSetting("watermarkOpacity", 0.5).toDouble() );
-    m_watermark->setRotation( fetchSetting("watermarkRotation", 0.5).toDouble() );
-    m_watermark->setAlignment( Qt::Alignment(fetchSetting("watermarkAlignment", Qt::AlignCenter).toInt()) );
+    QTextDocumentPagedPrinter::loadSettings(m_header, m_footer, m_watermark);
 }
 
 QTextDocumentPagedPrinter::~QTextDocumentPagedPrinter()
@@ -497,6 +457,63 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     m_progressReport->finish();
 
     return true;
+}
+
+void QTextDocumentPagedPrinter::loadSettings(HeaderFooter *header, HeaderFooter *footer, Watermark *watermark)
+{
+    const QSettings *settings = Application::instance()->settings();
+    auto fetchField = [settings](const QString &key, HeaderFooter::Field defaultValue) {
+        const QString settingsKey = "PageSetup/" + key;
+        const QVariant val = settings->value(settingsKey);
+        const int min = HeaderFooter::Nothing;
+        const int max = HeaderFooter::PageNumberOfCount;
+        if(!val.isValid() || val.toInt() < min || val.toInt() > max)
+            return defaultValue;
+        return HeaderFooter::Field(val.toInt());
+    };
+
+    if(header != nullptr)
+    {
+        header->setLeft(fetchField("headerLeft", HeaderFooter::Title));
+        header->setCenter(fetchField("headerCenter", HeaderFooter::Subtitle));
+        header->setRight(fetchField("headerRight", HeaderFooter::PageNumber));
+
+        const QVariant val = settings->value("PageSetup/headerOpacity");
+        if(val.isValid())
+            header->setOpacity( qBound(0.0,val.toDouble(),1.0) );
+    }
+
+    if(footer != nullptr)
+    {
+        footer->setLeft(fetchField("footerLeft", HeaderFooter::Author));
+        footer->setCenter(fetchField("footerCenter", HeaderFooter::Version));
+        footer->setRight(fetchField("footerRight", HeaderFooter::Contact));
+
+        const QVariant val = settings->value("PageSetup/footerOpacity");
+        if(val.isValid())
+            footer->setOpacity( qBound(0.0,val.toDouble(),1.0) );
+    }
+
+    auto fetchSetting = [settings](const QString &key, const QVariant &defaultValue) {
+        const QVariant val = settings->value("PageSetup/" + key);
+        return val.isValid() ? val : defaultValue;
+    };
+
+    if(watermark != nullptr)
+    {
+        watermark->setEnabled( fetchSetting("watermarkEnabled", watermark->isEnabled()).toBool() );
+        watermark->setText( fetchSetting("watermarkText", watermark->text()).toString() );
+
+        QFont watermarkFont;
+        watermarkFont.setFamily( fetchSetting("watermarkFont", "Courier Prime").toString() );
+        watermarkFont.setPointSize( fetchSetting("watermarkFontSize", 120).toInt() );
+        watermark->setFont(watermarkFont);
+
+        watermark->setColor( QColor(fetchSetting("watermarkColor", "lightgray").toString()) );
+        watermark->setOpacity( fetchSetting("watermarkOpacity", 0.5).toDouble() );
+        watermark->setRotation( fetchSetting("watermarkRotation", 0.5).toDouble() );
+        watermark->setAlignment( Qt::Alignment(fetchSetting("watermarkAlignment", Qt::AlignCenter).toInt()) );
+    }
 }
 
 void QTextDocumentPagedPrinter::printPage(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body)

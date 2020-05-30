@@ -112,22 +112,22 @@ Item {
                     function doOpen(filePath) {
                         if(scriteDocument.modified)
                             askQuestion({
-                                            "question": "Do you want to save your current project first?",
-                                            "okButtonText": "Yes",
-                                            "cancelButtonText": "No",
-                                            "callback": function(val) {
-                                                if(val) {
-                                                    if(scriteDocument.fileName !== "")
-                                                        scriteDocument.save()
-                                                    else {
-                                                        cmdSave.doClick()
-                                                        return
-                                                    }
-                                                }
-                                                recentFilesMenu.close()
-                                                fileDialog.launch("OPEN", filePath)
+                                    "question": "Do you want to save your current project first?",
+                                    "okButtonText": "Yes",
+                                    "cancelButtonText": "No",
+                                    "callback": function(val) {
+                                        if(val) {
+                                            if(scriteDocument.fileName !== "")
+                                                scriteDocument.save()
+                                            else {
+                                                cmdSave.doClick()
+                                                return
                                             }
-                                        }, this)
+                                        }
+                                        recentFilesMenu.close()
+                                        fileDialog.launch("OPEN", filePath)
+                                    }
+                                }, this)
                         else {
                             recentFilesMenu.close()
                             fileDialog.launch("OPEN", filePath)

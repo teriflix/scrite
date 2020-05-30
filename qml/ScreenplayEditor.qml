@@ -51,7 +51,18 @@ Item {
         Row {
             id: toolbarLayout
             anchors.left: parent.left
-            anchors.leftMargin: toolbar.margin
+            anchors.leftMargin: toolbar.margin - screenplayPreviewButton.width/2
+
+            ToolButton2 {
+                id: screenplayPreviewButton
+                icon.source: "../icons/action/preview.png"
+                ToolTip.text: "Preview the screenplay in print format."
+                ToolTip.delay: 1000
+                checkable: true
+                checked: screenplayPreview.visible
+                down: screenplayPreview.visible
+                onClicked: screenplayPreview.visible = checked
+            }
 
             ToolButton2 {
                 icon.source: "../icons/screenplay/character.png"
@@ -102,6 +113,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             searchEngine.objectName: "Screenplay Search Engine"
             allowReplace: true
+            enabled: !screenplayPreview.active
         }
     }
 
@@ -255,6 +267,170 @@ Item {
                 screenplayListView.contentY = pt.y
             else if( pt.y > endY )
                 screenplayListView.contentY = (pt.y + 2*rect.height) - screenplayListView.height
+        }
+    }
+
+    Rectangle {
+        id: statusBar
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.rightMargin: 20
+        anchors.bottomMargin: 2
+        color: primaryColors.c200.background
+        border.color: primaryColors.c200.text
+        border.width: 1
+        width: statusText.contentWidth + 14
+        height: statusText.contentHeight + 10
+        visible: screenplayText.active && scriteDocument.screenplay.elementCount > 0 && !screenplayPreview.active
+
+        Text {
+            id: statusText
+            anchors.centerIn: parent
+            color: primaryColors.c200.text
+            font.pointSize: 10
+            text: {
+                if(screenplayText.active)
+                    return screenplayText.item.document.currentPage + " of " + screenplayText.item.document.pageCount
+                return "loading ..."
+            }
+        }
+    }
+
+    Loader {
+        id: screenplayText
+        active: !scriteDocument.loading
+        asynchronous: false
+        sourceComponent: Item {
+            property real zoomLevel: 1
+
+            property ScreenplayTextDocument document: ScreenplayTextDocument {
+                syncEnabled: !scriteDocument.loading
+                screenplay: scriteDocument.screenplay
+                formatting: scriteDocument.printFormat
+                onPageCountChanged: console.log("PA: " + pageCount)
+            }
+
+            property ImagePrinter printer: ImagePrinter {
+                scale: app.devicePixelRatio
+            }
+
+            TrackObject {
+                objectName: "screenplayTextDocumentUpdateTracker"
+                enabled: !modalDialog.active && screenplayPreview.active
+                TrackSignal { target: document; signal: "updateFinished()" }
+                onTracked: document.print(printer)
+            }
+        }
+    }
+
+    Loader {
+        id: screenplayPreview
+        visible: false
+        active: visible && screenplayText.active
+        anchors.fill: screenplayListView
+        sourceComponent: Rectangle {
+            color: primaryColors.c50.background
+
+            Flickable {
+                id: pagesScroll
+                anchors.fill: parent
+                contentWidth: pagesViewContainer.width
+                contentHeight: pagesViewContainer.height
+                clip: true
+
+                ScrollBar.horizontal: ScrollBar {
+                    policy: pagesViewContainer.width > pagesScroll.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    minimumSize: 0.1
+                    palette {
+                        mid: Qt.rgba(0,0,0,0.25)
+                        dark: Qt.rgba(0,0,0,0.75)
+                    }
+                    opacity: active ? 1 : 0.2
+                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                }
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: pagesViewContainer.height > pagesScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    minimumSize: 0.1
+                    palette {
+                        mid: Qt.rgba(0,0,0,0.25)
+                        dark: Qt.rgba(0,0,0,0.75)
+                    }
+                    opacity: active ? 1 : 0.2
+                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                }
+
+                property int nrColumns: Math.max(Math.floor(width/pagesView.cellWidth), 1)
+                property int nrRows: Math.ceil(screenplayText.item.printer.pageCount / nrColumns)
+
+                Item {
+                    id: pagesViewContainer
+                    width: Math.max(pagesView.width, pagesScroll.width)
+                    height: pagesView.height
+
+                    DelayedPropertyBinder {
+                        id: delegateCounter
+                        initial: 0
+                        set: 0
+                        onGetChanged: console.log("PA: pagesView.delegateCount = " + get)
+                    }
+
+                    GridView {
+                        id: pagesView
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: pagesScroll.nrColumns * pagesView.cellWidth
+                        height:  pagesScroll.nrRows * pagesView.cellHeight
+                        model: screenplayText.item.printer.printing ? null : screenplayText.item.printer
+                        cellWidth: screenplayText.item.printer.pageWidth*zoomSlider.value + 40
+                        cellHeight: screenplayText.item.printer.pageHeight*zoomSlider.value + 40
+                        interactive: false
+                        delegate: Item {
+                            width: pagesView.cellWidth
+                            height: pagesView.cellHeight
+                            Component.onCompleted: delegateCounter.set = delegateCounter.set + 1
+                            Component.onDestruction: delegateCounter.set = delegateCounter.set - 1
+
+                            BorderImage {
+                                source: "../icons/content/shadow.png"
+                                anchors.fill: pageImage
+                                horizontalTileMode: BorderImage.Stretch
+                                verticalTileMode: BorderImage.Stretch
+                                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                                border { left: 21; top: 21; right: 21; bottom: 21 }
+                                opacity: pagesView.currentIndex === index ? 0.55 : 0.15
+                                visible: pageImage.status === Image.Ready
+                            }
+
+                            Image {
+                                id: pageImage
+                                width: pageWidth*zoomSlider.value
+                                height: pageHeight*zoomSlider.value
+                                source: pageUrl
+                                anchors.centerIn: parent
+                                smooth: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: pagesView.currentIndex = index
+                            }
+                        }
+                    }
+                }
+            }
+
+            Slider {
+                id: zoomSlider
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.margins: 20
+                width: 200
+                orientation: Qt.Horizontal
+                from: 0.5
+                to: 2.5
+                value: screenplayText.item.zoomLevel
+                onValueChanged: screenplayText.item.zoomLevel = value
+            }
         }
     }
 

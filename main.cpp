@@ -24,8 +24,10 @@
 #include "undoredo.h"
 #include "completer.h"
 #include "autoupdate.h"
+#include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
+#include "imageprinter.h"
 #include "focustracker.h"
 #include "notification.h"
 #include "searchengine.h"
@@ -40,8 +42,8 @@
 #include "genericarraymodel.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
-#include "trackobject.h"
 #include "delayedpropertybinder.h"
+#include "screenplaytextdocument.h"
 #include "abstractreportgenerator.h"
 #include "qtextdocumentpagedprinter.h"
 
@@ -190,6 +192,9 @@ int main(int argc, char **argv)
     qmlRegisterType<TrackProperty>("Scrite", 1, 0, "TrackProperty");
     qmlRegisterType<TrackSignal>("Scrite", 1, 0, "TrackSignal");
     qmlRegisterType<TrackObject>("Scrite", 1, 0, "TrackObject");
+
+    qmlRegisterType<ScreenplayTextDocument>("Scrite", 1, 0, "ScreenplayTextDocument");
+    qmlRegisterType<ImagePrinter>("Scrite", 1, 0, "ImagePrinter");
 
     NotificationManager notificationManager;
     ScriteDocument *scriteDocument = ScriteDocument::instance();

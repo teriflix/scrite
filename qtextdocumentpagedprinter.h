@@ -94,7 +94,6 @@ public:
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
 
-private:
     void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect);
     void paint(QPainter *paint, const QRectF &rect, int pageNr, int pageCount);
     void finish();
@@ -168,8 +167,6 @@ public:
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
 
-private:
-    friend class QTextDocumentPagedPrinter;
     void paint(QPainter *paint, const QRectF &pageRect, int pageNr, int pageCount);
 
 private:
@@ -181,6 +178,7 @@ private:
     Qt::Alignment m_alignment = Qt::AlignCenter;
     bool m_enabled = true;
     bool m_visibleFromPageOne = false;
+    char m_padding[2];
 };
 
 class QTextDocumentPagedPrinter : public QObject
@@ -201,6 +199,8 @@ public:
     Watermark *watermark() const { return m_watermark; }
 
     Q_INVOKABLE bool print(QTextDocument *document, QPagedPaintDevice *device);
+
+    static void loadSettings(HeaderFooter *header, HeaderFooter *footer, Watermark *watermark);
 
 private:
     void printPage(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body);

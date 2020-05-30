@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "pdfexporter.h"
+#include "imageprinter.h"
 #include "qtextdocumentpagedprinter.h"
 
 #include <QFileInfo>

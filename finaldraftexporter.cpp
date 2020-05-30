@@ -16,6 +16,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomAttr>
+#include <QFileInfo>
 
 FinalDraftExporter::FinalDraftExporter(QObject *parent)
                    :AbstractExporter(parent)
@@ -151,4 +152,12 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     ts.flush();
 
     return true;
+}
+
+QString FinalDraftExporter::polishFileName(const QString &fileName) const
+{
+    QFileInfo fi(fileName);
+    if( fi.suffix().toLower() != "fdx" )
+        return fileName + ".fdx";
+    return fileName;
 }

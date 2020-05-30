@@ -25,6 +25,9 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
 {
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::elementChanged, [=](){
+        this->markAsModified();
+    });
 }
 
 ScreenplayElement::~ScreenplayElement()
@@ -235,6 +238,9 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::versionChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
+    connect(this, &Screenplay::screenplayChanged, [=](){
+        this->markAsModified();
+    });
 
     m_author = QSysInfo::machineHostName();
     m_version = "0.1";
@@ -242,7 +248,7 @@ Screenplay::Screenplay(QObject *parent)
 
 Screenplay::~Screenplay()
 {
-
+    emit aboutToDelete(this);
 }
 
 void Screenplay::setTitle(const QString &val)
@@ -341,6 +347,7 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
 
     this->endInsertRows();
 
+    emit elementInserted(ptr, index);
     emit elementCountChanged();
     emit elementsChanged();
 
@@ -377,6 +384,7 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
 
     this->endRemoveRows();
 
+    emit elementRemoved(ptr, row);
     emit elementCountChanged();
     emit elementsChanged();
 
@@ -472,6 +480,7 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
     if(fromRow == m_currentElementIndex)
         this->setCurrentElementIndex(toRow);
 
+    emit elementMoved(ptr, fromRow, toRow);
     emit elementsChanged();
 
     if(UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
@@ -878,22 +887,42 @@ void Screenplay::removeSceneElements(Scene *scene)
 
 int Screenplay::firstIndexOfScene(Scene *scene) const
 {
-    if(scene == nullptr)
-        return -1;
-
-    for(int i=0; i<m_elements.size(); i++)
-    {
-        ScreenplayElement *element = m_elements.at(i);
-        if(element->scene() == scene)
-            return i;
-    }
-
-    return -1;
+    const QList<int> indexes = this->sceneElementIndexes(scene, 1);
+    return indexes.isEmpty() ? -1 : indexes.first();
 }
 
 int Screenplay::indexOfElement(ScreenplayElement *element) const
 {
     return m_elements.indexOf(element);
+}
+
+QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const
+{
+    QList<int> ret;
+    if(scene == nullptr || max == 0)
+        return ret;
+
+    for(int i=0; i<m_elements.size(); i++)
+    {
+        ScreenplayElement *element = m_elements.at(i);
+        if(element->scene() == scene)
+        {
+            ret << i;
+            if(max > 0 && ret.size() == max)
+                break;
+        }
+    }
+
+    return ret;
+}
+
+QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) const
+{
+    const QList<int> indexes = this->sceneElementIndexes(scene, max);
+    QList<ScreenplayElement*> elements;
+    Q_FOREACH(int idx, indexes)
+        elements << m_elements.at(idx);
+    return elements;
 }
 
 void Screenplay::addBreakElement(Screenplay::BreakType type)

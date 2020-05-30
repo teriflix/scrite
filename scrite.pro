@@ -35,6 +35,7 @@ HEADERS += \
     hourglass.h \
     htmlexporter.h \
     htmlimporter.h \
+    imageprinter.h \
     locationreportgenerator.h \
     materialcolors.h \
     modifiable.h \
@@ -60,6 +61,7 @@ HEADERS += \
     scene.h \
     scenecharactermatrixreportgenerator.h \
     screenplay.h \
+    screenplaytextdocument.h \
     scritedocument.h \
     searchengine.h \
     simpletimer.h \
@@ -102,6 +104,7 @@ SOURCES += \
     gridbackgrounditem.cpp \
     htmlexporter.cpp \
     htmlimporter.cpp \
+    imageprinter.cpp \
     locationreportgenerator.cpp \
     main.cpp \
     materialcolors.cpp \
@@ -124,6 +127,7 @@ SOURCES += \
     scene.cpp \
     scenecharactermatrixreportgenerator.cpp \
     screenplay.cpp \
+    screenplaytextdocument.cpp \
     scritedocument.cpp \
     searchengine.cpp \
     simpletimer.cpp \

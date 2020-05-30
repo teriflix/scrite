@@ -15,6 +15,7 @@
 #define SCREENPLAY_H
 
 #include "scene.h"
+#include "modifiable.h"
 #include "simpletimer.h"
 
 #include <QJsonArray>
@@ -24,7 +25,7 @@
 class Screenplay;
 class ScriteDocument;
 
-class ScreenplayElement : public QObject
+class ScreenplayElement : public QObject, public Modifiable
 {
     Q_OBJECT
 
@@ -101,13 +102,14 @@ private:
     ElementType m_elementType = SceneElementType;
 };
 
-class Screenplay : public QAbstractListModel
+class Screenplay : public QAbstractListModel, public Modifiable
 {
     Q_OBJECT
 
 public:
     Screenplay(QObject *parent=nullptr);
     ~Screenplay();
+    Q_SIGNAL void aboutToDelete(Screenplay *ptr);
 
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
@@ -149,12 +151,17 @@ public:
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
     Q_SIGNAL void elementsChanged();
+    Q_SIGNAL void elementInserted(ScreenplayElement *ptr, int index);
+    Q_SIGNAL void elementRemoved(ScreenplayElement *ptr, int index);
+    Q_SIGNAL void elementMoved(ScreenplayElement *ptr, int from, int to);
 
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
 
     Q_INVOKABLE void removeSceneElements(Scene *scene);
     Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
+    Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max=-1) const;
+    QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
 
     enum BreakType
     {

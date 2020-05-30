@@ -144,6 +144,7 @@ private:
 };
 
 #define PROFILE_THIS_FUNCTION TimeProfiler profiler##__LINE__(Q_FUNC_INFO, false)
+#define PROFILE_THIS_FUNCTION2 TimeProfiler profiler##__LINE__(Q_FUNC_INFO, true)
 
 #else // #ifdef ENABLE_TIME_PROFILING
 

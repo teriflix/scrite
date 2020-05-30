@@ -71,5 +71,7 @@
         <file>icons/action/find_replace_inverted.png</file>
         <file>icons/content/select_all_inverted.png</file>
         <file>icons/content/select_all.png</file>
+        <file>icons/action/preview.png</file>
+        <file>icons/action/preview_inverted.png</file>
     </qresource>
 </RCC>

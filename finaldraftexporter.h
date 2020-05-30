@@ -31,6 +31,7 @@ public:
 
 protected:
     bool doExport(QIODevice *device);
+    QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 };
 
 #endif // FINALDRAFTEXPORTER_H

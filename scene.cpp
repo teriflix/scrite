@@ -191,6 +191,9 @@ SceneHeading::SceneHeading(QObject *parent)
     connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationTypeChanged, this, &SceneHeading::textChanged);
+    connect(this, &SceneHeading::textChanged, [=](){
+        this->markAsModified();
+    });
 }
 
 SceneHeading::~SceneHeading()
@@ -247,7 +250,10 @@ void SceneHeading::setMoment(const QString &val2)
 
 QString SceneHeading::text() const
 {
-    return m_locationType + ". " + m_location + " - " + m_moment;
+    if(m_enabled)
+        return m_locationType + ". " + m_location + " - " + m_moment;
+
+    return QString();
 }
 
 void SceneHeading::parseFrom(const QString &text)
@@ -308,6 +314,9 @@ SceneElement::SceneElement(QObject *parent)
 {
     connect(this, &SceneElement::typeChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::textChanged, this, &SceneElement::elementChanged);
+    connect(this, &SceneElement::elementChanged, [=](){
+        this->markAsModified();
+    });
 }
 
 SceneElement::~SceneElement()
@@ -518,6 +527,9 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::headingChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::headingChanged);
+    connect(this, &Scene::sceneChanged, [=](){
+        this->markAsModified();
+    });
 
     connect(this, &Scene::sceneElementChanged, this, &Scene::onSceneElementChanged);
     connect(this, &Scene::aboutToRemoveSceneElement, this, &Scene::onAboutToRemoveSceneElement);
@@ -789,6 +801,7 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
         this->endInsertRows();
 
     emit elementCountChanged();
+    emit sceneRefreshed();
 
     // To ensure that character names are collected under all-character names
     // while an import is being done.
@@ -821,6 +834,7 @@ void Scene::removeElement(SceneElement *ptr)
         this->endRemoveRows();
 
     emit elementCountChanged();
+    emit sceneRefreshed();
 
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);

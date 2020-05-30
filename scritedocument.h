@@ -96,7 +96,6 @@ public:
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     bool isLoading() const { return m_loading; }
     Q_SIGNAL void loadingChanged();
-    bool m_loading = false;
 
     Q_INVOKABLE void reset();
 
@@ -161,6 +160,7 @@ private:
 
 private:
     bool m_busy = false;
+    bool m_loading = false;
     bool m_modified = false;
     bool m_autoSave = true;
     bool m_autoSaveMode = false;
