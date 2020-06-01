@@ -200,7 +200,7 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 {
     HourGlass hourGlass;
 
-    if(m_textDocument == nullptr || m_screenplay == nullptr)
+    if(m_textDocument == nullptr || m_screenplay == nullptr || m_formatting == nullptr)
         return;
 
     QPagedPaintDevice *printer = nullptr;
@@ -234,7 +234,10 @@ void ScreenplayTextDocument::print(QObject *printerObject)
     }
 
     if(printer)
+    {
+        m_formatting->pageLayout()->configure(printer);
         m_textDocument->print(printer);
+    }
 
     if(imagePrinter)
         imagePrinter->clearHeaderFooterFields();
@@ -269,15 +272,6 @@ void ScreenplayTextDocument::init()
 {
     if(m_textDocument == nullptr)
         m_textDocument = new QTextDocument(this);
-
-    const QImage image(32, 32, QImage::Format_ARGB32);
-    const QPageLayout pageLayout(QPageSize(QPageSize::Letter),
-                           QPageLayout::Portrait,
-                           QMarginsF(0.2,0.1,0.2,0.1),
-                           QPageLayout::Inch);
-    const int resolution = qMax(image.logicalDpiX(), image.logicalDpiY());
-    m_pageSize = pageLayout.pageSize().sizePixels(resolution);
-    m_pageMargin = int((2.0/2.54)*resolution); // 2 cm margins
 }
 
 void ScreenplayTextDocument::setUpdating(bool val)
@@ -334,11 +328,6 @@ void ScreenplayTextDocument::loadScreenplay()
     // document fresh from the start.
     m_elementFrameMap.clear();
     m_textDocument->clear();
-    m_textDocument->setPageSize(m_pageSize);
-
-    QTextFrameFormat fmt = m_textDocument->rootFrame()->frameFormat();
-    fmt.setMargin(m_pageMargin);
-    m_textDocument->rootFrame()->setFrameFormat(fmt);
 
     if(m_screenplay == nullptr)
         return;
@@ -350,6 +339,7 @@ void ScreenplayTextDocument::loadScreenplay()
         this->setFormatting(new ScreenplayFormat(this));
 
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
+    m_formatting->pageLayout()->configure(m_textDocument);
 
     QTextCursor cursor(m_textDocument);
     for(int i=0; i<m_screenplay->elementCount(); i++)
@@ -779,7 +769,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                                   // its only from the second paragraph, that we need a new block.
 
         auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
-            const qreal pageWidth = m_pageSize.width();
+            const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const SceneElementFormat *format = m_formatting->elementFormat(paraType);
             const QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
             const QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
@@ -824,7 +814,7 @@ void ScreenplayTextDocument::formatBlock(const QTextBlock &block, const QString 
     if(blockData == nullptr)
         return;
 
-    const qreal pageWidth = m_pageSize.width();
+    const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
     const SceneElementFormat *format = m_formatting->elementFormat(blockData->elementType());
     const QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
     const QTextCharFormat charFormat = format->createCharFormat(&pageWidth);

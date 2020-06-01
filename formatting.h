@@ -19,8 +19,10 @@
 #include "simpletimer.h"
 
 #include <QScreen>
+#include <QPageLayout>
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
+#include <QPagedPaintDevice>
 #include <QSyntaxHighlighter>
 #include <QQuickTextDocument>
 
@@ -135,6 +137,73 @@ private:
     SceneElement::Type m_elementType = SceneElement::Action;
 };
 
+class ScreenplayPageLayout : public QObject
+{
+    Q_OBJECT
+
+public:
+    ScreenplayPageLayout(QObject *parent=nullptr);
+    ~ScreenplayPageLayout();
+
+    enum PaperSize { A4, Letter };
+    Q_ENUM(PaperSize)
+    Q_PROPERTY(PaperSize paperSize READ paperSize WRITE setPaperSize NOTIFY paperSizeChanged STORED false)
+    void setPaperSize(PaperSize val);
+    PaperSize paperSize() const { return m_paperSize; }
+    Q_SIGNAL void paperSizeChanged();
+
+    Q_PROPERTY(qreal resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
+    void setResolution(qreal val);
+    qreal resolution() const { return m_resolution; }
+    Q_SIGNAL void resolutionChanged();
+
+    Q_PROPERTY(QMarginsF margins READ margins NOTIFY rectsChanged STORED false)
+    QMarginsF margins() const { return m_margins; }
+    Q_SIGNAL void marginsChanged();
+
+    Q_PROPERTY(QRectF paperRect READ paperRect NOTIFY rectsChanged STORED false)
+    QRectF paperRect() const { return m_paperRect; }
+    Q_SIGNAL void paperRectChanged();
+
+    Q_PROPERTY(QRectF paintRect READ paintRect NOTIFY rectsChanged STORED false)
+    QRectF paintRect() const { return m_paintRect; }
+    Q_SIGNAL void paintRectChanged();
+
+    Q_PROPERTY(QRectF headerRect READ headerRect NOTIFY rectsChanged STORED false)
+    QRectF headerRect() const { return m_headerRect; }
+    Q_SIGNAL void headerRectChanged();
+
+    Q_PROPERTY(QRectF footerRect READ footerRect NOTIFY rectsChanged STORED false)
+    QRectF footerRect() const { return m_footerRect; }
+    Q_SIGNAL void footerRectChanged();
+
+    Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY rectsChanged STORED false)
+    QRectF contentRect() const { return m_paintRect; }
+
+    Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY rectsChanged STORED false)
+    qreal contentWidth() const { return m_paintRect.width(); }
+
+    void configure(QTextDocument *document);
+    void configure(QPagedPaintDevice *printer);
+
+signals:
+    void rectsChanged();
+
+private:
+    void evaluateRects();
+
+private:
+    qreal m_resolution = 72.0;
+    QRectF m_paintRect;
+    QRectF m_paperRect;
+    QMarginsF m_margins;
+    QRectF m_headerRect;
+    QRectF m_footerRect;
+    PaperSize m_paperSize = Letter;
+    char m_padding[4];
+    QPageLayout m_pageLayout;
+};
+
 class ScreenplayFormat : public QAbstractListModel, public Modifiable
 {
     Q_OBJECT
@@ -151,8 +220,8 @@ public:
     QScreen* screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
 
-    Q_PROPERTY(qreal pageWidth READ pageWidth NOTIFY screenChanged)
-    qreal pageWidth() const { return m_pageWidth; }
+    Q_PROPERTY(ScreenplayPageLayout* pageLayout READ pageLayout CONSTANT STORED false)
+    ScreenplayPageLayout* pageLayout() const { return m_pageLayout; }
 
     Q_PROPERTY(QFont defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
     void setDefaultFont(const QFont &val);
@@ -188,8 +257,9 @@ private:
     qreal m_pageWidth = 750.0;
     int   m_fontPointSizeDelta = 0;
     QScreen* m_screen = nullptr;
-    QStringList m_suggestionsAtCursor;
     ScriteDocument *m_scriteDocument = nullptr;
+    QStringList m_suggestionsAtCursor;
+    ScreenplayPageLayout* m_pageLayout = new ScreenplayPageLayout(this);
 
     static SceneElementFormat* staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index);
     static int staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list);

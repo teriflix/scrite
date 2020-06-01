@@ -489,7 +489,11 @@ bool ImagePrinterEngine::begin(QPaintDevice *pdev)
 {
     ImagePrinter *printToImage = static_cast<ImagePrinter*>(pdev);
     m_currentDevice = printToImage;
+
     printToImage->begin();
+
+    const int resolution = qMax( m_currentDevice->metric(ImagePrinter::PdmDpiX), m_currentDevice->metric(ImagePrinter::PdmDpiY) );
+    const QPageLayout pageLayout = m_currentDevice->pageLayout();
 
     m_directory = printToImage->directory();
     m_pageSize = QSize(printToImage->width(), printToImage->height());
@@ -524,21 +528,19 @@ bool ImagePrinterEngine::begin(QPaintDevice *pdev)
     m_pagePainter = new QPainter(&m_pageImage);
     m_pageTransform = QTransform();
 
-    const qreal resolution = qMax(m_pageImage.logicalDpiX(), m_pageImage.logicalDpiY());
-    const qreal pageMargin = ((2.0/2.54)*resolution); // 2 cm margins
+    const QRect paperRect = pageLayout.fullRectPixels(int(resolution));
+    const QRect paintRect = pageLayout.paintRectPixels(int(resolution));
+    const qreal hfmargin = 0.5 * (resolution);
 
-    const QRect pageRect(0, 0, m_pageSize.width(), m_pageSize.height());
+    m_headerRect = paperRect;
+    m_headerRect.setBottom(paintRect.top());
+    m_headerRect.adjust(hfmargin, 0, -hfmargin, 0);
 
-    m_headerRect = pageRect;
-    m_headerRect.setHeight(pageMargin);
-    m_headerRect.adjust(pageMargin, 0, -pageMargin, 0);
+    m_footerRect = paperRect;
+    m_footerRect.setTop(paintRect.bottom());
+    m_footerRect.adjust(hfmargin, 0, -hfmargin, 0);
 
-    m_footerRect = m_headerRect;
-    m_footerRect.moveBottom(pageRect.bottom());
-
-    m_watermarkRect = pageRect;
-    m_watermarkRect.setTop(m_headerRect.bottom());
-    m_watermarkRect.setBottom(m_footerRect.top());
+    m_watermarkRect = paintRect;
 
     m_currentDevice->header()->setVisibleFromPageOne(true);
     m_currentDevice->footer()->setVisibleFromPageOne(true);

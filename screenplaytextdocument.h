@@ -126,10 +126,8 @@ private:
 private:
     int m_pageCount = 0;
     bool m_updating = false;
-    QSizeF m_pageSize;
     int m_currentPage = 0;
     bool m_syncEnabled = true;
-    qreal m_pageMargin = 0;
     QString m_pageImageId;
     Scene *m_activeScene = nullptr;
     bool m_componentComplete = true;

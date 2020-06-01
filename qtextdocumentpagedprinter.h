@@ -29,11 +29,7 @@ class HeaderFooter : public QObject
     Q_OBJECT
 
 public:
-    enum Type
-    {
-        Header,
-        Footer
-    };
+    enum Type { Header, Footer };
     Q_ENUM(Type)
 
     HeaderFooter(Type type, QObject *parent=nullptr);

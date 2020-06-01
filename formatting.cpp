@@ -18,8 +18,11 @@
 #include "qobjectserializer.h"
 
 #include <QPointer>
+#include <QMarginsF>
 #include <QMetaEnum>
+#include <QPdfWriter>
 #include <QTextCursor>
+#include <QPageLayout>
 #include <QTextBlockUserData>
 
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
@@ -197,7 +200,7 @@ void SceneElementFormat::setLineHeight(qreal val)
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenPageWidth) const
 {
-    const qreal pageWidth = givenPageWidth ? *givenPageWidth : m_format->pageWidth();
+    const qreal pageWidth = givenPageWidth ? *givenPageWidth : m_format->pageLayout()->contentWidth();
     const qreal blockWidthInPixels = pageWidth * m_blockWidth;
     const qreal fullMargin = (pageWidth - blockWidthInPixels);
     const qreal halfMargin = fullMargin*0.5;
@@ -258,6 +261,100 @@ void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ScreenplayPageLayout::ScreenplayPageLayout(QObject *parent)
+    : QObject(parent)
+{
+    m_padding[0] = 0; // just to get rid of the unused private variable warning.
+
+    this->evaluateRects();
+}
+
+ScreenplayPageLayout::~ScreenplayPageLayout()
+{
+
+}
+
+void ScreenplayPageLayout::setPaperSize(ScreenplayPageLayout::PaperSize val)
+{
+    if(m_paperSize == val)
+        return;
+
+    m_paperSize = val;
+    this->evaluateRects();
+
+    emit paperSizeChanged();
+}
+
+void ScreenplayPageLayout::setResolution(qreal val)
+{
+    if( qFuzzyCompare(m_resolution,val) )
+        return;
+
+    m_resolution = val;
+    this->evaluateRects();
+
+    emit resolutionChanged();
+}
+
+void ScreenplayPageLayout::configure(QTextDocument *document)
+{
+    const bool stdResolution = qFuzzyCompare(m_resolution,72);
+    const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(72);
+    const QSizeF pageSize = stdResolution ? m_paperRect.size() : m_pageLayout.pageSize().sizePixels(72);
+
+    document->setPageSize(pageSize);
+
+    QTextFrameFormat format;
+    format.setTopMargin(pixelMargins.top());
+    format.setBottomMargin(pixelMargins.bottom());
+    format.setLeftMargin(pixelMargins.left());
+    format.setRightMargin(pixelMargins.right());
+    document->rootFrame()->setFrameFormat(format);
+}
+
+void ScreenplayPageLayout::configure(QPagedPaintDevice *printer)
+{
+    printer->setPageLayout(m_pageLayout);
+}
+
+void ScreenplayPageLayout::evaluateRects()
+{
+    // Page margins
+    static const qreal leftMargin = 1.5; // inches
+    static const qreal topMargin = 1.5; // inches
+    static const qreal bottomMargin = 1.5; // inches
+    static const qreal contentWidth = 6.0; // inches
+
+    const QPageSize pageSize(m_paperSize == A4 ? QPageSize::A4 : QPageSize::Letter);
+    const QRectF paperRectIn = pageSize.rect(QPageSize::Inch);
+    const qreal rightMargin = paperRectIn.width() - contentWidth - leftMargin;
+
+    const QMarginsF margins(leftMargin, topMargin, rightMargin, bottomMargin);
+
+    QPageLayout pageLayout(pageSize, QPageLayout::Portrait, margins, QPageLayout::Inch);
+    pageLayout.setMode(QPageLayout::StandardMode);
+
+    m_paperRect = pageLayout.fullRectPixels(int(m_resolution));
+    m_paintRect = pageLayout.paintRectPixels(int(m_resolution));
+    m_margins = pageLayout.marginsPixels(int(m_resolution));
+
+    m_headerRect = m_paperRect;
+    m_headerRect.setLeft(m_paintRect.left());
+    m_headerRect.setRight(m_paintRect.right());
+    m_headerRect.setBottom(m_paintRect.top());
+
+    m_footerRect = m_paperRect;
+    m_footerRect.setLeft(m_paintRect.left());
+    m_footerRect.setRight(m_paintRect.right());
+    m_footerRect.setTop(m_paintRect.bottom());
+
+    m_pageLayout = pageLayout;
+
+    emit rectsChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
       m_pageWidth(750),
@@ -289,11 +386,10 @@ void ScreenplayFormat::setScreen(QScreen *val)
     if(m_screen == val || m_screen != nullptr)
         return;
 
-    const qreal a4PageWidthInInches = 8.5;
-
     m_screen = val;
-    m_pageWidth = m_screen->logicalDotsPerInchX() * a4PageWidthInInches;
     emit screenChanged();
+
+    m_pageLayout->setResolution(int(val->logicalDotsPerInch()));
 }
 
 void ScreenplayFormat::setDefaultFont(const QFont &val)
@@ -563,7 +659,7 @@ void SceneDocumentBinder::setScreenplayFormat(ScreenplayFormat *val)
                 this, &QSyntaxHighlighter::rehighlight);
 
         if( qFuzzyCompare(m_textWidth,0.0) )
-            this->setTextWidth(m_screenplayFormat->pageWidth());
+            this->setTextWidth(m_screenplayFormat->pageLayout()->contentWidth());
     }
 
     emit screenplayFormatChanged();
