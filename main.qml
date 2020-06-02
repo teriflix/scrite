@@ -357,6 +357,11 @@ Rectangle {
         onVisibleChanged: blur.visible = visible
     }
 
+    Connections {
+        target: qmlWindow
+        onScreenChanged: scriteDocument.formatting.setSreeenFromWindow(qmlWindow)
+    }
+
     Component.onCompleted: qmlWindow.raise()
 }
 

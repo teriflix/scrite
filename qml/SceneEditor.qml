@@ -45,7 +45,6 @@ Item {
     signal requestCharacterMenu(string characterName)
 
     readonly property real margin: Math.max( Math.round((width-sceneEditorFontMetrics.pageWidth)/2), sceneEditorFontMetrics.height*2 )
-    readonly property real padding: sceneEditorFontMetrics.paragraphMargin + margin
 
     DelayedPropertyBinder {
         id: activeFocusBinder
@@ -71,10 +70,8 @@ Item {
         Loader {
             id: sceneHeadingLoader
             height: loaderHeight.get
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: sceneEditor.padding
-            anchors.rightMargin: sceneEditor.padding
+            width: sceneEditorFontMetrics.pageWidth
+            anchors.horizontalCenter: parent.horizontalCenter
             property bool viewOnly: true
             active: enabled && scene !== null && scene.heading !== null && (showOnlyEnabledSceneHeadings ? scene.heading.enabled : true)
             sourceComponent: sceneHeadingComponent.get
@@ -166,10 +163,8 @@ Item {
     Loader {
         id: sceneCharactersList
         anchors.top: sceneHeadingArea.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: sceneEditor.padding
-        anchors.rightMargin: sceneEditor.padding
+        width: sceneEditorFontMetrics.pageWidth
+        anchors.horizontalCenter: parent.horizontalCenter
         active: sceneCharactersListActiveBinder.get
         enabled: true
 
@@ -306,11 +301,33 @@ Item {
             onRequestCursorPosition: app.execLater(sceneDocumentBinder, 100, function() { assumeFocusAt(position) })
         }
 
+        BorderImage {
+            source: "../icons/content/shadow.png"
+            anchors.fill: contentArea
+            horizontalTileMode: BorderImage.Stretch
+            verticalTileMode: BorderImage.Stretch
+            anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+            border { left: 21; top: 21; right: 21; bottom: 21 }
+            opacity: sceneContentEditor.activeFocus ? 0.25 : 0.1
+        }
+
+        Rectangle {
+            id: contentArea
+            radius: 8
+            border.width: 1
+            border.color: sceneContentEditor.activeFocus ? backgroundColor : primaryColors.borderColor
+            anchors.fill: contentEditorLoader
+            anchors.topMargin: sceneEditorFontMetrics.lineSpacing
+            anchors.bottomMargin: sceneEditorFontMetrics.lineSpacing
+            anchors.leftMargin: -scriteDocument.formatting.pageLayout.leftMargin
+            anchors.rightMargin: -scriteDocument.formatting.pageLayout.rightMargin
+            color: sceneContentEditor.activeFocus ? "white" : primaryColors.c10.background
+        }
+
         Loader {
             id: contentEditorLoader
-            anchors.fill: parent
-            anchors.leftMargin: 10
-            anchors.rightMargin: scrollable ? 0 : 10
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: scriteDocument.formatting.pageLayout.paperWidth
             active: true
             clip: true
             sourceComponent: scrollable ? scrollableSceneContentEditorComponent : sceneContentEditorComponent
@@ -369,36 +386,9 @@ Item {
             // renderType: Text.NativeRendering
             readOnly: sceneEditor.readOnly
             property real totalHeight: contentHeight + topPadding + bottomPadding + 10
-            background: Rectangle {
-                color: backgroundColor
-
-                BorderImage {
-                    source: "../icons/content/shadow.png"
-                    anchors.fill: contentArea
-                    horizontalTileMode: BorderImage.Stretch
-                    verticalTileMode: BorderImage.Stretch
-                    anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-                    border { left: 21; top: 21; right: 21; bottom: 21 }
-                    opacity: sceneTextArea.activeFocus ? 0.25 : 0.1
-                }
-
-                Rectangle {
-                    id: contentArea
-                    radius: 8
-                    border.width: 1
-                    border.color: sceneTextArea.activeFocus ? backgroundColor : primaryColors.borderColor
-                    anchors.fill: parent
-                    anchors.leftMargin: sceneEditor.margin
-                    anchors.rightMargin: sceneEditor.margin
-                    anchors.topMargin: sceneEditorFontMetrics.height
-                    anchors.bottomMargin: sceneEditorFontMetrics.height
-                    color: sceneTextArea.activeFocus ? "white" : primaryColors.c10.background
-                }
-            }
-            leftPadding: sceneEditor.padding
-            rightPadding: sceneEditor.padding
-            topPadding: sceneEditorFontMetrics.height*2
-            bottomPadding: sceneEditorFontMetrics.height*2
+            background: Item { }
+            topPadding: 3*sceneEditorFontMetrics.lineSpacing
+            bottomPadding: 3*sceneEditorFontMetrics.lineSpacing
             palette: app.palette
             selectByMouse: true
             selectByKeyboard: true

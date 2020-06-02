@@ -349,6 +349,8 @@ void ScreenplayPageLayout::evaluateRects()
 
     m_pageLayout = pageLayout;
 
+    qDebug() << "PA: " << m_resolution << m_margins << m_paperRect << m_paintRect;
+
     emit rectsChanged();
 }
 
@@ -384,13 +386,22 @@ ScreenplayFormat::~ScreenplayFormat()
 
 void ScreenplayFormat::setScreen(QScreen *val)
 {
-    if(m_screen == val || m_screen != nullptr)
+    if(m_screen == val)
         return;
 
     m_screen = val;
-    emit screenChanged();
 
-    m_pageLayout->setResolution(int(val->logicalDotsPerInch()));
+    if(val)
+        m_pageLayout->setResolution(int(val->logicalDotsPerInch()));
+    else
+        m_pageLayout->setResolution(72);
+
+    emit screenChanged();
+}
+
+void ScreenplayFormat::setSreeenFromWindow(QObject *windowObject)
+{
+    this->setScreen( Application::instance()->windowScreen(windowObject) );
 }
 
 void ScreenplayFormat::setDefaultFont(const QFont &val)
@@ -400,7 +411,7 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
 
     m_defaultFont = val;
 
-    static const int minPixelSize = 21; // Fonts should be atleast 22pixels tall on screen.
+    static const int minPixelSize = 16;
     QFont font = m_defaultFont;
     QFontInfo fontInfo(font);
     while(fontInfo.pixelSize() < minPixelSize)

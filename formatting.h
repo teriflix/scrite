@@ -153,9 +153,27 @@ public:
     QMarginsF margins() const { return m_margins; }
     Q_SIGNAL void marginsChanged();
 
+    Q_PROPERTY(qreal leftMargin READ leftMargin NOTIFY rectsChanged STORED false)
+    qreal leftMargin() const { return m_margins.left(); }
+
+    Q_PROPERTY(qreal topMargin READ topMargin NOTIFY rectsChanged STORED false)
+    qreal topMargin() const { return m_margins.top(); }
+
+    Q_PROPERTY(qreal rightMargin READ rightMargin NOTIFY rectsChanged STORED false)
+    qreal rightMargin() const { return m_margins.right(); }
+
+    Q_PROPERTY(qreal bottomMargin READ bottomMargin NOTIFY rectsChanged STORED false)
+    qreal bottomMargin() const { return m_margins.bottom(); }
+
     Q_PROPERTY(QRectF paperRect READ paperRect NOTIFY rectsChanged STORED false)
     QRectF paperRect() const { return m_paperRect; }
     Q_SIGNAL void paperRectChanged();
+
+    Q_PROPERTY(qreal paperWidth READ paperWidth NOTIFY rectsChanged STORED false)
+    qreal paperWidth() const { return m_paperRect.width(); }
+
+    Q_PROPERTY(qreal pageWidth READ pageWidth NOTIFY rectsChanged STORED false)
+    qreal pageWidth() const { return m_paperRect.width(); }
 
     Q_PROPERTY(QRectF paintRect READ paintRect NOTIFY rectsChanged STORED false)
     QRectF paintRect() const { return m_paintRect; }
@@ -211,6 +229,8 @@ public:
     void setScreen(QScreen* val);
     QScreen* screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
+
+    Q_INVOKABLE void setSreeenFromWindow(QObject *windowObject);
 
     Q_PROPERTY(ScreenplayPageLayout* pageLayout READ pageLayout CONSTANT STORED false)
     ScreenplayPageLayout* pageLayout() const { return m_pageLayout; }

@@ -31,6 +31,7 @@
 #include <QColorDialog>
 #include <QFontDatabase>
 #include <QStandardPaths>
+#include <QWindow>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -593,6 +594,19 @@ QString Application::fileContents(const QString &fileName) const
         return QString();
 
     return QString::fromLatin1(file.readAll());
+}
+
+QScreen *Application::windowScreen(QObject *window) const
+{
+    QWindow *qwindow = qobject_cast<QWindow*>(window);
+    if(qwindow)
+        return qwindow->screen();
+
+    QWidget *qwidget = qobject_cast<QWidget*>(window);
+    if(qwidget)
+        return qwidget->window()->windowHandle()->screen();
+
+    return nullptr;
 }
 
 void Application::initializeStandardColors(QQmlEngine *)

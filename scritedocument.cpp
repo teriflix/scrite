@@ -248,8 +248,16 @@ void ScriteDocument::reset()
 
     UndoStack::clearAllStacks();
 
-    this->setFormatting(new ScreenplayFormat(this));
-    this->setPrintFormat(new ScreenplayFormat(this));
+    if(m_formatting == nullptr)
+        this->setFormatting(new ScreenplayFormat(this));
+    else
+        m_formatting->resetToDefaults();
+
+    if(m_printFormat == nullptr)
+        this->setPrintFormat(new ScreenplayFormat(this));
+    else
+        m_printFormat->resetToDefaults();
+
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
     this->setModified(false);

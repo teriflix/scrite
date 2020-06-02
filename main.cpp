@@ -132,6 +132,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
     qmlRegisterUncreatableType<ScreenplayFormat>("Scrite", 1, 0, "ScreenplayFormat", reason);
     qmlRegisterUncreatableType<SceneElementFormat>("Scrite", 1, 0, "SceneElementFormat", reason);
+    qmlRegisterUncreatableType<ScreenplayPageLayout>("Scrite", 1, 0, "ScreenplayPageLayout", reason);
 
     qmlRegisterType<SceneDocumentBinder>("Scrite", 1, 0, "SceneDocumentBinder");
 
@@ -217,7 +218,7 @@ int main(int argc, char **argv)
 
     QQuickView qmlView;
     qmlView.setFormat(format);
-    scriteDocument->formatting()->setScreen(qmlView.screen());
+    scriteDocument->formatting()->setSreeenFromWindow(&qmlView);
     a.initializeStandardColors(qmlView.engine());
     qmlView.setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
