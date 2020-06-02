@@ -280,7 +280,10 @@ Item {
                     Button2 {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Reset Paragraph Formats"
-                        onClicked: scriteDocument.formatting.resetToDefaults()
+                        onClicked: {
+                            scriteDocument.formatting.resetToDefaults()
+                            scriteDocument.printFormat.resetToDefaults()
+                        }
                     }
 
                     Text {

@@ -58,46 +58,42 @@ public:
     Q_INVOKABLE void setFontItalics(bool val);
     Q_INVOKABLE void setFontUnderline(bool val);
     Q_INVOKABLE void setFontPointSize(int val);
+    Q_INVOKABLE void setFontCapitalization(QFont::Capitalization caps);
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
-    void setBackgroundColor(const QColor &val);
-    QColor backgroundColor() const { return m_backgroundColor; }
-    Q_SIGNAL void backgroundColorChanged();
-
     Q_PROPERTY(Qt::Alignment textAlignment READ textAlignment WRITE setTextAlignment NOTIFY textAlignmentChanged)
     void setTextAlignment(Qt::Alignment val);
     Qt::Alignment textAlignment() const { return m_textAlignment; }
     Q_SIGNAL void textAlignmentChanged();
 
-    Q_PROPERTY(qreal blockWidth READ blockWidth WRITE setBlockWidth NOTIFY blockWidthChanged)
-    void setBlockWidth(qreal val);
-    qreal blockWidth() const { return m_blockWidth; }
-    Q_SIGNAL void blockWidthChanged();
-
-    Q_PROPERTY(Qt::Alignment blockAlignment READ blockAlignment WRITE setBlockAlignment NOTIFY blockAlignmentChanged)
-    void setBlockAlignment(Qt::Alignment val);
-    Qt::Alignment blockAlignment() const { return m_blockAlignment; }
-    Q_SIGNAL void blockAlignmentChanged();
-
-    Q_PROPERTY(qreal topMargin READ topMargin WRITE setTopMargin NOTIFY topMarginChanged)
-    void setTopMargin(qreal val);
-    qreal topMargin() const { return m_topMargin; }
-    Q_SIGNAL void topMarginChanged();
-
-    Q_PROPERTY(qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
-    void setBottomMargin(qreal val);
-    qreal bottomMargin() const { return m_bottomMargin; }
-    Q_SIGNAL void bottomMarginChanged();
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    void setBackgroundColor(const QColor &val);
+    QColor backgroundColor() const { return m_backgroundColor; }
+    Q_SIGNAL void backgroundColorChanged();
 
     Q_PROPERTY(qreal lineHeight READ lineHeight WRITE setLineHeight NOTIFY lineHeightChanged)
     void setLineHeight(qreal val);
     qreal lineHeight() const { return m_lineHeight; }
     Q_SIGNAL void lineHeightChanged();
+
+    Q_PROPERTY(qreal lineSpacingBefore READ lineSpacingBefore WRITE setLineSpacingBefore NOTIFY lineSpacingBeforeChanged)
+    void setLineSpacingBefore(qreal val);
+    qreal lineSpacingBefore() const { return m_lineSpacingBefore; }
+    Q_SIGNAL void lineSpacingBeforeChanged();
+
+    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    void setLeftMargin(qreal val);
+    qreal leftMargin() const { return m_leftMargin; }
+    Q_SIGNAL void leftMarginChanged();
+
+    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
+    void setRightMargin(qreal val);
+    qreal rightMargin() const { return m_rightMargin; }
+    Q_SIGNAL void rightMarginChanged();
 
     QTextBlockFormat createBlockFormat(const qreal *pageWidth=nullptr) const;
     QTextCharFormat createCharFormat(const qreal *pageWidth=nullptr) const;
@@ -110,11 +106,8 @@ public:
         FontSize,
         FontStyle,
         LineHeight,
-        TextAndBackgroundColors,
-        TextAlignment,
-        BlockWidth,
-        BlockAlignment,
-        Margins
+        LineSpacingBefore,
+        TextAndBackgroundColors
     };
     Q_ENUM(Properties)
     Q_INVOKABLE void applyToAll(Properties properties);
@@ -125,15 +118,14 @@ private:
 
 private:
     QFont m_font;
-    qreal m_topMargin = 10;
-    qreal m_blockWidth = 1.0;
     qreal m_lineHeight = 1.0;
+    qreal m_leftMargin = 0;
+    qreal m_rightMargin = 0;
+    qreal m_lineSpacingBefore = 0;
     QColor m_textColor = QColor(Qt::black);
-    qreal m_bottomMargin = 0;
     QColor m_backgroundColor = QColor(Qt::transparent);
     ScreenplayFormat *m_format = nullptr;
     Qt::Alignment m_textAlignment = Qt::AlignLeft;
-    Qt::Alignment m_blockAlignment = Qt::AlignHCenter;
     SceneElement::Type m_elementType = SceneElement::Action;
 };
 
@@ -232,6 +224,9 @@ public:
     Q_PROPERTY(QFont defaultFont2 READ defaultFont2 NOTIFY defaultFontChanged)
     QFont defaultFont2() const;
 
+    QFontMetrics defaultFontMetrics() const { return m_defaultFontMetrics; }
+    QFontMetrics defaultFont2Metrics() const { return m_defaultFont2Metrics; }
+
     Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY defaultFontChanged)
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
 
@@ -258,6 +253,8 @@ private:
     int   m_fontPointSizeDelta = 0;
     QScreen* m_screen = nullptr;
     ScriteDocument *m_scriteDocument = nullptr;
+    QFontMetrics m_defaultFontMetrics;
+    QFontMetrics m_defaultFont2Metrics;
     QStringList m_suggestionsAtCursor;
     ScreenplayPageLayout* m_pageLayout = new ScreenplayPageLayout(this);
 

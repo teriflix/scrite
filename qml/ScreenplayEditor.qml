@@ -307,7 +307,6 @@ Item {
                 syncEnabled: !scriteDocument.loading
                 screenplay: scriteDocument.screenplay
                 formatting: scriteDocument.printFormat
-                onPageCountChanged: console.log("PA: " + pageCount)
             }
 
             property ImagePrinter printer: ImagePrinter {
@@ -368,13 +367,6 @@ Item {
                     width: Math.max(pagesView.width, pagesScroll.width)
                     height: pagesView.height
 
-                    DelayedPropertyBinder {
-                        id: delegateCounter
-                        initial: 0
-                        set: 0
-                        onGetChanged: console.log("PA: pagesView.delegateCount = " + get)
-                    }
-
                     GridView {
                         id: pagesView
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -387,8 +379,6 @@ Item {
                         delegate: Item {
                             width: pagesView.cellWidth
                             height: pagesView.cellHeight
-                            Component.onCompleted: delegateCounter.set = delegateCounter.set + 1
-                            Component.onDestruction: delegateCounter.set = delegateCounter.set - 1
 
                             BorderImage {
                                 source: "../icons/content/shadow.png"

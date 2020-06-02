@@ -341,20 +341,41 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
 
+    QTextBlockFormat frameBoundaryBlockFormat;
+    frameBoundaryBlockFormat.setLineHeight(0, QTextBlockFormat::FixedHeight);
+
     QTextCursor cursor(m_textDocument);
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
 
+        QTextFrameFormat frameFormat = m_sceneFrameFormat;
+        const Scene *scene = element->scene();
+        if(scene != nullptr && i > 0)
+        {
+            SceneElement::Type firstParaType = SceneElement::Heading;
+            if(!scene->heading()->isEnabled() && scene->elementCount())
+            {
+                SceneElement *firstPara = scene->elementAt(0);
+                firstParaType = firstPara->type();
+            }
+
+            const SceneElementFormat *firstParaFormat = m_formatting->elementFormat(firstParaType);
+            const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
+            const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
+            frameFormat.setTopMargin(blockFormat.topMargin());
+        }
+
         // Each screenplay element (or scene) has its own frame. That makes
         // moving them in one bunch easy.
-        QTextFrame *frame = cursor.insertFrame(m_sceneFrameFormat);
+        QTextFrame *frame = cursor.insertFrame(frameFormat);
         m_elementFrameMap[element] = frame;
         this->loadScreenplayElement(element, cursor);
 
         // We have to move the cursor out of the frame we created for the scene
         // https://doc.qt.io/qt-5/richtext-cursor.html#frames
         cursor = m_textDocument->rootFrame()->lastCursorPosition();
+        cursor.setBlockFormat(frameBoundaryBlockFormat);
     }
 }
 
@@ -768,11 +789,13 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         bool insertBlock = false; // the newly inserted frame has a default first block.
                                   // its only from the second paragraph, that we need a new block.
 
-        auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
+        auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType, bool firstParagraph) {
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const SceneElementFormat *format = m_formatting->elementFormat(paraType);
-            const QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
-            const QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
+            QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+            QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
+            if(firstParagraph)
+                blockFormat.setTopMargin(0);
             cursor.setCharFormat(charFormat);
             cursor.setBlockFormat(blockFormat);
         };
@@ -785,7 +808,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(nullptr));
-            prepareCursor(cursor, SceneElement::Heading);
+            prepareCursor(cursor, SceneElement::Heading, !insertBlock);
             cursor.insertText(heading->text());
             insertBlock = true;
         }
@@ -798,7 +821,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
-            prepareCursor(cursor, para->type());
+            prepareCursor(cursor, para->type(), !insertBlock);
             cursor.insertText(para->text());
             insertBlock = true;
         }

@@ -110,6 +110,16 @@ void SceneElementFormat::setFontPointSize(int val)
     emit elementFormatChanged();
 }
 
+void SceneElementFormat::setFontCapitalization(QFont::Capitalization caps)
+{
+    if(m_font.capitalization() == caps)
+        return;
+
+    m_font.setCapitalization(caps);
+    emit fontChanged();
+    emit elementFormatChanged();
+}
+
 void SceneElementFormat::setTextColor(const QColor &val)
 {
     if(m_textColor == val)
@@ -118,6 +128,15 @@ void SceneElementFormat::setTextColor(const QColor &val)
     m_textColor = val;
     emit textColorChanged();
     emit elementFormatChanged();
+}
+
+void SceneElementFormat::setTextAlignment(Qt::Alignment val)
+{
+    if(m_textAlignment == val)
+        return;
+
+    m_textAlignment = val;
+    emit textAlignmentChanged();
 }
 
 void SceneElementFormat::setBackgroundColor(const QColor &val)
@@ -137,57 +156,6 @@ void SceneElementFormat::setBackgroundColor(const QColor &val)
     emit elementFormatChanged();
 }
 
-void SceneElementFormat::setTextAlignment(Qt::Alignment val)
-{
-    if(m_textAlignment == val)
-        return;
-
-    m_textAlignment = val;
-    emit textAlignmentChanged();
-    emit elementFormatChanged();
-}
-
-void SceneElementFormat::setBlockWidth(qreal val)
-{
-    val = qBound(0.1, val, 1.0);
-    if( qFuzzyCompare(m_blockWidth, val) )
-        return;
-
-    m_blockWidth = val;
-    emit blockWidthChanged();
-    emit elementFormatChanged();
-}
-
-void SceneElementFormat::setBlockAlignment(Qt::Alignment val)
-{
-    if(m_blockAlignment == val)
-        return;
-
-    m_blockAlignment = val;
-    emit blockAlignmentChanged();
-    emit elementFormatChanged();
-}
-
-void SceneElementFormat::setTopMargin(qreal val)
-{
-    if( qFuzzyCompare(m_topMargin, val) )
-        return;
-
-    m_topMargin = val;
-    emit topMarginChanged();
-    emit elementFormatChanged();
-}
-
-void SceneElementFormat::setBottomMargin(qreal val)
-{
-    if( qFuzzyCompare(m_bottomMargin, val) )
-        return;
-
-    m_bottomMargin = val;
-    emit bottomMarginChanged();
-    emit elementFormatChanged();
-}
-
 void SceneElementFormat::setLineHeight(qreal val)
 {
     if( qFuzzyCompare(m_lineHeight, val) )
@@ -198,22 +166,53 @@ void SceneElementFormat::setLineHeight(qreal val)
     emit elementFormatChanged();
 }
 
-QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenPageWidth) const
+void SceneElementFormat::setLineSpacingBefore(qreal val)
 {
-    const qreal pageWidth = givenPageWidth ? *givenPageWidth : m_format->pageLayout()->contentWidth();
-    const qreal blockWidthInPixels = pageWidth * m_blockWidth;
-    const qreal fullMargin = (pageWidth - blockWidthInPixels);
-    const qreal halfMargin = fullMargin*0.5;
-    const qreal leftMargin = m_blockAlignment.testFlag(Qt::AlignLeft) ? 0 : (m_blockAlignment.testFlag(Qt::AlignHCenter) ? halfMargin : fullMargin);
-    const qreal rightMargin = pageWidth - blockWidthInPixels - leftMargin;
+    val = qBound(0.0, val, 2.0);
+    if( qFuzzyCompare(m_lineSpacingBefore, val) )
+        return;
+
+    m_lineSpacingBefore = val;
+    emit lineSpacingBeforeChanged();
+    emit elementFormatChanged();
+}
+
+void SceneElementFormat::setLeftMargin(qreal val)
+{
+    val = qBound(0.0, val, 1.0);
+    if( qFuzzyCompare(m_leftMargin, val) )
+        return;
+
+    m_leftMargin = val;
+    emit leftMarginChanged();
+    emit elementFormatChanged();
+}
+
+void SceneElementFormat::setRightMargin(qreal val)
+{
+    val = qBound(0.0, val, 1.0);
+    if( qFuzzyCompare(m_rightMargin, val) )
+        return;
+
+    m_rightMargin = val;
+    emit rightMarginChanged();
+    emit elementFormatChanged();
+}
+
+QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContentWidth) const
+{
+    const QFontMetrics fm = m_format->screen() ? m_format->defaultFont2Metrics() : m_format->defaultFontMetrics();
+    const qreal contentWidth = givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
+    const qreal leftMargin = contentWidth * m_leftMargin;
+    const qreal rightMargin = contentWidth * m_rightMargin;
+    const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore;
 
     QTextBlockFormat format;
     format.setLeftMargin(leftMargin);
     format.setRightMargin(rightMargin);
-    format.setTopMargin(m_topMargin);
-    format.setBottomMargin(m_bottomMargin);
+    format.setTopMargin(topMargin);
     format.setLineHeight(m_lineHeight*100, QTextBlockFormat::ProportionalHeight);
-    format.setAlignment(m_textAlignment);
+    format.setAlignment(Qt::AlignLeft);
     format.setBackground(QBrush(m_backgroundColor));
     format.setForeground(QBrush(m_textColor));
 
@@ -321,9 +320,9 @@ void ScreenplayPageLayout::evaluateRects()
 {
     // Page margins
     static const qreal leftMargin = 1.5; // inches
-    static const qreal topMargin = 1.5; // inches
-    static const qreal bottomMargin = 1.5; // inches
-    static const qreal contentWidth = 6.0; // inches
+    static const qreal topMargin = 1.0; // inches
+    static const qreal bottomMargin = 1.0; // inches
+    static const qreal contentWidth = 6.45; // inches
 
     const QPageSize pageSize(m_paperSize == A4 ? QPageSize::A4 : QPageSize::Letter);
     const QRectF paperRectIn = pageSize.rect(QPageSize::Inch);
@@ -358,7 +357,9 @@ void ScreenplayPageLayout::evaluateRects()
 ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
       m_pageWidth(750),
-      m_scriteDocument(qobject_cast<ScriteDocument*>(parent))
+      m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
+      m_defaultFontMetrics(m_defaultFont),
+      m_defaultFont2Metrics(m_defaultFont)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
@@ -409,6 +410,9 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
     }
 
     m_fontPointSizeDelta = qMax(fontInfo.pointSize()-m_defaultFont.pointSize(),0);
+
+    m_defaultFontMetrics = QFontMetrics(m_defaultFont);
+    m_defaultFont2Metrics = QFontMetrics(this->defaultFont2());
 
     emit defaultFontChanged();
 }
@@ -468,22 +472,12 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from, SceneElementFo
         case SceneElementFormat::LineHeight:
             format->setLineHeight( from->lineHeight() );
             break;
+        case SceneElementFormat::LineSpacingBefore:
+            format->setLineSpacingBefore( from->lineSpacingBefore() );
+            break;
         case SceneElementFormat::TextAndBackgroundColors:
             format->setTextColor( from->textColor() );
             format->setBackgroundColor( from->backgroundColor() );
-            break;
-        case SceneElementFormat::TextAlignment:
-            format->setTextAlignment( from->textAlignment() );
-            break;
-        case SceneElementFormat::BlockWidth:
-            format->setBlockWidth( from->blockWidth() );
-            break;
-        case SceneElementFormat::BlockAlignment:
-            format->setBlockAlignment( from->blockAlignment() );
-            break;
-        case SceneElementFormat::Margins:
-            format->setTopMargin( from->topMargin() );
-            format->setBottomMargin( from->bottomMargin() );
             break;
         }
     }
@@ -511,40 +505,61 @@ QHash<int, QByteArray> ScreenplayFormat::roleNames() const
 
 void ScreenplayFormat::resetToDefaults()
 {
-    // Standard font names, sizes, margins etc picked from the URL below.
-    // https://johnaugust.com/2007/hollywood-standard
+    /**
+      Here is how Final Draft formats its screenplays.
+
+      !!!!!! ALL PARAGRAPHS ARE LEFT ALIGNED !!!!!!
+
+      Paragraph Type | Starts From | Extends Upto | Spacing Before
+      ---------------|-------------|--------------|----------------
+      Scene Heading  | 1.6"        | 8.05"        | 2 Lines
+      Action         | 1.6"        | 8.05"        | 1 Line
+      Character      | 3.7"        | 7.8"         | 1 Line
+      Parenthetical  | 3.25"       | 5.9"         | 0 Lines
+      Dialogue       | 2.65"       | 6.5"         | 0 Lines
+      Transition     | 5.9"        | 7.6"         | 1 Lines
+      Shot           | 1.6"        | 7.6"         | 1 Lines
+      */
     this->setDefaultFont(QFont("Courier Prime", 12));
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
         m_elementFormats.at(i)->setFont(m_defaultFont);
 
-    m_elementFormats[SceneElement::Action]->setTextAlignment(Qt::AlignJustify);
+    const qreal contentWidth = 6.45;
+    const qreal left = 1.6;
+    const qreal right = 8.05;
 
-    m_elementFormats[SceneElement::Character]->setBlockWidth(0.6);
-    m_elementFormats[SceneElement::Character]->setTextAlignment(Qt::AlignHCenter);
-    m_elementFormats[SceneElement::Character]->fontRef().setBold(true);
-    m_elementFormats[SceneElement::Character]->fontRef().setCapitalization(QFont::AllUppercase);
+    m_elementFormats[SceneElement::Heading]->setLeftMargin( (1.6-left)/contentWidth );
+    m_elementFormats[SceneElement::Heading]->setRightMargin( (right-8.05)/contentWidth );
+    m_elementFormats[SceneElement::Heading]->setLineSpacingBefore(2);
+    m_elementFormats[SceneElement::Heading]->setFontCapitalization(QFont::AllUppercase);
 
-    m_elementFormats[SceneElement::Dialogue]->setBlockWidth(0.6);
-    m_elementFormats[SceneElement::Dialogue]->setTextAlignment(Qt::AlignJustify);
-    m_elementFormats[SceneElement::Dialogue]->setTopMargin(0);
+    m_elementFormats[SceneElement::Action]->setLeftMargin( (1.6-left)/contentWidth );
+    m_elementFormats[SceneElement::Action]->setRightMargin( (right-8.05)/contentWidth );
+    m_elementFormats[SceneElement::Action]->setLineSpacingBefore(1);
 
-    m_elementFormats[SceneElement::Parenthetical]->setBlockWidth(0.5);
-    m_elementFormats[SceneElement::Parenthetical]->setTextAlignment(Qt::AlignHCenter);
-    m_elementFormats[SceneElement::Parenthetical]->fontRef().setItalic(true);
-    m_elementFormats[SceneElement::Parenthetical]->setTopMargin(0);
+    m_elementFormats[SceneElement::Character]->setLeftMargin( (3.7-left)/contentWidth );
+    m_elementFormats[SceneElement::Character]->setRightMargin( (right-7.8)/contentWidth );
+    m_elementFormats[SceneElement::Character]->setLineSpacingBefore(1);
+    m_elementFormats[SceneElement::Character]->setFontCapitalization(QFont::AllUppercase);
 
-    m_elementFormats[SceneElement::Shot]->setTextAlignment(Qt::AlignLeft);
-    m_elementFormats[SceneElement::Shot]->setBlockWidth(0.85);
-    m_elementFormats[SceneElement::Shot]->setBlockAlignment(Qt::AlignCenter);
-    m_elementFormats[SceneElement::Shot]->fontRef().setCapitalization(QFont::AllUppercase);
+    m_elementFormats[SceneElement::Parenthetical]->setLeftMargin( (3.25-left)/contentWidth );
+    m_elementFormats[SceneElement::Parenthetical]->setRightMargin( (right-5.9)/contentWidth );
+    m_elementFormats[SceneElement::Parenthetical]->setLineSpacingBefore(0);
 
-    m_elementFormats[SceneElement::Transition]->setTextAlignment(Qt::AlignRight);
-    m_elementFormats[SceneElement::Transition]->fontRef().setCapitalization(QFont::AllUppercase);
+    m_elementFormats[SceneElement::Dialogue]->setLeftMargin( (2.65-left)/contentWidth );
+    m_elementFormats[SceneElement::Dialogue]->setRightMargin( (right-6.5)/contentWidth );
+    m_elementFormats[SceneElement::Dialogue]->setLineSpacingBefore(0);
 
-    m_elementFormats[SceneElement::Heading]->fontRef().setBold(true);
-    m_elementFormats[SceneElement::Heading]->fontRef().setPointSize(m_defaultFont.pointSize()+2);
-    m_elementFormats[SceneElement::Heading]->fontRef().setCapitalization(QFont::AllUppercase);
+    m_elementFormats[SceneElement::Transition]->setLeftMargin( (5.9-left)/contentWidth );
+    m_elementFormats[SceneElement::Transition]->setRightMargin( (right-7.6)/contentWidth );
+    m_elementFormats[SceneElement::Transition]->setLineSpacingBefore(1);
+    m_elementFormats[SceneElement::Transition]->setFontCapitalization(QFont::AllUppercase);
+
+    m_elementFormats[SceneElement::Shot]->setLeftMargin( (1.6-left)/contentWidth );
+    m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );
+    m_elementFormats[SceneElement::Shot]->setLineSpacingBefore(1);
+    m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
 }
 
 SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)

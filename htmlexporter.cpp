@@ -154,33 +154,9 @@ bool HtmlExporter::doExport(QIODevice *device)
             break;
         }
 
-        const int blockWidth = int(format->blockWidth()*100);
-        int leftMargin = 0;
-        int rightMargin = 0;
-
-        ts << "      width: " << int(format->blockWidth()*100.0) << "%;\n";
-        if(format->blockWidth() < 1)
-        {
-            switch(format->blockAlignment())
-            {
-            case Qt::AlignLeft:
-                rightMargin = 100 - blockWidth;
-                break;
-            default:
-            case Qt::AlignHCenter:
-                leftMargin = (100 - blockWidth) >> 1;
-                rightMargin = 100 - blockWidth - leftMargin;
-                break;
-            case Qt::AlignRight:
-                leftMargin = 100 - blockWidth;
-                break;
-            }
-        }
-
-        ts << "      margin-left: " << leftMargin << "%;\n";
-        ts << "      margin-right: " << rightMargin << "%;\n";
-        ts << "      margin-top: " << format->topMargin() << "px;\n";
-        ts << "      margin-bottom: " << format->bottomMargin() << "px;\n";
+        ts << "      margin-left: " << int(format->leftMargin()*100) << "%;\n";
+        ts << "      margin-right: " << int(format->rightMargin()*100) << "%;\n";
+        ts << "      margin-top: " << format->lineSpacingBefore() << "em;\n";
         ts << "      line-height: " << format->lineHeight()*1.1 << "em;\n";
         ts << "    }\n";
     }

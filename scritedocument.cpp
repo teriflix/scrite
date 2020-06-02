@@ -658,23 +658,9 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
         m_formatting->deleteLater();
 
     m_formatting = val;
+
     if(m_formatting != nullptr)
-    {
         m_formatting->setParent(this);
-
-        QFont font = m_formatting->defaultFont();
-        font.setPointSize(10);
-        m_formatting->setDefaultFont(font);
-
-        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-            m_formatting->elementFormat(i)->fontRef().setPointSize(10);
-
-        // Hack to ensure that onscreen top-margin is 25px by default
-        m_formatting->elementFormat(SceneElement::Action)->setTopMargin(25);
-        m_formatting->elementFormat(SceneElement::Character)->setTopMargin(25);
-        m_formatting->elementFormat(SceneElement::Shot)->setTopMargin(25);
-        m_formatting->elementFormat(SceneElement::Transition)->setTopMargin(25);
-    }
 
     emit formattingChanged();
 }
@@ -688,16 +674,9 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
         m_printFormat->deleteLater();
 
     m_printFormat = val;
-    if(m_formatting != nullptr)
-    {
-        m_printFormat->setParent(this);
 
-        // Hack to ensure that onscreen top-margin is 10px by default
-        m_printFormat->elementFormat(SceneElement::Action)->setTopMargin(10);
-        m_printFormat->elementFormat(SceneElement::Character)->setTopMargin(10);
-        m_printFormat->elementFormat(SceneElement::Shot)->setTopMargin(10);
-        m_printFormat->elementFormat(SceneElement::Transition)->setTopMargin(10);
-    }
+    if(m_formatting != nullptr)
+        m_printFormat->setParent(this);
 
     emit printFormatChanged();
 }
@@ -1024,23 +1003,14 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
         }
     }
 
-    if( version <= QVersionNumber(0,2,16) )
+    // With Version 0.3.9, we have completely changed the way in which we
+    // store formatting options. So, the old formatting options data doesnt
+    // work anymore. We better reset to defaults in the new version and then
+    // let the user alter it anyway he sees fit.
+    if( version <= QVersionNumber(0,3,8) )
     {
-        if( m_formatting->defaultFont().pointSize() == 12 )
-        {
-            QFont font = m_formatting->defaultFont();
-            font.setPointSize(10);
-            m_formatting->setDefaultFont(font);
-        }
-
-        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-        {
-            if(m_formatting->elementFormat(i)->font().pointSize() == 12)
-                m_formatting->elementFormat(i)->fontRef().setPointSize(10);
-        }
-
-        if(m_formatting->elementFormat(SceneElement::Heading)->font().pointSize() == 12)
-            m_formatting->elementFormat(SceneElement::Heading)->fontRef().setPointSize(10);
+        m_formatting->resetToDefaults();
+        m_printFormat->resetToDefaults();
     }
 }
 

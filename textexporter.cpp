@@ -48,10 +48,11 @@ bool TextExporter::doExport(QIODevice *device)
     ts.setAutoDetectUnicode(true);
 
     auto writeParagraph = [&ts,maxChars](const SceneElementFormat *format, const QString &text) {
-        if(format->topMargin() > 0)
+        for(int i=0; i<format->lineSpacingBefore(); i++)
             ts << "\n";
 
-        const int maxCharsInBlock = int(qreal(maxChars)*format->blockWidth());
+        const qreal blockWidth = 1.0 - format->leftMargin() - format->rightMargin();
+        const int maxCharsInBlock = int(qreal(maxChars)*blockWidth);
         const QString rightAlignPrefix(maxChars-maxCharsInBlock, ' ');
         const QString centerAlignPrefix(int(qreal(maxChars-maxCharsInBlock)/2.0), ' ');
 
@@ -99,16 +100,8 @@ bool TextExporter::doExport(QIODevice *device)
                 }
             }
 
-            if(format->blockAlignment() & Qt::AlignHCenter)
-                line = centerAlignPrefix + line;
-            else if(format->blockAlignment() == Qt::AlignRight)
-                line = rightAlignPrefix + line;
-
             ts << line << "\n";
         }
-
-        if(format->bottomMargin() > 0)
-            ts << "\n";
     };
 
     int nrHeadings = 0;
