@@ -959,6 +959,7 @@ void TransliteratedText::setContentHeight(qreal val)
 {
     if( qFuzzyCompare(m_contentHeight, val) )
         return;
+
     m_contentHeight = val;
     emit contentHeightChanged();
 }

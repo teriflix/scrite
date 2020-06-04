@@ -33,9 +33,21 @@ GarbageCollector::~GarbageCollector()
     qDeleteAll(m_objects);
 }
 
+void GarbageCollector::avoidChildrenOf(QObject *parent)
+{
+    if(parent != nullptr)
+    {
+        connect(parent, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
+        m_avoidList.append(parent);
+    }
+}
+
 void GarbageCollector::add(QObject *ptr)
 {
     if(ptr == nullptr || m_objects.contains(ptr) || m_shredder.contains(ptr))
+        return;
+
+    if(m_avoidList.contains(ptr->parent()))
         return;
 
     connect(ptr, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
@@ -66,4 +78,5 @@ void GarbageCollector::onObjectDestroyed(QObject *obj)
         m_timer.start(100, this);
 
     m_shredder.removeOne(obj);
+    m_avoidList.removeOne(obj);
 }

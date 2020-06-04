@@ -72,6 +72,7 @@ public:
     Screenplay* screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
+    Q_PROPERTY(ScreenplayFormat* displayFormat READ formatting NOTIFY formattingChanged STORED false)
     Q_PROPERTY(ScreenplayFormat* formatting READ formatting NOTIFY formattingChanged)
     ScreenplayFormat* formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
@@ -125,6 +126,8 @@ public:
     Q_PROPERTY(QJsonArray structureElementSequence READ structureElementSequence NOTIFY structureElementSequenceChanged)
     QJsonArray structureElementSequence() const { return m_structureElementSequence; }
     Q_SIGNAL void structureElementSequenceChanged();
+
+    void clearModified();
 
 protected:
     void timerEvent(QTimerEvent *event);

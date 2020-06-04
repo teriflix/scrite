@@ -30,6 +30,7 @@ public:
     static GarbageCollector *instance();
     ~GarbageCollector();
 
+    void avoidChildrenOf(QObject *parent);
     void add(QObject *ptr);
 
 protected:
@@ -40,6 +41,7 @@ protected:
 private:
     QObjectList m_objects;
     QObjectList m_shredder;
+    QObjectList m_avoidList;
     SimpleTimer m_timer;
 };
 

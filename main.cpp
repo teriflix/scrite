@@ -23,6 +23,7 @@
 
 #include "undoredo.h"
 #include "completer.h"
+#include "ruleritem.h"
 #include "autoupdate.h"
 #include "trackobject.h"
 #include "aggregation.h"
@@ -40,6 +41,7 @@
 #include "transliteration.h"
 #include "abstractexporter.h"
 #include "genericarraymodel.h"
+#include "screenplayadapter.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 #include "delayedpropertybinder.h"
@@ -194,8 +196,11 @@ int main(int argc, char **argv)
     qmlRegisterType<TrackSignal>("Scrite", 1, 0, "TrackSignal");
     qmlRegisterType<TrackObject>("Scrite", 1, 0, "TrackObject");
 
+    qmlRegisterType<ScreenplayAdapter>("Scrite", 1, 0, "ScreenplayAdapter");
     qmlRegisterType<ScreenplayTextDocument>("Scrite", 1, 0, "ScreenplayTextDocument");
     qmlRegisterType<ImagePrinter>("Scrite", 1, 0, "ImagePrinter");
+
+    qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
 
     NotificationManager notificationManager;
     ScriteDocument *scriteDocument = ScriteDocument::instance();
@@ -219,6 +224,7 @@ int main(int argc, char **argv)
     QQuickView qmlView;
     qmlView.setFormat(format);
     scriteDocument->formatting()->setSreeenFromWindow(&qmlView);
+    scriteDocument->clearModified();
     a.initializeStandardColors(qmlView.engine());
     qmlView.setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);

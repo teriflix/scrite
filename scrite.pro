@@ -58,9 +58,11 @@ HEADERS += \
     qobjectserializer.h \
     qtextdocumentpagedprinter.h \
     resetonchange.h \
+    ruleritem.h \
     scene.h \
     scenecharactermatrixreportgenerator.h \
     screenplay.h \
+    screenplayadapter.h \
     screenplaytextdocument.h \
     scritedocument.h \
     searchengine.h \
@@ -124,9 +126,11 @@ SOURCES += \
     qobjectserializer.cpp \
     qtextdocumentpagedprinter.cpp \
     resetonchange.cpp \
+    ruleritem.cpp \
     scene.cpp \
     scenecharactermatrixreportgenerator.cpp \
     screenplay.cpp \
+    screenplayadapter.cpp \
     screenplaytextdocument.cpp \
     scritedocument.cpp \
     searchengine.cpp \

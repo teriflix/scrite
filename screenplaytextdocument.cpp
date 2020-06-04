@@ -119,9 +119,6 @@ ScreenplayTextDocument::~ScreenplayTextDocument()
 {
     if(m_textDocument != nullptr && m_textDocument->parent() == this)
         m_textDocument->setUndoRedoEnabled(true);
-
-    if(m_qmlEngine != nullptr)
-        m_qmlEngine->removeImageProvider(m_pageImageId);
 }
 
 void ScreenplayTextDocument::setTextDocument(QTextDocument *val)
@@ -616,7 +613,9 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
     Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating while a scene's paragraph was changed.");
 
     const int paraIndex = scene->indexOfElement(para);
-    Q_ASSERT_X(paraIndex >= 0, "ScreenplayTextDocument", "Attempting to modify a non-existent paragraph from within the scene.");
+    if(paraIndex < 0)
+        return; // This can happen when the paragraph is not part of the scene text, but
+                // it exists as a way to capture a mute-character in the scene.
 
     ScreenplayTextDocumentUpdate update(this);
 

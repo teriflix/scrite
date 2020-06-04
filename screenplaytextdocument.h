@@ -128,10 +128,8 @@ private:
     bool m_updating = false;
     int m_currentPage = 0;
     bool m_syncEnabled = true;
-    QString m_pageImageId;
     Scene *m_activeScene = nullptr;
     bool m_componentComplete = true;
-    QQmlEngine *m_qmlEngine = nullptr;
     Screenplay* m_screenplay = nullptr;
     QTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_formatting = nullptr;
