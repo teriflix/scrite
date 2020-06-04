@@ -38,5 +38,6 @@
         <file>qml/TextAreaInput.qml</file>
         <file>qml/FlickablePreview.qml</file>
         <file>LICENSE.txt</file>
+        <file>qml/ScreenplayEditor2.qml</file>
     </qresource>
 </RCC>

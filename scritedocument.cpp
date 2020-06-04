@@ -561,6 +561,12 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
     return reportGenerator;
 }
 
+void ScriteDocument::clearModified()
+{
+    if(m_screenplay->elementCount() == 0 && m_structure->elementCount() == 0)
+        this->setModified(false);
+}
+
 void ScriteDocument::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_evaluateStructureElementSequenceTimer.timerId())

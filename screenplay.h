@@ -178,7 +178,7 @@ public:
     Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY currentElementIndexChanged)
     void setCurrentElementIndex(int val);
     int currentElementIndex() const { return m_currentElementIndex; }
-    Q_SIGNAL void currentElementIndexChanged();
+    Q_SIGNAL void currentElementIndexChanged(int val);
 
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();

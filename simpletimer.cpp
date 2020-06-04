@@ -15,6 +15,7 @@
 #include "application.h"
 
 #include <QList>
+#include <QThread>
 
 #ifndef QT_NO_DEBUG
 Q_GLOBAL_STATIC(QList<SimpleTimer*>, SimpleTimerList)
@@ -84,8 +85,13 @@ void SimpleTimer::start(int msec, QObject *object)
             connect(object, &QObject::destroyed, this, &SimpleTimer::onObjectDestroyed);
     }
 
-    m_timer.start(msec);
-    m_timerId = m_timer.timerId();
+    if(this->thread()->eventDispatcher() != nullptr)
+    {
+        m_timer.start(msec);
+        m_timerId = m_timer.timerId();
+    }
+    else
+        m_timerId = -1;
 }
 
 void SimpleTimer::onTimeout()

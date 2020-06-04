@@ -119,9 +119,6 @@ ScreenplayTextDocument::~ScreenplayTextDocument()
 {
     if(m_textDocument != nullptr && m_textDocument->parent() == this)
         m_textDocument->setUndoRedoEnabled(true);
-
-    if(m_qmlEngine != nullptr)
-        m_qmlEngine->removeImageProvider(m_pageImageId);
 }
 
 void ScreenplayTextDocument::setTextDocument(QTextDocument *val)

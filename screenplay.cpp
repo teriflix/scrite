@@ -32,6 +32,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
 
 ScreenplayElement::~ScreenplayElement()
 {
+    GarbageCollector::instance()->avoidChildrenOf(this);
     emit aboutToDelete(this);
 }
 
@@ -248,6 +249,7 @@ Screenplay::Screenplay(QObject *parent)
 
 Screenplay::~Screenplay()
 {
+    GarbageCollector::instance()->avoidChildrenOf(this);
     emit aboutToDelete(this);
 }
 
@@ -945,7 +947,7 @@ void Screenplay::setCurrentElementIndex(int val)
         return;
 
     m_currentElementIndex = val;
-    emit currentElementIndexChanged();
+    emit currentElementIndexChanged(m_currentElementIndex);
 
     if(m_currentElementIndex >= 0)
     {

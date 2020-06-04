@@ -850,8 +850,8 @@ Item {
                 clip: true
                 currentIndex: uiLayout2TabBar.currentIndex
 
-                Loader {
-                    sourceComponent: screenplayEditorComponent
+                ScreenplayEditor2 {
+
                 }
 
                 SplitView {

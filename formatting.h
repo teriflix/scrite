@@ -144,11 +144,6 @@ public:
     PaperSize paperSize() const { return m_paperSize; }
     Q_SIGNAL void paperSizeChanged();
 
-    Q_PROPERTY(qreal resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
-    void setResolution(qreal val);
-    qreal resolution() const { return m_resolution; }
-    Q_SIGNAL void resolutionChanged();
-
     Q_PROPERTY(QMarginsF margins READ margins NOTIFY rectsChanged STORED false)
     QMarginsF margins() const { return m_margins; }
     Q_SIGNAL void marginsChanged();
@@ -201,6 +196,8 @@ signals:
 
 private:
     void evaluateRects();
+    void evaluateRectsLater();
+    void timerEvent(QTimerEvent *event);
 
 private:
     qreal m_resolution = 72.0;
@@ -212,6 +209,7 @@ private:
     PaperSize m_paperSize = Letter;
     char m_padding[4];
     QPageLayout m_pageLayout;
+    SimpleTimer m_evaluateRectsTimer;
 };
 
 class ScreenplayFormat : public QAbstractListModel, public Modifiable
@@ -232,6 +230,13 @@ public:
 
     Q_INVOKABLE void setSreeenFromWindow(QObject *windowObject);
 
+    // By default devicePixelRatio is considered to be same as screen()->devicePixelRatio().
+    // But this value can be changed to become any value.
+    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
+    void setDevicePixelRatio(qreal val);
+    qreal devicePixelRatio() const { return m_devicePixelRatio; }
+    Q_SIGNAL void devicePixelRatioChanged();
+
     Q_PROPERTY(ScreenplayPageLayout* pageLayout READ pageLayout CONSTANT STORED false)
     ScreenplayPageLayout* pageLayout() const { return m_pageLayout; }
 
@@ -247,8 +252,9 @@ public:
     QFontMetrics defaultFontMetrics() const { return m_defaultFontMetrics; }
     QFontMetrics defaultFont2Metrics() const { return m_defaultFont2Metrics; }
 
-    Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY defaultFontChanged)
+    Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY fontPointSizeDeltaChanged)
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
+    Q_SIGNAL void fontPointSizeDeltaChanged();
 
     Q_INVOKABLE SceneElementFormat *elementFormat(SceneElement::Type type) const;
     Q_INVOKABLE SceneElementFormat *elementFormat(int type) const;
@@ -267,10 +273,14 @@ public:
     Q_INVOKABLE void resetToDefaults();
 
 private:
+    void evaluateFontPointSizeDelta();
+
+private:
     char  m_padding[4];
     QFont m_defaultFont;
     qreal m_pageWidth = 750.0;
     int   m_fontPointSizeDelta = 0;
+    qreal m_devicePixelRatio = 1.0;
     QScreen* m_screen = nullptr;
     ScriteDocument *m_scriteDocument = nullptr;
     QFontMetrics m_defaultFontMetrics;
@@ -387,6 +397,8 @@ private:
     void onSceneAboutToReset();
     void onSceneReset(int position);
 
+    void rehighlightLater();
+
 private:
     Scene* m_scene = nullptr;
     qreal m_textWidth = 0;
@@ -398,6 +410,7 @@ private:
     bool m_initializingDocument = false;
     QStringList m_characterNames;
     SceneElement* m_currentElement = nullptr;
+    SimpleTimer m_rehighlightTimer;
     QStringList m_autoCompleteHints;
     int m_currentElementCursorPosition = -1;
     QQuickTextDocument* m_textDocument = nullptr;

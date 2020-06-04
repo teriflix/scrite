@@ -35,7 +35,8 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
         this->markAsModified();
     });
     QObject::connect(this, &SceneElementFormat::fontChanged, this, &SceneElementFormat::font2Changed);
-    QObject::connect(m_format, &ScreenplayFormat::defaultFontChanged, this, &SceneElementFormat::font2Changed);
+    QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &SceneElementFormat::font2Changed);
+    QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &SceneElementFormat::elementFormatChanged);
 }
 
 SceneElementFormat::~SceneElementFormat()
@@ -201,10 +202,11 @@ void SceneElementFormat::setRightMargin(qreal val)
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContentWidth) const
 {
+    const qreal dpr = m_format->devicePixelRatio();
     const QFontMetrics fm = m_format->screen() ? m_format->defaultFont2Metrics() : m_format->defaultFontMetrics();
     const qreal contentWidth = givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
-    const qreal leftMargin = contentWidth * m_leftMargin;
-    const qreal rightMargin = contentWidth * m_rightMargin;
+    const qreal leftMargin = contentWidth * m_leftMargin * dpr;
+    const qreal rightMargin = contentWidth * m_rightMargin * dpr;
     const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore;
 
     QTextBlockFormat format;
@@ -225,27 +227,29 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
 
     QTextCharFormat format;
 
+    const QFont font = this->font2();
+
     // It turns out that format.setFont()
     // doesnt actually do all of the below.
     // So, we will have to do it explicitly
-    format.setFontFamily(m_font.family());
-    format.setFontItalic(m_font.italic());
-    format.setFontWeight(m_font.weight());
-    // format.setFontKerning(m_font.kerning());
-    format.setFontStretch(m_font.stretch());
-    format.setFontOverline(m_font.overline());
-    format.setFontPointSize(m_font.pointSize());
-    format.setFontStrikeOut(m_font.strikeOut());
-    // format.setFontStyleHint(m_font.styleHint());
-    // format.setFontStyleName(m_font.styleName());
-    format.setFontUnderline(m_font.underline());
-    // format.setFontFixedPitch(m_font.fixedPitch());
-    format.setFontWordSpacing(m_font.wordSpacing());
-    format.setFontLetterSpacing(m_font.letterSpacing());
-    // format.setFontStyleStrategy(m_font.styleStrategy());
-    format.setFontCapitalization(m_font.capitalization());
-    // format.setFontHintingPreference(m_font.hintingPreference());
-    format.setFontLetterSpacingType(m_font.letterSpacingType());
+    format.setFontFamily(font.family());
+    format.setFontItalic(font.italic());
+    format.setFontWeight(font.weight());
+    // format.setFontKerning(font.kerning());
+    format.setFontStretch(font.stretch());
+    format.setFontOverline(font.overline());
+    format.setFontPointSize(font.pointSize());
+    format.setFontStrikeOut(font.strikeOut());
+    // format.setFontStyleHint(font.styleHint());
+    // format.setFontStyleName(font.styleName());
+    format.setFontUnderline(font.underline());
+    // format.setFontFixedPitch(font.fixedPitch());
+    format.setFontWordSpacing(font.wordSpacing());
+    format.setFontLetterSpacing(font.letterSpacing());
+    // format.setFontStyleStrategy(font.styleStrategy());
+    format.setFontCapitalization(font.capitalization());
+    // format.setFontHintingPreference(font.hintingPreference());
+    format.setFontLetterSpacingType(font.letterSpacingType());
 
     format.setBackground(QBrush(m_backgroundColor));
     format.setForeground(QBrush(m_textColor));
@@ -265,7 +269,7 @@ ScreenplayPageLayout::ScreenplayPageLayout(QObject *parent)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
-    this->evaluateRects();
+    this->evaluateRectsLater();
 }
 
 ScreenplayPageLayout::~ScreenplayPageLayout()
@@ -279,20 +283,9 @@ void ScreenplayPageLayout::setPaperSize(ScreenplayPageLayout::PaperSize val)
         return;
 
     m_paperSize = val;
-    this->evaluateRects();
+    this->evaluateRectsLater();
 
     emit paperSizeChanged();
-}
-
-void ScreenplayPageLayout::setResolution(qreal val)
-{
-    if( qFuzzyCompare(m_resolution,val) )
-        return;
-
-    m_resolution = val;
-    this->evaluateRects();
-
-    emit resolutionChanged();
 }
 
 void ScreenplayPageLayout::configure(QTextDocument *document)
@@ -349,9 +342,21 @@ void ScreenplayPageLayout::evaluateRects()
 
     m_pageLayout = pageLayout;
 
-    qDebug() << "PA: " << m_resolution << m_margins << m_paperRect << m_paintRect;
-
     emit rectsChanged();
+}
+
+void ScreenplayPageLayout::evaluateRectsLater()
+{
+    m_evaluateRectsTimer.start(100, this);
+}
+
+void ScreenplayPageLayout::timerEvent(QTimerEvent *event)
+{
+    if(event->timerId() == m_evaluateRectsTimer.timerId())
+    {
+        m_evaluateRectsTimer.stop();
+        this->evaluateRects();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -390,11 +395,10 @@ void ScreenplayFormat::setScreen(QScreen *val)
         return;
 
     m_screen = val;
-
-    if(val)
-        m_pageLayout->setResolution(int(val->logicalDotsPerInch()));
+    if(m_screen)
+        this->setDevicePixelRatio(m_screen->devicePixelRatio());
     else
-        m_pageLayout->setResolution(72);
+        this->evaluateFontPointSizeDelta();
 
     emit screenChanged();
 }
@@ -404,28 +408,28 @@ void ScreenplayFormat::setSreeenFromWindow(QObject *windowObject)
     this->setScreen( Application::instance()->windowScreen(windowObject) );
 }
 
+void ScreenplayFormat::setDevicePixelRatio(qreal val)
+{
+    if( qFuzzyCompare(m_devicePixelRatio,val) )
+        return;
+
+    m_devicePixelRatio = val;
+    this->evaluateFontPointSizeDelta();
+
+    emit devicePixelRatioChanged();
+    emit formatChanged();
+}
+
 void ScreenplayFormat::setDefaultFont(const QFont &val)
 {
     if(m_defaultFont == val)
         return;
 
     m_defaultFont = val;
-
-    static const int minPixelSize = 16;
-    QFont font = m_defaultFont;
-    QFontInfo fontInfo(font);
-    while(fontInfo.pixelSize() < minPixelSize)
-    {
-        font.setPointSize(font.pointSize()+1);
-        fontInfo = QFontInfo(font);
-    }
-
-    m_fontPointSizeDelta = qMax(fontInfo.pointSize()-m_defaultFont.pointSize(),0);
-
-    m_defaultFontMetrics = QFontMetrics(m_defaultFont);
-    m_defaultFont2Metrics = QFontMetrics(this->defaultFont2());
+    this->evaluateFontPointSizeDelta();
 
     emit defaultFontChanged();
+    emit formatChanged();
 }
 
 QFont ScreenplayFormat::defaultFont2() const
@@ -532,6 +536,8 @@ void ScreenplayFormat::resetToDefaults()
       Shot           | 1.6"        | 7.6"         | 1 Lines
       */
     this->setDefaultFont(QFont("Courier Prime", 12));
+    if(m_screen != nullptr)
+        this->setDevicePixelRatio(m_screen->devicePixelRatio());
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
         m_elementFormats.at(i)->setFont(m_defaultFont);
@@ -571,6 +577,45 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );
     m_elementFormats[SceneElement::Shot]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
+}
+
+void ScreenplayFormat::evaluateFontPointSizeDelta()
+{
+    auto setDelta = [=](int val) {
+        if(m_fontPointSizeDelta == val)
+            return;
+        m_fontPointSizeDelta = val;
+        emit fontPointSizeDeltaChanged();
+        emit formatChanged();
+    };
+
+    m_defaultFontMetrics = QFontMetrics(m_defaultFont);
+    m_defaultFont2Metrics = m_defaultFontMetrics;
+
+    const qreal dpr = m_devicePixelRatio;
+    if( qFuzzyCompare(dpr,1.0) )
+    {
+        setDelta(0);
+        return;
+    }
+
+    const QFontMetricsF defaultFontMetrics(m_defaultFont);
+    const qreal minLineSpacing = defaultFontMetrics.lineSpacing() * dpr;
+    const int delta = dpr < 1.0 ? -1 : 1;
+    QFont font = m_defaultFont;
+    while(1)
+    {
+        font.setPointSize(font.pointSize()+delta);
+        const QFontMetricsF fm(font);
+        if(fm.lineSpacing() >= minLineSpacing)
+            break;
+    }
+
+    QFontInfo fontInfo(font);
+    setDelta( fontInfo.pointSize()-m_defaultFont.pointSize() );
+
+    m_defaultFontMetrics = QFontMetrics(m_defaultFont);
+    m_defaultFont2Metrics = QFontMetrics(this->defaultFont2());
 }
 
 SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)
@@ -675,14 +720,16 @@ void SceneDocumentBinder::setScreenplayFormat(ScreenplayFormat *val)
         return;
 
     if(m_screenplayFormat != nullptr)
+    {
         disconnect(m_screenplayFormat, &ScreenplayFormat::formatChanged,
-                this, &QSyntaxHighlighter::rehighlight);
+                this, &SceneDocumentBinder::rehighlightLater);
+    }
 
     m_screenplayFormat = val;
     if(m_screenplayFormat != nullptr)
     {
         connect(m_screenplayFormat, &ScreenplayFormat::formatChanged,
-                this, &QSyntaxHighlighter::rehighlight);
+                this, &SceneDocumentBinder::rehighlightLater);
 
         if( qFuzzyCompare(m_textWidth,0.0) )
             this->setTextWidth(m_screenplayFormat->pageLayout()->contentWidth());
@@ -1124,6 +1171,11 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
         m_initializeDocumentTimer.stop();
         this->initializeDocument();
     }
+    else if(te->timerId() == m_rehighlightTimer.timerId())
+    {
+        m_rehighlightTimer.stop();
+        this->QSyntaxHighlighter::rehighlight();
+    }
 }
 
 void SceneDocumentBinder::initializeDocument()
@@ -1557,5 +1609,10 @@ void SceneDocumentBinder::onSceneReset(int position)
     }
 
     m_sceneIsBeingReset = false;
+}
+
+void SceneDocumentBinder::rehighlightLater()
+{
+    m_rehighlightTimer.start(0, this);
 }
 

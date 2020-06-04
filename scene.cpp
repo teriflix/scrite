@@ -546,6 +546,7 @@ Scene::Scene(QObject *parent)
 
 Scene::~Scene()
 {
+    GarbageCollector::instance()->avoidChildrenOf(this);
     emit aboutToDelete(this);
 }
 
