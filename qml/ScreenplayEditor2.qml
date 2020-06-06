@@ -33,6 +33,7 @@ Item {
     ScreenplayAdapter {
         id: screenplayAdapter
         source: scriteDocument.screenplay
+        onCurrentIndexChanged: contentView.positionViewAtIndex2(currentIndex, ListView.Visible)
     }
 
     ScreenplayTextDocument {
@@ -75,38 +76,51 @@ Item {
             clip: true
             color: screenplayAdapter.elementCount > 0 ? "white" : Qt.rgba(0,0,0,0)
 
-            ListView {
+            DocumentView {
                 id: contentView
                 anchors.fill: parent
                 model: screenplayAdapter
-                delegate: contentComponent
+                itemDelegate: Loader {
+                    readonly property int theIndex: itemIndex
+                    readonly property Scene theScene: itemData.scene
+                    readonly property ScreenplayElement theElement: itemData.screenplayElement
+                    width: contentView.width
+                    sourceComponent: theScene ? contentComponent : breakComponent
+                    onItemChanged: {
+                        if(item) {
+                            item.theIndex = theIndex
+                            item.theScene = theScene
+                            item.theElement = theElement
+                        }
+                    }
+                }
+                sizeHintDelegate: Loader {
+                    readonly property int theIndex: itemIndex
+                    readonly property Scene theScene: itemData.scene
+                    readonly property ScreenplayElement theElement: itemData.screenplayElement
+                    width: contentView.width
+                    sourceComponent: theScene ? contentSizeHintComponent : breakComponent
+                    onItemChanged: {
+                        if(item) {
+                            item.theIndex = theIndex
+                            item.theScene = theScene
+                            item.theElement = theElement
+                        }
+                    }
+                }
+
+                // snapMode: ListView.NoSnap
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
-                cacheBuffer: Math.ceil(height / 300) * 2
+                // cacheBuffer: 10
                 ScrollBar.vertical: verticalScrollBar
                 header: Item {
-                    width: contentArea.width
+                    width: contentView.width
                     height: ruler.topMarginPx
                 }
                 footer: Item {
-                    width: contentArea.width
+                    width: contentView.width
                     height: ruler.bottomMarginPx
-                }
-
-                function ensureVisible(item, rect) {
-                    if(item === null)
-                        return
-
-                    var pt = item.mapToItem(contentView.contentItem, rect.x, rect.y)
-                    var startY = contentView.contentY
-                    var endY = contentView.contentY + contentView.height - rect.height
-                    if( startY < pt.y && pt.y < endY )
-                        return
-
-                    if( pt.y < startY )
-                        contentView.contentY = pt.y
-                    else if( pt.y > endY )
-                        contentView.contentY = (pt.y + 2*rect.height) - contentView.height
                 }
             }
         }
@@ -187,17 +201,91 @@ Item {
         }
     }
 
+    Repeater {
+        id: sceneItemRepeater
+        model: screenplayAdapter
+        delegate: SceneItem {
+            scene: modelData.scene
+            format: screenplayFormat
+            width: parent.width
+            height: Math.ceil(contentHeight)
+            leftMargin: ruler.leftMarginPx
+            rightMargin: ruler.rightMarginPx
+            topMargin: defaultFontMetrics.lineSpacing
+            bottomMargin: defaultFontMetrics.lineSpacing
+            computeSize: true
+            renderText: false
+        }
+    }
+
+    Component {
+        id: contentSizeHintComponent
+
+        Column {
+            id: contentSizeHintItem
+            property int theIndex: -1
+            property Scene theScene
+            property ScreenplayElement theElement
+
+            Loader {
+                id: sceneHeadingAreaLoader
+                width: parent.width
+                active: contentSizeHintItem.theScene !== null
+                sourceComponent: sceneHeadingArea
+                onItemChanged: {
+                    if(item)
+                        item.theScene = contentSizeHintItem.theScene
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: sceneItemRepeater.itemAt(parent.theIndex).height
+            }
+        }
+    }
+
+    Component {
+        id: breakComponent
+
+        Item {
+            property int theIndex: -1
+            property Scene theScene
+            property ScreenplayElement theElement
+            height: breakText.contentHeight+16
+
+            Rectangle {
+                anchors.fill: breakText
+                anchors.margins: -4
+                color: primaryColors.windowColor
+                border.width: 1
+                border.color: primaryColors.borderColor
+            }
+
+            Text {
+                id: breakText
+                anchors.centerIn: parent
+                width: parent.width-16
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 30
+                font.bold: true
+                text: parent.theElement.sceneID
+            }
+        }
+    }
+
     Component {
         id: contentComponent
 
         Rectangle {
             id: contentItem
+            property int theIndex: -1
+            property Scene theScene
+            property ScreenplayElement theElement
+
             width: contentArea.width
             height: contentItemLayout.height
             color: "white"
-
-            readonly property int theIndex: index
-            readonly property Scene theScene: scene
             readonly property var binder: sceneDocumentBinder
             readonly property var editor: sceneTextEditor
 
@@ -210,7 +298,7 @@ Item {
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 onDocumentInitialized: sceneTextEditor.cursorPosition = 0
-                // onRequestCursorPosition: app.execLater(sceneDocumentBinder, 100, function() { assumeFocusAt(position) })
+                onRequestCursorPosition: app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
                 onCurrentParagraphTypeChanged: {
                     if(currentParagraphType === SceneElement.Action) {
@@ -228,56 +316,22 @@ Item {
                 id: contentItemLayout
                 width: parent.width
 
-                Rectangle {
-                    id: sceneHeaderArea
-                    x: 1
+                Loader {
+                    id: sceneHeadingAreaLoader
                     width: parent.width
-                    height: sceneHeaderLayout.height + 16
-                    color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
-
-                    Column {
-                        id: sceneHeaderLayout
-                        spacing: 5
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.leftMargin: ruler.leftMarginPx
-                        anchors.rightMargin: ruler.rightMarginPx
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Loader {
-                            id: sceneHeadingLoader
-                            width: parent.width
-                            height: item ? item.contentHeight : headingFontMetrics.lineSpacing
-                            property bool viewOnly: true
-                            readonly property SceneHeading sceneHeading: contentItem.theScene.heading
-                            sourceComponent: {
-                                if(sceneHeading.enabled)
-                                    return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
-                                return sceneHeadingDisabled
-                            }
-
-                            Connections {
-                                target: sceneHeadingLoader.item
-                                ignoreUnknownSignals: true
-                                onEditRequest: sceneHeadingLoader.viewOnly = false
-                                onEditingFinished: sceneHeadingLoader.viewOnly = true
-                            }
-                        }
-
-                        Loader {
-                            id: sceneCharactersListLoader
-                            width: parent.width
-                            readonly property bool editorHasActiveFocus: sceneTextEditor.activeFocus
-                            readonly property Scene scene: contentItem.theScene
-                            sourceComponent: sceneCharactersList
-                        }
+                    active: contentItem.theScene !== null
+                    sourceComponent: sceneHeadingArea
+                    onItemChanged: {
+                        if(item)
+                            item.theScene = contentItem.theScene
                     }
                 }
 
                 TextArea {
+                    // Basic editing functionality
                     id: sceneTextEditor
                     width: parent.width
-                    height: contentHeight + topPadding + bottomPadding
+                    height: Math.ceil(contentHeight + topPadding + bottomPadding)
                     topPadding: sceneEditorFontMetrics.lineSpacing
                     bottomPadding: sceneEditorFontMetrics.lineSpacing
                     leftPadding: ruler.leftMarginPx
@@ -291,17 +345,426 @@ Item {
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
                     onActiveFocusChanged: {
                         if(activeFocus) {
+                            contentView.ensureVisible(sceneTextEditor, cursorRectangle, contentItem.theIndex)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalSceneEditorToolbar.sceneEditor = contentItem
                         } else if(globalSceneEditorToolbar.sceneEditor === contentItem)
                             globalSceneEditorToolbar.sceneEditor = null
+                        sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
                     }
 
                     FocusTracker.window: qmlWindow
                     onCursorRectangleChanged: {
                         if(activeFocus)
-                            contentView.ensureVisible(sceneTextEditor, cursorRectangle)
+                            contentView.ensureVisible(sceneTextEditor, cursorRectangle, contentItem.theIndex)
                     }
+
+                    // Support for transliteration.
+                    property bool userIsTyping: false
+                    EventFilter.events: [51,6] // Wheel, ShortcutOverride
+                    EventFilter.onFilter: {
+                        if(event.type === 51) {
+                            // We want to avoid TextArea from processing Ctrl+Z
+                            // and other such shortcuts.
+                            result.acceptEvent = false
+                            result.filter = true
+                        } else if(event.type === 6) {
+                            // Enter, Tab and other keys must not trigger
+                            // Transliteration. Only space should.
+                            sceneTextEditor.userIsTyping = event.hasText
+                        }
+                    }
+                    Transliterator.enabled: contentItem.theScene && !contentItem.theScene.isBeingReset && userIsTyping
+                    Transliterator.textDocument: textDocument
+                    Transliterator.cursorPosition: cursorPosition
+                    Transliterator.hasActiveFocus: activeFocus
+                    Transliterator.onAboutToTransliterate: {
+                        contentItem.theScene.beginUndoCapture(false)
+                        contentItem.theScene.undoRedoEnabled = false
+                    }
+                    Transliterator.onFinishedTransliterating: {
+                        app.execLater(Transliterator, 0, function() {
+                            contentItem.theScene.endUndoCapture()
+                            contentItem.theScene.undoRedoEnabled = true
+                        })
+                    }
+
+                    // Support for auto completion
+                    Item {
+                        id: cursorOverlay
+                        x: parent.cursorRectangle.x
+                        y: parent.cursorRectangle.y
+                        width: parent.cursorRectangle.width
+                        height: parent.cursorRectangle.height
+                        visible: parent.cursorVisible
+                        ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="lightgray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
+                        ToolTip.visible: completer.hasSuggestion
+
+                        Completer {
+                            id: completer
+                            strings: sceneDocumentBinder.autoCompleteHints
+                            completionPrefix: sceneDocumentBinder.completionPrefix
+                        }
+
+                        // Context menus must ideally show up directly below the cursor
+                        // So, we keep the menu loaders inside the cursorOverlay
+                        MenuLoader {
+                            id: editorContextMenu
+                            anchors.bottom: parent.bottom
+                            menu: Menu2 {
+                                onAboutToShow: sceneTextEditor.persistentSelection = true
+                                onAboutToHide: sceneTextEditor.persistentSelection = false
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
+                                    enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
+                                    onClicked: { sceneTextEditor.cut(); editorContextMenu.close() }
+                                }
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
+                                    enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
+                                    onClicked: { sceneTextEditor.copy(); editorContextMenu.close() }
+                                }
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
+                                    enabled: sceneTextEditor.canPaste
+                                    onClicked: { sceneTextEditor.paste(); editorContextMenu.close() }
+                                }
+
+                                MenuSeparator {  }
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    text: "Split Scene"
+                                    enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && screenplayAdapter.isSourceScreenplay
+                                    onClicked: {
+                                        screenplayAdapter.splitElement(screenplayAdapter.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                                        editorContextMenu.close()
+                                    }
+                                }
+
+                                MenuSeparator {  }
+
+                                Menu2 {
+                                    title: "Format"
+                                    width: 250
+
+                                    Repeater {
+                                        model: [
+                                            { "value": SceneElement.Action, "display": "Action" },
+                                            { "value": SceneElement.Character, "display": "Character" },
+                                            { "value": SceneElement.Dialogue, "display": "Dialogue" },
+                                            { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
+                                            { "value": SceneElement.Shot, "display": "Shot" },
+                                            { "value": SceneElement.Transition, "display": "Transition" }
+                                        ]
+
+                                        MenuItem2 {
+                                            focusPolicy: Qt.NoFocus
+                                            text: modelData.display + "\t" + app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
+                                            enabled: sceneDocumentBinder.currentElement !== null
+                                            onClicked: {
+                                                sceneDocumentBinder.currentElement.type = modelData.value
+                                                editorContextMenu.close()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Menu2 {
+                                    title: "Translate"
+                                    enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
+
+                                    Repeater {
+                                        model: app.enumerationModel(app.transliterationEngine, "Language")
+
+                                        MenuItem2 {
+                                            focusPolicy: Qt.NoFocus
+                                            visible: index > 0
+                                            text: modelData.key
+                                            onClicked: {
+                                                sceneTextEditor.Transliterator.transliterateToLanguage(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd, modelData.value)
+                                                editorContextMenu.close()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        MenuLoader {
+                            id: doubleEnterMenu
+                            anchors.bottom: parent.bottom
+                            menu: Menu2 {
+                                width: 200
+                                onAboutToShow: sceneTextEditor.persistentSelection = true
+                                onAboutToHide: sceneTextEditor.persistentSelection = false
+                                EventFilter.target: app
+                                EventFilter.events: [6]
+                                EventFilter.onFilter: {
+                                    result.filter = true
+                                    result.acceptEvent = true
+
+                                    if(screenplayAdapter.isSourceScreenplay && event.key === Qt.Key_N) {
+                                        newSceneMenuItem.handle()
+                                        return
+                                    }
+
+                                    if(event.key === Qt.Key_H) {
+                                        editHeadingMenuItem.handle()
+                                        return
+                                    }
+
+                                    if(sceneDocumentBinder.currentElement === null) {
+                                        result.filter = false
+                                        result.acceptEvent = false
+                                        sceneTextEditor.forceActiveFocus()
+                                        doubleEnterMenu.close()
+                                        return
+                                    }
+
+                                    switch(event.key) {
+                                    case Qt.Key_A:
+                                        sceneDocumentBinder.currentElement.type = SceneElement.Action
+                                        break;
+                                    case Qt.Key_C:
+                                        sceneDocumentBinder.currentElement.type = SceneElement.Character
+                                        break;
+                                    case Qt.Key_D:
+                                        sceneDocumentBinder.currentElement.type = SceneElement.Dialogue
+                                        break;
+                                    case Qt.Key_P:
+                                        sceneDocumentBinder.currentElement.type = SceneElement.Parenthetical
+                                        break;
+                                    case Qt.Key_S:
+                                        sceneDocumentBinder.currentElement.type = SceneElement.Shot
+                                        break;
+                                    case Qt.Key_T:
+                                        sceneDocumentBinder.currentElement.type = SceneElement.Transition
+                                        break;
+                                    default:
+                                        result.filter = false
+                                        result.acceptEvent = false
+                                    }
+
+                                    sceneTextEditor.forceActiveFocus()
+                                    doubleEnterMenu.close()
+                                }
+
+                                MenuItem2 {
+                                    id: editHeadingMenuItem
+                                    text: "&Heading (H)"
+                                    onClicked: handle()
+
+                                    function handle() {
+                                        if(contentItem.theScene.headingenabled === false)
+                                            contentItem.theScene.headingenabled = true
+                                        sceneHeadingLoader.viewOnly = false
+                                        doubleEnterMenu.close()
+                                    }
+                                }
+
+                                Repeater {
+                                    model: [
+                                        { "value": SceneElement.Action, "display": "Action" },
+                                        { "value": SceneElement.Character, "display": "Character" },
+                                        { "value": SceneElement.Dialogue, "display": "Dialogue" },
+                                        { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
+                                        { "value": SceneElement.Shot, "display": "Shot" },
+                                        { "value": SceneElement.Transition, "display": "Transition" }
+                                    ]
+
+                                    MenuItem2 {
+                                        text: modelData.display + " (" + modelData.display[0] + ")"
+                                        onClicked: {
+                                            if(sceneDocumentBinder.currentElement)
+                                                sceneDocumentBinder.currentElement.type = modelData.value
+                                            sceneTextEditor.forceActiveFocus()
+                                            doubleEnterMenu.close()
+                                        }
+                                    }
+                                }
+
+                                MenuSeparator { }
+
+                                MenuItem2 {
+                                    id: newSceneMenuItem
+                                    text: "&New Scene (N)"
+                                    onClicked: handle()
+                                    enabled: allowSplitSceneRequest
+
+                                    function handle() {
+                                        contentItem.theScene.removeLastElementIfEmpty()
+                                        scriteDocument.createNewScene()
+                                        doubleEnterMenu.close()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Keys.onTabPressed: {
+                        if(completer.suggestion !== "") {
+                            userIsTyping = false
+                            insert(cursorPosition, completer.suggestion)
+                            userIsTyping = true
+                            Transliterator.enableFromNextWord()
+                            event.accepted = true
+                        } else
+                            sceneDocumentBinder.tab()
+                    }
+                    Keys.onBacktabPressed: sceneDocumentBinder.backtab()
+
+                    // Double enter menu and split-scene handling.
+                    Keys.onReturnPressed: {
+                        if(event.modifiers & Qt.ControlModifier) {
+                            screenplayAdapter.splitElement(screenplayAdapter.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                            event.accepted = true
+                            return
+                        }
+
+                        if(binder.currentElement === null || binder.currentElement.text === "") {
+                            doubleEnterMenu.show()
+                            event.accepted = true
+                        } else
+                            event.accepted = false
+                    }
+
+                    // Context menu
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton
+                        enabled: !editorContextMenu.active && sceneTextEditor.activeFocus
+                        cursorShape: Qt.IBeamCursor
+                        onClicked: {
+                            sceneTextEditor.persistentSelection = true
+                            editorContextMenu.popup()
+                            mouse.accept = true
+                        }
+                    }
+
+                    // Scrolling up and down
+                    Keys.onUpPressed: {
+                        if(sceneDocumentBinder.canGoUp())
+                            event.accepted = false
+                        else {
+                            event.accepted = true
+                            contentItem.scrollToPreviousScene()
+                        }
+                    }
+                    Keys.onDownPressed: {
+                        if(sceneDocumentBinder.canGoDown())
+                            event.accepted = false
+                        else {
+                            event.accepted = true
+                            contentItem.scrollToNextScene()
+                        }
+                    }
+                    Keys.onPressed: {
+                        if(event.key === Qt.Key_PageUp) {
+                            event.accepted = true
+                            contentItem.scrollToPreviousScene()
+                        } else if(event.key === Qt.Key_PageDown) {
+                            event.accepted = true
+                            contentItem.scrollToNextScene()
+                        } else
+                            event.accepted = false
+                    }
+                }
+            }
+
+            function assumeFocus() {
+                if(!sceneTextEditor.activeFocus)
+                    sceneTextEditor.forceActiveFocus()
+            }
+
+            function assumeFocusAt(pos) {
+                if(!sceneTextEditor.activeFocus)
+                    sceneTextEditor.forceActiveFocus()
+                if(pos < 0)
+                    sceneTextEditor.cursorPosition = sceneDocumentBinder.lastCursorPosition()
+                else
+                    sceneTextEditor.cursorPosition = pos
+            }
+
+            function scrollToPreviousScene() {
+                var idx = screenplayAdapter.previousSceneElementIndex()
+                if(idx === 0 && idx === theIndex) {
+                    contentView.positionViewAtBeginning()
+                    assumeFocusAt(0)
+                    return
+                }
+
+                contentView.positionViewAtIndex2(idx, ListView.Visible)
+                var item = contentView.itemAtIndex(idx).item
+                item.assumeFocusAt(-1)
+            }
+
+            function scrollToNextScene() {
+                var idx = screenplayAdapter.nextSceneElementIndex()
+                if(idx === screenplayAdapter.elementCount-1 && idx === theIndex) {
+                    contentView.positionViewAtEnd()
+                    assumeFocusAt(-1)
+                    return
+                }
+
+                contentView.positionViewAtIndex2(idx, ListView.Visible)
+                var item = contentView.itemAtIndex(idx).item
+                item.assumeFocusAt(0)
+            }
+        }
+    }
+
+    Component {
+        id: sceneHeadingArea
+
+        Rectangle {
+            id: headingItem
+            property Scene theScene
+            property bool sceneHasFocus: false
+
+            height: sceneHeadingLayout.height + 16
+            color: Qt.tint(theScene.color, "#E7FFFFFF")
+
+            Column {
+                id: sceneHeadingLayout
+                spacing: 5
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: ruler.leftMarginPx
+                anchors.rightMargin: ruler.rightMarginPx
+                anchors.verticalCenter: parent.verticalCenter
+
+                Loader {
+                    id: sceneHeadingLoader
+                    width: parent.width
+                    height: item ? item.contentHeight : headingFontMetrics.lineSpacing
+                    property bool viewOnly: true
+                    property SceneHeading sceneHeading: headingItem.theScene.heading
+                    sourceComponent: {
+                        if(sceneHeading.enabled)
+                            return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
+                        return sceneHeadingDisabled
+                    }
+
+                    Connections {
+                        target: sceneHeadingLoader.item
+                        ignoreUnknownSignals: true
+                        onEditRequest: sceneHeadingLoader.viewOnly = false
+                        onEditingFinished: sceneHeadingLoader.viewOnly = true
+                    }
+                }
+
+                Loader {
+                    id: sceneCharactersListLoader
+                    width: parent.width
+                    readonly property bool editorHasActiveFocus: headingItem.sceneHasFocus
+                    property Scene scene: headingItem.theScene
+                    sourceComponent: sceneCharactersList
                 }
             }
         }
@@ -450,7 +913,7 @@ Item {
             }
 
             Repeater {
-                model: scene.characterNames
+                model: scene ? scene.characterNames : 0
 
                 TagText {
                     id: characterNameLabel

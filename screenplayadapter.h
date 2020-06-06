@@ -18,6 +18,7 @@
 
 class Scene;
 class Screenplay;
+class SceneElement;
 class ScreenplayElement;
 
 class ScreenplayAdapter : public QIdentityProxyModel
@@ -32,6 +33,12 @@ public:
     void setSource(QObject* val);
     QObject* source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
+
+    Q_PROPERTY(bool isSourceScene READ isSourceScene NOTIFY sourceChanged)
+    bool isSourceScene() const;
+
+    Q_PROPERTY(bool isSourceScreenplay READ isSourceScreenplay NOTIFY sourceChanged)
+    bool isSourceScreenplay() const;
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay NOTIFY sourceChanged)
     Screenplay *screenplay() const;
@@ -52,7 +59,11 @@ public:
     int elementCount() const { return this->rowCount(); }
     Q_SIGNAL void elementCountChanged();
 
-    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole };
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+    Q_INVOKABLE int previousSceneElementIndex();
+    Q_INVOKABLE int nextSceneElementIndex();
+
+    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, ModelDataRole, RowNumberRole };
     Q_ENUMS(Roles)
     QHash<int,QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;

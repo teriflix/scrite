@@ -23,9 +23,11 @@
 #include <QQmlListProperty>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
+#include <QQuickPaintedItem>
 
 #include "note.h"
 #include "modifiable.h"
+#include "simpletimer.h"
 #include "qobjectserializer.h"
 
 class Scene;
@@ -308,6 +310,124 @@ private:
     static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
     static int staticNoteCount(QQmlListProperty<Note> *list);
     QList<Note *> m_notes;
+};
+
+class ScreenplayFormat;
+class SceneItem : public QQuickPaintedItem
+{
+    Q_OBJECT
+
+public:
+    SceneItem(QQuickItem *parent=nullptr);
+    ~SceneItem();
+
+    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
+    void setScene(Scene* val);
+    Scene* scene() const { return m_scene; }
+    Q_SIGNAL void sceneChanged();
+
+    Q_PROPERTY(bool trackSceneChanges READ trackSceneChanges WRITE setTrackSceneChanges NOTIFY trackSceneChangesChanged)
+    void setTrackSceneChanges(bool val);
+    bool trackSceneChanges() const { return m_trackSceneChanges; }
+    Q_SIGNAL void trackSceneChangesChanged();
+
+    Q_PROPERTY(ScreenplayFormat* format READ format WRITE setFormat NOTIFY formatChanged)
+    void setFormat(ScreenplayFormat* val);
+    ScreenplayFormat* format() const { return m_format; }
+    Q_SIGNAL void formatChanged();
+
+    Q_PROPERTY(bool trackFormatChanges READ trackFormatChanges WRITE setTrackFormatChanges NOTIFY trackFormatChangesChanged)
+    void setTrackFormatChanges(bool val);
+    bool trackFormatChanges() const { return m_trackFormatChanges; }
+    Q_SIGNAL void trackFormatChangesChanged();
+
+    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    void setLeftMargin(qreal val);
+    qreal leftMargin() const { return m_leftMargin; }
+    Q_SIGNAL void leftMarginChanged();
+
+    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
+    void setRightMargin(qreal val);
+    qreal rightMargin() const { return m_rightMargin; }
+    Q_SIGNAL void rightMarginChanged();
+
+    Q_PROPERTY(qreal topMargin READ topMargin WRITE setTopMargin NOTIFY topMarginChanged)
+    void setTopMargin(qreal val);
+    qreal topMargin() const { return m_topMargin; }
+    Q_SIGNAL void topMarginChanged();
+
+    Q_PROPERTY(qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
+    void setBottomMargin(qreal val);
+    qreal bottomMargin() const { return m_bottomMargin; }
+    Q_SIGNAL void bottomMarginChanged();
+
+    Q_PROPERTY(bool renderText READ renderText WRITE setRenderText NOTIFY featuresChanged)
+    void setRenderText(bool val);
+    bool renderText() const { return m_features.testFlag(RenderText); }
+
+    Q_PROPERTY(bool computeSize READ computeSize WRITE setComputeSize NOTIFY featuresChanged)
+    void setComputeSize(bool val);
+    bool computeSize() const { return m_features.testFlag(ComputeSize); }
+
+    enum Feature { ComputeSize = 1, RenderText = 2 };
+    Q_DECLARE_FLAGS(Features, Feature)
+    Q_FLAG(Features)
+    Q_PROPERTY(Features features READ features WRITE setFeatures NOTIFY featuresChanged)
+    void setFeatures(Features val);
+    Features features() const { return m_features; }
+    Q_SIGNAL void featuresChanged();
+
+    Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
+    qreal contentWidth() const { return m_contentWidth; }
+    Q_SIGNAL void contentWidthChanged();
+
+    Q_PROPERTY(qreal contentHeight READ contentHeight NOTIFY contentHeightChanged)
+    qreal contentHeight() const { return m_contentHeight; }
+    Q_SIGNAL void contentHeightChanged();
+
+    Q_PROPERTY(bool hasPendingComputeSize READ hasPendingComputeSize NOTIFY hasPendingComputeSizeChanged)
+    bool hasPendingComputeSize() const { return m_hasPendingComputeSize; }
+    Q_SIGNAL void hasPendingComputeSizeChanged();
+
+    // QQmlParserStatus interface
+    void classBegin();
+    void componentComplete();
+
+protected:
+    void timerEvent(QTimerEvent *te);
+
+    // QQuickPaintedItem interface
+    void paint(QPainter *painter);
+
+private:
+    void updateFromFeatures();
+    void updateDocument();
+    void updateDocumentLater();
+    void onSceneDestroyed();
+    void onSceneChanged();
+    void onFormatDestroyed();
+    void onFormatChanged();
+
+    void setContentWidth(qreal val);
+    void setContentHeight(qreal val);
+    void setHasPendingComputeSize(bool val);
+
+private:
+    Scene* m_scene = nullptr;
+    qreal m_topMargin = 0;
+    qreal m_leftMargin = 0;
+    Features m_features = ComputeSize;
+    qreal m_rightMargin = 0;
+    qreal m_bottomMargin = 0;
+    qreal m_contentWidth = 0;
+    qreal m_contentHeight = 0;
+    bool m_componentComplete = false;
+    bool m_trackSceneChanges = true;
+    bool m_trackFormatChanges = true;
+    QTextDocument *m_document = new QTextDocument(this);
+    SimpleTimer m_updateTimer;
+    ScreenplayFormat* m_format = nullptr;
+    bool m_hasPendingComputeSize = false;
 };
 
 #endif // SCENE_H

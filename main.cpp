@@ -118,6 +118,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
 
     qmlRegisterType<Scene>("Scrite", 1, 0, "Scene");
+    qmlRegisterType<SceneItem>("Scrite", 1, 0, "SceneItem");
     qmlRegisterUncreatableType<SceneHeading>("Scrite", 1, 0, "SceneHeading", reason);
     qmlRegisterType<SceneElement>("Scrite", 1, 0, "SceneElement");
 

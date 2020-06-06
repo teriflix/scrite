@@ -167,6 +167,7 @@ public:
 
     Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
     Q_INVOKABLE QRectF intersectedRectangle(const QRectF &of, const QRectF &with) const;
+    Q_INVOKABLE bool   doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const;
     Q_INVOKABLE QSizeF scaledSize(const QSizeF &of, const QSizeF &into) const;
 
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }

@@ -21,6 +21,7 @@
 #include "qobjectserializer.h"
 
 #include <QUuid>
+#include <QSGNode>
 #include <QDateTime>
 #include <QByteArray>
 #include <QJsonArray>
@@ -29,6 +30,7 @@
 #include <QTextDocument>
 #include <QJsonDocument>
 #include <QScopedValueRollback>
+#include <QAbstractTextDocumentLayout>
 
 class PushSceneUndoCommand;
 class SceneUndoCommand : public QUndoCommand
@@ -1341,3 +1343,306 @@ int Scene::staticNoteCount(QQmlListProperty<Note> *list)
     return reinterpret_cast< Scene* >(list->data)->noteCount();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+SceneItem::SceneItem(QQuickItem *parent)
+    : QQuickPaintedItem(parent)
+{
+    this->setFlag(QQuickItem::ItemHasContents, m_features.testFlag(RenderText));
+}
+
+SceneItem::~SceneItem()
+{
+
+}
+
+void SceneItem::setScene(Scene *val)
+{
+    if(m_scene == val)
+        return;
+
+    if(m_scene != nullptr)
+    {
+        disconnect(m_scene, &Scene::aboutToDelete, this, &SceneItem::onSceneDestroyed);
+        disconnect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+    }
+
+    m_scene = val;
+
+    if(m_scene != nullptr)
+    {
+        connect(m_scene, &Scene::aboutToDelete, this, &SceneItem::onSceneDestroyed);
+        if(m_trackSceneChanges)
+            connect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+    }
+
+    emit sceneChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::setTrackSceneChanges(bool val)
+{
+    if(m_trackSceneChanges == val)
+        return;
+
+    m_trackSceneChanges = val;
+    emit trackSceneChangesChanged();
+
+    if(val)
+        connect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+    else
+        disconnect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+}
+
+void SceneItem::setFormat(ScreenplayFormat *val)
+{
+    if(m_format == val)
+        return;
+
+    if(m_format != nullptr)
+    {
+        disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneItem::onSceneDestroyed);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+    }
+
+    m_format = val;
+
+    if(m_format != nullptr)
+    {
+        connect(m_format, &ScreenplayFormat::destroyed, this, &SceneItem::onSceneDestroyed);
+        if(m_trackFormatChanges)
+            connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+    }
+
+    emit formatChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::setTrackFormatChanges(bool val)
+{
+    if(m_trackFormatChanges == val)
+        return;
+
+    m_trackFormatChanges = val;
+    emit trackFormatChangesChanged();
+
+    if(val)
+        connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+    else
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+}
+
+void SceneItem::setLeftMargin(qreal val)
+{
+    if( qFuzzyCompare(m_leftMargin, val) )
+        return;
+
+    m_leftMargin = val;
+    emit leftMarginChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::setRightMargin(qreal val)
+{
+    if( qFuzzyCompare(m_rightMargin, val) )
+        return;
+
+    m_rightMargin = val;
+    emit rightMarginChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::setTopMargin(qreal val)
+{
+    if( qFuzzyCompare(m_topMargin, val) )
+        return;
+
+    m_topMargin = val;
+    emit topMarginChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::setBottomMargin(qreal val)
+{
+    if( qFuzzyCompare(m_bottomMargin, val) )
+        return;
+
+    m_bottomMargin = val;
+    emit bottomMarginChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::setRenderText(bool val)
+{
+    m_features.setFlag(RenderText, val);
+    this->updateFromFeatures();
+}
+
+void SceneItem::setComputeSize(bool val)
+{
+    m_features.setFlag(ComputeSize, val);
+    this->updateFromFeatures();
+}
+
+void SceneItem::setFeatures(SceneItem::Features val)
+{
+    if(m_features == val)
+        return;
+
+    m_features = val;
+    emit featuresChanged();
+
+    this->updateFromFeatures();
+}
+
+void SceneItem::classBegin()
+{
+    m_componentComplete = false;
+}
+
+void SceneItem::componentComplete()
+{
+    m_componentComplete = true;
+    this->updateDocumentLater();
+}
+
+void SceneItem::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_updateTimer.timerId())
+    {
+        m_updateTimer.stop();
+        this->updateDocument();
+    }
+}
+
+void SceneItem::paint(QPainter *painter)
+{
+    QAbstractTextDocumentLayout::PaintContext context;
+    QAbstractTextDocumentLayout *layout = m_document->documentLayout();
+    layout->draw(painter, context);
+}
+
+void SceneItem::updateFromFeatures()
+{
+    if(m_features.testFlag(ComputeSize))
+    {
+        const QSizeF size = m_document->size();
+        this->setContentWidth(size.width());
+        this->setContentHeight(size.height());
+    }
+
+    this->setFlag(QQuickItem::ItemHasContents, m_features.testFlag(RenderText));
+    if(m_features.testFlag(RenderText))
+        this->update();
+}
+
+void SceneItem::updateDocument()
+{
+    m_document->clear();
+
+    // Establish root frame format with margins
+    QTextFrameFormat frameFormat;
+    frameFormat.setTopMargin(m_topMargin);
+    frameFormat.setLeftMargin(m_leftMargin);
+    frameFormat.setRightMargin(m_rightMargin);
+    frameFormat.setBottomMargin(m_bottomMargin);
+
+    QTextFrame *rootFrame = m_document->rootFrame();
+    rootFrame->setFrameFormat(frameFormat);
+
+    m_document->setTextWidth(this->width());
+
+    if(m_scene != nullptr && m_format != nullptr)
+    {
+        const qreal maxParaWidth = (this->width() - m_leftMargin - m_rightMargin) / m_format->devicePixelRatio();
+
+        QTextCursor cursor(m_document);
+        for(int j=0; j<m_scene->elementCount(); j++)
+        {
+            const SceneElement *para = m_scene->elementAt(j);
+            const SceneElementFormat *style = m_format->elementFormat(para->type());
+            if(j)
+                cursor.insertBlock();
+
+            const QTextBlockFormat blockFormat = style->createBlockFormat(&maxParaWidth);
+            const QTextCharFormat charFormat = style->createCharFormat(&maxParaWidth);
+            cursor.setBlockFormat(blockFormat);
+            cursor.setCharFormat(charFormat);
+            cursor.insertText(para->text());
+        }
+    }
+
+    this->updateFromFeatures();
+
+    if(m_features.testFlag(ComputeSize))
+        this->setHasPendingComputeSize(false);
+}
+
+void SceneItem::updateDocumentLater()
+{
+    if(m_features.testFlag(ComputeSize))
+        this->setHasPendingComputeSize(true);
+
+    m_updateTimer.start(10, this);
+}
+
+void SceneItem::onSceneDestroyed()
+{
+    m_scene = nullptr;
+    emit sceneChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::onSceneChanged()
+{
+    if(m_trackSceneChanges)
+        this->updateDocumentLater();
+}
+
+void SceneItem::onFormatDestroyed()
+{
+    m_format = nullptr;
+    emit formatChanged();
+
+    this->updateDocumentLater();
+}
+
+void SceneItem::onFormatChanged()
+{
+    if(m_trackFormatChanges)
+        this->updateDocumentLater();
+}
+
+void SceneItem::setContentWidth(qreal val)
+{
+    if( qFuzzyCompare(m_contentWidth, val) )
+        return;
+
+    m_contentWidth = val;
+    emit contentWidthChanged();
+}
+
+void SceneItem::setContentHeight(qreal val)
+{
+    if( qFuzzyCompare(m_contentHeight, val) )
+        return;
+
+    m_contentHeight = val;
+    emit contentHeightChanged();
+}
+
+void SceneItem::setHasPendingComputeSize(bool val)
+{
+    if(m_hasPendingComputeSize == val)
+        return;
+
+    m_hasPendingComputeSize = val;
+    emit hasPendingComputeSizeChanged();
+}

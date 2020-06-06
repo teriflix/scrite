@@ -582,6 +582,11 @@ QRectF Application::intersectedRectangle(const QRectF &of, const QRectF &with) c
     return of.intersected(with);
 }
 
+bool Application::doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const
+{
+    return r1.intersects(r2);
+}
+
 QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into) const
 {
     return of.scaled(into, Qt::KeepAspectRatio);

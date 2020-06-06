@@ -16,8 +16,8 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
-    width: 500
-    height: 600
+    width: 600
+    height: 700
 
     SwipeView {
         id: aboutBoxPages
