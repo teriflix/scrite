@@ -30,7 +30,7 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
                      m_font(parent->defaultFont()),
                      m_format(parent),
                      m_elementType(type)
-{        
+{
     QObject::connect(this, &SceneElementFormat::elementFormatChanged, [this]() {
         this->markAsModified();
     });
