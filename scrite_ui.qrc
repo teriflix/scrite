@@ -39,6 +39,5 @@
         <file>qml/FlickablePreview.qml</file>
         <file>LICENSE.txt</file>
         <file>qml/ScreenplayEditor2.qml</file>
-        <file>qml/DocumentView.qml</file>
     </qresource>
 </RCC>

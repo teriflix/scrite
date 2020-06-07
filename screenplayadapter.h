@@ -62,6 +62,7 @@ public:
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
+    Q_INVOKABLE QVariant at(int row) const;
 
     enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, ModelDataRole, RowNumberRole };
     Q_ENUMS(Roles)
@@ -70,6 +71,7 @@ public:
 
 private:
     void setCurrentElement(ScreenplayElement* val);
+    QVariant data(ScreenplayElement *element, int row, int role) const;
 
 private:
     QObject* m_source = nullptr;

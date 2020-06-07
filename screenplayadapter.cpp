@@ -18,7 +18,6 @@
 ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
     : QIdentityProxyModel(parent)
 {
-    connect(this, &ScreenplayAdapter::sourceChanged, this, &ScreenplayAdapter::elementCountChanged);
     connect(this, &ScreenplayAdapter::rowsInserted, this, &ScreenplayAdapter::elementCountChanged);
     connect(this, &ScreenplayAdapter::rowsRemoved, this, &ScreenplayAdapter::elementCountChanged);
     connect(this, &ScreenplayAdapter::modelReset, this, &ScreenplayAdapter::elementCountChanged);
@@ -151,6 +150,15 @@ int ScreenplayAdapter::nextSceneElementIndex()
     return 0;
 }
 
+QVariant ScreenplayAdapter::at(int row) const
+{
+    const QModelIndex index = this->index(row, 0);
+    if(index.isValid())
+        return this->data(index, ModelDataRole);
+
+    return QVariant();
+}
+
 QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
 {
     static QHash<int, QByteArray> roles;
@@ -169,43 +177,13 @@ QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
 
 QVariant ScreenplayAdapter::data(const QModelIndex &index, int role) const
 {
-    if(this->sourceModel() == nullptr)
+    if(!index.isValid() || this->sourceModel() == nullptr)
         return QVariant();
 
     const QModelIndex srcIndex = this->mapToSource(index);
     const QVariant srcData = this->sourceModel()->data(srcIndex, Screenplay::ScreenplayElementRole);
     ScreenplayElement *element = srcData.value<ScreenplayElement*>();
-    switch(role)
-    {
-    case IdRole:
-        return element->sceneID();
-    case ScreenplayElementRole:
-        return srcData;
-    case ScreenplayElementTypeRole:
-        return element->elementType();
-    case BreakTypeRole:
-        return element->breakType();
-    case SceneRole:
-        return QVariant::fromValue<Scene*>(element->scene());
-    case RowNumberRole:
-        return index.row();
-    case ModelDataRole: {
-            QVariantMap ret;
-            const QHash<int, QByteArray> roles = this->roleNames();
-            QHash<int, QByteArray>::const_iterator it = roles.begin();
-            QHash<int, QByteArray>::const_iterator end = roles.end();
-            while(it != end) {
-                if(it.key() != ModelDataRole)
-                    ret[ QString::fromLatin1(it.value()) ] = this->data(index, it.key());
-                ++it;
-            }
-            return ret;
-        }
-    default:
-        break;
-    }
-
-    return QVariant();
+    return this->data(element, index.row(), role);
 }
 
 void ScreenplayAdapter::setCurrentElement(ScreenplayElement *val)
@@ -215,5 +193,43 @@ void ScreenplayAdapter::setCurrentElement(ScreenplayElement *val)
 
     m_currentElement = val;
     emit currentElementChanged();
+}
+
+QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) const
+{
+    if(element == nullptr)
+        return QVariant();
+
+    switch(role)
+    {
+    case IdRole:
+        return element->sceneID();
+    case ScreenplayElementRole:
+        return QVariant::fromValue<ScreenplayElement*>(element);
+    case ScreenplayElementTypeRole:
+        return element->elementType();
+    case BreakTypeRole:
+        return element->breakType();
+    case SceneRole:
+        return QVariant::fromValue<Scene*>(element->scene());
+    case RowNumberRole:
+        return row;
+    case ModelDataRole: {
+            QVariantMap ret;
+            const QHash<int, QByteArray> roles = this->roleNames();
+            QHash<int, QByteArray>::const_iterator it = roles.begin();
+            QHash<int, QByteArray>::const_iterator end = roles.end();
+            while(it != end) {
+                if(it.key() != ModelDataRole)
+                    ret[ QString::fromLatin1(it.value()) ] = this->data(element, row, it.key());
+                ++it;
+            }
+            return ret;
+        }
+    default:
+        break;
+    }
+
+    return QVariant();
 }
 

@@ -33,7 +33,11 @@ Item {
     ScreenplayAdapter {
         id: screenplayAdapter
         source: scriteDocument.screenplay
-        onCurrentIndexChanged: contentView.positionViewAtIndex2(currentIndex, ListView.Visible)
+        onCurrentIndexChanged: {
+            app.execLater(contentView, 500, function() {
+                contentView.scrollIntoView(currentIndex)
+            })
+        }
     }
 
     ScreenplayTextDocument {
@@ -76,43 +80,20 @@ Item {
             clip: true
             color: screenplayAdapter.elementCount > 0 ? "white" : Qt.rgba(0,0,0,0)
 
-            DocumentView {
+            ListView {
                 id: contentView
                 anchors.fill: parent
                 model: screenplayAdapter
-                itemDelegate: Loader {
-                    readonly property int theIndex: itemIndex
-                    readonly property Scene theScene: itemData.scene
-                    readonly property ScreenplayElement theElement: itemData.screenplayElement
+                delegate: Loader {
                     width: contentView.width
-                    sourceComponent: theScene ? contentComponent : breakComponent
-                    onItemChanged: {
-                        if(item) {
-                            item.theIndex = theIndex
-                            item.theScene = theScene
-                            item.theElement = theElement
-                        }
-                    }
-                }
-                sizeHintDelegate: Loader {
-                    readonly property int theIndex: itemIndex
-                    readonly property Scene theScene: itemData.scene
-                    readonly property ScreenplayElement theElement: itemData.screenplayElement
-                    width: contentView.width
-                    sourceComponent: theScene ? contentSizeHintComponent : breakComponent
-                    onItemChanged: {
-                        if(item) {
-                            item.theIndex = theIndex
-                            item.theScene = theScene
-                            item.theElement = theElement
-                        }
-                    }
+                    property var componentData: modelData
+                    sourceComponent: modelData.scene ? contentComponent : breakComponent
                 }
 
-                // snapMode: ListView.NoSnap
+                snapMode: ListView.NoSnap
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
-                // cacheBuffer: 10
+                cacheBuffer: 10
                 ScrollBar.vertical: verticalScrollBar
                 header: Item {
                     width: contentView.width
@@ -121,6 +102,45 @@ Item {
                 footer: Item {
                     width: contentView.width
                     height: ruler.bottomMarginPx
+                }
+
+                property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+1), 0) : 0
+                property int lastItemIndex: screenplayAdapter.elementCount > 0 ? Math.min(indexAt(width/2, contentView.contentY+height-2), screenplayAdapter.elementCount-1) : 0
+
+                function isVisible(index) {
+                    return index >= firstItemIndex && index <= lastItemIndex
+                }
+
+                function scrollIntoView(index) {
+                    var topIndex = firstItemIndex
+                    var bottomIndex = lastItemIndex
+
+                    if(index >= topIndex && index <= bottomIndex)
+                        return // item is already visible
+
+                    if(index < topIndex && topIndex-index <= 2) {
+                        contentView.contentY -= height*0.2
+                    } else if(index > bottomIndex && index-bottomIndex <= 2) {
+                        contentView.contentY += height*0.2
+                    } else {
+                        positionViewAtIndex(index, ListView.Beginning)
+                    }
+                }
+
+                function ensureVisible(item, rect) {
+                    if(item === null)
+                        return
+
+                    var pt = item.mapToItem(contentView.contentItem, rect.x, rect.y)
+                    var startY = contentView.contentY
+                    var endY = contentView.contentY + contentView.height - rect.height
+                    if( startY < pt.y && pt.y < endY )
+                        return
+
+                    if( pt.y < startY )
+                        contentView.contentY = pt.y
+                    else if( pt.y > endY )
+                        contentView.contentY = (pt.y + 2*rect.height) - contentView.height
                 }
             }
         }
@@ -154,13 +174,35 @@ Item {
             text: screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
         }
 
-        Text {
+        Item {
+            width: pageRulerArea.width
+            height: parent.height
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: height*0.1
-            font.family: headingFontMetrics.font.family
-            font.pixelSize: parent.height * 0.6
-            text: screenplayAdapter.currentScene && screenplayAdapter.currentScene.heading.enabled ?
-                  "[" + screenplayAdapter.currentElement.sceneNumber + "] " + screenplayAdapter.currentScene.heading.text : ''
+
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: ruler.leftMarginPx
+                anchors.rightMargin: ruler.rightMarginPx
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: height*0.1
+                font.family: headingFontMetrics.font.family
+                font.pixelSize: parent.height * 0.6
+                elide: Text.ElideRight
+                text: {
+                    var scene = null
+                    var element = null
+                    if(contentView.isVisible(screenplayAdapter.currentIndex)) {
+                        scene = screenplayAdapter.currentScene
+                        element = screenplayAdapter.currentElement
+                    } else {
+                        var data = screenplayAdapter.at(contentView.firstItemIndex)
+                        scene = data ? data.scene : null
+                        element = data ? data.screenplayElement : null
+                    }
+                    return scene && scene.heading.enabled ? "[" + element.sceneNumber + "] " + scene.heading.text : ''
+                }
+            }
         }
 
         Row {
@@ -201,57 +243,13 @@ Item {
         }
     }
 
-    Repeater {
-        id: sceneItemRepeater
-        model: screenplayAdapter
-        delegate: SceneItem {
-            scene: modelData.scene
-            format: screenplayFormat
-            width: parent.width
-            height: Math.ceil(contentHeight)
-            leftMargin: ruler.leftMarginPx
-            rightMargin: ruler.rightMarginPx
-            topMargin: defaultFontMetrics.lineSpacing
-            bottomMargin: defaultFontMetrics.lineSpacing
-            computeSize: true
-            renderText: false
-        }
-    }
-
-    Component {
-        id: contentSizeHintComponent
-
-        Column {
-            id: contentSizeHintItem
-            property int theIndex: -1
-            property Scene theScene
-            property ScreenplayElement theElement
-
-            Loader {
-                id: sceneHeadingAreaLoader
-                width: parent.width
-                active: contentSizeHintItem.theScene !== null
-                sourceComponent: sceneHeadingArea
-                onItemChanged: {
-                    if(item)
-                        item.theScene = contentSizeHintItem.theScene
-                }
-            }
-
-            Item {
-                width: parent.width
-                height: sceneItemRepeater.itemAt(parent.theIndex).height
-            }
-        }
-    }
-
     Component {
         id: breakComponent
 
         Item {
-            property int theIndex: -1
-            property Scene theScene
-            property ScreenplayElement theElement
+            property int theIndex: componentData.rowNumber
+            property Scene theScene: componentData.scene
+            property ScreenplayElement theElement: componentData.screenplayElement
             height: breakText.contentHeight+16
 
             Rectangle {
@@ -279,9 +277,9 @@ Item {
 
         Rectangle {
             id: contentItem
-            property int theIndex: -1
-            property Scene theScene
-            property ScreenplayElement theElement
+            property int theIndex: componentData.rowNumber
+            property Scene theScene: componentData.scene
+            property ScreenplayElement theElement: componentData.screenplayElement
 
             width: contentArea.width
             height: contentItemLayout.height
@@ -699,7 +697,7 @@ Item {
                     return
                 }
 
-                contentView.positionViewAtIndex2(idx, ListView.Visible)
+                contentView.scrollIntoView(idx)
                 var item = contentView.itemAtIndex(idx).item
                 item.assumeFocusAt(-1)
             }
@@ -712,7 +710,7 @@ Item {
                     return
                 }
 
-                contentView.positionViewAtIndex2(idx, ListView.Visible)
+                contentView.scrollIntoView(idx)
                 var item = contentView.itemAtIndex(idx).item
                 item.assumeFocusAt(0)
             }

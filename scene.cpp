@@ -21,6 +21,7 @@
 #include "qobjectserializer.h"
 
 #include <QUuid>
+#include <QFuture>
 #include <QSGNode>
 #include <QDateTime>
 #include <QByteArray>
@@ -29,8 +30,10 @@
 #include <QUndoCommand>
 #include <QTextDocument>
 #include <QJsonDocument>
+#include <QtConcurrentRun>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
+#include <QFutureWatcher>
 
 class PushSceneUndoCommand;
 class SceneUndoCommand : public QUndoCommand
@@ -1345,43 +1348,43 @@ int Scene::staticNoteCount(QQmlListProperty<Note> *list)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SceneItem::SceneItem(QQuickItem *parent)
-    : QQuickPaintedItem(parent)
+SceneSizeHintItem::SceneSizeHintItem(QQuickItem *parent)
+    : QQuickItem(parent)
 {
-    this->setFlag(QQuickItem::ItemHasContents, m_features.testFlag(RenderText));
+    this->setFlag(QQuickItem::ItemHasContents,false);
 }
 
-SceneItem::~SceneItem()
+SceneSizeHintItem::~SceneSizeHintItem()
 {
 
 }
 
-void SceneItem::setScene(Scene *val)
+void SceneSizeHintItem::setScene(Scene *val)
 {
     if(m_scene == val)
         return;
 
     if(m_scene != nullptr)
     {
-        disconnect(m_scene, &Scene::aboutToDelete, this, &SceneItem::onSceneDestroyed);
-        disconnect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+        disconnect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::onSceneDestroyed);
+        disconnect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     }
 
     m_scene = val;
 
     if(m_scene != nullptr)
     {
-        connect(m_scene, &Scene::aboutToDelete, this, &SceneItem::onSceneDestroyed);
+        connect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::onSceneDestroyed);
         if(m_trackSceneChanges)
-            connect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+            connect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     }
 
     emit sceneChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::setTrackSceneChanges(bool val)
+void SceneSizeHintItem::setTrackSceneChanges(bool val)
 {
     if(m_trackSceneChanges == val)
         return;
@@ -1390,37 +1393,37 @@ void SceneItem::setTrackSceneChanges(bool val)
     emit trackSceneChangesChanged();
 
     if(val)
-        connect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+        connect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     else
-        disconnect(m_scene, &Scene::sceneChanged, this, &SceneItem::onSceneChanged);
+        disconnect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
 }
 
-void SceneItem::setFormat(ScreenplayFormat *val)
+void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 {
     if(m_format == val)
         return;
 
     if(m_format != nullptr)
     {
-        disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneItem::onSceneDestroyed);
-        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+        disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::onSceneDestroyed);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     }
 
     m_format = val;
 
     if(m_format != nullptr)
     {
-        connect(m_format, &ScreenplayFormat::destroyed, this, &SceneItem::onSceneDestroyed);
+        connect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::onSceneDestroyed);
         if(m_trackFormatChanges)
-            connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+            connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     }
 
     emit formatChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::setTrackFormatChanges(bool val)
+void SceneSizeHintItem::setTrackFormatChanges(bool val)
 {
     if(m_trackFormatChanges == val)
         return;
@@ -1429,12 +1432,12 @@ void SceneItem::setTrackFormatChanges(bool val)
     emit trackFormatChangesChanged();
 
     if(val)
-        connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+        connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     else
-        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneItem::onFormatChanged);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
 }
 
-void SceneItem::setLeftMargin(qreal val)
+void SceneSizeHintItem::setLeftMargin(qreal val)
 {
     if( qFuzzyCompare(m_leftMargin, val) )
         return;
@@ -1442,10 +1445,10 @@ void SceneItem::setLeftMargin(qreal val)
     m_leftMargin = val;
     emit leftMarginChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::setRightMargin(qreal val)
+void SceneSizeHintItem::setRightMargin(qreal val)
 {
     if( qFuzzyCompare(m_rightMargin, val) )
         return;
@@ -1453,10 +1456,10 @@ void SceneItem::setRightMargin(qreal val)
     m_rightMargin = val;
     emit rightMarginChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::setTopMargin(qreal val)
+void SceneSizeHintItem::setTopMargin(qreal val)
 {
     if( qFuzzyCompare(m_topMargin, val) )
         return;
@@ -1464,10 +1467,10 @@ void SceneItem::setTopMargin(qreal val)
     m_topMargin = val;
     emit topMarginChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::setBottomMargin(qreal val)
+void SceneSizeHintItem::setBottomMargin(qreal val)
 {
     if( qFuzzyCompare(m_bottomMargin, val) )
         return;
@@ -1475,94 +1478,71 @@ void SceneItem::setBottomMargin(qreal val)
     m_bottomMargin = val;
     emit bottomMarginChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::setRenderText(bool val)
-{
-    m_features.setFlag(RenderText, val);
-    this->updateFromFeatures();
-}
-
-void SceneItem::setComputeSize(bool val)
-{
-    m_features.setFlag(ComputeSize, val);
-    this->updateFromFeatures();
-}
-
-void SceneItem::setFeatures(SceneItem::Features val)
-{
-    if(m_features == val)
-        return;
-
-    m_features = val;
-    emit featuresChanged();
-
-    this->updateFromFeatures();
-}
-
-void SceneItem::classBegin()
+void SceneSizeHintItem::classBegin()
 {
     m_componentComplete = false;
 }
 
-void SceneItem::componentComplete()
+void SceneSizeHintItem::componentComplete()
 {
     m_componentComplete = true;
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::timerEvent(QTimerEvent *te)
+void SceneSizeHintItem::timerEvent(QTimerEvent *te)
 {
     if(te->timerId() == m_updateTimer.timerId())
     {
         m_updateTimer.stop();
-        this->updateDocument();
+
+        QFuture<QSizeF> future = QtConcurrent::run(this, &SceneSizeHintItem::evaluateSizeHint);
+
+        QFutureWatcher<QSizeF> *watcher = new QFutureWatcher<QSizeF>(this);
+        watcher->setFuture(future);
+        connect(watcher, &QFutureWatcher<void>::finished, [=]() {
+            this->updateSize( watcher->result() );
+        });
+        connect(watcher, &QFutureWatcher<void>::finished, watcher, &QObject::deleteLater);
     }
 }
 
-void SceneItem::paint(QPainter *painter)
+void SceneSizeHintItem::updateSize(const QSizeF &size)
 {
-    QAbstractTextDocumentLayout::PaintContext context;
-    QAbstractTextDocumentLayout *layout = m_document->documentLayout();
-    layout->draw(painter, context);
+    this->setContentWidth(size.width());
+    this->setContentHeight(size.height());
+
+    if(this->hasPendingComputeSize())
+        this->setHasPendingComputeSize(false);
 }
 
-void SceneItem::updateFromFeatures()
+QSizeF SceneSizeHintItem::evaluateSizeHint()
 {
-    if(m_features.testFlag(ComputeSize))
-    {
-        const QSizeF size = m_document->size();
-        this->setContentWidth(size.width());
-        this->setContentHeight(size.height());
-    }
+    m_lock.lockForRead();
+        const QMarginsF margins(m_leftMargin, m_topMargin, m_rightMargin, m_bottomMargin);
+        const qreal pageWidth = this->width();
+    m_lock.unlock();
 
-    this->setFlag(QQuickItem::ItemHasContents, m_features.testFlag(RenderText));
-    if(m_features.testFlag(RenderText))
-        this->update();
-}
+    QTextDocument document;
 
-void SceneItem::updateDocument()
-{
-    m_document->clear();
-
-    // Establish root frame format with margins
     QTextFrameFormat frameFormat;
-    frameFormat.setTopMargin(m_topMargin);
-    frameFormat.setLeftMargin(m_leftMargin);
-    frameFormat.setRightMargin(m_rightMargin);
-    frameFormat.setBottomMargin(m_bottomMargin);
+    frameFormat.setTopMargin(margins.top());
+    frameFormat.setLeftMargin(margins.left());
+    frameFormat.setRightMargin(margins.right());
+    frameFormat.setBottomMargin(margins.bottom());
 
-    QTextFrame *rootFrame = m_document->rootFrame();
+    QTextFrame *rootFrame = document.rootFrame();
     rootFrame->setFrameFormat(frameFormat);
 
-    m_document->setTextWidth(this->width());
+    document.setTextWidth(pageWidth);
 
     if(m_scene != nullptr && m_format != nullptr)
     {
-        const qreal maxParaWidth = (this->width() - m_leftMargin - m_rightMargin) / m_format->devicePixelRatio();
+        const qreal maxParaWidth = (pageWidth - margins.left() - margins.right()) / m_format->devicePixelRatio();
 
-        QTextCursor cursor(m_document);
+        QTextCursor cursor(&document);
         for(int j=0; j<m_scene->elementCount(); j++)
         {
             const SceneElement *para = m_scene->elementAt(j);
@@ -1578,49 +1558,45 @@ void SceneItem::updateDocument()
         }
     }
 
-    this->updateFromFeatures();
-
-    if(m_features.testFlag(ComputeSize))
-        this->setHasPendingComputeSize(false);
+    return document.size();
 }
 
-void SceneItem::updateDocumentLater()
+void SceneSizeHintItem::evaluateSizeHintLater()
 {
-    if(m_features.testFlag(ComputeSize))
-        this->setHasPendingComputeSize(true);
+    this->setHasPendingComputeSize(true);
 
     m_updateTimer.start(10, this);
 }
 
-void SceneItem::onSceneDestroyed()
+void SceneSizeHintItem::onSceneDestroyed()
 {
     m_scene = nullptr;
     emit sceneChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::onSceneChanged()
+void SceneSizeHintItem::onSceneChanged()
 {
     if(m_trackSceneChanges)
-        this->updateDocumentLater();
+        this->evaluateSizeHintLater();
 }
 
-void SceneItem::onFormatDestroyed()
+void SceneSizeHintItem::onFormatDestroyed()
 {
     m_format = nullptr;
     emit formatChanged();
 
-    this->updateDocumentLater();
+    this->evaluateSizeHintLater();
 }
 
-void SceneItem::onFormatChanged()
+void SceneSizeHintItem::onFormatChanged()
 {
     if(m_trackFormatChanges)
-        this->updateDocumentLater();
+        this->evaluateSizeHintLater();
 }
 
-void SceneItem::setContentWidth(qreal val)
+void SceneSizeHintItem::setContentWidth(qreal val)
 {
     if( qFuzzyCompare(m_contentWidth, val) )
         return;
@@ -1629,7 +1605,7 @@ void SceneItem::setContentWidth(qreal val)
     emit contentWidthChanged();
 }
 
-void SceneItem::setContentHeight(qreal val)
+void SceneSizeHintItem::setContentHeight(qreal val)
 {
     if( qFuzzyCompare(m_contentHeight, val) )
         return;
@@ -1638,7 +1614,7 @@ void SceneItem::setContentHeight(qreal val)
     emit contentHeightChanged();
 }
 
-void SceneItem::setHasPendingComputeSize(bool val)
+void SceneSizeHintItem::setHasPendingComputeSize(bool val)
 {
     if(m_hasPendingComputeSize == val)
         return;

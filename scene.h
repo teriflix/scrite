@@ -20,6 +20,7 @@
 #include <QPointer>
 #include <QJsonArray>
 #include <QUndoCommand>
+#include <QReadWriteLock>
 #include <QQmlListProperty>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
@@ -313,13 +314,13 @@ private:
 };
 
 class ScreenplayFormat;
-class SceneItem : public QQuickPaintedItem
+class SceneSizeHintItem : public QQuickItem
 {
     Q_OBJECT
 
 public:
-    SceneItem(QQuickItem *parent=nullptr);
-    ~SceneItem();
+    SceneSizeHintItem(QQuickItem *parent=nullptr);
+    ~SceneSizeHintItem();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
     void setScene(Scene* val);
@@ -361,22 +362,6 @@ public:
     qreal bottomMargin() const { return m_bottomMargin; }
     Q_SIGNAL void bottomMarginChanged();
 
-    Q_PROPERTY(bool renderText READ renderText WRITE setRenderText NOTIFY featuresChanged)
-    void setRenderText(bool val);
-    bool renderText() const { return m_features.testFlag(RenderText); }
-
-    Q_PROPERTY(bool computeSize READ computeSize WRITE setComputeSize NOTIFY featuresChanged)
-    void setComputeSize(bool val);
-    bool computeSize() const { return m_features.testFlag(ComputeSize); }
-
-    enum Feature { ComputeSize = 1, RenderText = 2 };
-    Q_DECLARE_FLAGS(Features, Feature)
-    Q_FLAG(Features)
-    Q_PROPERTY(Features features READ features WRITE setFeatures NOTIFY featuresChanged)
-    void setFeatures(Features val);
-    Features features() const { return m_features; }
-    Q_SIGNAL void featuresChanged();
-
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
     qreal contentWidth() const { return m_contentWidth; }
     Q_SIGNAL void contentWidthChanged();
@@ -396,13 +381,10 @@ public:
 protected:
     void timerEvent(QTimerEvent *te);
 
-    // QQuickPaintedItem interface
-    void paint(QPainter *painter);
-
 private:
-    void updateFromFeatures();
-    void updateDocument();
-    void updateDocumentLater();
+    void updateSize(const QSizeF &size);
+    QSizeF evaluateSizeHint();
+    void evaluateSizeHintLater();
     void onSceneDestroyed();
     void onSceneChanged();
     void onFormatDestroyed();
@@ -416,15 +398,14 @@ private:
     Scene* m_scene = nullptr;
     qreal m_topMargin = 0;
     qreal m_leftMargin = 0;
-    Features m_features = ComputeSize;
     qreal m_rightMargin = 0;
     qreal m_bottomMargin = 0;
     qreal m_contentWidth = 0;
     qreal m_contentHeight = 0;
+    QReadWriteLock m_lock;
     bool m_componentComplete = false;
     bool m_trackSceneChanges = true;
     bool m_trackFormatChanges = true;
-    QTextDocument *m_document = new QTextDocument(this);
     SimpleTimer m_updateTimer;
     ScreenplayFormat* m_format = nullptr;
     bool m_hasPendingComputeSize = false;
