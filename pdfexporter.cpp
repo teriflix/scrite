@@ -13,6 +13,7 @@
 
 #include "pdfexporter.h"
 #include "imageprinter.h"
+#include "screenplaytextdocument.h"
 #include "qtextdocumentpagedprinter.h"
 
 #include <QFileInfo>
@@ -35,11 +36,13 @@ PdfExporter::~PdfExporter()
 
 bool PdfExporter::doExport(QIODevice *device)
 {
-    const Screenplay *screenplay = this->document()->screenplay();
+    Screenplay *screenplay = this->document()->screenplay();
 
     QPdfWriter pdfWriter(device);
     pdfWriter.setTitle(screenplay->title());
     pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
+
+#ifdef QT_NO_DEBUG
     pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
     pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
 
@@ -52,6 +55,17 @@ bool PdfExporter::doExport(QIODevice *device)
     printer.footer()->setVisibleFromPageOne(false);
     printer.watermark()->setVisibleFromPageOne(false);
     return printer.print(&textDocument, &pdfWriter);
+#else
+    ScreenplayFormat *format = this->document()->printFormat();
+
+    ScreenplayTextDocument stDoc;
+    stDoc.setScreenplay(screenplay);
+    stDoc.setFormatting(format);
+    stDoc.syncNow();
+    stDoc.print(&pdfWriter);
+
+    return true;
+#endif
 }
 
 QString PdfExporter::polishFileName(const QString &fileName) const

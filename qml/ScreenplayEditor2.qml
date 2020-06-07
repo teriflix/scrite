@@ -89,7 +89,6 @@ Item {
                     property var componentData: modelData
                     sourceComponent: modelData.scene ? contentComponent : breakComponent
                 }
-
                 snapMode: ListView.NoSnap
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
@@ -112,6 +111,9 @@ Item {
                 }
 
                 function scrollIntoView(index) {
+                    if(moving || flicking)
+                        return
+
                     var topIndex = firstItemIndex
                     var bottomIndex = lastItemIndex
 
@@ -137,6 +139,7 @@ Item {
                     if( startY < pt.y && pt.y < endY )
                         return
 
+                    var newContentY = 0
                     if( pt.y < startY )
                         contentView.contentY = pt.y
                     else if( pt.y > endY )
@@ -337,7 +340,55 @@ Item {
                     palette: app.palette
                     selectByMouse: true
                     selectByKeyboard: true
-                    background: Item { }
+                    background: Item {
+                        id: sceneTextEditorBackground
+
+                        ResetOnChange {
+                            id: document
+                            trackChangesOn: sceneDocumentBinder.documentLoadCount
+                            from: null
+                            to: screenplayTextDocument
+                            delay: 100
+                        }
+
+                        ScreenplayElementPageBreaks {
+                            id: pageBreaksEvaluator
+                            screenplayElement: contentItem.theElement
+                            screenplayDocument: document.value
+                        }
+
+                        Repeater {
+                            model: pageBreaksEvaluator.pageBreaks
+
+                            PainterPathItem {
+                                id: pageBreakLine
+                                property rect cursorRect: sceneTextEditor.positionToRectangle(modelData.position)
+                                x: 0
+                                y: cursorRect.y - height/2
+                                width: sceneTextEditorBackground.width
+                                height: 3
+                                renderingMechanism: PainterPathItem.UseQPainter
+                                renderType: PainterPathItem.OutlineOnly
+                                outlineColor: primaryColors.a700.background
+                                outlineStyle: PainterPathItem.DashDotLine
+                                outlineWidth: 1
+
+                                painterPath: PainterPath {
+                                    MoveTo { x: 0; y: 1 }
+                                    LineTo { x: pageBreakLine.width; y: 1 }
+                                }
+
+                                Text {
+                                    font: defaultFontMetrics.font
+                                    text: modelData.pageNumber + ". "
+                                    anchors.right: parent.right
+                                    anchors.top: parent.bottom
+                                    anchors.topMargin: 5
+                                    color: pageBreakLine.outlineColor
+                                }
+                            }
+                        }
+                    }
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font: screenplayFormat.defaultFont2
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
@@ -349,11 +400,15 @@ Item {
                         } else if(globalSceneEditorToolbar.sceneEditor === contentItem)
                             globalSceneEditorToolbar.sceneEditor = null
                         sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
+                        contentItem.theScene.undoRedoEnabled = activeFocus
                     }
 
                     FocusTracker.window: qmlWindow
+                    FocusTracker.indicator.target: mainUndoStack
+                    FocusTracker.indicator.property: "screenplayEditorActive"
+
                     onCursorRectangleChanged: {
-                        if(activeFocus)
+                        if(activeFocus && contentView.isVisible(contentItem.theIndex))
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle, contentItem.theIndex)
                     }
 

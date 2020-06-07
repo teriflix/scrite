@@ -288,7 +288,7 @@ void ScreenplayPageLayout::setPaperSize(ScreenplayPageLayout::PaperSize val)
     emit paperSizeChanged();
 }
 
-void ScreenplayPageLayout::configure(QTextDocument *document)
+void ScreenplayPageLayout::configure(QTextDocument *document) const
 {
     const bool stdResolution = qFuzzyCompare(m_resolution,72);
     const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(72);
@@ -304,7 +304,7 @@ void ScreenplayPageLayout::configure(QTextDocument *document)
     document->rootFrame()->setFrameFormat(format);
 }
 
-void ScreenplayPageLayout::configure(QPagedPaintDevice *printer)
+void ScreenplayPageLayout::configure(QPagedPaintDevice *printer) const
 {
     printer->setPageLayout(m_pageLayout);
 }
@@ -1092,6 +1092,17 @@ QFont SceneDocumentBinder::currentFont() const
 
     QTextCharFormat format = cursor.charFormat();
     return format.font();
+}
+
+void SceneDocumentBinder::classBegin()
+{
+
+}
+
+void SceneDocumentBinder::componentComplete()
+{
+    m_initializeDocumentTimer.stop();
+    this->initializeDocument();
 }
 
 void SceneDocumentBinder::highlightBlock(const QString &text)

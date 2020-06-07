@@ -69,6 +69,13 @@ public:
 
     Q_INVOKABLE void print(QObject *printerObject);
 
+    QList< QPair<int,int> > pageBreaksFor(ScreenplayElement *element) const;
+
+    QList< QPair<int,int> > pageBoundaries() const { return m_pageBoundaries; }
+    Q_SIGNAL void pageBoundariesChanged();
+
+    void syncNow();
+
 signals:
     void updateStarted();
     void updateFinished();
@@ -96,6 +103,9 @@ private:
     void disconnectFromScreenplaySignals();
     void disconnectFromScreenplayFormatSignals();
 
+    void connectToSceneSignals(Scene *scene);
+    void disconnectFromSceneSignals(Scene *scene);
+
     // Hook to signals that convey change in sequencing of scenes
     void onSceneMoved(ScreenplayElement *ptr, int from, int to);
     void onSceneRemoved(ScreenplayElement *ptr, int index);
@@ -104,8 +114,11 @@ private:
     // Hook to signals that convey changes to a specific scene content
     void onSceneReset();
     void onSceneRefreshed();
+    void onSceneAboutToReset();
     void onSceneHeadingChanged();
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
+    void onSceneAboutToResetModel();
+    void onSceneResetModel();
 
     // Hook to signals that convey change in formatting
     void onElementFormatChanged();
@@ -117,6 +130,8 @@ private:
     void onActiveSceneDestroyed(Scene *ptr);
     void onActiveSceneCursorPositionChanged();
     void evaluateCurrentPage();
+    void evaluatePageBoundaries();
+    void evaluatePageBoundariesLater();
 
     // Other methods
     void formatAllBlocks();
@@ -134,14 +149,48 @@ private:
     QTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_formatting = nullptr;
     SimpleTimer m_loadScreenplayTimer;
+    SimpleTimer m_pageBoundaryEvalTimer;
     QTextFrameFormat m_sceneFrameFormat;
     bool m_connectedToScreenplaySignals = false;
     bool m_connectedToFormattingSignals = false;
     QPagedPaintDevice::PageSize m_paperSize = QPagedPaintDevice::Letter;
+    QList< QPair<int,int> > m_pageBoundaries;
     friend class ScreenplayTextDocumentUpdate;
     ModificationTracker m_screenplayModificationTracker;
     ModificationTracker m_formattingModificationTracker;
     QMap<const ScreenplayElement*, QTextFrame*> m_elementFrameMap;
+};
+
+class ScreenplayElementPageBreaks : public QObject
+{
+    Q_OBJECT
+
+public:
+    ScreenplayElementPageBreaks(QObject *parent=nullptr);
+    ~ScreenplayElementPageBreaks();
+
+    Q_PROPERTY(ScreenplayTextDocument* screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged)
+    void setScreenplayDocument(ScreenplayTextDocument* val);
+    ScreenplayTextDocument* screenplayDocument() const { return m_screenplayDocument; }
+    Q_SIGNAL void screenplayDocumentChanged();
+
+    Q_PROPERTY(ScreenplayElement* screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged)
+    void setScreenplayElement(ScreenplayElement* val);
+    ScreenplayElement* screenplayElement() const { return m_screenplayElement; }
+    Q_SIGNAL void screenplayElementChanged();
+
+    Q_PROPERTY(QVariantList pageBreaks READ pageBreaks NOTIFY pageBreaksChanged)
+    QVariantList pageBreaks() const { return m_pageBreaks; }
+    Q_SIGNAL void pageBreaksChanged();
+
+private:
+    void updatePageBreaks();
+    void setPageBreaks(const QVariantList &val);
+
+private:
+    QVariantList m_pageBreaks;
+    ScreenplayElement* m_screenplayElement = nullptr;
+    ScreenplayTextDocument* m_screenplayDocument = nullptr;
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H

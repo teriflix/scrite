@@ -95,6 +95,17 @@ void AbstractShapeItem::setOutlineWidth(const qreal &val)
     this->update();
 }
 
+void AbstractShapeItem::setOutlineStyle(AbstractShapeItem::OutlineStyle val)
+{
+    if(m_outlineStyle == val)
+        return;
+
+    m_outlineStyle = val;
+    emit outlineStyleChanged();
+
+    this->update();
+}
+
 QRectF AbstractShapeItem::contentRect() const
 {
     return m_path.boundingRect();
@@ -295,7 +306,11 @@ void AbstractShapeItem::paint(QPainter *paint)
         paint->setBrush(Qt::NoBrush);
 
     if(m_renderType&OutlineAlso)
-        paint->setPen( QPen(m_outlineColor,m_outlineWidth) );
+    {
+        QPen pen(m_outlineColor,m_outlineWidth);
+        pen.setStyle( Qt::PenStyle( int(m_outlineStyle) ) );
+        paint->setPen(pen);
+    }
     else
         paint->setPen(Qt::NoPen);
 

@@ -67,6 +67,20 @@ public:
     qreal outlineWidth() const { return m_outlineWidth; }
     Q_SIGNAL void outlineWidthChanged();
 
+    enum OutlineStyle
+    {
+        SolidLine = Qt::SolidLine,
+        DashLine,
+        DotLine,
+        DashDotLine,
+        DashDotDotLine,
+    };
+    Q_ENUM(OutlineStyle)
+    Q_PROPERTY(OutlineStyle outlineStyle READ outlineStyle WRITE setOutlineStyle NOTIFY outlineStyleChanged)
+    void setOutlineStyle(OutlineStyle val);
+    OutlineStyle outlineStyle() const { return m_outlineStyle; }
+    Q_SIGNAL void outlineStyleChanged();
+
     Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY contentRectChanged)
     QRectF contentRect() const;
     Q_SIGNAL void contentRectChanged();
@@ -90,6 +104,7 @@ private:
     qreal m_outlineWidth = 1.0;
     QColor m_outlineColor = QColor(Qt::black);
     RenderType m_renderType = OutlineAndFill;
+    OutlineStyle m_outlineStyle = SolidLine;
     RenderingMechanism m_renderingMechanism = UseOpenGL;
 };
 

@@ -89,6 +89,15 @@ void HeaderFooter::setVisibleFromPageOne(bool val)
     emit visibleFromPageOneChanged();
 }
 
+void HeaderFooter::setRect(const QRectF &val)
+{
+    if(m_rect == val)
+        return;
+
+    m_rect = val;
+    emit rectChanged();
+}
+
 void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF &rect)
 {
     m_columns.resize(3);
@@ -254,6 +263,15 @@ void Watermark::setVisibleFromPageOne(bool val)
 
     m_visibleFromPageOne = val;
     emit visibleFromPageOneChanged();
+}
+
+void Watermark::setRect(const QRectF &val)
+{
+    if(m_rect == val)
+        return;
+
+    m_rect = val;
+    emit rectChanged();
 }
 
 void Watermark::paint(QPainter *painter, const QRectF &pageRect, int pageNr, int pageCount)

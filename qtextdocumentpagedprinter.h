@@ -90,6 +90,11 @@ public:
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
 
+    Q_PROPERTY(QRectF rect READ rect WRITE setRect NOTIFY rectChanged)
+    void setRect(const QRectF &val);
+    QRectF rect() const { return m_rect; }
+    Q_SIGNAL void rectChanged();
+
     void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect);
     void paint(QPainter *paint, const QRectF &rect, int pageNr, int pageCount);
     void finish();
@@ -113,6 +118,7 @@ private:
     char m_padding2[3];
     QVector<ColumnContent> m_columns;
     qreal m_opacity = 0.5;
+    QRectF m_rect;
 };
 
 class Watermark : public QObject
@@ -163,6 +169,11 @@ public:
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
 
+    Q_PROPERTY(QRectF rect READ rect WRITE setRect NOTIFY rectChanged)
+    void setRect(const QRectF &val);
+    QRectF rect() const { return m_rect; }
+    Q_SIGNAL void rectChanged();
+
     void paint(QPainter *paint, const QRectF &pageRect, int pageNr, int pageCount);
 
 private:
@@ -175,6 +186,7 @@ private:
     bool m_enabled = true;
     bool m_visibleFromPageOne = false;
     char m_padding[2];
+    QRectF m_rect;
 };
 
 class QTextDocumentPagedPrinter : public QObject

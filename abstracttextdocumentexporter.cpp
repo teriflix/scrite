@@ -219,3 +219,4 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
         }
     }
 }
+

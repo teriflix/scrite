@@ -188,8 +188,8 @@ public:
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY rectsChanged STORED false)
     qreal contentWidth() const { return m_paintRect.width(); }
 
-    void configure(QTextDocument *document);
-    void configure(QPagedPaintDevice *printer);
+    void configure(QTextDocument *document) const;
+    void configure(QPagedPaintDevice *printer) const;
 
 signals:
     void rectsChanged();
@@ -299,9 +299,10 @@ private:
     QList<SceneElementFormat*> m_elementFormats;
 };
 
-class SceneDocumentBinder : public QSyntaxHighlighter
+class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     SceneDocumentBinder(QObject *parent=nullptr);
@@ -379,6 +380,10 @@ public:
 
     Q_SIGNAL void documentInitialized();
 
+    // QQmlParserStatus interface
+    void classBegin();
+    void componentComplete();
+
 protected:
     // QSyntaxHighlighter interface
     void highlightBlock(const QString &text);
@@ -422,7 +427,7 @@ private:
     QQuickTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_screenplayFormat = nullptr;
     SimpleTimer m_initializeDocumentTimer;
-    QList<SceneElement::Type> m_tabHistory;
+    QList<SceneElement::Type> m_tabHistory;    
 };
 
 #endif // FORMATTING_H

@@ -807,7 +807,6 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
         this->endInsertRows();
 
     emit elementCountChanged();
-    emit sceneRefreshed();
 
     // To ensure that character names are collected under all-character names
     // while an import is being done.
@@ -840,7 +839,6 @@ void Scene::removeElement(SceneElement *ptr)
         this->endRemoveRows();
 
     emit elementCountChanged();
-    emit sceneRefreshed();
 
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
