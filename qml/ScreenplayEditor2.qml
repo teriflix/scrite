@@ -362,9 +362,9 @@ Item {
 
                             PainterPathItem {
                                 id: pageBreakLine
-                                property rect cursorRect: sceneTextEditor.positionToRectangle(modelData.position)
+                                property rect cursorRect: modelData.position >= 0 ? sceneTextEditor.positionToRectangle(modelData.position) : Qt.rect(0,0,0,0)
                                 x: 0
-                                y: cursorRect.y - height/2
+                                y: (modelData.position >= 0 ? cursorRect.y : -sceneHeadingAreaLoader.height) - height/2
                                 width: sceneTextEditorBackground.width
                                 height: 3
                                 renderingMechanism: PainterPathItem.UseQPainter
@@ -380,10 +380,10 @@ Item {
 
                                 Text {
                                     font: defaultFontMetrics.font
-                                    text: modelData.pageNumber + ". "
-                                    anchors.right: parent.right
+                                    text: "Page " + modelData.pageNumber + ". "
+                                    anchors.left: parent.left
                                     anchors.top: parent.bottom
-                                    anchors.topMargin: 5
+                                    anchors.margins: 5
                                     color: pageBreakLine.outlineColor
                                 }
                             }

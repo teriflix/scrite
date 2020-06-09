@@ -261,7 +261,6 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *element) const
 {
     QList< QPair<int,int> > ret;
-
     if(element == nullptr)
         return ret;
 
@@ -269,30 +268,40 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     if(frame == nullptr)
         return ret;
 
+    // We need to know three positions within each scene frame.
+    // 1. Start of the frame
+    // 2. Start of the first paragraph in the scene (after the scene heading)
+    // 3. End of the scene frame
     QTextCursor cursor = frame->firstCursorPosition();
     QTextBlock block = cursor.block();
     ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
     if(blockData && blockData->elementType() == SceneElement::Heading)
         block = block.next();
 
-    const int frameStart = block.position();
-    const int frameEnd = frame->lastPosition();
+    // This is the range of cursor positions inside the frame
+    int sceneHeadingStart = frame->firstPosition();
+    int paragraphStart = block.position();
+    int paragraphEnd = frame->lastPosition();
 
-    auto checkAndAdd = [frameStart,frameEnd,&ret](int position, int pageNumber) {
-        if(position >= frameStart && position <= frameEnd) {
-            const int offset = position - frameStart;
+    // This method includes 'pageBorderPosition' and 'pageNumber' in the returned list
+    // If pageBorderPosition lies within the frame, then it is included in the list.
+    auto checkAndAdd = [sceneHeadingStart,paragraphStart,paragraphEnd,&ret](int pageBorderPosition, int pageNumber) {
+        if(pageBorderPosition >= sceneHeadingStart && pageBorderPosition <= paragraphEnd) {
+            const int offset = qMax(pageBorderPosition - paragraphStart, -1);
             if(ret.isEmpty() || ret.last().first != offset)
                 ret << qMakePair(offset, pageNumber);
         }
     };
 
-    if(m_screenplay->elementAt(0) == element)
-        checkAndAdd(frameStart, 1);
+    // Special case for page #1
+    if(element == m_screenplay->elementAt(0))
+        checkAndAdd(sceneHeadingStart, 1);
 
+    // Now loop through all pages and gather all pages that lie within the scene boundaries
     for(int i=0; i<m_pageBoundaries.count(); i++)
     {
         const QPair<int,int> pgBoundary = m_pageBoundaries.at(i);
-        if(pgBoundary.first > frameEnd)
+        if(pgBoundary.first > paragraphEnd)
             break;
 
         checkAndAdd(pgBoundary.first, i+1);
@@ -876,16 +885,13 @@ void ScreenplayTextDocument::evaluateCurrentPage()
     QTextBlock block = userCursor.block();
     ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
     if(blockData && blockData->elementType() == SceneElement::Heading)
-    {
         block = block.next();
-        userCursor = QTextCursor(block);
-    }
-    userCursor.setPosition(userCursor.position() + m_activeScene->cursorPosition());
 
+    const int cursorPosition = m_activeScene->cursorPosition() + block.position();
     for(int i=0; i<m_pageBoundaries.size(); i++)
     {
         const QPair<int,int> pgBoundary = m_pageBoundaries.at(i);
-        if(userCursor.position() >= pgBoundary.first && userCursor.position() <= pgBoundary.second)
+        if(cursorPosition >= pgBoundary.first-1 && cursorPosition < pgBoundary.second)
         {
             this->setCurrentPage(i+1);
             return;
@@ -915,17 +921,17 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
         QRectF paperRect = pageLayout->paperRect();
         QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
 
-        QTextCursor cursor(m_textDocument);
-        cursor.movePosition(QTextCursor::End);
+        QTextCursor endCursor(m_textDocument);
+        endCursor.movePosition(QTextCursor::End);
 
         const int pageCount = m_textDocument->pageCount();
         int pageIndex = 0;
         while(pageIndex < pageCount)
         {
             const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
-            const int firstPosition = layout->hitTest(contentsRect.topLeft(), Qt::FuzzyHit) + (pageIndex ? 1 : 0);
-            const int lastPosition = pageIndex == pageCount-1 ? cursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
-            pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : cursor.position());
+            const int firstPosition = pgBoundaries.isEmpty() ? layout->hitTest(contentsRect.topLeft(), Qt::FuzzyHit) : pgBoundaries.last().second+1;
+            const int lastPosition = pageIndex == pageCount-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
+            pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : endCursor.position());
             paperRect.moveTop(paperRect.bottom()+1);
             ++pageIndex;
         }
