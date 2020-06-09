@@ -735,6 +735,7 @@ Item {
                             anchors.fill: parent
                             property int currentStructureIndex: active ? scriteDocument.structure.currentElementIndex : -1
                             property int currentScreenplayIndex: active ? scriteDocument.screenplay.currentElementIndex : -1
+                            readonly property int screenplayZoomLevelModifier: -2
                             sourceComponent: {
                                 if(editorLoaderReset.preference === editorLoaderReset.prefer_SCENE_EDITOR) {
                                     if(currentStructureIndex >= 0)
@@ -850,8 +851,9 @@ Item {
                 clip: true
                 currentIndex: uiLayout2TabBar.currentIndex
 
-                ScreenplayEditor {
-
+                Loader {
+                    readonly property int screenplayZoomLevelModifier: 0
+                    sourceComponent: screenplayEditorComponent
                 }
 
                 SplitView {
@@ -936,6 +938,12 @@ Item {
         Item {
             id: screenplayEditorItem
 
+            ScreenplayEditor {
+                id: screenplayEditor
+                anchors.fill: parent
+                zoomLevelModifier: screenplayZoomLevelModifier
+            }
+
             Loader {
                 width: parent.width*0.7
                 anchors.centerIn: parent
@@ -949,12 +957,6 @@ Item {
                     // renderType: Text.NativeRendering
                     text: "Click on the add new scene button on the toolbar or press " + app.polishShortcutTextForDisplay("Ctrl+Shift+N") + " to create a new scene."
                 }
-            }
-
-            ScreenplayEditor {
-                id: screenplayEditor
-                anchors.fill: parent
-                zoomLevelModifier: -2
             }
         }
     }

@@ -921,8 +921,6 @@ void ScreenplayTextDocument::evaluateCurrentPage()
 
 void ScreenplayTextDocument::evaluatePageBoundaries()
 {
-    PROFILE_THIS_FUNCTION;
-
     // NOTE: Please do not call this function from anywhere other than
     // timerEvent(), while handling m_pageBoundaryEvalTimer
     QList< QPair<int,int> > pgBoundaries;
@@ -1099,8 +1097,6 @@ void ScreenplayElementPageBreaks::setScreenplayElement(ScreenplayElement *val)
 
 void ScreenplayElementPageBreaks::updatePageBreaks()
 {
-    PROFILE_THIS_FUNCTION;
-
     QVariantList breaks;
 
     if(m_screenplayDocument != nullptr && m_screenplayElement != nullptr)

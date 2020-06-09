@@ -39,9 +39,12 @@ Rectangle {
         id: screenplayAdapter
         source: scriteDocument.screenplay
         onCurrentIndexChanged: {
-            app.execLater(contentView, 50, function() {
-                contentView.scrollIntoView(currentIndex)
-            })
+            if(mainUndoStack.screenplayEditorActive)
+                app.execLater(contentView, 100, function() {
+                    contentView.scrollIntoView(currentIndex)
+                })
+            else
+                contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
     }
 
@@ -53,102 +56,108 @@ Rectangle {
     }
 
     Item {
-        id: pageRulerArea
-        width: pageLayout.paperWidth * screenplayEditor.zoomLevel * Screen.devicePixelRatio
-        height: parent.height
-        anchors.top: parent.top
-        anchors.bottom: statusBar.top
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.fill: parent
+        anchors.leftMargin: sceneListPanelLoader.active ? sceneListPanelLoader.width : 0
+        anchors.bottomMargin: statusBar.height
 
-        RulerItem {
-            id: ruler
-            width: parent.width
-            height: 20
-            font.pixelSize: 10
-            leftMargin: pageLayout.leftMargin * Screen.devicePixelRatio
-            rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
-            zoomLevel: screenplayEditor.zoomLevel
+        Item {
+            id: pageRulerArea
+            width: pageLayout.paperWidth * screenplayEditor.zoomLevel * Screen.devicePixelRatio
+            height: parent.height
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            property real leftMarginPx: leftMargin * zoomLevel
-            property real rightMarginPx: rightMargin * zoomLevel
-            property real topMarginPx: pageLayout.topMargin * Screen.devicePixelRatio * zoomLevel
-            property real bottomMarginPx: pageLayout.bottomMargin * Screen.devicePixelRatio * zoomLevel
-        }
+            RulerItem {
+                id: ruler
+                width: parent.width
+                height: 20
+                font.pixelSize: 10
+                leftMargin: pageLayout.leftMargin * Screen.devicePixelRatio
+                rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
+                zoomLevel: screenplayEditor.zoomLevel
 
-        Rectangle {
-            id: contentArea
-            anchors.top: ruler.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.topMargin: 5
-            clip: true
-            color: screenplayAdapter.elementCount > 0 ? "white" : Qt.rgba(0,0,0,0)
+                property real leftMarginPx: leftMargin * zoomLevel
+                property real rightMarginPx: rightMargin * zoomLevel
+                property real topMarginPx: pageLayout.topMargin * Screen.devicePixelRatio * zoomLevel
+                property real bottomMarginPx: pageLayout.bottomMargin * Screen.devicePixelRatio * zoomLevel
+            }
 
-            ListView {
-                id: contentView
-                anchors.fill: parent
-                model: screenplayAdapter
-                delegate: Loader {
-                    width: contentView.width
-                    property var componentData: modelData
-                    sourceComponent: modelData.scene ? contentComponent : breakComponent
-                }
-                snapMode: ListView.NoSnap
-                boundsBehavior: Flickable.StopAtBounds
-                boundsMovement: Flickable.StopAtBounds
-                cacheBuffer: 10
-                ScrollBar.vertical: verticalScrollBar
-                header: Item {
-                    width: contentView.width
-                    height: ruler.topMarginPx
-                }
-                footer: Item {
-                    width: contentView.width
-                    height: ruler.bottomMarginPx
-                }
+            Rectangle {
+                id: contentArea
+                anchors.top: ruler.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.topMargin: 5
+                clip: true
+                color: screenplayAdapter.elementCount > 0 ? "white" : Qt.rgba(0,0,0,0)
 
-                property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+1), 0) : 0
-                property int lastItemIndex: screenplayAdapter.elementCount > 0 ? Math.min(indexAt(width/2, contentView.contentY+height-2), screenplayAdapter.elementCount-1) : 0
-
-                function isVisible(index) {
-                    return index >= firstItemIndex && index <= lastItemIndex
-                }
-
-                function scrollIntoView(index) {
-                    if(moving || flicking)
-                        return
-
-                    var topIndex = firstItemIndex
-                    var bottomIndex = lastItemIndex
-
-                    if(index >= topIndex && index <= bottomIndex)
-                        return // item is already visible
-
-                    if(index < topIndex && topIndex-index <= 2) {
-                        contentView.contentY -= height*0.2
-                    } else if(index > bottomIndex && index-bottomIndex <= 2) {
-                        contentView.contentY += height*0.2
-                    } else {
-                        positionViewAtIndex(index, ListView.Beginning)
+                ListView {
+                    id: contentView
+                    anchors.fill: parent
+                    model: screenplayAdapter
+                    delegate: Loader {
+                        width: contentView.width
+                        property var componentData: modelData
+                        sourceComponent: modelData.scene ? contentComponent : breakComponent
                     }
-                }
+                    snapMode: ListView.NoSnap
+                    boundsBehavior: Flickable.StopAtBounds
+                    boundsMovement: Flickable.StopAtBounds
+                    cacheBuffer: 10
+                    ScrollBar.vertical: verticalScrollBar
+                    header: Item {
+                        width: contentView.width
+                        height: screenplayAdapter.isSourceScreenplay ? ruler.topMarginPx : 0
+                    }
+                    footer: Item {
+                        width: contentView.width
+                        height: ruler.bottomMarginPx
+                    }
 
-                function ensureVisible(item, rect) {
-                    if(item === null)
-                        return
+                    Component.onCompleted: positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
 
-                    var pt = item.mapToItem(contentView.contentItem, rect.x, rect.y)
-                    var startY = contentView.contentY
-                    var endY = contentView.contentY + contentView.height - rect.height
-                    if( startY < pt.y && pt.y < endY )
-                        return
+                    property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+1), 0) : 0
+                    property int lastItemIndex: screenplayAdapter.elementCount > 0 ? Math.min(indexAt(width/2, contentView.contentY+height-2), screenplayAdapter.elementCount-1) : 0
 
-                    var newContentY = 0
-                    if( pt.y < startY )
-                        contentView.contentY = pt.y
-                    else if( pt.y > endY )
-                        contentView.contentY = (pt.y + 2*rect.height) - contentView.height
+                    function isVisible(index) {
+                        return index >= firstItemIndex && index <= lastItemIndex
+                    }
+
+                    function scrollIntoView(index) {
+                        if(moving || flicking)
+                            return
+
+                        var topIndex = firstItemIndex
+                        var bottomIndex = lastItemIndex
+
+                        if(index >= topIndex && index <= bottomIndex)
+                            return // item is already visible
+
+                        if(index < topIndex && topIndex-index <= 2) {
+                            contentView.contentY -= height*0.2
+                        } else if(index > bottomIndex && index-bottomIndex <= 2) {
+                            contentView.contentY += height*0.2
+                        } else {
+                            positionViewAtIndex(index, ListView.Beginning)
+                        }
+                    }
+
+                    function ensureVisible(item, rect) {
+                        if(item === null)
+                            return
+
+                        var pt = item.mapToItem(contentView.contentItem, rect.x, rect.y)
+                        var startY = contentView.contentY
+                        var endY = contentView.contentY + contentView.height - rect.height
+                        if( startY < pt.y && pt.y < endY )
+                            return
+
+                        var newContentY = 0
+                        if( pt.y < startY )
+                            contentView.contentY = pt.y
+                        else if( pt.y > endY )
+                            contentView.contentY = (pt.y + 2*rect.height) - contentView.height
+                    }
                 }
             }
         }
@@ -330,8 +339,10 @@ Rectangle {
                     active: contentItem.theScene !== null
                     sourceComponent: sceneHeadingArea
                     onItemChanged: {
-                        if(item)
+                        if(item) {
                             item.theScene = contentItem.theScene
+                            item.theElement = contentItem.theElement
+                        }
                     }
                 }
 
@@ -387,7 +398,7 @@ Rectangle {
 
                                 Text {
                                     font: defaultFontMetrics.font
-                                    text: "Page " + modelData.pageNumber + ". "
+                                    text: "Pg " + modelData.pageNumber + ". "
                                     anchors.left: parent.left
                                     anchors.top: parent.bottom
                                     anchors.margins: 5
@@ -786,9 +797,24 @@ Rectangle {
             id: headingItem
             property Scene theScene
             property bool sceneHasFocus: false
+            property ScreenplayElement theElement
 
             height: sceneHeadingLayout.height + 16
             color: Qt.tint(theScene.color, "#E7FFFFFF")
+
+            Item {
+                width: ruler.leftMarginPx
+                height: sceneHeadingLoader.height + 16
+
+                Text {
+                    font: headingFontMetrics.font
+                    text: "[" + theElement.sceneNumber + "]"
+                    height: sceneHeadingLoader.height
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: parent.width * 0.075
+                }
+            }
 
             Column {
                 id: sceneHeadingLayout
@@ -1051,4 +1077,149 @@ Rectangle {
             }
         }
     }
+
+    Loader {
+        id: sceneListPanelLoader
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.topMargin: 5
+        anchors.bottomMargin: statusBar.height
+        active: screenplayAdapter.isSourceScreenplay && screenplayAdapter.elementCount > 1 && globalSceneEditorToolbar.editInFullscreen
+        property bool expanded: false
+        readonly property int expandCollapseButtonWidth: 25
+        readonly property int sceneListAreaWidth: 400
+        clip: !sceneListPanelLoader.expanded
+        width: active ? (expanded ? sceneListAreaWidth+expandCollapseButtonWidth : expandCollapseButtonWidth) : 0
+        Behavior on width { NumberAnimation { duration: 250 } }
+
+        FocusTracker.window: qmlWindow
+        FocusTracker.onHasFocusChanged: {
+            if(!FocusTracker.hasFocus)
+                sceneListPanelLoader.expanded = false
+        }
+
+        sourceComponent: Item {
+            id: sceneListPanel
+            width: expandCollapseButton.width + (expanded ? sceneListArea.width : 0)
+
+            BorderImage {
+                source: "../icons/content/shadow.png"
+                anchors.fill: sceneListArea
+                horizontalTileMode: BorderImage.Stretch
+                verticalTileMode: BorderImage.Stretch
+                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                border { left: 21; top: 21; right: 21; bottom: 21 }
+                opacity: 0.25
+                visible: sceneListArea.visible
+            }
+
+            Rectangle {
+                id: sceneListArea
+                color: "white"
+                border.width: 1
+                border.color: primaryColors.borderColor
+                height: parent.height
+                width: sceneListAreaWidth
+                opacity: sceneListPanelLoader.expanded ? 1 : 0
+                Behavior on opacity {  NumberAnimation { duration: 250 } }
+                visible: opacity > 0
+
+                ListView {
+                    id: sceneListView
+                    anchors.fill: parent
+                    anchors.topMargin: 5
+                    anchors.leftMargin: expandCollapseButton.width + 5
+                    anchors.rightMargin: 5
+                    anchors.bottomMargin: 5
+                    clip: true
+                    model: screenplayAdapter
+                    currentIndex: screenplayAdapter.currentIndex
+                    delegate: Rectangle {
+                        width: sceneListView.width-1
+                        height: scene && scene.heading.enabled ? 40 : 0
+                        color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF")) : Qt.rgba(0,0,0,0)
+
+                        Text {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.margins: 5
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.bold: screenplayAdapter.currentIndex === index
+                            font.pixelSize: 14
+                            text: "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
+                            elide: Text.ElideMiddle
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: navigateToScene()
+                            onDoubleClicked: {
+                                navigateToScene()
+                                sceneListPanelLoader.expanded = false
+                            }
+
+                            function navigateToScene() {
+                                contentView.positionViewAtIndex(index, ListView.Beginning)
+                                screenplayAdapter.currentIndex = index
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: expandCollapseButton
+                width: expandCollapseButtonWidth
+                height: sceneListPanelLoader.expanded ? parent.height-8 : expandCollapseButtonWidth*5
+                color: primaryColors.button.background
+                radius: (1.0-sceneListArea.opacity) * 6
+                border.width: 1
+                border.color: sceneListPanelLoader.expanded ? primaryColors.windowColor : primaryColors.borderColor
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.topMargin: 4
+                anchors.leftMargin: sceneListPanelLoader.expanded ? 4 : -radius
+                Behavior on height { NumberAnimation { duration: 250 } }
+
+                Image {
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: sceneListPanelLoader.expanded ? "../icons/navigation/arrow_left.png" : "../icons/navigation/arrow_right.png"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: sceneListPanelLoader.expanded = !sceneListPanelLoader.expanded
+                }
+
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.leftMargin: parent.radius
+                    width: 1
+                    color: primaryColors.borderColor
+                    visible: !sceneListPanelLoader.expanded
+                }
+            }
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

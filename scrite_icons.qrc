@@ -73,5 +73,9 @@
         <file>icons/content/select_all.png</file>
         <file>icons/action/preview.png</file>
         <file>icons/action/preview_inverted.png</file>
+        <file>icons/navigation/arrow_left_inverted.png</file>
+        <file>icons/navigation/arrow_left.png</file>
+        <file>icons/navigation/arrow_right_inverted.png</file>
+        <file>icons/navigation/arrow_right.png</file>
     </qresource>
 </RCC>

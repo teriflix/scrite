@@ -268,7 +268,7 @@ void RulerItem::paint(QPainter *painter)
         painter->fillRect(rightMarginRect, m_pageMarginColor);
     }
 
-    if(m_paragraphLeftMargin > 0 && m_paragraphRightMargin > 0)
+    if(m_paragraphLeftMargin > m_leftMargin && m_paragraphRightMargin > m_rightMargin)
     {
         QRectF paragraphMarginRect = rect;
         paragraphMarginRect.setLeft( unitToPixel(m_paragraphLeftMargin,m_marginsUnit) );
