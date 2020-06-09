@@ -262,6 +262,18 @@ void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
     m_format->applyToAll(this, properties);
 }
 
+void SceneElementFormat::resetToDefaults()
+{
+    this->setFont(m_format->defaultFont());
+    this->setLineHeight(1.0);
+    this->setLeftMargin(0);
+    this->setRightMargin(0);
+    this->setLineSpacingBefore(0);
+    this->setTextColor(Qt::black);
+    this->setBackgroundColor(Qt::transparent);
+    this->setTextAlignment(Qt::AlignLeft);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 qreal ScreenplayPageLayout::StandardResolution = 72;
@@ -561,7 +573,7 @@ void ScreenplayFormat::resetToDefaults()
         this->setDevicePixelRatio(m_screen->devicePixelRatio());
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-        m_elementFormats.at(i)->setFont(m_defaultFont);
+        m_elementFormats.at(i)->resetToDefaults();
 
     const qreal contentWidth = 6.45;
     const qreal left = 1.6;

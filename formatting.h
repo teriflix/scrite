@@ -112,6 +112,8 @@ public:
     Q_ENUM(Properties)
     Q_INVOKABLE void applyToAll(Properties properties);
 
+    void resetToDefaults();
+
 private:
     friend class ScreenplayFormat;
     SceneElementFormat(SceneElement::Type type=SceneElement::Action, ScreenplayFormat *parent=nullptr);

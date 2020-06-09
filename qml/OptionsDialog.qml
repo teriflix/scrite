@@ -38,21 +38,13 @@ Item {
             ListElement { name: "Title Page"; group: "Screenplay" }
             ListElement { name: "Page Setup"; group: "Screenplay" }
 
-            ListElement { name: "Heading"; group: "On Screen Format"; elementType: SceneElement.Heading }
-            ListElement { name: "Action"; group: "On Screen Format"; elementType: SceneElement.Action }
-            ListElement { name: "Character"; group: "On Screen Format"; elementType: SceneElement.Character }
-            ListElement { name: "Dialogue"; group: "On Screen Format"; elementType: SceneElement.Dialogue }
-            ListElement { name: "Parenthetical"; group: "On Screen Format"; elementType: SceneElement.Parenthetical }
-            ListElement { name: "Shot"; group: "On Screen Format"; elementType: SceneElement.Shot }
-            ListElement { name: "Transition"; group: "On Screen Format"; elementType: SceneElement.Transition }
-
-            ListElement { name: "Heading"; group: "Print Format"; elementType: SceneElement.Heading }
-            ListElement { name: "Action"; group: "Print Format"; elementType: SceneElement.Action }
-            ListElement { name: "Character"; group: "Print Format"; elementType: SceneElement.Character }
-            ListElement { name: "Dialogue"; group: "Print Format"; elementType: SceneElement.Dialogue }
-            ListElement { name: "Parenthetical"; group: "Print Format"; elementType: SceneElement.Parenthetical }
-            ListElement { name: "Shot"; group: "Print Format"; elementType: SceneElement.Shot }
-            ListElement { name: "Transition"; group: "Print Format"; elementType: SceneElement.Transition }
+            ListElement { name: "Heading"; group: "Formatting"; elementType: SceneElement.Heading }
+            ListElement { name: "Action"; group: "Formatting"; elementType: SceneElement.Action }
+            ListElement { name: "Character"; group: "Formatting"; elementType: SceneElement.Character }
+            ListElement { name: "Dialogue"; group: "Formatting"; elementType: SceneElement.Dialogue }
+            ListElement { name: "Parenthetical"; group: "Formatting"; elementType: SceneElement.Parenthetical }
+            ListElement { name: "Shot"; group: "Formatting"; elementType: SceneElement.Shot }
+            ListElement { name: "Transition"; group: "Formatting"; elementType: SceneElement.Transition }
         }
 
         ListView {
@@ -127,8 +119,6 @@ Item {
             function loadPage() {
                 pageLoader.active = false
                 if(pageList.currentIndex >= 3 && pageList.currentIndex <= 9)
-                    pageLoader.sourceComponent = elementFormatOptionsComponent
-                else if(pageList.currentIndex >= 10 && pageList.currentIndex <= 16)
                     pageLoader.sourceComponent = elementFormatOptionsComponent
                 else {
                     switch(pageList.currentIndex) {
@@ -622,6 +612,40 @@ Item {
 
     property var systemFontInfo: app.systemFontInfo()
 
+    /**
+      We had an opportunity to discuss (over email, Messenger, Zoom calls etc..) about formatting.
+      The experienced writers suggested to us that we should not allow deviation from the standard
+      screenplay formatting rules.
+
+      As of 0.3.9, we are NOT providing the following options for element formatting.
+      1. Font Family
+      2. Block Width & Alignment
+
+      We now ONLY PROVIDE the following options
+      1. Font Point Size & Weight
+      2. Text Alignment
+      3. Foreground and Background Color
+      4. Line Height
+      5. Line Spacing Before
+
+      Also, since 0.3.9 we compute page numbers and count on the fly. This means that we should keep
+      online and print formats in sync. So, we cannot afford to let users configure both of them
+      separately. Although we need to capture print and display formats as separate ScreenplayFormat
+      instances because the DPI and DPR values for printer and displays may not be the same.
+      */
+    Item {
+        property real devicePixelRatio: 1.0
+
+        Component.onCompleted: {
+            devicePixelRatio = scriteDocument.formatting.devicePixelRatio
+            scriteDocument.formatting.devicePixelRatio = app.devicePixelRatio
+        }
+
+        Component.onDestruction: {
+            scriteDocument.formatting.devicePixelRatio = devicePixelRatio
+        }
+    }
+
     Component {
         id: elementFormatOptionsComponent
 
@@ -629,8 +653,8 @@ Item {
             id: scrollView
             property real labelWidth: 125
             property var pageData: pageModel.get(pageList.currentIndex)
-            property ScreenplayFormat format: pageData.group === "On Screen Format" ? scriteDocument.formatting : scriteDocument.printFormat
-            property SceneElementFormat elementFormat: format.elementFormat(pageData.elementType)
+            property SceneElementFormat displayElementFormat: scriteDocument.formatting.elementFormat(pageData.elementType)
+            property SceneElementFormat printElementFormat: scriteDocument.printFormat.elementFormat(pageData.elementType)
             ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
             ScrollBar.vertical.policy: ScrollBar.AlwaysOn
 
@@ -641,7 +665,7 @@ Item {
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
-                    text: "<strong>" + pageData.name + "</strong> (" + pageData.group + ")"
+                    text: "<strong>" + pageData.name
                     font.pixelSize: 24
                 }
 
@@ -658,7 +682,7 @@ Item {
                         anchors.margins: 8
                         ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
                         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                        Component.onCompleted: ScrollBar.vertical.position = (elementFormat.elementType === SceneElement.Shot || elementFormat.elementType === SceneElement.Transition) ? 0.2 : 0
+                        Component.onCompleted: ScrollBar.vertical.position = (displayElementFormat.elementType === SceneElement.Shot || displayElementFormat.elementType === SceneElement.Transition) ? 0.2 : 0
 
                         TextArea {
                             id: previewText
@@ -670,7 +694,7 @@ Item {
                             }
 
                             SceneDocumentBinder {
-                                screenplayFormat: elementFormat.format
+                                screenplayFormat: scriteDocument.formatting
                                 scene: Scene {
                                     elements: [
                                         SceneElement {
@@ -713,36 +737,6 @@ Item {
 
                 Item { width: parent.width; height: 10 }
 
-                // Font Family
-                Row {
-                    spacing: 10
-                    width: parent.width
-                    visible: false
-
-                    Text {
-                        width: labelWidth
-                        horizontalAlignment: Text.AlignRight
-                        text: "Font Family"
-                        font.pixelSize: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    ComboBox2 {
-                        width: parent.width-2*parent.spacing-labelWidth-parent.height
-                        model: systemFontInfo.families
-                        currentIndex: systemFontInfo.families.indexOf(elementFormat.font.family)
-                        onCurrentIndexChanged: elementFormat.setFontFamily( systemFontInfo.families[currentIndex] )
-                    }
-
-                    ToolButton2 {
-                        icon.source: "../icons/action/done_all.png"
-                        anchors.verticalCenter: parent.verticalCenter
-                        ToolTip.text: "Apply this font family to all '" + pageData.group + "' paragraphs."
-                        ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.FontFamily)
-                    }
-                }
-
                 // Font Size
                 Row {
                     spacing: 10
@@ -762,8 +756,11 @@ Item {
                         to: 62
                         stepSize: 1
                         editable: true
-                        value: elementFormat.font.pointSize
-                        onValueModified: elementFormat.setFontPointSize(value)
+                        value: displayElementFormat.font.pointSize
+                        onValueModified: {
+                            displayElementFormat.setFontPointSize(value)
+                            printElementFormat.setFontPointSize(value)
+                        }
                     }
 
                     ToolButton2 {
@@ -771,7 +768,10 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this font size to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.FontSize)
+                        onClicked: {
+                            displayElementFormat.applyToAll(SceneElementFormat.FontSize)
+                            printElementFormat.applyToAll(SceneElementFormat.FontSize)
+                        }
                     }
                 }
 
@@ -797,24 +797,33 @@ Item {
                             text: "Bold"
                             font.bold: true
                             checkable: true
-                            checked: elementFormat.font.bold
-                            onToggled: elementFormat.setFontBold(checked)
+                            checked: displayElementFormat.font.bold
+                            onToggled: {
+                                displayElementFormat.setFontBold(checked)
+                                printElementFormat.setFontBold(checked)
+                            }
                         }
 
                         CheckBox2 {
                             text: "Italics"
                             font.italic: true
                             checkable: true
-                            checked: elementFormat.font.italic
-                            onToggled: elementFormat.setFontItalics(checked)
+                            checked: displayElementFormat.font.italic
+                            onToggled: {
+                                displayElementFormat.setFontItalics(checked)
+                                printElementFormat.setFontItalics(checked)
+                            }
                         }
 
                         CheckBox2 {
                             text: "Underline"
                             font.underline: true
                             checkable: true
-                            checked: elementFormat.font.underline
-                            onToggled: elementFormat.setFontUnderline(checked)
+                            checked: displayElementFormat.font.underline
+                            onToggled: {
+                                displayElementFormat.setFontUnderline(checked)
+                                printElementFormat.setFontUnderline(checked)
+                            }
                         }
                     }
 
@@ -823,7 +832,10 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this font style to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.FontStyle)
+                        onClicked: {
+                            displayElementFormat.applyToAll(SceneElementFormat.FontStyle)
+                            printElementFormat.applyToAll(SceneElementFormat.FontStyle)
+                        }
                     }
                 }
 
@@ -845,8 +857,11 @@ Item {
                         from: 25
                         to: 300
                         stepSize: 5
-                        value: elementFormat.lineHeight * 100
-                        onValueModified: elementFormat.lineHeight = value/100
+                        value: displayElementFormat.lineHeight * 100
+                        onValueModified: {
+                            displayElementFormat.lineHeight = value/100
+                            printElementFormat.lineHeight = value/100
+                        }
                         textFromValue: function(value,locale) {
                             return value + "%"
                         }
@@ -857,7 +872,10 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this line height to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.LineHeight)
+                        onClicked: {
+                            displayElementFormat.applyToAll(SceneElementFormat.LineHeight)
+                            printElementFormat.applyToAll(SceneElementFormat.LineHeight)
+                        }
                     }
                 }
 
@@ -882,13 +900,16 @@ Item {
                         Rectangle {
                             border.width: 1
                             border.color: primaryColors.borderColor
-                            color: elementFormat.textColor
+                            color: displayElementFormat.textColor
                             width: 30; height: 30
                             anchors.verticalCenter: parent.verticalCenter
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: elementFormat.textColor = app.pickColor(elementFormat.textColor)
+                                onClicked: {
+                                    displayElementFormat.textColor = app.pickColor(displayElementFormat.textColor)
+                                    printElementFormat.textColor = displayElementFormat.textColor
+                                }
                             }
                         }
 
@@ -902,13 +923,16 @@ Item {
                         Rectangle {
                             border.width: 1
                             border.color: primaryColors.borderColor
-                            color: elementFormat.backgroundColor
+                            color: displayElementFormat.backgroundColor
                             width: 30; height: 30
                             anchors.verticalCenter: parent.verticalCenter
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: elementFormat.backgroundColor = app.pickColor(elementFormat.backgroundColor)
+                                onClicked: {
+                                    displayElementFormat.backgroundColor = app.pickColor(displayElementFormat.backgroundColor)
+                                    printElementFormat.backgroundColor = displayElementFormat.backgroundColor
+                                }
                             }
                         }
                     }
@@ -918,7 +942,10 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply these colors to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.TextAndBackgroundColors)
+                        onClicked: {
+                            displayElementFormat.applyToAll(SceneElementFormat.TextAndBackgroundColors)
+                            printElementFormat.applyToAll(SceneElementFormat.TextAndBackgroundColors)
+                        }
                     }
                 }
 
@@ -943,40 +970,48 @@ Item {
                         RadioButton2 {
                             text: "Left"
                             checkable: true
-                            checked: elementFormat.textAlignment === Qt.AlignLeft
+                            checked: displayElementFormat.textAlignment === Qt.AlignLeft
                             onCheckedChanged: {
-                                if(checked)
-                                    elementFormat.textAlignment = Qt.AlignLeft
+                                if(checked) {
+                                    displayElementFormat.textAlignment = Qt.AlignLeft
+                                    printElementFormat.textAlignment = Qt.AlignLeft
+                                }
                             }
                         }
 
                         RadioButton2 {
                             text: "Center"
                             checkable: true
-                            checked: elementFormat.textAlignment === Qt.AlignHCenter
+                            checked: displayElementFormat.textAlignment === Qt.AlignHCenter
                             onCheckedChanged: {
-                                if(checked)
-                                    elementFormat.textAlignment = Qt.AlignHCenter
+                                if(checked) {
+                                    displayElementFormat.textAlignment = Qt.AlignHCenter
+                                    printElementFormat.textAlignment = Qt.AlignHCenter
+                                }
                             }
                         }
 
                         RadioButton2 {
                             text: "Right"
                             checkable: true
-                            checked: elementFormat.textAlignment === Qt.AlignRight
+                            checked: displayElementFormat.textAlignment === Qt.AlignRight
                             onCheckedChanged: {
-                                if(checked)
-                                    elementFormat.textAlignment = Qt.AlignRight
+                                if(checked) {
+                                    displayElementFormat.textAlignment = Qt.AlignRight
+                                    printElementFormat.textAlignment = Qt.AlignRight
+                                }
                             }
                         }
 
                         RadioButton2 {
                             text: "Justify"
                             checkable: true
-                            checked: elementFormat.textAlignment === Qt.AlignJustify
+                            checked: displayElementFormat.textAlignment === Qt.AlignJustify
                             onCheckedChanged: {
-                                if(checked)
-                                    elementFormat.textAlignment = Qt.AlignJustify
+                                if(checked) {
+                                    displayElementFormat.textAlignment = Qt.AlignJustify
+                                    printElementFormat.textAlignment = Qt.AlignJustify
+                                }
                             }
                         }
                     }
@@ -986,144 +1021,10 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this alignment to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.TextAlignment)
-                    }
-                }
-
-                // Block Margin
-                Row {
-                    spacing: 10
-                    width: parent.width
-
-                    Text {
-                        width: labelWidth
-                        horizontalAlignment: Text.AlignRight
-                        text: "Block Width"
-                        font.pixelSize: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    SpinBox {
-                        width: parent.width-2*parent.spacing-labelWidth-parent.height
-                        from: 0
-                        to: 100
-                        stepSize: 1
-                        value: elementFormat.blockWidth * 100
-                        onValueModified: elementFormat.blockWidth = value/100
-                        textFromValue: function(value,locale) {
-                            return value + "%"
+                        onClicked: {
+                            displayElementFormat.applyToAll(SceneElementFormat.TextAlignment)
+                            printElementFormat.applyToAll(SceneElementFormat.TextAlignment)
                         }
-                    }
-
-                    ToolButton2 {
-                        icon.source: "../icons/action/done_all.png"
-                        anchors.verticalCenter: parent.verticalCenter
-                        ToolTip.text: "Apply this block width to all '" + pageData.group + "' paragraphs."
-                        ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.BlockWidth)
-                    }
-                }
-
-                // Block Alignment
-                Row {
-                    spacing: 10
-                    width: parent.width
-
-                    Text {
-                        width: labelWidth
-                        horizontalAlignment: Text.AlignRight
-                        text: "Block Alignment"
-                        font.pixelSize: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Row {
-                        width: parent.width-2*parent.spacing-labelWidth-parent.height
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 5
-
-                        RadioButton2 {
-                            text: "Left"
-                            checkable: true
-                            checked: elementFormat.blockAlignment === Qt.AlignLeft
-                        }
-
-                        RadioButton2 {
-                            text: "Center"
-                            checkable: true
-                            checked: elementFormat.blockAlignment === Qt.AlignHCenter
-                        }
-
-                        RadioButton2 {
-                            text: "Right"
-                            checkable: true
-                            checked: elementFormat.blockAlignment === Qt.AlignRight
-                        }
-                    }
-
-                    ToolButton2 {
-                        icon.source: "../icons/action/done_all.png"
-                        anchors.verticalCenter: parent.verticalCenter
-                        ToolTip.text: "Apply this block alignment to all '" + pageData.group + "' paragraphs."
-                        ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.BlockAlignment)
-                    }
-                }
-
-                Row {
-                    spacing: 10
-                    width: parent.width
-
-                    Text {
-                        width: labelWidth
-                        horizontalAlignment: Text.AlignRight
-                        text: "Margins"
-                        font.pixelSize: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Row {
-                        width: parent.width-2*parent.spacing-labelWidth-parent.height
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 10
-
-                        Text {
-                            text: "Top"
-                            font.pixelSize: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        TextField {
-                            width: 100
-                            font.pixelSize: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: elementFormat.topMargin
-                            validator: IntValidator { top: 100; bottom: 0 }
-                            onTextChanged: elementFormat.topMargin = text === "" ? 0 : parseInt(text)
-                        }
-
-                        Text {
-                            text: "Bottom"
-                            font.pixelSize: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        TextField {
-                            width: 100
-                            font.pixelSize: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: elementFormat.bottomMargin
-                            validator: IntValidator { top: 100; bottom: 0 }
-                            onTextChanged: elementFormat.bottomMargin = text === "" ? 0 : parseInt(text)
-                        }
-                    }
-
-                    ToolButton2 {
-                        icon.source: "../icons/action/done_all.png"
-                        anchors.verticalCenter: parent.verticalCenter
-                        ToolTip.text: "Apply these margins to all '" + pageData.group + "' paragraphs."
-                        ToolTip.delay: 1000
-                        onClicked: elementFormat.applyToAll(SceneElementFormat.Margins)
                     }
                 }
             }
