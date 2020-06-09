@@ -850,7 +850,7 @@ Item {
                 clip: true
                 currentIndex: uiLayout2TabBar.currentIndex
 
-                ScreenplayEditor2 {
+                ScreenplayEditor {
 
                 }
 
@@ -951,7 +951,7 @@ Item {
                 }
             }
 
-            ScreenplayEditor2 {
+            ScreenplayEditor {
                 id: screenplayEditor
                 anchors.fill: parent
                 zoomLevelModifier: -2
@@ -962,7 +962,7 @@ Item {
     Component {
         id: sceneEditorComponent
 
-        ScreenplayEditor2 {
+        ScreenplayEditor {
             anchors.fill: parent
             source: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex).scene
             zoomLevelModifier: -2
