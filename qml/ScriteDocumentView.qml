@@ -759,13 +759,13 @@ Item {
                                 readonly property int prefer_SCREENPLAY_EDITOR: 1
                                 readonly property int prefer_SCENE_EDITOR: 2
                                 property int preference: prefer_SCREENPLAY_EDITOR
+                                trackChangesOn: preference
 
                                 function prefer(val) {
                                     if(val === prefer_SCREENPLAY_EDITOR || val === prefer_SCENE_EDITOR)
                                         preference = val
                                     else
                                         preference = prefer_SCREENPLAY_EDITOR
-                                    resetNow()
                                 }
                             }
                         }
@@ -933,10 +933,8 @@ Item {
     Component {
         id: screenplayEditorComponent
 
-        Rectangle {
+        Item {
             id: screenplayEditorItem
-            clip: true
-            color: globalSceneEditorToolbar.editInFullscreen && scriteDocument.screenplay.elementCount === 0 ? primaryColors.windowColor : primaryColors.c50.background
 
             Loader {
                 width: parent.width*0.7
@@ -953,12 +951,10 @@ Item {
                 }
             }
 
-            ScreenplayEditor {
+            ScreenplayEditor2 {
                 id: screenplayEditor
                 anchors.fill: parent
-                onCurrentSceneEditorChanged: globalSceneEditorToolbar.sceneEditor = currentSceneEditor
-                displaySceneNumbers: globalSceneEditorToolbar.editInFullscreen
-                displaySceneMenu: globalSceneEditorToolbar.editInFullscreen
+                zoomLevelModifier: -2
             }
         }
     }
@@ -966,51 +962,10 @@ Item {
     Component {
         id: sceneEditorComponent
 
-        Rectangle {
-            id: sceneEditorView
-            color: sceneEditor.backgroundColor
-
-            SearchBar {
-                id: searchBar
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                searchEngine.objectName: "Scene Search Engine"
-            }
-
-            SceneEditor {
-                id: sceneEditor
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.top: searchBar.bottom
-                anchors.margins: 3
-                clip: true
-                property StructureElement element: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
-                scene: element ? element.scene : null
-
-                onSplitSceneRequest: {
-                    showInformation({
-                            "message": "You can split a scene only when its edited in the context of a screenplay, not when edited as an independent scene.",
-                        }, this)
-                }
-
-                SearchAgent.engine: searchBar.searchEngine
-                SearchAgent.textDocument: editor.textDocument
-                SearchAgent.onHighlightText: {
-                    editor.cursorPosition = start
-                    editor.select(start, end)
-                }
-                SearchAgent.onClearSearchRequest: {
-                    editor.deselect()
-                }
-
-                FocusTracker.window: qmlWindow
-                FocusTracker.indicator.target: mainUndoStack
-                FocusTracker.indicator.property: "sceneEditorActive"
-            }
-
-            Component.onCompleted: globalSceneEditorToolbar.sceneEditor = sceneEditor
+        ScreenplayEditor2 {
+            anchors.fill: parent
+            source: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex).scene
+            zoomLevelModifier: -2
         }
     }
 

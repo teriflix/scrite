@@ -328,8 +328,8 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     index = (index < 0 || index >= m_elements.size()) ? m_elements.size() : index;
 
     QScopedPointer< PushObjectListCommand<Screenplay,ScreenplayElement> > cmd;
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(!info->isLocked())
+    ObjectPropertyInfo *info = m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
+    if(info != nullptr && !info->isLocked())
     {
         ObjectListPropertyMethods<Screenplay,ScreenplayElement> methods(&screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement, &screenplayElementAt, screenplayIndexOfElement);
         cmd.reset( new PushObjectListCommand<Screenplay,ScreenplayElement> (ptr, this, info->property, ObjectList::InsertOperation, methods) );
@@ -369,8 +369,8 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
         return;
 
     QScopedPointer< PushObjectListCommand<Screenplay,ScreenplayElement> > cmd;
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(!info->isLocked())
+    ObjectPropertyInfo *info = m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
+    if(info != nullptr && !info->isLocked())
     {
         ObjectListPropertyMethods<Screenplay,ScreenplayElement> methods(&screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement, &screenplayElementAt, screenplayIndexOfElement);
         cmd.reset( new PushObjectListCommand<Screenplay,ScreenplayElement> (ptr, this, info->property, ObjectList::RemoveOperation, methods) );

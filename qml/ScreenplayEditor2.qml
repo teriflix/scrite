@@ -17,7 +17,7 @@ import QtQuick.Window 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 
-Item {
+Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
     // The adapter may contain a single scene or an entire screenplay, that doesnt matter.
     // This way we can avoid having a SceneEditor and ScreenplayEditor as two distinct
@@ -29,12 +29,17 @@ Item {
     property alias source: screenplayAdapter.source
 
     property alias zoomLevel: zoomSlider.zoomLevel
+    property int zoomLevelModifier: 0
+    color: primaryColors.windowColor
+    border.width: 1
+    border.color: primaryColors.borderColor
+    clip: true
 
     ScreenplayAdapter {
         id: screenplayAdapter
         source: scriteDocument.screenplay
         onCurrentIndexChanged: {
-            app.execLater(contentView, 500, function() {
+            app.execLater(contentView, 50, function() {
                 contentView.scrollIntoView(currentIndex)
             })
         }
@@ -220,7 +225,7 @@ Item {
                 property real zoomLevel: zoomLevels[value]
                 property bool initialized: false
                 anchors.verticalCenter: parent.verticalCenter
-                from: 0; to: zoomLevels.length
+                from: 0; to: zoomLevels.length-1
                 stepSize: 1
                 onZoomLevelChanged: {
                     if(initialized)
@@ -228,12 +233,14 @@ Item {
                 }
                 Component.onCompleted: {
                     var list = zoomLevels
+                    var zoomOneIndex = -1
                     for(var i=0; i<list.length; i++) {
-                        if(list[i] === 1.0) {
-                            value = i
+                        zoomOneIndex = (list[i] === 1.0) ? i : -1
+                        if(zoomOneIndex >= 0)
                             break
-                        }
                     }
+                    zoomOneIndex = Math.min(Math.max(zoomOneIndex+zoomLevelModifier, from), to)
+                    value = zoomOneIndex
                     screenplayFormat.devicePixelRatio = Screen.devicePixelRatio * zoomLevel
                     initialized = true
                 }
