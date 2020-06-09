@@ -37,7 +37,7 @@ Rectangle {
 
     ScreenplayAdapter {
         id: screenplayAdapter
-        source: scriteDocument.screenplay
+        source: scriteDocument.loading ? null : scriteDocument.screenplay
         onCurrentIndexChanged: {
             if(mainUndoStack.screenplayEditorActive)
                 app.execLater(contentView, 100, function() {
@@ -1085,7 +1085,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.topMargin: 5
         anchors.bottomMargin: statusBar.height
-        active: screenplayAdapter.isSourceScreenplay && screenplayAdapter.elementCount > 1 && globalSceneEditorToolbar.editInFullscreen
+        active: screenplayAdapter.isSourceScreenplay && screenplayAdapter.elementCount > 1 && globalSceneEditorToolbar.editInFullscreen && !scriteDocument.loading
         property bool expanded: false
         readonly property int expandCollapseButtonWidth: 25
         readonly property int sceneListAreaWidth: 400
@@ -1135,6 +1135,16 @@ Rectangle {
                     clip: true
                     model: screenplayAdapter
                     currentIndex: screenplayAdapter.currentIndex
+                    ScrollBar.vertical: ScrollBar {
+                        policy: sceneListView.contentHeight > sceneListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        minimumSize: 0.1
+                        palette {
+                            mid: Qt.rgba(0,0,0,0.25)
+                            dark: Qt.rgba(0,0,0,0.75)
+                        }
+                        opacity: active ? 1 : 0.2
+                        Behavior on opacity { NumberAnimation { duration: 250 } }
+                    }
                     delegate: Rectangle {
                         width: sceneListView.width-1
                         height: scene && scene.heading.enabled ? 40 : 0
