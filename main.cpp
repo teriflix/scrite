@@ -99,6 +99,7 @@ int main(int argc, char **argv)
     qInstallMessageHandler(ScriteQtMessageHandler);
 
     Application a(argc, argv, applicationVersion);
+    ScreenplayPageLayout::figureOutMetrics();
 
     QPalette palette = Application::palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0,0.4,1));

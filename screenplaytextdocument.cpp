@@ -499,6 +499,9 @@ void ScreenplayTextDocument::connectToScreenplayFormatSignals()
         return;
 
     connect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged);
+    connect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged);
+    connect(m_formatting, &ScreenplayFormat::devicePixelRatioChanged, this, &ScreenplayTextDocument::onFormatDevicePixelRatioChanged);
+
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
         SceneElementFormat *elementFormat = m_formatting->elementFormat(i);
@@ -536,6 +539,9 @@ void ScreenplayTextDocument::disconnectFromScreenplayFormatSignals()
         return;
 
     disconnect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged);
+    disconnect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged);
+    disconnect(m_formatting, &ScreenplayFormat::devicePixelRatioChanged, this, &ScreenplayTextDocument::onFormatDevicePixelRatioChanged);
+
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
         SceneElementFormat *elementFormat = m_formatting->elementFormat(i);
@@ -820,6 +826,16 @@ void ScreenplayTextDocument::onDefaultFontChanged()
 #endif
 }
 
+void ScreenplayTextDocument::onFormatScreenChanged()
+{
+    this->evaluatePageBoundariesLater();
+}
+
+void ScreenplayTextDocument::onFormatDevicePixelRatioChanged()
+{
+    this->evaluatePageBoundariesLater();
+}
+
 void ScreenplayTextDocument::onActiveSceneChanged()
 {
     Scene *activeScene = m_screenplay->activeScene();
@@ -913,6 +929,9 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
 
     if(m_formatting != nullptr && m_textDocument != nullptr)
     {
+        m_textDocument->setDefaultFont(m_formatting->defaultFont());
+        m_formatting->pageLayout()->configure(m_textDocument);
+
         this->setPageCount(m_textDocument->pageCount());
 
         const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
@@ -939,6 +958,8 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
 
     m_pageBoundaries = pgBoundaries;
     emit pageBoundariesChanged();
+
+    this->evaluateCurrentPage();
 }
 
 void ScreenplayTextDocument::evaluatePageBoundariesLater()

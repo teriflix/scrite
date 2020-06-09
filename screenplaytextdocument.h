@@ -123,17 +123,19 @@ private:
     // Hook to signals that convey change in formatting
     void onElementFormatChanged();
     void onDefaultFontChanged();
+    void onFormatScreenChanged();
+    void onFormatDevicePixelRatioChanged();
 
     // Hook to signals to know current element and cursor position,
     // so that we can report current page number.
     void onActiveSceneChanged();
     void onActiveSceneDestroyed(Scene *ptr);
     void onActiveSceneCursorPositionChanged();
+
+    // Other methods
     void evaluateCurrentPage();
     void evaluatePageBoundaries();
     void evaluatePageBoundariesLater();
-
-    // Other methods
     void formatAllBlocks();
     void loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor);
     void formatBlock(const QTextBlock &block, const QString &text=QString());

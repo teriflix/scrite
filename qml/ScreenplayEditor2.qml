@@ -345,7 +345,7 @@ Item {
 
                         ResetOnChange {
                             id: document
-                            trackChangesOn: sceneDocumentBinder.documentLoadCount
+                            trackChangesOn: sceneDocumentBinder.documentLoadCount + zoomSlider.value
                             from: null
                             to: screenplayTextDocument
                             delay: 100

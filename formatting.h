@@ -134,8 +134,13 @@ class ScreenplayPageLayout : public QObject
     Q_OBJECT
 
 public:
-    ScreenplayPageLayout(QObject *parent=nullptr);
+    static void figureOutMetrics();
+
+    ScreenplayPageLayout(ScreenplayFormat *parent=nullptr);
     ~ScreenplayPageLayout();
+
+    Q_PROPERTY(ScreenplayFormat* format READ format CONSTANT)
+    ScreenplayFormat *format() const { return m_format; }
 
     enum PaperSize { A4, Letter };
     Q_ENUM(PaperSize)
@@ -200,7 +205,7 @@ private:
     void timerEvent(QTimerEvent *event);
 
 private:
-    qreal m_resolution = 72.0;
+    qreal m_resolution = StandardResolution;
     QRectF m_paintRect;
     QRectF m_paperRect;
     QMarginsF m_margins;
@@ -209,6 +214,8 @@ private:
     PaperSize m_paperSize = Letter;
     char m_padding[4];
     QPageLayout m_pageLayout;
+    ScreenplayFormat *m_format = nullptr;
+    static qreal StandardResolution;
     SimpleTimer m_evaluateRectsTimer;
 };
 

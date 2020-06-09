@@ -264,11 +264,25 @@ void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ScreenplayPageLayout::ScreenplayPageLayout(QObject *parent)
-    : QObject(parent)
+qreal ScreenplayPageLayout::StandardResolution = 72;
+
+void ScreenplayPageLayout::figureOutMetrics()
+{
+    const QList<QScreen*> screens = qApp->screens();
+    Q_FOREACH(QScreen *screen, screens)
+    {
+        const qreal res = qFuzzyCompare(screen->devicePixelRatio(), 1.0) ? screen->physicalDotsPerInch() : screen->logicalDotsPerInch();
+        StandardResolution = qMax(StandardResolution, res);
+    }
+}
+
+ScreenplayPageLayout::ScreenplayPageLayout(ScreenplayFormat *parent)
+    : QObject(parent),
+      m_format(parent)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
+    connect(m_format, &ScreenplayFormat::screenChanged, this, &ScreenplayPageLayout::evaluateRectsLater);
     this->evaluateRectsLater();
 }
 
@@ -290,9 +304,9 @@ void ScreenplayPageLayout::setPaperSize(ScreenplayPageLayout::PaperSize val)
 
 void ScreenplayPageLayout::configure(QTextDocument *document) const
 {
-    const bool stdResolution = qFuzzyCompare(m_resolution,72);
-    const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(72);
-    const QSizeF pageSize = stdResolution ? m_paperRect.size() : m_pageLayout.pageSize().sizePixels(72);
+    const bool stdResolution = qFuzzyCompare(m_resolution,ScreenplayPageLayout::StandardResolution);
+    const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(int(ScreenplayPageLayout::StandardResolution));
+    const QSizeF pageSize = stdResolution ? m_paperRect.size() : m_pageLayout.pageSize().sizePixels(int(ScreenplayPageLayout::StandardResolution));
 
     document->setPageSize(pageSize);
 
@@ -311,6 +325,11 @@ void ScreenplayPageLayout::configure(QPagedPaintDevice *printer) const
 
 void ScreenplayPageLayout::evaluateRects()
 {
+    if(m_format->screen())
+        m_resolution = qFuzzyCompare(m_format->screen()->devicePixelRatio(),1.0) ? m_format->screen()->physicalDotsPerInch() : m_format->screen()->logicalDotsPerInch();
+    else
+        m_resolution = ScreenplayPageLayout::StandardResolution;
+
     // Page margins
     static const qreal leftMargin = 1.5; // inches
     static const qreal topMargin = 1.0; // inches
