@@ -592,6 +592,43 @@ QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into) const
     return of.scaled(into, Qt::KeepAspectRatio);
 }
 
+QRectF Application::uniteRectangles(const QRectF &r1, const QRectF &r2) const
+{
+    return r1.united(r2);
+}
+
+QRectF Application::adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom) const
+{
+    return rect.adjusted(left, top, right, bottom);
+}
+
+bool Application::isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const
+{
+    return bigRect.contains(smallRect);
+}
+
+QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const
+{
+    QPointF ret(0, 0);
+
+    if(!bigRect.contains(smallRect))
+    {
+        if(smallRect.left() < bigRect.left())
+            ret.setX( bigRect.left()-smallRect.left() );
+        else if(smallRect.right() > bigRect.right())
+            ret.setX( -(smallRect.right()-bigRect.right()) );
+
+        if(smallRect.top() < bigRect.top())
+            ret.setY( bigRect.top()-smallRect.top() );
+        else if(smallRect.bottom() > bigRect.bottom())
+            ret.setY( -(smallRect.bottom()-bigRect.bottom()) );
+    }
+
+    qDebug() << "PA: " << bigRect << smallRect << ret;
+
+    return ret;
+}
+
 QString Application::fileContents(const QString &fileName) const
 {
     QFile file(fileName);

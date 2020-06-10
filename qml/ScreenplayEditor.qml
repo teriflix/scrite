@@ -55,10 +55,160 @@ Rectangle {
         syncEnabled: true
     }
 
+    Settings {
+        id: screenplayEditorSettings
+        fileName: app.settingsFilePath
+        category: "Screenplay Editor"
+        property bool displaySceneCharacters: true
+    }
+
+    Rectangle {
+        id: toolbar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 1
+        color: primaryColors.c100.background
+        width: ruler.width
+        height: Math.max(toolbarLayout.height, screenplaySearchBar.height)
+        enabled: screenplayAdapter.screenplay
+        border.width: 1
+        border.color: primaryColors.borderColor
+
+        Row {
+            id: toolbarLayout
+            anchors.right: screenplaySearchBar.left
+
+            ToolButton2 {
+                id: screenplayPreviewButton
+                icon.source: "../icons/action/preview.png"
+                ToolTip.text: "Preview the screenplay in print format."
+                ToolTip.delay: 1000
+                checkable: true
+//                checked: screenplayPreview.visible
+//                down: screenplayPreview.visible
+//                onClicked: screenplayPreview.visible = checked
+            }
+
+            ToolButton2 {
+                icon.source: "../icons/screenplay/character.png"
+                ToolTip.text: "Toggle display of character names under scene headings and scan for hidden characters in each scene."
+                ToolTip.delay: 1000
+                down: sceneCharactersMenu.visible
+                onClicked: sceneCharactersMenu.visible = true
+
+                Item {
+                    width: parent.width
+                    height: 1
+                    anchors.top: parent.bottom
+
+                    Menu2 {
+                        id: sceneCharactersMenu
+                        width: 300
+
+                        MenuItem2 {
+                            text: "Display scene characters"
+                            checkable: true
+                            checked: screenplayEditorSettings.displaySceneCharacters
+                            onToggled: screenplayEditorSettings.displaySceneCharacters = checked
+                        }
+
+                        MenuItem2 {
+                            text: "Scan for mute characters"
+                            onClicked: scriteDocument.structure.scanForMuteCharacters()
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: 1
+            height: parent.height
+            color: primaryColors.borderColor
+            anchors.right: screenplaySearchBar.left
+        }
+
+        SearchBar {
+            id: screenplaySearchBar
+            searchEngine.objectName: "Screenplay Search Engine"
+            anchors.horizontalCenter: parent.horizontalCenter
+            allowReplace: true
+            width: toolbar.width * 0.6
+//            enabled: !screenplayPreview.active
+
+            Repeater {
+                id: searchAgents
+                model: screenplayAdapter.screenplay ? 1 : 0
+
+                Item {
+                    property string searchString
+                    property var searchResults: []
+                    property int previousSceneIndex: -1
+
+                    signal replaceCurrentRequest(string replacementText)
+
+                    SearchAgent.onReplaceAll: {
+                        screenplayTextDocument.syncEnabled = false
+                        screenplayAdapter.screenplay.replace(searchString, replacementText, 0)
+                        screenplayTextDocument.syncEnabled = true
+                    }
+                    SearchAgent.onReplaceCurrent: replaceCurrentRequest(replacementText)
+
+                    SearchAgent.engine: screenplaySearchBar.searchEngine
+
+                    SearchAgent.onSearchRequest: {
+                        searchString = string
+                        searchResults = screenplayAdapter.screenplay.search(string, 0)
+                        SearchAgent.searchResultCount = searchResults.length
+                    }
+
+                    SearchAgent.onCurrentSearchResultIndexChanged: {
+                        if(SearchAgent.currentSearchResultIndex >= 0) {
+                            var searchResult = searchResults[SearchAgent.currentSearchResultIndex]
+                            var sceneIndex = searchResult["sceneIndex"]
+                            if(sceneIndex !== previousSceneIndex)
+                                clearPreviousElementUserData()
+                            var sceneResultIndex = searchResult["sceneResultIndex"]
+                            var screenplayElement = screenplayAdapter.screenplay.elementAt(sceneIndex)
+                            var data = {
+                                "searchString": searchString,
+                                "sceneResultIndex": sceneResultIndex,
+                                "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
+                                "searchResultCount": SearchAgent.searchResultCount
+                            }
+                            contentView.positionViewAtIndex(sceneIndex, ListView.Visible)
+                            screenplayElement.userData = data
+                            previousSceneIndex = sceneIndex
+                        }
+                    }
+
+                    SearchAgent.onClearSearchRequest: {
+                        screenplayAdapter.screenplay.currentElementIndex = previousSceneIndex
+                        searchString = ""
+                        searchResults = []
+                        clearPreviousElementUserData()
+                    }
+
+                    function clearPreviousElementUserData() {
+                        if(previousSceneIndex >= 0) {
+                            var screenplayElement = screenplayAdapter.screenplay.elementAt(previousSceneIndex)
+                            if(screenplayElement)
+                                screenplayElement.userData = undefined
+                        }
+                        previousSceneIndex = -1
+                    }
+                }
+            }
+        }
+    }
+
     Item {
-        anchors.fill: parent
+        anchors.top: toolbar.bottom
+        anchors.left: parent.left
         anchors.leftMargin: sceneListPanelLoader.active ? sceneListPanelLoader.width : 0
-        anchors.bottomMargin: statusBar.height
+        anchors.right: parent.right
+        anchors.bottom: statusBar.top
 
         EventFilter.events: [31]
         EventFilter.onFilter: {
@@ -131,9 +281,6 @@ Rectangle {
                     }
 
                     function scrollIntoView(index) {
-                        if(moving || flicking)
-                            return
-
                         var topIndex = firstItemIndex
                         var bottomIndex = lastItemIndex
 
@@ -156,13 +303,13 @@ Rectangle {
                         var pt = item.mapToItem(contentView.contentItem, rect.x, rect.y)
                         var startY = contentView.contentY
                         var endY = contentView.contentY + contentView.height - rect.height
-                        if( startY < pt.y && pt.y < endY )
+                        if( pt.y >= startY && pt.y <= endY )
                             return
 
                         var newContentY = 0
                         if( pt.y < startY )
                             contentView.contentY = pt.y
-                        else if( pt.y > endY )
+                        else
                             contentView.contentY = (pt.y + 2*rect.height) - contentView.height
                     }
                 }
@@ -172,7 +319,7 @@ Rectangle {
 
     ScrollBar {
         id: verticalScrollBar
-        anchors.top: parent.top
+        anchors.top: toolbar.bottom
         anchors.right: parent.right
         anchors.bottom: statusBar.top
         orientation: Qt.Vertical
@@ -214,6 +361,9 @@ Rectangle {
                 font.pixelSize: parent.height * 0.6
                 elide: Text.ElideRight
                 text: {
+                    if(screenplayAdapter.isSourceScene || screenplayAdapter.elementCount === 0)
+                        return ""
+
                     var scene = null
                     var element = null
                     if(contentView.isVisible(screenplayAdapter.currentIndex)) {
@@ -419,7 +569,7 @@ Rectangle {
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
                     onActiveFocusChanged: {
                         if(activeFocus) {
-                            contentView.ensureVisible(sceneTextEditor, cursorRectangle, contentItem.theIndex)
+                            contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalSceneEditorToolbar.sceneEditor = contentItem
                         } else if(globalSceneEditorToolbar.sceneEditor === contentItem)
@@ -434,7 +584,7 @@ Rectangle {
 
                     onCursorRectangleChanged: {
                         if(activeFocus && contentView.isVisible(contentItem.theIndex))
-                            contentView.ensureVisible(sceneTextEditor, cursorRectangle, contentItem.theIndex)
+                            contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                     }
 
                     // Support for transliteration.
@@ -685,6 +835,7 @@ Rectangle {
                             }
                         }
                     }
+
                     Keys.onTabPressed: {
                         if(completer.suggestion !== "") {
                             userIsTyping = false
@@ -751,6 +902,58 @@ Rectangle {
                             contentItem.scrollToNextScene()
                         } else
                             event.accepted = false
+                    }
+
+                    // Search & Replace
+                    TextDocumentSearch {
+                        id: textDocumentSearch
+                        textDocument: sceneTextEditor.textDocument
+                        searchString: sceneDocumentBinder.documentLoadCount > 0 ? (contentItem.theElement.userData ? contentItem.theElement.userData.searchString : "") : ""
+                        currentResultIndex: searchResultCount > 0 ? (contentItem.theElement.userData ? contentItem.theElement.userData.sceneResultIndex : -1) : -1
+                        onHighlightText: selection = {"start": start, "end": end}
+                        onClearHighlight: selection = { "start": -1, "end": -1 }
+
+                        property var selection: { "start": -1, "end": -1 }
+                        property int loadCount: sceneDocumentBinder.documentLoadCount
+
+                        onLoadCountChanged: highlightSearchResultTextSnippet()
+                        onSelectionChanged: highlightSearchResultTextSnippet()
+
+                        function highlightSearchResultTextSnippet() {
+                            if(selection.start >= 0 && selection.end >= 0) {
+                                var rect = app.uniteRectangles( sceneTextEditor.positionToRectangle(selection.start),
+                                                                sceneTextEditor.positionToRectangle(selection.end) )
+                                rect = app.adjustRectangle(rect, -20, -50, 20, 50)
+                                contentView.ensureVisible(contentItem, rect)
+
+                                sceneTextEditor.select(selection.start, selection.end)
+                                sceneTextEditor.update()
+                            } else {
+                                sceneTextEditor.deselect()
+                            }
+                        }
+                    }
+
+                    Connections {
+                        target: searchAgents.count > 0 ? searchAgents.itemAt(0).SearchAgent : null
+                        ignoreUnknownSignals: true
+                        onReplaceCurrentRequest: {
+                            if(textDocumentSearch.currentResultIndex >= 0) {
+                                contentItem.theScene.beginUndoCapture()
+                                textDocumentSearch.replace(replacementText)
+                                contentItem.theScene.endUndoCapture()
+                            }
+                        }
+                    }
+
+                    // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
+                    Connections {
+                        target: screenplayAdapter.isSourceScreenplay ? scriteDocument : null
+                        ignoreUnknownSignals: true
+                        onNewSceneCreated: {
+                            if(screenplayIndex === index)
+                                sceneTextEditor.forceActiveFocus()
+                        }
                     }
                 }
             }
@@ -1087,7 +1290,7 @@ Rectangle {
 
     Loader {
         id: sceneListPanelLoader
-        anchors.top: parent.top
+        anchors.top: toolbar.bottom
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.topMargin: 5

@@ -232,4 +232,3 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
 
     return QVariant();
 }
-

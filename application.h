@@ -169,6 +169,10 @@ public:
     Q_INVOKABLE QRectF intersectedRectangle(const QRectF &of, const QRectF &with) const;
     Q_INVOKABLE bool   doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const;
     Q_INVOKABLE QSizeF scaledSize(const QSizeF &of, const QSizeF &into) const;
+    Q_INVOKABLE QRectF uniteRectangles(const QRectF &r1, const QRectF &r2) const;
+    Q_INVOKABLE QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom) const;
+    Q_INVOKABLE bool   isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
+    Q_INVOKABLE QPointF translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
 
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }

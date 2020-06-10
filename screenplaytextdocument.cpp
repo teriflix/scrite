@@ -182,11 +182,13 @@ void ScreenplayTextDocument::setSyncEnabled(bool val)
         return;
 
     m_syncEnabled = val;
+    m_loadScreenplayTimer.stop();
 
     if(m_syncEnabled)
     {
         this->connectToScreenplaySignals();
         this->connectToScreenplayFormatSignals();
+        this->syncNow();
     }
     else
     {
