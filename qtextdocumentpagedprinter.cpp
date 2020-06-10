@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "ruleritem.h"
 #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
@@ -98,7 +99,7 @@ void HeaderFooter::setRect(const QRectF &val)
     emit rectChanged();
 }
 
-void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF &rect)
+void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF &rect, QPaintDevice *pd)
 {
     m_columns.resize(3);
 
@@ -108,7 +109,7 @@ void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF
     m_columns[2].content = fieldValues.value(m_right);
 
     // Figure out how much size does each column actually take
-    QFontMetricsF fm(m_font);
+    QFontMetricsF fm(m_font, pd);
     const qreal colSizes[3] = {
         fm.horizontalAdvance(m_columns[0].content),
         fm.horizontalAdvance(m_columns[1].content),
@@ -342,6 +343,11 @@ QTextDocumentPagedPrinter::~QTextDocumentPagedPrinter()
 
 }
 
+// Much of the code in the print() function is inspired from the implementation
+// of QTextDocument::print() method implementation. Because I tried writing
+// my own print() implementation and it always sucked in stellar proportions.
+Q_DECL_IMPORT int qt_defaultDpi();
+
 template <class T>
 struct Pointer
 {
@@ -352,17 +358,12 @@ private:
     T **m_ptr;
 };
 
-// Much of the code in this function is inspired from the implementation
-// of QTextDocument::print() method implementation.
-Q_DECL_IMPORT int qt_defaultDpi();
-
-bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice *device)
+bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice *printer)
 {
     Pointer<QTextDocument> td(&m_textDocument);
     Pointer<QPagedPaintDevice> pr(&m_printer);
-
     m_textDocument = document;
-    m_printer = device;
+    m_printer = printer;
 
     m_errorReport->clear();
 
@@ -378,41 +379,100 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
         return false;
     }
 
-    // Prepare printer
-    QPagedPaintDevice::Margins m = m_printer->margins();
-    m.left = m.right = m.top = m.bottom = 2.; // 2 is in mm
-    m_printer->setMargins(m);
+    if(!printer)
+        return false;
 
-    // Prepare document
-    const QTextDocument *doc = m_textDocument;
+    const QSizeF pageSize = document->pageSize();
+    bool documentPaginated = pageSize.isValid() && !pageSize.isNull() && int(pageSize.height()) != INT_MAX;
+
+    QPagedPaintDevice::Margins m = printer->margins();
+    if (!documentPaginated && m.left == 0. && m.right == 0. && m.top == 0. && m.bottom == 0.)
+    {
+        m.left = m.right = m.top = m.bottom = 2.;
+        printer->setMargins(m);
+    }
+
+    QPainter painter(printer);
+    if (!painter.isActive())
+        return false;
+
+    const QTextDocument *doc = document;
     QScopedPointer<QTextDocument> clonedDoc;
     (void)doc->documentLayout(); // make sure that there is a layout
 
-    doc = m_textDocument->clone(this);
-    clonedDoc.reset(const_cast<QTextDocument *>(doc));
+    QRectF body = QRectF(QPointF(0, 0), pageSize);
+    QPair<qreal,qreal> contentScale = qMakePair(1.0, 1.0);
 
-    for (QTextBlock srcBlock = m_textDocument->firstBlock(), dstBlock = clonedDoc->firstBlock();
-         srcBlock.isValid() && dstBlock.isValid();
-         srcBlock = srcBlock.next(), dstBlock = dstBlock.next())
-         dstBlock.layout()->setFormats(srcBlock.layout()->formats());
-
-    // Prepare painter
-    QPainter painter(m_printer);
-    QAbstractTextDocumentLayout *layout = doc->documentLayout();
-    layout->setPaintDevice(painter.device());
-    clonedDoc->setPageSize(QSizeF(m_printer->width(), m_printer->height()));
-
-    const int dpiy = painter.device()->logicalDpiY();
-    const int margin = int((2.0/2.54)*dpiy); // 2 cm margins
-    const int padding = int((0.2/2.54)*dpiy); // 2 mm padding
-
-    if(!doc->property("#rootFrameMarginNotRequired").toBool())
+    if (documentPaginated)
     {
+        // Documents generated using ScreenplayTextDocument will come paginated.
+
+        qreal sourceDpiX = qt_defaultDpi();
+        qreal sourceDpiY = sourceDpiX;
+
+        QPaintDevice *dev = doc->documentLayout()->paintDevice();
+        if (dev)
+        {
+            sourceDpiX = dev->logicalDpiX();
+            sourceDpiY = dev->logicalDpiY();
+        }
+
+        // scale to dpi
+        const qreal dpiScaleX = qreal(printer->logicalDpiX()) / sourceDpiX;
+        const qreal dpiScaleY = qreal(printer->logicalDpiY()) / sourceDpiY;
+        QSizeF scaledPageSize = pageSize;
+        scaledPageSize.rwidth() *= dpiScaleX;
+        scaledPageSize.rheight() *= dpiScaleY;
+
+        // scale to page
+        const QSizeF printerPageSize(printer->width(), printer->height());
+        const qreal pageScaleX = printerPageSize.width() / scaledPageSize.width();
+        const qreal pageScaleY = printerPageSize.height() / scaledPageSize.height();
+
+        contentScale.first = dpiScaleX * pageScaleX;
+        contentScale.second = dpiScaleY * pageScaleY;
+    }
+    else
+    {
+        // Reports generated using AbstractReportGenerator are not paginated.
+
+        doc = document->clone(this);
+        clonedDoc.reset(const_cast<QTextDocument *>(doc));
+
+        for (QTextBlock srcBlock = document->firstBlock(), dstBlock = clonedDoc->firstBlock();
+             srcBlock.isValid() && dstBlock.isValid();
+             srcBlock = srcBlock.next(), dstBlock = dstBlock.next())
+        {
+            dstBlock.layout()->setFormats(srcBlock.layout()->formats());
+        }
+
+        QAbstractTextDocumentLayout *layout = doc->documentLayout();
+        layout->setPaintDevice(painter.device());
+
+        // We dont have to do this because we do not use any custom handlers in Scrite.
+        // layout->d_func()->handlers = documentLayout()->d_func()->handlers;
+
+        int dpiy = painter.device()->logicalDpiY();
+        int margin = int(((2/2.54)*dpiy)); // 2 cm margins
         QTextFrameFormat fmt = doc->rootFrame()->frameFormat();
         fmt.setMargin(margin);
         doc->rootFrame()->setFrameFormat(fmt);
+
+        body = QRectF(0, 0, printer->width(), printer->height());
+
+        // We dont compute pageNumberPos because we have a separate mechanism for drawing
+        // headers, footers and watermark
+        // pageNumberPos = QPointF(body.width() - margin,
+        //                         body.height() - margin
+        //                         + QFontMetrics(doc->defaultFont(), p.device()).ascent()
+        //                         + 5 * dpiy / 72.0);
+
+        clonedDoc->setPageSize(body.size());
     }
 
+    // At this point we are ready to print as far as QTextDocument is concerned.
+
+    // Lets configure the headers and footers before we actually go ahead and print.
     QMap<HeaderFooter::Field,QString> fieldMap;
     fieldMap[HeaderFooter::AppName] = Application::instance()->applicationName();
     fieldMap[HeaderFooter::AppVersion] = Application::instance()->applicationVersion();
@@ -427,25 +487,31 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     fieldMap[HeaderFooter::PageNumber] = QString::number(doc->pageCount()) + ".  ";
     fieldMap[HeaderFooter::PageNumberOfCount] = QString::number(doc->pageCount()) + "/" + QString::number(doc->pageCount()) + "  ";
 
-    // Compute header & footer rects
-    const QRectF body(0, 0, m_printer->width(), m_printer->height());
-    m_headerRect = body;
-    m_footerRect = body;
+    // Here is where we got to figure out the header, footer and watermark rectangles
+    const QTextFrameFormat fmt = doc->rootFrame()->frameFormat();
+    const qreal topMargin = fmt.topMargin() * contentScale.second;
+    const qreal leftMargin = fmt.leftMargin() * contentScale.first;
+    const qreal rightMargin = fmt.rightMargin() * contentScale.first;
+    const qreal bottomMargin = fmt.bottomMargin() * contentScale.second;
+    const qreal padding = 0;
 
-    m_headerRect.setLeft(body.left() + margin);
-    m_headerRect.setBottom(body.top() + margin - padding);
-    m_headerRect.setRight(body.right() - margin);
+    m_headerRect = QRectF(0, 0, printer->width(), printer->height());
+    m_footerRect = m_headerRect;
 
-    m_footerRect.setTop(body.bottom() - margin + padding);
-    m_footerRect.setLeft(body.left() + margin);
-    m_footerRect.setRight(body.right() - margin);
+    m_headerRect.setLeft(leftMargin);
+    m_headerRect.setBottom(topMargin - padding);
+    m_headerRect.setRight(printer->width() - rightMargin);
+
+    m_footerRect.setTop(printer->height() - bottomMargin + padding);
+    m_footerRect.setLeft(leftMargin);
+    m_footerRect.setRight(printer->width() - rightMargin);
 
     m_header->setFont(doc->defaultFont());
     m_footer->setFont(doc->defaultFont());
-    m_header->prepare(fieldMap, m_headerRect);
-    m_footer->prepare(fieldMap, m_footerRect);
+    m_header->prepare(fieldMap, m_headerRect, printer);
+    m_footer->prepare(fieldMap, m_footerRect, printer);
 
-    // Get ready to print
+    // We are now ready to print.
     const int fromPageNr = 1;
     const int toPageNr = doc->pageCount();
 
@@ -456,7 +522,13 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     // Print away!
     while (pageNr <= toPageNr)
     {
-        this->printPage(pageNr, doc->pageCount(), &painter, doc, body);
+        this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
+
+        painter.save();
+        painter.scale(contentScale.first, contentScale.second);
+        this->printPageContents(pageNr, toPageNr, &painter, doc, body);
+        painter.restore();
+
         m_progressReport->tick();
 
         if(pageNr < toPageNr)
@@ -534,19 +606,12 @@ void QTextDocumentPagedPrinter::loadSettings(HeaderFooter *header, HeaderFooter 
     }
 }
 
-void QTextDocumentPagedPrinter::printPage(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body)
+void QTextDocumentPagedPrinter::printPageContents(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body)
 {
-    m_header->paint(painter, m_headerRect, pageNr, pageCount);
-    m_footer->paint(painter, m_footerRect, pageNr, pageCount);
-    m_watermark->paint(painter, QRectF(m_headerRect.bottomLeft(), m_footerRect.topRight()), pageNr, pageCount);
-
-#if 0
-    painter->setPen(Qt::black);
-    painter->drawLine(QLineF(body.left(), m_headerRect.bottom(), body.right(), m_headerRect.bottom()));
-    painter->drawLine(QLineF(body.left(), m_footerRect.top(), body.right(), m_footerRect.top()));
-#endif
+    Q_UNUSED(pageCount)
 
     painter->save();
+
     painter->translate(body.left(), body.top() - (pageNr - 1) * body.height());
     QRectF view(0, (pageNr - 1) * body.height(), body.width(), body.height());
 
@@ -556,8 +621,23 @@ void QTextDocumentPagedPrinter::printPage(int pageNr, int pageCount, QPainter *p
     painter->setClipRect(view);
     ctx.clip = view;
     ctx.palette.setColor(QPalette::Text, Qt::black);
-
     layout->draw(painter, ctx);
 
     painter->restore();
+}
+
+void QTextDocumentPagedPrinter::printHeaderFooterWatermark(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body)
+{
+    Q_UNUSED(doc)
+    Q_UNUSED(body)
+
+    m_header->paint(painter, m_headerRect, pageNr, pageCount);
+    m_footer->paint(painter, m_footerRect, pageNr, pageCount);
+    m_watermark->paint(painter, QRectF(m_headerRect.bottomLeft(), m_footerRect.topRight()), pageNr, pageCount);
+
+#if 0
+    painter->setPen(Qt::black);
+    painter->drawLine(QLineF(body.left(), m_headerRect.bottom(), body.right(), m_headerRect.bottom()));
+    painter->drawLine(QLineF(body.left(), m_footerRect.top(), body.right(), m_footerRect.top()));
+#endif
 }

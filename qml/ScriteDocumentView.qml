@@ -317,6 +317,7 @@ Item {
                             Menu2 {
                                 id: exportMenu
                                 title: "Export"
+                                width: 250
 
                                 Component {
                                     id: menuItemComponent

@@ -136,8 +136,6 @@ class ScreenplayPageLayout : public QObject
     Q_OBJECT
 
 public:
-    static void figureOutMetrics();
-
     ScreenplayPageLayout(ScreenplayFormat *parent=nullptr);
     ~ScreenplayPageLayout();
 
@@ -207,7 +205,7 @@ private:
     void timerEvent(QTimerEvent *event);
 
 private:
-    qreal m_resolution = StandardResolution;
+    qreal m_resolution = 0;
     QRectF m_paintRect;
     QRectF m_paperRect;
     QMarginsF m_margins;
@@ -217,7 +215,6 @@ private:
     char m_padding[4];
     QPageLayout m_pageLayout;
     ScreenplayFormat *m_format = nullptr;
-    static qreal StandardResolution;
     SimpleTimer m_evaluateRectsTimer;
 };
 

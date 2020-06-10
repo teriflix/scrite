@@ -69,7 +69,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<TextExporter>();
     ExporterFactory.addClass<StructureExporter>();
     ExporterFactory.addClass<FountainExporter>();
-    // ExporterFactory.addClass<OdtExporter>();
+    ExporterFactory.addClass<OdtExporter>();
 
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
     ReportGeneratorFactory.addClass<LocationReportGenerator>();

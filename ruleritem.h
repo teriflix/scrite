@@ -106,6 +106,7 @@ public:
     Q_SIGNAL void canConvertChanged();
 
     Q_INVOKABLE qreal convert(qreal val, Unit from, Unit to) const;
+    static qreal Convert(qreal val, Unit from, Unit to, const qreal pixelsPerIn);
 
 protected:
     // QQuickPaintedItem interface

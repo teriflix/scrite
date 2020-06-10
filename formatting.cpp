@@ -216,8 +216,9 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContent
     format.setTopMargin(topMargin);
     format.setLineHeight(m_lineHeight*100, QTextBlockFormat::ProportionalHeight);
     format.setAlignment(Qt::AlignLeft);
-    format.setBackground(QBrush(m_backgroundColor));
-    format.setForeground(QBrush(m_textColor));
+
+    if( !qFuzzyIsNull(m_backgroundColor.alphaF()) )
+        format.setBackground(QBrush(m_backgroundColor));
 
     return format;
 }
@@ -252,7 +253,6 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     // format.setFontHintingPreference(font.hintingPreference());
     format.setFontLetterSpacingType(font.letterSpacingType());
 
-    format.setBackground(QBrush(m_backgroundColor));
     format.setForeground(QBrush(m_textColor));
 
     return format;
@@ -277,22 +277,13 @@ void SceneElementFormat::resetToDefaults()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-qreal ScreenplayPageLayout::StandardResolution = 72;
-
-void ScreenplayPageLayout::figureOutMetrics()
-{
-    const QList<QScreen*> screens = qApp->screens();
-    Q_FOREACH(QScreen *screen, screens)
-    {
-        const qreal res = qFuzzyCompare(screen->devicePixelRatio(), 1.0) ? screen->physicalDotsPerInch() : screen->logicalDotsPerInch();
-        StandardResolution = qMax(StandardResolution, res);
-    }
-}
+Q_DECL_IMPORT int qt_defaultDpi();
 
 ScreenplayPageLayout::ScreenplayPageLayout(ScreenplayFormat *parent)
     : QObject(parent),
       m_format(parent)
 {
+    m_resolution = qt_defaultDpi();
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
     connect(m_format, &ScreenplayFormat::screenChanged, this, &ScreenplayPageLayout::evaluateRectsLater);
@@ -317,9 +308,9 @@ void ScreenplayPageLayout::setPaperSize(ScreenplayPageLayout::PaperSize val)
 
 void ScreenplayPageLayout::configure(QTextDocument *document) const
 {
-    const bool stdResolution = qFuzzyCompare(m_resolution,ScreenplayPageLayout::StandardResolution);
-    const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(int(ScreenplayPageLayout::StandardResolution));
-    const QSizeF pageSize = stdResolution ? m_paperRect.size() : m_pageLayout.pageSize().sizePixels(int(ScreenplayPageLayout::StandardResolution));
+    const bool stdResolution = qFuzzyCompare(m_resolution,qt_defaultDpi());
+    const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(qt_defaultDpi());
+    const QSizeF pageSize = stdResolution ? m_paperRect.size() : m_pageLayout.pageSize().sizePixels(qt_defaultDpi());
 
     document->setPageSize(pageSize);
 
@@ -341,7 +332,7 @@ void ScreenplayPageLayout::evaluateRects()
     if(m_format->screen())
         m_resolution = qFuzzyCompare(m_format->screen()->devicePixelRatio(),1.0) ? m_format->screen()->physicalDotsPerInch() : m_format->screen()->logicalDotsPerInch();
     else
-        m_resolution = ScreenplayPageLayout::StandardResolution;
+        m_resolution = qt_defaultDpi();
 
     // Page margins
     static const qreal leftMargin = 1.5; // inches

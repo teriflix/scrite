@@ -50,6 +50,11 @@ public:
     ScreenplayFormat* formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
+    Q_PROPERTY(bool titlePage READ hasTitlePage WRITE setTitlePage NOTIFY titlePageChanged)
+    void setTitlePage(bool val);
+    bool hasTitlePage() const { return m_titlePage; }
+    Q_SIGNAL void titlePageChanged();
+
     Q_PROPERTY(bool syncEnabled READ isSyncEnabled WRITE setSyncEnabled NOTIFY syncEnabledChanged)
     void setSyncEnabled(bool val);
     bool isSyncEnabled() const { return m_syncEnabled; }
@@ -143,6 +148,7 @@ private:
 private:
     int m_pageCount = 0;
     bool m_updating = false;
+    bool m_titlePage = false;
     int m_currentPage = 0;
     bool m_syncEnabled = true;
     Scene *m_activeScene = nullptr;

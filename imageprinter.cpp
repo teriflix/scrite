@@ -545,8 +545,8 @@ bool ImagePrinterEngine::begin(QPaintDevice *pdev)
     m_currentDevice->header()->setVisibleFromPageOne(true);
     m_currentDevice->footer()->setVisibleFromPageOne(true);
     m_currentDevice->watermark()->setVisibleFromPageOne(true);
-    m_currentDevice->header()->prepare(m_currentDevice->headerFooterFields(), m_headerRect);
-    m_currentDevice->footer()->prepare(m_currentDevice->headerFooterFields(), m_footerRect);
+    m_currentDevice->header()->prepare(m_currentDevice->headerFooterFields(), m_headerRect, pdev);
+    m_currentDevice->footer()->prepare(m_currentDevice->headerFooterFields(), m_footerRect, pdev);
 
     return true;
 }

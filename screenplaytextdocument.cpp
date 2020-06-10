@@ -29,6 +29,7 @@
 #include <QTextBlockUserData>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
+#include <QTextTable>
 
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
@@ -174,6 +175,17 @@ void ScreenplayTextDocument::setFormatting(ScreenplayFormat *val)
 #endif
 
     emit formattingChanged();
+}
+
+void ScreenplayTextDocument::setTitlePage(bool val)
+{
+    if(m_titlePage == val)
+        return;
+
+    m_titlePage = val;
+    emit titlePageChanged();
+
+    this->loadScreenplayLater();
 }
 
 void ScreenplayTextDocument::setSyncEnabled(bool val)
@@ -424,10 +436,149 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
 
+    // So that QTextDocumentPrinter can pick up this for header and footer fields.
+    m_textDocument->setProperty("#title", m_screenplay->title());
+    m_textDocument->setProperty("#subtitle", m_screenplay->subtitle());
+    m_textDocument->setProperty("#author", m_screenplay->author());
+    m_textDocument->setProperty("#contact", m_screenplay->contact());
+    m_textDocument->setProperty("#version", m_screenplay->version());
+
     QTextBlockFormat frameBoundaryBlockFormat;
     frameBoundaryBlockFormat.setLineHeight(0, QTextBlockFormat::FixedHeight);
 
     QTextCursor cursor(m_textDocument);
+
+    // Title Page
+    if(m_titlePage)
+    {
+        const QFont defaultFont = m_formatting->defaultFont();
+
+        QTextTableFormat tableFormat;
+        tableFormat.setCellPadding(0);
+        tableFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
+        QTextTable *table = cursor.insertTable(1, 1, tableFormat);
+
+        QTextCharFormat cellFormat;
+        cellFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
+
+        QTextTableCell cell = table->cellAt(0, 0);
+        cell.setFormat(cellFormat);
+
+        cursor = cell.firstCursorPosition();
+
+        // Title
+        {
+            QTextBlockFormat blockFormat;
+            blockFormat.setAlignment(Qt::AlignHCenter);
+            blockFormat.setBottomMargin(50);
+
+            QTextCharFormat charFormat;
+            charFormat.setFontFamily(defaultFont.family());
+            charFormat.setFontPointSize(36);
+
+            cursor.setBlockFormat(blockFormat);
+            cursor.setCharFormat(charFormat);
+
+            QString title = m_screenplay->title();
+            if(title.isEmpty())
+                title = "Untitled Screenplay";
+            cursor.insertText(title);
+            if(!m_screenplay->subtitle().isEmpty())
+            {
+                cursor.insertText(" - ");
+                cursor.insertText(m_screenplay->subtitle());
+            }
+        }
+
+        // Author
+        {
+            QTextBlockFormat blockFormat;
+            blockFormat.setAlignment(Qt::AlignHCenter);
+
+            QTextCharFormat charFormat;
+            charFormat.setFontFamily(defaultFont.family());
+            charFormat.setFontPointSize(defaultFont.pointSize());
+
+            cursor.insertBlock();
+            cursor.setBlockFormat(blockFormat);
+            cursor.setCharFormat(charFormat);
+
+            QString author = m_screenplay->author();
+            if(author.isEmpty())
+                author = "Unknown Author";
+            cursor.insertText(author);
+        }
+
+        // Contact
+        {
+            QTextBlockFormat blockFormat;
+            blockFormat.setAlignment(Qt::AlignHCenter);
+
+            QTextCharFormat charFormat;
+            charFormat.setFontFamily(defaultFont.family());
+            charFormat.setFontPointSize(defaultFont.pointSize());
+
+            cursor.insertBlock();
+            cursor.setBlockFormat(blockFormat);
+            cursor.setCharFormat(charFormat);
+
+            QString contact = m_screenplay->contact();
+            if(contact.isEmpty())
+                contact = "No Contact Information";
+            cursor.insertText(contact);
+        }
+
+        // Version
+        {
+            QTextBlockFormat blockFormat;
+            blockFormat.setAlignment(Qt::AlignHCenter);
+
+            QTextCharFormat charFormat;
+            charFormat.setFontFamily(defaultFont.family());
+            charFormat.setFontPointSize(defaultFont.pointSize());
+
+            cursor.insertBlock();
+            cursor.setBlockFormat(blockFormat);
+            cursor.setCharFormat(charFormat);
+
+            QString version = m_screenplay->version();
+            if(version.isEmpty())
+                version = "First Version";
+            cursor.insertText("Version: " + version);
+        }
+
+        // Generator
+        {
+            QTextBlockFormat blockFormat;
+            blockFormat.setAlignment(Qt::AlignHCenter);
+            blockFormat.setTopMargin(50);
+
+            QTextCharFormat charFormat;
+            charFormat.setFontFamily(defaultFont.family());
+            charFormat.setFontPointSize(9);
+
+            cursor.insertBlock();
+            cursor.setBlockFormat(blockFormat);
+            cursor.setCharFormat(charFormat);
+            cursor.insertHtml("This screenplay was generated using <strong>scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
+        }
+
+        cursor = m_textDocument->rootFrame()->lastCursorPosition();
+
+        const QRectF pageRect = QRectF( QPointF(0,0), m_textDocument->pageSize() );
+
+        QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+        QRectF tableRect = layout->frameBoundingRect(table);
+        tableRect.moveCenter(pageRect.center());
+
+        tableFormat.setTopMargin(tableRect.top() - m_textDocument->rootFrame()->frameFormat().topMargin());
+        table->setFormat(tableFormat);
+
+        QTextBlockFormat blkFormat;
+        blkFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
+        cursor.insertBlock(blkFormat);
+    }
+
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = m_screenplay->elementAt(i);

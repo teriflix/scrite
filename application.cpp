@@ -331,7 +331,8 @@ void ExecLater::timerEvent(QTimerEvent *event)
     if(m_timer.timerId() == event->timerId())
     {
         m_timer.stop();
-        m_function.call(m_arguments);
+        if(m_function.isCallable())
+            m_function.call(m_arguments);
         GarbageCollector::instance()->add(this);
     }
 }

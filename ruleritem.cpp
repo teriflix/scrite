@@ -195,11 +195,16 @@ void RulerItem::setZoomLevel(qreal val)
 
 qreal RulerItem::convert(qreal val, RulerItem::Unit from, RulerItem::Unit to) const
 {
+    const QScreen *screen = this->window()->screen();
+    const qreal pixelsPerIn = screen->physicalDotsPerInchX();
+    return RulerItem::Convert(val, from, to, pixelsPerIn);
+}
+
+qreal RulerItem::Convert(qreal val, RulerItem::Unit from, RulerItem::Unit to, const qreal pixelsPerIn)
+{
     if(from == to)
         return val;
 
-    const QScreen *screen = this->window()->screen();
-    const qreal pixelsPerIn = screen->physicalDotsPerInchX();
     const qreal cmsPerIn = 2.54;
     const qreal pixelsPerCm = pixelsPerIn / cmsPerIn;
 

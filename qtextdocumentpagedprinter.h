@@ -95,8 +95,8 @@ public:
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
 
-    void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect);
-    void paint(QPainter *paint, const QRectF &rect, int pageNr, int pageCount);
+    void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect, QPaintDevice *pd);
+    void paint(QPainter *paint, const QRectF &, int pageNr, int pageCount);
     void finish();
 
 private:
@@ -211,7 +211,8 @@ public:
     static void loadSettings(HeaderFooter *header, HeaderFooter *footer, Watermark *watermark);
 
 private:
-    void printPage(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body);
+    void printPageContents(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body);
+    void printHeaderFooterWatermark(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body);
 
 private:
     HeaderFooter* m_header = new HeaderFooter(HeaderFooter::Header, this);
