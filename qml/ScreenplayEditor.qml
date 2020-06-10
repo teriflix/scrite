@@ -279,7 +279,7 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 5
                 clip: true
-                color: screenplayAdapter.elementCount > 0 ? "white" : Qt.rgba(0,0,0,0)
+                color: "white"
 
                 ResetOnChange {
                     id: contentViewModel
@@ -314,6 +314,34 @@ Rectangle {
                     footer: Item {
                         width: contentView.width
                         height: ruler.bottomMarginPx
+
+                        Column {
+                            anchors.centerIn: parent
+                            visible: screenplayAdapter.screenplay === scriteDocument.screenplay
+                            spacing: 5
+
+                            Image {
+                                id: addSceneButton
+                                source: "../icons/content/add_circle_outline.png"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                opacity: defaultOpacity
+                                Behavior on opacity { NumberAnimation { duration: 250 } }
+                                property real defaultOpacity: screenplayAdapter.elementCount === 0 ? 0.5 : 0.05
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onContainsMouseChanged: parent.opacity = containsMouse ? 1 : parent.defaultOpacity
+                                    onClicked: scriteDocument.createNewScene()
+                                }
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                horizontalAlignment: Text.AlignHCenter
+                                text: (screenplayAdapter.elementCount === 0 ? "Create your first scene" : "Add a new scene") + "\n(" + app.polishShortcutTextForDisplay("Ctrl+Shift+N") + ")"
+                                opacity: addSceneButton.opacity
+                            }
+                        }
                     }
 
                     FocusTracker.window: qmlWindow

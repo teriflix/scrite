@@ -67,7 +67,7 @@ ScrollView {
                 }
 
                 ToolButton2 {
-                    icon.source: "../icons/content/add_box.png"
+                    icon.source: "../icons/content/add_circle_outline.png"
                     suggestedWidth: toolbar.toolButtonWidth
                     suggestedHeight: toolbar.toolButtonHeight
                     shortcut: "Ctrl+Shift+N"

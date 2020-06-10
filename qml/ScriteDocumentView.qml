@@ -936,29 +936,8 @@ Item {
     Component {
         id: screenplayEditorComponent
 
-        Item {
-            id: screenplayEditorItem
-
-            ScreenplayEditor {
-                id: screenplayEditor
-                anchors.fill: parent
-                zoomLevelModifier: screenplayZoomLevelModifier
-            }
-
-            Loader {
-                width: parent.width*0.7
-                anchors.centerIn: parent
-                active: globalSceneEditorToolbar.editInFullscreen && scriteDocument.screenplay.elementCount === 0
-                sourceComponent: TextArea {
-                    readOnly: true
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: 30
-                    enabled: false
-                    // renderType: Text.NativeRendering
-                    text: "Click on the add new scene button on the toolbar or press " + app.polishShortcutTextForDisplay("Ctrl+Shift+N") + " to create a new scene."
-                }
-            }
+        ScreenplayEditor {
+            zoomLevelModifier: screenplayZoomLevelModifier
         }
     }
 
@@ -966,9 +945,8 @@ Item {
         id: sceneEditorComponent
 
         ScreenplayEditor {
-            anchors.fill: parent
             source: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex).scene
-            zoomLevelModifier: -2
+            zoomLevelModifier: screenplayZoomLevelModifier
         }
     }
 
