@@ -300,6 +300,7 @@ Item {
                 id: pageSetupSettings
                 fileName: app.settingsFilePath
                 category: "PageSetup"
+                property var paperSize: ScreenplayPageLayout.Letter
                 property var headerLeft: HeaderFooter.Title
                 property var headerCenter: HeaderFooter.Subtitle
                 property var headerRight: HeaderFooter.PageNumber
@@ -335,9 +336,26 @@ Item {
                         font.pixelSize: 24
                     }
 
-                    Text {
-                        width: parent.width
-                        text: "PDFs are always generated in US Letter size."
+                    Row {
+                        spacing: 10
+
+                        Text {
+                            text: "Paper Size"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        ComboBox2 {
+                            width: 200
+                            textRole: "key"
+                            currentIndex: pageSetupSettings.paperSize
+                            anchors.verticalCenter: parent.verticalCenter
+                            onActivated: {
+                                pageSetupSettings.paperSize = currentIndex
+                                scriteDocument.formatting.pageLayout.paperSize = currentIndex
+                                scriteDocument.printFormat.pageLayout.paperSize = currentIndex
+                            }
+                            model: app.enumerationModelForType("ScreenplayPageLayout", "PaperSize")
+                        }
                     }
 
                     GroupBox {

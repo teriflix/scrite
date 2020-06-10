@@ -60,6 +60,13 @@ Rectangle {
         anchors.leftMargin: sceneListPanelLoader.active ? sceneListPanelLoader.width : 0
         anchors.bottomMargin: statusBar.height
 
+        EventFilter.events: [31]
+        EventFilter.onFilter: {
+            EventFilter.forwardEventTo(contentView)
+            result.filter = true
+            result.accepted = true
+        }
+
         Item {
             id: pageRulerArea
             width: pageLayout.paperWidth * screenplayEditor.zoomLevel * Screen.devicePixelRatio
@@ -1145,6 +1152,9 @@ Rectangle {
                         opacity: active ? 1 : 0.2
                         Behavior on opacity { NumberAnimation { duration: 250 } }
                     }
+                    highlightFollowsCurrentItem: true
+                    highlightMoveDuration: 0
+                    highlightResizeDuration: 0
                     delegate: Rectangle {
                         width: sceneListView.width-1
                         height: scene && scene.heading.enabled ? 40 : 0

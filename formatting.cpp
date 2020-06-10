@@ -19,6 +19,7 @@
 
 #include <QPointer>
 #include <QMarginsF>
+#include <QSettings>
 #include <QMetaEnum>
 #include <QPdfWriter>
 #include <QTextCursor>
@@ -553,6 +554,13 @@ QHash<int, QByteArray> ScreenplayFormat::roleNames() const
 
 void ScreenplayFormat::resetToDefaults()
 {
+    QSettings *settings = Application::instance()->settings();
+    const int iPaperSize = settings->value("PageSetup/paperSize").toInt();
+    if( iPaperSize == ScreenplayPageLayout::A4 )
+        this->pageLayout()->setPaperSize(ScreenplayPageLayout::A4);
+    else
+        this->pageLayout()->setPaperSize(ScreenplayPageLayout::Letter);
+
     /**
       Here is how Final Draft formats its screenplays.
 

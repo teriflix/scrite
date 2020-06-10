@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "eventfilter.h"
+#include "application.h"
 
 #include <QEvent>
 #include <QtDebug>
@@ -109,6 +110,23 @@ void EventFilter::setEvents(const QList<int> &val)
 
     m_events = val;
     emit eventsChanged();
+}
+
+bool EventFilter::forwardEventTo(QObject *object)
+{
+    if(object == nullptr || object == m_target)
+        return false;
+
+    // We have to create a duplicate copy of the event and
+    // put it into the queue.
+    QEvent *event = this->getCurrentEvent();
+    if(event != nullptr)
+    {
+        qApp->postEvent(object, event);
+        return true;
+    }
+
+    return false;
 }
 
 inline void packIntoJson(QMouseEvent *event, QJsonObject &object)
@@ -210,13 +228,15 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
     const bool doFilter = m_events.isEmpty() || m_events.contains(event->type());
 
     if(doFilter)
-    {
+    {        
         EventFilterResult result;
 
         QJsonObject eventJson;
         eventToJson(event, eventJson);
 
+        m_currentEvent = event;
         emit filter(watched, eventJson, &result);
+        m_currentEvent = nullptr;
 
         if(result.filter())
         {
@@ -226,5 +246,38 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
     }
 
     return false;
+}
+
+QEvent *EventFilter::getCurrentEvent() const
+{
+    if(m_currentEvent == nullptr)
+        return nullptr;
+
+    // This function is called by forwardEventTo() method. This function is
+    // expected to create a clone of the current event in m_currentEvent
+    // and return a pointer to that.
+    switch(m_currentEvent->type())
+    {
+    case QEvent::MouseMove:
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick: {
+            QMouseEvent *me = static_cast<QMouseEvent*>(m_currentEvent);
+            return new QMouseEvent(me->type(), me->localPos(), me->button(), me->buttons(), me->modifiers());
+        }
+    case QEvent::Wheel: {
+        QWheelEvent *we = static_cast<QWheelEvent*>(m_currentEvent);
+        return new QWheelEvent(we->pos(), we->delta(), we->buttons(), we->modifiers(), we->orientation());
+        }
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease:{
+        QKeyEvent *ke = static_cast<QKeyEvent*>(m_currentEvent);
+        return new QKeyEvent(ke->type(), ke->key(), ke->modifiers(), ke->text(), ke->isAutoRepeat(), ushort(ke->count()));
+        }
+    default:
+        break;
+    }
+
+    return nullptr;
 }
 

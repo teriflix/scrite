@@ -71,15 +71,20 @@ public:
     QList<int> events() const { return m_events; }
     Q_SIGNAL void eventsChanged();
 
+    // Forwards the event currently being filtered
+    Q_INVOKABLE bool forwardEventTo(QObject *object);
+
     Q_SIGNAL void filter(QObject *object, const QJsonObject &event, EventFilterResult *result);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
+    QEvent *getCurrentEvent() const;
 
 private:
     bool m_active = true;
     QObject* m_target = nullptr;
     QList<int> m_events;
+    QEvent *m_currentEvent = nullptr;
 };
 
 Q_DECLARE_METATYPE(EventFilter*)
