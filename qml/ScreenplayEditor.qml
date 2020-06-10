@@ -46,6 +46,7 @@ Rectangle {
             else
                 contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
+        onSourceChanged: screenplayPreview.visible = false
     }
 
     ScreenplayTextDocument {
@@ -53,6 +54,25 @@ Rectangle {
         screenplay: screenplayAdapter.screenplay
         formatting: scriteDocument.printFormat
         syncEnabled: true
+        onUpdateFinished: screenplayImagePrinter.needsUpdate = true
+    }
+
+    ImagePrinter {
+        id: screenplayImagePrinter
+        scale: app.devicePixelRatio
+        property bool needsUpdate: false
+        onNeedsUpdateChanged: {
+            if(needsUpdate)
+                clear()
+        }
+        function update() {
+            if(needsUpdate) {
+                clear()
+                app.execLater(screenplayTextDocument, 250, function() {
+                    screenplayTextDocument.print(screenplayImagePrinter)
+                })
+            }
+        }
     }
 
     Settings {
@@ -98,9 +118,9 @@ Rectangle {
                 ToolTip.text: "Preview the screenplay in print format."
                 ToolTip.delay: 1000
                 checkable: true
-//                checked: screenplayPreview.visible
-//                down: screenplayPreview.visible
-//                onClicked: screenplayPreview.visible = checked
+                checked: screenplayPreview.visible
+                down: screenplayPreview.visible
+                onClicked: screenplayPreview.visible = checked
             }
 
             ToolButton2 {
@@ -359,7 +379,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 20
-            text: screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
+            text: "Page " + screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
         }
 
         Item {
@@ -1315,6 +1335,7 @@ Rectangle {
         clip: !sceneListPanelLoader.expanded
         width: active ? (expanded ? sceneListAreaWidth+expandCollapseButtonWidth : expandCollapseButtonWidth) : 0
         Behavior on width { NumberAnimation { duration: 250 } }
+        visible: !screenplayPreview.visible
 
         FocusTracker.window: qmlWindow
         FocusTracker.onHasFocusChanged: {
@@ -1441,21 +1462,131 @@ Rectangle {
             }
         }
     }
+
+    Loader {
+        id: screenplayPreview
+        visible: false
+        active: visible
+        anchors.fill: parent
+        anchors.margins: 2
+        anchors.topMargin: toolbar.height+1
+        sourceComponent: Rectangle {
+            color: primaryColors.c50.background
+
+            Component.onCompleted: screenplayImagePrinter.update()
+
+            Text {
+                font.pixelSize: 30
+                anchors.centerIn: parent
+                text: "Generating preview ..."
+                visible: screenplayImagePrinter.printing || (screenplayImagePrinter.pageCount == 0 && screenplayTextDocument.pageCount > 0)
+            }
+
+            Flickable {
+                id: pagesScroll
+                anchors.fill: parent
+                anchors.bottomMargin: statusBar.height
+                contentWidth: pagesViewContainer.width
+                contentHeight: pagesViewContainer.height
+                clip: true
+
+                ScrollBar.horizontal: ScrollBar {
+                    policy: pagesViewContainer.width > pagesScroll.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    minimumSize: 0.1
+                    palette {
+                        mid: Qt.rgba(0,0,0,0.25)
+                        dark: Qt.rgba(0,0,0,0.75)
+                    }
+                    opacity: active ? 1 : 0.2
+                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                }
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: pagesViewContainer.height > pagesScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    minimumSize: 0.1
+                    palette {
+                        mid: Qt.rgba(0,0,0,0.25)
+                        dark: Qt.rgba(0,0,0,0.75)
+                    }
+                    opacity: active ? 1 : 0.2
+                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                }
+
+                property int nrColumns: Math.max(Math.floor(width/pagesView.cellWidth), 1)
+                property int nrRows: Math.ceil(screenplayImagePrinter.pageCount / nrColumns)
+
+                Item {
+                    id: pagesViewContainer
+                    width: Math.max(pagesView.width, pagesScroll.width)
+                    height: pagesView.height
+
+                    GridView {
+                        id: pagesView
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: pagesScroll.nrColumns * pagesView.cellWidth
+                        height:  pagesScroll.nrRows * pagesView.cellHeight
+                        model: screenplayImagePrinter.printing ? null : screenplayImagePrinter
+                        cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + 40
+                        cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + 40
+                        interactive: false
+                        delegate: Item {
+                            width: pagesView.cellWidth
+                            height: pagesView.cellHeight
+
+                            BorderImage {
+                                source: "../icons/content/shadow.png"
+                                anchors.fill: pageImage
+                                horizontalTileMode: BorderImage.Stretch
+                                verticalTileMode: BorderImage.Stretch
+                                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                                border { left: 21; top: 21; right: 21; bottom: 21 }
+                                opacity: pagesView.currentIndex === index ? 0.55 : 0.15
+                                visible: pageImage.status === Image.Ready
+                            }
+
+                            Image {
+                                id: pageImage
+                                width: pageWidth*previewZoomSlider.value
+                                height: pageHeight*previewZoomSlider.value
+                                source: pageUrl
+                                anchors.centerIn: parent
+                                smooth: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: pagesView.currentIndex = index
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: statusBar.height
+                color: statusBar.color
+                border.width: statusBar.border.width
+                border.color: statusBar.border.color
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+                    text: "Page " + (Math.max(pagesView.currentIndex,0)+1) + " of " + pagesView.count
+                }
+
+                Slider {
+                    id: previewZoomSlider
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    width: zoomSlider.width
+                    orientation: Qt.Horizontal
+                    from: 0.5; to: 2.5; value: 1
+                }
+            }
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

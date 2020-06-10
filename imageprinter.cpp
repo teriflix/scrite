@@ -177,7 +177,17 @@ QString ImagePrinter::pageUrl(int index) const
     return "image://" + ImagePrinterImageProvider::urlNamespace() + "/" +
                         this->objectName() + "/" +
                         QString::number(this->Modifiable::modificationTime()) + "/" +
-                        QString::number(index);
+            QString::number(index);
+}
+
+void ImagePrinter::clear()
+{
+    if(m_printing)
+        return;
+
+    this->beginResetModel();
+    m_pageImages.clear();
+    this->endResetModel();
 }
 
 void ImagePrinter::setPrinting(bool val)

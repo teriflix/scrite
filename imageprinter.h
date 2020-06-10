@@ -80,6 +80,8 @@ public:
     QImage pageImageAt(int index); // this function is non-const on purpose.
     Q_INVOKABLE QString pageUrl(int index) const;
 
+    Q_INVOKABLE void clear();
+
     Q_PROPERTY(bool printing READ isPrinting WRITE setPrinting NOTIFY printingChanged)
     void setPrinting(bool val);
     bool isPrinting() const { return m_printing; }
