@@ -1467,6 +1467,7 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 5
+                            anchors.rightMargin: sceneListView.ScrollBar.vertical.width + 5
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType
