@@ -85,6 +85,7 @@ void ResetOnChange::setValue(const QVariant &val)
 
 void ResetOnChange::reset()
 {
+    emit aboutToReset();
     this->setValue(m_from);
     m_timer.start(m_delay, this);
 }
@@ -95,5 +96,6 @@ void ResetOnChange::timerEvent(QTimerEvent *te)
     {
         m_timer.stop();
         this->setValue(m_to);
+        emit justReset();
     }
 }

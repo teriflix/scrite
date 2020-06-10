@@ -51,6 +51,10 @@ public:
 
     Q_INVOKABLE void resetNow();
 
+signals:
+    void aboutToReset();
+    void justReset();
+
 private:
     void setValue(const QVariant &val);
     void reset();

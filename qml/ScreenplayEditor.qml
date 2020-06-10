@@ -168,7 +168,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             allowReplace: true
             width: toolbar.width * 0.6
-//            enabled: !screenplayPreview.active
+            enabled: !screenplayPreview.active
 
             Repeater {
                 id: searchAgents
@@ -281,10 +281,22 @@ Rectangle {
                 clip: true
                 color: screenplayAdapter.elementCount > 0 ? "white" : Qt.rgba(0,0,0,0)
 
+                ResetOnChange {
+                    id: contentViewModel
+                    trackChangesOn: screenplayEditorSettings.displaySceneCharacters
+                    from: null
+                    to: screenplayAdapter
+                    onJustReset: {
+                        app.execLater(contentView, 100, function() {
+                            contentView.positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
+                        })
+                    }
+                }
+
                 ListView {
                     id: contentView
                     anchors.fill: parent
-                    model: screenplayAdapter
+                    model: contentViewModel.value
                     delegate: Loader {
                         width: contentView.width
                         property var componentData: modelData
@@ -1093,6 +1105,7 @@ Rectangle {
                     width: parent.width
                     readonly property bool editorHasActiveFocus: headingItem.sceneHasFocus
                     property Scene scene: headingItem.theScene
+                    active: screenplayEditorSettings.displaySceneCharacters
                     sourceComponent: sceneCharactersList
                 }
             }
