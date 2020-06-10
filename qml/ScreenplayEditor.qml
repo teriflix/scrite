@@ -284,6 +284,10 @@ Rectangle {
                         height: ruler.bottomMarginPx
                     }
 
+                    FocusTracker.window: qmlWindow
+                    FocusTracker.indicator.target: mainUndoStack
+                    FocusTracker.indicator.property: "screenplayEditorActive"
+
                     Component.onCompleted: positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
 
                     property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+1), 0) : 0
@@ -591,10 +595,6 @@ Rectangle {
                         contentItem.theScene.undoRedoEnabled = activeFocus
                     }
 
-                    FocusTracker.window: qmlWindow
-                    FocusTracker.indicator.target: mainUndoStack
-                    FocusTracker.indicator.property: "screenplayEditorActive"
-
                     onCursorRectangleChanged: {
                         if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/)
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
@@ -684,7 +684,7 @@ Rectangle {
                                     text: "Split Scene"
                                     enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && screenplayAdapter.isSourceScreenplay
                                     onClicked: {
-                                        screenplayAdapter.splitElement(screenplayAdapter.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                                        contentItem.splitScene()
                                         editorContextMenu.close()
                                     }
                                 }
@@ -864,7 +864,7 @@ Rectangle {
                     // Double enter menu and split-scene handling.
                     Keys.onReturnPressed: {
                         if(event.modifiers & Qt.ControlModifier) {
-                            screenplayAdapter.splitElement(screenplayAdapter.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                            contentItem.splitScene()
                             event.accepted = true
                             return
                         }
@@ -964,6 +964,16 @@ Rectangle {
             function assumeFocus() {
                 if(!sceneTextEditor.activeFocus)
                     sceneTextEditor.forceActiveFocus()
+            }
+
+            function splitScene() {
+                var newElement = screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                if(newElement !== null) {
+                    app.execLater(contentItem, 100, function() {
+                        var delegate = contentView.itemAtIndex(contentItem.theIndex+1)
+                        delegate.item.assumeFocus()
+                    })
+                }
             }
 
             function assumeFocusAt(pos) {
@@ -1109,9 +1119,9 @@ Rectangle {
 
             signal editingFinished()
 
-            FocusTracker.window: qmlWindow
-            FocusTracker.onHasFocusChanged: {
-                if(!FocusTracker.hasFocus)
+            property bool hasFocus: locTypeEdit.activeFocus || locEdit.activeFocus || momentEdit.activeFocus
+            onHasFocusChanged: {
+                if(!hasFocus)
                     editingFinished()
             }
 

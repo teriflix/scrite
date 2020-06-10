@@ -865,7 +865,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
         }
     }
 
-    if(ret != nullptr)
+    if(ret != nullptr && UndoStack::active() != nullptr)
     {
         undoCommand->commit(ret->scene());
         undoCommand.take();
