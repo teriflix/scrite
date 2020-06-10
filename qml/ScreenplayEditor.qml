@@ -62,6 +62,19 @@ Rectangle {
         property bool displaySceneCharacters: true
     }
 
+    // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
+    Connections {
+        target: screenplayAdapter.isSourceScreenplay ? scriteDocument : null
+        ignoreUnknownSignals: true
+        onNewSceneCreated: {
+            app.execLater(screenplayAdapter.screenplay, 100, function() {
+                contentView.positionViewAtIndex(screenplayIndex, ListView.Visible)
+                var delegate = contentView.itemAtIndex(screenplayIndex)
+                delegate.item.assumeFocus()
+            })
+        }
+    }
+
     Rectangle {
         id: toolbar
         anchors.top: parent.top
@@ -583,7 +596,7 @@ Rectangle {
                     FocusTracker.indicator.property: "screenplayEditorActive"
 
                     onCursorRectangleChanged: {
-                        if(activeFocus && contentView.isVisible(contentItem.theIndex))
+                        if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/)
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                     }
 
@@ -943,16 +956,6 @@ Rectangle {
                                 textDocumentSearch.replace(replacementText)
                                 contentItem.theScene.endUndoCapture()
                             }
-                        }
-                    }
-
-                    // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
-                    Connections {
-                        target: screenplayAdapter.isSourceScreenplay ? scriteDocument : null
-                        ignoreUnknownSignals: true
-                        onNewSceneCreated: {
-                            if(screenplayIndex === index)
-                                sceneTextEditor.forceActiveFocus()
                         }
                     }
                 }
