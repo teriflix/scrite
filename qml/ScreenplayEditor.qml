@@ -1369,7 +1369,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.topMargin: 5
         anchors.bottomMargin: statusBar.height
-        active: screenplayAdapter.isSourceScreenplay && screenplayAdapter.elementCount > 1 && globalSceneEditorToolbar.editInFullscreen && !scriteDocument.loading
+        active: screenplayAdapter.isSourceScreenplay && globalSceneEditorToolbar.editInFullscreen && !scriteDocument.loading
         property bool expanded: false
         readonly property int expandCollapseButtonWidth: 25
         readonly property int sceneListAreaWidth: 400
@@ -1410,6 +1410,18 @@ Rectangle {
                 Behavior on opacity {  NumberAnimation { duration: 250 } }
                 visible: opacity > 0
 
+                Text {
+                    width: sceneListView.width * 0.9
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: 16
+                    text: "Scene headings will be listed here as you add them into your screenplay."
+                    anchors.horizontalCenter: sceneListView.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: 50
+                    visible: screenplayAdapter.elementCount === 0
+                }
+
                 ListView {
                     id: sceneListView
                     anchors.fill: parent
@@ -1435,7 +1447,7 @@ Rectangle {
                     highlightResizeDuration: 0
                     delegate: Rectangle {
                         width: sceneListView.width-1
-                        height: scene && scene.heading.enabled ? 40 : 0
+                        height: 40
                         color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF")) : Qt.rgba(0,0,0,0)
 
                         Text {
@@ -1443,14 +1455,23 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.margins: 5
                             anchors.verticalCenter: parent.verticalCenter
-                            font.bold: screenplayAdapter.currentIndex === index
-                            font.pixelSize: 14
-                            text: "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
+                            font.family: "Courier Prime"
+                            font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType
+                            font.pixelSize: screenplayElementType === ScreenplayElement.BreakElementType ? 16 : 14
+                            font.letterSpacing: screenplayElementType === ScreenplayElement.BreakElementType ? 3 : 0
+                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignHCenter : Qt.AlignLeft
+                            color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                            text: {
+                                if(scene && scene.heading.enabled)
+                                    return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
+                                return screenplayElement.sceneID
+                            }
                             elide: Text.ElideMiddle
                         }
 
                         MouseArea {
                             anchors.fill: parent
+                            enabled: scene && scene.heading.enabled
                             onClicked: navigateToScene()
                             onDoubleClicked: {
                                 navigateToScene()
