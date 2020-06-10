@@ -576,7 +576,12 @@ Rectangle {
                         if(item) {
                             item.theScene = contentItem.theScene
                             item.theElement = contentItem.theElement
+                            item.sceneTextEditor = sceneTextEditor
                         }
+                    }
+                    function edit() {
+                        if(item)
+                            item.edit()
                     }
                 }
 
@@ -801,6 +806,7 @@ Rectangle {
                         MenuLoader {
                             id: doubleEnterMenu
                             anchors.bottom: parent.bottom
+                            property Scene currentScene: contentItem.theScene
                             menu: Menu2 {
                                 width: 200
                                 onAboutToShow: sceneTextEditor.persistentSelection = true
@@ -863,9 +869,9 @@ Rectangle {
                                     onClicked: handle()
 
                                     function handle() {
-                                        if(contentItem.theScene.headingenabled === false)
-                                            contentItem.theScene.headingenabled = true
-                                        sceneHeadingLoader.viewOnly = false
+                                        if(currentScene.heading.enabled === false)
+                                            currentScene.heading.enabled = true
+                                        sceneHeadingAreaLoader.edit()
                                         doubleEnterMenu.close()
                                     }
                                 }
@@ -897,10 +903,10 @@ Rectangle {
                                     id: newSceneMenuItem
                                     text: "&New Scene (N)"
                                     onClicked: handle()
-                                    enabled: allowSplitSceneRequest
+                                    enabled: screenplayAdapter.isSourceScreenplay
 
                                     function handle() {
-                                        contentItem.theScene.removeLastElementIfEmpty()
+                                        currentScene.removeLastElementIfEmpty()
                                         scriteDocument.createNewScene()
                                         doubleEnterMenu.close()
                                     }
@@ -1081,6 +1087,12 @@ Rectangle {
             property Scene theScene
             property bool sceneHasFocus: false
             property ScreenplayElement theElement
+            property TextArea sceneTextEditor
+
+            function edit() {
+                if(theScene.heading.enabled)
+                    sceneHeadingLoader.viewOnly = false
+            }
 
             height: sceneHeadingLayout.height + 16
             color: Qt.tint(theScene.color, "#E7FFFFFF")
@@ -1114,6 +1126,7 @@ Rectangle {
                     height: item ? item.contentHeight : headingFontMetrics.lineSpacing
                     property bool viewOnly: true
                     property SceneHeading sceneHeading: headingItem.theScene.heading
+                    property TextArea sceneTextEditor: headingItem.sceneTextEditor
                     sourceComponent: {
                         if(sceneHeading.enabled)
                             return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
@@ -1236,7 +1249,7 @@ Rectangle {
                     text: sceneHeading.moment
                     completionStrings: scriteDocument.structure.standardMoments()
                     onEditingComplete: sceneHeading.moment = text
-                    tabItem: sceneContentEditor
+                    tabItem: sceneTextEditor
                 }
             }
         }
