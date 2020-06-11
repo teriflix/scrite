@@ -149,6 +149,11 @@ public:
     bool hasActiveFocus() const { return m_hasActiveFocus; }
     Q_SIGNAL void hasActiveFocusChanged();
 
+    Q_PROPERTY(bool transliterateCurrentWordOnly READ isTransliterateCurrentWordOnly WRITE setTransliterateCurrentWordOnly NOTIFY transliterateCurrentWordOnlyChanged)
+    void setTransliterateCurrentWordOnly(bool val);
+    bool isTransliterateCurrentWordOnly() const { return m_transliterateCurrentWordOnly; }
+    Q_SIGNAL void transliterateCurrentWordOnlyChanged();
+
     Q_INVOKABLE void enableFromNextWord() { m_enableFromNextWord = true; }
 
     enum Mode
@@ -184,6 +189,7 @@ private:
     Mode m_mode = AutomaticMode;
     int m_cursorPosition = -1;
     bool m_hasActiveFocus = false;
+    bool m_transliterateCurrentWordOnly = true;
     QQuickTextDocument* m_textDocument = nullptr;
 };
 Q_DECLARE_METATYPE(Transliterator*)

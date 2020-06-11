@@ -158,6 +158,9 @@ private:
     void onTextFrameDestroyed(QObject *object);
     void clearTextFrames();
 
+    void addToSceneResetList(Scene *scene);
+    void processSceneResetList();
+
 private:
     int m_pageCount = 0;
     bool m_updating = false;
@@ -170,6 +173,8 @@ private:
     Screenplay* m_screenplay = nullptr;
     QTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_formatting = nullptr;
+    SimpleTimer m_sceneResetTimer;
+    QList<Scene*> m_sceneResetList;
     SimpleTimer m_loadScreenplayTimer;
     SimpleTimer m_pageBoundaryEvalTimer;
     QTextFrameFormat m_sceneFrameFormat;

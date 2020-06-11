@@ -155,10 +155,11 @@ public:
     ~TimeProfiler() { }
 
     QString context() const { return QString(); }
-    cdnTimeProfile profile(bool=false) const { return cdnTimeProfile(); }
+    TimeProfile profile(bool=false) const { return TimeProfile(); }
 };
 
 #define PROFILE_THIS_FUNCTION
+#define PROFILE_THIS_FUNCTION2
 
 #endif // #ifdef ENABLE_TIME_PROFILING
 

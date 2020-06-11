@@ -40,6 +40,10 @@ Rectangle {
         id: screenplayAdapter
         source: scriteDocument.loading ? null : scriteDocument.screenplay
         onCurrentIndexChanged: {
+            if(currentIndex < 0) {
+                contentView.positionViewAtBeginning()
+                return
+            }
             if(mainUndoStack.screenplayEditorActive)
                 app.execLater(contentView, 100, function() {
                     contentView.scrollIntoView(currentIndex)
@@ -55,29 +59,6 @@ Rectangle {
         screenplay: screenplayAdapter.screenplay
         formatting: scriteDocument.printFormat
         syncEnabled: true
-        onUpdateScheduled: screenplayImagePrinter.needsUpdate = true
-        onUpdateFinished: {
-            if(screenplayPreview.visible)
-                screenplayImagePrinter.update()
-        }
-    }
-
-    ImagePrinter {
-        id: screenplayImagePrinter
-        scale: app.devicePixelRatio
-        property bool needsUpdate: false
-        onNeedsUpdateChanged: {
-            if(needsUpdate)
-                clear()
-        }
-        function update() {
-            if(needsUpdate) {
-                clear()
-                app.execLater(screenplayTextDocument, 250, function() {
-                    screenplayTextDocument.print(screenplayImagePrinter)
-                })
-            }
-        }
     }
 
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
@@ -216,7 +197,7 @@ Rectangle {
 
                 ResetOnChange {
                     id: contentViewModel
-                    trackChangesOn: screenplayEditorSettings.displaySceneCharacters
+                    trackChangesOn: screenplayEditorSettings.displaySceneCharacters && scriteDocument.loading
                     from: null
                     to: screenplayAdapter
                     onJustReset: {
@@ -1541,13 +1522,22 @@ Rectangle {
         sourceComponent: Rectangle {
             color: primaryColors.windowColor
 
-            Component.onCompleted: screenplayImagePrinter.update()
+            Component.onCompleted: {
+                app.execLater(screenplayTextDocument, 250, function() {
+                    screenplayTextDocument.print(screenplayImagePrinter)
+                })
+            }
+
+            ImagePrinter {
+                id: screenplayImagePrinter
+                scale: app.devicePixelRatio
+            }
 
             Text {
                 font.pixelSize: 30
                 anchors.centerIn: parent
                 text: "Generating preview ..."
-                visible: screenplayImagePrinter.printing || (screenplayImagePrinter.pageCount == 0 && screenplayTextDocument.pageCount > 0)
+                visible: screenplayImagePrinter.printing || (screenplayImagePrinter.pageCount === 0 && screenplayTextDocument.pageCount > 0)
             }
 
             Flickable {

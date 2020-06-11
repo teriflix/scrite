@@ -777,6 +777,9 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
     cursor.removeSelectedText();
     this->removeTextFrame(element);
 
+    if(m_sceneResetList.removeOne(scene))
+        m_sceneResetTimer.start(100, this);
+
     this->disconnectFromSceneSignals(scene);
 }
 
@@ -816,24 +819,7 @@ void ScreenplayTextDocument::onSceneReset()
     if(scene == nullptr)
         return;
 
-    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating while new scene was reset or refreshed.");
-
-    ScreenplayTextDocumentUpdate update(this);
-
-    QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
-    Q_FOREACH(ScreenplayElement *element, elements)
-    {
-        QTextFrame *frame = this->findTextFrame(element);
-        Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
-
-        QTextCursor cursor = frame->firstCursorPosition();
-        cursor.setPosition(frame->lastPosition(), QTextCursor::KeepAnchor);
-        cursor.removeSelectedText();
-        this->loadScreenplayElement(element, cursor);
-    }
-
-    disconnect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset);
-    this->connectToSceneSignals(scene);
+    this->addToSceneResetList(scene);
 }
 
 void ScreenplayTextDocument::onSceneRefreshed()
@@ -1284,6 +1270,46 @@ void ScreenplayTextDocument::clearTextFrames()
     Q_FOREACH(QObject *textFrame, textFrames)
         disconnect(textFrame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
     m_frameElementMap.clear();
+}
+
+void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
+{
+    if(!m_sceneResetList.contains(scene))
+        m_sceneResetList.append(scene);
+    m_sceneResetTimer.start(100, this);
+}
+
+void ScreenplayTextDocument::processSceneResetList()
+{
+    if(m_sceneResetList.isEmpty())
+        return;
+
+    ScreenplayTextDocumentUpdate update(this);
+
+    QList<Scene*> scenes = m_sceneResetList;
+    m_sceneResetList.clear();
+
+    while(!scenes.isEmpty())
+    {
+        Scene *scene = scenes.takeFirst();
+
+        QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
+        Q_FOREACH(ScreenplayElement *element, elements)
+        {
+            QTextFrame *frame = this->findTextFrame(element);
+            Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
+
+            QTextCursor cursor = frame->firstCursorPosition();
+            cursor.setPosition(frame->lastPosition(), QTextCursor::KeepAnchor);
+            cursor.removeSelectedText();
+            this->loadScreenplayElement(element, cursor);
+        }
+
+        disconnect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset);
+        this->connectToSceneSignals(scene);
+    }
+
+    this->evaluatePageBoundariesLater();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

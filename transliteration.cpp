@@ -675,6 +675,15 @@ void Transliterator::setHasActiveFocus(bool val)
     emit hasActiveFocusChanged();
 }
 
+void Transliterator::setTransliterateCurrentWordOnly(bool val)
+{
+    if(m_transliterateCurrentWordOnly == val)
+        return;
+
+    m_transliterateCurrentWordOnly = val;
+    emit transliterateCurrentWordOnlyChanged();
+}
+
 void Transliterator::setMode(Transliterator::Mode val)
 {
     if(m_mode == val)
@@ -772,7 +781,7 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
             return;
         }
     }
-    else
+    else if(!m_transliterateCurrentWordOnly)
     {
         // Transliterate all the words that was just added.
         this->transliterate(cursor);
