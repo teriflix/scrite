@@ -15,6 +15,7 @@
 #include "application.h"
 #include "imageprinter.h"
 #include "timeprofiler.h"
+#include "timeprofiler.h"
 #include "garbagecollector.h"
 #include "screenplaytextdocument.h"
 
@@ -433,7 +434,12 @@ void ScreenplayTextDocument::loadScreenplay()
     {
         SceneNumberTextObjectInterface *toi = m_textDocument->findChild<SceneNumberTextObjectInterface*>();
         if(toi == nullptr)
-            m_textDocument->documentLayout()->registerHandler(SceneNumberObject, new SceneNumberTextObjectInterface(m_textDocument));
+        {
+            toi = new SceneNumberTextObjectInterface(m_textDocument);
+            m_textDocument->documentLayout()->registerHandler(SceneNumberObject, toi);
+        }
+
+        toi->resetIntrinsicSize();
     }
 
     const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
@@ -1371,10 +1377,14 @@ QSizeF SceneNumberTextObjectInterface::intrinsicSize(QTextDocument *doc, int pos
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
-    const QFontMetricsF fontMetrics(font);
+    if(!m_intrinsicSize.isValid())
+    {
+        const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+        const QFontMetricsF fontMetrics(font);
+        m_intrinsicSize = QSizeF(0, fontMetrics.lineSpacing());
+    }
 
-    return QSizeF(0, fontMetrics.lineSpacing());
+    return m_intrinsicSize;
 }
 
 Q_DECL_IMPORT int qt_defaultDpi();

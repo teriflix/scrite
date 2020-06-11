@@ -225,9 +225,14 @@ public:
     SceneNumberTextObjectInterface(QObject *parent=nullptr);
     ~SceneNumberTextObjectInterface();
 
+    void resetIntrinsicSize() { m_intrinsicSize = QSizeF(); }
+
     // QTextObjectInterface interface
     QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+
+private:
+    QSizeF m_intrinsicSize;
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H

@@ -923,7 +923,7 @@ Item {
             mode = launchMode
 
             if(filePath)
-                processFile(filePath)
+                app.execLater(qmlWindow, 250, function() { processFile(filePath) } )
             else {
                 var modeInfo = modes[mode]
                 if(modeInfo["reset"] === true) {

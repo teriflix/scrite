@@ -1377,7 +1377,7 @@ Rectangle {
         readonly property int expandCollapseButtonWidth: 25
         readonly property int sceneListAreaWidth: 400
         clip: !sceneListPanelLoader.expanded
-        width: active ? (expanded ? sceneListAreaWidth+expandCollapseButtonWidth : expandCollapseButtonWidth) : 0
+        width: active ? (expanded ? sceneListAreaWidth : expandCollapseButtonWidth) : 0
         Behavior on width { NumberAnimation { duration: 250 } }
         visible: !screenplayPreview.visible
 
