@@ -15,13 +15,14 @@
 #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
-#include <QtDebug>
 #include <QDate>
 #include <QTime>
+#include <QtDebug>
 #include <QPainter>
 #include <QDateTime>
 #include <QSettings>
 #include <QTextBlock>
+#include <QPaintEngine>
 #include <QAbstractTextDocumentLayout>
 
 HeaderFooter::HeaderFooter(Type type, QObject *parent)
@@ -168,6 +169,7 @@ void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCo
     {
         if(m_columns.at(i).content.isEmpty())
             continue;
+
         paint->save();
         paint->setOpacity(m_opacity);
         paint->setFont(m_font);
@@ -519,13 +521,18 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     m_progressReport->setProgressStep(1/qreal(doc->pageCount()+1));
     int pageNr = fromPageNr;
 
+    const bool isPdfDevice = printer->paintEngine()->type() == QPaintEngine::Pdf;
+
     // Print away!
     while (pageNr <= toPageNr)
     {
-        this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
+        if(isPdfDevice)
+            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
 
         painter.save();
         painter.scale(contentScale.first, contentScale.second);
+        if(!isPdfDevice)
+            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
         this->printPageContents(pageNr, toPageNr, &painter, doc, body);
         painter.restore();
 

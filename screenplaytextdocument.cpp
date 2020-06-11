@@ -19,17 +19,22 @@
 #include "screenplaytextdocument.h"
 
 #include <QDate>
+#include <QPainter>
 #include <QDateTime>
 #include <QQmlEngine>
 #include <QTextBlock>
 #include <QPdfWriter>
+#include <QTextTable>
 #include <QTextCursor>
+#include <QPaintEngine>
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
 #include <QTextBlockUserData>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
-#include <QTextTable>
+
+const int SceneNumberObject = QTextFormat::UserObject+1;
+const int SceneNumberProperty = QTextFormat::UserProperty+1;
 
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
@@ -188,6 +193,17 @@ void ScreenplayTextDocument::setTitlePage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setSceneNumbers(bool val)
+{
+    if(m_sceneNumbers == val)
+        return;
+
+    m_sceneNumbers = val;
+    emit sceneNumbersChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSyncEnabled(bool val)
 {
     if(m_syncEnabled == val)
@@ -218,58 +234,35 @@ void ScreenplayTextDocument::print(QObject *printerObject)
     if(m_textDocument == nullptr || m_screenplay == nullptr || m_formatting == nullptr)
         return;
 
+    if(m_loadScreenplayTimer.isActive())
+        this->syncNow();
+
     QPagedPaintDevice *printer = nullptr;
 
     QPdfWriter *pdfWriter = qobject_cast<QPdfWriter*>(printerObject);
     if(pdfWriter)
+    {
         printer = pdfWriter;
+
+        pdfWriter->setTitle(m_screenplay->title());
+        pdfWriter->setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
+    }
 
     ImagePrinter *imagePrinter = qobject_cast<ImagePrinter*>(printerObject);
     if(imagePrinter)
-    {
         printer = imagePrinter;
-
-        QMap<HeaderFooter::Field,QString> fieldMap;
-        fieldMap[HeaderFooter::AppName] = Application::instance()->applicationName();
-        fieldMap[HeaderFooter::AppVersion] = Application::instance()->applicationVersion();
-        fieldMap[HeaderFooter::Title] = m_screenplay->title();
-        fieldMap[HeaderFooter::Subtitle] = m_screenplay->subtitle();
-        fieldMap[HeaderFooter::Author] = m_screenplay->author();
-        fieldMap[HeaderFooter::Contact] = m_screenplay->contact();
-        fieldMap[HeaderFooter::Version] = m_screenplay->version();
-        fieldMap[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
-        fieldMap[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
-        fieldMap[HeaderFooter::DateTime] = QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
-        fieldMap[HeaderFooter::PageNumber] = QString::number(m_textDocument->pageCount()) + ".  ";
-        fieldMap[HeaderFooter::PageNumberOfCount] = QString::number(m_textDocument->pageCount()) + "/" + QString::number(m_textDocument->pageCount()) + "  ";
-
-        imagePrinter->header()->setFont(m_textDocument->defaultFont());
-        imagePrinter->footer()->setFont(m_textDocument->defaultFont());
-        imagePrinter->setHeaderFooterFields(fieldMap);
-    }
 
     if(printer)
     {
-        if(pdfWriter)
-        {
-            switch(m_formatting->pageLayout()->paperSize())
-            {
-            case ScreenplayPageLayout::A4:
-                printer->setPageSize(QPageSize(QPageSize::A4));
-                break;
-            case ScreenplayPageLayout::Letter:
-                printer->setPageSize(QPageSize(QPageSize::Letter));
-                break;
-            }
-        }
-        else
-            m_formatting->pageLayout()->configure(printer);
-
-        m_textDocument->print(printer);
+        m_formatting->pageLayout()->configure(printer);
+        printer->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
     }
 
-    if(imagePrinter)
-        imagePrinter->clearHeaderFooterFields();
+    QTextDocumentPagedPrinter docPrinter;
+    docPrinter.header()->setVisibleFromPageOne(!m_titlePage);
+    docPrinter.footer()->setVisibleFromPageOne(!m_titlePage);
+    docPrinter.watermark()->setVisibleFromPageOne(!m_titlePage);
+    docPrinter.print(m_textDocument, printer);
 }
 
 QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *element) const
@@ -436,6 +429,15 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
 
+    if(m_sceneNumbers)
+    {
+        SceneNumberTextObjectInterface *toi = m_textDocument->findChild<SceneNumberTextObjectInterface*>();
+        if(toi == nullptr)
+            m_textDocument->documentLayout()->registerHandler(SceneNumberObject, new SceneNumberTextObjectInterface(m_textDocument));
+    }
+
+    const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
+
     // So that QTextDocumentPrinter can pick up this for header and footer fields.
     m_textDocument->setProperty("#title", m_screenplay->title());
     m_textDocument->setProperty("#subtitle", m_screenplay->subtitle());
@@ -582,6 +584,8 @@ void ScreenplayTextDocument::loadScreenplay()
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
+        if(element->elementType() != ScreenplayElement::SceneElementType)
+            continue;
 
         QTextFrameFormat frameFormat = m_sceneFrameFormat;
         const Scene *scene = element->scene();
@@ -1176,6 +1180,16 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(nullptr));
+
+            if(m_sceneNumbers)
+            {
+                QTextCharFormat sceneNumberFormat;
+                sceneNumberFormat.setObjectType(SceneNumberObject);
+                sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
+                sceneNumberFormat.setProperty(SceneNumberProperty, element->sceneNumber());
+                cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
+            }
+
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
             cursor.insertText(heading->text());
             insertBlock = true;
@@ -1338,3 +1352,64 @@ void ScreenplayElementPageBreaks::setPageBreaks(const QVariantList &val)
     m_pageBreaks = val;
     emit pageBreaksChanged();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+SceneNumberTextObjectInterface::SceneNumberTextObjectInterface(QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+SceneNumberTextObjectInterface::~SceneNumberTextObjectInterface()
+{
+
+}
+
+QSizeF SceneNumberTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+
+    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+    const QFontMetricsF fontMetrics(font);
+
+    return QSizeF(0, fontMetrics.lineSpacing());
+}
+
+Q_DECL_IMPORT int qt_defaultDpi();
+
+void SceneNumberTextObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+
+    const int sceneNumber = format.property(SceneNumberProperty).toInt();
+    if(sceneNumber < 0)
+        return;
+
+    const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
+
+    QRectF rect = givenRect;
+    rect.setLeft( rect.left()/2 );
+
+    const QString sceneNumberText = QString::number(sceneNumber) + QStringLiteral(".");
+    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+    painter->setFont(font);
+
+    if(isPdfDevice)
+    {
+        const qreal invScaleX = qreal(qt_defaultDpi()) / painter->device()->logicalDpiX();
+        const qreal invScaleY = qreal(qt_defaultDpi()) / painter->device()->logicalDpiY();
+
+        painter->save();
+        painter->translate(rect.left(), rect.bottom());
+        painter->scale(invScaleX, invScaleY);
+        painter->drawText(0, 0, sceneNumberText);
+        painter->restore();
+    }
+    else
+        painter->drawText(rect.bottomLeft(), sceneNumberText);
+}
+
+

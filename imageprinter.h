@@ -37,19 +37,6 @@ public:
     ~ImagePrinter();
     Q_SIGNAL void aboutToDelete(ImagePrinter *ptr);
 
-    Q_PROPERTY(HeaderFooter* header READ header CONSTANT)
-    HeaderFooter* header() const { return m_header; }
-
-    Q_PROPERTY(HeaderFooter* footer READ footer CONSTANT)
-    HeaderFooter* footer() const { return m_footer; }
-
-    Q_PROPERTY(Watermark* watermark READ watermark CONSTANT)
-    Watermark *watermark() const { return m_watermark; }
-
-    void setHeaderFooterFields(const QMap<HeaderFooter::Field,QString> &fields) { m_headerFooterFields = fields; }
-    void clearHeaderFooterFields() { m_headerFooterFields.clear(); }
-    QMap<HeaderFooter::Field,QString> headerFooterFields() const { return m_headerFooterFields; }
-
     Q_PROPERTY(QString directory READ directory WRITE setDirectory NOTIFY directoryChanged)
     void setDirectory(const QString &val);
     QString directory() const { return m_directory; }
@@ -132,11 +119,6 @@ private:
     QReadWriteLock m_pageImagesLock;
     mutable QImage m_templatePageImage;
     mutable ImagePrinterEngine *m_engine = nullptr;
-
-    HeaderFooter* m_header = new HeaderFooter(HeaderFooter::Header, this);
-    HeaderFooter* m_footer = new HeaderFooter(HeaderFooter::Footer, this);
-    Watermark *m_watermark = new Watermark(this);
-    QMap<HeaderFooter::Field,QString> m_headerFooterFields;
 };
 
 #endif // PRINTTOIMAGE_H

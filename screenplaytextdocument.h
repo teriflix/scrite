@@ -17,6 +17,7 @@
 #include <QTextDocument>
 #include <QQmlParserStatus>
 #include <QPagedPaintDevice>
+#include <QAbstractTextDocumentLayout>
 
 #include "scene.h"
 #include "formatting.h"
@@ -54,6 +55,11 @@ public:
     void setTitlePage(bool val);
     bool hasTitlePage() const { return m_titlePage; }
     Q_SIGNAL void titlePageChanged();
+
+    Q_PROPERTY(bool sceneNumbers READ hasSceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
+    void setSceneNumbers(bool val);
+    bool hasSceneNumbers() const { return m_sceneNumbers; }
+    Q_SIGNAL void sceneNumbersChanged();
 
     Q_PROPERTY(bool syncEnabled READ isSyncEnabled WRITE setSyncEnabled NOTIFY syncEnabledChanged)
     void setSyncEnabled(bool val);
@@ -158,6 +164,7 @@ private:
     bool m_titlePage = false;
     int m_currentPage = 0;
     bool m_syncEnabled = true;
+    bool m_sceneNumbers = true;
     Scene *m_activeScene = nullptr;
     bool m_componentComplete = true;
     Screenplay* m_screenplay = nullptr;
@@ -207,6 +214,20 @@ private:
     QVariantList m_pageBreaks;
     ScreenplayElement* m_screenplayElement = nullptr;
     ScreenplayTextDocument* m_screenplayDocument = nullptr;
+};
+
+class SceneNumberTextObjectInterface : public QObject, public QTextObjectInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(QTextObjectInterface)
+
+public:
+    SceneNumberTextObjectInterface(QObject *parent=nullptr);
+    ~SceneNumberTextObjectInterface();
+
+    // QTextObjectInterface interface
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H

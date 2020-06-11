@@ -40,6 +40,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
 
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(true);
+    stDoc.setSceneNumbers(true);
     stDoc.setScreenplay(this->document()->screenplay());
     stDoc.setFormatting(this->document()->printFormat());
     stDoc.setTextDocument(textDoc);

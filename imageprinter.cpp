@@ -120,8 +120,6 @@ ImagePrinter::ImagePrinter(QObject *parent)
 
     this->setObjectName( QStringLiteral("imagePrinter") );
     connect(this, &QObject::objectNameChanged, this, &ImagePrinter::pagesChanged); // because all pageUrls will change
-
-    QTextDocumentPagedPrinter::loadSettings(m_header, m_footer, m_watermark);
 }
 
 ImagePrinter::~ImagePrinter()
@@ -538,26 +536,6 @@ bool ImagePrinterEngine::begin(QPaintDevice *pdev)
     m_pagePainter = new QPainter(&m_pageImage);
     m_pageTransform = QTransform();
 
-    const QRect paperRect = pageLayout.fullRectPixels(int(resolution));
-    const QRect paintRect = pageLayout.paintRectPixels(int(resolution));
-    const qreal hfmargin = 0.5 * (resolution);
-
-    m_headerRect = paperRect;
-    m_headerRect.setBottom(paintRect.top());
-    m_headerRect.adjust(hfmargin, 0, -hfmargin, 0);
-
-    m_footerRect = paperRect;
-    m_footerRect.setTop(paintRect.bottom());
-    m_footerRect.adjust(hfmargin, 0, -hfmargin, 0);
-
-    m_watermarkRect = paintRect;
-
-    m_currentDevice->header()->setVisibleFromPageOne(true);
-    m_currentDevice->footer()->setVisibleFromPageOne(true);
-    m_currentDevice->watermark()->setVisibleFromPageOne(true);
-    m_currentDevice->header()->prepare(m_currentDevice->headerFooterFields(), m_headerRect, pdev);
-    m_currentDevice->footer()->prepare(m_currentDevice->headerFooterFields(), m_footerRect, pdev);
-
     return true;
 }
 
@@ -861,10 +839,6 @@ void ImagePrinterEngine::paintHeaderFooterWatermark()
     {
         m_pagePainter->setTransform(QTransform());
         m_pagePainter->setClipping(false);
-
-        m_currentDevice->header()->paint(m_pagePainter, m_headerRect, m_pageNumber, -1);
-        m_currentDevice->footer()->paint(m_pagePainter, m_footerRect, m_pageNumber, -1);
-        m_currentDevice->watermark()->paint(m_pagePainter, m_watermarkRect, m_pageNumber, -1);
     }
 
     m_printedPageImage = m_pageImage;

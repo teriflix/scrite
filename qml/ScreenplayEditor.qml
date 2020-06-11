@@ -574,8 +574,8 @@ Rectangle {
                                 height: 3
                                 renderingMechanism: PainterPathItem.UseQPainter
                                 renderType: PainterPathItem.OutlineOnly
-                                outlineColor: primaryColors.a700.background
-                                outlineStyle: PainterPathItem.DashDotLine
+                                outlineColor: primaryColors.windowColor
+                                outlineStyle: PainterPathItem.SolidLine
                                 outlineWidth: 1
 
                                 painterPath: PainterPath {
