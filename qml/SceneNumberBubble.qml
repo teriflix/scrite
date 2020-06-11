@@ -33,12 +33,12 @@ PainterPathItem {
 
     renderType: PainterPathItem.OutlineAndFill
     fillColor: colors.background
-    outlineWidth: 2
-    outlineColor: colors.text
+    outlineWidth: 1
+    outlineColor: colors.background
 
     painterPath: PainterPath {
         id: bubblePath
-        property real  arrowSize: sceneNumberText.height/2
+        property real  arrowSize: sceneNumberText.height/4
         property point p1: Qt.point(itemRect.left, itemRect.top)
         property point p2: Qt.point(itemRect.right, itemRect.top)
         property point p3: Qt.point(itemRect.right, itemRect.center.y - arrowSize)

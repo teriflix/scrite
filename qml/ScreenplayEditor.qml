@@ -55,7 +55,6 @@ Rectangle {
         screenplay: screenplayAdapter.screenplay
         formatting: scriteDocument.printFormat
         syncEnabled: true
-        // sceneNumbers: false
         onUpdateScheduled: screenplayImagePrinter.needsUpdate = true
         onUpdateFinished: {
             if(screenplayPreview.visible)

@@ -139,6 +139,7 @@ void SceneElementFormat::setTextAlignment(Qt::Alignment val)
 
     m_textAlignment = val;
     emit textAlignmentChanged();
+    emit elementFormatChanged();
 }
 
 void SceneElementFormat::setBackgroundColor(const QColor &val)
@@ -215,7 +216,7 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContent
     format.setRightMargin(rightMargin);
     format.setTopMargin(topMargin);
     format.setLineHeight(m_lineHeight*100, QTextBlockFormat::ProportionalHeight);
-    format.setAlignment(Qt::AlignLeft);
+    format.setAlignment(m_textAlignment);
 
     if( !qFuzzyIsNull(m_backgroundColor.alphaF()) )
         format.setBackground(QBrush(m_backgroundColor));
