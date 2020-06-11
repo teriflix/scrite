@@ -237,6 +237,8 @@ Rectangle {
                             Image {
                                 id: addSceneButton
                                 source: "../icons/content/add_circle_outline.png"
+                                width: ruler.bottomMarginPx * 0.6; height: width
+                                smooth: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 opacity: defaultOpacity
                                 Behavior on opacity { NumberAnimation { duration: 250 } }
@@ -245,7 +247,10 @@ Rectangle {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : parent.defaultOpacity
-                                    onClicked: scriteDocument.createNewScene()
+                                    onClicked: {
+                                        scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.elementCount-1
+                                        scriteDocument.createNewScene()
+                                    }
                                 }
                             }
 

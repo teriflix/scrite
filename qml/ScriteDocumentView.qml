@@ -40,8 +40,8 @@ Item {
         id: workspaceSettings
         fileName: app.settingsFilePath
         category: "Workspace"
-        property var workspaceHeight
-        property var structureEditorWidth
+        property real workspaceHeight
+        property real screenplayEditorWidth: -1
     }
 
     Settings {
@@ -774,7 +774,8 @@ Item {
 
                             Loader {
                                 id: screenplayEditor2
-                                SplitView.preferredWidth: scriteDocument.formatting.pageLayout.paperWidth * 1.4
+                                SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? scriteDocument.formatting.pageLayout.paperWidth * 1.4 : workspaceSettings.screenplayEditorWidth
+                                onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                                 property bool editCurrentSceneInStructure: true
                                 readonly property int screenplayZoomLevelModifier: -3
                                 sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null

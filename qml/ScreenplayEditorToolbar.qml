@@ -102,6 +102,7 @@ Row {
         enabled: !showScreenplayPreview
         onClicked: {
             requestScreenplayEditor()
+            scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.elementCount-1
             scriteDocument.createNewScene()
         }
     }
