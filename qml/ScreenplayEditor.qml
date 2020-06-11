@@ -27,6 +27,7 @@ Rectangle {
     property ScreenplayFormat screenplayFormat: scriteDocument.displayFormat
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: screenplayAdapter.source
+    property bool toolBarVisible: toolbar.visible
 
     property alias zoomLevel: zoomSlider.zoomLevel
     property int zoomLevelModifier: 0
@@ -46,7 +47,7 @@ Rectangle {
             else
                 contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
-        onSourceChanged: screenplayPreview.visible = false
+        onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
     }
 
     ScreenplayTextDocument {
@@ -75,13 +76,6 @@ Rectangle {
         }
     }
 
-    Settings {
-        id: screenplayEditorSettings
-        fileName: app.settingsFilePath
-        category: "Screenplay Editor"
-        property bool displaySceneCharacters: true
-    }
-
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
     Connections {
         target: screenplayAdapter.isSourceScreenplay ? scriteDocument : null
@@ -103,64 +97,13 @@ Rectangle {
         anchors.margins: 1
         color: primaryColors.c100.background
         width: ruler.width
-        height: Math.max(toolbarLayout.height, screenplaySearchBar.height)
+        height: screenplaySearchBar.height * opacity
         enabled: screenplayAdapter.screenplay
         border.width: 1
         border.color: primaryColors.borderColor
-
-        Row {
-            id: toolbarLayout
-            anchors.right: screenplaySearchBar.left
-
-            ToolButton2 {
-                id: screenplayPreviewButton
-                icon.source: "../icons/action/preview.png"
-                ToolTip.text: "Preview the screenplay in print format."
-                ToolTip.delay: 1000
-                checkable: true
-                checked: screenplayPreview.visible
-                down: screenplayPreview.visible
-                onClicked: screenplayPreview.visible = checked
-            }
-
-            ToolButton2 {
-                icon.source: "../icons/screenplay/character.png"
-                ToolTip.text: "Toggle display of character names under scene headings and scan for hidden characters in each scene."
-                ToolTip.delay: 1000
-                down: sceneCharactersMenu.visible
-                onClicked: sceneCharactersMenu.visible = true
-
-                Item {
-                    width: parent.width
-                    height: 1
-                    anchors.top: parent.bottom
-
-                    Menu2 {
-                        id: sceneCharactersMenu
-                        width: 300
-
-                        MenuItem2 {
-                            text: "Display scene characters"
-                            checkable: true
-                            checked: screenplayEditorSettings.displaySceneCharacters
-                            onToggled: screenplayEditorSettings.displaySceneCharacters = checked
-                        }
-
-                        MenuItem2 {
-                            text: "Scan for mute characters"
-                            onClicked: scriteDocument.structure.scanForMuteCharacters()
-                        }
-                    }
-                }
-            }
-        }
-
-        Rectangle {
-            width: 1
-            height: parent.height
-            color: primaryColors.borderColor
-            anchors.right: screenplaySearchBar.left
-        }
+        visible: opacity > 0
+        opacity: globalScreenplayEditorToolbar.showFindAndReplace ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 100 } }
 
         SearchBar {
             id: screenplaySearchBar
@@ -237,7 +180,8 @@ Rectangle {
     }
 
     Item {
-        anchors.top: toolbar.bottom
+        id: screenplayEditorWorkspace
+        anchors.top: toolbar.visible ? toolbar.bottom : parent.top
         anchors.left: parent.left
         anchors.leftMargin: sceneListPanelLoader.active ? sceneListPanelLoader.width : 0
         anchors.right: parent.right
@@ -396,7 +340,7 @@ Rectangle {
 
     ScrollBar {
         id: verticalScrollBar
-        anchors.top: toolbar.bottom
+        anchors.top: screenplayEditorWorkspace.top
         anchors.right: parent.right
         anchors.bottom: statusBar.top
         orientation: Qt.Vertical
@@ -653,9 +597,9 @@ Rectangle {
                         if(activeFocus) {
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
-                            globalSceneEditorToolbar.sceneEditor = contentItem
-                        } else if(globalSceneEditorToolbar.sceneEditor === contentItem)
-                            globalSceneEditorToolbar.sceneEditor = null
+                            globalScreenplayEditorToolbar.sceneEditor = contentItem
+                        } else if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
+                            globalScreenplayEditorToolbar.sceneEditor = null
                         sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
                         contentItem.theScene.undoRedoEnabled = activeFocus
                     }
@@ -1377,12 +1321,12 @@ Rectangle {
 
     Loader {
         id: sceneListPanelLoader
-        anchors.top: toolbar.bottom
+        anchors.top: screenplayEditorWorkspace.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.topMargin: 5
         anchors.bottomMargin: statusBar.height
-        active: screenplayAdapter.isSourceScreenplay && globalSceneEditorToolbar.editInFullscreen && !scriteDocument.loading
+        active: screenplayAdapter.isSourceScreenplay && globalScreenplayEditorToolbar.editInFullscreen && !scriteDocument.loading
         property bool expanded: false
         readonly property int expandCollapseButtonWidth: 25
         readonly property int sceneListAreaWidth: 400
@@ -1541,13 +1485,11 @@ Rectangle {
 
     Loader {
         id: screenplayPreview
-        visible: false
-        active: visible
+        visible: globalScreenplayEditorToolbar.showScreenplayPreview
+        active: globalScreenplayEditorToolbar.showScreenplayPreview
         anchors.fill: parent
-        anchors.margins: 2
-        anchors.topMargin: toolbar.height+1
         sourceComponent: Rectangle {
-            color: primaryColors.c50.background
+            color: primaryColors.windowColor
 
             Component.onCompleted: screenplayImagePrinter.update()
 

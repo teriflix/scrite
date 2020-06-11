@@ -84,6 +84,8 @@ public:
     Q_INVOKABLE QPointF pointAtPercent(qreal t) const;
     Q_INVOKABLE qreal length() const;
 
+    Q_INVOKABLE void reset();
+
     QPainterPath path();
 
 signals:

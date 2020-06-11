@@ -22,15 +22,15 @@ import Scrite 1.0
 
 Item {
     id: documentUI
-    width: 1470
-    height: 865
+    width: 1350
+    height: 700
 
     // onWidthChanged: console.log(width)
 
     FontMetrics {
         id: sceneEditorFontMetrics
         readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
-        readonly property int lettersPerLine: globalSceneEditorToolbar.editInFullscreen ? 70 : 60
+        readonly property int lettersPerLine: globalScreenplayEditorToolbar.editInFullscreen ? 70 : 60
         readonly property int marginLetters: 5
         readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
         readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
@@ -44,7 +44,13 @@ Item {
         category: "Workspace"
         property var workspaceHeight
         property var structureEditorWidth
-        property bool editInFullscreen: true
+    }
+
+    Settings {
+        id: screenplayEditorSettings
+        fileName: app.settingsFilePath
+        category: "Screenplay Editor"
+        property bool displaySceneCharacters: true
     }
 
     Rectangle {
@@ -52,11 +58,11 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: appToolBar.height + 10
-        // color: primaryColors.windowColor
-        gradient: Gradient {
-            GradientStop { position: 0; color: primaryColors.c50.background }
-            GradientStop { position: 1; color: primaryColors.windowColor }
-        }
+        color: primaryColors.c50.background
+//        gradient: Gradient {
+//            GradientStop { position: 0; color: primaryColors.c50.background }
+//            GradientStop { position: 1; color: primaryColors.windowColor }
+//        }
 
         Item {
             id: appToolBar
@@ -69,44 +75,42 @@ Item {
 
             Row {
                 id: appFileTools
-                spacing: 5
+                spacing: 2
 
-                ToolButton2 {
-                    icon.source: "../icons/action/description.png"
+                ToolButton3 {
+                    iconSource: "../icons/action/description.png"
                     text: "New"
                     shortcut: "Ctrl+N"
                     shortcutText: "N"
-                    display: AbstractButton.IconOnly
                     onClicked: {
                         if(scriteDocument.modified)
                             askQuestion({
-                                            "question": "Do you want to save your current project first?",
-                                            "okButtonText": "Yes",
-                                            "cancelButtonText": "No",
-                                            "callback": function(val) {
-                                                if(val) {
-                                                    if(scriteDocument.fileName !== "")
-                                                        scriteDocument.save()
-                                                    else {
-                                                        cmdSave.doClick()
-                                                        return
-                                                    }
-                                                }
-                                                resetContentAnimation.start()
-                                            }
-                                        }, this)
+                                "question": "Do you want to save your current project first?",
+                                "okButtonText": "Yes",
+                                "cancelButtonText": "No",
+                                "callback": function(val) {
+                                    if(val) {
+                                        if(scriteDocument.fileName !== "")
+                                            scriteDocument.save()
+                                        else {
+                                            cmdSave.doClick()
+                                            return
+                                        }
+                                    }
+                                    resetContentAnimation.start()
+                                }
+                            }, this)
                         else
                             resetContentAnimation.start()
                     }
                 }
 
-                ToolButton2 {
+                ToolButton3 {
                     id: fileOpenButton
-                    icon.source: "../icons/file/folder_open.png"
+                    iconSource: "../icons/file/folder_open.png"
                     text: "Open"
                     shortcut: "Ctrl+O"
                     shortcutText: "O"
-                    display: documentUI.width > 1590 ? AbstractButton.TextBesideIcon : AbstractButton.IconOnly
                     down: recentFilesMenu.visible
                     onClicked: recentFilesMenu.recentFiles.length > 0 ? recentFilesMenu.open() : doOpen()
                     function doOpen(filePath) {
@@ -207,13 +211,12 @@ Item {
                     }
                 }
 
-                ToolButton2 {
+                ToolButton3 {
                     id: cmdSave
-                    icon.source: "../icons/content/save.png"
+                    iconSource: "../icons/content/save.png"
                     text: "Save"
                     shortcut: "Ctrl+S"
                     shortcutText: "S"
-                    display: AbstractButton.IconOnly
                     enabled: scriteDocument.structure.elementCount > 0
                     onClicked: doClick()
                     function doClick() {
@@ -224,11 +227,11 @@ Item {
                     }
                 }
 
-                ToolButton2 {
-                    display: AbstractButton.TextBesideIcon
+                ToolButton3 {
                     text: "Save As"
                     shortcut: "Ctrl+Shift+S"
                     shortcutText: "Shift+S"
+                    iconSource: "../icons/content/archive.png"
                     enabled: scriteDocument.structure.elementCount > 0
                     onClicked: fileDialog.launch("SAVE")
                     visible: documentUI.width > 1460
@@ -240,19 +243,19 @@ Item {
                     color: app.palette.mid
                 }
 
-                ToolButton2 {
+                ToolButton3 {
                     shortcut: "Ctrl+Z"
                     shortcutText: "Z"
-                    icon.source: "../icons/content/undo.png"
+                    iconSource: "../icons/content/undo.png"
                     enabled: app.canUndo
                     onClicked: app.undoGroup.undo()
                     ToolTip.text: app.undoText + "\t" + app.polishShortcutTextForDisplay(shortcut)
                 }
 
-                ToolButton2 {
+                ToolButton3 {
                     shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y"
                     shortcutText: app.isMacOSPlatform ? "Shift+Z" : "Y"
-                    icon.source: "../icons/content/redo.png"
+                    iconSource: "../icons/content/redo.png"
                     enabled: app.canRedo
                     onClicked: app.undoGroup.redo()
                     ToolTip.text: app.redoText + "\t" + app.polishShortcutTextForDisplay(shortcut)
@@ -264,11 +267,10 @@ Item {
                     color: app.palette.mid
                 }
 
-                ToolButton2 {
+                ToolButton3 {
                     id: importExportButton
-                    icon.source: "../icons/file/import_export.png"
+                    iconSource: "../icons/file/import_export.png"
                     text: "Import, Export & Reports"
-                    display: AbstractButton.IconOnly
                     onClicked: importExportMenu.visible = true
                     down: importExportMenu.visible
 
@@ -419,12 +421,11 @@ Item {
                     color: app.palette.mid
                 }
 
-                ToolButton2 {
-                    icon.source: "../icons/action/settings_applications.png"
+                ToolButton3 {
+                    iconSource: "../icons/action/settings_applications.png"
                     text: "Settings"
                     shortcut: "Ctrl+,"
                     shortcutText: ","
-                    display: documentUI.width > 1528 ? AbstractButton.TextBesideIcon : AbstractButton.IconOnly
                     onClicked: {
                         modalDialog.popupSource = this
                         modalDialog.sourceComponent = optionsDialogComponent
@@ -432,12 +433,12 @@ Item {
                     }
                 }
 
-                ToolButton2 {
-                    icon.source: "../icons/content/language.png"
+                ToolButton3 {
+                    id: languageToolButton
+                    iconSource: "../icons/content/language.png"
                     text: app.transliterationEngine.languageAsString
                     shortcut: "Ctrl+L"
                     shortcutText: "L"
-                    // display: AbstractButton.IconOnly
                     ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                     onClicked: languageMenu.visible = true
                     down: languageMenu.visible
@@ -494,16 +495,14 @@ Item {
                     }
                 }
 
-                ToolButton2 {
-                    icon.source: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
+                ToolButton3 {
+                    iconSource: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
                     ToolTip.text: "Show English to " + app.transliterationEngine.languageAsString + " alphabet mappings.\t" + app.polishShortcutTextForDisplay(shortcut)
                     shortcut: "Ctrl+K"
                     shortcutText: "K"
-                    display: AbstractButton.IconOnly
                     onClicked: alphabetMappingsPopup.visible = true
                     down: alphabetMappingsPopup.visible
-                    visible: app.transliterationEngine.language !== TransliterationEngine.English
-                    enabled: visible
+                    enabled: app.transliterationEngine.language !== TransliterationEngine.English
 
                     Item {
                         anchors.top: parent.bottom
@@ -528,24 +527,122 @@ Item {
                         }
                     }
                 }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: documentUI.width > 1470 ? fullText : fullText.substring(0, 2)
+                    property string fullText: app.transliterationEngine.languageAsString
+                    width: 80
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: languageToolButton.click()
+                    }
+                }
             }
         }
 
-        Item {
+        Row {
             anchors.right: parent.right
-            width: parent.width - appFileTools.width - 20
             height: parent.height
 
-            SceneEditorToolbar {
-                id: globalSceneEditorToolbar
+            ScreenplayEditorToolbar {
+                id: globalScreenplayEditorToolbar
+                property Item sceneEditor
+                readonly property bool editInFullscreen: true
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.right: appLogo.left
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
-                property Item sceneEditor
-                editInFullscreen: workspaceSettings.editInFullscreen
-                onEditInFullscreenChanged: workspaceSettings.editInFullscreen = editInFullscreen
+            }
+
+            Item {
+                height: parent.height
+                width: appToolBarArea.width * 0.01
+            }
+
+            // We move the main-tab bar here based on UI/UX suggestions from Surya Vasishta
+            Row {
+                id: mainTabBar
+                height: parent.height
+
+                property Item currentTab: currentIndex >= 0 ? mainTabBarRepeater.itemAt(currentIndex) : null
+                property int currentIndex: -1
+                property var tabs: ["Screenplay", "Structure", "Notebook"]
+                property var currentTabP1: currentTabExtents.value.p1
+                property var currentTabP2: currentTabExtents.value.p2
+                property color activeTabColor: primaryColors.windowColor
+
+                ResetOnChange {
+                    id: currentTabExtents
+                    trackChangesOn: appToolBarArea.width
+                    from: {
+                        "p1": { "x": 0, "y": 0 },
+                        "p2": { "x": 0, "y": 0 }
+                    }
+                    to: {
+                        "p1": mainTabBar.mapFromItem(mainTabBar.currentTab, 0, 0),
+                        "p2": mainTabBar.mapFromItem(mainTabBar.currentTab, mainTabBar.currentTab.width, 0)
+                    }
+                }
+
+                Component.onCompleted: currentIndex = 0
+
+                Repeater {
+                    id: mainTabBarRepeater
+                    model: mainTabBar.tabs
+
+                    Item {
+                        property bool active: mainTabBar.currentIndex === index
+                        height: mainTabBar.height
+                        width: tabBarFontMetrics.advanceWidth(modelData) + 30
+
+                        PainterPathItem {
+                            anchors.fill: parent
+                            fillColor: parent.active ? mainTabBar.activeTabColor : primaryColors.c10.background
+                            outlineColor: primaryColors.borderColor
+                            outlineWidth: 1
+                            renderingMechanism: PainterPathItem.UseQPainter
+                            renderType: parent.active ? PainterPathItem.OutlineAndFill : PainterPathItem.FillOnly
+                            painterPath: PainterPath {
+                                id: tabButtonPath
+                                readonly property point p1: Qt.point(itemRect.left, itemRect.bottom)
+                                readonly property point p2: Qt.point(itemRect.left, itemRect.top + 3)
+                                readonly property point p3: Qt.point(itemRect.right, itemRect.top + 3)
+                                readonly property point p4: Qt.point(itemRect.right, itemRect.bottom)
+                                MoveTo { x: tabButtonPath.p1.x; y: tabButtonPath.p1.y }
+                                LineTo { x: tabButtonPath.p2.x; y: tabButtonPath.p2.y }
+                                LineTo { x: tabButtonPath.p3.x; y: tabButtonPath.p3.y }
+                                LineTo { x: tabButtonPath.p4.x; y: tabButtonPath.p4.y }
+                            }
+                        }
+
+                        FontMetrics {
+                            id: tabBarFontMetrics
+                            font.pixelSize: 14
+                        }
+
+                        Text {
+                            id: tabBarText
+                            text: modelData
+                            anchors.centerIn: parent
+                            anchors.verticalCenterOffset:parent.active ? 0 : 1.5
+                            font.pixelSize: parent.active ? 14 : 12
+                            font.bold: parent.active
+                        }
+
+                        MouseArea {
+                            id: tabBarMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: mainTabBar.currentIndex = index
+                        }
+                    }
+                }
+            }
+
+            Item {
+                height: parent.height
+                width: appToolBarArea.width * 0.01
             }
 
             Image {
@@ -555,7 +652,6 @@ Item {
                 smooth: true
                 fillMode: Image.PreserveAspectFit
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
                 transformOrigin: Item.Right
                 ToolTip.text: "Click here to provide feedback"
 
@@ -578,13 +674,13 @@ Item {
     Loader {
         id: contentLoader
         active: true
-        sourceComponent: globalSceneEditorToolbar.editInFullscreen ? uiLayout2Component : uiLayout1Component
+        sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: appToolBarArea.bottom
         anchors.bottom: parent.bottom
         onActiveChanged: {
-            globalSceneEditorToolbar.sceneEditor = null
+            globalScreenplayEditorToolbar.sceneEditor = null
         }
     }
 
@@ -613,244 +709,42 @@ Item {
     }
 
     Component {
-        id: uiLayout1Component
+        id: uiLayoutComponent
 
-        SplitView {
-            orientation: Qt.Vertical
-            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+        Rectangle {
+            color: mainTabBar.activeTabColor
 
-            Item {
-                SplitView.preferredHeight: workspaceSettings.workspaceHeight ? documentUI.height*workspaceSettings.workspaceHeight : documentUI.height*0.75
-                SplitView.minimumHeight: documentUI.height * 0.5
-                onHeightChanged: workspaceSettings.workspaceHeight = height/documentUI.height
-
-                SplitView {
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    orientation: Qt.Horizontal
-
-                    Rectangle {
-                        SplitView.preferredWidth: workspaceSettings.structureEditorWidth ? documentUI.width*workspaceSettings.structureEditorWidth : documentUI.width*0.4
-                        onWidthChanged: workspaceSettings.structureEditorWidth = width/documentUI.width
-                        border {
-                            width: 1
-                            color: primaryColors.borderColor
-                        }
-                        radius: 5
-                        color: primaryColors.windowColor
-
-                        Item {
-                            id: structureEditor
-                            anchors.fill: parent
-
-                            property var tabs: ["Structure", "Notebook"]
-
-                            Item {
-                                id: structureEditorTabs
-                                anchors.left: parent.left
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                anchors.margins: 5
-                                height: 28
-                                property int currentIndex: 0
-
-                                Rectangle {
-                                    width: parent.width
-                                    height: 2
-                                    anchors.bottom: parent.bottom
-                                    color: primaryColors.borderColor
-                                }
-
-                                Row {
-                                    height: parent.height
-                                    anchors.centerIn: parent
-                                    spacing: -height*0.75
-
-                                    Repeater {
-                                        id: structureEditorTabGenerator
-                                        model: structureEditor.tabs
-
-                                        TabBarTab {
-                                            id: tabItem
-                                            text: modelData
-                                            width: tabTextWidth + 120
-                                            height: structureEditorTabs.height
-                                            tabIndex: index
-                                            tabCount: structureEditor.tabs.length
-                                            currentTabIndex: structureEditorTabs.currentIndex
-                                            onRequestActivation: structureEditorTabs.currentIndex = index
-                                        }
-                                    }
-                                }
-                            }
-
-                            StackLayout {
-                                id: structureEditorContent
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.top: structureEditorTabs.bottom
-                                anchors.bottom: parent.bottom
-                                anchors.margins: 5
-                                clip: true
-                                currentIndex: structureEditorTabs.currentIndex
-
-                                StructureView {
-                                    id: structureView
-                                    onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCENE_EDITOR)
-                                    onReleaseEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCREENPLAY_EDITOR)
-                                }
-
-                                NotebookView {
-                                    id: notebookView
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        SplitView.preferredWidth: documentUI.width * 0.6
-                        color: primaryColors.windowColor
-                        border {
-                            width: 1
-                            color: primaryColors.borderColor
-                        }
-                        radius: 5
-
-                        Loader {
-                            width: parent.width*0.7
-                            anchors.centerIn: parent
-                            active: editorLoader.item == null
-                            sourceComponent: TextArea {
-                                readOnly: true
-                                wrapMode: Text.WordWrap
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: 30
-                                enabled: false
-                                // renderType: Text.NativeRendering
-                                text: "Select a scene on the structure canvas or in the timeline to edit its content here."
-                            }
-                        }
-
-                        Loader {
-                            id: editorLoader
-                            anchors.fill: parent
-                            property int currentStructureIndex: active ? scriteDocument.structure.currentElementIndex : -1
-                            property int currentScreenplayIndex: active ? scriteDocument.screenplay.currentElementIndex : -1
-                            readonly property int screenplayZoomLevelModifier: -2
-                            sourceComponent: {
-                                if(editorLoaderReset.preference === editorLoaderReset.prefer_SCENE_EDITOR) {
-                                    if(currentStructureIndex >= 0)
-                                        return sceneEditorComponent
-                                    if(currentScreenplayIndex >= 0)
-                                        return screenplayEditorComponent
-                                } else {
-                                    if(currentScreenplayIndex >= 0)
-                                        return screenplayEditorComponent
-                                    if(currentStructureIndex >= 0)
-                                        return sceneEditorComponent
-                                }
-                                return null
-                            }
-                            active: editorLoaderReset.value
-
-                            ResetOnChange {
-                                id: editorLoaderReset
-                                from: false
-                                to: true
-
-                                readonly property int prefer_SCREENPLAY_EDITOR: 1
-                                readonly property int prefer_SCENE_EDITOR: 2
-                                property int preference: prefer_SCREENPLAY_EDITOR
-                                trackChangesOn: preference
-
-                                function prefer(val) {
-                                    if(val === prefer_SCREENPLAY_EDITOR || val === prefer_SCENE_EDITOR)
-                                        preference = val
-                                    else
-                                        preference = prefer_SCREENPLAY_EDITOR
-                                }
-                            }
-                        }
-
-                        Connections {
-                            target: globalSceneEditorToolbar
-                            onRequestScreenplayEditor: editorLoader.sourceComponent = screenplayEditorComponent
-                        }
-                    }
-                }
-            }
-
-            Item {
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    color: accentColors.c200.background
-                    border { width: 1; color: accentColors.borderColor }
-                    radius: 6
-
-                    ScreenplayView {
-                        id: screenplayView
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        onRequestEditor: editorLoaderReset.prefer(editorLoaderReset.prefer_SCREENPLAY_EDITOR)
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: uiLayout2Component
-
-        Item {
-            Item {
-                id: uiLayout2TabBar
+            PainterPathItem {
+                id: tabBarSeparator
                 anchors.left: parent.left
-                anchors.top: parent.top
                 anchors.right: parent.right
-                anchors.margins: 5
-                height: 28
-                property int currentIndex: 0
-                property var tabs: ["Screenplay Only", "Structure & Timeline", "Notebook"]
+                renderingMechanism: PainterPathItem.UseQPainter
+                renderType: PainterPathItem.OutlineOnly
+                height: 1
+                outlineColor: primaryColors.borderColor
+                outlineWidth: height
+                painterPath: PainterPath {
+                    id: tabBarSeparatorPath
+                    property var currentTabP1: tabBarSeparator.mapFromItem(mainTabBar, mainTabBar.currentTabP1.x, mainTabBar.currentTabP1.y)
+                    property var currentTabP2: tabBarSeparator.mapFromItem(mainTabBar, mainTabBar.currentTabP2.x, mainTabBar.currentTabP2.y)
+                    property point p1: Qt.point(itemRect.left, itemRect.center.y)
+                    property point p2: Qt.point(currentTabP1.x, itemRect.center.y)
+                    property point p3: Qt.point(currentTabP2.x, itemRect.center.y)
+                    property point p4: Qt.point(itemRect.right, itemRect.center.y)
 
-                Rectangle {
-                    width: parent.width
-                    height: 2
-                    anchors.bottom: parent.bottom
-                    color: primaryColors.borderColor
-                }
-
-                Row {
-                    height: parent.height
-                    anchors.centerIn: parent
-                    spacing: -height*0.75
-
-                    Repeater {
-                        model: uiLayout2TabBar.tabs
-
-                        TabBarTab {
-                            id: tabItem
-                            text: modelData
-                            width: tabTextWidth + 120
-                            height: uiLayout2TabBar.height
-                            tabCount: uiLayout2TabBar.tabs.length
-                            tabIndex: index
-                            currentTabIndex: uiLayout2TabBar.currentIndex
-                            onRequestActivation: uiLayout2TabBar.currentIndex = index
-                        }
-                    }
+                    MoveTo { x: tabBarSeparatorPath.p1.x; y: tabBarSeparatorPath.p1.y }
+                    LineTo { x: tabBarSeparatorPath.p2.x; y: tabBarSeparatorPath.p2.y }
+                    MoveTo { x: tabBarSeparatorPath.p3.x; y: tabBarSeparatorPath.p3.y }
+                    LineTo { x: tabBarSeparatorPath.p4.x; y: tabBarSeparatorPath.p4.y }
                 }
             }
 
             StackLayout {
-                id: uiLayout2TabView
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: uiLayout2TabBar.bottom
-                anchors.bottom: parent.bottom
+                id: uiLayoutTabView
+                anchors.fill: parent
                 anchors.margins: 5
                 clip: true
-                currentIndex: uiLayout2TabBar.currentIndex
+                currentIndex: mainTabBar.currentIndex
 
                 Loader {
                     readonly property int screenplayZoomLevelModifier: 0

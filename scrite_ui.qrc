@@ -23,7 +23,7 @@
         <file>qml/RadioButton2.qml</file>
         <file>qml/ReportGeneratorConfiguration.qml</file>
         <file>qml/RubberBand.qml</file>
-        <file>qml/SceneEditorToolbar.qml</file>
+        <file>qml/ScreenplayEditorToolbar.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScreenplayView.qml</file>
         <file>qml/ScriteDocumentView.qml</file>
@@ -37,5 +37,6 @@
         <file>qml/TextField2.qml</file>
         <file>qml/TextViewEdit.qml</file>
         <file>qml/ToolButton2.qml</file>
+        <file>qml/ToolButton3.qml</file>
     </qresource>
 </RCC>

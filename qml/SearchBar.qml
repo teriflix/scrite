@@ -57,7 +57,7 @@ Item {
             txtSearch.forceActiveFocus()
     }
 
-    Behavior on height { NumberAnimation { duration: 250 } }
+    Behavior on height { NumberAnimation { duration: 100 } }
 
     property SearchEngine searchEngine: SearchEngine { }
 

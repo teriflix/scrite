@@ -108,6 +108,11 @@ QJsonObject PainterPath::itemRect() const
         ret.insert("top", rect.top());
         ret.insert("right", rect.right());
         ret.insert("bottom", rect.bottom());
+
+        QJsonObject center;
+        center.insert("x", rect.center().x());
+        center.insert("y", rect.center().y());
+        ret.insert("center", center);
         return ret;
     };
 
@@ -134,6 +139,11 @@ QPointF PainterPath::pointAtPercent(qreal t) const
 qreal PainterPath::length() const
 {
     return m_path.length();
+}
+
+void PainterPath::reset()
+{
+    this->markDirty();
 }
 
 QPainterPath PainterPath::path()

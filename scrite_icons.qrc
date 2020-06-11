@@ -79,5 +79,7 @@
         <file>icons/navigation/arrow_right.png</file>
         <file>icons/content/add_circle_outline.png</file>
         <file>icons/content/add_circle_outline_inverted.png</file>
+        <file>icons/content/archive.png</file>
+        <file>icons/content/archive_inverted.png</file>
     </qresource>
 </RCC>

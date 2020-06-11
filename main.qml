@@ -22,8 +22,8 @@ import "./qml" as UI
 
 Rectangle {
     id: window
-    width: 1024
-    height: 768
+    width: 1350
+    height: 700
     color: primaryColors.windowColor
 
     MaterialColors {
