@@ -1480,14 +1480,16 @@ Rectangle {
                             text: {
                                 if(scene && scene.heading.enabled)
                                     return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
-                                return screenplayElement.sceneID
+                                if(screenplayElementType === ScreenplayElement.BreakElementType)
+                                    return screenplayElement.sceneID
+                                return "NO SCENE HEADING"
                             }
                             elide: Text.ElideMiddle
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            enabled: scene && scene.heading.enabled
+                            enabled: screenplayElementType === ScreenplayElement.SceneElementType
                             onClicked: navigateToScene()
                             onDoubleClicked: {
                                 navigateToScene()
