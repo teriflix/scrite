@@ -82,6 +82,7 @@ public:
     void syncNow();
 
 signals:
+    void updateScheduled();
     void updateStarted();
     void updateFinished();
 
@@ -145,6 +146,12 @@ private:
     void loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor);
     void formatBlock(const QTextBlock &block, const QString &text=QString());
 
+    void removeTextFrame(const ScreenplayElement *element);
+    void registerTextFrame(const ScreenplayElement *element, QTextFrame *frame);
+    QTextFrame *findTextFrame(const ScreenplayElement *element) const;
+    void onTextFrameDestroyed(QObject *object);
+    void clearTextFrames();
+
 private:
     int m_pageCount = 0;
     bool m_updating = false;
@@ -166,6 +173,7 @@ private:
     friend class ScreenplayTextDocumentUpdate;
     ModificationTracker m_screenplayModificationTracker;
     ModificationTracker m_formattingModificationTracker;
+    QMap<QObject *, const ScreenplayElement*> m_frameElementMap;
     QMap<const ScreenplayElement*, QTextFrame*> m_elementFrameMap;
 };
 

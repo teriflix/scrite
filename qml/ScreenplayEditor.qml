@@ -55,7 +55,11 @@ Rectangle {
         screenplay: screenplayAdapter.screenplay
         formatting: scriteDocument.printFormat
         syncEnabled: true
-        onUpdateFinished: screenplayImagePrinter.needsUpdate = true
+        onUpdateScheduled: screenplayImagePrinter.needsUpdate = true
+        onUpdateFinished: {
+            if(screenplayPreview.visible)
+                screenplayImagePrinter.update()
+        }
     }
 
     ImagePrinter {
@@ -1044,6 +1048,7 @@ Rectangle {
             Item {
                 width: ruler.leftMarginPx
                 height: sceneHeadingLoader.height + 16
+                visible: theElement.sceneNumber > 0
 
                 Text {
                     font: headingFontMetrics.font
@@ -1064,24 +1069,77 @@ Rectangle {
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
 
-                Loader {
-                    id: sceneHeadingLoader
+                Row {
+                    spacing: 5
                     width: parent.width
-                    height: item ? item.contentHeight : headingFontMetrics.lineSpacing
-                    property bool viewOnly: true
-                    property SceneHeading sceneHeading: headingItem.theScene.heading
-                    property TextArea sceneTextEditor: headingItem.sceneTextEditor
-                    sourceComponent: {
-                        if(sceneHeading.enabled)
-                            return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
-                        return sceneHeadingDisabled
+
+                    Loader {
+                        id: sceneHeadingLoader
+                        width: parent.width - sceneMenuButton.width - parent.spacing
+                        height: item ? item.contentHeight : headingFontMetrics.lineSpacing
+                        property bool viewOnly: true
+                        property SceneHeading sceneHeading: headingItem.theScene.heading
+                        property TextArea sceneTextEditor: headingItem.sceneTextEditor
+                        sourceComponent: {
+                            if(sceneHeading.enabled)
+                                return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
+                            return sceneHeadingDisabled
+                        }
+
+                        Connections {
+                            target: sceneHeadingLoader.item
+                            ignoreUnknownSignals: true
+                            onEditRequest: sceneHeadingLoader.viewOnly = false
+                            onEditingFinished: sceneHeadingLoader.viewOnly = true
+                        }
                     }
 
-                    Connections {
-                        target: sceneHeadingLoader.item
-                        ignoreUnknownSignals: true
-                        onEditRequest: sceneHeadingLoader.viewOnly = false
-                        onEditingFinished: sceneHeadingLoader.viewOnly = true
+                    ToolButton3 {
+                        id: sceneMenuButton
+                        iconSource: "../icons/navigation/menu.png"
+                        ToolTip.text: "Click here to view scene options menu."
+                        ToolTip.delay: 1000
+                        onClicked: sceneMenu.visible = true
+                        down: sceneMenu.visible
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Item {
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+
+                            Menu2 {
+                                id: sceneMenu
+                                MenuItem2 {
+                                    action: Action {
+                                        text: "Scene Heading"
+                                        checkable: true
+                                        checked: headingItem.theScene.heading.enabled
+                                    }
+                                    onTriggered: {
+                                        headingItem.theScene.heading.enabled = action.checked
+                                        sceneMenu.close()
+                                    }
+                                }
+
+                                ColorMenu {
+                                    title: "Colors"
+                                    onMenuItemClicked: {
+                                        headingItem.theScene.color = color
+                                        sceneMenu.close()
+                                    }
+                                }
+
+                                MenuItem2 {
+                                    text: "Remove"
+                                    enabled: screenplayAdapter.screenplay === scriteDocument.screenplay
+                                    onClicked: {
+                                        sceneMenu.close()
+                                        scriteDocument.screenplay.removeSceneElements(headingItem.theScene)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 

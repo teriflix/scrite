@@ -278,7 +278,7 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     if(element == nullptr)
         return ret;
 
-    QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
+    QTextFrame *frame = this->findTextFrame(element);
     if(frame == nullptr)
         return ret;
 
@@ -421,7 +421,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
     // Here we discard anything we have previously loaded and load the entire
     // document fresh from the start.
-    m_elementFrameMap.clear();
+    this->clearTextFrames();
     m_textDocument->clear();
 
     if(m_screenplay == nullptr)
@@ -603,7 +603,7 @@ void ScreenplayTextDocument::loadScreenplay()
         // Each screenplay element (or scene) has its own frame. That makes
         // moving them in one bunch easy.
         QTextFrame *frame = cursor.insertFrame(frameFormat);
-        m_elementFrameMap[element] = frame;
+        this->registerTextFrame(element, frame);
         this->loadScreenplayElement(element, cursor);
 
         // We have to move the cursor out of the frame we created for the scene
@@ -611,6 +611,8 @@ void ScreenplayTextDocument::loadScreenplay()
         cursor = m_textDocument->rootFrame()->lastCursorPosition();
         cursor.setBlockFormat(frameBoundaryBlockFormat);
     }
+
+    this->evaluatePageBoundariesLater();
 }
 
 void ScreenplayTextDocument::loadScreenplayLater()
@@ -618,7 +620,10 @@ void ScreenplayTextDocument::loadScreenplayLater()
     this->disconnectFromScreenplaySignals();
     this->disconnectFromScreenplayFormatSignals();
 
+    const bool updateWasScheduled = m_loadScreenplayTimer.isActive();
     m_loadScreenplayTimer.start(100, this);
+    if(!updateWasScheduled)
+        emit updateScheduled();
 }
 
 void ScreenplayTextDocument::connectToScreenplaySignals()
@@ -753,14 +758,14 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
 
     ScreenplayTextDocumentUpdate update(this);
 
-    QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
+    QTextFrame *frame = this->findTextFrame(element);
     Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to remove a scene before it was included in the text document.");
 
     QTextCursor cursor = frame->firstCursorPosition();
     cursor.movePosition(QTextCursor::Up);
     cursor.setPosition(frame->lastPosition(), QTextCursor::KeepAnchor);
     cursor.removeSelectedText();
-    m_elementFrameMap.remove(element);
+    this->removeTextFrame(element);
 
     this->disconnectFromSceneSignals(scene);
 }
@@ -781,14 +786,14 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
     else if(index > 0)
     {
         ScreenplayElement *before = m_screenplay->elementAt(index-1);
-        QTextFrame *beforeFrame = m_elementFrameMap.value(before, nullptr);
+        QTextFrame *beforeFrame = this->findTextFrame(before);
         Q_ASSERT_X(beforeFrame != nullptr, "ScreenplayTextDocument", "Attempting to insert scene before screenplay is loaded.");
         cursor = beforeFrame->lastCursorPosition();
         cursor.movePosition(QTextCursor::Down);
     }
 
     QTextFrame *frame = cursor.insertFrame(m_sceneFrameFormat);
-    m_elementFrameMap[element] = frame;
+    this->registerTextFrame(element, frame);
     this->loadScreenplayElement(element, cursor);
 
     if(m_syncEnabled)
@@ -808,7 +813,7 @@ void ScreenplayTextDocument::onSceneReset()
     QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
     Q_FOREACH(ScreenplayElement *element, elements)
     {
-        QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
+        QTextFrame *frame = this->findTextFrame(element);
         Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
 
         QTextCursor cursor = frame->firstCursorPosition();
@@ -838,6 +843,9 @@ void ScreenplayTextDocument::onSceneAboutToReset()
 
 void ScreenplayTextDocument::onSceneHeadingChanged()
 {
+#if 1
+    this->onSceneReset();
+#else
     SceneHeading *heading = qobject_cast<SceneHeading*>(this->sender());
     Scene *scene = heading ? heading->scene() : nullptr;
     if(scene == nullptr)
@@ -850,7 +858,7 @@ void ScreenplayTextDocument::onSceneHeadingChanged()
     QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
     Q_FOREACH(ScreenplayElement *element, elements)
     {
-        QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
+        QTextFrame *frame = this->findTextFrame(element);
         Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
 
         QTextCursor cursor = frame->firstCursorPosition();
@@ -866,7 +874,13 @@ void ScreenplayTextDocument::onSceneHeadingChanged()
                 cursor.removeSelectedText();
             }
         }
+        else if(heading->isEnabled())
+        {
+            cursor.insertBlock();
+            this->formatBlock(cursor.block(), heading->text());
+        }
     }
+#endif
 }
 
 void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::SceneElementChangeType type)
@@ -888,7 +902,7 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
     QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
     Q_FOREACH(ScreenplayElement *element, elements)
     {
-        QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
+        QTextFrame *frame = this->findTextFrame(element);
         Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
 
         QTextCursor cursor = frame->firstCursorPosition();
@@ -1034,7 +1048,7 @@ void ScreenplayTextDocument::evaluateCurrentPage()
     }
 
     ScreenplayElement *element = m_screenplay->elementAt(m_screenplay->currentElementIndex());
-    QTextFrame *frame = element && element->scene() && element->scene() == m_activeScene ? m_elementFrameMap.value(element) : nullptr;
+    QTextFrame *frame = element && element->scene() && element->scene() == m_activeScene ? this->findTextFrame(element) : nullptr;
     if(frame == nullptr)
     {
         this->setCurrentPage(0);
@@ -1134,7 +1148,7 @@ void ScreenplayTextDocument::formatAllBlocks()
 
 void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor)
 {
-    Q_ASSERT_X(cursor.currentFrame() == m_elementFrameMap.value(element, nullptr),
+    Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element),
                "ScreenplayTextDocument", "Screenplay element can be loaded only after a frame for it has been created");
 
     const Scene *scene = element->scene();
@@ -1202,6 +1216,54 @@ void ScreenplayTextDocument::formatBlock(const QTextBlock &block, const QString 
     cursor.setCharFormat(charFormat);
     if(!text.isEmpty())
         cursor.insertText(text);
+}
+
+void ScreenplayTextDocument::removeTextFrame(const ScreenplayElement *element)
+{
+    this->registerTextFrame(element, nullptr);
+}
+
+void ScreenplayTextDocument::registerTextFrame(const ScreenplayElement *element, QTextFrame *frame)
+{
+    QTextFrame *existingFrame = m_elementFrameMap.value(element, nullptr);
+    if(existingFrame && existingFrame != frame)
+    {
+        m_elementFrameMap.remove(element);
+        m_frameElementMap.remove(existingFrame);
+        disconnect(existingFrame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
+    }
+
+    if(frame != nullptr)
+    {
+        m_elementFrameMap[element] = frame;
+        m_frameElementMap[frame] = element;
+        connect(frame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
+    }
+}
+
+QTextFrame *ScreenplayTextDocument::findTextFrame(const ScreenplayElement *element) const
+{
+    return m_elementFrameMap.value(element, nullptr);
+}
+
+void ScreenplayTextDocument::onTextFrameDestroyed(QObject *object)
+{
+    const ScreenplayElement *element = m_frameElementMap.value(object, nullptr);
+    if(element != nullptr)
+    {
+        m_frameElementMap.remove(object);
+        m_elementFrameMap.remove(element);
+    }
+}
+
+void ScreenplayTextDocument::clearTextFrames()
+{
+    m_elementFrameMap.clear();
+
+    QList<QObject*> textFrames = m_frameElementMap.keys();
+    Q_FOREACH(QObject *textFrame, textFrames)
+        disconnect(textFrame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
+    m_frameElementMap.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

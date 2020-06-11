@@ -52,6 +52,7 @@ Row {
         ToolTip.delay: 1000
         down: sceneCharactersMenu.visible
         onClicked: sceneCharactersMenu.visible = true
+        enabled: !showScreenplayPreview
 
         Item {
             width: parent.width
@@ -84,6 +85,7 @@ Row {
         ToolTip.text: "Toggles the search & repleace panel in screenplay editor."
         checkable: true
         checked: false
+        enabled: !showScreenplayPreview
     }
 
     Rectangle {
@@ -97,6 +99,7 @@ Row {
         shortcut: "Ctrl+Shift+N"
         shortcutText: ""
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: !showScreenplayPreview
         onClicked: {
             requestScreenplayEditor()
             scriteDocument.createNewScene()
@@ -108,7 +111,7 @@ Row {
         shortcut: "F5"
         shortcutText: ""
         ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: binder ? true : false
+        enabled: binder && !showScreenplayPreview ? true : false
         onClicked: binder.refresh()
     }
 
@@ -126,7 +129,7 @@ Row {
             shortcut: "Ctrl+" + (index+1)
             shortcutText: (index+1)
             ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
-            enabled: binder ? binder.currentElement !== null : false
+            enabled: binder && !showScreenplayPreview ? binder.currentElement !== null : false
             down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
             onClicked: binder.currentElement.type = modelData.value
         }

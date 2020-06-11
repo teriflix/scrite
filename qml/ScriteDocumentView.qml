@@ -625,8 +625,8 @@ Item {
                             id: tabBarText
                             text: modelData
                             anchors.centerIn: parent
-                            anchors.verticalCenterOffset:parent.active ? 0 : 1.5
-                            font.pixelSize: parent.active ? 14 : 12
+                            anchors.verticalCenterOffset:parent.active ? 0 : 1
+                            font.pixelSize: 14
                             font.bold: parent.active
                         }
 
