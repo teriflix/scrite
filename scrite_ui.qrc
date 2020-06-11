@@ -38,5 +38,6 @@
         <file>qml/TextViewEdit.qml</file>
         <file>qml/ToolButton2.qml</file>
         <file>qml/ToolButton3.qml</file>
+        <file>qml/SceneNumberBubble.qml</file>
     </qresource>
 </RCC>

@@ -55,6 +55,7 @@ Rectangle {
         screenplay: screenplayAdapter.screenplay
         formatting: scriteDocument.printFormat
         syncEnabled: true
+        // sceneNumbers: false
         onUpdateScheduled: screenplayImagePrinter.needsUpdate = true
         onUpdateFinished: {
             if(screenplayPreview.visible)
@@ -190,6 +191,7 @@ Rectangle {
         anchors.leftMargin: sceneListPanelLoader.active ? sceneListPanelLoader.width : 0
         anchors.right: parent.right
         anchors.bottom: statusBar.top
+        clip: true
 
         EventFilter.events: [31]
         EventFilter.onFilter: {
@@ -204,21 +206,6 @@ Rectangle {
             height: parent.height
             anchors.horizontalCenter: parent.horizontalCenter
 
-            RulerItem {
-                id: ruler
-                width: parent.width
-                height: 20
-                font.pixelSize: 10
-                leftMargin: pageLayout.leftMargin * Screen.devicePixelRatio
-                rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
-                zoomLevel: screenplayEditor.zoomLevel
-
-                property real leftMarginPx: leftMargin * zoomLevel
-                property real rightMarginPx: rightMargin * zoomLevel
-                property real topMarginPx: pageLayout.topMargin * Screen.devicePixelRatio * zoomLevel
-                property real bottomMarginPx: pageLayout.bottomMargin * Screen.devicePixelRatio * zoomLevel
-            }
-
             Rectangle {
                 id: contentArea
                 anchors.top: ruler.bottom
@@ -226,7 +213,6 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 5
-                clip: true
                 color: "white"
 
                 ResetOnChange {
@@ -338,6 +324,21 @@ Rectangle {
                             contentView.contentY = (pt.y + 2*rect.height) - contentView.height
                     }
                 }
+            }
+
+            RulerItem {
+                id: ruler
+                width: parent.width
+                height: 20
+                font.pixelSize: 10
+                leftMargin: pageLayout.leftMargin * Screen.devicePixelRatio
+                rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
+                zoomLevel: screenplayEditor.zoomLevel
+
+                property real leftMarginPx: leftMargin * zoomLevel
+                property real rightMarginPx: rightMargin * zoomLevel
+                property real topMarginPx: pageLayout.topMargin * Screen.devicePixelRatio * zoomLevel
+                property real bottomMarginPx: pageLayout.bottomMargin * Screen.devicePixelRatio * zoomLevel
             }
         }
     }
@@ -559,37 +560,24 @@ Rectangle {
                         ScreenplayElementPageBreaks {
                             id: pageBreaksEvaluator
                             screenplayElement: contentItem.theElement
-                            screenplayDocument: document.value
+                            screenplayDocument: scriteDocument.loading ? null : document.value
                         }
 
                         Repeater {
                             model: pageBreaksEvaluator.pageBreaks
 
-                            PainterPathItem {
+                            Rectangle {
                                 id: pageBreakLine
                                 property rect cursorRect: modelData.position >= 0 ? sceneTextEditor.positionToRectangle(modelData.position) : Qt.rect(0,0,0,0)
                                 x: 0
                                 y: (modelData.position >= 0 ? cursorRect.y : -sceneHeadingAreaLoader.height) - height/2
                                 width: sceneTextEditorBackground.width
-                                height: 3
-                                renderingMechanism: PainterPathItem.UseQPainter
-                                renderType: PainterPathItem.OutlineOnly
-                                outlineColor: primaryColors.windowColor
-                                outlineStyle: PainterPathItem.SolidLine
-                                outlineWidth: 1
+                                height: 1
+                                color: primaryColors.c400.background
 
-                                painterPath: PainterPath {
-                                    MoveTo { x: 0; y: 1 }
-                                    LineTo { x: pageBreakLine.width; y: 1 }
-                                }
-
-                                Text {
-                                    font: defaultFontMetrics.font
-                                    text: "Pg " + modelData.pageNumber + ". "
-                                    anchors.left: parent.left
-                                    anchors.top: parent.bottom
-                                    anchors.margins: 5
-                                    color: pageBreakLine.outlineColor
+                                SceneNumberBubble {
+                                    x: -width - 20
+                                    sceneNumber: modelData.pageNumber
                                 }
                             }
                         }

@@ -1,0 +1,59 @@
+/****************************************************************************
+**
+** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+import Scrite 1.0
+
+PainterPathItem {
+    property int sceneNumber: -1
+    readonly property var colors: primaryColors.c600
+
+    Text {
+        id: sceneNumberText
+        anchors.centerIn: parent
+        font.family: scriteDocument.formatting.defaultFont.family
+        font.pixelSize: 16 * zoomLevel
+        text: "" + parent.sceneNumber
+        color: colors.text
+    }
+
+    width: Math.max(sceneNumberText.contentWidth * 1.5, 50*zoomLevel)
+    height: Math.max(sceneNumberText.contentHeight + 1.1, 30*zoomLevel)
+
+    renderType: PainterPathItem.OutlineAndFill
+    fillColor: colors.background
+    outlineWidth: 2
+    outlineColor: colors.text
+
+    painterPath: PainterPath {
+        id: bubblePath
+        property real  arrowSize: sceneNumberText.height/2
+        property point p1: Qt.point(itemRect.left, itemRect.top)
+        property point p2: Qt.point(itemRect.right, itemRect.top)
+        property point p3: Qt.point(itemRect.right, itemRect.center.y - arrowSize)
+        property point p4: Qt.point(itemRect.right+arrowSize, itemRect.center.y)
+        property point p5: Qt.point(itemRect.right, itemRect.center.y + arrowSize)
+        property point p6: Qt.point(itemRect.right, itemRect.bottom)
+        property point p7: Qt.point(itemRect.left, itemRect.bottom)
+
+        MoveTo { x: bubblePath.p1.x; y: bubblePath.p1.y }
+        LineTo { x: bubblePath.p2.x; y: bubblePath.p2.y }
+        LineTo { x: bubblePath.p3.x; y: bubblePath.p3.y }
+        LineTo { x: bubblePath.p4.x; y: bubblePath.p4.y }
+        LineTo { x: bubblePath.p5.x; y: bubblePath.p5.y }
+        LineTo { x: bubblePath.p6.x; y: bubblePath.p6.y }
+        LineTo { x: bubblePath.p7.x; y: bubblePath.p7.y }
+        CloseSubpath { }
+    }
+}
