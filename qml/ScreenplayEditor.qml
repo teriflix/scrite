@@ -1469,13 +1469,13 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.margins: 5
-                            anchors.rightMargin: sceneListView.ScrollBar.vertical.width + 5
+                            anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 0) + 5
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType
                             font.pixelSize: screenplayElementType === ScreenplayElement.BreakElementType ? 16 : 14
                             font.letterSpacing: screenplayElementType === ScreenplayElement.BreakElementType ? 3 : 0
-                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignHCenter : Qt.AlignLeft
+                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignHCenter : (scene && scene.heading.enabled ? Qt.AlignLeft : Qt.AlignRight)
                             color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
                             text: {
                                 if(scene && scene.heading.enabled)
@@ -1497,7 +1497,10 @@ Rectangle {
                             }
 
                             function navigateToScene() {
-                                contentView.positionViewAtIndex(index, ListView.Beginning)
+                                if(index === 0)
+                                    contentView.positionViewAtBeginning()
+                                else
+                                    contentView.positionViewAtIndex(index, ListView.Beginning)
                                 screenplayAdapter.currentIndex = index
                             }
                         }
