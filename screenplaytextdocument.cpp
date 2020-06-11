@@ -357,6 +357,11 @@ void ScreenplayTextDocument::timerEvent(QTimerEvent *event)
         m_pageBoundaryEvalTimer.stop();
         this->evaluatePageBoundaries();
     }
+    else if(event->timerId() == m_sceneResetTimer.timerId())
+    {
+        m_sceneResetTimer.stop();
+        this->processSceneResetList();
+    }
 }
 
 void ScreenplayTextDocument::init()
@@ -416,7 +421,10 @@ void ScreenplayTextDocument::loadScreenplay()
     // Here we discard anything we have previously loaded and load the entire
     // document fresh from the start.
     this->clearTextFrames();
+    m_sceneResetList.clear();
     m_textDocument->clear();
+    m_sceneResetTimer.stop();
+    m_pageBoundaryEvalTimer.stop();
 
     if(m_screenplay == nullptr)
         return;
