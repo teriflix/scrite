@@ -1657,4 +1657,25 @@ Rectangle {
             }
         }
     }
+
+    function requestCharacterMenu(characterName) {
+        characterMenu.characterName = characterName
+        characterMenu.popup()
+    }
+
+    Menu2 {
+        id: characterMenu
+        width: 300
+        property string characterName
+
+        MenuItem2 {
+            text: "Generate Character Report"
+            enabled: characterMenu.characterName !== ""
+            onClicked: {
+                reportGeneratorTimer.reportArgs = {"reportName": "Character Report", "configuration": {"characterNames": [characterMenu.characterName]}}
+                characterMenu.close()
+                characterMenu.characterName = ""
+            }
+        }
+    }
 }
