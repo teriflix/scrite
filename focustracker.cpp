@@ -54,6 +54,9 @@ void FocusTrackerIndicator::setProperty(const QString &val)
     if(m_property == val)
         return;
 
+    if(!m_property.isEmpty() && m_tracker != nullptr)
+        m_target->setProperty(qPrintable(m_property), m_offValue);
+
     m_property = val;
     emit propertyChanged();
 

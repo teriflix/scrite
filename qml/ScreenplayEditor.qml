@@ -40,11 +40,11 @@ Rectangle {
         id: screenplayAdapter
         source: scriteDocument.loading ? null : scriteDocument.screenplay
         onCurrentIndexChanged: {
-            if(currentIndex < 0) {
-                contentView.positionViewAtBeginning()
+            if(currentIndex <= 0) {
+                contentView.scrollToFirstScene()
                 return
             }
-            if(mainUndoStack.screenplayEditorActive)
+            if(mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive)
                 app.execLater(contentView, 100, function() {
                     contentView.scrollIntoView(currentIndex)
                 })
@@ -197,7 +197,7 @@ Rectangle {
 
                 ResetOnChange {
                     id: contentViewModel
-                    trackChangesOn: screenplayEditorSettings.displaySceneCharacters && scriteDocument.loading
+                    trackChangesOn: screenplayEditorSettings.displaySceneCharacters || scriteDocument.loading
                     from: null
                     to: screenplayAdapter
                     onJustReset: {
@@ -260,7 +260,7 @@ Rectangle {
 
                     FocusTracker.window: qmlWindow
                     FocusTracker.indicator.target: mainUndoStack
-                    FocusTracker.indicator.property: "screenplayEditorActive"
+                    FocusTracker.indicator.property: screenplayAdapter.isSourceScreenplay ? "screenplayEditorActive" : "sceneEditorActive"
 
                     Component.onCompleted: positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
 
@@ -269,6 +269,10 @@ Rectangle {
 
                     function isVisible(index) {
                         return index >= firstItemIndex && index <= lastItemIndex
+                    }
+
+                    function scrollToFirstScene() {
+                        positionViewAtBeginning()
                     }
 
                     function scrollIntoView(index) {
@@ -345,6 +349,7 @@ Rectangle {
         clip: true
 
         Text {
+            id: pageNumberDisplay
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 20
@@ -355,6 +360,7 @@ Rectangle {
             width: pageRulerArea.width
             height: parent.height
             anchors.centerIn: parent
+            visible: parent.width - pageNumberDisplay.width - zoomSliderBox.width > width
 
             Text {
                 anchors.left: parent.left
@@ -386,6 +392,7 @@ Rectangle {
         }
 
         Row {
+            id: zoomSliderBox
             anchors.right: parent.right
             anchors.rightMargin: 20
             anchors.verticalCenter: parent.verticalCenter
@@ -399,20 +406,36 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 from: 0; to: zoomLevels.length-1
                 stepSize: 1
+                onValueChanged: {
+                    if(mainTabBar.currentIndex === 0)
+                        screenplayEditorSettings.mainEditorZoomValue = value
+                    else
+                        screenplayEditorSettings.embeddedEditorZoomValue = value
+                }
                 onZoomLevelChanged: {
                     if(initialized)
                         screenplayFormat.devicePixelRatio = Screen.devicePixelRatio * zoomLevel
                 }
                 Component.onCompleted: {
-                    var list = zoomLevels
-                    var zoomOneIndex = -1
-                    for(var i=0; i<list.length; i++) {
-                        zoomOneIndex = (list[i] === 1.0) ? i : -1
-                        if(zoomOneIndex >= 0)
-                            break
+                    var _value = -1
+                    if(mainTabBar.currentIndex === 0)
+                        _value = screenplayEditorSettings.mainEditorZoomValue
+                    else
+                        _value = screenplayEditorSettings.embeddedEditorZoomValue
+                    if(_value >= from && _value <= to)
+                        value = _value
+                    else {
+                        var list = zoomLevels
+                        var zoomOneIndex = -1
+                        for(var i=0; i<list.length; i++) {
+                            zoomOneIndex = (list[i] === 1.0) ? i : -1
+                            if(zoomOneIndex >= 0)
+                                break
+                        }
+                        zoomOneIndex = Math.min(Math.max(zoomOneIndex+zoomLevelModifier, from), to)
+                        value = zoomOneIndex
                     }
-                    zoomOneIndex = Math.min(Math.max(zoomOneIndex+zoomLevelModifier, from), to)
-                    value = zoomOneIndex
+
                     screenplayFormat.devicePixelRatio = Screen.devicePixelRatio * zoomLevel
                     initialized = true
                 }
@@ -970,7 +993,7 @@ Rectangle {
             function scrollToPreviousScene() {
                 var idx = screenplayAdapter.previousSceneElementIndex()
                 if(idx === 0 && idx === theIndex) {
-                    contentView.positionViewAtBeginning()
+                    contentView.scrollToFirstScene()
                     assumeFocusAt(0)
                     return
                 }
@@ -1466,7 +1489,7 @@ Rectangle {
 
                             function navigateToScene() {
                                 if(index === 0)
-                                    contentView.positionViewAtBeginning()
+                                    contentView.scrollToFirstScene()
                                 else
                                     contentView.positionViewAtIndex(index, ListView.Beginning)
                                 screenplayAdapter.currentIndex = index

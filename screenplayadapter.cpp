@@ -80,6 +80,9 @@ void ScreenplayAdapter::setSource(QObject *val)
         this->setSourceModel(nullptr);
 
     emit sourceChanged();
+
+    if(this->isSourceScreenplay())
+        this->setCurrentIndex(this->screenplay()->currentElementIndex());
 }
 
 bool ScreenplayAdapter::isSourceScene() const

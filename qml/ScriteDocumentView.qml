@@ -25,8 +25,6 @@ Item {
     width: 1350
     height: 700
 
-    // onWidthChanged: console.log(width)
-
     FontMetrics {
         id: sceneEditorFontMetrics
         readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
@@ -51,6 +49,8 @@ Item {
         fileName: app.settingsFilePath
         category: "Screenplay Editor"
         property bool displaySceneCharacters: true
+        property int mainEditorZoomValue: -1
+        property int embeddedEditorZoomValue: -1
     }
 
     Rectangle {
@@ -59,10 +59,6 @@ Item {
         anchors.right: parent.right
         height: appToolBar.height + 10
         color: primaryColors.c50.background
-//        gradient: Gradient {
-//            GradientStop { position: 0; color: primaryColors.c50.background }
-//            GradientStop { position: 1; color: primaryColors.windowColor }
-//        }
 
         Item {
             id: appToolBar
@@ -747,29 +743,41 @@ Item {
                 currentIndex: mainTabBar.currentIndex
 
                 Loader {
+                    readonly property bool editCurrentSceneInStructure: false
                     readonly property int screenplayZoomLevelModifier: 0
-                    sourceComponent: screenplayEditorComponent
+                    sourceComponent: mainTabBar.currentIndex === 0 ? screenplayEditorComponent : null
                 }
 
                 SplitView {
                     orientation: Qt.Vertical
                     Material.background: Qt.darker(primaryColors.windowColor, 1.1)
 
-                    Item {
+                    Rectangle {
                         SplitView.fillHeight: true
+                        color: primaryColors.c10.background
+                        border {
+                            width: 1
+                            color: primaryColors.borderColor
+                        }
 
-                        Rectangle {
+                        SplitView {
+                            orientation: Qt.Horizontal
+                            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
                             anchors.fill: parent
-                            color: primaryColors.c10.background
-                            border {
-                                width: 1
-                                color: primaryColors.borderColor
-                            }
-                            radius: 4
 
                             StructureView {
-                                anchors.fill: parent
-                                anchors.margins: 2
+                                SplitView.fillWidth: true
+
+                                onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
+                                onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                            }
+
+                            Loader {
+                                id: screenplayEditor2
+                                SplitView.preferredWidth: scriteDocument.formatting.pageLayout.paperWidth * 1.4
+                                property bool editCurrentSceneInStructure: true
+                                readonly property int screenplayZoomLevelModifier: -3
+                                sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
                             }
                         }
                     }
@@ -790,6 +798,7 @@ Item {
                                 id: screenplayView
                                 anchors.fill: parent
                                 anchors.margins: 5
+                                onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = false
                             }
                         }
                     }
@@ -832,6 +841,14 @@ Item {
 
         ScreenplayEditor {
             zoomLevelModifier: screenplayZoomLevelModifier
+            source: {
+                if(editCurrentSceneInStructure) {
+                    var index = scriteDocument.structure.currentElementIndex
+                    var element = scriteDocument.structure.elementAt(index)
+                    return element ? element.scene : null
+                }
+                return scriteDocument.loading ? null : scriteDocument.screenplay
+            }
         }
     }
 
