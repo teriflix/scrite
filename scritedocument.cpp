@@ -768,7 +768,11 @@ void ScriteDocument::setModified(bool val)
     if(m_modified == val)
         return;
 
-    m_modified = val;
+    if((m_structure && m_structure->elementCount() > 0) || (m_screenplay && m_screenplay->elementCount() > 0))
+        m_modified = val;
+    else
+        m_modified = false;
+
     emit modifiedChanged();
 }
 
