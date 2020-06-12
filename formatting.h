@@ -236,12 +236,10 @@ public:
 
     Q_INVOKABLE void setSreeenFromWindow(QObject *windowObject);
 
-    // By default devicePixelRatio is considered to be same as screen()->devicePixelRatio().
-    // But this value can be changed to become any value.
-    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
-    void setDevicePixelRatio(qreal val);
-    qreal devicePixelRatio() const { return m_devicePixelRatio; }
-    Q_SIGNAL void devicePixelRatioChanged();
+    qreal screenDevicePixelRatio() const { return m_screen ? m_screen->devicePixelRatio() : 1.0; }
+
+    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio NOTIFY fontZoomLevelIndexChanged)
+    qreal devicePixelRatio() const;
 
     Q_PROPERTY(ScreenplayPageLayout* pageLayout READ pageLayout CONSTANT STORED false)
     ScreenplayPageLayout* pageLayout() const { return m_pageLayout; }
@@ -252,7 +250,7 @@ public:
     QFont &defaultFontRef() { return m_defaultFont; }
     Q_SIGNAL void defaultFontChanged();
 
-    Q_PROPERTY(QFont defaultFont2 READ defaultFont2 NOTIFY defaultFontChanged)
+    Q_PROPERTY(QFont defaultFont2 READ defaultFont2 NOTIFY fontPointSizeDeltaChanged)
     QFont defaultFont2() const;
 
     QFontMetrics defaultFontMetrics() const { return m_defaultFontMetrics; }
@@ -261,6 +259,11 @@ public:
     Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY fontPointSizeDeltaChanged)
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
     Q_SIGNAL void fontPointSizeDeltaChanged();
+
+    Q_PROPERTY(int fontZoomLevelIndex READ fontZoomLevelIndex WRITE setFontZoomLevelIndex NOTIFY fontZoomLevelIndexChanged STORED false)
+    void setFontZoomLevelIndex(int val);
+    int fontZoomLevelIndex() const { return m_fontZoomLevelIndex; }
+    Q_SIGNAL void fontZoomLevelIndexChanged();
 
     Q_PROPERTY(QVariantList fontZoomLevels READ fontZoomLevels NOTIFY fontZoomLevelsChanged)
     QVariantList fontZoomLevels() const { return m_fontZoomLevels; }
@@ -292,7 +295,8 @@ private:
     QScreen* m_screen = nullptr;
     qreal m_pageWidth = 750.0;
     int   m_fontPointSizeDelta = 0;
-    qreal m_devicePixelRatio = 1.0;
+    int m_fontZoomLevelIndex = -1;
+    QList<int> m_fontPointSizes;
     QVariantList m_fontZoomLevels;
     ScriteDocument *m_scriteDocument = nullptr;
     QFontMetrics m_defaultFontMetrics;

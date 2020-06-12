@@ -407,7 +407,6 @@ Rectangle {
                 id: zoomSlider
                 property var zoomLevels: screenplayFormat.fontZoomLevels
                 property real zoomLevel: zoomLevels[value]
-                property bool initialized: false
                 anchors.verticalCenter: parent.verticalCenter
                 from: 0; to: zoomLevels.length-1
                 stepSize: 1
@@ -416,10 +415,7 @@ Rectangle {
                         screenplayEditorSettings.mainEditorZoomValue = value
                     else
                         screenplayEditorSettings.embeddedEditorZoomValue = value
-                }
-                onZoomLevelChanged: {
-                    if(initialized)
-                        screenplayFormat.devicePixelRatio = Screen.devicePixelRatio * zoomLevel
+                    screenplayFormat.fontZoomLevelIndex = value
                 }
                 Component.onCompleted: {
                     var _value = -1
@@ -429,20 +425,8 @@ Rectangle {
                         _value = screenplayEditorSettings.embeddedEditorZoomValue
                     if(_value >= from && _value <= to)
                         value = _value
-                    else {
-                        var list = zoomLevels
-                        var zoomOneIndex = -1
-                        for(var i=0; i<list.length; i++) {
-                            zoomOneIndex = (list[i] === 1.0) ? i : -1
-                            if(zoomOneIndex >= 0)
-                                break
-                        }
-                        zoomOneIndex = Math.min(Math.max(zoomOneIndex+zoomLevelModifier, from), to)
-                        value = zoomOneIndex
-                    }
-
-                    screenplayFormat.devicePixelRatio = Screen.devicePixelRatio * zoomLevel
-                    initialized = true
+                    else
+                        value = screenplayFormat.fontZoomLevelIndex
                 }
             }
 

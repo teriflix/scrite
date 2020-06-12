@@ -676,7 +676,7 @@ void ScreenplayTextDocument::connectToScreenplayFormatSignals()
 
     connect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged);
     connect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged);
-    connect(m_formatting, &ScreenplayFormat::devicePixelRatioChanged, this, &ScreenplayTextDocument::onFormatDevicePixelRatioChanged);
+    connect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged);
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
@@ -716,7 +716,7 @@ void ScreenplayTextDocument::disconnectFromScreenplayFormatSignals()
 
     disconnect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged);
     disconnect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged);
-    disconnect(m_formatting, &ScreenplayFormat::devicePixelRatioChanged, this, &ScreenplayTextDocument::onFormatDevicePixelRatioChanged);
+    disconnect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged);
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
@@ -1002,7 +1002,7 @@ void ScreenplayTextDocument::onFormatScreenChanged()
     this->evaluatePageBoundariesLater();
 }
 
-void ScreenplayTextDocument::onFormatDevicePixelRatioChanged()
+void ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged()
 {
     this->evaluatePageBoundariesLater();
 }

@@ -24,6 +24,7 @@
 #include <QPdfWriter>
 #include <QTextCursor>
 #include <QPageLayout>
+#include <QFontDatabase>
 #include <QTextBlockUserData>
 
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
@@ -419,10 +420,9 @@ void ScreenplayFormat::setScreen(QScreen *val)
         return;
 
     m_screen = val;
-    if(m_screen)
-        this->setDevicePixelRatio(m_screen->devicePixelRatio());
-    else
-        this->evaluateFontPointSizeDelta();
+
+    this->evaluateFontZoomLevels();
+    this->evaluateFontPointSizeDelta();
 
     emit screenChanged();
 }
@@ -432,16 +432,15 @@ void ScreenplayFormat::setSreeenFromWindow(QObject *windowObject)
     this->setScreen( Application::instance()->windowScreen(windowObject) );
 }
 
-void ScreenplayFormat::setDevicePixelRatio(qreal val)
+qreal ScreenplayFormat::devicePixelRatio() const
 {
-    if( qFuzzyCompare(m_devicePixelRatio,val) )
-        return;
+    Q_ASSERT_X(m_fontPointSizes.size() == m_fontZoomLevels.size(), "ScreenplayFormat", "Font sizes and zoom levels are out of sync.");
 
-    m_devicePixelRatio = val;
-    this->evaluateFontPointSizeDelta();
+    const int index = m_fontPointSizes.indexOf( this->defaultFont2().pointSize() );
+    if(index < 0 || index >= m_fontPointSizes.size())
+        return 1.0; // FIXME
 
-    emit devicePixelRatioChanged();
-    emit formatChanged();
+    return m_fontZoomLevels.at(index).toDouble() * this->screenDevicePixelRatio();
 }
 
 void ScreenplayFormat::setDefaultFont(const QFont &val)
@@ -451,8 +450,8 @@ void ScreenplayFormat::setDefaultFont(const QFont &val)
 
     m_defaultFont = val;
 
-    this->evaluateFontPointSizeDelta();
     this->evaluateFontZoomLevels();
+    this->evaluateFontPointSizeDelta();
 
     emit defaultFontChanged();
     emit formatChanged();
@@ -463,6 +462,19 @@ QFont ScreenplayFormat::defaultFont2() const
     QFont font = m_defaultFont;
     font.setPointSize( font.pointSize()+m_fontPointSizeDelta );
     return font;
+}
+
+void ScreenplayFormat::setFontZoomLevelIndex(int val)
+{
+    val = qBound(0, val, m_fontZoomLevels.size()-1);
+    if(m_fontZoomLevelIndex == val)
+        return;
+
+    m_fontZoomLevelIndex = val;
+
+    this->evaluateFontPointSizeDelta();
+
+    emit fontZoomLevelIndexChanged();
 }
 
 SceneElementFormat *ScreenplayFormat::elementFormat(SceneElement::Type type) const
@@ -570,7 +582,10 @@ void ScreenplayFormat::resetToDefaults()
       */
     this->setDefaultFont(QFont("Courier Prime", 12));
     if(m_screen != nullptr)
-        this->setDevicePixelRatio(m_screen->devicePixelRatio());
+    {
+        const int index = m_fontZoomLevels.indexOf( QVariant(1.0) );
+        this->setFontZoomLevelIndex(index);
+    }
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
         m_elementFormats.at(i)->resetToDefaults();
@@ -614,86 +629,69 @@ void ScreenplayFormat::resetToDefaults()
 
 void ScreenplayFormat::evaluateFontPointSizeDelta()
 {
-    auto setDelta = [=](int val) {
-        if(m_fontPointSizeDelta == val)
-            return;
-        m_fontPointSizeDelta = val;
-        emit fontPointSizeDeltaChanged();
-        emit formatChanged();
-    };
+    Q_ASSERT_X(m_fontPointSizes.size() == m_fontZoomLevels.size(), "ScreenplayFormat", "Font sizes and zoom levels are out of sync.");
 
-    m_defaultFontMetrics = QFontMetrics(m_defaultFont);
-    m_defaultFont2Metrics = m_defaultFontMetrics;
-
-    const qreal dpr = m_devicePixelRatio;
-    if( qFuzzyCompare(dpr,1.0) )
+    int fontPointSize = m_defaultFont.pointSize();
+    if(m_fontZoomLevelIndex < 0)
     {
-        setDelta(0);
+        const int index = qBound(0, m_fontZoomLevels.indexOf( QVariant(1.0) ), m_fontZoomLevels.size()-1);
+        fontPointSize = m_fontPointSizes.at(index);
+    }
+    else
+        fontPointSize = m_fontPointSizes.at(qBound(0, m_fontZoomLevelIndex, m_fontZoomLevels.size()-1));
+
+    const int val = fontPointSize - m_defaultFont.pointSize();
+    if(m_fontPointSizeDelta == val)
         return;
-    }
 
-    const QFontMetricsF defaultFontMetrics(m_defaultFont);
-    const qreal minLineSpacing = defaultFontMetrics.lineSpacing() * dpr;
-    const int delta = dpr < 1.0 ? -1 : 1;
-    QFont font = m_defaultFont;
-    while(1)
-    {
-        font.setPointSize(font.pointSize()+delta);
-        const QFontMetricsF fm(font);
-        if(fm.lineSpacing() >= minLineSpacing)
-            break;
-    }
-
-    QFontInfo fontInfo(font);
-    setDelta( fontInfo.pointSize()-m_defaultFont.pointSize() );
-
-    m_defaultFontMetrics = QFontMetrics(m_defaultFont);
-    m_defaultFont2Metrics = QFontMetrics(this->defaultFont2());
+    m_fontPointSizeDelta = val;
+    emit fontPointSizeDeltaChanged();
+    emit formatChanged();
 }
 
 void ScreenplayFormat::evaluateFontZoomLevels()
 {
-    auto setFontZoomLevels = [=](const QVariantList &val) {
-        if(m_fontZoomLevels == val)
-            return;
-        m_fontZoomLevels = val;
-        emit fontZoomLevelsChanged();
-    };
+    QFont font2 = m_defaultFont;
+    font2.setPointSize( int(font2.pointSize()*this->screenDevicePixelRatio()) );
 
-    QVariantList levels = QVariantList() << 1.0;
-    const qreal standardLineSpacing = m_defaultFont2Metrics.lineSpacing();
-    const qreal minimumLineSpacing = standardLineSpacing * 0.5;
-    const qreal maximumLineSpacing = standardLineSpacing * 2.0;
+    QFontInfo defaultFontInfo(font2);
+    font2.setPointSize(defaultFontInfo.pointSize());
 
-    QFont font = this->defaultFont2();
-    while(1)
+    QFontMetricsF fm2(font2);
+    const qreal zoomOneLineSpacing = fm2.lineSpacing();
+    const int maxPointSize = int(2.0 * qreal(defaultFontInfo.pointSize()));
+
+    QVariantList zoomLevels;
+    QList<int> selectedPointSizes;
+    const QList<int> stdSizes = QFontDatabase().pointSizes(m_defaultFont.family());
+    int zoomOneIndex = -1;
+
+    for(int i=0; i<stdSizes.size(); i++)
     {
-        font.setPointSize(font.pointSize()-1);
-
-        const qreal lineSpacing = QFontMetricsF(font).lineSpacing();
-        if(lineSpacing < minimumLineSpacing)
+        const int fontSize = stdSizes.at(i);
+        if(fontSize > maxPointSize)
             break;
 
-        const qreal zoomLevel = lineSpacing / standardLineSpacing;
-        if(levels.first().toDouble() - zoomLevel > 0.1)
-            levels.prepend(zoomLevel);
+        font2.setPointSize(fontSize);
+        fm2 = QFontMetricsF(font2);
+
+        const qreal zoomLevel = fm2.lineSpacing() / zoomOneLineSpacing;
+        zoomLevels.append(zoomLevel);
+        selectedPointSizes.append(fontSize);
+
+        if(fontSize == defaultFontInfo.pointSize())
+            zoomOneIndex = i;
     }
 
-    font = this->defaultFont2();
-    while(1)
-    {
-        font.setPointSize(font.pointSize()+1);
+    std::sort(zoomLevels.begin(), zoomLevels.end());
+    std::sort(selectedPointSizes.begin(), selectedPointSizes.end());
 
-        const qreal lineSpacing = QFontMetricsF(font).lineSpacing();
-        if(lineSpacing > maximumLineSpacing)
-            break;
+    m_fontZoomLevels = zoomLevels;
+    m_fontPointSizes = selectedPointSizes;
+    emit fontZoomLevelsChanged();
 
-        const qreal zoomLevel = lineSpacing / standardLineSpacing;
-        if(zoomLevel - levels.last().toDouble() > 0.1)
-            levels.append(zoomLevel);
-    }
-
-    setFontZoomLevels(levels);
+    m_fontZoomLevelIndex = zoomOneIndex;
+    emit fontZoomLevelIndexChanged();
 }
 
 SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)

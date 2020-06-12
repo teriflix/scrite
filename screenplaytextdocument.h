@@ -136,7 +136,7 @@ private:
     void onElementFormatChanged();
     void onDefaultFontChanged();
     void onFormatScreenChanged();
-    void onFormatDevicePixelRatioChanged();
+    void onFormatFontPointSizeDeltaChanged();
 
     // Hook to signals to know current element and cursor position,
     // so that we can report current page number.
