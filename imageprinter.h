@@ -110,7 +110,7 @@ private:
 
 private:
     friend class ImagePrinterEngine;
-    qreal m_scale = 1.0;
+    qreal m_scale = 2.0;
     bool m_printing = false;
     QSize m_pageSize;
     QString m_directory;

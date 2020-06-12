@@ -22,7 +22,9 @@ TextArea {
     // renderType: Text.NativeRendering
     Material.primary: primaryColors.key
     Material.accent: accentColors.key
-    background: Item {
+    background: Rectangle {
+        color: enabled ? primaryColors.c10.background : primaryColors.button.background
+
         Rectangle {
             width: parent.width
             height: txtAreaInput.activeFocus ? 2 : 1

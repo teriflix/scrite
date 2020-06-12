@@ -603,8 +603,8 @@ Item {
                                 id: tabButtonPath
                                 readonly property point p1: Qt.point(itemRect.left, itemRect.bottom)
                                 readonly property point p2: Qt.point(itemRect.left, itemRect.top + 3)
-                                readonly property point p3: Qt.point(itemRect.right, itemRect.top + 3)
-                                readonly property point p4: Qt.point(itemRect.right, itemRect.bottom)
+                                readonly property point p3: Qt.point(itemRect.right-1, itemRect.top + 3)
+                                readonly property point p4: Qt.point(itemRect.right-1, itemRect.bottom)
                                 MoveTo { x: tabButtonPath.p1.x; y: tabButtonPath.p1.y }
                                 LineTo { x: tabButtonPath.p2.x; y: tabButtonPath.p2.y }
                                 LineTo { x: tabButtonPath.p3.x; y: tabButtonPath.p3.y }

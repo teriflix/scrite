@@ -1542,7 +1542,7 @@ Rectangle {
 
             ImagePrinter {
                 id: screenplayImagePrinter
-                scale: app.devicePixelRatio
+                scale: 2
             }
 
             Text {
@@ -1621,6 +1621,7 @@ Rectangle {
                                 source: pageUrl
                                 anchors.centerIn: parent
                                 smooth: true
+                                mipmap: true
                             }
 
                             MouseArea {

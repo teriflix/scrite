@@ -500,7 +500,6 @@ bool ImagePrinterEngine::begin(QPaintDevice *pdev)
 
     printToImage->begin();
 
-    const int resolution = qMax( m_currentDevice->metric(ImagePrinter::PdmDpiX), m_currentDevice->metric(ImagePrinter::PdmDpiY) );
     const QPageLayout pageLayout = m_currentDevice->pageLayout();
 
     m_directory = printToImage->directory();

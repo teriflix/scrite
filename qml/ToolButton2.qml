@@ -48,6 +48,7 @@ ToolButton {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: status === Image.Ready
                 smooth: true
+                mipmap: true
             }
 
             Text {
