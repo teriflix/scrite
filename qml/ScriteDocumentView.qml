@@ -646,6 +646,7 @@ Item {
                 source: "../images/teriflix_logo.png"
                 height: parent.height
                 smooth: true
+                mipmap: true
                 fillMode: Image.PreserveAspectFit
                 anchors.verticalCenter: parent.verticalCenter
                 transformOrigin: Item.Right
