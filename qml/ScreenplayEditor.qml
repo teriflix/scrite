@@ -426,7 +426,7 @@ Rectangle {
                     if(_value >= from && _value <= to)
                         value = _value
                     else
-                        value = screenplayFormat.fontZoomLevelIndex
+                        value = screenplayFormat.fontZoomLevelIndex + zoomLevelModifier
                 }
             }
 
