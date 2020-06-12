@@ -51,6 +51,7 @@ Row {
         from: 0.4; to: 2; value: 1
         stepSize: 0.1
         property real zoomLevel: value
+        anchors.verticalCenter: parent.verticalCenter
     }
 
     Rectangle {
