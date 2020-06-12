@@ -1546,6 +1546,7 @@ Rectangle {
             }
 
             Text {
+                id: noticeText
                 font.pixelSize: 30
                 anchors.centerIn: parent
                 text: "Generating preview ..."
@@ -1663,7 +1664,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 20
-                    text: "Page " + (Math.max(pagesGridView.currentIndex,0)+1) + " of " + pagesGridView.count
+                    text: noticeText.visible ? "Generating preview ..." : ("Page " + (Math.max(pageView.currentIndex,0)+1) + " of " + pageRepeater.count)
                 }
 
                 Slider {

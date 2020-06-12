@@ -14,6 +14,7 @@
 #include "screenplay.h"
 #include "garbagecollector.h"
 #include "screenplayadapter.h"
+#include "scritedocument.h"
 
 ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
     : QIdentityProxyModel(parent)
@@ -64,7 +65,16 @@ void ScreenplayAdapter::setSource(QObject *val)
             Scene *scene = qobject_cast<Scene*>(m_source);
             if(scene != nullptr)
             {
+                Screenplay *masterScreenplay = ScriteDocument::instance()->screenplay();
+
                 screenplay = new Screenplay(this);
+                if(masterScreenplay != nullptr)
+                {
+                    screenplay->setTitle(masterScreenplay->title());
+                    screenplay->setSubtitle(masterScreenplay->subtitle());
+                    screenplay->setAuthor(masterScreenplay->author());
+                    screenplay->setVersion(masterScreenplay->version());
+                }
 
                 ScreenplayElement *element = new ScreenplayElement(screenplay);
                 element->setScene(scene);
