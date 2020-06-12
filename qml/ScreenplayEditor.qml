@@ -421,6 +421,7 @@ Rectangle {
                     value = _value
                 else
                     value = screenplayFormat.fontZoomLevelIndex + zoomLevelModifier
+                screenplayFormat.fontZoomLevelIndex = value
             }
         }
     }
