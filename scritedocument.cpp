@@ -1021,7 +1021,7 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // store formatting options. So, the old formatting options data doesnt
     // work anymore. We better reset to defaults in the new version and then
     // let the user alter it anyway he sees fit.
-    if( version <= QVersionNumber(0,3,8) )
+    if( version <= QVersionNumber(0,3,9) )
     {
         m_formatting->resetToDefaults();
         m_printFormat->resetToDefaults();
