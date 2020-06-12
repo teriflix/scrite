@@ -658,15 +658,16 @@ void ScreenplayFormat::evaluateFontZoomLevels()
     font2.setPointSize(defaultFontInfo.pointSize());
 
     QFontMetricsF fm2(font2);
-    const qreal zoomOneLineSpacing = fm2.lineSpacing();
+    const qreal zoomOneACW = fm2.averageCharWidth();
     const int maxPointSize = int(2.0 * qreal(defaultFontInfo.pointSize()));
+    const int minPointSize = 8;
 
-    QVariantList zoomLevels;
-    QList<int> selectedPointSizes;
+    QVariantList zoomLevels = QVariantList() << QVariant(1.0);
+    QList<int> selectedPointSizes = QList<int>() << defaultFontInfo.pointSize();
     const QList<int> stdSizes = QFontDatabase().pointSizes(m_defaultFont.family());
-    int zoomOneIndex = -1;
 
-    for(int i=0; i<stdSizes.size(); i++)
+    const int start = stdSizes.indexOf(defaultFontInfo.pointSize());
+    for(int i=start+1; i<stdSizes.size(); i++)
     {
         const int fontSize = stdSizes.at(i);
         if(fontSize > maxPointSize)
@@ -674,23 +675,39 @@ void ScreenplayFormat::evaluateFontZoomLevels()
 
         font2.setPointSize(fontSize);
         fm2 = QFontMetricsF(font2);
-
-        const qreal zoomLevel = fm2.lineSpacing() / zoomOneLineSpacing;
-        zoomLevels.append(zoomLevel);
-        selectedPointSizes.append(fontSize);
-
-        if(fontSize == defaultFontInfo.pointSize())
-            zoomOneIndex = i;
+        const qreal zoomLevel = fm2.averageCharWidth() / zoomOneACW;
+        const qreal lastZoomLevel = zoomLevels.last().toDouble();
+        const qreal zoomScale = zoomLevel / lastZoomLevel;
+        if(zoomScale > 0.1)
+        {
+            zoomLevels.append(zoomLevel);
+            selectedPointSizes.append(fontSize);
+        }
     }
 
-    std::sort(zoomLevels.begin(), zoomLevels.end());
-    std::sort(selectedPointSizes.begin(), selectedPointSizes.end());
+    for(int i=start-1; i>=0; i--)
+    {
+        const int fontSize = stdSizes.at(i);
+        if(fontSize <= minPointSize)
+            break;
+
+        font2.setPointSize(fontSize);
+        fm2 = QFontMetricsF(font2);
+        const qreal zoomLevel = fm2.averageCharWidth() / zoomOneACW;
+        const qreal lastZoomLevel = zoomLevels.first().toDouble();
+        const qreal zoomScale = zoomLevel / lastZoomLevel;
+        if(zoomScale < 0.9)
+        {
+            zoomLevels.prepend(zoomLevel);
+            selectedPointSizes.prepend(fontSize);
+        }
+    }
 
     m_fontZoomLevels = zoomLevels;
     m_fontPointSizes = selectedPointSizes;
     emit fontZoomLevelsChanged();
 
-    m_fontZoomLevelIndex = zoomOneIndex;
+    m_fontZoomLevelIndex = m_fontPointSizes.indexOf(defaultFontInfo.pointSize());
     emit fontZoomLevelIndexChanged();
 }
 
