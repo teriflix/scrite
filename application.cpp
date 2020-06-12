@@ -625,8 +625,6 @@ QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF
             ret.setY( -(smallRect.bottom()-bigRect.bottom()) );
     }
 
-    qDebug() << "PA: " << bigRect << smallRect << ret;
-
     return ret;
 }
 

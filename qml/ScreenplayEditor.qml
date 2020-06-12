@@ -929,7 +929,7 @@ Rectangle {
                         function highlightSearchResultTextSnippet() {
                             if(selection.start >= 0 && selection.end >= 0) {
                                 var rect = app.uniteRectangles( sceneTextEditor.positionToRectangle(selection.start),
-                                                                sceneTextEditor.positionToRectangle(selection.end) )
+                                                               sceneTextEditor.positionToRectangle(selection.end) )
                                 rect = app.adjustRectangle(rect, -20, -50, 20, 50)
                                 contentView.ensureVisible(contentItem, rect)
 
@@ -1553,15 +1553,15 @@ Rectangle {
             }
 
             Flickable {
-                id: pagesScroll
+                id: pageView
                 anchors.fill: parent
                 anchors.bottomMargin: statusBar.height
-                contentWidth: pagesViewContainer.width
-                contentHeight: pagesViewContainer.height
+                contentWidth: pageViewContent.width
+                contentHeight: pageViewContent.height
                 clip: true
 
                 ScrollBar.horizontal: ScrollBar {
-                    policy: pagesViewContainer.width > pagesScroll.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    policy: pageLayout.width > pageView.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                     minimumSize: 0.1
                     palette {
                         mid: Qt.rgba(0,0,0,0.25)
@@ -1572,7 +1572,7 @@ Rectangle {
                 }
 
                 ScrollBar.vertical: ScrollBar {
-                    policy: pagesViewContainer.height > pagesScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    policy: pageLayout.height > pageView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                     minimumSize: 0.1
                     palette {
                         mid: Qt.rgba(0,0,0,0.25)
@@ -1582,51 +1582,68 @@ Rectangle {
                     Behavior on opacity { NumberAnimation { duration: 250 } }
                 }
 
-                property int nrColumns: Math.max(Math.floor(width/pagesView.cellWidth), 1)
+                property real cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + 40
+                property real cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + 40
+                property int nrColumns: Math.max(Math.floor(width/cellWidth), 1)
                 property int nrRows: Math.ceil(screenplayImagePrinter.pageCount / nrColumns)
+                property int currentIndex: 0
 
                 Item {
-                    id: pagesViewContainer
-                    width: Math.max(pagesView.width, pagesScroll.width)
-                    height: pagesView.height
+                    id: pageViewContent
+                    width: Math.max(pageLayout.width, pageView.width)
+                    height: pageLayout.height
 
-                    GridView {
-                        id: pagesView
+                    Flow {
+                        id: pageLayout
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: pagesScroll.nrColumns * pagesView.cellWidth
-                        height:  pagesScroll.nrRows * pagesView.cellHeight
-                        model: screenplayImagePrinter.printing ? null : screenplayImagePrinter
-                        cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + 40
-                        cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + 40
-                        interactive: false
-                        delegate: Item {
-                            width: pagesView.cellWidth
-                            height: pagesView.cellHeight
+                        width: pageView.cellWidth * pageView.nrColumns
+                        height: pageView.cellHeight * pageView.nrRows
 
-                            BorderImage {
-                                source: "../icons/content/shadow.png"
-                                anchors.fill: pageImage
-                                horizontalTileMode: BorderImage.Stretch
-                                verticalTileMode: BorderImage.Stretch
-                                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-                                border { left: 21; top: 21; right: 21; bottom: 21 }
-                                opacity: pagesView.currentIndex === index ? 0.55 : 0.15
-                                visible: pageImage.status === Image.Ready
-                            }
+                        Repeater {
+                            id: pageRepeater
 
-                            Image {
-                                id: pageImage
-                                width: pageWidth*previewZoomSlider.value
-                                height: pageHeight*previewZoomSlider.value
-                                source: pageUrl
-                                anchors.centerIn: parent
-                                smooth: true
-                                mipmap: true
-                            }
+                            model: screenplayImagePrinter.printing ? null : screenplayImagePrinter
+                            delegate: Item {
+                                readonly property int pageIndex: index
+                                width: pageView.cellWidth
+                                height: pageView.cellHeight
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: pagesView.currentIndex = index
+                                property bool itemIsVisible: {
+                                    var firstRow = Math.max(Math.floor(pageView.contentY / pageView.cellHeight), 0)
+                                    var lastRow = Math.min(Math.ceil( (pageView.contentY+pageView.height)/pageView.cellHeight ), pageRepeater.count-1)
+                                    var myRow = Math.floor(pageIndex/pageView.nrColumns)
+                                    return firstRow <= myRow && myRow <= lastRow;
+                                }
+
+                                BorderImage {
+                                    source: "../icons/content/shadow.png"
+                                    anchors.fill: pageImage
+                                    horizontalTileMode: BorderImage.Stretch
+                                    verticalTileMode: BorderImage.Stretch
+                                    anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+                                    border { left: 21; top: 21; right: 21; bottom: 21 }
+                                    opacity: pageView.currentIndex === index ? 0.55 : 0.15
+                                }
+
+                                Rectangle {
+                                    anchors.fill: pageImage
+                                    color: "white"
+                                }
+
+                                Image {
+                                    id: pageImage
+                                    width: pageWidth*previewZoomSlider.value
+                                    height: pageHeight*previewZoomSlider.value
+                                    source: parent.itemIsVisible ? pageUrl : ""
+                                    anchors.centerIn: parent
+                                    smooth: true
+                                    mipmap: true
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: pageView.currentIndex = index
+                                }
                             }
                         }
                     }
@@ -1646,7 +1663,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 20
-                    text: "Page " + (Math.max(pagesView.currentIndex,0)+1) + " of " + pagesView.count
+                    text: "Page " + (Math.max(pagesGridView.currentIndex,0)+1) + " of " + pagesGridView.count
                 }
 
                 Slider {
