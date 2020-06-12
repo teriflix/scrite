@@ -365,7 +365,7 @@ Rectangle {
             width: pageRulerArea.width
             height: parent.height
             anchors.centerIn: parent
-            visible: parent.width - pageNumberDisplay.width - zoomSliderBox.width > width
+            visible: parent.width - pageNumberDisplay.width - zoomSlider.width > width
 
             Text {
                 anchors.left: parent.left
@@ -396,43 +396,31 @@ Rectangle {
             }
         }
 
-        Row {
-            id: zoomSliderBox
-            anchors.right: parent.right
-            anchors.rightMargin: 20
+        ZoomSlider {
+            id: zoomSlider
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 10
-
-            Slider {
-                id: zoomSlider
-                property var zoomLevels: screenplayFormat.fontZoomLevels
-                property real zoomLevel: zoomLevels[value]
-                anchors.verticalCenter: parent.verticalCenter
-                from: 0; to: zoomLevels.length-1
-                stepSize: 1
-                onValueChanged: {
-                    if(mainTabBar.currentIndex === 0)
-                        screenplayEditorSettings.mainEditorZoomValue = value
-                    else
-                        screenplayEditorSettings.embeddedEditorZoomValue = value
-                    screenplayFormat.fontZoomLevelIndex = value
-                }
-                Component.onCompleted: {
-                    var _value = -1
-                    if(mainTabBar.currentIndex === 0)
-                        _value = screenplayEditorSettings.mainEditorZoomValue
-                    else
-                        _value = screenplayEditorSettings.embeddedEditorZoomValue
-                    if(_value >= from && _value <= to)
-                        value = _value
-                    else
-                        value = screenplayFormat.fontZoomLevelIndex + zoomLevelModifier
-                }
+            anchors.right: parent.right
+            property var zoomLevels: screenplayFormat.fontZoomLevels
+            zoomLevel: zoomLevels[value]
+            from: 0; to: zoomLevels.length-1
+            stepSize: 1
+            onValueChanged: {
+                if(mainTabBar.currentIndex === 0)
+                    screenplayEditorSettings.mainEditorZoomValue = value
+                else
+                    screenplayEditorSettings.embeddedEditorZoomValue = value
+                screenplayFormat.fontZoomLevelIndex = value
             }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: Math.round(zoomSlider.zoomLevel * 100) + "%"
+            Component.onCompleted: {
+                var _value = -1
+                if(mainTabBar.currentIndex === 0)
+                    _value = screenplayEditorSettings.mainEditorZoomValue
+                else
+                    _value = screenplayEditorSettings.embeddedEditorZoomValue
+                if(_value >= from && _value <= to)
+                    value = _value
+                else
+                    value = screenplayFormat.fontZoomLevelIndex + zoomLevelModifier
             }
         }
     }
@@ -1667,12 +1655,10 @@ Rectangle {
                     text: noticeText.visible ? "Generating preview ..." : ("Page " + (Math.max(pageView.currentIndex,0)+1) + " of " + pageRepeater.count)
                 }
 
-                Slider {
+                ZoomSlider {
                     id: previewZoomSlider
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    width: zoomSlider.width
-                    orientation: Qt.Horizontal
                     from: 0.5; to: 2.5; value: 1
                 }
             }
