@@ -596,7 +596,7 @@ void ScreenplayFormat::resetToDefaults()
 
     m_elementFormats[SceneElement::Heading]->setLeftMargin( (1.6-left)/contentWidth );
     m_elementFormats[SceneElement::Heading]->setRightMargin( (right-8.05)/contentWidth );
-    m_elementFormats[SceneElement::Heading]->setLineSpacingBefore(2);
+    m_elementFormats[SceneElement::Heading]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Heading]->setFontCapitalization(QFont::AllUppercase);
 
     m_elementFormats[SceneElement::Action]->setLeftMargin( (1.6-left)/contentWidth );

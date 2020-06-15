@@ -46,6 +46,7 @@ public:
     bool contains(const SceneElement *other) const;
     SceneElement::Type elementType() const;
     QString elementText() const;
+    const SceneElement *element() const { return m_element; }
 
     static ScreenplayParagraphBlockData *get(const QTextBlock &block);
     static ScreenplayParagraphBlockData *get(QTextBlockUserData *userData);
@@ -226,6 +227,15 @@ void ScreenplayTextDocument::setSyncEnabled(bool val)
     }
 
     emit syncEnabledChanged();
+}
+
+void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
+{
+    if(m_purpose == val)
+        return;
+
+    m_purpose = val;
+    emit purposeChanged();
 }
 
 void ScreenplayTextDocument::print(QObject *printerObject)
@@ -628,6 +638,199 @@ void ScreenplayTextDocument::loadScreenplay()
         // https://doc.qt.io/qt-5/richtext-cursor.html#frames
         cursor = m_textDocument->rootFrame()->lastCursorPosition();
         cursor.setBlockFormat(frameBoundaryBlockFormat);
+    }
+
+    if(m_purpose == ForPrinting && !m_syncEnabled)
+    {
+        /**
+          When we print a screenplay, we expect it to do the following
+
+          1. Slug line or Scene Heading cannot come on the last line of the page
+          2. Character name cannot be on the last line of the page
+          3. If only one line of the dialogue can be squeezed into the last line of the page, then
+             we must move it to the next page along with the charactername.
+          4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with character name.
+          */
+        const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
+        const QMarginsF pageMargins = pageLayout->margins();
+        const QFont defaultFont = m_formatting->defaultFont();
+
+        m_textDocument->setDefaultFont(defaultFont);
+        pageLayout->configure(m_textDocument);
+
+        QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+        QTextCursor endCursor(m_textDocument);
+        endCursor.movePosition(QTextCursor::End);
+
+        const int nrPages = m_textDocument->pageCount();
+        int pageIndex = m_titlePage ? 1 : 0;
+
+        QRectF paperRect = pageLayout->paperRect();
+        if(m_titlePage)
+            paperRect.moveTop(paperRect.bottom()+1);
+
+        auto insertPageBreakAfter = [](const QTextBlock &block) {
+            QTextBlockFormat blockFormat;
+            blockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+            QTextCursor cursor(block);
+            cursor.setPosition(block.position());
+            cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+            cursor.mergeBlockFormat(blockFormat);
+            cursor.clearSelection();
+        };
+
+        const ScreenplayFormat *format = m_formatting;
+        const SceneElementFormat *characterFormat = format->elementFormat(SceneElement::Character);
+        const SceneElementFormat *dialogueFormat = format->elementFormat(SceneElement::Dialogue);
+        const QFontMetricsF dialogFontMetrics(dialogueFormat->font());
+
+        enum Markers { MoreMarker=1, ContinuedMarker=2, MoreAndContinuedMarkers=3 };
+
+        auto insertMarkers = [defaultFont,characterFormat](const QTextBlock &block, Markers markers) {
+            QTextBlock characterBlock;
+
+            QTextCursor cursor(block);
+            QTextFrame *frame = cursor.currentFrame();
+
+            // Keep going up, until we hit a character block.
+            QTextBlock blockUp = block.previous();
+            while(1) {
+                ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(blockUp);
+                if(blockData == nullptr)
+                    return; // Ill formatted screenplay, we cannot fix it.
+
+                if(blockData->elementType() == SceneElement::Character) {
+                    characterBlock = blockUp;
+                    break;
+                }
+
+                blockUp = blockUp.previous();
+
+                cursor = QTextCursor(blockUp);
+                if(cursor.currentFrame() != frame)
+                    break;
+            }
+
+            if(!characterBlock.isValid())
+                return; // Ill formatted screenplay, we cannot fix it.
+
+            ScreenplayParagraphBlockData *characterBlockData = ScreenplayParagraphBlockData::get(characterBlock);
+
+            if(markers & MoreMarker) {
+                QTextBlockFormat moreMarkerBlockFormat;
+                moreMarkerBlockFormat.setTopMargin(0);
+                moreMarkerBlockFormat.setAlignment(Qt::AlignHCenter);
+                moreMarkerBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+
+                QTextCharFormat moreMarkerCharFormat;
+                moreMarkerCharFormat.setFont(defaultFont);
+
+                cursor = QTextCursor(block);
+                cursor.setPosition(cursor.position()-1);
+                cursor.insertBlock(moreMarkerBlockFormat, moreMarkerCharFormat);
+                cursor.insertText(QStringLiteral("(MORE)"));
+            }
+            else {
+                cursor = QTextCursor(block);
+                cursor.setPosition(cursor.position()-1);
+            }
+
+            if(markers & ContinuedMarker) {
+                QTextBlockFormat contdMarkerBlockFormat = characterFormat->createBlockFormat();
+                QTextCharFormat contdMarkerCharFormat = characterFormat->createCharFormat();
+                contdMarkerBlockFormat.setTopMargin(0);
+                cursor.insertBlock(contdMarkerBlockFormat, contdMarkerCharFormat);
+                cursor.insertText(characterBlockData->elementText() + QStringLiteral(" (CONT'D)"));
+            }
+        };
+
+        for(int i=pageIndex; i<nrPages; i++)
+        {
+            const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
+            const int lastPosition = pageIndex == nrPages-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
+
+            QTextCursor cursor(m_textDocument);
+            cursor.setPosition(lastPosition-1);
+
+            QTextBlock block = cursor.block();
+            ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
+            if(blockData)
+            {
+                switch(blockData->elementType())
+                {
+                case SceneElement::Character:
+                case SceneElement::Heading:
+                    insertPageBreakAfter(block.previous());
+                    qDebug() << "PA: Page " << pageIndex+1 << " MOVED TO NEXT PAGE";
+                    break;
+                case SceneElement::Transition:
+                case SceneElement::Shot:
+                case SceneElement::Action:
+                    break; // do nothing for these
+                case SceneElement::Parenthetical: {
+                    QTextBlock previousBlock = block.previous();
+                    ScreenplayParagraphBlockData *previousBlockData = ScreenplayParagraphBlockData::get(previousBlock);
+                    if(previousBlockData) {
+                        if(previousBlockData->elementType() == SceneElement::Character) {
+                            previousBlock = previousBlock.previous();
+                            insertPageBreakAfter(previousBlock);
+                            qDebug() << "PA: Page " << pageIndex+1 << " MOVED PARENTHETICAL TO NEXT PAGE";
+                        } else if(previousBlockData->elementType() == SceneElement::Dialogue) {
+                            insertMarkers(block, MoreAndContinuedMarkers);
+                            qDebug() << "PA: Page " << pageIndex+1 << " MORE AND CONTINUED MARKER";
+                        }
+                    }
+                    } break;
+                case SceneElement::Dialogue:
+                    if(block.position()+block.length()-1 > lastPosition) {
+                        const QString moreMarker = QStringLiteral("... (MORE)");
+                        const QString blockText = block.text();
+                        const SceneElement *dialogElement = blockData->element();
+
+                        cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor, 1);
+
+                        QString blockTextPart1 = cursor.selectedText();
+                        blockTextPart1.chop(moreMarker.length());
+                        while(blockTextPart1.length() && !blockTextPart1.at(blockTextPart1.length()-1).isSpace())
+                            blockTextPart1.chop(1);
+                        blockTextPart1.chop(1);
+
+                        if(blockTextPart1.isNull())
+                            break; // Ill formatted screenplay, we cannot fix it.
+
+                        QString blockTextPart2 = QStringLiteral("... ") + blockText.mid(blockTextPart1.length()+1);
+
+                        cursor.clearSelection();
+                        cursor.select(QTextCursor::BlockUnderCursor);
+                        cursor.removeSelectedText();
+
+                        QTextBlockFormat dialogBlockFormat = dialogueFormat->createBlockFormat();
+                        QTextCharFormat dialogCharFormat = dialogueFormat->createCharFormat();
+
+                        dialogBlockFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
+                        cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
+                        cursor.insertText(blockTextPart1);
+                        cursor.insertText(moreMarker);
+                        block = cursor.block();
+                        block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
+
+                        dialogBlockFormat.setPageBreakPolicy(QTextFormat::PageBreak_Auto);
+                        cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
+                        cursor.insertText(blockTextPart2);
+                        block = cursor.block();
+                        block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
+
+                        insertMarkers(block, ContinuedMarker);
+
+                        qDebug() << "PA: Page " << pageIndex+1 << " CONTINUED MARKER";
+                    }
+                    break;
+                }
+            }
+
+            paperRect.moveTop(paperRect.bottom()+1);
+            ++pageIndex;
+        }
     }
 
     this->evaluatePageBoundariesLater();

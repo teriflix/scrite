@@ -80,17 +80,17 @@ public:
     qreal lineHeight() const { return m_lineHeight; }
     Q_SIGNAL void lineHeightChanged();
 
-    Q_PROPERTY(qreal lineSpacingBefore READ lineSpacingBefore WRITE setLineSpacingBefore NOTIFY lineSpacingBeforeChanged)
+    Q_PROPERTY(qreal lineSpacingBefore READ lineSpacingBefore WRITE setLineSpacingBefore NOTIFY lineSpacingBeforeChanged STORED false)
     void setLineSpacingBefore(qreal val);
     qreal lineSpacingBefore() const { return m_lineSpacingBefore; }
     Q_SIGNAL void lineSpacingBeforeChanged();
 
-    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged STORED false)
     void setLeftMargin(qreal val);
     qreal leftMargin() const { return m_leftMargin; }
     Q_SIGNAL void leftMarginChanged();
 
-    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
+    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged STORED false)
     void setRightMargin(qreal val);
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();

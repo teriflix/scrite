@@ -66,6 +66,13 @@ public:
     bool isSyncEnabled() const { return m_syncEnabled; }
     Q_SIGNAL void syncEnabledChanged();
 
+    enum Purpose { ForDisplay, ForPrinting };
+    Q_ENUM(Purpose)
+    Q_PROPERTY(Purpose purpose READ purpose WRITE setPurpose NOTIFY purposeChanged)
+    void setPurpose(Purpose val);
+    Purpose purpose() const { return m_purpose; }
+    Q_SIGNAL void purposeChanged();
+
     Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
     bool isUpdating() const { return m_updating; }
     Q_SIGNAL void updatingChanged();
@@ -166,6 +173,7 @@ private:
     bool m_updating = false;
     bool m_titlePage = false;
     int m_currentPage = 0;
+    Purpose m_purpose = ForDisplay;
     bool m_syncEnabled = true;
     bool m_sceneNumbers = true;
     Scene *m_activeScene = nullptr;

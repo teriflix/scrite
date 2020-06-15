@@ -1525,8 +1525,16 @@ Rectangle {
 
             Component.onCompleted: {
                 app.execLater(screenplayTextDocument, 250, function() {
-                    screenplayTextDocument.print(screenplayImagePrinter)
+                    screenplayTextDocument2.print(screenplayImagePrinter)
                 })
+            }
+
+            ScreenplayTextDocument {
+                id: screenplayTextDocument2
+                screenplay: screenplayTextDocument.screenplay
+                formatting: screenplayTextDocument.formatting
+                purpose: ScreenplayTextDocument.ForPrinting
+                syncEnabled: false
             }
 
             ImagePrinter {
