@@ -1031,7 +1031,7 @@ Rectangle {
 
             Column {
                 id: sceneHeadingLayout
-                spacing: 5
+                spacing: sceneCharactersListLoader.active ? 5 : 0
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: ruler.leftMarginPx
@@ -1071,6 +1071,8 @@ Rectangle {
                         onClicked: sceneMenu.visible = true
                         down: sceneMenu.visible
                         anchors.verticalCenter: parent.verticalCenter
+                        width: headingFontMetrics.lineSpacing
+                        height: headingFontMetrics.lineSpacing
 
                         Item {
                             anchors.bottom: parent.bottom

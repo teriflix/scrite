@@ -54,13 +54,24 @@ Item {
     }
 
     Image {
+        id: iconImage
+        z: 1
         anchors.fill: parent
         anchors.margins: anchorMargins
         source: parent.iconSource
         fillMode: Image.PreserveAspectFit
+        smooth: true; mipmap: true
         opacity: enabled ? (toolButtonMouseArea.containsMouse ? 1 : 0.9) : 0.45
-        property real anchorMargins: toolButtonMouseArea.containsMouse ? 8 : 10
-        Behavior on anchorMargins { NumberAnimation { duration: 250 } }
+        property real anchorMargins: {
+            var am = toolButtonMouseArea.containsMouse ? 8 : 10
+            return parent.width-2*am < 16 ? 1 : am
+        }
+        Behavior on anchorMargins {
+            enabled: iconImage.anchorMargins > 0
+            NumberAnimation {
+                duration: 250
+            }
+        }
     }
 
     Shortcut {
