@@ -754,11 +754,22 @@ void ScreenplayTextDocument::loadScreenplay()
 
             QTextBlock block = cursor.block();
             ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
+            if(blockData == nullptr)
+            {
+                block = block.previous();
+                blockData = ScreenplayParagraphBlockData::get(block);
+            }
+
             if(blockData)
             {
                 switch(blockData->elementType())
                 {
-                case SceneElement::Character:
+                case SceneElement::Character: {
+                    const SceneElement *element = blockData->element();
+                    if(element->scene()->elementAt(0) == element)
+                        block = block.previous();
+                    insertPageBreakAfter(block.previous());
+                    } break;
                 case SceneElement::Heading:
                     insertPageBreakAfter(block.previous());
                     break;
