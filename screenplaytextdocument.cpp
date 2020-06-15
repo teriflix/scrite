@@ -761,7 +761,6 @@ void ScreenplayTextDocument::loadScreenplay()
                 case SceneElement::Character:
                 case SceneElement::Heading:
                     insertPageBreakAfter(block.previous());
-                    qDebug() << "PA: Page " << pageIndex+1 << " MOVED TO NEXT PAGE";
                     break;
                 case SceneElement::Transition:
                 case SceneElement::Shot:
@@ -774,10 +773,8 @@ void ScreenplayTextDocument::loadScreenplay()
                         if(previousBlockData->elementType() == SceneElement::Character) {
                             previousBlock = previousBlock.previous();
                             insertPageBreakAfter(previousBlock);
-                            qDebug() << "PA: Page " << pageIndex+1 << " MOVED PARENTHETICAL TO NEXT PAGE";
                         } else if(previousBlockData->elementType() == SceneElement::Dialogue) {
                             insertMarkers(block, MoreAndContinuedMarkers);
-                            qDebug() << "PA: Page " << pageIndex+1 << " MORE AND CONTINUED MARKER";
                         }
                     }
                     } break;
@@ -821,8 +818,6 @@ void ScreenplayTextDocument::loadScreenplay()
                         block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
                         insertMarkers(block, ContinuedMarker);
-
-                        qDebug() << "PA: Page " << pageIndex+1 << " CONTINUED MARKER";
                     }
                     break;
                 }

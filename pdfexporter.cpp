@@ -25,12 +25,21 @@
 PdfExporter::PdfExporter(QObject *parent)
             : AbstractTextDocumentExporter(parent)
 {
-
+    this->setUsePageBreaks(true);
 }
 
 PdfExporter::~PdfExporter()
 {
 
+}
+
+void PdfExporter::setIncludeSceneNumbers(bool val)
+{
+    if(m_includeSceneNumbers == val)
+        return;
+
+    m_includeSceneNumbers = val;
+    emit includeSceneNumbersChanged();
 }
 
 bool PdfExporter::doExport(QIODevice *device)

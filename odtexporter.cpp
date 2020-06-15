@@ -20,7 +20,7 @@
 OdtExporter::OdtExporter(QObject *parent)
             :AbstractTextDocumentExporter(parent)
 {
-
+    this->setUsePageBreaks(false);
 }
 
 OdtExporter::~OdtExporter()
