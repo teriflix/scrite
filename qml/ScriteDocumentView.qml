@@ -780,7 +780,14 @@ Item {
                                 onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                                 property bool editCurrentSceneInStructure: true
                                 readonly property int screenplayZoomLevelModifier: -3
+                                active: screenplayEditor2Active.value
                                 sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
+                            }
+
+                            ResetOnChange {
+                                id: screenplayEditor2Active
+                                trackChangesOn: screenplayEditor2.editCurrentSceneInStructure
+                                from: false; to: true
                             }
                         }
                     }
@@ -844,13 +851,20 @@ Item {
 
         ScreenplayEditor {
             zoomLevelModifier: screenplayZoomLevelModifier
-            source: {
-                if(editCurrentSceneInStructure) {
-                    var index = scriteDocument.structure.currentElementIndex
-                    var element = scriteDocument.structure.elementAt(index)
-                    return element ? element.scene : null
+            source: sourceBinder.get
+
+            DelayedPropertyBinder {
+                id: sourceBinder
+                initial: null
+                set: {
+                    if(editCurrentSceneInStructure) {
+                        var index = scriteDocument.structure.currentElementIndex
+                        var element = scriteDocument.structure.elementAt(index)
+                        return element ? element.scene : null
+                    }
+                    return scriteDocument.loading ? null : scriteDocument.screenplay
                 }
-                return scriteDocument.loading ? null : scriteDocument.screenplay
+                delay: 50
             }
         }
     }
