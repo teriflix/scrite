@@ -267,6 +267,13 @@ Item {
                     width: parent.width-20
                     anchors.horizontalCenter: parent.horizontalCenter
 
+                    CheckBox2 {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Include Title Page In Preview"
+                        checked: screenplayEditorSettings.includeTitlePageInPreview
+                        onToggled: screenplayEditorSettings.includeTitlePageInPreview = checked
+                    }
+
                     Button2 {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Reset Paragraph Formats"

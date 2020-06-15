@@ -51,6 +51,7 @@ Item {
         property bool displaySceneCharacters: true
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
+        property bool includeTitlePageInPreview: true
     }
 
     Rectangle {

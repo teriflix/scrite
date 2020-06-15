@@ -1535,6 +1535,8 @@ Rectangle {
                 id: screenplayTextDocument2
                 screenplay: screenplayTextDocument.screenplay
                 formatting: screenplayTextDocument.formatting
+                sceneNumbers: true
+                titlePage: screenplayEditorSettings.includeTitlePageInPreview
                 purpose: ScreenplayTextDocument.ForPrinting
                 syncEnabled: false
             }
