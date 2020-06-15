@@ -666,8 +666,6 @@ void ScreenplayTextDocument::loadScreenplay()
         int pageIndex = m_titlePage ? 1 : 0;
 
         QRectF paperRect = pageLayout->paperRect();
-        if(m_titlePage)
-            paperRect.moveTop(paperRect.bottom()+1);
 
         auto insertPageBreakAfter = [](const QTextBlock &block) {
             QTextBlockFormat blockFormat;
@@ -746,6 +744,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
         for(int i=pageIndex; i<nrPages; i++)
         {
+            paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
             const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
             const int lastPosition = pageIndex == nrPages-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
 
@@ -758,10 +757,14 @@ void ScreenplayTextDocument::loadScreenplay()
             {
                 block = block.previous();
                 blockData = ScreenplayParagraphBlockData::get(block);
-            }
+            }            
 
             if(blockData)
             {
+                // Verify that the block actually comes towards the end of the page.
+                QRectF blockRect = layout->blockBoundingRect(block);
+                blockRect.moveTop( blockRect.top() - contentsRect.top() );
+
                 switch(blockData->elementType())
                 {
                 case SceneElement::Character: {
@@ -791,7 +794,7 @@ void ScreenplayTextDocument::loadScreenplay()
                     } break;
                 case SceneElement::Dialogue:
                     if(block.position()+block.length()-1 > lastPosition) {
-                        const QString moreMarker = QStringLiteral("... (MORE)");
+                        const QString moreMarker = QStringLiteral(" -- (MORE)");
                         const QString blockText = block.text();
                         const SceneElement *dialogElement = blockData->element();
 
@@ -806,7 +809,7 @@ void ScreenplayTextDocument::loadScreenplay()
                         if(blockTextPart1.isNull())
                             break; // Ill formatted screenplay, we cannot fix it.
 
-                        QString blockTextPart2 = QStringLiteral("... ") + blockText.mid(blockTextPart1.length()+1);
+                        QString blockTextPart2 = QStringLiteral("-- ") + blockText.mid(blockTextPart1.length()+1);
 
                         cursor.clearSelection();
                         cursor.select(QTextCursor::BlockUnderCursor);
@@ -834,7 +837,6 @@ void ScreenplayTextDocument::loadScreenplay()
                 }
             }
 
-            paperRect.moveTop(paperRect.bottom()+1);
             ++pageIndex;
         }
     }
@@ -1325,11 +1327,12 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
         int pageIndex = 0;
         while(pageIndex < pageCount)
         {
+            paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
             const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
             const int firstPosition = pgBoundaries.isEmpty() ? layout->hitTest(contentsRect.topLeft(), Qt::FuzzyHit) : pgBoundaries.last().second+1;
             const int lastPosition = pageIndex == pageCount-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
             pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : endCursor.position());
-            paperRect.moveTop(paperRect.bottom()+1);
+
             ++pageIndex;
         }
     }
