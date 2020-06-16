@@ -44,6 +44,10 @@ public:
     Application(int &argc, char **argv, const QVersionNumber &version);
     ~Application();
 
+    QString installationId() const;
+    QDateTime installationTimestamp() const;
+    int launchCounter() const;
+
     Q_PROPERTY(QPalette palette READ palette CONSTANT)
     Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio CONSTANT)
     Q_PROPERTY(QFont font READ applicationFont NOTIFY applicationFontChanged)

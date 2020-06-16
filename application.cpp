@@ -17,12 +17,15 @@
 #include "simpletimer.h"
 
 #include <QDir>
+#include <QUuid>
 #include <QtDebug>
+#include <QWindow>
 #include <QPointer>
 #include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
 #include <QKeyEvent>
+#include <QDateTime>
 #include <QMetaEnum>
 #include <QQuickItem>
 #include <QJsonArray>
@@ -31,7 +34,6 @@
 #include <QColorDialog>
 #include <QFontDatabase>
 #include <QStandardPaths>
-#include <QWindow>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -57,6 +59,9 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
+    this->installationId();
+    this->installationTimestamp();
+    m_settings->setValue("Installation/launchCount", this->launchCounter()+1);
 
 #ifndef QT_NO_DEBUG
     QInternal::registerCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
@@ -70,6 +75,37 @@ Application::~Application()
 #ifndef QT_NO_DEBUG
     QInternal::unregisterCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
 #endif
+}
+
+QString Application::installationId() const
+{
+    QString clientID = m_settings->value("Installation/ClientID").toString();
+    if(clientID.isEmpty())
+    {
+        clientID = QUuid::createUuid().toString();
+        m_settings->setValue("Installation/ClientID", clientID);
+    }
+
+    return clientID;
+}
+
+QDateTime Application::installationTimestamp() const
+{
+    QString installTimestampStr = m_settings->value("Installation/timestamp").toString();
+    QDateTime installTimestamp = QDateTime::fromString(installTimestampStr);
+    if(installTimestampStr.isEmpty() || !installTimestamp.isValid())
+    {
+        installTimestamp = QDateTime::currentDateTime();
+        installTimestampStr = installTimestamp.toString();
+        m_settings->setValue("Installation/timestamp", installTimestampStr);
+    }
+
+    return installTimestamp;
+}
+
+int Application::launchCounter() const
+{
+    return m_settings->value("Installation/launchCount", 0).toInt();
 }
 
 #ifdef Q_OS_MAC

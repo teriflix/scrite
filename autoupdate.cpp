@@ -15,7 +15,6 @@
 #include "application.h"
 #include "garbagecollector.h"
 
-#include <QUuid>
 #include <QSettings>
 #include <QUrlQuery>
 #include <QJsonDocument>
@@ -160,6 +159,25 @@ void AutoUpdate::setSurveyInfo(const QJsonObject &val)
     if(m_surveyInfo == val)
         return;
 
+    QSettings *settings = Application::instance()->settings();
+
+    /**
+     * It would be a big turn off if the first thing that the user gets after
+     * installing and running the app for the very first time is a survey
+     * invite. Lets allow the user to use the app for alteast a few days
+     * before we ask for survey participation.
+     *
+     * So, we give the user 2 days of 5 launches which ever is later.
+     */
+
+    static const int minDaysBeforeSurvey = 2;
+    static const int minLaunchesBeforeSurvey = 5;
+
+    const QDateTime now = QDateTime::currentDateTime();
+    const bool allowSurvey = Application::instance()->installationTimestamp().daysTo(now) >= minDaysBeforeSurvey && Application::instance()->launchCounter() > minLaunchesBeforeSurvey;
+    if(!allowSurvey)
+        return;
+
     QString link = val.value("link").toString();
     if(link.isEmpty())
         return;
@@ -171,12 +189,12 @@ void AutoUpdate::setSurveyInfo(const QJsonObject &val)
     link = url.toString();
 
     const int surveyCounter = val.value("counter").toInt();
-    const int lastSurveyCounter = Application::instance()->settings()->value("Survey/counter").toInt();
-    const bool dontAskAgain = Application::instance()->settings()->value("Survey/dontAskAgain").toBool();
+    const int lastSurveyCounter = settings->value("Survey/counter").toInt();
+    const bool dontAskAgain = settings->value("Survey/dontAskAgain").toBool();
     if(lastSurveyCounter < surveyCounter || !dontAskAgain)
     {
-        Application::instance()->settings()->setValue("Survey/counter", surveyCounter);
-        Application::instance()->settings()->setValue("Survey/dontAskAgain", false);
+        settings->setValue("Survey/counter", surveyCounter);
+        settings->setValue("Survey/dontAskAgain", false);
 
         m_surveyInfo = val;
         m_surveyInfo.insert("link", link);
@@ -314,20 +332,10 @@ QString AutoUpdate::getClientId() const
     {
         ret = "scrite-";
         ret += Application::instance()->applicationVersion() + " ";
-
         QString prodName = QSysInfo::prettyProductName() + "-" + QSysInfo::currentCpuArchitecture();
         prodName.replace(" ", "_");
         ret += prodName + " ";
-
-        QSettings *settings = Application::instance()->settings();
-        QString clientID = settings->value("Installation/ClientID").toString();
-        if(clientID.isEmpty())
-        {
-            clientID = QUuid::createUuid().toString();
-            settings->setValue("Installation/ClientID", clientID);
-        }
-
-        ret += clientID;
+        ret += Application::instance()->installationId();
     }
 
     return ret;
