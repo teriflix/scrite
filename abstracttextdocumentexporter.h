@@ -30,13 +30,7 @@ public:
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
-    Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
-    Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY usePageBreaksChanged)
-    void setUsePageBreaks(bool val);
-    bool usePageBreaks() const { return m_usePageBreaks; }
-    Q_SIGNAL void usePageBreaksChanged();
-
+    virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
 
     bool requiresConfiguration() const { return true; }
@@ -46,7 +40,6 @@ protected:
     void generate(QTextDocument *textDocument, const qreal pageWidth);
 
 private:
-    bool m_usePageBreaks = false;
     bool m_listSceneCharacters = false;
 };
 

@@ -34,9 +34,6 @@
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
 
-const int SceneNumberObject = QTextFormat::UserObject+1;
-const int SceneNumberProperty = QTextFormat::UserProperty+1;
-
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
 public:
@@ -47,6 +44,10 @@ public:
     SceneElement::Type elementType() const;
     QString elementText() const;
     const SceneElement *element() const { return m_element; }
+    bool isFirstElementInScene() const;
+
+    const SceneElement *getCharacterElement() const;
+    QString getCharacterElementText() const;
 
     static ScreenplayParagraphBlockData *get(const QTextBlock &block);
     static ScreenplayParagraphBlockData *get(QTextBlockUserData *userData);
@@ -73,6 +74,38 @@ SceneElement::Type ScreenplayParagraphBlockData::elementType() const
 QString ScreenplayParagraphBlockData::elementText() const
 {
     return m_element ? m_element->text() : QString();
+}
+
+bool ScreenplayParagraphBlockData::isFirstElementInScene() const
+{
+    if(m_element)
+        return m_element->scene()->elementAt(0) == m_element;
+    return false;
+}
+
+const SceneElement *ScreenplayParagraphBlockData::getCharacterElement() const
+{
+    if(m_element && (m_element->type() == SceneElement::Dialogue || m_element->type() == SceneElement::Parenthetical))
+    {
+        Scene *scene = m_element->scene();
+        SceneElement *element = const_cast<SceneElement*>(m_element);
+        int index = m_element->scene()->indexOfElement(element) - 1;
+        while(index >= 0)
+        {
+            element = scene->elementAt(index);
+            if(element->type() == SceneElement::Character)
+                return element;
+            --index;
+        }
+    }
+
+    return nullptr;
+}
+
+QString ScreenplayParagraphBlockData::getCharacterElementText() const
+{
+    const SceneElement *element = this->getCharacterElement();
+    return element ? element->formattedText() : QString();
 }
 
 ScreenplayParagraphBlockData *ScreenplayParagraphBlockData::get(const QTextBlock &block)
@@ -448,16 +481,14 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
 
-    if(m_sceneNumbers)
+    if(m_sceneNumbers || (m_purpose == ForPrinting && m_syncEnabled))
     {
-        SceneNumberTextObjectInterface *toi = m_textDocument->findChild<SceneNumberTextObjectInterface*>();
+        ScreenplayTextObjectInterface *toi = m_textDocument->findChild<ScreenplayTextObjectInterface*>();
         if(toi == nullptr)
         {
-            toi = new SceneNumberTextObjectInterface(m_textDocument);
-            m_textDocument->documentLayout()->registerHandler(SceneNumberObject, toi);
+            toi = new ScreenplayTextObjectInterface(m_textDocument);
+            m_textDocument->documentLayout()->registerHandler(ScreenplayTextObjectInterface::Kind, toi);
         }
-
-        toi->resetIntrinsicSize();
     }
 
     const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
@@ -640,208 +671,200 @@ void ScreenplayTextDocument::loadScreenplay()
         cursor.setBlockFormat(frameBoundaryBlockFormat);
     }
 
-    if(m_purpose == ForPrinting && !m_syncEnabled)
+    this->includeMoreAndContdMarkers();
+    this->evaluatePageBoundariesLater();
+}
+
+void ScreenplayTextDocument::includeMoreAndContdMarkers()
+{
+    if(m_purpose != ForPrinting || m_syncEnabled)
+        return;
+
+    /**
+      When we print a screenplay, we expect it to do the following
+
+      1. Slug line or Scene Heading cannot come on the last line of the page
+      2. Character name cannot be on the last line of the page
+      3. If only one line of the dialogue can be squeezed into the last line of the page, then
+         we must move it to the next page along with the charactername.
+      4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with character name.
+      */
+    const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
+    const QMarginsF pageMargins = pageLayout->margins();
+    const QFont defaultFont = m_formatting->defaultFont();
+
+    m_textDocument->setDefaultFont(defaultFont);
+    pageLayout->configure(m_textDocument);
+
+    QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+    QTextCursor endCursor(m_textDocument);
+    endCursor.movePosition(QTextCursor::End);
+
+    int nrPages = m_textDocument->pageCount();
+    int pageIndex = m_titlePage ? 1 : 0;
+
+    QRectF paperRect = pageLayout->paperRect();
+
+    auto insertPageBreakAfter = [](const QTextBlock &block) {
+        QTextBlockFormat blockFormat;
+        blockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+        QTextCursor cursor(block);
+        cursor.setPosition(block.position());
+        cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+        cursor.mergeBlockFormat(blockFormat);
+        cursor.clearSelection();
+    };
+
+    const ScreenplayFormat *format = m_formatting;
+    const SceneElementFormat *characterFormat = format->elementFormat(SceneElement::Character);
+    const SceneElementFormat *dialogueFormat = format->elementFormat(SceneElement::Dialogue);
+    const QFontMetricsF dialogFontMetrics(dialogueFormat->font());
+    const int nrCharsPerDialogLine = int(ceil((pageLayout->contentWidth()-pageLayout->leftMargin()-pageLayout->rightMargin()-dialogueFormat->leftMargin()-dialogueFormat->rightMargin())/dialogFontMetrics.averageCharWidth()));
+
+    auto insertMarkers = [=](const QTextBlock &block) {
+        ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
+        if(blockData == nullptr)
+            return;
+
+        const QString characterName = blockData ? blockData->getCharacterElementText() : QString();
+        if(characterName.isEmpty())
+            return;
+
+        SceneElementFormat *elementFormat = format->elementFormat(blockData->elementType());
+        const QFont font = elementFormat->font();
+
+        QTextCursor cursor(block);
+        cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+
+        QTextBlockFormat pageBreakFormat;
+        pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+        cursor.mergeBlockFormat(pageBreakFormat);
+        cursor.clearSelection();
+
+        QTextCharFormat moreMarkerFormat;
+        moreMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
+        moreMarkerFormat.setFont(font);
+        moreMarkerFormat.setForeground(elementFormat->textColor());
+        moreMarkerFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::MoreMarkerType);
+        moreMarkerFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, QStringLiteral("  (MORE)"));
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), moreMarkerFormat);
+
+        QTextBlockFormat characterBlockFormat = characterFormat->createBlockFormat();
+        QTextCharFormat characterCharFormat = characterFormat->createCharFormat();
+        characterBlockFormat.setTopMargin(0);
+        cursor.insertBlock(characterBlockFormat, characterCharFormat);
+        cursor.insertText(characterName);
+
+        QTextCharFormat contdMarkerFormat;
+        contdMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
+        contdMarkerFormat.setFont(characterFormat->font());
+        contdMarkerFormat.setForeground(characterFormat->textColor());
+        contdMarkerFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::ContdMarkerType);
+        contdMarkerFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, QStringLiteral(" (CONT'D)"));
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), contdMarkerFormat);
+    };
+
+    while(pageIndex < nrPages)
     {
-        /**
-          When we print a screenplay, we expect it to do the following
+        if(pageIndex == 38)
+            qDebug("Check this.");
 
-          1. Slug line or Scene Heading cannot come on the last line of the page
-          2. Character name cannot be on the last line of the page
-          3. If only one line of the dialogue can be squeezed into the last line of the page, then
-             we must move it to the next page along with the charactername.
-          4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with character name.
-          */
-        const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
-        const QMarginsF pageMargins = pageLayout->margins();
-        const QFont defaultFont = m_formatting->defaultFont();
+        paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
+        const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
+        const int lastPosition = pageIndex == nrPages-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
 
-        m_textDocument->setDefaultFont(defaultFont);
-        pageLayout->configure(m_textDocument);
+        QTextCursor cursor(m_textDocument);
+        cursor.setPosition(lastPosition-1);
 
-        QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
-        QTextCursor endCursor(m_textDocument);
-        endCursor.movePosition(QTextCursor::End);
-
-        const int nrPages = m_textDocument->pageCount();
-        int pageIndex = m_titlePage ? 1 : 0;
-
-        QRectF paperRect = pageLayout->paperRect();
-
-        auto insertPageBreakAfter = [](const QTextBlock &block) {
-            QTextBlockFormat blockFormat;
-            blockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
-            QTextCursor cursor(block);
-            cursor.setPosition(block.position());
-            cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
-            cursor.mergeBlockFormat(blockFormat);
-            cursor.clearSelection();
-        };
-
-        const ScreenplayFormat *format = m_formatting;
-        const SceneElementFormat *characterFormat = format->elementFormat(SceneElement::Character);
-        const SceneElementFormat *dialogueFormat = format->elementFormat(SceneElement::Dialogue);
-        const QFontMetricsF dialogFontMetrics(dialogueFormat->font());
-
-        enum Markers { MoreMarker=1, ContinuedMarker=2, MoreAndContinuedMarkers=3 };
-
-        auto insertMarkers = [defaultFont,characterFormat](const QTextBlock &block, Markers markers) {
-            QTextBlock characterBlock;
-
-            QTextCursor cursor(block);
-            QTextFrame *frame = cursor.currentFrame();
-
-            // Keep going up, until we hit a character block.
-            QTextBlock blockUp = block.previous();
-            while(1) {
-                ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(blockUp);
-                if(blockData == nullptr)
-                    return; // Ill formatted screenplay, we cannot fix it.
-
-                if(blockData->elementType() == SceneElement::Character) {
-                    characterBlock = blockUp;
-                    break;
-                }
-
-                blockUp = blockUp.previous();
-
-                cursor = QTextCursor(blockUp);
-                if(cursor.currentFrame() != frame)
-                    break;
-            }
-
-            if(!characterBlock.isValid())
-                return; // Ill formatted screenplay, we cannot fix it.
-
-            ScreenplayParagraphBlockData *characterBlockData = ScreenplayParagraphBlockData::get(characterBlock);
-
-            if(markers & MoreMarker) {
-                QTextBlockFormat moreMarkerBlockFormat;
-                moreMarkerBlockFormat.setTopMargin(0);
-                moreMarkerBlockFormat.setAlignment(Qt::AlignHCenter);
-                moreMarkerBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
-
-                QTextCharFormat moreMarkerCharFormat;
-                moreMarkerCharFormat.setFont(defaultFont);
-
-                cursor = QTextCursor(block);
-                cursor.setPosition(cursor.position()-1);
-                cursor.insertBlock(moreMarkerBlockFormat, moreMarkerCharFormat);
-                cursor.insertText(QStringLiteral("(MORE)"));
-            }
-            else {
-                cursor = QTextCursor(block);
-                cursor.setPosition(cursor.position()-1);
-            }
-
-            if(markers & ContinuedMarker) {
-                QTextBlockFormat contdMarkerBlockFormat = characterFormat->createBlockFormat();
-                QTextCharFormat contdMarkerCharFormat = characterFormat->createCharFormat();
-                contdMarkerBlockFormat.setTopMargin(0);
-                cursor.insertBlock(contdMarkerBlockFormat, contdMarkerCharFormat);
-                cursor.insertText(characterBlockData->elementText() + QStringLiteral(" (CONT'D)"));
-            }
-        };
-
-        for(int i=pageIndex; i<nrPages; i++)
+        QTextBlock block = cursor.block();
+        ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
+        if(blockData == nullptr)
         {
-            paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
-            const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
-            const int lastPosition = pageIndex == nrPages-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
+            block = block.previous();
+            blockData = ScreenplayParagraphBlockData::get(block);
+        }
 
-            QTextCursor cursor(m_textDocument);
-            cursor.setPosition(lastPosition-1);
-
-            QTextBlock block = cursor.block();
-            ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-            if(blockData == nullptr)
+        if(blockData)
+        {
+            switch(blockData->elementType())
             {
-                block = block.previous();
-                blockData = ScreenplayParagraphBlockData::get(block);
-            }            
+            case SceneElement::Character: {
+                const SceneElement *element = blockData->element();
+                if(element->scene()->elementAt(0) == element)
+                    block = block.previous();
+                insertPageBreakAfter(block.previous());
+                } break;
+            case SceneElement::Heading:
+                insertPageBreakAfter(block.previous());
+                break;
+            case SceneElement::Transition:
+            case SceneElement::Shot:
+            case SceneElement::Action:
+                break; // do nothing for these
+            case SceneElement::Parenthetical: {
+                QTextBlock previousBlock = block.previous();
+                ScreenplayParagraphBlockData *previousBlockData = ScreenplayParagraphBlockData::get(previousBlock);
+                if(previousBlockData) {
+                    if(previousBlockData->elementType() == SceneElement::Character) {
+                        previousBlock = previousBlock.previous();
+                        insertPageBreakAfter(previousBlock);
+                    } else if(previousBlockData->elementType() == SceneElement::Dialogue) {
+                        insertMarkers(previousBlock);
+                    }
+                }
+                } break;
+            case SceneElement::Dialogue:
+                if(block.position()+block.length()-1 > lastPosition) {
+                    const QString blockText = block.text();
+                    const SceneElement *dialogElement = blockData->element();
 
-            if(blockData)
-            {
-                // Verify that the block actually comes towards the end of the page.
-                QRectF blockRect = layout->blockBoundingRect(block);
-                blockRect.moveTop( blockRect.top() - contentsRect.top() );
+                    cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor, 1);
 
-                switch(blockData->elementType())
-                {
-                case SceneElement::Character: {
-                    const SceneElement *element = blockData->element();
-                    if(element->scene()->elementAt(0) == element)
-                        block = block.previous();
-                    insertPageBreakAfter(block.previous());
-                    } break;
-                case SceneElement::Heading:
-                    insertPageBreakAfter(block.previous());
-                    break;
-                case SceneElement::Transition:
-                case SceneElement::Shot:
-                case SceneElement::Action:
-                    break; // do nothing for these
-                case SceneElement::Parenthetical: {
-                    QTextBlock previousBlock = block.previous();
-                    ScreenplayParagraphBlockData *previousBlockData = ScreenplayParagraphBlockData::get(previousBlock);
-                    if(previousBlockData) {
+                    QString blockTextPart1 = cursor.selectedText();
+                    blockTextPart1.chop(nrCharsPerDialogLine);
+                    while(blockTextPart1.length() && !blockTextPart1.at(blockTextPart1.length()-1).isSpace())
+                        blockTextPart1.chop(1);
+                    blockTextPart1.chop(1);
+
+                    // if(blockTextPart1.length() < nrCharsPerDialogLine) {
+                    if(blockTextPart1.isEmpty()) {
+                        QTextBlock previousBlock = block.previous();
+                        ScreenplayParagraphBlockData *previousBlockData = ScreenplayParagraphBlockData::get(previousBlock);
                         if(previousBlockData->elementType() == SceneElement::Character) {
-                            previousBlock = previousBlock.previous();
-                            insertPageBreakAfter(previousBlock);
-                        } else if(previousBlockData->elementType() == SceneElement::Dialogue) {
-                            insertMarkers(block, MoreAndContinuedMarkers);
+                            if(previousBlockData->isFirstElementInScene())
+                                previousBlock = previousBlock.previous();
+                            insertPageBreakAfter(previousBlock.previous());
+                            break;
                         }
                     }
-                    } break;
-                case SceneElement::Dialogue:
-                    if(block.position()+block.length()-1 > lastPosition) {
-                        const QString moreMarker = QStringLiteral(" -- (MORE)");
-                        const QString blockText = block.text();
-                        const SceneElement *dialogElement = blockData->element();
 
-                        cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor, 1);
+                    QString blockTextPart2 = blockText.mid(blockTextPart1.length()+1);
 
-                        QString blockTextPart1 = cursor.selectedText();
-                        blockTextPart1.chop(moreMarker.length());
-                        while(blockTextPart1.length() && !blockTextPart1.at(blockTextPart1.length()-1).isSpace())
-                            blockTextPart1.chop(1);
-                        blockTextPart1.chop(1);
+                    cursor.clearSelection();
+                    cursor.select(QTextCursor::BlockUnderCursor);
+                    cursor.removeSelectedText();
 
-                        if(blockTextPart1.isNull())
-                            break; // Ill formatted screenplay, we cannot fix it.
+                    QTextBlockFormat dialogBlockFormat = dialogueFormat->createBlockFormat();
+                    QTextCharFormat dialogCharFormat = dialogueFormat->createCharFormat();
+                    cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
+                    cursor.insertText(blockTextPart1);
+                    block = cursor.block();
+                    block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
-                        QString blockTextPart2 = QStringLiteral("-- ") + blockText.mid(blockTextPart1.length()+1);
+                    cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
+                    cursor.insertText(blockTextPart2);
+                    block = cursor.block();
+                    block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
-                        cursor.clearSelection();
-                        cursor.select(QTextCursor::BlockUnderCursor);
-                        cursor.removeSelectedText();
-
-                        QTextBlockFormat dialogBlockFormat = dialogueFormat->createBlockFormat();
-                        QTextCharFormat dialogCharFormat = dialogueFormat->createCharFormat();
-
-                        dialogBlockFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
-                        cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
-                        cursor.insertText(blockTextPart1);
-                        cursor.insertText(moreMarker);
-                        block = cursor.block();
-                        block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
-
-                        dialogBlockFormat.setPageBreakPolicy(QTextFormat::PageBreak_Auto);
-                        cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
-                        cursor.insertText(blockTextPart2);
-                        block = cursor.block();
-                        block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
-
-                        insertMarkers(block, ContinuedMarker);
-                    }
-                    break;
+                    insertMarkers(block.previous());
                 }
+                break;
             }
-
-            ++pageIndex;
         }
-    }
 
-    this->evaluatePageBoundariesLater();
+        nrPages = layout->pageCount();
+        ++pageIndex;
+    }
 }
 
 void ScreenplayTextDocument::loadScreenplayLater()
@@ -1396,9 +1419,10 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             if(m_sceneNumbers)
             {
                 QTextCharFormat sceneNumberFormat;
-                sceneNumberFormat.setObjectType(SceneNumberObject);
+                sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
                 sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
-                sceneNumberFormat.setProperty(SceneNumberProperty, element->sceneNumber());
+                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
+                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, element->sceneNumber());
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
 
@@ -1607,51 +1631,93 @@ void ScreenplayElementPageBreaks::setPageBreaks(const QVariantList &val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SceneNumberTextObjectInterface::SceneNumberTextObjectInterface(QObject *parent)
+ScreenplayTextObjectInterface::ScreenplayTextObjectInterface(QObject *parent)
     : QObject(parent)
 {
 
 }
 
-SceneNumberTextObjectInterface::~SceneNumberTextObjectInterface()
+ScreenplayTextObjectInterface::~ScreenplayTextObjectInterface()
 {
 
 }
 
-QSizeF SceneNumberTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
+QSizeF ScreenplayTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    if(!m_intrinsicSize.isValid())
-    {
-        const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
-        const QFontMetricsF fontMetrics(font);
-        m_intrinsicSize = QSizeF(0, fontMetrics.lineSpacing());
-    }
-
-    return m_intrinsicSize;
+    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+    const QFontMetricsF fontMetrics(font);
+    return QSizeF(0, fontMetrics.lineSpacing());
 }
 
 Q_DECL_IMPORT int qt_defaultDpi();
 
-void SceneNumberTextObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTextObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    const int sceneNumber = format.property(SceneNumberProperty).toInt();
+    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+    painter->setFont(font);
+
+    int type = format.property(TypeProperty).toInt();
+    switch(type)
+    {
+    case SceneNumberType:
+        this->drawSceneNumber(painter, givenRect, doc, posInDocument, format);
+        break;
+    case ContdMarkerType:
+    case MoreMarkerType:
+        this->drawMoreMarker(painter, givenRect, doc, posInDocument, format);
+        break;
+    }
+}
+
+void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+
+    const int sceneNumber = format.property(DataProperty).toInt();
     if(sceneNumber < 0)
         return;
-
-    const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
 
     QRectF rect = givenRect;
     rect.setLeft( rect.left()/2 );
 
     const QString sceneNumberText = QString::number(sceneNumber) + QStringLiteral(".");
-    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
-    painter->setFont(font);
+    this->drawText(painter, rect, sceneNumberText);
+}
+
+void ScreenplayTextObjectInterface::drawMoreMarker(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+
+    const QString text = format.property(DataProperty).toString();
+    if(text.isEmpty())
+        return;
+
+    QFontMetricsF fm(painter->font());
+    QRectF rect = fm.boundingRect(text);
+    rect.moveLeft( givenRect.right() );
+    rect.moveBottom( givenRect.bottom() );
+
+    const QPen oldPen = painter->pen();
+
+    QColor textColor = format.foreground().color();
+    textColor.setAlphaF(textColor.alphaF()*0.75);
+    painter->setPen(textColor);
+    this->drawText(painter, rect, text);
+
+    painter->setPen(oldPen);
+}
+
+void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &rect, const QString &text)
+{
+    const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
 
     if(isPdfDevice)
     {
@@ -1661,11 +1727,11 @@ void SceneNumberTextObjectInterface::drawObject(QPainter *painter, const QRectF 
         painter->save();
         painter->translate(rect.left(), rect.bottom());
         painter->scale(invScaleX, invScaleY);
-        painter->drawText(0, 0, sceneNumberText);
+        painter->drawText(0, 0, text);
         painter->restore();
     }
     else
-        painter->drawText(rect.bottomLeft(), sceneNumberText);
+        painter->drawText(rect.bottomLeft(), text);
 }
 
 

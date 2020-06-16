@@ -26,6 +26,13 @@ public:
     Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
     ~PdfExporter();
 
+    Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
+    Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY usePageBreaksChanged)
+    void setUsePageBreaks(bool val);
+    bool usePageBreaks() const { return m_usePageBreaks; }
+    Q_SIGNAL void usePageBreaksChanged();
+
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
@@ -40,6 +47,7 @@ protected:
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
+    bool m_usePageBreaks = true;
     bool m_includeSceneNumbers = true;
 };
 

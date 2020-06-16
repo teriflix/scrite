@@ -34,15 +34,6 @@ void AbstractTextDocumentExporter::setListSceneCharacters(bool val)
     emit listSceneCharactersChanged();
 }
 
-void AbstractTextDocumentExporter::setUsePageBreaks(bool val)
-{
-    if(m_usePageBreaks == val)
-        return;
-
-    m_usePageBreaks = val;
-    emit usePageBreaksChanged();
-}
-
 void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal pageWidth)
 {
     Q_UNUSED(pageWidth)
@@ -51,7 +42,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setTitlePage(true);
     stDoc.setSceneNumbers(this->isIncludeSceneNumbers());
     stDoc.setSyncEnabled(false);
-    if(m_usePageBreaks)
+    if(this->usePageBreaks())
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
     else
         stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);

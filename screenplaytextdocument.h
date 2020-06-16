@@ -114,6 +114,7 @@ private:
     void setCurrentPage(int val);
 
     void loadScreenplay();
+    void includeMoreAndContdMarkers();
     void loadScreenplayLater();
 
     void connectToScreenplaySignals();
@@ -229,23 +230,31 @@ private:
     ScreenplayTextDocument* m_screenplayDocument = nullptr;
 };
 
-class SceneNumberTextObjectInterface : public QObject, public QTextObjectInterface
+class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterface
 {
     Q_OBJECT
     Q_INTERFACES(QTextObjectInterface)
 
 public:
-    SceneNumberTextObjectInterface(QObject *parent=nullptr);
-    ~SceneNumberTextObjectInterface();
+    ScreenplayTextObjectInterface(QObject *parent=nullptr);
+    ~ScreenplayTextObjectInterface();
 
-    void resetIntrinsicSize() { m_intrinsicSize = QSizeF(); }
+    enum { Kind=QTextFormat::UserObject+1 };
+    enum Type { SceneNumberType, MoreMarkerType, ContdMarkerType };
+    enum Property
+    {
+        TypeProperty = QTextFormat::UserProperty+1,
+        DataProperty
+    };
 
     // QTextObjectInterface interface
     QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
 
 private:
-    QSizeF m_intrinsicSize;
+    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawText(QPainter *painter, const QRectF &rect, const QString &text);
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H
