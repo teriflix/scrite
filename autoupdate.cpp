@@ -125,6 +125,16 @@ QUrl AutoUpdate::updateDownloadUrl() const
     return QUrl(m_updateInfo.value("link").toString());
 }
 
+QUrl AutoUpdate::surveyUrl() const
+{
+    return QUrl(m_surveyInfo.value("link").toString());
+}
+
+void AutoUpdate::dontAskForSurveyAgain(bool val)
+{
+    Application::instance()->settings()->setValue("Survey/dontAskAgain", val);
+}
+
 void AutoUpdate::setUpdateInfo(const QJsonObject &val)
 {
     if(m_updateInfo == val)
@@ -136,13 +146,43 @@ void AutoUpdate::setUpdateInfo(const QJsonObject &val)
     if(!link.isEmpty())
     {
         QUrl url(link);
-        QUrlQuery uq;
+        QUrlQuery uq(link);
         uq.addQueryItem("client", this->getClientId());
         url.setQuery(uq);
         m_updateInfo.insert("link", url.toString());
     }
 
     emit updateInfoChanged();
+}
+
+void AutoUpdate::setSurveyInfo(const QJsonObject &val)
+{
+    if(m_surveyInfo == val)
+        return;
+
+    QString link = val.value("link").toString();
+    if(link.isEmpty())
+        return;
+
+    QUrl url(link);
+    QUrlQuery uq(url);
+    uq.addQueryItem("client", this->getClientId());
+    url.setQuery(uq);
+    link = url.toString();
+
+    const int surveyCounter = val.value("counter").toInt();
+    const int lastSurveyCounter = Application::instance()->settings()->value("Survey/counter").toInt();
+    const bool dontAskAgain = Application::instance()->settings()->value("Survey/dontAskAgain").toBool();
+    if(lastSurveyCounter < surveyCounter || !dontAskAgain)
+    {
+        Application::instance()->settings()->setValue("Survey/counter", surveyCounter);
+        Application::instance()->settings()->setValue("Survey/dontAskAgain", false);
+
+        m_surveyInfo = val;
+        m_surveyInfo.insert("link", link);
+
+        emit surveyInfoChanged();
+    }
 }
 
 void AutoUpdate::checkForUpdates()
@@ -179,6 +219,7 @@ void AutoUpdate::checkForUpdates()
 
         const QJsonObject json = jsonDoc.object();
         this->lookForUpdates(json);
+        this->lookForSurvey(json);
     });
 }
 
@@ -243,6 +284,15 @@ void AutoUpdate::lookForUpdates(const QJsonObject &json)
 
     this->setUpdateInfo(info);
     // Dont check for updates until this update is used up.
+}
+
+void AutoUpdate::lookForSurvey(const QJsonObject &json)
+{
+    const QJsonObject info = json.value("survey").toObject();
+    if(info.isEmpty())
+        return;
+
+    this->setSurveyInfo(info);
 }
 
 void AutoUpdate::timerEvent(QTimerEvent *event)
