@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE OdtExporter(QObject *parent=nullptr);
     ~OdtExporter();
 
+    bool generateTitlePage() const { return false; }
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface

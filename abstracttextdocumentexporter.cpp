@@ -39,7 +39,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     Q_UNUSED(pageWidth)
 
     ScreenplayTextDocument stDoc;
-    stDoc.setTitlePage(true);
+    stDoc.setTitlePage(this->generateTitlePage());
     stDoc.setSceneNumbers(this->isIncludeSceneNumbers());
     stDoc.setSyncEnabled(false);
     if(this->usePageBreaks())

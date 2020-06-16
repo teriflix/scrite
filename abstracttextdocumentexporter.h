@@ -30,6 +30,7 @@ public:
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
+    virtual bool generateTitlePage() const { return true; }
     virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
 

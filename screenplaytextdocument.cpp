@@ -510,18 +510,11 @@ void ScreenplayTextDocument::loadScreenplay()
     {
         const QFont defaultFont = m_formatting->defaultFont();
 
-        QTextTableFormat tableFormat;
-        tableFormat.setCellPadding(0);
-        tableFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
-        QTextTable *table = cursor.insertTable(1, 1, tableFormat);
+        QTextFrameFormat titleFrameFormat;
+        titleFrameFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
+        QTextFrame *titleFrame = cursor.insertFrame(titleFrameFormat);
 
-        QTextCharFormat cellFormat;
-        cellFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
-
-        QTextTableCell cell = table->cellAt(0, 0);
-        cell.setFormat(cellFormat);
-
-        cursor = cell.firstCursorPosition();
+        cursor = titleFrame->firstCursorPosition();
 
         // Title
         {
@@ -612,28 +605,25 @@ void ScreenplayTextDocument::loadScreenplay()
 
             QTextCharFormat charFormat;
             charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(9);
+            charFormat.setForeground(QColor(0,0,0,192));
 
             cursor.insertBlock();
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);
-            cursor.insertHtml("This screenplay was generated using <strong>scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
+            cursor.insertHtml("<font size=\"-2\">This screenplay was generated using <strong>Scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)</font>");
         }
-
-        cursor = m_textDocument->rootFrame()->lastCursorPosition();
 
         const QRectF pageRect = QRectF( QPointF(0,0), m_textDocument->pageSize() );
 
         QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
-        QRectF tableRect = layout->frameBoundingRect(table);
+        QRectF tableRect = layout->frameBoundingRect(titleFrame);
         tableRect.moveCenter(pageRect.center());
 
-        tableFormat.setTopMargin(tableRect.top() - m_textDocument->rootFrame()->frameFormat().topMargin());
-        table->setFormat(tableFormat);
+        titleFrameFormat.setTopMargin(tableRect.top() - 2*m_textDocument->rootFrame()->frameFormat().topMargin());
+        titleFrameFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
+        titleFrame->setFrameFormat(titleFrameFormat);
 
-        QTextBlockFormat blkFormat;
-        blkFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
-        cursor.insertBlock(blkFormat);
+        cursor = m_textDocument->rootFrame()->lastCursorPosition();
     }
 
     for(int i=0; i<m_screenplay->elementCount(); i++)
