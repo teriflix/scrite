@@ -70,8 +70,12 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 
 private:
+    void setCurrentIndexInternal(int val);
     void setCurrentElement(ScreenplayElement* val);
     QVariant data(ScreenplayElement *element, int row, int role) const;
+
+    void clearCurrentIndex();
+    void updateCurrentIndexAndCount();
 
 private:
     QObject* m_source = nullptr;

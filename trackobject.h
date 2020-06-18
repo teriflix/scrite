@@ -18,10 +18,13 @@
 
 #include <QObject>
 #include <QQmlListProperty>
+#include <QQmlParserStatus>
+#include <QAbstractListModel>
 
-class AbstractObjectTracker : public QObject
+class AbstractObjectTracker : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     ~AbstractObjectTracker();
@@ -31,13 +34,30 @@ public:
     QObject* target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
+    bool isInitialized() const { return m_initialized; }
+
+    // QQmlParserStatus interface
+    void classBegin();
+    void componentComplete();
+
 signals:
     void tracked();
+    void emitTracked();
+
+protected:
+    void onEmitTracked();
 
 protected:
     AbstractObjectTracker(QObject *parent=nullptr);
     virtual void init() { }
 
+    bool m_enabled = true;
+    bool m_initialized = true;
     QObject* m_target = nullptr;
 };
 
@@ -61,6 +81,58 @@ private:
     QString m_property;
 };
 
+class TrackModelRow : public AbstractObjectTracker
+{
+    Q_OBJECT
+
+public:
+    TrackModelRow(QObject *parent=nullptr);
+    ~TrackModelRow();
+
+    Q_PROPERTY(int row READ row WRITE setRow NOTIFY rowChanged)
+    void setRow(int val);
+    int row() const { return m_row; }
+    Q_SIGNAL void rowChanged();
+
+    Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)
+    void setRootIndex(const QModelIndex &val);
+    QModelIndex rootIndex() const { return m_rootIndex; }
+    Q_SIGNAL void rootIndexChanged();
+
+    enum Event
+    {
+        RowAboutToRemove,
+        RowRemoved,
+        RowAboutToInsert,
+        RowInserted
+    };
+    Q_ENUM(Event)
+    Q_PROPERTY(Event event READ rowEvent WRITE setRowEvent NOTIFY eventChanged)
+    void setRowEvent(Event val);
+    Event rowEvent() const { return m_event; }
+    Q_SIGNAL void eventChanged();
+
+private:
+    void init();
+    void onRowsAboutToInsert(const QModelIndex &parent, int start, int end);
+    void onRowsInserted();
+    void onRowsAboutToDelete(const QModelIndex &parent, int start, int end);
+    void onRowsDeleted();
+    void onAboutToReset();
+    void onReset();
+
+private:
+    int m_row = -1;
+    Event m_event = RowAboutToRemove;
+    QModelIndex m_rootIndex;
+
+    enum Operation { None, Insert, Remove, Move };
+    int m_operation = None;
+    int m_start = -1;
+    int m_end = -1;
+    void resetOperation() { m_operation = None; m_start=-1; m_end=-1; }
+};
+
 class TrackSignal : public AbstractObjectTracker
 {
     Q_OBJECT
@@ -81,13 +153,13 @@ private:
     QString m_signal;
 };
 
-class TrackObject : public QObject
+class TrackerPack : public QObject
 {
     Q_OBJECT
 
 public:
-    TrackObject(QObject *parent = nullptr);
-    ~TrackObject();
+    TrackerPack(QObject *parent = nullptr);
+    ~TrackerPack();
 
     Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
     void setDelay(int val);

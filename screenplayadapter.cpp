@@ -19,9 +19,13 @@
 ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
     : QIdentityProxyModel(parent)
 {
-    connect(this, &ScreenplayAdapter::rowsInserted, this, &ScreenplayAdapter::elementCountChanged);
-    connect(this, &ScreenplayAdapter::rowsRemoved, this, &ScreenplayAdapter::elementCountChanged);
-    connect(this, &ScreenplayAdapter::modelReset, this, &ScreenplayAdapter::elementCountChanged);
+    connect(this, &ScreenplayAdapter::modelReset, this, &ScreenplayAdapter::updateCurrentIndexAndCount);
+    connect(this, &ScreenplayAdapter::rowsRemoved, this, &ScreenplayAdapter::updateCurrentIndexAndCount);
+    connect(this, &ScreenplayAdapter::rowsInserted, this, &ScreenplayAdapter::updateCurrentIndexAndCount);
+
+    connect(this, &ScreenplayAdapter::modelAboutToBeReset, this, &ScreenplayAdapter::clearCurrentIndex);
+    connect(this, &ScreenplayAdapter::rowsAboutToBeRemoved, this, &ScreenplayAdapter::clearCurrentIndex);
+    connect(this, &ScreenplayAdapter::rowsAboutToBeInserted, this, &ScreenplayAdapter::clearCurrentIndex);
 }
 
 ScreenplayAdapter::~ScreenplayAdapter()
@@ -112,22 +116,7 @@ Screenplay *ScreenplayAdapter::screenplay() const
 
 void ScreenplayAdapter::setCurrentIndex(int val)
 {
-    const int nrRows = this->rowCount();
-    val = nrRows > 0 ? qBound(0, val, nrRows-1) : -1;
-    if(m_currentIndex == val)
-        return;
-
-    m_currentIndex = val;
-
-    if(m_currentIndex >= 0)
-    {
-        const QModelIndex index = this->index(m_currentIndex, 0);
-        ScreenplayElement *element = this->data(index, ScreenplayElementRole).value<ScreenplayElement*>();
-        this->setCurrentElement(element);
-    }
-    else
-        this->setCurrentElement(nullptr);
-
+    this->setCurrentIndexInternal(val);
     emit currentIndexChanged(m_currentIndex);
 }
 
@@ -199,6 +188,25 @@ QVariant ScreenplayAdapter::data(const QModelIndex &index, int role) const
     return this->data(element, index.row(), role);
 }
 
+void ScreenplayAdapter::setCurrentIndexInternal(int val)
+{
+    const int nrRows = this->rowCount();
+    val = nrRows > 0 ? qBound(-1, val, nrRows-1) : -1;
+    if(m_currentIndex == val)
+        return;
+
+    m_currentIndex = val;
+
+    if(m_currentIndex >= 0)
+    {
+        const QModelIndex index = this->index(m_currentIndex, 0);
+        ScreenplayElement *element = this->data(index, ScreenplayElementRole).value<ScreenplayElement*>();
+        this->setCurrentElement(element);
+    }
+    else
+        this->setCurrentElement(nullptr);
+}
+
 void ScreenplayAdapter::setCurrentElement(ScreenplayElement *val)
 {
     if(m_currentElement == val)
@@ -244,4 +252,18 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
     }
 
     return QVariant();
+}
+
+void ScreenplayAdapter::clearCurrentIndex()
+{
+    this->setCurrentIndexInternal(-1);
+}
+
+void ScreenplayAdapter::updateCurrentIndexAndCount()
+{
+    Screenplay *sp = this->screenplay();
+    if(sp != nullptr)
+        this->setCurrentIndexInternal(sp->currentElementIndex());
+
+    emit elementCountChanged();
 }

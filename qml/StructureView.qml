@@ -365,7 +365,7 @@ Item {
         onViewportRectRequest: canvasScroll.ensureVisible(rect, canvas.scale, 0)
         visible: structureCanvasSettings.showPreview
 
-        TrackObject {
+        TrackerPack {
             delay: 100
             enabled: !scriteDocument.loading && canvasPreview.visible
 

@@ -270,7 +270,7 @@ Rectangle {
                     Component.onCompleted: positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
 
                     property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+1), 0) : 0
-                    property int lastItemIndex: screenplayAdapter.elementCount > 0 ? Math.min(indexAt(width/2, contentView.contentY+height-2), screenplayAdapter.elementCount-1) : 0
+                    property int lastItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+height-2), screenplayAdapter.elementCount-1) : 0
 
                     function isVisible(index) {
                         return index >= firstItemIndex && index <= lastItemIndex

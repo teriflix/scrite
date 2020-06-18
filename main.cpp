@@ -195,7 +195,8 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<AbstractObjectTracker>("Scrite", 1, 0, "AbstractTracker", reason);
     qmlRegisterType<TrackProperty>("Scrite", 1, 0, "TrackProperty");
     qmlRegisterType<TrackSignal>("Scrite", 1, 0, "TrackSignal");
-    qmlRegisterType<TrackObject>("Scrite", 1, 0, "TrackObject");
+    qmlRegisterType<TrackModelRow>("Scrite", 1, 0, "TrackModelRow");
+    qmlRegisterType<TrackerPack>("Scrite", 1, 0, "TrackerPack");
 
     qmlRegisterType<ScreenplayAdapter>("Scrite", 1, 0, "ScreenplayAdapter");
     qmlRegisterType<ScreenplayTextDocument>("Scrite", 1, 0, "ScreenplayTextDocument");

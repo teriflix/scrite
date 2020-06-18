@@ -71,7 +71,7 @@ Item {
             width: flickablePreview.flickable.visibleArea.widthRatio * parent.width
             height: flickablePreview.flickable.visibleArea.heightRatio * parent.height
 
-            TrackObject {
+            TrackerPack {
                 objectName: "CanvasPreviewTracker"
                 enabled: !viewportIndicatorMouseArea.drag.active && flickablePreview.visible
 
@@ -84,7 +84,7 @@ Item {
                 }
             }
 
-            TrackObject {
+            TrackerPack {
                 objectName: "PreviewCanvasTracker"
                 enabled: viewportIndicatorMouseArea.drag.active && flickablePreview.visible
 
