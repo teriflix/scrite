@@ -1348,13 +1348,25 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
     if(m_currentElement == val)
         return;
 
+    if(m_currentElement != nullptr)
+        disconnect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+
     m_currentElement = val;
+
+    if(m_currentElement != nullptr)
+        connect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+
     emit currentElementChanged();
 
     m_tabHistory.clear();
     this->evaluateAutoCompleteHints();
 
     emit currentFontChanged();
+}
+
+void SceneDocumentBinder::resetCurrentElement()
+{
+    this->setCurrentElement(nullptr);
 }
 
 class ForceCursorPositionHack : public QObject

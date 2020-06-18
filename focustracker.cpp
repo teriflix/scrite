@@ -105,6 +105,9 @@ FocusTracker::FocusTracker(QObject *parent)
 
 FocusTracker::~FocusTracker()
 {
+    if(m_window != nullptr)
+        disconnect(m_window, &QQuickWindow::activeFocusItemChanged, this, &FocusTracker::evaluateHasFocus);
+
     ::GlobalFocusTrackerList->removeOne(this);
 }
 
@@ -140,7 +143,7 @@ void FocusTracker::setHasFocus(bool val)
 
 void FocusTracker::evaluateHasFocus()
 {
-    if(m_item == nullptr || !m_window->isActive())
+    if(m_item == nullptr || (m_window != nullptr && !m_window->isActive()))
     {
         this->setHasFocus(false);
         return;

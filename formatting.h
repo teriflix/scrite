@@ -406,6 +406,7 @@ private:
     void initializeDocumentLater();
     void setDocumentLoadCount(int val);
     void setCurrentElement(SceneElement* val);
+    void resetCurrentElement();
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onContentsChange(int from, int charsRemoved, int charsAdded);
     void syncSceneFromDocument(int nrBlocks=-1);
