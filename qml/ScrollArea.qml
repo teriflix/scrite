@@ -80,7 +80,7 @@ Flickable {
         area = Qt.rect( area.x*scaling, area.y*scaling,
                         area.width*scaling, area.height*scaling )
 
-        if(area.right > contentWidth || area.bottom > contentHeight) {
+        if(area.right > contentWidth || area.bottom > contentHeight || width < 0 || height < 0) {
             ensureVisibleParams = {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }

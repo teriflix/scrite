@@ -230,8 +230,14 @@ Item {
                 border { left: 21; top: 21; right: 21; bottom: 21 }
                 visible: currentElementItem !== null
                 opacity: 0.55
-                property Item currentElementItem: elementItems.count > scriteDocument.structure.currentElementIndex ? elementItems.itemAt(scriteDocument.structure.currentElementIndex) : null
-                onCurrentElementItemChanged: app.execLater(currentElementItem, 100, function() { canvasScroll.ensureItemVisible(currentElementItem, canvas.scale) })
+                property Item currentElementItem: currentElementItemBinder.get
+                onCurrentElementItemChanged: canvasScroll.ensureItemVisible(currentElementItem, canvas.scale)
+
+                DelayedPropertyBinder {
+                    id: currentElementItemBinder
+                    initial: null
+                    set: elementItems.count > scriteDocument.structure.currentElementIndex ? elementItems.itemAt(scriteDocument.structure.currentElementIndex) : null
+                }
             }
 
             Repeater {
