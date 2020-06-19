@@ -329,6 +329,20 @@ SceneElement::~SceneElement()
     emit aboutToDelete(this);
 }
 
+SpellCheck *SceneElement::spellCheck() const
+{
+    if(m_spellCheck == nullptr)
+    {
+        m_spellCheck = new SpellCheck(const_cast<SceneElement*>(this));
+        m_spellCheck->setMethod(SpellCheck::OnDemand);
+        m_spellCheck->setAsynchronous(true);
+        m_spellCheck->setThreaded(true);
+        m_spellCheck->setText(m_text);
+    }
+
+    return m_spellCheck;
+}
+
 void SceneElement::setType(SceneElement::Type val)
 {
     if(m_type == val)
@@ -367,7 +381,10 @@ void SceneElement::setText(const QString &val)
     PushSceneUndoCommand cmd(m_scene);
 
     m_text = val.trimmed();
-    emit textChanged();
+    if(m_spellCheck != nullptr)
+        m_spellCheck->setText(m_text);
+
+    emit textChanged(val);
 
     if(m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
@@ -843,6 +860,8 @@ void Scene::removeElement(SceneElement *ptr)
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
 }
+
+
 
 SceneElement *Scene::elementAt(int index) const
 {

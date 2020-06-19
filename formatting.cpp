@@ -13,6 +13,7 @@
 
 #include "formatting.h"
 #include "application.h"
+#include "timeprofiler.h"
 #include "scritedocument.h"
 #include "qobjectserializer.h"
 #include "qobjectserializer.h"
@@ -725,24 +726,34 @@ int ScreenplayFormat::staticElementFormatCount(QQmlListProperty<SceneElementForm
 ///////////////////////////////////////////////////////////////////////////////
 
 class SceneDocumentBlockUserData : public QTextBlockUserData
-{
+{    
 public:
-    SceneDocumentBlockUserData(SceneElement *element);
+    SceneDocumentBlockUserData(SceneElement *element, SceneDocumentBinder *binder);
     ~SceneDocumentBlockUserData();
-
-    SceneElement *sceneElement() const { return m_sceneElement; }
-
-    void resetFormat() { m_formatMTime = -1; }
-    bool shouldUpdateFromFormat(const SceneElementFormat *format) {
-        return format->isModified(&m_formatMTime);
-    }
 
     QTextBlockFormat blockFormat;
     QTextCharFormat charFormat;
 
-    void setHighlightedText(const QString &text) {
-        m_highlightedText = text;
+    SceneElement *sceneElement() const { return m_sceneElement; }
+
+    void resetFormat() { m_formatMTime = -1; }
+    bool shouldUpdateFromFormat(const SceneElementFormat *format) { return format->isModified(&m_formatMTime); }
+
+    void initializeSpellCheck(SceneDocumentBinder *binder);
+    bool shouldUpdateFromSpellCheck() {
+        return !m_spellCheck.isNull() && m_spellCheck->isModified(&m_spellCheckMTime);
     }
+    void scheduleSpellCheckUpdate() {
+        if(!m_spellCheck.isNull())
+            m_spellCheck->scheduleUpdate();
+    }
+    QList<TextFragment> misspelledFragments() const {
+        if(!m_spellCheck.isNull())
+            return m_spellCheck->misspelledFragments();
+        return QList<TextFragment>();
+    }
+
+    void setHighlightedText(const QString &text) { m_highlightedText = text; }
     QString highlightedText() const { return m_highlightedText; }
 
     void setTransliteratedSegment(int start, int end, TransliterationEngine::Language language) {
@@ -769,17 +780,53 @@ public:
     static SceneDocumentBlockUserData *get(QTextBlockUserData *userData);
 
 private:
+    QPointer<SpellCheck> m_spellCheck;
     QPointer<SceneElement> m_sceneElement;
     QString m_highlightedText;
-    int m_formatMTime = 0;
+    int m_formatMTime = -1;
+    int m_spellCheckMTime = -1;
     int m_transliterationEnd = 0;
     int m_transliterationStart = 0;
     TransliterationEngine::Language m_translitrationLanguage = TransliterationEngine::English;
+    char m_padding[4];
+    QMetaObject::Connection m_spellCheckConnection;
 };
 
-SceneDocumentBlockUserData::SceneDocumentBlockUserData(SceneElement *element)
-    : m_sceneElement(element) { }
-SceneDocumentBlockUserData::~SceneDocumentBlockUserData() { }
+SceneDocumentBlockUserData::SceneDocumentBlockUserData(SceneElement *element, SceneDocumentBinder *binder)
+    : m_sceneElement(element)
+{
+    m_padding[0] = 0;
+
+    if(binder->isSpellCheckEnabled())
+    {
+        m_spellCheck = element->spellCheck();
+        m_spellCheckConnection = QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), binder, SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
+        m_spellCheck->scheduleUpdate();
+    }
+}
+
+SceneDocumentBlockUserData::~SceneDocumentBlockUserData()
+{
+    if(m_spellCheckConnection)
+        QObject::disconnect(m_spellCheckConnection);
+}
+
+void SceneDocumentBlockUserData::initializeSpellCheck(SceneDocumentBinder *binder)
+{
+    if(binder->isSpellCheckEnabled())
+    {
+        m_spellCheck = m_sceneElement->spellCheck();
+        m_spellCheckConnection = QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), binder, SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
+        m_spellCheck->scheduleUpdate();
+    }
+    else
+    {
+        if(m_spellCheckConnection)
+            QObject::disconnect(m_spellCheckConnection);
+
+        m_spellCheck = nullptr;
+    }
+}
 
 SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(const QTextBlock &block)
 {
@@ -922,6 +969,37 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     }
     else
         this->setCursorPosition(-1);
+}
+
+void SceneDocumentBinder::setSpellCheckEnabled(bool val)
+{
+    if(m_spellCheckEnabled == val)
+        return;
+
+    m_spellCheckEnabled = val;
+    emit spellCheckEnabledChanged();
+
+    if(this->document() != nullptr)
+    {
+        QTextBlock block = this->document()->firstBlock();
+        while(block.isValid())
+        {
+            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+            userData->initializeSpellCheck(this);
+            block = block.next();
+        }
+
+        this->rehighlightLater();
+    }
+}
+
+void SceneDocumentBinder::setLiveSpellCheckEnabled(bool val)
+{
+    if(m_liveSpellCheckEnabled == val)
+        return;
+
+    m_liveSpellCheckEnabled = val;
+    emit liveSpellCheckEnabledChanged();
 }
 
 void SceneDocumentBinder::setTextWidth(qreal val)
@@ -1189,12 +1267,44 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         userData->blockFormat = format->createBlockFormat();
         userData->charFormat = format->createCharFormat();
         userData->charFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
+    }
 
-        cursor.setPosition(block.position(), QTextCursor::MoveAnchor);
-        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-        cursor.setCharFormat(userData->charFormat);
-        cursor.setBlockFormat(userData->blockFormat);
-        cursor.clearSelection();
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    cursor.setCharFormat(userData->charFormat);
+    cursor.setBlockFormat(userData->blockFormat);
+    cursor.clearSelection();
+    cursor.setPosition(block.position());
+
+    const QList<TextFragment> fragments = userData->misspelledFragments();
+    if(!fragments.isEmpty())
+    {
+        /**
+         * https://bugreports.qt.io/browse/QTBUG-39617
+         *
+         * There is a long and pending bug report in Qt that impacts our ability to show wavy-underline
+         * for spelling mistakes in TextArea QML elements. So the following lines of code would not provide
+         * us with a red-wavy-underline as expected.
+         *
+         * spellingErrorFormat.setFontUnderline(true);
+         * spellingErrorFormat.setUnderlineColor(Qt::red);
+         * spellingErrorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+         *
+         * Until we can see a fix from Qt, we will have to make do with semi-transparent red background color
+         * to highlight spelling mistakes.
+         */
+        QTextCharFormat spellingErrorFormat;
+        spellingErrorFormat.setBackground(QColor(255,0,0,32));
+
+        Q_FOREACH(TextFragment fragment, fragments)
+        {
+            if(!fragment.isValid())
+                continue;
+
+            cursor.setPosition(block.position() + fragment.start());
+            cursor.setPosition(block.position() + fragment.end()+1, QTextCursor::KeepAnchor);
+            cursor.mergeCharFormat(spellingErrorFormat);
+            cursor.clearSelection();
+        }
     }
 
     if(userData->hasTransliteratedSegment())
@@ -1278,7 +1388,18 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
     else if(te->timerId() == m_rehighlightTimer.timerId())
     {
         m_rehighlightTimer.stop();
-        this->QSyntaxHighlighter::rehighlight();
+
+        const int nrBlocks = this->document()->blockCount();
+        const int nrTresholdBlocks = nrBlocks >> 1;
+        if(m_rehighlightBlockQueue.size() > nrTresholdBlocks || m_rehighlightBlockQueue.isEmpty())
+            this->QSyntaxHighlighter::rehighlight();
+        else
+        {
+            Q_FOREACH(QTextBlock block, m_rehighlightBlockQueue)
+                this->rehighlightBlock(block);
+        }
+
+        m_rehighlightBlockQueue.clear();
     }
 }
 
@@ -1314,7 +1435,9 @@ void SceneDocumentBinder::initializeDocument()
             cursor.insertBlock();
             block = cursor.block();
         }
-        block.setUserData(new SceneDocumentBlockUserData(element));
+
+        SceneDocumentBlockUserData *userData = new SceneDocumentBlockUserData(element, this);
+        block.setUserData(userData);
         cursor.insertText(element->text());
     }
     document->blockSignals(false);
@@ -1475,6 +1598,28 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
     }
 }
 
+void SceneDocumentBinder::onSpellCheckUpdated()
+{
+    if(m_scene == nullptr || this->document() == nullptr || m_initializingDocument)
+        return;
+
+    SpellCheck *spellCheck = qobject_cast<SpellCheck*>(this->sender());
+    if(spellCheck == nullptr)
+        return;
+
+    SceneElement *element = qobject_cast<SceneElement*>(spellCheck->parent());
+    if(element == nullptr)
+        return;
+
+    const int elementIndex = m_scene->indexOfElement(element);
+    if(elementIndex < 0)
+        return;
+
+    const QTextBlock block = this->document()->findBlockByNumber(elementIndex);
+    if(block.isValid())
+        this->rehighlightBlockLater(block);
+}
+
 void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int charsAdded)
 {
     if(m_initializingDocument || m_sceneIsBeingReset)
@@ -1511,6 +1656,8 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     }
 
     sceneElement->setText(block.text());
+    if(m_spellCheckEnabled && m_liveSpellCheckEnabled)
+        userData->scheduleSpellCheckUpdate();
     m_tabHistory.clear();
 }
 
@@ -1586,7 +1733,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
                 m_scene->insertElementAt(newElement, 0);
             }
 
-            userData = new SceneDocumentBlockUserData(newElement);
+            userData = new SceneDocumentBlockUserData(newElement, this);
             block.setUserData(userData);
         }
 
@@ -1729,6 +1876,13 @@ void SceneDocumentBinder::onSceneReset(int position)
 
 void SceneDocumentBinder::rehighlightLater()
 {
-    m_rehighlightTimer.start(0, this);
+    m_rehighlightTimer.start(100, this);
 }
+
+void SceneDocumentBinder::rehighlightBlockLater(const QTextBlock &block)
+{
+    m_rehighlightBlockQueue << block;
+    this->rehighlightLater();
+}
+
 

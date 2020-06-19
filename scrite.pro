@@ -170,6 +170,8 @@ win32 {
     RC_ICONS = appicon.ico
 }
 
+include($$PWD/3rdparty/sonnet/sonnet.pri)
+
 DISTFILES += \
     Info.plist \
     README \
@@ -180,7 +182,8 @@ DISTFILES += \
     packaging/windows/package-x64.bat \
     packaging/windows/installer-x86.nsi \
     packaging/windows/installer-x64.nsi \
-    packaging/mac/packaging.sh \
+    packaging/mac/package.sh \
+    packaging/mac/prepare.sh \
     3rdparty/poly2tri/License.txt
 
 

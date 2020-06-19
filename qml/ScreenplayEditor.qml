@@ -478,6 +478,8 @@ Rectangle {
                 characterNames: scriteDocument.structure.characterNames
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus
+                spellCheckEnabled: true
+                liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 onDocumentInitialized: sceneTextEditor.cursorPosition = 0
                 onRequestCursorPosition: app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action

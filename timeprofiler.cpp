@@ -22,6 +22,7 @@
 #include <QThreadStorage>
 #include <QStandardPaths>
 #include <QCoreApplication>
+#include <QThread>
 
 static void dump_time_profile_data()
 {
@@ -186,8 +187,13 @@ TimeProfile TimeProfile::put(const TimeProfile &profile)
 
 Q_GLOBAL_STATIC( QThreadStorage< QStack<TimeProfiler*> >, TimeProfilerStack )
 
+inline QString evaluateContextPrefix()
+{
+    return qApp->thread() == QThread::currentThread() ? QStringLiteral(" [MainThread]") : QStringLiteral(" [BackgroundThread]");
+}
+
 TimeProfiler::TimeProfiler(const QString &context, bool print)
-    : m_context(context), m_printInDestructor(print)
+    : m_context(context + evaluateContextPrefix()), m_printInDestructor(print)
 {
     static bool postRoutingAdded = false;
     if( !postRoutingAdded && qApp )

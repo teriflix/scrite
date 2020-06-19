@@ -26,8 +26,9 @@
 #include <QSyntaxHighlighter>
 #include <QQuickTextDocument>
 
-class ScreenplayFormat;
+class SpellCheck;
 class ScriteDocument;
+class ScreenplayFormat;
 
 class SceneElementFormat : public QObject, public Modifiable
 {
@@ -333,6 +334,16 @@ public:
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
+    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY spellCheckEnabledChanged)
+    void setSpellCheckEnabled(bool val);
+    bool isSpellCheckEnabled() const { return m_spellCheckEnabled; }
+    Q_SIGNAL void spellCheckEnabledChanged();
+
+    Q_PROPERTY(bool liveSpellCheckEnabled READ isLiveSpellCheckEnabled WRITE setLiveSpellCheckEnabled NOTIFY liveSpellCheckEnabledChanged)
+    void setLiveSpellCheckEnabled(bool val);
+    bool isLiveSpellCheckEnabled() const { return m_liveSpellCheckEnabled; }
+    Q_SIGNAL void liveSpellCheckEnabledChanged();
+
     Q_PROPERTY(qreal textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)
     void setTextWidth(qreal val);
     qreal textWidth() const { return m_textWidth; }
@@ -408,6 +419,7 @@ private:
     void setCurrentElement(SceneElement* val);
     void resetCurrentElement();
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
+    Q_SLOT void onSpellCheckUpdated();
     void onContentsChange(int from, int charsRemoved, int charsAdded);
     void syncSceneFromDocument(int nrBlocks=-1);
     bool eventFilter(QObject *object, QEvent *event);
@@ -420,17 +432,21 @@ private:
     void onSceneReset(int position);
 
     void rehighlightLater();
+    void rehighlightBlockLater(const QTextBlock &block);
 
 private:
+    friend class SpellCheck;
     Scene* m_scene = nullptr;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
     int m_documentLoadCount = 0;
     bool m_sceneIsBeingReset = false;
     bool m_forceSyncDocument = false;
+    bool m_spellCheckEnabled = true;
     QString m_completionPrefix;
     bool m_initializingDocument = false;
     QStringList m_characterNames;
+    bool m_liveSpellCheckEnabled = true;
     SceneElement* m_currentElement = nullptr;
     SimpleTimer m_rehighlightTimer;
     QStringList m_autoCompleteHints;
@@ -438,7 +454,8 @@ private:
     QQuickTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_screenplayFormat = nullptr;
     SimpleTimer m_initializeDocumentTimer;
-    QList<SceneElement::Type> m_tabHistory;    
+    QList<SceneElement::Type> m_tabHistory;
+    QList<QTextBlock> m_rehighlightBlockQueue;
 };
 
 #endif // FORMATTING_H

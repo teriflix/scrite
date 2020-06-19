@@ -1,0 +1,42 @@
+Sonnet is a KDE Library for multi-language spell checking.
+URL: https://marketplace.qt.io/products/sonnet
+
+Scrite uses version 5.62.0 of Sonnet from KDE Frameworks. Link for 
+downloading this package is: 
+http://download.kde.org/stable/frameworks/5.62/sonnet-5.62.0.tar.xz
+
+You can browse the latest version of Sonnet's code here:
+https://projects.kde.org/projects/frameworks/sonnet/repository
+
+Sonnet is provided by KDE under LGPL license, which AFAIK is compatible
+with GPLv3 (the license in which we are making Scrite available). LGPL
+requires us to provide a way for users to relink a different version of
+Sonnet with Scrite (as long as the code is compatible.) Since we have
+provided the entire source code of Scrite under GPLv3, relinking is 
+obviously possible.
+
+The complete copyright of everything within the sonnet folder belongs
+to its respective owners as clearly stated in the header of each of those
+files.
+
+
+
+We use Sonnet for its ability to provide fast spell-checking and 
+highlighting capability. We cannot use Sonnet directly in our code
+without changes, because we want to avoid external dependencies as much
+as possible. We cannot expect developers who pull a copy of Scrite
+from Git to setup Hunspell and all its dependencies before compiling
+Scrite. We want them to simply be able to pull a copy of Scrite, load
+it in Qt Creator and build. Thats it.
+
+The changes we have made to Sonnet source code is towards making this
+happen. Plugins that we have added to Sonnet are in the plugins folder
+within this directory. The plugins that come bundled with Sonnet are 
+inside sonnet/src/plugins folder, from which we are only using 
+nsspellchecker plugin (on macOS). 
+
+If you have any questions regarding our use of Sonnet within Scrite
+please write to us at scrite@teriflix.com.
+
+
+

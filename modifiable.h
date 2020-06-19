@@ -14,14 +14,17 @@
 #ifndef MODIFIABLE_H
 #define MODIFIABLE_H
 
+#include <QAtomicInt>
+
 class Modifiable
 {
 public:
     void markAsModified() { ++m_modificationTime; }
     int modificationTime() const { return m_modificationTime; }
     bool isModified(int *time) const {
-        const bool ret = m_modificationTime > *time;
-        *time = m_modificationTime;
+        const bool ret = time ? m_modificationTime > *time : true;
+        if(time)
+            *time = m_modificationTime;
         return ret;
     }
     bool isModified(const int time) const { return m_modificationTime > time; }
