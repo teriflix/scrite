@@ -547,14 +547,14 @@ Rectangle {
                         Repeater {
                             model: pageBreaksEvaluator.pageBreaks
 
-                            Rectangle {
+                            Item {
                                 id: pageBreakLine
                                 property rect cursorRect: modelData.position >= 0 ? sceneTextEditor.positionToRectangle(modelData.position) : Qt.rect(0,0,0,0)
                                 x: 0
                                 y: (modelData.position >= 0 ? cursorRect.y : -sceneHeadingAreaLoader.height) - height/2
                                 width: sceneTextEditorBackground.width
                                 height: 1
-                                color: primaryColors.c400.background
+                                // color: primaryColors.c400.background
 
                                 SceneNumberBubble {
                                     x: -width - 20
