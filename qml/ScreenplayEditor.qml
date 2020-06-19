@@ -1184,6 +1184,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     text: sceneHeading.locationType
                     completionStrings: scriteDocument.structure.standardLocationTypes()
+                    enableTransliteration: true
                     onEditingComplete: sceneHeading.locationType = text
                     tabItem: locEdit
                 }
@@ -1220,6 +1221,7 @@ Rectangle {
                     width: Math.max(contentWidth, 150);
                     anchors.verticalCenter: parent.verticalCenter
                     text: sceneHeading.moment
+                    enableTransliteration: true
                     completionStrings: scriteDocument.structure.standardMoments()
                     onEditingComplete: sceneHeading.moment = text
                     tabItem: sceneTextEditor

@@ -27,13 +27,11 @@ TextField {
     signal editingComplete()
 
     onEditingFinished: {
-        if(enableTransliteration)
-            text = app.transliterationEngine.transliteratedSentence(text, true)
+        transliterate(true)
         editingComplete()
     }
     Component.onDestruction: {
-        if(enableTransliteration)
-            text = app.transliterationEngine.transliteratedSentence(text, true)
+        transliterate(true)
         editingComplete()
     }
 
@@ -58,9 +56,13 @@ TextField {
         completionPrefix: textField.text.toUpperCase()
     }
 
-    onTextEdited: {
-        if(enableTransliteration)
-            text = app.transliterationEngine.transliteratedSentence(text, false)
+    onTextEdited: transliterate(false)
+
+    property bool userTypedSomeText: false
+    onUserTypedSomeTextChanged: console.log("PA: " + userTypedSomeText + " (" + text + ")")
+    Keys.onPressed: {
+        if(event.text !== "")
+            userTypedSomeText = true
     }
 
     Keys.onReturnPressed: {
@@ -72,10 +74,24 @@ TextField {
         if(completer.hasSuggestion && completer.suggestion !== text) {
             text = completer.suggestion
             editingFinished()
-        } else if(tabItem)
+        } else if(tabItem) {
+            editingFinished()
             tabItem.forceActiveFocus()
+        }
     }
 
     KeyNavigation.tab: tabItem
     KeyNavigation.backtab: backTabItem
+
+    function transliterate(includingLastWord) {
+        if(includingLastWord === undefined)
+            includingLastWord = false
+        if(enableTransliteration & userTypedSomeText) {
+            var newText = app.transliterationEngine.transliteratedSentence(text, includingLastWord)
+            if(text === newText)
+                return
+            userTypedSomeText = false
+            text = newText
+        }
+    }
 }
