@@ -189,6 +189,7 @@ void SpellCheck::update()
     emit started();
 
     const QStringList characterNames = ScriteDocument::instance()->structure()->characterNames();
+    const int timestamp = m_textModifiable.modificationTime();
 
     if(m_threaded)
     {
@@ -204,15 +205,15 @@ void SpellCheck::update()
          */
         static QThreadPool threadPool;
         threadPool.setMaxThreadCount(1);
-        QFuture<SpellCheckResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, this->modificationTime(), characterNames);
+        QFuture<SpellCheckResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
 #else
-        QFuture<SpellCheckResult> future = QtConcurrent::run(CheckSpellings, m_text, this->modificationTime(), characterNames);
+        QFuture<SpellCheckResult> future = QtConcurrent::run(CheckSpellings, m_text, timestamp, characterNames);
 #endif
         watcher->setFuture(future);
     }
     else
     {
-        const SpellCheckResult result = CheckSpellings(m_text, this->modificationTime(), characterNames);
+        const SpellCheckResult result = CheckSpellings(m_text, timestamp, characterNames);
         this->acceptResult(result);
     }
 }
@@ -279,7 +280,7 @@ void SpellCheck::spellCheckThreadComplete()
         return;
 
     const SpellCheckResult result = watcher->result();
-    if(this->isModified(result.timestamp))
+    if(m_textModifiable.isModified(result.timestamp))
         return;
 
     this->acceptResult(result);
