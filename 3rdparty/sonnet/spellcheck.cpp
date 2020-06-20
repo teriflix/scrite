@@ -279,13 +279,13 @@ void SpellCheck::spellCheckThreadComplete()
     if(watcher == nullptr)
         return;
 
+    GarbageCollector::instance()->add(watcher);
+
     const SpellCheckResult result = watcher->result();
     if(m_textModifiable.isModified(result.timestamp))
         return;
 
     this->acceptResult(result);
-
-    GarbageCollector::instance()->add(watcher);
 }
 
 void SpellCheck::acceptResult(const SpellCheckResult &result)
