@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "spellcheck.h"
+#include "spellcheckservice.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
@@ -30,12 +30,12 @@
 #include "3rdparty/sonnet/sonnet/src/core/textbreaks_p.h"
 #include "3rdparty/sonnet/sonnet/src/core/guesslanguage.h"
 
-class SpellCheckResult
+class SpellCheckServiceResult
 {
     char padding[4];
 
 public:
-    SpellCheckResult() { padding[0] = 0; }
+    SpellCheckServiceResult() { padding[0] = 0; }
 
     int timestamp = -1;
     QString text;
@@ -47,20 +47,29 @@ class EnglishLanguageSpeller : public Sonnet::Speller
 public:
     static EnglishLanguageSpeller &instance();
 
+#ifdef Q_OS_MAC
     EnglishLanguageSpeller() : Sonnet::Speller("en") { }
+#else
+    EnglishLanguageSpeller() : Sonnet::Speller("en-US") { }
+#endif
     ~EnglishLanguageSpeller() { }
 };
 
 EnglishLanguageSpeller &EnglishLanguageSpeller::instance()
 {
     Sonnet::Loader::openLoader();
+#ifdef Q_OS_MAC
     static EnglishLanguageSpeller theInstance;
     return theInstance;
+#else
+    static QThreadStorage<EnglishLanguageSpeller> spellerCache;
+    return spellerCache.localData();
+#endif
 }
 
-SpellCheckResult CheckSpellings(const QString &text, int timestamp, const QStringList &characterNames)
+SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const QStringList &characterNames)
 {
-    SpellCheckResult result;
+    SpellCheckServiceResult result;
     result.timestamp = timestamp;
     result.text = text;
 
@@ -98,6 +107,17 @@ SpellCheckResult CheckSpellings(const QString &text, int timestamp, const QStrin
     Q_FOREACH(Sonnet::TextBreaks::Position wordPosition, wordPositions)
     {
         const QString word = text.mid(wordPosition.start, wordPosition.length);
+        if(word.isEmpty())
+            continue; // not sure why this would happen, but just keeping safe.
+
+#ifdef Q_OS_WIN
+        // We have to do this on Windows, otherwise all non-English words will be flagged
+        // as spelling mistakes. What would be ideal is to check if the entire word
+        // only has non-latin letters, but this is good enough.
+        if(word.at(0).script() != QChar::Script_Latin)
+            continue;
+#endif
+
         const bool misspelled = speller.isMisspelled(word);
         if(misspelled)
         {
@@ -119,19 +139,19 @@ SpellCheckResult CheckSpellings(const QString &text, int timestamp, const QStrin
     return result;
 }
 
-SpellCheck::SpellCheck(QObject *parent)
+SpellCheckService::SpellCheckService(QObject *parent)
     : QObject(parent),
       m_textTracker(&m_textModifiable)
 {
-    EnglishLanguageSpeller::instance();
+
 }
 
-SpellCheck::~SpellCheck()
+SpellCheckService::~SpellCheckService()
 {
 
 }
 
-void SpellCheck::setText(const QString &val)
+void SpellCheckService::setText(const QString &val)
 {
     if(m_text == val)
         return;
@@ -144,7 +164,7 @@ void SpellCheck::setText(const QString &val)
     this->doUpdate();
 }
 
-void SpellCheck::setMethod(SpellCheck::Method val)
+void SpellCheckService::setMethod(SpellCheckService::Method val)
 {
     if(m_method == val)
         return;
@@ -153,7 +173,7 @@ void SpellCheck::setMethod(SpellCheck::Method val)
     emit methodChanged();
 }
 
-void SpellCheck::setAsynchronous(bool val)
+void SpellCheckService::setAsynchronous(bool val)
 {
     if(m_asynchronous == val)
         return;
@@ -162,7 +182,7 @@ void SpellCheck::setAsynchronous(bool val)
     emit asynchronousChanged();
 }
 
-void SpellCheck::setThreaded(bool val)
+void SpellCheckService::setThreaded(bool val)
 {
     if(m_threaded == val)
         return;
@@ -171,12 +191,12 @@ void SpellCheck::setThreaded(bool val)
     emit threadedChanged();
 }
 
-void SpellCheck::scheduleUpdate()
+void SpellCheckService::scheduleUpdate()
 {
     m_updateTimer.start(500, this);
 }
 
-void SpellCheck::update()
+void SpellCheckService::update()
 {
     if(!m_textTracker.isModified())
         return;
@@ -193,42 +213,32 @@ void SpellCheck::update()
 
     if(m_threaded)
     {
-        QFutureWatcher<SpellCheckResult> *watcher = new QFutureWatcher<SpellCheckResult>(this);
+        QFutureWatcher<SpellCheckServiceResult> *watcher = new QFutureWatcher<SpellCheckServiceResult>(this);
         connect(watcher, SIGNAL(finished()), this, SLOT(spellCheckThreadComplete()), Qt::QueuedConnection);
 
-#ifdef Q_OS_MAC
-        /**
-         * NSSpellChecker that we use on macOS provides us only a shared instance of the actual spell-checker.
-         * Using that shared instance from multiple threads is really of no use, because macOS will end up using
-         * mutexes to serialize access to it. We are better off queuing all the CheckSpellings() calls to a
-         * single thread.
-         */
         static QThreadPool threadPool;
         threadPool.setMaxThreadCount(1);
-        QFuture<SpellCheckResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
-#else
-        QFuture<SpellCheckResult> future = QtConcurrent::run(CheckSpellings, m_text, timestamp, characterNames);
-#endif
+        QFuture<SpellCheckServiceResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
         watcher->setFuture(future);
     }
     else
     {
-        const SpellCheckResult result = CheckSpellings(m_text, timestamp, characterNames);
+        const SpellCheckServiceResult result = CheckSpellings(m_text, timestamp, characterNames);
         this->acceptResult(result);
     }
 }
 
-void SpellCheck::classBegin()
+void SpellCheckService::classBegin()
 {
 
 }
 
-void SpellCheck::componentComplete()
+void SpellCheckService::componentComplete()
 {
     this->doUpdate();
 }
 
-void SpellCheck::setMisspelledFragments(const QList<TextFragment> &val)
+void SpellCheckService::setMisspelledFragments(const QList<TextFragment> &val)
 {
     if(m_misspelledFragments == val)
         return;
@@ -253,7 +263,7 @@ void SpellCheck::setMisspelledFragments(const QList<TextFragment> &val)
     emit misspelledFragmentsChanged();
 }
 
-void SpellCheck::doUpdate()
+void SpellCheckService::doUpdate()
 {
     if(m_method == Automatic)
     {
@@ -264,7 +274,7 @@ void SpellCheck::doUpdate()
     }
 }
 
-void SpellCheck::timerEvent(QTimerEvent *event)
+void SpellCheckService::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_updateTimer.timerId())
     {
@@ -273,22 +283,22 @@ void SpellCheck::timerEvent(QTimerEvent *event)
     }
 }
 
-void SpellCheck::spellCheckThreadComplete()
+void SpellCheckService::spellCheckThreadComplete()
 {
-    QFutureWatcher<SpellCheckResult> *watcher = dynamic_cast< QFutureWatcher<SpellCheckResult> *>(this->sender());
+    QFutureWatcher<SpellCheckServiceResult> *watcher = dynamic_cast< QFutureWatcher<SpellCheckServiceResult> *>(this->sender());
     if(watcher == nullptr)
         return;
 
     GarbageCollector::instance()->add(watcher);
 
-    const SpellCheckResult result = watcher->result();
+    const SpellCheckServiceResult result = watcher->result();
     if(m_textModifiable.isModified(result.timestamp))
         return;
 
     this->acceptResult(result);
 }
 
-void SpellCheck::acceptResult(const SpellCheckResult &result)
+void SpellCheckService::acceptResult(const SpellCheckServiceResult &result)
 {
     this->setMisspelledFragments(result.misspelledFragments);
     emit finished();

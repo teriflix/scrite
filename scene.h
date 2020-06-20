@@ -27,7 +27,7 @@
 #include <QQuickPaintedItem>
 
 #include "note.h"
-#include "spellcheck.h"
+#include "spellcheckservice.h"
 #include "modifiable.h"
 #include "simpletimer.h"
 #include "qobjectserializer.h"
@@ -96,8 +96,8 @@ public:
     Q_PROPERTY(Scene* scene READ scene CONSTANT STORED false)
     Scene* scene() const { return m_scene; }
 
-    Q_PROPERTY(SpellCheck* spellCheck READ spellCheck CONSTANT STORED false)
-    SpellCheck *spellCheck() const;
+    Q_PROPERTY(SpellCheckService* spellCheck READ spellCheck CONSTANT STORED false)
+    SpellCheckService *spellCheck() const;
 
     enum Type { Action, Character, Dialogue, Parenthetical, Shot, Transition, Heading, Min=Action, Max=Heading };
     Q_ENUM(Type)
@@ -133,7 +133,7 @@ private:
     Type m_type = Action;
     QString m_text;
     Scene* m_scene = nullptr;
-    mutable SpellCheck *m_spellCheck = nullptr;
+    mutable SpellCheckService *m_spellCheck = nullptr;
 };
 
 class CharacterElementMap

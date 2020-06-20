@@ -24,7 +24,7 @@
 #include "undoredo.h"
 #include "completer.h"
 #include "ruleritem.h"
-#include "spellcheck.h"
+#include "spellcheckservice.h"
 #include "autoupdate.h"
 #include "trackobject.h"
 #include "aggregation.h"
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
 
     qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
 
-    qmlRegisterType<SpellCheck>("Scrite", 1, 0, "SpellCheck");
+    qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
 
     NotificationManager notificationManager;
     ScriteDocument *scriteDocument = ScriteDocument::instance();

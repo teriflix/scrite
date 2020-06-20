@@ -329,12 +329,12 @@ SceneElement::~SceneElement()
     emit aboutToDelete(this);
 }
 
-SpellCheck *SceneElement::spellCheck() const
+SpellCheckService *SceneElement::spellCheck() const
 {
     if(m_spellCheck == nullptr)
     {
-        m_spellCheck = new SpellCheck(const_cast<SceneElement*>(this));
-        m_spellCheck->setMethod(SpellCheck::OnDemand);
+        m_spellCheck = new SpellCheckService(const_cast<SceneElement*>(this));
+        m_spellCheck->setMethod(SpellCheckService::OnDemand);
         m_spellCheck->setAsynchronous(true);
         m_spellCheck->setThreaded(true);
         m_spellCheck->setText(m_text);

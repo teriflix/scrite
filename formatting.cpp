@@ -780,7 +780,7 @@ public:
     static SceneDocumentBlockUserData *get(QTextBlockUserData *userData);
 
 private:
-    QPointer<SpellCheck> m_spellCheck;
+    QPointer<SpellCheckService> m_spellCheck;
     QPointer<SceneElement> m_sceneElement;
     QString m_highlightedText;
     int m_formatMTime = -1;
@@ -1603,7 +1603,7 @@ void SceneDocumentBinder::onSpellCheckUpdated()
     if(m_scene == nullptr || this->document() == nullptr || m_initializingDocument)
         return;
 
-    SpellCheck *spellCheck = qobject_cast<SpellCheck*>(this->sender());
+    SpellCheckService *spellCheck = qobject_cast<SpellCheckService*>(this->sender());
     if(spellCheck == nullptr)
         return;
 

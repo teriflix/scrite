@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef SPELL_CHECK_H
-#define SPELL_CHECK_H
+#ifndef SPELL_CHECK_SERVICE_H
+#define SPELL_CHECK_SERVICE_H
 
 #include <QObject>
 #include <QJsonArray>
@@ -45,15 +45,15 @@ private:
 };
 Q_DECLARE_METATYPE(TextFragment)
 
-class SpellCheckResult;
-class SpellCheck : public QObject, public Modifiable, public QQmlParserStatus
+class SpellCheckServiceResult;
+class SpellCheckService : public QObject, public Modifiable, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
 
 public:
-    SpellCheck(QObject *parent=nullptr);
-    ~SpellCheck();
+    SpellCheckService(QObject *parent=nullptr);
+    ~SpellCheckService();
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     void setText(const QString &val);
@@ -98,7 +98,7 @@ private:
     void doUpdate();
     void timerEvent(QTimerEvent *event);
     Q_SLOT void spellCheckThreadComplete();
-    void acceptResult(const SpellCheckResult& result);
+    void acceptResult(const SpellCheckServiceResult& result);
 
 private:
     QString m_text;
@@ -113,4 +113,4 @@ private:
     QList<TextFragment> m_misspelledFragments;
 };
 
-#endif // SPELL_CHECK_H
+#endif // SPELL_CHECK_SERVICE_H

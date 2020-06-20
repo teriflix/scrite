@@ -26,7 +26,7 @@
 #include <QSyntaxHighlighter>
 #include <QQuickTextDocument>
 
-class SpellCheck;
+class SpellCheckService;
 class ScriteDocument;
 class ScreenplayFormat;
 
@@ -435,7 +435,7 @@ private:
     void rehighlightBlockLater(const QTextBlock &block);
 
 private:
-    friend class SpellCheck;
+    friend class SpellCheckService;
     Scene* m_scene = nullptr;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;

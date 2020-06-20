@@ -10,7 +10,8 @@ INCLUDEPATH += $$PWD \
                $$PWD/sonnet/src/plugins/nsspellchecker
 
 HEADERS +=  $$PWD/sonnetcore_export.h \
-            $$PWD/core_debug.h
+            $$PWD/core_debug.h \
+            $$PWD/spellcheckservice.h
 
 HEADERS +=  $$PWD/sonnet/src/core/client_p.h \
             $$PWD/sonnet/src/core/tokenizer_p.h \
@@ -24,7 +25,8 @@ HEADERS +=  $$PWD/sonnet/src/core/client_p.h \
             $$PWD/sonnet/src/core/backgroundchecker.h \
             $$PWD/sonnet/src/core/loader_p.h
 
-SOURCES +=  $$PWD/core_debug.cpp
+SOURCES +=  $$PWD/core_debug.cpp \
+    $$PWD/spellcheckservice.cpp
 
 SOURCES +=  $$PWD/sonnet/src/core/client.cpp \
             $$PWD/sonnet/src/core/spellerplugin.cpp \
@@ -37,11 +39,9 @@ SOURCES +=  $$PWD/sonnet/src/core/client.cpp \
             $$PWD/sonnet/src/core/loader.cpp \
             $$PWD/sonnet/src/core/settings.cpp
 
-HEADERS  += $$PWD/plugins/dummy/dummyclient.h \
-            $$PWD/spellcheck.h
+HEADERS  += $$PWD/plugins/dummy/dummyclient.h
 
-SOURCES  += $$PWD/plugins/dummy/dummyclient.cpp \
-            $$PWD/spellcheck.cpp
+SOURCES  += $$PWD/plugins/dummy/dummyclient.cpp
 
 macx {
 HEADERS +=  $$PWD/nsspellcheckerdebug.h \
@@ -52,3 +52,11 @@ OBJECTIVE_SOURCES += $$PWD/sonnet/src/plugins/nsspellchecker/nsspellcheckerdict.
             $$PWD/sonnet/src/plugins/nsspellchecker/nsspellcheckerclient.mm
 LIBS    +=  -framework AppKit
 }
+
+win32 {
+HEADERS += $$PWD/plugins/windows/windowsclient.h
+SOURCES += $$PWD/plugins/windows/windowsclient.cpp
+LIBS    += Ole32.lib
+}
+
+

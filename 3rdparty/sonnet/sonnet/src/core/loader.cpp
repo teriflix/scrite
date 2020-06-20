@@ -34,14 +34,19 @@
 #include <algorithm>
 
 #ifdef SONNET_STATIC
-#ifndef SONNET_AVOID_HUNSPELL_CLIENT
-#include "../plugins/hunspell/hunspellclient.h"
-#else
-#include "./plugins/dummy/dummyclient.h"
-#endif
-#ifdef Q_OS_MACOS
-#include "../plugins/nsspellchecker/nsspellcheckerclient.h"
-#endif
+    #ifndef SONNET_AVOID_HUNSPELL_CLIENT
+        #include "../plugins/hunspell/hunspellclient.h"
+    #else
+        #include "./plugins/dummy/dummyclient.h"
+    #endif
+
+    #ifdef Q_OS_MACOS
+    #include "../plugins/nsspellchecker/nsspellcheckerclient.h"
+    #endif
+
+    #ifdef Q_OS_WIN
+    #include "./plugins/windows/windowsclient.h"
+    #endif
 #endif
 
 namespace Sonnet {
@@ -310,12 +315,15 @@ void Loader::loadPlugins()
         qCWarning(SONNET_LOG_CORE) << "Sonnet: No speller backends available!";
     }
 #else
-#ifdef Q_OS_MACOS
-    loadPlugin(QString());
-#endif
-#ifndef SONNET_AVOID_HUNSPELL_CLIENT
-    loadPlugin(QStringLiteral("Hunspell"));
-#endif
+    #ifdef Q_OS_MACOS
+        loadPlugin(QString());
+    #endif
+    #ifndef SONNET_AVOID_HUNSPELL_CLIENT
+        loadPlugin(QStringLiteral("Hunspell"));
+    #endif
+    #ifdef Q_OS_WIN
+        loadPlugin(QStringLiteral("Windows"));
+    #endif
 #endif
 }
 
@@ -342,6 +350,10 @@ void Loader::loadPlugin(const QString &pluginPath)
         client = new HunspellClient(this);
 #else
         return;
+#endif
+#ifdef Q_OS_WIN
+    } else if(pluginPath == QLatin1String("Windows")) {
+        client = new WindowsClient(this);
 #endif
     } else {
 #ifdef Q_OS_MACOS
