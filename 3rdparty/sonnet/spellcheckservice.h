@@ -24,6 +24,9 @@
 struct TextFragment
 {
     TextFragment() {}
+    TextFragment(const TextFragment &other)
+        : m_start(other.m_start), m_length(other.m_length),
+          m_suggestions(other.m_suggestions) { }
     TextFragment(int s, int l, const QStringList &slist)
         : m_start(s), m_length(l), m_suggestions(slist) { }
 

@@ -34,10 +34,9 @@
 #include <algorithm>
 
 #ifdef SONNET_STATIC
+    #include "./plugins/dummy/dummyclient.h"
     #ifndef SONNET_AVOID_HUNSPELL_CLIENT
         #include "../plugins/hunspell/hunspellclient.h"
-    #else
-        #include "./plugins/dummy/dummyclient.h"
     #endif
 
     #ifdef Q_OS_MACOS

@@ -20,6 +20,7 @@
 #include "screenplaytextdocument.h"
 
 #include <QDate>
+#include <QtMath>
 #include <QPainter>
 #include <QDateTime>
 #include <QQmlEngine>
@@ -709,7 +710,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
     const SceneElementFormat *characterFormat = format->elementFormat(SceneElement::Character);
     const SceneElementFormat *dialogueFormat = format->elementFormat(SceneElement::Dialogue);
     const QFontMetricsF dialogFontMetrics(dialogueFormat->font());
-    const int nrCharsPerDialogLine = int(ceil((pageLayout->contentWidth()-pageLayout->leftMargin()-pageLayout->rightMargin()-dialogueFormat->leftMargin()-dialogueFormat->rightMargin())/dialogFontMetrics.averageCharWidth()));
+    const int nrCharsPerDialogLine = int(qCeil((pageLayout->contentWidth()-pageLayout->leftMargin()-pageLayout->rightMargin()-dialogueFormat->leftMargin()-dialogueFormat->rightMargin())/dialogFontMetrics.averageCharWidth()));
 
     auto insertMarkers = [=](const QTextBlock &block) {
         ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);

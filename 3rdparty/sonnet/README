@@ -19,15 +19,13 @@ The complete copyright of everything within the sonnet folder belongs
 to its respective owners as clearly stated in the header of each of those
 files.
 
-
-
 We use Sonnet for its ability to provide fast spell-checking and 
 highlighting capability. We cannot use Sonnet directly in our code
 without changes, because we want to avoid external dependencies as much
 as possible. We cannot expect developers who pull a copy of Scrite
-from Git to setup Hunspell and all its dependencies before compiling
-Scrite. We want them to simply be able to pull a copy of Scrite, load
-it in Qt Creator and build. Thats it.
+from Git to compile Hunspell from source along with all its dependencies 
+before compiling Scrite. We want them to simply be able to pull a copy 
+of Scrite, load it in Qt Creator and build. Thats it.
 
 The changes we have made to Sonnet source code is towards making this
 happen. Plugins that we have added to Sonnet are in the plugins folder
@@ -37,6 +35,20 @@ nsspellchecker plugin (on macOS).
 
 If you have any questions regarding our use of Sonnet within Scrite
 please write to us at scrite@teriflix.com.
+
+IMPORTANT
+===============
+
+To build Scrite with Hunspell support on Linux, please install hunspell-dev (1.7)
+On Ubuntu, you can do this by executing the following command
+
+sudo apt-get install libhunspell-dev
+
+For more information about this package, please visit
+https://packages.debian.org/sid/libhunspell-dev
+
+
+
 
 
 

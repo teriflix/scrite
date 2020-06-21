@@ -2,7 +2,6 @@ DEFINES += SONNETUI_EXPORT=""
 DEFINES += SONNETCORE_EXPORT=""
 DEFINES += INSTALLATION_PLUGIN_PATH=""
 DEFINES += SONNET_STATIC
-DEFINES += SONNET_AVOID_HUNSPELL_CLIENT # We will use a native Win32 API for spell-check on Windows
 
 INCLUDEPATH += $$PWD \
                $$PWD/sonnet/src/core/ \
@@ -51,12 +50,24 @@ SOURCES +=  $$PWD/nsspellcheckerdebug.cpp
 OBJECTIVE_SOURCES += $$PWD/sonnet/src/plugins/nsspellchecker/nsspellcheckerdict.mm \
             $$PWD/sonnet/src/plugins/nsspellchecker/nsspellcheckerclient.mm
 LIBS    +=  -framework AppKit
+DEFINES += SONNET_AVOID_HUNSPELL_CLIENT # We use a native NSSpellChecker from AppKit
 }
 
 win32 {
 HEADERS += $$PWD/plugins/windows/windowsclient.h
 SOURCES += $$PWD/plugins/windows/windowsclient.cpp
 LIBS    += Ole32.lib
+DEFINES += SONNET_AVOID_HUNSPELL_CLIENT # We use ISpellChecker from Windows SDK
 }
 
-
+linux-g++ {
+HEADERS +=  $$PWD/hunspelldebug.h \
+            $$PWD/config-hunspell.h \
+            $$PWD/sonnet/src/plugins/hunspell/hunspellclient.h \
+            $$PWD/sonnet/src/plugins/hunspell/hunspelldict.h
+SOURCES +=  $$PWD/hunspelldebug.cpp \
+            $$PWD/sonnet/src/plugins/hunspell/hunspellclient.cpp \
+            $$PWD/sonnet/src/plugins/hunspell/hunspelldict.cpp
+LIBS    += -lhunspell
+INCLUDEPATH += /usr/include/hunspell
+}

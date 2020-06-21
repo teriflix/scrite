@@ -48,7 +48,11 @@ public:
 #ifdef Q_OS_MAC
     EnglishLanguageSpeller() : Sonnet::Speller("en") { }
 #else
+#ifdef Q_OS_WIN
     EnglishLanguageSpeller() : Sonnet::Speller("en-US") { }
+#else
+    EnglishLanguageSpeller() : Sonnet::Speller("en_US") { }
+#endif
 #endif
     ~EnglishLanguageSpeller() { }
 };
@@ -101,10 +105,10 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
         if(word.isEmpty())
             continue; // not sure why this would happen, but just keeping safe.
 
-#ifdef Q_OS_WIN
-        // We have to do this on Windows, otherwise all non-English words will be flagged
-        // as spelling mistakes. What would be ideal is to check if the entire word
-        // only has non-latin letters, but this is good enough.
+#ifndef Q_OS_MAC
+        // We have to do this on Windows and Linux, otherwise all non-English words will
+        // be flagged as spelling mistakes. What would be ideal is to check if the entire
+        // word only has non-latin letters, but this is good enough.
         if(word.at(0).script() != QChar::Script_Latin)
             continue;
 #endif
