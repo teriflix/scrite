@@ -1198,6 +1198,19 @@ Item {
                         GroupBox {
                             width: parent.width
                             label: Text {
+                                text: "Screenplay Editor"
+                            }
+
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.enableSpellCheck
+                                text: "Enable spell check"
+                                onToggled: screenplayEditorSettings.enableSpellCheck = checked
+                            }
+                        }
+
+                        GroupBox {
+                            width: parent.width
+                            label: Text {
                                 text: "Active Languages"
                             }
                             height: activeLanguagesView.height+45

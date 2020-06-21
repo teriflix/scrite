@@ -500,7 +500,7 @@ Rectangle {
                 id: spellCheckEnabledFlag
                 trackChangesOn: contentView.numberOfWordsAddedToDict
                 from: false
-                to: true
+                to: screenplayEditorSettings.enableSpellCheck
                 delay: 100
             }
 
