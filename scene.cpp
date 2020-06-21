@@ -648,6 +648,15 @@ void Scene::setEnabled(bool val)
     emit enabledChanged();
 }
 
+void Scene::setType(Scene::Type val)
+{
+    if(m_type == val)
+        return;
+
+    m_type = val;
+    emit typeChanged();
+}
+
 void Scene::setUndoRedoEnabled(bool val)
 {
     if(m_undoRedoEnabled == val)

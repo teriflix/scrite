@@ -81,5 +81,9 @@
         <file>icons/content/add_circle_outline_inverted.png</file>
         <file>icons/content/archive.png</file>
         <file>icons/content/archive_inverted.png</file>
+        <file>icons/content/queue_mus24px.png</file>
+        <file>icons/content/queue_mus24px_inverted.png</file>
+        <file>icons/content/fight_scene_inverted.png</file>
+        <file>icons/content/fight_scene.png</file>
     </qresource>
 </RCC>

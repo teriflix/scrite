@@ -1083,6 +1083,42 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
                 }
+
+                Image {
+                    width: sceneHeadingLoader.height
+                    height: width
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: parent.width * 0.2
+                    fillMode: Image.PreserveAspectFit
+                    mipmap: true
+                    source: {
+                        switch(headingItem.theScene.type) {
+                        case Scene.Song: return "../icons/content/queue_mus24px.png"
+                        case Scene.Action: return "../icons/content/fight_scene.png"
+                        default: break
+                        }
+                        return ""
+                    }
+
+                    ToolTip.delay: 1000
+                    ToolTip.text: {
+                        switch(headingItem.theScene.type) {
+                        case Scene.Song: return "This is a Song scene."
+                        case Scene.Action: return "This is a Action scene."
+                        default: break
+                        }
+                        return ""
+                    }
+                    ToolTip.visible: sceneTypeMouseArea.containsMouse
+
+                    MouseArea {
+                        id: sceneTypeMouseArea
+                        enabled: headingItem.theScene.type !== Scene.Standard
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                    }
+                }
             }
 
             Column {
@@ -1154,6 +1190,21 @@ Rectangle {
                                     onMenuItemClicked: {
                                         headingItem.theScene.color = color
                                         sceneMenu.close()
+                                    }
+                                }
+
+                                Menu2 {
+                                    title: "Mark Scene As"
+
+                                    Repeater {
+                                        model: app.enumerationModel(headingItem.theScene, "Type")
+
+                                        MenuItem2 {
+                                            text: modelData.key
+                                            checkable: true
+                                            checked: headingItem.theScene.type === modelData.value
+                                            onTriggered: headingItem.theScene.type = modelData.value
+                                        }
                                     }
                                 }
 

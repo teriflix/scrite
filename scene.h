@@ -199,6 +199,13 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
+    enum Type { Standard, Song, Action };
+    Q_ENUM(Type)
+    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    void setType(Type val);
+    Type type() const { return m_type; }
+    Q_SIGNAL void typeChanged();
+
     Q_PROPERTY(bool isBeingReset READ isBeingReset NOTIFY resetStateChanged)
     bool isBeingReset() const { return m_isBeingReset; }
     Q_SIGNAL void resetStateChanged();
@@ -292,6 +299,7 @@ private:
     friend class SceneElement;
     friend class SceneDocumentBinder;
 
+    Type m_type = Standard;
     QColor m_color = QColor(Qt::white);
     QString m_title;
     bool m_enabled = true;
