@@ -28,6 +28,9 @@
 #include <QFontDatabase>
 #include <QTextBlockUserData>
 
+static const int IsWordMisspelledProperty = QTextCharFormat::UserProperty+100;
+static const int WordSuggestionsProperty = IsWordMisspelledProperty+1;
+
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
                    : QObject(parent),
                      m_font(parent->defaultFont()),
@@ -1021,11 +1024,12 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if(m_initializingDocument)
         return;
 
-    if(m_cursorPosition >= 0 && (m_textDocument == nullptr || this->document() == nullptr))
+    if(m_textDocument == nullptr || this->document() == nullptr)
     {
         m_cursorPosition = -1;
         m_currentElementCursorPosition = -1;
         emit cursorPositionChanged();
+		return;
     }
 
     if(m_cursorPosition == val)
@@ -1076,6 +1080,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
         this->setCurrentElement(userData->sceneElement());
         if(!m_autoCompleteHints.isEmpty())
             this->setCompletionPrefix(block.text());
+        this->setSpellingSuggestions( this->spellingSuggestionsForWordAt(m_cursorPosition) );
     }
 
     m_currentElementCursorPosition = m_cursorPosition - block.position();
@@ -1178,6 +1183,58 @@ void SceneDocumentBinder::refresh()
         }
 
         this->rehighlight();
+    }
+}
+
+QStringList SceneDocumentBinder::spellingSuggestionsForWordAt(int position) const
+{
+    QStringList ret;
+
+    if(this->document() == nullptr || m_initializingDocument || position < 0)
+        return ret;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(position);
+    cursor.select(QTextCursor::WordUnderCursor);
+
+    const QTextCharFormat format = cursor.charFormat();
+    if(format.property(IsWordMisspelledProperty).toBool() == true)
+    {
+        const QString word = cursor.selectedText();
+        if(word.isEmpty())
+            return ret;
+
+        return format.property(WordSuggestionsProperty).toStringList();
+    }
+
+    return ret;
+}
+
+void SceneDocumentBinder::replaceWordAt(int position, const QString &with)
+{
+    if(this->document() == nullptr || m_initializingDocument || position < 0)
+        return;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(position);
+    cursor.select(QTextCursor::WordUnderCursor);
+
+    QTextCharFormat format = cursor.charFormat();
+    if(format.property(IsWordMisspelledProperty).toBool() == true)
+    {
+        const bool fromSuggestion = m_spellingSuggestions.contains(with);
+        if(fromSuggestion)
+        {
+            format.setBackground(Qt::transparent);
+            format.setProperty(IsWordMisspelledProperty, QVariant());
+            format.setProperty(WordSuggestionsProperty, QVariant());
+            cursor.mergeCharFormat(format);
+        }
+
+        cursor.insertText(with);
+
+        if(fromSuggestion)
+            this->setSpellingSuggestions(QStringList());
     }
 }
 
@@ -1294,11 +1351,14 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
          */
         QTextCharFormat spellingErrorFormat;
         spellingErrorFormat.setBackground(QColor(255,0,0,32));
+        spellingErrorFormat.setProperty(IsWordMisspelledProperty, true);
 
         Q_FOREACH(TextFragment fragment, fragments)
         {
             if(!fragment.isValid())
                 continue;
+
+            spellingErrorFormat.setProperty(WordSuggestionsProperty, fragment.suggestions());
 
             cursor.setPosition(block.position() + fragment.start());
             cursor.setPosition(block.position() + fragment.end()+1, QTextCursor::KeepAnchor);
@@ -1852,6 +1912,15 @@ void SceneDocumentBinder::setCompletionPrefix(const QString &val)
 
     m_completionPrefix = val;
     emit completionPrefixChanged();
+}
+
+void SceneDocumentBinder::setSpellingSuggestions(const QStringList &val)
+{
+    if(m_spellingSuggestions == val)
+        return;
+
+    m_spellingSuggestions = val;
+    emit spellingSuggestionsChanged();
 }
 
 void SceneDocumentBinder::onSceneAboutToReset()

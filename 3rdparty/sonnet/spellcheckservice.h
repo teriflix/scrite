@@ -24,24 +24,30 @@
 struct TextFragment
 {
     TextFragment() {}
-    TextFragment(int s, int l) : m_start(s), m_length(l) { }
+    TextFragment(int s, int l, const QStringList &slist)
+        : m_start(s), m_length(l), m_suggestions(slist) { }
 
     int start() const { return m_start; }
     int length() const { return m_length; }
     int end() const { return m_start+m_length-1; }
     bool isValid() { return m_length > 0 && m_start >= 0; }
     bool operator == (const TextFragment &other) const {
-        return m_start == other.m_start && m_length == other.m_length;
+        return m_start == other.m_start &&
+               m_length == other.m_length &&
+               m_suggestions == other.m_suggestions;
     }
     TextFragment & operator = (const TextFragment &other) {
         m_start = other.m_start;
         m_length = other.m_length;
+        m_suggestions = other.m_suggestions;
         return *this;
     }
+    QStringList suggestions() const { return m_suggestions; }
 
 private:
     int m_start = -1;
     int m_length = 0;
+    QStringList m_suggestions;
 };
 Q_DECLARE_METATYPE(TextFragment)
 

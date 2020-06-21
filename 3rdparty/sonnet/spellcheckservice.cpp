@@ -89,7 +89,6 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
      * But for now, we simply take a brute-force approach. But this function could be a
      * good place for us to accept community contribution.
      */
-
     Sonnet::Loader::openLoader();
     EnglishLanguageSpeller speller;
 
@@ -120,13 +119,36 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
                     continue;
             }
 
-            TextFragment fragment(wordPosition.start, wordPosition.length);
+            TextFragment fragment(wordPosition.start, wordPosition.length, speller.suggest(word));
             if(fragment.isValid())
                 result.misspelledFragments << fragment;
         }
     }
 
     return result;
+}
+
+QStringList GetSpellingSuggestions(const QString &word)
+{
+    /**
+     * It is assumed that word contains a single word. We won't bother checking for that.
+     */
+    EnglishLanguageSpeller speller;
+    return speller.suggest(word);
+}
+
+static QThreadPool &SpellCheckServiceThreadPool()
+{
+    static bool initialized = false;
+    static QThreadPool threadPool;
+    if(!initialized)
+    {
+        threadPool.setExpiryTimeout(-1);
+        threadPool.setMaxThreadCount(1);
+        initialized = true;
+    }
+
+    return threadPool;
 }
 
 SpellCheckService::SpellCheckService(QObject *parent)
@@ -206,8 +228,7 @@ void SpellCheckService::update()
         QFutureWatcher<SpellCheckServiceResult> *watcher = new QFutureWatcher<SpellCheckServiceResult>(this);
         connect(watcher, SIGNAL(finished()), this, SLOT(spellCheckThreadComplete()), Qt::QueuedConnection);
 
-        static QThreadPool threadPool;
-        threadPool.setMaxThreadCount(1);
+        QThreadPool &threadPool = SpellCheckServiceThreadPool();
         QFuture<SpellCheckServiceResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
         watcher->setFuture(future);
     }

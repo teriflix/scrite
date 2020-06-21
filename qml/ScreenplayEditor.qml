@@ -634,6 +634,28 @@ Rectangle {
                         // Context menus must ideally show up directly below the cursor
                         // So, we keep the menu loaders inside the cursorOverlay
                         MenuLoader {
+                            id: spellingSuggestionsMenu
+                            anchors.bottom: parent.bottom
+                            menu: Menu2 {
+                                onAboutToShow: sceneTextEditor.persistentSelection = true
+                                onAboutToHide: sceneTextEditor.persistentSelection = false
+
+                                Repeater {
+                                    model: sceneDocumentBinder.spellingSuggestions
+
+                                    MenuItem2 {
+                                        text: modelData
+                                        focusPolicy: Qt.NoFocus
+                                        onClicked: {
+                                            spellingSuggestionsMenu.close()
+                                            sceneDocumentBinder.replaceWordUnderCursor(modelData)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        MenuLoader {
                             id: editorContextMenu
                             anchors.bottom: parent.bottom
                             menu: Menu2 {
@@ -865,12 +887,25 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.RightButton
-                        enabled: !editorContextMenu.active && sceneTextEditor.activeFocus
+                        enabled: contextMenuEnableBinder.get
                         cursorShape: Qt.IBeamCursor
                         onClicked: {
-                            sceneTextEditor.persistentSelection = true
-                            editorContextMenu.popup()
                             mouse.accept = true
+                            sceneTextEditor.persistentSelection = true
+                            sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
+                            if(!sceneDocumentBinder.spellCheckEnabled || sceneDocumentBinder.spellingSuggestions.length === 0)
+                                editorContextMenu.popup()
+                            else {
+                                spellingSuggestionsMenu.popup()
+                                console.log("PA: Popping up spelling suggestions menu.")
+                            }
+                        }
+
+                        DelayedPropertyBinder {
+                            id: contextMenuEnableBinder
+                            initial: false
+                            set: !editorContextMenu.active && !spellingSuggestionsMenu.active && sceneTextEditor.activeFocus
+                            delay: 100
                         }
                     }
 

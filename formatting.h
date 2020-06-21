@@ -380,8 +380,17 @@ public:
     Q_INVOKABLE void refresh();
 
     Q_INVOKABLE int lastCursorPosition() const;
-
     Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;
+
+    Q_PROPERTY(QStringList spellingSuggestions READ spellingSuggestions NOTIFY spellingSuggestionsChanged)
+    QStringList spellingSuggestions() const {return m_spellingSuggestions; }
+    Q_SIGNAL void spellingSuggestionsChanged();
+
+    Q_INVOKABLE QStringList spellingSuggestionsForWordAt(int position) const;
+    Q_INVOKABLE void replaceWordAt(int position, const QString &with);
+    Q_INVOKABLE void replaceWordUnderCursor(const QString &with) {
+        this->replaceWordAt(m_cursorPosition, with);
+    }
 
     Q_PROPERTY(QStringList autoCompleteHints READ autoCompleteHints NOTIFY autoCompleteHintsChanged)
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }
@@ -427,6 +436,7 @@ private:
     void evaluateAutoCompleteHints();
     void setAutoCompleteHints(const QStringList &val);
     void setCompletionPrefix(const QString &val);
+    void setSpellingSuggestions(const QStringList &val);
 
     void onSceneAboutToReset();
     void onSceneReset(int position);
@@ -450,6 +460,7 @@ private:
     SceneElement* m_currentElement = nullptr;
     SimpleTimer m_rehighlightTimer;
     QStringList m_autoCompleteHints;
+    QStringList m_spellingSuggestions;
     int m_currentElementCursorPosition = -1;
     QQuickTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_screenplayFormat = nullptr;
