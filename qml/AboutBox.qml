@@ -121,6 +121,21 @@ Item {
                             onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
                         }
                     }
+
+                    Text {
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: 14
+                        horizontalAlignment: Text.AlignHCenter
+                        text: "Using <strong>Sonnet</strong> from KDE Frameworks 5 for Spellcheck.<br/><font color=\"blue\">https://api.kde.org/frameworks/sonnet/html/index.html</font>"
+                        color: accentColors.c50.text
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Qt.openUrlExternally("https://api.kde.org/frameworks/sonnet/html/index.html")
+                        }
+                    }
                 }
 
                 Row {
