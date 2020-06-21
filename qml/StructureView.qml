@@ -333,6 +333,28 @@ Item {
                     }
                 }
 
+                Menu2 {
+                    title: "Mark Scene As"
+
+                    ButtonGroup { id: markSceneAsGroup }
+
+                    Repeater {
+                        model: elementContextMenu.element ? app.enumerationModelForType(elementContextMenu.element.scene, "Type") : 0
+
+                        MenuItem2 {
+                            text: modelData.key
+                            autoExclusive: true
+                            checkable: true
+                            ButtonGroup.group: markSceneAsGroup
+                            checked: elementContextMenu.element.scene.type === modelData.value
+                            onTriggered: {
+                                elementContextMenu.element.scene.type = modelData.value
+                                elementContextMenu.element = null
+                            }
+                        }
+                    }
+                }
+
                 MenuItem2 {
                     text: "Duplicate"
                     enabled: elementContextMenu.element !== null
@@ -516,6 +538,10 @@ Item {
                 searchSequenceNumber: index
                 property bool editMode: element.objectName === "newElement"
                 readOnly: !(editMode && index === scriteDocument.structure.currentElementIndex)
+                leftPadding: 17
+                rightPadding: 17
+                topPadding: 5
+                bottomPadding: 5
             }
 
             MouseArea {
@@ -575,6 +601,16 @@ Item {
                 "scrite/sceneID": element.scene.id
             }
             Drag.source: element.scene
+
+            SceneTypeImage {
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
+                anchors.margins: 3
+                width: 24; height: 24
+                opacity: 0.5
+                showTooltip: false
+                sceneType: elementItem.element.scene.type
+            }
 
             Image {
                 id: dragHandle

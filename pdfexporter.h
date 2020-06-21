@@ -40,6 +40,13 @@ public:
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
+    Q_CLASSINFO("includeSceneIcons_FieldLabel", "Include scene icons in the generated PDF.")
+    Q_CLASSINFO("includeSceneIcons_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneIcons READ isIncludeSceneIcons WRITE setIncludeSceneIcons NOTIFY includeSceneIconsChanged)
+    void setIncludeSceneIcons(bool val);
+    bool isIncludeSceneIcons() const { return m_includeSceneIcons; }
+    Q_SIGNAL void includeSceneIconsChanged();
+
     bool canBundleFonts() const { return false; }
 
 protected:
@@ -48,6 +55,7 @@ protected:
 
 private:
     bool m_usePageBreaks = true;
+    bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
 };
 

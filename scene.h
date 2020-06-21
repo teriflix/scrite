@@ -199,7 +199,7 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    enum Type { Standard, Song, Action };
+    enum Type { Standard=0, Song, Action };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
     void setType(Type val);

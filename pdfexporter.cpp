@@ -42,6 +42,15 @@ void PdfExporter::setIncludeSceneNumbers(bool val)
     emit includeSceneNumbersChanged();
 }
 
+void PdfExporter::setIncludeSceneIcons(bool val)
+{
+    if(m_includeSceneIcons == val)
+        return;
+
+    m_includeSceneIcons = val;
+    emit includeSceneIconsChanged();
+}
+
 void PdfExporter::setUsePageBreaks(bool val)
 {
     if(m_usePageBreaks == val)

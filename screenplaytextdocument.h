@@ -61,6 +61,11 @@ public:
     bool hasSceneNumbers() const { return m_sceneNumbers; }
     Q_SIGNAL void sceneNumbersChanged();
 
+    Q_PROPERTY(bool sceneIcons READ hasSceneIcons WRITE setSceneIcons NOTIFY sceneIconsChanged)
+    void setSceneIcons(bool val);
+    bool hasSceneIcons() const { return m_sceneIcons; }
+    Q_SIGNAL void sceneIconsChanged();
+
     Q_PROPERTY(bool syncEnabled READ isSyncEnabled WRITE setSyncEnabled NOTIFY syncEnabledChanged)
     void setSyncEnabled(bool val);
     bool isSyncEnabled() const { return m_syncEnabled; }
@@ -174,6 +179,7 @@ private:
     bool m_updating = false;
     bool m_titlePage = false;
     int m_currentPage = 0;
+    bool m_sceneIcons = true;
     Purpose m_purpose = ForDisplay;
     bool m_syncEnabled = true;
     bool m_sceneNumbers = true;
@@ -240,7 +246,7 @@ public:
     ~ScreenplayTextObjectInterface();
 
     enum { Kind=QTextFormat::UserObject+1 };
-    enum Type { SceneNumberType, MoreMarkerType, ContdMarkerType };
+    enum Type { SceneNumberType, MoreMarkerType, ContdMarkerType, SceneIconType };
     enum Property
     {
         TypeProperty = QTextFormat::UserProperty+1,
@@ -254,6 +260,7 @@ public:
 private:
     void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawText(QPainter *painter, const QRectF &rect, const QString &text);
 };
 

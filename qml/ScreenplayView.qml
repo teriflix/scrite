@@ -311,6 +311,16 @@ Item {
                         screenplayElementList.moveMode = Drag.active
                     }
 
+                    SceneTypeImage {
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 5
+                        width: 24; height: 24
+                        opacity: 0.5
+                        showTooltip: false
+                        sceneType: elementItemDelegate.element.scene.type
+                    }
+
                     Image {
                         id: dragTriggerButton
                         source: "../icons/action/view_array.png"

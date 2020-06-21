@@ -1178,7 +1178,12 @@ void SceneDocumentBinder::refresh()
             block = block.next();
         }
 
-        this->rehighlightLater();
+        // if m_spellCheckEnabled is true, then userData->initializeSpellCheck() would have
+        // scheduled an update which would cause rehighlight() to happen anytime now. So we
+        // dont have to schedule one more rehighlight() from here and impose unnecessary
+        // redraws.
+        if(!m_spellCheckEnabled)
+            this->rehighlightLater();
     }
 }
 

@@ -33,6 +33,7 @@ public:
     virtual bool generateTitlePage() const { return true; }
     virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
+    virtual bool isIncludeSceneIcons() const { return false; }
 
     bool requiresConfiguration() const { return true; }
 

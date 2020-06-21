@@ -1073,7 +1073,6 @@ Rectangle {
             Item {
                 width: ruler.leftMarginPx
                 height: sceneHeadingLoader.height + 16
-                visible: theElement.sceneNumber > 0
 
                 Text {
                     font: headingFontMetrics.font
@@ -1082,42 +1081,16 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
+                    visible: theElement.sceneNumber > 0
                 }
 
-                Image {
+                SceneTypeImage {
                     width: sceneHeadingLoader.height
                     height: width
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: parent.width * 0.2
-                    fillMode: Image.PreserveAspectFit
-                    mipmap: true
-                    source: {
-                        switch(headingItem.theScene.type) {
-                        case Scene.Song: return "../icons/content/queue_mus24px.png"
-                        case Scene.Action: return "../icons/content/fight_scene.png"
-                        default: break
-                        }
-                        return ""
-                    }
-
-                    ToolTip.delay: 1000
-                    ToolTip.text: {
-                        switch(headingItem.theScene.type) {
-                        case Scene.Song: return "This is a Song scene."
-                        case Scene.Action: return "This is a Action scene."
-                        default: break
-                        }
-                        return ""
-                    }
-                    ToolTip.visible: sceneTypeMouseArea.containsMouse
-
-                    MouseArea {
-                        id: sceneTypeMouseArea
-                        enabled: headingItem.theScene.type !== Scene.Standard
-                        anchors.fill: parent
-                        propagateComposedEvents: true
-                    }
+                    sceneType: headingItem.theScene.type
                 }
             }
 
@@ -1186,7 +1159,7 @@ Rectangle {
                                 }
 
                                 ColorMenu {
-                                    title: "Colors"
+                                    title: "Color"
                                     onMenuItemClicked: {
                                         headingItem.theScene.color = color
                                         sceneMenu.close()
@@ -1196,11 +1169,15 @@ Rectangle {
                                 Menu2 {
                                     title: "Mark Scene As"
 
+                                    ButtonGroup { id: markSceneAsGroup }
+
                                     Repeater {
                                         model: app.enumerationModel(headingItem.theScene, "Type")
 
                                         MenuItem2 {
                                             text: modelData.key
+                                            autoExclusive: true
+                                            ButtonGroup.group: markSceneAsGroup
                                             checkable: true
                                             checked: headingItem.theScene.type === modelData.value
                                             onTriggered: headingItem.theScene.type = modelData.value
@@ -1467,7 +1444,7 @@ Rectangle {
         active: screenplayAdapter.isSourceScreenplay && globalScreenplayEditorToolbar.editInFullscreen && !scriteDocument.loading
         property bool expanded: false
         readonly property int expandCollapseButtonWidth: 25
-        readonly property int sceneListAreaWidth: 400
+        readonly property int sceneListAreaWidth: 440
         clip: !sceneListPanelLoader.expanded
         width: active ? (expanded ? sceneListAreaWidth : expandCollapseButtonWidth) : 0
         Behavior on width { NumberAnimation { duration: 250 } }
@@ -1545,10 +1522,22 @@ Rectangle {
                         height: 40
                         color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF")) : Qt.rgba(0,0,0,0)
 
-                        Text {
+                        SceneTypeImage {
+                            id: sceneTypeImage
+                            width: 18
+                            height: 18
+                            showTooltip: false
+                            anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
+                            anchors.leftMargin: 12
+                            sceneType: scene ? scene.type : Scene.Standard
+                            opacity: screenplayAdapter.currentIndex === index ? 1 : 0.5
+                        }
+
+                        Text {
+                            anchors.left: sceneTypeImage.right
+                            anchors.leftMargin: 12
                             anchors.right: parent.right
-                            anchors.margins: 5
                             anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 0) + 5
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"

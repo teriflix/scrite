@@ -449,6 +449,8 @@ Item {
                             id: languageMenu
                             width: 250
 
+                            ButtonGroup { id: languageMenuGroup }
+
                             Repeater {
                                 model: app.enumerationModel(app.transliterationEngine, "Language")
 
@@ -457,6 +459,8 @@ Item {
                                     property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
                                     onClicked: app.transliterationEngine.language = modelData.value
+                                    autoExclusive: true
+                                    ButtonGroup.group: languageMenuGroup
                                     checkable: true
                                     checked: app.transliterationEngine.language === modelData.value
                                 }

@@ -40,5 +40,6 @@
         <file>qml/ToolButton3.qml</file>
         <file>qml/SceneNumberBubble.qml</file>
         <file>qml/ZoomSlider.qml</file>
+        <file>qml/SceneTypeImage.qml</file>
     </qresource>
 </RCC>

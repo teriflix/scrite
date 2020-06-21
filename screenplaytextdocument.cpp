@@ -240,6 +240,17 @@ void ScreenplayTextDocument::setSceneNumbers(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setSceneIcons(bool val)
+{
+    if(m_sceneIcons == val)
+        return;
+
+    m_sceneIcons = val;
+    emit sceneIconsChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSyncEnabled(bool val)
 {
     if(m_syncEnabled == val)
@@ -482,7 +493,7 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
 
-    if(m_sceneNumbers || (m_purpose == ForPrinting && m_syncEnabled))
+    if(m_sceneNumbers || (m_purpose == ForPrinting && m_syncEnabled) || m_sceneIcons)
     {
         ScreenplayTextObjectInterface *toi = m_textDocument->findChild<ScreenplayTextObjectInterface*>();
         if(toi == nullptr)
@@ -1407,6 +1418,16 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(nullptr));
 
+            if(m_sceneIcons)
+            {
+                QTextCharFormat sceneIconFormat;
+                sceneIconFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
+                sceneIconFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
+                sceneIconFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneIconType);
+                sceneIconFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, scene->type());
+                cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneIconFormat);
+            }
+
             if(m_sceneNumbers)
             {
                 QTextCharFormat sceneNumberFormat;
@@ -1640,7 +1661,7 @@ QSizeF ScreenplayTextObjectInterface::intrinsicSize(QTextDocument *doc, int posI
 
     const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
     const QFontMetricsF fontMetrics(font);
-    return QSizeF(0, fontMetrics.lineSpacing());
+    return QSizeF(0, fontMetrics.lineSpacing() - fontMetrics.descent());
 }
 
 Q_DECL_IMPORT int qt_defaultDpi();
@@ -1663,6 +1684,9 @@ void ScreenplayTextObjectInterface::drawObject(QPainter *painter, const QRectF &
     case MoreMarkerType:
         this->drawMoreMarker(painter, givenRect, doc, posInDocument, format);
         break;
+    case SceneIconType:
+        this->drawSceneIcon(painter, givenRect, doc, posInDocument, format);
+        break;
     }
 }
 
@@ -1676,7 +1700,7 @@ void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRe
         return;
 
     QRectF rect = givenRect;
-    rect.setLeft( rect.left()/2 );
+    rect.setLeft( rect.left()*0.6 );
 
     const QString sceneNumberText = QString::number(sceneNumber) + QStringLiteral(".");
     this->drawText(painter, rect, sceneNumberText);
@@ -1704,6 +1728,29 @@ void ScreenplayTextObjectInterface::drawMoreMarker(QPainter *painter, const QRec
     this->drawText(painter, rect, text);
 
     painter->setPen(oldPen);
+}
+
+void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(doc)
+    Q_UNUSED(posInDocument)
+
+    const int sceneType = format.property(DataProperty).toInt();
+    if(sceneType == Scene::Standard)
+        return;
+
+    static const QImage musicIcon(":/icons/content/queue_mus24px.png");
+    static const QImage actionIcon(":/icons/content/fight_scene.png");
+    const qreal iconSize = givenRect.height();
+    QImage icon = sceneType == Scene::Action ? actionIcon : musicIcon;
+
+    QRectF rect = givenRect;
+    rect.setLeft( rect.left()*0.45 );
+
+    const bool flag = painter->renderHints().testFlag(QPainter::SmoothPixmapTransform);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+    painter->drawImage(QRectF(rect.left()-iconSize, rect.bottom()-iconSize, iconSize, iconSize), icon);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
 }
 
 void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &rect, const QString &text)

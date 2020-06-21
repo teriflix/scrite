@@ -33,6 +33,10 @@ Loader {
     property alias fontAscent: fontMetrics.ascent
     property alias fontDescent: fontMetrics.descent
     property alias fontHeight: fontMetrics.height
+    property real leftPadding: 0
+    property real rightPadding: 0
+    property real topPadding: 0
+    property real bottomPadding: 0
 
     signal textEdited(string text)
     signal editingFinished()
@@ -57,6 +61,10 @@ Loader {
             verticalAlignment: textViewEdit.verticalAlignment
             padding: 5
             textFormat: markupText === "" ? Text.PlainText : Text.RichText
+            leftPadding: textViewEdit.leftPadding
+            topPadding: textViewEdit.topPadding
+            rightPadding: textViewEdit.rightPadding
+            bottomPadding: textViewEdit.bottomPadding
 
             property var searchResults: []
             SearchAgent.engine: searchEngine
@@ -95,6 +103,10 @@ Loader {
                 border.color: primaryColors.borderColor
             }
             opacity: activeFocus ? 1 : 0.5
+            leftPadding: textViewEdit.leftPadding
+            topPadding: textViewEdit.topPadding
+            rightPadding: textViewEdit.rightPadding
+            bottomPadding: textViewEdit.bottomPadding
 
             Component.onCompleted: {
                 selectAll()
