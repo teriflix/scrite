@@ -221,6 +221,7 @@ Rectangle {
                     boundsMovement: Flickable.StopAtBounds
                     cacheBuffer: 10
                     ScrollBar.vertical: verticalScrollBar
+                    property int numberOfWordsAddedToDict : 0
                     header: Item {
                         width: contentView.width
                         height: screenplayAdapter.isSourceScreenplay ? ruler.topMarginPx : 0
@@ -478,7 +479,7 @@ Rectangle {
                 characterNames: scriteDocument.structure.characterNames
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus
-                spellCheckEnabled: true
+                spellCheckEnabled: spellCheckEnabledFlag.value
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 onDocumentInitialized: sceneTextEditor.cursorPosition = 0
                 onRequestCursorPosition: app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
@@ -493,6 +494,14 @@ Rectangle {
                         ruler.paragraphRightMargin = ruler.rightMargin + pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
                     }
                 }
+            }
+
+            ResetOnChange {
+                id: spellCheckEnabledFlag
+                trackChangesOn: contentView.numberOfWordsAddedToDict
+                from: false
+                to: true
+                delay: 100
             }
 
             Column {
@@ -661,6 +670,7 @@ Rectangle {
                                     onClicked: {
                                         spellingSuggestionsMenu.close()
                                         sceneDocumentBinder.addWordUnderCursorToDictionary()
+                                        ++contentView.numberOfWordsAddedToDict
                                     }
                                 }
                             }
@@ -904,10 +914,10 @@ Rectangle {
                             mouse.accept = true
                             sceneTextEditor.persistentSelection = true
                             sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
-                            if(!sceneDocumentBinder.spellCheckEnabled || sceneDocumentBinder.spellingSuggestions.length === 0)
-                                editorContextMenu.popup()
-                            else
+                            if(sceneDocumentBinder.spellCheckEnabled && sceneDocumentBinder.wordUnderCursorIsMisspelled)
                                 spellingSuggestionsMenu.popup()
+                            else
+                                editorContextMenu.popup()
                         }
 
                         DelayedPropertyBinder {

@@ -55,15 +55,11 @@ public:
 
 void InitializeSpellCheckThread()
 {
-    PROFILE_THIS_FUNCTION;
-
     Sonnet::Loader::openLoader();
 }
 
 SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const QStringList &characterNames)
 {
-    PROFILE_THIS_FUNCTION;
-
     SpellCheckServiceResult result;
     result.timestamp = timestamp;
     result.text = text;
@@ -136,8 +132,6 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
 
 bool AddToDictionary(const QString &word)
 {
-    PROFILE_THIS_FUNCTION;
-
     /**
      * It is assumed that word contains a single word. We won't bother checking for that.
      */
@@ -232,6 +226,7 @@ void SpellCheckService::setAsynchronous(bool val)
 
 void SpellCheckService::scheduleUpdate()
 {
+    m_textModifiable.markAsModified();
     m_updateTimer.start(500, this);
 }
 
@@ -314,7 +309,7 @@ void SpellCheckService::doUpdate()
     if(m_method == Automatic)
     {
         if(m_asynchronous)
-            this->scheduleUpdate();
+            m_updateTimer.start(500, this);
         else
             this->update();
     }

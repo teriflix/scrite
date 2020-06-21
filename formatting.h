@@ -386,6 +386,10 @@ public:
     QStringList spellingSuggestions() const {return m_spellingSuggestions; }
     Q_SIGNAL void spellingSuggestionsChanged();
 
+    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY wordUnderCursorIsMisspelledChanged)
+    bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
+    Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
+
     Q_INVOKABLE QStringList spellingSuggestionsForWordAt(int position) const;
     Q_INVOKABLE void replaceWordAt(int position, const QString &with);
     Q_INVOKABLE void replaceWordUnderCursor(const QString &with) {
@@ -441,6 +445,7 @@ private:
     void setAutoCompleteHints(const QStringList &val);
     void setCompletionPrefix(const QString &val);
     void setSpellingSuggestions(const QStringList &val);
+    void setWordUnderCursorIsMisspelled(bool val);
 
     void onSceneAboutToReset();
     void onSceneReset(int position);
@@ -466,6 +471,7 @@ private:
     QStringList m_autoCompleteHints;
     QStringList m_spellingSuggestions;
     int m_currentElementCursorPosition = -1;
+    bool m_wordUnderCursorIsMisspelled = false;
     QQuickTextDocument* m_textDocument = nullptr;
     ScreenplayFormat* m_screenplayFormat = nullptr;
     SimpleTimer m_initializeDocumentTimer;

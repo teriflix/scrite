@@ -982,18 +982,7 @@ void SceneDocumentBinder::setSpellCheckEnabled(bool val)
     m_spellCheckEnabled = val;
     emit spellCheckEnabledChanged();
 
-    if(this->document() != nullptr)
-    {
-        QTextBlock block = this->document()->firstBlock();
-        while(block.isValid())
-        {
-            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
-            userData->initializeSpellCheck(this);
-            block = block.next();
-        }
-
-        this->rehighlightLater();
-    }
+    this->refresh();
 }
 
 void SceneDocumentBinder::setLiveSpellCheckEnabled(bool val)
@@ -1080,7 +1069,10 @@ void SceneDocumentBinder::setCursorPosition(int val)
         this->setCurrentElement(userData->sceneElement());
         if(!m_autoCompleteHints.isEmpty())
             this->setCompletionPrefix(block.text());
-        this->setSpellingSuggestions( this->spellingSuggestionsForWordAt(m_cursorPosition) );
+
+        const QTextCharFormat format = cursor.charFormat();
+        this->setWordUnderCursorIsMisspelled(format.property(IsWordMisspelledProperty).toBool());
+        this->setSpellingSuggestions(format.property(WordSuggestionsProperty).toStringList());
     }
 
     m_currentElementCursorPosition = m_cursorPosition - block.position();
@@ -1178,11 +1170,15 @@ void SceneDocumentBinder::refresh()
         {
             SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
             if(userData)
+            {
                 userData->resetFormat();
+                userData->initializeSpellCheck(this);
+            }
+
             block = block.next();
         }
 
-        this->rehighlight();
+        this->rehighlightLater();
     }
 }
 
@@ -1234,7 +1230,10 @@ void SceneDocumentBinder::replaceWordAt(int position, const QString &with)
         cursor.insertText(with);
 
         if(fromSuggestion)
+        {
             this->setSpellingSuggestions(QStringList());
+            this->setWordUnderCursorIsMisspelled(false);
+        }
     }
 }
 
@@ -1261,6 +1260,7 @@ void SceneDocumentBinder::addWordAtCursorToDictionary(int position)
             cursor.insertText(word);
 
             this->setSpellingSuggestions(QStringList());
+            this->setWordUnderCursorIsMisspelled(false);
         }
     }
 }
@@ -1948,6 +1948,15 @@ void SceneDocumentBinder::setSpellingSuggestions(const QStringList &val)
 
     m_spellingSuggestions = val;
     emit spellingSuggestionsChanged();
+}
+
+void SceneDocumentBinder::setWordUnderCursorIsMisspelled(bool val)
+{
+    if(m_wordUnderCursorIsMisspelled == val)
+        return;
+
+    m_wordUnderCursorIsMisspelled = val;
+    emit wordUnderCursorIsMisspelledChanged();
 }
 
 void SceneDocumentBinder::onSceneAboutToReset()
