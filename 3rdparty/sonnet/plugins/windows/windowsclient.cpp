@@ -16,6 +16,8 @@
 
 #include <spellcheck.h>
 
+Q_LOGGING_CATEGORY(SONNET_WINDOWS_ISPELLCHECKER, "SONNET_NSSPELLCHECKER")
+
 namespace Microsoft
 {
     class COM
@@ -52,18 +54,15 @@ namespace Microsoft
             if(m_pointer != nullptr)
                 m_pointer->AddRef();
         }
+
         ~COMInterface() {
             if(m_pointer != nullptr)
                 m_pointer->Release();
+            m_pointer = nullptr;
         }
 
         COMInterface &operator = (const COMInterface &other) {
-            if(m_pointer != nullptr)
-                m_pointer->Release();
-            m_pointer = other.m_pointer;
-            if(m_pointer != nullptr)
-                m_pointer->AddRef();
-            return *this;
+            return *this = other.m_pointer;
         }
 
         COMInterface &operator = (T *ptr) {
@@ -87,6 +86,25 @@ namespace Microsoft
     private:
         T *m_pointer = nullptr;
     };
+
+    QStringList toStringList(IEnumString *enumeration, int max=INT_MAX)
+    {
+        QStringList ret;
+
+        HRESULT hr = S_OK;
+        while(S_OK == hr && ret.size() < max)
+        {
+            LPOLESTR string = nullptr;
+            hr = enumeration->Next(1, &string, nullptr);
+            if (S_OK == hr)
+            {
+                ret << QString::fromWCharArray(string);
+                CoTaskMemFree(string);
+            }
+        }
+
+        return ret;
+    }
 }
 
 struct WindowsClientData
@@ -118,17 +136,8 @@ WindowsClient::WindowsClient(QObject *parent)
         hr = spellCheckerFactory->get_SupportedLanguages(&enumLanguages);
         if (SUCCEEDED(hr))
         {
-            HRESULT hr = S_OK;
-            while (S_OK == hr)
-            {
-                LPOLESTR string = nullptr;
-                hr = enumLanguages->Next(1, &string, nullptr);
-                if (S_OK == hr)
-                {
-                    d->supportedLanguages << QString::fromWCharArray(string);
-                    CoTaskMemFree(string);
-                }
-            }
+            d->supportedLanguages = Microsoft::toStringList(enumLanguages);
+            enumLanguages->Release();
         }
 
         spellCheckerFactory->Release();
@@ -164,6 +173,7 @@ QStringList WindowsClient::languages() const
 struct WindowsSpellerPluginData
 {
     Microsoft::COMInterface<ISpellChecker> spellChecker;
+    QSet<QString> sessionWords;
 };
 
 WindowsSpellerPlugin::WindowsSpellerPlugin(const QString &language, WindowsClientData *clientData)
@@ -192,57 +202,93 @@ WindowsSpellerPlugin::~WindowsSpellerPlugin()
 
 bool WindowsSpellerPlugin::isCorrect(const QString &word) const
 {
-    if(d->spellChecker.isNull())
-        return true;
+    return this->suggest(word, 1).isEmpty();
+}
 
-    bool ret = true;
+QStringList WindowsSpellerPlugin::suggest(const QString &word) const
+{
+    return this->suggest(word, INT_MAX);
+}
+
+bool WindowsSpellerPlugin::checkAndSuggest(const QString &word, QStringList &suggestions) const
+{
+    return Sonnet::SpellerPlugin::checkAndSuggest(word, suggestions);
+}
+
+bool WindowsSpellerPlugin::storeReplacement(const QString &bad, const QString &good)
+{
+    qCDebug(SONNET_WINDOWS_ISPELLCHECKER) << "Not storing replacement" << good << "for" << bad;
+    return false;
+}
+
+bool WindowsSpellerPlugin::addToPersonal(const QString &word)
+{
+    if(d->spellChecker.isNull())
+        return false;
+
+    const std::wstring word2 = word.toStdWString();
+    const HRESULT hr = d->spellChecker->Add(word2.data());
+    return hr == S_OK;
+}
+
+bool WindowsSpellerPlugin::addToSession(const QString &word)
+{
+    qCDebug(SONNET_WINDOWS_ISPELLCHECKER) << "Not storing" << word << "in the session dictionary";
+    return false;
+}
+
+QStringList WindowsSpellerPlugin::suggest(const QString &word, int atMost) const
+{
+    QStringList ret;
+    if(d->spellChecker.isNull())
+        return ret;
+
     IEnumSpellingError* enumSpellingError = nullptr;
     const std::wstring wideWord = word.toStdWString();
     HRESULT hr = d->spellChecker->Check(wideWord.data(), &enumSpellingError);
-    if( SUCCEEDED(hr) )
+    if( hr == S_OK )
     {
         ISpellingError* spellingError = nullptr;
         hr = enumSpellingError->Next(&spellingError);
-        if(hr == S_OK)
+        if( hr == S_OK )
         {
+            CORRECTIVE_ACTION correctiveAction = CORRECTIVE_ACTION_NONE;
+            hr = spellingError->get_CorrectiveAction(&correctiveAction);
+
+            if( SUCCEEDED(hr) )
+            {
+                switch(correctiveAction)
+                {
+                case CORRECTIVE_ACTION_GET_SUGGESTIONS: {
+                        IEnumString* enumSuggestions = nullptr;
+                        hr = d->spellChecker->Suggest(wideWord.data(), &enumSuggestions);
+                        if (SUCCEEDED(hr)) {
+                            ret = Microsoft::toStringList(enumSuggestions, atMost);
+                            enumSuggestions->Release();
+                        }
+                    } break;
+                case CORRECTIVE_ACTION_REPLACE: {
+                        PWSTR replacement = nullptr;
+                        hr = spellingError->get_Replacement(&replacement);
+                        if (SUCCEEDED(hr)) {
+                            ret << QString::fromWCharArray(replacement);
+                            CoTaskMemFree(replacement);
+                        }
+                    } break;
+                case CORRECTIVE_ACTION_DELETE: {
+                        if(atMost == 1)
+                            ret << QString();
+                    } break;
+                default:
+                    break;
+                }
+            }
+
             spellingError->Release();
-            ret = false;
         }
 
         enumSpellingError->Release();
     }
 
     return ret;
-}
-
-QStringList WindowsSpellerPlugin::suggest(const QString &word) const
-{
-    Q_UNUSED(word)
-    return QStringList();
-}
-
-bool WindowsSpellerPlugin::checkAndSuggest(const QString &word, QStringList &suggestions) const
-{
-    Q_UNUSED(word)
-    Q_UNUSED(suggestions)
-    return true;
-}
-
-bool WindowsSpellerPlugin::storeReplacement(const QString &bad, const QString &good)
-{
-    Q_UNUSED(bad)
-    Q_UNUSED(good)
-    return true;
-}
-
-bool WindowsSpellerPlugin::addToPersonal(const QString &word)
-{
-    Q_UNUSED(word)
-    return true;
-}
-
-bool WindowsSpellerPlugin::addToSession(const QString &word)
-{
-    Q_UNUSED(word)
-    return true;
 }

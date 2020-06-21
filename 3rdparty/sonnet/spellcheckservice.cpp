@@ -45,8 +45,6 @@ public:
 class EnglishLanguageSpeller : public Sonnet::Speller
 {
 public:
-    static EnglishLanguageSpeller &instance();
-
 #ifdef Q_OS_MAC
     EnglishLanguageSpeller() : Sonnet::Speller("en") { }
 #else
@@ -55,20 +53,10 @@ public:
     ~EnglishLanguageSpeller() { }
 };
 
-EnglishLanguageSpeller &EnglishLanguageSpeller::instance()
-{
-    Sonnet::Loader::openLoader();
-#ifdef Q_OS_MAC
-    static EnglishLanguageSpeller theInstance;
-    return theInstance;
-#else
-    static QThreadStorage<EnglishLanguageSpeller> spellerCache;
-    return spellerCache.localData();
-#endif
-}
-
 SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const QStringList &characterNames)
 {
+    PROFILE_THIS_FUNCTION;
+
     SpellCheckServiceResult result;
     result.timestamp = timestamp;
     result.text = text;
@@ -102,7 +90,9 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
      * good place for us to accept community contribution.
      */
 
-    EnglishLanguageSpeller &speller = EnglishLanguageSpeller::instance();
+    Sonnet::Loader::openLoader();
+    EnglishLanguageSpeller speller;
+
     const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(text);
     Q_FOREACH(Sonnet::TextBreaks::Position wordPosition, wordPositions)
     {

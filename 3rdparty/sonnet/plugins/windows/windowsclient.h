@@ -17,6 +17,8 @@
 #include "client_p.h"
 #include "spellerplugin_p.h"
 
+#include <QLoggingCategory>
+
 namespace Sonnet {
 class SpellerPlugin;
 }
@@ -59,8 +61,13 @@ public:
     bool addToSession(const QString &word);
 
 private:
+    QStringList suggest(const QString &word, int atMost) const;
+
+private:
     WindowsSpellerPluginData *d;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(SONNET_WINDOWS_ISPELLCHECKER)
 
 #endif
 
