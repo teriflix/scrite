@@ -1225,9 +1225,9 @@ void SceneDocumentBinder::replaceWordAt(int position, const QString &with)
         const bool fromSuggestion = m_spellingSuggestions.contains(with);
         if(fromSuggestion)
         {
-            format.setBackground(Qt::transparent);
-            format.setProperty(IsWordMisspelledProperty, QVariant());
-            format.setProperty(WordSuggestionsProperty, QVariant());
+            format.setBackground(Qt::NoBrush);
+            format.setProperty(IsWordMisspelledProperty, false);
+            format.setProperty(WordSuggestionsProperty, QStringList());
             cursor.mergeCharFormat(format);
         }
 
@@ -1235,6 +1235,33 @@ void SceneDocumentBinder::replaceWordAt(int position, const QString &with)
 
         if(fromSuggestion)
             this->setSpellingSuggestions(QStringList());
+    }
+}
+
+void SceneDocumentBinder::addWordAtCursorToDictionary(int position)
+{
+    if(this->document() == nullptr || m_initializingDocument || position < 0)
+        return;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(position);
+    cursor.select(QTextCursor::WordUnderCursor);
+
+    QTextCharFormat format = cursor.charFormat();
+    if(format.property(IsWordMisspelledProperty).toBool() == true)
+    {
+        const QString word = cursor.selectedText();
+        if( SpellCheckService::addToDictionary(cursor.selectedText()) )
+        {
+            format.setBackground(Qt::NoBrush);
+            format.setProperty(IsWordMisspelledProperty, false);
+            format.setProperty(WordSuggestionsProperty, QStringList());
+            cursor.mergeCharFormat(format);
+            cursor.removeSelectedText();
+            cursor.insertText(word);
+
+            this->setSpellingSuggestions(QStringList());
+        }
     }
 }
 

@@ -172,14 +172,19 @@ QStringList WindowsClient::languages() const
 
 struct WindowsSpellerPluginData
 {
+    QString language;
     Microsoft::COMInterface<ISpellChecker> spellChecker;
     QSet<QString> sessionWords;
+    WindowsClientData *clientData = nullptr;
+    QStringList customWords;
 };
 
 WindowsSpellerPlugin::WindowsSpellerPlugin(const QString &language, WindowsClientData *clientData)
     : Sonnet::SpellerPlugin(language)
 {
     d = new WindowsSpellerPluginData;
+    d->language = language;
+    d->clientData = clientData;
 
     if(!clientData->spellCheckerFactory.isNull())
     {
@@ -228,7 +233,7 @@ bool WindowsSpellerPlugin::addToPersonal(const QString &word)
 
     const std::wstring word2 = word.toStdWString();
     const HRESULT hr = d->spellChecker->Add(word2.data());
-    return hr == S_OK;
+    return (hr == S_OK);
 }
 
 bool WindowsSpellerPlugin::addToSession(const QString &word)

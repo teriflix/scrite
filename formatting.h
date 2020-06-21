@@ -391,6 +391,10 @@ public:
     Q_INVOKABLE void replaceWordUnderCursor(const QString &with) {
         this->replaceWordAt(m_cursorPosition, with);
     }
+    Q_INVOKABLE void addWordAtCursorToDictionary(int position);
+    Q_INVOKABLE void addWordUnderCursorToDictionary() {
+        this->addWordAtCursorToDictionary(m_cursorPosition);
+    }
 
     Q_PROPERTY(QStringList autoCompleteHints READ autoCompleteHints NOTIFY autoCompleteHintsChanged)
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }

@@ -652,6 +652,17 @@ Rectangle {
                                         }
                                     }
                                 }
+
+                                MenuSeparator { }
+
+                                MenuItem2 {
+                                    text: "Add to dictionary"
+                                    focusPolicy: Qt.NoFocus
+                                    onClicked: {
+                                        spellingSuggestionsMenu.close()
+                                        sceneDocumentBinder.addWordUnderCursorToDictionary()
+                                    }
+                                }
                             }
                         }
 
@@ -895,10 +906,8 @@ Rectangle {
                             sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
                             if(!sceneDocumentBinder.spellCheckEnabled || sceneDocumentBinder.spellingSuggestions.length === 0)
                                 editorContextMenu.popup()
-                            else {
+                            else
                                 spellingSuggestionsMenu.popup()
-                                console.log("PA: Popping up spelling suggestions menu.")
-                            }
                         }
 
                         DelayedPropertyBinder {

@@ -53,6 +53,13 @@ public:
     ~EnglishLanguageSpeller() { }
 };
 
+void InitializeSpellCheckThread()
+{
+    PROFILE_THIS_FUNCTION;
+
+    Sonnet::Loader::openLoader();
+}
+
 SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const QStringList &characterNames)
 {
     PROFILE_THIS_FUNCTION;
@@ -89,7 +96,6 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
      * But for now, we simply take a brute-force approach. But this function could be a
      * good place for us to accept community contribution.
      */
-    Sonnet::Loader::openLoader();
     EnglishLanguageSpeller speller;
 
     const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(text);
@@ -128,6 +134,17 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
     return result;
 }
 
+bool AddToDictionary(const QString &word)
+{
+    PROFILE_THIS_FUNCTION;
+
+    /**
+     * It is assumed that word contains a single word. We won't bother checking for that.
+     */
+    EnglishLanguageSpeller speller;
+    return speller.addToPersonal(word);
+}
+
 QStringList GetSpellingSuggestions(const QString &word)
 {
     /**
@@ -139,12 +156,31 @@ QStringList GetSpellingSuggestions(const QString &word)
 
 static QThreadPool &SpellCheckServiceThreadPool()
 {
+    /**
+     * We make use of QtConcurrent::run() method to schedule the following methods on a
+     * background thread, so that they dont block the UI.
+     * - InitializeSpellCheckThread
+     * - CheckSpellings
+     * - AddToDictionary
+     * - GetSpellingSuggestions
+     *
+     * We know for a fact that CheckSpellings() does indeed block the UI thread because
+     * spelling lookup is a slow process. The default behaviour of SpellCheckService is
+     * to looup spellings asynchronously and in the background. So, scheduling these
+     * functions in a background thread works for us.
+     *
+     * Moreover we need exactly one thread for this purpose. While a QThreadPool can
+     * allocate multiple threads for us, we need only one. And one that thread is created
+     * it should NEVER EVER terminate until the program finishes.
+     */
     static bool initialized = false;
     static QThreadPool threadPool;
     if(!initialized)
     {
         threadPool.setExpiryTimeout(-1);
         threadPool.setMaxThreadCount(1);
+        QFuture<void> future = QtConcurrent::run(&threadPool, InitializeSpellCheckThread);
+        future.waitForFinished();
         initialized = true;
     }
 
@@ -194,15 +230,6 @@ void SpellCheckService::setAsynchronous(bool val)
     emit asynchronousChanged();
 }
 
-void SpellCheckService::setThreaded(bool val)
-{
-    if(m_threaded == val)
-        return;
-
-    m_threaded = val;
-    emit threadedChanged();
-}
-
 void SpellCheckService::scheduleUpdate()
 {
     m_updateTimer.start(500, this);
@@ -223,20 +250,28 @@ void SpellCheckService::update()
     const QStringList characterNames = ScriteDocument::instance()->structure()->characterNames();
     const int timestamp = m_textModifiable.modificationTime();
 
-    if(m_threaded)
-    {
-        QFutureWatcher<SpellCheckServiceResult> *watcher = new QFutureWatcher<SpellCheckServiceResult>(this);
-        connect(watcher, SIGNAL(finished()), this, SLOT(spellCheckThreadComplete()), Qt::QueuedConnection);
+    QFutureWatcher<SpellCheckServiceResult> *watcher = new QFutureWatcher<SpellCheckServiceResult>(this);
+    connect(watcher, SIGNAL(finished()), this, SLOT(spellCheckComplete()), Qt::QueuedConnection);
 
-        QThreadPool &threadPool = SpellCheckServiceThreadPool();
-        QFuture<SpellCheckServiceResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
-        watcher->setFuture(future);
-    }
-    else
-    {
-        const SpellCheckServiceResult result = CheckSpellings(m_text, timestamp, characterNames);
-        this->acceptResult(result);
-    }
+    QThreadPool &threadPool = SpellCheckServiceThreadPool();
+    QFuture<SpellCheckServiceResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
+    watcher->setFuture(future);
+}
+
+QStringList SpellCheckService::suggestions(const QString &word)
+{
+    QThreadPool &threadPool = SpellCheckServiceThreadPool();
+    QFuture<QStringList> future = QtConcurrent::run(&threadPool, GetSpellingSuggestions, word);
+    future.waitForFinished();
+    return future.result();
+}
+
+bool SpellCheckService::addToDictionary(const QString &word)
+{
+    QThreadPool &threadPool = SpellCheckServiceThreadPool();
+    QFuture<bool> future = QtConcurrent::run(&threadPool, AddToDictionary, word);
+    future.waitForFinished();
+    return future.result();
 }
 
 void SpellCheckService::classBegin()
@@ -294,7 +329,7 @@ void SpellCheckService::timerEvent(QTimerEvent *event)
     }
 }
 
-void SpellCheckService::spellCheckThreadComplete()
+void SpellCheckService::spellCheckComplete()
 {
     QFutureWatcher<SpellCheckServiceResult> *watcher = dynamic_cast< QFutureWatcher<SpellCheckServiceResult> *>(this->sender());
     if(watcher == nullptr)

@@ -336,7 +336,6 @@ SpellCheckService *SceneElement::spellCheck() const
         m_spellCheck = new SpellCheckService(const_cast<SceneElement*>(this));
         m_spellCheck->setMethod(SpellCheckService::OnDemand);
         m_spellCheck->setAsynchronous(true);
-        m_spellCheck->setThreaded(true);
         m_spellCheck->setText(m_text);
     }
 

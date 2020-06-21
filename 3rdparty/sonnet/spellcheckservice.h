@@ -83,13 +83,11 @@ public:
     bool isAsynchronous() const { return m_asynchronous; }
     Q_SIGNAL void asynchronousChanged();
 
-    Q_PROPERTY(bool threaded READ isThreaded WRITE setThreaded NOTIFY threadedChanged)
-    void setThreaded(bool val);
-    bool isThreaded() const { return m_threaded; }
-    Q_SIGNAL void threadedChanged();
-
     Q_INVOKABLE void scheduleUpdate();
     Q_INVOKABLE void update();
+
+    static QStringList suggestions(const QString &word);
+    static bool addToDictionary(const QString &word);
 
     // QQmlParserStatus interface
     void classBegin();
@@ -103,13 +101,12 @@ private:
     void setMisspelledFragments(const QList<TextFragment> &val);
     void doUpdate();
     void timerEvent(QTimerEvent *event);
-    Q_SLOT void spellCheckThreadComplete();
+    Q_SLOT void spellCheckComplete();
     void acceptResult(const SpellCheckServiceResult& result);
 
 private:
     QString m_text;
     Method m_method = OnDemand;
-    bool m_threaded = true;
     bool m_asynchronous = true;
     bool m_requiresSpellCheck = false;
     SimpleTimer m_updateTimer;
