@@ -673,6 +673,16 @@ Rectangle {
                                         ++contentView.numberOfWordsAddedToDict
                                     }
                                 }
+
+                                MenuItem2 {
+                                    text: "Ignore"
+                                    focusPolicy: Qt.NoFocus
+                                    onClicked: {
+                                        spellingSuggestionsMenu.close()
+                                        sceneDocumentBinder.addWordUnderCursorToIgnoreList()
+                                        ++contentView.numberOfWordsAddedToDict
+                                    }
+                                }
                             }
                         }
 

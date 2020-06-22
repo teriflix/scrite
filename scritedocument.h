@@ -81,6 +81,13 @@ public:
     ScreenplayFormat* printFormat() const { return m_printFormat; }
     Q_SIGNAL void printFormatChanged();
 
+    Q_PROPERTY(QStringList spellCheckIgnoreList READ spellCheckIgnoreList WRITE setSpellCheckIgnoreList NOTIFY spellCheckIgnoreListChanged)
+    void setSpellCheckIgnoreList(const QStringList &val);
+    QStringList spellCheckIgnoreList() const { return m_spellCheckIgnoreList; }
+    Q_SIGNAL void spellCheckIgnoreListChanged();
+
+    Q_INVOKABLE void addToSpellCheckIgnoreList(const QString &word);
+
     // This function adds a new scene to both structure and screenplay
     // and inserts it right after the current element in both.
     Q_INVOKABLE Scene *createNewScene();
@@ -178,6 +185,7 @@ private:
     ScreenplayFormat* m_formatting = nullptr;
     ScreenplayFormat* m_printFormat = nullptr;
     int m_autoSaveDurationInSeconds = 60;
+    QStringList m_spellCheckIgnoreList;
     QJsonArray m_structureElementSequence;
     SimpleTimer m_evaluateStructureElementSequenceTimer;
     bool m_syncingStructureScreenplayCurrentIndex = false;

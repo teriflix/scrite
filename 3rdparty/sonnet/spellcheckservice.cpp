@@ -57,18 +57,26 @@ public:
     ~EnglishLanguageSpeller() { }
 };
 
+struct SpellCheckServiceRequest
+{
+    QString text;
+    int timestamp;
+    QStringList characterNames;
+    QStringList ignoreList;
+};
+
 void InitializeSpellCheckThread()
 {
     Sonnet::Loader::openLoader();
 }
 
-SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const QStringList &characterNames)
+SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
 {
     SpellCheckServiceResult result;
-    result.timestamp = timestamp;
-    result.text = text;
+    result.timestamp = request.timestamp;
+    result.text = request.text;
 
-    if(text.isEmpty())
+    if(request.text.isEmpty())
         return result; // Should never happen
 
     /*
@@ -98,10 +106,10 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
      */
     EnglishLanguageSpeller speller;
 
-    const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(text);
+    const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(request.text);
     Q_FOREACH(Sonnet::TextBreaks::Position wordPosition, wordPositions)
     {
-        const QString word = text.mid(wordPosition.start, wordPosition.length);
+        const QString word = request.text.mid(wordPosition.start, wordPosition.length);
         if(word.isEmpty())
             continue; // not sure why this would happen, but just keeping safe.
 
@@ -116,12 +124,15 @@ SpellCheckServiceResult CheckSpellings(const QString &text, int timestamp, const
         const bool misspelled = speller.isMisspelled(word);
         if(misspelled)
         {
-            if(characterNames.contains(word.toUpper()))
+            if(request.ignoreList.contains(word))
+                continue;
+
+            if(request.characterNames.contains(word.toUpper()))
                 continue;
 
             if(word.endsWith("\'s", Qt::CaseInsensitive))
             {
-                if(characterNames.contains(word.leftRef(word.length()-2)))
+                if(request.characterNames.contains(word.leftRef(word.length()-2)))
                     continue;
             }
 
@@ -246,14 +257,17 @@ void SpellCheckService::update()
 
     emit started();
 
-    const QStringList characterNames = ScriteDocument::instance()->structure()->characterNames();
-    const int timestamp = m_textModifiable.modificationTime();
+    SpellCheckServiceRequest request;
+    request.text = m_text;
+    request.timestamp = m_textModifiable.modificationTime();
+    request.characterNames = ScriteDocument::instance()->structure()->characterNames();
+    request.ignoreList = ScriteDocument::instance()->spellCheckIgnoreList();
 
     QFutureWatcher<SpellCheckServiceResult> *watcher = new QFutureWatcher<SpellCheckServiceResult>(this);
     connect(watcher, SIGNAL(finished()), this, SLOT(spellCheckComplete()), Qt::QueuedConnection);
 
     QThreadPool &threadPool = SpellCheckServiceThreadPool();
-    QFuture<SpellCheckServiceResult> future = QtConcurrent::run(&threadPool, CheckSpellings, m_text, timestamp, characterNames);
+    QFuture<SpellCheckServiceResult> future = QtConcurrent::run(&threadPool, CheckSpellings, request);
     watcher->setFuture(future);
 }
 

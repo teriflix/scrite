@@ -1187,28 +1187,60 @@ void SceneDocumentBinder::refresh()
     }
 }
 
-QStringList SceneDocumentBinder::spellingSuggestionsForWordAt(int position) const
+class SpellCheckCursor : public QTextCursor
 {
-    QStringList ret;
+public:
+    SpellCheckCursor(QTextDocument *document, int position)
+        : QTextCursor(document) {
+        this->setPosition(position);
+        this->select(QTextCursor::WordUnderCursor);
+    }
+    ~SpellCheckCursor() { }
 
-    if(this->document() == nullptr || m_initializingDocument || position < 0)
-        return ret;
+    QString word() const { return this->selectedText(); }
 
-    QTextCursor cursor(this->document());
-    cursor.setPosition(position);
-    cursor.select(QTextCursor::WordUnderCursor);
+    bool isMisspelled() const {
+        return this->charFormatProperty(IsWordMisspelledProperty).toBool();
+    }
+    QStringList suggestions() const {
+        return this->charFormatProperty(WordSuggestionsProperty).toStringList();
+    }
+    QVariant charFormatProperty(int prop) const {
+        if(this->word().isEmpty())
+            return QVariant();
 
-    const QTextCharFormat format = cursor.charFormat();
-    if(format.property(IsWordMisspelledProperty).toBool() == true)
-    {
-        const QString word = cursor.selectedText();
-        if(word.isEmpty())
-            return ret;
-
-        return format.property(WordSuggestionsProperty).toStringList();
+        const QTextCharFormat format = this->charFormat();
+        return format.property(prop);
     }
 
-    return ret;
+    void replace(const QString &word) {
+        if(this->word().isEmpty())
+            return;
+
+        QTextCharFormat format;
+        format.setBackground(Qt::NoBrush);
+        format.setProperty(IsWordMisspelledProperty, false);
+        format.setProperty(WordSuggestionsProperty, QStringList());
+        this->mergeCharFormat(format);
+        this->removeSelectedText();
+        this->insertText(word);
+    }
+
+    void resetCharFormat() {
+        this->replace(this->word());
+    }
+};
+
+QStringList SceneDocumentBinder::spellingSuggestionsForWordAt(int position) const
+{
+    if(this->document() == nullptr || m_initializingDocument || position < 0)
+        return QStringList();
+
+    SpellCheckCursor cursor(this->document(), position);
+    if(cursor.isMisspelled())
+        return cursor.suggestions();
+
+    return QStringList();
 }
 
 void SceneDocumentBinder::replaceWordAt(int position, const QString &with)
@@ -1216,58 +1248,45 @@ void SceneDocumentBinder::replaceWordAt(int position, const QString &with)
     if(this->document() == nullptr || m_initializingDocument || position < 0)
         return;
 
-    QTextCursor cursor(this->document());
-    cursor.setPosition(position);
-    cursor.select(QTextCursor::WordUnderCursor);
+    SpellCheckCursor cursor(this->document(), position);
+    if(!cursor.isMisspelled())
+        return;
 
-    QTextCharFormat format = cursor.charFormat();
-    if(format.property(IsWordMisspelledProperty).toBool() == true)
-    {
-        const bool fromSuggestion = m_spellingSuggestions.contains(with);
-        if(fromSuggestion)
-        {
-            format.setBackground(Qt::NoBrush);
-            format.setProperty(IsWordMisspelledProperty, false);
-            format.setProperty(WordSuggestionsProperty, QStringList());
-            cursor.mergeCharFormat(format);
-        }
-
-        cursor.insertText(with);
-
-        if(fromSuggestion)
-        {
-            this->setSpellingSuggestions(QStringList());
-            this->setWordUnderCursorIsMisspelled(false);
-        }
-    }
+    cursor.replace(with);
+    this->setSpellingSuggestions(QStringList());
+    this->setWordUnderCursorIsMisspelled(false);
 }
 
-void SceneDocumentBinder::addWordAtCursorToDictionary(int position)
+void SceneDocumentBinder::addWordAtPositionToDictionary(int position)
 {
     if(this->document() == nullptr || m_initializingDocument || position < 0)
         return;
 
-    QTextCursor cursor(this->document());
-    cursor.setPosition(position);
-    cursor.select(QTextCursor::WordUnderCursor);
+    SpellCheckCursor cursor(this->document(), position);
+    if(!cursor.isMisspelled())
+        return;
 
-    QTextCharFormat format = cursor.charFormat();
-    if(format.property(IsWordMisspelledProperty).toBool() == true)
+    if(SpellCheckService::addToDictionary(cursor.word()))
     {
-        const QString word = cursor.selectedText();
-        if( SpellCheckService::addToDictionary(cursor.selectedText()) )
-        {
-            format.setBackground(Qt::NoBrush);
-            format.setProperty(IsWordMisspelledProperty, false);
-            format.setProperty(WordSuggestionsProperty, QStringList());
-            cursor.mergeCharFormat(format);
-            cursor.removeSelectedText();
-            cursor.insertText(word);
-
-            this->setSpellingSuggestions(QStringList());
-            this->setWordUnderCursorIsMisspelled(false);
-        }
+        cursor.resetCharFormat();
+        this->setSpellingSuggestions(QStringList());
+        this->setWordUnderCursorIsMisspelled(false);
     }
+}
+
+void SceneDocumentBinder::addWordAtPositionToIgnoreList(int position)
+{
+    if(this->document() == nullptr || m_initializingDocument || position < 0)
+        return;
+
+    SpellCheckCursor cursor(this->document(), position);
+    if(!cursor.isMisspelled())
+        return;
+
+    ScriteDocument::instance()->addToSpellCheckIgnoreList(cursor.word());
+    cursor.resetCharFormat();
+    this->setSpellingSuggestions(QStringList());
+    this->setWordUnderCursorIsMisspelled(false);
 }
 
 int SceneDocumentBinder::lastCursorPosition() const

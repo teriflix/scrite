@@ -391,13 +391,20 @@ public:
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
 
     Q_INVOKABLE QStringList spellingSuggestionsForWordAt(int position) const;
+
     Q_INVOKABLE void replaceWordAt(int position, const QString &with);
     Q_INVOKABLE void replaceWordUnderCursor(const QString &with) {
         this->replaceWordAt(m_cursorPosition, with);
     }
-    Q_INVOKABLE void addWordAtCursorToDictionary(int position);
+
+    Q_INVOKABLE void addWordAtPositionToDictionary(int position);
     Q_INVOKABLE void addWordUnderCursorToDictionary() {
-        this->addWordAtCursorToDictionary(m_cursorPosition);
+        this->addWordAtPositionToDictionary(m_cursorPosition);
+    }
+
+    Q_INVOKABLE void addWordAtPositionToIgnoreList(int position);
+    Q_INVOKABLE void addWordUnderCursorToIgnoreList() {
+        this->addWordAtPositionToIgnoreList(m_cursorPosition);
     }
 
     Q_PROPERTY(QStringList autoCompleteHints READ autoCompleteHints NOTIFY autoCompleteHintsChanged)

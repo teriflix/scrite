@@ -94,8 +94,11 @@ ScriteDocument::ScriteDocument(QObject *parent)
                   m_clearModifyTimer("ScriteDocument.m_clearModifyTimer"),
                   m_evaluateStructureElementSequenceTimer("ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
+
     this->reset();
     this->updateDocumentWindowTitle();
+
+    connect(this, &ScriteDocument::spellCheckIgnoreListChanged, this, &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::modifiedChanged, this, &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged, this, &ScriteDocument::updateDocumentWindowTitle);
 
@@ -162,6 +165,27 @@ void ScriteDocument::setBusyMessage(const QString &val)
     emit busyMessageChanged();
 
     this->setBusy(!m_busyMessage.isEmpty());
+}
+
+void ScriteDocument::setSpellCheckIgnoreList(const QStringList &val)
+{
+    QStringList val2 = val.toSet().toList(); // so that we eliminate all duplicates
+    std::sort(val2.begin(), val2.end());
+    if(m_spellCheckIgnoreList == val)
+        return;
+
+    m_spellCheckIgnoreList = val;
+    emit spellCheckIgnoreListChanged();
+}
+
+void ScriteDocument::addToSpellCheckIgnoreList(const QString &word)
+{
+    if(word.isEmpty() || m_spellCheckIgnoreList.contains(word))
+        return;
+
+    m_spellCheckIgnoreList.append(word);
+    std::sort(m_spellCheckIgnoreList.begin(), m_spellCheckIgnoreList.end());
+    emit spellCheckIgnoreListChanged();
 }
 
 Scene *ScriteDocument::createNewScene()
@@ -260,6 +284,7 @@ void ScriteDocument::reset()
 
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
+    this->setSpellCheckIgnoreList(QStringList());
     this->setModified(false);
     this->setFileName(QString());
     this->evaluateStructureElementSequence();
