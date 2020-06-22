@@ -1550,13 +1550,14 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.leftMargin: 12
                             sceneType: scene ? scene.type : Scene.Standard
-                            opacity: screenplayAdapter.currentIndex === index ? 1 : 0.5
-                            visible: screenplayAdapter.hasNonStandardScenes
+                            opacity: (screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
+                            visible: t > 0
+                            property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
+                            Behavior on t { NumberAnimation { duration: 250 } }
                         }
 
                         Text {
-                            property real leftMargin: 6 + (screenplayAdapter.hasNonStandardScenes ? sceneTypeImage.width+12 : 0)
-                            Behavior on leftMargin { NumberAnimation { duration: 250 } }
+                            property real leftMargin: 6 + (sceneTypeImage.width+12)*sceneTypeImage.t
                             anchors.left: parent.left
                             anchors.leftMargin: leftMargin
                             anchors.right: parent.right
