@@ -1615,7 +1615,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     const QString phoneNumber = screenplay->phoneNumber();
     const QString email = screenplay->email();
     const QString website = screenplay->website();
-    const QString marketing = QStringLiteral("Written/Generated in Scrite (www.scrite.io)");
+    const QString marketing = QStringLiteral("Written/Generated using Scrite (www.scrite.io)");
 
     const QFont normalFont = doc->defaultFont();
     const QFontMetricsF normalFontMetrics(normalFont);
@@ -1686,7 +1686,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     paintText(painter, contactFrameRect, Qt::AlignLeft|Qt::TextWordWrap, contactFrameText);
 
     painter->setFont(marketingFont);
-    painter->setPen(Qt::lightGray);
+    painter->setPen(Qt::darkGray);
     paintText(painter, marketingFrame, Qt::AlignRight|Qt::TextWordWrap, marketingText);
 
     painter->restore();

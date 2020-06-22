@@ -21,6 +21,12 @@ Item {
     width: 1050
     height: 680
 
+    Component.onCompleted: {
+        pageList.currentIndex = modalDialog.arguments && modalDialog.arguments.activePageIndex ? modalDialog.arguments.activePageIndex : 0
+        pageLoader.loadPage()
+        modalDialog.arguments = undefined
+    }
+
     Item {
         anchors.fill: parent
         anchors.margins: 20
@@ -144,12 +150,11 @@ Item {
         ScrollView {
             id: screenplayOptionsView
             property real labelWidth: 60
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-            ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
 
             Column {
-                width: screenplayOptionsView.width - 20
-                spacing: 20
+                width: screenplayOptionsView.width
+                spacing: 0
 
                 Text {
                     width: parent.width
@@ -354,8 +359,10 @@ Item {
                     }
                 }
 
+                Item { width: parent.width; height: 20 }
+
                 Column {
-                    spacing: parent.spacing/2
+                    spacing: 10
                     width: parent.width-20
                     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -750,19 +757,6 @@ Item {
       separately. Although we need to capture print and display formats as separate ScreenplayFormat
       instances because the DPI and DPR values for printer and displays may not be the same.
       */
-    Item {
-        property real devicePixelRatio: 1.0
-
-        Component.onCompleted: {
-            devicePixelRatio = scriteDocument.formatting.devicePixelRatio
-            scriteDocument.formatting.devicePixelRatio = app.devicePixelRatio
-        }
-
-        Component.onDestruction: {
-            scriteDocument.formatting.devicePixelRatio = devicePixelRatio
-        }
-    }
-
     Component {
         id: elementFormatOptionsComponent
 

@@ -59,6 +59,10 @@ public:
     int elementCount() const { return this->rowCount(); }
     Q_SIGNAL void elementCountChanged();
 
+    Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    bool hasNonStandardScenes() const;
+    Q_SIGNAL void hasNonStandardScenesChanged();
+
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();

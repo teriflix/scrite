@@ -47,6 +47,7 @@ void ScreenplayAdapter::setSource(QObject *val)
         {
             disconnect(this, &ScreenplayAdapter::currentIndexChanged, screenplay, &Screenplay::setCurrentElementIndex);
             disconnect(screenplay, &Screenplay::currentElementIndexChanged, this, &ScreenplayAdapter::setCurrentIndex);
+            disconnect(screenplay, &Screenplay::hasNonStandardScenesChanged, this, &ScreenplayAdapter::hasNonStandardScenesChanged);
         }
     }
 
@@ -63,6 +64,7 @@ void ScreenplayAdapter::setSource(QObject *val)
 
             connect(this, &ScreenplayAdapter::currentIndexChanged, screenplay, &Screenplay::setCurrentElementIndex);
             connect(screenplay, &Screenplay::currentElementIndexChanged, this, &ScreenplayAdapter::setCurrentIndex);
+            connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this, &ScreenplayAdapter::hasNonStandardScenesChanged);
         }
         else
         {
@@ -83,6 +85,8 @@ void ScreenplayAdapter::setSource(QObject *val)
                 ScreenplayElement *element = new ScreenplayElement(screenplay);
                 element->setScene(scene);
                 screenplay->addElement(element);
+
+                connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this, &ScreenplayAdapter::hasNonStandardScenesChanged);
 
                 this->setSourceModel(screenplay);
             }
@@ -123,6 +127,15 @@ void ScreenplayAdapter::setCurrentIndex(int val)
 Scene *ScreenplayAdapter::currentScene() const
 {
     return m_currentElement == nullptr ? nullptr : m_currentElement->scene();
+}
+
+bool ScreenplayAdapter::hasNonStandardScenes() const
+{
+    Screenplay *screenplay = this->screenplay();
+    if(screenplay != nullptr)
+        return screenplay->hasNonStandardScenes();
+
+    return false;
 }
 
 ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition)

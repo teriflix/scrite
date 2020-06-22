@@ -83,6 +83,7 @@ public:
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
     Q_SIGNAL void evaluateSceneNumberRequest();
+    Q_SIGNAL void sceneTypeChanged();
 
 protected:
     bool event(QEvent *event);
@@ -159,6 +160,10 @@ public:
     QString version() const { return m_version; }
     Q_SIGNAL void versionChanged();
 
+    Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
+    Q_SIGNAL void hasNonStandardScenesChanged();
+
     Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<ScreenplayElement> elements();
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
@@ -226,6 +231,7 @@ protected:
     void evaluateSceneNumbers();
     void evaluateSceneNumbersLater();
     void validateCurrentElementIndex();
+    void setHasNonStandardScenes(bool val);
 
 private:
     QString m_title;
@@ -246,6 +252,7 @@ private:
     QList<ScreenplayElement *> m_elements;
     int m_currentElementIndex = -1;
     Scene* m_activeScene = nullptr;
+    bool m_hasNonStandardScenes = false;
 
     SimpleTimer m_sceneNumberEvaluationTimer;
 };

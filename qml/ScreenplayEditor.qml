@@ -225,6 +225,19 @@ Rectangle {
                     header: Item {
                         width: contentView.width
                         height: screenplayAdapter.isSourceScreenplay ? ruler.topMarginPx : 0
+
+                        Button2 {
+                            text: "Edit Title Page"
+                            visible: screenplayAdapter.isSourceScreenplay
+                            opacity: hovered ? 1 : 0.75
+                            anchors.centerIn: parent
+                            onClicked: {
+                                modalDialog.arguments = {"activePageIndex": 1}
+                                modalDialog.popupSource = this
+                                modalDialog.sourceComponent = optionsDialogComponent
+                                modalDialog.active = true
+                            }
+                        }
                     }
                     footer: Item {
                         width: contentView.width
@@ -238,7 +251,8 @@ Rectangle {
                             Image {
                                 id: addSceneButton
                                 source: "../icons/content/add_circle_outline.png"
-                                width: ruler.bottomMarginPx * 0.6; height: width
+                                height: ruler.bottomMarginPx * 0.6
+                                width: height
                                 smooth: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 opacity: defaultOpacity
@@ -1537,11 +1551,14 @@ Rectangle {
                             anchors.leftMargin: 12
                             sceneType: scene ? scene.type : Scene.Standard
                             opacity: screenplayAdapter.currentIndex === index ? 1 : 0.5
+                            visible: screenplayAdapter.hasNonStandardScenes
                         }
 
                         Text {
-                            anchors.left: sceneTypeImage.right
-                            anchors.leftMargin: 12
+                            property real leftMargin: 6 + (screenplayAdapter.hasNonStandardScenes ? sceneTypeImage.width+12 : 0)
+                            Behavior on leftMargin { NumberAnimation { duration: 250 } }
+                            anchors.left: parent.left
+                            anchors.leftMargin: leftMargin
                             anchors.right: parent.right
                             anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 0) + 5
                             anchors.verticalCenter: parent.verticalCenter

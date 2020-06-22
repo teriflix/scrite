@@ -157,6 +157,7 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::aboutToDelete, this, &ScreenplayElement::sceneWasDeleted);
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
+    connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
 
     if(m_screenplay)
         connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
@@ -382,6 +383,7 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
     connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
+    connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
 
     this->endInsertRows();
 
@@ -419,6 +421,7 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
     disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
+    disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
 
     this->endRemoveRows();
 
@@ -1210,8 +1213,15 @@ void Screenplay::onSceneReset(int elementIndex)
 void Screenplay::evaluateSceneNumbers()
 {
     int number = 1;
+    bool containsNonStandardScenes = false;
     Q_FOREACH(ScreenplayElement *element, m_elements)
+    {
         element->evaluateSceneNumber(number);
+        if(!containsNonStandardScenes && element->scene() && element->scene()->type() != Scene::Standard)
+            containsNonStandardScenes = true;
+    }
+
+    this->setHasNonStandardScenes(containsNonStandardScenes);
 }
 
 void Screenplay::evaluateSceneNumbersLater()
@@ -1235,6 +1245,15 @@ void Screenplay::validateCurrentElementIndex()
     }
 
     this->setCurrentElementIndex(val);
+}
+
+void Screenplay::setHasNonStandardScenes(bool val)
+{
+    if(m_hasNonStandardScenes == val)
+        return;
+
+    m_hasNonStandardScenes = val;
+    emit hasNonStandardScenesChanged();
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)
