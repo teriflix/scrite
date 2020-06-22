@@ -141,11 +141,14 @@ Item {
     Component {
         id: screenplayOptionsComponent
 
-        Item {
+        ScrollView {
+            id: screenplayOptionsView
             property real labelWidth: 60
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
             Column {
-                width: parent.width
+                width: screenplayOptionsView.width - 20
                 spacing: 20
 
                 Text {
@@ -199,6 +202,27 @@ Item {
                     }
                 }
 
+                // Version field
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Version"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextField {
+                        width: parent.width-parent.spacing-labelWidth
+                        text: scriteDocument.screenplay.version
+                        onTextEdited: scriteDocument.screenplay.version = text
+                        font.pixelSize: 20
+                    }
+                }
+
                 // Author field
                 Row {
                     spacing: 10
@@ -207,7 +231,7 @@ Item {
                     Text {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
-                        text: "Author"
+                        text: "Written By"
                         font.pixelSize: 14
                         anchors.verticalCenter: parent.verticalCenter
                     }
@@ -238,10 +262,11 @@ Item {
                         text: scriteDocument.screenplay.contact
                         onTextEdited: scriteDocument.screenplay.contact = text
                         font.pixelSize: 20
+                        placeholderText: "(Optional) Production company or Studio name"
                     }
                 }
 
-                // Version field
+                // Address field
                 Row {
                     spacing: 10
                     width: parent.width
@@ -249,16 +274,83 @@ Item {
                     Text {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
-                        text: "Version"
+                        text: "Address"
                         font.pixelSize: 14
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
-                        text: scriteDocument.screenplay.version
-                        onTextEdited: scriteDocument.screenplay.version = text
+                        text: scriteDocument.screenplay.address
+                        onTextEdited: scriteDocument.screenplay.address = text
                         font.pixelSize: 20
+                        placeholderText: "(Optional) Optional"
+                    }
+                }
+
+                // Email field
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Email"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextField {
+                        width: parent.width-parent.spacing-labelWidth
+                        text: scriteDocument.screenplay.email
+                        onTextEdited: scriteDocument.screenplay.email = text
+                        font.pixelSize: 20
+                        placeholderText: "(Optional)"
+                    }
+                }
+
+                // Phone field
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Phone"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextField {
+                        width: parent.width-parent.spacing-labelWidth
+                        text: scriteDocument.screenplay.phoneNumber
+                        onTextEdited: scriteDocument.screenplay.phoneNumber = text
+                        font.pixelSize: 20
+                        placeholderText: "(Optional)"
+                    }
+                }
+
+                // Website field
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Website"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextField {
+                        width: parent.width-parent.spacing-labelWidth
+                        text: scriteDocument.screenplay.website
+                        onTextEdited: scriteDocument.screenplay.website = text
+                        font.pixelSize: 20
+                        placeholderText: "(Optional)"
                     }
                 }
 

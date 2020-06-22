@@ -483,6 +483,9 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     fieldMap[HeaderFooter::Author] = document->property("#author").toString();
     fieldMap[HeaderFooter::Contact] = document->property("#contact").toString();
     fieldMap[HeaderFooter::Version] = document->property("#version").toString();
+    fieldMap[HeaderFooter::Email] = document->property("#email").toString();
+    fieldMap[HeaderFooter::Phone] = document->property("#phone").toString();
+    fieldMap[HeaderFooter::Website] = document->property("#website").toString();
     fieldMap[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
     fieldMap[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
     fieldMap[HeaderFooter::DateTime] = QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);

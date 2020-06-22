@@ -134,6 +134,26 @@ public:
     QString contact() const { return m_contact; }
     Q_SIGNAL void contactChanged();
 
+    Q_PROPERTY(QString address READ address WRITE setAddress NOTIFY addressChanged)
+    void setAddress(QString val);
+    QString address() const { return m_address; }
+    Q_SIGNAL void addressChanged();
+
+    Q_PROPERTY(QString phoneNumber READ phoneNumber WRITE setPhoneNumber NOTIFY phoneNumberChanged)
+    void setPhoneNumber(QString val);
+    QString phoneNumber() const { return m_phoneNumber; }
+    Q_SIGNAL void phoneNumberChanged();
+
+    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
+    void setEmail(QString val);
+    QString email() const { return m_email; }
+    Q_SIGNAL void emailChanged();
+
+    Q_PROPERTY(QString website READ website WRITE setWebsite NOTIFY websiteChanged)
+    void setWebsite(QString val);
+    QString website() const { return m_website; }
+    Q_SIGNAL void websiteChanged();
+
     Q_PROPERTY(QString version READ version WRITE setVersion NOTIFY versionChanged)
     void setVersion(const QString &val);
     QString version() const { return m_version; }
@@ -209,10 +229,14 @@ protected:
 
 private:
     QString m_title;
+    QString m_email;
     QString m_author;
     QString m_contact;
     QString m_version;
+    QString m_website;
+    QString m_address;
     QString m_subtitle;
+    QString m_phoneNumber;
     ScriteDocument *m_scriteDocument = nullptr;
 
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);

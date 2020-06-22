@@ -511,6 +511,9 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setProperty("#author", m_screenplay->author());
     m_textDocument->setProperty("#contact", m_screenplay->contact());
     m_textDocument->setProperty("#version", m_screenplay->version());
+    m_textDocument->setProperty("#phone", m_screenplay->phoneNumber());
+    m_textDocument->setProperty("#email", m_screenplay->email());
+    m_textDocument->setProperty("#website", m_screenplay->website());
 
     QTextBlockFormat frameBoundaryBlockFormat;
     frameBoundaryBlockFormat.setLineHeight(0, QTextBlockFormat::FixedHeight);
@@ -520,122 +523,21 @@ void ScreenplayTextDocument::loadScreenplay()
     // Title Page
     if(m_titlePage)
     {
-        const QFont defaultFont = m_formatting->defaultFont();
-
-        QTextFrameFormat titleFrameFormat;
-        titleFrameFormat.setBorderStyle(QTextTableFormat::BorderStyle_None);
-        QTextFrame *titleFrame = cursor.insertFrame(titleFrameFormat);
-
-        cursor = titleFrame->firstCursorPosition();
-
-        // Title
+        ScreenplayTitlePageObjectInterface *tpoi = m_textDocument->findChild<ScreenplayTitlePageObjectInterface*>();
+        if(tpoi == nullptr)
         {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-            blockFormat.setBottomMargin(50);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(36);
-
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString title = m_screenplay->title();
-            if(title.isEmpty())
-                title = "Untitled Screenplay";
-            cursor.insertText(title);
-            if(!m_screenplay->subtitle().isEmpty())
-            {
-                cursor.insertText(" - ");
-                cursor.insertText(m_screenplay->subtitle());
-            }
+            tpoi = new ScreenplayTitlePageObjectInterface(m_textDocument);
+            m_textDocument->documentLayout()->registerHandler(ScreenplayTitlePageObjectInterface::Kind, tpoi);
         }
 
-        // Author
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
+        QTextBlockFormat pageBreakFormat;
+        pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+        cursor.setBlockFormat(pageBreakFormat);
 
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(defaultFont.pointSize());
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString author = m_screenplay->author();
-            if(author.isEmpty())
-                author = "Unknown Author";
-            cursor.insertText(author);
-        }
-
-        // Contact
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(defaultFont.pointSize());
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString contact = m_screenplay->contact();
-            if(contact.isEmpty())
-                contact = "No Contact Information";
-            cursor.insertText(contact);
-        }
-
-        // Version
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setFontPointSize(defaultFont.pointSize());
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-
-            QString version = m_screenplay->version();
-            if(version.isEmpty())
-                version = "First Version";
-            cursor.insertText("Version: " + version);
-        }
-
-        // Generator
-        {
-            QTextBlockFormat blockFormat;
-            blockFormat.setAlignment(Qt::AlignHCenter);
-            blockFormat.setTopMargin(50);
-
-            QTextCharFormat charFormat;
-            charFormat.setFontFamily(defaultFont.family());
-            charFormat.setForeground(QColor(0,0,0,192));
-
-            cursor.insertBlock();
-            cursor.setBlockFormat(blockFormat);
-            cursor.setCharFormat(charFormat);
-            cursor.insertHtml("<font size=\"-2\">This screenplay was generated using <strong>Scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)</font>");
-        }
-
-        const QRectF pageRect = QRectF( QPointF(0,0), m_textDocument->pageSize() );
-
-        QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
-        QRectF tableRect = layout->frameBoundingRect(titleFrame);
-        tableRect.moveCenter(pageRect.center());
-
-        titleFrameFormat.setTopMargin(tableRect.top() - 2*m_textDocument->rootFrame()->frameFormat().topMargin());
-        titleFrameFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
-        titleFrame->setFrameFormat(titleFrameFormat);
-
-        cursor = m_textDocument->rootFrame()->lastCursorPosition();
+        QTextCharFormat titlePageFormat;
+        titlePageFormat.setObjectType(ScreenplayTitlePageObjectInterface::Kind);
+        titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::ScreenplayProperty, QVariant::fromValue<QObject*>(m_screenplay));
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), titlePageFormat);
     }
 
     for(int i=0; i<m_screenplay->elementCount(); i++)
@@ -1642,6 +1544,157 @@ void ScreenplayElementPageBreaks::setPageBreaks(const QVariantList &val)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+Q_DECL_IMPORT int qt_defaultDpi();
+
+ScreenplayTitlePageObjectInterface::ScreenplayTitlePageObjectInterface(QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+ScreenplayTitlePageObjectInterface::~ScreenplayTitlePageObjectInterface()
+{
+
+}
+
+QSizeF ScreenplayTitlePageObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(format)
+    Q_UNUSED(posInDocument)
+
+    const QSizeF pageSize = doc->pageSize();
+    const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
+    const QSizeF ret( (pageSize.width() - rootFrameFormat.leftMargin() - rootFrameFormat.rightMargin()),
+                   (pageSize.height() - rootFrameFormat.topMargin() - rootFrameFormat.bottomMargin()) );
+    return ret;
+}
+
+void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+{
+    Q_UNUSED(posInDocument)
+
+    /**
+      The title page now consists of 3 frames.
+
+      In the center of the page, we will have the first frame, with the following
+               TITLE        <----- Bold
+              VERSION       <----- Normal
+
+             Written by     <----- Normal
+              AUTHORS       <----- Normal
+
+      In the bottom left, we will have the second frame, with the following
+
+      COPYRIGHT OWNER
+      ADDRESS
+      PHONE
+      EMAIL
+      URL
+
+      On the bottom right, we will have the third frame with the following information
+      Written or Generated using Scrite
+      https://www.scrite.io
+      */
+
+    const Screenplay *screenplay = qobject_cast<Screenplay*>(format.property(ScreenplayProperty).value<QObject*>());
+    if(screenplay == nullptr)
+        return;
+
+    auto fetch = [](const QString &given, const QString &defaultValue) {
+        const QString val = given.trimmed();
+        return val.isEmpty() ? defaultValue : val;
+    };
+
+    const QString title = fetch(screenplay->title(), QStringLiteral("Untitled Screenplay"));
+    const QString subtitle = screenplay->subtitle();
+    const QString writtenBy = QStringLiteral("Written By");
+    const QString version = fetch(screenplay->version(), QStringLiteral("Initial Draft"));
+    const QString authors = fetch(screenplay->author(), QStringLiteral("A Good Writer"));
+    const QString contact = fetch(screenplay->contact(), authors);
+    const QString address = screenplay->address();
+    const QString phoneNumber = screenplay->phoneNumber();
+    const QString email = screenplay->email();
+    const QString website = screenplay->website();
+    const QString marketing = QStringLiteral("Written/Generated in Scrite (www.scrite.io)");
+
+    const QFont normalFont = doc->defaultFont();
+    const QFontMetricsF normalFontMetrics(normalFont);
+
+    QFont titleFont = normalFont;
+    titleFont.setBold(true);
+    titleFont.setPointSize(titleFont.pointSize()+2);
+    const QFontMetricsF titleFontMetrics(titleFont);
+
+    QFont marketingFont = normalFont;
+    marketingFont.setPointSize(8);
+    const QFontMetricsF marketingFontMetrics(marketingFont);
+
+    const QString newline = QStringLiteral("\n");
+    const QString centerFrameText = ((subtitle.isEmpty() ? QString() : newline) +
+                                    subtitle + newline +
+                                    newline +
+                                    version + (version.isEmpty() ? QString() : newline) +
+                                    newline +
+                                    writtenBy + (writtenBy.isEmpty() ? QString() : newline) +
+                                    authors).trimmed();
+    QRectF centerFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, centerFrameText);
+    centerFrameRect.moveCenter(rect.center());
+    centerFrameRect.moveBottom(rect.center().y());
+
+    const QString titleFrameText = title;
+    QRectF titleFrameRect = titleFontMetrics.boundingRect(rect, Qt::TextWordWrap, titleFrameText);
+    titleFrameRect.moveCenter(centerFrameRect.center());
+    titleFrameRect.moveBottom(centerFrameRect.top());
+
+    const QString marketingText = marketing;
+    QRectF marketingFrame = marketingFontMetrics.boundingRect(rect, Qt::TextWordWrap, marketingText);
+    marketingFrame.moveBottomRight(rect.bottomRight());
+
+    const QString contactFrameText =  (QStringLiteral("Contact:") + newline +
+                                      contact + (contact.isEmpty() ? QString() : newline) +
+                                      address + (address.isEmpty() ? QString() : newline) +
+                                      phoneNumber + (phoneNumber.isEmpty() ? QString() : newline) +
+                                      email + (email.isEmpty() ? QString() : newline) +
+                                      website).trimmed() + newline;
+    QRectF contactFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, contactFrameText);
+    contactFrameRect.moveBottomLeft(rect.bottomLeft());
+    contactFrameRect.moveBottom(marketingFrame.top());
+
+    const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
+    const qreal defaultDpi = qt_defaultDpi();
+    auto paintText = [isPdfDevice,defaultDpi](QPainter *painter, const QRectF &rect, int flags, const QString &text) {
+        if(isPdfDevice) {
+            const qreal invScaleX = defaultDpi / qreal(painter->device()->logicalDpiX());
+            const qreal invScaleY = defaultDpi / qreal(painter->device()->logicalDpiY());
+            painter->save();
+            painter->translate(rect.left(), rect.top());
+            painter->scale(invScaleX, invScaleY);
+            const QRectF textRect(0,0,(rect.width()*1.1)/invScaleX,rect.height()/invScaleY);
+            QRectF requiredTextRect;
+            painter->drawText(textRect, flags, text, &requiredTextRect);
+            painter->drawRect(requiredTextRect);
+            painter->restore();
+        } else
+            painter->drawText(rect, flags, text);
+    };
+
+    painter->save();
+
+    painter->setFont(titleFont);
+    paintText(painter, titleFrameRect, Qt::AlignHCenter|Qt::TextWordWrap, titleFrameText);
+
+    painter->setFont(normalFont);
+    paintText(painter, centerFrameRect, Qt::AlignHCenter|Qt::TextWordWrap, centerFrameText);
+    paintText(painter, contactFrameRect, Qt::AlignLeft|Qt::TextWordWrap, contactFrameText);
+
+    painter->setFont(marketingFont);
+    painter->setPen(Qt::lightGray);
+    paintText(painter, marketingFrame, Qt::AlignRight|Qt::TextWordWrap, marketingText);
+
+    painter->restore();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 ScreenplayTextObjectInterface::ScreenplayTextObjectInterface(QObject *parent)
     : QObject(parent)
@@ -1663,8 +1716,6 @@ QSizeF ScreenplayTextObjectInterface::intrinsicSize(QTextDocument *doc, int posI
     const QFontMetricsF fontMetrics(font);
     return QSizeF(0, fontMetrics.lineSpacing() - fontMetrics.descent());
 }
-
-Q_DECL_IMPORT int qt_defaultDpi();
 
 void ScreenplayTextObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
@@ -1771,5 +1822,4 @@ void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &re
     else
         painter->drawText(rect.bottomLeft(), text);
 }
-
 

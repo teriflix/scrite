@@ -236,6 +236,25 @@ private:
     ScreenplayTextDocument* m_screenplayDocument = nullptr;
 };
 
+class ScreenplayTitlePageObjectInterface : public QObject, public QTextObjectInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(QTextObjectInterface)
+
+public:
+    ScreenplayTitlePageObjectInterface(QObject *parent=nullptr);
+    ~ScreenplayTitlePageObjectInterface();
+
+    enum { Kind=QTextFormat::UserObject+2 };
+    enum Property
+    {
+        ScreenplayProperty = QTextFormat::UserProperty+10,
+    };
+
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+};
+
 class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterface
 {
     Q_OBJECT

@@ -244,7 +244,7 @@ Screenplay::Screenplay(QObject *parent)
     });
 
     m_author = QSysInfo::machineHostName();
-    m_version = "0.1";
+    m_version = "Initial Draft";
 }
 
 Screenplay::~Screenplay()
@@ -287,6 +287,42 @@ void Screenplay::setContact(const QString &val)
 
     m_contact = val;
     emit contactChanged();
+}
+
+void Screenplay::setAddress(QString val)
+{
+    if(m_address == val)
+        return;
+
+    m_address = val;
+    emit addressChanged();
+}
+
+void Screenplay::setPhoneNumber(QString val)
+{
+    if(m_phoneNumber == val)
+        return;
+
+    m_phoneNumber = val;
+    emit phoneNumberChanged();
+}
+
+void Screenplay::setEmail(QString val)
+{
+    if(m_email == val)
+        return;
+
+    m_email = val;
+    emit emailChanged();
+}
+
+void Screenplay::setWebsite(QString val)
+{
+    if(m_website == val)
+        return;
+
+    m_website = val;
+    emit websiteChanged();
 }
 
 void Screenplay::setVersion(const QString &val)

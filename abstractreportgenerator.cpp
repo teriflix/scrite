@@ -111,6 +111,9 @@ bool AbstractReportGenerator::generate()
     textDocument.setProperty("#author", screenplay->author());
     textDocument.setProperty("#contact", screenplay->contact());
     textDocument.setProperty("#version", screenplay->version());
+    textDocument.setProperty("#phone", screenplay->phoneNumber());
+    textDocument.setProperty("#email", screenplay->email());
+    textDocument.setProperty("#website", screenplay->website());
 
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Title"));

@@ -47,6 +47,9 @@ public:
         Contact, // query QTextDocument::property("#contact") for this.
         Version, // query QTextDocument::property("#version") for this.
         Subtitle, // query QTextDocument::property("#subtitle") for this.
+        Phone, // query QTextDocument::property("#phone") for this.
+        Email, // query QTextDocument::property("#email") for this.
+        Website, // query QTextDocument::property("#website") for this.
 
         AppName,
         AppVersion,
