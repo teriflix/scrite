@@ -104,9 +104,12 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
      * But for now, we simply take a brute-force approach. But this function could be a
      * good place for us to accept community contribution.
      */
-    EnglishLanguageSpeller speller;
 
     const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(request.text);
+    if(wordPositions.isEmpty())
+        return result;
+
+    EnglishLanguageSpeller speller;
     Q_FOREACH(Sonnet::TextBreaks::Position wordPosition, wordPositions)
     {
         const QString word = request.text.mid(wordPosition.start, wordPosition.length);

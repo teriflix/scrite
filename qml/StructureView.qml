@@ -339,7 +339,7 @@ Item {
                     ButtonGroup { id: markSceneAsGroup }
 
                     Repeater {
-                        model: elementContextMenu.element ? app.enumerationModelForType(elementContextMenu.element.scene, "Type") : 0
+                        model: elementContextMenu.element ? app.enumerationModelForType("Scene", "Type") : 0
 
                         MenuItem2 {
                             text: modelData.key
