@@ -1179,17 +1179,12 @@ Rectangle {
                                 Menu2 {
                                     title: "Mark Scene As"
 
-                                    ButtonGroup { id: markSceneAsGroup }
-
                                     Repeater {
                                         model: app.enumerationModel(headingItem.theScene, "Type")
 
                                         MenuItem2 {
                                             text: modelData.key
-                                            autoExclusive: true
-                                            ButtonGroup.group: markSceneAsGroup
-                                            checkable: true
-                                            checked: headingItem.theScene.type === modelData.value
+                                            font.bold: headingItem.theScene.type === modelData.value
                                             onTriggered: headingItem.theScene.type = modelData.value
                                         }
                                     }

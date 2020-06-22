@@ -458,11 +458,8 @@ Item {
                                     property string baseText: modelData.key
                                     property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
+                                    font.bold: app.transliterationEngine.language === modelData.value
                                     onClicked: app.transliterationEngine.language = modelData.value
-                                    autoExclusive: true
-                                    ButtonGroup.group: languageMenuGroup
-                                    checkable: true
-                                    checked: app.transliterationEngine.language === modelData.value
                                 }
                             }
 
@@ -470,8 +467,6 @@ Item {
 
                             MenuItem2 {
                                 text: "Next-Language (F10)"
-                                checkable: true
-                                checked: false
                                 onClicked: app.transliterationEngine.cycleLanguage()
                             }
                         }

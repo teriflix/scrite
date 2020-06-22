@@ -336,17 +336,12 @@ Item {
                 Menu2 {
                     title: "Mark Scene As"
 
-                    ButtonGroup { id: markSceneAsGroup }
-
                     Repeater {
                         model: elementContextMenu.element ? app.enumerationModelForType("Scene", "Type") : 0
 
                         MenuItem2 {
                             text: modelData.key
-                            autoExclusive: true
-                            checkable: true
-                            ButtonGroup.group: markSceneAsGroup
-                            checked: elementContextMenu.element.scene.type === modelData.value
+                            font.bold: elementContextMenu.element.scene.type === modelData.value
                             onTriggered: {
                                 elementContextMenu.element.scene.type = modelData.value
                                 elementContextMenu.element = null
