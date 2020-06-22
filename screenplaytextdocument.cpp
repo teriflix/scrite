@@ -1670,9 +1670,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
             painter->translate(rect.left(), rect.top());
             painter->scale(invScaleX, invScaleY);
             const QRectF textRect(0,0,(rect.width()*1.1)/invScaleX,rect.height()/invScaleY);
-            QRectF requiredTextRect;
-            painter->drawText(textRect, flags, text, &requiredTextRect);
-            painter->drawRect(requiredTextRect);
+            painter->drawText(textRect, flags, text);
             painter->restore();
         } else
             painter->drawText(rect, flags, text);

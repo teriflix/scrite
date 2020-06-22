@@ -298,30 +298,32 @@ Rectangle {
                 anchors.fill: indication
                 anchors.margins: -30
                 radius: 10
-                color: accentColors.c50.background
-                border { width: 2; color: accentColors.c900.background }
+                color: primaryColors.c600.background
             }
 
-            Column {
+            Row {
                 id: indication
                 anchors.centerIn: parent
-                anchors.verticalCenterOffset: -parent.height*0.2
-                spacing: 30
-                width: parent.width * 0.6
+                spacing: 20
+                width: Math.min(parent.width * 0.4, implicitWidth)
+                property real maxWidth: parent.width*0.4
 
                 BusyIndicator {
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    id: busyIndicator
+                    anchors.verticalCenter: parent.verticalCenter
                     running: true
+                    width: 50; height: 50
+                    Material.accent: primaryColors.c600.text
                 }
 
                 Text {
-                    width: parent.width
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: Math.min(parent.maxWidth - busyIndicator.width - parent.spacing, contentWidth)
+                    anchors.verticalCenter: parent.verticalCenter
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     text: scriteDocument.busyMessage
-                    font.pixelSize: 32
-                    color: accentColors.c50.text
+                    font.pixelSize: 16
+                    color: primaryColors.c600.text
                 }
             }
 
