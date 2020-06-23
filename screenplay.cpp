@@ -235,9 +235,14 @@ Screenplay::Screenplay(QObject *parent)
       m_sceneNumberEvaluationTimer("Screenplay.m_sceneNumberEvaluationTimer")
 {
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::subtitleChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::contactChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::versionChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::addressChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::phoneNumberChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::emailChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::websiteChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
     connect(this, &Screenplay::screenplayChanged, [=](){
