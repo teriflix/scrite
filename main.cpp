@@ -225,6 +225,9 @@ int main(int argc, char **argv)
     else
         format.setSamples(2); // default
 
+    const QScreen *primaryScreen = a.primaryScreen();
+    const QSize primaryScreenSize = primaryScreen->availableSize();
+
     QQuickStyle::setStyle("Material");
 
     QQuickView qmlView;
@@ -240,7 +243,7 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
-    qmlView.setMinimumSize(QSize(1350, 700));
+    qmlView.setMinimumSize(QSize(qMin(1440,primaryScreenSize.width()), qMin(900,primaryScreenSize.height())));
     qmlView.showMaximized();
     qmlView.raise();
 

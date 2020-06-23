@@ -17,3 +17,18 @@ Qt on your computer (Windows, macOS or Linux).
 
 Open scrite.pro in Qt Creator and build.
 
+IMPORTANT
+===============
+
+To build Scrite with Hunspell support on Linux, please install hunspell-dev
+On Ubuntu, you can do this by executing the following command
+
+sudo apt-get install libhunspell-dev
+
+Depending on the version number of hunspell installed on your computer, you
+will have to update config-hunspell.h. Comments in this file should help you
+understand what changes you should be making.
+
+For more information about this package, please visit
+https://packages.debian.org/sid/libhunspell-dev
+

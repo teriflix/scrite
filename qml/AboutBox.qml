@@ -16,7 +16,7 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
-    width: 600
+    width: 700
     height: 700
 
     SwipeView {
@@ -184,6 +184,7 @@ Item {
                     font.family: "Courier Prime"
                     font.pointSize: 10
                     text: app.fileContents(":/LICENSE.txt")
+                    selectByMouse: true
                 }
             }
         }

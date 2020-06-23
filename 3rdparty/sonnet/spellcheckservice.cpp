@@ -130,12 +130,12 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
             if(request.ignoreList.contains(word))
                 continue;
 
-            if(request.characterNames.contains(word.toUpper()))
+            if(request.characterNames.contains(word, Qt::CaseInsensitive))
                 continue;
 
             if(word.endsWith("\'s", Qt::CaseInsensitive))
             {
-                if(request.characterNames.contains(word.leftRef(word.length()-2)))
+                if(request.characterNames.contains(word.leftRef(word.length()-2), Qt::CaseInsensitive))
                     continue;
             }
 

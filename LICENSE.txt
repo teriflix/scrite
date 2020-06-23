@@ -20,7 +20,7 @@ licenses compatible with GPLv3.
 4. The appication icon is created from a free image available at
    https://shorturl.at/dEJNV
 
-5. 3rdparty/sonnet: This is a library from KDE5 Frameworks for enabling spell
+5. 3rdparty/sonnet: This is a library from KDE Frameworks 5 for enabling spell
    check feature in Scrite. While we have added out own code to it, much of it
    is directly taken from the KDE project. Read 3rdparty/sonnet/README file for
    more information.

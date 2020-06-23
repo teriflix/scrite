@@ -181,6 +181,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.title
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.title = text
                         font.pixelSize: 20
                     }
@@ -202,6 +203,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.subtitle
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.subtitle = text
                         font.pixelSize: 20
                     }
@@ -223,6 +225,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.version
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.version = text
                         font.pixelSize: 20
                     }
@@ -244,6 +247,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.author
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.author = text
                         font.pixelSize: 20
                     }
@@ -265,6 +269,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.contact
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.contact = text
                         font.pixelSize: 20
                         placeholderText: "(Optional) Production company or Studio name"
@@ -287,6 +292,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.address
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.address = text
                         font.pixelSize: 20
                         placeholderText: "(Optional) Optional"
@@ -309,6 +315,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.email
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.email = text
                         font.pixelSize: 20
                         placeholderText: "(Optional)"
@@ -331,6 +338,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.phoneNumber
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.phoneNumber = text
                         font.pixelSize: 20
                         placeholderText: "(Optional)"
@@ -353,6 +361,7 @@ Item {
                     TextField {
                         width: parent.width-parent.spacing-labelWidth
                         text: scriteDocument.screenplay.website
+                        selectByMouse: true
                         onTextEdited: scriteDocument.screenplay.website = text
                         font.pixelSize: 20
                         placeholderText: "(Optional)"

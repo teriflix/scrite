@@ -1649,6 +1649,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     const QString marketingText = marketing;
     QRectF marketingFrame = marketingFontMetrics.boundingRect(rect, Qt::TextWordWrap, marketingText);
     marketingFrame.moveBottomRight(rect.bottomRight());
+    marketingFrame.moveRight(rect.left() + rect.width()*0.95);
 
     const QString contactFrameText =  (QStringLiteral("Contact:") + newline +
                                       contact + (contact.isEmpty() ? QString() : newline) +
@@ -1795,6 +1796,7 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
 
     QRectF rect = givenRect;
     rect.setLeft( rect.left()*0.45 );
+    rect.moveBottom( rect.bottom()+iconSize*0.15 );
 
     const bool flag = painter->renderHints().testFlag(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
