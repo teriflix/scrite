@@ -176,10 +176,12 @@ Item {
                 anchors.top: backButton.bottom
                 anchors.bottom: parent.bottom
                 anchors.margins: 10
+                anchors.leftMargin: Math.max(10, (parent.width-licenseTextView.contentWidth-20)/2)
                 clip: true
                 ScrollBar.vertical.policy: ScrollBar.AlwaysOn
 
                 TextEdit {
+                    id: licenseTextView
                     readOnly: true
                     font.family: "Courier Prime"
                     font.pointSize: 10
