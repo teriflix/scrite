@@ -259,7 +259,7 @@ void Screenplay::setTitle(const QString &val)
     if(m_title == val)
         return;
 
-    m_title = val.trimmed();
+    m_title = val;
     emit titleChanged();
 }
 
@@ -268,7 +268,7 @@ void Screenplay::setSubtitle(const QString &val)
     if(m_subtitle == val)
         return;
 
-    m_subtitle = val.trimmed();
+    m_subtitle = val;
     emit subtitleChanged();
 }
 
@@ -277,7 +277,7 @@ void Screenplay::setAuthor(const QString &val)
     if(m_author == val)
         return;
 
-    m_author = val.trimmed();
+    m_author = val;
     emit authorChanged();
 }
 
@@ -286,7 +286,7 @@ void Screenplay::setContact(const QString &val)
     if(m_contact == val)
         return;
 
-    m_contact = val.trimmed();
+    m_contact = val;
     emit contactChanged();
 }
 
@@ -295,7 +295,7 @@ void Screenplay::setAddress(QString val)
     if(m_address == val)
         return;
 
-    m_address = val.trimmed();
+    m_address = val;
     emit addressChanged();
 }
 
@@ -304,7 +304,7 @@ void Screenplay::setPhoneNumber(QString val)
     if(m_phoneNumber == val)
         return;
 
-    m_phoneNumber = val.trimmed();
+    m_phoneNumber = val;
     emit phoneNumberChanged();
 }
 
@@ -313,7 +313,7 @@ void Screenplay::setEmail(QString val)
     if(m_email == val)
         return;
 
-    m_email = val.trimmed();
+    m_email = val;
     emit emailChanged();
 }
 
@@ -322,7 +322,7 @@ void Screenplay::setWebsite(QString val)
     if(m_website == val)
         return;
 
-    m_website = val.trimmed();
+    m_website = val;
     emit websiteChanged();
 }
 
@@ -331,7 +331,7 @@ void Screenplay::setVersion(const QString &val)
     if(m_version == val)
         return;
 
-    m_version = val.trimmed();
+    m_version = val;
     emit versionChanged();
 }
 
