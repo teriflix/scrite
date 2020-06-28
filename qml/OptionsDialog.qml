@@ -210,6 +210,28 @@ Item {
                     }
                 }
 
+                // Based on field
+                Row {
+                    spacing: 10
+                    width: parent.width
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Based on"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    TextField {
+                        width: parent.width-parent.spacing-labelWidth
+                        text: scriteDocument.screenplay.basedOn
+                        selectByMouse: true
+                        onTextEdited: scriteDocument.screenplay.basedOn = text
+                        font.pixelSize: 20
+                    }
+                }
+
                 // Version field
                 Row {
                     spacing: 10

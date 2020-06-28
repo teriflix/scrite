@@ -236,6 +236,7 @@ Screenplay::Screenplay(QObject *parent)
 {
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::subtitleChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::basedOnChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::contactChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::versionChanged, this, &Screenplay::screenplayChanged);
@@ -275,6 +276,15 @@ void Screenplay::setSubtitle(const QString &val)
 
     m_subtitle = val;
     emit subtitleChanged();
+}
+
+void Screenplay::setBasedOn(const QString &val)
+{
+    if(m_basedOn == val)
+        return;
+
+    m_basedOn = val;
+    emit basedOnChanged();
 }
 
 void Screenplay::setAuthor(const QString &val)

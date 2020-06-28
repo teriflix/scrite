@@ -125,6 +125,11 @@ public:
     QString subtitle() const { return m_subtitle; }
     Q_SIGNAL void subtitleChanged();
 
+    Q_PROPERTY(QString basedOn READ basedOn WRITE setBasedOn NOTIFY basedOnChanged)
+    void setBasedOn(const QString &val);
+    QString basedOn() const { return m_basedOn; }
+    Q_SIGNAL void basedOnChanged();
+
     Q_PROPERTY(QString author READ author WRITE setAuthor NOTIFY authorChanged)
     void setAuthor(const QString &val);
     QString author() const { return m_author; }
@@ -237,6 +242,7 @@ private:
     QString m_title;
     QString m_email;
     QString m_author;
+    QString m_basedOn;
     QString m_contact;
     QString m_version;
     QString m_website;

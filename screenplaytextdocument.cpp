@@ -1608,6 +1608,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     const QString title = fetch(screenplay->title(), QStringLiteral("Untitled Screenplay"));
     const QString subtitle = screenplay->subtitle();
     const QString writtenBy = QStringLiteral("Written By");
+    const QString basedOn = screenplay->basedOn();
     const QString version = fetch(screenplay->version(), QStringLiteral("Initial Draft"));
     const QString authors = fetch(screenplay->author(), QStringLiteral("A Good Writer"));
     const QString contact = fetch(screenplay->contact(), authors);
@@ -1630,13 +1631,22 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     const QFontMetricsF marketingFontMetrics(marketingFont);
 
     const QString newline = QStringLiteral("\n");
-    const QString centerFrameText = ((subtitle.isEmpty() ? QString() : newline) +
-                                    subtitle + newline +
-                                    newline +
-                                    version + (version.isEmpty() ? QString() : newline) +
-                                    newline +
-                                    writtenBy + (writtenBy.isEmpty() ? QString() : newline) +
-                                    authors).trimmed();
+    const QString emptyPara = QStringLiteral(".");
+    auto createParagraph = [newline,emptyPara](const QStringList &items) {
+        QString ret;
+        for(int i=0; i<items.size(); i++) {
+            const QString item = items.at(i);
+            if(item.isEmpty())
+                continue;
+            if(!ret.isEmpty())
+                ret += newline;
+            if(item != emptyPara)
+                ret += item;
+        }
+        return ret.trimmed();
+    };
+
+    const QString centerFrameText = createParagraph( QStringList() << subtitle << emptyPara << writtenBy << authors << emptyPara << basedOn << emptyPara << version);
     QRectF centerFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, centerFrameText);
     centerFrameRect.moveCenter(rect.center());
     centerFrameRect.moveBottom(rect.center().y());
@@ -1651,12 +1661,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     marketingFrame.moveBottomRight(rect.bottomRight());
     marketingFrame.moveRight(rect.left() + rect.width()*0.95);
 
-    const QString contactFrameText =  (QStringLiteral("Contact:") + newline +
-                                      contact + (contact.isEmpty() ? QString() : newline) +
-                                      address + (address.isEmpty() ? QString() : newline) +
-                                      phoneNumber + (phoneNumber.isEmpty() ? QString() : newline) +
-                                      email + (email.isEmpty() ? QString() : newline) +
-                                      website).trimmed() + newline;
+    const QString contactFrameText = createParagraph( QStringList() << contact << address << phoneNumber << email << website );
     QRectF contactFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, contactFrameText);
     contactFrameRect.moveBottomLeft(rect.bottomLeft());
     contactFrameRect.moveBottom(marketingFrame.top());
