@@ -1454,14 +1454,17 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         userData->charFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
     }
 
-    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    cursor.setCharFormat(userData->charFormat);
-    cursor.setBlockFormat(userData->blockFormat);
-    cursor.clearSelection();
-    cursor.setPosition(block.position());
+    if(updateFromFormat || TransliterationEngine::instance()->language() == TransliterationEngine::English)
+    {
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        cursor.setCharFormat(userData->charFormat);
+        cursor.setBlockFormat(userData->blockFormat);
+        cursor.clearSelection();
+        cursor.setPosition(block.position());
+    }
 
     const QList<TextFragment> fragments = userData->misspelledFragments();
-    if(!fragments.isEmpty())
+    if(!fragments.isEmpty() && TransliterationEngine::instance()->language() == TransliterationEngine::English)
     {
         /**
          * https://bugreports.qt.io/browse/QTBUG-39617

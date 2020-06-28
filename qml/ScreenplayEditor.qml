@@ -552,6 +552,8 @@ Rectangle {
                     palette: app.palette
                     selectByMouse: true
                     selectByKeyboard: true
+                    property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd >= selectionStart
+                    property Scene scene: contentItem.theScene
                     background: Item {
                         id: sceneTextEditorBackground
 
@@ -770,18 +772,22 @@ Rectangle {
 
                                 Menu2 {
                                     title: "Translate"
-                                    enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
+                                    enabled: sceneTextEditor.hasSelection
 
                                     Repeater {
                                         model: app.enumerationModel(app.transliterationEngine, "Language")
 
                                         MenuItem2 {
                                             focusPolicy: Qt.NoFocus
-                                            visible: index > 0
+                                            visible: index >= 0
+                                            enabled: modelData.value !== TransliterationEngine.English
                                             text: modelData.key
                                             onClicked: {
-                                                sceneTextEditor.Transliterator.transliterateToLanguage(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd, modelData.value)
                                                 editorContextMenu.close()
+                                                sceneTextEditor.forceActiveFocus()
+                                                sceneTextEditor.scene.beginUndoCapture()
+                                                sceneTextEditor.Transliterator.transliterateToLanguage(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd, modelData.value)
+                                                sceneTextEditor.scene.endUndoCapture()
                                             }
                                         }
                                     }
@@ -937,10 +943,10 @@ Rectangle {
                         onClicked: {
                             mouse.accept = true
                             sceneTextEditor.persistentSelection = true
-                            sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
-                            if(sceneDocumentBinder.spellCheckEnabled && sceneDocumentBinder.wordUnderCursorIsMisspelled)
+                            if(!sceneTextEditor.hasSelection && sceneDocumentBinder.spellCheckEnabled && sceneDocumentBinder.wordUnderCursorIsMisspelled) {
+                                sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
                                 spellingSuggestionsMenu.popup()
-                            else
+                            } else
                                 editorContextMenu.popup()
                         }
 

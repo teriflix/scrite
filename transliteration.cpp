@@ -11,8 +11,9 @@
 **
 ****************************************************************************/
 
-#include "transliteration.h"
 #include "application.h"
+#include "transliteration.h"
+#include "3rdparty/sonnet/sonnet/src/core/textbreaks_p.h"
 
 #include <QPainter>
 #include <QMetaEnum>
@@ -392,25 +393,55 @@ TransliterationEngine::Language TransliterationEngine::languageOf(void *translit
 
 QString TransliterationEngine::transliteratedWord(const QString &word) const
 {
-    if(m_transliterator == nullptr)
-        return word;
-
-    return QString::fromStdWString(Translate(m_transliterator, word.toStdWString().c_str()));
+    return TransliterationEngine::transliteratedWord(word, m_transliterator);
 }
 
-QString TransliterationEngine::transliteratedSentence(const QString &sentence, bool includingLastWord) const
+QString TransliterationEngine::transliteratedParagraph(const QString &paragraph, bool includingLastWord) const
 {
-    if(m_transliterator == nullptr)
-        return sentence;
+    return TransliterationEngine::transliteratedParagraph(paragraph, m_transliterator, includingLastWord);
+}
 
-    QStringList words = sentence.split(" ");
-    for(int i=0; i<words.length(); i++)
+QString TransliterationEngine::transliteratedWord(const QString &word, void *transliterator)
+{
+    if(transliterator == nullptr)
+        return word;
+
+    return QString::fromStdWString(Translate(transliterator, word.toStdWString().c_str()));
+}
+
+QString TransliterationEngine::transliteratedParagraph(const QString &paragraph, void *transliterator, bool includingLastWord)
+{
+    if(transliterator == nullptr || paragraph.isEmpty())
+        return paragraph;
+
+    const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(paragraph);
+    if(wordPositions.isEmpty())
+        return paragraph;
+
+    QString ret;
+    Sonnet::TextBreaks::Position wordPosition;
+    for(int i=0; i<wordPositions.size(); i++)
     {
-        if(i < words.length()-1 || includingLastWord)
-            words[i] = this->transliteratedWord(words[i]);
+        wordPosition = wordPositions.at(i);
+        const QString word = paragraph.mid(wordPosition.start, wordPosition.length);
+        QString replacement;
+
+        if(i < wordPositions.length()-1 || includingLastWord)
+            replacement = transliteratedWord(word, transliterator);
+        else
+            replacement = word;
+
+        ret += replacement;
+        if(paragraph.length() > wordPosition.start+wordPosition.length)
+        {
+            if(i < wordPositions.size()-1)
+                ret += paragraph.at(wordPosition.start+wordPosition.length);
+            else
+                ret += paragraph.mid(wordPosition.start+wordPosition.length);
+        }
     }
 
-    return words.join(" ");
+    return ret;
 }
 
 QFont TransliterationEngine::languageFont(TransliterationEngine::Language language) const
@@ -731,8 +762,8 @@ void Transliterator::transliterateToLanguage(int from, int to, int language)
 
     QTextCursor cursor(this->document());
     cursor.setPosition(from);
-    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, to-from);
-    this->transliterate(cursor, transliterator);
+    cursor.setPosition(to, QTextCursor::KeepAnchor);
+    this->transliterate(cursor, transliterator, true);
 }
 
 QTextDocument *Transliterator::document() const
@@ -770,8 +801,8 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
 
     if(charsAdded == 1)
     {
-        // Check if the char that was added was a space.
-        if(original.length() == 1 && !original.at(0).isLetter() && !original.at(0).isDigit())
+        const QChar ch = original.at(original.length()-1);
+        if( !(ch.isLetter() || ch.isDigit()) )
         {
             // Select the word that is just before the cursor.
             cursor.setPosition(from);
@@ -788,9 +819,12 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
     }
 }
 
-void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
+void Transliterator::transliterate(QTextCursor &cursor, void *transliterator, bool force)
 {
-    if(this->document() == nullptr || cursor.document() != this->document() || !m_hasActiveFocus || !m_enabled)
+    if(this->document() == nullptr || cursor.document() != this->document())
+        return;
+
+    if(!force && (!m_hasActiveFocus || !m_enabled))
         return;
 
     if(transliterator == nullptr)
@@ -799,24 +833,7 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator)
         return;
 
     const QString original = cursor.selectedText();
-    QString replacement;
-    QString word;
-
-    for(int i=0; i<original.length(); i++)
-    {
-        const QChar ch = original.at(i);
-        if(ch.isLetter() || ch.isDigit())
-            word += ch;
-        else
-        {
-            replacement += TransliterationEngine::instance()->transliteratedWord(word);
-            replacement += ch;
-            word.clear();
-        }
-    }
-
-    if(!word.isEmpty())
-        replacement += TransliterationEngine::instance()->transliteratedWord(word);
+    const QString replacement = TransliterationEngine::transliteratedParagraph(original, transliterator, true);
 
     if(replacement == original)
         return;

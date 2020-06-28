@@ -87,7 +87,7 @@ TextField {
         if(includingLastWord === undefined)
             includingLastWord = false
         if(enableTransliteration & userTypedSomeText) {
-            var newText = app.transliterationEngine.transliteratedSentence(text, includingLastWord)
+            var newText = app.transliterationEngine.transliteratedParagraph(text, includingLastWord)
             if(text === newText)
                 return
             userTypedSomeText = false

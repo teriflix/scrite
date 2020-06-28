@@ -89,7 +89,10 @@ public:
     Language languageOf(void *transliterator) const;
 
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
-    Q_INVOKABLE QString transliteratedSentence(const QString &sentence, bool includingLastWord=true) const;
+    Q_INVOKABLE QString transliteratedParagraph(const QString &paragraph, bool includingLastWord=true) const;
+
+    static QString transliteratedWord(const QString &word, void *transliterator);
+    static QString transliteratedParagraph(const QString &paragraph, void *transliterator, bool includingLastWord=true);
 
     Q_INVOKABLE QFont languageFont(Language language) const;
     QStringList languageFontFilePaths(Language language) const;
@@ -182,7 +185,7 @@ private:
     QTextDocument *document() const;
     void onTextDocumentDestroyed();
     void processTransliteration(int from, int charsRemoved, int charsAdded);
-    void transliterate(QTextCursor &cursor, void *transliterator=nullptr);
+    void transliterate(QTextCursor &cursor, void *transliterator=nullptr, bool force=false);
 
 private:
     bool m_enabled = true;
