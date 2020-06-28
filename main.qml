@@ -168,6 +168,8 @@ Rectangle {
                 item.okButtonText = params.okButtonText
             if(params.cancelButtonText)
                 item.cancelButtonText = params.cancelButtonText
+            if(params.abortButtonText)
+                item.abortButtonText = params.abortButtonText
             item.okCallback = okCallback
             item.cancelCallback = cancelCallback
         }
@@ -206,6 +208,7 @@ Rectangle {
             property string question: "Press Ok to continue."
             property string okButtonText: "Ok"
             property string cancelButtonText: "Cancel"
+            property string abortButtonText
             property var    okCallback
             property var    cancelCallback
 
@@ -243,6 +246,12 @@ Rectangle {
                                 cancelCallback()
                             modalDialog.closeRequest()
                         }
+                    }
+
+                    UI.Button2 {
+                        visible: text !== ""
+                        text: abortButtonText
+                        onClicked: modalDialog.closeRequest()
                     }
                 }
             }

@@ -182,6 +182,7 @@ public:
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
 
     Q_INVOKABLE QString fileContents(const QString &fileName) const;
+    Q_INVOKABLE QString fileName(const QString &path) const;
 
     Q_INVOKABLE QScreen *windowScreen(QObject *window) const;
 

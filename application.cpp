@@ -673,6 +673,11 @@ QString Application::fileContents(const QString &fileName) const
     return QString::fromLatin1(file.readAll());
 }
 
+QString Application::fileName(const QString &path) const
+{
+    return QFileInfo(path).baseName();
+}
+
 QScreen *Application::windowScreen(QObject *window) const
 {
     QWindow *qwindow = qobject_cast<QWindow*>(window);

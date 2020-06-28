@@ -71,6 +71,12 @@ Item {
             anchors.margins: 10
             height: appFileTools.height
 
+            function saveQuestionText() {
+                if(scriteDocument.fileName === "")
+                    return "Do you want to save this document first?"
+                return "Do you want to save changes to <strong>" + app.fileName(scriteDocument.fileName) + "</strong> first?"
+            }
+
             Row {
                 id: appFileTools
                 spacing: 2
@@ -83,9 +89,10 @@ Item {
                     onClicked: {
                         if(scriteDocument.modified)
                             askQuestion({
-                                "question": "Do you want to save your current project first?",
+                                "question": appToolBar.saveQuestionText(),
                                 "okButtonText": "Yes",
                                 "cancelButtonText": "No",
+                                "abortButtonText": "Cancel",
                                 "callback": function(val) {
                                     if(val) {
                                         if(scriteDocument.fileName !== "")
@@ -114,9 +121,10 @@ Item {
                     function doOpen(filePath) {
                         if(scriteDocument.modified)
                             askQuestion({
-                                    "question": "Do you want to save your current project first?",
+                                    "question": appToolBar.saveQuestionText(),
                                     "okButtonText": "Yes",
                                     "cancelButtonText": "No",
+                                    "abortButtonText": "Cancel",
                                     "callback": function(val) {
                                         if(val) {
                                             if(scriteDocument.fileName !== "")
