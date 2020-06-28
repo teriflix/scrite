@@ -69,11 +69,12 @@ Item {
                 color: accentColors.c600.background
 
                 Text {
-                    anchors.centerIn: parent
-                    font.pixelSize: 14
-                    font.letterSpacing: 2
                     text: section
                     color: accentColors.c600.text
+                    width: parent.width - 20
+                    font.pixelSize: 14
+                    font.letterSpacing: 2
+                    anchors.centerIn: parent
                 }
             }
 
@@ -96,7 +97,8 @@ Item {
             delegate: Text {
                 width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
                 verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
+                leftPadding: 10
+                rightPadding: 2.5
                 height: 32
                 font.pixelSize: 18
                 font.bold: pageList.currentIndex === index
@@ -158,12 +160,11 @@ Item {
 
                 Text {
                     width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
                     text: "Title Page Settings"
                     font.pixelSize: 24
                 }
 
-                Item { width: parent.width; height: 1 }
+                Item { width: parent.width; height: 10 }
 
                 // Title field
                 Row {
@@ -446,7 +447,6 @@ Item {
 
                     Text {
                         width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
                         text: "Page Setup"
                         font.pixelSize: 24
                     }
@@ -784,10 +784,11 @@ Item {
 
                 Text {
                     width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "<strong>" + pageData.name
+                    text: pageData.name
                     font.pixelSize: 24
                 }
+
+                Item { width: parent.width; height: 10 }
 
                 Rectangle {
                     width: parent.width
@@ -856,6 +857,52 @@ Item {
                 }
 
                 Item { width: parent.width; height: 10 }
+
+                // Default Language
+                Row {
+                    spacing: 10
+                    width: parent.width
+                    visible: pageData.elementType !== SceneElement.Heading
+
+                    Text {
+                        width: labelWidth
+                        horizontalAlignment: Text.AlignRight
+                        text: "Language"
+                        font.pixelSize: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    ComboBox2 {
+                        property var enumModel: app.enumerationModel(displayElementFormat, "DefaultLanguage")
+                        model: enumModel
+                        width: 300
+                        textRole: "key"
+                        currentIndex: displayElementFormat.defaultLanguageInt
+                        onActivated: {
+                            displayElementFormat.defaultLanguageInt = enumModel[currentIndex].value
+                            switch(displayElementFormat.elementType) {
+                            case SceneElement.Action:
+                                paragraphLanguageSettings.actionLanguage = enumModel[currentIndex].key
+                                break;
+                            case SceneElement.Character:
+                                paragraphLanguageSettings.characterLanguage = enumModel[currentIndex].key
+                                break;
+                            case SceneElement.Parenthetical:
+                                paragraphLanguageSettings.parentheticalLanguage = enumModel[currentIndex].key
+                                break;
+                            case SceneElement.Dialogue:
+                                paragraphLanguageSettings.dialogueLanguage = enumModel[currentIndex].key
+                                break;
+                            case SceneElement.Transition:
+                                paragraphLanguageSettings.transitionLanguage = enumModel[currentIndex].key
+                                break;
+                            case SceneElement.Shot:
+                                paragraphLanguageSettings.shotLanguage = enumModel[currentIndex].key
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 // Font Size
                 Row {
@@ -1312,10 +1359,9 @@ Item {
 
                             Grid {
                                 id: activeLanguagesView
-                                width: parent.width-10
-                                anchors.top: parent.top
+                                width: parent.width
                                 spacing: 5
-                                columns: 3
+                                columns: 4
 
                                 Repeater {
                                     model: app.transliterationEngine.getLanguages()

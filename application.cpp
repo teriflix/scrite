@@ -302,6 +302,36 @@ QJsonArray Application::enumerationModelForType(const QString &typeName, const Q
     return ::enumerationModel(mo, enumName);
 }
 
+QString enumerationKey(const QMetaObject *metaObject, const QString &enumName, int value)
+{
+    QString ret;
+
+    if( metaObject == nullptr || enumName.isEmpty() )
+        return ret;
+
+    const int enumIndex = metaObject->indexOfEnumerator( qPrintable(enumName) );
+    if( enumIndex < 0 )
+        return ret;
+
+    const QMetaEnum enumInfo = metaObject->enumerator(enumIndex);
+    if( !enumInfo.isValid() )
+        return ret;
+
+    return QString::fromLatin1( enumInfo.valueToKey(value) );
+}
+
+QString Application::enumerationKey(QObject *object, const QString &enumName, int value) const
+{
+    return ::enumerationKey(object->metaObject(), enumName, value);
+}
+
+QString Application::enumerationKeyForType(const QString &typeName, const QString &enumName, int value) const
+{
+    const int typeId = QMetaType::type(qPrintable(typeName+"*"));
+    const QMetaObject *mo = typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    return ::enumerationKey(mo, enumName, value);
+}
+
 QJsonObject Application::fileInfo(const QString &path) const
 {
     QFileInfo fi(path);

@@ -17,6 +17,7 @@
 #include "scene.h"
 #include "modifiable.h"
 #include "simpletimer.h"
+#include "transliteration.h"
 
 #include <QScreen>
 #include <QPageLayout>
@@ -96,6 +97,34 @@ public:
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
+    // Must be manually kept in sync with TransliterationEngine::Language
+    enum DefaultLanguage
+    {
+        Default,
+        English,
+        Bengali,
+        Gujarati,
+        Hindi,
+        Kannada,
+        Malayalam,
+        Oriya,
+        Punjabi,
+        Sanskrit,
+        Tamil,
+        Telugu
+    };
+    Q_ENUM(DefaultLanguage)
+    Q_PROPERTY(DefaultLanguage defaultLanguage READ defaultLanguage WRITE setDefaultLanguage NOTIFY defaultLanguageChanged)
+    void setDefaultLanguage(DefaultLanguage val);
+    DefaultLanguage defaultLanguage() const { return m_defaultLanguage; }
+    Q_SIGNAL void defaultLanguageChanged();
+
+    Q_PROPERTY(int defaultLanguageInt READ defaultLanguageInt WRITE setDefaultLanguageInt NOTIFY defaultLanguageChanged)
+    int defaultLanguageInt() const { return int(m_defaultLanguage); }
+    void setDefaultLanguageInt(int val) { this->setDefaultLanguage(DefaultLanguage(val)); }
+
+    Q_INVOKABLE void activateDefaultLanguage();
+
     QTextBlockFormat createBlockFormat(const qreal *pageWidth=nullptr) const;
     QTextCharFormat createCharFormat(const qreal *pageWidth=nullptr) const;
 
@@ -130,6 +159,7 @@ private:
     ScreenplayFormat *m_format = nullptr;
     Qt::Alignment m_textAlignment = Qt::AlignLeft;
     SceneElement::Type m_elementType = SceneElement::Action;
+    DefaultLanguage m_defaultLanguage = Default;
 };
 
 class ScreenplayPageLayout : public QObject
@@ -245,6 +275,15 @@ public:
     Q_PROPERTY(ScreenplayPageLayout* pageLayout READ pageLayout CONSTANT STORED false)
     ScreenplayPageLayout* pageLayout() const { return m_pageLayout; }
 
+    Q_PROPERTY(TransliterationEngine::Language defaultLanguage READ defaultLanguage WRITE setDefaultLanguage NOTIFY defaultLanguageChanged)
+    void setDefaultLanguage(TransliterationEngine::Language val);
+    TransliterationEngine::Language defaultLanguage() const { return m_defaultLanguage; }
+    Q_SIGNAL void defaultLanguageChanged();
+
+    Q_PROPERTY(int defaultLanguageInt READ defaultLanguageInt WRITE setDefaultLanguageInt NOTIFY defaultLanguageChanged)
+    int defaultLanguageInt() const { return int(m_defaultLanguage); }
+    void setDefaultLanguageInt(int val) { this->setDefaultLanguage(TransliterationEngine::Language(val)); }
+
     Q_PROPERTY(QFont defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
     void setDefaultFont(const QFont &val);
     QFont defaultFont() const { return m_defaultFont; }
@@ -304,6 +343,7 @@ private:
     QFontMetrics m_defaultFont2Metrics;
     QStringList m_suggestionsAtCursor;
     ScreenplayPageLayout* m_pageLayout = new ScreenplayPageLayout(this);
+    TransliterationEngine::Language m_defaultLanguage = TransliterationEngine::English;
 
     static SceneElementFormat* staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index);
     static int staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list);

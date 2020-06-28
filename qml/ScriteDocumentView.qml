@@ -55,6 +55,20 @@ Item {
         property bool enableSpellCheck: true
     }
 
+    Settings {
+        id: paragraphLanguageSettings
+        fileName: app.settingsFilePath
+        category: "Paragraph Language"
+
+        property string shotLanguage: "Default"
+        property string actionLanguage: "Default"
+        property string defaultLanguage: "English"
+        property string dialogueLanguage: "Default"
+        property string characterLanguage: "Default"
+        property string transitionLanguage: "Default"
+        property string parentheticalLanguage: "Default"
+    }
+
     Rectangle {
         id: appToolBarArea
         anchors.left: parent.left
@@ -467,7 +481,11 @@ Item {
                                     property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
                                     font.bold: app.transliterationEngine.language === modelData.value
-                                    onClicked: app.transliterationEngine.language = modelData.value
+                                    onClicked: {
+                                        app.transliterationEngine.language = modelData.value
+                                        scriteDocument.formatting.defaultLanguage = modelData.value
+                                        paragraphLanguageSettings.defaultLanguage = modelData.key
+                                    }
                                 }
                             }
 
@@ -475,7 +493,11 @@ Item {
 
                             MenuItem2 {
                                 text: "Next-Language (F10)"
-                                onClicked: app.transliterationEngine.cycleLanguage()
+                                onClicked: {
+                                    app.transliterationEngine.cycleLanguage()
+                                    scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
+                                    paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                                }
                             }
                         }
 
@@ -487,7 +509,11 @@ Item {
                                     property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
                                     context: Qt.ApplicationShortcut
                                     sequence: "Alt+"+shortcutKey
-                                    onActivated: app.transliterationEngine.language = modelData.value
+                                    onActivated: {
+                                        app.transliterationEngine.language = modelData.value
+                                        scriteDocument.formatting.defaultLanguage = modelData.value
+                                        paragraphLanguageSettings.defaultLanguage = modelData.key
+                                    }
                                 }
                             }
                         }
@@ -495,7 +521,11 @@ Item {
                         Shortcut {
                             context: Qt.ApplicationShortcut
                             sequence: "F10"
-                            onActivated: app.transliterationEngine.cycleLanguage()
+                            onActivated: {
+                                app.transliterationEngine.cycleLanguage()
+                                scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
+                                paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                            }
                         }
                     }
                 }

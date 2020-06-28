@@ -207,6 +207,27 @@ void SceneElementFormat::setRightMargin(qreal val)
     emit elementFormatChanged();
 }
 
+void SceneElementFormat::setDefaultLanguage(SceneElementFormat::DefaultLanguage val)
+{
+    if(m_defaultLanguage == val)
+        return;
+
+    m_defaultLanguage = val;
+    emit defaultLanguageChanged();
+}
+
+void SceneElementFormat::activateDefaultLanguage()
+{
+    if(m_defaultLanguage == Default)
+    {
+        TransliterationEngine::instance()->setLanguage(m_format->defaultLanguage());
+        return;
+    }
+
+    TransliterationEngine::Language language = TransliterationEngine::Language( int(m_defaultLanguage)-1 );
+    TransliterationEngine::instance()->setLanguage(language);
+}
+
 QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContentWidth) const
 {
     const qreal dpr = m_format->devicePixelRatio();
@@ -279,6 +300,42 @@ void SceneElementFormat::resetToDefaults()
     this->setTextColor(Qt::black);
     this->setBackgroundColor(Qt::transparent);
     this->setTextAlignment(Qt::AlignLeft);
+
+    const QSettings *settings = Application::instance()->settings();
+    QString defaultLanguage = QStringLiteral("Default");
+    switch(m_elementType)
+    {
+    case SceneElement::Action:
+        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/actionLanguage"), defaultLanguage).toString();
+        break;
+    case SceneElement::Character:
+        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/characterLanguage"), defaultLanguage).toString();
+        break;
+    case SceneElement::Parenthetical:
+        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/parentheticalLanguage"), defaultLanguage).toString();
+        break;
+    case SceneElement::Dialogue:
+        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/dialogueLanguage"), defaultLanguage).toString();
+        break;
+    case SceneElement::Shot:
+        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/shotLanguage"), defaultLanguage).toString();
+        break;
+    case SceneElement::Transition:
+        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/transitionLanguage"), defaultLanguage).toString();
+        break;
+    default:
+        break;
+    }
+
+    const QMetaObject *mo = this->metaObject();
+    const QMetaEnum enumerator = mo->enumerator( mo->indexOfEnumerator("DefaultLanguage") );
+    if(enumerator.isValid())
+    {
+        bool ok = false;
+        const int value = enumerator.keyToValue( qPrintable(defaultLanguage), &ok );
+        if(ok)
+            this->setDefaultLanguageInt(value);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -447,6 +504,15 @@ qreal ScreenplayFormat::devicePixelRatio() const
     return m_fontZoomLevels.at(index).toDouble() * this->screenDevicePixelRatio();
 }
 
+void ScreenplayFormat::setDefaultLanguage(TransliterationEngine::Language val)
+{
+    if(m_defaultLanguage == val)
+        return;
+
+    m_defaultLanguage = val;
+    emit defaultLanguageChanged();
+}
+
 void ScreenplayFormat::setDefaultFont(const QFont &val)
 {
     if(m_defaultFont == val)
@@ -589,6 +655,17 @@ void ScreenplayFormat::resetToDefaults()
     {
         const int index = m_fontZoomLevels.indexOf( QVariant(1.0) );
         this->setFontZoomLevelIndex(index);
+    }
+
+    const QString defLanguage = settings->value( QStringLiteral("Paragraph Language/defaultLanguage"), QStringLiteral("English") ).toString();
+    const QMetaObject *mo = &SceneElement::staticMetaObject;
+    const QMetaEnum enumerator = mo->enumerator( mo->indexOfEnumerator("Language") );
+    if(enumerator.isValid())
+    {
+        bool ok = false;
+        const int value = enumerator.keyToValue( qPrintable(defLanguage), &ok );
+        if(ok)
+            this->setDefaultLanguageInt(value);
     }
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
@@ -1588,7 +1665,13 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
     m_currentElement = val;
 
     if(m_currentElement != nullptr)
+    {
         connect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+
+        SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
+        if(format != nullptr)
+            format->activateDefaultLanguage();
+    }
 
     emit currentElementChanged();
 
@@ -1672,6 +1755,13 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
 
     if(type != Scene::ElementTypeChange)
         return;
+
+    if(m_currentElement != nullptr && element == m_currentElement)
+    {
+        SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
+        if(format != nullptr)
+            format->activateDefaultLanguage();
+    }
 
     this->evaluateAutoCompleteHints();
 

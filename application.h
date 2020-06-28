@@ -135,6 +135,8 @@ public:
     Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
     Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
     Q_INVOKABLE QJsonArray enumerationModelForType(const QString &typeName, const QString &enumName) const;
+    Q_INVOKABLE QString enumerationKey(QObject *object, const QString &enumName, int value) const;
+    Q_INVOKABLE QString enumerationKeyForType(const QString &typeName, const QString &enumName, int value) const;
     Q_INVOKABLE QJsonObject fileInfo(const QString &path) const;
 
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
