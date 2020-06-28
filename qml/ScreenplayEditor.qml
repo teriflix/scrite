@@ -1410,7 +1410,7 @@ Rectangle {
                     TextViewEdit {
                         id: textViewEdit
                         width: parent.width
-                        y: -fontDescent
+                        y: fontDescent
                         readOnly: false
                         font.capitalization: Font.AllUppercase
                         font.pointSize: 12
@@ -1426,7 +1426,7 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            anchors.bottomMargin: parent.fontAscent
+                            anchors.bottomMargin: parent.fontHeight - parent.fontAscent - parent.fontHeight*0.25
                             height: 1
                             color: accentColors.borderColor
                         }
