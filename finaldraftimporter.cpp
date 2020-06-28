@@ -79,7 +79,16 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         if(typeIndex < 0)
             continue;
 
-        const QString text = paragraphE.firstChildElement("Text").text();
+        QString text;
+        QDomElement textE = paragraphE.firstChildElement("Text");
+        while(!textE.isNull())
+        {
+            if(!text.isEmpty())
+                text += QStringLiteral(" ");
+            text += textE.text();
+            textE = textE.nextSiblingElement("Text");
+        }
+
         if(text.isEmpty())
             continue;
 
