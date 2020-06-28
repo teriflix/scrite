@@ -297,7 +297,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: indication
                 anchors.margins: -30
-                radius: 10
+                radius: 4
                 color: primaryColors.c600.background
             }
 
