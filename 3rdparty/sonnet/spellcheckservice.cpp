@@ -106,7 +106,7 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
      */
 
     const Sonnet::TextBreaks::Positions wordPositions = Sonnet::TextBreaks::wordBreaks(request.text);
-    if(wordPositions.isEmpty())
+    if(wordPositions.isEmpty() || Sonnet::Loader::openLoader() == nullptr)
         return result;
 
     EnglishLanguageSpeller speller;
@@ -123,6 +123,12 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
         if(word.at(0).script() != QChar::Script_Latin)
             continue;
 #endif
+
+        if(Sonnet::Loader::openLoader() == nullptr)
+        {
+            result.misspelledFragments.clear();
+            break;
+        }
 
         const bool misspelled = speller.isMisspelled(word);
         if(misspelled)

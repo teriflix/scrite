@@ -1371,27 +1371,28 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 };
 
                 QChar::Script script = QChar::Script_Unknown;
-                QString snippet;
+                int from = 0;
+                int length = 0;
                 for(int i=0; i<text.length(); i++)
                 {
                     const QChar ch = text.at(i);
                     if(script == QChar::Script_Unknown)
                     {
                         script = ch.script();
-                        snippet += ch;
+                        ++length;
                     }
-                    else if(script == ch.script())
-                        snippet += ch;
+                    else if(script == ch.script() || ch.isPunct() || ch.isSpace() || ch.isSymbol())
+                        ++length;
                     else
                     {
-                        insertSnippet(snippet, script);
-                        snippet.clear();
+                        insertSnippet(text.mid(from, length), script);
+                        from = from+length;
                         script = ch.script();
-                        snippet += ch;
+                        ++length;
                     }
                 }
 
-                insertSnippet(snippet, script);
+                insertSnippet(text.mid(from, length), script);
             }
             else
                 cursor.insertText(text);
