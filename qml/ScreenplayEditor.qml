@@ -552,7 +552,7 @@ Rectangle {
                     palette: app.palette
                     selectByMouse: true
                     selectByKeyboard: true
-                    property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd >= selectionStart
+                    property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
                     property Scene scene: contentItem.theScene
                     background: Item {
                         id: sceneTextEditorBackground
@@ -943,11 +943,14 @@ Rectangle {
                         onClicked: {
                             mouse.accept = true
                             sceneTextEditor.persistentSelection = true
-                            if(!sceneTextEditor.hasSelection && sceneDocumentBinder.spellCheckEnabled && sceneDocumentBinder.wordUnderCursorIsMisspelled) {
+                            if(!sceneTextEditor.hasSelection && sceneDocumentBinder.spellCheckEnabled) {
                                 sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
-                                spellingSuggestionsMenu.popup()
-                            } else
-                                editorContextMenu.popup()
+                                if(sceneDocumentBinder.wordUnderCursorIsMisspelled) {
+                                    spellingSuggestionsMenu.popup()
+                                    return
+                                }
+                            }
+                            editorContextMenu.popup()
                         }
 
                         DelayedPropertyBinder {

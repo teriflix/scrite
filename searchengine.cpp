@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "hourglass.h"
 #include "searchengine.h"
 
 #include <QSet>
@@ -253,6 +254,8 @@ void SearchEngine::setSearchString(const QString &val)
 
 void SearchEngine::replace(const QString &string)
 {
+    HourGlass hourGlass;
+
     if(m_currentSearchResultIndex >= 0 && m_currentSearchResultIndex < m_searchResults.size())
     {
         const QPair<SearchAgent*,int> result = m_searchResults.at(m_currentSearchResultIndex);
@@ -263,6 +266,8 @@ void SearchEngine::replace(const QString &string)
 
 void SearchEngine::replaceAll(const QString &string)
 {
+    HourGlass hourGlass;
+
     if(m_searchResults.isEmpty())
         return;
 
@@ -442,6 +447,8 @@ int SearchEngine::staticSearchAgentCount(QQmlListProperty<SearchAgent> *list)
 
 void SearchEngine::doSearch()
 {
+    HourGlass hourGlass;
+
     if(!m_searchResults.isEmpty())
     {        
         SearchAgent *agent = nullptr;
