@@ -1354,7 +1354,42 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
             prepareCursor(cursor, para->type(), !insertBlock);
-            cursor.insertText(para->text());
+
+            auto insertSnippet = [&cursor](const QString &snippet, QChar::Script script) {
+                if(snippet.isEmpty())
+                    return;
+                TransliterationEngine::Language language = TransliterationEngine::languageForScript(script);
+                const QFont font = TransliterationEngine::instance()->languageFont(language);
+                QTextCharFormat format;
+                format.setFont(font);
+                cursor.mergeCharFormat(format);
+                cursor.insertText(snippet);
+            };
+
+            const QString text = para->text();
+            QChar::Script script = QChar::Script_Unknown;
+            QString snippet;
+            for(int i=0; i<text.length(); i++)
+            {
+                const QChar ch = text.at(i);
+                if(script == QChar::Script_Unknown)
+                {
+                    script = ch.script();
+                    snippet += ch;
+                }
+                else if(script == ch.script())
+                    snippet += ch;
+                else
+                {
+                    insertSnippet(snippet, script);
+                    snippet.clear();
+                    script = ch.script();
+                    snippet += ch;
+                }
+            }
+
+            insertSnippet(snippet, script);
+
             insertBlock = true;
         }
     }
