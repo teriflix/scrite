@@ -3,6 +3,8 @@ DESTDIR = $$PWD/../Release/
 
 DEFINES += PHTRANSLATE_STATICLIB
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
 HEADERS += \
     3rdparty/phtranslator/LanguageCodes.h \
     3rdparty/phtranslator/PhTranslateLib.h \

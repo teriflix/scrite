@@ -50,6 +50,7 @@ SimpleTimer::SimpleTimer(const QString &name, QObject *parent)
 
 SimpleTimer::~SimpleTimer()
 {
+    m_destroyed = true;
     this->stop();
 
 #ifndef QT_NO_DEBUG
@@ -71,7 +72,7 @@ void SimpleTimer::start(int msec, QObject *object)
     if(m_timer.isActive())
         this->stop();
 
-    if(object == nullptr)
+    if(object == nullptr || m_destroyed)
         return;
 
     if(object != m_object)
@@ -85,7 +86,7 @@ void SimpleTimer::start(int msec, QObject *object)
             connect(object, &QObject::destroyed, this, &SimpleTimer::onObjectDestroyed);
     }
 
-    if(this->thread()->eventDispatcher() != nullptr)
+    if(this->thread() != nullptr && this->thread()->eventDispatcher() != nullptr)
     {
         m_timer.start(msec);
         m_timerId = m_timer.timerId();

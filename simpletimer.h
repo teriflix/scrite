@@ -48,6 +48,7 @@ private:
     int m_timerId = -1;
     QTimer m_timer;
     QString m_name;
+    bool m_destroyed = false;
     QObject *m_object = nullptr;
 };
 
