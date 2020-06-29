@@ -269,7 +269,7 @@ Item {
                     iconSource: "../icons/content/undo.png"
                     enabled: app.canUndo
                     onClicked: app.undoGroup.undo()
-                    ToolTip.text: app.undoText + "\t" + app.polishShortcutTextForDisplay(shortcut)
+                    ToolTip.text: "Undo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
                 }
 
                 ToolButton3 {
@@ -278,7 +278,7 @@ Item {
                     iconSource: "../icons/content/redo.png"
                     enabled: app.canRedo
                     onClicked: app.undoGroup.redo()
-                    ToolTip.text: app.redoText + "\t" + app.polishShortcutTextForDisplay(shortcut)
+                    ToolTip.text: "Redo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
                 }
 
                 Rectangle {

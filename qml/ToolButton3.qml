@@ -82,7 +82,7 @@ Item {
         onActivated: toolButton.click()
     }
 
-    ToolTip.text: text + "\t(" + shortcut + ")"
+    ToolTip.text: toolButtonShortcut.nativeText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(toolButtonShortcut.sequence) + ")")
     ToolTip.visible: toolButtonMouseArea.containsMouse ? toolTipVisibility.get : false
 
     DelayedPropertyBinder {

@@ -82,7 +82,7 @@ Row {
         id: findAndReplaceButton
         iconSource: "../icons/action/search.png"
         shortcut: "Ctrl+F"
-        ToolTip.text: "Toggles the search & repleace panel in screenplay editor."
+        ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
         enabled: !showScreenplayPreview
