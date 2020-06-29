@@ -817,7 +817,9 @@ public:
     SceneElement *sceneElement() const { return m_sceneElement; }
 
     void resetFormat() { m_formatMTime = -1; }
-    bool shouldUpdateFromFormat(const SceneElementFormat *format) { return format->isModified(&m_formatMTime); }
+    bool shouldUpdateFromFormat(const SceneElementFormat *format) {
+        return format->isModified(&m_formatMTime) || m_highlightedText.isEmpty();
+    }
 
     void initializeSpellCheck(SceneDocumentBinder *binder);
     bool shouldUpdateFromSpellCheck() {
