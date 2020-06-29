@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Dialogs 1.3
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
@@ -165,6 +166,115 @@ Item {
                 }
 
                 Item { width: parent.width; height: 10 }
+
+                // Cover page photo field
+                Rectangle {
+                    /**
+                      At best we can paint a 464x261 point photo on the cover page. Nothing more.
+                      So, we need to provide a image preview in this aspect ratio.
+                      */
+                    width: 400; height: 225
+                    border.width: 1
+                    border.color: "black"
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Loader {
+                        anchors.fill: parent
+                        active: coverPagePhoto.paintedWidth < parent.width || coverPagePhoto.paintedHeight < parent.height
+                        opacity: 0.1
+                        sourceComponent: Item {
+                            Image {
+                                id: coverPageImage
+                                anchors.fill: parent
+                                fillMode: Image.PreserveAspectCrop
+                                source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                            }
+                        }
+                    }
+
+                    Image {
+                        id: coverPagePhoto
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        smooth: true; mipmap: true
+                        fillMode: Image.PreserveAspectFit
+                        source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                        opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: parent.status === Image.Loading
+                        }
+                    }
+
+                    Text {
+                        anchors.fill: parent
+                        wrapMode: Text.WordWrap
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        opacity: coverPagePhotoMouseArea.containsMouse ? 1 : (scriteDocument.screenplay.coverPagePhoto === "" ? 0.5 : 0)
+                        text: scriteDocument.screenplay.coverPagePhoto === "" ? "Click here to set the cover page photo" : "Click here to change the cover page photo"
+                    }
+
+                    MouseArea {
+                        id: coverPagePhotoMouseArea
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        hoverEnabled: true
+                        onClicked: fileDialog.open()
+                    }
+
+                    Column {
+                        spacing: 0
+                        anchors.left: parent.right
+                        anchors.leftMargin: 20
+                        visible: scriteDocument.screenplay.coverPagePhoto !== ""
+                        enabled: visible
+
+                        Text {
+                            text: "Cover Photo Size"
+                            font.bold: true
+                            topPadding: 5
+                            bottomPadding: 5
+                        }
+
+                        RadioButton2 {
+                            text: "Small"
+                            checked: scriteDocument.screenplay.coverPagePhotoSize === Screenplay.SmallCoverPhoto
+                            onToggled: scriteDocument.screenplay.coverPagePhotoSize = Screenplay.SmallCoverPhoto
+                        }
+
+                        RadioButton2 {
+                            text: "Medium"
+                            checked: scriteDocument.screenplay.coverPagePhotoSize === Screenplay.MediumCoverPhoto
+                            onToggled: scriteDocument.screenplay.coverPagePhotoSize = Screenplay.MediumCoverPhoto
+                        }
+
+                        RadioButton2 {
+                            text: "Large"
+                            checked: scriteDocument.screenplay.coverPagePhotoSize === Screenplay.LargeCoverPhoto
+                            onToggled: scriteDocument.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
+                        }
+
+                        Button2 {
+                            text: "Remove"
+                            onClicked: scriteDocument.screenplay.clearCoverPagePhoto()
+                        }
+                    }
+
+                    FileDialog {
+                        id: fileDialog
+                        nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
+                        selectFolder: false
+                        selectMultiple: false
+                        sidebarVisible: true
+                        selectExisting: modes[mode].selectExisting
+                        onAccepted: {
+                            if(fileUrl != "")
+                                scriteDocument.screenplay.setCoverPagePhoto(app.urlToLocalFile(fileUrl))
+                        }
+                    }
+                }
 
                 // Title field
                 Row {

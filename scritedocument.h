@@ -137,6 +137,9 @@ public:
 
     void clearModified();
 
+    // Callers must be responsible for how they use this.
+    DocumentFileSystem *fileSystem() { return &m_docFileSystem; }
+
 protected:
     void timerEvent(QTimerEvent *event);
 

@@ -229,26 +229,28 @@ void ScreenplayElement::sceneWasDeleted()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static const QString coverPagePhotoPath("coverPage/photo.jpg");
+
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
       m_sceneNumberEvaluationTimer("Screenplay.m_sceneNumberEvaluationTimer")
 {
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::subtitleChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::basedOnChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::emailChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::websiteChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::basedOnChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::contactChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::versionChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::addressChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::phoneNumberChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::emailChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::websiteChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::subtitleChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::phoneNumberChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::coverPagePhotoChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
-    connect(this, &Screenplay::screenplayChanged, [=](){
-        this->markAsModified();
-    });
+    connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::screenplayChanged, [=](){ this->markAsModified(); });
 
     m_author = QSysInfo::machineHostName();
     m_version = "Initial Draft";
@@ -348,6 +350,46 @@ void Screenplay::setVersion(const QString &val)
 
     m_version = val;
     emit versionChanged();
+}
+
+void Screenplay::setCoverPagePhoto(const QString &val)
+{
+    HourGlass hourGlass;
+
+    QImage image(val);
+    if( image.isNull() )
+    {
+        m_scriteDocument->fileSystem()->remove(coverPagePhotoPath);
+        m_coverPagePhoto.clear();
+    }
+    else
+    {
+        const QSize imageSize = image.size().scaled(1920, 1080, Qt::KeepAspectRatio);
+        if(image.width() > imageSize.width() || image.height() > imageSize.height())
+            image = image.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        const QString photoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath, true);
+        if(image.save(photoPath, "JPG"))
+            m_coverPagePhoto = photoPath;
+        else
+            m_coverPagePhoto.clear();
+    }
+
+    emit coverPagePhotoChanged();
+}
+
+void Screenplay::clearCoverPagePhoto()
+{
+    this->setCoverPagePhoto(QString());
+}
+
+void Screenplay::setCoverPagePhotoSize(Screenplay::CoverPagePhotoSize val)
+{
+    if(m_coverPagePhotoSize == val)
+        return;
+
+    m_coverPagePhotoSize = val;
+    emit coverPagePhotoSizeChanged();
 }
 
 QQmlListProperty<ScreenplayElement> Screenplay::elements()
@@ -1173,6 +1215,16 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     }
 
     return counter;
+}
+
+void Screenplay::deserializeFromJson(const QJsonObject &)
+{
+    const QString cpPhotoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath);
+    if( QFile::exists(cpPhotoPath) )
+    {
+        m_coverPagePhoto = cpPhotoPath;
+        emit coverPagePhotoChanged();
+    }
 }
 
 int Screenplay::rowCount(const QModelIndex &parent) const

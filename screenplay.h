@@ -103,9 +103,10 @@ private:
     ElementType m_elementType = SceneElementType;
 };
 
-class Screenplay : public QAbstractListModel, public Modifiable
+class Screenplay : public QAbstractListModel, public Modifiable, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Screenplay(QObject *parent=nullptr);
@@ -165,6 +166,19 @@ public:
     QString version() const { return m_version; }
     Q_SIGNAL void versionChanged();
 
+    Q_PROPERTY(QString coverPagePhoto READ coverPagePhoto NOTIFY coverPagePhotoChanged)
+    Q_INVOKABLE void setCoverPagePhoto(const QString &val);
+    Q_INVOKABLE void clearCoverPagePhoto();
+    QString coverPagePhoto() const { return m_coverPagePhoto; }
+    Q_SIGNAL void coverPagePhotoChanged();
+
+    enum CoverPagePhotoSize { SmallCoverPhoto, MediumCoverPhoto, LargeCoverPhoto };
+    Q_ENUM(CoverPagePhotoSize)
+    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize READ coverPagePhotoSize WRITE setCoverPagePhotoSize NOTIFY coverPagePhotoSizeChanged)
+    void setCoverPagePhotoSize(CoverPagePhotoSize val);
+    CoverPagePhotoSize coverPagePhotoSize() const { return m_coverPagePhotoSize; }
+    Q_SIGNAL void coverPagePhotoSizeChanged();
+
     Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
     Q_SIGNAL void hasNonStandardScenesChanged();
@@ -223,6 +237,9 @@ public:
     Q_INVOKABLE QJsonArray search(const QString &text, int flags=0) const;
     Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags=0);
 
+    // QObjectSerializer::Interface interface
+    void deserializeFromJson(const QJsonObject &);
+
     // QAbstractItemModel interface
     enum Roles { ScreenplayElementRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
@@ -249,7 +266,9 @@ private:
     QString m_address;
     QString m_subtitle;
     QString m_phoneNumber;
+    QString m_coverPagePhoto;
     ScriteDocument *m_scriteDocument = nullptr;
+    CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
 
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);

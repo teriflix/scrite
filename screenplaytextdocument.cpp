@@ -1726,6 +1726,40 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     painter->save();
 
+    if(!screenplay->coverPagePhoto().isEmpty())
+    {
+        QImage photo(screenplay->coverPagePhoto());
+        QRectF photoRect = photo.rect();
+        QSizeF photoSize = photoRect.size();
+
+        QRectF spaceAvailable = rect;
+        spaceAvailable.setBottom(titleFrameRect.top() - titleFrameRect.height());
+        photoSize.scale(spaceAvailable.size(), Qt::KeepAspectRatio);
+
+        switch(screenplay->coverPagePhotoSize())
+        {
+        case Screenplay::LargeCoverPhoto:
+            break;
+        case Screenplay::MediumCoverPhoto:
+            photoSize /= 2.0;
+            photo = photo.scaled( photo.size()/2.0, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+            break;
+        case Screenplay::SmallCoverPhoto:
+            photoSize /= 4.0;
+            photo = photo.scaled( photo.size()/4.0, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+            break;
+        }
+
+        photoRect.setSize(photoSize);
+        photoRect.moveCenter(spaceAvailable.center());
+        photoRect.moveBottom(spaceAvailable.bottom());
+
+        const bool flag = painter->renderHints().testFlag(QPainter::SmoothPixmapTransform);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform);
+        painter->drawImage(photoRect, photo);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
+    }
+
     painter->setFont(titleFont);
     paintText(painter, titleFrameRect, Qt::AlignHCenter|Qt::TextWordWrap, titleFrameText);
 
