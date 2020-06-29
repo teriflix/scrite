@@ -18,6 +18,7 @@
 #include <QPainter>
 #include <QMetaEnum>
 #include <QSettings>
+#include <QTextBlock>
 #include <QMetaObject>
 #include <QJsonObject>
 #include <QTextCursor>
@@ -760,10 +761,22 @@ void Transliterator::transliterateToLanguage(int from, int to, int language)
     if(transliterator == nullptr)
         return;
 
+    const QTextBlock fromBlock = this->document()->findBlock(from);
+    const QTextBlock toBlock = this->document()->findBlock(to);
+    if(!fromBlock.isValid() && !toBlock.isValid())
+        return;
+
     QTextCursor cursor(this->document());
-    cursor.setPosition(from);
-    cursor.setPosition(to, QTextCursor::KeepAnchor);
-    this->transliterate(cursor, transliterator, true);
+    QTextBlock block = fromBlock;
+    while(block.isValid())
+    {
+        cursor.setPosition( qMax(from, block.position()) );
+        cursor.setPosition( qMin(to, block.position()+block.length()-1), QTextCursor::KeepAnchor );
+        this->transliterate(cursor, transliterator, true);
+
+        if(block == toBlock)
+            break;
+    }
 }
 
 QTextDocument *Transliterator::document() const

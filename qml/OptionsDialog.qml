@@ -97,7 +97,7 @@ Item {
             delegate: Text {
                 width: pageList.scrollBarRequired ? pageList.width - 17 : pageList.width
                 verticalAlignment: Text.AlignVCenter
-                leftPadding: 10
+                leftPadding: 20
                 rightPadding: 2.5
                 height: 32
                 font.pixelSize: 18
