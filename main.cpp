@@ -209,6 +209,9 @@ int main(int argc, char **argv)
     qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
 
     NotificationManager notificationManager;
+
+    DocumentFileSystem::setMarker( QByteArrayLiteral("SCRITE") );
+
     ScriteDocument *scriteDocument = ScriteDocument::instance();
 
     if(a.arguments().size() == 2)

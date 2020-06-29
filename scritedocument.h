@@ -23,6 +23,7 @@
 #include "errorreport.h"
 #include "progressreport.h"
 #include "qobjectserializer.h"
+#include "documentfilesystem.h"
 
 class AbstractExporter;
 class AbstractReportGenerator;
@@ -154,6 +155,8 @@ private:
     void setModified(bool val);
     void setFileName(const QString &val);
     bool load(const QString &fileName);
+    bool classicLoad(const QString &fileName);
+    bool modernLoad(const QString &fileName);
     void structureElementIndexChanged();
     void screenplayElementIndexChanged();
 
@@ -185,6 +188,7 @@ private:
     ScreenplayFormat* m_formatting = nullptr;
     ScreenplayFormat* m_printFormat = nullptr;
     int m_autoSaveDurationInSeconds = 60;
+    DocumentFileSystem m_docFileSystem;
     QStringList m_spellCheckIgnoreList;
     QJsonArray m_structureElementSequence;
     SimpleTimer m_evaluateStructureElementSequenceTimer;

@@ -272,6 +272,7 @@ void ScriteDocument::reset()
         disconnect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
 
     UndoStack::clearAllStacks();
+    m_docFileSystem.reset();
 
     if(m_formatting == nullptr)
         this->setFormatting(new ScreenplayFormat(this));
@@ -327,6 +328,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         return;
     }
 
+    file.close();
+
     if(!m_autoSaveMode)
         this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
 
@@ -334,8 +337,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     const QJsonObject json = QObjectSerializer::toJson(this);
     const QByteArray bytes = QJsonDocument(json).toBinaryData();
-
-    file.write(bytes);
+    m_docFileSystem.setHeader(bytes);
+    m_docFileSystem.save(fileName);
 
     this->setFileName(fileName);
     this->setModified(false);
@@ -815,15 +818,49 @@ bool ScriteDocument::load(const QString &fileName)
 {
     m_errorReport->clear();
 
-    QFile file(fileName);
-    if( !file.open(QFile::ReadOnly) )
+    if( QFile(fileName).isReadable() )
     {
         m_errorReport->setErrorMessage( QString("Cannot open %1 for reading.").arg(fileName));
         return false;
     }
 
-    const QByteArray bytes = file.readAll();
-    const QJsonDocument jsonDoc = QJsonDocument::fromBinaryData(bytes);
+    bool loaded = this->classicLoad(fileName);
+    if(!loaded)
+        loaded = this->modernLoad(fileName);
+
+    if(!loaded)
+    {
+        m_errorReport->setErrorMessage( QString("%1 is not a Scrite document.").arg(fileName) );
+        return false;
+    }
+
+    struct LoadCleanup
+    {
+        LoadCleanup(ScriteDocument *doc)
+            : m_document(doc) {
+            m_document->m_errorReport->clear();
+        }
+
+        ~LoadCleanup() {
+            if(m_loadBegun) {
+                m_document->m_progressReport->finish();
+                m_document->setLoading(false);
+            } else
+                m_document->m_docFileSystem.reset();
+        }
+
+        void begin() {
+            m_loadBegun = true;
+            m_document->m_progressReport->start();
+            m_document->setLoading(true);
+        }
+
+    private:
+        bool m_loadBegun = false;
+        ScriteDocument *m_document;
+    } loadCleanup(this);
+
+    const QJsonDocument jsonDoc = QJsonDocument::fromBinaryData(m_docFileSystem.header());
 
 #ifndef QT_NO_DEBUG
     {
@@ -838,7 +875,7 @@ bool ScriteDocument::load(const QString &fileName)
     const QJsonObject json = jsonDoc.object();
     if(json.isEmpty())
     {
-        m_errorReport->setErrorMessage(QString("Scrite document was not found in %1").arg(fileName));
+        m_errorReport->setErrorMessage( QString("%1 is not a Scrite document.").arg(fileName) );
         return false;
     }
 
@@ -860,16 +897,12 @@ bool ScriteDocument::load(const QString &fileName)
     m_fileName = fileName;
     emit fileNameChanged();
 
-    this->setLoading(true);
-    m_progressReport->start();
+    loadCleanup.begin();
 
     UndoStack::ignoreUndoCommands = true;
     const bool ret = QObjectSerializer::fromJson(json, this);
     UndoStack::ignoreUndoCommands = false;
     UndoStack::clearAllStacks();
-
-    m_progressReport->finish();
-    this->setLoading(false);
 
     // When we finish loading, QML begins lazy initialization of the UI
     // for displaying the document. In the process even a small 1/2 pixel
@@ -881,6 +914,32 @@ bool ScriteDocument::load(const QString &fileName)
     m_clearModifyTimer.start(100, this);
 
     return ret;
+}
+
+bool ScriteDocument::classicLoad(const QString &fileName)
+{
+    if(fileName.isEmpty())
+        return false;
+
+    QFile file(fileName);
+    if(!file.open(QFile::ReadOnly))
+        return false;
+
+    static const QByteArray classicMarker("qbjs");
+    const QByteArray marker = file.read(classicMarker.length());
+    if(marker != classicMarker)
+        return false;
+
+    file.seek(0);
+
+    const QByteArray bytes = file.readAll();
+    m_docFileSystem.setHeader(bytes);
+    return true;
+}
+
+bool ScriteDocument::modernLoad(const QString &fileName)
+{
+    return m_docFileSystem.load(fileName);
 }
 
 void ScriteDocument::structureElementIndexChanged()
