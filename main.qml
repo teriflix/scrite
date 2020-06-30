@@ -378,6 +378,7 @@ Rectangle {
     UI.NotificationsView {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: -1
         width: parent.width * 0.7
         onVisibleChanged: blur.visible = visible
     }

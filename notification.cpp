@@ -15,6 +15,7 @@
 #include "notificationmanager.h"
 
 #include <QEvent>
+#include <QtDebug>
 
 Notification::Notification(QObject *parent)
     : QObject(parent),

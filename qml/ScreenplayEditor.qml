@@ -94,7 +94,7 @@ Rectangle {
             id: screenplaySearchBar
             searchEngine.objectName: "Screenplay Search Engine"
             anchors.horizontalCenter: parent.horizontalCenter
-            allowReplace: true
+            allowReplace: !scriteDocument.readOnly
             width: toolbar.width * 0.6
             enabled: !screenplayPreview.active
 
@@ -247,16 +247,18 @@ Rectangle {
                                 anchors.rightMargin: ruler.rightMarginPx
                                 iconSource: "../icons/action/edit.png"
                                 onClicked: editTitlePage()
-                                visible: parent.active
+                                visible: parent.active && enabled
+                                enabled: !scriteDocument.readOnly
                             }
                         }
 
                         Button2 {
                             text: "Edit Title Page"
-                            visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false
+                            visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
                             onClicked: editTitlePage()
+                            enabled: !scriteDocument.readOnly
                         }
                     }
                     footer: Item {
@@ -265,8 +267,9 @@ Rectangle {
 
                         Column {
                             anchors.centerIn: parent
-                            visible: screenplayAdapter.screenplay === scriteDocument.screenplay
+                            visible: screenplayAdapter.screenplay === scriteDocument.screenplay && enabled
                             spacing: 5
+                            enabled: !scriteDocument.readOnly
 
                             Image {
                                 id: addSceneButton
@@ -284,7 +287,8 @@ Rectangle {
                                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : parent.defaultOpacity
                                     onClicked: {
                                         scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.elementCount-1
-                                        scriteDocument.createNewScene()
+                                        if(!scriteDocument.readOnly)
+                                            scriteDocument.createNewScene()
                                     }
                                 }
                             }
@@ -388,10 +392,41 @@ Rectangle {
         border.color: primaryColors.borderColor
         clip: true
 
+        ToolButton3 {
+            id: toggleLockButton
+            width: parent.height - 10
+            height: width
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+            enabled: !scriteDocument.readOnly
+            iconSource: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
+            ToolTip.text: "Lock to allow editing of this document only on this computer."
+            onClicked: {
+                var question = ""
+                if(scriteDocument.locked)
+                    question = "By unlocking this document, you will be able to edit it on this and any other computer. Do you want to unlock?"
+                else
+                    question = "By locking this document, you will be able to edit it only on this computer. Do you want to lock?"
+
+                askQuestion({
+                    "question": question,
+                    "okButtonText": "Yes",
+                    "cancelButtonText": "No",
+                    "abortButtonText": "Cancel",
+                    "callback": function(val) {
+                        if(val) {
+                            scriteDocument.locked = !scriteDocument.locked
+                        }
+                    }
+                }, this)
+            }
+        }
+
         Text {
             id: pageNumberDisplay
             anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
+            anchors.left: toggleLockButton.right
             anchors.leftMargin: 20
             text: "Page " + screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
         }
@@ -513,7 +548,7 @@ Rectangle {
                 characterNames: scriteDocument.structure.characterNames
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus
-                spellCheckEnabled: spellCheckEnabledFlag.value
+                spellCheckEnabled: !scriteDocument.readOnly && spellCheckEnabledFlag.value
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 onDocumentInitialized: sceneTextEditor.cursorPosition = 0
                 onRequestCursorPosition: app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
@@ -574,6 +609,7 @@ Rectangle {
                     selectByKeyboard: true
                     property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
                     property Scene scene: contentItem.theScene
+                    readOnly: scriteDocument.readOnly
                     background: Item {
                         id: sceneTextEditorBackground
 
@@ -603,9 +639,9 @@ Rectangle {
                                 height: 1
                                 // color: primaryColors.c400.background
 
-                                SceneNumberBubble {
+                                PageNumberBubble {
                                     x: -width - 20
-                                    sceneNumber: modelData.pageNumber
+                                    pageNumber: modelData.pageNumber
                                 }
                             }
                         }
@@ -681,6 +717,7 @@ Rectangle {
                         MenuLoader {
                             id: spellingSuggestionsMenu
                             anchors.bottom: parent.bottom
+                            enabled: !scriteDocument.readOnly
                             menu: Menu2 {
                                 onAboutToShow: sceneTextEditor.persistentSelection = true
                                 onAboutToHide: sceneTextEditor.persistentSelection = false
@@ -725,6 +762,7 @@ Rectangle {
                         MenuLoader {
                             id: editorContextMenu
                             anchors.bottom: parent.bottom
+                            enabled: !scriteDocument.readOnly
                             menu: Menu2 {
                                 onAboutToShow: sceneTextEditor.persistentSelection = true
                                 onAboutToHide: sceneTextEditor.persistentSelection = false
@@ -817,6 +855,7 @@ Rectangle {
 
                         MenuLoader {
                             id: doubleEnterMenu
+                            enabled: !scriteDocument.readOnly
                             anchors.bottom: parent.bottom
                             property Scene currentScene: contentItem.theScene
                             menu: Menu2 {
@@ -958,7 +997,7 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.RightButton
-                        enabled: contextMenuEnableBinder.get
+                        enabled: !scriteDocument.readOnly && contextMenuEnableBinder.get
                         cursorShape: Qt.IBeamCursor
                         onClicked: {
                             mouse.accept = true
@@ -1134,7 +1173,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
-                    visible: theElement.sceneNumber > 0
+                    visible: theElement.sceneNumber > 0 && screenplayAdapter.isSourceScreenplay
                 }
 
                 SceneTypeImage {
@@ -1168,6 +1207,8 @@ Rectangle {
                         property SceneHeading sceneHeading: headingItem.theScene.heading
                         property TextArea sceneTextEditor: headingItem.sceneTextEditor
                         sourceComponent: {
+                            if(scriteDocument.readOnly)
+                                return sceneHeading.enabled ? sceneHeadingViewer : sceneHeadingDisabled
                             if(sceneHeading.enabled)
                                 return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
                             return sceneHeadingDisabled
@@ -1191,6 +1232,8 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         width: headingFontMetrics.lineSpacing
                         height: headingFontMetrics.lineSpacing
+                        visible: enabled
+                        enabled: !scriteDocument.readOnly
 
                         Item {
                             anchors.bottom: parent.bottom
@@ -1424,7 +1467,10 @@ Rectangle {
                     font.pointSize: 12
                     closable: scene.isCharacterMute(modelData)
                     onClicked: requestCharacterMenu(modelData)
-                    onCloseRequest: scene.removeMuteCharacter(modelData)
+                    onCloseRequest: {
+                        if(!scriteDocument.readOnly)
+                            scene.removeMuteCharacter(modelData)
+                    }
                 }
             }
 
@@ -1468,6 +1514,8 @@ Rectangle {
                 width: sceneCharactersListHeading.height
                 height: sceneCharactersListHeading.height
                 opacity: 0.5
+                visible: enabled
+                enabled: !scriteDocument.readOnly
 
                 MouseArea {
                     ToolTip.text: "Click here to capture characters who don't have any dialogues in this scene, but are still required for the scene."
@@ -1853,12 +1901,13 @@ Rectangle {
         id: titleCardComponent
 
         Column {
-            spacing: 10
+            property int defaultFontSize: screenplayFormat.defaultFont2.pointSize
+            spacing: 10 * zoomLevel
 
-            Image { width: parent.width; height: 20 }
+            Image { width: parent.width; height: 20 * zoomLevel }
 
             Image {
-                property real maxWidth: parent.width * 0.5
+                property real maxWidth: parent.width - 2*ruler.leftMarginPx
                 width: {
                     switch(scriteDocument.screenplay.coverPagePhotoSize) {
                     case Screenplay.SmallCoverPhoto:
@@ -1881,15 +1930,22 @@ Rectangle {
                 spacing: parent.spacing/1
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 22
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize + 2
+                    font.bold: true
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
                     text: scriteDocument.screenplay.title === "" ? "<untitled>" : scriteDocument.screenplay.title
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 18
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
                     text: scriteDocument.screenplay.subtitle
                     visible: scriteDocument.screenplay.subtitle !== ""
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -1897,24 +1953,31 @@ Rectangle {
             }
 
             Text {
-                font.family: scriteDocument.formatting.defaultFont
-                font.pixelSize: 16
+                font.family: scriteDocument.formatting.defaultFont.family
+                font.pixelSize: defaultFontSize
+                width: parent.width
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
                 text: "Written By\n" + (scriteDocument.screenplay.author === "" ? "<unknown author>" : scriteDocument.screenplay.author)
                 anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
             }
 
             Text {
-                font.family: scriteDocument.formatting.defaultFont
-                font.pixelSize: 16
+                font.family: scriteDocument.formatting.defaultFont.family
+                font.pixelSize: defaultFontSize
+                width: parent.width
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
                 text: scriteDocument.screenplay.version === "" ? "Initial Version" : scriteDocument.screenplay.version
                 anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
             }
 
             Text {
-                font.family: scriteDocument.formatting.defaultFont
-                font.pixelSize: 16
+                font.family: scriteDocument.formatting.defaultFont.family
+                font.pixelSize: defaultFontSize
+                width: parent.width
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
                 text: scriteDocument.screenplay.basedOn
                 visible: scriteDocument.screenplay.basedOn !== ""
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1922,35 +1985,44 @@ Rectangle {
 
             Column {
                 spacing: parent.spacing/2
+                width: parent.width * 0.5
                 anchors.left: parent.left
                 anchors.leftMargin: ruler.leftMarginPx
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 14
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize - 2
+                    width: parent.width
+                    wrapMode: Text.WordWrap
                     text: scriteDocument.screenplay.contact
                     visible: text !== ""
                 }
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 14
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize - 2
+                    width: parent.width
+                    wrapMode: Text.WordWrap
                     text: scriteDocument.screenplay.address
                     visible: text !== ""
                 }
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 14
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize - 2
+                    width: parent.width
+                    wrapMode: Text.WordWrap
                     text: scriteDocument.screenplay.phoneNumber
                     visible: text !== ""
                 }
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 14
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize - 2
                     font.underline: true
                     color: "blue"
+                    width: parent.width
+                    elide: Text.ElideMiddle
                     text: scriteDocument.screenplay.email
                     visible: text !== ""
 
@@ -1962,10 +2034,12 @@ Rectangle {
                 }
 
                 Text {
-                    font.family: scriteDocument.formatting.defaultFont
-                    font.pixelSize: 14
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.pixelSize: defaultFontSize - 2
                     font.underline: true
                     color: "blue"
+                    width: parent.width
+                    elide: Text.ElideRight
                     text: scriteDocument.screenplay.website
                     visible: text !== ""
 
@@ -1977,7 +2051,7 @@ Rectangle {
                 }
             }
 
-            Image { width: parent.width; height: 20 }
+            Image { width: parent.width; height: 20 * zoomLevel }
         }
     }
 }

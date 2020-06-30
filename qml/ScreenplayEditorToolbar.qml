@@ -73,6 +73,7 @@ Row {
                 MenuItem2 {
                     text: "Scan for mute characters"
                     onClicked: scriteDocument.structure.scanForMuteCharacters()
+                    enabled: !scriteDocument.readOnly
                 }
             }
         }
@@ -99,7 +100,7 @@ Row {
         shortcut: "Ctrl+Shift+N"
         shortcutText: ""
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview
+        enabled: !showScreenplayPreview && !scriteDocument.readOnly
         onClicked: {
             requestScreenplayEditor()
             scriteDocument.createNewScene()
@@ -129,7 +130,7 @@ Row {
             shortcut: "Ctrl+" + (index+1)
             shortcutText: (index+1)
             ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
-            enabled: binder && !showScreenplayPreview ? binder.currentElement !== null : false
+            enabled: !scriteDocument.readOnly && binder && !showScreenplayPreview ? binder.currentElement !== null : false
             down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
             onClicked: binder.currentElement.type = modelData.value
         }

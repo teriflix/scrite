@@ -32,30 +32,30 @@
 static QStringList getCustomFontFilePaths()
 {
     const QStringList customFonts = QStringList() <<
-         ":/font/Gujarati/HindVadodara-Regular.ttf" <<
-         ":/font/Gujarati/HindVadodara-Bold.ttf" <<
-         ":/font/Oriya/BalooBhaina2-Regular.ttf" <<
-         ":/font/Oriya/BalooBhaina2-Bold.ttf" <<
-         ":/font/Punjabi/BalooPaaji2-Regular.ttf" <<
-         ":/font/Punjabi/BalooPaaji2-Bold.ttf" <<
-         ":/font/Malayalam/BalooChettan2-Regular.ttf" <<
-         ":/font/Malayalam/BalooChettan2-Bold.ttf" <<
-         ":/font/Hindi/Mukta-Regular.ttf" <<
-         ":/font/Hindi/Mukta-Bold.ttf" <<
-         ":/font/Telugu/HindGuntur-Regular.ttf" <<
-         ":/font/Telugu/HindGuntur-Bold.ttf" <<
-         ":/font/Sanskrit/Mukta-Regular.ttf" <<
-         ":/font/Sanskrit/Mukta-Bold.ttf" <<
-         ":/font/English/CourierPrime-BoldItalic.ttf" <<
-         ":/font/English/CourierPrime-Bold.ttf" <<
-         ":/font/English/CourierPrime-Italic.ttf" <<
-         ":/font/English/CourierPrime-Regular.ttf" <<
-         ":/font/Kannada/BalooTamma2-Regular.ttf" <<
-         ":/font/Kannada/BalooTamma2-Bold.ttf" <<
-         ":/font/Tamil/HindMadurai-Regular.ttf" <<
-         ":/font/Tamil/HindMadurai-Bold.ttf" <<
-         ":/font/Bengali/HindSiliguri-Regular.ttf" <<
-         ":/font/Bengali/HindSiliguri-Bold.ttf";
+         QStringLiteral(":/font/Gujarati/HindVadodara-Regular.ttf") <<
+         QStringLiteral(":/font/Gujarati/HindVadodara-Bold.ttf") <<
+         QStringLiteral(":/font/Oriya/BalooBhaina2-Regular.ttf") <<
+         QStringLiteral(":/font/Oriya/BalooBhaina2-Bold.ttf") <<
+         QStringLiteral(":/font/Punjabi/BalooPaaji2-Regular.ttf") <<
+         QStringLiteral(":/font/Punjabi/BalooPaaji2-Bold.ttf") <<
+         QStringLiteral(":/font/Malayalam/BalooChettan2-Regular.ttf") <<
+         QStringLiteral(":/font/Malayalam/BalooChettan2-Bold.ttf") <<
+         QStringLiteral(":/font/Hindi/Mukta-Regular.ttf") <<
+         QStringLiteral(":/font/Hindi/Mukta-Bold.ttf") <<
+         QStringLiteral(":/font/Telugu/HindGuntur-Regular.ttf") <<
+         QStringLiteral(":/font/Telugu/HindGuntur-Bold.ttf") <<
+         QStringLiteral(":/font/Sanskrit/Mukta-Regular.ttf") <<
+         QStringLiteral(":/font/Sanskrit/Mukta-Bold.ttf") <<
+         QStringLiteral(":/font/English/CourierPrime-BoldItalic.ttf") <<
+         QStringLiteral(":/font/English/CourierPrime-Bold.ttf") <<
+         QStringLiteral(":/font/English/CourierPrime-Italic.ttf") <<
+         QStringLiteral(":/font/English/CourierPrime-Regular.ttf") <<
+         QStringLiteral(":/font/Kannada/BalooTamma2-Regular.ttf") <<
+         QStringLiteral(":/font/Kannada/BalooTamma2-Bold.ttf") <<
+         QStringLiteral(":/font/Tamil/HindMadurai-Regular.ttf") <<
+         QStringLiteral(":/font/Tamil/HindMadurai-Bold.ttf") <<
+         QStringLiteral(":/font/Bengali/HindSiliguri-Regular.ttf") <<
+         QStringLiteral(":/font/Bengali/HindSiliguri-Bold.ttf");
     return customFonts;
 }
 

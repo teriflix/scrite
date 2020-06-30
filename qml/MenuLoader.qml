@@ -25,11 +25,15 @@ Loader {
     sourceComponent: menu
 
     function show() {
+        if(!enabled)
+            return
         itemInitMode = "show"
         active = true
     }
 
     function popup() {
+        if(!enabled)
+            return
         itemInitMode = "popup"
         active = true
     }

@@ -58,6 +58,7 @@ Item {
                     icon.source: "../icons/content/clear_all.png"
                     suggestedWidth: parent.width; suggestedHeight: parent.width
                     ToolTip.text: "Clear the screenplay, while retaining the scenes."
+                    enabled: !scriteDocument.readOnly
                     onClicked: {
                         askQuestion({
                             "question": "Are you sure you want to clear the screenplay?",
@@ -94,8 +95,9 @@ Item {
                     suggestedWidth: parent.width; suggestedHeight: parent.width
                     ToolTip.text: "Add a act, chapter or interval break."
                     autoRepeat: false
-                    enabled: scriteDocument.screenplay.elementCount === 0 ||
-                             scriteDocument.screenplay.currentElementIndex >= 0
+                    enabled: !scriteDocument.readOnly &&
+                             (scriteDocument.screenplay.elementCount === 0 ||
+                             scriteDocument.screenplay.currentElementIndex >= 0)
                     onClicked: breakElementMenu.popup(width,height/2)
                     down: breakElementMenu.visible
 
@@ -269,7 +271,7 @@ Item {
                             rotation: isBreakElement ? -90 : 0
                             horizontalAlignment: Text.AlignHCenter
                             maximumLineCount: isBreakElement ? 1 : 4
-                            font.pixelSize: isBreakElement ? 18 : 15
+                            font.pointSize: isBreakElement ? 15 : 13
                             visible: isBreakElement ? true : width >= 80
                             wrapMode: isBreakElement ? Text.NoWrap : Text.WrapAnywhere
                             font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
@@ -331,6 +333,8 @@ Item {
                         anchors.rightMargin: 5
                         opacity: dragMouseArea.containsMouse ? 1 : 0.1
                         scale: dragMouseArea.containsMouse ? 2 : 1
+                        visible: !scriteDocument.readOnly
+                        enabled: visible
                         Behavior on scale { NumberAnimation { duration: 250 } }
 
                         MouseArea {
@@ -401,6 +405,7 @@ Item {
 
         MenuItem2 {
             text: "Remove"
+            enabled: !scriteDocument.readOnly
             onClicked: {
                 scriteDocument.screenplay.removeElement(elementItemMenu.element)
                 elementItemMenu.close()

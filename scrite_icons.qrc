@@ -87,5 +87,9 @@
         <file>icons/content/fight_scene.png</file>
         <file>icons/action/edit.png</file>
         <file>icons/action/edit_inverted.png</file>
+        <file>icons/action/lock_open.png</file>
+        <file>icons/action/lock_open_inverted.png</file>
+        <file>icons/action/lock_outline_inverted.png</file>
+        <file>icons/action/lock_outline.png</file>
     </qresource>
 </RCC>

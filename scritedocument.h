@@ -39,6 +39,15 @@ public:
     static ScriteDocument *instance();
     ~ScriteDocument();
 
+    Q_PROPERTY(bool readOnly READ isReadOnly NOTIFY readOnlyChanged)
+    bool isReadOnly() const { return m_readOnly; }
+    Q_SIGNAL void readOnlyChanged();
+
+    Q_PROPERTY(bool locked READ isLocked WRITE setLocked NOTIFY lockedChanged)
+    void setLocked(bool val);
+    bool isLocked() const { return m_locked; }
+    Q_SIGNAL void lockedChanged();
+
     Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)
     void setAutoSaveDurationInSeconds(int val);
     int autoSaveDurationInSeconds() const { return m_autoSaveDurationInSeconds; }
@@ -144,6 +153,7 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
+    void setReadOnly(bool val);
     void setLoading(bool val);
     void prepareAutoSave();
     void updateDocumentWindowTitle();
@@ -176,9 +186,11 @@ private:
 
 private:
     bool m_busy = false;
+    bool m_locked = false;
     bool m_loading = false;
     bool m_modified = false;
     bool m_autoSave = true;
+    bool m_readOnly = false;
     bool m_autoSaveMode = false;
     QString m_fileName;
     QString m_busyMessage;

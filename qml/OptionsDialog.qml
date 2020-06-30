@@ -159,6 +159,7 @@ Item {
             Column {
                 width: screenplayOptionsView.width-20
                 spacing: 0
+                enabled: !scriteDocument.readOnly
 
                 Text {
                     width: parent.width
@@ -229,7 +230,7 @@ Item {
                         spacing: 0
                         anchors.left: parent.right
                         anchors.leftMargin: 20
-                        visible: scriteDocument.screenplay.coverPagePhoto !== ""
+                        visible: scriteDocument.screenplay.coverPagePhoto !== "" && !scriteDocument.readOnly
                         enabled: visible
 
                         Text {
@@ -914,6 +915,7 @@ Item {
             Column {
                 width: scrollView.width - 20
                 spacing: 0
+                enabled: !scriteDocument.readOnly
 
                 Text {
                     width: parent.width

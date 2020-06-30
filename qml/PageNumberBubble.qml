@@ -16,7 +16,7 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 PainterPathItem {
-    property int sceneNumber: -1
+    property int pageNumber: -1
     readonly property var colors: primaryColors.c600
 
     Text {
@@ -24,7 +24,7 @@ PainterPathItem {
         anchors.centerIn: parent
         font.family: scriteDocument.formatting.defaultFont.family
         font.pixelSize: 16 * zoomLevel
-        text: "" + parent.sceneNumber
+        text: "" + parent.pageNumber
         color: colors.text
     }
 

@@ -48,6 +48,12 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
       m_versionNumber(version)
 {
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-BoldItalic.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-Regular.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-Italic.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-Bold.ttf"));
+    this->setFont( QFont("Raleway") );
+
     connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
     connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
     connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);
@@ -792,7 +798,9 @@ bool Application::loadScript()
 
     QJSEngine jsEngine;
     QJSValue globalObject = jsEngine.globalObject();
-    globalObject.setProperty("document", jsEngine.newQObject(document));
+    if(!document->isReadOnly())
+        globalObject.setProperty("document", jsEngine.newQObject(document));
+
     const QJSValue result = jsEngine.evaluate(program, scriptFile);
     if(result.isError())
     {

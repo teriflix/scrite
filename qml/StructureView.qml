@@ -51,6 +51,7 @@ Item {
                     down: newSceneColorMenuLoader.active
                     onClicked: newSceneColorMenuLoader.active = true
                     anchors.verticalCenter: parent.verticalCenter
+                    enabled: !scriteDocument.readOnly
                     property color activeColor: "white"
 
                     Loader {
@@ -202,7 +203,7 @@ Item {
                 id: createElementMouseHandler
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton
-                enabled: false
+                enabled: false && !scriteDocument.readOnly
                 onClicked: {
                     canvas.createElement(mouse.x-130, mouse.y-22, newSceneButton.activeColor)
                     enabled = false
@@ -269,6 +270,7 @@ Item {
             Selection {
                 id: selection
                 anchors.fill: parent
+                enabled: !scriteDocument.readOnly
                 onMoveItem: {
                     item.x = item.x + dx
                     item.y = item.y + dy
@@ -284,6 +286,7 @@ Item {
 
                 MenuItem2 {
                     text: "New Scene"
+                    enabled: !scriteDocument.readOnly
                     onClicked: {
                         canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
                         canvasContextMenu.close()
@@ -293,6 +296,7 @@ Item {
                 ColorMenu {
                     title: "Colored Scene"
                     selectedColor: newSceneButton.activeColor
+                    enabled: !scriteDocument.readOnly
                     onMenuItemClicked: {
                         newSceneButton.activeColor = color
                         canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
@@ -520,7 +524,7 @@ Item {
                 wrapMode: Text.WordWrap
                 text: element.scene.title
                 anchors.centerIn: parent
-                font.pointSize: 15
+                font.pointSize: 13
                 horizontalAlignment: Text.AlignHCenter
                 onTextEdited: element.scene.title = text
                 onEditingFinished: {
@@ -554,7 +558,8 @@ Item {
                     canvas.forceActiveFocus()
                     searchBar.searchEngine.clearSearch()
                     scriteDocument.structure.currentElementIndex = index
-                    titleText.editMode = true
+                    if(!scriteDocument.readOnly)
+                        titleText.editMode = true
                 }
                 onClicked: {
                     canvas.forceActiveFocus()
@@ -562,7 +567,7 @@ Item {
                     requestEditor()
                 }
 
-                drag.target: elementItem
+                drag.target: scriteDocument.readOnly ? null : elementItem
                 drag.axis: Drag.XAndYAxis
                 drag.minimumX: 0
                 drag.minimumY: 0
@@ -609,8 +614,8 @@ Item {
 
             Image {
                 id: dragHandle
-                visible: !parent.editing
-                enabled: canvasScroll.editItem === null
+                visible: !parent.editing && !scriteDocument.readOnly
+                enabled: canvasScroll.editItem === null && !scriteDocument.readOnly
                 source: "../icons/action/view_array.png"
                 width: 24; height: 24
                 anchors.right: parent.right

@@ -44,6 +44,7 @@ Item {
                 anchors.centerIn: parent
                 hoverEnabled: true
                 icon.source: "../icons/content/person_add.png"
+                enabled: !scriteDocument.readOnly
                 onClicked: {
                     modalDialog.popupSource = this
                     modalDialog.sourceComponent = newCharactersDialogUi
@@ -269,6 +270,7 @@ Item {
                                             if(activeFocus)
                                                 note.heading = text
                                         }
+                                        readOnly: scriteDocument.readOnly
                                         palette: app.palette
                                         Keys.onReturnPressed: editingFinished()
                                         anchors.verticalCenter: parent.verticalCenter
@@ -283,6 +285,7 @@ Item {
                                         icon.source: "../icons/navigation/menu.png"
                                         anchors.verticalCenter: parent.verticalCenter
                                         down: noteMenuLoader.item.visible
+                                        enabled: !scriteDocument.readOnly
                                         onClicked: {
                                             if(noteMenuLoader.item.visible)
                                                 noteMenuLoader.item.close()
@@ -311,6 +314,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         onClicked: notesPack.removeNote(note)
                                         flat: true
+                                        enabled: !scriteDocument.readOnly
                                     }
                                 }
                             }
@@ -327,6 +331,7 @@ Item {
                                     if(activeFocus)
                                         note.content = text
                                 }
+                                readOnly: scriteDocument.readOnly
                                 palette: app.palette
                                 placeholderText: "type the contents of your note here.."
                                 KeyNavigation.tab: headingEdit
@@ -351,6 +356,9 @@ Item {
         id: newNoteDelegate
 
         Item {
+            visible: !scriteDocument.readOnly
+            enabled: !scriteDocument.readOnly
+
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 10

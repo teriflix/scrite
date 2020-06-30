@@ -34,7 +34,7 @@ Flickable {
                 width: notificationsView.width-1
                 height: Math.max(100, ntextLayout.implicitHeight+20)
                 color: notification.color
-                border { width: 2; color: primaryColors.borderColor }
+                border { width: 1; color: primaryColors.borderColor }
                 property Notification notification: notificationManager.notificationAt(index)
 
                 Column {

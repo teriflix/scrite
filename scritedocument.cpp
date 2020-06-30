@@ -21,6 +21,7 @@
 #include "odtexporter.h"
 #include "htmlexporter.h"
 #include "textexporter.h"
+#include "notification.h"
 #include "htmlimporter.h"
 #include "qobjectfactory.h"
 #include "fountainimporter.h"
@@ -114,6 +115,15 @@ ScriteDocument::ScriteDocument(QObject *parent)
 ScriteDocument::~ScriteDocument()
 {
 
+}
+
+void ScriteDocument::setLocked(bool val)
+{
+    if(m_locked == val)
+        return;
+
+    m_locked = val;
+    emit lockedChanged();
 }
 
 void ScriteDocument::setAutoSaveDurationInSeconds(int val)
@@ -273,6 +283,8 @@ void ScriteDocument::reset()
 
     UndoStack::clearAllStacks();
     m_docFileSystem.reset();
+    this->setReadOnly(false);
+    this->setLocked(false);
 
     if(m_formatting == nullptr)
         this->setFormatting(new ScreenplayFormat(this));
@@ -355,12 +367,17 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     m_progressReport->finish();
 
+    this->setReadOnly(false);
+
     if(!m_autoSaveMode)
         this->clearBusyMessage();
 }
 
 void ScriteDocument::save()
 {
+    if(m_readOnly)
+        return;
+
     QFileInfo fi(m_fileName);
     if(fi.exists())
     {
@@ -625,6 +642,15 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
     QObject::timerEvent(event);
 }
 
+void ScriteDocument::setReadOnly(bool val)
+{
+    if(m_readOnly == val)
+        return;
+
+    m_readOnly = val;
+    emit readOnlyChanged();
+}
+
 void ScriteDocument::setLoading(bool val)
 {
     if(m_loading == val)
@@ -794,6 +820,9 @@ void ScriteDocument::evaluateStructureElementSequenceLater()
 
 void ScriteDocument::setModified(bool val)
 {
+    if(m_readOnly)
+        val = false;
+
     if(m_modified == val)
         return;
 
@@ -897,6 +926,10 @@ bool ScriteDocument::load(const QString &fileName)
     m_fileName = fileName;
     emit fileNameChanged();
 
+    const bool ro = QFileInfo(fileName).permission(QFile::WriteUser) == false;
+    this->setReadOnly(ro);
+    this->setModified(false);
+
     loadCleanup.begin();
 
     UndoStack::ignoreUndoCommands = true;
@@ -912,6 +945,17 @@ bool ScriteDocument::load(const QString &fileName)
     // loading it. So, we set this timer here to ensure that modified flag is
     // set to false after the QML UI has finished its lazy loading.
     m_clearModifyTimer.start(100, this);
+
+    if(ro)
+    {
+        Notification *notification = new Notification(this);
+        connect(notification, &Notification::dismissed, &Notification::deleteLater);
+
+        notification->setTitle(QStringLiteral("File only has read permission."));
+        notification->setText(QStringLiteral("This document is being opened in read only mode.\nTo edit this document, please apply write-permissions for the file in your computer."));
+        notification->setAutoClose(false);
+        notification->setActive(true);
+    }
 
     return ret;
 }
@@ -1004,6 +1048,12 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     systemInfo.insert("productType", QSysInfo::productType());
     systemInfo.insert("productVersion", QSysInfo::productVersion());
     metaInfo.insert("system", systemInfo);
+
+    QJsonObject installationInfo;
+    installationInfo.insert("id", Application::instance()->installationId());
+    installationInfo.insert("since", Application::instance()->installationTimestamp().toMSecsSinceEpoch());
+    installationInfo.insert("launchCount", Application::instance()->launchCounter());
+    metaInfo.insert("installation", installationInfo);
 
     json.insert("meta", metaInfo);
 }
@@ -1114,6 +1164,30 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     {
         m_formatting->resetToDefaults();
         m_printFormat->resetToDefaults();
+    }
+
+    // Starting with 0.4.5, it is possible for users to lock a document
+    // such that it is editable only the system in which it was created.
+    if(m_locked && !m_readOnly)
+    {
+        const QJsonObject installationInfo = metaInfo.value("installation").toObject();
+        const QString docClientId = installationInfo.value("id").toString();
+        const QString myClientId = Application::instance()->installationId();
+        if(!myClientId.isEmpty() && !docClientId.isEmpty() )
+        {
+            const bool ro = myClientId != docClientId;
+            this->setReadOnly( ro );
+            if(ro)
+            {
+                Notification *notification = new Notification(this);
+                connect(notification, &Notification::dismissed, &Notification::deleteLater);
+
+                notification->setTitle(QStringLiteral("Document is locked for edit."));
+                notification->setText(QStringLiteral("This document is being opened in read only mode.\nYou cannot edit this document on your computer, because it has been locked for edit on another computer.\nYou can however save a copy using the 'Save As' option and edit the copy on your computer."));
+                notification->setAutoClose(false);
+                notification->setActive(true);
+            }
+        }
     }
 }
 

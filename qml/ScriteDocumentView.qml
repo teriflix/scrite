@@ -237,7 +237,7 @@ Item {
                     text: "Save"
                     shortcut: "Ctrl+S"
                     shortcutText: "S"
-                    enabled: scriteDocument.structure.elementCount > 0
+                    enabled: scriteDocument.structure.elementCount > 0 && !scriteDocument.readOnly
                     onClicked: doClick()
                     function doClick() {
                         if(scriteDocument.fileName === "")
