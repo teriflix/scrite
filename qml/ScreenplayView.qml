@@ -54,11 +54,11 @@ Item {
                 id: screenplayToolsLayout
                 width: 40
 
-                ToolButton2 {
-                    icon.source: "../icons/content/clear_all.png"
-                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                ToolButton3 {
+                    iconSource: "../icons/content/clear_all.png"
                     ToolTip.text: "Clear the screenplay, while retaining the scenes."
                     enabled: !scriteDocument.readOnly
+                    suggestedWidth: 30; suggestedHeight: 30
                     onClicked: {
                         askQuestion({
                             "question": "Are you sure you want to clear the screenplay?",
@@ -74,27 +74,27 @@ Item {
                     }
                 }
 
-                ToolButton2 {
-                    icon.source: "../icons/navigation/zoom_in.png"
-                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                ToolButton3 {
+                    iconSource: "../icons/navigation/zoom_in.png"
                     ToolTip.text: "Increase size of blocks in this view."
                     onClicked: zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
                     autoRepeat: true
+                    suggestedWidth: 30; suggestedHeight: 30
                 }
 
-                ToolButton2 {
-                    icon.source: "../icons/navigation/zoom_out.png"
-                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                ToolButton3 {
+                    iconSource: "../icons/navigation/zoom_out.png"
                     ToolTip.text: "Decrease size of blocks in this view."
                     onClicked: zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
                     autoRepeat: true
+                    suggestedWidth: 30; suggestedHeight: 30
                 }
 
-                ToolButton2 {
-                    icon.source: "../icons/content/add_box.png"
-                    suggestedWidth: parent.width; suggestedHeight: parent.width
+                ToolButton3 {
+                    iconSource: "../icons/content/add_box.png"
                     ToolTip.text: "Add a act, chapter or interval break."
                     autoRepeat: false
+                    suggestedWidth: 30; suggestedHeight: 30
                     enabled: !scriteDocument.readOnly &&
                              (scriteDocument.screenplay.elementCount === 0 ||
                              scriteDocument.screenplay.currentElementIndex >= 0)
@@ -271,9 +271,9 @@ Item {
                             rotation: isBreakElement ? -90 : 0
                             horizontalAlignment: Text.AlignHCenter
                             maximumLineCount: isBreakElement ? 1 : 4
-                            font.pointSize: isBreakElement ? 15 : 13
+                            font.pointSize: isBreakElement ? 15 : 10
                             visible: isBreakElement ? true : width >= 80
-                            wrapMode: isBreakElement ? Text.NoWrap : Text.WrapAnywhere
+                            wrapMode: isBreakElement ? Text.NoWrap : Text.Wrap
                             font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
                             width: elementItemDelegate.isBreakElement ? parent.height : parent.width
                             height: elementItemDelegate.isBreakElement ? contentHeight : parent.height

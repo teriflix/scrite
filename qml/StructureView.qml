@@ -26,7 +26,6 @@ Item {
         anchors.right: parent.right
         anchors.margins: 1
         color: primaryColors.c100.background
-        radius: 3
         height: toolbarLayout.height+4
 
         Row {
@@ -45,7 +44,7 @@ Item {
                     icon.source: "../icons/content/add_box.png"
                     text: "Add Scene"
                     suggestedWidth: display === ToolButton.TextBesideIcon ? 130 : suggestedHeight
-                    suggestedHeight: 45
+                    suggestedHeight: 40
                     display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
                     ToolTip.visible: hovered && display === ToolButton.IconOnly
                     down: newSceneColorMenuLoader.active
@@ -83,7 +82,7 @@ Item {
                     icon.source: "../icons/content/select_all.png"
                     text: "Preview"
                     display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
-                    suggestedHeight: 45
+                    suggestedHeight: 40
                     anchors.verticalCenter: parent.verticalCenter
                     checkable: true
                     checked: canvasPreview.visible
@@ -96,7 +95,7 @@ Item {
                     icon.source: "../icons/navigation/zoom_in.png"
                     text: "Zoom In"
                     display: ToolButton.IconOnly
-                    suggestedHeight: 45
+                    suggestedHeight: 40
                     anchors.verticalCenter: parent.verticalCenter
                     autoRepeat: true
                     onClicked: canvasScroll.zoomIn()
@@ -106,7 +105,7 @@ Item {
                     icon.source: "../icons/navigation/zoom_out.png"
                     text: "Zoom Out"
                     display: ToolButton.IconOnly
-                    suggestedHeight: 45
+                    suggestedHeight: 40
                     anchors.verticalCenter: parent.verticalCenter
                     autoRepeat: true
                     onClicked: canvasScroll.zoomOut()
@@ -139,7 +138,6 @@ Item {
         anchors.top: toolbar.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: 3
         contentWidth: canvas.width * canvas.scale
         contentHeight: canvas.height * canvas.scale
         initialContentWidth: canvas.width

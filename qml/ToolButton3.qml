@@ -38,6 +38,7 @@ Item {
     property bool checked: false
     property alias hovered: toolButtonMouseArea.containsMouse
     property string text
+    property bool autoRepeat: false
 
     signal toggled()
     signal clicked()
@@ -65,7 +66,7 @@ Item {
         opacity: enabled ? (toolButtonMouseArea.containsMouse ? 1 : 0.9) : 0.45
         property real anchorMargins: {
             var am = toolButtonMouseArea.containsMouse ? 8 : 10
-            return parent.width-2*am < 16 ? 1 : am
+            return parent.width-2*am < 16 ? (parent.width*0.15) : am
         }
         Behavior on anchorMargins {
             enabled: iconImage.anchorMargins > 0

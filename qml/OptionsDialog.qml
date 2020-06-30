@@ -200,7 +200,7 @@ Item {
                         anchors.margins: 1
                         smooth: true; mipmap: true
                         fillMode: Image.PreserveAspectFit
-                        source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                        source: "file:///" + scriteDocument.screenplay.coverPagePhoto
                         opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
 
                         BusyIndicator {

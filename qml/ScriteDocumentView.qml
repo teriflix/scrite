@@ -795,21 +795,26 @@ Item {
                     Rectangle {
                         SplitView.fillHeight: true
                         color: primaryColors.c10.background
-                        border {
-                            width: 1
-                            color: primaryColors.borderColor
-                        }
 
                         SplitView {
                             orientation: Qt.Horizontal
                             Material.background: Qt.darker(primaryColors.windowColor, 1.1)
                             anchors.fill: parent
 
-                            StructureView {
+                            Rectangle {
                                 SplitView.fillWidth: true
+                                color: primaryColors.c10.background
+                                border {
+                                    width: 1
+                                    color: primaryColors.borderColor
+                                }
 
-                                onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
-                                onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                                StructureView {
+                                    anchors.fill: parent
+                                    anchors.margins: 1
+                                    onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
+                                    onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                                }
                             }
 
                             Loader {

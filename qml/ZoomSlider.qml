@@ -80,6 +80,13 @@ Row {
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Math.round(zoomSlider.zoomLevel * 100) + "%"
+        horizontalAlignment: Text.AlignRight
+        width: fontMetrics.advanceWidth("999%")
+
+        FontMetrics {
+            id: fontMetrics
+            font: parent.font
+        }
     }
 
     Item { width: parent.height/3; height: parent.height }

@@ -413,7 +413,6 @@ Rectangle {
                     "question": question,
                     "okButtonText": "Yes",
                     "cancelButtonText": "No",
-                    "abortButtonText": "Cancel",
                     "callback": function(val) {
                         if(val) {
                             scriteDocument.locked = !scriteDocument.locked
@@ -1918,7 +1917,7 @@ Rectangle {
                     return maxWidth
                 }
 
-                source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                source: "file:///" + scriteDocument.screenplay.coverPagePhoto
                 visible: scriteDocument.screenplay.coverPagePhoto !== ""
                 smooth: true; mipmap: true
                 fillMode: Image.PreserveAspectFit
@@ -1931,7 +1930,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize + 2
+                    font.pointSize: defaultFontSize + 2
                     font.bold: true
                     width: parent.width
                     wrapMode: Text.WordWrap
@@ -1942,7 +1941,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize
+                    font.pointSize: defaultFontSize
                     width: parent.width
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -1954,7 +1953,7 @@ Rectangle {
 
             Text {
                 font.family: scriteDocument.formatting.defaultFont.family
-                font.pixelSize: defaultFontSize
+                font.pointSize: defaultFontSize
                 width: parent.width
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
@@ -1964,7 +1963,7 @@ Rectangle {
 
             Text {
                 font.family: scriteDocument.formatting.defaultFont.family
-                font.pixelSize: defaultFontSize
+                font.pointSize: defaultFontSize
                 width: parent.width
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
@@ -1974,7 +1973,7 @@ Rectangle {
 
             Text {
                 font.family: scriteDocument.formatting.defaultFont.family
-                font.pixelSize: defaultFontSize
+                font.pointSize: defaultFontSize
                 width: parent.width
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
@@ -1991,7 +1990,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize - 2
+                    font.pointSize: defaultFontSize - 2
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: scriteDocument.screenplay.contact
@@ -2000,7 +1999,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize - 2
+                    font.pointSize: defaultFontSize - 2
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: scriteDocument.screenplay.address
@@ -2009,7 +2008,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize - 2
+                    font.pointSize: defaultFontSize - 2
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: scriteDocument.screenplay.phoneNumber
@@ -2018,7 +2017,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize - 2
+                    font.pointSize: defaultFontSize - 2
                     font.underline: true
                     color: "blue"
                     width: parent.width
@@ -2035,7 +2034,7 @@ Rectangle {
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pixelSize: defaultFontSize - 2
+                    font.pointSize: defaultFontSize - 2
                     font.underline: true
                     color: "blue"
                     width: parent.width
