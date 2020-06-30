@@ -124,6 +124,8 @@ void ScriteDocument::setLocked(bool val)
 
     m_locked = val;
     emit lockedChanged();
+
+    this->markAsModified();
 }
 
 void ScriteDocument::setAutoSaveDurationInSeconds(int val)
