@@ -153,10 +153,11 @@ Item {
         ScrollView {
             id: screenplayOptionsView
             property real labelWidth: 60
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
 
             Column {
-                width: screenplayOptionsView.width
+                width: screenplayOptionsView.width-20
                 spacing: 0
 
                 Text {

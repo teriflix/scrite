@@ -480,6 +480,9 @@ void ScreenplayFormat::setScreen(QScreen *val)
     if(m_screen == val)
         return;
 
+    if(m_screen != nullptr && val == nullptr)
+        return; // Happens when Scrite is running and user switches to Login Screen on macOS.
+
     m_screen = val;
 
     this->evaluateFontZoomLevels();
