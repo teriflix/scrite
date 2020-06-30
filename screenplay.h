@@ -179,6 +179,10 @@ public:
     CoverPagePhotoSize coverPagePhotoSize() const { return m_coverPagePhotoSize; }
     Q_SIGNAL void coverPagePhotoSizeChanged();
 
+    Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY hasTitlePageAttributesChanged)
+    bool hasTitlePageAttributes() const { return m_hasTitlePageAttributes; }
+    Q_SIGNAL void hasTitlePageAttributesChanged();
+
     Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
     Q_SIGNAL void hasNonStandardScenesChanged();
@@ -254,6 +258,8 @@ protected:
     void evaluateSceneNumbersLater();
     void validateCurrentElementIndex();
     void setHasNonStandardScenes(bool val);
+    void setHasTitlePageAttributes(bool val);
+    void evaluateHasTitlePageAttributes();
 
 private:
     QString m_title;
@@ -267,6 +273,7 @@ private:
     QString m_subtitle;
     QString m_phoneNumber;
     QString m_coverPagePhoto;
+    bool m_hasTitlePageAttributes = false;
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
 

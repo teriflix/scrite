@@ -224,19 +224,39 @@ Rectangle {
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
                         width: contentView.width
-                        height: screenplayAdapter.isSourceScreenplay ? ruler.topMarginPx : 0
+                        height: (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
+                        property real padding: width * 0.1
+
+                        function editTitlePage() {
+                            modalDialog.arguments = {"activePageIndex": 1}
+                            modalDialog.popupSource = this
+                            modalDialog.sourceComponent = optionsDialogComponent
+                            modalDialog.active = true
+                        }
+
+                        Loader {
+                            id: titleCardLoader
+                            active: screenplayAdapter.isSourceScreenplay && scriteDocument.screenplay.hasTitlePageAttributes
+                            sourceComponent: titleCardComponent
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+
+                            ToolButton3 {
+                                anchors.top: parent.top
+                                anchors.right: parent.right
+                                anchors.rightMargin: ruler.rightMarginPx
+                                iconSource: "../icons/action/edit.png"
+                                onClicked: editTitlePage()
+                                visible: parent.active
+                            }
+                        }
 
                         Button2 {
                             text: "Edit Title Page"
-                            visible: screenplayAdapter.isSourceScreenplay
+                            visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
-                            onClicked: {
-                                modalDialog.arguments = {"activePageIndex": 1}
-                                modalDialog.popupSource = this
-                                modalDialog.sourceComponent = optionsDialogComponent
-                                modalDialog.active = true
-                            }
+                            onClicked: editTitlePage()
                         }
                     }
                     footer: Item {
@@ -1826,6 +1846,138 @@ Rectangle {
                 characterMenu.close()
                 characterMenu.characterName = ""
             }
+        }
+    }
+
+    Component {
+        id: titleCardComponent
+
+        Column {
+            spacing: 10
+
+            Image { width: parent.width; height: 20 }
+
+            Image {
+                property real maxWidth: parent.width * 0.5
+                width: {
+                    switch(scriteDocument.screenplay.coverPagePhotoSize) {
+                    case Screenplay.SmallCoverPhoto:
+                        return maxWidth / 4
+                    case Screenplay.MediumCoverPhoto:
+                        return maxWidth / 2
+                    }
+                    return maxWidth
+                }
+
+                source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                visible: scriteDocument.screenplay.coverPagePhoto !== ""
+                smooth: true; mipmap: true
+                fillMode: Image.PreserveAspectFit
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Column {
+                width: parent.width
+                spacing: parent.spacing/1
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 22
+                    text: scriteDocument.screenplay.title === "" ? "<untitled>" : scriteDocument.screenplay.title
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 18
+                    text: scriteDocument.screenplay.subtitle
+                    visible: scriteDocument.screenplay.subtitle !== ""
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            Text {
+                font.family: scriteDocument.formatting.defaultFont
+                font.pixelSize: 16
+                text: "Written By\n" + (scriteDocument.screenplay.author === "" ? "<unknown author>" : scriteDocument.screenplay.author)
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Text {
+                font.family: scriteDocument.formatting.defaultFont
+                font.pixelSize: 16
+                text: scriteDocument.screenplay.version === "" ? "Initial Version" : scriteDocument.screenplay.version
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Text {
+                font.family: scriteDocument.formatting.defaultFont
+                font.pixelSize: 16
+                text: scriteDocument.screenplay.basedOn
+                visible: scriteDocument.screenplay.basedOn !== ""
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Column {
+                spacing: parent.spacing/2
+                anchors.left: parent.left
+                anchors.leftMargin: ruler.leftMarginPx
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 14
+                    text: scriteDocument.screenplay.contact
+                    visible: text !== ""
+                }
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 14
+                    text: scriteDocument.screenplay.address
+                    visible: text !== ""
+                }
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 14
+                    text: scriteDocument.screenplay.phoneNumber
+                    visible: text !== ""
+                }
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 14
+                    font.underline: true
+                    color: "blue"
+                    text: scriteDocument.screenplay.email
+                    visible: text !== ""
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: Qt.openUrlExternally("mailto:" + parent.text)
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                }
+
+                Text {
+                    font.family: scriteDocument.formatting.defaultFont
+                    font.pixelSize: 14
+                    font.underline: true
+                    color: "blue"
+                    text: scriteDocument.screenplay.website
+                    visible: text !== ""
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: Qt.openUrlExternally(parent.text)
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                }
+            }
+
+            Image { width: parent.width; height: 20 }
         }
     }
 }

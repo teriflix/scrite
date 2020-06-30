@@ -269,6 +269,8 @@ void Screenplay::setTitle(const QString &val)
 
     m_title = val;
     emit titleChanged();
+
+    this->evaluateHasTitlePageAttributes();
 }
 
 void Screenplay::setSubtitle(const QString &val)
@@ -296,6 +298,8 @@ void Screenplay::setAuthor(const QString &val)
 
     m_author = val;
     emit authorChanged();
+
+    this->evaluateHasTitlePageAttributes();
 }
 
 void Screenplay::setContact(const QString &val)
@@ -350,6 +354,8 @@ void Screenplay::setVersion(const QString &val)
 
     m_version = val;
     emit versionChanged();
+
+    this->evaluateHasTitlePageAttributes();
 }
 
 void Screenplay::setCoverPagePhoto(const QString &val)
@@ -1321,6 +1327,24 @@ void Screenplay::setHasNonStandardScenes(bool val)
 
     m_hasNonStandardScenes = val;
     emit hasNonStandardScenesChanged();
+}
+
+void Screenplay::setHasTitlePageAttributes(bool val)
+{
+    if(m_hasTitlePageAttributes == val)
+        return;
+
+    m_hasTitlePageAttributes = val;
+    emit hasTitlePageAttributesChanged();
+}
+
+void Screenplay::evaluateHasTitlePageAttributes()
+{
+    this->setHasTitlePageAttributes(
+            !m_title.isEmpty() &&
+            !m_author.isEmpty() &&
+            !m_version.isEmpty()
+        );
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)
