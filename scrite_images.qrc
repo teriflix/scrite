@@ -3,5 +3,6 @@
         <file>images/appicon.png</file>
         <file>images/notebookpage.jpg</file>
         <file>images/teriflix_logo.png</file>
+        <file>images/splash.jpg</file>
     </qresource>
 </RCC>

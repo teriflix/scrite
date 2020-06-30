@@ -1056,7 +1056,7 @@ Item {
 
     Loader {
         id: openingAnimationLoader
-        active: true
+        active: splashLoader.active === false
         sourceComponent: SequentialAnimation {
             running: true
 

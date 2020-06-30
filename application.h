@@ -188,6 +188,8 @@ public:
 
     Q_INVOKABLE QScreen *windowScreen(QObject *window) const;
 
+    Q_INVOKABLE QString getEnvironmentVariable(const QString &name) const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

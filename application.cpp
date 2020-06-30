@@ -727,6 +727,11 @@ QScreen *Application::windowScreen(QObject *window) const
     return nullptr;
 }
 
+QString Application::getEnvironmentVariable(const QString &name) const
+{
+    return QProcessEnvironment::systemEnvironment().value(name);
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())

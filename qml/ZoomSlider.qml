@@ -78,6 +78,7 @@ Row {
     Item { width: parent.height/3; height: parent.height }
 
     Text {
+        id: percentText
         anchors.verticalCenter: parent.verticalCenter
         text: Math.round(zoomSlider.zoomLevel * 100) + "%"
         horizontalAlignment: Text.AlignRight
@@ -85,7 +86,7 @@ Row {
 
         FontMetrics {
             id: fontMetrics
-            font: parent.font
+            font: percentText.font
         }
     }
 

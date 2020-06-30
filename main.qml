@@ -388,6 +388,32 @@ Rectangle {
         onScreenChanged: scriteDocument.formatting.setSreeenFromWindow(qmlWindow)
     }
 
+    Loader {
+        id: splashLoader
+        anchors.fill: parent
+        sourceComponent: UI.SplashScreen {
+            Component.onCompleted: blur.visible = true
+            Component.onDestruction: blur.visible = false
+            onDone: splashLoader.active = false
+        }
+    }
+
+    property var lastSnapshotTimestamp: 0
+    EventFilter.active: app.getEnvironmentVariable("SCRITE_SNAPSHOT_CAPTURE") === "YES"
+    EventFilter.target: app
+    EventFilter.events: [6]
+    EventFilter.onFilter: {
+        if(event.key === Qt.Key_F6) {
+            var timestamp = (new Date()).getTime()
+            if(timestamp - lastSnapshotTimestamp > 500) {
+                lastSnapshotTimestamp = timestamp
+                window.grabToImage( function(result) {
+                    result.saveToFile("/Users/prashanthudupa/Pictures/scrite-ui-" + timestamp + ".jpg")
+                }, Qt.size(window.width*2,window.height*2))
+            }
+        }
+    }
+
     Component.onCompleted: qmlWindow.raise()
 }
 
