@@ -21,7 +21,7 @@ Item {
 
     BorderImage {
         source: "../icons/content/shadow.png"
-        anchors.fill: splashImage
+        anchors.fill: splashImageArea
         horizontalTileMode: BorderImage.Stretch
         verticalTileMode: BorderImage.Stretch
         anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
@@ -31,23 +31,39 @@ Item {
         opacity: 0.75
     }
 
-    Image {
-        id: splashImage
-        width: Screen.width * 0.6
+    Item {
+        id: splashImageArea
+        width: Math.min(Screen.width * 0.7, splashImage.sourceSize.width)
         height: width / 2.35
-        smooth: true
-        mipmap: true
-        source: "../images/splash.jpg"
         anchors.centerIn: parent
+        clip: true
+
+        Image {
+            id: splashImage
+            source: "../images/splash.jpg"
+            anchors.fill: parent
+            smooth: true
+            mipmap: true
+        }
 
         Text {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: parent.height * 0.025
-            anchors.leftMargin: parent.width * 0.05
+            id: versionText
+            x: (765 / splashImage.sourceSize.width) * parent.width
+            y: (140 / splashImage.sourceSize.height) * parent.height
             font.family: "Raleway"
-            font.pixelSize: parent.height * 0.04
+            font.pixelSize: 20
             text: app.applicationVersion
+            color: "#4a4a4a"
+        }
+
+        NumberAnimation {
+            target: versionText
+            property: "font.letterSpacing"
+            duration: 1000
+            easing.type: Easing.OutBack
+            from: 10
+            to: 0
+            running: true
         }
     }
 
@@ -66,6 +82,8 @@ Item {
     EventFilter.events: [6, 7, 31, 117, 51]
     EventFilter.target: app
     EventFilter.onFilter: {
+        if(event.type === 6 && event.key === Qt.Key_Escape)
+            done()
         result.acceptEvent = true
         result.filter = true
     }
