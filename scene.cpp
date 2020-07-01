@@ -1513,6 +1513,8 @@ void SceneSizeHintItem::classBegin()
 
 void SceneSizeHintItem::componentComplete()
 {
+    QQuickItem::componentComplete();
+
     m_componentComplete = true;
     this->evaluateSizeHintLater();
 }

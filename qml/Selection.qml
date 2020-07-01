@@ -17,7 +17,11 @@ import QtQuick.Controls 2.13
 Item {
     id: selection
 
+    property bool interactive: true
     property alias active: tightRect.visible
+    property bool hasItems: items.length > 0
+    property bool canLayout: items.length >= 2
+
     property var items: []
     signal moveItem(Item item, real dx, real dy)
     signal placeItem(Item item)
@@ -77,17 +81,22 @@ Item {
         items = selectedItems
     }
 
+    function clear() {
+        if(interactive) {
+            var elements = items
+            elements.forEach( function(element) {
+                placeItem(element);
+            })
+        }
+        items = []
+    }
+
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
         enabled: tightRect.visible
         onPressed: {
-            var elements = selection.items
-            if(elements.length > 0) {
-                for(var i=0; i<elements.length; i++)
-                    selection.placeItem(elements[i])
-                selection.items = []
-            }
+            selection.clear()
             mouse.accepted = false
         }
     }
@@ -102,7 +111,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            drag.target: parent
+            drag.target: selection.interactive ? parent : null
             drag.axis: Drag.XAndYAxis
             drag.minimumX: 0
             drag.minimumY: 0

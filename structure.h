@@ -30,6 +30,7 @@ class Character;
 class Screenplay;
 class SceneHeading;
 class ScriteDocument;
+class StructureLayout;
 class StructurePositionCommand;
 
 class StructureElement : public QObject
@@ -91,6 +92,11 @@ public:
     Scene* scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
+    Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
+    void setSelected(bool val);
+    bool isSelected() const { return m_selected; }
+    Q_SIGNAL void selectedChanged();
+
     Q_SIGNAL void elementChanged();
     Q_SIGNAL void sceneHeadingChanged();
     Q_SIGNAL void sceneLocationChanged();
@@ -107,6 +113,7 @@ private:
     qreal m_width = 0;
     qreal m_height = 0;
     Scene* m_scene = nullptr;
+    bool m_selected = false;
     QPointer<QQuickItem> m_follow;
     Structure *m_structure = nullptr;
 };
@@ -265,6 +272,16 @@ public:
     Q_INVOKABLE int indexOfElement(StructureElement *element) const;
     Q_INVOKABLE StructureElement *findElementBySceneID(const QString &id) const;
 
+    enum LayoutType
+    {
+        HorizontalLayout,
+        VerticalLayout,
+        FlowHorizontalLayout,
+        FlowVerticalLayout
+    };
+    Q_ENUM(LayoutType)
+    Q_INVOKABLE QRectF layoutElements(LayoutType layoutType);
+
     Q_INVOKABLE void scanForMuteCharacters();
 
     Q_INVOKABLE QStringList standardLocationTypes() const;
@@ -326,6 +343,7 @@ private:
     static int staticNoteCount(QQmlListProperty<Note> *list);
     QList<Note *> m_notes;
 
+    friend class StructureLayout;
     static void staticAppendElement(QQmlListProperty<StructureElement> *list, StructureElement *ptr);
     static void staticClearElements(QQmlListProperty<StructureElement> *list);
     static StructureElement* staticElementAt(QQmlListProperty<StructureElement> *list, int index);

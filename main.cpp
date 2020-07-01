@@ -24,7 +24,6 @@
 #include "undoredo.h"
 #include "completer.h"
 #include "ruleritem.h"
-#include "spellcheckservice.h"
 #include "autoupdate.h"
 #include "trackobject.h"
 #include "aggregation.h"
@@ -41,8 +40,10 @@
 #include "painterpathitem.h"
 #include "transliteration.h"
 #include "abstractexporter.h"
+#include "tightboundingbox.h"
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
+#include "spellcheckservice.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 #include "delayedpropertybinder.h"
@@ -207,6 +208,9 @@ int main(int argc, char **argv)
     qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
 
     qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
+
+    qmlRegisterType<TightBoundingBoxEvaluator>("Scrite", 1, 0, "TightBoundingBoxEvaluator");
+    qmlRegisterUncreatableType<TightBoundingBoxItem>("Scrite", 1, 0, "TightBoundingBoxItem", "Use as attached property.");
 
     NotificationManager notificationManager;
 

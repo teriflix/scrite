@@ -34,89 +34,101 @@ Item {
             width: parent.width-4
             anchors.verticalCenter: parent.verticalCenter
 
-            Row {
-                id: toolbarButtons
-                spacing: parent.spacing
-                anchors.verticalCenter: parent.verticalCenter
+            ToolButton3 {
+                id: newSceneButton
+                down: newSceneColorMenuLoader.active
+                enabled: !scriteDocument.readOnly
+                onClicked: newSceneColorMenuLoader.active = true
+                iconSource: "../icons/content/add_box.png"
+                ToolTip.text: "Add Scene"
+                property color activeColor: "white"
 
-                ToolButton2 {
-                    id: newSceneButton
-                    icon.source: "../icons/content/add_box.png"
-                    text: "Add Scene"
-                    suggestedWidth: display === ToolButton.TextBesideIcon ? 130 : suggestedHeight
-                    suggestedHeight: 40
-                    display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
-                    ToolTip.visible: hovered && display === ToolButton.IconOnly
-                    down: newSceneColorMenuLoader.active
-                    onClicked: newSceneColorMenuLoader.active = true
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: !scriteDocument.readOnly
-                    property color activeColor: "white"
+                Loader {
+                    id: newSceneColorMenuLoader
+                    width: parent.width; height: 1
+                    anchors.top: parent.bottom
+                    sourceComponent: ColorMenu {
+                        selectedColor: newSceneButton.activeColor
+                    }
+                    active: false
+                    onItemChanged: {
+                        if(item)
+                            item.open()
+                    }
 
-                    Loader {
-                        id: newSceneColorMenuLoader
-                        width: parent.width; height: 1
-                        anchors.top: parent.bottom
-                        sourceComponent: ColorMenu {
-                            selectedColor: newSceneButton.activeColor
-                        }
-                        active: false
-                        onItemChanged: {
-                            if(item)
-                                item.open()
-                        }
-
-                        Connections {
-                            target: newSceneColorMenuLoader.item
-                            onAboutToHide: newSceneColorMenuLoader.active = false
-                            onMenuItemClicked: {
-                                newSceneButton.activeColor = color
-                                createElementMouseHandler.enabled = true
-                                newSceneColorMenuLoader.active = false
-                            }
+                    Connections {
+                        target: newSceneColorMenuLoader.item
+                        onAboutToHide: newSceneColorMenuLoader.active = false
+                        onMenuItemClicked: {
+                            newSceneButton.activeColor = color
+                            createElementMouseHandler.enabled = true
+                            newSceneColorMenuLoader.active = false
                         }
                     }
                 }
-
-                ToolButton2 {
-                    icon.source: "../icons/content/select_all.png"
-                    text: "Preview"
-                    display: toolbar.width > 720 ? ToolButton.TextBesideIcon : ToolButton.IconOnly
-                    suggestedHeight: 40
-                    anchors.verticalCenter: parent.verticalCenter
-                    checkable: true
-                    checked: canvasPreview.visible
-                    down: canvasPreview.visible
-                    onToggled: structureCanvasSettings.showPreview = checked
-                    ToolTip.visible: hovered && display === ToolButton.IconOnly
-                }
-
-                ToolButton2 {
-                    icon.source: "../icons/navigation/zoom_in.png"
-                    text: "Zoom In"
-                    display: ToolButton.IconOnly
-                    suggestedHeight: 40
-                    anchors.verticalCenter: parent.verticalCenter
-                    autoRepeat: true
-                    onClicked: canvasScroll.zoomIn()
-                }
-
-                ToolButton2 {
-                    icon.source: "../icons/navigation/zoom_out.png"
-                    text: "Zoom Out"
-                    display: ToolButton.IconOnly
-                    suggestedHeight: 40
-                    anchors.verticalCenter: parent.verticalCenter
-                    autoRepeat: true
-                    onClicked: canvasScroll.zoomOut()
-                }
             }
 
-            SearchBar {
-                id: searchBar
-                width: parent.width-toolbarButtons.width-parent.spacing
-                anchors.verticalCenter: parent.verticalCenter
-                searchEngine.objectName: "Structure Search Engine"
+            ToolButton3 {
+                down: canvasPreview.visible
+                checked: canvasPreview.visible
+                checkable: true
+                onToggled: structureCanvasSettings.showPreview = checked
+                iconSource: "../icons/content/select_all.png"
+                ToolTip.text: "Preview"
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: app.palette.mid
+            }
+
+            ToolButton3 {
+                onClicked: canvasScroll.zoomIn()
+                iconSource: "../icons/navigation/zoom_in.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom In"
+            }
+
+            ToolButton3 {
+                onClicked: canvasScroll.zoomOut()
+                iconSource: "../icons/navigation/zoom_out.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom Out"
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: app.palette.mid
+            }
+
+            ToolButton3 {
+                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                iconSource: "../icons/action/layout_horizontally.png"
+                ToolTip.text: "Layout Horizontally"
+                onClicked: selection.layout(Structure.HorizontalLayout)
+            }
+
+            ToolButton3 {
+                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                iconSource: "../icons/action/layout_vertically.png"
+                ToolTip.text: "Layout Vertically"
+                onClicked: selection.layout(Structure.VerticalLayout)
+            }
+
+            ToolButton3 {
+                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                iconSource: "../icons/action/layout_flow_horizontally.png"
+                ToolTip.text: "Flow Horizontally"
+                onClicked: selection.layout(Structure.FlowHorizontalLayout)
+            }
+
+            ToolButton3 {
+                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                iconSource: "../icons/action/layout_flow_vertically.png"
+                ToolTip.text: "Flow Vertically"
+                onClicked: selection.layout(Structure.FlowVerticalLayout)
             }
         }
     }
@@ -125,12 +137,6 @@ Item {
         anchors.fill: canvasScroll
         color: structureCanvasSettings.canvasColor
     }
-
-    FocusTracker.window: qmlWindow
-    FocusTracker.indicator.target: searchBar
-    FocusTracker.indicator.property: "focusOnShortcut"
-    FocusTracker.indicator.onValue: true
-    FocusTracker.indicator.offValue: false
 
     ScrollArea {
         id: canvasScroll
@@ -179,17 +185,21 @@ Item {
                 element.scene.undoRedoEnabled = true
             }
 
+            TightBoundingBoxEvaluator {
+                id: elementsBoundingBox
+            }
+
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.ceil(canvas.childrenRect.right / 100) * 100
+                set: Math.ceil(elementsBoundingBox.right / 100) * 100
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.ceil(canvas.childrenRect.bottom / 100) * 100
+                set: Math.ceil(elementsBoundingBox.bottom / 100) * 100
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -268,7 +278,7 @@ Item {
             Selection {
                 id: selection
                 anchors.fill: parent
-                enabled: !scriteDocument.readOnly
+                interactive: !scriteDocument.readOnly
                 onMoveItem: {
                     item.x = item.x + dx
                     item.y = item.y + dy
@@ -276,6 +286,74 @@ Item {
                 onPlaceItem: {
                     item.x = scriteDocument.structure.snapToGrid(item.x)
                     item.y = scriteDocument.structure.snapToGrid(item.y)
+                }
+
+                function layout(type) {
+                    if(scriteDocument.readOnly)
+                        return
+
+                    if(!hasItems) {
+                        scriteDocument.structure.layoutElements(type)
+                        return
+                    }
+
+                    if(!canLayout)
+                        return
+
+                    layoutAnimation.layoutType = type
+                    layoutAnimation.start()
+                }
+
+                SequentialAnimation {
+                    id: layoutAnimation
+
+                    property var layoutType: -1
+                    property var layoutItems: []
+                    property var layoutItemBounds
+                    running: false
+
+                    ScriptAction {
+                        script: {
+                            layoutAnimation.layoutItems = selection.items
+                            selection.clear()
+                        }
+                    }
+
+                    PauseAnimation {
+                        duration: 50
+                    }
+
+                    ScriptAction {
+                        script: {
+                            var oldItems = layoutAnimation.layoutItems
+                            layoutAnimation.layoutItems = []
+                            oldItems.forEach( function(item) {
+                                item.element.selected = true
+                            })
+                            layoutAnimation.layoutItemBounds = scriteDocument.structure.layoutElements(layoutAnimation.layoutType)
+                            layoutAnimation.layoutType = -1
+                            oldItems.forEach( function(item) {
+                                item.element.selected = false
+                            })
+                        }
+                    }
+
+                    PauseAnimation {
+                        duration: 50
+                    }
+
+                    ScriptAction {
+                        script: {
+                            var rect = {
+                                "top": layoutAnimation.layoutItemBounds.top,
+                                "left": layoutAnimation.layoutItemBounds.left,
+                                "right": layoutAnimation.layoutItemBounds.left + layoutAnimation.layoutItemBounds.width-1,
+                                "bottom": layoutAnimation.layoutItemBounds.top + layoutAnimation.layoutItemBounds.height-1
+                            };
+                            layoutAnimation.layoutItemBounds = undefined
+                            selection.init(elementItems, rect)
+                        }
+                    }
                 }
             }
 
@@ -477,6 +555,8 @@ Item {
             Component.onCompleted: element.follow = elementItem
             enabled: selection.active === false
 
+            TightBoundingBoxItem.evaluator: elementsBoundingBox
+
             readonly property bool selected: scriteDocument.structure.currentElementIndex === index
             readonly property bool editing: titleText.readOnly === false
             onEditingChanged: {
@@ -491,10 +571,10 @@ Item {
                 element.objectName = "oldElement"
             }
 
-            width: titleText.width + 10
-            height: titleText.height + 10
             x: positionBinder.get.x
             y: positionBinder.get.y
+            width: titleText.width + 10
+            height: titleText.height + 10
 
             DelayedPropertyBinder {
                 id: positionBinder
@@ -531,8 +611,6 @@ Item {
                 }
                 onHighlightRequest: scriteDocument.structure.currentElementIndex = index
                 Keys.onReturnPressed: editingFinished()
-                searchEngine: searchBar.searchEngine
-                searchSequenceNumber: index
                 property bool editMode: element.objectName === "newElement"
                 readOnly: !(editMode && index === scriteDocument.structure.currentElementIndex)
                 leftPadding: 17

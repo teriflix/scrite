@@ -193,6 +193,15 @@ void StructureElement::setScene(Scene *val)
     emit sceneChanged();
 }
 
+void StructureElement::setSelected(bool val)
+{
+    if(m_selected == val)
+        return;
+
+    m_selected = val;
+    emit selectedChanged();
+}
+
 bool StructureElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -755,6 +764,122 @@ StructureElement *Structure::findElementBySceneID(const QString &id) const
     }
 
     return nullptr;
+}
+
+QRectF Structure::layoutElements(Structure::LayoutType layoutType)
+{
+    QRectF newBoundingRect;
+
+    QList<StructureElement*> elementsToLayout;
+    Q_FOREACH(StructureElement *element, m_elements)
+        if(element->isSelected())
+            elementsToLayout << element;
+
+    if(elementsToLayout.isEmpty())
+        elementsToLayout = m_elements;
+
+    if(elementsToLayout.size() < 2)
+        return newBoundingRect;
+
+    const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
+    if(screenplay == nullptr)
+        return newBoundingRect;
+
+    auto lessThan = [screenplay](StructureElement *e1, StructureElement *e2) -> bool {
+          const int pos1 = screenplay->firstIndexOfScene(e1->scene());
+          const int pos2 = screenplay->firstIndexOfScene(e2->scene());
+          if(pos1 >= 0 && pos2 >= 0) return pos1 < pos2;
+          if(pos2 < 0) return true;
+          return false;
+    };
+    std::sort(elementsToLayout.begin(), elementsToLayout.end(), lessThan);
+
+    QRectF oldBoundingRect;
+    Q_FOREACH(StructureElement *element, elementsToLayout)
+        oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
+
+    static const qreal verticalLayoutSpacing = 75;
+    static const qreal horizontalLayoutSpacing = 50;
+    static const qreal flowVerticalLayoutSpacing = 20;
+    static const qreal flowHorizontalLayoutSpacing = 20;
+
+    int direction = 1;
+    QRectF elementRect;
+    for(int i=0; i<elementsToLayout.size(); i++)
+    {
+        StructureElement *element = elementsToLayout.at(i);
+        if(i == 0)
+        {
+            elementRect = QRectF(element->position(), QSize(element->width(),element->height()));
+            newBoundingRect = elementRect;
+
+            if(layoutType == HorizontalLayout || layoutType == FlowHorizontalLayout)
+            {
+                if(elementRect.left() > oldBoundingRect.center().x())
+                {
+                    direction = -1;
+                    elementRect.moveRight(oldBoundingRect.right());
+                }
+            }
+            else
+            {
+                if(elementRect.top() > oldBoundingRect.center().y())
+                {
+                    direction = -1;
+                    elementRect.moveBottom(oldBoundingRect.bottom());
+                }
+            }
+
+            if(direction < 0)
+            {
+                elementRect = QRectF(element->position(), QSize(element->width(),element->height()));
+                newBoundingRect = elementRect;
+            }
+
+            continue;
+        }
+
+        switch(layoutType)
+        {
+        case VerticalLayout:
+            if(direction > 0)
+                elementRect.moveTop(elementRect.bottom() + verticalLayoutSpacing);
+            else
+                elementRect.moveBottom(elementRect.top() - verticalLayoutSpacing);
+            break;
+        case HorizontalLayout:
+            if(direction > 0)
+                elementRect.moveLeft(elementRect.right() + horizontalLayoutSpacing);
+            else
+                elementRect.moveRight(elementRect.left() - horizontalLayoutSpacing);
+            break;
+        case FlowVerticalLayout:
+            if(direction > 0)
+                elementRect.moveTop(elementRect.bottom() + verticalLayoutSpacing);
+            else
+                elementRect.moveBottom(elementRect.top() - verticalLayoutSpacing);
+            if(i%2)
+                elementRect.moveLeft(elementRect.right() + flowVerticalLayoutSpacing);
+            else
+                elementRect.moveRight(elementRect.left() - flowVerticalLayoutSpacing);
+            break;
+        case FlowHorizontalLayout:
+            if(direction > 0)
+                elementRect.moveLeft( elementRect.center().x() + flowHorizontalLayoutSpacing );
+            else
+                elementRect.moveRight( elementRect.center().x() - flowHorizontalLayoutSpacing );
+            if(i%2)
+                elementRect.moveTop( elementRect.bottom() + verticalLayoutSpacing );
+            else
+                elementRect.moveBottom( elementRect.top() - verticalLayoutSpacing );
+            break;
+        }
+
+        element->setPosition(elementRect.topLeft());
+        newBoundingRect |= elementRect;
+    }
+
+    return newBoundingRect;
 }
 
 void Structure::scanForMuteCharacters()
@@ -1399,5 +1524,3 @@ void StructureElementConnector::setSuggestedLabelPosition(const QPointF &val)
     m_suggestedLabelPosition = val;
     emit suggestedLabelPositionChanged();
 }
-
-

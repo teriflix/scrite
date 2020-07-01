@@ -74,6 +74,7 @@ HEADERS += \
     structureexporter.h \
     textexporter.h \
     textshapeitem.h \
+    tightboundingbox.h \
     timeprofiler.h \
     standardpaths.h \
     trackobject.h \
@@ -143,6 +144,7 @@ SOURCES += \
     structureexporter.cpp \
     textexporter.cpp \
     textshapeitem.cpp \
+    tightboundingbox.cpp \
     timeprofiler.cpp \
     standardpaths.cpp \
     trackobject.cpp \

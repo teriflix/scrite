@@ -91,5 +91,13 @@
         <file>icons/action/lock_open_inverted.png</file>
         <file>icons/action/lock_outline_inverted.png</file>
         <file>icons/action/lock_outline.png</file>
+        <file>icons/action/layout_horizontally.png</file>
+        <file>icons/action/layout_horizontally_inverted.png</file>
+        <file>icons/action/layout_vertically_inverted.png</file>
+        <file>icons/action/layout_vertically.png</file>
+        <file>icons/action/layout_flow_vertically.png</file>
+        <file>icons/action/layout_flow_vertically_inverted.png</file>
+        <file>icons/action/layout_flow_horizontally.png</file>
+        <file>icons/action/layout_flow_horizontally_inverted.png</file>
     </qresource>
 </RCC>

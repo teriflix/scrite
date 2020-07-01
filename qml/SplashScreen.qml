@@ -14,6 +14,8 @@
 import QtQuick 2.13
 import QtQuick.Window 2.13
 
+import Scrite 1.0
+
 Item {
     signal done()
 
@@ -59,5 +61,12 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: parent.done()
+    }
+
+    EventFilter.events: [6, 7, 31, 117, 51]
+    EventFilter.target: app
+    EventFilter.onFilter: {
+        result.acceptEvent = true
+        result.filter = true
     }
 }
