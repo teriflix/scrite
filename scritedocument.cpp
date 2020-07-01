@@ -548,7 +548,7 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
             suggestedName = QStringLiteral("Scrite - Screenplay");
         else
             suggestedName += QStringLiteral(" - Screenplay");
-        suggestedName += QStringLiteral(" - ") + QString::number(QDateTime::currentSecsSinceEpoch());
+        suggestedName += QStringLiteral(" - ") + QDateTime::currentDateTime().toString(QStringLiteral("dd-MM-yyyy hh:mm:ss"));
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
@@ -590,7 +590,7 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 
         const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
-        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ") + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix;
+        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ") + QDateTime::currentDateTime().toString(QStringLiteral("dd-MM-yyyy hh:mm:ss")) + suffix;
 
         QFileInfo fi(m_fileName);
         if(fi.exists())

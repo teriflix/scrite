@@ -393,7 +393,7 @@ Item {
             }
 
             TextField2 {
-                width: parent.width
+                width: parent.width - 30
                 placeholderText: fieldInfo.label
                 onTextChanged: {
                     if(generator)
