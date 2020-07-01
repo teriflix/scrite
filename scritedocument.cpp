@@ -544,16 +544,15 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
         QString suggestedName = m_screenplay->title();
         if(suggestedName.isEmpty())
             suggestedName = QFileInfo(m_fileName).baseName();
-        else if(!m_screenplay->subtitle().isEmpty())
-            suggestedName = " " + m_screenplay->subtitle();
         if(suggestedName.isEmpty())
-            suggestedName = "Scrite Screenplay";
-        // suggestedName += " " + QDateTime::currentDateTime().toString(dateTimeFormat);
-        suggestedName += " " + QString::number(QDateTime::currentSecsSinceEpoch());
+            suggestedName = QStringLiteral("Scrite - Screenplay");
+        else
+            suggestedName += QStringLiteral(" - Screenplay");
+        suggestedName += QStringLiteral(" - ") + QString::number(QDateTime::currentSecsSinceEpoch());
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
-            exporter->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + " - " + suggestedName) );
+            exporter->setFileName( fi.absoluteDir().absoluteFilePath(suggestedName) );
         else
             exporter->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
     }
@@ -583,14 +582,19 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 
     if(reportGenerator->fileName().isEmpty())
     {
+        QString suggestedName = m_screenplay->title();
+        if(suggestedName.isEmpty())
+            suggestedName = QFileInfo(m_fileName).baseName();
+        if(suggestedName.isEmpty())
+            suggestedName = QStringLiteral("Scrite");
+
         const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
-        // const QString suggestedName = reportName + " - " + QDateTime::currentDateTime().toString(dateTimeFormat) + suffix;
-        const QString suggestedName = reportName + " - " + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix;
+        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ") + QString::number(QDateTime::currentSecsSinceEpoch()) + suffix;
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
-            reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(fi.baseName() + " - " + suggestedName) );
+            reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(suggestedName) );
         else
             reportGenerator->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
     }
