@@ -48,22 +48,32 @@ Item {
 
         Text {
             id: versionText
-            x: (765 / splashImage.sourceSize.width) * parent.width
-            y: (140 / splashImage.sourceSize.height) * parent.height
+            x: (1018 / splashImage.sourceSize.width) * parent.width
+            y: (187 / splashImage.sourceSize.height) * parent.height
             font.family: "Raleway"
-            font.pixelSize: 20
+            font.pixelSize: 26
             text: app.applicationVersion
             color: "#4a4a4a"
         }
 
-        NumberAnimation {
-            target: versionText
-            property: "font.letterSpacing"
-            duration: 1000
-            easing.type: Easing.OutBack
-            from: 10
-            to: 0
+        ParallelAnimation {
             running: true
+
+            NumberAnimation {
+                target: versionText
+                property: "opacity"
+                duration: 1000
+                easing.type: Easing.OutBack
+                from: 0; to: 0.8
+            }
+
+            NumberAnimation {
+                target: versionText
+                property: "font.letterSpacing"
+                duration: 1000
+                easing.type: Easing.OutBack
+                from: 10; to: 0
+            }
         }
     }
 
