@@ -1359,13 +1359,14 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             if(m_purpose == ForPrinting)
             {
+                const QTextCharFormat givenCharFormat = cursor.charFormat();
                 auto insertSnippet = [&cursor](const QString &snippet, QChar::Script script) {
                     if(snippet.isEmpty())
                         return;
                     TransliterationEngine::Language language = TransliterationEngine::languageForScript(script);
                     const QFont font = TransliterationEngine::instance()->languageFont(language);
                     QTextCharFormat format;
-                    format.setFont(font);
+                    format.setFontFamily(font.family());
                     cursor.mergeCharFormat(format);
                     cursor.insertText(snippet);
                 };
