@@ -632,7 +632,6 @@ Item {
                 acceptedButtons: Qt.LeftButton
                 onDoubleClicked: {
                     canvas.forceActiveFocus()
-                    searchBar.searchEngine.clearSearch()
                     scriteDocument.structure.currentElementIndex = index
                     if(!scriteDocument.readOnly)
                         titleText.editMode = true
@@ -655,6 +654,17 @@ Item {
                         elementItem.y = scriteDocument.structure.snapToGrid(parent.y)
                     }
                 }
+            }
+
+            Keys.onPressed: {
+                if(event.key === Qt.Key_F2) {
+                    canvas.forceActiveFocus()
+                    scriteDocument.structure.currentElementIndex = index
+                    if(!scriteDocument.readOnly)
+                        titleText.editMode = true
+                    event.accepted = true
+                } else
+                    event.accepted = false
             }
 
             MouseArea {
