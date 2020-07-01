@@ -44,6 +44,24 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
     emit formatChanged();
 }
 
+void AbstractReportGenerator::setWatermark(const QString &val)
+{
+    if(m_watermark == val)
+        return;
+
+    m_watermark = val;
+    emit watermarkChanged();
+}
+
+void AbstractReportGenerator::setComment(const QString &val)
+{
+    if(m_comment == val)
+        return;
+
+    m_comment = val;
+    emit commentChanged();
+}
+
 QString AbstractReportGenerator::name() const
 {
     const int ciIndex = this->metaObject()->indexOfClassInfo("Title");
@@ -114,6 +132,8 @@ bool AbstractReportGenerator::generate()
     textDocument.setProperty("#phone", screenplay->phoneNumber());
     textDocument.setProperty("#email", screenplay->email());
     textDocument.setProperty("#website", screenplay->website());
+    textDocument.setProperty("#comment", m_comment);
+    textDocument.setProperty("#watermark", m_watermark);
 
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Title"));

@@ -42,6 +42,20 @@ public:
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
+    Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled. (PDF Only)")
+    Q_CLASSINFO("watermark_FieldEditor", "TextBox")
+    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    void setWatermark(const QString &val);
+    QString watermark() const { return m_watermark; }
+    Q_SIGNAL void watermarkChanged();
+
+    Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer. (PDF Only)")
+    Q_CLASSINFO("comment_FieldEditor", "TextBox")
+    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    void setComment(const QString &val);
+    QString comment() const { return m_comment; }
+    Q_SIGNAL void commentChanged();
+
     Q_INVOKABLE virtual bool supportsFormat(Format) const { return true; }
 
     Q_PROPERTY(QString name READ name CONSTANT)
@@ -72,6 +86,8 @@ protected:
 
 private:
     Format m_format = AdobePDF;
+    QString m_comment;
+    QString m_watermark;
     QEventLoop m_eventLoop;
 };
 

@@ -288,7 +288,7 @@ void Watermark::paint(QPainter *painter, const QRectF &pageRect, int pageNr, int
 
     const QPointF pageCenter = pageRect.center();
 
-    QFontMetricsF fm(m_font);
+    QFontMetricsF fm(m_font, painter->device());
     QRectF textRect = fm.boundingRect( m_text );
 
     QTransform tx;
@@ -319,6 +319,12 @@ void Watermark::paint(QPainter *painter, const QRectF &pageRect, int pageNr, int
 
     textRect.moveCenter( rotatedTextRect.center() );
 
+    qreal scale = 1.0;
+    if(rotatedTextRect.width() > pageRect.width())
+        scale = qMin(scale, pageRect.width() / rotatedTextRect.width());
+    if(rotatedTextRect.height() > pageRect.height())
+        scale = qMin(scale, pageRect.height() / rotatedTextRect.height());
+
     painter->save();
 
     painter->setFont( m_font );
@@ -326,6 +332,7 @@ void Watermark::paint(QPainter *painter, const QRectF &pageRect, int pageNr, int
     painter->setOpacity( m_opacity );
     painter->translate( textRect.center() );
     painter->rotate( m_rotation );
+    painter->scale(scale, scale);
     painter->translate( -textRect.center() );
     painter->drawText( textRect, Qt::AlignCenter|Qt::TextDontClip, m_text );
 
@@ -486,6 +493,8 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     fieldMap[HeaderFooter::Email] = document->property("#email").toString();
     fieldMap[HeaderFooter::Phone] = document->property("#phone").toString();
     fieldMap[HeaderFooter::Website] = document->property("#website").toString();
+    fieldMap[HeaderFooter::Comment] = document->property("#comment").toString();
+    fieldMap[HeaderFooter::Watermark] = document->property("#watermark").toString();
     fieldMap[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
     fieldMap[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
     fieldMap[HeaderFooter::DateTime] = QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
@@ -515,6 +524,10 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     m_footer->setFont(doc->defaultFont());
     m_header->prepare(fieldMap, m_headerRect, printer);
     m_footer->prepare(fieldMap, m_footerRect, printer);
+
+    const QString watermarkText = fieldMap.value(HeaderFooter::Watermark);
+    if(!watermarkText.isEmpty())
+        m_watermark->setText(watermarkText);
 
     // We are now ready to print.
     const int fromPageNr = 1;

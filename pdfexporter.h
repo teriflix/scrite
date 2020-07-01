@@ -26,6 +26,20 @@ public:
     Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
     ~PdfExporter();
 
+    Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
+    Q_CLASSINFO("watermark_FieldEditor", "TextBox")
+    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    void setWatermark(const QString &val);
+    QString watermark() const { return m_watermark; }
+    Q_SIGNAL void watermarkChanged();
+
+    Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer.")
+    Q_CLASSINFO("comment_FieldEditor", "TextBox")
+    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    void setComment(const QString &val);
+    QString comment() const { return m_comment; }
+    Q_SIGNAL void commentChanged();
+
     Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
     Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
     Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY usePageBreaksChanged)
@@ -54,6 +68,8 @@ protected:
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
+    QString m_comment;
+    QString m_watermark;
     bool m_usePageBreaks = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;

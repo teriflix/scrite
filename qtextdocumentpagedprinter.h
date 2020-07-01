@@ -58,6 +58,9 @@ public:
         Time,
         DateTime,
 
+        Comment,
+        Watermark,
+
         PageNumber,
         PageNumberOfCount
     };

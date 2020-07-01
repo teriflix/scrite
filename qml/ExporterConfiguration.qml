@@ -214,6 +214,8 @@ Item {
             return editor_IntegerSpinBox
         if(kind === "CheckBox")
             return editor_CheckBox
+        if(kind === "TextBox")
+            return editor_TextBox
         return editor_Unknown
     }
 
@@ -253,6 +255,26 @@ Item {
             checkable: true
             checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
             onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
+        }
+    }
+
+    Component {
+        id: editor_TextBox
+
+        Column {
+            property var fieldInfo
+            spacing: 5
+
+            Text {
+                text: fieldInfo.name
+                font.capitalization: Font.Capitalize
+            }
+
+            TextField2 {
+                width: parent.width
+                placeholderText: fieldInfo.label
+                onTextChanged: exporter.setConfigurationValue(fieldInfo.name, text)
+            }
         }
     }
 

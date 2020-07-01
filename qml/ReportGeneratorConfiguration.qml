@@ -227,6 +227,8 @@ Item {
             return editor_CheckBox
         if(kind === "EnumSelector")
             return editor_EnumSelector
+        if(kind === "TextBox")
+            return editor_TextBox
         return editor_Unknown
     }
 
@@ -373,6 +375,29 @@ Item {
                 onCurrentIndexChanged: {
                     if(generator)
                         generator.setConfigurationValue(fieldInfo.name, fieldInfo.choices[currentIndex].value)
+                }
+            }
+        }
+    }
+
+    Component {
+        id: editor_TextBox
+
+        Column {
+            property var fieldInfo
+            spacing: 5
+
+            Text {
+                text: fieldInfo.name
+                font.capitalization: Font.Capitalize
+            }
+
+            TextField2 {
+                width: parent.width
+                placeholderText: fieldInfo.label
+                onTextChanged: {
+                    if(generator)
+                        generator.setConfigurationValue(fieldInfo.name, text)
                 }
             }
         }

@@ -33,6 +33,24 @@ PdfExporter::~PdfExporter()
 
 }
 
+void PdfExporter::setWatermark(const QString &val)
+{
+    if(m_watermark == val)
+        return;
+
+    m_watermark = val;
+    emit watermarkChanged();
+}
+
+void PdfExporter::setComment(const QString &val)
+{
+    if(m_comment == val)
+        return;
+
+    m_comment = val;
+    emit commentChanged();
+}
+
 void PdfExporter::setIncludeSceneNumbers(bool val)
 {
     if(m_includeSceneNumbers == val)
@@ -73,7 +91,9 @@ bool PdfExporter::doExport(QIODevice *device)
 
     const qreal pageWidth = pdfWriter.width();
     QTextDocument textDocument;
-    this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);
+    this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);    
+    textDocument.setProperty("#comment", m_comment);
+    textDocument.setProperty("#watermark", m_watermark);
 
     QTextDocumentPagedPrinter printer;
     printer.header()->setVisibleFromPageOne(false);
