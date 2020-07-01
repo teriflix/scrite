@@ -183,7 +183,7 @@ bool StructureExporter::doExport(QIODevice *device)
     paint.scale(scale, scale);
 
     QFont font;
-    font.setPixelSize(20);
+    font.setPixelSize(13);
     paint.setFont(font);
 
     const StructureElement *previousElement = nullptr;
@@ -225,7 +225,7 @@ bool StructureExporter::doExport(QIODevice *device)
             const QColor pathColor = QColor::fromRgbF( (previousElementColor.redF()+currentElementColor.redF())/2.0,
                                                  (previousElementColor.greenF()+currentElementColor.greenF())/2.0,
                                                  (previousElementColor.blueF()+currentElementColor.blueF())/2.0 );
-            paint.setPen( QPen(pathColor, 4) );
+            paint.setPen( QPen(pathColor, 2.0) );
             paint.setBrush( Qt::NoBrush );
             paint.drawPath(path);
         }
