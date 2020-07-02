@@ -192,14 +192,14 @@ Item {
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.ceil(elementsBoundingBox.right / 100) * 100
+                set: Math.max( Math.ceil(elementsBoundingBox.right / 100) * 100, 1000 )
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.ceil(elementsBoundingBox.bottom / 100) * 100
+                set: Math.max( Math.ceil(elementsBoundingBox.bottom / 100) * 100, 1000 )
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -211,9 +211,11 @@ Item {
                 id: createElementMouseHandler
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton
-                enabled: false && !scriteDocument.readOnly
+                enabled: false
+                cursorShape: Qt.CrossCursor
                 onClicked: {
-                    canvas.createElement(mouse.x-130, mouse.y-22, newSceneButton.activeColor)
+                    if(!scriteDocument.readOnly)
+                        canvas.createElement(mouse.x-130, mouse.y-22, newSceneButton.activeColor)
                     enabled = false
                 }
             }

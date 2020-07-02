@@ -108,8 +108,7 @@ Rectangle {
         anchors.fill: contentsArea
         anchors.margins: -4
         radius: 6
-        color: "white"
-        Behavior on color { ColorAnimation { duration: 500 } }
+        color: contentsLoader.item && contentsLoader.item.dialogColor ? contentsLoader.item.dialogColor : "white"
     }
 
     Item {

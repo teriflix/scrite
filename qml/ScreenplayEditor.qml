@@ -228,7 +228,7 @@ Rectangle {
                         property real padding: width * 0.1
 
                         function editTitlePage() {
-                            modalDialog.arguments = {"activePageIndex": 1}
+                            modalDialog.arguments = {"activeTabIndex": 2}
                             modalDialog.popupSource = this
                             modalDialog.sourceComponent = optionsDialogComponent
                             modalDialog.active = true
