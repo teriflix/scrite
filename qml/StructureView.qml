@@ -232,15 +232,9 @@ Item {
                 onSelect: selection.init(elementItems, rectangle)
             }
 
-            BorderImage {
-                source: "../icons/content/shadow.png"
+            BoxShadow {
                 anchors.fill: currentElementItem
-                horizontalTileMode: BorderImage.Stretch
-                verticalTileMode: BorderImage.Stretch
-                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-                border { left: 21; top: 21; right: 21; bottom: 21 }
                 visible: currentElementItem !== null
-                opacity: 0.55
                 property Item currentElementItem: currentElementItemBinder.get
                 onCurrentElementItemChanged: canvasScroll.ensureItemVisible(currentElementItem, canvas.scale)
 
@@ -590,7 +584,6 @@ Item {
 
             Rectangle {
                 id: background
-                radius: 3
                 anchors.fill: parent
                 border.width: elementItem.selected ? 2 : 1
                 border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "lightgray" : element.scene.color)
@@ -739,7 +732,7 @@ Item {
             fromElement: scriteDocument.structure.elementAt(modelData.from)
             toElement: scriteDocument.structure.elementAt(modelData.to)
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: canvasPreview.updatingThumbnail ? 0.1 : app.devicePixelRatio*2*canvas.scale
+            outlineWidth: canvasPreview.updatingThumbnail ? 0.1 : app.devicePixelRatio*canvas.scale
 
             Rectangle {
                 id: labelBg

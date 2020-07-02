@@ -1,3 +1,3 @@
-cp -vaRf ../../../Release/scrite.app .
-~/Qt5.13.2/5.13.2/clang_64/bin/macdeployqt scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -dmg
-mv scrite.dmg scrite-0.4.5-beta.dmg
+cp -vaRf ../../../Release/Scrite.app .
+~/Qt5.13.2/5.13.2/clang_64/bin/macdeployqt Scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -dmg
+mv Scrite.dmg Scrite-0.4.5-beta.dmg

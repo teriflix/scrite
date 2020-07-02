@@ -31,13 +31,8 @@ Item {
     width: maximumWidth
     height: maximumHeight
 
-    BorderImage {
-        source: "../icons/content/shadow.png"
+    BoxShadow {
         anchors.fill: previewArea
-        horizontalTileMode: BorderImage.Stretch
-        verticalTileMode: BorderImage.Stretch
-        anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-        border { left: 21; top: 21; right: 21; bottom: 21 }
         opacity: 0.55 * previewArea.opacity
     }
 

@@ -1557,14 +1557,8 @@ Rectangle {
             id: sceneListPanel
             width: expandCollapseButton.width + (expanded ? sceneListArea.width : 0)
 
-            BorderImage {
-                source: "../icons/content/shadow.png"
+            BoxShadow {
                 anchors.fill: sceneListArea
-                horizontalTileMode: BorderImage.Stretch
-                verticalTileMode: BorderImage.Stretch
-                anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-                border { left: 21; top: 21; right: 21; bottom: 21 }
-                opacity: 0.25
                 visible: sceneListArea.visible
             }
 
@@ -1816,14 +1810,9 @@ Rectangle {
                                     return firstRow <= myRow && myRow <= lastRow;
                                 }
 
-                                BorderImage {
-                                    source: "../icons/content/shadow.png"
+                                BoxShadow {
                                     anchors.fill: pageImage
-                                    horizontalTileMode: BorderImage.Stretch
-                                    verticalTileMode: BorderImage.Stretch
-                                    anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-                                    border { left: 21; top: 21; right: 21; bottom: 21 }
-                                    opacity: pageView.currentIndex === index ? 0.55 : 0.15
+                                    opacity: pageView.currentIndex === index ? 1 : 0.15
                                 }
 
                                 Rectangle {

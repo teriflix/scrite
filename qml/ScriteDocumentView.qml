@@ -841,7 +841,6 @@ Item {
                             anchors.margins: 2
                             color: accentColors.c200.background
                             border { width: 1; color: accentColors.borderColor }
-                            radius: 6
 
                             ScreenplayView {
                                 id: screenplayView
@@ -871,7 +870,6 @@ Item {
                             anchors.margins: 2
                             color: accentColors.c200.background
                             border { width: 1; color: accentColors.borderColor }
-                            radius: 6
 
                             ScreenplayView {
                                 id: screenplayView2

@@ -211,14 +211,8 @@ Item {
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
                 anchors.fill: parent
 
-                BorderImage {
-                    source: "../icons/content/shadow.png"
+                BoxShadow {
                     anchors.fill: parent
-                    horizontalTileMode: BorderImage.Stretch
-                    verticalTileMode: BorderImage.Stretch
-                    anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-                    border { left: 21; top: 21; right: 21; bottom: 21 }
-                    opacity: 0.75
                 }
             }
         }
@@ -249,7 +243,6 @@ Item {
                     color: Qt.tint(sceneColor, "#C0FFFFFF")
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
-                    radius: 3
                     Behavior on border.width { NumberAnimation { duration: 400 } }
 
                     Item {

@@ -103,7 +103,6 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         clip: true
-        radius: 4
 
         Loader {
             anchors.fill: parent
@@ -330,15 +329,17 @@ Item {
                 anchors.centerIn: parent
 
                 Row {
-                    spacing: 10
+                    spacing: 20
+                    width: parent.width/2 - 5
 
                     Text {
+                        id: paperSizeLabel
                         text: "Paper Size"
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
                     ComboBox2 {
-                        width: 200
+                        width: parent.width - parent.spacing - paperSizeLabel.width
                         textRole: "key"
                         currentIndex: pageSetupSettings.paperSize
                         anchors.verticalCenter: parent.verticalCenter
@@ -1144,10 +1145,11 @@ Item {
                 ScrollView {
                     id: scrollView
                     ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
-                    ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                    ScrollBar.vertical.policy: scrollViewContent.height > height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                     anchors.fill: parent
 
                     Column {
+                        id: scrollViewContent
                         width: scrollView.width - 20
                         spacing: 0
                         enabled: !scriteDocument.readOnly

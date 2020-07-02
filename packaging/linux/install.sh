@@ -1,14 +1,14 @@
-rm -f scrite.desktop
-echo "[Desktop Entry]" > scrite.desktop
-echo "Type=Application" >> scrite.desktop
-echo "Name=Scrite" >> scrite.desktop
-echo "Exec=`pwd`/AppRun %f" >> scrite.desktop
-echo "Icon=`pwd`/scrite_app_icon.png" >> scrite.desktop
-echo "Comment=Multilingual Screenplay Writing App from TERIFLIX" >> scrite.desktop
-echo "Terminal=false" >> scrite.desktop
-echo "Categories=Office;WordProcessor;" >> scrite.desktop
-chmod a+x scrite.desktop
-sudo desktop-file-install scrite.desktop
-cp -f scrite.desktop ~/Desktop
+rm -f Scrite.desktop
+echo "[Desktop Entry]" > Scrite.desktop
+echo "Type=Application" >> Scrite.desktop
+echo "Name=Scrite" >> Scrite.desktop
+echo "Exec=`pwd`/AppRun %f" >> Scrite.desktop
+echo "Icon=`pwd`/scrite_app_icon.png" >> Scrite.desktop
+echo "Comment=Multilingual Screenplay Writing App from TERIFLIX" >> Scrite.desktop
+echo "Terminal=false" >> Scrite.desktop
+echo "Categories=Office;WordProcessor;" >> Scrite.desktop
+chmod a+x Scrite.desktop
+sudo desktop-file-install Scrite.desktop
+cp -f Scrite.desktop ~/Desktop
 mkdir -p ~/Applications
-cp -f scrite.desktop ~/Applications
+cp -f Scrite.desktop ~/Applications

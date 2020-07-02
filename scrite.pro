@@ -1,5 +1,6 @@
 QT += gui qml quick widgets xml concurrent network quickcontrols2
 DESTDIR = $$PWD/../Release/
+TARGET = Scrite
 
 DEFINES += PHTRANSLATE_STATICLIB
 

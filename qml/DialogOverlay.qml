@@ -26,6 +26,7 @@ Rectangle {
     property rect defaultPopupSourceArea: Qt.rect( (parent.x+(parent.width-10)/2), (parent.y+(parent.height-10)/2), 10, 10 )
     property bool animationComplete: false
     property alias closeable: closeButton.visible
+    property bool closeUponClickOutsideContentArea: false
     signal closeRequest()
 
     function close() {
@@ -73,6 +74,10 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         onWheel: wheel.accepted = true
+        onClicked: {
+            if(parent.closeUponClickOutsideContentArea)
+                close()
+        }
     }
 
     QtObject {
@@ -91,23 +96,13 @@ Rectangle {
         property real height: contentsLoader.height
     }
 
-    BorderImage {
-        source: "../icons/content/shadow.png"
+    BoxShadow {
         anchors.fill: contentsAreaBackground
-        horizontalTileMode: BorderImage.Stretch
-        verticalTileMode: BorderImage.Stretch
-        anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-        border { left: 21; top: 21; right: 21; bottom: 21 }
-        smooth: true
-        visible: true
-        opacity: 0.75
     }
 
     Rectangle {
         id: contentsAreaBackground
         anchors.fill: contentsArea
-        anchors.margins: -4
-        radius: 6
         color: contentsLoader.item && contentsLoader.item.dialogColor ? contentsLoader.item.dialogColor : "white"
     }
 
@@ -147,11 +142,14 @@ Rectangle {
         anchors.right: contentsArea.right
         anchors.margins: -width/2
         source: "../icons/action/dialog_close_button.png"
-        width: 32; height: 32
         smooth: true
         fillMode: Image.PreserveAspectFit
+        opacity: closeButtonMouseArea.containsMouse ? 1 : 0.8
+
         MouseArea {
+            id: closeButtonMouseArea
             anchors.fill: parent
+            hoverEnabled: true
             onClicked: close()
         }
     }

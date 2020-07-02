@@ -188,6 +188,7 @@ Rectangle {
         onCloseRequest: {
             active = false
             closeable = true
+            closeUponClickOutsideContentArea = false
         }
         property var arguments
         property var initItemCallback

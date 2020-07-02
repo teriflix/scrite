@@ -42,5 +42,6 @@
         <file>qml/ZoomSlider.qml</file>
         <file>qml/SceneTypeImage.qml</file>
         <file>qml/SplashScreen.qml</file>
+        <file>qml/BoxShadow.qml</file>
     </qresource>
 </RCC>

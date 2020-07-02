@@ -12,12 +12,30 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
-Item {
-    width: 700
-    height: 700
+Image {
+    source: "../images/aboutbox.jpg"
+    width: Screen.width * 0.5
+    height: iscale*sourceSize.height
+
+    Component.onCompleted: {
+        modalDialog.closeUponClickOutsideContentArea = true
+        modalDialog.closeable = false
+    }
+
+    property real iscale: width / sourceSize.width
+
+    Text {
+        x: 60 * iscale
+        y: 125 * iscale
+        font.family: "Raleway"
+        font.pixelSize: 18
+        color: "white"
+        text: app.applicationVersion
+    }
 
     SwipeView {
         id: aboutBoxPages
@@ -26,61 +44,22 @@ Item {
 
         Item {
             Column {
-                width: parent.width * 0.75
+                spacing: 50
                 anchors.centerIn: parent
-                spacing: 30
 
-                Column {
-                    spacing: 10
-                    width: parent.width
+                Image {
+                    source: "../images/appicon.png"
+                    width: 92; height: 92
+                    mipmap: true; smooth: true
                     anchors.horizontalCenter: parent.horizontalCenter
-
-                    Image {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        source: "../images/teriflix_logo.png"
-                        fillMode: Image.PreserveAspectFit
-                        height: 128
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: app.applicationName
-                        font.family: "Courier Prime"
-                        font.pixelSize: 80
-                        color: accentColors.c50.text
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: 20
-                        text: "Version " + app.applicationVersion
-                        color: accentColors.c50.text
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: 14
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "This app is released under GPLv3.<br/><font color=\"blue\">Click here</font> to view the license terms."
-                        wrapMode: Text.WordWrap
-                        color: accentColors.c50.text
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: aboutBoxPages.currentIndex = 1
-                        }
-                    }
                 }
 
                 Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: 16
-                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: 20
                     text: "© TERIFLIX Entertainment Spaces Pvt. Ltd.<br/><font color=\"blue\">https://www.teriflix.com</font>"
-                    color: accentColors.c50.text
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
@@ -88,58 +67,63 @@ Item {
                     }
                 }
 
-                Column {
-                    width: parent.width
-                    spacing: parent.spacing/3
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 20
 
-                    Text {
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "Developed using Qt " + app.qtVersion + " <br/><font color=\"blue\">https://www.qt.io</font>"
-                        color: accentColors.c50.text
+                    Column {
+                        id: links1
+                        spacing: 20
 
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Qt.openUrlExternally("https://www.qt.io")
+                        Text {
+                            text: "Using <strong>PhoneticTranslator</strong><br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
+                            }
+                        }
+
+                        Text {
+                            text: "Using <strong>Sonnet</strong> from KDE Frameworks 5<br/><font color=\"blue\">https://api.kde.org/frameworks/sonnet/html/index.html</font>"
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Qt.openUrlExternally("https://api.kde.org/frameworks/sonnet/html/index.html")
+                            }
                         }
                     }
 
-                    Text {
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "Using <strong>PhoneticTranslator</strong> for transliteration support.<br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
-                        color: accentColors.c50.text
+                    Column {
+                        id: links2
+                        spacing: 20
 
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
+                        Text {
+                            text: "Developed using <strong>Qt " + app.qtVersion + "</strong><br/><font color=\"blue\">https://www.qt.io</font>"
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Qt.openUrlExternally("https://www.qt.io")
+                            }
                         }
-                    }
 
-                    Text {
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "Using <strong>Sonnet</strong> from KDE Frameworks 5 for Spellcheck.<br/><font color=\"blue\">https://api.kde.org/frameworks/sonnet/html/index.html</font>"
-                        color: accentColors.c50.text
+                        Text {
+                            text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
 
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Qt.openUrlExternally("https://api.kde.org/frameworks/sonnet/html/index.html")
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: aboutBoxPages.currentIndex = 1
+                            }
                         }
                     }
                 }
 
                 Row {
-                    spacing: 10
+                    spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Button2 {
@@ -160,7 +144,7 @@ Item {
             }
         }
 
-        Item {
+        Rectangle {
             Button {
                 id: backButton
                 text: "< Back"
@@ -171,11 +155,7 @@ Item {
             }
 
             ScrollView {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: backButton.bottom
-                anchors.bottom: parent.bottom
-                anchors.margins: 10
+                anchors.fill: parent
                 anchors.leftMargin: Math.max(10, (parent.width-licenseTextView.contentWidth-20)/2)
                 clip: true
                 ScrollBar.vertical.policy: ScrollBar.AlwaysOn
@@ -184,7 +164,9 @@ Item {
                     id: licenseTextView
                     readOnly: true
                     font.family: "Courier Prime"
-                    font.pointSize: 10
+                    font.pointSize: 12
+                    topPadding: backButton.y
+                    bottomPadding: backButton.y
                     text: app.fileContents(":/LICENSE.txt")
                     selectByMouse: true
                 }
@@ -192,3 +174,17 @@ Item {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

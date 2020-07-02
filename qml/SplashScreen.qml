@@ -19,16 +19,8 @@ import Scrite 1.0
 Item {
     signal done()
 
-    BorderImage {
-        source: "../icons/content/shadow.png"
+    BoxShadow {
         anchors.fill: splashImageArea
-        horizontalTileMode: BorderImage.Stretch
-        verticalTileMode: BorderImage.Stretch
-        anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
-        border { left: 21; top: 21; right: 21; bottom: 21 }
-        smooth: true
-        visible: true
-        opacity: 0.75
     }
 
     Item {
