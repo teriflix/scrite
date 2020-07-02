@@ -1905,7 +1905,7 @@ Rectangle {
             property int defaultFontSize: screenplayFormat.defaultFont2.pointSize
             spacing: 10 * zoomLevel
 
-            Image { width: parent.width; height: 20 * zoomLevel }
+            Image { width: parent.width; height: 35 * zoomLevel }
 
             Image {
                 property real maxWidth: parent.width - 2*ruler.leftMarginPx
@@ -1919,12 +1919,14 @@ Rectangle {
                     return maxWidth
                 }
 
-                source: "file:///" + scriteDocument.screenplay.coverPagePhoto
+                source: visible ? "file:///" + scriteDocument.screenplay.coverPagePhoto : ""
                 visible: scriteDocument.screenplay.coverPagePhoto !== ""
                 smooth: true; mipmap: true
                 fillMode: Image.PreserveAspectFit
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
+            Image { width: parent.width; height: scriteDocument.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
 
             Column {
                 width: parent.width
@@ -1990,6 +1992,11 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: ruler.leftMarginPx
 
+                Item {
+                    width: parent.width
+                    height: 20 * zoomLevel
+                }
+
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.pointSize: defaultFontSize - 2
@@ -2052,7 +2059,7 @@ Rectangle {
                 }
             }
 
-            Image { width: parent.width; height: 20 * zoomLevel }
+            Image { width: parent.width; height: 35 * zoomLevel }
         }
     }
 }

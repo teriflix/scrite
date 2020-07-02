@@ -170,6 +170,8 @@ Item {
 
                         Menu2 {
                             id: recentFilesMenu
+                            width: recentFiles.length > 1 ? 400 : 200
+
                             property var recentFiles: []
                             function add(filePath) {
                                 var r = recentFiles
@@ -192,39 +194,33 @@ Item {
                                 visible: true
                             }
 
-                            Menu2 {
-                                id: recentFilesSubMenu
-                                title: "Recent Files"
-                                width: 400
+                            FontMetrics {
+                                id: recentFilesFontMetrics
+                            }
 
-                                FontMetrics {
-                                    id: recentFilesFontMetrics
-                                }
+                            onAboutToShow: {
+                                var newFiles = []
+                                var filesDropped = false
+                                recentFilesMenu.recentFiles.forEach(function(filePath) {
+                                    var fi = app.fileInfo(filePath)
+                                    if(fi.exists)
+                                        newFiles.push(filePath)
+                                    else
+                                        filesDropped = true
+                                })
+                                if(filesDropped)
+                                    recentFilesMenu.recentFiles = newFiles
+                            }
 
-                                onAboutToShow: {
-                                    var newFiles = []
-                                    var filesDropped = false
-                                    recentFilesMenu.recentFiles.forEach(function(filePath) {
-                                        var fi = app.fileInfo(filePath)
-                                        if(fi.exists)
-                                            newFiles.push(filePath)
-                                        else
-                                            filesDropped = true
-                                    })
-                                    if(filesDropped)
-                                        recentFilesMenu.recentFiles = newFiles
-                                }
+                            Repeater {
+                                model: recentFilesMenu.recentFiles
 
-                                Repeater {
-                                    model: recentFilesMenu.recentFiles
-
-                                    MenuItem2 {
-                                        property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
-                                        text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesSubMenu.width)
-                                        ToolTip.text: filePath
-                                        ToolTip.visible: hovered
-                                        onClicked: fileOpenButton.doOpen(filePath)
-                                    }
+                                MenuItem2 {
+                                    property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
+                                    text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                    ToolTip.text: filePath
+                                    ToolTip.visible: hovered
+                                    onClicked: fileOpenButton.doOpen(filePath)
                                 }
                             }
                         }

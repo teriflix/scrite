@@ -33,7 +33,7 @@ Item {
 
     Item {
         id: splashImageArea
-        width: Math.min(Screen.width * 0.7, splashImage.sourceSize.width)
+        width: Math.min(Screen.width * 0.6, splashImage.sourceSize.width)
         height: width / 2.35
         anchors.centerIn: parent
         clip: true
@@ -51,36 +51,72 @@ Item {
             x: (1018 / splashImage.sourceSize.width) * parent.width
             y: (187 / splashImage.sourceSize.height) * parent.height
             font.family: "Raleway"
-            font.pixelSize: 26
+            font.pixelSize: 24
             text: app.applicationVersion
             color: "#4a4a4a"
         }
 
-        ParallelAnimation {
+        SequentialAnimation {
             running: true
 
-            NumberAnimation {
-                target: versionText
-                property: "opacity"
-                duration: 1000
-                easing.type: Easing.OutBack
-                from: 0; to: 0.8
+            ParallelAnimation {
+                NumberAnimation {
+                    target: versionText
+                    property: "opacity"
+                    duration: 500
+                    easing.type: Easing.OutBack
+                    from: 0; to: 0.8
+                }
+
+                NumberAnimation {
+                    target: versionText
+                    property: "font.letterSpacing"
+                    duration: 500
+                    easing.type: Easing.OutBack
+                    from: 10; to: 0
+                }
             }
 
-            NumberAnimation {
-                target: versionText
-                property: "font.letterSpacing"
-                duration: 1000
-                easing.type: Easing.OutBack
-                from: 10; to: 0
+            PauseAnimation {
+                duration: 500
+            }
+
+            ParallelAnimation {
+                NumberAnimation {
+                    target: footnoteText
+                    property: "opacity"
+                    duration: 500
+                    easing.type: Easing.OutBack
+                    from: 0; to: 0.8
+                }
+
+                NumberAnimation {
+                    target: footnoteText
+                    property: "font.letterSpacing"
+                    duration: 500
+                    easing.type: Easing.OutBack
+                    from: 10; to: 0
+                }
             }
         }
+    }
+
+    Text {
+        id: footnoteText
+        anchors.top: splashImageArea.bottom
+        anchors.topMargin: 40
+        anchors.horizontalCenter: parent.horizontalCenter
+        font.pixelSize: 20
+        text: "CLICK HERE TO GET STARTED"
+        font.letterSpacing: 10
+        opacity: 0.01
+        color: "#4a4a4a"
     }
 
     Timer {
         running: true
         repeat: false
-        interval: 2500
+        interval: 7500
         onTriggered: parent.done()
     }
 
