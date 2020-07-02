@@ -20,6 +20,7 @@ Image {
     source: "../images/aboutbox.jpg"
     width: Screen.width * 0.5
     height: iscale*sourceSize.height
+    smooth: true; mipmap: true
 
     Component.onCompleted: {
         modalDialog.closeUponClickOutsideContentArea = true
@@ -29,12 +30,23 @@ Image {
     property real iscale: width / sourceSize.width
 
     Text {
+        id: versionText
         x: 60 * iscale
         y: 125 * iscale
         font.family: "Raleway"
         font.pixelSize: 18
         color: "white"
         text: app.applicationVersion
+        font.letterSpacing: 10
+
+        NumberAnimation {
+            target: versionText
+            property: "font.letterSpacing"
+            from: 10; to: 0
+            duration: 1500
+            running: true
+            easing.type: Easing.OutBack
+        }
     }
 
     SwipeView {
