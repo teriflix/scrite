@@ -29,20 +29,22 @@ Rectangle {
     MaterialColors {
         id: primaryColors
         name: "Gray"
-        property var key: Material.Grey
-        property color windowColor: c300.background
-        property color borderColor: c400.background
-        property var highlight: c400
-        property var button: c200
+        readonly property int key: Material.Grey
+        readonly property color windowColor: c300.background
+        readonly property color borderColor: c400.background
+        readonly property color separatorColor: c400.background
+        readonly property var highlight: c400
+        readonly property var button: c200
     }
 
     MaterialColors {
         id: accentColors
         name: "Blue Gray"
-        property var key: Material.BlueGrey
-        property color windowColor: c300.background
-        property color borderColor: c400.background
-        property var button: c200
+        readonly property int key: Material.BlueGrey
+        readonly property color windowColor: c300.background
+        readonly property color borderColor: c400.background
+        readonly property color separatorColor: c400.background
+        readonly property var button: c200
     }
 
     Material.primary: primaryColors.key

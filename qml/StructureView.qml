@@ -80,7 +80,8 @@ Item {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: app.palette.mid
+                color: primaryColors.separatorColor
+                opacity: 0.5
             }
 
             ToolButton3 {
@@ -100,7 +101,8 @@ Item {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: app.palette.mid
+                color: primaryColors.separatorColor
+                opacity: 0.5
             }
 
             ToolButton3 {

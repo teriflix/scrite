@@ -92,7 +92,8 @@ Row {
     Rectangle {
         width: 1
         height: parent.height
-        color: primaryColors.borderColor
+        color: primaryColors.separatorColor
+        opacity: 0.5
     }
 
     ToolButton3 {
@@ -119,7 +120,8 @@ Row {
     Rectangle {
         width: 1
         height: parent.height
-        color: primaryColors.borderColor
+        color: primaryColors.separatorColor
+        opacity: 0.5
     }
 
     Repeater {
