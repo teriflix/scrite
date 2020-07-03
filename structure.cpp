@@ -798,7 +798,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     Q_FOREACH(StructureElement *element, elementsToLayout)
         oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
 
-    static const qreal verticalLayoutSpacing = 75;
+    static const qreal verticalLayoutSpacing = 50;
     static const qreal horizontalLayoutSpacing = 50;
     static const qreal flowVerticalLayoutSpacing = 20;
     static const qreal flowHorizontalLayoutSpacing = 20;

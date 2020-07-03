@@ -1102,6 +1102,7 @@ Item {
                     "question": "Do you want to save your current project before closing?",
                     "okButtonText": "Yes",
                     "cancelButtonText": "No",
+                    "abortButtonText": "Cancel",
                     "callback": function(val) {
                         if(val) {
                             if(scriteDocument.fileName !== "")
