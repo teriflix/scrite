@@ -39,7 +39,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const int nrElements = screenplay->elementCount();
     if(screenplay->elementCount() == 0)
     {
-        this->error()->setErrorMessage("There are no scenes in the screenplay to export.");
+        this->error()->setErrorMessage(QStringLiteral("There are no scenes in the screenplay to export."));
         return false;
     }
 
@@ -47,19 +47,25 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
     QDomDocument doc;
 
-    QDomElement rootE = doc.createElement("FinalDraft");
-    rootE.setAttribute("DocumentType", "Script");
-    rootE.setAttribute("Template", "No");
-    rootE.setAttribute("Version", "2");
+    QDomElement rootE = doc.createElement(QStringLiteral("FinalDraft"));
+    rootE.setAttribute(QStringLiteral("DocumentType"), QStringLiteral("Script"));
+    rootE.setAttribute(QStringLiteral("Template"), QStringLiteral("No"));
+    rootE.setAttribute(QStringLiteral("Version"), QStringLiteral("2"));
     doc.appendChild(rootE);
 
-    QDomElement contentE = doc.createElement("Content");
+    QDomElement contentE = doc.createElement(QStringLiteral("Content"));
     rootE.appendChild(contentE);
 
+
     auto addTextToParagraph = [&doc](QDomElement &element, const QString &text) {
-        QDomElement textE = doc.createElement("Text");
-        element.appendChild(textE);
-        textE.appendChild(doc.createTextNode(text));
+        QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
+        Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
+            const QFont font = TransliterationEngine::instance()->languageFont(item.language, false);
+            QDomElement textE = doc.createElement(QStringLiteral("Text"));
+            element.appendChild(textE);
+            textE.setAttribute(QStringLiteral("Font"), font.family());
+            textE.appendChild(doc.createTextNode(item.string));
+        }
     };
 
     QStringList locations;
@@ -74,10 +80,10 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
         if(heading->isEnabled())
         {
-            QDomElement paragraphE = doc.createElement("Paragraph");
+            QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
 
-            paragraphE.setAttribute("Type", "Scene Heading");
+            paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
             addTextToParagraph(paragraphE, heading->text());
             locations.append(heading->location());
 
@@ -92,29 +98,29 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         for(int j=0; j<nrSceneElements; j++)
         {
             const SceneElement *sceneElement = scene->elementAt(j);
-            QDomElement paragraphE = doc.createElement("Paragraph");
+            QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
 
-            paragraphE.setAttribute("Type", sceneElement->typeAsString());
+            paragraphE.setAttribute(QStringLiteral("Type"), sceneElement->typeAsString());
             addTextToParagraph(paragraphE, sceneElement->formattedText());
         }
 
         this->progress()->tick();
     }
 
-    QDomElement watermarkingE = doc.createElement("Watermarking");
+    QDomElement watermarkingE = doc.createElement(QStringLiteral("Watermarking"));
     rootE.appendChild(watermarkingE);
-    watermarkingE.setAttribute("Text", qApp->applicationName());
+    watermarkingE.setAttribute(QStringLiteral("Text"), qApp->applicationName());
 
     QDomElement smartTypeE = doc.createElement("SmartType");
     rootE.appendChild(smartTypeE);
 
     const QStringList characters = structure->allCharacterNames();
-    QDomElement charactersE = doc.createElement("Characters");
+    QDomElement charactersE = doc.createElement(QStringLiteral("Characters"));
     smartTypeE.appendChild(charactersE);
     Q_FOREACH(QString name, characters)
     {
-        QDomElement characterE = doc.createElement("Character");
+        QDomElement characterE = doc.createElement(QStringLiteral("Character"));
         charactersE.appendChild(characterE);
         characterE.appendChild(doc.createTextNode(name));
     }
@@ -122,24 +128,24 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     locations.removeDuplicates();
     std::sort(locations.begin(), locations.end());
 
-    QDomElement timesOfDayE = doc.createElement("TimesOfDay");
+    QDomElement timesOfDayE = doc.createElement(QStringLiteral("TimesOfDay"));
     smartTypeE.appendChild(timesOfDayE);
-    timesOfDayE.setAttribute("Separator", " - ");
+    timesOfDayE.setAttribute(QStringLiteral("Separator"), QStringLiteral(" - "));
     std::sort(moments.begin(), moments.end());
     Q_FOREACH(QString moment, moments)
     {
-        QDomElement timeOfDayE = doc.createElement("TimeOfDay");
+        QDomElement timeOfDayE = doc.createElement(QStringLiteral("TimeOfDay"));
         timesOfDayE.appendChild(timeOfDayE);
         timeOfDayE.appendChild(doc.createTextNode(moment));
     }
 
     std::sort(locationTypes.begin(), locationTypes.end());
-    QDomElement sceneIntrosE = doc.createElement("SceneIntros");
+    QDomElement sceneIntrosE = doc.createElement(QStringLiteral("SceneIntros"));
     smartTypeE.appendChild(sceneIntrosE);
-    sceneIntrosE.setAttribute("Separator", ". ");
+    sceneIntrosE.setAttribute(QStringLiteral("Separator"), QStringLiteral(". "));
     Q_FOREACH(QString locationType, locationTypes)
     {
-        QDomElement sceneIntroE = doc.createElement("SceneIntro");
+        QDomElement sceneIntroE = doc.createElement(QStringLiteral("SceneIntro"));
         sceneIntrosE.appendChild(sceneIntroE);
         sceneIntroE.appendChild(doc.createTextNode(locationType));
     }

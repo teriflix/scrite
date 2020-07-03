@@ -11,7 +11,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>scrite - build your screenplay</string>
 	<key>CFBundleExecutable</key>
-	<string>scrite</string>
+        <string>Scrite</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.teriflix.scrite</string>
 	<key>CFBundleVersion</key>

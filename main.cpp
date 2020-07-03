@@ -20,6 +20,7 @@
 #include <QQmlContext>
 #include <QQuickStyle>
 #include <QFontDatabase>
+#include <QMenuBar>
 
 #include "undoredo.h"
 #include "completer.h"
@@ -235,6 +236,11 @@ int main(int argc, char **argv)
     const QScreen *primaryScreen = a.primaryScreen();
     const QSize primaryScreenSize = primaryScreen->availableSize();
 
+#ifdef Q_OS_MAC
+    QMenuBar *menuBar = new QMenuBar(nullptr);
+    QAction *quitAction = menuBar->addMenu("File")->addAction("Quit");
+#endif
+
     QQuickStyle::setStyle("Material");
 
     QQuickView qmlView;
@@ -253,6 +259,10 @@ int main(int argc, char **argv)
     qmlView.setMinimumSize(QSize(qMin(1440,primaryScreenSize.width()), qMin(900,primaryScreenSize.height())));
     qmlView.showMaximized();
     qmlView.raise();
+
+#ifdef Q_OS_MAC
+    QObject::connect(quitAction, &QAction::triggered, &qmlView, &QQuickView::close);
+#endif
 
     QObject::connect(&a, &Application::minimizeWindowRequest, &qmlView, &QQuickView::showMinimized);
 

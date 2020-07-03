@@ -94,7 +94,8 @@ public:
     static QString transliteratedWord(const QString &word, void *transliterator);
     static QString transliteratedParagraph(const QString &paragraph, void *transliterator, bool includingLastWord=true);
 
-    Q_INVOKABLE QFont languageFont(Language language) const;
+    Q_INVOKABLE QFont languageFont(Language language) const { return this->languageFont(language,true); }
+    QFont languageFont(Language language, bool preferAppFonts) const;
     QStringList languageFontFilePaths(Language language) const;
     static Language languageForScript(QChar::Script script);
 

@@ -445,7 +445,7 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
     return ret;
 }
 
-QFont TransliterationEngine::languageFont(TransliterationEngine::Language language) const
+QFont TransliterationEngine::languageFont(TransliterationEngine::Language language, bool preferAppFonts) const
 {
     static QMap<Language,QFontDatabase::WritingSystem> languageSystemMap;
     if(languageSystemMap.isEmpty())
@@ -469,7 +469,28 @@ QFont TransliterationEngine::languageFont(TransliterationEngine::Language langua
     if(families.isEmpty())
         return Application::instance()->font();
 
-    return QFont( families.first() );
+    if(preferAppFonts)
+        return QFont(families.first());
+
+    QStringList allFamilies, appFamilies;
+    if(id >= 0)
+    {
+        allFamilies = fontDb.families(languageSystemMap.value(language));
+        appFamilies = families;
+    }
+    else
+        allFamilies = families;
+
+    if(appFamilies.isEmpty())
+        return QFont(allFamilies.first());
+
+    while( allFamilies.size() && appFamilies.contains(allFamilies.first()) )
+        allFamilies.takeFirst();
+
+    if(allFamilies.isEmpty())
+        return QFont(families.first());
+
+    return QFont(allFamilies.first());
 }
 
 QStringList TransliterationEngine::languageFontFilePaths(TransliterationEngine::Language language) const
