@@ -18,6 +18,8 @@ Item {
     id: rubberband
     signal tryStart(point pos)
     signal select(rect rectangle)
+
+    property bool selectionMode: false
     property bool active: false
 
     Rectangle {
@@ -45,7 +47,7 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if(mouse.modifiers & Qt.ControlModifier) {
+            if(mouse.modifiers & Qt.ControlModifier || parent.selectionMode) {
                 var pos = Qt.point(mouse.x, mouse.y)
                 rubberband.tryStart(pos)
 

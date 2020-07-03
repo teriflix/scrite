@@ -104,6 +104,15 @@ Item {
             }
 
             ToolButton3 {
+                id: selectionModeButton
+                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                iconSource: "../icons/action/selection_drag.png"
+                ToolTip.text: "Selecttion mode"
+                checkable: true
+                onClicked: selection.layout(Structure.HorizontalLayout)
+            }
+
+            ToolButton3 {
                 enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
                 iconSource: "../icons/action/layout_horizontally.png"
                 ToolTip.text: "Layout Horizontally"
@@ -225,11 +234,15 @@ Item {
                 enabled: !createElementMouseHandler.enabled
                 anchors.fill: parent
                 z: active ? 1000 : -1
+                selectionMode: selectionModeButton.checked
                 onTryStart: {
                     parent.forceActiveFocus()
                     active = true // TODO
                 }
-                onSelect: selection.init(elementItems, rectangle)
+                onSelect: {
+                    selection.init(elementItems, rectangle)
+                    selectionModeButton.checked = false
+                }
             }
 
             BoxShadow {
