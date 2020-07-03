@@ -56,7 +56,7 @@ Image {
 
         Item {
             Column {
-                spacing: 50
+                spacing: 10
                 anchors.centerIn: parent
 
                 Image {
@@ -77,6 +77,11 @@ Image {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: Qt.openUrlExternally("https://www.teriflix.com")
                     }
+                }
+
+                Item {
+                    width: parent.width
+                    height: 50
                 }
 
                 Row {
@@ -132,6 +137,11 @@ Image {
                             }
                         }
                     }
+                }
+
+                Item {
+                    width: parent.width
+                    height: 50
                 }
 
                 Row {
