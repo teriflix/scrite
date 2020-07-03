@@ -8,8 +8,12 @@
 	<string>appicon.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+        <key>CFBundleDisplayName</key>
+        <string>Scrite</string>
+        <key>CFBundleName</key>
+        <string>Scrite</string>
 	<key>CFBundleGetInfoString</key>
-	<string>scrite - build your screenplay</string>
+        <string>Scrite - Version 0.4.5 Beta</string>
 	<key>CFBundleExecutable</key>
         <string>Scrite</string>
 	<key>CFBundleIdentifier</key>

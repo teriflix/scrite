@@ -99,7 +99,7 @@ Item {
         anchors.topMargin: 40
         anchors.horizontalCenter: parent.horizontalCenter
         font.pixelSize: 20
-        text: "CLICK HERE TO GET STARTED"
+        text: "Click anywhere to get started."
         font.letterSpacing: 10
         opacity: 0.01
         color: "#4a4a4a"
