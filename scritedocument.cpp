@@ -530,6 +530,12 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     return ret;
 }
 
+inline QString createTimestampString(const QDateTime &dt = QDateTime::currentDateTime())
+{
+    static const QString format = QStringLiteral("MMM dd, yyyy HHmmss");
+    return dt.toString(format);
+}
+
 AbstractExporter *ScriteDocument::createExporter(const QString &format)
 {
     const QByteArray formatKey = format.toLatin1();
@@ -548,7 +554,7 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
             suggestedName = QStringLiteral("Scrite - Screenplay");
         else
             suggestedName += QStringLiteral(" - Screenplay");
-        suggestedName += QStringLiteral(" - ") + QDateTime::currentDateTime().toString(QStringLiteral("dd-MM-yyyy hh:mm:ss"));
+        suggestedName += QStringLiteral(" - ") + createTimestampString();
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
@@ -590,7 +596,7 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 
         const QString reportName = reportGenerator->name();
         const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
-        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ") + QDateTime::currentDateTime().toString(QStringLiteral("dd-MM-yyyy hh:mm:ss")) + suffix;
+        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ") + createTimestampString() + suffix;
 
         QFileInfo fi(m_fileName);
         if(fi.exists())
