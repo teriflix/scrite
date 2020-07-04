@@ -41,7 +41,11 @@ protected:
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
+#ifdef Q_OS_WIN
     bool m_markLanguagesExplicitly = false;
+#else
+    bool m_markLanguagesExplicitly = true;
+#endif
 };
 
 #endif // FINALDRAFTEXPORTER_H
