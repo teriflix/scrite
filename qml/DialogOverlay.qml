@@ -62,7 +62,7 @@ Rectangle {
     EventFilter.target: app
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {
-        if(closeable && event.key === Qt.Key_Escape) {
+        if( (closeable || closeUponClickOutsideContentArea) && event.key === Qt.Key_Escape) {
             result.acceptEvent = true
             result.filter = true
             close()
