@@ -272,6 +272,8 @@ void SpellCheckService::update()
     request.characterNames = ScriteDocument::instance()->structure()->characterNames();
     request.ignoreList = ScriteDocument::instance()->spellCheckIgnoreList();
 
+    request.characterNames << QStringLiteral("Rajkumar");
+
     QFutureWatcher<SpellCheckServiceResult> *watcher = new QFutureWatcher<SpellCheckServiceResult>(this);
     connect(watcher, SIGNAL(finished()), this, SLOT(spellCheckComplete()), Qt::QueuedConnection);
 

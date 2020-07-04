@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
 #ifdef Q_OS_MAC
-    Application::setApplicationVersion(applicationVersion.toString() + "-dev-beta5");
+    Application::setApplicationVersion(applicationVersion.toString() + "-beta");
 #else
     if(QSysInfo::WordSize == 32)
         Application::setApplicationVersion(applicationVersion.toString() + "-beta-x86");
@@ -102,6 +102,7 @@ int main(int argc, char **argv)
     qInstallMessageHandler(ScriteQtMessageHandler);
 
     Application a(argc, argv, applicationVersion);
+    a.setWindowIcon(QIcon(":/images/appicon.png"));
 
     QPalette palette = Application::palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0,0.4,1));
