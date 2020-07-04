@@ -51,6 +51,16 @@ bool HtmlExporter::doExport(QIODevice *device)
     const Screenplay *screenplay = this->document()->screenplay();
     const ScreenplayFormat *formatting = this->document()->printFormat();
 
+    // Different systems have different qt_defaultDpi() values. While that works for everything we
+    // do in Scrite, it doesnt work for HTML export. So, we will have to do something else.
+    const qreal paperWidth = formatting->pageLayout()->paperSize() == ScreenplayPageLayout::A4 ? 794 : 816;
+    const qreal layoutScale = paperWidth / formatting->pageLayout()->paperWidth();
+    const int   topMargin = int(formatting->pageLayout()->topMargin() * layoutScale);
+    const qreal leftMargin = formatting->pageLayout()->leftMargin() * layoutScale;
+    const qreal rightMargin = formatting->pageLayout()->rightMargin() * layoutScale;
+    const int   bottomMargin = int(formatting->pageLayout()->bottomMargin() * layoutScale);
+    const qreal contentWidth = formatting->pageLayout()->contentWidth() * layoutScale;
+
     QMap<SceneElement::Type,QString> typeStringMap;
     typeStringMap[SceneElement::Heading] = "heading";
     typeStringMap[SceneElement::Action] = "action";
@@ -158,11 +168,11 @@ bool HtmlExporter::doExport(QIODevice *device)
             break;
         }
 
-        const int leftMargin = int(format->leftMargin() * formatting->pageLayout()->contentWidth() + formatting->pageLayout()->leftMargin());
-        const int rightMargin = int(format->rightMargin() * formatting->pageLayout()->contentWidth() + formatting->pageLayout()->rightMargin());
+        const int pLeftMargin = int(format->leftMargin() * contentWidth + leftMargin);
+        const int pRightMargin = int(format->rightMargin() * contentWidth + rightMargin);
 
-        ts << "      padding-left: " << leftMargin << "px;\n";
-        ts << "      padding-right: " << rightMargin << "px;\n";
+        ts << "      padding-left: " << pLeftMargin << "px;\n";
+        ts << "      padding-right: " << pRightMargin << "px;\n";
         if(qFuzzyIsNull(format->lineSpacingBefore()) || format->elementType() == SceneElement::Heading)
             ts << "      padding-top: 0px;\n";
         else
@@ -188,12 +198,12 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     ts << "\n";
     ts << "    div.scrite-screenplay {\n";
-    ts << "        width: " << formatting->pageLayout()->paperWidth() << "px;\n";
+    ts << "        width: " << int(paperWidth) << "px;\n";
     ts << "        border: 1px solid gray;\n";
     ts << "        margin-left: auto;\n";
     ts << "        margin-right: auto;\n";
-    ts << "        margin-top: " << formatting->pageLayout()->topMargin() << "px;\n";
-    ts << "        margin-bottom: " << formatting->pageLayout()->bottomMargin() << "px;\n";
+    ts << "        margin-top: " << topMargin << "px;\n";
+    ts << "        margin-bottom: " << bottomMargin << "px;\n";
     ts << "    }\n";
 
     ts << "    </style>\n\n";
