@@ -521,10 +521,10 @@ TransliterationEngine::Language TransliterationEngine::languageForScript(QChar::
 
 void TransliterationEngine::Boundary::append(const QChar &ch, int pos)
 {
-    string.append(ch);
+    string += ch;
     if(start < 0)
         start = pos;
-    end = pos+1;
+    end = pos;
 }
 
 bool TransliterationEngine::Boundary::isEmpty() const
@@ -538,7 +538,8 @@ QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries
     if(text.isEmpty())
         return ret;
 
-    QChar::Script script = QChar::Script_Unknown;
+    bool lettersStarted = false;
+    QChar::Script script = QChar::Script_Latin;
 
     Boundary item;
     auto captureBoundary = [&ret,this](Boundary &item, QChar::Script script) {
@@ -551,20 +552,32 @@ QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries
         item = Boundary();
     };
 
-    auto isEnglishChar = [](const QChar &ch) {
-        return ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line || ch.script() == QChar::Script_Latin;
-    };
-
     for(int index=0; index<text.length(); index++)
     {
         const QChar ch = text.at(index);
-        const QChar::Script chScript = isEnglishChar(ch) ? QChar::Script_Latin : ch.script();
-        if(script != chScript)
+        if(!lettersStarted)
         {
-            captureBoundary(item, script);
-            script = chScript;
+            item.append(ch, index);
+
+            if(ch.isLetterOrNumber())
+            {
+                lettersStarted = true;
+                script = ch.script();
+            }
+
+            continue;
         }
 
+        const bool isSplChar = ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line;
+        if(isSplChar || ch.script() == script)
+        {
+            item.append(ch, index);
+            continue;
+        }
+
+        captureBoundary(item, script);
+
+        script = ch.script();
         item.append(ch, index);
     }
 

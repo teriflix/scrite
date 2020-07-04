@@ -56,14 +56,17 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement contentE = doc.createElement(QStringLiteral("Content"));
     rootE.appendChild(contentE);
 
-
     auto addTextToParagraph = [&doc](QDomElement &element, const QString &text) {
         QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
         Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
-            const QFont font = TransliterationEngine::instance()->languageFont(item.language, false);
             QDomElement textE = doc.createElement(QStringLiteral("Text"));
             element.appendChild(textE);
-            textE.setAttribute(QStringLiteral("Font"), font.family());
+            if(item.language == TransliterationEngine::English)
+                textE.setAttribute(QStringLiteral("Font"), QStringLiteral("Courier Final Draft"));
+            else {
+                const QFont font = TransliterationEngine::instance()->languageFont(item.language, false);
+                textE.setAttribute(QStringLiteral("Font"), font.family());
+            }
             textE.appendChild(doc.createTextNode(item.string));
         }
     };

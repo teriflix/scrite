@@ -1360,10 +1360,9 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             if(m_purpose == ForPrinting)
             {
                 const QTextCharFormat givenCharFormat = cursor.charFormat();
-                auto insertSnippet = [&cursor](const QString &snippet, QChar::Script script) {
+                auto insertSnippet = [&cursor](const QString &snippet, TransliterationEngine::Language language) {
                     if(snippet.isEmpty())
                         return;
-                    TransliterationEngine::Language language = TransliterationEngine::languageForScript(script);
                     const QFont font = TransliterationEngine::instance()->languageFont(language);
                     QTextCharFormat format;
                     format.setFontFamily(font.family());
@@ -1371,29 +1370,9 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     cursor.insertText(snippet);
                 };
 
-                QChar::Script script = QChar::Script_Unknown;
-                int from = 0;
-                int length = 0;
-                for(int i=0; i<text.length(); i++)
-                {
-                    const QChar ch = text.at(i);
-                    if(script == QChar::Script_Unknown)
-                    {
-                        script = ch.script();
-                        ++length;
-                    }
-                    else if(script == ch.script() || ch.isPunct() || ch.isSpace() || ch.isSymbol())
-                        ++length;
-                    else
-                    {
-                        insertSnippet(text.mid(from, length), script);
-                        from = from+length;
-                        script = ch.script();
-                        ++length;
-                    }
-                }
-
-                insertSnippet(text.mid(from, length), script);
+                const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
+                Q_FOREACH(TransliterationEngine::Boundary item, items)
+                    insertSnippet(item.string, item.language);
             }
             else
                 cursor.insertText(text);
