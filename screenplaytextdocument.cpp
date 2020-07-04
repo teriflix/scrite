@@ -1680,13 +1680,12 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     const QString marketingText = marketing;
     QRectF marketingFrame = marketingFontMetrics.boundingRect(rect, Qt::TextWordWrap, marketingText);
-    marketingFrame.moveBottomRight(rect.bottomRight());
-    marketingFrame.moveRight(rect.left() + rect.width()*0.95);
+    marketingFrame.moveCenter(rect.center());
+    marketingFrame.moveTop( rect.bottom() + marketingFrame.height()*3 );
 
     const QString contactFrameText = createParagraph( QStringList() << contact << address << phoneNumber << email << website );
     QRectF contactFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, contactFrameText);
     contactFrameRect.moveBottomLeft(rect.bottomLeft());
-    contactFrameRect.moveBottom(marketingFrame.top());
 
     const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
     const qreal defaultDpi = qt_defaultDpi();
