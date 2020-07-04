@@ -3,7 +3,7 @@ echo "[Desktop Entry]" > Scrite.desktop
 echo "Type=Application" >> Scrite.desktop
 echo "Name=Scrite" >> Scrite.desktop
 echo "Exec=`pwd`/AppRun %f" >> Scrite.desktop
-echo "Icon=`pwd`/scrite_app_icon.png" >> Scrite.desktop
+echo "Icon=`pwd`/Scrite_app_icon.png" >> Scrite.desktop
 echo "Comment=Multilingual Screenplay Writing App from TERIFLIX" >> Scrite.desktop
 echo "Terminal=false" >> Scrite.desktop
 echo "Categories=Office;WordProcessor;" >> Scrite.desktop

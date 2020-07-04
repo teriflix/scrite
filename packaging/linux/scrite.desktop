@@ -2,7 +2,7 @@
 Type=Application
 Name=Scrite
 Exec=AppRun %f
-Icon=scrite_app_icon.png
+Icon=Scrite_app_icon.png
 Comment=Multilingual Screenplay Writing App from TERIFLIX
 Terminal=false
 Categories=Office;WordProcessor
