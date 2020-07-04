@@ -26,6 +26,13 @@ public:
     Q_INVOKABLE HtmlExporter(QObject *parent=nullptr);
     ~HtmlExporter();
 
+    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
+    Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
+    void setIncludeSceneNumbers(bool val);
+    bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
+    Q_SIGNAL void includeSceneNumbersChanged();
+
     Q_CLASSINFO("exportWithSceneColors_FieldLabel", "Export with scene colors")
     Q_CLASSINFO("exportWithSceneColors_FieldEditor", "CheckBox")
     Q_PROPERTY(bool exportWithSceneColors READ isExportWithSceneColors WRITE setExportWithSceneColors NOTIFY exportWithSceneColorsChanged)
@@ -41,7 +48,8 @@ protected:
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
-    bool m_exportWithSceneColors = true;
+    bool m_includeSceneNumbers = false;
+    bool m_exportWithSceneColors = false;
 };
 
 #endif // HTMLEXPORTER_H

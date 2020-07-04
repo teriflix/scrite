@@ -37,10 +37,20 @@ void HtmlExporter::setExportWithSceneColors(bool val)
     emit exportWithSceneColorsChanged();
 }
 
+void HtmlExporter::setIncludeSceneNumbers(bool val)
+{
+    if(m_includeSceneNumbers == val)
+        return;
+
+    m_includeSceneNumbers = val;
+    emit includeSceneNumbersChanged();
+}
+
 bool HtmlExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
     const ScreenplayFormat *formatting = this->document()->printFormat();
+
     QMap<SceneElement::Type,QString> typeStringMap;
     typeStringMap[SceneElement::Heading] = "heading";
     typeStringMap[SceneElement::Action] = "action";
@@ -73,12 +83,6 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     while(it != end)
     {
-        if(it.key() == TransliterationEngine::English)
-        {
-            ++it;
-            continue;
-        }
-
         if(it.value())
         {
             QDir().mkpath(fontsDir);
@@ -154,19 +158,42 @@ bool HtmlExporter::doExport(QIODevice *device)
             break;
         }
 
-        ts << "      margin-left: " << int(format->leftMargin()*100) << "%;\n";
-        ts << "      margin-right: " << int(format->rightMargin()*100) << "%;\n";
-        ts << "      margin-top: " << format->lineSpacingBefore() << "em;\n";
+        const int leftMargin = int(format->leftMargin() * formatting->pageLayout()->contentWidth() + formatting->pageLayout()->leftMargin());
+        const int rightMargin = int(format->rightMargin() * formatting->pageLayout()->contentWidth() + formatting->pageLayout()->rightMargin());
+
+        ts << "      padding-left: " << leftMargin << "px;\n";
+        ts << "      padding-right: " << rightMargin << "px;\n";
+        if(qFuzzyIsNull(format->lineSpacingBefore()) || format->elementType() == SceneElement::Heading)
+            ts << "      padding-top: 0px;\n";
+        else
+            ts << "      padding-top: " << format->lineSpacingBefore() << "em;\n";
+        ts << "      padding-bottom: 0px;\n";
+        ts << "      margin: 0px;\n";
         ts << "      line-height: " << format->lineHeight()*1.1 << "em;\n";
         ts << "    }\n";
     }
 
+    const SceneElementFormat *headingFormat = formatting->elementFormat(SceneElement::Heading);
+
     ts << "\n";
     ts << "    div.scrite-scene {\n";
-    ts << "      padding-top: 10px;\n";
-    ts << "      padding-bottom: 10px;\n";
-    ts << "      padding-left: 10px;\n";
-    ts << "      padding-right: 10px;\n";
+    if(qFuzzyIsNull(headingFormat->lineSpacingBefore()))
+        ts << "      padding-top: 0px;\n";
+    else
+        ts << "      padding-top: " << headingFormat->lineSpacingBefore() << "em;\n";
+    ts << "      padding-bottom: 0px;\n";
+    ts << "      padding-left: 0px;\n";
+    ts << "      padding-right: 0px;\n";
+    ts << "    }\n";
+
+    ts << "\n";
+    ts << "    div.scrite-screenplay {\n";
+    ts << "        width: " << formatting->pageLayout()->paperWidth() << "px;\n";
+    ts << "        border: 1px solid gray;\n";
+    ts << "        margin-left: auto;\n";
+    ts << "        margin-right: auto;\n";
+    ts << "        margin-top: " << formatting->pageLayout()->topMargin() << "px;\n";
+    ts << "        margin-bottom: " << formatting->pageLayout()->bottomMargin() << "px;\n";
     ts << "    }\n";
 
     ts << "    </style>\n\n";
@@ -178,7 +205,7 @@ bool HtmlExporter::doExport(QIODevice *device)
         ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">";
         QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
         Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
-            if(item.language == TransliterationEngine::English || !langBundleMap.value(item.language,false))
+            if(!langBundleMap.value(item.language,false))
                 ts << "<span>" << item.string << "</span>";
             else
                 ts << "<span class=\"lang_" << item.language << "_" << QFont::Normal << "_" << QFont::StyleNormal << "\">" << item.string << "</span>";
@@ -204,12 +231,17 @@ bool HtmlExporter::doExport(QIODevice *device)
                     QString::number(sceneColor.blue()) + ",0.1)";
             ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\" style=\"background-color: " << sceneColorText << ";\">\n";
         }
+        else
+            ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\">\n";
 
         const SceneHeading *heading = scene->heading();
         if(heading->isEnabled())
         {
             ++nrHeadings;
-            writeParagraph(SceneElement::Heading, "[" + QString::number(nrHeadings) + "] " + heading->text());
+            if(m_includeSceneNumbers)
+                writeParagraph(SceneElement::Heading, "[" + QString::number(nrHeadings) + "] " + heading->text());
+            else
+                writeParagraph(SceneElement::Heading, heading->text());
         }
 
         const int nrElements = scene->elementCount();
@@ -219,8 +251,10 @@ bool HtmlExporter::doExport(QIODevice *device)
             writeParagraph(element->type(), element->formattedText());
         }
 
-        if(m_exportWithSceneColors)
-            ts << "      </div>\n";
+        if(i == nrScenes-1)
+            ts << "<p class=\"scrite-action\" custom-style=\"scrite-action\">&nbsp;</p>";
+
+        ts << "      </div>\n";
     }
 
     ts << "    </div>\n\n";
