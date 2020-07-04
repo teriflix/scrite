@@ -61,6 +61,7 @@ public:
 
     Q_PROPERTY(QString languageAsString READ languageAsString NOTIFY languageChanged)
     QString languageAsString() const;
+    QString languageAsString(Language language) const;
 
     Q_PROPERTY(QJsonObject alphabetMappings READ alphabetMappings NOTIFY languageChanged)
     QJsonObject alphabetMappings() const { return this->alphabetMappingsFor(m_language); }

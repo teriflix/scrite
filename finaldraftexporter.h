@@ -26,12 +26,22 @@ public:
     Q_INVOKABLE FinalDraftExporter(QObject *parent=nullptr);
     ~FinalDraftExporter();
 
+    Q_CLASSINFO("markLanguagesExplicitly_FieldLabel", "Explicity mark text-fragments of different languages.")
+    Q_CLASSINFO("markLanguagesExplicitly_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool markLanguagesExplicitly READ isMarkLanguagesExplicitly WRITE setMarkLanguagesExplicitly NOTIFY markLanguagesExplicitlyChanged)
+    void setMarkLanguagesExplicitly(bool val);
+    bool isMarkLanguagesExplicitly() const {return m_markLanguagesExplicitly; }
+    Q_SIGNAL void markLanguagesExplicitlyChanged();
+
     bool canBundleFonts() const { return false; }
-    bool requiresConfiguration() const { return false; }
+    bool requiresConfiguration() const { return true; }
 
 protected:
     bool doExport(QIODevice *device);
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+
+private:
+    bool m_markLanguagesExplicitly = false;
 };
 
 #endif // FINALDRAFTEXPORTER_H

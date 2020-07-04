@@ -137,9 +137,14 @@ void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
 
 QString TransliterationEngine::languageAsString() const
 {
+    return this->languageAsString(m_language);
+}
+
+QString TransliterationEngine::languageAsString(TransliterationEngine::Language language) const
+{
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
-    return QString::fromLatin1(metaEnum.valueToKey(m_language));
+    return QString::fromLatin1(metaEnum.valueToKey(language));
 }
 
 QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language val) const

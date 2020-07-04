@@ -29,6 +29,15 @@ FinalDraftExporter::~FinalDraftExporter()
 
 }
 
+void FinalDraftExporter::setMarkLanguagesExplicitly(bool val)
+{
+    if(m_markLanguagesExplicitly == val)
+        return;
+
+    m_markLanguagesExplicitly = val;
+    emit markLanguagesExplicitlyChanged();
+}
+
 bool FinalDraftExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
@@ -56,18 +65,27 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement contentE = doc.createElement(QStringLiteral("Content"));
     rootE.appendChild(contentE);
 
-    auto addTextToParagraph = [&doc](QDomElement &element, const QString &text) {
-        QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
-        Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
+    auto addTextToParagraph = [&doc,this](QDomElement &element, const QString &text) {
+        if(m_markLanguagesExplicitly) {
+            QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
+            Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
+                QDomElement textE = doc.createElement(QStringLiteral("Text"));
+                element.appendChild(textE);
+                if(item.language == TransliterationEngine::English) {
+                    textE.setAttribute(QStringLiteral("Font"), QStringLiteral("Courier Final Draft"));
+                    textE.setAttribute(QStringLiteral("Language"), QStringLiteral("English"));
+                } else {
+                    const QFont font = TransliterationEngine::instance()->languageFont(item.language, false);
+                    textE.setAttribute(QStringLiteral("Font"), font.family());
+                    textE.setAttribute(QStringLiteral("Language"), TransliterationEngine::instance()->languageAsString(item.language));
+                }
+                textE.appendChild(doc.createTextNode(item.string));
+            }
+        } else {
             QDomElement textE = doc.createElement(QStringLiteral("Text"));
             element.appendChild(textE);
-            if(item.language == TransliterationEngine::English)
-                textE.setAttribute(QStringLiteral("Font"), QStringLiteral("Courier Final Draft"));
-            else {
-                const QFont font = TransliterationEngine::instance()->languageFont(item.language, false);
-                textE.setAttribute(QStringLiteral("Font"), font.family());
-            }
-            textE.appendChild(doc.createTextNode(item.string));
+            textE.setAttribute(QStringLiteral("Font"), QStringLiteral("Courier Final Draft"));
+            textE.appendChild(doc.createTextNode(text));
         }
     };
 
@@ -156,6 +174,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const QString xml = doc.toString(4);
 
     QTextStream ts(device);
+    ts.setCodec("utf-8");
+    ts.setAutoDetectUnicode(true);
+
     ts << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
     ts << xml;
     ts.flush();
