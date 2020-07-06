@@ -34,6 +34,7 @@ public:
     virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
     virtual bool isIncludeSceneIcons() const { return false; }
+    virtual bool isPrintEachSceneOnANewPage() const { return false; }
 
     bool requiresConfiguration() const { return true; }
 

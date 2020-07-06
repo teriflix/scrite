@@ -75,11 +75,17 @@ void ScreenplayAdapter::setSource(QObject *val)
 
                 screenplay = new Screenplay(this);
                 if(masterScreenplay != nullptr)
-                {
+                {                    
+                    screenplay->setEmail(masterScreenplay->email());
                     screenplay->setTitle(masterScreenplay->title());
-                    screenplay->setSubtitle(masterScreenplay->subtitle());
                     screenplay->setAuthor(masterScreenplay->author());
+                    screenplay->setAddress(masterScreenplay->address());
+                    screenplay->setBasedOn(masterScreenplay->basedOn());
+                    screenplay->setContact(masterScreenplay->contact());
                     screenplay->setVersion(masterScreenplay->version());
+                    screenplay->setSubtitle(masterScreenplay->subtitle());
+                    screenplay->setPhoneNumber(masterScreenplay->phoneNumber());
+                    screenplay->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
                 }
 
                 ScreenplayElement *element = new ScreenplayElement(screenplay);

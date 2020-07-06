@@ -16,12 +16,14 @@ HEADERS += \
     abstractexporter.h \
     abstractimporter.h \
     abstractreportgenerator.h \
+    abstractscreenplaysubsetreport.h \
     abstractshapeitem.h \
     abstracttextdocumentexporter.h \
     aggregation.h \
     application.h \
     autoupdate.h \
     characterreportgenerator.h \
+    characterscreenplayreport.h \
     completer.h \
     delayedpropertybinder.h \
     documentfilesystem.h \
@@ -90,12 +92,14 @@ SOURCES += \
     abstractexporter.cpp \
     abstractimporter.cpp \
     abstractreportgenerator.cpp \
+    abstractscreenplaysubsetreport.cpp \
     abstractshapeitem.cpp \
     abstracttextdocumentexporter.cpp \
     aggregation.cpp \
     application.cpp \
     autoupdate.cpp \
     characterreportgenerator.cpp \
+    characterscreenplayreport.cpp \
     completer.cpp \
     delayedpropertybinder.cpp \
     documentfilesystem.cpp \

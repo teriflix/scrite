@@ -22,6 +22,7 @@
 
 class QPdfWriter;
 class QTextDocumentWriter;
+class QTextDocumentPagedPrinter;
 
 class AbstractReportGenerator : public AbstractDeviceIO
 {
@@ -80,6 +81,7 @@ protected:
     virtual bool doGenerate(QTextDocument *) { return false; }
     virtual void configureWriter(QTextDocumentWriter *, const QTextDocument *) const { }
     virtual void configureWriter(QPdfWriter *, const QTextDocument *) const { }
+    virtual void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *) { }
 
     virtual bool canDirectPrintToPdf() const { return false; }
     virtual bool directPrintToPdf(QPdfWriter *) { return false; }

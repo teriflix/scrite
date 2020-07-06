@@ -163,6 +163,7 @@ bool AbstractReportGenerator::generate()
         printer.header()->setVisibleFromPageOne(true);
         printer.footer()->setVisibleFromPageOne(true);
         printer.watermark()->setVisibleFromPageOne(true);
+        this->configureTextDocumentPrinter(&printer, &textDocument);
         printer.print(&textDocument, &pdfWriter);
     }
 

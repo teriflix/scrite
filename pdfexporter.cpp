@@ -33,24 +33,6 @@ PdfExporter::~PdfExporter()
 
 }
 
-void PdfExporter::setWatermark(const QString &val)
-{
-    if(m_watermark == val)
-        return;
-
-    m_watermark = val;
-    emit watermarkChanged();
-}
-
-void PdfExporter::setComment(const QString &val)
-{
-    if(m_comment == val)
-        return;
-
-    m_comment = val;
-    emit commentChanged();
-}
-
 void PdfExporter::setIncludeSceneNumbers(bool val)
 {
     if(m_includeSceneNumbers == val)
@@ -69,6 +51,15 @@ void PdfExporter::setIncludeSceneIcons(bool val)
     emit includeSceneIconsChanged();
 }
 
+void PdfExporter::setPrintEachSceneOnANewPage(bool val)
+{
+    if(m_printEachSceneOnANewPage == val)
+        return;
+
+    m_printEachSceneOnANewPage = val;
+    emit printEachSceneOnANewPageChanged();
+}
+
 void PdfExporter::setUsePageBreaks(bool val)
 {
     if(m_usePageBreaks == val)
@@ -76,6 +67,24 @@ void PdfExporter::setUsePageBreaks(bool val)
 
     m_usePageBreaks = val;
     emit usePageBreaksChanged();
+}
+
+void PdfExporter::setWatermark(const QString &val)
+{
+    if(m_watermark == val)
+        return;
+
+    m_watermark = val;
+    emit watermarkChanged();
+}
+
+void PdfExporter::setComment(const QString &val)
+{
+    if(m_comment == val)
+        return;
+
+    m_comment = val;
+    emit commentChanged();
 }
 
 bool PdfExporter::doExport(QIODevice *device)

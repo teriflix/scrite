@@ -60,7 +60,7 @@ public:
     QString sceneID() const;
 
     Q_PROPERTY(int sceneNumber READ sceneNumber NOTIFY sceneNumberChanged)
-    int sceneNumber() const { return m_sceneNumber; }
+    int sceneNumber() const { return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber; }
     Q_SIGNAL void sceneNumberChanged();
 
     Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false)
@@ -98,6 +98,7 @@ private:
     int m_sceneNumber = -1;
     QString m_sceneID;
     QJsonValue m_userData;
+    int m_customSceneNumber = -1;
     Screenplay* m_screenplay = nullptr;
     bool m_elementTypeIsSet = false;
     ElementType m_elementType = SceneElementType;

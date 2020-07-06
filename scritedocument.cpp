@@ -32,6 +32,7 @@
 #include "finaldraftexporter.h"
 #include "locationreportgenerator.h"
 #include "characterreportgenerator.h"
+#include "characterscreenplayreport.h"
 #include "scenecharactermatrixreportgenerator.h"
 
 #include <QDir>
@@ -75,6 +76,7 @@ DeviceIOFactories::DeviceIOFactories()
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();
     ReportGeneratorFactory.addClass<LocationReportGenerator>();
     ReportGeneratorFactory.addClass<SceneCharacterMatrixReportGenerator>();
+    ReportGeneratorFactory.addClass<CharacterScreenplayReport>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()

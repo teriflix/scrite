@@ -1885,6 +1885,16 @@ Rectangle {
                 characterMenu.characterName = ""
             }
         }
+
+        MenuItem2 {
+            text: "Generate Character Screenplay"
+            enabled: characterMenu.characterName !== ""
+            onClicked: {
+                reportGeneratorTimer.reportArgs = {"reportName": "Character Screenplay", "configuration": {"characterNames": [characterMenu.characterName]}}
+                characterMenu.close()
+                characterMenu.characterName = ""
+            }
+        }
     }
 
     Component {

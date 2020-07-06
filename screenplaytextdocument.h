@@ -23,6 +23,33 @@
 #include "formatting.h"
 #include "screenplay.h"
 
+class ScreenplayTextDocument;
+class AbstractScreenplayTextDocumentInjectionInterface
+{
+public:
+    enum InjectLocation
+    {
+        AfterTitlePage,
+        AfterSceneHeading,
+        AfterLastScene
+    };
+    virtual void inject(QTextCursor &, InjectLocation) { }
+
+    const ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
+
+private:
+    friend class ScreenplayTextDocument;
+    void setScreenplayElement(const ScreenplayElement *element) {
+        m_screenplayElement = element;
+    }
+
+private:
+    const ScreenplayElement *m_screenplayElement = nullptr;
+};
+
+#define AbstractScreenplayTextDocumentInjectionInterface_iid "io.scrite.AbstractScreenplayTextDocumentInjectionInterface"
+Q_DECLARE_INTERFACE(AbstractScreenplayTextDocumentInjectionInterface, AbstractScreenplayTextDocumentInjectionInterface_iid)
+
 class QQmlEngine;
 class ScreenplayTextDocumentUpdate;
 class ScreenplayTextDocument : public QObject,
@@ -71,12 +98,27 @@ public:
     bool isSyncEnabled() const { return m_syncEnabled; }
     Q_SIGNAL void syncEnabledChanged();
 
+    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters NOTIFY listSceneCharactersChanged)
+    void setListSceneCharacters(bool val);
+    bool isListSceneCharacters() const { return m_listSceneCharacters; }
+    Q_SIGNAL void listSceneCharactersChanged();
+
+    Q_PROPERTY(QStringList highlightDialoguesOf READ highlightDialoguesOf WRITE setHighlightDialoguesOf NOTIFY highlightDialoguesOfChanged)
+    void setHighlightDialoguesOf(QStringList val);
+    QStringList highlightDialoguesOf() const { return m_highlightDialoguesOf; }
+    Q_SIGNAL void highlightDialoguesOfChanged();
+
     enum Purpose { ForDisplay, ForPrinting };
     Q_ENUM(Purpose)
     Q_PROPERTY(Purpose purpose READ purpose WRITE setPurpose NOTIFY purposeChanged)
     void setPurpose(Purpose val);
     Purpose purpose() const { return m_purpose; }
     Q_SIGNAL void purposeChanged();
+
+    Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
+    void setPrintEachSceneOnANewPage(bool val);
+    bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
+    Q_SIGNAL void printEachSceneOnANewPageChanged();
 
     Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
     bool isUpdating() const { return m_updating; }
@@ -96,6 +138,12 @@ public:
 
     QList< QPair<int,int> > pageBoundaries() const { return m_pageBoundaries; }
     Q_SIGNAL void pageBoundariesChanged();
+
+    Q_PROPERTY(QObject* injection READ injection WRITE setInjection NOTIFY injectionChanged)
+    void setInjection(QObject* val);
+    QObject* injection() const { return m_injection; }
+    Q_SIGNAL void injectionChanged();
+    QObject* m_injection = nullptr;
 
     void syncNow();
 
@@ -174,6 +222,8 @@ private:
     void addToSceneResetList(Scene *scene);
     void processSceneResetList();
 
+    void clearInjection() { this->setInjection(nullptr); }
+
 private:
     int m_pageCount = 0;
     bool m_updating = false;
@@ -186,11 +236,14 @@ private:
     Scene *m_activeScene = nullptr;
     bool m_componentComplete = true;
     Screenplay* m_screenplay = nullptr;
+    bool m_listSceneCharacters = false;
     QTextDocument* m_textDocument = nullptr;
-    ScreenplayFormat* m_formatting = nullptr;
     SimpleTimer m_sceneResetTimer;
+    ScreenplayFormat* m_formatting = nullptr;
     QList<Scene*> m_sceneResetList;
+    bool m_printEachSceneOnANewPage = false;
     SimpleTimer m_loadScreenplayTimer;
+    QStringList m_highlightDialoguesOf;
     SimpleTimer m_pageBoundaryEvalTimer;
     QTextFrameFormat m_sceneFrameFormat;
     bool m_connectedToScreenplaySignals = false;

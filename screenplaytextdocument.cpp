@@ -16,6 +16,7 @@
 #include "imageprinter.h"
 #include "timeprofiler.h"
 #include "timeprofiler.h"
+#include "scritedocument.h"
 #include "garbagecollector.h"
 #include "screenplaytextdocument.h"
 
@@ -274,6 +275,28 @@ void ScreenplayTextDocument::setSyncEnabled(bool val)
     emit syncEnabledChanged();
 }
 
+void ScreenplayTextDocument::setListSceneCharacters(bool val)
+{
+    if(m_listSceneCharacters == val)
+        return;
+
+    m_listSceneCharacters = val;
+    emit listSceneCharactersChanged();
+
+    this->loadScreenplayLater();
+}
+
+void ScreenplayTextDocument::setHighlightDialoguesOf(QStringList val)
+{
+    if(m_highlightDialoguesOf == val)
+        return;
+
+    m_highlightDialoguesOf = val;
+    emit highlightDialoguesOfChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 {
     if(m_purpose == val)
@@ -281,6 +304,17 @@ void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 
     m_purpose = val;
     emit purposeChanged();
+}
+
+void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
+{
+    if(m_printEachSceneOnANewPage == val)
+        return;
+
+    m_printEachSceneOnANewPage = val;
+    emit printEachSceneOnANewPageChanged();
+
+    this->loadScreenplayLater();
 }
 
 void ScreenplayTextDocument::print(QObject *printerObject)
@@ -371,6 +405,24 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     }
 
     return ret;
+}
+
+void ScreenplayTextDocument::setInjection(QObject *val)
+{
+    if(m_injection == val)
+        return;
+
+    if(m_injection != val)
+        disconnect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::clearInjection);
+
+    m_injection = val;
+
+    if(m_injection != val)
+        connect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::clearInjection);
+
+    emit injectionChanged();
+
+    this->loadScreenplayLater();
 }
 
 void ScreenplayTextDocument::syncNow()
@@ -492,6 +544,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
+    m_textDocument->setIndentWidth(10);
 
     if(m_sceneNumbers || (m_purpose == ForPrinting && m_syncEnabled) || m_sceneIcons)
     {
@@ -540,6 +593,10 @@ void ScreenplayTextDocument::loadScreenplay()
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), titlePageFormat);
     }
 
+    AbstractScreenplayTextDocumentInjectionInterface *injection = qobject_cast<AbstractScreenplayTextDocumentInjectionInterface*>(m_injection);
+    if(injection != nullptr)
+        injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterTitlePage);
+
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
@@ -563,6 +620,9 @@ void ScreenplayTextDocument::loadScreenplay()
             frameFormat.setTopMargin(blockFormat.topMargin());
         }
 
+        if(i > 0 && m_printEachSceneOnANewPage)
+            frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);
+
         // Each screenplay element (or scene) has its own frame. That makes
         // moving them in one bunch easy.
         QTextFrame *frame = cursor.insertFrame(frameFormat);
@@ -574,6 +634,9 @@ void ScreenplayTextDocument::loadScreenplay()
         cursor = m_textDocument->rootFrame()->lastCursorPosition();
         cursor.setBlockFormat(frameBoundaryBlockFormat);
     }
+
+    if(injection != nullptr)
+        injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterLastScene);
 
     this->includeMoreAndContdMarkers();
     this->evaluatePageBoundariesLater();
@@ -1294,6 +1357,9 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
     Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element),
                "ScreenplayTextDocument", "Screenplay element can be loaded only after a frame for it has been created");
 
+    QTextCharFormat highlightCharFormat;
+    highlightCharFormat.setBackground(Qt::yellow);
+
     const Scene *scene = element->scene();
     if(scene != nullptr)
     {
@@ -1345,6 +1411,30 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             insertBlock = true;
         }
 
+        AbstractScreenplayTextDocumentInjectionInterface *injection = qobject_cast<AbstractScreenplayTextDocumentInjectionInterface*>(m_injection);
+        if(injection != nullptr)
+        {
+            injection->setScreenplayElement(element);
+            injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterSceneHeading);
+            injection->setScreenplayElement(nullptr);
+        }
+
+        if(m_listSceneCharacters)
+        {
+            const QStringList sceneCharacters = scene->characterNames();
+            if(!sceneCharacters.isEmpty())
+            {
+                if(insertBlock)
+                    cursor.insertBlock();
+
+                prepareCursor(cursor, SceneElement::Heading, !insertBlock);
+                cursor.mergeCharFormat(highlightCharFormat);
+                cursor.insertText( QStringLiteral("{") + sceneCharacters.join(", ") + QStringLiteral("}") );
+                insertBlock = true;
+            }
+        }
+
+        bool highlightParagraph = false;
         for(int j=0; j<scene->elementCount(); j++)
         {
             const SceneElement *para = scene->elementAt(j);
@@ -1355,8 +1445,21 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             block.setUserData(new ScreenplayParagraphBlockData(para));
             prepareCursor(cursor, para->type(), !insertBlock);
 
-            const QString text = para->text();
+            if(!m_highlightDialoguesOf.isEmpty())
+            {
+                if(para->type() == SceneElement::Character)
+                {
+                    const QString chName = para->text().section('(', 0, 0).trimmed();
+                    highlightParagraph = (m_highlightDialoguesOf.contains(chName, Qt::CaseInsensitive));
+                }
+                else if(para->type() != SceneElement::Parenthetical && para->type() != SceneElement::Dialogue)
+                    highlightParagraph = false;
+            }
 
+            if(highlightParagraph)
+                cursor.mergeCharFormat(highlightCharFormat);
+
+            const QString text = para->text();
             if(m_purpose == ForPrinting)
             {
                 const QTextCharFormat givenCharFormat = cursor.charFormat();
@@ -1622,6 +1725,11 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     if(screenplay == nullptr)
         return;
 
+    const Screenplay *masterScreenplay = ScriteDocument::instance()->screenplay();
+    const Screenplay *coverPageImageScreenplay = screenplay;
+    if(screenplay->property("#useDocumentScreenplayForCoverPagePhoto").toBool() == true)
+        coverPageImageScreenplay = masterScreenplay;
+
     auto fetch = [](const QString &given, const QString &defaultValue) {
         const QString val = given.trimmed();
         return val.isEmpty() ? defaultValue : val;
@@ -1705,9 +1813,9 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     painter->save();
 
-    if(!screenplay->coverPagePhoto().isEmpty())
+    if(!coverPageImageScreenplay->coverPagePhoto().isEmpty())
     {
-        QImage photo(screenplay->coverPagePhoto());
+        QImage photo(coverPageImageScreenplay->coverPagePhoto());
         QRectF photoRect = photo.rect();
         QSizeF photoSize = photoRect.size();
 
@@ -1715,7 +1823,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         spaceAvailable.setBottom(titleFrameRect.top() - titleFrameRect.height());
         photoSize.scale(spaceAvailable.size(), Qt::KeepAspectRatio);
 
-        switch(screenplay->coverPagePhotoSize())
+        switch(coverPageImageScreenplay->coverPagePhotoSize())
         {
         case Screenplay::LargeCoverPhoto:
             break;

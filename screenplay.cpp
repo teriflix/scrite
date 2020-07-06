@@ -191,6 +191,16 @@ bool ScreenplayElement::event(QEvent *event)
         if(m_scene == nullptr && !m_sceneID.isEmpty())
             this->setSceneFromID(m_sceneID);
     }
+    else if(event->type() == QEvent::DynamicPropertyChange)
+    {
+        QDynamicPropertyChangeEvent *propEvent = static_cast<QDynamicPropertyChangeEvent*>(event);
+        const QByteArray propName = propEvent->propertyName();
+        if( propName == QByteArrayLiteral("#sceneNumber") )
+        {
+            m_customSceneNumber = property(propName).toInt();
+            emit sceneNumberChanged();
+        }
+    }
 
     return QObject::event(event);
 }
@@ -362,7 +372,7 @@ void Screenplay::setCoverPagePhoto(const QString &val)
 {
     HourGlass hourGlass;
 
-    QImage image(val);
+    QImage image = val.isEmpty() ? QImage() : QImage(val);
     if( image.isNull() )
     {
         m_scriteDocument->fileSystem()->remove(coverPagePhotoPath);
@@ -370,15 +380,20 @@ void Screenplay::setCoverPagePhoto(const QString &val)
     }
     else
     {
-        const QSize imageSize = image.size().scaled(1920, 1080, Qt::KeepAspectRatio);
-        if(image.width() > imageSize.width() || image.height() > imageSize.height())
-            image = image.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-        const QString photoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath, true);
-        if(image.save(photoPath, "JPG"))
-            m_coverPagePhoto = photoPath;
+        if(m_scriteDocument->fileSystem()->contains(val))
+            m_coverPagePhoto = val;
         else
-            m_coverPagePhoto.clear();
+        {
+            const QSize imageSize = image.size().scaled(1920, 1080, Qt::KeepAspectRatio);
+            if(image.width() > imageSize.width() || image.height() > imageSize.height())
+                image = image.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            const QString photoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath, true);
+            if(image.save(photoPath, "JPG"))
+                m_coverPagePhoto = photoPath;
+            else
+                m_coverPagePhoto.clear();
+        }
     }
 
     emit coverPagePhotoChanged();

@@ -42,6 +42,8 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setTitlePage(this->generateTitlePage());
     stDoc.setSceneNumbers(this->isIncludeSceneNumbers());
     stDoc.setSceneIcons(this->isIncludeSceneIcons());
+    stDoc.setListSceneCharacters(m_listSceneCharacters);
+    stDoc.setPrintEachSceneOnANewPage(this->isPrintEachSceneOnANewPage());
     stDoc.setSyncEnabled(false);
     if(this->usePageBreaks())
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);

@@ -11,27 +11,36 @@
 **
 ****************************************************************************/
 
-#ifndef PDFEXPORTER_H
-#define PDFEXPORTER_H
+#ifndef SCREENPLAYSUBSETREPORT_H
+#define SCREENPLAYSUBSETREPORT_H
 
-#include "abstracttextdocumentexporter.h"
+#include "screenplaytextdocument.h"
+#include "abstractreportgenerator.h"
 
-class PdfExporter : public AbstractTextDocumentExporter
+class AbstractScreenplaySubsetReport : public AbstractReportGenerator,
+                                       public AbstractScreenplayTextDocumentInjectionInterface
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Screenplay/Adobe PDF")
-    Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
+    Q_INTERFACES(AbstractScreenplayTextDocumentInjectionInterface)
 
 public:
-    Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
-    ~PdfExporter();
+    ~AbstractScreenplaySubsetReport();
 
-    Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
-    Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY usePageBreaksChanged)
-    void setUsePageBreaks(bool val);
-    bool usePageBreaks() const { return m_usePageBreaks; }
-    Q_SIGNAL void usePageBreaksChanged();
+    bool requiresConfiguration() const { return true; }
+
+    Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
+    Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY generateTitlePageChanged)
+    void setGenerateTitlePage(bool val);
+    bool isGenerateTitlePage() const { return m_generateTitlePage; }
+    Q_SIGNAL void generateTitlePageChanged();
+
+    Q_CLASSINFO("listSceneCharacters_FieldLabel", "List characters for each scene.")
+    Q_CLASSINFO("listSceneCharacters_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters NOTIFY listSceneCharactersChanged)
+    void setListSceneCharacters(bool val);
+    bool isListSceneCharacters() const { return m_listSceneCharacters; }
+    Q_SIGNAL void listSceneCharactersChanged();
 
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
@@ -54,33 +63,27 @@ public:
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
-    Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
-    Q_CLASSINFO("watermark_FieldEditor", "TextBox")
-    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
-    void setWatermark(const QString &val);
-    QString watermark() const { return m_watermark; }
-    Q_SIGNAL void watermarkChanged();
-
-    Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer.")
-    Q_CLASSINFO("comment_FieldEditor", "TextBox")
-    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
-    void setComment(const QString &val);
-    QString comment() const { return m_comment; }
-    Q_SIGNAL void commentChanged();
-
-    bool canBundleFonts() const { return false; }
+    virtual QString screenplaySubtitle() const { return QStringLiteral("Screenplay Subset"); }
+    virtual bool includeScreenplayElement(const ScreenplayElement *) const { return true; }
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+    AbstractScreenplaySubsetReport(QObject *parent=nullptr);
+
+    // AbstractReportGenerator interface
+    bool doGenerate(QTextDocument *);
+
+    // AbstractReportGenerator interface
+    void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *);
+
+    virtual void configureScreenplayTextDocument(ScreenplayTextDocument &) { }
 
 private:
-    QString m_comment;
-    QString m_watermark;
-    bool m_usePageBreaks = true;
+    bool m_generateTitlePage = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
+    bool m_listSceneCharacters = false;
+    Screenplay *m_screenplaySubset = nullptr;
     bool m_printEachSceneOnANewPage = false;
 };
 
-#endif // PDFEXPORTER_H
+#endif // SCREENPLAYSUBSETREPORT_H

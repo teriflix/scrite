@@ -83,7 +83,7 @@ Item {
 
                 Column {
                     width: formView.width - (formView.scrollBarRequired ? 17 : 0)
-                    spacing: 20
+                    spacing: 10
 
                     Text {
                         font.pointSize: 24
