@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef SCREENPLAYSUBSETREPORT_H
-#define SCREENPLAYSUBSETREPORT_H
+#ifndef ABSTRACTSCREENPLAYSUBSETREPORT_H
+#define ABSTRACTSCREENPLAYSUBSETREPORT_H
 
 #include "screenplaytextdocument.h"
 #include "abstractreportgenerator.h"
@@ -86,4 +86,4 @@ private:
     bool m_printEachSceneOnANewPage = false;
 };
 
-#endif // SCREENPLAYSUBSETREPORT_H
+#endif // ABSTRACTSCREENPLAYSUBSETREPORT_H

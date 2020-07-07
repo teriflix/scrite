@@ -70,6 +70,7 @@ HEADERS += \
     scenecharactermatrixreportgenerator.h \
     screenplay.h \
     screenplayadapter.h \
+    screenplaysubsetreport.h \
     screenplaytextdocument.h \
     scritedocument.h \
     searchengine.h \
@@ -143,6 +144,7 @@ SOURCES += \
     scenecharactermatrixreportgenerator.cpp \
     screenplay.cpp \
     screenplayadapter.cpp \
+    screenplaysubsetreport.cpp \
     screenplaytextdocument.cpp \
     scritedocument.cpp \
     searchengine.cpp \

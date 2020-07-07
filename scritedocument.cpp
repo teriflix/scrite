@@ -30,6 +30,7 @@
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
+#include "screenplaysubsetreport.h"
 #include "locationreportgenerator.h"
 #include "characterreportgenerator.h"
 #include "locationscreenplayreport.h"
@@ -74,6 +75,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<StructureExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
 
+    ReportGeneratorFactory.addClass<ScreenplaySubsetReport>();
     ReportGeneratorFactory.addClass<LocationReportGenerator>();
     ReportGeneratorFactory.addClass<LocationScreenplayReport>();
     ReportGeneratorFactory.addClass<CharacterReportGenerator>();

@@ -229,6 +229,8 @@ Item {
             return editor_MultipleCharacterNameSelector
         if(kind === "MultipleLocationSelector")
             return editor_MultipleLocationSelector
+        if(kind === "MultipleSceneSelector")
+            return editor_MultipleSceneSelector
         if(kind === "CheckBox")
             return editor_CheckBox
         if(kind === "EnumSelector")
@@ -395,8 +397,6 @@ Item {
                         ListView {
                             id: allLocationsView
                             model: allLocations
-                            anchors.fill: parent
-                            anchors.margins: 2
                             clip: true
                             property string currentLocation: currentIndex >= 0 ? allLocations[currentIndex] : ""
                             delegate: Item {
@@ -517,6 +517,64 @@ Item {
                             highlightFollowsCurrentItem: true
                             highlightResizeDuration: 0
                             highlightMoveDuration: 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: editor_MultipleSceneSelector
+
+        Column {
+            property var fieldInfo
+            spacing: 5
+
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                text: fieldInfo.label
+            }
+
+            Text {
+                font.italic: true
+                wrapMode: Text.WordWrap
+                text: "(Select one or more locations from the list below)"
+            }
+
+            ScrollView {
+                width: parent.width - 20
+                height: 350
+                background: Rectangle {
+                    color: primaryColors.c100.background
+                    border.width: 1
+                    border.color: primaryColors.c100.text
+                }
+                ListView {
+                    id: sceneListView
+                    model: scriteDocument.screenplay
+                    clip: true
+                    delegate: CheckBox2 {
+                        width: sceneListView.width-1
+                        text: {
+                            var scene = screenplayElement.scene
+                            if(scene && scene.heading.enabled)
+                                return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
+                            if(screenplayElementType === ScreenplayElement.BreakElementType)
+                                return screenplayElement.sceneID
+                            return "NO SCENE HEADING"
+                        }
+                        enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
+                        onToggled: {
+                            var numbers = generator.getConfigurationValue(fieldInfo.name)
+                            if(checked)
+                                numbers.push(screenplayElement.sceneNumber)
+                            else {
+                                var idx = numbers.indexOf(screenplayElement.sceneNumber)
+                                numbers.splice(idx, 1)
+                            }
+                            generator.setConfigurationValue(fieldInfo.name, numbers)
                         }
                     }
                 }
