@@ -107,13 +107,16 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     }
 
     ScreenplayTextDocument stDoc;
-    stDoc.setTitlePage(m_generateTitlePage);
-    stDoc.setSceneNumbers(m_includeSceneNumbers);
-    stDoc.setSceneIcons(m_includeSceneIcons);
+    stDoc.setTitlePage(this->format() == AdobePDF ? m_generateTitlePage : false);
+    stDoc.setSceneNumbers(this->format() == AdobePDF ? m_includeSceneNumbers : false);
+    stDoc.setSceneIcons(this->format() == AdobePDF ? m_includeSceneIcons : false);
     stDoc.setListSceneCharacters(m_listSceneCharacters);
-    stDoc.setPrintEachSceneOnANewPage(m_printEachSceneOnANewPage);
+    stDoc.setPrintEachSceneOnANewPage(this->format() == AdobePDF ? m_printEachSceneOnANewPage : false);
     stDoc.setSyncEnabled(false);
-    stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
+    if(this->format() == AdobePDF)
+        stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
+    else
+        stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);
     stDoc.setScreenplay(m_screenplaySubset);
     stDoc.setFormatting(document->printFormat());
     stDoc.setTextDocument(textDocument);

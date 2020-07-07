@@ -43,6 +43,7 @@ HEADERS += \
     htmlimporter.h \
     imageprinter.h \
     locationreportgenerator.h \
+    locationscreenplayreport.h \
     materialcolors.h \
     modifiable.h \
     note.h \
@@ -118,6 +119,7 @@ SOURCES += \
     htmlimporter.cpp \
     imageprinter.cpp \
     locationreportgenerator.cpp \
+    locationscreenplayreport.cpp \
     main.cpp \
     materialcolors.cpp \
     note.cpp \

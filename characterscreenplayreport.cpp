@@ -49,6 +49,9 @@ bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement
     if(scene == nullptr)
         return false;
 
+    if(m_characterNames.isEmpty())
+        return true;
+
     const QStringList sceneCharacters = scene->characterNames();
     Q_FOREACH(QString characterName, m_characterNames)
         if(sceneCharacters.contains(characterName))
@@ -60,9 +63,14 @@ bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement
 QString CharacterScreenplayReport::screenplaySubtitle() const
 {
     if(m_characterNames.isEmpty())
-        return AbstractScreenplaySubsetReport::screenplaySubtitle();
+        return QStringLiteral("Location Screenplay of: ALL CHARACTERS");
 
-    return QStringLiteral("Character Screenplay Of: ") + m_characterNames.join(", ");
+    const QString subtitle = QStringLiteral("Character Screenplay Of: ") + m_characterNames.join(", ");
+    if(subtitle.length() > 60)
+        return  m_characterNames.first() + QStringLiteral(" and ") +
+                QString::number(m_characterNames.size()-1) + QStringLiteral(" other characters(s).");
+
+    return subtitle;
 }
 
 void CharacterScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDocument &stDoc)

@@ -32,6 +32,7 @@
 #include "finaldraftexporter.h"
 #include "locationreportgenerator.h"
 #include "characterreportgenerator.h"
+#include "locationscreenplayreport.h"
 #include "characterscreenplayreport.h"
 #include "scenecharactermatrixreportgenerator.h"
 
@@ -61,22 +62,23 @@ DeviceIOFactories::DeviceIOFactories()
       ExporterFactory("Format"),
       ReportGeneratorFactory("Title")
 {
-    ImporterFactory.addClass<FinalDraftImporter>();
     ImporterFactory.addClass<HtmlImporter>();
     ImporterFactory.addClass<FountainImporter>();
+    ImporterFactory.addClass<FinalDraftImporter>();
 
+    ExporterFactory.addClass<OdtExporter>();
     ExporterFactory.addClass<PdfExporter>();
-    ExporterFactory.addClass<FinalDraftExporter>();
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
-    ExporterFactory.addClass<StructureExporter>();
     ExporterFactory.addClass<FountainExporter>();
-    ExporterFactory.addClass<OdtExporter>();
+    ExporterFactory.addClass<StructureExporter>();
+    ExporterFactory.addClass<FinalDraftExporter>();
 
-    ReportGeneratorFactory.addClass<CharacterReportGenerator>();
     ReportGeneratorFactory.addClass<LocationReportGenerator>();
-    ReportGeneratorFactory.addClass<SceneCharacterMatrixReportGenerator>();
+    ReportGeneratorFactory.addClass<LocationScreenplayReport>();
+    ReportGeneratorFactory.addClass<CharacterReportGenerator>();
     ReportGeneratorFactory.addClass<CharacterScreenplayReport>();
+    ReportGeneratorFactory.addClass<SceneCharacterMatrixReportGenerator>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()

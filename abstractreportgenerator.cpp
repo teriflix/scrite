@@ -16,6 +16,7 @@
 #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
+#include <QDir>
 #include <QFileInfo>
 #include <QPdfWriter>
 #include <QJsonArray>
@@ -42,6 +43,13 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
 
     m_format = val;
     emit formatChanged();
+
+    if(!this->fileName().isEmpty())
+    {
+        const QString suffix = m_format == AdobePDF ? QStringLiteral(".pdf") : QStringLiteral(".odt");
+        const QFileInfo fileInfo(this->fileName());
+        this->setFileName( fileInfo.absoluteDir().absoluteFilePath(fileInfo.baseName() + suffix) );
+    }
 }
 
 void AbstractReportGenerator::setWatermark(const QString &val)

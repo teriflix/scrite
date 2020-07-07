@@ -103,5 +103,13 @@
         <file>icons/navigation/check.png</file>
         <file>icons/action/selection_drag.png</file>
         <file>icons/action/selection_drag_inverted.png</file>
+        <file>icons/action/add_one.png</file>
+        <file>icons/action/add_one_inverted.png</file>
+        <file>icons/action/add_all.png</file>
+        <file>icons/action/add_all_inverted.png</file>
+        <file>icons/action/remove_one.png</file>
+        <file>icons/action/remove_one_inverted.png</file>
+        <file>icons/action/remove_all.png</file>
+        <file>icons/action/remove_all_inverted.png</file>
     </qresource>
 </RCC>

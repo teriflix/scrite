@@ -101,6 +101,8 @@ Item {
     }
 
     function click() {
+        if(!enabled)
+            return
         if(checkable) {
             checked = !checked
             toggled()

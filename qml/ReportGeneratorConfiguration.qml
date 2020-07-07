@@ -102,7 +102,7 @@ Item {
 
                 Column {
                     width: formView.width - (formView.scrollBarRequired ? 17 : 0)
-                    spacing: 10
+                    spacing: 5
 
                     Text {
                         font.pointSize: 24
@@ -110,6 +110,8 @@ Item {
                         text: formInfo.title
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
+
+                    Item { width: parent.width; height: 20 }
 
                     Column {
                         width: parent.width
@@ -159,6 +161,8 @@ Item {
                             }
                         }
                     }
+
+                    Item { width: parent.width; height: 20 }
 
                     Repeater {
                         model: formInfo.fields
@@ -223,6 +227,8 @@ Item {
     function loadFieldEditor(kind) {
         if(kind === "MultipleCharacterNameSelector")
             return editor_MultipleCharacterNameSelector
+        if(kind === "MultipleLocationSelector")
+            return editor_MultipleLocationSelector
         if(kind === "CheckBox")
             return editor_CheckBox
         if(kind === "EnumSelector")
@@ -340,6 +346,180 @@ Item {
                 anchors.rightMargin: 30
                 anchors.leftMargin: 5
                 charactersModel.array: charactersModel.stringListArray(scriteDocument.structure.characterNames)
+            }
+        }
+    }
+
+    Component {
+        id: editor_MultipleLocationSelector
+
+        Item {
+            property var fieldInfo
+            property var allLocations: scriteDocument.structure.allLocations()
+            property var selectedLocations: []
+
+            height: multipleLocationSelectorLayout.height
+
+            Column {
+                id: multipleLocationSelectorLayout
+                width: parent.width-20
+                spacing: 5
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    text: fieldInfo.label
+                }
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    font.italic: true
+                    text: "(Double click on an item in one list, to add a it to the other.)"
+                }
+
+                Row {
+                    width: parent.width - 5
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 350
+                    spacing: 10
+
+                    ScrollView {
+                        width: (parent.width - addRemoveButtons.width - parent.spacing*2)/2
+                        height: parent.height
+                        background: Rectangle {
+                            color: primaryColors.c100.background
+                            border.width: 1
+                            border.color: primaryColors.c100.text
+                        }
+                        ListView {
+                            id: allLocationsView
+                            model: allLocations
+                            anchors.fill: parent
+                            anchors.margins: 2
+                            clip: true
+                            property string currentLocation: currentIndex >= 0 ? allLocations[currentIndex] : ""
+                            delegate: Item {
+                                width: allLocationsView.width-1
+                                height: 25
+
+                                Text {
+                                    id: allLocatonText
+                                    anchors.fill: parent
+                                    anchors.margins: 4
+                                    verticalAlignment: Text.AlignVCenter
+                                    elide: Text.ElideRight
+                                    text: modelData
+                                    color: selectedLocations.indexOf(modelData) >= 0 ? "gray" : "black"
+                                }
+
+                                ToolTip.visible: allLocatonTextMouseArea.containsMouse && (allLocatonText.contentWidth > allLocatonText.width)
+                                ToolTip.text: modelData
+
+                                MouseArea {
+                                    id: allLocatonTextMouseArea
+                                    hoverEnabled: true
+                                    anchors.fill: parent
+                                    onClicked: allLocationsView.currentIndex = index
+                                    onDoubleClicked: addOneButton.click()
+                                }
+                            }
+                            highlight: Rectangle { color: accentColors.windowColor }
+                            highlightFollowsCurrentItem: true
+                            highlightResizeDuration: 0
+                            highlightMoveDuration: 0
+                        }
+                    }
+
+                    Column {
+                        id: addRemoveButtons
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 10
+
+                        ToolButton3 {
+                            id: addOneButton
+                            iconSource: "../icons/action/add_one.png"
+                            enabled: selectedLocations.indexOf(allLocationsView.currentLocation) < 0
+                            onClicked: {
+                                var locs = selectedLocations
+                                locs.push( allLocationsView.currentLocation )
+                                selectedLocations = locs
+                                generator.setConfigurationValue(fieldInfo.name, locs)
+                            }
+                        }
+
+                        ToolButton3 {
+                            id: removeOneButton
+                            iconSource: "../icons/action/remove_one.png"
+                            enabled: selectedLocationsView.currentIndex >= 0
+                            onClicked: {
+                                var locs = selectedLocations
+                                locs.splice(selectedLocationsView.currentIndex,1)
+                                selectedLocations = locs
+                                generator.setConfigurationValue(fieldInfo.name, locs)
+                            }
+                        }
+
+                        ToolButton3 {
+                            id: addAllButton
+                            iconSource: "../icons/action/add_all.png"
+                            enabled: selectedLocationsView.count !== allLocationsView.count
+                        }
+
+                        ToolButton3 {
+                            id: removeAllButton
+                            iconSource: "../icons/action/remove_all.png"
+                            enabled: selectedLocationsView.count > 0
+                        }
+                    }
+
+                    ScrollView {
+                        width: (parent.width - addRemoveButtons.width - parent.spacing*2)/2
+                        height: parent.height
+                        background: Rectangle {
+                            color: primaryColors.c100.background
+                            border.width: 1
+                            border.color: primaryColors.c100.text
+                        }
+
+                        ListView {
+                            id: selectedLocationsView
+                            anchors.fill: parent
+                            anchors.margins: 2
+                            clip: true
+                            model: selectedLocations
+                            property string currentLocation: currentIndex >= 0 ? selectedLocations[currentIndex] : ""
+                            delegate: Item {
+                                width: selectedLocationsView.width-1
+                                height: 25
+
+                                Text {
+                                    id: selectedLocationText
+                                    anchors.fill: parent
+                                    anchors.margins: 4
+                                    verticalAlignment: Text.AlignVCenter
+                                    elide: Text.ElideRight
+                                    text: modelData
+                                }
+
+                                ToolTip.visible: selectedLocationTextMouseArea.containsMouse && (selectedLocationText.contentWidth > selectedLocationText.width)
+                                ToolTip.text: modelData
+
+                                MouseArea {
+                                    id: selectedLocationTextMouseArea
+                                    hoverEnabled: true
+                                    anchors.fill: parent
+                                    onClicked: selectedLocationsView.currentIndex = index
+                                    onDoubleClicked: removeOneButton.click()
+                                }
+                            }
+                            highlight: Rectangle { color: accentColors.windowColor }
+                            highlightFollowsCurrentItem: true
+                            highlightResizeDuration: 0
+                            highlightMoveDuration: 0
+                        }
+                    }
+                }
             }
         }
     }
