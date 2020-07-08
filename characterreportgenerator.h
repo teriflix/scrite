@@ -20,7 +20,7 @@ class CharacterReportGenerator : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Report")
-    Q_CLASSINFO("Description", "Generates a report with dialogues and notes for one or more selected characters.")
+    Q_CLASSINFO("Description", "Generate a report with dialogues and notes for one or more selected characters.")
 
 public:
     Q_INVOKABLE CharacterReportGenerator(QObject *parent=nullptr);

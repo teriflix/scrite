@@ -20,7 +20,7 @@ class SceneCharacterMatrixReportGenerator : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Scene Character Matrix")
-    Q_CLASSINFO("Description", "Generates a table of scene names and characters.")
+    Q_CLASSINFO("Description", "Generate a table of scene names and characters.")
 
 public:
     Q_INVOKABLE SceneCharacterMatrixReportGenerator(QObject *parent=nullptr);

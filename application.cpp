@@ -444,6 +444,7 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
     };
 
     ret.insert("title", queryClassInfo("Title"));
+    ret.insert("description", queryClassInfo("Description"));
 
     QJsonArray fields;
     QJsonArray groupedFields;

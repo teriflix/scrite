@@ -1871,7 +1871,7 @@ Rectangle {
             var reports = scriteDocument.supportedReports
             var chReports = []
             reports.forEach( function(item) {
-                if(item.name.indexOf('Character') === 0)
+                if(item.name.indexOf('Character') >= 0)
                     chReports.push(item)
             })
             characterMenu.characterReports = chReports

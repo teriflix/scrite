@@ -21,7 +21,7 @@ import QtQuick.Controls.Material 2.12
 Item {
     id: configurationBox
     property AbstractReportGenerator generator
-    property var formInfo: {"title": "Unknown", "groupedFields": []}
+    property var formInfo: {"title": "Unknown", "description": "", "groupedFields": []}
 
     width: 700
     height: formInfo.fields.length > 0 ? 700 : 275
@@ -74,8 +74,9 @@ Item {
                 }
 
                 Text {
-                    text: "Configure options for your report using the options in the tabs below."
-                    width: parent.width * 0.7
+                    text: formInfo.description
+                    font.pointSize: 14
+                    width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -97,6 +98,7 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     property int currentIndex: 0
+                    visible: tabRepeater.count > 1
 
                     Repeater {
                         id: tabRepeater
@@ -134,7 +136,7 @@ Item {
 
                 Rectangle {
                     id: contentPanel
-                    anchors.top: tabBar.bottom
+                    anchors.top: tabBar.visible ? tabBar.bottom : parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
