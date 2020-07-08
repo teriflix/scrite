@@ -23,6 +23,7 @@ TextField {
     property bool enableTransliteration: false
     selectedTextColor: "white"
     selectionColor: "blue"
+    selectByMouse: true
 
     signal editingComplete()
 
@@ -59,7 +60,6 @@ TextField {
     onTextEdited: transliterate(false)
 
     property bool userTypedSomeText: false
-    onUserTypedSomeTextChanged: console.log("PA: " + userTypedSomeText + " (" + text + ")")
     Keys.onPressed: {
         if(event.text !== "")
             userTypedSomeText = true

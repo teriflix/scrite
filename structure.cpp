@@ -1131,7 +1131,11 @@ void Structure::updateLocationHeadingMap()
         if(scene == nullptr || !scene->heading()->isEnabled())
             continue;
 
-        map[scene->heading()->location()].append(scene->heading());
+        const QString location = scene->heading()->location();
+        if(location.isEmpty())
+            continue;
+
+        map[location].append(scene->heading());
     }
 
     m_locationHeadingsMap = map;

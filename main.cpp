@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
 #ifdef Q_OS_MAC
-    Application::setApplicationVersion(applicationVersion.toString() + "-dev-beta3");
+    Application::setApplicationVersion(applicationVersion.toString() + "-beta");
 #else
     if(QSysInfo::WordSize == 32)
         Application::setApplicationVersion(applicationVersion.toString() + "-beta-x86");
