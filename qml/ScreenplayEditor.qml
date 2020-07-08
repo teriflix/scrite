@@ -1912,6 +1912,7 @@ Rectangle {
                         text: modelData.description
                         width: parent.width
                         wrapMode: Text.WordWrap
+                        font.pixelSize: 12
                         font.italic: true
                     }
                 }
