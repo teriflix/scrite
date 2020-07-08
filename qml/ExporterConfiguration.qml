@@ -13,7 +13,6 @@
 
 import Scrite 1.0
 import QtQuick 2.13
-import QtQuick.Dialogs 1.3
 import QtQuick.Controls 2.13
 
 Item {
@@ -51,22 +50,6 @@ Item {
         active: exporter
         sourceComponent: Item {
             property real idealHeight: formView.contentHeight + buttonRow.height + 50
-            FileDialog {
-                id: filePathDialog
-                folder: {
-                    if(scriteDocument.fileName !== "") {
-                        var fileInfo = app.fileInfo(scriteDocument.fileName)
-                        if(fileInfo.exists)
-                            return "file:///" + fileInfo.absolutePath
-                    }
-                    return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-                }
-                selectFolder: false
-                selectMultiple: false
-                selectExisting: false
-                nameFilters: exporter.nameFilters
-                onAccepted: exporter.fileName = app.urlToLocalFile(fileUrl)
-            }
 
             ScrollView {
                 id: formView
@@ -92,35 +75,11 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
-                    Column {
-                        width: parent.width
-                        spacing: parent.spacing/2
-
-                        Text {
-                            width: parent.width
-                            text: "Select a file to export into"
-                        }
-
-                        Row {
-                            width: parent.width
-                            spacing: parent.spacing
-
-                            TextField {
-                                id: filePathField
-                                readOnly: true
-                                width: parent.width - filePathDialogButton.width - parent.spacing
-                                text: exporter.fileName
-                            }
-
-                            ToolButton2 {
-                                id: filePathDialogButton
-                                text: "..."
-                                suggestedWidth: 35
-                                suggestedHeight: 35
-                                onClicked: filePathDialog.open()
-                                hoverEnabled: false
-                            }
-                        }
+                    FileSelector {
+                        width: parent.width-20
+                        label: "Select a file to export into"
+                        absoluteFilePath: exporter.fileName
+                        onAbsoluteFilePathChanged: exporter.fileName = absoluteFilePath
                     }
 
                     Loader {

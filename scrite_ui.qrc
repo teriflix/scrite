@@ -43,5 +43,6 @@
         <file>qml/SceneTypeImage.qml</file>
         <file>qml/SplashScreen.qml</file>
         <file>qml/BoxShadow.qml</file>
+        <file>qml/FileSelector.qml</file>
     </qresource>
 </RCC>

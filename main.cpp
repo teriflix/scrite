@@ -13,6 +13,7 @@
 
 #include "application.h"
 
+#include <QMenuBar>
 #include <QShortcut>
 #include <QUndoStack>
 #include <QQuickView>
@@ -20,8 +21,8 @@
 #include <QQmlContext>
 #include <QQuickStyle>
 #include <QFontDatabase>
-#include <QMenuBar>
 
+#include "fileinfo.h"
 #include "undoredo.h"
 #include "completer.h"
 #include "ruleritem.h"
@@ -213,6 +214,8 @@ int main(int argc, char **argv)
 
     qmlRegisterType<TightBoundingBoxEvaluator>("Scrite", 1, 0, "TightBoundingBoxEvaluator");
     qmlRegisterUncreatableType<TightBoundingBoxItem>("Scrite", 1, 0, "TightBoundingBoxItem", "Use as attached property.");
+
+    qmlRegisterType<FileInfo>("Scrite", 1, 0, "FileInfo");
 
     NotificationManager notificationManager;
 

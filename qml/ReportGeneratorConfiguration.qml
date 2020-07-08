@@ -13,7 +13,7 @@
 
 import Scrite 1.0
 import QtQuick 2.13
-import QtQuick.Dialogs 1.3
+import QtQuick.Window 2.13
 import QtQuick.Layouts 1.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
@@ -66,7 +66,7 @@ Item {
                 y: 20
 
                 Text {
-                    font.pointSize: 20
+                    font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
                     font.bold: true
                     text: formInfo.title
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -75,7 +75,7 @@ Item {
 
                 Text {
                     text: formInfo.description
-                    font.pointSize: 10
+                    font.pointSize:  Screen.devicePixelRatio > 1 ? 14 : 10
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -158,27 +158,6 @@ Item {
                             implicitWidth: contentPanel.width
                             implicitHeight: contentPanel.height
 
-                            FileDialog {
-                                id: filePathDialog
-                                folder: {
-                                    if(scriteDocument.fileName !== "") {
-                                        var fileInfo = app.fileInfo(scriteDocument.fileName)
-                                        if(fileInfo.exists)
-                                            return "file:///" + fileInfo.absolutePath
-                                    }
-                                    return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-                                }
-                                selectFolder: false
-                                selectMultiple: false
-                                selectExisting: false
-                                nameFilters: {
-                                    if(generator.format === AbstractReportGenerator.AdobePDF)
-                                        return "Adobe PDF (*.pdf)"
-                                    return "Open Document Format (*.odt)"
-                                }
-                                onAccepted: generator.fileName = app.urlToLocalFile(fileUrl)
-                            }
-
                             ScrollView {
                                 id: firstTabScrollView
                                 anchors.fill: parent
@@ -190,50 +169,26 @@ Item {
 
                                     Item { width: parent.width; height: 10 }
 
-                                    Column {
-                                        width: parent.width
-                                        spacing: parent.spacing/2
-
-                                        Text {
-                                            width: parent.width
-                                            text: "Select a file to export into"
-                                        }
-
-                                        Row {
-                                            width: parent.width
-                                            spacing: parent.spacing
-
-                                            TextField {
-                                                id: filePathField
-                                                readOnly: true
-                                                width: parent.width - filePathDialogButton.width - parent.spacing
-                                                text: generator.fileName
+                                    FileSelector {
+                                        width: parent.width-20
+                                        label: "Select a file to export into"
+                                        absoluteFilePath: generator.fileName
+                                        allowedExtensions: [
+                                            {
+                                                "label": "Adobe PDF Format",
+                                                "suffix": "pdf",
+                                                "value": AbstractReportGenerator.AdobePDF,
+                                                "enabled": generator.supportsFormat(AbstractReportGenerator.AdobePDF)
+                                            },
+                                            {
+                                                "label": "Open Document Format",
+                                                "suffix": "odt",
+                                                "value": AbstractReportGenerator.OpenDocumentFormat,
+                                                "enabled": generator.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
                                             }
-
-                                            ToolButton3 {
-                                                id: filePathDialogButton
-                                                iconSource: "../icons/file/folder_open.png"
-                                                onClicked: filePathDialog.open()
-                                            }
-                                        }
-
-                                        Row {
-                                            spacing: 20
-
-                                            RadioButton2 {
-                                                text: "Adobe PDF Format"
-                                                checked: generator.format === AbstractReportGenerator.AdobePDF
-                                                onClicked: generator.format = AbstractReportGenerator.AdobePDF
-                                                enabled: generator.supportsFormat(AbstractReportGenerator.AdobePDF)
-                                            }
-
-                                            RadioButton2 {
-                                                text: "Open Document Format"
-                                                checked: generator.format === AbstractReportGenerator.OpenDocumentFormat
-                                                onClicked: generator.format = AbstractReportGenerator.OpenDocumentFormat
-                                                enabled: generator.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
-                                            }
-                                        }
+                                        ]
+                                        onSelectedExtensionChanged: generator.format = selectedExtension.value
+                                        onAbsoluteFilePathChanged: generator.fileName = absoluteFilePath
                                     }
 
                                     Repeater {

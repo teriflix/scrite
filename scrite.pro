@@ -29,6 +29,7 @@ HEADERS += \
     documentfilesystem.h \
     errorreport.h \
     eventfilter.h \
+    fileinfo.h \
     finaldraftexporter.h \
     finaldraftimporter.h \
     focustracker.h \
@@ -107,6 +108,7 @@ SOURCES += \
     documentfilesystem.cpp \
     errorreport.cpp \
     eventfilter.cpp \
+    fileinfo.cpp \
     finaldraftexporter.cpp \
     finaldraftimporter.cpp \
     focustracker.cpp \
