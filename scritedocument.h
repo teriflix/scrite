@@ -129,8 +129,8 @@ public:
     QStringList supportedExportFormats() const;
     Q_INVOKABLE QString exportFormatFileSuffix(const QString &format) const;
 
-    Q_PROPERTY(QStringList supportedReports READ supportedReports CONSTANT)
-    QStringList supportedReports() const;
+    Q_PROPERTY(QJsonArray supportedReports READ supportedReports CONSTANT)
+    QJsonArray supportedReports() const;
 
     Q_INVOKABLE QString reportFileSuffix() const;
 

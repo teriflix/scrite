@@ -43,6 +43,7 @@ public:
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
+    Q_CLASSINFO("watermark_FieldGroup", "Basic")
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled. (PDF Only)")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
     Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
@@ -50,6 +51,7 @@ public:
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();
 
+    Q_CLASSINFO("comment_FieldGroup", "Basic")
     Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer. (PDF Only)")
     Q_CLASSINFO("comment_FieldEditor", "TextBox")
     Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)

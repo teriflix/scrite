@@ -446,6 +446,41 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
     ret.insert("title", queryClassInfo("Title"));
 
     QJsonArray fields;
+    QJsonArray groupedFields;
+
+    auto addFieldToGroup = [&groupedFields,queryClassInfo](const QJsonObject &field) {
+        const QString fieldGroup = field.value("group").toString();
+        int index = -1;
+        if(fieldGroup.isEmpty() && !groupedFields.isEmpty())
+            index = 0;
+        else {
+            for(int i=0; i<groupedFields.size(); i++) {
+                QJsonObject groupInfo = groupedFields.at(i).toObject();
+                if(groupInfo.value("name").toString() == fieldGroup) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+
+        QJsonObject groupInfo;
+        if(index < 0) {
+            const QString descKey = fieldGroup + QStringLiteral("_Description");
+            groupInfo.insert("name", fieldGroup);
+            groupInfo.insert("description", queryClassInfo(qPrintable(descKey)));
+        } else {
+            groupInfo = groupedFields.at(index).toObject();
+        }
+
+        QJsonArray fields = groupInfo.value("fields").toArray();
+        fields.append(field);
+        groupInfo.insert("fields", fields);
+        if(index < 0)
+            groupedFields.append(groupInfo);
+        else
+            groupedFields.replace(index, groupInfo);
+    };
+
     for(int i=from->propertyOffset(); i<mo->propertyCount(); i++)
     {
         const QMetaProperty prop = mo->property(i);
@@ -460,6 +495,7 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         field.insert("min", queryPropertyInfo(prop, "FieldMinValue"));
         field.insert("max", queryPropertyInfo(prop, "FieldMaxValue"));
         field.insert("ideal", queryPropertyInfo(prop, "FieldDefaultValue"));
+        field.insert("group", queryPropertyInfo(prop, "FieldGroup"));
 
         const QString fieldEnum = queryPropertyInfo(prop, "FieldEnum");
         if( !fieldEnum.isEmpty() )
@@ -486,9 +522,11 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         }
 
         fields.append(field);
+        addFieldToGroup(field);
     }
 
     ret.insert("fields", fields);
+    ret.insert("groupedFields", groupedFields);
 
     return ret;
 }

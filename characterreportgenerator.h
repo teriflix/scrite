@@ -20,6 +20,7 @@ class CharacterReportGenerator : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Report")
+    Q_CLASSINFO("Description", "Generates a report with dialogues and notes for one or more selected characters.")
 
 public:
     Q_INVOKABLE CharacterReportGenerator(QObject *parent=nullptr);
@@ -27,6 +28,7 @@ public:
 
     bool requiresConfiguration() const { return true; }
 
+    Q_CLASSINFO("characterNames_FieldGroup", "Characters")
     Q_CLASSINFO("characterNames_FieldLabel", "Character names")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
@@ -34,6 +36,7 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_CLASSINFO("includeSceneHeadings_FieldGroup", "Characters")
     Q_CLASSINFO("includeSceneHeadings_FieldLabel", "Include scene headings")
     Q_CLASSINFO("includeSceneHeadings_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneHeadings READ isIncludeSceneHeadings WRITE setIncludeSceneHeadings NOTIFY includeSceneHeadingsChanged)
@@ -41,6 +44,7 @@ public:
     bool isIncludeSceneHeadings() const { return m_includeSceneHeadings; }
     Q_SIGNAL void includeSceneHeadingsChanged();
 
+    Q_CLASSINFO("includeDialogues_FieldGroup", "Characters")
     Q_CLASSINFO("includeDialogues_FieldLabel", "Include dialogues")
     Q_CLASSINFO("includeDialogues_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeDialogues READ isIncludeDialogues WRITE setIncludeDialogues NOTIFY includeDialoguesChanged)
@@ -48,6 +52,7 @@ public:
     bool isIncludeDialogues() const { return m_includeDialogues; }
     Q_SIGNAL void includeDialoguesChanged();
 
+    Q_CLASSINFO("includeNotes_FieldGroup", "Characters")
     Q_CLASSINFO("includeNotes_FieldLabel", "Include character notes")
     Q_CLASSINFO("includeNotes_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeNotes READ includeNotes WRITE setIncludeNotes NOTIFY includeNotesChanged)

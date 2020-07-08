@@ -372,15 +372,40 @@ Item {
                                 id: reportsMenu
                                 title: "Reports"
                                 enabled: scriteDocument.screenplay.elementCount > 0
-                                width: 250
+                                width: 300
 
                                 Repeater {
                                     model: scriteDocument.supportedReports
 
                                     MenuItem2 {
-                                        text: modelData
+                                        leftPadding: 15
+                                        rightPadding: 15
+                                        topPadding: 5
+                                        bottomPadding: 5
+                                        width: reportsMenu.width
+                                        height: 65
+                                        contentItem: Column {
+                                            id: menuContent
+                                            width: reportsMenu.width - 30
+                                            spacing: 5
+
+                                            Text {
+                                                font.bold: true
+                                                font.pixelSize: 16
+                                                text: modelData.name
+                                            }
+
+                                            Text {
+                                                text: modelData.description
+                                                width: parent.width
+                                                wrapMode: Text.WordWrap
+                                                font.pixelSize: 12
+                                                font.italic: true
+                                            }
+                                        }
+
                                         onTriggered: {
-                                            reportGeneratorTimer.reportArgs = modelData
+                                            reportGeneratorTimer.reportArgs = modelData.name
                                         }
                                     }
                                 }

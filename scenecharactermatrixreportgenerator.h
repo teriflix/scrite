@@ -20,6 +20,7 @@ class SceneCharacterMatrixReportGenerator : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Scene Character Matrix")
+    Q_CLASSINFO("Description", "Generates a table of scene names and characters.")
 
 public:
     Q_INVOKABLE SceneCharacterMatrixReportGenerator(QObject *parent=nullptr);
@@ -36,6 +37,7 @@ public:
     Q_CLASSINFO("Type_CharacterVsScene", "Character vs Scene")
     Q_CLASSINFO("Type_SceneVsCharacter", "Scene Vs Character")
 
+    Q_CLASSINFO("type_FieldGroup", "Characters")
     Q_CLASSINFO("type_FieldLabel", "Select type of matrix to generate")
     Q_CLASSINFO("type_FieldEditor", "EnumSelector")
     Q_CLASSINFO("type_FieldEnum", "Type")
@@ -44,6 +46,7 @@ public:
     int type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
+    Q_CLASSINFO("characterNames_FieldGroup", "Characters")
     Q_CLASSINFO("characterNames_FieldLabel", "Character names")
     Q_CLASSINFO("characterNames_FieldNote", "If no characters are selected, then the report is generted for all characters in the screenplay.")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")

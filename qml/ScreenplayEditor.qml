@@ -1867,6 +1867,16 @@ Rectangle {
     }
 
     function requestCharacterMenu(characterName) {
+        if(characterMenu.characterReports.length === 0) {
+            var reports = scriteDocument.supportedReports
+            var chReports = []
+            reports.forEach( function(item) {
+                if(item.name.indexOf('Character') === 0)
+                    chReports.push(item)
+            })
+            characterMenu.characterReports = chReports
+        }
+
         characterMenu.characterName = characterName
         characterMenu.popup()
     }
@@ -1875,24 +1885,42 @@ Rectangle {
         id: characterMenu
         width: 300
         property string characterName
+        property var characterReports: []
 
-        MenuItem2 {
-            text: "Generate Character Report"
-            enabled: characterMenu.characterName !== ""
-            onClicked: {
-                reportGeneratorTimer.reportArgs = {"reportName": "Character Report", "configuration": {"characterNames": [characterMenu.characterName]}}
-                characterMenu.close()
-                characterMenu.characterName = ""
-            }
-        }
+        Repeater {
+            model: characterMenu.characterReports
 
-        MenuItem2 {
-            text: "Generate Character Screenplay"
-            enabled: characterMenu.characterName !== ""
-            onClicked: {
-                reportGeneratorTimer.reportArgs = {"reportName": "Character Screenplay", "configuration": {"characterNames": [characterMenu.characterName]}}
-                characterMenu.close()
-                characterMenu.characterName = ""
+            MenuItem2 {
+                leftPadding: 15
+                rightPadding: 15
+                topPadding: 5
+                bottomPadding: 5
+                width: reportsMenu.width
+                height: 65
+                contentItem: Column {
+                    id: menuContent
+                    width: characterMenu.width - 30
+                    spacing: 5
+
+                    Text {
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: modelData.name
+                    }
+
+                    Text {
+                        text: modelData.description
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        font.italic: true
+                    }
+                }
+
+                onClicked: {
+                    reportGeneratorTimer.reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
+                    characterMenu.close()
+                    characterMenu.characterName = ""
+                }
             }
         }
     }

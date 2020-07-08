@@ -20,11 +20,13 @@ class ScreenplaySubsetReport : public AbstractScreenplaySubsetReport
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Screenplay Subset")
+    Q_CLASSINFO("Description", "Generates screenplay with only a subset of scenes selected by you.")
 
 public:
     Q_INVOKABLE ScreenplaySubsetReport(QObject *parent=nullptr);
     ~ScreenplaySubsetReport();
 
+    Q_CLASSINFO("sceneNumbers_FieldGroup", "Scenes")
     Q_CLASSINFO("sceneNumbers_FieldLabel", "Locations")
     Q_CLASSINFO("sceneNumbers_FieldEditor", "MultipleSceneSelector")
     Q_PROPERTY(QList<int> sceneNumbers READ sceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
@@ -37,6 +39,9 @@ protected:
     bool includeScreenplayElement(const ScreenplayElement *) const;
     QString screenplaySubtitle() const;
     void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc);
+
+    // AbstractScreenplayTextDocumentInjectionInterface interface
+    void inject(QTextCursor &, InjectLocation);
 
 private:
     QList<int> m_sceneNumbers;

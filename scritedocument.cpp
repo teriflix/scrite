@@ -462,12 +462,28 @@ QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
     return QString::fromLatin1(classInfo.value());
 }
 
-QStringList ScriteDocument::supportedReports() const
+QJsonArray ScriteDocument::supportedReports() const
 {
     static QList<QByteArray> keys = deviceIOFactories->ReportGeneratorFactory.keys();
-    static QStringList reports;
+    static QJsonArray reports;
     if(reports.isEmpty())
-        Q_FOREACH(QByteArray key, keys) reports << key;
+    {
+        Q_FOREACH(QByteArray key, keys)
+        {
+            QJsonObject item;
+            item.insert("name", QString::fromLatin1(key));
+
+            const QMetaObject *mo = deviceIOFactories->ReportGeneratorFactory.find(key);
+            const int ciIndex = mo->indexOfClassInfo("Description");
+            if(ciIndex >= 0)
+                item.insert("description", QString::fromLatin1(mo->classInfo(ciIndex).value()));
+            else
+                item.insert("description", QString::fromLatin1(key));
+
+            reports.append(item);
+        }
+    }
+
     return reports;
 }
 

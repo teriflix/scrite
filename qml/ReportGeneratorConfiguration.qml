@@ -14,15 +14,18 @@
 import Scrite 1.0
 import QtQuick 2.13
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.13
 import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.12
 
 Item {
     id: configurationBox
     property AbstractReportGenerator generator
-    property var formInfo: {"title": "Unknown", "fields": []}
+    property var formInfo: {"title": "Unknown", "groupedFields": []}
 
     width: 700
     height: formInfo.fields.length > 0 ? 700 : 275
+    readonly property color dialogColor: primaryColors.c300.background
 
     Component.onCompleted: {
         var reportName = typeof modalDialog.arguments === "string" ? modalDialog.arguments : modalDialog.arguments.reportName
@@ -56,131 +59,229 @@ Item {
         anchors.fill: parent
         active: generator
         sourceComponent: Item {
-            FileDialog {
-                id: filePathDialog
-                folder: {
-                    if(scriteDocument.fileName !== "") {
-                        var fileInfo = app.fileInfo(scriteDocument.fileName)
-                        if(fileInfo.exists)
-                            return "file:///" + fileInfo.absolutePath
-                    }
-                    return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+            Column {
+                id: formTitle
+                width: parent.width
+                spacing: 10
+                y: 20
+
+                Text {
+                    font.pointSize: 24
+                    font.bold: true
+                    text: formInfo.title
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: primaryColors.c300.text
                 }
-                selectFolder: false
-                selectMultiple: false
-                selectExisting: false
-                nameFilters: {
-                    if(generator.format === AbstractReportGenerator.AdobePDF)
-                        return "Adobe PDF (*.pdf)"
-                    return "Open Document Format (*.odt)"
+
+                Text {
+                    text: "Configure options for your report using the options in the tabs below."
+                    width: parent.width * 0.7
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: primaryColors.c300.text
                 }
-                onAccepted: generator.fileName = app.urlToLocalFile(fileUrl)
             }
 
-            Rectangle {
-                anchors.fill: formView
-                anchors.margins: -3
-                visible: formView.contentHeight > formView.height
-                color: primaryColors.c10.background
-                border.width: 1
-                border.color: primaryColors.borderColor
-            }
-
-            ScrollView {
-                id: formView
+            Item {
+                id: formOptionsArea
+                anchors.top: formTitle.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.top: parent.top
                 anchors.bottom: buttonRow.top
-                anchors.margins: 20
+                anchors.topMargin: 15
                 anchors.bottomMargin: 10
-                clip: true
 
-                property bool scrollBarRequired: formView.height < formView.contentHeight
-                ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                ScrollBar.vertical.opacity: ScrollBar.vertical.active ? 1 : 0.2
-
-                Column {
-                    width: formView.width - (formView.scrollBarRequired ? 17 : 0)
-                    spacing: 5
-
-                    Text {
-                        font.pointSize: 24
-                        font.bold: true
-                        text: formInfo.title
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Item { width: parent.width; height: 20 }
-
-                    Column {
-                        width: parent.width
-                        spacing: parent.spacing/2
-
-                        Text {
-                            width: parent.width
-                            text: "Select a file to export into"
-                        }
-
-                        Row {
-                            width: parent.width
-                            spacing: parent.spacing
-
-                            TextField {
-                                id: filePathField
-                                readOnly: true
-                                width: parent.width - filePathDialogButton.width - parent.spacing
-                                text: generator.fileName
-                            }
-
-                            ToolButton2 {
-                                id: filePathDialogButton
-                                text: "..."
-                                suggestedWidth: 35
-                                suggestedHeight: 35
-                                onClicked: filePathDialog.open()
-                                hoverEnabled: false
-                            }
-                        }
-
-                        Row {
-                            spacing: 20
-
-                            RadioButton2 {
-                                text: "Adobe PDF Format"
-                                checked: generator.format === AbstractReportGenerator.AdobePDF
-                                onClicked: generator.format = AbstractReportGenerator.AdobePDF
-                                enabled: generator.supportsFormat(AbstractReportGenerator.AdobePDF)
-                            }
-
-                            RadioButton2 {
-                                text: "Open Document Format"
-                                checked: generator.format === AbstractReportGenerator.OpenDocumentFormat
-                                onClicked: generator.format = AbstractReportGenerator.OpenDocumentFormat
-                                enabled: generator.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
-                            }
-                        }
-                    }
-
-                    Item { width: parent.width; height: 20 }
+                Row {
+                    id: tabBar
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    property int currentIndex: 0
 
                     Repeater {
-                        model: formInfo.fields
+                        id: tabRepeater
+                        model: formInfo.groupedFields
 
-                        Loader {
-                            width: formView.width
-                            active: true
-                            sourceComponent: loadFieldEditor(modelData.editor)
-                            onItemChanged: {
-                                if(item)
-                                    item.fieldInfo = modelData
+                        Rectangle {
+                            width: tabText.contentWidth + 40
+                            height: tabText.contentHeight + 30
+                            color: selected ? "white" : Qt.rgba(0,0,0,0)
+                            property bool selected: tabBar.currentIndex === index
+
+                            Rectangle {
+                                height: 4
+                                anchors.top: parent.top
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                color: accentColors.c500.background
+                                visible: parent.selected
+                            }
+
+                            Text {
+                                id: tabText
+                                anchors.centerIn: parent
+                                font.pixelSize: 16
+                                text: modelData.name
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: tabBar.currentIndex = index
                             }
                         }
                     }
+                }
 
-                    Item {
-                        width: parent.width
-                        height: 40
+                Rectangle {
+                    id: contentPanel
+                    anchors.top: tabBar.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    clip: true
+
+                    StackLayout {
+                        currentIndex: tabBar.currentIndex
+
+                        Item {
+                            id: firstTab
+                            implicitWidth: contentPanel.width
+                            implicitHeight: contentPanel.height
+
+                            FileDialog {
+                                id: filePathDialog
+                                folder: {
+                                    if(scriteDocument.fileName !== "") {
+                                        var fileInfo = app.fileInfo(scriteDocument.fileName)
+                                        if(fileInfo.exists)
+                                            return "file:///" + fileInfo.absolutePath
+                                    }
+                                    return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+                                }
+                                selectFolder: false
+                                selectMultiple: false
+                                selectExisting: false
+                                nameFilters: {
+                                    if(generator.format === AbstractReportGenerator.AdobePDF)
+                                        return "Adobe PDF (*.pdf)"
+                                    return "Open Document Format (*.odt)"
+                                }
+                                onAccepted: generator.fileName = app.urlToLocalFile(fileUrl)
+                            }
+
+                            ScrollView {
+                                id: firstTabScrollView
+                                anchors.fill: parent
+                                anchors.leftMargin: 20
+
+                                Column {
+                                    spacing: 10
+                                    width: firstTabScrollView.width
+
+                                    Item { width: parent.width; height: 10 }
+
+                                    Column {
+                                        width: parent.width
+                                        spacing: parent.spacing/2
+
+                                        Text {
+                                            width: parent.width
+                                            text: "Select a file to export into"
+                                        }
+
+                                        Row {
+                                            width: parent.width
+                                            spacing: parent.spacing
+
+                                            TextField {
+                                                id: filePathField
+                                                readOnly: true
+                                                width: parent.width - filePathDialogButton.width - parent.spacing
+                                                text: generator.fileName
+                                            }
+
+                                            ToolButton2 {
+                                                id: filePathDialogButton
+                                                text: "..."
+                                                suggestedWidth: 35
+                                                suggestedHeight: 35
+                                                onClicked: filePathDialog.open()
+                                                hoverEnabled: false
+                                            }
+                                        }
+
+                                        Row {
+                                            spacing: 20
+
+                                            RadioButton2 {
+                                                text: "Adobe PDF Format"
+                                                checked: generator.format === AbstractReportGenerator.AdobePDF
+                                                onClicked: generator.format = AbstractReportGenerator.AdobePDF
+                                                enabled: generator.supportsFormat(AbstractReportGenerator.AdobePDF)
+                                            }
+
+                                            RadioButton2 {
+                                                text: "Open Document Format"
+                                                checked: generator.format === AbstractReportGenerator.OpenDocumentFormat
+                                                onClicked: generator.format = AbstractReportGenerator.OpenDocumentFormat
+                                                enabled: generator.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
+                                            }
+                                        }
+                                    }
+
+                                    Repeater {
+                                        model: formInfo.groupedFields[0].fields
+
+                                        Loader {
+                                            width: parent.width
+                                            active: true
+                                            sourceComponent: loadFieldEditor(modelData.editor)
+                                            onItemChanged: {
+                                                if(item)
+                                                    item.fieldInfo = modelData
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Repeater {
+                            model: formInfo.groupedFields.length-1
+
+                            Item {
+                                id: subsequentTab
+                                implicitWidth: contentPanel.width
+                                implicitHeight: contentPanel.height
+
+                                ScrollView {
+                                    id: subsequenTabScrollView
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 20
+
+                                    Column {
+                                        spacing: 5
+                                        width: subsequenTabScrollView.width
+
+                                        Item { width: parent.width; height: 10 }
+
+                                        Repeater {
+                                            model: formInfo.groupedFields[index+1].fields
+
+                                            Loader {
+                                                width: parent.width
+                                                active: true
+                                                sourceComponent: loadFieldEditor(modelData.editor)
+                                                onItemChanged: {
+                                                    if(item)
+                                                        item.fieldInfo = modelData
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -189,11 +290,14 @@ Item {
                 id: buttonRow
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.margins: 20
+                anchors.rightMargin: 20
+                anchors.bottomMargin: 20
                 spacing: 20
 
                 Button2 {
                     text: "Cancel"
+                    Material.background: primaryColors.c100.background
+                    Material.foreground: primaryColors.c100.text
                     onClicked: {
                         generator.discard()
                         modalDialog.close()
@@ -214,6 +318,9 @@ Item {
                 Button2 {
                     enabled: filePathField.text !== ""
                     text: "Generate"
+                    Material.background: primaryColors.c100.background
+                    Material.foreground: primaryColors.c100.text
+
                     onClicked: {
                         if(generator.generate())
                             app.revealFileOnDesktop(generator.fileName)
@@ -250,7 +357,7 @@ Item {
                 if(fieldInfo)
                     generator.setConfigurationValue(fieldInfo.name, characterNames)
             }
-            height: fieldTitleText.height + (characterNameListView.visible ? 300 : 0)
+            height: fieldTitleText.height + (characterNameListView.visible ? 275 : 0)
 
             onFieldInfoChanged: {
                 characterNameListView.selectedCharacters = generator.getConfigurationValue(fieldInfo.name)
@@ -557,12 +664,11 @@ Item {
                     clip: true
                     delegate: CheckBox2 {
                         width: sceneListView.width-1
+                        font.family: scriteDocument.formatting.defaultFont.family
                         text: {
                             var scene = screenplayElement.scene
                             if(scene && scene.heading.enabled)
                                 return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
-                            if(screenplayElementType === ScreenplayElement.BreakElementType)
-                                return screenplayElement.sceneID
                             return "NO SCENE HEADING"
                         }
                         enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
