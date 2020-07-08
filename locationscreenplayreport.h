@@ -27,7 +27,7 @@ public:
     ~LocationScreenplayReport();
 
     Q_CLASSINFO("locations_FieldGroup", "Locations")
-    Q_CLASSINFO("locations_FieldLabel", "Locations")
+    Q_CLASSINFO("locations_FieldLabel", "Locations to include in the report")
     Q_CLASSINFO("locations_FieldEditor", "MultipleLocationSelector")
     Q_PROPERTY(QStringList locations READ locations WRITE setLocations NOTIFY locationsChanged)
     void setLocations(const QStringList &val);

@@ -27,8 +27,9 @@ public:
     ~ScreenplaySubsetReport();
 
     Q_CLASSINFO("sceneNumbers_FieldGroup", "Scenes")
-    Q_CLASSINFO("sceneNumbers_FieldLabel", "Locations")
+    Q_CLASSINFO("sceneNumbers_FieldLabel", "Scenes to include in the report")
     Q_CLASSINFO("sceneNumbers_FieldEditor", "MultipleSceneSelector")
+    Q_CLASSINFO("sceneNumbers_FieldNote", "If no scenes are selected, then the report is generted for all scenes in the screenplay.")
     Q_PROPERTY(QList<int> sceneNumbers READ sceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
     void setSceneNumbers(const QList<int> &val);
     QList<int> sceneNumbers() const { return m_sceneNumbers; }

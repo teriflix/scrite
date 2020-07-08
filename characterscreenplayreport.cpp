@@ -34,6 +34,15 @@ void CharacterScreenplayReport::setIncludeNotes(bool val)
     emit includeNotesChanged();
 }
 
+void CharacterScreenplayReport::setHighlightDialogues(bool val)
+{
+    if(m_highlightDialogues == val)
+        return;
+
+    m_highlightDialogues = val;
+    emit highlightDialoguesChanged();
+}
+
 void CharacterScreenplayReport::setCharacterNames(const QStringList &val)
 {
     if(m_characterNames == val)
@@ -75,7 +84,8 @@ QString CharacterScreenplayReport::screenplaySubtitle() const
 
 void CharacterScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDocument &stDoc)
 {
-    stDoc.setHighlightDialoguesOf(m_characterNames);
+    if(m_highlightDialogues)
+        stDoc.setHighlightDialoguesOf(m_characterNames);
 }
 
 void CharacterScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)

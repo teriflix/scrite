@@ -47,7 +47,7 @@ public:
     Q_SIGNAL void typeChanged();
 
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
-    Q_CLASSINFO("characterNames_FieldLabel", "Character names")
+    Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldNote", "If no characters are selected, then the report is generted for all characters in the screenplay.")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)

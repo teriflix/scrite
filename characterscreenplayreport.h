@@ -34,8 +34,16 @@ public:
     bool includeNotes() const { return m_includeNotes; }
     Q_SIGNAL void includeNotesChanged();
 
+    Q_CLASSINFO("highlightDialogues_FieldGroup", "Characters")
+    Q_CLASSINFO("highlightDialogues_FieldLabel", "Highlight dialogues in yellow background")
+    Q_CLASSINFO("highlightDialogues_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool highlightDialogues READ isHighlightDialogues WRITE setHighlightDialogues NOTIFY highlightDialoguesChanged)
+    void setHighlightDialogues(bool val);
+    bool isHighlightDialogues() const { return m_highlightDialogues; }
+    Q_SIGNAL void highlightDialoguesChanged();
+
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
-    Q_CLASSINFO("characterNames_FieldLabel", "Character names")
+    Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);
@@ -57,6 +65,7 @@ private:
     bool m_includeNotes;
     QStringList m_characterNames;
     bool m_includeSceneIcons = true;
+    bool m_highlightDialogues = true;
     bool m_includeSceneNumbers = true;
     bool m_printEachSceneOnANewPage = false;    
 };

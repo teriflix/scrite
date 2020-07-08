@@ -23,7 +23,7 @@ Item {
     property AbstractReportGenerator generator
     property var formInfo: {"title": "Unknown", "description": "", "groupedFields": []}
 
-    width: 700
+    width: 750
     height: formInfo.fields.length > 0 ? 700 : 275
     readonly property color dialogColor: primaryColors.c300.background
 
@@ -66,7 +66,7 @@ Item {
                 y: 20
 
                 Text {
-                    font.pointSize: 24
+                    font.pointSize: 20
                     font.bold: true
                     text: formInfo.title
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -75,7 +75,7 @@ Item {
 
                 Text {
                     text: formInfo.description
-                    font.pointSize: 14
+                    font.pointSize: 10
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -93,42 +93,50 @@ Item {
                 anchors.topMargin: 15
                 anchors.bottomMargin: 10
 
-                Row {
-                    id: tabBar
-                    anchors.top: parent.top
-                    anchors.left: parent.left
+                Rectangle {
+                    id: pageList
+                    width: 175
+                    height: parent.height
+                    color: primaryColors.c700.background
                     property int currentIndex: 0
-                    visible: tabRepeater.count > 1
+                    visible: pageRepeater.count > 1
 
-                    Repeater {
-                        id: tabRepeater
-                        model: formInfo.groupedFields
+                    Column {
+                        width: parent.width
 
-                        Rectangle {
-                            width: tabText.contentWidth + 40
-                            height: tabText.contentHeight + 30
-                            color: selected ? "white" : Qt.rgba(0,0,0,0)
-                            property bool selected: tabBar.currentIndex === index
+                        Repeater {
+                            id: pageRepeater
+                            model: formInfo.groupedFields
 
                             Rectangle {
-                                height: 4
-                                anchors.top: parent.top
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                color: accentColors.c500.background
-                                visible: parent.selected
-                            }
+                                width: parent.width
+                                height: 60
+                                color: pageList.currentIndex === index ? contentPanel.color : primaryColors.c10.background
 
-                            Text {
-                                id: tabText
-                                anchors.centerIn: parent
-                                font.pixelSize: 16
-                                text: modelData.name
-                            }
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    font.pixelSize: 18
+                                    font.bold: pageList.currentIndex === index
+                                    width: parent.width-34
+                                    horizontalAlignment: Text.AlignRight
+                                    text: modelData.name
+                                    elide: Text.ElideRight
+                                    color: pageList.currentIndex === index ? "black" : primaryColors.c700.text
+                                }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: tabBar.currentIndex = index
+                                Image {
+                                    width: 24; height: 24
+                                    source: "../icons/navigation/arrow_right.png"
+                                    visible: pageList.currentIndex === index
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: 10
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: pageList.currentIndex = index
+                                }
                             }
                         }
                     }
@@ -136,14 +144,14 @@ Item {
 
                 Rectangle {
                     id: contentPanel
-                    anchors.top: tabBar.visible ? tabBar.bottom : parent.top
-                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.left: pageList.visible ? pageList.right : parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     clip: true
 
                     StackLayout {
-                        currentIndex: tabBar.currentIndex
+                        currentIndex: pageList.currentIndex
 
                         Item {
                             id: firstTab
@@ -202,13 +210,10 @@ Item {
                                                 text: generator.fileName
                                             }
 
-                                            ToolButton2 {
+                                            ToolButton3 {
                                                 id: filePathDialogButton
-                                                text: "..."
-                                                suggestedWidth: 35
-                                                suggestedHeight: 35
+                                                iconSource: "../icons/file/folder_open.png"
                                                 onClicked: filePathDialog.open()
-                                                hoverEnabled: false
                                             }
                                         }
 
@@ -376,8 +381,6 @@ Item {
                     Text {
                         id: sceneCharactersListHeading
                         text: fieldInfo.label + ": "
-                        font.bold: true
-                        font.pointSize: 12
                         topPadding: 5
                         bottomPadding: 5
                     }
@@ -480,6 +483,14 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: fieldInfo.label
+                }
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    text: fieldInfo.note
+                    font.pixelSize: 10
+                    font.italic: true
                 }
 
                 Text {
@@ -647,9 +658,11 @@ Item {
             }
 
             Text {
-                font.italic: true
+                width: parent.width
                 wrapMode: Text.WordWrap
-                text: "(Select one or more locations from the list below)"
+                text: fieldInfo.note
+                font.pixelSize: 10
+                font.italic: true
             }
 
             ScrollView {

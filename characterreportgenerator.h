@@ -29,7 +29,7 @@ public:
     bool requiresConfiguration() const { return true; }
 
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
-    Q_CLASSINFO("characterNames_FieldLabel", "Character names")
+    Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);
