@@ -6,7 +6,19 @@ DEFINES += PHTRANSLATE_STATICLIB
 
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
-INCLUDEPATH += . src/
+INCLUDEPATH += . \
+        ./src \
+        ./src/core \
+        ./src/importers \
+        ./src/exporters \
+        ./src/printing \
+        ./src/quick \
+        ./src/quick/objects \
+        ./src/quick/items \
+        ./src/utils \
+        ./src/document \
+        ./src/interfaces \
+        ./src/reports
 
 HEADERS += \
     3rdparty/phtranslator/LanguageCodes.h \
@@ -14,47 +26,6 @@ HEADERS += \
     3rdparty/phtranslator/PhTranslator.h \
     3rdparty/phtranslator/stdafx.h \
     3rdparty/phtranslator/targetver.h \
-    src/abstractdeviceio.h \
-    src/abstractexporter.h \
-    src/abstractimporter.h \
-    src/abstractreportgenerator.h \
-    src/abstractscreenplaysubsetreport.h \
-    src/abstractshapeitem.h \
-    src/abstracttextdocumentexporter.h \
-    src/aggregation.h \
-    src/application.h \
-    src/autoupdate.h \
-    src/characterreportgenerator.h \
-    src/characterscreenplayreport.h \
-    src/completer.h \
-    src/delayedpropertybinder.h \
-    src/documentfilesystem.h \
-    src/errorreport.h \
-    src/eventfilter.h \
-    src/fileinfo.h \
-    src/finaldraftexporter.h \
-    src/finaldraftimporter.h \
-    src/focustracker.h \
-    src/formatting.h \
-    src/fountainexporter.h \
-    src/fountainimporter.h \
-    src/garbagecollector.h \
-    src/genericarraymodel.h \
-    src/gridbackgrounditem.h \
-    src/hourglass.h \
-    src/htmlexporter.h \
-    src/htmlimporter.h \
-    src/imageprinter.h \
-    src/locationreportgenerator.h \
-    src/locationscreenplayreport.h \
-    src/materialcolors.h \
-    src/modifiable.h \
-    src/note.h \
-    src/notification.h \
-    src/notificationmanager.h \
-    src/odtexporter.h \
-    src/painterpathitem.h \
-    src/pdfexporter.h \
     3rdparty/poly2tri/common/shapes.h \
     3rdparty/poly2tri/common/utils.h \
     3rdparty/poly2tri/poly2tri.h \
@@ -62,107 +33,148 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
-    src/polygontesselator.h \
-    src/progressreport.h \
-    src/qobjectfactory.h \
-    src/qobjectserializer.h \
-    src/qtextdocumentpagedprinter.h \
-    src/resetonchange.h \
-    src/ruleritem.h \
-    src/scene.h \
-    src/scenecharactermatrixreportgenerator.h \
-    src/screenplay.h \
-    src/screenplayadapter.h \
-    src/screenplaysubsetreport.h \
-    src/screenplaytextdocument.h \
-    src/scritedocument.h \
-    src/searchengine.h \
-    src/simpletimer.h \
-    src/structure.h \
-    src/structureexporter.h \
-    src/textexporter.h \
-    src/textshapeitem.h \
-    src/tightboundingbox.h \
-    src/timeprofiler.h \
-    src/standardpaths.h \
-    src/trackobject.h \
-    src/transliteration.h \
-    src/undoredo.h
+    src/printing/qtextdocumentpagedprinter.h \
+    src/printing/imageprinter.h \
+    src/quick/objects/delayedpropertybinder.h \
+    src/quick/objects/notification.h \
+    src/quick/objects/fileinfo.h \
+    src/quick/objects/searchengine.h \
+    src/quick/objects/completer.h \
+    src/quick/objects/eventfilter.h \
+    src/quick/objects/polygontesselator.h \
+    src/quick/objects/trackobject.h \
+    src/quick/objects/notificationmanager.h \
+    src/quick/objects/materialcolors.h \
+    src/quick/objects/errorreport.h \
+    src/quick/objects/resetonchange.h \
+    src/quick/objects/focustracker.h \
+    src/quick/objects/standardpaths.h \
+    src/quick/objects/aggregation.h \
+    src/quick/items/textshapeitem.h \
+    src/quick/items/tightboundingbox.h \
+    src/quick/items/ruleritem.h \
+    src/quick/items/abstractshapeitem.h \
+    src/quick/items/gridbackgrounditem.h \
+    src/quick/items/painterpathitem.h \
+    src/utils/timeprofiler.h \
+    src/utils/garbagecollector.h \
+    src/utils/hourglass.h \
+    src/utils/simpletimer.h \
+    src/utils/genericarraymodel.h \
+    src/utils/qobjectfactory.h \
+    src/utils/qobjectserializer.h \
+    src/utils/modifiable.h \
+    src/document/formatting.h \
+    src/document/transliteration.h \
+    src/document/scritedocument.h \
+    src/document/documentfilesystem.h \
+    src/document/structure.h \
+    src/document/screenplaytextdocument.h \
+    src/document/undoredo.h \
+    src/document/screenplayadapter.h \
+    src/document/note.h \
+    src/document/screenplay.h \
+    src/document/scene.h \
+    src/core/application.h \
+    src/core/autoupdate.h \
+    src/exporters/finaldraftexporter.h \
+    src/exporters/structureexporter.h \
+    src/exporters/textexporter.h \
+    src/exporters/fountainexporter.h \
+    src/exporters/htmlexporter.h \
+    src/exporters/pdfexporter.h \
+    src/exporters/odtexporter.h \
+    src/importers/fountainimporter.h \
+    src/importers/finaldraftimporter.h \
+    src/importers/htmlimporter.h \
+    src/interfaces/abstracttextdocumentexporter.h \
+    src/interfaces/abstractreportgenerator.h \
+    src/interfaces/abstractexporter.h \
+    src/interfaces/abstractimporter.h \
+    src/interfaces/abstractdeviceio.h \
+    src/interfaces/abstractscreenplaysubsetreport.h \
+    src/reports/characterscreenplayreport.h \
+    src/reports/progressreport.h \
+    src/reports/screenplaysubsetreport.h \
+    src/reports/locationscreenplayreport.h \
+    src/reports/characterreportgenerator.h \
+    src/reports/scenecharactermatrixreportgenerator.h \
+    src/reports/locationreportgenerator.h 
 
 SOURCES += \
+    main.cpp \
     3rdparty/phtranslator/PhTranslateLib.cpp \
     3rdparty/phtranslator/PhTranslator.cpp \
     3rdparty/phtranslator/stdafx.cpp \
-    src/abstractdeviceio.cpp \
-    src/abstractexporter.cpp \
-    src/abstractimporter.cpp \
-    src/abstractreportgenerator.cpp \
-    src/abstractscreenplaysubsetreport.cpp \
-    src/abstractshapeitem.cpp \
-    src/abstracttextdocumentexporter.cpp \
-    src/aggregation.cpp \
-    src/application.cpp \
-    src/autoupdate.cpp \
-    src/characterreportgenerator.cpp \
-    src/characterscreenplayreport.cpp \
-    src/completer.cpp \
-    src/delayedpropertybinder.cpp \
-    src/documentfilesystem.cpp \
-    src/errorreport.cpp \
-    src/eventfilter.cpp \
-    src/fileinfo.cpp \
-    src/finaldraftexporter.cpp \
-    src/finaldraftimporter.cpp \
-    src/focustracker.cpp \
-    src/formatting.cpp \
-    src/fountainexporter.cpp \
-    src/fountainimporter.cpp \
-    src/garbagecollector.cpp \
-    src/genericarraymodel.cpp \
-    src/gridbackgrounditem.cpp \
-    src/htmlexporter.cpp \
-    src/htmlimporter.cpp \
-    src/imageprinter.cpp \
-    src/locationreportgenerator.cpp \
-    src/locationscreenplayreport.cpp \
-    main.cpp \
-    src/materialcolors.cpp \
-    src/note.cpp \
-    src/notification.cpp \
-    src/notificationmanager.cpp \
-    src/odtexporter.cpp \
-    src/painterpathitem.cpp \
-    src/pdfexporter.cpp \
     3rdparty/poly2tri/common/shapes.cc \
     3rdparty/poly2tri/sweep/advancing_front.cc \
     3rdparty/poly2tri/sweep/cdt.cc \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
-    src/polygontesselator.cpp \
-    src/progressreport.cpp \
-    src/qobjectserializer.cpp \
-    src/qtextdocumentpagedprinter.cpp \
-    src/resetonchange.cpp \
-    src/ruleritem.cpp \
-    src/scene.cpp \
-    src/scenecharactermatrixreportgenerator.cpp \
-    src/screenplay.cpp \
-    src/screenplayadapter.cpp \
-    src/screenplaysubsetreport.cpp \
-    src/screenplaytextdocument.cpp \
-    src/scritedocument.cpp \
-    src/searchengine.cpp \
-    src/simpletimer.cpp \
-    src/structure.cpp \
-    src/structureexporter.cpp \
-    src/textexporter.cpp \
-    src/textshapeitem.cpp \
-    src/tightboundingbox.cpp \
-    src/timeprofiler.cpp \
-    src/standardpaths.cpp \
-    src/trackobject.cpp \
-    src/transliteration.cpp \
-    src/undoredo.cpp
+    src/printing/qtextdocumentpagedprinter.cpp \
+    src/printing/imageprinter.cpp \
+    src/quick/objects/fileinfo.cpp \
+    src/quick/objects/focustracker.cpp \
+    src/quick/objects/delayedpropertybinder.cpp \
+    src/quick/objects/notificationmanager.cpp \
+    src/quick/objects/notification.cpp \
+    src/quick/objects/resetonchange.cpp \
+    src/quick/objects/completer.cpp \
+    src/quick/objects/eventfilter.cpp \
+    src/quick/objects/aggregation.cpp \
+    src/quick/objects/trackobject.cpp \
+    src/quick/objects/materialcolors.cpp \
+    src/quick/objects/errorreport.cpp \
+    src/quick/objects/standardpaths.cpp \
+    src/quick/objects/polygontesselator.cpp \
+    src/quick/objects/searchengine.cpp \
+    src/quick/items/tightboundingbox.cpp \
+    src/quick/items/gridbackgrounditem.cpp \
+    src/quick/items/painterpathitem.cpp \
+    src/quick/items/textshapeitem.cpp \
+    src/quick/items/abstractshapeitem.cpp \
+    src/quick/items/ruleritem.cpp \
+    src/utils/genericarraymodel.cpp \
+    src/utils/timeprofiler.cpp \
+    src/utils/garbagecollector.cpp \
+    src/utils/simpletimer.cpp \
+    src/utils/qobjectserializer.cpp \
+    src/document/scritedocument.cpp \
+    src/document/screenplay.cpp \
+    src/document/scene.cpp \
+    src/document/documentfilesystem.cpp \
+    src/document/structure.cpp \
+    src/document/screenplaytextdocument.cpp \
+    src/document/undoredo.cpp \
+    src/document/transliteration.cpp \
+    src/document/screenplayadapter.cpp \
+    src/document/note.cpp \
+    src/document/formatting.cpp \
+    src/core/autoupdate.cpp \
+    src/core/application.cpp \
+    src/exporters/htmlexporter.cpp \
+    src/exporters/structureexporter.cpp \
+    src/exporters/odtexporter.cpp \
+    src/exporters/textexporter.cpp \
+    src/exporters/pdfexporter.cpp \
+    src/exporters/fountainexporter.cpp \
+    src/exporters/finaldraftexporter.cpp \
+    src/importers/finaldraftimporter.cpp \
+    src/importers/fountainimporter.cpp \
+    src/importers/htmlimporter.cpp \
+    src/interfaces/abstracttextdocumentexporter.cpp \
+    src/interfaces/abstractdeviceio.cpp \
+    src/interfaces/abstractexporter.cpp \
+    src/interfaces/abstractscreenplaysubsetreport.cpp \
+    src/interfaces/abstractimporter.cpp \
+    src/interfaces/abstractreportgenerator.cpp \
+    src/reports/locationreportgenerator.cpp \
+    src/reports/screenplaysubsetreport.cpp \
+    src/reports/characterscreenplayreport.cpp \
+    src/reports/progressreport.cpp \
+    src/reports/locationscreenplayreport.cpp \
+    src/reports/characterreportgenerator.cpp \
+    src/reports/scenecharactermatrixreportgenerator.cpp \
 
 RESOURCES += \
     scrite_bengali_font.qrc \
