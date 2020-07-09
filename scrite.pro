@@ -6,53 +6,55 @@ DEFINES += PHTRANSLATE_STATICLIB
 
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
+INCLUDEPATH += . src/
+
 HEADERS += \
     3rdparty/phtranslator/LanguageCodes.h \
     3rdparty/phtranslator/PhTranslateLib.h \
     3rdparty/phtranslator/PhTranslator.h \
     3rdparty/phtranslator/stdafx.h \
     3rdparty/phtranslator/targetver.h \
-    abstractdeviceio.h \
-    abstractexporter.h \
-    abstractimporter.h \
-    abstractreportgenerator.h \
-    abstractscreenplaysubsetreport.h \
-    abstractshapeitem.h \
-    abstracttextdocumentexporter.h \
-    aggregation.h \
-    application.h \
-    autoupdate.h \
-    characterreportgenerator.h \
-    characterscreenplayreport.h \
-    completer.h \
-    delayedpropertybinder.h \
-    documentfilesystem.h \
-    errorreport.h \
-    eventfilter.h \
-    fileinfo.h \
-    finaldraftexporter.h \
-    finaldraftimporter.h \
-    focustracker.h \
-    formatting.h \
-    fountainexporter.h \
-    fountainimporter.h \
-    garbagecollector.h \
-    genericarraymodel.h \
-    gridbackgrounditem.h \
-    hourglass.h \
-    htmlexporter.h \
-    htmlimporter.h \
-    imageprinter.h \
-    locationreportgenerator.h \
-    locationscreenplayreport.h \
-    materialcolors.h \
-    modifiable.h \
-    note.h \
-    notification.h \
-    notificationmanager.h \
-    odtexporter.h \
-    painterpathitem.h \
-    pdfexporter.h \
+    src/abstractdeviceio.h \
+    src/abstractexporter.h \
+    src/abstractimporter.h \
+    src/abstractreportgenerator.h \
+    src/abstractscreenplaysubsetreport.h \
+    src/abstractshapeitem.h \
+    src/abstracttextdocumentexporter.h \
+    src/aggregation.h \
+    src/application.h \
+    src/autoupdate.h \
+    src/characterreportgenerator.h \
+    src/characterscreenplayreport.h \
+    src/completer.h \
+    src/delayedpropertybinder.h \
+    src/documentfilesystem.h \
+    src/errorreport.h \
+    src/eventfilter.h \
+    src/fileinfo.h \
+    src/finaldraftexporter.h \
+    src/finaldraftimporter.h \
+    src/focustracker.h \
+    src/formatting.h \
+    src/fountainexporter.h \
+    src/fountainimporter.h \
+    src/garbagecollector.h \
+    src/genericarraymodel.h \
+    src/gridbackgrounditem.h \
+    src/hourglass.h \
+    src/htmlexporter.h \
+    src/htmlimporter.h \
+    src/imageprinter.h \
+    src/locationreportgenerator.h \
+    src/locationscreenplayreport.h \
+    src/materialcolors.h \
+    src/modifiable.h \
+    src/note.h \
+    src/notification.h \
+    src/notificationmanager.h \
+    src/odtexporter.h \
+    src/painterpathitem.h \
+    src/pdfexporter.h \
     3rdparty/poly2tri/common/shapes.h \
     3rdparty/poly2tri/common/utils.h \
     3rdparty/poly2tri/poly2tri.h \
@@ -60,107 +62,107 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
-    polygontesselator.h \
-    progressreport.h \
-    qobjectfactory.h \
-    qobjectserializer.h \
-    qtextdocumentpagedprinter.h \
-    resetonchange.h \
-    ruleritem.h \
-    scene.h \
-    scenecharactermatrixreportgenerator.h \
-    screenplay.h \
-    screenplayadapter.h \
-    screenplaysubsetreport.h \
-    screenplaytextdocument.h \
-    scritedocument.h \
-    searchengine.h \
-    simpletimer.h \
-    structure.h \
-    structureexporter.h \
-    textexporter.h \
-    textshapeitem.h \
-    tightboundingbox.h \
-    timeprofiler.h \
-    standardpaths.h \
-    trackobject.h \
-    transliteration.h \
-    undoredo.h
+    src/polygontesselator.h \
+    src/progressreport.h \
+    src/qobjectfactory.h \
+    src/qobjectserializer.h \
+    src/qtextdocumentpagedprinter.h \
+    src/resetonchange.h \
+    src/ruleritem.h \
+    src/scene.h \
+    src/scenecharactermatrixreportgenerator.h \
+    src/screenplay.h \
+    src/screenplayadapter.h \
+    src/screenplaysubsetreport.h \
+    src/screenplaytextdocument.h \
+    src/scritedocument.h \
+    src/searchengine.h \
+    src/simpletimer.h \
+    src/structure.h \
+    src/structureexporter.h \
+    src/textexporter.h \
+    src/textshapeitem.h \
+    src/tightboundingbox.h \
+    src/timeprofiler.h \
+    src/standardpaths.h \
+    src/trackobject.h \
+    src/transliteration.h \
+    src/undoredo.h
 
 SOURCES += \
     3rdparty/phtranslator/PhTranslateLib.cpp \
     3rdparty/phtranslator/PhTranslator.cpp \
     3rdparty/phtranslator/stdafx.cpp \
-    abstractdeviceio.cpp \
-    abstractexporter.cpp \
-    abstractimporter.cpp \
-    abstractreportgenerator.cpp \
-    abstractscreenplaysubsetreport.cpp \
-    abstractshapeitem.cpp \
-    abstracttextdocumentexporter.cpp \
-    aggregation.cpp \
-    application.cpp \
-    autoupdate.cpp \
-    characterreportgenerator.cpp \
-    characterscreenplayreport.cpp \
-    completer.cpp \
-    delayedpropertybinder.cpp \
-    documentfilesystem.cpp \
-    errorreport.cpp \
-    eventfilter.cpp \
-    fileinfo.cpp \
-    finaldraftexporter.cpp \
-    finaldraftimporter.cpp \
-    focustracker.cpp \
-    formatting.cpp \
-    fountainexporter.cpp \
-    fountainimporter.cpp \
-    garbagecollector.cpp \
-    genericarraymodel.cpp \
-    gridbackgrounditem.cpp \
-    htmlexporter.cpp \
-    htmlimporter.cpp \
-    imageprinter.cpp \
-    locationreportgenerator.cpp \
-    locationscreenplayreport.cpp \
+    src/abstractdeviceio.cpp \
+    src/abstractexporter.cpp \
+    src/abstractimporter.cpp \
+    src/abstractreportgenerator.cpp \
+    src/abstractscreenplaysubsetreport.cpp \
+    src/abstractshapeitem.cpp \
+    src/abstracttextdocumentexporter.cpp \
+    src/aggregation.cpp \
+    src/application.cpp \
+    src/autoupdate.cpp \
+    src/characterreportgenerator.cpp \
+    src/characterscreenplayreport.cpp \
+    src/completer.cpp \
+    src/delayedpropertybinder.cpp \
+    src/documentfilesystem.cpp \
+    src/errorreport.cpp \
+    src/eventfilter.cpp \
+    src/fileinfo.cpp \
+    src/finaldraftexporter.cpp \
+    src/finaldraftimporter.cpp \
+    src/focustracker.cpp \
+    src/formatting.cpp \
+    src/fountainexporter.cpp \
+    src/fountainimporter.cpp \
+    src/garbagecollector.cpp \
+    src/genericarraymodel.cpp \
+    src/gridbackgrounditem.cpp \
+    src/htmlexporter.cpp \
+    src/htmlimporter.cpp \
+    src/imageprinter.cpp \
+    src/locationreportgenerator.cpp \
+    src/locationscreenplayreport.cpp \
     main.cpp \
-    materialcolors.cpp \
-    note.cpp \
-    notification.cpp \
-    notificationmanager.cpp \
-    odtexporter.cpp \
-    painterpathitem.cpp \
-    pdfexporter.cpp \
+    src/materialcolors.cpp \
+    src/note.cpp \
+    src/notification.cpp \
+    src/notificationmanager.cpp \
+    src/odtexporter.cpp \
+    src/painterpathitem.cpp \
+    src/pdfexporter.cpp \
     3rdparty/poly2tri/common/shapes.cc \
     3rdparty/poly2tri/sweep/advancing_front.cc \
     3rdparty/poly2tri/sweep/cdt.cc \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
-    polygontesselator.cpp \
-    progressreport.cpp \
-    qobjectserializer.cpp \
-    qtextdocumentpagedprinter.cpp \
-    resetonchange.cpp \
-    ruleritem.cpp \
-    scene.cpp \
-    scenecharactermatrixreportgenerator.cpp \
-    screenplay.cpp \
-    screenplayadapter.cpp \
-    screenplaysubsetreport.cpp \
-    screenplaytextdocument.cpp \
-    scritedocument.cpp \
-    searchengine.cpp \
-    simpletimer.cpp \
-    structure.cpp \
-    structureexporter.cpp \
-    textexporter.cpp \
-    textshapeitem.cpp \
-    tightboundingbox.cpp \
-    timeprofiler.cpp \
-    standardpaths.cpp \
-    trackobject.cpp \
-    transliteration.cpp \
-    undoredo.cpp
+    src/polygontesselator.cpp \
+    src/progressreport.cpp \
+    src/qobjectserializer.cpp \
+    src/qtextdocumentpagedprinter.cpp \
+    src/resetonchange.cpp \
+    src/ruleritem.cpp \
+    src/scene.cpp \
+    src/scenecharactermatrixreportgenerator.cpp \
+    src/screenplay.cpp \
+    src/screenplayadapter.cpp \
+    src/screenplaysubsetreport.cpp \
+    src/screenplaytextdocument.cpp \
+    src/scritedocument.cpp \
+    src/searchengine.cpp \
+    src/simpletimer.cpp \
+    src/structure.cpp \
+    src/structureexporter.cpp \
+    src/textexporter.cpp \
+    src/textshapeitem.cpp \
+    src/tightboundingbox.cpp \
+    src/timeprofiler.cpp \
+    src/standardpaths.cpp \
+    src/trackobject.cpp \
+    src/transliteration.cpp \
+    src/undoredo.cpp
 
 RESOURCES += \
     scrite_bengali_font.qrc \
