@@ -165,7 +165,10 @@ Item {
             policy: screenplayElementList.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
             opacity: active ? 1 : 0.2
-            Behavior on opacity { NumberAnimation { duration: 250 } }
+            Behavior on opacity {
+                enabled: screenplayEditorSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
         }
 
         FocusTracker.window: qmlWindow
@@ -243,7 +246,10 @@ Item {
                     color: Qt.tint(sceneColor, "#C0FFFFFF")
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
-                    Behavior on border.width { NumberAnimation { duration: 400 } }
+                    Behavior on border.width {
+                        enabled: screenplayEditorSettings.enableAnimations
+                        NumberAnimation { duration: 400 }
+                    }
 
                     Item {
                         anchors.left: parent.left
@@ -329,7 +335,10 @@ Item {
                         scale: dragMouseArea.containsMouse ? 2 : 1
                         visible: !scriteDocument.readOnly
                         enabled: visible
-                        Behavior on scale { NumberAnimation { duration: 250 } }
+                        Behavior on scale {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
 
                         MouseArea {
                             id: dragMouseArea

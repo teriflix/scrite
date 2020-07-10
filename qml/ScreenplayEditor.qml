@@ -88,7 +88,10 @@ Rectangle {
         border.color: primaryColors.borderColor
         visible: opacity > 0
         opacity: globalScreenplayEditorToolbar.showFindAndReplace ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 100 } }
+        Behavior on opacity {
+            enabled: screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 100 }
+        }
 
         SearchBar {
             id: screenplaySearchBar
@@ -280,7 +283,10 @@ Rectangle {
                                 smooth: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 opacity: defaultOpacity
-                                Behavior on opacity { NumberAnimation { duration: 250 } }
+                                Behavior on opacity {
+                                    enabled: screenplayEditorSettings.enableAnimations
+                                    NumberAnimation { duration: 250 }
+                                }
                                 property real defaultOpacity: screenplayAdapter.elementCount === 0 ? 0.5 : 0.05
                                 MouseArea {
                                     anchors.fill: parent
@@ -1545,7 +1551,10 @@ Rectangle {
         readonly property int sceneListAreaWidth: 440
         clip: !sceneListPanelLoader.expanded
         width: active ? (expanded ? sceneListAreaWidth : expandCollapseButtonWidth) : 0
-        Behavior on width { NumberAnimation { duration: 250 } }
+        Behavior on width {
+            enabled: screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 250 }
+        }
         visible: !screenplayPreview.visible
 
         FocusTracker.window: qmlWindow
@@ -1571,7 +1580,10 @@ Rectangle {
                 height: parent.height
                 width: sceneListAreaWidth
                 opacity: sceneListPanelLoader.expanded ? 1 : 0
-                Behavior on opacity {  NumberAnimation { duration: 250 } }
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
                 visible: opacity > 0
 
                 Text {
@@ -1604,7 +1616,10 @@ Rectangle {
                             dark: Qt.rgba(0,0,0,0.75)
                         }
                         opacity: active ? 1 : 0.2
-                        Behavior on opacity { NumberAnimation { duration: 250 } }
+                        Behavior on opacity {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
                     }
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
@@ -1626,7 +1641,10 @@ Rectangle {
                             opacity: (screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
                             visible: t > 0
                             property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
-                            Behavior on t { NumberAnimation { duration: 250 } }
+                            Behavior on t {
+                                enabled: screenplayEditorSettings.enableAnimations
+                                NumberAnimation { duration: 250 }
+                            }
                         }
 
                         Text {
@@ -1685,7 +1703,10 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.topMargin: 4
                 anchors.leftMargin: sceneListPanelLoader.expanded ? 4 : -radius
-                Behavior on height { NumberAnimation { duration: 250 } }
+                Behavior on height {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
 
                 Image {
                     anchors.fill: parent
@@ -1764,7 +1785,10 @@ Rectangle {
                         dark: Qt.rgba(0,0,0,0.75)
                     }
                     opacity: active ? 1 : 0.2
-                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                    Behavior on opacity {
+                        enabled: screenplayEditorSettings.enableAnimations
+                        NumberAnimation { duration: 250 }
+                    }
                 }
 
                 ScrollBar.vertical: ScrollBar {
@@ -1775,7 +1799,10 @@ Rectangle {
                         dark: Qt.rgba(0,0,0,0.75)
                     }
                     opacity: active ? 1 : 0.2
-                    Behavior on opacity { NumberAnimation { duration: 250 } }
+                    Behavior on opacity {
+                        enabled: screenplayEditorSettings.enableAnimations
+                        NumberAnimation { duration: 250 }
+                    }
                 }
 
                 property real cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + 40

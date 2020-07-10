@@ -56,7 +56,10 @@ ToolButton {
                 font.pixelSize: toolButton.font.pixelSize
                 font.bold: toolButton.down
                 anchors.verticalCenter: parent.verticalCenter
-                Behavior on color { ColorAnimation { duration: 250 } }
+                Behavior on color {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    ColorAnimation { duration: 250 }
+                }
                 visible: toolButton.display !== AbstractButton.IconOnly
             }
         }

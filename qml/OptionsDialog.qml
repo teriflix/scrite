@@ -264,6 +264,19 @@ Item {
                             onToggled: screenplayEditorSettings.enableSpellCheck = checked
                         }
                     }
+
+                    GroupBox {
+                        width: parent.width
+                        label: Text {
+                            text: "Animations"
+                        }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.enableAnimations
+                            text: "Enable Animations"
+                            onToggled: screenplayEditorSettings.enableAnimations = checked
+                        }
+                    }
                 }
 
                 GroupBox {

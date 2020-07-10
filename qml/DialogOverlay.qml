@@ -26,6 +26,7 @@ Rectangle {
     property bool animationComplete: false
     property alias closeable: closeButton.visible
     property bool closeUponClickOutsideContentArea: false
+    property bool animationsEnabled: true
     signal closeRequest()
 
     function close() {
@@ -64,6 +65,7 @@ Rectangle {
     onVisibleChanged: blur.visible = visible
 
     Behavior on t {
+        enabled: animationsEnabled
         NumberAnimation {
             duration: 150
             easing.type: Easing.Linear

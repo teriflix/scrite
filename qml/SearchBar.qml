@@ -57,7 +57,10 @@ Item {
             txtSearch.forceActiveFocus()
     }
 
-    Behavior on height { NumberAnimation { duration: 100 } }
+    Behavior on height {
+        enabled: screenplayEditorSettings.enableAnimations
+        NumberAnimation { duration: 100 }
+    }
 
     property SearchEngine searchEngine: SearchEngine { }
 

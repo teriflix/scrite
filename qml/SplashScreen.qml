@@ -50,7 +50,7 @@ Item {
         }
 
         SequentialAnimation {
-            running: true
+            running: true & screenplayEditorSettings.enableAnimations
 
             ParallelAnimation {
                 NumberAnimation {
@@ -101,8 +101,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         font.pixelSize: 20
         text: "Click anywhere to get started."
-        font.letterSpacing: 10
-        opacity: 0.01
+        font.letterSpacing: screenplayEditorSettings.enableAnimations ? 10 : 0
+        opacity: screenplayEditorSettings.enableAnimations ? 0.01 : 1
         color: "#4a4a4a"
     }
 

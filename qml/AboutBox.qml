@@ -49,14 +49,14 @@ Item {
                 font.pixelSize: 18
                 color: "white"
                 text: app.applicationVersion
-                font.letterSpacing: 10
+                font.letterSpacing: screenplayEditorSettings.enableAnimations ? 10 : 0
 
                 NumberAnimation {
                     target: versionText
                     property: "font.letterSpacing"
                     from: 10; to: 0
                     duration: 1500
-                    running: true
+                    running: true && screenplayEditorSettings.enableAnimations
                     easing.type: Easing.OutBack
                 }
             }

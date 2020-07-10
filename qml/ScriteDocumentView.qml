@@ -53,6 +53,8 @@ Item {
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true
         property bool enableSpellCheck: true
+        property bool enableAnimations: true
+        onEnableAnimationsChanged: modalDialog.animationsEnabled = enableAnimations
     }
 
     Settings {
@@ -96,6 +98,7 @@ Item {
                 spacing: 2
 
                 ToolButton3 {
+                    id: fileNewButton
                     iconSource: "../icons/action/description.png"
                     text: "New"
                     shortcut: "Ctrl+N"
@@ -118,7 +121,7 @@ Item {
                                     }
                                     resetContentAnimation.start()
                                 }
-                            }, this)
+                            }, fileNewButton)
                         else
                             resetContentAnimation.start()
                     }
@@ -151,7 +154,7 @@ Item {
                                         recentFilesMenu.close()
                                         fileDialog.launch("OPEN", filePath)
                                     }
-                                }, this)
+                                }, fileOpenButton)
                         else {
                             recentFilesMenu.close()
                             fileDialog.launch("OPEN", filePath)
@@ -308,6 +311,7 @@ Item {
                                     model: scriteDocument.supportedImportFormats
 
                                     MenuItem2 {
+                                        id: importMenuItem
                                         text: modelData
                                         onClicked: {
                                             if(scriteDocument.modified)
@@ -326,7 +330,7 @@ Item {
                                                             }
                                                             fileDialog.launch("IMPORT " + modelData)
                                                         }
-                                                    }, this)
+                                                    }, importMenuItem)
                                             else
                                                 fileDialog.launch("IMPORT " + modelData)
                                         }
@@ -1086,7 +1090,7 @@ Item {
             running: true
 
             PauseAnimation {
-                duration: 500
+                duration: screenplayEditorSettings.enableAnimations ? 500 : 0
             }
 
             ScriptAction {
@@ -1097,14 +1101,18 @@ Item {
                 target: appLogo
                 properties: "scale"
                 from: 1; to: 1.5
-                duration: 1000
+                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
             }
 
             PropertyAnimation {
                 target: appLogo
                 properties: "scale"
                 from: 1.5; to: 1
-                duration: 1000
+                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
+            }
+
+            PauseAnimation {
+                duration: screenplayEditorSettings.enableAnimations ? 0 : 2000
             }
 
             ScriptAction {
@@ -1143,7 +1151,7 @@ Item {
                         handleCloseEvent = false
                         qmlWindow.close()
                     }
-                }, documentUI)
+                }, fileNewButton)
             } else
                 close.accepted = true
         }

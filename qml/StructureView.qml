@@ -603,7 +603,10 @@ Item {
                 border.width: elementItem.selected ? 2 : 1
                 border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "lightgray" : element.scene.color)
                 color: Qt.tint(element.scene.color, "#C0FFFFFF")
-                Behavior on border.width { NumberAnimation { duration: 400 } }
+                Behavior on border.width {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 400 }
+                }
             }
 
             TextViewEdit {
@@ -720,7 +723,10 @@ Item {
                 anchors.rightMargin: 3
                 opacity: dragMouseArea.containsMouse ? 1 : 0.1
                 scale: dragMouseArea.containsMouse ? 2 : 1
-                Behavior on scale { NumberAnimation { duration: 250 } }
+                Behavior on scale {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
 
                 MouseArea {
                     id: dragMouseArea

@@ -164,7 +164,10 @@ Item {
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AlwaysOn
             opacity: active ? 1 : 0.2
-            Behavior on opacity { NumberAnimation { duration: 250 } }
+            Behavior on opacity {
+                enabled: screenplayEditorSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
         }
 
         property real minimumCellWidth: 340
@@ -232,7 +235,10 @@ Item {
                         border.width: 2
                         border.color: (note.color === Qt.rgba(1,1,1,1)) ? "black" : note.color
                         radius: 5
-                        Behavior on color {  ColorAnimation { duration: 500 } }
+                        Behavior on color {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            ColorAnimation { duration: 500 }
+                        }
                     }
 
                     ScrollView {

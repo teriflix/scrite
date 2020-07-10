@@ -38,8 +38,14 @@ Flickable {
         zoomScale = 1
     }
 
-    Behavior on contentX { NumberAnimation { duration: 250 } }
-    Behavior on contentY { NumberAnimation { duration: 250 } }
+    Behavior on contentX {
+        enabled: screenplayEditorSettings.enableAnimations
+        NumberAnimation { duration: 250 }
+    }
+    Behavior on contentY {
+        enabled: screenplayEditorSettings.enableAnimations
+        NumberAnimation { duration: 250 }
+    }
 
     ScrollBar.horizontal: ScrollBar {
         policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -49,7 +55,10 @@ Flickable {
             dark: Qt.rgba(0,0,0,0.75)
         }
         opacity: active ? 1 : 0.2
-        Behavior on opacity { NumberAnimation { duration: 250 } }
+        Behavior on opacity {
+            enabled: screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 250 }
+        }
     }
     ScrollBar.vertical: ScrollBar {
         policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -59,7 +68,10 @@ Flickable {
             dark: Qt.rgba(0,0,0,0.75)
         }
         opacity: active ? 1 : 0.2
-        Behavior on opacity { NumberAnimation { duration: 250 } }
+        Behavior on opacity {
+            enabled: screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 250 }
+        }
     }
 
     function ensureItemVisible(item, scaling, leaveMargin) {
