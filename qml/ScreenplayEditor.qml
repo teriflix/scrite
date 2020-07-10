@@ -51,7 +51,11 @@ Rectangle {
             else
                 contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
-        onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
+        onSourceChanged: {
+            globalScreenplayEditorToolbar.showScreenplayPreview = false
+            contentView.synopsisExpandCounter = 0
+            contentView.synopsisExpanded = false
+        }
     }
 
     ScreenplayTextDocument {
@@ -175,6 +179,7 @@ Rectangle {
         anchors.bottom: statusBar.top
         clip: true
 
+        EventFilter.active: !contentView.synopsisExpanded
         EventFilter.events: [31]
         EventFilter.onFilter: {
             EventFilter.forwardEventTo(contentView)
@@ -186,7 +191,13 @@ Rectangle {
             id: pageRulerArea
             width: pageLayout.paperWidth * screenplayEditor.zoomLevel * Screen.devicePixelRatio
             height: parent.height
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: leftMargin
+            property real leftMargin: contentView.synopsisExpanded && sidePanels.expanded ? 80 : (parent.width-width)/2
+            Behavior on leftMargin {
+                enabled: screenplayEditorSettings.enableAnimations && contentView.synopsisExpandCounter > 0
+                NumberAnimation { duration: 250 }
+            }
 
             Rectangle {
                 id: contentArea
@@ -213,6 +224,10 @@ Rectangle {
                     id: contentView
                     anchors.fill: parent
                     model: contentViewModel.value
+                    property int synopsisExpandCounter: 0
+                    property bool synopsisExpanded: false
+                    property real spaceForSynopsis: (sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20
+                    onSynopsisExpandedChanged: synopsisExpandCounter = synopsisExpandCounter+1
                     delegate: Loader {
                         width: contentView.width
                         property var componentData: modelData
@@ -578,6 +593,40 @@ Rectangle {
                 from: false
                 to: screenplayEditorSettings.enableSpellCheck
                 delay: 100
+            }
+
+            SidePanel {
+                buttonText: "Synopsis"
+                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
+                backgroundColor: buttonColor
+                anchors.top: parent.top
+                anchors.left: parent.right
+                height: Math.min(300, parent.height)
+                property bool synopsisExpanded: contentView.synopsisExpanded
+                expanded: synopsisExpanded
+                onSynopsisExpandedChanged: expanded = synopsisExpanded
+                onExpandedChanged: contentView.synopsisExpanded = expanded
+                maxPanelWidth: contentView.spaceForSynopsis
+                width: maxPanelWidth
+                clip: true
+                visible: width >= 100
+                content: TextArea {
+                    background: Rectangle {
+                        color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
+                    }
+                    font.pointSize: app.idealFontPointSize + 1
+                    onTextChanged: contentItem.theScene.title = text
+                    wrapMode: Text.WordWrap
+                    text: contentItem.theScene.title
+                    leftPadding: 10
+                    rightPadding: 10
+                    topPadding: 10
+                    bottomPadding: 10
+
+                    Transliterator.textDocument: textDocument
+                    Transliterator.cursorPosition: cursorPosition
+                    Transliterator.hasActiveFocus: activeFocus
+                }
             }
 
             Column {
@@ -1545,6 +1594,8 @@ Rectangle {
         anchors.topMargin: 5
         anchors.bottomMargin: 5
         width: sceneListSidePanel.width // Math.max(sceneListSidePanel.width, notesSidePanel.width)
+        property bool expanded: sceneListSidePanel.expanded
+        onExpandedChanged: contentView.synopsisExpandCounter = 0
 
         SidePanel {
             id: sceneListSidePanel

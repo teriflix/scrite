@@ -20,15 +20,18 @@ Item {
 
     property real buttonY: 0
     property string buttonText: ""
+    property alias buttonColor: expandCollapseButton.color
+    property alias backgroundColor: panelBackground.color
+    property color borderColor: primaryColors.borderColor
 
     property bool expanded: false
     property alias content: contentLoader.sourceComponent
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
-    property real buttonSize: (textLabel.contentWidth + iconImage.width + 20) * 1.75
+    property real buttonSize: Math.min((textLabel.contentWidth + iconImage.width + 20) * 1.75, height)
     readonly property real minPanelWidth: 25
-    readonly property real maxPanelWidth: 450
+    property real maxPanelWidth: 450
     Behavior on width {
         enabled: screenplayEditorSettings.enableAnimations
         NumberAnimation { duration: 50 }
@@ -36,7 +39,7 @@ Item {
 
     BorderImage {
         source: "../icons/content/shadow.png"
-        anchors.fill: panelBackgound
+        anchors.fill: panelBackground
         horizontalTileMode: BorderImage.Stretch
         verticalTileMode: BorderImage.Stretch
         anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
@@ -46,11 +49,11 @@ Item {
     }
 
     Rectangle {
-        id: panelBackgound
+        id: panelBackground
         anchors.fill: parent
         color: "white"
         opacity: contentLoader.opacity
-        border.color: primaryColors.borderColor
+        border.color: borderColor
         border.width: 1
     }
 
@@ -87,7 +90,7 @@ Item {
         height: sidePanel.expanded ? parent.height-8 : sidePanel.buttonSize
         radius: (1.0-contentLoader.opacity) * 6
         border.width: contentLoader.visible ? 0 : 1
-        border.color: sidePanel.expanded ? primaryColors.windowColor : primaryColors.borderColor
+        border.color: sidePanel.expanded ? primaryColors.windowColor : borderColor
 
         Behavior on height {
             enabled: screenplayEditorSettings.enableAnimations

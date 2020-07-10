@@ -17,6 +17,7 @@ import QtQuick.Window 2.13
 import Scrite 1.0
 
 Item {
+    property bool animationsEnabled: true
     signal done()
 
     BoxShadow {
@@ -50,7 +51,7 @@ Item {
         }
 
         SequentialAnimation {
-            running: true & screenplayEditorSettings.enableAnimations
+            running: true & animationsEnabled
 
             ParallelAnimation {
                 NumberAnimation {
@@ -101,8 +102,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         font.pixelSize: 20
         text: "Click anywhere to get started."
-        font.letterSpacing: screenplayEditorSettings.enableAnimations ? 10 : 0
-        opacity: screenplayEditorSettings.enableAnimations ? 0.01 : 1
+        font.letterSpacing: animationsEnabled ? 10 : 0
+        opacity: animationsEnabled ? 0.01 : 1
         color: "#4a4a4a"
     }
 
