@@ -44,5 +44,6 @@
         <file>qml/SplashScreen.qml</file>
         <file>qml/BoxShadow.qml</file>
         <file>qml/FileSelector.qml</file>
+        <file>qml/SidePanel.qml</file>
     </qresource>
 </RCC>
