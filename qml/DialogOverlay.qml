@@ -60,8 +60,8 @@ Rectangle {
 
     Behavior on t {
         NumberAnimation {
-            duration: 400
-            easing.type: Easing.InOutBack
+            duration: 250
+            easing.type: Easing.OutBack
         }
     }
 

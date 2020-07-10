@@ -689,6 +689,7 @@ Item {
                                 anchors.fill: parent
                                 fillMode: Image.PreserveAspectCrop
                                 source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                                asynchronous: true
                             }
                         }
                     }

@@ -16,38 +16,16 @@ import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
-Image {
-    source: "../images/aboutbox.jpg"
-    width: Screen.width * 0.5
-    height: iscale*sourceSize.height
-    smooth: true; mipmap: true
-    asynchronous: true
+Item {
+    readonly property real splashWidth: 1464
+    readonly property real splashHeight: 978
+    readonly property real iscale: (Screen.width * 0.5)/splashWidth
+    width: iscale * splashWidth
+    height: iscale * splashHeight
 
     Component.onCompleted: {
         modalDialog.closeUponClickOutsideContentArea = true
         modalDialog.closeable = false
-    }
-
-    property real iscale: width / sourceSize.width
-
-    Text {
-        id: versionText
-        x: 60 * iscale
-        y: 125 * iscale
-        font.family: "Raleway"
-        font.pixelSize: 18
-        color: "white"
-        text: app.applicationVersion
-        font.letterSpacing: 10
-
-        NumberAnimation {
-            target: versionText
-            property: "font.letterSpacing"
-            from: 10; to: 0
-            duration: 1500
-            running: true
-            easing.type: Easing.OutBack
-        }
     }
 
     SwipeView {
@@ -56,6 +34,33 @@ Image {
         interactive: false
 
         Item {
+            Image {
+                source: modalDialog.t >= 1 ? "../images/aboutbox.jpg" : ""
+                anchors.fill: parent
+                smooth: true; mipmap: true
+                asynchronous: true
+            }
+
+            Text {
+                id: versionText
+                x: 60 * iscale
+                y: 125 * iscale
+                font.family: "Raleway"
+                font.pixelSize: 18
+                color: "white"
+                text: app.applicationVersion
+                font.letterSpacing: 10
+
+                NumberAnimation {
+                    target: versionText
+                    property: "font.letterSpacing"
+                    from: 10; to: 0
+                    duration: 1500
+                    running: true
+                    easing.type: Easing.OutBack
+                }
+            }
+
             Column {
                 spacing: 10
                 anchors.centerIn: parent
@@ -178,8 +183,11 @@ Image {
             }
 
             ScrollView {
-                anchors.fill: parent
-                anchors.leftMargin: Math.max(10, (parent.width-licenseTextView.contentWidth-20)/2)
+                anchors.left: backButton.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.leftMargin: 10
                 clip: true
                 ScrollBar.vertical.policy: ScrollBar.AlwaysOn
 
@@ -197,17 +205,3 @@ Image {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
