@@ -690,7 +690,7 @@ void Application::computeIdealFontPointSize()
         idealFont.setPointSize(stdSizes.takeFirst());
     }
 
-    m_idealFontPointSize = idealFont.pointSize();
+    m_idealFontPointSize = qMax(idealFont.pointSize(), 12);
 }
 
 QColor Application::pickStandardColor(int counter) const
