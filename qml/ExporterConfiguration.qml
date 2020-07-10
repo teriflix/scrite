@@ -49,7 +49,7 @@ Item {
         anchors.fill: parent
         active: exporter
         sourceComponent: Item {
-            property real idealHeight: formView.contentHeight + buttonRow.height + 50
+            property real idealHeight: formView.contentHeight + buttonRow.height + 100
 
             ScrollView {
                 id: formView

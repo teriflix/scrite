@@ -58,6 +58,13 @@ Rectangle {
     visible: t > 0
     onVisibleChanged: blur.visible = visible
 
+    Behavior on t {
+        NumberAnimation {
+            duration: 400
+            easing.type: Easing.InOutBack
+        }
+    }
+
     EventFilter.target: app
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {
