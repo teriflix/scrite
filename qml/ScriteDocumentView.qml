@@ -590,6 +590,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: documentUI.width > 1470 ? fullText : fullText.substring(0, 2)
+                    font.pointSize: app.idealFontPointSize-2
                     property string fullText: app.transliterationEngine.languageAsString
                     width: 80
 
@@ -677,7 +678,7 @@ Item {
 
                         FontMetrics {
                             id: tabBarFontMetrics
-                            font.pixelSize: 14
+                            font.pointSize: app.idealFontPointSize
                         }
 
                         Text {
@@ -685,7 +686,7 @@ Item {
                             text: modelData
                             anchors.centerIn: parent
                             anchors.verticalCenterOffset:parent.active ? 0 : 1
-                            font.pixelSize: 14
+                            font.pointSize: app.idealFontPointSize
                             font.bold: parent.active
                         }
 

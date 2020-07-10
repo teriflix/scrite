@@ -54,6 +54,10 @@ public:
     QFont applicationFont() const { return this->font(); }
     Q_SIGNAL void applicationFontChanged();
 
+    Q_PROPERTY(int idealFontPointSize READ idealFontPointSize CONSTANT)
+    int idealFontPointSize() const { return m_idealFontPointSize; }
+    Q_SIGNAL void idealFontPointSizeChanged();
+
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) { return url.toLocalFile(); }
 
     enum Platform { LinuxDesktop, WindowsDesktop, MacOS };
@@ -200,6 +204,7 @@ public:
 
     // Although public, please do not call it.
     bool notifyInternal(QObject *object, QEvent *event);
+    void computeIdealFontPointSize();
 
 signals:
     void minimizeWindowRequest();
@@ -210,6 +215,7 @@ private:
 private:
     QSettings *m_settings = nullptr;
     QUndoGroup *m_undoGroup = new QUndoGroup(this);
+    int m_idealFontPointSize = 12;
     QString m_baseWindowTitle;
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;

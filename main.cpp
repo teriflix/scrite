@@ -104,6 +104,7 @@ int main(int argc, char **argv)
 
     Application a(argc, argv, applicationVersion);
     a.setWindowIcon(QIcon(":/images/appicon.png"));
+    a.computeIdealFontPointSize();
 
     QPalette palette = Application::palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0,0.4,1));

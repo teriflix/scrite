@@ -18,7 +18,6 @@ import Scrite 1.0
 Rectangle {
     property var mappings: app.transliterationEngine.alphabetMappings
     property font languageFont: app.transliterationEngine.font
-    property int fontPointSize: scriteDocument.formatting.defaultFont2.pointSize
 
     property var mappingModels: [
         { "heading": "Vowels", "array": mappings.vowels },
@@ -36,12 +35,12 @@ Rectangle {
     FontMetrics {
         id: languageFontMetrics
         font.family: languageFont.family
-        font.pointSize: fontPointSize
+        font.pointSize: app.idealFontPointSize
     }
 
     FontMetrics {
         id: normalFontMetrics
-        font.pointSize: fontPointSize
+        font.pointSize: app.idealFontPointSize
     }
 
     Row {
@@ -63,7 +62,7 @@ Rectangle {
                     Text {
                         text: modelData.heading
                         padding: 8
-                        font.pointSize: fontPointSize
+                        font.pointSize: normalFontMetrics.font.pointSize
                         anchors.centerIn: parent
                         color: primaryColors.c600.text
                     }

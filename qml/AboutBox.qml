@@ -100,6 +100,7 @@ Item {
 
                         Text {
                             text: "Using <strong>PhoneticTranslator</strong><br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
+                            font.pointSize: app.idealFontPointSize - 1
 
                             MouseArea {
                                 anchors.fill: parent
@@ -110,6 +111,7 @@ Item {
 
                         Text {
                             text: "Using <strong>Sonnet</strong> from KDE Frameworks 5<br/><font color=\"blue\">https://api.kde.org/frameworks/sonnet/html/index.html</font>"
+                            font.pointSize: app.idealFontPointSize - 1
 
                             MouseArea {
                                 anchors.fill: parent
@@ -125,6 +127,7 @@ Item {
 
                         Text {
                             text: "Developed using <strong>Qt " + app.qtVersion + "</strong><br/><font color=\"blue\">https://www.qt.io</font>"
+                            font.pointSize: app.idealFontPointSize - 1
 
                             MouseArea {
                                 anchors.fill: parent
@@ -135,6 +138,7 @@ Item {
 
                         Text {
                             text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
+                            font.pointSize: app.idealFontPointSize - 1
 
                             MouseArea {
                                 anchors.fill: parent

@@ -18,6 +18,7 @@
 
 #include <QDir>
 #include <QUuid>
+#include <QScreen>
 #include <QtDebug>
 #include <QWindow>
 #include <QPointer>
@@ -664,6 +665,32 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
 #endif
 
     return false;
+}
+
+void Application::computeIdealFontPointSize()
+{
+    QFont idealFont( this->font() );
+
+    // The default font of the application should be Raleway font, such that it occupes
+    // roughly 0.25 cms height on the screen. We will have to estimate this size at runtime only.
+    const qreal dpr = this->primaryScreen()->devicePixelRatio();
+    const qreal cmPerInch = 2.54; // number of centimeters in an inch
+    const qreal minCms = 0.25 * (dpr-1)*1.1;    // centimeters that a font should occupy on the screen
+    const qreal minPixels = this->primaryScreen()->physicalDotsPerInchY() * minCms/cmPerInch;
+    QList<int> stdSizes = QFontDatabase().pointSizes(idealFont.family());
+    idealFont.setPointSize(stdSizes.takeFirst());
+
+    while(!stdSizes.isEmpty())
+    {
+        const QFontInfo fontInfo(idealFont);
+        const qreal fontHeight = fontInfo.pixelSize();
+        if(fontHeight >= minPixels)
+            break;
+
+        idealFont.setPointSize(stdSizes.takeFirst());
+    }
+
+    m_idealFontPointSize = idealFont.pointSize();
 }
 
 QColor Application::pickStandardColor(int counter) const
