@@ -438,6 +438,7 @@ Item {
                             id: reportGeneratorTimer
                             objectName: "ScriteDocumentView.reportGeneratorTimer"
                             property var reportArgs
+                            property Item requestSource
                             repeat: false
                             interval: 10
                             onReportArgsChanged: {
@@ -449,10 +450,11 @@ Item {
                                     modalDialog.closeable = false
                                     modalDialog.arguments = reportArgs
                                     modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-                                    modalDialog.popupSource = importExportButton
+                                    modalDialog.popupSource = requestSource === null ? importExportButton : requestSource
                                     modalDialog.active = true
                                 }
                                 reportArgs = ""
+                                requestSource = null
                             }
                         }
                     }

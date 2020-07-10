@@ -227,9 +227,9 @@ Rectangle {
                         height: (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
                         property real padding: width * 0.1
 
-                        function editTitlePage() {
+                        function editTitlePage(source) {
                             modalDialog.arguments = {"activeTabIndex": 2}
-                            modalDialog.popupSource = this
+                            modalDialog.popupSource = source
                             modalDialog.sourceComponent = optionsDialogComponent
                             modalDialog.active = true
                         }
@@ -246,18 +246,19 @@ Rectangle {
                                 anchors.right: parent.right
                                 anchors.rightMargin: ruler.rightMarginPx
                                 iconSource: "../icons/action/edit.png"
-                                onClicked: editTitlePage()
+                                onClicked: editTitlePage(this)
                                 visible: parent.active && enabled
                                 enabled: !scriteDocument.readOnly
                             }
                         }
 
                         Button2 {
+                            id: editTitlePageButton
                             text: "Edit Title Page"
                             visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
-                            onClicked: editTitlePage()
+                            onClicked: editTitlePage(this)
                             enabled: !scriteDocument.readOnly
                         }
                     }
@@ -1918,6 +1919,7 @@ Rectangle {
                 }
 
                 onClicked: {
+                    reportGeneratorTimer.requestSource = this
                     reportGeneratorTimer.reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
                     characterMenu.close()
                     characterMenu.characterName = ""

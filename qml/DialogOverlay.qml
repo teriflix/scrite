@@ -47,8 +47,13 @@ Rectangle {
     onActiveChanged: {
         if(active) {
             if(popupSource) {
-                var mappedRect = mapFromItem(popupSource, 0, 0, popupSource.width, popupSource.height)
-                popupSourceArea = Qt.rect(mappedRect.x, mappedRect.y, mappedRect.width, mappedRect.height)
+                var pos = Qt.point(0,0)
+                var item = popupSource
+                while(item !== null) {
+                    pos = Qt.point(item.x+pos.x, item.y+pos.y)
+                    item = item.parent
+                }
+                popupSourceArea = Qt.rect(pos.x, pos.y, popupSource.width, popupSource.height)
             } else
                 popupSourceArea = defaultPopupSourceArea
         }
@@ -60,8 +65,8 @@ Rectangle {
 
     Behavior on t {
         NumberAnimation {
-            duration: 250
-            easing.type: Easing.OutBack
+            duration: 150
+            easing.type: Easing.Linear
         }
     }
 
