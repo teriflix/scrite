@@ -21,6 +21,7 @@ Image {
     width: Screen.width * 0.5
     height: iscale*sourceSize.height
     smooth: true; mipmap: true
+    asynchronous: true
 
     Component.onCompleted: {
         modalDialog.closeUponClickOutsideContentArea = true

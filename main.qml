@@ -15,7 +15,7 @@ import Scrite 1.0
 import QtQuick 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
-import QtGraphicalEffects 1.0
+// import QtGraphicalEffects 1.0
 import QtQuick.Controls.Material 2.12
 
 import "./qml" as UI
@@ -80,16 +80,22 @@ Rectangle {
                 color = primaryColors.windowColor
         }
 
+        /*
+          // There are many graphics card drivers out there that are simply unable to fund
+          // this blur effect. We have to aim for the lowest common denominator unfortunately.
+
         FastBlur {
             anchors.fill: parent
             source: ui
             radius: parent.radius
         }
+        */
 
         Rectangle {
             anchors.fill: parent
             color: parent.color
-            opacity: 0.6 * (parent.radius/parent.maxRadius)
+            // opacity: 0.6 * (parent.radius/parent.maxRadius)
+            opacity: 0.9 * (parent.radius/parent.maxRadius)
         }
     }
 

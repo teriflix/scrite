@@ -36,6 +36,7 @@ Item {
             anchors.fill: parent
             smooth: true
             mipmap: true
+            asynchronous: true
         }
 
         Text {
