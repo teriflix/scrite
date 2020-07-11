@@ -13,6 +13,7 @@
 
 import Scrite 1.0
 import QtQuick 2.13
+import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
 Item {
@@ -22,7 +23,7 @@ Item {
 
     width: 700
     height: exporter && (exporter.requiresConfiguration || exporter.canBundleFonts) ?
-            Math.min(750, contentLoader.item.idealHeight) : 250
+            Math.min(documentUI.height*0.9, contentLoader.item.idealHeight) : 300
 
     Component.onCompleted: {
         exporter = scriteDocument.createExporter(modalDialog.arguments)
@@ -69,7 +70,7 @@ Item {
                     spacing: 10
 
                     Text {
-                        font.pointSize: 24
+                        font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
                         font.bold: true
                         text: exporter.formatName + " - Export"
                         anchors.horizontalCenter: parent.horizontalCenter
