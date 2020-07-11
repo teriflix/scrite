@@ -49,6 +49,7 @@ Item {
         fileName: app.settingsFilePath
         category: "Screenplay Editor"
         property bool displaySceneCharacters: true
+        property bool displaySceneNotes: true
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true

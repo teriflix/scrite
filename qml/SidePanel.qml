@@ -30,7 +30,11 @@ Item {
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
-    property real buttonSize: Math.min((textLabel.contentWidth + iconImage.width + 20) * 1.25, height)
+    property real buttonSize: {
+        if(textLabel.text !== "")
+            Math.min((textLabel.contentWidth + iconImage.width + 20) * 1.25, height)
+        return Math.min(100, height)
+    }
     readonly property real minPanelWidth: 25
     property real maxPanelWidth: 450
     Behavior on width {
@@ -118,7 +122,7 @@ Item {
                 width: parent.width
                 height: width
                 anchors.centerIn: parent
-                anchors.verticalCenterOffset: textLabel.contentWidth/2 + 10
+                anchors.verticalCenterOffset: textLabel.text === "" ? 0 : (textLabel.contentWidth/2 + 10)
                 source: sidePanel.expanded ? "../icons/navigation/arrow_left.png" : "../icons/navigation/arrow_right.png"
                 fillMode: Image.PreserveAspectFit
             }
@@ -135,7 +139,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: Math.abs(parent.x)
             width: 1
-            color: primaryColors.borderColor
+            color: borderColor
             visible: parent.x < 0
         }
     }

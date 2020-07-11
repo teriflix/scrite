@@ -111,5 +111,6 @@
         <file>icons/action/remove_one_inverted.png</file>
         <file>icons/action/remove_all.png</file>
         <file>icons/action/remove_all_inverted.png</file>
+        <file>icons/content/blank.png</file>
     </qresource>
 </RCC>

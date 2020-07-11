@@ -225,7 +225,7 @@ Rectangle {
                     model: contentViewModel.value
                     property int synopsisExpandCounter: 0
                     property bool synopsisExpanded: false
-                    property real spaceForSynopsis: (sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20
+                    property real spaceForSynopsis: screenplayEditorSettings.displaySceneNotes ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
                     onSynopsisExpandedChanged: synopsisExpandCounter = synopsisExpandCounter+1
                     delegate: Loader {
                         width: contentView.width
@@ -595,12 +595,16 @@ Rectangle {
             }
 
             SidePanel {
-                buttonText: "Synopsis"
-                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
+                id: synopsisSidePanel
+                z: 1
+                buttonText: ""
+                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
+                borderColor: expanded ? primaryColors.borderColor : Qt.rgba(0,0,0,0)
                 anchors.top: parent.top
                 anchors.left: parent.right
-                height: Math.min(300, parent.height)
+                // anchors.leftMargin: expanded ? 0 : -minPanelWidth
+                height: expanded ? Math.min(300, parent.height) : sceneHeadingAreaLoader.height
                 property bool synopsisExpanded: contentView.synopsisExpanded
                 expanded: synopsisExpanded
                 onSynopsisExpandedChanged: expanded = synopsisExpanded
@@ -608,7 +612,7 @@ Rectangle {
                 maxPanelWidth: contentView.spaceForSynopsis
                 width: maxPanelWidth
                 clip: true
-                visible: width >= 100
+                visible: width >= 100 && screenplayEditorSettings.displaySceneNotes
                 content: TextArea {
                     background: Rectangle {
                         color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
@@ -1600,7 +1604,7 @@ Rectangle {
             id: sceneListSidePanel
             height: parent.height
             buttonY: 20
-            buttonText: "SCENES"
+            buttonText: ""
             z: expanded ? 1 : 0
 
             content: Item {

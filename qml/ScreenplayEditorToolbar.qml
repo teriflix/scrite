@@ -64,16 +64,26 @@ Row {
                 width: 300
 
                 MenuItem2 {
-                    text: "Display scene characters"
-                    checkable: true
-                    checked: screenplayEditorSettings.displaySceneCharacters
-                    onToggled: screenplayEditorSettings.displaySceneCharacters = checked
+                    icon.source: "../icons/content/blank.png"
+                    text: "Scan For Mute Characters"
+                    onClicked: scriteDocument.structure.scanForMuteCharacters()
+                    enabled: !scriteDocument.readOnly && screenplayEditorSettings.displaySceneCharacters
                 }
 
                 MenuItem2 {
-                    text: "Scan for mute characters"
-                    onClicked: scriteDocument.structure.scanForMuteCharacters()
-                    enabled: !scriteDocument.readOnly
+                    text: "Display Scene Characters"
+                    icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
+                }
+
+                MenuSeparator {
+
+                }
+
+                MenuItem2 {
+                    text: "Display Scene Synopsis"
+                    icon.source: screenplayEditorSettings.displaySceneNotes ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneNotes = !screenplayEditorSettings.displaySceneNotes
                 }
             }
         }
