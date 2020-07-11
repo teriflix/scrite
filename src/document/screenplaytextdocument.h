@@ -108,6 +108,11 @@ public:
     QStringList highlightDialoguesOf() const { return m_highlightDialoguesOf; }
     Q_SIGNAL void highlightDialoguesOfChanged();
 
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    void setIncludeSceneSynopsis(bool val);
+    bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
+    Q_SIGNAL void includeSceneSynopsisChanged();
+
     enum Purpose { ForDisplay, ForPrinting };
     Q_ENUM(Purpose)
     Q_PROPERTY(Purpose purpose READ purpose WRITE setPurpose NOTIFY purposeChanged)
@@ -237,6 +242,7 @@ private:
     bool m_componentComplete = true;
     Screenplay* m_screenplay = nullptr;
     bool m_listSceneCharacters = false;
+    bool m_includeSceneSynopsis = false;
     QTextDocument* m_textDocument = nullptr;
     SimpleTimer m_sceneResetTimer;
     ScreenplayFormat* m_formatting = nullptr;

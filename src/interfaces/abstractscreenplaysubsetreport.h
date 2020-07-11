@@ -28,14 +28,6 @@ public:
 
     bool requiresConfiguration() const { return true; }
 
-    Q_CLASSINFO("generateTitlePage_FieldGroup", "PDF Options")
-    Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
-    Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY generateTitlePageChanged)
-    void setGenerateTitlePage(bool val);
-    bool isGenerateTitlePage() const { return m_generateTitlePage; }
-    Q_SIGNAL void generateTitlePageChanged();
-
     Q_CLASSINFO("listSceneCharacters_FieldGroup", "Basic")
     Q_CLASSINFO("listSceneCharacters_FieldLabel", "List characters for each scene.")
     Q_CLASSINFO("listSceneCharacters_FieldEditor", "CheckBox")
@@ -43,6 +35,22 @@ public:
     void setListSceneCharacters(bool val);
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
+
+    Q_CLASSINFO("includeSceneSynopsis_FieldGroup", "Basic")
+    Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include synopsis of each scene.")
+    Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    void setIncludeSceneSynopsis(bool val);
+    bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
+    Q_SIGNAL void includeSceneSynopsisChanged();
+
+    Q_CLASSINFO("generateTitlePage_FieldGroup", "PDF Options")
+    Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
+    Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY generateTitlePageChanged)
+    void setGenerateTitlePage(bool val);
+    bool isGenerateTitlePage() const { return m_generateTitlePage; }
+    Q_SIGNAL void generateTitlePageChanged();
 
     Q_CLASSINFO("includeSceneNumbers_FieldGroup", "PDF Options")
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
@@ -80,6 +88,9 @@ protected:
     // AbstractReportGenerator interface
     void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *);
 
+    // AbstractScreenplayTextDocumentInjectionInterface interface
+    void inject(QTextCursor &, InjectLocation);
+
     virtual void configureScreenplayTextDocument(ScreenplayTextDocument &) { }
 
 private:
@@ -87,6 +98,7 @@ private:
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
     bool m_listSceneCharacters = false;
+    bool m_includeSceneSynopsis = false;
     Screenplay *m_screenplaySubset = nullptr;
     bool m_printEachSceneOnANewPage = false;
 };

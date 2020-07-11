@@ -34,6 +34,15 @@ void AbstractTextDocumentExporter::setListSceneCharacters(bool val)
     emit listSceneCharactersChanged();
 }
 
+void AbstractTextDocumentExporter::setIncludeSceneSynopsis(bool val)
+{
+    if(m_includeSceneSynopsis == val)
+        return;
+
+    m_includeSceneSynopsis = val;
+    emit includeSceneSynopsisChanged();
+}
+
 void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal pageWidth)
 {
     Q_UNUSED(pageWidth)
@@ -43,6 +52,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setSceneNumbers(this->isIncludeSceneNumbers());
     stDoc.setSceneIcons(this->isIncludeSceneIcons());
     stDoc.setListSceneCharacters(m_listSceneCharacters);
+    stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
     stDoc.setPrintEachSceneOnANewPage(this->isPrintEachSceneOnANewPage());
     stDoc.setSyncEnabled(false);
     if(this->usePageBreaks())

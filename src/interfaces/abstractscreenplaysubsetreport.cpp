@@ -14,6 +14,8 @@
 #include "abstractscreenplaysubsetreport.h"
 #include "qtextdocumentpagedprinter.h"
 #include "screenplaytextdocument.h"
+#include "application.h"
+#include "scene.h"
 
 AbstractScreenplaySubsetReport::AbstractScreenplaySubsetReport(QObject *parent)
     : AbstractReportGenerator(parent)
@@ -42,6 +44,15 @@ void AbstractScreenplaySubsetReport::setListSceneCharacters(bool val)
 
     m_listSceneCharacters = val;
     emit listSceneCharactersChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneSynopsis(bool val)
+{
+    if(m_includeSceneSynopsis == val)
+        return;
+
+    m_includeSceneSynopsis = val;
+    emit includeSceneSynopsisChanged();
 }
 
 void AbstractScreenplaySubsetReport::setIncludeSceneNumbers(bool val)
@@ -120,6 +131,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     stDoc.setScreenplay(m_screenplaySubset);
     stDoc.setFormatting(document->printFormat());
     stDoc.setTextDocument(textDocument);
+    stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
     stDoc.setInjection(this);
     this->configureScreenplayTextDocument(stDoc);
     stDoc.syncNow();
@@ -132,4 +144,9 @@ void AbstractScreenplaySubsetReport::configureTextDocumentPrinter(QTextDocumentP
     printer->header()->setVisibleFromPageOne(!m_generateTitlePage);
     printer->footer()->setVisibleFromPageOne(!m_generateTitlePage);
     printer->watermark()->setVisibleFromPageOne(true);
+}
+
+void AbstractScreenplaySubsetReport::inject(QTextCursor &, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation)
+{
+    // Incase we need to plug something in.
 }

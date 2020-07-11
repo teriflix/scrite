@@ -90,6 +90,8 @@ void CharacterScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDo
 
 void CharacterScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
+    AbstractScreenplaySubsetReport::inject(cursor, location);
+
     if(location != AfterTitlePage || !m_includeNotes)
         return;
 

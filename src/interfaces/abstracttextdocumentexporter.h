@@ -30,6 +30,13 @@ public:
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
+    Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include synopsis of each scene.")
+    Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    void setIncludeSceneSynopsis(bool val);
+    bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
+    Q_SIGNAL void includeSceneSynopsisChanged();
+
     virtual bool generateTitlePage() const { return true; }
     virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
@@ -44,6 +51,7 @@ protected:
 
 private:
     bool m_listSceneCharacters = false;
+    bool m_includeSceneSynopsis = false;
 };
 
 #endif // ABSTRACTTEXTDOCUMENTEXPORTER_H

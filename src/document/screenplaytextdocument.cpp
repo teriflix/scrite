@@ -297,6 +297,17 @@ void ScreenplayTextDocument::setHighlightDialoguesOf(QStringList val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setIncludeSceneSynopsis(bool val)
+{
+    if(m_includeSceneSynopsis == val)
+        return;
+
+    m_includeSceneSynopsis = val;
+    emit includeSceneSynopsisChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 {
     if(m_purpose == val)
@@ -1432,6 +1443,24 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText( QStringLiteral("{") + sceneCharacters.join(", ") + QStringLiteral("}") );
                 insertBlock = true;
             }
+        }
+
+        if(m_includeSceneSynopsis && !scene->title().isEmpty())
+        {
+            QColor sceneColor = scene->color().lighter(175);
+            sceneColor.setAlphaF(0.5);
+
+            QTextBlockFormat blockFormat;
+            blockFormat.setTopMargin(10);
+            blockFormat.setBackground(sceneColor);
+
+            QTextCharFormat charFormat;
+            charFormat.setFont(Application::instance()->font());
+
+            cursor.insertBlock(blockFormat, charFormat);
+            cursor.insertText(scene->title());
+
+            insertBlock = true;
         }
 
         bool highlightParagraph = false;

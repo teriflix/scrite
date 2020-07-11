@@ -22,7 +22,7 @@ Item {
 
     width: 700
     height: exporter && (exporter.requiresConfiguration || exporter.canBundleFonts) ?
-            Math.min(700, contentLoader.item.idealHeight) : 250
+            Math.min(750, contentLoader.item.idealHeight) : 250
 
     Component.onCompleted: {
         exporter = scriteDocument.createExporter(modalDialog.arguments)

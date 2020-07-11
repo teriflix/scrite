@@ -76,6 +76,8 @@ void LocationScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDoc
 
 void LocationScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
+    AbstractScreenplaySubsetReport::inject(cursor, location);
+
     if(location == AfterTitlePage)
     {
         m_summaryLocation = cursor.position();

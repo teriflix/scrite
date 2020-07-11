@@ -57,6 +57,8 @@ void ScreenplaySubsetReport::configureScreenplayTextDocument(ScreenplayTextDocum
 
 void ScreenplaySubsetReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
+    AbstractScreenplaySubsetReport::inject(cursor, location);
+
     if(location != AfterTitlePage)
         return;
 
