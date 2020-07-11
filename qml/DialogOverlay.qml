@@ -67,7 +67,7 @@ Rectangle {
     Behavior on t {
         enabled: animationsEnabled
         NumberAnimation {
-            duration: 150
+            duration: 100
             easing.type: Easing.Linear
         }
     }

@@ -119,7 +119,10 @@ bool EventFilter::forwardEventTo(QObject *object)
 
     // We have to create a duplicate copy of the event and
     // put it into the queue.
-    QEvent *event = this->getCurrentEvent();
+    if(m_currentEvent->type() == QEvent::NativeGesture)
+        return qApp->sendEvent(object, m_currentEvent);
+
+    QEvent *event = this->cloneCurrentEvent();
     if(event != nullptr)
     {
         qApp->postEvent(object, event);
@@ -248,7 +251,7 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-QEvent *EventFilter::getCurrentEvent() const
+QEvent *EventFilter::cloneCurrentEvent() const
 {
     if(m_currentEvent == nullptr)
         return nullptr;
@@ -267,10 +270,12 @@ QEvent *EventFilter::getCurrentEvent() const
         }
     case QEvent::Wheel: {
         QWheelEvent *we = static_cast<QWheelEvent*>(m_currentEvent);
-        return new QWheelEvent(we->pos(), we->delta(), we->buttons(), we->modifiers(), we->orientation());
+        return new QWheelEvent(we->posF(), we->globalPosF(), we->pixelDelta(), we->angleDelta(),
+                               we->delta(), we->orientation(), we->buttons(),
+                               we->modifiers(), we->phase(), we->source(), we->inverted() );
         }
     case QEvent::KeyPress:
-    case QEvent::KeyRelease:{
+    case QEvent::KeyRelease: {
         QKeyEvent *ke = static_cast<QKeyEvent*>(m_currentEvent);
         return new QKeyEvent(ke->type(), ke->key(), ke->modifiers(), ke->text(), ke->isAutoRepeat(), ushort(ke->count()));
         }

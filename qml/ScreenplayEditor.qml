@@ -179,7 +179,6 @@ Rectangle {
         anchors.bottom: statusBar.top
         clip: true
 
-        EventFilter.active: !contentView.synopsisExpanded
         EventFilter.events: [31]
         EventFilter.onFilter: {
             EventFilter.forwardEventTo(contentView)
@@ -196,7 +195,7 @@ Rectangle {
             property real leftMargin: contentView.synopsisExpanded && sidePanels.expanded ? 80 : (parent.width-width)/2
             Behavior on leftMargin {
                 enabled: screenplayEditorSettings.enableAnimations && contentView.synopsisExpandCounter > 0
-                NumberAnimation { duration: 250 }
+                NumberAnimation { duration: 50 }
             }
 
             Rectangle {

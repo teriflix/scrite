@@ -78,7 +78,7 @@ public:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
-    QEvent *getCurrentEvent() const;
+    QEvent *cloneCurrentEvent() const;
 
 private:
     bool m_active = true;

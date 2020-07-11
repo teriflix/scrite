@@ -26,10 +26,11 @@ Item {
 
     property bool expanded: false
     property alias content: contentLoader.sourceComponent
+    property alias contentItem: contentLoader.item
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
-    property real buttonSize: Math.min((textLabel.contentWidth + iconImage.width + 20) * 1.75, height)
+    property real buttonSize: Math.min((textLabel.contentWidth + iconImage.width + 20) * 1.25, height)
     readonly property real minPanelWidth: 25
     property real maxPanelWidth: 450
     Behavior on width {
