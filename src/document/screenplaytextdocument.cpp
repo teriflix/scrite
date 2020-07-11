@@ -816,7 +816,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                         }
                     }
 
-                    QString blockTextPart2 = blockText.mid(blockTextPart1.length()+1);
+                    QString blockTextPart2 = blockTextPart1.isEmpty() ? blockText : blockText.mid(blockTextPart1.length()+1);
 
                     cursor.clearSelection();
                     cursor.select(QTextCursor::BlockUnderCursor);
