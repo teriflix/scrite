@@ -621,6 +621,8 @@ Rectangle {
                     onTextChanged: contentItem.theScene.title = text
                     wrapMode: Text.WordWrap
                     text: contentItem.theScene.title
+                    selectByMouse: true
+                    selectByKeyboard: true
                     leftPadding: 10
                     rightPadding: 10
                     topPadding: 10

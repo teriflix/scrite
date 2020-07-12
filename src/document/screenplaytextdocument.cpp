@@ -816,7 +816,10 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                         }
                     }
 
-                    QString blockTextPart2 = blockTextPart1.isEmpty() ? blockText : blockText.mid(blockTextPart1.length()+1);
+                    QString blockTextPart2 = blockTextPart1.isEmpty() ? blockText :
+                                             blockText.mid(blockTextPart1.length()+1);
+                                             // Why +1? Because we want to skip the space
+                                             // between blockTextPart1 & blockTextPart2.
 
                     cursor.clearSelection();
                     cursor.select(QTextCursor::BlockUnderCursor);

@@ -170,11 +170,11 @@ Item {
             }
         }
 
-        property real minimumCellWidth: 340
+        property real minimumCellWidth: 450
         property int nrCells: Math.floor(width/minimumCellWidth)
 
         cellWidth: width/nrCells
-        cellHeight: 400
+        cellHeight: 500
 
         model: notesPack ? notesPack.noteCount+1 : 0
 
@@ -271,7 +271,12 @@ Item {
                                         text: note.heading
                                         font.bold: true
                                         font.pixelSize: 20
+                                        background: Item { }
+                                        leftPadding: 10
+                                        rightPadding: 10
                                         // renderType: Text.NativeRendering
+                                        selectByMouse: true
+                                        selectByKeyboard: true
                                         onTextChanged: {
                                             if(activeFocus)
                                                 note.heading = text
@@ -286,9 +291,9 @@ Item {
                                         Transliterator.hasActiveFocus: activeFocus
                                     }
 
-                                    ToolButton {
+                                    ToolButton3 {
                                         id: menuButton
-                                        icon.source: "../icons/navigation/menu.png"
+                                        iconSource: "../icons/navigation/menu.png"
                                         anchors.verticalCenter: parent.verticalCenter
                                         down: noteMenuLoader.item.visible
                                         enabled: !scriteDocument.readOnly
@@ -298,7 +303,6 @@ Item {
                                             else
                                                 noteMenuLoader.item.open()
                                         }
-                                        flat: true
 
                                         Loader {
                                             id: noteMenuLoader
@@ -314,12 +318,11 @@ Item {
                                         }
                                     }
 
-                                    ToolButton {
+                                    ToolButton3 {
                                         id: deleteButton
-                                        icon.source: "../icons/action/delete.png"
+                                        iconSource: "../icons/action/delete.png"
                                         anchors.verticalCenter: parent.verticalCenter
                                         onClicked: notesPack.removeNote(note)
-                                        flat: true
                                         enabled: !scriteDocument.readOnly
                                     }
                                 }
@@ -331,6 +334,9 @@ Item {
                                 wrapMode: Text.WordWrap
                                 text: note.content
                                 textFormat: TextArea.PlainText
+                                background: Item { }
+                                leftPadding: 10
+                                rightPadding: 10
                                 // renderType: Text.NativeRendering
                                 font.pixelSize: 18
                                 onTextChanged: {
@@ -339,6 +345,8 @@ Item {
                                 }
                                 readOnly: scriteDocument.readOnly
                                 palette: app.palette
+                                selectByMouse: true
+                                selectByKeyboard: true
                                 placeholderText: "type the contents of your note here.."
                                 KeyNavigation.tab: headingEdit
                                 Transliterator.textDocument: textDocument
@@ -420,7 +428,7 @@ Item {
         id: newCharactersDialogUi
 
         Rectangle {
-            width: Math.max(Math.min(charactersListView.implicitWidth+20, 1050), 400)
+            width: 800
             height: 680
             color: primaryColors.c10.background
 
