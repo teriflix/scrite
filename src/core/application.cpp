@@ -75,6 +75,14 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     QInternal::registerCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
 #endif
 
+    const QVersionNumber sversion = QVersionNumber::fromString( m_settings->value( QStringLiteral("Installation/version") ).toString() );
+    if(sversion.isNull() || sversion == QVersionNumber(0,4,7))
+    {
+        // until we can fix https://github.com/teriflix/scrite/issues/138
+        m_settings->setValue("Screenplay Editor/enableSpellCheck", false);
+    }
+    m_settings->setValue( QStringLiteral("Installation/version"), m_versionNumber.toString() );
+
     TransliterationEngine::instance(this);
 }
 

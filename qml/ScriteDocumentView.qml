@@ -53,7 +53,7 @@ Item {
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true
-        property bool enableSpellCheck: true
+        property bool enableSpellCheck: false // until we can fix https://github.com/teriflix/scrite/issues/138
         property bool enableAnimations: true
         onEnableAnimationsChanged: modalDialog.animationsEnabled = enableAnimations
     }
