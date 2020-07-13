@@ -61,8 +61,8 @@ Item {
         anchors.margins: anchorMargins
         source: parent.iconSource
         fillMode: Image.PreserveAspectFit
-        // smooth: true
-        // mipmap: true
+        smooth: true
+        mipmap: true
         opacity: enabled ? (toolButtonMouseArea.containsMouse ? 1 : 0.9) : 0.45
         property real anchorMargins: {
             var am = toolButtonMouseArea.containsMouse ? 8 : 10
