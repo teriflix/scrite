@@ -670,10 +670,14 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
 
 void Application::computeIdealFontPointSize()
 {
+#ifdef Q_OS_WIN
+    m_idealFontPointSize = 12;
+#else
     const qreal minInch = 0.12;
     const qreal nrPointsPerInch = 72.0;
     const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
     m_idealFontPointSize = qCeil(minInch * nrPointsPerInch * scale);
+#endif
 }
 
 QColor Application::pickStandardColor(int counter) const
