@@ -1649,6 +1649,29 @@ Rectangle {
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
+
+                    header: Rectangle {
+                        width: sceneListView.width-1
+                        height: 40
+                        color: screenplayAdapter.currentIndex < 0 ? accentColors.windowColor : Qt.rgba(0,0,0,0)
+
+                        Text {
+                            anchors.centerIn: parent
+                            font.family: "Courier Prime"
+                            font.pixelSize: 16
+                            font.bold: screenplayAdapter.currentIndex < 0
+                            text: "Title Page"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                screenplayAdapter.currentIndex = -1
+                                contentView.positionViewAtBeginning()
+                            }
+                        }
+                    }
+
                     delegate: Rectangle {
                         width: sceneListView.width-1
                         height: 40
@@ -1705,10 +1728,7 @@ Rectangle {
                             }
 
                             function navigateToScene() {
-                                if(index === 0)
-                                    contentView.scrollToFirstScene()
-                                else
-                                    contentView.positionViewAtIndex(index, ListView.Beginning)
+                                contentView.positionViewAtIndex(index, ListView.Beginning)
                                 screenplayAdapter.currentIndex = index
                             }
                         }
