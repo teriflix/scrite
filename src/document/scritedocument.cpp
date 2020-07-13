@@ -968,6 +968,8 @@ bool ScriteDocument::load(const QString &fileName)
 
     UndoStack::ignoreUndoCommands = true;
     const bool ret = QObjectSerializer::fromJson(json, this);
+    if(m_screenplay->currentElementIndex() == 0)
+        m_screenplay->setCurrentElementIndex(-1);
     UndoStack::ignoreUndoCommands = false;
     UndoStack::clearAllStacks();
 

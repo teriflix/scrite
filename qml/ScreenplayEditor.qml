@@ -40,7 +40,7 @@ Rectangle {
         id: screenplayAdapter
         source: scriteDocument.loading ? null : scriteDocument.screenplay
         onCurrentIndexChanged: {
-            if(currentIndex <= 0) {
+            if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
                 return
             }
@@ -342,6 +342,11 @@ Rectangle {
                     }
 
                     function scrollIntoView(index) {
+                        if(index < 0) {
+                            positionViewAtBeginning()
+                            return
+                        }
+
                         var topIndex = firstItemIndex
                         var bottomIndex = lastItemIndex
 
