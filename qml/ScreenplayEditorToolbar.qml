@@ -97,6 +97,10 @@ Row {
         checkable: true
         checked: false
         enabled: !showScreenplayPreview
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Find"
+        ShortcutsModelItem.shortcut: shortcut
     }
 
     Rectangle {
@@ -116,6 +120,10 @@ Row {
             requestScreenplayEditor()
             scriteDocument.createNewScene()
         }
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Create New Scene"
+        ShortcutsModelItem.shortcut: shortcut
     }
 
     ToolButton3 {
@@ -125,6 +133,10 @@ Row {
         ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: binder && !showScreenplayPreview ? true : false
         onClicked: binder.refresh()
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Refresh"
+        ShortcutsModelItem.shortcut: shortcut
     }
 
     Rectangle {
@@ -145,6 +157,11 @@ Row {
             enabled: !scriteDocument.readOnly && binder && !showScreenplayPreview ? binder.currentElement !== null : false
             down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
             onClicked: binder.currentElement.type = modelData.value
+
+            ShortcutsModelItem.group: "Formatting"
+            ShortcutsModelItem.title: modelData.display + " format"
+            ShortcutsModelItem.shortcut: shortcut
+            ShortcutsModelItem.enabled: enabled
         }
     }
 }

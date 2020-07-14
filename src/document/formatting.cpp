@@ -934,7 +934,7 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
     : QSyntaxHighlighter(parent),
       m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer")
 {
-
+    connect(this, &SceneDocumentBinder::currentElementChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder()
@@ -1182,43 +1182,71 @@ void SceneDocumentBinder::setForceSyncDocument(bool val)
     emit forceSyncDocumentChanged();
 }
 
-void SceneDocumentBinder::tab()
+QString SceneDocumentBinder::nextTabFormatAsString() const
+{
+    auto typeToString = [](int type) {
+        switch(type) {
+        case SceneElement::Action: return QStringLiteral("Action");
+        case SceneElement::Character: return QStringLiteral("Character");
+        case SceneElement::Dialogue: return QStringLiteral("Dialogue");
+        case SceneElement::Parenthetical: return QStringLiteral("Parenthetical");
+        case SceneElement::Shot: return QStringLiteral("Shot");
+        case SceneElement::Transition: return QStringLiteral("Transition");
+        case SceneElement::Heading: return QStringLiteral("Scene Heading");
+        }
+        return QStringLiteral("Unknown");
+    };
+
+    const int ntf = this->nextTabFormat();
+    if(ntf < 0)
+        return QStringLiteral("Change Format");
+
+    const QString current = m_currentElement ? typeToString(m_currentElement->type()) : typeToString(-1);
+    const QString next = typeToString(ntf);
+    return current + QStringLiteral(" -> ") + next;
+}
+
+int SceneDocumentBinder::nextTabFormat() const
 {
     if(m_cursorPosition < 0 || m_textDocument == nullptr || m_currentElement == nullptr || this->document() == nullptr)
-        return;
+        return -1;
 
     const int elementNr = m_scene->indexOfElement(m_currentElement);
     if(elementNr < 0)
-        return;
+        return -1;
 
     switch(m_currentElement->type())
     {
     case SceneElement::Action:
-        m_currentElement->setType(SceneElement::Character);
-        break;
+        return SceneElement::Character;
     case SceneElement::Character:
         if(m_tabHistory.isEmpty())
-            m_currentElement->setType(SceneElement::Action);
-        else
-            m_currentElement->setType(SceneElement::Transition);
-        break;
+            return SceneElement::Action;
+        return SceneElement::Transition;
     case SceneElement::Dialogue:
-        m_currentElement->setType(SceneElement::Parenthetical);
-        break;
+        return SceneElement::Parenthetical;
     case SceneElement::Parenthetical:
-        m_currentElement->setType(SceneElement::Dialogue);
-        break;
+        return SceneElement::Dialogue;
     case SceneElement::Shot:
-        m_currentElement->setType(SceneElement::Transition);
-        break;
+        return SceneElement::Transition;
     case SceneElement::Transition:
-        m_currentElement->setType(SceneElement::Action);
-        break;
+        return SceneElement::Action;
     default:
         break;
     }
 
+    return m_currentElement->type();
+}
+
+void SceneDocumentBinder::tab()
+{
+    const int ntf = this->nextTabFormat();
+    if(ntf < 0)
+        return;
+
+    m_currentElement->setType(SceneElement::Type(ntf));
     m_tabHistory.append(m_currentElement->type());
+    emit nextTabFormatChanged();
 }
 
 void SceneDocumentBinder::backtab()
@@ -1685,13 +1713,17 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
         return;
 
     if(m_currentElement != nullptr)
+    {
         disconnect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+        disconnect(m_currentElement, &SceneElement::typeChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
+    }
 
     m_currentElement = val;
 
     if(m_currentElement != nullptr)
     {
         connect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+        connect(m_currentElement, &SceneElement::typeChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
 
         SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
         if(format != nullptr)

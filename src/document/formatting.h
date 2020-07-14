@@ -413,6 +413,13 @@ public:
     bool isForceSyncDocument() const { return m_forceSyncDocument; }
     Q_SIGNAL void forceSyncDocumentChanged();
 
+    Q_PROPERTY(QString nextTabFormatAsString READ nextTabFormatAsString NOTIFY nextTabFormatChanged)
+    QString nextTabFormatAsString() const;
+
+    Q_PROPERTY(int nextTabFormat READ nextTabFormat NOTIFY nextTabFormatChanged)
+    int nextTabFormat() const;
+    Q_SIGNAL void nextTabFormatChanged();
+
     Q_INVOKABLE void tab();
     Q_INVOKABLE void backtab();
     Q_INVOKABLE bool canGoUp();

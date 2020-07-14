@@ -1032,16 +1032,40 @@ Rectangle {
                         }
                     }
 
-                    Keys.onTabPressed: {
-                        if(completer.suggestion !== "") {
-                            userIsTyping = false
-                            insert(cursorPosition, completer.suggestion)
-                            userIsTyping = true
-                            Transliterator.enableFromNextWord()
-                            event.accepted = true
-                        } else
-                            sceneDocumentBinder.tab()
+                    QtObject {
+                        ShortcutsModelItem.priority: 1
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.visible: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.group: "Formatting"
+                        ShortcutsModelItem.title: sceneDocumentBinder.nextTabFormatAsString
+                        ShortcutsModelItem.shortcut: "Tab"
                     }
+
+                    QtObject {
+                        ShortcutsModelItem.priority: 1
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.visible: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.group: "Formatting"
+                        ShortcutsModelItem.title: {
+                            if( (binder.currentElement === null || binder.currentElement.text === "") && completer.suggestion !== "")
+                                return "Show Format Menu"
+                            if( completer.suggestion !== "" )
+                                return "Auto Complete"
+                            return "Create New Paragraph"
+                        }
+                        ShortcutsModelItem.shortcut: "Enter"
+                    }
+
+                    QtObject {
+                        ShortcutsModelItem.priority: 1
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.visible: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.group: "Formatting"
+                        ShortcutsModelItem.title: "Split Scene"
+                        ShortcutsModelItem.shortcut: "Ctrl+Enter"
+                    }
+
+                    Keys.onTabPressed: sceneDocumentBinder.tab()
                     Keys.onBacktabPressed: sceneDocumentBinder.backtab()
 
                     // Double enter menu and split-scene handling.
@@ -1052,8 +1076,14 @@ Rectangle {
                             return
                         }
 
-                        if(binder.currentElement === null || binder.currentElement.text === "") {
+                        if( (binder.currentElement === null || binder.currentElement.text === "") && completer.suggestion === "" ) {
                             doubleEnterMenu.show()
+                            event.accepted = true
+                        } else if(completer.suggestion !== "") {
+                            userIsTyping = false
+                            insert(cursorPosition, completer.suggestion)
+                            userIsTyping = true
+                            Transliterator.enableFromNextWord()
                             event.accepted = true
                         } else
                             event.accepted = false

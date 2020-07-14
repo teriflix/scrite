@@ -112,5 +112,8 @@
         <file>icons/action/remove_all.png</file>
         <file>icons/action/remove_all_inverted.png</file>
         <file>icons/content/blank.png</file>
+        <file>icons/navigation/shortcuts_linux.png</file>
+        <file>icons/navigation/shortcuts_macos.png</file>
+        <file>icons/navigation/shortcuts_windows.png</file>
     </qresource>
 </RCC>

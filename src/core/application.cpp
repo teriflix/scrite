@@ -761,6 +761,11 @@ QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF
     return ret;
 }
 
+qreal Application::distanceBetweenPoints(const QPointF &p1, const QPointF &p2) const
+{
+    return QLineF(p1, p2).length();
+}
+
 QString Application::fileContents(const QString &fileName) const
 {
     QFile file(fileName);

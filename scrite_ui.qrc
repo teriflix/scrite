@@ -45,5 +45,7 @@
         <file>qml/BoxShadow.qml</file>
         <file>qml/FileSelector.qml</file>
         <file>qml/SidePanel.qml</file>
+        <file>qml/ShortcutsView.qml</file>
+        <file>qml/DockWidget.qml</file>
     </qresource>
 </RCC>

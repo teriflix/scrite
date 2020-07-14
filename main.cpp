@@ -38,6 +38,7 @@
 #include "textshapeitem.h"
 #include "resetonchange.h"
 #include "scritedocument.h"
+#include "shortcutsmodel.h"
 #include "materialcolors.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
@@ -218,9 +219,15 @@ int main(int argc, char **argv)
 
     qmlRegisterType<FileInfo>("Scrite", 1, 0, "FileInfo");
 
+    qmlRegisterUncreatableType<ShortcutsModelItem>("Scrite", 1, 0, "ShortcutsModelItem", "Use as attached property.");
+
     NotificationManager notificationManager;
 
     DocumentFileSystem::setMarker( QByteArrayLiteral("SCRITE") );
+
+    ShortcutsModel::instance()->setGroups( QStringList() << QStringLiteral("Application") <<
+        QStringLiteral("Formatting") << QStringLiteral("Settings") << QStringLiteral("Language") <<
+        QStringLiteral("File") << QStringLiteral("Edit") );
 
     ScriteDocument *scriteDocument = ScriteDocument::instance();
 
@@ -258,6 +265,7 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
     qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);
+    qmlView.engine()->rootContext()->setContextProperty("shortcutsModel", ShortcutsModel::instance());
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));

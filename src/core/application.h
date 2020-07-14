@@ -183,6 +183,7 @@ public:
     Q_INVOKABLE QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom) const;
     Q_INVOKABLE bool   isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
     Q_INVOKABLE QPointF translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
+    Q_INVOKABLE qreal  distanceBetweenPoints(const QPointF &p1, const QPointF &p2) const;
 
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }

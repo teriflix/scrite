@@ -72,6 +72,42 @@ Item {
         property string parentheticalLanguage: "Default"
     }
 
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Alt+C"
+        ShortcutsModelItem.group: "Settings"
+        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters" : "Show Scene Characters"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Alt+S"
+        ShortcutsModelItem.group: "Settings"
+        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneNotes ? "Hide Synopsis" : "Show Synopsis"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: screenplayEditorSettings.displaySceneNotes = !screenplayEditorSettings.displaySceneNotes
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Alt+L"
+        ShortcutsModelItem.group: "Settings"
+        ShortcutsModelItem.title: screenplayEditorSettings.enableSpellCheck ? "Disable Spellcheck" : "Enable Spellcheck"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: screenplayEditorSettings.enableSpellCheck = !screenplayEditorSettings.enableSpellCheck
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Alt+A"
+        ShortcutsModelItem.group: "Settings"
+        ShortcutsModelItem.title: screenplayEditorSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: screenplayEditorSettings.enableAnimations = !screenplayEditorSettings.enableAnimations
+    }
+
     Rectangle {
         id: appToolBarArea
         anchors.left: parent.left
@@ -126,6 +162,10 @@ Item {
                         else
                             resetContentAnimation.start()
                     }
+
+                    ShortcutsModelItem.group: "File"
+                    ShortcutsModelItem.title: text
+                    ShortcutsModelItem.shortcut: shortcut
                 }
 
                 ToolButton3 {
@@ -161,6 +201,10 @@ Item {
                             fileDialog.launch("OPEN", filePath)
                         }
                     }
+
+                    ShortcutsModelItem.group: "File"
+                    ShortcutsModelItem.title: text
+                    ShortcutsModelItem.shortcut: shortcut
 
                     Item {
                         anchors.top: parent.bottom
@@ -245,6 +289,10 @@ Item {
                         else
                             scriteDocument.save()
                     }
+
+                    ShortcutsModelItem.group: "File"
+                    ShortcutsModelItem.title: text
+                    ShortcutsModelItem.shortcut: shortcut
                 }
 
                 ToolButton3 {
@@ -255,6 +303,10 @@ Item {
                     enabled: scriteDocument.structure.elementCount > 0
                     onClicked: fileDialog.launch("SAVE")
                     visible: documentUI.width > 1460
+
+                    ShortcutsModelItem.group: "File"
+                    ShortcutsModelItem.title: text
+                    ShortcutsModelItem.shortcut: shortcut
                 }
 
                 Rectangle {
@@ -271,6 +323,10 @@ Item {
                     enabled: app.canUndo
                     onClicked: app.undoGroup.undo()
                     ToolTip.text: "Undo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
+
+                    ShortcutsModelItem.group: "Edit"
+                    ShortcutsModelItem.title: "Undo"
+                    ShortcutsModelItem.shortcut: shortcut
                 }
 
                 ToolButton3 {
@@ -280,6 +336,11 @@ Item {
                     enabled: app.canRedo
                     onClicked: app.undoGroup.redo()
                     ToolTip.text: "Redo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
+
+                    ShortcutsModelItem.group: "Edit"
+                    ShortcutsModelItem.title: "Redo"
+                    ShortcutsModelItem.shortcut: shortcut
+
                 }
 
                 Rectangle {
@@ -482,6 +543,10 @@ Item {
                         modalDialog.sourceComponent = optionsDialogComponent
                         modalDialog.active = true
                     }
+
+                    ShortcutsModelItem.group: "Application"
+                    ShortcutsModelItem.title: text
+                    ShortcutsModelItem.shortcut: shortcut
                 }
 
                 ToolButton3 {
@@ -545,6 +610,11 @@ Item {
                                         scriteDocument.formatting.defaultLanguage = modelData.value
                                         paragraphLanguageSettings.defaultLanguage = modelData.key
                                     }
+
+                                    ShortcutsModelItem.priority: 0
+                                    ShortcutsModelItem.title: modelData.key
+                                    ShortcutsModelItem.group: "Language"
+                                    ShortcutsModelItem.shortcut: sequence
                                 }
                             }
                         }
@@ -557,6 +627,11 @@ Item {
                                 scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
                                 paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
                             }
+
+                            ShortcutsModelItem.priority: 1
+                            ShortcutsModelItem.title: "Next Language"
+                            ShortcutsModelItem.group: "Language"
+                            ShortcutsModelItem.shortcut: "F10"
                         }
                     }
                 }
@@ -569,6 +644,12 @@ Item {
                     onClicked: alphabetMappingsPopup.visible = true
                     down: alphabetMappingsPopup.visible
                     enabled: app.transliterationEngine.language !== TransliterationEngine.English
+
+                    ShortcutsModelItem.priority: 1
+                    ShortcutsModelItem.group: "Language"
+                    ShortcutsModelItem.title: "Alphabet Mapping"
+                    ShortcutsModelItem.shortcut: shortcut
+                    ShortcutsModelItem.enabled: enabled
 
                     Item {
                         anchors.top: parent.bottom
@@ -622,6 +703,38 @@ Item {
                 editor: sceneEditor ? sceneEditor.editor : null
             }
 
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            Item {
+                height: parent.height
+                width: appToolBarArea.width * 0.01
+            }
+
+            ToolButton3 {
+                id: shortcutsDockWidgetToggleButton
+                anchors.verticalCenter: parent.verticalCenter
+                iconSource: {
+                    if(app.isMacOSPlatform)
+                        return "../icons/navigation/shortcuts_macos.png"
+                    if(app.isWindowsPlatform)
+                        return "../icons/navigation/shortcuts_windows.png"
+                    return "../icons/navigation/shortcuts_linux.png"
+                }
+                shortcut: "Ctrl+E"
+                ToolTip.text: "Shortcuts Window\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                down: shortcutsDockWidget.visible
+                onClicked: shortcutsDockWidget.toggle()
+
+                ShortcutsModelItem.group: "Application"
+                ShortcutsModelItem.title: "Shortcuts Window"
+                ShortcutsModelItem.shortcut: shortcut
+            }
+
             Item {
                 height: parent.height
                 width: appToolBarArea.width * 0.01
@@ -638,6 +751,11 @@ Item {
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
                 property color activeTabColor: primaryColors.windowColor
+
+                onCurrentIndexChanged: {
+                    if(currentIndex !== 0)
+                        shortcutsDockWidget.hide()
+                }
 
                 ResetOnChange {
                     id: currentTabExtents
@@ -705,11 +823,6 @@ Item {
                         }
                     }
                 }
-            }
-
-            Item {
-                height: parent.height
-                width: appToolBarArea.width * 0.01
             }
 
             Image {
@@ -1162,6 +1275,36 @@ Item {
                 } else
                     close.accepted = true
             }
+        }
+    }
+
+    DockWidget {
+        id: shortcutsDockWidget
+        title: "Shortcuts"
+        anchors.fill: parent
+        contentX: -1
+        contentY: -1
+        contentWidth: 375
+        contentHeight: (parent.height - appToolBar.height - 30) * 0.8
+        visible: shortcutsDockWidgetSettings.visible
+        sourceItem: shortcutsDockWidgetToggleButton
+        content: ShortcutsView { }
+        onCloseRequest: hide()
+
+        Settings {
+            id: shortcutsDockWidgetSettings
+            fileName: app.settingsFilePath
+            category: "Shortcuts Dock Widget"
+            property alias contentX: shortcutsDockWidget.contentX
+            property alias contentY: shortcutsDockWidget.contentY
+            property alias visible: shortcutsDockWidget.visible
+        }
+
+        Component.onCompleted: {
+            if(contentX < 0)
+                contentX = documentUI.width - 40 - shortcutsDockWidget.contentWidth
+            if(contentY < 0)
+                contentY = (documentUI.height - shortcutsDockWidget.contentHeight)/2
         }
     }
 }
