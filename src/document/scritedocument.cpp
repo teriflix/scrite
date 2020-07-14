@@ -1225,6 +1225,20 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             }
         }
     }
+
+    if(version <= QVersionNumber(0,4,7))
+    {
+        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+        {
+            SceneElementFormat *format = m_formatting->elementFormat( SceneElement::Type(i) );
+            if(qFuzzyCompare(format->lineHeight(), 1.0))
+                format->setLineHeight(0.85);
+            const qreal lineHeight = format->lineHeight();
+
+            format = m_printFormat->elementFormat( SceneElement::Type(i) );
+            format->setLineHeight(lineHeight);
+        }
+    }
 }
 
 QString ScriteDocument::polishFileName(const QString &givenFileName) const
