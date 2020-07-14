@@ -393,7 +393,11 @@ void ScreenplayPageLayout::configure(QPagedPaintDevice *printer) const
 void ScreenplayPageLayout::evaluateRects()
 {
     if(m_format->screen())
-        m_resolution = qFuzzyCompare(m_format->screen()->devicePixelRatio(),1.0) ? m_format->screen()->physicalDotsPerInch() : m_format->screen()->logicalDotsPerInch();
+    {
+        const qreal pdpi = m_format->screen()->physicalDotsPerInch();
+        const qreal dpr = m_format->screen()->devicePixelRatio();
+        m_resolution = pdpi / dpr;
+    }
     else
         m_resolution = qt_defaultDpi();
 
@@ -401,10 +405,11 @@ void ScreenplayPageLayout::evaluateRects()
     static const qreal leftMargin = 1.5; // inches
     static const qreal topMargin = 1.0; // inches
     static const qreal bottomMargin = 1.0; // inches
-    static const qreal contentWidth = 6.45; // inches
+    static const qreal contentWidth = 6.55; // inches
 
     const QPageSize pageSize(m_paperSize == A4 ? QPageSize::A4 : QPageSize::Letter);
     const QRectF paperRectIn = pageSize.rect(QPageSize::Inch);
+
     const qreal rightMargin = paperRectIn.width() - contentWidth - leftMargin;
 
     const QMarginsF margins(leftMargin, topMargin, rightMargin, bottomMargin);
@@ -645,13 +650,13 @@ void ScreenplayFormat::resetToDefaults()
 
       Paragraph Type | Starts From | Extends Upto | Spacing Before
       ---------------|-------------|--------------|----------------
-      Scene Heading  | 1.6"        | 8.05"        | 2 Lines
-      Action         | 1.6"        | 8.05"        | 1 Line
-      Character      | 3.7"        | 7.8"         | 1 Line
-      Parenthetical  | 3.25"       | 5.9"         | 0 Lines
-      Dialogue       | 2.65"       | 6.5"         | 0 Lines
-      Transition     | 5.9"        | 7.6"         | 1 Lines
-      Shot           | 1.6"        | 7.6"         | 1 Lines
+      Scene Heading  | 1.50"       | 8.05"        | 2 Lines
+      Action         | 1.50"       | 8.05"        | 1 Line
+      Character      | 3.70"       | 8.05"        | 1 Line
+      Parenthetical  | 3.10"       | 5.63"        | 0 Lines
+      Dialogue       | 2.50"       | 6.55"        | 0 Lines
+      Transition     | 5.60"       | 7.6"         | 1 Lines
+      Shot           | 1.50"       | 7.6"         | 1 Lines
       */
     this->setDefaultFont(QFont("Courier Prime", 12));
     if(m_screen != nullptr)
@@ -674,38 +679,38 @@ void ScreenplayFormat::resetToDefaults()
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
         m_elementFormats.at(i)->resetToDefaults();
 
-    const qreal contentWidth = 6.45;
-    const qreal left = 1.6;
+    const qreal contentWidth = 6.55;
+    const qreal left = 1.50;
     const qreal right = 8.05;
 
-    m_elementFormats[SceneElement::Heading]->setLeftMargin( (1.6-left)/contentWidth );
+    m_elementFormats[SceneElement::Heading]->setLeftMargin( (1.5-left)/contentWidth );
     m_elementFormats[SceneElement::Heading]->setRightMargin( (right-8.05)/contentWidth );
     m_elementFormats[SceneElement::Heading]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Heading]->setFontCapitalization(QFont::AllUppercase);
 
-    m_elementFormats[SceneElement::Action]->setLeftMargin( (1.6-left)/contentWidth );
+    m_elementFormats[SceneElement::Action]->setLeftMargin( (1.5-left)/contentWidth );
     m_elementFormats[SceneElement::Action]->setRightMargin( (right-8.05)/contentWidth );
     m_elementFormats[SceneElement::Action]->setLineSpacingBefore(1);
 
     m_elementFormats[SceneElement::Character]->setLeftMargin( (3.7-left)/contentWidth );
-    m_elementFormats[SceneElement::Character]->setRightMargin( (right-7.8)/contentWidth );
+    m_elementFormats[SceneElement::Character]->setRightMargin( (right-8.05)/contentWidth );
     m_elementFormats[SceneElement::Character]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Character]->setFontCapitalization(QFont::AllUppercase);
 
-    m_elementFormats[SceneElement::Parenthetical]->setLeftMargin( (3.25-left)/contentWidth );
-    m_elementFormats[SceneElement::Parenthetical]->setRightMargin( (right-5.9)/contentWidth );
+    m_elementFormats[SceneElement::Parenthetical]->setLeftMargin( (3.1-left)/contentWidth );
+    m_elementFormats[SceneElement::Parenthetical]->setRightMargin( (right-5.63)/contentWidth );
     m_elementFormats[SceneElement::Parenthetical]->setLineSpacingBefore(0);
 
-    m_elementFormats[SceneElement::Dialogue]->setLeftMargin( (2.65-left)/contentWidth );
-    m_elementFormats[SceneElement::Dialogue]->setRightMargin( (right-6.5)/contentWidth );
+    m_elementFormats[SceneElement::Dialogue]->setLeftMargin( (2.5-left)/contentWidth );
+    m_elementFormats[SceneElement::Dialogue]->setRightMargin( (right-6.55)/contentWidth );
     m_elementFormats[SceneElement::Dialogue]->setLineSpacingBefore(0);
 
-    m_elementFormats[SceneElement::Transition]->setLeftMargin( (5.9-left)/contentWidth );
+    m_elementFormats[SceneElement::Transition]->setLeftMargin( (5.6-left)/contentWidth );
     m_elementFormats[SceneElement::Transition]->setRightMargin( (right-7.6)/contentWidth );
     m_elementFormats[SceneElement::Transition]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Transition]->setFontCapitalization(QFont::AllUppercase);
 
-    m_elementFormats[SceneElement::Shot]->setLeftMargin( (1.6-left)/contentWidth );
+    m_elementFormats[SceneElement::Shot]->setLeftMargin( (1.5-left)/contentWidth );
     m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );
     m_elementFormats[SceneElement::Shot]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
