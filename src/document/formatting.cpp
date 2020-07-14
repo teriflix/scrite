@@ -652,7 +652,7 @@ void ScreenplayFormat::resetToDefaults()
       ---------------|-------------|--------------|----------------
       Scene Heading  | 1.50"       | 8.05"        | 2 Lines
       Action         | 1.50"       | 8.05"        | 1 Line
-      Character      | 3.70"       | 8.05"        | 1 Line
+      Character      | 3.70"       | 7.36"        | 1 Line
       Parenthetical  | 3.10"       | 5.63"        | 0 Lines
       Dialogue       | 2.50"       | 6.55"        | 0 Lines
       Transition     | 5.60"       | 7.6"         | 1 Lines
@@ -693,7 +693,7 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Action]->setLineSpacingBefore(1);
 
     m_elementFormats[SceneElement::Character]->setLeftMargin( (3.7-left)/contentWidth );
-    m_elementFormats[SceneElement::Character]->setRightMargin( (right-8.05)/contentWidth );
+    m_elementFormats[SceneElement::Character]->setRightMargin( (right-7.36)/contentWidth );
     m_elementFormats[SceneElement::Character]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Character]->setFontCapitalization(QFont::AllUppercase);
 
