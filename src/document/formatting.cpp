@@ -293,7 +293,7 @@ void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
 void SceneElementFormat::resetToDefaults()
 {
     this->setFont(m_format->defaultFont());
-    this->setLineHeight(1.0);
+    this->setLineHeight(0.85);
     this->setLeftMargin(0);
     this->setRightMargin(0);
     this->setLineSpacingBefore(0);
