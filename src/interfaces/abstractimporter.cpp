@@ -103,7 +103,11 @@ Scene *AbstractImporter::createScene(const QString &heading)
 
     StructureElement *structureElement = new StructureElement(structure);
     scene = new Scene(structureElement);
+#if 0
     scene->setColor(sceneColors.at(sceneIndex%sceneColors.length()));
+#else
+    scene->setColor(Qt::white);
+#endif
     structureElement->setScene(scene);
     structureElement->setX(elementX + (sceneIndex%2 ? elementXSpacing : 0));
     structureElement->setY(elementY + elementYSpacing*sceneIndex);
