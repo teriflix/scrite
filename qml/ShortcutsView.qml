@@ -20,7 +20,7 @@ Item {
     property alias backgroundOpacity: background.opacity
     property alias backgroundBorder: background.border
 
-    readonly property real minimumWidth: 350
+    readonly property real minimumWidth: 375
 
     Rectangle {
         id: background
@@ -78,14 +78,13 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: 20
                 anchors.right: parent.right
-                anchors.rightMargin: 5
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     // font.family: "Courier Prime"
                     font.pointSize: app.idealFontPointSize
                     text: itemTitle
-                    width: parent.width * 0.7
+                    width: parent.width * 0.65
                     elide: Text.ElideRight
                 }
 
@@ -94,7 +93,7 @@ Item {
                     font.family: "Courier Prime"
                     font.pointSize: app.idealFontPointSize-2
                     text: app.polishShortcutTextForDisplay(itemShortcut)
-                    width: parent.width * 0.3
+                    width: parent.width * 0.35
                 }
             }
         }

@@ -559,6 +559,7 @@ Item {
             TrackProperty { target: canvas; property: "height" }
             TrackProperty { target: canvasScroll; property: "width" }
             TrackProperty { target: canvasScroll; property: "height" }
+            TrackProperty { target: selection; property: active }
             TrackSignal { target: scriteDocument.structure; signal: "structureChanged()" }
 
             onTracked: {
