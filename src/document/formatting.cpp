@@ -1033,6 +1033,7 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
         this->QSyntaxHighlighter::setDocument(m_textDocument->textDocument());
     else
         this->QSyntaxHighlighter::setDocument(nullptr);
+    this->setDocumentLoadCount(0);
 
     this->evaluateAutoCompleteHints();
 

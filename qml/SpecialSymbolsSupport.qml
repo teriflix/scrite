@@ -44,14 +44,16 @@ Item {
             background: Item { }
             contentItem: SpecialSymbolsPanel {
                 onSymbolClicked: {
-                    symbolMenu.close()
                     if(textEditorHasCursorInterface) {
                         var cp = textEditor.cursorPosition
                         textEditor.insert(textEditor.cursorPosition, text)
+                        app.execLater(textEditor, 100, function() { textEditor.cursorPosition = cp + text.length })
+                        symbolMenu.close()
                         textEditor.forceActiveFocus()
-                        textEditor.cursorPosition = cp + text.length
-                    } else
+                    } else {
+                        SpecialSymbolsSupport
                         symbolSelected(text)
+                    }
                 }
             }
         }

@@ -26,7 +26,7 @@ Rectangle {
             "symbols": ["Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "×", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "÷", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ", "Œ", "œ", "Š", "š", "Ÿ", "ƒ", "ˆ", "˜"]
         },
         {
-            "title": "Smileys",
+            "title": "Emoji",
             "symbols": ["😁","😂","😃","😄","😅","😆","😉","😊","😋","😌","😍","😏","😒","😔","😖","😘","😚","😜","😝","😞","😠","😡","😢","😣","😤","😥","😨","😩","😪","😫","😭","😰","😱","😲","😳","😵","😷","😇","😈","😎","😐","😶","😸","😹","😺","😻","😼","😽","😾","😿","🙀","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍","🙎","🙏"]
         }
     ]
@@ -45,7 +45,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         color: primaryColors.c700.background
         property int currentIndex: 0
-        property bool currentIndexIsSmileys: symbols[symbolsPanel.currentIndex].title === "Smileys"
+        property bool currentIndexIsSmileys: symbols[symbolsPanel.currentIndex].title === "Emoji"
 
         Column {
             width: parent.width
@@ -103,7 +103,7 @@ Rectangle {
         model: symbols[symbolsPanel.currentIndex].symbols
         header: Item {
             width: symbolsGridView.width-14
-            height: symbolsPanel.currentIndexIsSmileys ? 50 : 0
+            height: symbolsPanel.currentIndexIsSmileys ? 35 : 0
 
             Text {
                 visible: symbolsPanel.currentIndexIsSmileys
@@ -111,7 +111,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 anchors.centerIn: parent
                 font.pointSize: app.idealFontPointSize
-                text: "Smileys may not be included in PDF exports."
+                text: "Emojis may not be included in PDF exports."
             }
         }
 
