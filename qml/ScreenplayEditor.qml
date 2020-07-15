@@ -633,6 +633,7 @@ Rectangle {
                     rightPadding: 10
                     topPadding: 10
                     bottomPadding: 10
+                    readOnly: scriteDocument.readOnly
 
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
@@ -643,6 +644,7 @@ Rectangle {
                         anchors.left: parent.left
                         textEditor: synopsisEdit
                         textEditorHasCursorInterface: true
+                        enabled: !scriteDocument.readOnly
                     }
                 }
             }
@@ -793,6 +795,7 @@ Rectangle {
                             // just won't work.
                             includeEmojis: app.isWindowsPlatform || app.isLinuxPlatform
                             textEditorHasCursorInterface: true
+                            enabled: !scriteDocument.readOnly
                         }
 
                         Completer {
@@ -1057,7 +1060,7 @@ Rectangle {
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: sceneDocumentBinder.nextTabFormatAsString
@@ -1066,7 +1069,7 @@ Rectangle {
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: {
@@ -1081,18 +1084,29 @@ Rectangle {
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: "Split Scene"
                         ShortcutsModelItem.shortcut: "Ctrl+Enter"
                     }
 
-                    Keys.onTabPressed: sceneDocumentBinder.tab()
-                    Keys.onBacktabPressed: sceneDocumentBinder.backtab()
+                    Keys.onTabPressed: {
+                        if(!scriteDocument.readOnly)
+                            sceneDocumentBinder.tab()
+                    }
+                    Keys.onBacktabPressed: {
+                        if(!scriteDocument.readOnly)
+                            sceneDocumentBinder.backtab()
+                    }
 
                     // Double enter menu and split-scene handling.
                     Keys.onReturnPressed: {
+                        if(scriteDocument.readOnly) {
+                            event.accepted = false
+                            return
+                        }
+
                         if(event.modifiers & Qt.ControlModifier) {
                             contentItem.splitScene()
                             event.accepted = true

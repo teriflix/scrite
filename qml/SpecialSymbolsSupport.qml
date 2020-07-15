@@ -25,9 +25,15 @@ Item {
     signal symbolSelected(string text)
 
     EventFilter.target: textEditor
-    EventFilter.active: textEditor !== null
+    EventFilter.active: textEditor !== null && specialSymbolsSupport.enabled
     EventFilter.events: [6]
     EventFilter.onFilter: {
+        if(!specialSymbolsSupport.enabled)
+            return
+
+        if(textEditorHasCursorInterface && textEditor.readOnly)
+            return
+
         if(event.key === Qt.Key_F3) {
             symbolMenu.visible = true
             result.filer = true
@@ -48,7 +54,13 @@ Item {
             contentItem: SpecialSymbolsPanel {
                 includeEmojis: specialSymbolsSupport.includeEmojis
                 onSymbolClicked: {
+                    if(!specialSymbolsSupport.enabled)
+                        return
+
                     if(textEditorHasCursorInterface) {
+                        if(textEditor.readOnly)
+                            return
+
                         var cp = textEditor.cursorPosition
                         textEditor.insert(textEditor.cursorPosition, text)
                         app.execLater(textEditor, 250, function() { textEditor.cursorPosition = cp + text.length })

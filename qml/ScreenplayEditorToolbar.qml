@@ -123,6 +123,7 @@ Row {
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Create New Scene"
+        ShortcutsModelItem.enabled: !scriteDocument.readOnly
         ShortcutsModelItem.shortcut: shortcut
     }
 

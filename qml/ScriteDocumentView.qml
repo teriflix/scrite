@@ -292,6 +292,7 @@ Item {
 
                     ShortcutsModelItem.group: "File"
                     ShortcutsModelItem.title: text
+                    ShortcutsModelItem.enabled: enabled
                     ShortcutsModelItem.shortcut: shortcut
                 }
 
@@ -320,12 +321,13 @@ Item {
                     shortcut: "Ctrl+Z"
                     shortcutText: "Z"
                     iconSource: "../icons/content/undo.png"
-                    enabled: app.canUndo
+                    enabled: app.canUndo && !scriteDocument.readOnly
                     onClicked: app.undoGroup.undo()
                     ToolTip.text: "Undo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
 
                     ShortcutsModelItem.group: "Edit"
                     ShortcutsModelItem.title: "Undo"
+                    ShortcutsModelItem.enabled: enabled
                     ShortcutsModelItem.shortcut: shortcut
                 }
 
@@ -333,12 +335,13 @@ Item {
                     shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y"
                     shortcutText: app.isMacOSPlatform ? "Shift+Z" : "Y"
                     iconSource: "../icons/content/redo.png"
-                    enabled: app.canRedo
+                    enabled: app.canRedo && !scriteDocument.readOnly
                     onClicked: app.undoGroup.redo()
                     ToolTip.text: "Redo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
 
                     ShortcutsModelItem.group: "Edit"
                     ShortcutsModelItem.title: "Redo"
+                    ShortcutsModelItem.enabled: enabled
                     ShortcutsModelItem.shortcut: shortcut
 
                 }

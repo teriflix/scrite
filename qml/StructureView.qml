@@ -115,6 +115,7 @@ Item {
             }
 
             ToolButton3 {
+                enabled: !scriteDocument.readOnly && scriteDocument.structure.elementCount >= 2
                 iconSource: "../icons/content/select_all.png"
                 ToolTip.text: "Select All"
                 onClicked: selection.init(elementItems, elementsBoundingBox.boundingBox)
