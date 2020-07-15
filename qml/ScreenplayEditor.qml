@@ -791,7 +791,7 @@ Rectangle {
                             // When we update Qt to say 5.15 in the next cycle, we can allow
                             // Emoji's to be used within the screenplay editor. Until then, it
                             // just won't work.
-                            includeEmojis: app.isWindowsPlatform
+                            includeEmojis: app.isWindowsPlatform || app.isLinuxPlatform
                             textEditorHasCursorInterface: true
                         }
 
@@ -1483,7 +1483,7 @@ Rectangle {
                     enableTransliteration: true
                     onEditingComplete: sceneHeading.locationType = text
                     tabItem: locEdit
-                    includeEmojiSymbols: false
+                    includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
                 }
 
                 Text {
@@ -1503,7 +1503,7 @@ Rectangle {
                     completionStrings: scriteDocument.structure.allLocations()
                     onEditingComplete: sceneHeading.location = text
                     tabItem: momentEdit
-                    includeEmojiSymbols: false
+                    includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
                 }
 
                 Text {
@@ -1523,7 +1523,7 @@ Rectangle {
                     completionStrings: scriteDocument.structure.standardMoments()
                     onEditingComplete: sceneHeading.moment = text
                     tabItem: sceneTextEditor
-                    includeEmojiSymbols: false
+                    includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
                 }
             }
         }
