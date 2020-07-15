@@ -550,6 +550,33 @@ Item {
                 }
 
                 ToolButton3 {
+                    id: shortcutsDockWidgetToggleButton
+                    anchors.verticalCenter: parent.verticalCenter
+                    iconSource: {
+                        if(app.isMacOSPlatform)
+                            return "../icons/navigation/shortcuts_macos.png"
+                        if(app.isWindowsPlatform)
+                            return "../icons/navigation/shortcuts_windows.png"
+                        return "../icons/navigation/shortcuts_linux.png"
+                    }
+                    shortcut: "Ctrl+E"
+                    ToolTip.text: "Shortcuts Window\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                    down: shortcutsDockWidget.visible
+                    onClicked: shortcutsDockWidget.toggle()
+
+                    ShortcutsModelItem.group: "Application"
+                    ShortcutsModelItem.title: "Shortcuts Window"
+                    ShortcutsModelItem.shortcut: shortcut
+                }
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    color: primaryColors.separatorColor
+                    opacity: 0.5
+                }
+
+                ToolButton3 {
                     id: languageToolButton
                     iconSource: "../icons/content/language.png"
                     text: app.transliterationEngine.languageAsString
@@ -701,43 +728,6 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.separatorColor
-                opacity: 0.5
-            }
-
-            Item {
-                height: parent.height
-                width: appToolBarArea.width * 0.01
-            }
-
-            ToolButton3 {
-                id: shortcutsDockWidgetToggleButton
-                anchors.verticalCenter: parent.verticalCenter
-                iconSource: {
-                    if(app.isMacOSPlatform)
-                        return "../icons/navigation/shortcuts_macos.png"
-                    if(app.isWindowsPlatform)
-                        return "../icons/navigation/shortcuts_windows.png"
-                    return "../icons/navigation/shortcuts_linux.png"
-                }
-                shortcut: "Ctrl+E"
-                ToolTip.text: "Shortcuts Window\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-                down: shortcutsDockWidget.visible
-                onClicked: shortcutsDockWidget.toggle()
-
-                ShortcutsModelItem.group: "Application"
-                ShortcutsModelItem.title: "Shortcuts Window"
-                ShortcutsModelItem.shortcut: shortcut
-            }
-
-            Item {
-                height: parent.height
-                width: appToolBarArea.width * 0.01
             }
 
             // We move the main-tab bar here based on UI/UX suggestions from Surya Vasishta
@@ -1285,7 +1275,7 @@ Item {
         contentX: -1
         contentY: -1
         contentWidth: 375
-        contentHeight: (parent.height - appToolBar.height - 30) * 0.8
+        contentHeight: (parent.height - appToolBar.height - 30) * 0.85
         visible: shortcutsDockWidgetSettings.visible
         sourceItem: shortcutsDockWidgetToggleButton
         content: ShortcutsView { }

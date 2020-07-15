@@ -1208,7 +1208,7 @@ QString SceneDocumentBinder::nextTabFormatAsString() const
 
     const QString current = m_currentElement ? typeToString(m_currentElement->type()) : typeToString(-1);
     const QString next = typeToString(ntf);
-    return current + QStringLiteral(" -> ") + next;
+    return current + QStringLiteral(" → ") + next;
 }
 
 int SceneDocumentBinder::nextTabFormat() const

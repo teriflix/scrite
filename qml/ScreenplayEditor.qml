@@ -1686,11 +1686,21 @@ Rectangle {
                         color: screenplayAdapter.currentIndex < 0 ? accentColors.windowColor : Qt.rgba(0,0,0,0)
 
                         Text {
-                            anchors.centerIn: parent
+                            readonly property real iconWidth: 18
+                            property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
+                            property real leftMargin: 6 + (iconWidth+12)*t
+                            Behavior on t {
+                                enabled: screenplayEditorSettings.enableAnimations
+                                NumberAnimation { duration: 250 }
+                            }
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: leftMargin
                             font.family: "Courier Prime"
-                            font.pixelSize: 16
+                            font.pixelSize: 14
                             font.bold: screenplayAdapter.currentIndex < 0
-                            text: "Title Page"
+                            text: "[#] TITLE PAGE"
                         }
 
                         MouseArea {

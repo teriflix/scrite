@@ -159,9 +159,10 @@ Row {
             onClicked: binder.currentElement.type = modelData.value
 
             ShortcutsModelItem.group: "Formatting"
-            ShortcutsModelItem.title: modelData.display + " format"
+            ShortcutsModelItem.title: modelData.display
             ShortcutsModelItem.shortcut: shortcut
             ShortcutsModelItem.enabled: enabled
+            ShortcutsModelItem.priority: -index
         }
     }
 }
