@@ -16,6 +16,7 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Rectangle {
+    property bool includeEmojis: true
     readonly property var symbols: [
         {
             "title": "Symbols",
@@ -45,7 +46,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         color: primaryColors.c700.background
         property int currentIndex: 0
-        property bool currentIndexIsSmileys: symbols[symbolsPanel.currentIndex].title === "Emoji"
+        property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
 
         Column {
             width: parent.width
@@ -98,26 +99,28 @@ Rectangle {
         }
         rightMargin: 14
 
-        cellWidth: symbolsPanel.currentIndexIsSmileys ? 50 : 40
+        cellWidth: symbolsPanel.currentIndexIsEmoji ? 50 : 40
         cellHeight: cellWidth
         model: symbols[symbolsPanel.currentIndex].symbols
         header: Item {
             width: symbolsGridView.width-14
-            height: symbolsPanel.currentIndexIsSmileys ? 35 : 0
+            height: symbolsPanel.currentIndexIsEmoji ? 35 : 0
 
             Text {
-                visible: symbolsPanel.currentIndexIsSmileys
+                visible: symbolsPanel.currentIndexIsEmoji
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 anchors.centerIn: parent
                 font.pointSize: app.idealFontPointSize
-                text: "Emojis may not be included in PDF exports."
+                text: includeEmojis ? "Emojis may not be included in PDF exports." : "Emojis are not supported in this text area."
             }
         }
 
         delegate: Item {
             width: symbolsGridView.cellWidth
             height: symbolsGridView.cellHeight
+            enabled: !symbolsPanel.currentIndexIsEmoji || includeEmojis
+            opacity: enabled ? 1 : 0.5
 
             Rectangle {
                 anchors.fill: parent
@@ -132,6 +135,7 @@ Rectangle {
                 text: modelData
                 font.pixelSize: parent.height * 0.6
             }
+
             MouseArea {
                 anchors.fill: parent
                 onClicked: symbolClicked(modelData)

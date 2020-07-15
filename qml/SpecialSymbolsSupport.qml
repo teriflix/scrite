@@ -16,8 +16,11 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
+    id: specialSymbolsSupport
     property Item textEditor
     property bool textEditorHasCursorInterface: false
+    property bool includeEmojis: true
+    property bool showingSymbols: symbolMenu.visible
 
     signal symbolSelected(string text)
 
@@ -43,6 +46,7 @@ Item {
             focusPolicy: Qt.NoFocus
             background: Item { }
             contentItem: SpecialSymbolsPanel {
+                includeEmojis: specialSymbolsSupport.includeEmojis
                 onSymbolClicked: {
                     if(textEditorHasCursorInterface) {
                         var cp = textEditor.cursorPosition
@@ -51,7 +55,7 @@ Item {
                         symbolMenu.close()
                         textEditor.forceActiveFocus()
                     } else {
-                        SpecialSymbolsSupport
+                        symbolMenu.close()
                         symbolSelected(text)
                     }
                 }

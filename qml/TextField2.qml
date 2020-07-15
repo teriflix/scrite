@@ -21,6 +21,8 @@ TextField {
     property Item tabItem
     property Item backTabItem
     property bool enableTransliteration: false
+    property bool includeEmojiSymbols: true
+    property alias showingSymbols: specialSymbolSupport.showingSymbols
     selectedTextColor: "white"
     selectionColor: "blue"
     selectByMouse: true
@@ -96,9 +98,11 @@ TextField {
     }
 
     SpecialSymbolsSupport {
+        id: specialSymbolSupport
         anchors.top: parent.bottom
         anchors.left: parent.left
         textEditor: textField
+        includeEmojis: parent.includeEmojiSymbols
         textEditorHasCursorInterface: true
     }
 }

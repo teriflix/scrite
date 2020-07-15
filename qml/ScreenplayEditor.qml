@@ -784,6 +784,14 @@ Rectangle {
                             anchors.top: parent.bottom
                             anchors.left: parent.left
                             textEditor: sceneTextEditor
+                            // Because of a bug in Qt we will be unable to include Emoji's in
+                            // the generated PDFs.
+                            // More information about the bug can be found here:
+                            // https://bugreports.qt.io/browse/QTBUG-78833
+                            // When we update Qt to say 5.15 in the next cycle, we can allow
+                            // Emoji's to be used within the screenplay editor. Until then, it
+                            // just won't work.
+                            includeEmojis: app.isWindowsPlatform
                             textEditorHasCursorInterface: true
                         }
 
@@ -1452,7 +1460,9 @@ Rectangle {
 
             signal editingFinished()
 
-            property bool hasFocus: locTypeEdit.activeFocus || locEdit.activeFocus || momentEdit.activeFocus
+            property bool hasFocus: locTypeEdit.activeFocus || locTypeEdit.showingSymbols ||
+                                    locEdit.activeFocus || locEdit.showingSymbols ||
+                                    momentEdit.activeFocus || momentEdit.showingSymbols
             onHasFocusChanged: {
                 if(!hasFocus)
                     editingFinished()
@@ -1473,6 +1483,7 @@ Rectangle {
                     enableTransliteration: true
                     onEditingComplete: sceneHeading.locationType = text
                     tabItem: locEdit
+                    includeEmojiSymbols: false
                 }
 
                 Text {
@@ -1492,6 +1503,7 @@ Rectangle {
                     completionStrings: scriteDocument.structure.allLocations()
                     onEditingComplete: sceneHeading.location = text
                     tabItem: momentEdit
+                    includeEmojiSymbols: false
                 }
 
                 Text {
@@ -1511,6 +1523,7 @@ Rectangle {
                     completionStrings: scriteDocument.structure.standardMoments()
                     onEditingComplete: sceneHeading.moment = text
                     tabItem: sceneTextEditor
+                    includeEmojiSymbols: false
                 }
             }
         }
