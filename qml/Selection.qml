@@ -21,6 +21,7 @@ Item {
     property alias active: tightRect.visible
     property bool hasItems: items.length > 0
     property bool canLayout: items.length >= 2
+    property alias contextMenu: selectionMenu.menu
 
     property var items: []
     signal moveItem(Item item, real dx, real dy)
@@ -111,11 +112,19 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             drag.target: selection.interactive ? parent : null
             drag.axis: Drag.XAndYAxis
             drag.minimumX: 0
             drag.minimumY: 0
             enabled: parent.visible
+            onClicked: {
+                if(!selection.interactive)
+                    return
+
+                if(selectionMenu.menu && mouse.button === Qt.RightButton)
+                    selectionMenu.popup()
+            }
         }
 
         onXChanged: shiftElements()
@@ -129,6 +138,11 @@ Item {
             topLeft = Qt.point(x,y)
             for(i=0; i<elements.length; i++)
                 selection.moveItem(elements[i], dx, dy)
+        }
+
+        MenuLoader {
+            id: selectionMenu
+            anchors.fill: parent
         }
     }
 }

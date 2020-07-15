@@ -73,7 +73,7 @@ Item {
                 checked: canvasPreview.visible
                 checkable: true
                 onToggled: structureCanvasSettings.showPreview = checked
-                iconSource: "../icons/content/select_all.png"
+                iconSource: "../icons/action/preview.png"
                 ToolTip.text: "Preview"
             }
 
@@ -112,6 +112,12 @@ Item {
                 ToolTip.text: "Selecttion mode"
                 checkable: true
                 onClicked: selection.layout(Structure.HorizontalLayout)
+            }
+
+            ToolButton3 {
+                iconSource: "../icons/content/select_all.png"
+                ToolTip.text: "Select All"
+                onClicked: selection.init(elementItems, elementsBoundingBox.boundingBox)
             }
 
             ToolButton3 {
@@ -275,7 +281,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvasScroll.editItem === null
+                enabled: canvasScroll.editItem === null && !selection.active
                 acceptedButtons: Qt.RightButton
                 onPressed: canvasContextMenu.popup()
             }
@@ -297,6 +303,71 @@ Item {
                 onPlaceItem: {
                     item.x = scriteDocument.structure.snapToGrid(item.x)
                     item.y = scriteDocument.structure.snapToGrid(item.y)
+                }
+
+                contextMenu: Menu2 {
+                    id: selectionContextMenu
+
+                    ColorMenu {
+                        title: "Scenes Color"
+                        onMenuItemClicked: {
+                            var items = selection.items
+                            items.forEach( function(item) {
+                                item.element.scene.color = color
+                            })
+                            selectionContextMenu.close()
+                        }
+                    }
+
+                    Menu2 {
+                        title: "Mark Scenes As"
+
+                        Repeater {
+                            model: app.enumerationModelForType("Scene", "Type")
+
+                            MenuItem2 {
+                                text: modelData.key
+                                onTriggered: {
+                                    var items = selection.items
+                                    items.forEach( function(item) {
+                                        item.element.scene.type = modelData.value
+                                    })
+                                    selectionContextMenu.close()
+                                }
+                            }
+                        }
+                    }
+
+                    Menu2 {
+                        title: "Layout"
+
+                        MenuItem2 {
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            icon.source: "../icons/action/layout_horizontally.png"
+                            text: "Layout Horizontally"
+                            onClicked: selection.layout(Structure.HorizontalLayout)
+                        }
+
+                        MenuItem2 {
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            icon.source: "../icons/action/layout_vertically.png"
+                            text: "Layout Vertically"
+                            onClicked: selection.layout(Structure.VerticalLayout)
+                        }
+
+                        MenuItem2 {
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            icon.source: "../icons/action/layout_flow_horizontally.png"
+                            text: "Flow Horizontally"
+                            onClicked: selection.layout(Structure.FlowHorizontalLayout)
+                        }
+
+                        MenuItem2 {
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            icon.source: "../icons/action/layout_flow_vertically.png"
+                            text: "Flow Vertically"
+                            onClicked: selection.layout(Structure.FlowVerticalLayout)
+                        }                    }
                 }
 
                 function layout(type) {
