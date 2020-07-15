@@ -840,6 +840,11 @@ bool Application::loadScript()
         return true;
 
     ScriteDocument *document = ScriteDocument::instance();
+    if(document->isReadOnly())
+    {
+        QMessageBox::information(nullptr, "Warning", "Cannot execute script on a readonly document.");
+        return false;
+    }
 
     QString scriptPath = QDir::homePath();
     if( !document->fileName().isEmpty() )
