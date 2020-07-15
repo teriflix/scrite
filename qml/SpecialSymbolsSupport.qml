@@ -51,7 +51,7 @@ Item {
                     if(textEditorHasCursorInterface) {
                         var cp = textEditor.cursorPosition
                         textEditor.insert(textEditor.cursorPosition, text)
-                        app.execLater(textEditor, 100, function() { textEditor.cursorPosition = cp + text.length })
+                        app.execLater(textEditor, 250, function() { textEditor.cursorPosition = cp + text.length })
                         symbolMenu.close()
                         textEditor.forceActiveFocus()
                     } else {
