@@ -94,4 +94,11 @@ TextField {
             text = newText
         }
     }
+
+    SpecialSymbolsSupport {
+        anchors.top: parent.bottom
+        anchors.left: parent.left
+        textEditor: textField
+        textEditorHasCursorInterface: true
+    }
 }

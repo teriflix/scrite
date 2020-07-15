@@ -1300,6 +1300,14 @@ Item {
         }
     }
 
+    QtObject {
+        ShortcutsModelItem.enabled: qmlWindow.activeFocusItem !== null
+        ShortcutsModelItem.priority: 10
+        ShortcutsModelItem.group: "Formatting"
+        ShortcutsModelItem.title: "Symbols & Smileys"
+        ShortcutsModelItem.shortcut: "F3"
+    }
+
     DockWidget {
         id: shortcutsDockWidget
         title: "Shortcuts"

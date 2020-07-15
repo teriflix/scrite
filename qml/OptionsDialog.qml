@@ -153,7 +153,7 @@ Item {
                                 text: "Auto Save Interval (in seconds)"
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width
                                 enabled: scriteDocument.autoSave
                                 text: scriteDocument.autoSaveDurationInSeconds
@@ -559,7 +559,7 @@ Item {
                                 horizontalAlignment: Text.AlignRight
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: 300
                                 text: pageSetupSettings.watermarkText
                                 onTextEdited: pageSetupSettings.watermarkText = text
@@ -816,7 +816,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.title
                                 selectByMouse: true
@@ -838,7 +838,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.subtitle
                                 selectByMouse: true
@@ -860,7 +860,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.basedOn
                                 selectByMouse: true
@@ -882,7 +882,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.version
                                 selectByMouse: true
@@ -904,7 +904,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.author
                                 selectByMouse: true
@@ -930,7 +930,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.contact
                                 selectByMouse: true
@@ -953,7 +953,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.address
                                 selectByMouse: true
@@ -976,7 +976,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.email
                                 selectByMouse: true
@@ -999,7 +999,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.phoneNumber
                                 selectByMouse: true
@@ -1022,7 +1022,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField {
+                            TextField2 {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.website
                                 selectByMouse: true

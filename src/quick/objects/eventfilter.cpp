@@ -150,6 +150,10 @@ inline void packIntoJson(QMouseEvent *event, QJsonObject &object)
     object.insert("pos", pointToJson(event->pos()));
     object.insert("windowPos", pointToJson(event->windowPos()));
     object.insert("source", int(event->source()));
+    object.insert("modifiers", int(event->modifiers()));
+    object.insert("controlModifier", event->modifiers()&Qt::ControlModifier ? true : false);
+    object.insert("shiftModifier", event->modifiers()&Qt::ShiftModifier ? true : false);
+    object.insert("altModifier", event->modifiers()&Qt::AltModifier ? true : false);
 }
 
 inline void packIntoJson(QKeyEvent *event, QJsonObject &object)
@@ -160,7 +164,9 @@ inline void packIntoJson(QKeyEvent *event, QJsonObject &object)
     object.insert("modifiers", int(event->modifiers()));
     object.insert("text", event->text());
     object.insert("hasText", !event->text().isEmpty());
-}
+    object.insert("controlModifier", event->modifiers()&Qt::ControlModifier ? true : false);
+    object.insert("shiftModifier", event->modifiers()&Qt::ShiftModifier ? true : false);
+    object.insert("altModifier", event->modifiers()&Qt::AltModifier ? true : false);}
 
 inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
 {
@@ -182,6 +188,9 @@ inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
     object.insert("phase", int(event->phase()));
     object.insert("inverted", event->inverted());
     object.insert("source", int(event->source()));
+    object.insert("controlModifier", event->modifiers()&Qt::ControlModifier ? true : false);
+    object.insert("shiftModifier", event->modifiers()&Qt::ShiftModifier ? true : false);
+    object.insert("altModifier", event->modifiers()&Qt::AltModifier ? true : false);
 }
 
 inline bool eventToJson(QEvent *event, QJsonObject &object)

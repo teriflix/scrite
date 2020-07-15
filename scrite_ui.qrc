@@ -47,5 +47,7 @@
         <file>qml/SidePanel.qml</file>
         <file>qml/ShortcutsView.qml</file>
         <file>qml/DockWidget.qml</file>
+        <file>qml/SpecialSymbolsPanel.qml</file>
+        <file>qml/SpecialSymbolsSupport.qml</file>
     </qresource>
 </RCC>

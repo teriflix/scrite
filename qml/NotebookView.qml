@@ -289,6 +289,13 @@ Item {
                                         Transliterator.textDocument: textDocument
                                         Transliterator.cursorPosition: cursorPosition
                                         Transliterator.hasActiveFocus: activeFocus
+
+                                        SpecialSymbolsSupport {
+                                            anchors.top: parent.bottom
+                                            anchors.left: parent.left
+                                            textEditor: headingEdit
+                                            textEditorHasCursorInterface: true
+                                        }
                                     }
 
                                     ToolButton3 {
@@ -352,6 +359,13 @@ Item {
                                 Transliterator.textDocument: textDocument
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
+
+                                SpecialSymbolsSupport {
+                                    anchors.top: parent.bottom
+                                    anchors.left: parent.left
+                                    textEditor: contentEdit
+                                    textEditorHasCursorInterface: true
+                                }
                             }
                         }
                     }

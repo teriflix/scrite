@@ -619,6 +619,7 @@ Rectangle {
                 clip: true
                 visible: width >= 100 && screenplayEditorSettings.displaySceneNotes
                 content: TextArea {
+                    id: synopsisEdit
                     background: Rectangle {
                         color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
                     }
@@ -636,6 +637,13 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
+
+                    SpecialSymbolsSupport {
+                        anchors.top: parent.bottom
+                        anchors.left: parent.left
+                        textEditor: synopsisEdit
+                        textEditorHasCursorInterface: true
+                    }
                 }
             }
 
@@ -771,6 +779,13 @@ Rectangle {
                         visible: parent.cursorVisible
                         ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="lightgray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
                         ToolTip.visible: completer.hasSuggestion
+
+                        SpecialSymbolsSupport {
+                            anchors.top: parent.bottom
+                            anchors.left: parent.left
+                            textEditor: sceneTextEditor
+                            textEditorHasCursorInterface: true
+                        }
 
                         Completer {
                             id: completer
