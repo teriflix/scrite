@@ -1338,9 +1338,9 @@ Item {
             onActiveChanged: {
                 if(splashLoader.active)
                     return
-                if(shortcutsDockWidget.contentX < 0)
+                if(shortcutsDockWidget.contentX < 0 || shortcutsDockWidget.contentX + shortcutsDockWidget.contentWidth > documentUI.width)
                     shortcutsDockWidget.contentX = documentUI.width - 40 - shortcutsDockWidget.contentWidth
-                if(shortcutsDockWidget.contentY < 0)
+                if(shortcutsDockWidget.contentY < 0 || shortcutsDockWidget.contentY + shortcutsDockWidget.contentHeight > documentUI.height)
                     shortcutsDockWidget.contentY = (documentUI.height - shortcutsDockWidget.contentHeight)/2
             }
         }
