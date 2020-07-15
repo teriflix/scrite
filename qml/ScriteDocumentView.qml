@@ -534,39 +534,71 @@ Item {
                 }
 
                 ToolButton3 {
+                    id: settingsAndShortcutsButton
                     iconSource: "../icons/action/settings_applications.png"
-                    text: "Settings"
-                    shortcut: "Ctrl+,"
-                    shortcutText: ","
-                    onClicked: {
-                        modalDialog.popupSource = this
-                        modalDialog.sourceComponent = optionsDialogComponent
-                        modalDialog.active = true
+                    text: "Settings & Shortcuts"
+                    down: settingsAndShortcutsMenu.visible
+                    onClicked: settingsAndShortcutsMenu.visible = true
+
+                    Item {
+                        anchors.top: parent.bottom
+                        anchors.left: parent.left
+
+                        Menu2 {
+                            id: settingsAndShortcutsMenu
+                            width: 300
+
+                            MenuItem2 {
+                                id: settingsMenuItem
+                                text: "Application Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
+                                icon.source: "../icons/action/settings_applications.png"
+                                onClicked: activate()
+
+                                function activate() {
+                                    modalDialog.popupSource = settingsAndShortcutsButton
+                                    modalDialog.sourceComponent = optionsDialogComponent
+                                    modalDialog.active = true
+                                }
+
+                                ShortcutsModelItem.group: "Application"
+                                ShortcutsModelItem.title: "Settings"
+                                ShortcutsModelItem.shortcut: "Ctrl+,"
+
+                                Shortcut {
+                                    context: Qt.ApplicationShortcut
+                                    sequence: "Ctrl+,"
+                                    onActivated: settingsMenuItem.activate()
+                                }
+                            }
+
+                            MenuItem2 {
+                                id: shortcutsMenuItem
+                                text: "Shortcuts\t" + app.polishShortcutTextForDisplay("Ctrl+E")
+                                icon.source: {
+                                    if(app.isMacOSPlatform)
+                                        return "../icons/navigation/shortcuts_macos.png"
+                                    if(app.isWindowsPlatform)
+                                        return "../icons/navigation/shortcuts_windows.png"
+                                    return "../icons/navigation/shortcuts_linux.png"
+                                }
+                                onClicked: activate()
+
+                                ShortcutsModelItem.group: "Application"
+                                ShortcutsModelItem.title: shortcutsDockWidget.visible ? "Hide Shortcuts" : "Show Shortcuts"
+                                ShortcutsModelItem.shortcut: "Ctrl+E"
+
+                                function activate() {
+                                    shortcutsDockWidget.toggle()
+                                }
+
+                                Shortcut {
+                                    context: Qt.ApplicationShortcut
+                                    sequence: "Ctrl+E"
+                                    onActivated: shortcutsMenuItem.activate()
+                                }
+                            }
+                        }
                     }
-
-                    ShortcutsModelItem.group: "Application"
-                    ShortcutsModelItem.title: text
-                    ShortcutsModelItem.shortcut: shortcut
-                }
-
-                ToolButton3 {
-                    id: shortcutsDockWidgetToggleButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconSource: {
-                        if(app.isMacOSPlatform)
-                            return "../icons/navigation/shortcuts_macos.png"
-                        if(app.isWindowsPlatform)
-                            return "../icons/navigation/shortcuts_windows.png"
-                        return "../icons/navigation/shortcuts_linux.png"
-                    }
-                    shortcut: "Ctrl+E"
-                    ToolTip.text: "Shortcuts Window\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-                    down: shortcutsDockWidget.visible
-                    onClicked: shortcutsDockWidget.toggle()
-
-                    ShortcutsModelItem.group: "Application"
-                    ShortcutsModelItem.title: "Shortcuts Window"
-                    ShortcutsModelItem.shortcut: shortcut
                 }
 
                 Rectangle {
@@ -588,7 +620,7 @@ Item {
 
                     Item {
                         anchors.top: parent.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.left: parent.left
 
                         Menu2 {
                             id: languageMenu
@@ -1277,7 +1309,7 @@ Item {
         contentWidth: 375
         contentHeight: (parent.height - appToolBar.height - 30) * 0.85
         visible: shortcutsDockWidgetSettings.visible
-        sourceItem: shortcutsDockWidgetToggleButton
+        sourceItem: settingsAndShortcutsButton
         content: ShortcutsView { }
         onCloseRequest: hide()
 
@@ -1290,11 +1322,16 @@ Item {
             property alias visible: shortcutsDockWidget.visible
         }
 
-        Component.onCompleted: {
-            if(contentX < 0)
-                contentX = documentUI.width - 40 - shortcutsDockWidget.contentWidth
-            if(contentY < 0)
-                contentY = (documentUI.height - shortcutsDockWidget.contentHeight)/2
+        Connections {
+            target: splashLoader
+            onActiveChanged: {
+                if(splashLoader.active)
+                    return
+                if(shortcutsDockWidget.contentX < 0)
+                    shortcutsDockWidget.contentX = documentUI.width - 40 - shortcutsDockWidget.contentWidth
+                if(shortcutsDockWidget.contentY < 0)
+                    shortcutsDockWidget.contentY = (documentUI.height - shortcutsDockWidget.contentHeight)/2
+            }
         }
     }
 }
