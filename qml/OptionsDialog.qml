@@ -320,7 +320,7 @@ Item {
                             Text {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                text: "Default Resolution: <strong>" + scriteDocument.displayFormat.pageLayout.customResolution + "</strong>"
+                                text: "Default Resolution: <strong>" + scriteDocument.displayFormat.pageLayout.defaultResolution + "</strong>"
                             }
 
                             TextField2 {
