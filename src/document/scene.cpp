@@ -452,12 +452,12 @@ bool CharacterElementMap::include(SceneElement *element)
 
     if(element->type() == SceneElement::Character)
     {
-        this->remove(element);
+        const bool ret = this->remove(element);
 
         QString newName = element->formattedText();
         newName = newName.section('(', 0, 0).trimmed();
         if(newName.isEmpty())
-            return false;
+            return ret;
 
         m_forwardMap[element] = newName;
         m_reverseMap[newName].append(element);
