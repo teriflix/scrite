@@ -394,12 +394,27 @@ void ScreenplayPageLayout::evaluateRects()
 {
     if(m_format->screen())
     {
+        const qreal oldResolution = m_resolution;
+        QSettings *settings = Application::instance()->settings();
+
         const qreal pdpi = m_format->screen()->physicalDotsPerInch();
         const qreal dpr = m_format->screen()->devicePixelRatio();
-        m_resolution = pdpi / dpr;
+        m_resolution = !qFuzzyIsNull(pdpi) && !qFuzzyIsNull(dpr) ? (pdpi / dpr) : qt_defaultDpi();
+
+        settings->setValue("ScreenplayPageLayout/defaultResolution", m_resolution);
+
+        const qreal customResolution = settings->value("ScreenplayPageLayout/customResolution", 0.0).toDouble();
+        if( !qFuzzyIsNull(customResolution) )
+            m_resolution = customResolution;
+        else
+            settings->setValue("ScreenplayPageLayout/customResolution", 0);
+
+        if( !qFuzzyCompare(oldResolution,m_resolution) )
+            emit resolutionChanged();
     }
     else
         m_resolution = qt_defaultDpi();
+
 
     // Page margins
     static const qreal leftMargin = 1.5; // inches

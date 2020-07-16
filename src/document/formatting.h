@@ -224,6 +224,10 @@ public:
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY rectsChanged STORED false)
     qreal contentWidth() const { return m_paintRect.width(); }
 
+    Q_PROPERTY(qreal resolution READ resolution NOTIFY resolutionChanged)
+    qreal resolution() const { return m_resolution; }
+    Q_SIGNAL void resolutionChanged();
+
     void configure(QTextDocument *document) const;
     void configure(QPagedPaintDevice *printer) const;
 

@@ -105,6 +105,11 @@ public:
     bool canConvert() const { return m_canConvert; }
     Q_SIGNAL void canConvertChanged();
 
+    Q_PROPERTY(qreal resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
+    void setResolution(qreal val);
+    qreal resolution() const { return m_resolution; }
+    Q_SIGNAL void resolutionChanged();
+
     Q_INVOKABLE qreal convert(qreal val, Unit from, Unit to) const;
     static qreal Convert(qreal val, Unit from, Unit to, const qreal pixelsPerIn);
 
@@ -120,6 +125,7 @@ private:
     QColor m_textColor = Qt::black;
     qreal  m_zoomLevel = 1.0;
     qreal  m_leftMargin = 0;
+    qreal  m_resolution = 0;
     bool   m_canConvert = false;
     qreal  m_rightMargin = 0;
     QColor m_borderColor = Qt::gray;

@@ -279,25 +279,68 @@ Item {
                     }
                 }
 
-                GroupBox {
+                Column {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Active Languages" }
-                    height: Math.max(activeLanguagesView.height+45, parent.height)
+                    height: parent.height
+                    spacing: 10
 
-                    Grid {
-                        id: activeLanguagesView
+                    GroupBox {
+                        label: Text { text: "Active Languages" }
                         width: parent.width
-                        spacing: 5
-                        columns: 2
+                        height: parent.height - pageLayoutGroupBox.height - parent.spacing
 
-                        Repeater {
-                            model: app.transliterationEngine.getLanguages()
-                            delegate: CheckBox2 {
-                                width: activeLanguagesView.width/activeLanguagesView.columns
-                                checkable: true
-                                checked: modelData.active
-                                text: modelData.key
-                                onToggled: app.transliterationEngine.markLanguage(modelData.value,checked)
+                        Grid {
+                            id: activeLanguagesView
+                            width: parent.width
+                            spacing: 5
+                            columns: 2
+
+                            Repeater {
+                                model: app.transliterationEngine.getLanguages()
+                                delegate: CheckBox2 {
+                                    width: activeLanguagesView.width/activeLanguagesView.columns
+                                    checkable: true
+                                    checked: modelData.active
+                                    text: modelData.key
+                                    onToggled: app.transliterationEngine.markLanguage(modelData.value,checked)
+                                }
+                            }
+                        }
+                    }
+
+                    GroupBox {
+                        id: pageLayoutGroupBox
+                        label: Text { text: "Page Layout (Display)" }
+                        width: parent.width
+
+                        Column {
+                            width: parent.width
+                            spacing: 10
+
+                            Text {
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                text: "Default Resolution: <strong>" + pageLayoutSettings.defaultResolution + "</strong>"
+                            }
+
+                            TextField2 {
+                                width: parent.width
+                                placeholderText: "leave empty for default, or enter a custom value."
+                                text: pageLayoutSettings.customResolution > 0 ? pageLayoutSettings.customResolution : ""
+                                onEditingComplete: {
+                                    var value = parseFloat(text)
+                                    if(isNaN(value))
+                                        pageLayoutSettings.customResolution = 0
+                                    else
+                                        pageLayoutSettings.customResolution = value
+                                }
+                            }
+
+                            Text {
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                font.pixelSize: 10
+                                text: "NOTE: You may have to restart the application to apply these changes."
                             }
                         }
                     }

@@ -193,6 +193,17 @@ void RulerItem::setZoomLevel(qreal val)
     this->update();
 }
 
+void RulerItem::setResolution(qreal val)
+{
+    if(m_resolution == val)
+        return;
+
+    m_resolution = val;
+    emit resolutionChanged();
+
+    this->update();
+}
+
 qreal RulerItem::convert(qreal val, RulerItem::Unit from, RulerItem::Unit to) const
 {
     const QScreen *screen = this->window()->screen();
@@ -236,7 +247,7 @@ void RulerItem::paint(QPainter *painter)
         return;
 
     const QScreen *screen = this->window()->screen();
-    const qreal pixelsPerIn = screen->physicalDotsPerInchX();
+    const qreal pixelsPerIn = qFuzzyIsNull(m_resolution) ? screen->physicalDotsPerInchX() : (m_resolution * screen->devicePixelRatio());
     const qreal cmsPerIn = 2.54;
     const qreal pixelsPerCm = pixelsPerIn / cmsPerIn;
     const QFontMetricsF fm(m_font);
