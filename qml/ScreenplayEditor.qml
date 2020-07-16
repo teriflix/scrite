@@ -571,7 +571,7 @@ Rectangle {
                 id: sceneDocumentBinder
                 scene: contentItem.theScene
                 textDocument: sceneTextEditor.textDocument
-                cursorPosition: sceneTextEditor.cursorPosition
+                cursorPosition: sceneTextEditor.activeFocus ? sceneTextEditor.cursorPosition : -1
                 characterNames: scriteDocument.structure.characterNames
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus

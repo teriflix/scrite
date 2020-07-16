@@ -155,7 +155,25 @@ Row {
             shortcut: "Ctrl+" + (index+1)
             shortcutText: (index+1)
             ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
-            enabled: !scriteDocument.readOnly && binder && !showScreenplayPreview ? binder.currentElement !== null : false
+            enabled: {
+                if(scriteDocument.readOnly) {
+                    console.log("PA: Document is readonly.")
+                    return false
+                }
+                if(showScreenplayPreview) {
+                    console.log("PA: Showing preview.")
+                    return false
+                }
+                if(binder === null) {
+                    console.log("PA: Binder is null.")
+                    return false
+                }
+                if(binder.currentElement === null) {
+                    console.log("PA: Binder has no current element.")
+                    return false
+                }
+                return true
+            }
             down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
             onClicked: binder.currentElement.type = modelData.value
 
