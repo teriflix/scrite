@@ -224,6 +224,15 @@ public:
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY rectsChanged STORED false)
     qreal contentWidth() const { return m_paintRect.width(); }
 
+    Q_PROPERTY(qreal defaultResolution READ defaultResolution NOTIFY defaultResolutionChanged)
+    qreal defaultResolution() const { return m_defaultResolution; }
+    Q_SIGNAL void defaultResolutionChanged();
+
+    Q_PROPERTY(qreal customResolution READ customResolution WRITE setCustomResolution NOTIFY customResolutionChanged)
+    void setCustomResolution(qreal val);
+    qreal customResolution() const { return m_customResolution; }
+    Q_SIGNAL void customResolutionChanged();
+
     Q_PROPERTY(qreal resolution READ resolution NOTIFY resolutionChanged)
     qreal resolution() const { return m_resolution; }
     Q_SIGNAL void resolutionChanged();
@@ -239,6 +248,10 @@ private:
     void evaluateRectsLater();
     void timerEvent(QTimerEvent *event);
 
+    void setResolution(qreal val);
+    void setDefaultResolution(qreal val);
+    void loadCustomResolutionFromSettings();
+
 private:
     qreal m_resolution = 0;
     QRectF m_paintRect;
@@ -249,6 +262,8 @@ private:
     PaperSize m_paperSize = Letter;
     char m_padding[4];
     QPageLayout m_pageLayout;
+    qreal m_customResolution = 0;
+    qreal m_defaultResolution = 0;
     ScreenplayFormat *m_format = nullptr;
     SimpleTimer m_evaluateRectsTimer;
 };

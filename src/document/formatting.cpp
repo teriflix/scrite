@@ -369,6 +369,52 @@ void ScreenplayPageLayout::setPaperSize(ScreenplayPageLayout::PaperSize val)
     emit paperSizeChanged();
 }
 
+void ScreenplayPageLayout::setResolution(qreal val)
+{
+    if( qFuzzyCompare(m_resolution,val) )
+        return;
+
+    m_resolution = val;
+    emit resolutionChanged();
+}
+
+void ScreenplayPageLayout::setDefaultResolution(qreal val)
+{
+    if(qFuzzyCompare(m_defaultResolution, val))
+        return;
+
+    m_defaultResolution = val;
+
+    QSettings *settings = Application::instance()->settings();
+    settings->setValue("ScreenplayPageLayout/defaultResolution", val);
+
+    emit defaultResolutionChanged();
+}
+
+void ScreenplayPageLayout::loadCustomResolutionFromSettings()
+{
+    if(qFuzzyIsNull(m_customResolution))
+    {
+        QSettings *settings = Application::instance()->settings();
+        this->setCustomResolution(settings->value("ScreenplayPageLayout/customResolution", 0.0).toDouble());
+    }
+}
+
+void ScreenplayPageLayout::setCustomResolution(qreal val)
+{
+    if(m_customResolution == val)
+        return;
+
+    m_customResolution = val;
+
+    QSettings *settings = Application::instance()->settings();
+    settings->setValue("ScreenplayPageLayout/customResolution", val);
+
+    emit customResolutionChanged();
+
+    this->evaluateRectsLater();
+}
+
 void ScreenplayPageLayout::configure(QTextDocument *document) const
 {
     const bool stdResolution = qFuzzyCompare(m_resolution,qt_defaultDpi());
@@ -394,27 +440,15 @@ void ScreenplayPageLayout::evaluateRects()
 {
     if(m_format->screen())
     {
-        const qreal oldResolution = m_resolution;
-        QSettings *settings = Application::instance()->settings();
-
         const qreal pdpi = m_format->screen()->physicalDotsPerInch();
         const qreal dpr = m_format->screen()->devicePixelRatio();
-        m_resolution = !qFuzzyIsNull(pdpi) && !qFuzzyIsNull(dpr) ? (pdpi / dpr) : qt_defaultDpi();
-
-        settings->setValue("ScreenplayPageLayout/defaultResolution", m_resolution);
-
-        const qreal customResolution = settings->value("ScreenplayPageLayout/customResolution", 0.0).toDouble();
-        if( !qFuzzyIsNull(customResolution) )
-            m_resolution = customResolution;
-        else
-            settings->setValue("ScreenplayPageLayout/customResolution", 0);
-
-        if( !qFuzzyCompare(oldResolution,m_resolution) )
-            emit resolutionChanged();
+        const qreal dres = !qFuzzyIsNull(pdpi) && !qFuzzyIsNull(dpr) ? (pdpi / dpr) : qt_defaultDpi();
+        this->setDefaultResolution(dres);
+        this->loadCustomResolutionFromSettings();
+        this->setResolution( qFuzzyIsNull(m_customResolution) ? m_defaultResolution : m_customResolution );
     }
     else
-        m_resolution = qt_defaultDpi();
-
+        this->setResolution(qt_defaultDpi());
 
     // Page margins
     static const qreal leftMargin = 1.5; // inches

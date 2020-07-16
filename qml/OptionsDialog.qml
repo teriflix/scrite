@@ -320,27 +320,20 @@ Item {
                             Text {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                text: "Default Resolution: <strong>" + pageLayoutSettings.defaultResolution + "</strong>"
+                                text: "Default Resolution: <strong>" + scriteDocument.displayFormat.pageLayout.customResolution + "</strong>"
                             }
 
                             TextField2 {
                                 width: parent.width
                                 placeholderText: "leave empty for default, or enter a custom value."
-                                text: pageLayoutSettings.customResolution > 0 ? pageLayoutSettings.customResolution : ""
+                                text: scriteDocument.displayFormat.pageLayout.customResolution > 0 ? scriteDocument.displayFormat.pageLayout.customResolution : ""
                                 onEditingComplete: {
                                     var value = parseFloat(text)
                                     if(isNaN(value))
-                                        pageLayoutSettings.customResolution = 0
+                                        scriteDocument.displayFormat.pageLayout.customResolution = 0
                                     else
-                                        pageLayoutSettings.customResolution = value
+                                        scriteDocument.displayFormat.pageLayout.customResolution = value
                                 }
-                            }
-
-                            Text {
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                font.pixelSize: 10
-                                text: "NOTE: You may have to restart the application to apply these changes."
                             }
                         }
                     }

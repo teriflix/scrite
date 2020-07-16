@@ -72,14 +72,6 @@ Item {
         property string parentheticalLanguage: "Default"
     }
 
-    Settings {
-        id: pageLayoutSettings
-        fileName: app.settingsFilePath
-        category: "ScreenplayPageLayout"
-        property real defaultResolution
-        property real customResolution
-    }
-
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+C"

@@ -389,7 +389,7 @@ Rectangle {
                 leftMargin: pageLayout.leftMargin * Screen.devicePixelRatio
                 rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
                 zoomLevel: screenplayEditor.zoomLevel
-                resolution: pageLayoutSettings.customResolution
+                resolution: scriteDocument.displayFormat.pageLayout.resolution
 
                 property real leftMarginPx: leftMargin * zoomLevel
                 property real rightMarginPx: rightMargin * zoomLevel
