@@ -205,6 +205,7 @@ public:
     Q_SIGNAL void elementMoved(ScreenplayElement *ptr, int from, int to);
 
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+    Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
 
     Q_INVOKABLE void removeSceneElements(Scene *scene);
     Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;

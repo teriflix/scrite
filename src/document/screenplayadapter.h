@@ -64,6 +64,7 @@ public:
     Q_SIGNAL void hasNonStandardScenesChanged();
 
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+    Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
     Q_INVOKABLE QVariant at(int row) const;

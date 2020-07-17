@@ -991,6 +991,62 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
     return ret;
 }
 
+ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *element)
+{
+    /* We dont capture undo for this action, because user can always split scene once again */
+    QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+    Screenplay *screenplay = this;
+
+    if(element == nullptr || element->scene() == nullptr)
+        return nullptr;
+
+    Scene *currentScene = element->scene();
+    int previousElementIndex = screenplay->indexOfElement(element)-1;
+    while(previousElementIndex >= 0)
+    {
+        ScreenplayElement *element = screenplay->elementAt(previousElementIndex);
+        if(element == nullptr || element->scene() == nullptr)
+        {
+            --previousElementIndex;
+            continue;
+        }
+
+        break;
+    }
+
+    if(previousElementIndex < 0)
+        return nullptr;
+
+    ScreenplayElement *previousSceneElement = screenplay->elementAt(previousElementIndex);
+    Scene *previousScene = previousSceneElement->scene();
+
+    SceneElement *newElement = new SceneElement(previousScene);
+    newElement->setType(SceneElement::Action);
+    newElement->setText(QStringLiteral("--"));
+    previousScene->addElement(newElement);
+
+    int length = 0;
+    for(int i=0; i<previousScene->elementCount(); i++)
+        length += previousScene->elementAt(i)->text().length();
+
+    while(currentScene->elementCount())
+    {
+        SceneElement *element = currentScene->elementAt(0);
+
+        newElement = new SceneElement(previousScene);
+        newElement->setType(element->type());
+        newElement->setText(element->text());
+        previousScene->addElement(newElement);
+
+        currentScene->removeElement(element);
+    }
+
+    screenplay->removeElement(element);
+    screenplay->setCurrentElementIndex(previousElementIndex);
+    previousScene->setCursorPosition(length);
+    return previousSceneElement;
+}
+
 void Screenplay::removeSceneElements(Scene *scene)
 {
     if(scene == nullptr)

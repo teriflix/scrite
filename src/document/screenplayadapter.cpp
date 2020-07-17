@@ -153,6 +153,15 @@ ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *ptr, Scene
     return nullptr;
 }
 
+ScreenplayElement *ScreenplayAdapter::mergeElementWithPrevious(ScreenplayElement *ptr)
+{
+    Screenplay *screenplay = qobject_cast<Screenplay*>(m_source);
+    if(screenplay != nullptr)
+        return screenplay->mergeElementWithPrevious(ptr);
+
+    return nullptr;
+}
+
 int ScreenplayAdapter::previousSceneElementIndex()
 {
     Screenplay *screenplay = qobject_cast<Screenplay*>(m_source);

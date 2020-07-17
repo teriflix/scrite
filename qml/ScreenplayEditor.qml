@@ -1080,7 +1080,7 @@ Rectangle {
                                 return "Auto Complete"
                             return "Create New Paragraph"
                         }
-                        ShortcutsModelItem.shortcut: "Enter"
+                        ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Return" : "Enter"
                     }
 
                     QtObject {
@@ -1089,7 +1089,16 @@ Rectangle {
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: "Split Scene"
-                        ShortcutsModelItem.shortcut: "Ctrl+Enter"
+                        ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Ctrl+Return" : "Ctrl+Enter"
+                    }
+
+                    QtObject {
+                        ShortcutsModelItem.priority: 1
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneTextEditor.cursorPosition === 0
+                        ShortcutsModelItem.visible: sceneTextEditor.activeFocus
+                        ShortcutsModelItem.group: "Formatting"
+                        ShortcutsModelItem.title: "Join Previous Scene"
+                        ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Ctrl+Delete" : "Ctrl+Backspace"
                     }
 
                     Keys.onTabPressed: {
@@ -1178,6 +1187,11 @@ Rectangle {
                         } else if(event.key === Qt.Key_PageDown) {
                             event.accepted = true
                             contentItem.scrollToNextScene()
+                        } else if(event.modifiers & Qt.ControlModifier && sceneTextEditor.cursorPosition === 0) {
+                            if(app.isMacOSPlatform && event.key === Qt.Key_Delete)
+                                contentItem.mergeWithPreviousScene()
+                            else if(event.key === Qt.Key_Backspace)
+                                contentItem.mergeWithPreviousScene()
                         } else
                             event.accepted = false
                     }
@@ -1226,19 +1240,36 @@ Rectangle {
                 }
             }
 
-            function assumeFocus() {
-                if(!sceneTextEditor.activeFocus)
-                    sceneTextEditor.forceActiveFocus()
+            function mergeWithPreviousScene() {
+                if(sceneTextEditor.cursorPosition === 0) {
+                    var element = screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
+                    var cursorPosition = element.scene.cursorPosition
+                    if(element === null)
+                        return
+                    // contentView.scrollIntoView(screenplayAdapter.currentIndex)
+                    contentView.positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
+                    var delegate = contentView.itemAtIndex(screenplayAdapter.currentIndex)
+                    app.execLater(contentView, 100, function() {
+                        delegate.item.assumeFocusAt(cursorPosition)
+                    })
+                }
             }
 
             function splitScene() {
                 var newElement = screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
                 if(newElement !== null) {
+                    // contentView.scrollIntoView(contentItem.theIndex+1)
+                    contentView.positionViewAtIndex(contentItem.theIndex+1, ListView.Beginning)
+                    var delegate = contentView.itemAtIndex(contentItem.theIndex+1)
                     app.execLater(contentItem, 100, function() {
-                        var delegate = contentView.itemAtIndex(contentItem.theIndex+1)
                         delegate.item.assumeFocus()
                     })
                 }
+            }
+
+            function assumeFocus() {
+                if(!sceneTextEditor.activeFocus)
+                    sceneTextEditor.forceActiveFocus()
             }
 
             function assumeFocusAt(pos) {
