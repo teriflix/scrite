@@ -1094,7 +1094,7 @@ Rectangle {
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneTextEditor.cursorPosition === 0
+                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneTextEditor.cursorPosition === 0 && contentItem.theIndex > 0
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: "Join Previous Scene"

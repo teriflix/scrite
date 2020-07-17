@@ -1028,6 +1028,7 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
     int length = 0;
     for(int i=0; i<previousScene->elementCount(); i++)
         length += previousScene->elementAt(i)->text().length();
+    length += previousScene->elementCount();
 
     while(currentScene->elementCount())
     {
