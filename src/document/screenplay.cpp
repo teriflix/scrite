@@ -1042,9 +1042,9 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
         currentScene->removeElement(element);
     }
 
-    screenplay->removeElement(element);
     screenplay->setCurrentElementIndex(previousElementIndex);
     previousScene->setCursorPosition(length);
+    GarbageCollector::instance()->add(element);
     return previousSceneElement;
 }
 
