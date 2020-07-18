@@ -332,6 +332,20 @@ void ScriteDocument::open(const QString &fileName)
     this->clearBusyMessage();
 }
 
+void ScriteDocument::openAnonymously(const QString &fileName)
+{
+    HourGlass hourGlass;
+
+    this->setBusyMessage("Loading ...");
+    this->reset();
+    this->load(fileName);
+    this->setModified(false);
+    this->clearBusyMessage();
+
+    m_fileName.clear();
+    emit fileNameChanged();
+}
+
 void ScriteDocument::saveAs(const QString &givenFileName)
 {
     HourGlass hourGlass;
@@ -730,7 +744,7 @@ void ScriteDocument::setStructure(Structure *val)
         return;
 
     if(m_structure != nullptr)
-        m_structure->deleteLater();
+        GarbageCollector::instance()->add(m_structure);
 
     m_structure = val;
     m_structure->setParent(this);
@@ -744,7 +758,7 @@ void ScriteDocument::setScreenplay(Screenplay *val)
         return;
 
     if(m_screenplay != nullptr)
-        m_screenplay->deleteLater();
+        GarbageCollector::instance()->add(m_screenplay);
 
     m_screenplay = val;
     m_screenplay->setParent(this);
@@ -758,7 +772,7 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
         return;
 
     if(m_formatting != nullptr)
-        m_formatting->deleteLater();
+        GarbageCollector::instance()->add(m_formatting);
 
     m_formatting = val;
 
@@ -774,7 +788,7 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
         return;
 
     if(m_printFormat != nullptr)
-        m_printFormat->deleteLater();
+        GarbageCollector::instance()->add(m_printFormat);
 
     m_printFormat = val;
 

@@ -271,6 +271,23 @@ Item {
                                     onClicked: fileOpenButton.doOpen(filePath)
                                 }
                             }
+
+                            MenuSeparator { }
+
+                            MenuItem2 {
+                                text: "From Library"
+                                onClicked: {
+                                    resetContentAnimation.filePath = ""
+                                    resetContentAnimation.openFileDialog = false
+                                    resetContentAnimation.callback = undefined
+                                    resetContentAnimation.start()
+
+                                    modalDialog.closeable = false
+                                    modalDialog.popupSource = fileOpenButton
+                                    modalDialog.sourceComponent = importFromLibraryComponent
+                                    modalDialog.active = true
+                                }
+                            }
                         }
                     }
                 }
@@ -1220,6 +1237,12 @@ Item {
         id: exporterConfigurationComponent
 
         ExporterConfiguration { }
+    }
+
+    Component {
+        id: importFromLibraryComponent
+
+        ImportFromLibrary { }
     }
 
     Loader {

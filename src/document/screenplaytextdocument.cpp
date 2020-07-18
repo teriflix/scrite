@@ -187,7 +187,13 @@ void ScreenplayTextDocument::setScreenplay(Screenplay *val)
 
     this->disconnectFromScreenplaySignals();
 
+    if(m_screenplay)
+        disconnect(m_screenplay, &Screenplay::aboutToDelete, this, &ScreenplayTextDocument::resetScreenplay);
+
     m_screenplay = val;
+
+    if(m_screenplay)
+        connect(m_screenplay, &Screenplay::aboutToDelete, this, &ScreenplayTextDocument::resetScreenplay);
 
     this->loadScreenplayLater();
 
@@ -857,6 +863,11 @@ void ScreenplayTextDocument::loadScreenplayLater()
     m_loadScreenplayTimer.start(100, this);
     if(!updateWasScheduled)
         emit updateScheduled();
+}
+
+void ScreenplayTextDocument::resetScreenplay()
+{
+    this->setScreenplay(nullptr);
 }
 
 void ScreenplayTextDocument::connectToScreenplaySignals()

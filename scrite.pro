@@ -91,6 +91,7 @@ HEADERS += \
     src/importers/fountainimporter.h \
     src/importers/finaldraftimporter.h \
     src/importers/htmlimporter.h \
+    src/importers/libraryimporter.h \
     src/interfaces/abstracttextdocumentexporter.h \
     src/interfaces/abstractreportgenerator.h \
     src/interfaces/abstractexporter.h \
@@ -167,6 +168,7 @@ SOURCES += \
     src/importers/finaldraftimporter.cpp \
     src/importers/fountainimporter.cpp \
     src/importers/htmlimporter.cpp \
+    src/importers/libraryimporter.cpp \
     src/interfaces/abstracttextdocumentexporter.cpp \
     src/interfaces/abstractdeviceio.cpp \
     src/interfaces/abstractexporter.cpp \

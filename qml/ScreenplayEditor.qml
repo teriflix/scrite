@@ -76,6 +76,7 @@ Rectangle {
                 delegate.item.assumeFocus()
             })
         }
+        onLoadingChanged: zoomSlider.reset()
     }
 
     Rectangle {
@@ -501,6 +502,16 @@ Rectangle {
             zoomLevel: zoomLevels[value]
             from: 0; to: zoomLevels.length-1
             stepSize: 1
+            function reset() {
+                var zls = zoomLevels
+                for(var i=0; i<zls.length; i++) {
+                    if(zls[i] === 1) {
+                        value = i
+                        return
+                    }
+                }
+            }
+
             onValueChanged: {
                 if(mainTabBar.currentIndex === 0)
                     screenplayEditorSettings.mainEditorZoomValue = value

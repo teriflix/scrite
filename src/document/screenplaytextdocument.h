@@ -174,6 +174,7 @@ private:
     void loadScreenplay();
     void includeMoreAndContdMarkers();
     void loadScreenplayLater();
+    void resetScreenplay();
 
     void connectToScreenplaySignals();
     void connectToScreenplayFormatSignals();

@@ -81,6 +81,7 @@ private:
 
     void clearCurrentIndex();
     void updateCurrentIndexAndCount();
+    void onSourceDestroyed();
 
 private:
     QObject* m_source = nullptr;
