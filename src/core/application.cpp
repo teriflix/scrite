@@ -11,10 +11,11 @@
 **
 ****************************************************************************/
 
-#include "application.h"
 #include "undoredo.h"
 #include "autoupdate.h"
+#include "application.h"
 #include "simpletimer.h"
+#include "scritedocument.h"
 
 #include <QDir>
 #include <QUuid>
@@ -700,6 +701,19 @@ void Application::computeIdealFontPointSize()
     const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
     m_idealFontPointSize = qCeil(minInch * nrPointsPerInch * scale);
 #endif
+}
+
+bool Application::event(QEvent *event)
+{
+#ifdef Q_OS_MAC
+    if(event->type() == QEvent::FileOpen)
+    {
+        QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
+        m_fileToOpen = openEvent->file();
+        return true;
+    }
+#endif
+    return QtApplicationClass::event(event);
 }
 
 QColor Application::pickStandardColor(int counter) const

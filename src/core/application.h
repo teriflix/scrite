@@ -213,6 +213,11 @@ public:
     // Although public, please do not call it.
     bool notifyInternal(QObject *object, QEvent *event);
     void computeIdealFontPointSize();
+#ifdef Q_OS_MAC
+    QString fileToOpen() const { return m_fileToOpen; }
+#endif
+
+    bool event(QEvent *event);
 
 signals:
     void minimizeWindowRequest();
@@ -222,6 +227,9 @@ private:
     bool registerFileTypes();
 
 private:
+#ifdef Q_OS_MAC
+    QString m_fileToOpen;
+#endif
     QSettings *m_settings = nullptr;
     QUndoGroup *m_undoGroup = new QUndoGroup(this);
     int m_idealFontPointSize = 12;

@@ -239,9 +239,6 @@ int main(int argc, char **argv)
 
     ScriteDocument *scriteDocument = ScriteDocument::instance();
 
-    if(a.arguments().size() == 2)
-        scriteDocument->open( a.arguments().last() );
-
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     const QByteArray envOpenGLMultisampling = qgetenv("SCRITE_OPENGL_MULTISAMPLING").toUpper().trimmed();
     if(envOpenGLMultisampling == QByteArrayLiteral("FULL"))
@@ -286,6 +283,22 @@ int main(int argc, char **argv)
 #endif
 
     QObject::connect(&a, &Application::minimizeWindowRequest, &qmlView, &QQuickView::showMinimized);
+
+#ifdef Q_OS_MAC
+    if(!a.fileToOpen().isEmpty())
+        scriteDocument->open(a.fileToOpen());
+#else
+    if(a.arguments().size() > 1)
+    {
+#ifdef Q_OS_WIN
+        scriteDocument->open( a.arguments().last() );
+#else
+        QStringList args = a.arguments();
+        args.takeFirst();
+        scriteDocument->open( args.join(QStringLiteral(" ")) );
+#endif
+    }
+#endif
 
     return a.exec();
 }

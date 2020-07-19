@@ -2,33 +2,54 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-	<key>CFBundleIconFile</key>
-	<string>appicon.icns</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-        <key>CFBundleDisplayName</key>
-        <string>Scrite</string>
-        <key>CFBundleName</key>
-        <string>Scrite</string>
-	<key>CFBundleGetInfoString</key>
-        <string>Scrite - Version 0.4.11 Beta</string>
-	<key>CFBundleExecutable</key>
-        <string>Scrite</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.teriflix.scrite</string>
-	<key>CFBundleVersion</key>
-        <string>0.4.11</string>
-	<key>CFBundleShortVersionString</key>
-        <string>0.4.11</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.productivity</string>
-	<key>Vendor</key>
-	<string>TERIFLIX Entertainment Spaces Pvt. Ltd.</string>
-	<key>NOTE</key>
-	<string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
-	<key>NSSupportsAutomaticGraphicsSwitching</key>
-	<true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>CFBundleIconFile</key>
+    <string>appicon.icns</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleDisplayName</key>
+    <string>Scrite</string>
+    <key>CFBundleName</key>
+    <string>Scrite</string>
+    <key>CFBundleGetInfoString</key>
+    <string>Scrite - Version 0.4.11 Beta</string>
+    <key>CFBundleExecutable</key>
+    <string>Scrite</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.teriflix.scrite</string>
+    <key>CFBundleVersion</key>
+    <string>0.4.11</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.4.11</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
+    <key>Vendor</key>
+    <string>TERIFLIX Entertainment Spaces Pvt. Ltd.</string>
+    <key>NOTE</key>
+    <string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>scrite</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>appicon.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>Scrite Screenplay Document (*.scrite)</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.teriflix.scrite</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
