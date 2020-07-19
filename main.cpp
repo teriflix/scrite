@@ -287,6 +287,7 @@ int main(int argc, char **argv)
 #ifdef Q_OS_MAC
     if(!a.fileToOpen().isEmpty())
         scriteDocument->open(a.fileToOpen());
+    a.setHandleFileOpenEvents(true);
 #else
     if(a.arguments().size() > 1)
     {

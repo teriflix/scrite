@@ -325,6 +325,9 @@ void ScriteDocument::reset()
 
 void ScriteDocument::open(const QString &fileName)
 {
+    if(fileName == m_fileName)
+        return;
+
     HourGlass hourGlass;
 
     this->setBusyMessage("Loading " + QFileInfo(fileName).baseName() + " ...");

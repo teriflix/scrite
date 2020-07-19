@@ -213,9 +213,13 @@ public:
     // Although public, please do not call it.
     bool notifyInternal(QObject *object, QEvent *event);
     void computeIdealFontPointSize();
+
 #ifdef Q_OS_MAC
     QString fileToOpen() const { return m_fileToOpen; }
+    void setHandleFileOpenEvents(bool val=true) { m_handleFileOpenEvents = val; }
 #endif
+
+    Q_SIGNAL void openFileRequest(const QString &filePath);
 
     bool event(QEvent *event);
 
@@ -229,6 +233,7 @@ private:
 private:
 #ifdef Q_OS_MAC
     QString m_fileToOpen;
+    bool m_handleFileOpenEvents = false;
 #endif
     QSettings *m_settings = nullptr;
     QUndoGroup *m_undoGroup = new QUndoGroup(this);

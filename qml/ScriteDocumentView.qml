@@ -177,6 +177,9 @@ Item {
                     down: recentFilesMenu.visible
                     onClicked: recentFilesMenu.recentFiles.length > 0 ? recentFilesMenu.open() : doOpen()
                     function doOpen(filePath) {
+                        if(filePath === scriteDocument.fileName)
+                            return
+
                         if(scriteDocument.modified)
                             askQuestion({
                                     "question": appToolBar.saveQuestionText(),
@@ -200,6 +203,11 @@ Item {
                             recentFilesMenu.close()
                             fileDialog.launch("OPEN", filePath)
                         }
+                    }
+
+                    Connections {
+                        target: app
+                        onOpenFileRequest: fileOpenButton.doOpen(filePath)
                     }
 
                     ShortcutsModelItem.group: "File"

@@ -227,6 +227,14 @@ void ScreenplayAdapter::setCurrentIndexInternal(int val)
     if(m_currentIndex < 0 && val < 0)
         return;
 
+    if(m_source.isNull())
+    {
+        m_currentIndex = -1;
+        this->setCurrentElement(nullptr);
+        this->setSourceModel(nullptr);
+        return;
+    }
+
     const int nrRows = this->sourceModel() ? this->rowCount() : 0;
     val = nrRows > 0 ? qBound(-1, val, nrRows-1) : -1;
     if(m_currentIndex == val)

@@ -709,7 +709,10 @@ bool Application::event(QEvent *event)
     if(event->type() == QEvent::FileOpen)
     {
         QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
-        m_fileToOpen = openEvent->file();
+        if(m_handleFileOpenEvents)
+            emit openFileRequest(openEvent->file());
+        else
+            m_fileToOpen = openEvent->file();
         return true;
     }
 #endif
