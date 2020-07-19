@@ -944,10 +944,12 @@ bool Application::registerFileTypes()
 #endif
 
 #ifdef Q_OS_MAC
-    return false;
+    // Registration happens via Info.plist file.
+    return true;
 #else
 #ifdef Q_OS_UNIX
-    return false;
+    // Registration happens via .desktop file
+    return true;
 #endif
 #endif
 }

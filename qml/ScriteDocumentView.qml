@@ -344,7 +344,6 @@ Item {
                     iconSource: "../icons/content/archive.png"
                     enabled: scriteDocument.structure.elementCount > 0
                     onClicked: fileDialog.launch("SAVE")
-                    // visible: documentUI.width > 1460
 
                     ShortcutsModelItem.group: "File"
                     ShortcutsModelItem.title: text
@@ -893,7 +892,7 @@ Item {
 
             Image {
                 id: appLogo
-                source: "../images/teriflix_logo.png"
+                source: documentUI.width >= 1440 ? "../images/teriflix_logo.png" : "../images/teriflix_icon.png"
                 height: parent.height
                 smooth: true
                 mipmap: true
