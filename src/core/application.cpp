@@ -36,6 +36,7 @@
 #include <QColorDialog>
 #include <QFontDatabase>
 #include <QStandardPaths>
+#include <QOperatingSystemVersion>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -134,6 +135,11 @@ Application::Platform Application::platform() const
 Application::Platform Application::platform() const
 {
     return Application::WindowsDesktop;
+}
+
+bool Application::isNotWindows10() const
+{
+    return QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows10;
 }
 #else
 Application::Platform Application::platform() const

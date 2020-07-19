@@ -17,7 +17,7 @@ import QtQuick.Window 2.13
 import Scrite 1.0
 
 Item {
-    property bool animationsEnabled: true
+    property bool animationsEnabled: app.isWindowsPlatform ? !app.isNotWindows10 : true
     signal done()
 
     BoxShadow {

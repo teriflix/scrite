@@ -403,7 +403,13 @@ Rectangle {
         sourceComponent: UI.SplashScreen {
             Component.onCompleted: blur.visible = true
             Component.onDestruction: blur.visible = false
-            onDone: splashLoader.active = false
+            onDone: {
+                splashLoader.active = false
+                if(app.isWindowsPlatform && app.isNotWindows10)
+                    showInformation({
+                        "message": "Scrite is designed for Windows 10. While it may work on earlier versions of Windows, we dont't actively test on them. We recommend that you use Scrite on Windows 10."
+                    })
+            }
         }
     }
 

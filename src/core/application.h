@@ -79,6 +79,13 @@ public:
     bool isWindowsPlatform() const { return false; }
 #endif
 
+    Q_PROPERTY(bool isNotWindows10 READ isNotWindows10 CONSTANT)
+#ifdef Q_OS_WIN
+    bool isNotWindows10() const;
+#else
+    bool isNotWindows10() const { return true; }
+#endif
+
     Q_PROPERTY(bool isLinuxPlatform READ isLinuxPlatform CONSTANT)
 #ifdef Q_OS_MAC
     bool isLinuxPlatform() const { return false; }
