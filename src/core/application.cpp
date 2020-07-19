@@ -70,7 +70,15 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
     this->installationId();
     this->installationTimestamp();
-    m_settings->setValue("Installation/launchCount", this->launchCounter()+1);
+    m_settings->setValue( QStringLiteral("Installation/launchCount"), this->launchCounter()+1);
+
+    if( m_settings->value( QStringLiteral("Installation/fileTypeRegistered") , false).toBool() == false )
+    {
+        const bool rft = this->registerFileType();
+        m_settings->setValue( QStringLiteral("Installation/fileTypeRegistered"), rft );
+        if(rft)
+            m_settings->setValue( QStringLiteral("Installation/path"), this->applicationFilePath() );
+    }
 
 #ifndef QT_NO_DEBUG
     QInternal::registerCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
@@ -894,7 +902,26 @@ bool Application::loadScript()
 
     return true;
 }
-
 #else
 bool Application::loadScript() { return false; }
 #endif
+
+bool Application::registerFileType()
+{
+#ifdef Q_OS_WIN
+    const QString appFilePath = this->applicationFilePath();
+    QSettings s("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES", QSettings::NativeFormat);
+        s.setValue(".scrite/DefaultIcon/.",QDir::toNativeSeparators(appFilePath));
+        s.setValue(".scrite/.","com.teriflix.scrite");
+        s.setValue("com.teriflix.scrite/shell/open/command/.", QDir::toNativeSeparators(appFilePath) + " \"%1\"");
+    return true;
+#endif
+
+#ifdef Q_OS_MAC
+    return false;
+#else
+#ifdef Q_OS_UNIX
+    return false;
+#endif
+#endif
+}
