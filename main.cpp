@@ -42,7 +42,7 @@
 #include "materialcolors.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
-#include "libraryimporter.h"
+#include "openfromlibrary.h"
 #include "abstractexporter.h"
 #include "tightboundingbox.h"
 #include "genericarraymodel.h"
@@ -222,8 +222,8 @@ int main(int argc, char **argv)
 
     qmlRegisterUncreatableType<ShortcutsModelItem>("Scrite", 1, 0, "ShortcutsModelItem", "Use as attached property.");
 
-    qmlRegisterType<LibraryImporter>("Scrite", 1, 0, "LibraryImporter");
-    qmlRegisterUncreatableType<Library>("Scrite", 1, 0, "Library", "Use from LibraryImporter.library");
+    qmlRegisterType<LibraryService>("Scrite", 1, 0, "LibraryService");
+    qmlRegisterUncreatableType<Library>("Scrite", 1, 0, "Library", "Use from LibraryService.library");
 
     NotificationManager notificationManager;
 

@@ -36,6 +36,7 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
+    src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
     src/quick/objects/delayedpropertybinder.h \
@@ -91,7 +92,6 @@ HEADERS += \
     src/importers/fountainimporter.h \
     src/importers/finaldraftimporter.h \
     src/importers/htmlimporter.h \
-    src/importers/libraryimporter.h \
     src/interfaces/abstracttextdocumentexporter.h \
     src/interfaces/abstractreportgenerator.h \
     src/interfaces/abstractexporter.h \
@@ -116,6 +116,7 @@ SOURCES += \
     3rdparty/poly2tri/sweep/cdt.cc \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
+    src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
     src/quick/objects/fileinfo.cpp \
@@ -168,7 +169,6 @@ SOURCES += \
     src/importers/finaldraftimporter.cpp \
     src/importers/fountainimporter.cpp \
     src/importers/htmlimporter.cpp \
-    src/importers/libraryimporter.cpp \
     src/interfaces/abstracttextdocumentexporter.cpp \
     src/interfaces/abstractdeviceio.cpp \
     src/interfaces/abstractexporter.cpp \

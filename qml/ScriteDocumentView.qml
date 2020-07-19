@@ -284,7 +284,7 @@ Item {
 
                                     modalDialog.closeable = false
                                     modalDialog.popupSource = fileOpenButton
-                                    modalDialog.sourceComponent = importFromLibraryComponent
+                                    modalDialog.sourceComponent = openFromLibraryComponent
                                     modalDialog.active = true
                                 }
                             }
@@ -1240,9 +1240,9 @@ Item {
     }
 
     Component {
-        id: importFromLibraryComponent
+        id: openFromLibraryComponent
 
-        ImportFromLibrary { }
+        OpenFromLibrary { }
     }
 
     Loader {

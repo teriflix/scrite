@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "libraryimporter.h"
+#include "openfromlibrary.h"
 
 #include <QNetworkReply>
 #include <QJsonDocument>
@@ -52,23 +52,23 @@ QNetworkAccessManager & LibraryNetworkAccess()
     return nam;
 }
 
-LibraryImporter::LibraryImporter(QObject *parent)
+LibraryService::LibraryService(QObject *parent)
     : AbstractImporter(parent)
 {
 
 }
 
-LibraryImporter::~LibraryImporter()
+LibraryService::~LibraryService()
 {
 
 }
 
-Library *LibraryImporter::library() const
+Library *LibraryService::library() const
 {
     return Library::instance();
 }
 
-void LibraryImporter::importLibraryRecordAt(int index)
+void LibraryService::openLibraryRecordAt(int index)
 {
     if(m_importing)
         return;
@@ -115,7 +115,7 @@ void LibraryImporter::importLibraryRecordAt(int index)
     });
 }
 
-bool LibraryImporter::doImport(QIODevice *device)
+bool LibraryService::doImport(QIODevice *device)
 {
     Q_UNUSED(device);
     return false;
@@ -180,7 +180,7 @@ void Library::fetchRecords()
         return;
 
     QNetworkAccessManager &nam = ::LibraryNetworkAccess();
-    const QUrl url = QUrl( m_baseUrl.toString() + QStringLiteral("/records.json") );
+    const QUrl url = QUrl( m_baseUrl.toString() + QStringLiteral("/records.hexdb") );
 
     this->setBusy(true);
 
@@ -189,14 +189,21 @@ void Library::fetchRecords()
     connect(reply, &QNetworkReply::finished, [=]() {
         const QByteArray bytes = reply->readAll();
         reply->deleteLater();
-        QJsonParseError error;
-        const QJsonDocument doc = QJsonDocument::fromJson(bytes, &error);
-        if(error.error == QJsonParseError::NoError) {
-            const QJsonObject object = doc.object();
-            this->setRecords(object.value("records").toArray());
-        }
+        this->loadDatabase(bytes);
         this->setBusy(false);
     });
+}
+
+void Library::loadDatabase(const QByteArray &bytes)
+{
+    const QByteArray bson = qUncompress(QByteArray::fromHex(bytes));
+
+    const QJsonDocument doc = QJsonDocument::fromBinaryData(bson);
+    if(doc.isNull())
+        return;
+
+    const QJsonObject object = doc.object();
+    this->setRecords(object.value("records").toArray());
 }
 
 void Library::setRecords(const QJsonArray &array)

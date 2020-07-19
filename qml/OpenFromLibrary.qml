@@ -30,7 +30,7 @@ Item {
         Text {
             font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
             font.bold: true
-            text: "Download From The Library"
+            text: "Open From Library"
             anchors.horizontalCenter: parent.horizontalCenter
             color: primaryColors.c300.text
         }
@@ -55,8 +55,8 @@ Item {
         }
     }
 
-    LibraryImporter {
-        id: libraryImporter
+    LibraryService {
+        id: libraryService
         onImported: modalDialog.close()
     }
 
@@ -74,7 +74,7 @@ Item {
         anchors.right: parent.right
         anchors.bottom: buttonsRow.top
         anchors.margins: 15
-        model: libraryImporter.library
+        model: libraryService.library
         rightMargin: contentHeight > height ? 15 : 0
         highlightMoveDuration: 0
         clip: true
@@ -179,7 +179,7 @@ Item {
                     fillMode: Image.PreserveAspectCrop
                     smooth: true
                     anchors.horizontalCenter: parent.horizontalCenter
-                    source: libraryImporter.library.baseUrl + "/" + record.poster
+                    source: libraryService.library.baseUrl + "/" + record.poster
 
                     Rectangle {
                         anchors.fill: parent
@@ -237,7 +237,7 @@ Item {
                 onClicked: libraryGridView.currentIndex = index
                 onDoubleClicked: {
                     libraryGridView.currentIndex = index
-                    importButton.click()
+                    openButton.click()
                 }
             }
         }
@@ -245,7 +245,7 @@ Item {
 
     BusyIndicator {
         anchors.centerIn: libraryGridView
-        running: libraryImporter.library.busy
+        running: libraryService.library.busy
     }
 
     Item {
@@ -264,15 +264,15 @@ Item {
 
             Button2 {
                 text: "Reload"
-                onClicked: libraryImporter.library.reload()
+                onClicked: libraryService.library.reload()
             }
         }
 
         Text {
-            text: "" + libraryImporter.library.count + " screenplays available."
+            text: "" + libraryService.library.count + " screenplays available."
             font.pointSize: app.idealFontPointSize
             anchors.centerIn: parent
-            visible: !libraryImporter.library.busy && libraryGridView.contentHeight > libraryGridView.height
+            visible: !libraryService.library.busy && libraryGridView.contentHeight > libraryGridView.height
         }
 
         Row {
@@ -287,12 +287,12 @@ Item {
             }
 
             Button2 {
-                id: importButton
-                text: "Import"
-                enabled: libraryGridView.currentIndex >= 0 && !libraryImporter.library.busy
+                id: openButton
+                text: "Open"
+                enabled: libraryGridView.currentIndex >= 0 && !libraryService.library.busy
                 function click() {
                     importFromLibraryUi.enabled = false
-                    libraryImporter.importLibraryRecordAt(libraryGridView.currentIndex)
+                    libraryService.openLibraryRecordAt(libraryGridView.currentIndex)
                 }
                 onClicked: click()
             }

@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef LIBRARYIMPORTER_H
-#define LIBRARYIMPORTER_H
+#ifndef OPENFROMLIBRARY_H
+#define OPENFROMLIBRARY_H
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -25,19 +25,19 @@ class Library;
 // This is a special case importer, that wont be created through
 // the factory. So, we dont have to make it work like other factory
 // based importers.
-class LibraryImporter : public AbstractImporter
+class LibraryService : public AbstractImporter
 {
     Q_OBJECT
     Q_CLASSINFO("Format", "Library")
 
 public:
-    LibraryImporter(QObject *parent=nullptr);
-    ~LibraryImporter();
+    LibraryService(QObject *parent=nullptr);
+    ~LibraryService();
 
     Q_PROPERTY(Library* library READ library CONSTANT)
     Library* library() const;
 
-    Q_INVOKABLE void importLibraryRecordAt(int index);
+    Q_INVOKABLE void openLibraryRecordAt(int index);
 
     // AbstractImporter interface
     bool doImport(QIODevice *device);
@@ -83,6 +83,7 @@ public:
 
 private:
     void fetchRecords();
+    void loadDatabase(const QByteArray &bytes);
     void setRecords(const QJsonArray &array);
     void setBusy(bool val);
 

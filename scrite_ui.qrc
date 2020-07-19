@@ -49,6 +49,6 @@
         <file>qml/DockWidget.qml</file>
         <file>qml/SpecialSymbolsPanel.qml</file>
         <file>qml/SpecialSymbolsSupport.qml</file>
-        <file>qml/ImportFromLibrary.qml</file>
+        <file>qml/OpenFromLibrary.qml</file>
     </qresource>
 </RCC>
