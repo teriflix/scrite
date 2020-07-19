@@ -36,7 +36,7 @@ Item {
         }
 
         Text {
-            text: "The library consists of curated screenplays either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories.<br/>In all cases, <u>the copyright of the works rests with its respective owners only</u>. Read the complete <a href=\"disclaimer\">disclaimer</a> here."
+            text: "The library consists of curated screenplays either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u>. Read the complete <a href=\"disclaimer\">disclaimer</a> here."
             font.pointSize:  Screen.devicePixelRatio > 1 ? 14 : 10
             width: parent.width * 0.9
             wrapMode: Text.WordWrap
