@@ -62,7 +62,7 @@ Item {
 
     Rectangle {
         anchors.fill: libraryGridView
-        color: primaryColors.a100.background
+        color: primaryColors.c50.background
         border.width: 1
         border.color: primaryColors.borderColor
     }
@@ -115,8 +115,8 @@ Item {
                 width: libraryGridView.cellWidth * 2.5
                 height: description.contentHeight + 20
                 border.width: 1
-                border.color: accentColors.borderColor
-                color: accentColors.c200.background
+                border.color: primaryColors.c600.text
+                color: primaryColors.c600.background
 
                 DelayedPropertyBinder {
                     id: toolTipVisibility
@@ -151,7 +151,7 @@ Item {
                     font.pixelSize: app.idealFontPointSize
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    color: accentColors.c200.text
+                    color: primaryColors.c600.text
                     text: record.logline + "<br/><br/>" +
                           "<strong>Revision:</strong> " + record.revision + "<br/>" +
                           "<strong>Copyright:</strong> " + record.copyright + "<br/>" +
