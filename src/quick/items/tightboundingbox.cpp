@@ -68,7 +68,8 @@ void TightBoundingBoxEvaluator::evaluateNow()
 
 TightBoundingBoxItem::TightBoundingBoxItem(QObject *parent)
     : QObject(parent),
-      m_item(qobject_cast<QQuickItem*>(parent))
+      m_item(qobject_cast<QQuickItem*>(parent)),
+      m_evaluator(this, "evaluator")
 {
     if(m_item)
     {
@@ -111,4 +112,10 @@ void TightBoundingBoxItem::requestReevaluation()
 {
     if(m_evaluator)
         m_evaluator->markDirty(this);
+}
+
+void TightBoundingBoxItem::resetEvaluator()
+{
+    m_evaluator = nullptr;
+    emit evaluatorChanged();
 }

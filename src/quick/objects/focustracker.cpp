@@ -17,11 +17,12 @@
 #include <QQuickItem>
 
 FocusTrackerIndicator::FocusTrackerIndicator(FocusTracker *parent)
-                      :QObject(parent), m_tracker(parent)
+                      : QObject(parent),
+                        m_tracker(parent),
+                        m_target(this, "target")
 {
     connect(m_tracker, &FocusTracker::hasFocusChanged, this, &FocusTrackerIndicator::apply);
 }
-
 
 FocusTrackerIndicator::~FocusTrackerIndicator()
 {
@@ -91,6 +92,11 @@ void FocusTrackerIndicator::apply()
         m_target->setProperty(qPrintable(m_property), m_tracker->hasFocus() ? m_onValue : m_offValue);
 }
 
+void FocusTrackerIndicator::resetTarget()
+{
+    this->setTarget(nullptr);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef QList<FocusTracker*> FocusTrackerList;
@@ -98,7 +104,8 @@ Q_GLOBAL_STATIC(FocusTrackerList, GlobalFocusTrackerList);
 
 FocusTracker::FocusTracker(QObject *parent)
     :QObject(parent),
-      m_item(qobject_cast<QQuickItem*>(parent))
+      m_item(qobject_cast<QQuickItem*>(parent)),
+      m_window(this, "window")
 {
     ::GlobalFocusTrackerList->append(this);
 }
@@ -129,6 +136,12 @@ void FocusTracker::setWindow(QQuickWindow *val)
     if(m_window != nullptr)
         connect(m_window, &QQuickWindow::activeFocusItemChanged, this, &FocusTracker::evaluateHasFocus);
 
+    emit windowChanged();
+}
+
+void FocusTracker::resetWindow()
+{
+    m_window = nullptr;
     emit windowChanged();
 }
 

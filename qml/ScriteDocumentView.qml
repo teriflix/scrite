@@ -320,7 +320,7 @@ Item {
                     iconSource: "../icons/content/archive.png"
                     enabled: scriteDocument.structure.elementCount > 0
                     onClicked: fileDialog.launch("SAVE")
-                    visible: documentUI.width > 1460
+                    // visible: documentUI.width > 1460
 
                     ShortcutsModelItem.group: "File"
                     ShortcutsModelItem.title: text

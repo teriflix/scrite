@@ -17,6 +17,7 @@
 #include "note.h"
 #include "scene.h"
 #include "simpletimer.h"
+#include "qobjectproperty.h"
 #include "abstractshapeitem.h"
 
 #include <QColor>
@@ -67,7 +68,7 @@ public:
     qreal height() const { return m_height; }
     Q_SIGNAL void heightChanged();
 
-    Q_PROPERTY(QQuickItem* follow READ follow WRITE setFollow NOTIFY followChanged STORED false)
+    Q_PROPERTY(QQuickItem* follow READ follow WRITE setFollow NOTIFY followChanged RESET resetFollow STORED false)
     void setFollow(QQuickItem* val);
     QQuickItem* follow() const { return m_follow; }
     Q_SIGNAL void followChanged();
@@ -103,6 +104,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void resetFollow();
     void syncWithFollowItem();
 
 private:
@@ -114,8 +116,8 @@ private:
     qreal m_height = 0;
     Scene* m_scene = nullptr;
     bool m_selected = false;
-    QPointer<QQuickItem> m_follow;
     Structure *m_structure = nullptr;
+    QObjectProperty<QQuickItem> m_follow;
 };
 
 class Character : public QObject
@@ -386,12 +388,12 @@ public:
     LineType lineType() const { return m_lineType; }
     Q_SIGNAL void lineTypeChanged();
 
-    Q_PROPERTY(StructureElement* fromElement READ fromElement WRITE setFromElement NOTIFY fromElementChanged)
+    Q_PROPERTY(StructureElement* fromElement READ fromElement WRITE setFromElement NOTIFY fromElementChanged RESET resetFromElement)
     void setFromElement(StructureElement* val);
     StructureElement* fromElement() const { return m_fromElement; }
     Q_SIGNAL void fromElementChanged();
 
-    Q_PROPERTY(StructureElement* toElement READ toElement WRITE setToElement NOTIFY toElementChanged)
+    Q_PROPERTY(StructureElement* toElement READ toElement WRITE setToElement NOTIFY toElementChanged RESET resetToElement)
     void setToElement(StructureElement* val);
     StructureElement* toElement() const { return m_toElement; }
     Q_SIGNAL void toElementChanged();
@@ -415,9 +417,10 @@ protected:
     void timerEvent(QTimerEvent *te);
 
 private:
+    void resetFromElement();
+    void resetToElement();
     void requestUpdateLater();
     void requestUpdate() { this->update(); }
-    void onElementDestroyed(StructureElement *element);
     void pickElementColor();
     void updateArrowAndLabelPositions();
     void setArrowPosition(const QPointF &val);
@@ -428,8 +431,8 @@ private:
     QPointF m_arrowPosition;
     SimpleTimer m_updateTimer;
     qreal m_arrowAndLabelSpacing = 30;
-    StructureElement* m_toElement = nullptr;
-    StructureElement* m_fromElement = nullptr;
+    QObjectProperty<StructureElement> m_toElement;
+    QObjectProperty<StructureElement> m_fromElement;
     QPointF m_suggestedLabelPosition;
 };
 

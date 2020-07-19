@@ -14,7 +14,8 @@
 #include "errorreport.h"
 
 ErrorReport::ErrorReport(QObject *parent)
-            :QAbstractListModel(parent)
+            :QAbstractListModel(parent),
+              m_proxyFor(this, "proxyFor")
 {
 
 }
@@ -31,7 +32,7 @@ void ErrorReport::setProxyFor(ErrorReport *val)
 
     if(m_proxyFor == nullptr)
     {
-        disconnect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::clearProxyFor);
+        disconnect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::resetProxyFor);
         disconnect(m_proxyFor, &ErrorReport::errorMessageChanged, this, &ErrorReport::updateErrorMessageFromProxy);
         disconnect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this, &ErrorReport::updateWarningMessageFromProxy);
     }
@@ -40,7 +41,7 @@ void ErrorReport::setProxyFor(ErrorReport *val)
 
     if(m_proxyFor != nullptr)
     {
-        connect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::clearProxyFor);
+        connect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::resetProxyFor);
         connect(m_proxyFor, &ErrorReport::errorMessageChanged, this, &ErrorReport::updateErrorMessageFromProxy);
         connect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this, &ErrorReport::updateWarningMessageFromProxy);
 
@@ -99,9 +100,10 @@ QHash<int, QByteArray> ErrorReport::roleNames() const
     return roles;
 }
 
-void ErrorReport::clearProxyFor()
+void ErrorReport::resetProxyFor()
 {
-    this->setProxyFor(nullptr);
+    m_proxyFor = nullptr;
+    emit proxyForChanged();
 }
 
 void ErrorReport::updateErrorMessageFromProxy()

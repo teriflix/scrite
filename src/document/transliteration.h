@@ -25,6 +25,8 @@
 #include <QJsonObject>
 #include <QQuickPaintedItem>
 
+#include "qobjectproperty.h"
+
 class QTextCursor;
 class QTextDocument;
 class QCoreApplication;
@@ -140,7 +142,7 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
+    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument* val);
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
@@ -185,7 +187,7 @@ public:
 private:
     Transliterator(QObject *parent=nullptr);
     QTextDocument *document() const;
-    void onTextDocumentDestroyed();
+    void resetTextDocument();
     void processTransliteration(int from, int charsRemoved, int charsAdded);
     void transliterate(QTextCursor &cursor, void *transliterator=nullptr, bool force=false);
 
@@ -196,7 +198,7 @@ private:
     int m_cursorPosition = -1;
     bool m_hasActiveFocus = false;
     bool m_transliterateCurrentWordOnly = true;
-    QQuickTextDocument* m_textDocument = nullptr;
+    QObjectProperty<QQuickTextDocument> m_textDocument;
 };
 Q_DECLARE_METATYPE(Transliterator*)
 QML_DECLARE_TYPEINFO(Transliterator, QML_HAS_ATTACHED_PROPERTIES)

@@ -15,9 +15,11 @@
 #define ABSTRACTDEVICEIO_H
 
 #include <QObject>
+
+#include "errorreport.h"
 #include "scritedocument.h"
 #include "progressreport.h"
-#include "errorreport.h"
+#include "qobjectproperty.h"
 
 class QIODevice;
 
@@ -33,7 +35,7 @@ public:
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
-    Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged)
+    Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged RESET resetDocument)
     void setDocument(ScriteDocument* val);
     ScriteDocument* document() const { return m_document; }
     Q_SIGNAL void documentChanged();
@@ -41,14 +43,15 @@ public:
 protected:
     AbstractDeviceIO(QObject *parent=nullptr);
     virtual QString polishFileName(const QString &fileName) const { return fileName; }
+    void resetDocument();
 
     ProgressReport *progress() const { return m_progressReport; }
     ErrorReport *error() const { return m_errorReport; }
 
 private:
     QString m_fileName;
-    ScriteDocument* m_document = nullptr;
     ErrorReport *m_errorReport = new ErrorReport(this);
+    QObjectProperty<ScriteDocument> m_document;
     ProgressReport *m_progressReport = new ProgressReport(this);
 };
 

@@ -16,7 +16,8 @@
 #include <QFile>
 
 AbstractDeviceIO::AbstractDeviceIO(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_document(this, "document")
 {
 
 }
@@ -45,3 +46,7 @@ void AbstractDeviceIO::setDocument(ScriteDocument *val)
     emit documentChanged();
 }
 
+void AbstractDeviceIO::resetDocument()
+{
+    this->setDocument(nullptr);
+}

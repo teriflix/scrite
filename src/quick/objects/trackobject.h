@@ -15,6 +15,7 @@
 #define TRACKPROPERTYCHANGES_H
 
 #include "simpletimer.h"
+#include "qobjectproperty.h"
 
 #include <QObject>
 #include <QQmlListProperty>
@@ -29,7 +30,7 @@ class AbstractObjectTracker : public QObject, public QQmlParserStatus
 public:
     ~AbstractObjectTracker();
 
-    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
     void setTarget(QObject* val);
     QObject* target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -51,6 +52,7 @@ signals:
 
 protected:
     void onEmitTracked();
+    void resetTarget();
 
 protected:
     AbstractObjectTracker(QObject *parent=nullptr);
@@ -58,7 +60,7 @@ protected:
 
     bool m_enabled = true;
     bool m_initialized = true;
-    QObject* m_target = nullptr;
+    QObjectProperty<QObject> m_target;
 };
 
 class TrackProperty : public AbstractObjectTracker

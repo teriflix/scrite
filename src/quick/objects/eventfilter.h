@@ -18,6 +18,8 @@
 #include <QQmlEngine>
 #include <QJsonObject>
 
+#include "qobjectproperty.h"
+
 class EventFilter;
 
 class EventFilterResult : public QObject
@@ -61,7 +63,7 @@ public:
     bool isActive() const { return m_active; }
     Q_SIGNAL void activeChanged();
 
-    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
     void setTarget(QObject* val);
     QObject* target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -77,14 +79,15 @@ public:
     Q_SIGNAL void filter(QObject *object, const QJsonObject &event, EventFilterResult *result);
 
 protected:
+    void resetTarget();
     bool eventFilter(QObject *watched, QEvent *event);
     QEvent *cloneCurrentEvent() const;
 
 private:
     bool m_active = true;
-    QObject* m_target = nullptr;
     QList<int> m_events;
     QEvent *m_currentEvent = nullptr;
+    QObjectProperty<QObject> m_target;
 };
 
 Q_DECLARE_METATYPE(EventFilter*)

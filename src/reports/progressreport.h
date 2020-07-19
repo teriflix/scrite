@@ -16,6 +16,8 @@
 
 #include <QObject>
 
+#include "qobjectproperty.h"
+
 class ProgressReport : public QObject
 {
     Q_OBJECT
@@ -25,7 +27,7 @@ public:
     ~ProgressReport();
     Q_SIGNAL void aboutToDelete(ProgressReport *val);
 
-    Q_PROPERTY(ProgressReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged)
+    Q_PROPERTY(ProgressReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET resetProxyFor)
     void setProxyFor(ProgressReport* val);
     ProgressReport* proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
@@ -65,7 +67,7 @@ public:
 private:
     void setStatus(Status val);
     void setProgress(qreal val);
-    void clearProxyFor();
+    void resetProxyFor();
     void updateProgressTextFromProxy();
     void updateProgressFromProxy();
     void updateStatusFromProxy();
@@ -75,7 +77,7 @@ private:
     qreal m_progress = 1.0;
     qreal m_progressStep = 0.0;
     QString m_progressText;
-    ProgressReport* m_proxyFor = nullptr;
+    QObjectProperty<ProgressReport> m_proxyFor;
 };
 
 #endif // PROGRESSREPORT_H

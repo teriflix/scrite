@@ -125,7 +125,8 @@ QHash<int, QByteArray> GenericArrayModel::roleNames() const
 ///////////////////////////////////////////////////////////////////////////////
 
 GenericArraySortFilterProxyModel::GenericArraySortFilterProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
+    : QSortFilterProxyModel(parent),
+      m_arrayModel(this, "arrayModel")
 {
 
 }
@@ -151,4 +152,9 @@ QHash<int, QByteArray> GenericArraySortFilterProxyModel::roleNames() const
         return QSortFilterProxyModel::roleNames();
 
     return m_arrayModel->roleNames();
+}
+
+void GenericArraySortFilterProxyModel::resetArrayModel()
+{
+    this->setArrayModel(nullptr);
 }

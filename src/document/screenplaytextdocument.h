@@ -22,6 +22,7 @@
 #include "scene.h"
 #include "formatting.h"
 #include "screenplay.h"
+#include "qobjectproperty.h"
 
 class ScreenplayTextDocument;
 class AbstractScreenplayTextDocumentInjectionInterface
@@ -63,17 +64,17 @@ public:
     ScreenplayTextDocument(QTextDocument *document, QObject *parent=nullptr);
     ~ScreenplayTextDocument();
 
-    Q_PROPERTY(QTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
+    Q_PROPERTY(QTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QTextDocument* val);
     QTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged RESET resetScreenplay)
     void setScreenplay(Screenplay* val);
     Screenplay* screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(ScreenplayFormat* formatting READ formatting WRITE setFormatting NOTIFY formattingChanged)
+    Q_PROPERTY(ScreenplayFormat* formatting READ formatting WRITE setFormatting NOTIFY formattingChanged RESET resetFormatting)
     void setFormatting(ScreenplayFormat* val);
     ScreenplayFormat* formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
@@ -144,11 +145,10 @@ public:
     QList< QPair<int,int> > pageBoundaries() const { return m_pageBoundaries; }
     Q_SIGNAL void pageBoundariesChanged();
 
-    Q_PROPERTY(QObject* injection READ injection WRITE setInjection NOTIFY injectionChanged)
+    Q_PROPERTY(QObject* injection READ injection WRITE setInjection NOTIFY injectionChanged RESET resetInjection)
     void setInjection(QObject* val);
     QObject* injection() const { return m_injection; }
     Q_SIGNAL void injectionChanged();
-    QObject* m_injection = nullptr;
 
     void syncNow();
 
@@ -170,6 +170,8 @@ private:
     void setUpdating(bool val);
     void setPageCount(int val);
     void setCurrentPage(int val);
+    void resetFormatting();
+    void resetTextDocument();
 
     void loadScreenplay();
     void includeMoreAndContdMarkers();
@@ -228,7 +230,7 @@ private:
     void addToSceneResetList(Scene *scene);
     void processSceneResetList();
 
-    void clearInjection() { this->setInjection(nullptr); }
+    void resetInjection();
 
 private:
     int m_pageCount = 0;
@@ -241,23 +243,24 @@ private:
     bool m_sceneNumbers = true;
     Scene *m_activeScene = nullptr;
     bool m_componentComplete = true;
-    Screenplay* m_screenplay = nullptr;
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
-    QTextDocument* m_textDocument = nullptr;
     SimpleTimer m_sceneResetTimer;
-    ScreenplayFormat* m_formatting = nullptr;
     QList<Scene*> m_sceneResetList;
     bool m_printEachSceneOnANewPage = false;
     SimpleTimer m_loadScreenplayTimer;
     QStringList m_highlightDialoguesOf;
     SimpleTimer m_pageBoundaryEvalTimer;
     QTextFrameFormat m_sceneFrameFormat;
+    QObjectProperty<QObject> m_injection;
     bool m_connectedToScreenplaySignals = false;
     bool m_connectedToFormattingSignals = false;
     QPagedPaintDevice::PageSize m_paperSize = QPagedPaintDevice::Letter;
     QList< QPair<int,int> > m_pageBoundaries;
+    QObjectProperty<Screenplay> m_screenplay;
     friend class ScreenplayTextDocumentUpdate;
+    QObjectProperty<QTextDocument> m_textDocument;
+    QObjectProperty<ScreenplayFormat> m_formatting;
     ModificationTracker m_screenplayModificationTracker;
     ModificationTracker m_formattingModificationTracker;
     QMap<QObject *, const ScreenplayElement*> m_frameElementMap;
@@ -272,12 +275,12 @@ public:
     ScreenplayElementPageBreaks(QObject *parent=nullptr);
     ~ScreenplayElementPageBreaks();
 
-    Q_PROPERTY(ScreenplayTextDocument* screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged)
+    Q_PROPERTY(ScreenplayTextDocument* screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged RESET resetScreenplayDocument)
     void setScreenplayDocument(ScreenplayTextDocument* val);
     ScreenplayTextDocument* screenplayDocument() const { return m_screenplayDocument; }
     Q_SIGNAL void screenplayDocumentChanged();
 
-    Q_PROPERTY(ScreenplayElement* screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged)
+    Q_PROPERTY(ScreenplayElement* screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged RESET resetScreenplayElement)
     void setScreenplayElement(ScreenplayElement* val);
     ScreenplayElement* screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
@@ -287,13 +290,15 @@ public:
     Q_SIGNAL void pageBreaksChanged();
 
 private:
+    void resetScreenplayDocument();
+    void resetScreenplayElement();
     void updatePageBreaks();
     void setPageBreaks(const QVariantList &val);
 
 private:
     QVariantList m_pageBreaks;
-    ScreenplayElement* m_screenplayElement = nullptr;
-    ScreenplayTextDocument* m_screenplayDocument = nullptr;
+    QObjectProperty<ScreenplayElement> m_screenplayElement;
+    QObjectProperty<ScreenplayTextDocument> m_screenplayDocument;
 };
 
 class ScreenplayTitlePageObjectInterface : public QObject, public QTextObjectInterface

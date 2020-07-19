@@ -15,6 +15,8 @@
 #define PATHITEM_H
 
 #include "abstractshapeitem.h"
+#include "qobjectproperty.h"
+
 #include <QQmlListProperty>
 #include <QPainterPath>
 #include <QJsonObject>
@@ -29,15 +31,18 @@ public:
     PainterPathItem(QQuickItem *parent=nullptr);
     ~PainterPathItem();
 
-    Q_PROPERTY(PainterPath* painterPath READ painterPath WRITE setPainterPath NOTIFY painterPathChanged)
+    Q_PROPERTY(PainterPath* painterPath READ painterPath WRITE setPainterPath NOTIFY painterPathChanged RESET resetPainterPath)
     void setPainterPath(PainterPath *val);
-    PainterPath* painterPath() const { return m_path; }
+    PainterPath* painterPath() const { return m_painterPath; }
     Q_SIGNAL void painterPathChanged();
 
     QPainterPath shape() const;
 
+private:
+    void resetPainterPath();
+
 protected:
-    PainterPath *m_path = nullptr;
+    QObjectProperty<PainterPath> m_painterPath;
 };
 
 class AbstractPathElement : public QObject

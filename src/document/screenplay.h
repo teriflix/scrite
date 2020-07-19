@@ -17,6 +17,7 @@
 #include "scene.h"
 #include "modifiable.h"
 #include "simpletimer.h"
+#include "qobjectproperty.h"
 
 #include <QJsonArray>
 #include <QJsonValue>
@@ -50,7 +51,7 @@ public:
     int breakType() const { return m_breakType; }
     Q_SIGNAL void breakTypeChanged();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged STORED false)
+    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged STORED false RESET resetScreenplay)
     void setScreenplay(Screenplay *val);
     Screenplay* screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
@@ -63,7 +64,7 @@ public:
     int sceneNumber() const { return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber; }
     Q_SIGNAL void sceneNumberChanged();
 
-    Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false)
+    Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false RESET resetScene)
     void setScene(Scene *val);
     Scene* scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
@@ -88,20 +89,21 @@ public:
 protected:
     bool event(QEvent *event);
     void evaluateSceneNumber(int &number);
-    void sceneWasDeleted();
+    void resetScene();
+    void resetScreenplay();
 
 private:
     friend class Screenplay;
-    Scene* m_scene = nullptr;
     bool m_expanded = true;
     int m_breakType = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;
     QJsonValue m_userData;
     int m_customSceneNumber = -1;
-    Screenplay* m_screenplay = nullptr;
     bool m_elementTypeIsSet = false;
     ElementType m_elementType = SceneElementType;
+    QObjectProperty<Scene> m_scene;
+    QObjectProperty<Screenplay> m_screenplay;
 };
 
 class Screenplay : public QAbstractListModel, public Modifiable, public QObjectSerializer::Interface
@@ -233,7 +235,7 @@ public:
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
 
-    Q_PROPERTY(Scene* activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged STORED false)
+    Q_PROPERTY(Scene* activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged STORED false RESET resetActiveScene)
     void setActiveScene(Scene* val);
     Scene* activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
@@ -255,6 +257,7 @@ public:
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *te);
+    void resetActiveScene();
     void onSceneReset(int elementIndex);
     void evaluateSceneNumbers();
     void evaluateSceneNumbersLater();
@@ -285,7 +288,7 @@ private:
     static int staticElementCount(QQmlListProperty<ScreenplayElement> *list);
     QList<ScreenplayElement *> m_elements;
     int m_currentElementIndex = -1;
-    Scene* m_activeScene = nullptr;
+    QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
 
     SimpleTimer m_sceneNumberEvaluationTimer;

@@ -22,6 +22,7 @@
 #include "simpletimer.h"
 #include "errorreport.h"
 #include "progressreport.h"
+#include "qobjectproperty.h"
 
 class SearchEngine;
 
@@ -35,7 +36,7 @@ public:
 
     static SearchAgent *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(SearchEngine* engine READ engine WRITE setEngine NOTIFY engineChanged)
+    Q_PROPERTY(SearchEngine* engine READ engine WRITE setEngine NOTIFY engineChanged RESET resetEngine)
     void setEngine(SearchEngine* val);
     SearchEngine* engine() const { return m_engine; }
     Q_SIGNAL void engineChanged();
@@ -57,7 +58,7 @@ public:
     int currentSearchResultIndex() const { return m_currentSearchResultIndex; }
     Q_SIGNAL void currentSearchResultIndexChanged();
 
-    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
+    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument* val);
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
@@ -77,16 +78,17 @@ public:
 
 protected:
     SearchAgent(QObject *parent=nullptr);
-    void onSearchEngineDestroyed();
+    void resetEngine();
+    void resetTextDocument();
     void onSearchRequest(const QString &string);
     void onClearSearchRequest();
 
 private:
     int m_sequenceNumber = -1;
-    SearchEngine* m_engine = nullptr;
     int m_searchResultCount = 0;
     int m_currentSearchResultIndex = -1;
-    QQuickTextDocument* m_textDocument = nullptr;
+    QObjectProperty<SearchEngine> m_engine;
+    QObjectProperty<QQuickTextDocument> m_textDocument;
     QList< QPair<int,int> > m_textDocumentSearchResults;
 };
 Q_DECLARE_METATYPE(SearchAgent*)
@@ -189,7 +191,7 @@ public:
     TextDocumentSearch(QObject *parent=nullptr);
     ~TextDocumentSearch();
 
-    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
+    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument* val);
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
@@ -226,14 +228,15 @@ public:
 
 private:
     void setCurrentResultInternal(int val);
+    void resetTextDocument();
     void doSearch(const QString &string);
 
 private:
     QString m_searchString;
     int m_currentResultIndex = -1;
-    QQuickTextDocument* m_textDocument = nullptr;
     SearchEngine::SearchFlags m_searchFlags;
     QList< QPair<int,int> > m_searchResults;
+    QObjectProperty<QQuickTextDocument> m_textDocument;
 };
 
 #endif // SEARCHENGINE_H

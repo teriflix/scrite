@@ -36,6 +36,7 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
+    src/core/qobjectproperty.h \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
@@ -116,6 +117,7 @@ SOURCES += \
     3rdparty/poly2tri/sweep/cdt.cc \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
+    src/core/qobjectproperty.cpp \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \

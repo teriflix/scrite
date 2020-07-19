@@ -18,6 +18,8 @@
 #include <QQmlEngine>
 #include <QQuickWindow>
 
+#include "qobjectproperty.h"
+
 class FocusTracker;
 
 class FocusTrackerIndicator : public QObject
@@ -27,7 +29,7 @@ class FocusTrackerIndicator : public QObject
 public:
     ~FocusTrackerIndicator();
 
-    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
     void setTarget(QObject* val);
     QObject* target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -51,14 +53,15 @@ private:
     friend class FocusTracker;
     FocusTrackerIndicator(FocusTracker *parent=nullptr);
     void apply();
+    void resetTarget();
 
 private:
-    QObject* m_target = nullptr;
     QVariant m_onValue;
     QQuickItem* m_item = nullptr;
     QString m_property;
     QVariant m_offValue;
     FocusTracker *m_tracker = nullptr;
+    QObjectProperty<QObject> m_target;
 };
 
 class FocusTracker : public QObject
@@ -74,7 +77,7 @@ public:
     Q_PROPERTY(QQuickItem* item READ item CONSTANT)
     QQuickItem *item() const { return m_item; }
 
-    Q_PROPERTY(QQuickWindow* window READ window WRITE setWindow NOTIFY windowChanged)
+    Q_PROPERTY(QQuickWindow* window READ window WRITE setWindow NOTIFY windowChanged RESET resetWindow)
     void setWindow(QQuickWindow* val);
     QQuickWindow* window() const { return m_window; }
     Q_SIGNAL void windowChanged();
@@ -87,14 +90,15 @@ public:
     FocusTrackerIndicator* indicator() const { return m_indicator; }
 
 private:
+    void resetWindow();
     void setHasFocus(bool val);
     void evaluateHasFocus();
 
 private:
     bool m_hasFocus = false;
     QQuickItem *m_item = nullptr;
-    QQuickWindow* m_window = nullptr;
     FocusTrackerIndicator* m_indicator = new FocusTrackerIndicator(this);
+    QObjectProperty<QQuickWindow> m_window;
 };
 Q_DECLARE_METATYPE(FocusTracker*)
 QML_DECLARE_TYPEINFO(FocusTracker, QML_HAS_ATTACHED_PROPERTIES)

@@ -545,9 +545,8 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);
-    connect(this, &Scene::headingChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
-    connect(m_heading, &SceneHeading::textChanged, this, &Scene::headingChanged);
+    connect(m_heading, &SceneHeading::textChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::sceneChanged, [=](){
         this->markAsModified();
     });
@@ -1374,7 +1373,9 @@ int Scene::staticNoteCount(QQmlListProperty<Note> *list)
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneSizeHintItem::SceneSizeHintItem(QQuickItem *parent)
-    : QQuickItem(parent)
+    : QQuickItem(parent),
+      m_scene(this, "scene"),
+      m_format(this, "format")
 {
     this->setFlag(QQuickItem::ItemHasContents,false);
 }
@@ -1391,7 +1392,7 @@ void SceneSizeHintItem::setScene(Scene *val)
 
     if(m_scene != nullptr)
     {
-        disconnect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::onSceneDestroyed);
+        disconnect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::sceneReset);
         disconnect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     }
 
@@ -1399,7 +1400,7 @@ void SceneSizeHintItem::setScene(Scene *val)
 
     if(m_scene != nullptr)
     {
-        connect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::onSceneDestroyed);
+        connect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::sceneReset);
         if(m_trackSceneChanges)
             connect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     }
@@ -1430,7 +1431,7 @@ void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 
     if(m_format != nullptr)
     {
-        disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::onSceneDestroyed);
+        disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::formatReset);
         disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     }
 
@@ -1438,7 +1439,7 @@ void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 
     if(m_format != nullptr)
     {
-        connect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::onSceneDestroyed);
+        connect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::formatReset);
         if(m_trackFormatChanges)
             connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     }
@@ -1595,7 +1596,7 @@ void SceneSizeHintItem::evaluateSizeHintLater()
     m_updateTimer.start(10, this);
 }
 
-void SceneSizeHintItem::onSceneDestroyed()
+void SceneSizeHintItem::sceneReset()
 {
     m_scene = nullptr;
     emit sceneChanged();
@@ -1609,7 +1610,7 @@ void SceneSizeHintItem::onSceneChanged()
         this->evaluateSizeHintLater();
 }
 
-void SceneSizeHintItem::onFormatDestroyed()
+void SceneSizeHintItem::formatReset()
 {
     m_format = nullptr;
     emit formatChanged();

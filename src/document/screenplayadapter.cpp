@@ -17,7 +17,9 @@
 #include "scritedocument.h"
 
 ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
-    : QIdentityProxyModel(parent)
+    : QIdentityProxyModel(parent),
+      m_source(this, "source"),
+      m_currentElement(this, "currentElement")
 {
     connect(this, &ScreenplayAdapter::modelReset, this, &ScreenplayAdapter::updateCurrentIndexAndCount);
     connect(this, &ScreenplayAdapter::rowsRemoved, this, &ScreenplayAdapter::updateCurrentIndexAndCount);
@@ -38,19 +40,20 @@ void ScreenplayAdapter::setSource(QObject *val)
     if(m_source == val)
         return;
 
-    if(m_source != val)
-        disconnect(m_source, 0, this, 0);
-
     if(this->sourceModel() != nullptr)
     {
-        Screenplay *screenplay = qobject_cast<Screenplay*>(this->sourceModel());
-        if(screenplay->parent() == this)
-            GarbageCollector::instance()->add(screenplay);
-        else
+        QAbstractItemModel *srcModel = this->sourceModel();
+        Screenplay *screenplay = qobject_cast<Screenplay*>(srcModel);
+        if(screenplay != nullptr)
         {
-            disconnect(this, &ScreenplayAdapter::currentIndexChanged, screenplay, &Screenplay::setCurrentElementIndex);
-            disconnect(screenplay, &Screenplay::currentElementIndexChanged, this, &ScreenplayAdapter::setCurrentIndex);
-            disconnect(screenplay, &Screenplay::hasNonStandardScenesChanged, this, &ScreenplayAdapter::hasNonStandardScenesChanged);
+            if(screenplay->parent() == this)
+                GarbageCollector::instance()->add(screenplay);
+            else
+            {
+                disconnect(this, &ScreenplayAdapter::currentIndexChanged, screenplay, &Screenplay::setCurrentElementIndex);
+                disconnect(screenplay, &Screenplay::currentElementIndexChanged, this, &ScreenplayAdapter::setCurrentIndex);
+                disconnect(screenplay, &Screenplay::hasNonStandardScenesChanged, this, &ScreenplayAdapter::hasNonStandardScenesChanged);
+            }
         }
     }
 
@@ -63,8 +66,6 @@ void ScreenplayAdapter::setSource(QObject *val)
         Screenplay *screenplay = qobject_cast<Screenplay*>(m_source);
         if(screenplay != nullptr)
         {
-            connect(screenplay, &Screenplay::aboutToDelete, this, &ScreenplayAdapter::onSourceDestroyed);
-
             this->setSourceModel(screenplay);
 
             connect(this, &ScreenplayAdapter::currentIndexChanged, screenplay, &Screenplay::setCurrentElementIndex);
@@ -76,8 +77,6 @@ void ScreenplayAdapter::setSource(QObject *val)
             Scene *scene = qobject_cast<Scene*>(m_source);
             if(scene != nullptr)
             {
-                connect(scene, &Scene::aboutToDelete, this, &ScreenplayAdapter::onSourceDestroyed);
-
                 Screenplay *masterScreenplay = ScriteDocument::instance()->screenplay();
 
                 screenplay = new Screenplay(this);
@@ -225,7 +224,10 @@ QVariant ScreenplayAdapter::data(const QModelIndex &index, int role) const
 
 void ScreenplayAdapter::setCurrentIndexInternal(int val)
 {
-    const int nrRows = this->rowCount();
+    if(m_currentIndex < 0 && val < 0)
+        return;
+
+    const int nrRows = this->sourceModel() ? this->rowCount() : 0;
     val = nrRows > 0 ? qBound(-1, val, nrRows-1) : -1;
     if(m_currentIndex == val)
         return;
@@ -299,11 +301,22 @@ void ScreenplayAdapter::updateCurrentIndexAndCount()
     Screenplay *sp = this->screenplay();
     if(sp != nullptr)
         this->setCurrentIndexInternal(sp->currentElementIndex());
+    else
+        this->setCurrentIndexInternal(-1);
 
     emit elementCountChanged();
 }
 
-void ScreenplayAdapter::onSourceDestroyed()
+void ScreenplayAdapter::resetSource()
 {
-    this->setSource(nullptr);
+    m_currentElement = nullptr;
+    emit currentElementChanged();
+
+    m_currentIndex = -1;
+    emit currentIndexChanged(-1);
+
+    this->setSourceModel(nullptr);
+
+    m_source = nullptr;
+    emit sourceChanged();
 }

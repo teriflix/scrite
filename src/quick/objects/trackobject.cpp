@@ -17,7 +17,8 @@
 #include <QTimerEvent>
 
 AbstractObjectTracker::AbstractObjectTracker(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_target(this, "target")
 {
     connect(this, &AbstractObjectTracker::emitTracked, this, &AbstractObjectTracker::onEmitTracked);
 }
@@ -65,6 +66,11 @@ void AbstractObjectTracker::onEmitTracked()
 {
     if(m_enabled)
         emit tracked();
+}
+
+void AbstractObjectTracker::resetTarget()
+{
+    this->setTarget(nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

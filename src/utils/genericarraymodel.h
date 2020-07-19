@@ -19,6 +19,8 @@
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 
+#include "qobjectproperty.h"
+
 class GenericArrayModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -70,7 +72,7 @@ public:
     GenericArraySortFilterProxyModel(QObject *parent=nullptr);
     ~GenericArraySortFilterProxyModel();
 
-    Q_PROPERTY(GenericArrayModel* arrayModel READ arrayModel WRITE setArrayModel NOTIFY arrayModelChanged)
+    Q_PROPERTY(GenericArrayModel* arrayModel READ arrayModel WRITE setArrayModel NOTIFY arrayModelChanged RESET resetArrayModel)
     void setArrayModel(GenericArrayModel* val);
     GenericArrayModel* arrayModel() const { return m_arrayModel; }
     Q_SIGNAL void arrayModelChanged();
@@ -78,7 +80,10 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    GenericArrayModel* m_arrayModel = nullptr;
+    void resetArrayModel();
+
+private:
+    QObjectProperty<GenericArrayModel> m_arrayModel;
 };
 
 #endif // GENERICARRAYMODEL_H

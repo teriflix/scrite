@@ -18,7 +18,8 @@
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
-      m_structure(qobject_cast<Structure*>(parent))
+      m_structure(qobject_cast<Structure*>(parent)),
+      m_follow(this, "follow")
 {
     connect(this, &StructureElement::xChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::elementChanged);
@@ -136,6 +137,12 @@ void StructureElement::setFollow(QQuickItem *val)
     emit followChanged();
 }
 
+void StructureElement::resetFollow()
+{
+    m_follow = nullptr;
+    emit followChanged();
+}
+
 void StructureElement::setXf(qreal val)
 {
     if(m_structure == nullptr)
@@ -181,7 +188,6 @@ void StructureElement::setScene(Scene *val)
     m_scene = val;
     m_scene->setParent(this);
     connect(m_scene, &Scene::sceneChanged, this, &StructureElement::elementChanged);
-    connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
     connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
 
     connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &StructureElement::sceneHeadingChanged);
@@ -1197,7 +1203,9 @@ int Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
 
 StructureElementConnector::StructureElementConnector(QQuickItem *parent)
     :AbstractShapeItem(parent),
-      m_updateTimer("StructureElementConnector.m_updateTimer")
+      m_updateTimer("StructureElementConnector.m_updateTimer"),
+      m_toElement(this, "toElement"),
+      m_fromElement(this, "fromElement")
 {
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);
@@ -1231,7 +1239,6 @@ void StructureElementConnector::setFromElement(StructureElement *val)
         disconnect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
-        disconnect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_fromElement->scene();
         disconnect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -1245,7 +1252,6 @@ void StructureElementConnector::setFromElement(StructureElement *val)
         connect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
-        connect(m_fromElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_fromElement->scene();
         connect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -1269,7 +1275,6 @@ void StructureElementConnector::setToElement(StructureElement *val)
         disconnect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
-        disconnect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_toElement->scene();
         disconnect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -1283,7 +1288,6 @@ void StructureElementConnector::setToElement(StructureElement *val)
         connect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
-        connect(m_toElement, &StructureElement::aboutToDelete, this, &StructureElementConnector::onElementDestroyed);
 
         Scene *scene = m_toElement->scene();
         connect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -1461,17 +1465,25 @@ void StructureElementConnector::timerEvent(QTimerEvent *te)
     AbstractShapeItem::timerEvent(te);
 }
 
+void StructureElementConnector::resetFromElement()
+{
+    m_fromElement = nullptr;
+    emit fromElementChanged();
+    this->pickElementColor();
+    this->update();
+}
+
+void StructureElementConnector::resetToElement()
+{
+    m_toElement = nullptr;
+    emit toElementChanged();
+    this->pickElementColor();
+    this->update();
+}
+
 void StructureElementConnector::requestUpdateLater()
 {
     m_updateTimer.start(0, this);
-}
-
-void StructureElementConnector::onElementDestroyed(StructureElement *element)
-{
-    if(element == m_fromElement)
-        this->setFromElement(nullptr);
-    else if(element == m_toElement)
-        this->setToElement(nullptr);
 }
 
 void StructureElementConnector::pickElementColor()

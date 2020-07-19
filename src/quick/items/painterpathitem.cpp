@@ -14,7 +14,8 @@
 #include "painterpathitem.h"
 
 PainterPathItem::PainterPathItem(QQuickItem *parent)
-    : AbstractShapeItem(parent)
+    : AbstractShapeItem(parent),
+      m_painterPath(this, "painterPath")
 {
 }
 
@@ -25,24 +26,24 @@ PainterPathItem::~PainterPathItem()
 
 void PainterPathItem::setPainterPath(PainterPath *val)
 {
-    if(m_path == val)
+    if(m_painterPath == val)
         return;
 
-    if(m_path)
+    if(m_painterPath)
     {
-        disconnect(m_path, SIGNAL(updated()), this, SLOT(update()));
-        disconnect(this, SIGNAL(widthChanged()), m_path, SIGNAL(itemRectChanged()));
-        disconnect(this, SIGNAL(heightChanged()), m_path, SIGNAL(itemRectChanged()));
+        disconnect(m_painterPath, SIGNAL(updated()), this, SLOT(update()));
+        disconnect(this, SIGNAL(widthChanged()), m_painterPath, SIGNAL(itemRectChanged()));
+        disconnect(this, SIGNAL(heightChanged()), m_painterPath, SIGNAL(itemRectChanged()));
     }
 
-    m_path = val;
+    m_painterPath = val;
 
-    if(m_path)
+    if(m_painterPath)
     {
-        m_path->setParent(this);
-        connect(m_path, SIGNAL(updated()), this, SLOT(update()));
-        connect(this, SIGNAL(widthChanged()), m_path, SIGNAL(itemRectChanged()));
-        connect(this, SIGNAL(heightChanged()), m_path, SIGNAL(itemRectChanged()));
+        m_painterPath->setParent(this);
+        connect(m_painterPath, SIGNAL(updated()), this, SLOT(update()));
+        connect(this, SIGNAL(widthChanged()), m_painterPath, SIGNAL(itemRectChanged()));
+        connect(this, SIGNAL(heightChanged()), m_painterPath, SIGNAL(itemRectChanged()));
     }
 
     emit painterPathChanged();
@@ -50,7 +51,13 @@ void PainterPathItem::setPainterPath(PainterPath *val)
 
 QPainterPath PainterPathItem::shape() const
 {
-    return m_path->path();
+    return m_painterPath->path();
+}
+
+void PainterPathItem::resetPainterPath()
+{
+    m_painterPath = nullptr;
+    emit painterPathChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

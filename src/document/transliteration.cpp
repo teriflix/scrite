@@ -655,7 +655,8 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
 ///////////////////////////////////////////////////////////////////////////////
 
 Transliterator::Transliterator(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_textDocument(this, "textDocument")
 {
 
 }
@@ -687,14 +688,11 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
     if(m_textDocument != nullptr)
     {
         QTextDocument *doc = m_textDocument->textDocument();
-        doc->setUndoRedoEnabled(true);
 
         if(doc != nullptr)
         {
-            disconnect( doc, &QQuickTextDocument::destroyed,
-                        this, &Transliterator::onTextDocumentDestroyed);
-            disconnect( doc, &QTextDocument::contentsChange,
-                        this, &Transliterator::processTransliteration);
+            doc->setUndoRedoEnabled(true);
+            disconnect( doc, &QTextDocument::contentsChange, this, &Transliterator::processTransliteration);
         }
 
         this->setCursorPosition(-1);
@@ -706,14 +704,11 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
     if(m_textDocument != nullptr)
     {
         QTextDocument *doc = m_textDocument->textDocument();
-        doc->setUndoRedoEnabled(false);
 
         if(doc != nullptr)
         {
-            connect( doc, &QQuickTextDocument::destroyed,
-                     this, &Transliterator::onTextDocumentDestroyed);
-            connect( doc, &QTextDocument::contentsChange,
-                     this, &Transliterator::processTransliteration);
+            doc->setUndoRedoEnabled(false);
+            connect( doc, &QTextDocument::contentsChange, this, &Transliterator::processTransliteration);
         }
     }
 
@@ -823,7 +818,7 @@ QTextDocument *Transliterator::document() const
     return m_textDocument ? m_textDocument->textDocument() : nullptr;
 }
 
-void Transliterator::onTextDocumentDestroyed()
+void Transliterator::resetTextDocument()
 {
     m_textDocument = nullptr;
     emit textDocumentChanged();

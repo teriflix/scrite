@@ -16,6 +16,8 @@
 
 #include <QIdentityProxyModel>
 
+#include "qobjectproperty.h"
+
 class Scene;
 class Screenplay;
 class SceneElement;
@@ -29,7 +31,7 @@ public:
     ScreenplayAdapter(QObject *parent=nullptr);
     ~ScreenplayAdapter();
 
-    Q_PROPERTY(QObject* source READ source WRITE setSource NOTIFY sourceChanged)
+    Q_PROPERTY(QObject* source READ source WRITE setSource NOTIFY sourceChanged RESET resetSource)
     void setSource(QObject* val);
     QObject* source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
@@ -81,12 +83,12 @@ private:
 
     void clearCurrentIndex();
     void updateCurrentIndexAndCount();
-    void onSourceDestroyed();
+    void resetSource();
 
 private:
-    QObject* m_source = nullptr;
     int m_currentIndex = -1;
-    ScreenplayElement* m_currentElement = nullptr;
+    QObjectProperty<QObject> m_source;
+    QObjectProperty<ScreenplayElement> m_currentElement;
 };
 
 #endif // SCREENPLAYADAPTER_H

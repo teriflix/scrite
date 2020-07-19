@@ -54,8 +54,11 @@ void EventFilterResult::setAcceptEvent(bool val)
 ///////////////////////////////////////////////////////////////////////////////
 
 EventFilter::EventFilter(QObject *parent)
-    : QObject(parent), m_target(parent)
+    : QObject(parent),
+      m_target(this, "target")
 {
+    m_target = parent;
+
     if(m_active)
         parent->installEventFilter(this);
 }
@@ -130,6 +133,12 @@ bool EventFilter::forwardEventTo(QObject *object)
     }
 
     return false;
+}
+
+void EventFilter::resetTarget()
+{
+    m_target = nullptr;
+    emit targetChanged();
 }
 
 inline void packIntoJson(QMouseEvent *event, QJsonObject &object)

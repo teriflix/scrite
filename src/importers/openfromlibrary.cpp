@@ -13,6 +13,7 @@
 
 #include "openfromlibrary.h"
 
+#include <QApplication>
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QTemporaryFile>
@@ -90,12 +91,14 @@ void LibraryService::openLibraryRecordAt(int index)
     const QNetworkRequest request(url);
 
     this->progress()->setProgressText( QStringLiteral("Downloading screenplay of \"") + name + QStringLiteral("\" from library...") );
+    qApp->setOverrideCursor(Qt::WaitCursor);
 
     QNetworkReply *reply = nam.get(request);
     connect(reply, &QNetworkReply::finished, [=]() {
         const QByteArray bytes = reply->readAll();
         reply->deleteLater();
         this->progress()->finish();
+        qApp->restoreOverrideCursor();
 
         if(bytes.isEmpty()) {
             this->error()->setErrorMessage( QStringLiteral("Error downloading ") + name + QStringLiteral(". Please try again later.") );
@@ -229,6 +232,12 @@ void Library::setBusy(bool val)
         return;
 
     m_busy = val;
+
+    if(val)
+        qApp->setOverrideCursor(Qt::WaitCursor);
+    else
+        qApp->restoreOverrideCursor();
+
     emit busyChanged();
 }
 

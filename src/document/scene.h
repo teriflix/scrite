@@ -27,10 +27,11 @@
 #include <QQuickPaintedItem>
 
 #include "note.h"
-#include "spellcheckservice.h"
 #include "modifiable.h"
 #include "simpletimer.h"
+#include "qobjectproperty.h"
 #include "qobjectserializer.h"
+#include "spellcheckservice.h"
 
 class Scene;
 class SceneHeading;
@@ -220,9 +221,8 @@ public:
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(SceneHeading* heading READ heading NOTIFY headingChanged)
+    Q_PROPERTY(SceneHeading* heading READ heading CONSTANT)
     SceneHeading* heading() const { return m_heading; }
-    Q_SIGNAL void headingChanged();
 
     Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
     QStringList characterNames() const { return m_characterElementMap.characterNames(); }
@@ -335,7 +335,7 @@ public:
     SceneSizeHintItem(QQuickItem *parent=nullptr);
     ~SceneSizeHintItem();
 
-    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
+    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET sceneReset)
     void setScene(Scene* val);
     Scene* scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
@@ -398,9 +398,9 @@ private:
     void updateSize(const QSizeF &size);
     QSizeF evaluateSizeHint();
     void evaluateSizeHintLater();
-    void onSceneDestroyed();
+    void sceneReset();
     void onSceneChanged();
-    void onFormatDestroyed();
+    void formatReset();
     void onFormatChanged();
 
     void setContentWidth(qreal val);
@@ -408,7 +408,6 @@ private:
     void setHasPendingComputeSize(bool val);
 
 private:
-    Scene* m_scene = nullptr;
     qreal m_topMargin = 0;
     qreal m_leftMargin = 0;
     qreal m_rightMargin = 0;
@@ -420,8 +419,9 @@ private:
     bool m_trackSceneChanges = true;
     bool m_trackFormatChanges = true;
     SimpleTimer m_updateTimer;
-    ScreenplayFormat* m_format = nullptr;
     bool m_hasPendingComputeSize = false;
+    QObjectProperty<Scene> m_scene;
+    QObjectProperty<ScreenplayFormat> m_format;
 };
 
 #endif // SCENE_H

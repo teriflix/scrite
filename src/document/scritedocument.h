@@ -22,6 +22,7 @@
 #include "formatting.h"
 #include "errorreport.h"
 #include "progressreport.h"
+#include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "documentfilesystem.h"
 
@@ -199,14 +200,14 @@ private:
     SimpleTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     SimpleTimer m_clearModifyTimer;
-    Structure* m_structure = nullptr;
-    Screenplay* m_screenplay = nullptr;
-    ScreenplayFormat* m_formatting = nullptr;
-    ScreenplayFormat* m_printFormat = nullptr;
     int m_autoSaveDurationInSeconds = 60;
     DocumentFileSystem m_docFileSystem;
     QStringList m_spellCheckIgnoreList;
     QJsonArray m_structureElementSequence;
+    QObjectProperty<Structure> m_structure;
+    QObjectProperty<Screenplay> m_screenplay;
+    QObjectProperty<ScreenplayFormat> m_formatting;
+    QObjectProperty<ScreenplayFormat> m_printFormat;
     SimpleTimer m_evaluateStructureElementSequenceTimer;
     bool m_syncingStructureScreenplayCurrentIndex = false;
 

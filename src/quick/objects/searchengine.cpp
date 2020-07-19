@@ -21,7 +21,9 @@
 #include <QTimerEvent>
 
 SearchAgent::SearchAgent(QObject *parent)
-            :QObject(parent)
+            :QObject(parent),
+             m_engine(this, "engine"),
+             m_textDocument(this, "textDocument")
 {
 
 }
@@ -46,20 +48,23 @@ void SearchAgent::setEngine(SearchEngine *val)
         return;
 
     if(m_engine != nullptr)
-    {
         m_engine->removeSearchAgent(this);
-        disconnect(m_engine, &SearchEngine::destroyed, this, &SearchAgent::onSearchEngineDestroyed);
-    }
 
     m_engine = val;
 
     if(m_engine != nullptr)
-    {
         m_engine->addSearchAgent(this);
-        connect(m_engine, &SearchEngine::destroyed, this, &SearchAgent::onSearchEngineDestroyed);
-    }
 
     emit engineChanged();
+}
+
+void SearchAgent::resetEngine()
+{
+    m_engine = nullptr;
+
+    this->setSearchResultCount(0);
+    this->setCurrentSearchResultIndex(-1);
+    emit clearSearchRequest();
 }
 
 void SearchAgent::setSequenceNumber(int val)
@@ -121,6 +126,7 @@ void SearchAgent::setTextDocument(QQuickTextDocument *val)
         return;
 
     m_textDocument = val;
+
     if(m_textDocument == nullptr)
     {
         disconnect(this, &SearchAgent::searchRequest, this, &SearchAgent::onSearchRequest);
@@ -135,6 +141,11 @@ void SearchAgent::setTextDocument(QQuickTextDocument *val)
     emit textDocumentChanged();
 }
 
+void SearchAgent::resetTextDocument()
+{
+    this->setTextDocument(nullptr);
+}
+
 QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 {
     SearchEngine::SearchFlags flags;
@@ -146,15 +157,6 @@ QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 QString SearchAgent::createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const
 {
     return SearchEngine::createMarkupText(text, from, to, QBrush(bg), QBrush(fg));
-}
-
-void SearchAgent::onSearchEngineDestroyed()
-{
-    m_engine = nullptr;
-
-    this->setSearchResultCount(0);
-    this->setCurrentSearchResultIndex(-1);
-    emit clearSearchRequest();
 }
 
 void SearchAgent::onSearchRequest(const QString &string)
@@ -538,7 +540,8 @@ void SearchEngine::setCurrentSearchResultIndex(int val)
 ///////////////////////////////////////////////////////////////////////////////
 
 TextDocumentSearch::TextDocumentSearch(QObject *parent)
-                   : QObject(parent)
+                   : QObject(parent),
+                     m_textDocument(this, "textDocument")
 {
 
 }
@@ -554,6 +557,7 @@ void TextDocumentSearch::setTextDocument(QQuickTextDocument *val)
         return;
 
     m_textDocument = val;
+
     if(m_textDocument != nullptr)
     {
         if(!m_searchString.isEmpty())
@@ -561,6 +565,11 @@ void TextDocumentSearch::setTextDocument(QQuickTextDocument *val)
     }
 
     emit textDocumentChanged();
+}
+
+void TextDocumentSearch::resetTextDocument()
+{
+    this->setTextDocument(nullptr);
 }
 
 void TextDocumentSearch::setSearchString(const QString &val)

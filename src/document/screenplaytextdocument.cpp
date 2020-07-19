@@ -147,15 +147,23 @@ private:
 
 ScreenplayTextDocument::ScreenplayTextDocument(QObject *parent)
     : QObject(parent),
-      m_textDocument(new QTextDocument(this))
+      m_injection(this, "injection"),
+      m_screenplay(this, "screenplay"),
+      m_textDocument(this, "textDocument"),
+      m_formatting(this, "formatting")
 {
+    m_textDocument = new QTextDocument(this);
     this->init();
 }
 
 ScreenplayTextDocument::ScreenplayTextDocument(QTextDocument *document, QObject *parent)
     : QObject(parent),
-      m_textDocument(document)
+      m_injection(this, "injection"),
+      m_screenplay(this, "screenplay"),
+      m_textDocument(this, "textDocument"),
+      m_formatting(this, "formatting")
 {
+    m_textDocument = document;
     this->init();
 }
 
@@ -167,7 +175,7 @@ ScreenplayTextDocument::~ScreenplayTextDocument()
 
 void ScreenplayTextDocument::setTextDocument(QTextDocument *val)
 {
-    if(m_textDocument == val)
+    if(m_textDocument != nullptr && m_textDocument == val)
         return;
 
     if(m_textDocument != nullptr && m_textDocument->parent() == this)
@@ -223,6 +231,21 @@ void ScreenplayTextDocument::setFormatting(ScreenplayFormat *val)
 #endif
 
     emit formattingChanged();
+}
+
+void ScreenplayTextDocument::resetFormatting()
+{
+    m_formatting = nullptr;
+    this->loadScreenplayLater();
+    emit formattingChanged();
+}
+
+void ScreenplayTextDocument::resetTextDocument()
+{
+    m_textDocument = new QTextDocument(this);
+    m_textDocument->setUndoRedoEnabled(false);
+    this->loadScreenplayLater();
+    emit textDocumentChanged();
 }
 
 void ScreenplayTextDocument::setTitlePage(bool val)
@@ -341,7 +364,7 @@ void ScreenplayTextDocument::print(QObject *printerObject)
     if(m_textDocument == nullptr || m_screenplay == nullptr || m_formatting == nullptr)
         return;
 
-    if(m_loadScreenplayTimer.isActive())
+    if(m_loadScreenplayTimer.isActive() || m_textDocument->isEmpty())
         this->syncNow();
 
     QPagedPaintDevice *printer = nullptr;
@@ -430,12 +453,12 @@ void ScreenplayTextDocument::setInjection(QObject *val)
         return;
 
     if(m_injection != val)
-        disconnect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::clearInjection);
+        disconnect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::resetInjection);
 
     m_injection = val;
 
     if(m_injection != val)
-        connect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::clearInjection);
+        connect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::resetInjection);
 
     emit injectionChanged();
 
@@ -856,18 +879,26 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
 
 void ScreenplayTextDocument::loadScreenplayLater()
 {
-    this->disconnectFromScreenplaySignals();
-    this->disconnectFromScreenplayFormatSignals();
+    if(m_textDocument != nullptr)
+        m_textDocument->clear();
 
-    const bool updateWasScheduled = m_loadScreenplayTimer.isActive();
-    m_loadScreenplayTimer.start(100, this);
-    if(!updateWasScheduled)
-        emit updateScheduled();
+    if(m_syncEnabled)
+    {
+        this->disconnectFromScreenplaySignals();
+        this->disconnectFromScreenplayFormatSignals();
+
+        const bool updateWasScheduled = m_loadScreenplayTimer.isActive();
+        m_loadScreenplayTimer.start(100, this);
+        if(!updateWasScheduled)
+            emit updateScheduled();
+    }
 }
 
 void ScreenplayTextDocument::resetScreenplay()
 {
-    this->setScreenplay(nullptr);
+    m_screenplay = nullptr;
+    this->loadScreenplayLater();
+    emit screenplayChanged();
 }
 
 void ScreenplayTextDocument::connectToScreenplaySignals()
@@ -1638,10 +1669,19 @@ void ScreenplayTextDocument::processSceneResetList()
     this->evaluatePageBoundariesLater();
 }
 
+void ScreenplayTextDocument::resetInjection()
+{
+    m_injection = nullptr;
+    this->loadScreenplayLater();
+    emit injectionChanged();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ScreenplayElementPageBreaks::ScreenplayElementPageBreaks(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_screenplayElement(this, "screenplayElement"),
+      m_screenplayDocument(this, "screenplayDocument")
 {
 
 }
@@ -1679,6 +1719,20 @@ void ScreenplayElementPageBreaks::setScreenplayElement(ScreenplayElement *val)
     m_screenplayElement = val;
     emit screenplayElementChanged();
 
+    this->updatePageBreaks();
+}
+
+void ScreenplayElementPageBreaks::resetScreenplayDocument()
+{
+    m_screenplayDocument = nullptr;
+    emit screenplayDocumentChanged();
+    this->updatePageBreaks();
+}
+
+void ScreenplayElementPageBreaks::resetScreenplayElement()
+{
+    m_screenplayElement = nullptr;
+    emit screenplayElementChanged();
     this->updatePageBreaks();
 }
 

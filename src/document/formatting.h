@@ -18,6 +18,7 @@
 #include "modifiable.h"
 #include "simpletimer.h"
 #include "transliteration.h"
+#include "qobjectproperty.h"
 
 #include <QScreen>
 #include <QPageLayout>
@@ -279,7 +280,7 @@ public:
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QScreen* screen READ screen WRITE setScreen NOTIFY screenChanged STORED false)
+    Q_PROPERTY(QScreen* screen READ screen WRITE setScreen NOTIFY screenChanged RESET resetScreen STORED false)
     void setScreen(QScreen* val);
     QScreen* screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
@@ -345,18 +346,19 @@ public:
     Q_INVOKABLE void resetToDefaults();
 
 private:
+    void resetScreen();
     void evaluateFontPointSizeDelta();
     void evaluateFontZoomLevels();
 
 private:
     char  m_padding[4];
     QFont m_defaultFont;
-    QScreen* m_screen = nullptr;
     qreal m_pageWidth = 750.0;
     int   m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
     QList<int> m_fontPointSizes;
     QVariantList m_fontZoomLevels;
+    QObjectProperty<QScreen> m_screen;
     ScriteDocument *m_scriteDocument = nullptr;
     QFontMetrics m_defaultFontMetrics;
     QFontMetrics m_defaultFont2Metrics;
@@ -378,17 +380,17 @@ public:
     SceneDocumentBinder(QObject *parent=nullptr);
     ~SceneDocumentBinder();
 
-    Q_PROPERTY(ScreenplayFormat* screenplayFormat READ screenplayFormat WRITE setScreenplayFormat NOTIFY screenplayFormatChanged)
+    Q_PROPERTY(ScreenplayFormat* screenplayFormat READ screenplayFormat WRITE setScreenplayFormat NOTIFY screenplayFormatChanged RESET resetScreenplayFormat)
     void setScreenplayFormat(ScreenplayFormat* val);
     ScreenplayFormat* screenplayFormat() const { return m_screenplayFormat; }
     Q_SIGNAL void screenplayFormatChanged();
 
-    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
+    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
     void setScene(Scene* val);
     Scene* scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
+    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument* val);
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
@@ -420,7 +422,7 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_PROPERTY(SceneElement* currentElement READ currentElement NOTIFY currentElementChanged)
+    Q_PROPERTY(SceneElement* currentElement READ currentElement NOTIFY currentElementChanged RESET resetCurrentElement)
     SceneElement* currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
@@ -503,6 +505,10 @@ protected:
     void timerEvent(QTimerEvent *te);
 
 private:
+    void resetScene();
+    void resetTextDocument();
+    void resetScreenplayFormat();
+
     void initializeDocument();
     void initializeDocumentLater();
     void setDocumentLoadCount(int val);
@@ -528,7 +534,6 @@ private:
 
 private:
     friend class SpellCheckService;
-    Scene* m_scene = nullptr;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
     int m_documentLoadCount = 0;
@@ -539,17 +544,18 @@ private:
     bool m_initializingDocument = false;
     QStringList m_characterNames;
     bool m_liveSpellCheckEnabled = true;
-    SceneElement* m_currentElement = nullptr;
+    QObjectProperty<Scene> m_scene;
     SimpleTimer m_rehighlightTimer;
     QStringList m_autoCompleteHints;
     QStringList m_spellingSuggestions;
     int m_currentElementCursorPosition = -1;
     bool m_wordUnderCursorIsMisspelled = false;
-    QQuickTextDocument* m_textDocument = nullptr;
-    ScreenplayFormat* m_screenplayFormat = nullptr;
     SimpleTimer m_initializeDocumentTimer;
     QList<SceneElement::Type> m_tabHistory;
     QList<QTextBlock> m_rehighlightBlockQueue;
+    QObjectProperty<SceneElement> m_currentElement;
+    QObjectProperty<QQuickTextDocument> m_textDocument;
+    QObjectProperty<ScreenplayFormat> m_screenplayFormat;
 };
 
 #endif // FORMATTING_H

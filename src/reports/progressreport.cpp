@@ -14,7 +14,8 @@
 #include "progressreport.h"
 
 ProgressReport::ProgressReport(QObject *parent)
-               :QObject(parent)
+               :QObject(parent),
+                 m_proxyFor(this, "proxyFor")
 {
 
 }
@@ -31,7 +32,7 @@ void ProgressReport::setProxyFor(ProgressReport *val)
 
     if(m_proxyFor != nullptr)
     {
-        disconnect(m_proxyFor, &ProgressReport::aboutToDelete, this, &ProgressReport::clearProxyFor);
+        disconnect(m_proxyFor, &ProgressReport::aboutToDelete, this, &ProgressReport::resetProxyFor);
         disconnect(m_proxyFor, &ProgressReport::progressTextChanged, this, &ProgressReport::updateProgressTextFromProxy);
         disconnect(m_proxyFor, &ProgressReport::progressChanged, this, &ProgressReport::updateProgressFromProxy);
         disconnect(m_proxyFor, &ProgressReport::statusChanged, this, &ProgressReport::updateStatusFromProxy);
@@ -41,7 +42,7 @@ void ProgressReport::setProxyFor(ProgressReport *val)
 
     if(m_proxyFor != nullptr)
     {
-        connect(m_proxyFor, &ProgressReport::aboutToDelete, this, &ProgressReport::clearProxyFor);
+        connect(m_proxyFor, &ProgressReport::aboutToDelete, this, &ProgressReport::resetProxyFor);
         connect(m_proxyFor, &ProgressReport::progressTextChanged, this, &ProgressReport::updateProgressTextFromProxy);
         connect(m_proxyFor, &ProgressReport::progressChanged, this, &ProgressReport::updateProgressFromProxy);
         connect(m_proxyFor, &ProgressReport::statusChanged, this, &ProgressReport::updateStatusFromProxy);
@@ -102,9 +103,13 @@ void ProgressReport::setProgress(qreal val)
     this->setStatus(InProgress);
 }
 
-void ProgressReport::clearProxyFor()
+void ProgressReport::resetProxyFor()
 {
-    this->setProxyFor(nullptr);
+    m_proxyFor = nullptr;
+    this->setProgressText(QString());
+    this->setProgress(1.0);
+    this->setStatus(NotStarted);
+    emit proxyForChanged();
 }
 
 void ProgressReport::updateProgressTextFromProxy()

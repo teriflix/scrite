@@ -99,9 +99,12 @@ ScriteDocument::ScriteDocument(QObject *parent)
                 :QObject(parent),
                   m_autoSaveTimer("ScriteDocument.m_autoSaveTimer"),
                   m_clearModifyTimer("ScriteDocument.m_clearModifyTimer"),
+                  m_structure(this, "structure"),
+                  m_screenplay(this, "screenplay"),
+                  m_formatting(this, "formatting"),
+                  m_printFormat(this, "printFormat"),
                   m_evaluateStructureElementSequenceTimer("ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
-
     this->reset();
     this->updateDocumentWindowTitle();
 

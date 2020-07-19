@@ -57,7 +57,11 @@ Item {
 
     LibraryService {
         id: libraryService
-        onImported: modalDialog.close()
+        onImported: {
+            app.execLater(libraryService, 250, function() {
+                modalDialog.close()
+            })
+        }
     }
 
     Rectangle {

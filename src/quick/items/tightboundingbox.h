@@ -18,9 +18,11 @@
 
 #include <QRectF>
 #include <QObject>
+#include <QPointer>
 #include <QQmlEngine>
 #include <QQuickItem>
-#include <QPointer>
+
+#include "qobjectproperty.h"
 
 /**
  * QQuickItem::childrenRect() doesn't ever shrink, even though items have moved
@@ -93,6 +95,7 @@ class TightBoundingBoxItem : public QObject
 public:
     TightBoundingBoxItem(QObject *parent=nullptr);
     ~TightBoundingBoxItem();
+
     Q_SIGNAL void aboutToDestroy(TightBoundingBoxItem *ptr);
 
     static TightBoundingBoxItem *qmlAttachedProperties(QObject *object);
@@ -100,17 +103,18 @@ public:
     QQuickItem *item() const { return m_item; }
     QRectF itemRect() const { return m_item ? QRectF(m_item->x(), m_item->y(), m_item->width(), m_item->height()) : QRectF(); }
 
-    Q_PROPERTY(TightBoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged)
+    Q_PROPERTY(TightBoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
     void setEvaluator(TightBoundingBoxEvaluator* val);
     TightBoundingBoxEvaluator* evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
 private:
     void requestReevaluation();
+    void resetEvaluator();
 
 private:
     QPointer<QQuickItem> m_item;
-    QPointer<TightBoundingBoxEvaluator> m_evaluator;
+    QObjectProperty<TightBoundingBoxEvaluator> m_evaluator;
 };
 
 Q_DECLARE_METATYPE(TightBoundingBoxItem*)

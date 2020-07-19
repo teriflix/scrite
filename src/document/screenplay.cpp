@@ -21,8 +21,11 @@
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent),
-      m_screenplay(qobject_cast<Screenplay*>(parent))
+      m_scene(this, "scene"),
+      m_screenplay(this, "screenplay")
 {
+    m_screenplay = qobject_cast<Screenplay*>(parent);
+
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::elementChanged, [=](){
@@ -154,7 +157,7 @@ void ScreenplayElement::setScene(Scene *val)
 
     m_scene = val;
     m_sceneID = m_scene->id();
-    connect(m_scene, &Scene::aboutToDelete, this, &ScreenplayElement::sceneWasDeleted);
+    connect(m_scene, &Scene::aboutToDelete, this, &ScreenplayElement::resetScene);
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
     connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
@@ -187,7 +190,7 @@ bool ScreenplayElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
     {
-        m_screenplay = qobject_cast<Screenplay*>(this->parent());
+        this->setScreenplay( qobject_cast<Screenplay*>(this->parent()) );
         if(m_scene == nullptr && !m_sceneID.isEmpty())
             this->setSceneFromID(m_sceneID);
     }
@@ -224,7 +227,7 @@ void ScreenplayElement::evaluateSceneNumber(int &number)
 }
 
 
-void ScreenplayElement::sceneWasDeleted()
+void ScreenplayElement::resetScene()
 {
     if(m_screenplay != nullptr)
         m_screenplay->removeElement(this);
@@ -237,6 +240,14 @@ void ScreenplayElement::sceneWasDeleted()
     }
 }
 
+void ScreenplayElement::resetScreenplay()
+{
+    m_screenplay = nullptr;
+    emit screenplayChanged();
+
+    this->deleteLater();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static const QString coverPagePhotoPath("coverPage/photo.jpg");
@@ -244,6 +255,7 @@ static const QString coverPagePhotoPath("coverPage/photo.jpg");
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
+      m_activeScene(this, "activeScene"),
       m_sceneNumberEvaluationTimer("Screenplay.m_sceneNumberEvaluationTimer")
 {
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
@@ -1340,6 +1352,13 @@ void Screenplay::timerEvent(QTimerEvent *te)
         m_sceneNumberEvaluationTimer.stop();
         this->evaluateSceneNumbers();
     }
+}
+
+void Screenplay::resetActiveScene()
+{
+    m_activeScene = nullptr;
+    emit activeSceneChanged();
+    this->setCurrentElementIndex(-1);
 }
 
 void Screenplay::onSceneReset(int elementIndex)

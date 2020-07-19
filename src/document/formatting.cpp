@@ -504,6 +504,7 @@ void ScreenplayPageLayout::timerEvent(QTimerEvent *event)
 ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
       m_pageWidth(750),
+      m_screen(this, "screen"),
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
       m_defaultFontMetrics(m_defaultFont),
       m_defaultFont2Metrics(m_defaultFont)
@@ -765,6 +766,16 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
 }
 
+void ScreenplayFormat::resetScreen()
+{
+    m_screen = nullptr;
+
+    this->evaluateFontZoomLevels();
+    this->evaluateFontPointSizeDelta();
+
+    emit screenChanged();
+}
+
 void ScreenplayFormat::evaluateFontPointSizeDelta()
 {
     Q_ASSERT_X(m_fontPointSizes.size() == m_fontZoomLevels.size(), "ScreenplayFormat", "Font sizes and zoom levels are out of sync.");
@@ -991,7 +1002,11 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 
 SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
     : QSyntaxHighlighter(parent),
-      m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer")
+      m_scene(this, "scene"),
+      m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer"),
+      m_currentElement(this, "currentElement"),
+      m_textDocument(this, "textDocument"),
+      m_screenplayFormat(this, "screenplayFormat")
 {
     connect(this, &SceneDocumentBinder::currentElementChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
 }
@@ -1704,6 +1719,30 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
     }
 }
 
+void SceneDocumentBinder::resetScene()
+{
+    m_scene = nullptr;
+    emit sceneChanged();
+
+    this->initializeDocument();
+}
+
+void SceneDocumentBinder::resetTextDocument()
+{
+    m_textDocument = nullptr;
+    this->QSyntaxHighlighter::setDocument(nullptr);
+    this->setDocumentLoadCount(0);
+    this->evaluateAutoCompleteHints();
+    emit textDocumentChanged();
+    this->setCursorPosition(-1);
+}
+
+void SceneDocumentBinder::resetScreenplayFormat()
+{
+    m_screenplayFormat = nullptr;
+    emit screenplayFormatChanged();
+}
+
 void SceneDocumentBinder::initializeDocument()
 {
     if(m_textDocument == nullptr || m_scene == nullptr || m_screenplayFormat == nullptr)
@@ -1800,7 +1839,13 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
 
 void SceneDocumentBinder::resetCurrentElement()
 {
-    this->setCurrentElement(nullptr);
+    m_currentElement = nullptr;
+    emit currentElementChanged();
+
+    m_tabHistory.clear();
+    this->evaluateAutoCompleteHints();
+
+    emit currentFontChanged();
 }
 
 class ForceCursorPositionHack : public QObject

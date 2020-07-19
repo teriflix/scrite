@@ -16,6 +16,8 @@
 
 #include <QAbstractListModel>
 
+#include "qobjectproperty.h"
+
 class ErrorReport : public QAbstractListModel
 {
     Q_OBJECT
@@ -25,7 +27,7 @@ public:
     ~ErrorReport();
     Q_SIGNAL void aboutToDelete(ErrorReport *val);
 
-    Q_PROPERTY(ErrorReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged)
+    Q_PROPERTY(ErrorReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET resetProxyFor)
     void setProxyFor(ErrorReport* val);
     ErrorReport* proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
@@ -58,14 +60,14 @@ public:
     QHash<int,QByteArray> roleNames() const;
 
 private:
-    void clearProxyFor();
+    void resetProxyFor();
     void updateErrorMessageFromProxy();
     void updateWarningMessageFromProxy();
 
 private:
-    ErrorReport* m_proxyFor = nullptr;
     QString m_errorMessage;
     QStringList m_warningMessages;
+    QObjectProperty<ErrorReport> m_proxyFor;
 };
 
 #endif // ERRORREPORT_H
