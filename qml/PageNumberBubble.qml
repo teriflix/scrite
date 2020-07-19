@@ -23,13 +23,13 @@ PainterPathItem {
         id: sceneNumberText
         anchors.centerIn: parent
         font.family: scriteDocument.formatting.defaultFont.family
-        font.pixelSize: 16 * zoomLevel
+        font.pointSize: app.idealFontPointSize
         text: "" + parent.pageNumber
         color: colors.text
     }
 
-    width: Math.max(sceneNumberText.contentWidth * 1.5, 50*zoomLevel)
-    height: Math.max(sceneNumberText.contentHeight + 1.1, 30*zoomLevel)
+    width: Math.max(sceneNumberText.contentWidth * 1.5, 30)
+    height: sceneNumberText.contentHeight + 1.1
 
     renderType: PainterPathItem.OutlineAndFill
     fillColor: colors.background

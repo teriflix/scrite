@@ -102,6 +102,10 @@ int main(int argc, char **argv)
         Application::setApplicationVersion(applicationVersion.toString() + "-beta-x64");
 #endif
 
+#ifdef Q_OS_WIN
+    Application::setAttribute(Qt::AA_Use96Dpi);
+#endif
+
     qInstallMessageHandler(ScriteQtMessageHandler);
 
     Application a(argc, argv, applicationVersion);

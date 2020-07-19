@@ -37,7 +37,7 @@ Item {
 
         Text {
             text: "The library consists of curated screenplays either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u>. Read the complete <a href=\"disclaimer\">disclaimer</a> here."
-            font.pointSize:  Screen.devicePixelRatio > 1 ? 14 : 10
+            font.pointSize: app.idealFontPointSize-1
             width: parent.width * 0.9
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
@@ -102,7 +102,7 @@ Item {
         readonly property real minCellWidth: posterWidth * 1.5
         property int nrCells: Math.floor(availableWidth/minCellWidth)
         cellWidth: availableWidth / nrCells
-        cellHeight: posterHeight + 90
+        cellHeight: posterHeight + 20
 
         highlight: Rectangle {
             color: primaryColors.highlight.background
@@ -152,7 +152,7 @@ Item {
                 Text {
                     id: description
                     width: parent.width-20
-                    font.pixelSize: app.idealFontPointSize
+                    font.pointSize: app.idealFontPointSize
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
                     color: primaryColors.c600.text
@@ -171,10 +171,14 @@ Item {
                 border.color: primaryColors.borderColor
             }
 
-            Item {
-                anchors.fill: parent
-                anchors.margins: 10
+            Column {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 10
+                width: parent.width-20
                 clip: true
+                onHeightChanged: libraryGridView.cellHeight = Math.max(libraryGridView.cellHeight,height+20)
+                spacing: 10
 
                 Image {
                     id: poster
@@ -199,13 +203,12 @@ Item {
                 }
 
                 Column {
+                    id: metaData
                     width: parent.width
-                    anchors.top: poster.bottom
-                    anchors.topMargin: 10
                     spacing: 5
 
                     Text {
-                        font.pointSize:  Screen.devicePixelRatio > 1 ? 16 : 12
+                        font.pointSize: app.idealFontPointSize
                         font.bold: true
                         text: record.name
                         width: parent.width
@@ -215,7 +218,7 @@ Item {
                     }
 
                     Text {
-                        font.pointSize:  Screen.devicePixelRatio > 1 ? 14 : 10
+                        font.pointSize: app.idealFontPointSize-1
                         text: record.authors
                         width: parent.width
                         wrapMode: Text.WordWrap
@@ -224,7 +227,7 @@ Item {
                     }
 
                     Text {
-                        font.pointSize:  Screen.devicePixelRatio > 1 ? 12 : 8
+                        font.pointSize: app.idealFontPointSize-3
                         text: record.languages.join(", ")
                         width: parent.width
                         elide: Text.ElideRight
