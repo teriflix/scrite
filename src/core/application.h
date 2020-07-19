@@ -219,7 +219,7 @@ signals:
 
 private:
     bool loadScript();
-    bool registerFileType();
+    bool registerFileTypes();
 
 private:
     QSettings *m_settings = nullptr;

@@ -74,7 +74,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     if( m_settings->value( QStringLiteral("Installation/fileTypeRegistered") , false).toBool() == false )
     {
-        const bool rft = this->registerFileType();
+        const bool rft = this->registerFileTypes();
         m_settings->setValue( QStringLiteral("Installation/fileTypeRegistered"), rft );
         if(rft)
             m_settings->setValue( QStringLiteral("Installation/path"), this->applicationFilePath() );
@@ -906,14 +906,26 @@ bool Application::loadScript()
 bool Application::loadScript() { return false; }
 #endif
 
-bool Application::registerFileType()
+bool Application::registerFileTypes()
 {
 #ifdef Q_OS_WIN
-    const QString appFilePath = this->applicationFilePath();
-    QSettings s("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES", QSettings::NativeFormat);
-        s.setValue(".scrite/DefaultIcon/.",QDir::toNativeSeparators(appFilePath));
-        s.setValue(".scrite/.","com.teriflix.scrite");
-        s.setValue("com.teriflix.scrite/shell/open/command/.", QDir::toNativeSeparators(appFilePath) + " \"%1\"");
+    const QString appFilePath = this->applicationFilePath();   
+    QSettings classes(QStringLiteral("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES"), QSettings::NativeFormat);
+
+    const QString ns = QStringLiteral("com.teriflix.scrite");
+    const QString root = QStringLiteral("/.");
+    const QString shell = QStringLiteral("/shell/open/command/.");
+
+    auto registerFileExtension = [&](const QString &extension, const QString &description, const QString &cmdLineOption) {
+        classes.setValue(extension + root, ns + extension);
+        classes.setValue(ns + extension + root, description);
+        classes.setValue(ns + extension + shell, QDir::toNativeSeparators(appFilePath) + QStringLiteral(" ") + cmdLineOption + QStringLiteral(" \"%1\""));
+        const bool makeDefault = (extension == QStringLiteral(".scrite"));
+        if(makeDefault)
+            classes.setValue(extension + QStringLiteral("/DefaultIcon/."), QDir::toNativeSeparators(appFilePath));
+    };
+    registerFileExtension(".scrite", "Scrite Screenplay Document", QString());
+
     return true;
 #endif
 
