@@ -275,8 +275,9 @@ Item {
                             MenuSeparator { }
 
                             MenuItem2 {
+                                id: openFromLibrary
                                 text: "From Library"
-                                onClicked: {
+                                function go() {
                                     resetContentAnimation.filePath = ""
                                     resetContentAnimation.openFileDialog = false
                                     resetContentAnimation.callback = undefined
@@ -286,6 +287,29 @@ Item {
                                     modalDialog.popupSource = fileOpenButton
                                     modalDialog.sourceComponent = openFromLibraryComponent
                                     modalDialog.active = true
+                                }
+
+                                onClicked: {
+                                    if(scriteDocument.modified)
+                                        askQuestion({
+                                            "question": appToolBar.saveQuestionText(),
+                                            "okButtonText": "Yes",
+                                            "cancelButtonText": "No",
+                                            "abortButtonText": "Cancel",
+                                            "callback": function(val) {
+                                                if(val) {
+                                                    if(scriteDocument.fileName !== "")
+                                                        scriteDocument.save()
+                                                    else {
+                                                        cmdSave.doClick()
+                                                        return
+                                                    }
+                                                }
+                                                app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
+                                            }
+                                        }, fileNewButton)
+                                    else
+                                        openFromLibrary.go()
                                 }
                             }
                         }
