@@ -407,7 +407,7 @@ Rectangle {
                 splashLoader.active = false
                 if(app.isWindowsPlatform && app.isNotWindows10)
                     showInformation({
-                        "message": "Scrite is designed for Windows 10. While it may work on earlier versions of Windows, we dont't actively test on them. We recommend that you use Scrite on Windows 10."
+                        "message": "The Windows version of Scrite works best on Windows 10. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on Windows 10 PCs."
                     })
             }
         }
