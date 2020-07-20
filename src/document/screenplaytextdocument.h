@@ -32,20 +32,28 @@ public:
     {
         AfterTitlePage,
         AfterSceneHeading,
-        AfterLastScene
+        AfterLastScene,
+        BeforeSceneElement,
+        AfterSceneElement
     };
     virtual void inject(QTextCursor &, InjectLocation) { }
+    virtual bool filterSceneElement() const { return false; }
 
     const ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
+    const SceneElement *sceneElement() const { return m_sceneElement; }
 
 private:
     friend class ScreenplayTextDocument;
     void setScreenplayElement(const ScreenplayElement *element) {
         m_screenplayElement = element;
     }
+    void setSceneElement(const SceneElement *element) {
+        m_sceneElement = element;
+    }
 
 private:
     const ScreenplayElement *m_screenplayElement = nullptr;
+    const SceneElement *m_sceneElement = nullptr;
 };
 
 #define AbstractScreenplayTextDocumentInjectionInterface_iid "io.scrite.AbstractScreenplayTextDocumentInjectionInterface"

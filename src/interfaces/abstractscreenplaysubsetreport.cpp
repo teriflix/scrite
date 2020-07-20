@@ -55,6 +55,15 @@ void AbstractScreenplaySubsetReport::setIncludeSceneSynopsis(bool val)
     emit includeSceneSynopsisChanged();
 }
 
+void AbstractScreenplaySubsetReport::setIncludeSceneContents(bool val)
+{
+    if(m_includeSceneContents == val)
+        return;
+
+    m_includeSceneContents = val;
+    emit includeSceneContentsChanged();
+}
+
 void AbstractScreenplaySubsetReport::setIncludeSceneNumbers(bool val)
 {
     if(m_includeSceneNumbers == val)
@@ -149,4 +158,9 @@ void AbstractScreenplaySubsetReport::configureTextDocumentPrinter(QTextDocumentP
 void AbstractScreenplaySubsetReport::inject(QTextCursor &, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation)
 {
     // Incase we need to plug something in.
+}
+
+bool AbstractScreenplaySubsetReport::filterSceneElement() const
+{
+    return !m_includeSceneContents;
 }

@@ -43,6 +43,15 @@ void AbstractTextDocumentExporter::setIncludeSceneSynopsis(bool val)
     emit includeSceneSynopsisChanged();
 }
 
+void AbstractTextDocumentExporter::setIncludeSceneContents(bool val)
+{
+    if(m_includeSceneContents == val)
+        return;
+
+    m_includeSceneContents = val;
+    emit includeSceneContentsChanged();
+}
+
 void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal pageWidth)
 {
     Q_UNUSED(pageWidth)
@@ -55,13 +64,19 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
     stDoc.setPrintEachSceneOnANewPage(this->isPrintEachSceneOnANewPage());
     stDoc.setSyncEnabled(false);
-    if(this->usePageBreaks())
+    if(this->usePageBreaks() && m_includeSceneContents)
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
     else
         stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);
     stDoc.setScreenplay(this->document()->screenplay());
     stDoc.setFormatting(this->document()->printFormat());
     stDoc.setTextDocument(textDoc);
+    stDoc.setInjection(this);
     stDoc.syncNow();
+}
+
+bool AbstractTextDocumentExporter::filterSceneElement() const
+{
+    return !m_includeSceneContents;
 }
 

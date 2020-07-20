@@ -15,10 +15,13 @@
 #define ABSTRACTTEXTDOCUMENTEXPORTER_H
 
 #include "abstractexporter.h"
+#include "screenplaytextdocument.h"
 
-class AbstractTextDocumentExporter : public AbstractExporter
+class AbstractTextDocumentExporter : public AbstractExporter,
+                                     public AbstractScreenplayTextDocumentInjectionInterface
 {
     Q_OBJECT
+    Q_INTERFACES(AbstractScreenplayTextDocumentInjectionInterface)
 
 public:
     ~AbstractTextDocumentExporter();
@@ -37,6 +40,13 @@ public:
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();
 
+    Q_CLASSINFO("includeSceneContents_FieldLabel", "Include scene content.")
+    Q_CLASSINFO("includeSceneContents_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneContents READ isIncludeSceneContents WRITE setIncludeSceneContents NOTIFY includeSceneContentsChanged)
+    void setIncludeSceneContents(bool val);
+    bool isIncludeSceneContents() const { return m_includeSceneContents; }
+    Q_SIGNAL void includeSceneContentsChanged();
+
     virtual bool generateTitlePage() const { return true; }
     virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
@@ -49,9 +59,13 @@ protected:
     AbstractTextDocumentExporter(QObject *parent=nullptr);
     void generate(QTextDocument *textDocument, const qreal pageWidth);
 
+    // AbstractScreenplayTextDocumentInjectionInterface interface
+    bool filterSceneElement() const;
+
 private:
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
+    bool m_includeSceneContents = true;
 };
 
 #endif // ABSTRACTTEXTDOCUMENTEXPORTER_H

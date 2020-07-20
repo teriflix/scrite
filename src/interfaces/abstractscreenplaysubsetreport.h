@@ -44,6 +44,14 @@ public:
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();
 
+    Q_CLASSINFO("includeSceneContents_FieldGroup", "Basic")
+    Q_CLASSINFO("includeSceneContents_FieldLabel", "Include scene content.")
+    Q_CLASSINFO("includeSceneContents_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneContents READ isIncludeSceneContents WRITE setIncludeSceneContents NOTIFY includeSceneContentsChanged)
+    void setIncludeSceneContents(bool val);
+    bool isIncludeSceneContents() const { return m_includeSceneContents; }
+    Q_SIGNAL void includeSceneContentsChanged();
+
     Q_CLASSINFO("generateTitlePage_FieldGroup", "PDF Options")
     Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
     Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
@@ -90,14 +98,17 @@ protected:
 
     // AbstractScreenplayTextDocumentInjectionInterface interface
     void inject(QTextCursor &, InjectLocation);
+    bool filterSceneElement() const;
 
     virtual void configureScreenplayTextDocument(ScreenplayTextDocument &) { }
 
 private:
     bool m_generateTitlePage = true;
+    bool m_printSceneContent = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
     bool m_listSceneCharacters = false;
+    bool m_includeSceneContents = true;
     bool m_includeSceneSynopsis = false;
     Screenplay *m_screenplaySubset = nullptr;
     bool m_printEachSceneOnANewPage = false;

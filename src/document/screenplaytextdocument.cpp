@@ -1462,6 +1462,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
 
+
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
             cursor.insertText(heading->text());
             insertBlock = true;
@@ -1512,6 +1513,17 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         for(int j=0; j<scene->elementCount(); j++)
         {
             const SceneElement *para = scene->elementAt(j);
+            if(injection != nullptr)
+            {
+                injection->setSceneElement(para);
+                injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::BeforeSceneElement);
+                if(injection->filterSceneElement())
+                {
+                    injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterSceneElement);
+                    continue;
+                }
+            }
+
             if(insertBlock)
                 cursor.insertBlock();
 
@@ -1553,6 +1565,9 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             }
             else
                 cursor.insertText(text);
+
+            if(injection != nullptr)
+                injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterSceneElement);
 
             insertBlock = true;
         }
