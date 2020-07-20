@@ -30,7 +30,7 @@ Item {
         Text {
             font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
             font.bold: true
-            text: "Open From Library"
+            text: "Open From Screenplay Library"
             anchors.horizontalCenter: parent.horizontalCenter
             color: primaryColors.c300.text
         }

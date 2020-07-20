@@ -798,7 +798,7 @@ Rectangle {
                                     property: "opacity"
                                     duration: 250
                                     from: 1
-                                    to: 0.25
+                                    to: 0.1
                                 }
                             }
 
@@ -825,7 +825,7 @@ Rectangle {
                                     target: cursorRectangle
                                     property: "opacity"
                                     duration: 250
-                                    from: 0.25
+                                    from: 0.1
                                     to: 1
                                 }
                             }

@@ -175,7 +175,7 @@ Item {
                     shortcut: "Ctrl+O"
                     shortcutText: "O"
                     down: recentFilesMenu.visible
-                    onClicked: recentFilesMenu.recentFiles.length > 0 ? recentFilesMenu.open() : doOpen()
+                    onClicked: recentFilesMenu.open()
                     function doOpen(filePath) {
                         if(filePath === scriteDocument.fileName)
                             return
@@ -242,12 +242,8 @@ Item {
                             }
 
                             MenuItem2 {
-                                text: "Open Another"
+                                text: recentFilesMenu.recentFiles.length > 0 ? "Open Another" : "Open"
                                 onClicked: fileOpenButton.doOpen()
-                            }
-
-                            MenuSeparator {
-                                visible: true
                             }
 
                             FontMetrics {
@@ -280,11 +276,11 @@ Item {
                                 }
                             }
 
-                            MenuSeparator { }
+                            MenuSeparator {  }
 
                             MenuItem2 {
                                 id: openFromLibrary
-                                text: "From Library"
+                                text: "Screenplay Library"
                                 function go() {
                                     resetContentAnimation.filePath = ""
                                     resetContentAnimation.openFileDialog = false
