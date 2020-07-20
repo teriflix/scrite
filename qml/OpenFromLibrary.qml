@@ -271,7 +271,10 @@ Item {
 
             Button2 {
                 text: "Reload"
-                onClicked: libraryService.library.reload()
+                onClicked: {
+                    libraryGridView.currentIndex = -1
+                    libraryService.library.reload()
+                }
             }
         }
 

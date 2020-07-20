@@ -743,6 +743,7 @@ Rectangle {
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
+                            justReceivedFocus = true
                         } else if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
                             globalScreenplayEditorToolbar.sceneEditor = null
                         sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
@@ -752,6 +753,110 @@ Rectangle {
                     onCursorRectangleChanged: {
                         if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/)
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
+                    }
+
+                    property bool justReceivedFocus: false
+                    cursorDelegate: Item {
+                        x: sceneTextEditor.cursorRectangle.x
+                        y: sceneTextEditor.cursorRectangle.y
+                        width: sceneTextEditor.cursorRectangle.width
+                        height: sceneTextEditor.cursorRectangle.height
+                        visible: sceneTextEditor.activeFocus
+
+                        Rectangle {
+                            id: cursorRectangle
+                            width: parent.width*1.5
+                            height: parent.height
+                            anchors.centerIn: parent
+                            color: scriteDocument.readOnly ? primaryColors.borderColor : "black"
+                        }
+
+                        SequentialAnimation {
+                            running: sceneTextEditor.justReceivedFocus && screenplayEditorSettings.enableAnimations
+
+                            ParallelAnimation {
+                                running: true
+
+                                NumberAnimation {
+                                    target: cursorRectangle
+                                    property: "width"
+                                    duration: 250
+                                    from: sceneTextEditor.cursorRectangle.width*1.5
+                                    to: sceneTextEditor.cursorRectangle.width*10
+                                }
+
+                                NumberAnimation {
+                                    target: cursorRectangle
+                                    property: "height"
+                                    duration: 250
+                                    from: sceneTextEditor.cursorRectangle.height
+                                    to: sceneTextEditor.cursorRectangle.height*2
+                                }
+
+                                NumberAnimation {
+                                    target: cursorRectangle
+                                    property: "opacity"
+                                    duration: 250
+                                    from: 1
+                                    to: 0.25
+                                }
+                            }
+
+                            ParallelAnimation {
+                                running: true
+
+                                NumberAnimation {
+                                    target: cursorRectangle
+                                    property: "width"
+                                    duration: 250
+                                    from: sceneTextEditor.cursorRectangle.width*10
+                                    to: sceneTextEditor.cursorRectangle.width*1.5
+                                }
+
+                                NumberAnimation {
+                                    target: cursorRectangle
+                                    property: "height"
+                                    duration: 250
+                                    from: sceneTextEditor.cursorRectangle.height*2
+                                    to: sceneTextEditor.cursorRectangle.height
+                                }
+
+                                NumberAnimation {
+                                    target: cursorRectangle
+                                    property: "opacity"
+                                    duration: 250
+                                    from: 0.25
+                                    to: 1
+                                }
+                            }
+
+                            ScriptAction {
+                                script: {
+                                    sceneTextEditor.justReceivedFocus = false
+                                    cursorRectangle.width = sceneTextEditor.cursorRectangle.width*1.5
+                                    cursorRectangle.height = sceneTextEditor.cursorRectangle.height
+                                }
+                            }
+                        }
+
+                        SequentialAnimation {
+                            running: !sceneTextEditor.justReceivedFocus && sceneTextEditor.activeFocus
+                            loops: Animation.Infinite
+
+                            NumberAnimation {
+                                target: cursorRectangle
+                                property: "opacity"
+                                duration: 350
+                                from: 1; to: 0.25
+                            }
+
+                            NumberAnimation {
+                                target: cursorRectangle
+                                property: "opacity"
+                                duration: 350
+                                from: 0.25; to: 1
+                            }
+                        }
                     }
 
                     // Support for transliteration.
@@ -1177,6 +1282,12 @@ Rectangle {
 
                     // Scrolling up and down
                     Keys.onUpPressed: {
+                        if(event.modifiers & Qt.ControlModifier) {
+                            contentItem.scrollToPreviousScene()
+                            event.accepted = true
+                            return
+                        }
+
                         if(sceneDocumentBinder.canGoUp())
                             event.accepted = false
                         else {
@@ -1185,6 +1296,12 @@ Rectangle {
                         }
                     }
                     Keys.onDownPressed: {
+                        if(event.modifiers & Qt.ControlModifier) {
+                            contentItem.scrollToNextScene()
+                            event.accepted = true
+                            return
+                        }
+
                         if(sceneDocumentBinder.canGoDown())
                             event.accepted = false
                         else {
