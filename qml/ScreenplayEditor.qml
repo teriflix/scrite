@@ -1062,118 +1062,6 @@ Rectangle {
                                 }
                             }
                         }
-
-                        MenuLoader {
-                            id: doubleEnterMenu
-                            enabled: !scriteDocument.readOnly
-                            anchors.bottom: parent.bottom
-                            property Scene currentScene: contentItem.theScene
-                            menu: Menu2 {
-                                width: 200
-                                onAboutToShow: sceneTextEditor.persistentSelection = true
-                                onAboutToHide: sceneTextEditor.persistentSelection = false
-                                EventFilter.target: app
-                                EventFilter.events: [6]
-                                EventFilter.onFilter: {
-                                    result.filter = true
-                                    result.acceptEvent = true
-
-                                    if(screenplayAdapter.isSourceScreenplay && event.key === Qt.Key_N) {
-                                        newSceneMenuItem.handle()
-                                        return
-                                    }
-
-                                    if(event.key === Qt.Key_H) {
-                                        editHeadingMenuItem.handle()
-                                        return
-                                    }
-
-                                    if(sceneDocumentBinder.currentElement === null) {
-                                        result.filter = false
-                                        result.acceptEvent = false
-                                        sceneTextEditor.forceActiveFocus()
-                                        doubleEnterMenu.close()
-                                        return
-                                    }
-
-                                    switch(event.key) {
-                                    case Qt.Key_A:
-                                        sceneDocumentBinder.currentElement.type = SceneElement.Action
-                                        break;
-                                    case Qt.Key_C:
-                                        sceneDocumentBinder.currentElement.type = SceneElement.Character
-                                        break;
-                                    case Qt.Key_D:
-                                        sceneDocumentBinder.currentElement.type = SceneElement.Dialogue
-                                        break;
-                                    case Qt.Key_P:
-                                        sceneDocumentBinder.currentElement.type = SceneElement.Parenthetical
-                                        break;
-                                    case Qt.Key_S:
-                                        sceneDocumentBinder.currentElement.type = SceneElement.Shot
-                                        break;
-                                    case Qt.Key_T:
-                                        sceneDocumentBinder.currentElement.type = SceneElement.Transition
-                                        break;
-                                    default:
-                                        result.filter = false
-                                        result.acceptEvent = false
-                                    }
-
-                                    sceneTextEditor.forceActiveFocus()
-                                    doubleEnterMenu.close()
-                                }
-
-                                MenuItem2 {
-                                    id: editHeadingMenuItem
-                                    text: "&Heading (H)"
-                                    onClicked: handle()
-
-                                    function handle() {
-                                        if(currentScene.heading.enabled === false)
-                                            currentScene.heading.enabled = true
-                                        sceneHeadingAreaLoader.edit()
-                                        doubleEnterMenu.close()
-                                    }
-                                }
-
-                                Repeater {
-                                    model: [
-                                        { "value": SceneElement.Action, "display": "Action" },
-                                        { "value": SceneElement.Character, "display": "Character" },
-                                        { "value": SceneElement.Dialogue, "display": "Dialogue" },
-                                        { "value": SceneElement.Parenthetical, "display": "Parenthetical" },
-                                        { "value": SceneElement.Shot, "display": "Shot" },
-                                        { "value": SceneElement.Transition, "display": "Transition" }
-                                    ]
-
-                                    MenuItem2 {
-                                        text: modelData.display + " (" + modelData.display[0] + ")"
-                                        onClicked: {
-                                            if(sceneDocumentBinder.currentElement)
-                                                sceneDocumentBinder.currentElement.type = modelData.value
-                                            sceneTextEditor.forceActiveFocus()
-                                            doubleEnterMenu.close()
-                                        }
-                                    }
-                                }
-
-                                MenuSeparator { }
-
-                                MenuItem2 {
-                                    id: newSceneMenuItem
-                                    text: "&New Scene (N)"
-                                    onClicked: handle()
-                                    enabled: screenplayAdapter.isSourceScreenplay
-
-                                    function handle() {
-                                        currentScene.removeLastElementIfEmpty()
-                                        scriteDocument.createNewScene()
-                                        doubleEnterMenu.close()
-                                    }
-                                }
-                            }
-                        }
                     }
 
                     QtObject {
@@ -1227,7 +1115,7 @@ Rectangle {
                             sceneDocumentBinder.backtab()
                     }
 
-                    // Double enter menu and split-scene handling.
+                    // split-scene handling.
                     Keys.onReturnPressed: {
                         if(scriteDocument.readOnly) {
                             event.accepted = false
@@ -1240,10 +1128,7 @@ Rectangle {
                             return
                         }
 
-                        /*if( (binder.currentElement !== null || binder.currentElement.text === "") && completer.suggestion === "" ) {
-                            doubleEnterMenu.show()
-                            event.accepted = true
-                        } else*/ if(completer.suggestion !== "") {
+                        if(completer.suggestion !== "") {
                             userIsTyping = false
                             insert(cursorPosition, completer.suggestion)
                             userIsTyping = true
