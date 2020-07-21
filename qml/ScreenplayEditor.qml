@@ -1240,7 +1240,7 @@ Rectangle {
                             return
                         }
 
-                        if( (binder.currentElement === null || binder.currentElement.text === "") && completer.suggestion === "" ) {
+                        if( (binder.currentElement !== null || binder.currentElement.text === "") && completer.suggestion === "" ) {
                             doubleEnterMenu.show()
                             event.accepted = true
                         } else if(completer.suggestion !== "") {

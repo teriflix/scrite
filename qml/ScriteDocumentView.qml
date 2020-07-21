@@ -42,6 +42,7 @@ Item {
         category: "Workspace"
         property real workspaceHeight
         property real screenplayEditorWidth: -1
+        property bool scriptalayIntroduced: false
     }
 
     Settings {
@@ -132,7 +133,7 @@ Item {
 
             Row {
                 id: appFileTools
-                spacing: 2
+                spacing: documentUI.width >= 1440 ? 2 : 0
 
                 ToolButton3 {
                     id: fileNewButton
@@ -328,7 +329,7 @@ Item {
                         resetContentAnimation.start()
 
                         modalDialog.closeable = false
-                        modalDialog.popupSource = fileOpenButton
+                        modalDialog.popupSource = openFromLibrary
                         modalDialog.sourceComponent = openFromLibraryComponent
                         modalDialog.active = true
                     }
@@ -1282,6 +1283,7 @@ Item {
     Loader {
         id: openingAnimationLoader
         active: splashLoader.active === false
+        anchors.fill: parent
         sourceComponent: SequentialAnimation {
             running: true
 
@@ -1314,7 +1316,64 @@ Item {
             ScriptAction {
                 script: {
                     appLogo.ToolTip.visible = false
+                    if(workspaceSettings.scriptalayIntroduced)
+                        openingAnimationLoader.active = false
+                    else {
+                        var r = openingAnimationLoader.mapFromItem(openFromLibrary, 0, 0, openFromLibrary.width, openFromLibrary.height)
+                        openFromLibraryIntro.parent.x = r.x
+                        openFromLibraryIntro.parent.y = r.y
+                        openFromLibraryIntro.parent.width = r.width
+                        openFromLibraryIntro.parent.height = r.height
+                        openFromLibraryIntro.visible = true
+                    }
+                }
+            }
+
+            PropertyAnimation {
+                target: openFromLibrary.toolButtonImage
+                properties: "scale"
+                from: 1; to: 3
+                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
+            }
+
+            PropertyAnimation {
+                target: openFromLibrary.toolButtonImage
+                properties: "scale"
+                from: 3; to: 1
+                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
+            }
+
+            PauseAnimation {
+                duration: 5000
+            }
+
+            ScriptAction {
+                script: {
+                    openFromLibraryIntro.visible = false
                     openingAnimationLoader.active = false
+                    workspaceSettings.scriptalayIntroduced = true
+                }
+            }
+        }
+
+        Item {
+            Rectangle {
+                id: openFromLibraryIntro
+                anchors.top: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: openFromLibraryIntroText.width + 40
+                height: openFromLibraryIntroText.height + 40
+                color: primaryColors.c600.background
+                visible: false
+
+                Text {
+                    id: openFromLibraryIntroText
+                    anchors.centerIn: parent
+                    width: Math.min(contentWidth, 250)
+                    text: "Introducing <strong>Scriptalay</strong>! Click this button to browse through and download from a repository of screenpalys in Scrite format."
+                    wrapMode: Text.WordWrap
+                    font.pointSize: app.idealFontPointSize
+                    color: primaryColors.c600.text
                 }
             }
         }

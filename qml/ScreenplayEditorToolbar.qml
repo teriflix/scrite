@@ -36,7 +36,7 @@ Row {
         { "value": SceneElement.Shot, "display": "Shot", "icon": "../icons/screenplay/shot.png" },
         { "value": SceneElement.Transition, "display": "Transition", "icon": "../icons/screenplay/transition.png" }
     ]
-    spacing: 2
+    spacing: documentUI.width >= 1440 ? 2 : 0
 
     ToolButton3 {
         id: screenplayPreviewButton

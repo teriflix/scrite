@@ -7,7 +7,11 @@ cp ../../images/dmgbackdrop.png dmgbackdrop.png
 sed "s/{{VERSION}}/Version 0.4.11 Beta/" dmgbackdrop.qml > dmgbackdropgen.qml
 ~/Qt5.13.2/5.13.2/clang_64/bin/qmlscene dmgbackdropgen.qml
 rm -f dmgbackdropgen.qml
+
+# https://ss64.com/osx/sips.html
 sips -s dpiWidth 144 -s dpiHeight 144 background.png
+
+# https://github.com/create-dmg/create-dmg
 ~/Utils/create-dmg/create-dmg \
   --volname "Scrite-0.4.11-beta" \
   --background "background.png" \
