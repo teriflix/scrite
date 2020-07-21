@@ -8,5 +8,7 @@
         <file>images/teriflix_icon.png</file>
         <file>images/library.png</file>
         <file>images/library_inverted.png</file>
+        <file>images/library_woicon.png</file>
+        <file>images/library_woicon_inverted.png</file>
     </qresource>
 </RCC>

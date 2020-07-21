@@ -317,8 +317,8 @@ Item {
 
                 ToolButton3 {
                     id: openFromLibrary
-                    iconSource: "../icons/action/account_balance.png"
-                    text: "<img src=\"qrc:/images/library_inverted.png\" height=\"30\" width=\"107\">\t&nbsp;"
+                    iconSource: "../icons/action/library.png"
+                    text: "<img src=\"qrc:/images/library_woicon_inverted.png\" height=\"30\" width=\"107\">\t&nbsp;"
                     shortcut: "Ctrl+Shift+O"
                     shortcutText: "Shift+O"
                     function go() {
@@ -357,7 +357,7 @@ Item {
                     }
 
                     ShortcutsModelItem.group: "File"
-                    ShortcutsModelItem.title: "<img src=\"qrc:/images/library.png\" height=\"30\" width=\"107\">"
+                    ShortcutsModelItem.title: "<img src=\"qrc:/images/library_woicon.png\" height=\"30\" width=\"107\">"
                     ShortcutsModelItem.shortcut: shortcut
                 }
 

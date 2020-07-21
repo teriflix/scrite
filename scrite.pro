@@ -225,6 +225,7 @@ DISTFILES += \
     packaging/windows/installer-x64.nsi \
     packaging/mac/package.sh \
     packaging/mac/prepare.sh \
+    packaging/mac/dmgbackdrop.qml \
     3rdparty/poly2tri/License.txt
 
 
