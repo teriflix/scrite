@@ -39,6 +39,7 @@ Item {
     property alias hovered: toolButtonMouseArea.containsMouse
     property string text
     property bool autoRepeat: false
+    property alias toolButtonImage: iconImage
 
     signal toggled()
     signal clicked()
