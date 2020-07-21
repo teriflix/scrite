@@ -4,7 +4,9 @@ cp -vaf ../../Info.plist Scrite.app/Contents
 mkdir Scrite-0.4.11-beta
 mv Scrite.app Scrite-0.4.11-beta
 cp ../../images/dmgbackdrop.png dmgbackdrop.png
-~/Qt5.13.2/5.13.2/clang_64/bin/TextOverImage --file dmgbackdrop.png --text "Version 0.4.11 beta" --text-color lightgray --xpos 75 --ypos 160 --font-size 32 --dpr 2 --output background.png
+~/Qt5.13.2/5.13.2/clang_64/bin/TextOverImage --file dmgbackdrop.png --text "Version 0.4.11 beta" --text-color lightgray --xpos 75 --ypos 160 --font-size 32 --dpr 2 --output dmgbackdrop1.png
+~/Qt5.13.2/5.13.2/clang_64/bin/TextOverImage --file dmgbackdrop1.png --text "You're so close to writing your next blockbuster on Scrite!\nTo install Scrite, drag the icon to the Applications folder." --text-color gray --xpos 75 --ypos 160 --font-size 32 --dpr 2 --output dmgbackdrop2.png
+~/Qt5.13.2/5.13.2/clang_64/bin/TextOverImage --file dmgbackdrop2.png --text "https://www.scrite.io" --text-color "#65318f" --xpos 75 --ypos 160 --font-size 32 --dpr 2 --output dmgbackdrop3.png
 ~/Utils/create-dmg/create-dmg \
   --volname "Scrite-0.4.11-beta" \
   --background "background.png" \

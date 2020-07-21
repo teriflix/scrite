@@ -21,26 +21,47 @@ Item {
     width: documentUI.width * 0.75
     height: documentUI.height * 0.85
 
+    EventFilter.target: app
+    EventFilter.events: [6] // KeyPress
+    EventFilter.onFilter: {
+        if( event.key === Qt.Key_Escape) {
+            result.acceptEvent = true
+            result.filter = true
+            modalDialog.close()
+        }
+    }
+
     Column {
         id: titleBar
         width: parent.width
-        spacing: 10
-        y: 20
+        y: 30
 
-        Text {
-            font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
-            font.bold: true
-            text: "Open From Screenplay Library"
+        Row {
+            spacing: 10
             anchors.horizontalCenter: parent.horizontalCenter
-            color: primaryColors.c300.text
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -height*0.25
+                height: subtitle.height * 1.5
+                fillMode: Image.PreserveAspectFit
+                smooth: true; mipmap: true
+                source: "../images/library.png"
+            }
+
+            Text {
+                id: subtitle
+                font.pointSize: Screen.devicePixelRatio > 1 ? 22 : 18
+                text: "-  Repository of Screenplays in Scrite Format"
+                color: primaryColors.c300.text
+            }
         }
 
         Text {
-            text: "The library consists of curated screenplays either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u>. Read the complete <a href=\"disclaimer\">disclaimer</a> here."
-            font.pointSize: app.idealFontPointSize-1
+            text: "The repository consists of curated screenplays either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u>. Read the complete <a href=\"disclaimer\">disclaimer</a> here."
+            font.pointSize: app.idealFontPointSize-2
             width: parent.width * 0.9
             wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
             color: primaryColors.c300.text
 
@@ -118,8 +139,6 @@ Item {
                 visible: toolTipVisibility.get
                 width: libraryGridView.cellWidth * 2.5
                 height: description.contentHeight + 20
-                border.width: 1
-                border.color: primaryColors.c600.text
                 color: primaryColors.c600.background
 
                 DelayedPropertyBinder {
@@ -228,7 +247,7 @@ Item {
 
                     Text {
                         font.pointSize: app.idealFontPointSize-3
-                        text: record.languages.join(", ")
+                        text: record.pageCount + " Pages"
                         width: parent.width
                         elide: Text.ElideRight
                         color: textColor
@@ -279,7 +298,7 @@ Item {
         }
 
         Text {
-            text: "" + libraryService.library.count + " screenplays available."
+            text: "" + libraryService.library.count + " Screenplays Available"
             font.pointSize: app.idealFontPointSize
             anchors.centerIn: parent
             visible: !libraryService.library.busy && libraryGridView.contentHeight > libraryGridView.height

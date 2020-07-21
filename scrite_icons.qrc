@@ -115,5 +115,7 @@
         <file>icons/navigation/shortcuts_linux.png</file>
         <file>icons/navigation/shortcuts_macos.png</file>
         <file>icons/navigation/shortcuts_windows.png</file>
+        <file>icons/action/account_balance.png</file>
+        <file>icons/action/account_balance_inverted.png</file>
     </qresource>
 </RCC>

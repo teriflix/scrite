@@ -277,45 +277,6 @@ Item {
                             }
 
                             MenuSeparator { visible: true }
-
-                            MenuItem2 {
-                                id: openFromLibrary
-                                text: "Screenplay Library"
-                                function go() {
-                                    resetContentAnimation.filePath = ""
-                                    resetContentAnimation.openFileDialog = false
-                                    resetContentAnimation.callback = undefined
-                                    resetContentAnimation.start()
-
-                                    modalDialog.closeable = false
-                                    modalDialog.popupSource = fileOpenButton
-                                    modalDialog.sourceComponent = openFromLibraryComponent
-                                    modalDialog.active = true
-                                }
-
-                                onClicked: {
-                                    if(scriteDocument.modified)
-                                        askQuestion({
-                                            "question": appToolBar.saveQuestionText(),
-                                            "okButtonText": "Yes",
-                                            "cancelButtonText": "No",
-                                            "abortButtonText": "Cancel",
-                                            "callback": function(val) {
-                                                if(val) {
-                                                    if(scriteDocument.fileName !== "")
-                                                        scriteDocument.save()
-                                                    else {
-                                                        cmdSave.doClick()
-                                                        return
-                                                    }
-                                                }
-                                                app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
-                                            }
-                                        }, fileNewButton)
-                                    else
-                                        openFromLibrary.go()
-                                }
-                            }
                         }
                     }
                 }
@@ -351,6 +312,52 @@ Item {
 
                     ShortcutsModelItem.group: "File"
                     ShortcutsModelItem.title: text
+                    ShortcutsModelItem.shortcut: shortcut
+                }
+
+                ToolButton3 {
+                    id: openFromLibrary
+                    iconSource: "../icons/action/account_balance.png"
+                    text: "<img src=\"qrc:/images/library_inverted.png\" height=\"30\" width=\"107\">\t&nbsp;"
+                    shortcut: "Ctrl+Shift+O"
+                    shortcutText: "Shift+O"
+                    function go() {
+                        resetContentAnimation.filePath = ""
+                        resetContentAnimation.openFileDialog = false
+                        resetContentAnimation.callback = undefined
+                        resetContentAnimation.start()
+
+                        modalDialog.closeable = false
+                        modalDialog.popupSource = fileOpenButton
+                        modalDialog.sourceComponent = openFromLibraryComponent
+                        modalDialog.active = true
+                    }
+
+                    onClicked: {
+                        if(scriteDocument.modified)
+                            askQuestion({
+                                "question": appToolBar.saveQuestionText(),
+                                "okButtonText": "Yes",
+                                "cancelButtonText": "No",
+                                "abortButtonText": "Cancel",
+                                "callback": function(val) {
+                                    if(val) {
+                                        if(scriteDocument.fileName !== "")
+                                            scriteDocument.save()
+                                        else {
+                                            cmdSave.doClick()
+                                            return
+                                        }
+                                    }
+                                    app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
+                                }
+                            }, fileNewButton)
+                        else
+                            openFromLibrary.go()
+                    }
+
+                    ShortcutsModelItem.group: "File"
+                    ShortcutsModelItem.title: "<img src=\"qrc:/images/library.png\" height=\"30\" width=\"107\">"
                     ShortcutsModelItem.shortcut: shortcut
                 }
 
