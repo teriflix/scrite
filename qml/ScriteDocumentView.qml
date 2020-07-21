@@ -276,7 +276,7 @@ Item {
                                 }
                             }
 
-                            MenuSeparator {  }
+                            MenuSeparator { visible: true }
 
                             MenuItem2 {
                                 id: openFromLibrary
