@@ -141,6 +141,12 @@ Scene *ScreenplayAdapter::currentScene() const
     return m_currentElement == nullptr ? nullptr : m_currentElement->scene();
 }
 
+int ScreenplayAdapter::elementCount() const
+{
+    const int nrElements = m_source.isNull() || this->sourceModel() == nullptr ? 0 : this->rowCount(QModelIndex());
+    return qMax(nrElements, 0);
+}
+
 bool ScreenplayAdapter::hasNonStandardScenes() const
 {
     Screenplay *screenplay = this->screenplay();
@@ -222,6 +228,15 @@ QVariant ScreenplayAdapter::data(const QModelIndex &index, int role) const
     return this->data(element, index.row(), role);
 }
 
+int ScreenplayAdapter::rowCount(const QModelIndex &parent) const
+{
+    if(parent.isValid())
+        return 0;
+
+    const Screenplay *screenplay = this->screenplay();
+    return m_source.isNull() || screenplay == nullptr ? 0 : screenplay->rowCount(QModelIndex());
+}
+
 void ScreenplayAdapter::setCurrentIndexInternal(int val)
 {
     if(m_currentIndex < 0 && val < 0)
@@ -235,7 +250,7 @@ void ScreenplayAdapter::setCurrentIndexInternal(int val)
         return;
     }
 
-    const int nrRows = this->sourceModel() ? this->rowCount() : 0;
+    const int nrRows = this->elementCount();
     val = nrRows > 0 ? qBound(-1, val, nrRows-1) : -1;
     if(m_currentIndex == val)
         return;

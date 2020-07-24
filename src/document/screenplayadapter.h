@@ -58,7 +58,7 @@ public:
     Scene* currentScene() const;
 
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
-    int elementCount() const { return this->rowCount(); }
+    int elementCount() const;
     Q_SIGNAL void elementCountChanged();
 
     Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
@@ -75,6 +75,7 @@ public:
     Q_ENUMS(Roles)
     QHash<int,QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
     void setCurrentIndexInternal(int val);
