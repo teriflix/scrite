@@ -1834,8 +1834,9 @@ Rectangle {
                             font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType
                             font.pixelSize: screenplayElementType === ScreenplayElement.BreakElementType ? 16 : 14
                             font.letterSpacing: screenplayElementType === ScreenplayElement.BreakElementType ? 3 : 0
-                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignHCenter : (scene && scene.heading.enabled ? Qt.AlignLeft : Qt.AlignRight)
+                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignRight : (scene && scene.heading.enabled ? Qt.AlignLeft : Qt.AlignRight)
                             color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                            font.capitalization: Font.AllUppercase
                             text: {
                                 if(scene && scene.heading.enabled)
                                     return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
