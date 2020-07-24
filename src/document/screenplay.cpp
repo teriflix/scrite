@@ -1231,6 +1231,9 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
     for(int i=0; i<nrScenes; i++)
     {
         Scene *scene = m_elements.at(i)->scene();
+        if(scene == nullptr)
+            continue;
+
         int sceneResultIndex = 0;
 
         const int nrElements = scene->elementCount();
@@ -1270,6 +1273,9 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     for(int i=0; i<nrScenes; i++)
     {
         Scene *scene = m_elements.at(i)->scene();
+        if(scene == nullptr)
+            continue;
+
         bool begunUndoCapture = false;
 
         const int nrElements = scene->elementCount();
