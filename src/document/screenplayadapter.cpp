@@ -332,14 +332,14 @@ void ScreenplayAdapter::updateCurrentIndexAndCount()
 
 void ScreenplayAdapter::resetSource()
 {
+    this->setSourceModel(nullptr);
+
+    m_source = nullptr;
+    emit sourceChanged();
+
     m_currentElement = nullptr;
     emit currentElementChanged();
 
     m_currentIndex = -1;
     emit currentIndexChanged(-1);
-
-    this->setSourceModel(nullptr);
-
-    m_source = nullptr;
-    emit sourceChanged();
 }
