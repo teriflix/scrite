@@ -17,3 +17,8 @@ We wonder if screenplay writers can write software unless they are software deve
 We have absolutely nothing against _Final Draft_, _Celtx_, _Writer Duet_, _Causality_, _Fade In_ and other screenplay writing apps. Infact we love all of them. We would just like an opportunity to present one more way of writing with _Scrite_, in the hope that you may find it useful.
 
 If you are one of those brave writers who dont mind the temporary discomfort that comes along with using any new app; and are willing to invest 20-30 minutes in consideration of another way of writing - then we are so happy to have you here.
+
+## Table Of Contents
+
+- [Installing Scrite][installation.md]
+- [Quick Start][quick-start.md]
