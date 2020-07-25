@@ -9,7 +9,7 @@ Scrite is a free and open-source product written using [Qt](https://www.qt.io). 
 - [Instaling on Windows](#installing-on-windows)
 - [Instaling on macOS](#installing-on-macos)
 - [Instaling on Linux](#installing-on-linux)
-- [Instaling on Windows](#building-from-source)
+- [Building from Source](#building-from-source)
 - [Next Steps](#next-steps)
 
 ## Installing on Windows
