@@ -20,7 +20,7 @@ We provide signed 32-bit and 64-bit installers on [our website](https://www.scri
 
 You may choose to click on the ‘keep’ option and confirm your intent to save the file. Or you may want to wait until ur browser no longer shows these warnings.
 
-![Download Warning on Windows 10](screenshots/windows-download-warning2.jpg)
+![Download Warning on Windows 10](screenshots/windows-download-warning-2.jpg)
 
 Once downloaded, double click on the installer file to install Scrite.
 
@@ -40,7 +40,7 @@ Once you verify, you can click on "Run Anyway" button to complete the installati
 
 We provide signed DMG package for macOS on [our website](https://www.scrite.io/index.php/download-macOS). When you download and mount the DMG you will see a screen like this
 
-![Scrite DMG, when mounted on macOS](screeshots/scrite-dmg-macos.jpg)
+![Scrite DMG, when mounted on macOS](screenshots/scrite-dmg-macos.jpg)
 
 > NOTE: While updating, please make sure that you have closed any open instances of Scrite on your Mac.
 

@@ -20,5 +20,5 @@ If you are one of those brave writers who dont mind the temporary discomfort tha
 
 ## Table Of Contents
 
-- [Installing Scrite][installation.md]
-- [Quick Start][quick-start.md]
+- [Installing Scrite](installation.md)
+- [Quick Start](quick-start.md)
