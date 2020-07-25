@@ -82,12 +82,12 @@ Scrite is developed using [Qt](https://www.qt.io). Right now we are building Scr
 
 Once the source code of Scrite has been pulled into your local computer, you can open scrite.pro from $HOME/ScriteProject/scrite folder in Qt Creator. Simply build and run the project.
 
-If you like to build from the command line, then you can:
+If you like to build from the command line, then you can: (assuming the bin & lib folder of Qt are available in PATH, LD_LIBRARY_PATH or DYLD_LIBRARY_PATH as needed)
 
     cd ~/ScriteProject/scrite
-    /path/to/qmake 
+    qmake 
     make
-    ../Releases/scrite
+    ../Release/scrite
 
 Although Scrite depends on 3rd party (GPL friendly) libraries, we have bundled them all into our git repsitory so that you dont have to setup dependencies in order to build Scrite.
 
