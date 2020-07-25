@@ -44,7 +44,7 @@ Once you verify, you can click on "Run Anyway" button to complete the installati
 
 ## Installing on macOS
 
-We provide signed DMG package for macOS on [our website](https://www.scrite.io/index.php/download-macOS). When you download and mount the DMG you will see a screen like this
+We provide a signed DMG package for macOS on [our website](https://www.scrite.io/index.php/download-macOS). When you download and mount the DMG you will see a screen like this
 
 ![Scrite DMG, when mounted on macOS](screenshots/scrite-dmg-macos.jpg)
 

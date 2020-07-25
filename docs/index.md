@@ -10,7 +10,7 @@ One of our early adopters sent us this feedback as a rant. We are removing all t
 
 > Scrite seems like an app written by "software developers" for "software developers" and not writers.
 
-We wonder if screenplay writers can write software unless they are software developers also. So atleast one of of his rant was true. Scrite is an app written by software developers. Its the second part that we are not entirely onboard with. A more accurate way to describe Scrite would be
+We wonder if screenplay writers can write software unless they are software developers also. So atleast one part of his rant was true. Scrite is an app written by software developers. Its the second part that we are not entirely onboard with. A more accurate way to describe Scrite would be
 
 > Scrite _is_ an app written by "software developers" for "writers" who are willing to look beyond _Final Draft_.
 
@@ -22,3 +22,10 @@ If you are one of those brave writers who dont mind the temporary discomfort tha
 
 - [Installing Scrite](installation.md)
 - [Quick Start](quick-start.md)
+- [Scriptalay - A library of screenplays in Scrite](scriptalay.md)
+- [Import Existing Screenplay](import.md)
+- [Advanced Editing](advanced-editing.md)
+- [Exporting Your Screenplay](export.md)
+- [Reports](reports.md)
+- [Structure & Timeline](structure.md)
+- [Notebook](notebook.md)
