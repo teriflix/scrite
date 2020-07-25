@@ -32,12 +32,12 @@ Notice the toolbar on the top?
 
 From left to right, it has the following toggle buttons for changing the formatting type of your current paragraph
 
-- ![](../../../icons/screenplay/action.png) Action
-- ![](../../../icons/screenplay/character.png) Character
-- ![](../../../icons/screenplay/dialogue.png) Dialogue
-- ![](../../../icons/screenplay/paranthetical.png) Parenthetical
-- ![](../../../icons/screenplay/shot.png) Shot
-- ![](../../../icons/screenplay/transition.png) Transition
+- ![](screenshots/quick-start/formatting-icons/action.png) Action
+- ![](screenshots/quick-start/formatting-icons/character.png) Character
+- ![](screenshots/quick-start/formatting-icons/dialogue.png) Dialogue
+- ![](screenshots/quick-start/formatting-icons/paranthetical.png) Parenthetical
+- ![](screenshots/quick-start/formatting-icons/shot.png) Shot
+- ![](screenshots/quick-start/formatting-icons/transition.png) Transition
 
 You can click on any of these buttons to switch the formatting style of the current paragraph.
 
