@@ -6,6 +6,12 @@ Scrite is a free and open-source product written using [Qt](https://www.qt.io). 
 > 
 > Please read more about what a beta release means here (https://techterms.com/definition/beta_software). If you wish to have a more stable and complete version, we recommend you to wait until we have a 1.0 release. But if you are one of the early adopters who wants to check out Scrite, please feel free to download and please provide feedback.
 
+- [Instaling on Windows](#installing-on-windows)
+- [Instaling on macOS](#installing-on-macos)
+- [Instaling on Linux](#installing-on-linux)
+- [Instaling on Windows](#building-from-source)
+- [Next Steps](#next-steps)
+
 ## Installing on Windows
 
 Depending on the type of Windows PC you use, please download the 32-bit or 64-bit installer from [the download page](https://www.scrite.io/index.php/download-windows) here. 
