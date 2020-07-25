@@ -4,6 +4,21 @@ Scrite is an open-source, multi-platform screenplay writing app for macOS, Windo
 
 ![Scrite](screenshots/scrite-home.jpg)
 
+## Table Of Contents
+
+- [Introduction](#introduction)
+- [Installing Scrite](installation.md)
+- [Quick Start](quick-start.md)
+- [Scriptalay - A library of screenplays in Scrite](scriptalay.md)
+- [Import Existing Screenplay](import.md)
+- [Advanced Editing](advanced-editing.md)
+- [Exporting Your Screenplay](export.md)
+- [Reports](reports.md)
+- [Structure & Timeline](structure.md)
+- [Notebook](notebook.md)
+
+## Introduction
+
 Scrite was never conceptualized to be a replacement app for Final Draft, Celtx or any of the existing apps. So, you will find significant differences in our approach to screenplay writing. We believe that this approach will grow on you, if you give it a chance and some time to play around with it.
 
 One of our early adopters sent us this feedback as a rant. We are removing all the rude language from his WhatsApp message, because we like to be civil. But we are retaining the essense of his message.
@@ -18,14 +33,5 @@ We have absolutely nothing against _Final Draft_, _Celtx_, _Writer Duet_, _Causa
 
 If you are one of those brave writers who dont mind the temporary discomfort that comes along with using any new app; and are willing to invest 20-30 minutes in consideration of another way of writing - then we are so happy to have you here.
 
-## Table Of Contents
+Next: [Installing Scrite](installation.md)
 
-- [Installing Scrite](installation.md)
-- [Quick Start](quick-start.md)
-- [Scriptalay - A library of screenplays in Scrite](scriptalay.md)
-- [Import Existing Screenplay](import.md)
-- [Advanced Editing](advanced-editing.md)
-- [Exporting Your Screenplay](export.md)
-- [Reports](reports.md)
-- [Structure & Timeline](structure.md)
-- [Notebook](notebook.md)

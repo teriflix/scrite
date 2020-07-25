@@ -91,7 +91,4 @@ If you like to build from the command line, then you can:
 
 Although Scrite depends on 3rd party (GPL friendly) libraries, we have bundled them all into our git repsitory so that you dont have to setup dependencies in order to build Scrite.
 
-## Next Steps
-
-Okay, now that you have built Scrite - you must be wondering how to use it. Head over to our [Quick Start](quick-start.md) guide right away.
-
+Next: [Quick Start](quick-start.md)

@@ -126,11 +126,4 @@ Finally, you can click on the "Export" button to export your screenplay in PDF f
 
 That's it! That was our quick start guide for you. You should be ready to get started with just this much information.
 
-What's next?
-- For one, you can start writing your next screenplay with what you have learned so far.
-- OR, you may want to [import your existing screenplay](import.md) and continue working on it in Scrite.
-- OR, you may want to read one or more screenplays from our [Scriptalay](scriptalay.md).
-- OR, you may want to know some of the [advanced editing features](advanced-editing.md) available in Scrite
-- OR, maybe you want to dive into features like [structure, timeline](structure.md) and [notebook](notebook.md).
-- OR, maybe you want to know about all the various [export](export.md) options we have.
-- OR, maybe you want to know about [generating reports](reports.md).
+Next: [Scriptalay - A library of screenplays in Scrite](scriptalay.md)

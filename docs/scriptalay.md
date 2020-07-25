@@ -31,5 +31,5 @@ The purpose of hosting screenplays in the library is to
 - Get a sense of how a real screenplay would look in Scrite
 - Try out all [export](export.md) and [reports](reports.md) options.
 
- But if you have a screenplay already written in Final Draft, or Microsoft Word, or Celtx or even in Fountain format; read the chapter on [Importing Screenplays](import.md) to know how to import your existing work into Scrite.
+Next: [Import Existing Screenplay](import.md)
  
