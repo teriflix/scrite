@@ -1413,6 +1413,19 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
     Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element),
                "ScreenplayTextDocument", "Screenplay element can be loaded only after a frame for it has been created");
 
+    auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
+        const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
+        Q_FOREACH(TransliterationEngine::Boundary item, items) {
+            if(item.string.isEmpty())
+                continue;
+            const QFont font = TransliterationEngine::instance()->languageFont(item.language);
+            QTextCharFormat format;
+            format.setFontFamily(font.family());
+            cursor.mergeCharFormat(format);
+            cursor.insertText(item.string);
+        }
+    };
+
     QTextCharFormat highlightCharFormat;
     highlightCharFormat.setBackground(Qt::yellow);
 
@@ -1462,9 +1475,11 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
 
-
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
-            cursor.insertText(heading->text());
+            if(m_purpose == ForPrinting)
+                polishFontsAndInsertTextAtCursor(cursor, heading->text());
+            else
+                cursor.insertText(heading->text());
             insertBlock = true;
         }
 
@@ -1547,22 +1562,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             const QString text = para->text();
             if(m_purpose == ForPrinting)
-            {
-                const QTextCharFormat givenCharFormat = cursor.charFormat();
-                auto insertSnippet = [&cursor](const QString &snippet, TransliterationEngine::Language language) {
-                    if(snippet.isEmpty())
-                        return;
-                    const QFont font = TransliterationEngine::instance()->languageFont(language);
-                    QTextCharFormat format;
-                    format.setFontFamily(font.family());
-                    cursor.mergeCharFormat(format);
-                    cursor.insertText(snippet);
-                };
-
-                const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
-                Q_FOREACH(TransliterationEngine::Boundary item, items)
-                    insertSnippet(item.string, item.language);
-            }
+                polishFontsAndInsertTextAtCursor(cursor, text);
             else
                 cursor.insertText(text);
 

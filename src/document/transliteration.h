@@ -23,6 +23,7 @@
 #include <QJsonArray>
 #include <QQmlEngine>
 #include <QJsonObject>
+#include <QFontDatabase>
 #include <QQuickPaintedItem>
 
 #include "qobjectproperty.h"
@@ -93,6 +94,7 @@ public:
 
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
     Q_INVOKABLE QString transliteratedParagraph(const QString &paragraph, bool includingLastWord=true) const;
+    Q_INVOKABLE QString transliteratedWordInLanguage(const QString &word, Language language) const;
 
     static QString transliteratedWord(const QString &word, void *transliterator);
     static QString transliteratedParagraph(const QString &paragraph, void *transliterator, bool includingLastWord=true);
@@ -100,7 +102,15 @@ public:
     Q_INVOKABLE QFont languageFont(Language language) const { return this->languageFont(language,true); }
     QFont languageFont(Language language, bool preferAppFonts) const;
     QStringList languageFontFilePaths(Language language) const;
+
+    Q_INVOKABLE QJsonObject availableLanguageFontFamilies(Language language) const;
+    Q_INVOKABLE QString preferredFontFamilyForLanguage(Language language);
+    Q_INVOKABLE void setPreferredFontFamilyForLanguage(Language language, const QString &fontFamily);
+    Q_SIGNAL void preferredFontFamilyForLanguageChanged(Language language, const QString &fontFamily);
+
     static Language languageForScript(QChar::Script script);
+    static QChar::Script scriptForLanguage(Language language);
+    static QFontDatabase::WritingSystem writingSystemForLanguage(Language language);
 
     struct Boundary
     {
@@ -124,8 +134,10 @@ private:
     void *m_transliterator = nullptr;
     Language m_language = English;
     QMap<Language,bool> m_activeLanguages;
-    QMap<Language,int> m_languageFontIdMap;
+    QMap<Language,int> m_languageBundledFontId;
+    QMap<Language,QString> m_languageFontFamily;
     QMap<Language,QStringList> m_languageFontFilePaths;
+    mutable QMap<Language,QStringList> m_availableLanguageFontFamilies;
 };
 
 class Transliterator : public QObject

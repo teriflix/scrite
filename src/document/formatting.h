@@ -345,6 +345,8 @@ public:
 
     Q_INVOKABLE void resetToDefaults();
 
+    void useUserSpecifiedFonts();
+
 private:
     void resetScreen();
     void evaluateFontPointSizeDelta();

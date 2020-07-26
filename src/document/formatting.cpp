@@ -518,8 +518,14 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
         m_elementFormats.append(elementFormat);
     }
 
-    QObject::connect(this, &ScreenplayFormat::formatChanged, [this]() {
+    connect(this, &ScreenplayFormat::formatChanged, [this]() {
         this->markAsModified();
+    });
+
+    connect(TransliterationEngine::instance(),
+            &TransliterationEngine::preferredFontFamilyForLanguageChanged, [=] {
+        this->useUserSpecifiedFonts();
+        emit formatChanged();
     });
 
     this->resetToDefaults();
@@ -764,6 +770,24 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );
     m_elementFormats[SceneElement::Shot]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
+}
+
+void ScreenplayFormat::useUserSpecifiedFonts()
+{
+    const QString englishFont = TransliterationEngine::instance()->preferredFontFamilyForLanguage(TransliterationEngine::English);
+    QFont defFont = this->defaultFont();
+    if(defFont.family() != englishFont)
+    {
+        defFont.setFamily(englishFont);
+        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+        {
+            SceneElementFormat *format = this->elementFormat(i);
+            QFont formatFont = format->font();
+            formatFont.setFamily(englishFont);
+            format->setFont(formatFont);
+        }
+        this->setDefaultFont(defFont);
+    }
 }
 
 void ScreenplayFormat::resetScreen()

@@ -1259,6 +1259,12 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             format->setLineHeight(lineHeight);
         }
     }
+
+    // From version 0.4.13 onwards we allow users to set their own custom fonts
+    // for each language. This is a deviation from using "Courier Prime" as the
+    // default Latin font.
+    m_formatting->useUserSpecifiedFonts();
+    m_printFormat->useUserSpecifiedFonts();
 }
 
 QString ScriteDocument::polishFileName(const QString &givenFileName) const

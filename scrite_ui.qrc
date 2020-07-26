@@ -50,5 +50,7 @@
         <file>qml/SpecialSymbolsPanel.qml</file>
         <file>qml/SpecialSymbolsSupport.qml</file>
         <file>qml/OpenFromLibrary.qml</file>
+        <file>qml/TabView2.qml</file>
+        <file>qml/PageView.qml</file>
     </qresource>
 </RCC>

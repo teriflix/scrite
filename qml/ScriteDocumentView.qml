@@ -605,7 +605,7 @@ Item {
 
                             MenuItem2 {
                                 id: settingsMenuItem
-                                text: "Application Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
+                                text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
                                 icon.source: "../icons/action/settings_applications.png"
                                 onClicked: activate()
 
