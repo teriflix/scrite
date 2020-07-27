@@ -41,7 +41,7 @@ public:
     static TransliterationEngine *instance(QCoreApplication *app=nullptr);
     ~TransliterationEngine();
 
-    // Must be manually kept in sync with SceneElementFormat::DefaultLanguage
+    // Must be manually kept in sync with SceneElementFormat::DefaultLanguage & SystemInputSource::Language
     enum Language
     {
         English,

@@ -37,6 +37,7 @@ HEADERS += \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
     src/core/qobjectproperty.h \
+    src/core/systemtextinputmanager.h \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
@@ -118,6 +119,7 @@ SOURCES += \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
     src/core/qobjectproperty.cpp \
+    src/core/systemtextinputmanager.cpp \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
@@ -205,6 +207,10 @@ RESOURCES += \
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
+
+    HEADERS += src/core/systemtextinputmanager_macos.h
+    OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
+    LIBS += -framework Carbon
 }
 
 win32 {
