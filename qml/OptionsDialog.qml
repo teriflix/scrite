@@ -309,7 +309,7 @@ Item {
             spacing: 10
 
             readonly property var languagePreviewString: [
-                "English",
+                "Greetings",
                 "বাংলা",
                 "ગુજરાતી",
                 "हिन्दी",
@@ -358,7 +358,7 @@ Item {
                         id: previewText
                         anchors.verticalCenter: parent.verticalCenter
                         font.family: app.transliterationEngine.preferredFontFamilyForLanguage(modelData.value)
-                        font.pointSize: modelData.value === TranslitrationEngine.English ? app.idealFontPointSize : app.idealFontPointSize+2
+                        font.pixelSize: fontCombo.font.pixelSize * 1.2
                         text: fontSettingsUi.languagePreviewString[modelData.value]
                         width: 150
                         font.bold: fontCombo.down
@@ -374,7 +374,7 @@ Item {
         Column {
             spacing: 10
 
-            Item { width: parent.width; height: 20 }
+            Item { width: parent.width; height: 10 }
 
             Text {
                 id: titleText
@@ -416,7 +416,7 @@ Item {
                         Component.onCompleted: {
                             var tisSources = app.textInputManager.sourcesForLanguageJson(modelData.value)
                             var tisSourceId = app.transliterationEngine.textInputSourceIdForLanguage(modelData.value)
-                            tisSources.push({"id": "", "title": "Default (Inbuilt Scrite Transliterator)"})
+                            tisSources.unshift({"id": "", "title": "Default (Inbuilt Scrite Transliterator)"})
                             enabled = tisSources.length > 1
                             sources = tisSources
                             for(var i=0; i<sources.length; i++) {
@@ -426,7 +426,7 @@ Item {
                                 }
                             }
                         }
-                    }
+                    }                    
                 }
             }
         }

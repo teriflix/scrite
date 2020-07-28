@@ -714,7 +714,9 @@ void ScreenplayFormat::resetToDefaults()
       Transition     | 5.60"       | 7.6"         | 1 Lines
       Shot           | 1.50"       | 7.6"         | 1 Lines
       */
-    this->setDefaultFont(QFont("Courier Prime", 12));
+
+    const QString fontFamily = TransliterationEngine::instance()->preferredFontFamilyForLanguage(TransliterationEngine::English);
+    this->setDefaultFont(QFont(fontFamily, 12));
     if(m_screen != nullptr)
     {
         const int index = m_fontZoomLevels.indexOf( QVariant(1.0) );

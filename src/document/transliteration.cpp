@@ -152,14 +152,7 @@ void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
     const QString tisId = m_tisMap.value(val);
     if(tisId.isEmpty())
     {
-        AbstractSystemTextInputSource *fallbackSource = tisManager->defaultInputSource();
-        if(fallbackSource->language() != English)
-        {
-            QList<AbstractSystemTextInputSource*> englishSources = tisManager->sourcesForLanguage(English);
-            if(!englishSources.isEmpty())
-                fallbackSource = englishSources.first();
-        }
-
+        AbstractSystemTextInputSource *fallbackSource = tisManager->fallbackInputSource();
         if(fallbackSource)
             fallbackSource->select();
     }
@@ -168,6 +161,8 @@ void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
         AbstractSystemTextInputSource *tis = SystemTextInputManager::instance()->findSourceById(tisId);
         if(tis != nullptr)
             tis->select();
+        else
+            this->setTextInputSourceIdForLanguage(m_language, QString());
     }
 
     emit languageChanged();
@@ -384,6 +379,12 @@ QJsonArray TransliterationEngine::languages() const
     return ret;
 }
 
+void *TransliterationEngine::transliterator() const
+{
+    const QString tisId = m_tisMap.value(m_language);
+    return tisId.isEmpty() ? m_transliterator : nullptr;
+}
+
 void *TransliterationEngine::transliteratorFor(TransliterationEngine::Language language)
 {
     switch(language)
@@ -446,9 +447,16 @@ void TransliterationEngine::setTextInputSourceIdForLanguage(TransliterationEngin
 
     if(m_language == language)
     {
-        AbstractSystemTextInputSource *source = SystemTextInputManager::instance()->findSourceById(id);
+        SystemTextInputManager *tisManager = SystemTextInputManager::instance();
+        AbstractSystemTextInputSource *source = id.isEmpty() ? nullptr : tisManager->findSourceById(id);
         if(source)
             source->select();
+        else
+        {
+            AbstractSystemTextInputSource *fallbackSource = tisManager->fallbackInputSource();
+            if(fallbackSource)
+                fallbackSource->select();
+        }
     }
 }
 

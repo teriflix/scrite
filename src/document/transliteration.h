@@ -88,7 +88,7 @@ public:
 
     Q_INVOKABLE QJsonArray getLanguages() const { return this->languages(); }
 
-    void *transliterator() const { return m_transliterator; }
+    void *transliterator() const;
     static void *transliteratorFor(Language language);
     static Language languageOf(void *transliterator);
 

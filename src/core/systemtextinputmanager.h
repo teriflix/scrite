@@ -53,6 +53,8 @@ public:
     AbstractSystemTextInputSource *defaultInputSource() const { return m_defaultInputSource; }
     Q_SIGNAL void defaultInputSourceChanged();
 
+    AbstractSystemTextInputSource *fallbackInputSource(int fallbackLanguage=0) const;
+
     // QAbstractItemModel interface
     enum Role
     {
