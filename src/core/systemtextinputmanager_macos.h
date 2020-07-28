@@ -28,7 +28,6 @@ public:
 
     // AbstractSystemTextInputManagerBackend interface
     void reloadSources();
-    void determineSelectedInputSource();
 
     // Hook to receive notifications from macOS
     void registerNotificationHooks();
@@ -36,6 +35,9 @@ public:
 
     // For handling kTISNotifySelectedKeyboardInputSourceChanged
     void handleInputSourceChangedNotification();
+
+    // For handling kTISNotifyEnabledKeyboardInputSourcesChanged
+    void handleInputSourcesChangedNotification();
 };
 
 class SystemTextInputSource_macOS : public AbstractSystemTextInputSource
@@ -51,14 +53,13 @@ public:
     // AbstractSystemTextInputSource interface
     QString id() const { return m_id; }
     QString displayName() const { return m_displayName; }
+    int language() const { return m_language; }
     void select();
-
-private:
-    friend class SystemTextInputManagerBackend_macOS;
-    void updateSelectionStatus();
+    void checkSelection();
 
 private:
     QString m_id;
+    int m_language = -1;
     QString m_displayName;
     TISInputSourceRef m_inputSource;
 };

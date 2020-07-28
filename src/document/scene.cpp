@@ -1003,8 +1003,8 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
 
     this->setTitle("1st Part Of " + this->title());
 
-    // Move all elements from index+1 onwards to the new scene.
-    for(int i=this->elementCount()-1; i>=index+1; i--)
+    // Move all elements from index onwards to the new scene.
+    for(int i=this->elementCount()-1; i>=index; i--)
     {
         SceneElement *oldElement = this->elementAt(i);
 
@@ -1016,118 +1016,7 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
         this->removeElement(oldElement);
     }
 
-    auto splitText = [](const QString &text, int position) {
-        if(position <= 0)
-            return qMakePair<QString,QString>(QString(), text);
-
-        if(position >= text.length())
-            return qMakePair<QString,QString>(text, QString());
-
-        // Go to the previous word.
-        while(position >= 1) {
-            if(text.at(position-1).isSpace())
-                break;
-            --position;
-        }
-
-        if(position <= 0)
-            return qMakePair<QString,QString>(QString(), text);
-
-        QString first = text.left(position).trimmed();
-        QString second = text.mid(position);
-        if(!first.endsWith("."))
-            first += ".";
-
-        return qMakePair<QString,QString>(first, second);
-    };
-
-    switch(element->type())
-    {
-    case SceneElement::Action:
-        {
-            const QPair<QString,QString> texts = splitText(element->text(), textPosition);
-            if(texts.first.isEmpty())
-                this->removeElement(element);
-            else
-                element->setText(texts.first);
-
-            if(!texts.second.isEmpty())
-            {
-                SceneElement *newElement = new SceneElement(newScene);
-                newElement->setType(SceneElement::Action);
-                newElement->setText(texts.second);
-                newScene->insertElementAt(newElement, 0);
-            }
-        } break;
-    case SceneElement::Character:
-        {
-            // We cannot split the character element into two, we have to move
-            // everything from the character element and down to the new scene
-            newScene->insertElementAt(element, 0);
-        } break;
-    case SceneElement::Dialogue:
-        {
-            const QPair<QString,QString> texts = splitText(element->text(), textPosition);
-            if(!texts.second.isEmpty())
-            {
-                // Dialogue cannot be split independently. We have to split carry
-                // over the character element for which it was created to the
-                // next scene.
-                SceneElement *characterElement = nullptr;
-                SceneElement *newCharacterElement = nullptr;
-                int characterElementIndex = index-1;
-                while(characterElementIndex >= 0)
-                {
-                    characterElement = this->elementAt(characterElementIndex);
-                    if(characterElement->type() == SceneElement::Character)
-                    {
-                        newCharacterElement = new SceneElement(newScene);
-                        newCharacterElement->setType(SceneElement::Character);
-                        newCharacterElement->setText(characterElement->text());
-                        break;
-                    }
-
-                    --characterElementIndex;
-                    characterElement = nullptr;
-                }
-
-                if(texts.first.isEmpty())
-                    this->removeElement(element);
-                else
-                    element->setText(texts.first);
-
-                SceneElement *newElement = new SceneElement(newScene);
-                newElement->setType(newCharacterElement ? SceneElement::Dialogue : SceneElement::Action);
-                newElement->setText(texts.second);
-                newScene->insertElementAt(newElement, 0);
-                if(newCharacterElement)
-                    newScene->insertElementAt(newCharacterElement, 0);
-            }
-        } break;
-    default:
-        {
-            if(textPosition <= 0)
-                newScene->insertElementAt(element, 0);
-        } break;
-    }
-
-    while(1)
-    {
-        SceneElement *newSceneElement = newScene->elementAt(0);
-        if(newSceneElement == nullptr)
-            break;
-
-        if(newSceneElement->text().isEmpty())
-        {
-            newScene->removeElement(newSceneElement);
-            break;
-        }
-
-        break;
-    }
-
     emit sceneReset(textPosition);
-
     return newScene;
 }
 

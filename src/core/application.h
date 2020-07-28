@@ -29,6 +29,7 @@
 #include "undoredo.h"
 #include "errorreport.h"
 #include "transliteration.h"
+#include "systemtextinputmanager.h"
 
 typedef QApplication QtApplicationClass;
 class QSettings;
@@ -154,7 +155,10 @@ public:
     QString settingsFilePath() const;
 
     Q_PROPERTY(TransliterationEngine* transliterationEngine READ transliterationEngine CONSTANT)
-    TransliterationEngine* transliterationEngine() const { return TransliterationEngine::instance(); }
+    TransliterationEngine *transliterationEngine() const { return TransliterationEngine::instance(); }
+
+    Q_PROPERTY(SystemTextInputManager* textInputManager READ textInputManager CONSTANT)
+    SystemTextInputManager *textInputManager() const { return SystemTextInputManager::instance(); }
 
     Q_INVOKABLE QPointF cursorPosition() const;
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;

@@ -57,9 +57,15 @@ Item {
         id: applicationSettingsComponent
 
         PageView {
-            pagesArray: ["Settings", "Fonts"]
+            pagesArray: ["Settings", "Fonts", "Transliteration"]
             currentIndex: 0
-            pageContent: currentIndex === 0 ? coreSettingsComponent : fontSettingsComponent
+            pageContent: {
+                switch(currentIndex) {
+                case 1: return fontSettingsComponent
+                case 2: return transliterationSettingsComponent
+                }
+                return coreSettingsComponent
+            }
             pageContentSpacing: 0
         }
     }
@@ -299,7 +305,22 @@ Item {
         id: fontSettingsComponent
 
         Column {
+            id: fontSettingsUi
             spacing: 10
+
+            readonly property var languagePreviewString: [
+                "English",
+                "বাংলা",
+                "ગુજરાતી",
+                "हिन्दी",
+                "ಕನ್ನಡ",
+                "മലയാളം",
+                "ଓଡିଆ",
+                "ਪੰਜਾਬੀ",
+                "संस्कृत",
+                "தமிழ்",
+                "తెలుగు"
+            ]
 
             Item { width: parent.width; height: 20 }
 
@@ -337,13 +358,74 @@ Item {
                         id: previewText
                         anchors.verticalCenter: parent.verticalCenter
                         font.family: app.transliterationEngine.preferredFontFamilyForLanguage(modelData.value)
-                        font.pointSize: app.idealFontPointSize
-                        text: {
-                            var text = modelData.value === TransliterationEngine.English ? modelData.key : modelData.key.toLowerCase()
-                            app.transliterationEngine.transliteratedWordInLanguage(text, modelData.value)
-                        }
+                        font.pointSize: modelData.value === TranslitrationEngine.English ? app.idealFontPointSize : app.idealFontPointSize+2
+                        text: fontSettingsUi.languagePreviewString[modelData.value]
                         width: 150
                         font.bold: fontCombo.down
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: transliterationSettingsComponent
+
+        Column {
+            spacing: 10
+
+            Item { width: parent.width; height: 20 }
+
+            Text {
+                id: titleText
+                font.pointSize: app.idealFontPointSize
+                wrapMode: Text.WordWrap
+                width: parent.width - 40
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Override the built-in transliterator to use any of your operating system's input methods."
+            }
+
+            Repeater {
+                model: app.enumerationModelForType("TransliterationEngine", "Language")
+
+                Row {
+                    spacing: 10
+                    width: parent.width - 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pointSize: app.idealFontPointSize
+                        text: modelData.key + ": "
+                        width: 175
+                        horizontalAlignment: Text.AlignRight
+                        font.bold: tisSourceCombo.down
+                    }
+
+                    ComboBox2 {
+                        id: tisSourceCombo
+                        property var sources: []
+                        model: sources
+                        width: 400
+                        textRole: "title"
+                        onActivated: {
+                            var item = sources[currentIndex]
+                            app.transliterationEngine.setTextInputSourceIdForLanguage(modelData.value, item.id)
+                        }
+
+                        Component.onCompleted: {
+                            var tisSources = app.textInputManager.sourcesForLanguageJson(modelData.value)
+                            var tisSourceId = app.transliterationEngine.textInputSourceIdForLanguage(modelData.value)
+                            tisSources.push({"id": "", "title": "Default (Inbuilt Scrite Transliterator)"})
+                            enabled = tisSources.length > 1
+                            sources = tisSources
+                            for(var i=0; i<sources.length; i++) {
+                                if(sources[i].id === tisSourceId) {
+                                    currentIndex = i
+                                    break
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -215,6 +215,9 @@ macx {
 
 win32 {
     RC_ICONS = appicon.ico
+    HEADERS += src/core/systemtextinputmanager_windows.h
+    SOURCES += src/core/systemtextinputmanager_windows.cpp
+    LIBS += User32.lib
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)

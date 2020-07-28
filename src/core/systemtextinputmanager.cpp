@@ -12,16 +12,30 @@
 ****************************************************************************/
 
 #include "systemtextinputmanager.h"
-#include <QCoreApplication>
+#include "transliteration.h"
+
 #include <QtDebug>
+#include <QMetaEnum>
+#include <QQmlEngine>
+#include <QGuiApplication>
 
 #ifdef Q_OS_MAC
 #include "systemtextinputmanager_macos.h"
 #endif
 
+#ifdef Q_OS_WIN
+#include "systemtextinputmanager_windows.h"
+#endif
+
 SystemTextInputManager *SystemTextInputManager::instance()
 {
-    static SystemTextInputManager *theInstance = new SystemTextInputManager(qApp);
+    static SystemTextInputManager *theInstance = nullptr;
+    if(theInstance == nullptr)
+    {
+        qmlRegisterUncreatableType<AbstractSystemTextInputSource>("Scrite", 1, 0, "TextInputSource", "Use from app.textInputManager method return values");
+        theInstance = new SystemTextInputManager(qApp);
+    }
+
     return theInstance;
 }
 
@@ -32,20 +46,74 @@ SystemTextInputManager::SystemTextInputManager(QObject *parent)
     m_backend = new SystemTextInputManagerBackend_macOS(this);
 #endif
 
-    if(m_backend != nullptr)
-        m_backend->reloadSources();
+#ifdef Q_OS_WIN
+    m_backend = new SystemTextInputManagerBackend_Windows(this);
+#endif
+
+    this->reload();
+
+    qApp->installEventFilter(this);
 }
 
 SystemTextInputManager::~SystemTextInputManager()
 {
+	// In anycase, this object will be removed from filter lists during destruction.
+	// qApp->installEventFilter(this);
+
+    if(m_defaultInputSource != nullptr)
+        m_defaultInputSource->select();
+
     this->clear();
+}
+
+QList<AbstractSystemTextInputSource *> SystemTextInputManager::sourcesForLanguage(int language) const
+{
+    QList<AbstractSystemTextInputSource *> ret;
+    Q_FOREACH(AbstractSystemTextInputSource *source, m_inputSources)
+    {
+        if(source->language() == language)
+            ret.append(source);
+    }
+
+    return ret;
+}
+
+QJsonArray SystemTextInputManager::sourcesForLanguageJson(int language) const
+{
+    QJsonArray ret;
+    QList<AbstractSystemTextInputSource *> sources = this->sourcesForLanguage(language);
+    Q_FOREACH(AbstractSystemTextInputSource *source, sources)
+    {
+        QJsonObject item;
+        item.insert("id", source->id());
+        item.insert("title", source->title());
+        ret.append(item);
+    }
+
+    return ret;
+}
+
+AbstractSystemTextInputSource *SystemTextInputManager::findSourceById(const QString &id) const
+{
+    Q_FOREACH(AbstractSystemTextInputSource *source, m_inputSources)
+    {
+        if(source->id() == id)
+            return source;
+    }
+
+    return nullptr;
 }
 
 void SystemTextInputManager::reload()
 {
     this->clear();
+
     if(m_backend != nullptr)
+    {
         m_backend->reloadSources();
+        m_backend->determineSelectedInputSource();
+        this->setDefault(this->selectedInputSource());
+    }
 }
 
 AbstractSystemTextInputSource *SystemTextInputManager::sourceAt(int index) const
@@ -76,6 +144,14 @@ QVariant SystemTextInputManager::data(const QModelIndex &index, int role) const
             return source->displayName();
         case TextInputSourceSelectedRole:
             return source->isSelected();
+        case TextInputSourceLanguageRole:
+            return source->language();
+        case TextInputSourceLanguageAsStringRole: {
+            if(source->language() < 0)
+                return QStringLiteral("Unknown");
+            const QMetaEnum metaEnum = QMetaEnum::fromType<TransliterationEngine::Language>();
+            return QString::fromLatin1(metaEnum.valueToKey(source->language()));
+        }
         case Qt::DisplayRole:
             return source->displayName() + QStringLiteral(" [") + source->id() + QStringLiteral("]: ") + (source->isSelected() ? QStringLiteral("ACTIVE") : QString());
         }
@@ -91,7 +167,26 @@ QHash<int, QByteArray> SystemTextInputManager::roleNames() const
     roles[TextInputSourceIDRole] = "tisID";
     roles[TextInputSourceDisplayNameRole] = "tisDisplayName";
     roles[TextInputSourceSelectedRole] = "tisSelected";
+    roles[TextInputSourceLanguageRole] = "tisLanguage";
+    roles[TextInputSourceLanguageAsStringRole] = "tisLanguageAsString";
     return roles;
+}
+
+bool SystemTextInputManager::eventFilter(QObject *object, QEvent *event)
+{
+    if(m_defaultInputSource != nullptr && event->type() == QEvent::ApplicationStateChange && object == qApp)
+    {
+        if(qApp->applicationState() != Qt::ApplicationActive)
+            m_defaultInputSource->select();
+        else
+        {
+            AbstractSystemTextInputSource *source = this->findSourceById(m_revertToInputSourceUponActivation);
+            if(source != nullptr)
+                source->select();
+        }
+    }
+
+    return false;
 }
 
 void SystemTextInputManager::clear()
@@ -102,7 +197,10 @@ void SystemTextInputManager::clear()
 
         QList<AbstractSystemTextInputSource*> sources = m_inputSources;
         m_inputSources.clear();
-        qDeleteAll(sources);
+        this->setSelected(nullptr);
+        this->setDefault(nullptr);
+        while(!sources.isEmpty())
+            sources.takeFirst()->deleteLater();
 
         this->endResetModel();
 
@@ -120,6 +218,9 @@ void SystemTextInputManager::add(AbstractSystemTextInputSource *source)
     this->endInsertRows();
 
     emit countChanged();
+
+    if(source->isSelected())
+        this->setSelected(source);
 }
 
 void SystemTextInputManager::remove(AbstractSystemTextInputSource *source)
@@ -133,6 +234,9 @@ void SystemTextInputManager::remove(AbstractSystemTextInputSource *source)
 
     if(m_selectedInputSource == source)
         this->setSelected(nullptr);
+
+    if(m_defaultInputSource == source)
+        this->setDefault(nullptr); // We will have a NULL default for a while
 
     this->beginRemoveRows(QModelIndex(), row, row);
     m_inputSources.removeAt(row);
@@ -149,23 +253,33 @@ void SystemTextInputManager::setSelected(AbstractSystemTextInputSource *source)
     if(m_selectedInputSource == source)
         return;
 
-    const int oldRow = m_selectedInputSource == nullptr ? -1 : m_inputSources.indexOf(m_selectedInputSource);
+    if(m_selectedInputSource != nullptr)
+        m_selectedInputSource->setSelected(false);
 
     m_selectedInputSource = source;
     emit selectedInputSourceChanged();
 
-    if(oldRow >= 0)
-    {
-        const QModelIndex oldIndex = this->index(oldRow);
-        emit dataChanged(oldIndex, oldIndex);
-    }
+    if(m_selectedInputSource != nullptr && qApp->applicationState() == Qt::ApplicationActive)
+        m_revertToInputSourceUponActivation = m_selectedInputSource->id();
 
-    const int newRow = m_selectedInputSource == nullptr ? -1 : m_inputSources.indexOf(m_selectedInputSource);
-    if(newRow >= 0)
-    {
-        const QModelIndex newIndex = this->index(newRow);
-        emit dataChanged(newIndex, newIndex);
-    }
+    const QModelIndex firstRow = this->index(0);
+    const QModelIndex lastRow = this->index(m_inputSources.size()-1);
+    emit dataChanged(firstRow, lastRow);
+}
+
+void SystemTextInputManager::setDefault(AbstractSystemTextInputSource *dSource)
+{
+    if(m_defaultInputSource == dSource)
+        return;
+
+    m_defaultInputSource = dSource;
+    emit defaultInputSourceChanged();
+}
+
+void SystemTextInputManager::resetDefault()
+{
+    m_defaultInputSource = nullptr;
+    emit defaultInputSourceChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,7 +315,8 @@ void AbstractSystemTextInputSource::setSelected(bool val)
     m_selected = val;
     emit selectedChanged();
 
-    m_inputManager->setSelected(this);
+    if(val)
+        m_inputManager->setSelected(this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,6 +330,20 @@ AbstractSystemTextInputManagerBackend::AbstractSystemTextInputManagerBackend(Sys
 AbstractSystemTextInputManagerBackend::~AbstractSystemTextInputManagerBackend()
 {
 
+}
+
+void AbstractSystemTextInputManagerBackend::determineSelectedInputSource()
+{
+    const int nrInputSources = this->inputManager()->count();
+    if(nrInputSources == 0)
+        return;
+
+    for(int i=0; i<nrInputSources; i++)
+    {
+        AbstractSystemTextInputSource *inputSource = this->inputManager()->sourceAt(i);
+        if(inputSource)
+            inputSource->checkSelection();
+    }
 }
 
 

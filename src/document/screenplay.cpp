@@ -992,6 +992,8 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
                     ret = newScreenplayElement;
             }
         }
+
+        this->setCurrentElementIndex(this->indexOfElement(ret));
     }
 
     if(ret != nullptr && UndoStack::active() != nullptr)
@@ -1054,8 +1056,8 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
         currentScene->removeElement(element);
     }
 
-    screenplay->setCurrentElementIndex(previousElementIndex);
     previousScene->setCursorPosition(length);
+    screenplay->setCurrentElementIndex(previousElementIndex);
     GarbageCollector::instance()->add(element);
     return previousSceneElement;
 }

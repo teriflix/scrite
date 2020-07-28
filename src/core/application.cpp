@@ -94,6 +94,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     m_settings->setValue( QStringLiteral("Installation/version"), m_versionNumber.toString() );
 
     TransliterationEngine::instance(this);
+    SystemTextInputManager::instance();
 }
 
 Application::~Application()

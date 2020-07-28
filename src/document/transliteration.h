@@ -64,7 +64,7 @@ public:
 
     Q_PROPERTY(QString languageAsString READ languageAsString NOTIFY languageChanged)
     QString languageAsString() const;
-    QString languageAsString(Language language) const;
+    static QString languageAsString(Language language);
 
     Q_PROPERTY(QJsonObject alphabetMappings READ alphabetMappings NOTIFY languageChanged)
     QJsonObject alphabetMappings() const { return this->alphabetMappingsFor(m_language); }
@@ -89,8 +89,15 @@ public:
     Q_INVOKABLE QJsonArray getLanguages() const { return this->languages(); }
 
     void *transliterator() const { return m_transliterator; }
-    void *transliteratorFor(Language language) const;
-    Language languageOf(void *transliterator) const;
+    static void *transliteratorFor(Language language);
+    static Language languageOf(void *transliterator);
+
+    Q_INVOKABLE void setTextInputSourceIdForLanguage(Language language, const QString &id);
+    Q_INVOKABLE QString textInputSourceIdForLanguage(Language language) const;
+
+    Q_PROPERTY(QJsonObject languageTextInputSourceMap READ languageTextInputSourceMap NOTIFY languageTextInputSourceMapChanged)
+    QJsonObject languageTextInputSourceMap() const;
+    Q_SIGNAL void languageTextInputSourceMapChanged();
 
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
     Q_INVOKABLE QString transliteratedParagraph(const QString &paragraph, bool includingLastWord=true) const;
@@ -133,6 +140,7 @@ private:
 private:
     void *m_transliterator = nullptr;
     Language m_language = English;
+    QMap<Language,QString> m_tisMap;
     QMap<Language,bool> m_activeLanguages;
     QMap<Language,int> m_languageBundledFontId;
     QMap<Language,QString> m_languageFontFamily;

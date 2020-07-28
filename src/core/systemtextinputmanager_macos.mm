@@ -41,20 +41,6 @@ void SystemTextInputManagerBackend_macOS::reloadSources()
     }
 }
 
-void SystemTextInputManagerBackend_macOS::determineSelectedInputSource()
-{
-    const int nrInputSources = this->inputManager()->count();
-    if(nrInputSources == 0)
-        return;
-
-    for(int i=0; i<nrInputSources; i++)
-    {
-        SystemTextInputSource_macOS *inputSource = static_cast<SystemTextInputSource_macOS*>(this->inputManager()->sourceAt(i));
-        if(inputSource)
-            inputSource->updateSelectionStatus();
-    }
-}
-
 static void macOSNotificationHandler(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
     Q_UNUSED(object);
@@ -70,6 +56,8 @@ static void macOSNotificationHandler(CFNotificationCenterRef center, void *obser
     {
         if(qname == QString::fromCFString(kTISNotifySelectedKeyboardInputSourceChanged))
             macOSBackend->handleInputSourceChangedNotification();
+        else if(qname == QString::fromCFString(kTISNotifyEnabledKeyboardInputSourcesChanged))
+            macOSBackend->handleInputSourcesChangedNotification();
     }
 }
 
@@ -80,6 +68,15 @@ void SystemTextInputManagerBackend_macOS::registerNotificationHooks()
             this,
             &macOSNotificationHandler,
             kTISNotifySelectedKeyboardInputSourceChanged,
+            NULL,
+            CFNotificationSuspensionBehaviorDeliverImmediately
+        );
+
+    CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDistributedCenter(),
+            this,
+            &macOSNotificationHandler,
+            kTISNotifyEnabledKeyboardInputSourcesChanged,
             NULL,
             CFNotificationSuspensionBehaviorDeliverImmediately
         );
@@ -98,6 +95,11 @@ void SystemTextInputManagerBackend_macOS::handleInputSourceChangedNotification()
     this->determineSelectedInputSource();
 }
 
+void SystemTextInputManagerBackend_macOS::handleInputSourcesChangedNotification()
+{
+    this->inputManager()->reload();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 SystemTextInputSource_macOS::SystemTextInputSource_macOS(TISInputSourceRef inputSource, SystemTextInputManager *parent)
@@ -105,6 +107,20 @@ SystemTextInputSource_macOS::SystemTextInputSource_macOS(TISInputSourceRef input
 {
     m_id = QString::fromCFString( (CFStringRef)TISGetInputSourceProperty(m_inputSource, kTISPropertyInputSourceID) );
     m_displayName = QString::fromCFString( (CFStringRef)TISGetInputSourceProperty(m_inputSource, kTISPropertyLocalizedName) );
+
+    CFArrayRef languages = (CFArrayRef)TISGetInputSourceProperty(m_inputSource, kTISPropertyInputSourceLanguages);
+    const int nrLanguages = CFArrayGetCount(languages);
+    if(nrLanguages >= 1)
+    {
+        const QString primaryLanguage = QString::fromCFString( (CFStringRef)CFArrayGetValueAtIndex(languages, 0) ).left(2);
+        static const QStringList languageCodes = QStringList() << QStringLiteral("en") << QStringLiteral("bn") <<
+            QStringLiteral("gu") << QStringLiteral("hi") << QStringLiteral("kn") << QStringLiteral("ml") <<
+            QStringLiteral("or") << QStringLiteral("pa") << QStringLiteral("sa") << QStringLiteral("ta") <<
+            QStringLiteral("te");
+        const int languageIndex = languageCodes.indexOf(primaryLanguage);
+        m_language = languageIndex;
+    }
+
     this->setSelected( (CFBooleanRef)TISGetInputSourceProperty(m_inputSource, kTISPropertyInputSourceIsSelected) == kCFBooleanTrue );
 }
 
@@ -117,10 +133,10 @@ void SystemTextInputSource_macOS::select()
 {
     TISInputSourceRef inputSource = (TISInputSourceRef)m_inputSource;
     TISSelectInputSource(inputSource);
-    this->updateSelectionStatus();
+    this->checkSelection();
 }
 
-void SystemTextInputSource_macOS::updateSelectionStatus()
+void SystemTextInputSource_macOS::checkSelection()
 {
     const bool flag = (CFBooleanRef)TISGetInputSourceProperty(m_inputSource, kTISPropertyInputSourceIsSelected) == kCFBooleanTrue;
     this->setSelected(flag);

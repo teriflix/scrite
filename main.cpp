@@ -261,7 +261,8 @@ int main(int argc, char **argv)
     QQuickStyle::setStyle("Material");
 
     QQuickView qmlView;
-    qmlView.setFormat(format);
+    // qmlView.setFormat(format);
+    qmlView.setSceneGraphBackend(QSGRendererInterface::Software);
     scriteDocument->formatting()->setSreeenFromWindow(&qmlView);
     scriteDocument->clearModified();
     a.initializeStandardColors(qmlView.engine());

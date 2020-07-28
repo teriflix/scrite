@@ -208,15 +208,29 @@ Rectangle {
                 anchors.topMargin: 5
                 color: "white"
 
+                TrackerPack {
+                    id: trackerPack
+                    property int counter: 0
+                    TrackProperty { target: screenplayEditorSettings; property: "displaySceneCharacters" }
+                    TrackProperty { target: screenplayAdapter; property: "elementCount" }
+                    TrackProperty { target: screenplayAdapter; property: "source" }
+                    onTracked: counter = counter+1
+                }
+
                 ResetOnChange {
                     id: contentViewModel
-                    trackChangesOn: screenplayEditorSettings.displaySceneCharacters || scriteDocument.loading
+                    trackChangesOn: trackerPack.counter
                     from: null
                     to: screenplayAdapter
                     onJustReset: {
-                        app.execLater(contentView, 100, function() {
+                        if(screenplayAdapter.currentIndex < 0)
+                            contentView.positionViewAtBeginning()
+                        else {
                             contentView.positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
-                        })
+                            var contentItem = contentView.itemAtIndex(screenplayAdapter.currentIndex)
+                            if(contentItem)
+                                contentItem.item.assumeFocusAt(Math.max(screenplayAdapter.currentScene.cursorPosition,0))
+                        }
                     }
                 }
 
@@ -578,6 +592,8 @@ Rectangle {
             color: "white"
             readonly property var binder: sceneDocumentBinder
             readonly property var editor: sceneTextEditor
+            property bool canSplitScene: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition === 0 && screenplayAdapter.isSourceScreenplay
+            property bool canJoinToPreviousScene: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneTextEditor.cursorPosition === 0 && contentItem.theIndex > 0
 
             SceneDocumentBinder {
                 id: sceneDocumentBinder
@@ -689,8 +705,8 @@ Rectangle {
                     id: sceneTextEditor
                     width: parent.width
                     height: Math.ceil(contentHeight + topPadding + bottomPadding)
-                    topPadding: sceneEditorFontMetrics.lineSpacing
-                    bottomPadding: sceneEditorFontMetrics.lineSpacing
+                    topPadding: sceneEditorFontMetrics.height
+                    bottomPadding: sceneEditorFontMetrics.height
                     leftPadding: ruler.leftMarginPx
                     rightPadding: ruler.rightMarginPx
                     palette: app.palette
@@ -1003,9 +1019,19 @@ Rectangle {
                                 MenuItem2 {
                                     focusPolicy: Qt.NoFocus
                                     text: "Split Scene"
-                                    enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition >= 0 && screenplayAdapter.isSourceScreenplay
+                                    enabled: contentItem.canSplitScene
                                     onClicked: {
                                         contentItem.splitScene()
+                                        editorContextMenu.close()
+                                    }
+                                }
+
+                                MenuItem2 {
+                                    focusPolicy: Qt.NoFocus
+                                    text: "Join Previous Scene"
+                                    enabled: contentItem.canJoinToPreviousScene
+                                    onClicked: {
+                                        contentItem.mergeWithPreviousScene()
                                         editorContextMenu.close()
                                     }
                                 }
@@ -1090,7 +1116,7 @@ Rectangle {
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
+                        ShortcutsModelItem.enabled: contentItem.canSplitScene
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: "Split Scene"
@@ -1099,7 +1125,7 @@ Rectangle {
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneTextEditor.cursorPosition === 0 && contentItem.theIndex > 0
+                        ShortcutsModelItem.enabled: contentItem.canJoinToPreviousScene
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
                         ShortcutsModelItem.title: "Join Previous Scene"
@@ -1255,30 +1281,15 @@ Rectangle {
             }
 
             function mergeWithPreviousScene() {
-                if(sceneTextEditor.cursorPosition === 0) {
-                    var element = screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
-                    var cursorPosition = element.scene.cursorPosition
-                    if(element === null)
-                        return
-                    // contentView.scrollIntoView(screenplayAdapter.currentIndex)
-                    contentView.positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
-                    var delegate = contentView.itemAtIndex(screenplayAdapter.currentIndex)
-                    app.execLater(contentView, 100, function() {
-                        delegate.item.assumeFocusAt(cursorPosition)
-                    })
-                }
+                if(!contentItem.canJoinToPreviousScene)
+                    return
+                screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
             }
 
             function splitScene() {
-                var newElement = screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
-                if(newElement !== null) {
-                    // contentView.scrollIntoView(contentItem.theIndex+1)
-                    contentView.positionViewAtIndex(contentItem.theIndex+1, ListView.Beginning)
-                    var delegate = contentView.itemAtIndex(contentItem.theIndex+1)
-                    app.execLater(contentItem, 100, function() {
-                        delegate.item.assumeFocus()
-                    })
-                }
+                if(!contentItem.canSplitScene)
+                    return
+                screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
             }
 
             function assumeFocus() {

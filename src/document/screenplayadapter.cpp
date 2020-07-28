@@ -234,7 +234,7 @@ int ScreenplayAdapter::rowCount(const QModelIndex &parent) const
         return 0;
 
     const Screenplay *screenplay = this->screenplay();
-    return m_source.isNull() || screenplay == nullptr ? 0 : screenplay->rowCount(QModelIndex());
+    return m_source.isNull() || screenplay == nullptr ? 0 : screenplay->elementCount();
 }
 
 void ScreenplayAdapter::setCurrentIndexInternal(int val)

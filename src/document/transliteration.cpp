@@ -14,6 +14,7 @@
 #include "hourglass.h"
 #include "application.h"
 #include "transliteration.h"
+#include "systemtextinputmanager.h"
 #include "3rdparty/sonnet/sonnet/src/core/textbreaks_p.h"
 
 #include <QPainter>
@@ -87,10 +88,18 @@ TransliterationEngine::TransliterationEngine(QObject *parent)
     {
         Language lang = Language(metaEnum.value(i));
         m_activeLanguages[lang] = false;
-        const QString skey = QStringLiteral("Transliteration/") + QString::fromLatin1(metaEnum.key(i)) + QStringLiteral("_Font");
-        const QString fontFamily = settings->value(skey).toString();
+
+        const QString langStr = QString::fromLatin1(metaEnum.key(i));
+
+        const QString sfontKey = QStringLiteral("Transliteration/") + langStr + QStringLiteral("_Font");
+        const QString fontFamily = settings->value(sfontKey).toString();
         if(!fontFamily.isEmpty())
             m_languageFontFamily[lang] = fontFamily;
+
+        const QString tisIdKey = QStringLiteral("Transliteration/") + langStr + QStringLiteral("_tisID");
+        const QVariant tisId = settings->value(tisIdKey, QVariant());
+        if(tisId.isValid())
+            m_tisMap[lang] = tisId.toString();
     }
 
     const QStringList activeLanguages = settings->value("Transliteration/activeLanguages").toStringList();
@@ -119,8 +128,6 @@ TransliterationEngine::TransliterationEngine(QObject *parent)
         lang = Language(val);
     }
     this->setLanguage(lang);
-
-
 }
 
 TransliterationEngine::~TransliterationEngine()
@@ -141,6 +148,28 @@ void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
     settings->setValue("Transliteration/currentLanguage", QString::fromLatin1(metaEnum.valueToKey(m_language)));
 
+    SystemTextInputManager *tisManager = SystemTextInputManager::instance();
+    const QString tisId = m_tisMap.value(val);
+    if(tisId.isEmpty())
+    {
+        AbstractSystemTextInputSource *fallbackSource = tisManager->defaultInputSource();
+        if(fallbackSource->language() != English)
+        {
+            QList<AbstractSystemTextInputSource*> englishSources = tisManager->sourcesForLanguage(English);
+            if(!englishSources.isEmpty())
+                fallbackSource = englishSources.first();
+        }
+
+        if(fallbackSource)
+            fallbackSource->select();
+    }
+    else
+    {
+        AbstractSystemTextInputSource *tis = SystemTextInputManager::instance()->findSourceById(tisId);
+        if(tis != nullptr)
+            tis->select();
+    }
+
     emit languageChanged();
 }
 
@@ -149,10 +178,9 @@ QString TransliterationEngine::languageAsString() const
     return this->languageAsString(m_language);
 }
 
-QString TransliterationEngine::languageAsString(TransliterationEngine::Language language) const
+QString TransliterationEngine::languageAsString(TransliterationEngine::Language language)
 {
-    const QMetaObject *mo = this->metaObject();
-    const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
+    const QMetaEnum metaEnum = QMetaEnum::fromType<TransliterationEngine::Language>();
     return QString::fromLatin1(metaEnum.valueToKey(language));
 }
 
@@ -356,7 +384,7 @@ QJsonArray TransliterationEngine::languages() const
     return ret;
 }
 
-void *TransliterationEngine::transliteratorFor(TransliterationEngine::Language language) const
+void *TransliterationEngine::transliteratorFor(TransliterationEngine::Language language)
 {
     switch(language)
     {
@@ -387,7 +415,7 @@ void *TransliterationEngine::transliteratorFor(TransliterationEngine::Language l
     return nullptr;
 }
 
-TransliterationEngine::Language TransliterationEngine::languageOf(void *transliterator) const
+TransliterationEngine::Language TransliterationEngine::languageOf(void *transliterator)
 {
 #define CHECK(x) if(transliterator == transliteratorFor(TransliterationEngine::x)) return TransliterationEngine::x
     CHECK(English);
@@ -404,6 +432,43 @@ TransliterationEngine::Language TransliterationEngine::languageOf(void *translit
 #undef CHECK
 
     return English;
+}
+
+void TransliterationEngine::setTextInputSourceIdForLanguage(TransliterationEngine::Language language, const QString &id)
+{
+    if(m_tisMap.value(language) == id)
+        return;
+
+    m_tisMap[language] = id;
+
+    QSettings *settings = Application::instance()->settings();
+    settings->setValue(QStringLiteral("Transliteration/") + languageAsString(language) + QStringLiteral("_tisID"), id);
+
+    if(m_language == language)
+    {
+        AbstractSystemTextInputSource *source = SystemTextInputManager::instance()->findSourceById(id);
+        if(source)
+            source->select();
+    }
+}
+
+QString TransliterationEngine::textInputSourceIdForLanguage(TransliterationEngine::Language language) const
+{
+    return m_tisMap.value(language);
+}
+
+QJsonObject TransliterationEngine::languageTextInputSourceMap() const
+{
+    QJsonObject ret;
+    QMap<Language,QString>::const_iterator it = m_tisMap.constBegin();
+    QMap<Language,QString>::const_iterator end = m_tisMap.constEnd();
+    while(it != end)
+    {
+        ret.insert( this->languageAsString(it.key()), it.value() );
+        ++it;
+    }
+
+    return ret;
 }
 
 QString TransliterationEngine::transliteratedWord(const QString &word) const
@@ -426,7 +491,12 @@ QString TransliterationEngine::transliteratedWord(const QString &word, void *tra
     if(transliterator == nullptr)
         return word;
 
-    return QString::fromStdWString(Translate(transliterator, word.toStdWString().c_str()));
+    Language language = languageOf(transliterator);
+    const QString tisId = TransliterationEngine::instance()->textInputSourceIdForLanguage(language);
+    if(tisId.isEmpty())
+        return QString::fromStdWString(Translate(transliterator, word.toStdWString().c_str()));
+
+    return word;
 }
 
 QString TransliterationEngine::transliteratedParagraph(const QString &paragraph, void *transliterator, bool includingLastWord)
