@@ -34,6 +34,7 @@ SystemTextInputManager *SystemTextInputManager::instance()
     {
         qmlRegisterUncreatableType<AbstractSystemTextInputSource>("Scrite", 1, 0, "TextInputSource", "Use from app.textInputManager method return values");
         theInstance = new SystemTextInputManager(qApp);
+        theInstance->reload();
     }
 
     return theInstance;
@@ -50,8 +51,6 @@ SystemTextInputManager::SystemTextInputManager(QObject *parent)
     m_backend = new SystemTextInputManagerBackend_Windows(this);
 #endif
 
-    this->reload();
-
     qApp->installEventFilter(this);
 }
 
@@ -64,6 +63,9 @@ SystemTextInputManager::~SystemTextInputManager()
         m_defaultInputSource->select();
 
     this->clear();
+
+    delete m_backend;
+    m_backend = nullptr;
 }
 
 QList<AbstractSystemTextInputSource *> SystemTextInputManager::sourcesForLanguage(int language) const
@@ -300,24 +302,12 @@ void SystemTextInputManager::resetDefault()
 AbstractSystemTextInputSource::AbstractSystemTextInputSource(SystemTextInputManager *parent)
     : QObject(parent), m_inputManager(parent)
 {
-    m_addTimer.start(0, this);
+    m_inputManager->add(this);
 }
 
 AbstractSystemTextInputSource::~AbstractSystemTextInputSource()
 {
     m_inputManager->remove(this);
-}
-
-void AbstractSystemTextInputSource::timerEvent(QTimerEvent *event)
-{
-    if(event->timerId() == m_addTimer.timerId())
-    {
-        m_addTimer.stop();
-        m_inputManager->add(this);
-        return;
-    }
-
-    QObject::timerEvent(event);
 }
 
 void AbstractSystemTextInputSource::setSelected(bool val)

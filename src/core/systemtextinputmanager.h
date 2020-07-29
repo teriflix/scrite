@@ -121,7 +121,6 @@ public:
     Q_INVOKABLE virtual void checkSelection() = 0;
 
 protected:
-    void timerEvent(QTimerEvent *event);
     void setSelected(bool val);
 
 private:
