@@ -86,7 +86,33 @@ As of writing, we do not support input method mapping on Linux. We hope to addre
 
 # Formatting
 
-# Configuring a lanugage for dialogues
+While Scrite provides comes bundled with default format settings for your screenplay, you can customise many aspects of it. 
+
+## Changing fonts
+
+Scrite bundles default fonts for each language it supports. By default Scrite uses those fonts. However, you can assign different fonts by opening the *Fonts* page in *Application* tab of *Settings* dialog box.
+
+![](screenshots/advanced-editing/015.jpg)
+
+## Altering paragraph styles
+
+Within the *Formatting Rules* tab of the *Settings* dialog box, you can change paragraph styles for each paragraph.
+
+![](screenshots/advanced-editing/016.jpg)
+
+In the screenshot below, you can see how we have changed the color and font-weight of various paragraphs in the screenplay.
+
+![](screenshots/advanced-editing/017.jpg)
+
+# Configuring a language for dialogues
+
+Suppose that you are writing screenplays in which all dialogues are writting in Kannada, but Action and every other paragraph kind is written in English. You can simply configure the *Language* option to *Kannada*.
+
+![](screenshots/advanced-editing/018.jpg)
+
+From now on, whenever you switch to a dialogue paragraph - Scrite will automatically switch to Kannada language.
+
+![](screenshots/advanced-editing/019.jpg)
 
 # Splitting scenes
 
