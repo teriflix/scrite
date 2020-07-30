@@ -27,7 +27,7 @@ public:
     ~SystemTextInputManagerBackend_macOS();
 
     // AbstractSystemTextInputManagerBackend interface
-    void reloadSources();
+    QList<AbstractSystemTextInputSource *> reloadSources() override;
 
     // Hook to receive notifications from macOS
     void registerNotificationHooks();

@@ -125,8 +125,12 @@ void SystemTextInputManager::reload()
 
     if(m_backend != nullptr)
     {
-        m_backend->reloadSources();
+        QList<AbstractSystemTextInputSource *> sources = m_backend->reloadSources();
+        Q_FOREACH(AbstractSystemTextInputSource *source, sources)
+            this->add(source);
+
         m_backend->determineSelectedInputSource();
+
         this->setDefault(this->selectedInputSource());
     }
 }
@@ -228,7 +232,10 @@ void SystemTextInputManager::add(AbstractSystemTextInputSource *source)
     if(source == nullptr || m_inputSources.contains(source))
         return;
 
-    this->beginInsertRows(QModelIndex(), m_inputSources.size(), m_inputSources.size());
+    connect(source, &AbstractSystemTextInputSource::aboutToDelete, this, &SystemTextInputManager::remove);
+
+    const int index = m_inputSources.size();
+    this->beginInsertRows(QModelIndex(), index, index);
     m_inputSources.append(source);
     this->endInsertRows();
 
@@ -302,12 +309,12 @@ void SystemTextInputManager::resetDefault()
 AbstractSystemTextInputSource::AbstractSystemTextInputSource(SystemTextInputManager *parent)
     : QObject(parent), m_inputManager(parent)
 {
-    m_inputManager->add(this);
+
 }
 
 AbstractSystemTextInputSource::~AbstractSystemTextInputSource()
 {
-    m_inputManager->remove(this);
+    emit aboutToDelete(this);
 }
 
 void AbstractSystemTextInputSource::setSelected(bool val)

@@ -26,7 +26,7 @@ public:
     ~SystemTextInputManagerBackend_Windows();
 
     // AbstractSystemTextInputManagerBackend interface
-    void reloadSources();
+    QList<AbstractSystemTextInputSource *> reloadSources();
 
     // QAbstractNativeEventFilter interface
     bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);

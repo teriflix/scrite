@@ -25,8 +25,9 @@ SystemTextInputManagerBackend_macOS::~SystemTextInputManagerBackend_macOS()
     this->unregisterNotificationHooks();
 }
 
-void SystemTextInputManagerBackend_macOS::reloadSources()
+QList<AbstractSystemTextInputSource *> SystemTextInputManagerBackend_macOS::reloadSources()
 {
+    QList<AbstractSystemTextInputSource *> ret;
     CFArrayRef sourceList = TISCreateInputSourceList(NULL, false);
     const int nrSources = CFArrayGetCount(sourceList);
 
@@ -37,8 +38,10 @@ void SystemTextInputManagerBackend_macOS::reloadSources()
         if( kTISTypeKeyboardInputMode != inputSourceType && kTISTypeKeyboardLayout != inputSourceType )
             continue;
 
-        new SystemTextInputSource_macOS(inputSource, this->inputManager());
+        ret << new SystemTextInputSource_macOS(inputSource, this->inputManager());
     }
+
+    return ret;
 }
 
 static void macOSNotificationHandler(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)

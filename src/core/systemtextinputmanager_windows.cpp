@@ -29,16 +29,19 @@ SystemTextInputManagerBackend_Windows::~SystemTextInputManagerBackend_Windows()
     // qApp->removeEventFilter(this);
 }
 
-void SystemTextInputManagerBackend_Windows::reloadSources()
+QList<AbstractSystemTextInputSource *> SystemTextInputManagerBackend_Windows::reloadSources()
 {
+    QList<AbstractSystemTextInputSource *> ret;
     int nrKeyboards = GetKeyboardLayoutList(0, nullptr);
     if(nrKeyboards == 0)
-        return;
+        return ret;
 
     QVector<HKL> keyboards(nrKeyboards, nullptr);
     nrKeyboards = GetKeyboardLayoutList(nrKeyboards, keyboards.data());
     for(int i=0; i<nrKeyboards; i++)
-        new SystemTextInputSource_Windows(keyboards.at(i), this->inputManager());
+        ret << new SystemTextInputSource_Windows(keyboards.at(i), this->inputManager());
+
+    return ret;
 }
 
 bool SystemTextInputManagerBackend_Windows::nativeEventFilter(const QByteArray &eventType, void *message, long *result)

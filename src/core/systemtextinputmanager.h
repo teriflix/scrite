@@ -98,6 +98,7 @@ class AbstractSystemTextInputSource : public QObject
 public:
     AbstractSystemTextInputSource(SystemTextInputManager *parent=nullptr);
     ~AbstractSystemTextInputSource();
+    Q_SIGNAL void aboutToDelete(AbstractSystemTextInputSource *source);
 
     Q_PROPERTY(QString id READ id CONSTANT)
     virtual QString id() const = 0;
@@ -138,8 +139,8 @@ public:
 
     SystemTextInputManager *inputManager() const { return m_inputManager; }
 
-    virtual void reloadSources() = 0;
-    virtual void determineSelectedInputSource();
+    virtual QList<AbstractSystemTextInputSource*> reloadSources() = 0;
+    void determineSelectedInputSource();
 
 private:
     SystemTextInputManager *m_inputManager = nullptr;
