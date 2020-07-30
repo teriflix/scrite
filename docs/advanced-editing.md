@@ -12,7 +12,7 @@ To switch to a different languge, click on the language button in the toolbar an
 
 ![](screenshots/advanced-editing/001.jpg)
 
-From this point onwards, you can type any word from the selected language in phonetic-English and Scrite translates its when you hit space or any punctuation mark.
+From this point onwards, you can type any word from the selected language in phonetic-English and Scrite transliterates it when you hit space or any punctuation mark.
 
 ![](screenshots/advanced-editing/002.jpg)
 
@@ -84,13 +84,21 @@ From this point onwards, Scrite will automatically switch to the input method on
 
 As of writing, we do not support input method mapping on Linux. We hope to address this feature gap in a future update.
 
-- Formatting
-- Kannada for dialogues
-- Splitting scenes
-- Merging scenes
-- Scene List
-- Scene Synopsis
-- Color Coding Scenes
-- Character List
+# Formatting
+
+# Configuring a lanugage for dialogues
+
+# Splitting scenes
+
+# Merging scenes
+
+# Scene List
+
+# Scene Synopsis
+
+# Color Coding Scenes
+
+# Character List
+
 
 Next: [Exporting Your Screenplay](export.md)
