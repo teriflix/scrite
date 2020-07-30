@@ -193,10 +193,13 @@ QHash<int, QByteArray> SystemTextInputManager::roleNames() const
 
 bool SystemTextInputManager::eventFilter(QObject *object, QEvent *event)
 {
-    if(m_defaultInputSource != nullptr && event->type() == QEvent::ApplicationStateChange && object == qApp)
+    if(event->type() == QEvent::ApplicationStateChange && object == qApp)
     {
         if(qApp->applicationState() != Qt::ApplicationActive)
-            m_defaultInputSource->select();
+        {
+            if(m_defaultInputSource != nullptr)
+                m_defaultInputSource->select();
+        }
         else
         {
             AbstractSystemTextInputSource *source = this->findSourceById(m_revertToInputSourceUponActivation);
@@ -212,15 +215,19 @@ void SystemTextInputManager::clear()
 {
     if(!m_inputSources.isEmpty())
     {
-        this->beginResetModel();
+        m_selectedInputSource = nullptr;
+        emit selectedInputSourceChanged();
 
+        if(m_defaultInputSource != nullptr)
+            m_defaultInputSource->select();
+        m_defaultInputSource = nullptr;
+        emit defaultInputSourceChanged();
+
+        this->beginResetModel();
         QList<AbstractSystemTextInputSource*> sources = m_inputSources;
         m_inputSources.clear();
-        this->setSelected(nullptr);
-        this->setDefault(nullptr);
         while(!sources.isEmpty())
             sources.takeFirst()->deleteLater();
-
         this->endResetModel();
 
         emit countChanged();
@@ -295,12 +302,6 @@ void SystemTextInputManager::setDefault(AbstractSystemTextInputSource *dSource)
         return;
 
     m_defaultInputSource = dSource;
-    emit defaultInputSourceChanged();
-}
-
-void SystemTextInputManager::resetDefault()
-{
-    m_defaultInputSource = nullptr;
     emit defaultInputSourceChanged();
 }
 

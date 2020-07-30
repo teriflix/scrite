@@ -80,7 +80,6 @@ private:
     void remove(AbstractSystemTextInputSource *source);
     void setSelected(AbstractSystemTextInputSource *source);
     void setDefault(AbstractSystemTextInputSource *dSource);
-    void resetDefault();
 
 private:
     friend class AbstractSystemTextInputSource;
