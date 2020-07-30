@@ -42,8 +42,8 @@ Item {
 
             Image {
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: -height*0.25
-                height: subtitle.height * 1.5
+                anchors.verticalCenterOffset: -height*0.22
+                height: subtitle.height * 1.75
                 fillMode: Image.PreserveAspectFit
                 smooth: true; mipmap: true
                 source: "../images/library.png"
