@@ -117,7 +117,7 @@ Item {
         color: primaryColors.c50.background
 
         Row {
-            id: appTools
+            id: appToolBar
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
@@ -617,7 +617,7 @@ Item {
                             text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "../icons/action/settings_applications.png"
                             onClicked: activate()
-                            enabled: appTools.visible
+                            enabled: appToolBar.visible
 
                             function activate() {
                                 modalDialog.popupSource = settingsAndShortcutsButton
@@ -628,7 +628,7 @@ Item {
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Settings"
                             ShortcutsModelItem.shortcut: "Ctrl+,"
-                            ShortcutsModelItem.enabled: appTools.visible
+                            ShortcutsModelItem.enabled: appToolBar.visible
 
                             Shortcut {
                                 context: Qt.ApplicationShortcut
@@ -648,12 +648,12 @@ Item {
                                 return "../icons/navigation/shortcuts_linux.png"
                             }
                             onClicked: activate()
-                            enabled: appTools.visible
+                            enabled: appToolBar.visible
 
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: shortcutsDockWidget.visible ? "Hide Shortcuts" : "Show Shortcuts"
                             ShortcutsModelItem.shortcut: "Ctrl+E"
-                            ShortcutsModelItem.enabled: appTools.visible
+                            ShortcutsModelItem.enabled: appToolBar.visible
 
                             function activate() {
                                 shortcutsDockWidget.toggle()
@@ -821,7 +821,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
-            visible: !appTools.visible
+            visible: !appToolBar.visible
 
             ToolButton3 {
                 text: "File"
@@ -946,7 +946,7 @@ Item {
 
         Row {
             id: editTools
-            x: appTools.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x) / 2)
+            x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x) / 2)
             height: parent.height
 
             ScreenplayEditorToolbar {
@@ -962,7 +962,7 @@ Item {
             Row {
                 id: mainTabBar
                 height: parent.height
-                visible: appTools.visible
+                visible: appToolBar.visible
                 onVisibleChanged: currentIndex = 0
 
                 property Item currentTab: currentIndex >= 0 ? mainTabBarRepeater.itemAt(currentIndex) : null
@@ -1064,7 +1064,7 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onEntered: parent.ToolTip.visible = true
                 onExited: parent.ToolTip.visible = false
-                enabled: appTools.visible
+                enabled: appToolBar.visible
                 onClicked: {
                     modalDialog.sourceComponent = aboutBoxComponent
                     modalDialog.popupSource = parent
