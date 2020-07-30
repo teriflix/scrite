@@ -66,9 +66,11 @@ Click on Options and in the resulting window, click on "Add a keyboard" to add a
 
 Lastly, ensure that the "Let me set a different input method for each app window" is checked.
 
+![](screenshots/advanced-editing/012.jpg)
+
 Once you have added input methods for all the languaes you like, verify that you are able to switch between them in the status bar.
 
-![](screenshots/advanced-editing/012.jpg)
+![](screenshots/advanced-editing/012a.jpg)
 
 Now, on Scrite you can map languages to the input methods you just enabeld in Settings. Open Scrite's settings dialog box and switch to "Transliteration" page.
 
