@@ -117,5 +117,7 @@
         <file>icons/navigation/shortcuts_windows.png</file>
         <file>icons/action/library.png</file>
         <file>icons/action/library_inverted.png</file>
+        <file>icons/action/help.png</file>
+        <file>icons/action/help_inverted.png</file>
     </qresource>
 </RCC>

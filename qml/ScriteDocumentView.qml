@@ -121,7 +121,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            visible: appToolBarArea.width >= 1326
+            visible: appToolBarArea.width >= 1366
             onVisibleChanged: {
                 if(!visible)
                     mainTabBar.currentIndex = 0
@@ -141,7 +141,7 @@ Item {
                 text: "New"
                 shortcut: "Ctrl+N"
                 shortcutText: "N"
-                function click() {
+                onClicked: {
                     if(scriteDocument.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
@@ -163,7 +163,6 @@ Item {
                     else
                         resetContentAnimation.start()
                 }
-                onClicked: click()
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
@@ -337,7 +336,7 @@ Item {
                     modalDialog.active = true
                 }
 
-                function click() {
+                onClicked: {
                     if(scriteDocument.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
@@ -359,8 +358,6 @@ Item {
                     else
                         openFromLibrary.go()
                 }
-
-                onClicked: click()
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: "<img src=\"qrc:/images/library_woicon.png\" height=\"30\" width=\"107\">"
@@ -669,6 +666,18 @@ Item {
                 }
             }
 
+            ToolButton3 {
+                id: helpButton
+                iconSource: "../icons/action/help.png"
+                text: "Help"
+                shortcut: "F1"
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
+
+                ShortcutsModelItem.group: "Application"
+                ShortcutsModelItem.title: "Help"
+                ShortcutsModelItem.shortcut: "F1"
+            }
+
             Rectangle {
                 width: 1
                 height: parent.height
@@ -768,7 +777,7 @@ Item {
                 ToolTip.text: "Show English to " + app.transliterationEngine.languageAsString + " alphabet mappings.\t" + app.polishShortcutTextForDisplay(shortcut)
                 shortcut: "Ctrl+K"
                 shortcutText: "K"
-                onClicked: alphabetMappingsPopup.visible = true
+                onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                 down: alphabetMappingsPopup.visible
                 enabled: app.transliterationEngine.language !== TransliterationEngine.English
 
@@ -796,7 +805,29 @@ Item {
                             active: parent.visible
                             width: item ? item.width : 0
                             height: item ? item.height : 0
-                            sourceComponent: AlphabetMappings { }
+                            sourceComponent: AlphabetMappings {
+                                enabled: app.transliterationEngine.textInputSourceIdForLanguage(app.transliterationEngine.language) === ""
+
+                                Rectangle {
+                                    visible: !parent.enabled
+                                    color: primaryColors.c300.background
+                                    opacity: 0.9
+                                    anchors.fill: parent
+
+                                    Text {
+                                        width: parent.width * 0.75
+                                        font.pointSize: app.idealFontPointSize + 5
+                                        anchors.centerIn: parent
+                                        horizontalAlignment: Text.AlignHCenter
+                                        color: primaryColors.c300.text
+                                        text: {
+                                            if(app.isMacOSPlatform)
+                                                return "Scrite is using an input source from macOS while typing in " + app.transliterationEngine.languageAsString + "."
+                                            return "Scrite is using an input method & keyboard layout from Windows while typing in " + app.transliterationEngine.languageAsString + "."
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -938,6 +969,11 @@ Item {
                             text: "Settings"
                             enabled: documentUI.width >= 1100
                             onTriggered: settingsMenuItem.activate()
+                        }
+
+                        MenuItem2 {
+                            text: "Help"
+                            onTriggered: helpButton.click()
                         }
                     }
                 }
