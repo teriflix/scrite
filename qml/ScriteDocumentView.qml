@@ -113,17 +113,19 @@ Item {
         id: appToolBarArea
         anchors.left: parent.left
         anchors.right: parent.right
-        height: appToolBar.height + 10
+        height: 53
         color: primaryColors.c50.background
 
-        Item {
-            id: appToolBar
-
+        Row {
+            id: appTools
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: 10
-            height: appFileTools.height
+            anchors.leftMargin: 10
+            visible: appToolBarArea.width >= 1326
+            onVisibleChanged: {
+                if(!visible)
+                    mainTabBar.currentIndex = 0
+            }
 
             function saveQuestionText() {
                 if(scriteDocument.fileName === "")
@@ -131,19 +133,57 @@ Item {
                 return "Do you want to save changes to <strong>" + app.fileName(scriteDocument.fileName) + "</strong> first?"
             }
 
-            Row {
-                id: appFileTools
-                spacing: documentUI.width >= 1440 ? 2 : 0
+            spacing: documentUI.width >= 1440 ? 2 : 0
 
-                ToolButton3 {
-                    id: fileNewButton
-                    iconSource: "../icons/action/description.png"
-                    text: "New"
-                    shortcut: "Ctrl+N"
-                    shortcutText: "N"
-                    onClicked: {
-                        if(scriteDocument.modified)
-                            askQuestion({
+            ToolButton3 {
+                id: fileNewButton
+                iconSource: "../icons/action/description.png"
+                text: "New"
+                shortcut: "Ctrl+N"
+                shortcutText: "N"
+                function click() {
+                    if(scriteDocument.modified)
+                        askQuestion({
+                            "question": appToolBar.saveQuestionText(),
+                            "okButtonText": "Yes",
+                            "cancelButtonText": "No",
+                            "abortButtonText": "Cancel",
+                            "callback": function(val) {
+                                if(val) {
+                                    if(scriteDocument.fileName !== "")
+                                        scriteDocument.save()
+                                    else {
+                                        cmdSave.doClick()
+                                        return
+                                    }
+                                }
+                                resetContentAnimation.start()
+                            }
+                        }, fileNewButton)
+                    else
+                        resetContentAnimation.start()
+                }
+                onClicked: click()
+
+                ShortcutsModelItem.group: "File"
+                ShortcutsModelItem.title: text
+                ShortcutsModelItem.shortcut: shortcut
+            }
+
+            ToolButton3 {
+                id: fileOpenButton
+                iconSource: "../icons/file/folder_open.png"
+                text: "Open"
+                shortcut: "Ctrl+O"
+                shortcutText: "O"
+                down: recentFilesMenu.visible
+                onClicked: recentFilesMenu.open()
+                function doOpen(filePath) {
+                    if(filePath === scriteDocument.fileName)
+                        return
+
+                    if(scriteDocument.modified)
+                        askQuestion({
                                 "question": appToolBar.saveQuestionText(),
                                 "okButtonText": "Yes",
                                 "cancelButtonText": "No",
@@ -157,113 +197,662 @@ Item {
                                             return
                                         }
                                     }
-                                    resetContentAnimation.start()
+                                    recentFilesMenu.close()
+                                    fileDialog.launch("OPEN", filePath)
                                 }
-                            }, fileNewButton)
-                        else
-                            resetContentAnimation.start()
+                            }, fileOpenButton)
+                    else {
+                        recentFilesMenu.close()
+                        fileDialog.launch("OPEN", filePath)
                     }
-
-                    ShortcutsModelItem.group: "File"
-                    ShortcutsModelItem.title: text
-                    ShortcutsModelItem.shortcut: shortcut
                 }
 
-                ToolButton3 {
-                    id: fileOpenButton
-                    iconSource: "../icons/file/folder_open.png"
-                    text: "Open"
-                    shortcut: "Ctrl+O"
-                    shortcutText: "O"
-                    down: recentFilesMenu.visible
-                    onClicked: recentFilesMenu.open()
-                    function doOpen(filePath) {
-                        if(filePath === scriteDocument.fileName)
-                            return
+                Connections {
+                    target: app
+                    onOpenFileRequest: fileOpenButton.doOpen(filePath)
+                }
 
-                        if(scriteDocument.modified)
-                            askQuestion({
-                                    "question": appToolBar.saveQuestionText(),
-                                    "okButtonText": "Yes",
-                                    "cancelButtonText": "No",
-                                    "abortButtonText": "Cancel",
-                                    "callback": function(val) {
-                                        if(val) {
-                                            if(scriteDocument.fileName !== "")
-                                                scriteDocument.save()
-                                            else {
-                                                cmdSave.doClick()
-                                                return
-                                            }
-                                        }
-                                        recentFilesMenu.close()
-                                        fileDialog.launch("OPEN", filePath)
-                                    }
-                                }, fileOpenButton)
-                        else {
-                            recentFilesMenu.close()
-                            fileDialog.launch("OPEN", filePath)
+                ShortcutsModelItem.group: "File"
+                ShortcutsModelItem.title: text
+                ShortcutsModelItem.shortcut: shortcut
+
+                Item {
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+
+                    Settings {
+                        fileName: app.settingsFilePath
+                        category: "RecentFiles"
+                        property alias files: recentFilesMenu.recentFiles
+                    }
+
+                    Menu2 {
+                        id: recentFilesMenu
+                        width: recentFiles.length > 1 ? 400 : 200
+
+                        property var recentFiles: []
+                        function add(filePath) {
+                            var r = recentFiles
+                            for(var i=0; i<r.length; i++) {
+                                if(r[i] === filePath)
+                                    r.splice(i,1);
+                            }
+                            r.push(filePath)
+                            if(r.length > 10)
+                                r.splice(0, r.length-10)
+                            recentFiles = r
+                        }
+
+                        function prepareRecentFilesList() {
+                            var newFiles = []
+                            var filesDropped = false
+                            recentFilesMenu.recentFiles.forEach(function(filePath) {
+                                var fi = app.fileInfo(filePath)
+                                if(fi.exists)
+                                    newFiles.push(filePath)
+                                else
+                                    filesDropped = true
+                            })
+                            if(filesDropped)
+                                recentFilesMenu.recentFiles = newFiles
+                        }
+
+                        onAboutToShow: prepareRecentFilesList()
+
+                        MenuItem2 {
+                            text: recentFilesMenu.recentFiles.length > 0 ? "Open Another" : "Open"
+                            onClicked: fileOpenButton.doOpen()
+                        }
+
+                        MenuSeparator { visible: true }
+
+                        FontMetrics {
+                            id: recentFilesFontMetrics
+                        }
+
+                        Repeater {
+                            model: recentFilesMenu.recentFiles
+
+                            MenuItem2 {
+                                property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
+                                text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                ToolTip.text: filePath
+                                ToolTip.visible: hovered
+                                onClicked: fileOpenButton.doOpen(filePath)
+                            }
                         }
                     }
+                }
+            }
 
-                    Connections {
-                        target: app
-                        onOpenFileRequest: fileOpenButton.doOpen(filePath)
-                    }
+            ToolButton3 {
+                id: cmdSave
+                iconSource: "../icons/content/save.png"
+                text: "Save"
+                shortcut: "Ctrl+S"
+                shortcutText: "S"
+                enabled: scriteDocument.structure.elementCount > 0 && !scriteDocument.readOnly
+                onClicked: doClick()
+                function doClick() {
+                    if(scriteDocument.fileName === "")
+                        fileDialog.launch("SAVE")
+                    else
+                        scriteDocument.save()
+                }
 
-                    ShortcutsModelItem.group: "File"
-                    ShortcutsModelItem.title: text
-                    ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.group: "File"
+                ShortcutsModelItem.title: text
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: shortcut
+            }
 
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
+            ToolButton3 {
+                text: "Save As"
+                shortcut: "Ctrl+Shift+S"
+                shortcutText: "Shift+S"
+                iconSource: "../icons/content/archive.png"
+                enabled: scriteDocument.structure.elementCount > 0
+                onClicked: fileDialog.launch("SAVE")
 
-                        Settings {
-                            fileName: app.settingsFilePath
-                            category: "RecentFiles"
-                            property alias files: recentFilesMenu.recentFiles
+                ShortcutsModelItem.group: "File"
+                ShortcutsModelItem.title: text
+                ShortcutsModelItem.shortcut: shortcut
+            }
+
+            ToolButton3 {
+                id: openFromLibrary
+                iconSource: "../icons/action/library.png"
+                text: "<img src=\"qrc:/images/library_woicon_inverted.png\" height=\"30\" width=\"107\">\t&nbsp;"
+                shortcut: "Ctrl+Shift+O"
+                shortcutText: "Shift+O"
+                function go() {
+                    resetContentAnimation.filePath = ""
+                    resetContentAnimation.openFileDialog = false
+                    resetContentAnimation.callback = undefined
+                    resetContentAnimation.start()
+
+                    modalDialog.closeable = false
+                    modalDialog.popupSource = openFromLibrary
+                    modalDialog.sourceComponent = openFromLibraryComponent
+                    modalDialog.active = true
+                }
+
+                function click() {
+                    if(scriteDocument.modified)
+                        askQuestion({
+                            "question": appToolBar.saveQuestionText(),
+                            "okButtonText": "Yes",
+                            "cancelButtonText": "No",
+                            "abortButtonText": "Cancel",
+                            "callback": function(val) {
+                                if(val) {
+                                    if(scriteDocument.fileName !== "")
+                                        scriteDocument.save()
+                                    else {
+                                        cmdSave.doClick()
+                                        return
+                                    }
+                                }
+                                app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
+                            }
+                        }, fileNewButton)
+                    else
+                        openFromLibrary.go()
+                }
+
+                onClicked: click()
+
+                ShortcutsModelItem.group: "File"
+                ShortcutsModelItem.title: "<img src=\"qrc:/images/library_woicon.png\" height=\"30\" width=\"107\">"
+                ShortcutsModelItem.shortcut: shortcut
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            ToolButton3 {
+                shortcut: "Ctrl+Z"
+                shortcutText: "Z"
+                iconSource: "../icons/content/undo.png"
+                enabled: app.canUndo && !scriteDocument.readOnly
+                onClicked: app.undoGroup.undo()
+                ToolTip.text: "Undo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
+
+                ShortcutsModelItem.group: "Edit"
+                ShortcutsModelItem.title: "Undo"
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: shortcut
+            }
+
+            ToolButton3 {
+                shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y"
+                shortcutText: app.isMacOSPlatform ? "Shift+Z" : "Y"
+                iconSource: "../icons/content/redo.png"
+                enabled: app.canRedo && !scriteDocument.readOnly
+                onClicked: app.undoGroup.redo()
+                ToolTip.text: "Redo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
+
+                ShortcutsModelItem.group: "Edit"
+                ShortcutsModelItem.title: "Redo"
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: shortcut
+
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            ToolButton3 {
+                id: importExportButton
+                iconSource: "../icons/file/import_export.png"
+                text: "Import, Export & Reports"
+                onClicked: importExportMenu.visible = true
+                down: importExportMenu.visible
+
+                Item {
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    Menu2 {
+                        id: importExportMenu
+
+                        Menu2 {
+                            id: importMenu
+                            title: "Import"
+
+                            Repeater {
+                                model: scriteDocument.supportedImportFormats
+
+                                MenuItem2 {
+                                    id: importMenuItem
+                                    text: modelData
+                                    onClicked: click()
+                                    function click() {
+                                        if(scriteDocument.modified)
+                                            askQuestion({
+                                                    "question": "Do you want to save your current project first?",
+                                                    "okButtonText": "Yes",
+                                                    "cancelButtonText": "No",
+                                                    "callback": function(val) {
+                                                        if(val) {
+                                                            if(scriteDocument.fileName !== "")
+                                                                scriteDocument.save()
+                                                            else {
+                                                                cmdSave.doClick()
+                                                                return
+                                                            }
+                                                        }
+                                                        fileDialog.launch("IMPORT " + modelData)
+                                                    }
+                                                }, importMenuItem)
+                                        else
+                                            fileDialog.launch("IMPORT " + modelData)
+                                    }
+                                }
+                            }
                         }
 
                         Menu2 {
-                            id: recentFilesMenu
-                            width: recentFiles.length > 1 ? 400 : 200
+                            id: exportMenu
+                            title: "Export"
+                            width: 250
 
-                            property var recentFiles: []
-                            function add(filePath) {
-                                var r = recentFiles
-                                for(var i=0; i<r.length; i++) {
-                                    if(r[i] === filePath)
-                                        r.splice(i,1);
+                            Component {
+                                id: menuItemComponent
+                                MenuItem2 {
+                                    property string format
+                                    text: {
+                                        var fields = format.split("/")
+                                        return fields[fields.length-1]
+                                    }
+                                    function click() { exportTimer.formatName = format }
+                                    onClicked: click()
                                 }
-                                r.push(filePath)
-                                if(r.length > 10)
-                                    r.splice(0, r.length-10)
-                                recentFiles = r
                             }
+
+                            Component {
+                                id: menuSeparatorComponent
+                                MenuSeparator { }
+                            }
+
+                            Component.onCompleted: {
+                                var formats = scriteDocument.supportedExportFormats
+                                for(var i=0; i<formats.length; i++) {
+                                    var format = formats[i]
+                                    if(format === "")
+                                        exportMenu.addItem(menuSeparatorComponent.createObject(exportMenu))
+                                    else
+                                        exportMenu.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
+                                }
+                            }
+                        }
+
+                        Menu2 {
+                            id: reportsMenu
+                            title: "Reports"
+                            enabled: scriteDocument.screenplay.elementCount > 0
+                            width: 300
+
+                            Repeater {
+                                model: scriteDocument.supportedReports
+
+                                MenuItem2 {
+                                    leftPadding: 15
+                                    rightPadding: 15
+                                    topPadding: 5
+                                    bottomPadding: 5
+                                    width: reportsMenu.width
+                                    height: 65
+                                    contentItem: Column {
+                                        id: menuContent
+                                        width: reportsMenu.width - 30
+                                        spacing: 5
+
+                                        Text {
+                                            font.bold: true
+                                            font.pixelSize: 16
+                                            text: modelData.name
+                                        }
+
+                                        Text {
+                                            text: modelData.description
+                                            width: parent.width
+                                            wrapMode: Text.WordWrap
+                                            font.pixelSize: 12
+                                            font.italic: true
+                                        }
+                                    }
+
+                                    function click() {
+                                        reportGeneratorTimer.reportArgs = modelData.name
+                                    }
+
+                                    onTriggered: click()
+                                }
+                            }
+                        }
+                    }
+
+                    Timer {
+                        id: exportTimer
+                        objectName: "ScriteDocumentView.exportTimer"
+                        property string formatName
+                        repeat: false
+                        interval: 10
+                        onFormatNameChanged: {
+                            if(formatName !== "")
+                                start()
+                        }
+                        onTriggered: {
+                            if(formatName !== "") {
+                                modalDialog.closeable = false
+                                modalDialog.arguments = formatName
+                                modalDialog.sourceComponent = exporterConfigurationComponent
+                                modalDialog.popupSource = importExportButton
+                                modalDialog.active = true
+                            }
+                            formatName = ""
+                        }
+                    }
+
+                    Timer {
+                        id: reportGeneratorTimer
+                        objectName: "ScriteDocumentView.reportGeneratorTimer"
+                        property var reportArgs
+                        property Item requestSource
+                        repeat: false
+                        interval: 10
+                        onReportArgsChanged: {
+                            if(reportArgs !== "")
+                                start()
+                        }
+                        onTriggered: {
+                            if(reportArgs !== "") {
+                                modalDialog.closeable = false
+                                modalDialog.arguments = reportArgs
+                                modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+                                modalDialog.popupSource = requestSource === null ? importExportButton : requestSource
+                                modalDialog.active = true
+                            }
+                            reportArgs = ""
+                            requestSource = null
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            ToolButton3 {
+                id: settingsAndShortcutsButton
+                iconSource: "../icons/action/settings_applications.png"
+                text: "Settings & Shortcuts"
+                down: settingsAndShortcutsMenu.visible
+                onClicked: settingsAndShortcutsMenu.visible = true
+
+                Item {
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+
+                    Menu2 {
+                        id: settingsAndShortcutsMenu
+                        width: 300
+
+                        MenuItem2 {
+                            id: settingsMenuItem
+                            text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
+                            icon.source: "../icons/action/settings_applications.png"
+                            onClicked: activate()
+                            enabled: appTools.visible
+
+                            function activate() {
+                                modalDialog.popupSource = settingsAndShortcutsButton
+                                modalDialog.sourceComponent = optionsDialogComponent
+                                modalDialog.active = true
+                            }
+
+                            ShortcutsModelItem.group: "Application"
+                            ShortcutsModelItem.title: "Settings"
+                            ShortcutsModelItem.shortcut: "Ctrl+,"
+                            ShortcutsModelItem.enabled: appTools.visible
+
+                            Shortcut {
+                                context: Qt.ApplicationShortcut
+                                sequence: "Ctrl+,"
+                                onActivated: settingsMenuItem.activate()
+                            }
+                        }
+
+                        MenuItem2 {
+                            id: shortcutsMenuItem
+                            text: "Shortcuts\t" + app.polishShortcutTextForDisplay("Ctrl+E")
+                            icon.source: {
+                                if(app.isMacOSPlatform)
+                                    return "../icons/navigation/shortcuts_macos.png"
+                                if(app.isWindowsPlatform)
+                                    return "../icons/navigation/shortcuts_windows.png"
+                                return "../icons/navigation/shortcuts_linux.png"
+                            }
+                            onClicked: activate()
+                            enabled: appTools.visible
+
+                            ShortcutsModelItem.group: "Application"
+                            ShortcutsModelItem.title: shortcutsDockWidget.visible ? "Hide Shortcuts" : "Show Shortcuts"
+                            ShortcutsModelItem.shortcut: "Ctrl+E"
+                            ShortcutsModelItem.enabled: appTools.visible
+
+                            function activate() {
+                                shortcutsDockWidget.toggle()
+                            }
+
+                            Shortcut {
+                                context: Qt.ApplicationShortcut
+                                sequence: "Ctrl+E"
+                                onActivated: shortcutsMenuItem.activate()
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            ToolButton3 {
+                id: languageToolButton
+                iconSource: "../icons/content/language.png"
+                text: app.transliterationEngine.languageAsString
+                shortcut: "Ctrl+L"
+                shortcutText: "L"
+                ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
+                onClicked: languageMenu.visible = true
+                down: languageMenu.visible
+
+                Item {
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+
+                    Menu2 {
+                        id: languageMenu
+                        width: 250
+
+                        ButtonGroup { id: languageMenuGroup }
+
+                        Repeater {
+                            model: app.enumerationModel(app.transliterationEngine, "Language")
 
                             MenuItem2 {
-                                text: recentFilesMenu.recentFiles.length > 0 ? "Open Another" : "Open"
-                                onClicked: fileOpenButton.doOpen()
+                                property string baseText: modelData.key
+                                property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
+                                text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
+                                font.bold: app.transliterationEngine.language === modelData.value
+                                onClicked: {
+                                    app.transliterationEngine.language = modelData.value
+                                    scriteDocument.formatting.defaultLanguage = modelData.value
+                                    paragraphLanguageSettings.defaultLanguage = modelData.key
+                                }
                             }
+                        }
 
-                            FontMetrics {
-                                id: recentFilesFontMetrics
-                            }
+                        MenuSeparator { }
 
-                            onAboutToShow: {
-                                var newFiles = []
-                                var filesDropped = false
-                                recentFilesMenu.recentFiles.forEach(function(filePath) {
-                                    var fi = app.fileInfo(filePath)
-                                    if(fi.exists)
-                                        newFiles.push(filePath)
-                                    else
-                                        filesDropped = true
-                                })
-                                if(filesDropped)
-                                    recentFilesMenu.recentFiles = newFiles
+                        MenuItem2 {
+                            text: "Next-Language (F10)"
+                            onClicked: {
+                                app.transliterationEngine.cycleLanguage()
+                                scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
+                                paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
                             }
+                        }
+                    }
+
+                    Repeater {
+                        model: app.enumerationModel(app.transliterationEngine, "Language")
+
+                        Item {
+                            Shortcut {
+                                property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
+                                context: Qt.ApplicationShortcut
+                                sequence: "Alt+"+shortcutKey
+                                onActivated: {
+                                    app.transliterationEngine.language = modelData.value
+                                    scriteDocument.formatting.defaultLanguage = modelData.value
+                                    paragraphLanguageSettings.defaultLanguage = modelData.key
+                                }
+
+                                ShortcutsModelItem.priority: 0
+                                ShortcutsModelItem.title: modelData.key
+                                ShortcutsModelItem.group: "Language"
+                                ShortcutsModelItem.shortcut: sequence
+                            }
+                        }
+                    }
+
+                    Shortcut {
+                        context: Qt.ApplicationShortcut
+                        sequence: "F10"
+                        onActivated: {
+                            app.transliterationEngine.cycleLanguage()
+                            scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
+                            paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                        }
+
+                        ShortcutsModelItem.priority: 1
+                        ShortcutsModelItem.title: "Next Language"
+                        ShortcutsModelItem.group: "Language"
+                        ShortcutsModelItem.shortcut: "F10"
+                    }
+                }
+            }
+
+            ToolButton3 {
+                iconSource: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
+                ToolTip.text: "Show English to " + app.transliterationEngine.languageAsString + " alphabet mappings.\t" + app.polishShortcutTextForDisplay(shortcut)
+                shortcut: "Ctrl+K"
+                shortcutText: "K"
+                onClicked: alphabetMappingsPopup.visible = true
+                down: alphabetMappingsPopup.visible
+                enabled: app.transliterationEngine.language !== TransliterationEngine.English
+
+                ShortcutsModelItem.priority: 1
+                ShortcutsModelItem.group: "Language"
+                ShortcutsModelItem.title: "Alphabet Mapping"
+                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.enabled: enabled
+
+                Item {
+                    anchors.top: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: alphabetMappingsPopup.width
+
+                    Popup {
+                        id: alphabetMappingsPopup
+                        width: alphabetMappingsLoader.width + 30
+                        height: alphabetMappingsLoader.height + 30
+                        modal: false
+                        focus: false
+                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+                        Loader {
+                            id: alphabetMappingsLoader
+                            active: parent.visible
+                            width: item ? item.width : 0
+                            height: item ? item.height : 0
+                            sourceComponent: AlphabetMappings { }
+                        }
+                    }
+                }
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: documentUI.width > 1470 ? fullText : fullText.substring(0, 2)
+                font.pointSize: app.idealFontPointSize-2
+                property string fullText: app.transliterationEngine.languageAsString
+                width: 80
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: languageToolButton.click()
+                }
+            }
+        }
+
+        Row {
+            id: appToolsMenu
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            visible: !appTools.visible
+
+            ToolButton3 {
+                text: "File"
+                iconSource: "../icons/navigation/menu.png"
+                onClicked: {
+                    if(appFileMenu.active)
+                        appFileMenu.close()
+                    else
+                        appFileMenu.show()
+                }
+                down: appFileMenu.active
+
+                MenuLoader {
+                    id: appFileMenu
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+                    menu: Menu2 {
+                        MenuItem2 {
+                            text: "New File"
+                            onTriggered: fileNewButton.click()
+                        }
+
+                        MenuItem2 {
+                            text: "Open File"
+                            onTriggered: fileOpenButton.doOpen()
+                        }
+
+                        Menu2 {
+                            title: "Open Recent"
+                            onAboutToShow: recentFilesMenu.prepareRecentFilesList()
+                            width: Math.min(documentUI.width * 0.75, 350)
 
                             Repeater {
                                 model: recentFilesMenu.recentFiles
@@ -276,536 +865,88 @@ Item {
                                     onClicked: fileOpenButton.doOpen(filePath)
                                 }
                             }
-
-                            MenuSeparator { visible: true }
                         }
-                    }
-                }
 
-                ToolButton3 {
-                    id: cmdSave
-                    iconSource: "../icons/content/save.png"
-                    text: "Save"
-                    shortcut: "Ctrl+S"
-                    shortcutText: "S"
-                    enabled: scriteDocument.structure.elementCount > 0 && !scriteDocument.readOnly
-                    onClicked: doClick()
-                    function doClick() {
-                        if(scriteDocument.fileName === "")
-                            fileDialog.launch("SAVE")
-                        else
-                            scriteDocument.save()
-                    }
+                        MenuItem2 {
+                            text: "Save"
+                            onTriggered: cmdSave.doClick()
+                        }
 
-                    ShortcutsModelItem.group: "File"
-                    ShortcutsModelItem.title: text
-                    ShortcutsModelItem.enabled: enabled
-                    ShortcutsModelItem.shortcut: shortcut
-                }
+                        MenuItem2 {
+                            text: "Save As"
+                            onTriggered: fileDialog.launch("SAVE")
+                        }
 
-                ToolButton3 {
-                    text: "Save As"
-                    shortcut: "Ctrl+Shift+S"
-                    shortcutText: "Shift+S"
-                    iconSource: "../icons/content/archive.png"
-                    enabled: scriteDocument.structure.elementCount > 0
-                    onClicked: fileDialog.launch("SAVE")
+                        MenuSeparator { }
 
-                    ShortcutsModelItem.group: "File"
-                    ShortcutsModelItem.title: text
-                    ShortcutsModelItem.shortcut: shortcut
-                }
+                        MenuItem2 {
+                            text: "Scriptalay"
+                            enabled: documentUI.width >= 858
+                            onTriggered: openFromLibrary.click()
+                        }
 
-                ToolButton3 {
-                    id: openFromLibrary
-                    iconSource: "../icons/action/library.png"
-                    text: "<img src=\"qrc:/images/library_woicon_inverted.png\" height=\"30\" width=\"107\">\t&nbsp;"
-                    shortcut: "Ctrl+Shift+O"
-                    shortcutText: "Shift+O"
-                    function go() {
-                        resetContentAnimation.filePath = ""
-                        resetContentAnimation.openFileDialog = false
-                        resetContentAnimation.callback = undefined
-                        resetContentAnimation.start()
-
-                        modalDialog.closeable = false
-                        modalDialog.popupSource = openFromLibrary
-                        modalDialog.sourceComponent = openFromLibraryComponent
-                        modalDialog.active = true
-                    }
-
-                    onClicked: {
-                        if(scriteDocument.modified)
-                            askQuestion({
-                                "question": appToolBar.saveQuestionText(),
-                                "okButtonText": "Yes",
-                                "cancelButtonText": "No",
-                                "abortButtonText": "Cancel",
-                                "callback": function(val) {
-                                    if(val) {
-                                        if(scriteDocument.fileName !== "")
-                                            scriteDocument.save()
-                                        else {
-                                            cmdSave.doClick()
-                                            return
-                                        }
-                                    }
-                                    app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
-                                }
-                            }, fileNewButton)
-                        else
-                            openFromLibrary.go()
-                    }
-
-                    ShortcutsModelItem.group: "File"
-                    ShortcutsModelItem.title: "<img src=\"qrc:/images/library_woicon.png\" height=\"30\" width=\"107\">"
-                    ShortcutsModelItem.shortcut: shortcut
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: primaryColors.separatorColor
-                    opacity: 0.5
-                }
-
-                ToolButton3 {
-                    shortcut: "Ctrl+Z"
-                    shortcutText: "Z"
-                    iconSource: "../icons/content/undo.png"
-                    enabled: app.canUndo && !scriteDocument.readOnly
-                    onClicked: app.undoGroup.undo()
-                    ToolTip.text: "Undo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
-
-                    ShortcutsModelItem.group: "Edit"
-                    ShortcutsModelItem.title: "Undo"
-                    ShortcutsModelItem.enabled: enabled
-                    ShortcutsModelItem.shortcut: shortcut
-                }
-
-                ToolButton3 {
-                    shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y"
-                    shortcutText: app.isMacOSPlatform ? "Shift+Z" : "Y"
-                    iconSource: "../icons/content/redo.png"
-                    enabled: app.canRedo && !scriteDocument.readOnly
-                    onClicked: app.undoGroup.redo()
-                    ToolTip.text: "Redo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
-
-                    ShortcutsModelItem.group: "Edit"
-                    ShortcutsModelItem.title: "Redo"
-                    ShortcutsModelItem.enabled: enabled
-                    ShortcutsModelItem.shortcut: shortcut
-
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: primaryColors.separatorColor
-                    opacity: 0.5
-                }
-
-                ToolButton3 {
-                    id: importExportButton
-                    iconSource: "../icons/file/import_export.png"
-                    text: "Import, Export & Reports"
-                    onClicked: importExportMenu.visible = true
-                    down: importExportMenu.visible
-
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
+                        MenuSeparator { }
 
                         Menu2 {
-                            id: importExportMenu
-
-                            Menu2 {
-                                id: importMenu
-                                title: "Import"
-
-                                Repeater {
-                                    model: scriteDocument.supportedImportFormats
-
-                                    MenuItem2 {
-                                        id: importMenuItem
-                                        text: modelData
-                                        onClicked: {
-                                            if(scriteDocument.modified)
-                                                askQuestion({
-                                                        "question": "Do you want to save your current project first?",
-                                                        "okButtonText": "Yes",
-                                                        "cancelButtonText": "No",
-                                                        "callback": function(val) {
-                                                            if(val) {
-                                                                if(scriteDocument.fileName !== "")
-                                                                    scriteDocument.save()
-                                                                else {
-                                                                    cmdSave.doClick()
-                                                                    return
-                                                                }
-                                                            }
-                                                            fileDialog.launch("IMPORT " + modelData)
-                                                        }
-                                                    }, importMenuItem)
-                                            else
-                                                fileDialog.launch("IMPORT " + modelData)
-                                        }
-                                    }
-                                }
-                            }
-
-                            Menu2 {
-                                id: exportMenu
-                                title: "Export"
-                                width: 250
-
-                                Component {
-                                    id: menuItemComponent
-                                    MenuItem2 {
-                                        property string format
-                                        text: {
-                                            var fields = format.split("/")
-                                            return fields[fields.length-1]
-                                        }
-                                        onClicked: exportTimer.formatName = format
-                                    }
-                                }
-
-                                Component {
-                                    id: menuSeparatorComponent
-                                    MenuSeparator { }
-                                }
-
-                                Component.onCompleted: {
-                                    var formats = scriteDocument.supportedExportFormats
-                                    for(var i=0; i<formats.length; i++) {
-                                        var format = formats[i]
-                                        if(format === "")
-                                            exportMenu.addItem(menuSeparatorComponent.createObject(exportMenu))
-                                        else
-                                            exportMenu.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
-                                    }
-                                }
-                            }
-
-                            Menu2 {
-                                id: reportsMenu
-                                title: "Reports"
-                                enabled: scriteDocument.screenplay.elementCount > 0
-                                width: 300
-
-                                Repeater {
-                                    model: scriteDocument.supportedReports
-
-                                    MenuItem2 {
-                                        leftPadding: 15
-                                        rightPadding: 15
-                                        topPadding: 5
-                                        bottomPadding: 5
-                                        width: reportsMenu.width
-                                        height: 65
-                                        contentItem: Column {
-                                            id: menuContent
-                                            width: reportsMenu.width - 30
-                                            spacing: 5
-
-                                            Text {
-                                                font.bold: true
-                                                font.pixelSize: 16
-                                                text: modelData.name
-                                            }
-
-                                            Text {
-                                                text: modelData.description
-                                                width: parent.width
-                                                wrapMode: Text.WordWrap
-                                                font.pixelSize: 12
-                                                font.italic: true
-                                            }
-                                        }
-
-                                        onTriggered: {
-                                            reportGeneratorTimer.reportArgs = modelData.name
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Timer {
-                            id: exportTimer
-                            objectName: "ScriteDocumentView.exportTimer"
-                            property string formatName
-                            repeat: false
-                            interval: 10
-                            onFormatNameChanged: {
-                                if(formatName !== "")
-                                    start()
-                            }
-                            onTriggered: {
-                                if(formatName !== "") {
-                                    modalDialog.closeable = false
-                                    modalDialog.arguments = formatName
-                                    modalDialog.sourceComponent = exporterConfigurationComponent
-                                    modalDialog.popupSource = importExportButton
-                                    modalDialog.active = true
-                                }
-                                formatName = ""
-                            }
-                        }
-
-                        Timer {
-                            id: reportGeneratorTimer
-                            objectName: "ScriteDocumentView.reportGeneratorTimer"
-                            property var reportArgs
-                            property Item requestSource
-                            repeat: false
-                            interval: 10
-                            onReportArgsChanged: {
-                                if(reportArgs !== "")
-                                    start()
-                            }
-                            onTriggered: {
-                                if(reportArgs !== "") {
-                                    modalDialog.closeable = false
-                                    modalDialog.arguments = reportArgs
-                                    modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-                                    modalDialog.popupSource = requestSource === null ? importExportButton : requestSource
-                                    modalDialog.active = true
-                                }
-                                reportArgs = ""
-                                requestSource = null
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: primaryColors.separatorColor
-                    opacity: 0.5
-                }
-
-                ToolButton3 {
-                    id: settingsAndShortcutsButton
-                    iconSource: "../icons/action/settings_applications.png"
-                    text: "Settings & Shortcuts"
-                    down: settingsAndShortcutsMenu.visible
-                    onClicked: settingsAndShortcutsMenu.visible = true
-
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-
-                        Menu2 {
-                            id: settingsAndShortcutsMenu
-                            width: 300
-
-                            MenuItem2 {
-                                id: settingsMenuItem
-                                text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
-                                icon.source: "../icons/action/settings_applications.png"
-                                onClicked: activate()
-
-                                function activate() {
-                                    modalDialog.popupSource = settingsAndShortcutsButton
-                                    modalDialog.sourceComponent = optionsDialogComponent
-                                    modalDialog.active = true
-                                }
-
-                                ShortcutsModelItem.group: "Application"
-                                ShortcutsModelItem.title: "Settings"
-                                ShortcutsModelItem.shortcut: "Ctrl+,"
-
-                                Shortcut {
-                                    context: Qt.ApplicationShortcut
-                                    sequence: "Ctrl+,"
-                                    onActivated: settingsMenuItem.activate()
-                                }
-                            }
-
-                            MenuItem2 {
-                                id: shortcutsMenuItem
-                                text: "Shortcuts\t" + app.polishShortcutTextForDisplay("Ctrl+E")
-                                icon.source: {
-                                    if(app.isMacOSPlatform)
-                                        return "../icons/navigation/shortcuts_macos.png"
-                                    if(app.isWindowsPlatform)
-                                        return "../icons/navigation/shortcuts_windows.png"
-                                    return "../icons/navigation/shortcuts_linux.png"
-                                }
-                                onClicked: activate()
-
-                                ShortcutsModelItem.group: "Application"
-                                ShortcutsModelItem.title: shortcutsDockWidget.visible ? "Hide Shortcuts" : "Show Shortcuts"
-                                ShortcutsModelItem.shortcut: "Ctrl+E"
-
-                                function activate() {
-                                    shortcutsDockWidget.toggle()
-                                }
-
-                                Shortcut {
-                                    context: Qt.ApplicationShortcut
-                                    sequence: "Ctrl+E"
-                                    onActivated: shortcutsMenuItem.activate()
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: primaryColors.separatorColor
-                    opacity: 0.5
-                }
-
-                ToolButton3 {
-                    id: languageToolButton
-                    iconSource: "../icons/content/language.png"
-                    text: app.transliterationEngine.languageAsString
-                    shortcut: "Ctrl+L"
-                    shortcutText: "L"
-                    ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
-                    onClicked: languageMenu.visible = true
-                    down: languageMenu.visible
-
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-
-                        Menu2 {
-                            id: languageMenu
-                            width: 250
-
-                            ButtonGroup { id: languageMenuGroup }
+                            title: "Import"
 
                             Repeater {
-                                model: app.enumerationModel(app.transliterationEngine, "Language")
+                                model: scriteDocument.supportedImportFormats
 
                                 MenuItem2 {
-                                    property string baseText: modelData.key
-                                    property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
-                                    text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
-                                    font.bold: app.transliterationEngine.language === modelData.value
-                                    onClicked: {
-                                        app.transliterationEngine.language = modelData.value
-                                        scriteDocument.formatting.defaultLanguage = modelData.value
-                                        paragraphLanguageSettings.defaultLanguage = modelData.key
-                                    }
-                                }
-                            }
-
-                            MenuSeparator { }
-
-                            MenuItem2 {
-                                text: "Next-Language (F10)"
-                                onClicked: {
-                                    app.transliterationEngine.cycleLanguage()
-                                    scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
-                                    paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                                    text: modelData
+                                    onClicked: importMenu.itemAt(index).click()
                                 }
                             }
                         }
 
-                        Repeater {
-                            model: app.enumerationModel(app.transliterationEngine, "Language")
+                        Menu2 {
+                            id: exportMenu2
+                            title: "Export"
+                            width: 250
 
-                            Item {
-                                Shortcut {
-                                    property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
-                                    context: Qt.ApplicationShortcut
-                                    sequence: "Alt+"+shortcutKey
-                                    onActivated: {
-                                        app.transliterationEngine.language = modelData.value
-                                        scriteDocument.formatting.defaultLanguage = modelData.value
-                                        paragraphLanguageSettings.defaultLanguage = modelData.key
-                                    }
-
-                                    ShortcutsModelItem.priority: 0
-                                    ShortcutsModelItem.title: modelData.key
-                                    ShortcutsModelItem.group: "Language"
-                                    ShortcutsModelItem.shortcut: sequence
+                            Component.onCompleted: {
+                                var formats = scriteDocument.supportedExportFormats
+                                for(var i=0; i<formats.length; i++) {
+                                    var format = formats[i]
+                                    if(format === "")
+                                        exportMenu2.addItem(menuSeparatorComponent.createObject(exportMenu))
+                                    else
+                                        exportMenu2.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
                                 }
                             }
                         }
 
-                        Shortcut {
-                            context: Qt.ApplicationShortcut
-                            sequence: "F10"
-                            onActivated: {
-                                app.transliterationEngine.cycleLanguage()
-                                scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
-                                paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
-                            }
+                        Menu2 {
+                            title: "Reports"
+                            width: 300
 
-                            ShortcutsModelItem.priority: 1
-                            ShortcutsModelItem.title: "Next Language"
-                            ShortcutsModelItem.group: "Language"
-                            ShortcutsModelItem.shortcut: "F10"
-                        }
-                    }
-                }
+                            Repeater {
+                                model: scriteDocument.supportedReports
 
-                ToolButton3 {
-                    iconSource: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
-                    ToolTip.text: "Show English to " + app.transliterationEngine.languageAsString + " alphabet mappings.\t" + app.polishShortcutTextForDisplay(shortcut)
-                    shortcut: "Ctrl+K"
-                    shortcutText: "K"
-                    onClicked: alphabetMappingsPopup.visible = true
-                    down: alphabetMappingsPopup.visible
-                    enabled: app.transliterationEngine.language !== TransliterationEngine.English
-
-                    ShortcutsModelItem.priority: 1
-                    ShortcutsModelItem.group: "Language"
-                    ShortcutsModelItem.title: "Alphabet Mapping"
-                    ShortcutsModelItem.shortcut: shortcut
-                    ShortcutsModelItem.enabled: enabled
-
-                    Item {
-                        anchors.top: parent.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: alphabetMappingsPopup.width
-
-                        Popup {
-                            id: alphabetMappingsPopup
-                            width: alphabetMappingsLoader.width + 30
-                            height: alphabetMappingsLoader.height + 30
-                            modal: false
-                            focus: false
-                            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-                            Loader {
-                                id: alphabetMappingsLoader
-                                active: parent.visible
-                                width: item ? item.width : 0
-                                height: item ? item.height : 0
-                                sourceComponent: AlphabetMappings { }
+                                MenuItem2 {
+                                    text: modelData.name
+                                    onClicked: reportsMenu.itemAt(index).click()
+                                    enabled: documentUI.width >= 800
+                                }
                             }
                         }
-                    }
-                }
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: documentUI.width > 1470 ? fullText : fullText.substring(0, 2)
-                    font.pointSize: app.idealFontPointSize-2
-                    property string fullText: app.transliterationEngine.languageAsString
-                    width: 80
+                        MenuSeparator { }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: languageToolButton.click()
+                        MenuItem2 {
+                            text: "Settings"
+                            enabled: documentUI.width >= 1100
+                            onTriggered: settingsMenuItem.activate()
+                        }
                     }
                 }
             }
         }
 
         Row {
-            anchors.right: parent.right
+            id: editTools
+            x: appTools.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x) / 2)
             height: parent.height
 
             ScreenplayEditorToolbar {
@@ -821,6 +962,8 @@ Item {
             Row {
                 id: mainTabBar
                 height: parent.height
+                visible: appTools.visible
+                onVisibleChanged: currentIndex = 0
 
                 property Item currentTab: currentIndex >= 0 ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
@@ -841,10 +984,10 @@ Item {
                         "p1": { "x": 0, "y": 0 },
                         "p2": { "x": 0, "y": 0 }
                     }
-                    to: {
+                    to: mainTabBar.visible && mainTabBar.currentTab ? {
                         "p1": mainTabBar.mapFromItem(mainTabBar.currentTab, 0, 0),
                         "p2": mainTabBar.mapFromItem(mainTabBar.currentTab, mainTabBar.currentTab.width, 0)
-                    }
+                    } : from
                 }
 
                 Component.onCompleted: currentIndex = 0
@@ -901,29 +1044,31 @@ Item {
                     }
                 }
             }
+        }
 
-            Image {
-                id: appLogo
-                source: documentUI.width >= 1440 ? "../images/teriflix_logo.png" : "../images/teriflix_icon.png"
-                height: parent.height
-                smooth: true
-                mipmap: true
-                fillMode: Image.PreserveAspectFit
-                anchors.verticalCenter: parent.verticalCenter
-                transformOrigin: Item.Right
-                ToolTip.text: "Click here to provide feedback"
+        Image {
+            id: appLogo
+            anchors.right: parent.right
+            source: documentUI.width >= 1440 ? "../images/teriflix_logo.png" : "../images/teriflix_icon.png"
+            height: parent.height
+            smooth: true
+            mipmap: true
+            fillMode: Image.PreserveAspectFit
+            anchors.verticalCenter: parent.verticalCenter
+            transformOrigin: Item.Right
+            ToolTip.text: "Click here to provide feedback"
 
-                MouseArea {
-                    hoverEnabled: true
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onEntered: parent.ToolTip.visible = true
-                    onExited: parent.ToolTip.visible = false
-                    onClicked: {
-                        modalDialog.sourceComponent = aboutBoxComponent
-                        modalDialog.popupSource = parent
-                        modalDialog.active = true
-                    }
+            MouseArea {
+                hoverEnabled: true
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onEntered: parent.ToolTip.visible = true
+                onExited: parent.ToolTip.visible = false
+                enabled: appTools.visible
+                onClicked: {
+                    modalDialog.sourceComponent = aboutBoxComponent
+                    modalDialog.popupSource = parent
+                    modalDialog.active = true
                 }
             }
         }
@@ -935,7 +1080,7 @@ Item {
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: appToolBarArea.bottom
+        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
         anchors.bottom: parent.bottom
         onActiveChanged: {
             globalScreenplayEditorToolbar.sceneEditor = null
@@ -981,6 +1126,7 @@ Item {
                 height: 1
                 outlineColor: primaryColors.borderColor
                 outlineWidth: height
+                visible: mainTabBar.visible
                 painterPath: PainterPath {
                     id: tabBarSeparatorPath
                     property var currentTabP1: tabBarSeparator.mapFromItem(mainTabBar, mainTabBar.currentTabP1.x, mainTabBar.currentTabP1.y)
@@ -1369,7 +1515,7 @@ Item {
                 Text {
                     id: openFromLibraryIntroText
                     anchors.centerIn: parent
-                    width: Math.min(contentWidth, 250)
+                    width: 250
                     text: "Introducing <strong>Scriptalay</strong>! Click this button to browse through and download from a repository of screenpalys in Scrite format."
                     wrapMode: Text.WordWrap
                     font.pointSize: app.idealFontPointSize
@@ -1434,7 +1580,7 @@ Item {
         contentX: -1
         contentY: -1
         contentWidth: 375
-        contentHeight: (parent.height - appToolBar.height - 30) * 0.85
+        contentHeight: (parent.height - appToolBarArea.height - 30) * 0.85
         visible: shortcutsDockWidgetSettings.visible
         sourceItem: settingsAndShortcutsButton
         content: ShortcutsView { }

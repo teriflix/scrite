@@ -275,7 +275,7 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
-    qmlView.setMinimumSize(QSize(qMin(1440,primaryScreenSize.width()), qMin(900,primaryScreenSize.height())));
+    qmlView.setMinimumSize(QSize(qMin(600,primaryScreenSize.width()), qMin(375,primaryScreenSize.height())));
     qmlView.showMaximized();
     qmlView.raise();
 

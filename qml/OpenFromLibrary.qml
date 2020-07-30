@@ -300,7 +300,10 @@ Item {
         Text {
             text: "" + libraryService.library.count + " Screenplays Available"
             font.pointSize: app.idealFontPointSize
-            anchors.centerIn: parent
+            anchors.left: leftButtons.right
+            anchors.right: rightButtons.left
+            anchors.verticalCenter: parent.verticalCenter
+            horizontalAlignment: Text.AlignHCenter
             visible: !libraryService.library.busy && libraryGridView.contentHeight > libraryGridView.height
         }
 
