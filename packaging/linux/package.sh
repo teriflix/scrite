@@ -1,12 +1,17 @@
-export PATH=/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/bin:/home/prashanthudupa/QtPackaging/linuxdeployqt/bin:$PATH
+export PATH=/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/bin:/home/prashanthudupa/QtPackaging/linuxdeployqt/bin:/home/prashanthudupa/QtPackaging:$PATH
 export LD_LIBRARY_PATH=export LD_LIBRARY_PATH=/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/lib:/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/bin:$LD_LIBRARY_PATH
+export VERSION=0.4.13-beta
 mkdir Scrite-0.4.13-beta.AppImage
 cd Scrite-0.4.13-beta.AppImage
-cp ../../../../Release/Scrite .
-cp ../../../images/appicon.png Scrite_app_icon.png
-cp ../Scrite.desktop .
-cp ../install.sh install_Scrite.sh
-chmod a+x install_Scrite.sh
-linuxdeployqt Scrite -appimage -qmldir=../../../qml -verbose=2 -always-overwrite -no-translations -no-copy-copyright-files
+mkdir bin
+cp ../../../../Release/Scrite ./bin/
+mkdir -p share/applications
+cp ../Scrite.desktop share/applications/Scrite.desktop
+mkdir -p share/icons/hicolor/512x512/apps/
+cp ../../../images/appicon.png share/icons/hicolor/512x512/apps/Scrite.png
+mkdir -p share/icons/hicolor/256x256/apps/
+convert ../../../images/appicon.png -resize 256x256 share/icons/hicolor/256x256/apps/Scrite.png
 cd ../
-tar -czvf Scrite-0.4.13-beta.AppImage.tar.gz Scrite-0.4.13-beta.AppImage
+linuxdeployqt Scrite-0.4.13-beta.AppImage/share/applications/Scrite.desktop -appimage -qmldir=../../qml -verbose=2 -always-overwrite -no-translations
+cd ../
+
