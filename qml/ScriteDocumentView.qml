@@ -1035,7 +1035,7 @@ Item {
                     Item {
                         property bool active: mainTabBar.currentIndex === index
                         height: mainTabBar.height
-                        width: tabBarFontMetrics.advanceWidth(modelData) + 30
+                        width: tabBarFontMetrics.advanceWidth(modelData) + (documentUI.width >= 1485 ? 30 : 20)
 
                         PainterPathItem {
                             anchors.fill: parent
