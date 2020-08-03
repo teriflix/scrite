@@ -16,6 +16,7 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
+    id: structureView
     signal requestEditor()
     signal releaseEditor()
 
@@ -210,14 +211,14 @@ Item {
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.max( Math.ceil(elementsBoundingBox.right / 100) * 100, 1000 )
+                set: Math.max( Math.ceil(elementsBoundingBox.right / 100) * 100, 60000 )
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.max( Math.ceil(elementsBoundingBox.bottom / 100) * 100, 1000 )
+                set: Math.max( Math.ceil(elementsBoundingBox.bottom / 100) * 100, 60000 )
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -235,6 +236,95 @@ Item {
                     if(!scriteDocument.readOnly)
                         canvas.createElement(mouse.x-130, mouse.y-22, newSceneButton.activeColor)
                     enabled = false
+                }
+            }
+
+            Item {
+                id: annotationsLayer
+                anchors.fill: parent
+                enabled: !createElementMouseHandler.enabled
+
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: annotationGripLoader.active
+                    onClicked: annotationGripLoader.reset()
+                }
+
+                Repeater {
+                    id: annotationItems
+                    model: scriteDocument.loading ? 0 : scriteDocument.structure.annotations
+                    delegate: Loader {
+                        property Annotation annotation: modelData
+                        sourceComponent: {
+                            switch(annotation.type) {
+                            case "rectangle": return rectangleAnnotationComponent
+                            }
+                        }
+                    }
+                }
+
+                Loader {
+                    id: annotationGripLoader
+                    property Item annotationItem
+                    property Annotation annotation
+                    sourceComponent: annotationGripComponent
+                    active: annotation !== null
+                    onActiveChanged: {
+                        if(!active)
+                            floatingDockWidget.hide()
+                    }
+
+                    function reset() {
+                        floatingDockWidget.hide()
+                        annotation = null
+                        annotationItem = null
+                    }
+
+                    onAnnotationChanged: {
+                        if(annotation === null)
+                            floatingDockWidget.hide()
+                        else {
+                            if(floatingDockWidget.contentX < 0) {
+                                floatingDockWidget.contentX = documentUI.mapFromItem(structureView, 0, 0).x + structureView.width + 40
+                                floatingDockWidget.contentY = (documentUI.height - floatingDockWidget.contentHeight)/2
+                            }
+
+                            floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
+                        }
+                    }
+
+                    Connections {
+                        target: createElementMouseHandler
+                        onEnabledChanged: {
+                            if(canvasScroll.enabled)
+                                annotationGripLoader.reset()
+                        }
+                    }
+
+                    Connections {
+                        target: canvasScroll
+                        onEditItemChanged: {
+                            if(canvasScroll.editItem !== null)
+                                annotationGripLoader.reset()
+                        }
+                    }
+
+                    Connections {
+                        target: canvasContextMenu
+                        onVisibleChanged: {
+                            if(canvasContextMenu.visible)
+                                annotationGripLoader.reset()
+                        }
+                    }
+
+                    Connections {
+                        target: scriteDocument.structure
+                        onCurrentElementIndexChanged: {
+                            if(scriteDocument.structure.currentElementIndex >= 0)
+                                annotationGripLoader.reset()
+                        }
+                        onAnnotationCountChanged: annotationGripLoader.reset()
+                    }
                 }
             }
 
@@ -256,7 +346,7 @@ Item {
 
             BoxShadow {
                 anchors.fill: currentElementItem
-                visible: currentElementItem !== null
+                visible: currentElementItem !== null && !annotationGripLoader.active
                 property Item currentElementItem: currentElementItemBinder.get
                 onCurrentElementItemChanged: canvasScroll.ensureItemVisible(currentElementItem, canvas.scale)
 
@@ -462,6 +552,21 @@ Item {
                         canvasContextMenu.close()
                     }
                 }
+
+                MenuSeparator { }
+
+                Menu2 {
+                    title: "Annotation"
+
+                    MenuItem2 {
+                        text: "Rectangle"
+                        onClicked: structureView.createNewRectangleAnnotation(canvasContextMenu.x,canvasContextMenu.y)
+                    }
+
+                    MenuItem2 {
+                        text: "Text"
+                    }
+                }
             }
 
             Menu2 {
@@ -604,7 +709,7 @@ Item {
     Loader {
         width: parent.width*0.7
         anchors.centerIn: parent
-        active: scriteDocument.structure.elementCount === 0
+        active: scriteDocument.structure.elementCount === 0 && scriteDocument.structure.annotationCount === 0
         sourceComponent: TextArea {
             readOnly: true
             wrapMode: Text.WordWrap
@@ -717,12 +822,14 @@ Item {
                 }
                 acceptedButtons: Qt.LeftButton
                 onDoubleClicked: {
+                    annotationGripLoader.reset()
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
                     if(!scriteDocument.readOnly)
                         titleText.editMode = true
                 }
                 onClicked: {
+                    annotationGripLoader.reset()
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
                     requestEditor()
@@ -845,6 +952,236 @@ Item {
                     text: (index+1)
                 }
             }
+        }
+    }
+
+    // Template annotation component
+    Component {
+        id: annotationObject
+
+        Annotation { }
+    }
+
+    Component {
+        id: annotationGripComponent
+
+        Item {
+            id: annotationGripItem
+            x: annotationItem.x
+            y: annotationItem.y
+            width: annotationItem.width
+            height: annotationItem.height
+            readonly property int geometryUpdateInterval: 50
+
+            PainterPathItem {
+                id: focusIndicator
+                anchors.fill: parent
+                anchors.margins: -5
+                renderType: PainterPathItem.OutlineOnly
+                renderingMechanism: PainterPathItem.UseQPainter
+                outlineWidth: 1
+                outlineColor: accentColors.a700.background
+                outlineStyle: PainterPathItem.DashDotDotLine
+                painterPath: PainterPath {
+                    MoveTo { x: 0; y: 0 }
+                    LineTo { x: focusIndicator.width-1; y: 0 }
+                    LineTo { x: focusIndicator.width-1; y: focusIndicator.height-1 }
+                    LineTo { x: 0; y: focusIndicator.height-1 }
+                    CloseSubpath { }
+                }
+            }
+
+            onXChanged: annotGeoUpdateTimer.start()
+            onYChanged: annotGeoUpdateTimer.start()
+            onWidthChanged: annotGeoUpdateTimer.start()
+            onHeightChanged: annotGeoUpdateTimer.start()
+
+            Timer {
+                id: annotGeoUpdateTimer
+                interval: geometryUpdateInterval
+                onTriggered: {
+                    annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, annotationGripItem.width, annotationGripItem.height)
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.SizeAllCursor
+                drag.target: annotationItem
+                drag.minimumX: 0
+                drag.minimumY: 0
+                drag.maximumX: canvas.width - parent.width
+                drag.maximumY: canvas.height - parent.height
+                drag.axis: Drag.XAndYAxis
+            }
+
+            Rectangle {
+                id: rightGrip
+                width: 10
+                height: 10
+                color: accentColors.a700.background
+                x: parent.width - width/2
+                y: (parent.height - height)/2
+
+                onXChanged: widthUpdateTimer.start()
+
+                Timer {
+                    id: widthUpdateTimer
+                    interval: geometryUpdateInterval
+                    onTriggered: {
+                        annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, rightGrip.x + rightGrip.width/2, annotationGripItem.height)
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.SizeHorCursor
+                    drag.target: parent
+                    drag.axis: Drag.XAxis
+                }
+            }
+
+            Rectangle {
+                id: bottomGrip
+                width: 10
+                height: 10
+                color: accentColors.a700.background
+                x: (parent.width - width)/2
+                y: parent.height - height/2
+
+                onYChanged: heightUpdateTimer.start()
+
+                Timer {
+                    id: heightUpdateTimer
+                    interval: geometryUpdateInterval
+                    onTriggered: {
+                        annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, annotationGripItem.width, bottomGrip.y + bottomGrip.height/2)
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.SizeVerCursor
+                    drag.target: parent
+                    drag.axis: Drag.YAxis
+                }
+            }
+
+            Rectangle {
+                id: bottomRightGrip
+                width: 10
+                height: 10
+                color: accentColors.a700.background
+                x: parent.width - width/2
+                y: parent.height - height/2
+
+                onXChanged: sizeUpdateTimer.start()
+                onYChanged: sizeUpdateTimer.start()
+
+                Timer {
+                    id: sizeUpdateTimer
+                    interval: geometryUpdateInterval
+                    onTriggered: {
+                        annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, bottomRightGrip.x + bottomRightGrip.width/2, bottomRightGrip.y + bottomRightGrip.height/2)
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.SizeFDiagCursor
+                    drag.target: parent
+                    drag.axis: Drag.XAndYAxis
+                }
+            }
+        }
+    }
+
+    Component {
+        id: annotationPropertyEditorComponent
+
+        AnnotationPropertyEditor {
+            annotation: annotationGripLoader.annotation
+        }
+    }
+
+    function createNewRectangleAnnotation(x, y) {
+        var annot = annotationObject.createObject(canvas)
+        annot.type = "rectangle"
+        annot.geometry = Qt.rect(x, y, 200, 200)
+        annot.metaData = [
+                {
+                    "name": "color",
+                    "title": "Color",
+                    "type": "color",
+                    "default": "white",
+                    "allowAlpha": false
+                },
+                {
+                    "name": "borderColor",
+                    "title": "Border Color",
+                    "type": "color",
+                    "default": "black",
+                    "allowAlpha": false
+                },
+                {
+                    "name": "borderWidth",
+                    "title": "Border Width",
+                    "type": "number",
+                    "default": 1,
+                    "step": 1,
+                    "min": 0,
+                    "max": 5
+                },
+                {
+                    "name": "opacity",
+                    "title": "Opacity",
+                    "type": "number",
+                    "default": 50,
+                    "step": 10,
+                    "min": 0,
+                    "max": 100
+                }
+            ]
+        scriteDocument.structure.addAnnotation(annot)
+    }
+
+    Component {
+        id: rectangleAnnotationComponent
+
+        Rectangle {
+            x: annotation.geometry.x
+            y: annotation.geometry.y
+            width: annotation.geometry.width
+            height: annotation.geometry.height
+            color: annotation.attributes.color
+            border {
+                width: annotation.attributes.borderWidth
+                color: annotation.attributes.borderColor
+            }
+            opacity: annotation.attributes.opacity / 100
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: annotationGripLoader.annotation !== annotation
+                onClicked: {
+                    annotationGripLoader.annotationItem = parent
+                    annotationGripLoader.annotation = annotation
+                }
+            }
+        }
+    }
+
+    Component {
+        id: unknownAnnotationComponent
+
+        Text {
+            text: "Unknown annotation: <strong>" + annotation.type + "</strong>"
+            x: annotation.geometry.x
+            y: annotation.geometry.y
         }
     }
 }

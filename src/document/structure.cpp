@@ -354,7 +354,9 @@ Annotation::Annotation(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
 {
-
+    connect(this, &Annotation::typeChanged, this, &Annotation::annotationChanged);
+    connect(this, &Annotation::geometryChanged, this, &Annotation::annotationChanged);
+    connect(this, &Annotation::attributesChanged, this, &Annotation::annotationChanged);
 }
 
 Annotation::~Annotation()
@@ -362,27 +364,49 @@ Annotation::~Annotation()
     emit aboutToDelete(this);
 }
 
-void Annotation::setType(const QJsonValue &val)
+void Annotation::setType(const QString &val)
 {
-    if(m_type == val || !m_type.isUndefined())
+    // Can be set only once.
+    if(m_type == val || !m_type.isEmpty())
         return;
 
     m_type = val;
     emit typeChanged();
 }
 
-void Annotation::setAttributes(const QJsonValue &val)
+void Annotation::setGeometry(const QRectF &val)
+{
+    if(m_geometry == val)
+        return;
+
+    m_geometry = val;
+    emit geometryChanged();
+}
+
+void Annotation::setAttributes(const QJsonObject &val)
 {
     if(m_attributes == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "type");
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "attributes");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
     if(!info->isLocked())
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_attributes = val;
+    this->polishAttributes();
     emit attributesChanged();
+}
+
+void Annotation::setMetaData(const QJsonArray &val)
+{
+    // Can be set only once.
+    if(m_metaData == val || !m_metaData.isEmpty())
+        return;
+
+    m_metaData = val;
+    this->polishAttributes();
+    emit metaDataChanged();
 }
 
 bool Annotation::event(QEvent *event)
@@ -391,6 +415,46 @@ bool Annotation::event(QEvent *event)
         m_structure = qobject_cast<Structure*>(this->parent());
 
     return QObject::event(event);
+}
+
+void Annotation::polishAttributes()
+{
+    QJsonArray::const_iterator it = m_metaData.begin();
+    QJsonArray::const_iterator end = m_metaData.end();
+    while(it != end)
+    {
+        const QJsonObject meta = (*it).toObject();
+        if(meta.isEmpty())
+        {
+            ++it;
+            continue;
+        }
+
+        const QString key = meta.value( QStringLiteral("name") ).toString();
+        if(key.isEmpty())
+        {
+            ++it;
+            continue;
+        }
+
+        QJsonValue attrVal = m_attributes.value(key);
+        if(attrVal.isUndefined())
+            m_attributes.insert(key, meta.value(QStringLiteral("default")));
+        else
+        {
+            const bool isNumber = meta.value(QStringLiteral("type")).toString() == QStringLiteral("number");
+            if(isNumber)
+            {
+                const qreal min = meta.value(QStringLiteral("min")).toDouble();
+                const qreal max = meta.value(QStringLiteral("max")).toDouble();
+                const qreal val = qBound(min, attrVal.toDouble(), max);
+                if(val != attrVal.toDouble())
+                    m_attributes.insert(key, val);
+            }
+        }
+
+        ++it;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -966,8 +1030,7 @@ void Structure::addAnnotation(Annotation *ptr)
 
     ptr->setParent(this);
     connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
-    connect(ptr, &Annotation::typeChanged, this, &Structure::structureChanged);
-    connect(ptr, &Annotation::attributesChanged, this, &Structure::structureChanged);
+    connect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
 
     emit annotationCountChanged();
 }
@@ -992,8 +1055,7 @@ void Structure::removeAnnotation(Annotation *ptr)
     m_annotations.removeAt(index);
 
     disconnect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
-    disconnect(ptr, &Annotation::typeChanged, this, &Structure::structureChanged);
-    disconnect(ptr, &Annotation::attributesChanged, this, &Structure::structureChanged);
+    disconnect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
 
     emit annotationCountChanged();
 

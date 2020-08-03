@@ -179,23 +179,39 @@ public:
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
     Structure* structure() const { return m_structure; }
 
-    Q_PROPERTY(QJsonValue type READ type WRITE setType NOTIFY typeChanged)
-    void setType(const QJsonValue &val);
-    QJsonValue type() const { return m_type; }
+    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
+    void setType(const QString &val);
+    QString type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QJsonValue attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
-    void setAttributes(const QJsonValue &val);
-    QJsonValue attributes() const { return m_attributes; }
+    Q_PROPERTY(QRectF geometry READ geometry WRITE setGeometry NOTIFY geometryChanged)
+    void setGeometry(const QRectF &val);
+    QRectF geometry() const { return m_geometry; }
+    Q_SIGNAL void geometryChanged();
+
+    Q_PROPERTY(QJsonObject attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
+    void setAttributes(const QJsonObject &val);
+    QJsonObject attributes() const { return m_attributes; }
     Q_SIGNAL void attributesChanged();
+
+    Q_PROPERTY(QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged)
+    void setMetaData(const QJsonArray &val);
+    QJsonArray metaData() const { return m_metaData; }
+    Q_SIGNAL void metaDataChanged();
+
+signals:
+    void annotationChanged();
 
 protected:
     bool event(QEvent *event);
+    void polishAttributes();
 
 private:
-    QJsonValue m_type = QJsonValue(QJsonValue::Undefined);
+    QRectF m_geometry;
+    QString m_type;
     Structure *m_structure = nullptr;
-    QJsonValue m_attributes = QJsonValue(QJsonValue::Undefined);
+    QJsonArray m_metaData;
+    QJsonObject m_attributes;
 };
 
 class Structure : public QObject

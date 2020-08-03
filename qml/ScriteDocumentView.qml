@@ -1643,4 +1643,29 @@ Item {
             }
         }
     }
+
+    DockWidget {
+        id: floatingDockWidget
+        title: "Floating"
+        anchors.fill: parent
+        visible: false
+        contentX: -1
+        contentY: -1
+        contentWidth: 375
+        contentHeight: 480
+        onCloseRequest: hide()
+
+        function display(titleText, contentComponent) {
+            title = titleText
+            content = contentComponent
+            show()
+        }
+
+        onVisibleChanged: {
+            if(visible === false) {
+                title = "Floating"
+                content = null
+            }
+        }
+    }
 }

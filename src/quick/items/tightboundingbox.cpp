@@ -28,7 +28,10 @@ TightBoundingBoxEvaluator::~TightBoundingBoxEvaluator()
 void TightBoundingBoxEvaluator::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_evaluationTimer.timerId())
+    {
+        m_evaluationTimer.stop();
         this->evaluateNow();
+    }
 }
 
 void TightBoundingBoxEvaluator::setBoundingBox(const QRectF &val)
