@@ -447,6 +447,32 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     return ret;
 }
 
+qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *element) const
+{
+    QTextFrame *frame = this->findTextFrame(element);
+    if(frame == nullptr)
+        return 0;
+
+    QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+    return layout->frameBoundingRect(frame).height();
+}
+
+qreal ScreenplayTextDocument::lengthInPages(ScreenplayElement *element) const
+{
+    const qreal pxLength = this->lengthInPixels(element);
+    if( qFuzzyIsNull(pxLength) )
+        return 0;
+
+    const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
+    const qreal topMargin = rootFrameFormat.topMargin();
+    const qreal bottomMargin = rootFrameFormat.bottomMargin();
+    const qreal pageLength = m_textDocument->pageSize().height() - topMargin - bottomMargin;
+    if( qFuzzyIsNull(pageLength) )
+        return 0;
+
+    return pxLength / pageLength;
+}
+
 void ScreenplayTextDocument::setInjection(QObject *val)
 {
     if(m_injection == val)

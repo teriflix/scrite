@@ -153,6 +153,9 @@ public:
     QList< QPair<int,int> > pageBoundaries() const { return m_pageBoundaries; }
     Q_SIGNAL void pageBoundariesChanged();
 
+    Q_INVOKABLE qreal lengthInPixels(ScreenplayElement *element) const;
+    Q_INVOKABLE qreal lengthInPages(ScreenplayElement *element) const;
+
     Q_PROPERTY(QObject* injection READ injection WRITE setInjection NOTIFY injectionChanged RESET resetInjection)
     void setInjection(QObject* val);
     QObject* injection() const { return m_injection; }
