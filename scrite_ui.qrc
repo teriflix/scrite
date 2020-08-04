@@ -53,5 +53,6 @@
         <file>qml/TabView2.qml</file>
         <file>qml/PageView.qml</file>
         <file>qml/AnnotationPropertyEditor.qml</file>
+        <file>annotations_metadata.json</file>
     </qresource>
 </RCC>

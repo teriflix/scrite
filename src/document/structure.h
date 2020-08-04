@@ -194,7 +194,7 @@ public:
     QJsonObject attributes() const { return m_attributes; }
     Q_SIGNAL void attributesChanged();
 
-    Q_PROPERTY(QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged)
+    Q_PROPERTY(QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged STORED false)
     void setMetaData(const QJsonArray &val);
     QJsonArray metaData() const { return m_metaData; }
     Q_SIGNAL void metaDataChanged();

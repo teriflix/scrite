@@ -16,6 +16,8 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QJsonDocument>
+
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent)),
@@ -372,6 +374,17 @@ void Annotation::setType(const QString &val)
 
     m_type = val;
     emit typeChanged();
+
+    static QJsonObject metaDataDict;
+    if(metaDataDict.isEmpty())
+    {
+        QFile file(":/annotations_metadata.json");
+        file.open(QFile::ReadOnly);
+        metaDataDict = QJsonDocument::fromJson(file.readAll()).object();
+    }
+
+    const QJsonArray metaData = metaDataDict.value(m_type).toArray();
+    this->setMetaData(metaData);
 }
 
 void Annotation::setGeometry(const QRectF &val)

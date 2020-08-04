@@ -1112,40 +1112,6 @@ Item {
         var annot = annotationObject.createObject(canvas)
         annot.type = "rectangle"
         annot.geometry = Qt.rect(x, y, 200, 200)
-        annot.metaData = [
-                {
-                    "name": "color",
-                    "title": "Color",
-                    "type": "color",
-                    "default": "white",
-                    "allowAlpha": false
-                },
-                {
-                    "name": "borderColor",
-                    "title": "Border Color",
-                    "type": "color",
-                    "default": "black",
-                    "allowAlpha": false
-                },
-                {
-                    "name": "borderWidth",
-                    "title": "Border Width",
-                    "type": "number",
-                    "default": 1,
-                    "step": 1,
-                    "min": 0,
-                    "max": 5
-                },
-                {
-                    "name": "opacity",
-                    "title": "Opacity",
-                    "type": "number",
-                    "default": 50,
-                    "step": 10,
-                    "min": 0,
-                    "max": 100
-                }
-            ]
         scriteDocument.structure.addAnnotation(annot)
     }
 
