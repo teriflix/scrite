@@ -1192,100 +1192,12 @@ Item {
                     sourceComponent: mainTabBar.currentIndex === 0 ? screenplayEditorComponent : null
                 }
 
-                SplitView {
-                    orientation: Qt.Vertical
-                    Material.background: Qt.darker(primaryColors.windowColor, 1.1)
-
-                    Rectangle {
-                        SplitView.fillHeight: true
-                        color: primaryColors.c10.background
-
-                        SplitView {
-                            orientation: Qt.Horizontal
-                            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
-                            anchors.fill: parent
-
-                            Rectangle {
-                                SplitView.fillWidth: true
-                                color: primaryColors.c10.background
-                                border {
-                                    width: 1
-                                    color: primaryColors.borderColor
-                                }
-
-                                StructureView {
-                                    anchors.fill: parent
-                                    anchors.margins: 1
-                                    onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
-                                    onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
-                                }
-                            }
-
-                            Loader {
-                                id: screenplayEditor2
-                                SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? scriteDocument.formatting.pageLayout.paperWidth * 1.4 : workspaceSettings.screenplayEditorWidth
-                                onWidthChanged: workspaceSettings.screenplayEditorWidth = width
-                                property bool editCurrentSceneInStructure: true
-                                readonly property int screenplayZoomLevelModifier: -3
-                                active: screenplayEditor2Active.value
-                                sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
-                            }
-
-                            ResetOnChange {
-                                id: screenplayEditor2Active
-                                trackChangesOn: screenplayEditor2.editCurrentSceneInStructure
-                                from: false; to: true
-                            }
-                        }
-                    }
-
-                    Item {
-                        SplitView.preferredHeight: screenplayView.preferredHeight + 40
-                        SplitView.minimumHeight: SplitView.preferredHeight
-                        SplitView.maximumHeight: SplitView.preferredHeight
-
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: 2
-                            color: accentColors.c200.background
-                            border { width: 1; color: accentColors.borderColor }
-
-                            ScreenplayView {
-                                id: screenplayView
-                                anchors.fill: parent
-                                anchors.margins: 5
-                                onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = false
-                            }
-                        }
-                    }
+                Loader {
+                    sourceComponent: mainTabBar.currentIndex === 1 ? structureEditorComponent : null
                 }
 
-                SplitView {
-                    orientation: Qt.Vertical
-                    Material.background: Qt.darker(primaryColors.windowColor, 1.1)
-
-                    NotebookView {
-                        SplitView.fillHeight: true
-                    }
-
-                    Item {
-                        SplitView.preferredHeight: screenplayView2.preferredHeight + 40
-                        SplitView.minimumHeight: SplitView.preferredHeight
-                        SplitView.maximumHeight: SplitView.preferredHeight
-
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: 2
-                            color: accentColors.c200.background
-                            border { width: 1; color: accentColors.borderColor }
-
-                            ScreenplayView {
-                                id: screenplayView2
-                                anchors.fill: parent
-                                anchors.margins: 5
-                            }
-                        }
-                    }
+                Loader {
+                    sourceComponent: mainTabBar.currentIndex === 2 ? notebookEditorComponent : null
                 }
             }
         }
@@ -1320,6 +1232,110 @@ Item {
         ScreenplayEditor {
             source: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex).scene
             zoomLevelModifier: screenplayZoomLevelModifier
+        }
+    }
+
+    Component {
+        id: structureEditorComponent
+
+        SplitView {
+            orientation: Qt.Vertical
+            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+
+            Rectangle {
+                SplitView.fillHeight: true
+                color: primaryColors.c10.background
+
+                SplitView {
+                    orientation: Qt.Horizontal
+                    Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+                    anchors.fill: parent
+
+                    Rectangle {
+                        SplitView.fillWidth: true
+                        color: primaryColors.c10.background
+                        border {
+                            width: 1
+                            color: primaryColors.borderColor
+                        }
+
+                        StructureView {
+                            anchors.fill: parent
+                            anchors.margins: 1
+                            onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
+                            onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                        }
+                    }
+
+                    Loader {
+                        id: screenplayEditor2
+                        SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? scriteDocument.formatting.pageLayout.paperWidth * 1.4 : workspaceSettings.screenplayEditorWidth
+                        onWidthChanged: workspaceSettings.screenplayEditorWidth = width
+                        property bool editCurrentSceneInStructure: true
+                        readonly property int screenplayZoomLevelModifier: -3
+                        active: screenplayEditor2Active.value
+                        sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
+                    }
+
+                    ResetOnChange {
+                        id: screenplayEditor2Active
+                        trackChangesOn: screenplayEditor2.editCurrentSceneInStructure
+                        from: false; to: true
+                    }
+                }
+            }
+
+            Item {
+                SplitView.preferredHeight: screenplayView.preferredHeight + 40
+                SplitView.minimumHeight: SplitView.preferredHeight
+                SplitView.maximumHeight: SplitView.preferredHeight
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    color: accentColors.c200.background
+                    border { width: 1; color: accentColors.borderColor }
+
+                    ScreenplayView {
+                        id: screenplayView
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: notebookEditorComponent
+
+        SplitView {
+            orientation: Qt.Vertical
+            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+
+            NotebookView {
+                SplitView.fillHeight: true
+            }
+
+            Item {
+                SplitView.preferredHeight: screenplayView2.preferredHeight + 40
+                SplitView.minimumHeight: SplitView.preferredHeight
+                SplitView.maximumHeight: SplitView.preferredHeight
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    color: accentColors.c200.background
+                    border { width: 1; color: accentColors.borderColor }
+
+                    ScreenplayView {
+                        id: screenplayView2
+                        anchors.fill: parent
+                        anchors.margins: 5
+                    }
+                }
+            }
         }
     }
 
