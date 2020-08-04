@@ -53,6 +53,7 @@ void UrlAttributes::setUrl(const QUrl &val)
     else
         this->setStatus(m_url.isEmpty() ? Null : Error);
 #else
+    this->setAttributes(this->createDefaultAttributes());
     this->setStatus(Ready);
 #endif
 }
@@ -77,15 +78,17 @@ void UrlAttributes::onWebPageLoadFinished(bool ok)
     static QString jsCode;
     if(jsCode.isEmpty())
     {
-        QFile jsFile(":/misc/fetchogattribs.js");
+        QFile jsFile(QStringLiteral(":/misc/fetchogattribs.js"));
         if(jsFile.open(QFile::ReadOnly))
             jsCode = jsFile.readAll();
     }
 
     QJsonObject defaultAttribs;
-    defaultAttribs.insert("url", webPage->url().toString());
-    defaultAttribs.insert("type", "website");
-    defaultAttribs.insert("title", webPage->title());
+    defaultAttribs.insert(QStringLiteral("url"), webPage->url().toString());
+    defaultAttribs.insert(QStringLiteral("type"), "website");
+    defaultAttribs.insert((QStringLiteral("title"), webPage->title());
+    defaultAttribs.insert((QStringLiteral("image"), QStringLiteral(""));
+    defaultAtrribs.insert((QStringLiteral("description"), (QStringLiteral(""));
 
     if(jsCode.isEmpty())
     {
@@ -151,6 +154,17 @@ void UrlAttributes::setAttributes(const QJsonObject &val)
 
     m_attributes = val;
     emit attributesChanged();
+}
+
+QJsonObject UrlAttributes::createDefaultAttributes() const
+{
+    QJsonObject defaultAttrs;
+    defaultAttrs.insert(QStringLiteral("url"), m_url.toString());
+    defaultAttrs.insert(QStringLiteral("type"), QStringLiteral("website"));
+    defaultAttrs.insert(QStringLiteral("title"), QStringLiteral("Website URL"));
+    defaultAttrs.insert(QStringLiteral("image"), QStringLiteral(""));
+    defaultAttrs.insert(QStringLiteral("description"), QStringLiteral(""));
+    return defaultAttrs;
 }
 
 

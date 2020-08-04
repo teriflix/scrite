@@ -260,6 +260,7 @@ Item {
                             case "rectangle": return rectangleAnnotationComponent
                             case "text": return textAnnotationComponent
                             case "url": return urlAnnotationComponent
+                            case "image": return imageAnnotationComponent
                             }
                             return null
                         }
@@ -572,8 +573,13 @@ Item {
                     }
 
                     MenuItem2 {
-                        text: "Url"
+                        text: "Website Link"
                         onClicked: structureView.createNewUrlAnnotation(canvasContextMenu.x,canvasContextMenu.y)
+                    }
+
+                    MenuItem2 {
+                        text: "Image"
+                        onClicked: structureView.createNewImageAnnotation(canvasContextMenu.x,canvasContextMenu.y)
                     }
                 }
             }
@@ -968,7 +974,9 @@ Item {
     Component {
         id: annotationObject
 
-        Annotation { }
+        Annotation {
+            objectName: "ica" // interactively created annotation
+        }
     }
 
     Component {
@@ -1136,27 +1144,7 @@ Item {
     Component {
         id: rectangleAnnotationComponent
 
-        Rectangle {
-            x: annotation.geometry.x
-            y: annotation.geometry.y
-            width: annotation.geometry.width
-            height: annotation.geometry.height
-            color: annotation.attributes.fillBackground ? annotation.attributes.color : Qt.rgba(0,0,0,0)
-            border {
-                width: annotation.attributes.borderWidth
-                color: annotation.attributes.borderColor
-            }
-            opacity: annotation.attributes.opacity / 100
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: annotationGripLoader.annotation !== annotation
-                onClicked: {
-                    annotationGripLoader.annotationItem = parent
-                    annotationGripLoader.annotation = annotation
-                }
-            }
-        }
+        AnnotationItem { }
     }
 
     function createNewTextAnnotation(x, y) {
@@ -1169,18 +1157,7 @@ Item {
     Component {
         id: textAnnotationComponent
 
-        Rectangle {
-            x: annotation.geometry.x
-            y: annotation.geometry.y
-            width: annotation.geometry.width
-            height: annotation.geometry.height
-            color: annotation.attributes.fillBackground ? annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)
-            border {
-                width: annotation.attributes.borderWidth
-                color: annotation.attributes.borderColor
-            }
-            opacity: annotation.attributes.opacity / 100
-
+        AnnotationItem {
             Text {
                 anchors.centerIn: parent
                 horizontalAlignment: {
@@ -1209,15 +1186,6 @@ Item {
                 clip: true
                 wrapMode: Text.WordWrap
             }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: annotationGripLoader.annotation !== annotation
-                onClicked: {
-                    annotationGripLoader.annotationItem = parent
-                    annotationGripLoader.annotation = annotation
-                }
-            }
         }
     }
 
@@ -1232,32 +1200,17 @@ Item {
     Component {
         id: urlAnnotationComponent
 
-        Rectangle {
-            id: urlAnnotItem
-            x: annotation.geometry.x
-            y: annotation.geometry.y
-            width: annotation.geometry.width
-            height: annotation.geometry.height
+        AnnotationItem {
             color: primaryColors.c50.background
             border {
                 width: 1
                 color: primaryColors.borderColor
             }
+            opacity: 1
 
             UrlAttributes {
                 id: urlAttribs
                 url: annotation.attributes.url
-            }
-
-            function grip() {
-                annotationGripLoader.annotationItem = urlAnnotItem
-                annotationGripLoader.annotation = annotation
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: annotationGripLoader.annotation !== annotation
-                onClicked: grip()
             }
 
             Loader {
@@ -1278,7 +1231,7 @@ Item {
                     Text {
                         font.bold: true
                         font.pointSize: app.idealFontPointSize + 2
-                        text: app.isMacOSPlatform ? "Website URL" : (urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.title : "Loading ...")
+                        text: urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.title : "Loading ..."
                         width: parent.width
                         elide: Text.ElideRight
                     }
@@ -1318,6 +1271,55 @@ Item {
                 font.pointSize: app.idealFontPointSize
                 text: app.isMacOSPlatform ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
                 visible: urlAttribs.url == ""
+            }
+        }
+    }
+
+    function createNewImageAnnotation(x, y) {
+        var annot = annotationObject.createObject(canvas)
+        annot.type = "image"
+        annot.geometry = Qt.rect(x, y, 300, 169)
+        scriteDocument.structure.addAnnotation(annot)
+    }
+
+    Component {
+        id: imageAnnotationComponent
+
+        AnnotationItem {
+            clip: true
+
+            Image {
+                id: image
+                width: parent.width - 10
+                anchors.top: parent.top
+                anchors.topMargin: 5
+                anchors.horizontalCenter: parent.horizontalCenter
+                fillMode: Image.PreserveAspectFit
+                smooth: canvasScroll.moving || canvasScroll.flicking ? false : true
+                mipmap: smooth
+                source: annotation.imageUrl(annotation.attributes.image)
+                asynchronous: true
+            }
+
+            Text {
+                width: image.width
+                height: Math.max(parent.height - image.height - 10, 0)
+                visible: height > 0
+                wrapMode: Text.WordWrap
+                elide: Text.ElideRight
+                font.pointSize: app.idealFontPointSize
+                text: annotation.attributes.caption
+                color: annotation.attributes.captionColor
+                anchors.top: image.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 5
+                horizontalAlignment: {
+                    switch(annotation.attributes.captionAlignment) {
+                    case "left": return Text.AlignLeft
+                    case "right": return Text.AlignRight
+                    }
+                    return Text.AlignHCenter
+                }
             }
         }
     }

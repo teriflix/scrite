@@ -209,6 +209,10 @@ public:
     QJsonArray metaData() const { return m_metaData; }
     Q_SIGNAL void metaDataChanged();
 
+    Q_INVOKABLE bool removeImage(const QString &name) const;
+    Q_INVOKABLE QString addImage(const QString &path) const;
+    Q_INVOKABLE QUrl imageUrl(const QString &name) const;
+
 signals:
     void annotationChanged();
 

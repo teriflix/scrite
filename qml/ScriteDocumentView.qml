@@ -1668,7 +1668,7 @@ Item {
         contentX: -1
         contentY: -1
         contentWidth: 375
-        contentHeight: 480
+        contentHeight: documentUI.height * 0.6
         onCloseRequest: hide()
 
         function display(titleText, contentComponent) {

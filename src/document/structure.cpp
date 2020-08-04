@@ -446,6 +446,34 @@ void Annotation::setMetaData(const QJsonArray &val)
     emit metaDataChanged();
 }
 
+bool Annotation::removeImage(const QString &name) const
+{
+    if(name.isEmpty())
+        return false;
+
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    if(dfs->contains(name))
+    {
+        dfs->remove(name);
+        return true;
+    }
+
+    return false;
+}
+
+QString Annotation::addImage(const QString &path) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    const QString addedPath = dfs->add(path, "annotation");
+    return dfs->relativePath(addedPath);
+}
+
+QUrl Annotation::imageUrl(const QString &name) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    return QUrl::fromLocalFile(dfs->absolutePath(name));
+}
+
 bool Annotation::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)

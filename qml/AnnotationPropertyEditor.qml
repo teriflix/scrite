@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
@@ -66,6 +67,7 @@ Item {
                 id: editorLoader
                 width: parent.width - 20
                 anchors.right: parent.right
+                enabled: !scriteDocument.readOnly
 
                 property var propertyInfo: parent.propertyInfo
                 property var propertyValue: annotation.attributes[ propertyInfo.name ]
@@ -87,6 +89,7 @@ Item {
                     case "fontStyle": return fontStyleEditor
                     case "hAlign": return hAlignEditor
                     case "vAlign": return vAlignEditor
+                    case "image": return imageEditor
                     }
                     return unknownEditor
                 }
@@ -281,6 +284,90 @@ Item {
                     font.capitalization: Font.Capitalize
                     checked: modelData === propertyValue
                     onToggled: changePropertyValue(modelData)
+                }
+            }
+        }
+    }
+
+    Component {
+        id: imageEditor
+
+        Rectangle {
+            height: (width/16)*9
+            color: primaryColors.c100.background
+            border.width: 1
+            border.color: primaryColors.borderColor
+
+            FileDialog {
+                id: fileDialog
+                nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
+                selectFolder: false
+                selectMultiple: false
+                sidebarVisible: true
+                selectExisting: true
+                onAccepted: {
+                    if(fileUrl != "") {
+                        if(propertyValue != "")
+                            annotation.removeImage(propertyValue)
+                        var newImageName = annotation.addImage(app.urlToLocalFile(fileUrl))
+                        changePropertyValue(newImageName)
+                    }
+                }
+            }
+
+            Image {
+                id: image
+                anchors.fill: parent
+                anchors.margins: 1
+                fillMode: Image.PreserveAspectFit
+                source: annotation.imageUrl(propertyValue)
+                asynchronous: true
+            }
+
+            BusyIndicator {
+                anchors.centerIn: parent
+                running: parent.status === Image.Loading
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onContainsMouseChanged: image.opacity = containsMouse ? 0.25 : 1
+            }
+
+            Row {
+                anchors.centerIn: parent
+                spacing: 20
+
+                Text {
+                    text: propertyValue == "" ? "Set" : "Change"
+                    color: "blue"
+                    font.underline: true
+                    font.pointSize: app.idealFontPointSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: fileDialog.open()
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                }
+
+                Text {
+                    text: "Remove"
+                    color: "blue"
+                    font.underline: true
+                    visible: propertyValue != ""
+                    font.pointSize: app.idealFontPointSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if(propertyValue != "")
+                                annotation.removeImage(propertyValue)
+                            changePropertyValue("")
+                        }
+                    }
                 }
             }
         }

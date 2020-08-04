@@ -129,5 +129,68 @@
             "type": "url",
             "default": ""
         }
+    ],
+    "image": [
+        {
+            "name": "image",
+            "title": "Image",
+            "type": "image",
+            "default": ""
+        },
+        {
+            "name": "caption",
+            "title": "Caption",
+            "type": "text",
+            "default": ""
+        },
+        {
+           "name":"captionColor",
+           "title":"Caption Text Color",
+           "type":"color",
+           "default":"black"
+        },
+        {
+           "name":"captionAlignment",
+           "title":"Caption Alignment",
+           "type":"hAlign",
+           "default":"center"
+        },
+        {
+           "name": "fillBackground",
+           "title": "Fill Background",
+           "text": "Fill with 'Background Color'",
+           "type": "boolean",
+           "default": false
+        },
+        {
+           "name":"backgroundColor",
+           "title":"Background Color",
+           "type":"color",
+           "default":"white"
+        },
+        {
+           "name":"borderColor",
+           "title":"Border Color",
+           "type":"color",
+           "default":"black"
+        },
+        {
+           "name":"borderWidth",
+           "title":"Border Width",
+           "type":"number",
+           "default":0,
+           "step":1,
+           "min":0,
+           "max":5
+        },
+        {
+           "name":"opacity",
+           "title":"Opacity",
+           "type":"number",
+           "default":100,
+           "step":10,
+           "min":0,
+           "max":100
+        }
     ]
 }

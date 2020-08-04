@@ -56,6 +56,7 @@ private:
     void onWebPageLoadFinished(bool ok);
     void setStatus(Status val);
     void setAttributes(const QJsonObject &val);
+    QJsonObject createDefaultAttributes() const;
 
 private:
     QUrl m_url;
