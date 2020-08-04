@@ -227,7 +227,7 @@ DISTFILES += \
     README \
     packaging/linux/install.sh \
     packaging/linux/package.sh \
-    packaging/linux/scrite.desktop \
+    packaging/linux/Scrite.desktop \
     packaging/windows/package-x86.bat \
     packaging/windows/package-x64.bat \
     packaging/windows/installer-x86.nsi \

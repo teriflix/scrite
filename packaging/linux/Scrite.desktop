@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Scrite
-Exec=AppRun %f
-Icon=Scrite_app_icon.png
+Exec=Scrite
+Icon=Scrite
 Comment=Multilingual Screenplay Writing App from TERIFLIX
 Terminal=false
-Categories=Office;WordProcessor
+Categories=Office;WordProcessor;
