@@ -14,7 +14,7 @@
 #ifndef TIGHTBOUNDINGBOX_H
 #define TIGHTBOUNDINGBOX_H
 
-#include "simpletimer.h"
+#include "execlatertimer.h"
 
 #include <QRectF>
 #include <QObject>
@@ -84,7 +84,7 @@ private:
 private:
     friend class TightBoundingBoxItem;
     QRectF m_boundingBox;
-    SimpleTimer m_evaluationTimer;
+    ExecLaterTimer m_evaluationTimer;
     QList<TightBoundingBoxItem*> m_items;
 };
 

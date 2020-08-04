@@ -253,12 +253,12 @@ private:
     bool m_componentComplete = true;
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
-    SimpleTimer m_sceneResetTimer;
+    ExecLaterTimer m_sceneResetTimer;
     QList<Scene*> m_sceneResetList;
     bool m_printEachSceneOnANewPage = false;
-    SimpleTimer m_loadScreenplayTimer;
+    ExecLaterTimer m_loadScreenplayTimer;
     QStringList m_highlightDialoguesOf;
-    SimpleTimer m_pageBoundaryEvalTimer;
+    ExecLaterTimer m_pageBoundaryEvalTimer;
     QTextFrameFormat m_sceneFrameFormat;
     QObjectProperty<QObject> m_injection;
     bool m_connectedToScreenplaySignals = false;

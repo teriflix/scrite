@@ -17,7 +17,7 @@
 
 #include <QQuickItem>
 
-#include "simpletimer.h"
+#include "execlatertimer.h"
 
 class DelayedPropertyBinder : public QQuickItem
 {
@@ -63,7 +63,7 @@ private:
     QVariant m_set;
     QVariant m_get;
     QVariant m_initial;
-    SimpleTimer m_timer;
+    ExecLaterTimer m_timer;
 };
 
 #endif // DELAYEDPROPERTYBINDER_H

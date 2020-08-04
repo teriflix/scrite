@@ -197,9 +197,9 @@ private:
     QString m_fileName;
     QString m_busyMessage;
     bool m_inCreateNewScene = false;
-    SimpleTimer m_autoSaveTimer;
+    ExecLaterTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
-    SimpleTimer m_clearModifyTimer;
+    ExecLaterTimer m_clearModifyTimer;
     int m_autoSaveDurationInSeconds = 60;
     DocumentFileSystem m_docFileSystem;
     QStringList m_spellCheckIgnoreList;
@@ -208,7 +208,7 @@ private:
     QObjectProperty<Screenplay> m_screenplay;
     QObjectProperty<ScreenplayFormat> m_formatting;
     QObjectProperty<ScreenplayFormat> m_printFormat;
-    SimpleTimer m_evaluateStructureElementSequenceTimer;
+    ExecLaterTimer m_evaluateStructureElementSequenceTimer;
     bool m_syncingStructureScreenplayCurrentIndex = false;
 
     ErrorReport *m_errorReport = new ErrorReport(this);

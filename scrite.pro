@@ -63,10 +63,10 @@ HEADERS += \
     src/quick/items/abstractshapeitem.h \
     src/quick/items/gridbackgrounditem.h \
     src/quick/items/painterpathitem.h \
+    src/utils/execlatertimer.h \
     src/utils/timeprofiler.h \
     src/utils/garbagecollector.h \
     src/utils/hourglass.h \
-    src/utils/simpletimer.h \
     src/utils/genericarraymodel.h \
     src/utils/qobjectfactory.h \
     src/utils/qobjectserializer.h \
@@ -145,10 +145,10 @@ SOURCES += \
     src/quick/items/textshapeitem.cpp \
     src/quick/items/abstractshapeitem.cpp \
     src/quick/items/ruleritem.cpp \
+    src/utils/execlatertimer.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/timeprofiler.cpp \
     src/utils/garbagecollector.cpp \
-    src/utils/simpletimer.cpp \
     src/utils/qobjectserializer.cpp \
     src/document/scritedocument.cpp \
     src/document/screenplay.cpp \

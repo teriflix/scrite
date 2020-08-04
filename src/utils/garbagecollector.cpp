@@ -50,6 +50,10 @@ void GarbageCollector::add(QObject *ptr)
     if(m_avoidList.contains(ptr->parent()))
         return;
 
+#ifndef QT_NO_DEBUG
+    qDebug() << "Adding to Garbage Collector: " << ptr;
+#endif
+
     connect(ptr, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
     m_objects.append(ptr);
     m_timer.start(100, this);

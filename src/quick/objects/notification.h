@@ -19,7 +19,7 @@
 #include <QColor>
 #include <QQmlEngine>
 
-#include "simpletimer.h"
+#include "execlatertimer.h"
 
 class Notification : public QObject
 {
@@ -90,7 +90,7 @@ private:
     QColor m_textColor = QColor(Qt::black);
     int m_autoCloseDelay = 2000;
     QStringList m_buttons;
-    SimpleTimer m_autoCloseTimer;
+    ExecLaterTimer m_autoCloseTimer;
 };
 Q_DECLARE_METATYPE(Notification*)
 QML_DECLARE_TYPEINFO(Notification, QML_HAS_ATTACHED_PROPERTIES)

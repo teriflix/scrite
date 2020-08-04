@@ -16,7 +16,7 @@
 
 #include "scene.h"
 #include "modifiable.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "qobjectproperty.h"
 
 #include <QJsonArray>
@@ -291,7 +291,7 @@ private:
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
 
-    SimpleTimer m_sceneNumberEvaluationTimer;
+    ExecLaterTimer m_sceneNumberEvaluationTimer;
 };
 
 #endif // SCREENPLAY_H

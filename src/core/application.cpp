@@ -14,7 +14,7 @@
 #include "undoredo.h"
 #include "autoupdate.h"
 #include "application.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "scritedocument.h"
 
 #include <QDir>
@@ -416,7 +416,7 @@ public:
     void timerEvent(QTimerEvent *event);
 
 private:
-    SimpleTimer m_timer;
+    ExecLaterTimer m_timer;
     QJSValue m_function;
     QJSValueList m_arguments;
 };
@@ -445,8 +445,13 @@ void ExecLater::timerEvent(QTimerEvent *event)
 }
 
 void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args)
-{
+{    
     QObject *parent = context ? context : this;
+
+#ifndef QT_NO_DEBUG
+    qDebug() << "Registering Exec Later for " << context << " after " << howMuchLater;
+#endif
+
     new ExecLater(howMuchLater, function, args, parent);
 }
 
@@ -690,7 +695,7 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
     {
         const QString objectName = evaluateObjectName(object, objectNameMap);
         QTimerEvent *te = static_cast<QTimerEvent*>(event);
-        SimpleTimer *timer = SimpleTimer::get(te->timerId());
+        ExecLaterTimer *timer = ExecLaterTimer::get(te->timerId());
         qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
     }
 #else

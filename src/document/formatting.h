@@ -16,7 +16,7 @@
 
 #include "scene.h"
 #include "modifiable.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "transliteration.h"
 #include "qobjectproperty.h"
 
@@ -266,7 +266,7 @@ private:
     qreal m_customResolution = 0;
     qreal m_defaultResolution = 0;
     ScreenplayFormat *m_format = nullptr;
-    SimpleTimer m_evaluateRectsTimer;
+    ExecLaterTimer m_evaluateRectsTimer;
 };
 
 class ScreenplayFormat : public QAbstractListModel, public Modifiable
@@ -547,12 +547,12 @@ private:
     QStringList m_characterNames;
     bool m_liveSpellCheckEnabled = true;
     QObjectProperty<Scene> m_scene;
-    SimpleTimer m_rehighlightTimer;
+    ExecLaterTimer m_rehighlightTimer;
     QStringList m_autoCompleteHints;
     QStringList m_spellingSuggestions;
     int m_currentElementCursorPosition = -1;
     bool m_wordUnderCursorIsMisspelled = false;
-    SimpleTimer m_initializeDocumentTimer;
+    ExecLaterTimer m_initializeDocumentTimer;
     QList<SceneElement::Type> m_tabHistory;
     QList<QTextBlock> m_rehighlightBlockQueue;
     QObjectProperty<SceneElement> m_currentElement;

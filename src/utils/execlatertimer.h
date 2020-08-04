@@ -11,21 +11,21 @@
 **
 ****************************************************************************/
 
-#ifndef SIMPLETIMER_H
-#define SIMPLETIMER_H
+#ifndef EXECLATERTIMER_H
+#define EXECLATERTIMER_H
 
 #include <QTimer>
 #include <QString>
 
-class SimpleTimer : public QObject
+class ExecLaterTimer : public QObject
 {
     Q_OBJECT
 
 public:
-    static SimpleTimer *get(int timerId);
+    static ExecLaterTimer *get(int timerId);
 
-    SimpleTimer(const QString &name=QStringLiteral("Scrite Timer"), QObject *parent=nullptr);
-    ~SimpleTimer();
+    ExecLaterTimer(const QString &name=QStringLiteral("Scrite Timer"), QObject *parent=nullptr);
+    ~ExecLaterTimer();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     void setName(const QString &val);
@@ -33,10 +33,7 @@ public:
     Q_SIGNAL void nameChanged();
 
     void start(int msec, QObject *object);
-    void stop() {
-        m_timer.stop();
-        m_timerId = -1;
-    }
+    void stop();
     int timerId() const { return m_timerId; }
     bool isActive() const { return m_timerId >= 0 && m_timer.isActive(); }
 
@@ -52,5 +49,5 @@ private:
     QObject *m_object = nullptr;
 };
 
-#endif // SIMPLETIMER_H
+#endif // EXECLATERTIMER_H
 
