@@ -17,6 +17,15 @@
 #include <QFile>
 #include <QTimer>
 
+/**
+ * https://bugreports.qt.io/browse/QTBUG-78240
+ *
+ * Qt 5.13.x on macOS crashes whenever QWebEnginePage is initialized. This happens
+ * when it tries to query for the default font family on macOS. The issue has been
+ * fixed in Qt 5.14. Until we move past 5.13, we have to unfortunately turn off
+ * fetching Open Graph Attributes in UrlAttributes class on macOS.
+ */
+
 UrlAttributes::UrlAttributes(QObject *parent)
     : QObject(parent)
 {
