@@ -945,8 +945,16 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             enabled: !scriteDocument.readOnly
                             menu: Menu2 {
-                                onAboutToShow: sceneTextEditor.persistentSelection = true
-                                onAboutToHide: sceneTextEditor.persistentSelection = false
+                                property int cursorPosition: -1
+                                onAboutToShow: {
+                                    cursorPosition = sceneTextEditor.cursorPosition
+                                    sceneTextEditor.persistentSelection = true
+                                }
+                                onAboutToHide: {
+                                    sceneTextEditor.persistentSelection = false
+                                    sceneTextEditor.forceActiveFocus()
+                                    sceneTextEditor.cursorPosition = cursorPosition
+                                }
 
                                 Repeater {
                                     model: sceneDocumentBinder.spellingSuggestions
@@ -956,7 +964,7 @@ Rectangle {
                                         focusPolicy: Qt.NoFocus
                                         onClicked: {
                                             spellingSuggestionsMenu.close()
-                                            sceneDocumentBinder.replaceWordUnderCursor(modelData)
+                                            sceneDocumentBinder.replaceWordAt(cursorPosition, modelData)
                                         }
                                     }
                                 }
