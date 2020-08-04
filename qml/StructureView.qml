@@ -169,7 +169,7 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: scriteDocument.structure.elementCount >= 1
-        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null
+        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting) && mouseOverItem === null && editItem === null
         property Item mouseOverItem
         property Item editItem
 
@@ -976,20 +976,23 @@ Item {
             height: annotationItem.height
             readonly property int geometryUpdateInterval: 50
 
+            property real gripSize: 10 * onePxSize
+            property real onePxSize: Math.max(1, 1/canvas.scale)
+
             PainterPathItem {
                 id: focusIndicator
                 anchors.fill: parent
-                anchors.margins: -5
+                anchors.margins: -gripSize/2
                 renderType: PainterPathItem.OutlineOnly
                 renderingMechanism: PainterPathItem.UseQPainter
-                outlineWidth: 1
+                outlineWidth: onePxSize
                 outlineColor: accentColors.a700.background
                 outlineStyle: PainterPathItem.DashDotDotLine
                 painterPath: PainterPath {
-                    MoveTo { x: 0; y: 0 }
-                    LineTo { x: focusIndicator.width-1; y: 0 }
-                    LineTo { x: focusIndicator.width-1; y: focusIndicator.height-1 }
-                    LineTo { x: 0; y: focusIndicator.height-1 }
+                    MoveTo { x: onePxSize; y: onePxSize }
+                    LineTo { x: focusIndicator.width-onePxSize; y: onePxSize }
+                    LineTo { x: focusIndicator.width-onePxSize; y: focusIndicator.height-onePxSize }
+                    LineTo { x: onePxSize; y: focusIndicator.height-onePxSize }
                     CloseSubpath { }
                 }
             }
@@ -1021,8 +1024,8 @@ Item {
 
             Rectangle {
                 id: rightGrip
-                width: 10
-                height: 10
+                width: gripSize
+                height: gripSize
                 color: accentColors.a700.background
                 x: parent.width - width/2
                 y: (parent.height - height)/2
@@ -1048,8 +1051,8 @@ Item {
 
             Rectangle {
                 id: bottomGrip
-                width: 10
-                height: 10
+                width: gripSize
+                height: gripSize
                 color: accentColors.a700.background
                 x: (parent.width - width)/2
                 y: parent.height - height/2
@@ -1075,8 +1078,8 @@ Item {
 
             Rectangle {
                 id: bottomRightGrip
-                width: 10
-                height: 10
+                width: gripSize
+                height: gripSize
                 color: accentColors.a700.background
                 x: parent.width - width/2
                 y: parent.height - height/2
