@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>LICENSE.txt</file>
         <file>main.qml</file>
-        <file>material_colors_db.json</file>
         <file>qml/AboutBox.qml</file>
         <file>qml/AlphabetMappings.qml</file>
         <file>qml/Button2.qml</file>
@@ -53,6 +52,5 @@
         <file>qml/TabView2.qml</file>
         <file>qml/PageView.qml</file>
         <file>qml/AnnotationPropertyEditor.qml</file>
-        <file>annotations_metadata.json</file>
     </qresource>
 </RCC>

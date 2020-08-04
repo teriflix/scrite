@@ -184,6 +184,16 @@ public:
     QString type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
+    Q_PROPERTY(bool resizable READ isResizable WRITE setResizable NOTIFY resizableChanged STORED false)
+    void setResizable(bool val);
+    bool isResizable() const { return m_resizable; }
+    Q_SIGNAL void resizableChanged();
+
+    Q_PROPERTY(bool movable READ isMovable WRITE setMovable NOTIFY movableChanged STORED false)
+    void setMovable(bool val);
+    bool isMovable() const { return m_movable; }
+    Q_SIGNAL void movableChanged();
+
     Q_PROPERTY(QRectF geometry READ geometry WRITE setGeometry NOTIFY geometryChanged)
     void setGeometry(const QRectF &val);
     QRectF geometry() const { return m_geometry; }
@@ -209,6 +219,8 @@ protected:
 private:
     QRectF m_geometry;
     QString m_type;
+    bool m_movable = true;
+    bool m_resizable = true;
     Structure *m_structure = nullptr;
     QJsonArray m_metaData;
     QJsonObject m_attributes;

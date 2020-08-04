@@ -121,5 +121,13 @@
          "min":0,
          "max":100
       }
-   ]
+   ],
+    "url": [
+        {
+            "name": "url",
+            "title": "URL",
+            "type": "url",
+            "default": ""
+        }
+    ]
 }

@@ -378,7 +378,7 @@ void Annotation::setType(const QString &val)
     static QJsonObject metaDataDict;
     if(metaDataDict.isEmpty())
     {
-        QFile file(":/annotations_metadata.json");
+        QFile file(":/misc/annotations_metadata.json");
         file.open(QFile::ReadOnly);
         metaDataDict = QJsonDocument::fromJson(file.readAll()).object();
     }
@@ -387,9 +387,33 @@ void Annotation::setType(const QString &val)
     this->setMetaData(metaData);
 }
 
+void Annotation::setResizable(bool val)
+{
+    if(m_resizable == val)
+        return;
+
+    m_resizable = val;
+    emit resizableChanged();
+}
+
+void Annotation::setMovable(bool val)
+{
+    if(m_movable == val)
+        return;
+
+    m_movable = val;
+    emit movableChanged();
+}
+
 void Annotation::setGeometry(const QRectF &val)
 {
     if(m_geometry == val)
+        return;
+
+    QRectF val2;
+    val2.setSize( m_resizable || m_geometry.size().isEmpty() ? val.size() : m_geometry.size() );
+    val2.moveTopLeft( m_movable || m_geometry.topLeft().isNull() ? val.topLeft() : m_geometry.topLeft() );
+    if(m_geometry == val2)
         return;
 
     m_geometry = val;

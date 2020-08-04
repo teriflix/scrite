@@ -82,6 +82,7 @@ Item {
                     case "number": return numberEditor
                     case "boolean": return booleanEditor
                     case "text": return textEditor
+                    case "url": return urlEditor
                     case "fontFamily": return fontFamilyEditor
                     case "fontStyle": return fontStyleEditor
                     case "hAlign": return hAlignEditor
@@ -194,6 +195,15 @@ Item {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
+        }
+    }
+
+    Component {
+        id: urlEditor
+
+        TextField {
+            text: propertyValue
+            onAccepted: changePropertyValue(text)
         }
     }
 

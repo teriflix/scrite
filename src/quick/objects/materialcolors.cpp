@@ -35,7 +35,7 @@ private:
 
 MaterialColorsDb::MaterialColorsDb()
 {
-    QFile file(":/material_colors_db.json");
+    QFile file(":/misc/material_colors_db.json");
     if( file.open(QFile::ReadOnly) )
     {
         const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());

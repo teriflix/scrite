@@ -259,6 +259,7 @@ Item {
                             switch(annotation.type) {
                             case "rectangle": return rectangleAnnotationComponent
                             case "text": return textAnnotationComponent
+                            case "url": return urlAnnotationComponent
                             }
                             return null
                         }
@@ -568,6 +569,11 @@ Item {
                     MenuItem2 {
                         text: "Text"
                         onClicked: structureView.createNewTextAnnotation(canvasContextMenu.x,canvasContextMenu.y)
+                    }
+
+                    MenuItem2 {
+                        text: "Url"
+                        onClicked: structureView.createNewUrlAnnotation(canvasContextMenu.x,canvasContextMenu.y)
                     }
                 }
             }
@@ -974,6 +980,7 @@ Item {
             y: annotationItem.y
             width: annotationItem.width
             height: annotationItem.height
+            enabled: !scriteDocument.readOnly
             readonly property int geometryUpdateInterval: 50
 
             property real gripSize: 10 * onePxSize
@@ -1020,6 +1027,8 @@ Item {
                 drag.maximumX: canvas.width - parent.width
                 drag.maximumY: canvas.height - parent.height
                 drag.axis: Drag.XAndYAxis
+                enabled: annotation.movable
+                propagateComposedEvents: true
             }
 
             Rectangle {
@@ -1029,6 +1038,7 @@ Item {
                 color: accentColors.a700.background
                 x: parent.width - width/2
                 y: (parent.height - height)/2
+                visible: annotation.resizable
 
                 onXChanged: widthUpdateTimer.start()
 
@@ -1056,6 +1066,7 @@ Item {
                 color: accentColors.a700.background
                 x: (parent.width - width)/2
                 y: parent.height - height/2
+                visible: annotation.resizable
 
                 onYChanged: heightUpdateTimer.start()
 
@@ -1083,6 +1094,7 @@ Item {
                 color: accentColors.a700.background
                 x: parent.width - width/2
                 y: parent.height - height/2
+                visible: annotation.resizable
 
                 onXChanged: sizeUpdateTimer.start()
                 onYChanged: sizeUpdateTimer.start()
@@ -1205,6 +1217,107 @@ Item {
                     annotationGripLoader.annotationItem = parent
                     annotationGripLoader.annotation = annotation
                 }
+            }
+        }
+    }
+
+    function createNewUrlAnnotation(x, y) {
+        var annot = annotationObject.createObject(canvas)
+        annot.type = "url"
+        annot.resizable = false
+        annot.geometry = app.isMacOSPlatform ? Qt.rect(x, y, 300, 60) : Qt.rect(x, y, 300, 350)
+        scriteDocument.structure.addAnnotation(annot)
+    }
+
+    Component {
+        id: urlAnnotationComponent
+
+        Rectangle {
+            id: urlAnnotItem
+            x: annotation.geometry.x
+            y: annotation.geometry.y
+            width: annotation.geometry.width
+            height: annotation.geometry.height
+            color: primaryColors.c50.background
+            border {
+                width: 1
+                color: primaryColors.borderColor
+            }
+
+            UrlAttributes {
+                id: urlAttribs
+                url: annotation.attributes.url
+            }
+
+            function grip() {
+                annotationGripLoader.annotationItem = urlAnnotItem
+                annotationGripLoader.annotation = annotation
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: annotationGripLoader.annotation !== annotation
+                onClicked: grip()
+            }
+
+            Loader {
+                anchors.fill: parent
+                anchors.margins: 8
+                active: urlAttribs.status === UrlAttributes.Ready
+                clip: true
+                sourceComponent: Column {
+                    spacing: 4
+
+                    Image {
+                        width: parent.width
+                        fillMode: Image.PreserveAspectFit
+                        source: urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.image : ""
+                        visible: !app.isMacOSPlatform
+                    }
+
+                    Text {
+                        font.bold: true
+                        font.pointSize: app.idealFontPointSize + 2
+                        text: app.isMacOSPlatform ? "Website URL" : (urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.title : "Loading ...")
+                        width: parent.width
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        font.pointSize: app.idealFontPointSize
+                        text: urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.description : "Loading ..."
+                        visible: !app.isMacOSPlatform
+                        width: parent.width
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        font.pointSize: app.idealFontPointSize - 2
+                        color: urlAttribs.status === UrlAttributes.Error ? "red" : "blue"
+                        text: urlAttribs.url
+                        width: parent.width
+                        elide: Text.ElideRight
+                        font.underline: urlMouseArea.containsMouse
+
+                        MouseArea {
+                            id: urlMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            enabled: urlAttribs.status !== UrlAttributes.Error
+                            onClicked: Qt.openUrlExternally(urlAttribs.url)
+                        }
+                    }
+                }
+            }
+
+            Text {
+                anchors.fill: parent
+                anchors.margins: 10
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pointSize: app.idealFontPointSize
+                text: app.isMacOSPlatform ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
+                visible: urlAttribs.url == ""
             }
         }
     }

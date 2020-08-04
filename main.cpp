@@ -35,6 +35,7 @@
 #include "notification.h"
 #include "searchengine.h"
 #include "standardpaths.h"
+#include "urlattributes.h"
 #include "textshapeitem.h"
 #include "resetonchange.h"
 #include "scritedocument.h"
@@ -228,6 +229,8 @@ int main(int argc, char **argv)
 
     qmlRegisterType<LibraryService>("Scrite", 1, 0, "LibraryService");
     qmlRegisterUncreatableType<Library>("Scrite", 1, 0, "Library", "Use from LibraryService.library");
+
+    qmlRegisterType<UrlAttributes>("Scrite", 1, 0, "UrlAttributes");
 
     NotificationManager notificationManager;
 
