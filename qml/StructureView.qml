@@ -169,7 +169,7 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: scriteDocument.structure.elementCount >= 1
-        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting) && mouseOverItem === null && editItem === null
+        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null
         property Item mouseOverItem
         property Item editItem
 
@@ -258,7 +258,9 @@ Item {
                         sourceComponent: {
                             switch(annotation.type) {
                             case "rectangle": return rectangleAnnotationComponent
+                            case "text": return textAnnotationComponent
                             }
+                            return null
                         }
                     }
                 }
@@ -565,6 +567,7 @@ Item {
 
                     MenuItem2 {
                         text: "Text"
+                        onClicked: structureView.createNewTextAnnotation(canvasContextMenu.x,canvasContextMenu.y)
                     }
                 }
             }
@@ -1123,12 +1126,74 @@ Item {
             y: annotation.geometry.y
             width: annotation.geometry.width
             height: annotation.geometry.height
-            color: annotation.attributes.color
+            color: annotation.attributes.fillBackground ? annotation.attributes.color : Qt.rgba(0,0,0,0)
             border {
                 width: annotation.attributes.borderWidth
                 color: annotation.attributes.borderColor
             }
             opacity: annotation.attributes.opacity / 100
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: annotationGripLoader.annotation !== annotation
+                onClicked: {
+                    annotationGripLoader.annotationItem = parent
+                    annotationGripLoader.annotation = annotation
+                }
+            }
+        }
+    }
+
+    function createNewTextAnnotation(x, y) {
+        var annot = annotationObject.createObject(canvas)
+        annot.type = "text"
+        annot.geometry = Qt.rect(x, y, 200, 40)
+        scriteDocument.structure.addAnnotation(annot)
+    }
+
+    Component {
+        id: textAnnotationComponent
+
+        Rectangle {
+            x: annotation.geometry.x
+            y: annotation.geometry.y
+            width: annotation.geometry.width
+            height: annotation.geometry.height
+            color: annotation.attributes.fillBackground ? annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)
+            border {
+                width: annotation.attributes.borderWidth
+                color: annotation.attributes.borderColor
+            }
+            opacity: annotation.attributes.opacity / 100
+
+            Text {
+                anchors.centerIn: parent
+                horizontalAlignment: {
+                    switch(annotation.attributes.hAlign) {
+                    case "left": return Text.AlignLeft
+                    case "right": return Text.AlignRight
+                    }
+                    return Text.AlignHCenter
+                }
+                verticalAlignment: {
+                    switch(annotation.attributes.vAlign) {
+                    case "top": return Text.AlignTop
+                    case "bottom": return Text.AlignBottom
+                    }
+                    return Text.AlignVCenter
+                }
+                text: annotation.attributes.text
+                color: annotation.attributes.textColor
+                font.family: annotation.attributes.fontFamily
+                font.pointSize: annotation.attributes.fontSize
+                font.bold: annotation.attributes.fontStyle.indexOf('bold') >= 0
+                font.italic: annotation.attributes.fontStyle.indexOf('italic') >= 0
+                font.underline: annotation.attributes.fontStyle.indexOf('underline') >= 0
+                width: parent.width - 15
+                height: parent.height - 15
+                clip: true
+                wrapMode: Text.WordWrap
+            }
 
             MouseArea {
                 anchors.fill: parent

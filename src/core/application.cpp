@@ -218,14 +218,23 @@ QJsonObject Application::systemFontInfo() const
 {
     QFontDatabase fontdb;
 
-    QJsonObject ret;
-    ret.insert("families", QJsonArray::fromStringList(fontdb.families()));
+    static QJsonObject ret;
+    if(ret.isEmpty())
+    {
+        const QStringList allFamilies = fontdb.families( QFontDatabase::Latin );
+        QStringList families;
+        std::copy_if (allFamilies.begin(), allFamilies.end(),
+                      std::back_inserter(families), [fontdb](const QString &family) {
+            return !fontdb.isPrivateFamily(family);
+        });
+        ret.insert("families", QJsonArray::fromStringList(families));
 
-    QJsonArray sizes;
-    QList<int> stdSizes = fontdb.standardSizes();
-    Q_FOREACH(int stdSize, stdSizes)
-        sizes.append( QJsonValue(stdSize) );
-    ret.insert("standardSizes", sizes);
+        QJsonArray sizes;
+        QList<int> stdSizes = fontdb.standardSizes();
+        Q_FOREACH(int stdSize, stdSizes)
+            sizes.append( QJsonValue(stdSize) );
+        ret.insert("standardSizes", sizes);
+    }
 
     return ret;
 }
