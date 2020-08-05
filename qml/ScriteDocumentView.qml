@@ -1276,12 +1276,12 @@ Item {
                         active: screenplayEditor2Active.value
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
                     }
+                }
 
-                    ResetOnChange {
-                        id: screenplayEditor2Active
-                        trackChangesOn: screenplayEditor2.editCurrentSceneInStructure
-                        from: false; to: true
-                    }
+                ResetOnChange {
+                    id: screenplayEditor2Active
+                    trackChangesOn: screenplayEditor2.editCurrentSceneInStructure
+                    from: false; to: true
                 }
             }
 

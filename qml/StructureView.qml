@@ -402,6 +402,7 @@ Item {
 
                 contextMenu: Menu2 {
                     id: selectionContextMenu
+                    width: 250
 
                     ColorMenu {
                         title: "Scenes Color"
@@ -462,7 +463,16 @@ Item {
                             icon.source: "../icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
                             onClicked: selection.layout(Structure.FlowVerticalLayout)
-                        }                    }
+                        }
+                    }
+
+                    MenuItem2 {
+                        text: "Annotate With Rectangle"
+                        onClicked: {
+                            createNewRectangleAnnotation(selection.rect.x-10, selection.rect.y-10, selection.rect.width+20, selection.rect.height+20)
+                            selection.clear()
+                        }
+                    }
                 }
 
                 function layout(type) {
@@ -1190,10 +1200,11 @@ Item {
         }
     }
 
-    function createNewRectangleAnnotation(x, y) {
+    function createNewRectangleAnnotation(x, y, w, h) {
+        var rect = Qt.rect(x, y, w ? w : 200, h ? h : 200)
         var annot = annotationObject.createObject(canvas)
         annot.type = "rectangle"
-        annot.geometry = Qt.rect(x, y, 200, 200)
+        annot.geometry = rect
         scriteDocument.structure.addAnnotation(annot)
     }
 

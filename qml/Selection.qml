@@ -22,6 +22,7 @@ Item {
     property bool hasItems: items.length > 0
     property bool canLayout: items.length >= 2
     property alias contextMenu: selectionMenu.menu
+    property rect rect: Qt.rect(tightRect.x, tightRect.y, tightRect.width, tightRect.height)
 
     property var items: []
     signal moveItem(Item item, real dx, real dy)

@@ -194,6 +194,8 @@ Item {
             function commitTextChanges() {
                 changePropertyValue(text)
             }
+            selectByKeyboard: true
+            selectByMouse: true
             wrapMode: Text.WordWrap
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
