@@ -343,6 +343,8 @@ public:
     Q_INVOKABLE void addAnnotation(Annotation *ptr);
     Q_INVOKABLE void removeAnnotation(Annotation *ptr);
     Q_INVOKABLE Annotation *annotationAt(int index) const;
+    Q_INVOKABLE void bringToFront(Annotation *ptr);
+    Q_INVOKABLE void sendToBack(Annotation *ptr);
     Q_PROPERTY(int annotationCount READ annotationCount NOTIFY annotationCountChanged)
     int annotationCount() const { return m_annotations.size(); }
     Q_INVOKABLE void clearAnnotations();

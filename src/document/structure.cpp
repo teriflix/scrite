@@ -1142,6 +1142,42 @@ Annotation *Structure::annotationAt(int index) const
     return index < 0 || index >= m_annotations.size() ? nullptr : m_annotations.at(index);
 }
 
+void Structure::bringToFront(Annotation *ptr)
+{
+    if(ptr == nullptr || m_annotations.empty())
+        return;
+
+    if(m_annotations.last() == ptr)
+        return;
+
+    const int index = m_annotations.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    m_annotations.takeAt(index);
+    m_annotations.append(ptr);
+    emit annotationCountChanged(); // Although the count did not change, we use the same
+                                   // signal to announce change in the annotations list property
+}
+
+void Structure::sendToBack(Annotation *ptr)
+{
+    if(ptr == nullptr || m_annotations.empty())
+        return;
+
+    if(m_annotations.first() == ptr)
+        return;
+
+    const int index = m_annotations.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    m_annotations.takeAt(index);
+    m_annotations.prepend(ptr);
+    emit annotationCountChanged(); // Although the count did not change, we use the same
+                                   // signal to announce change in the annotations list property
+}
+
 void Structure::clearAnnotations()
 {
     while(m_annotations.size())

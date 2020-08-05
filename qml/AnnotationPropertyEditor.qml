@@ -46,7 +46,30 @@ Item {
         }
         footer: Item {
             width: propertyEditorView.width - 20
-            height: 10
+            height: 80
+
+            Row {
+                spacing: 10
+                anchors.centerIn: parent
+
+                Button2 {
+                    text: "Bring To Front"
+                    onClicked: {
+                        var a = annotationGripLoader.annotation
+                        annotationGripLoader.reset()
+                        scriteDocument.structure.bringToFront(a)
+                    }
+                }
+
+                Button2 {
+                    text: "Send To Back"
+                    onClicked: {
+                        var a = annotationGripLoader.annotation
+                        annotationGripLoader.reset()
+                        scriteDocument.structure.sendToBack(a)
+                    }
+                }
+            }
         }
         ScrollBar.vertical: ScrollBar {
             policy: propertyEditorView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
