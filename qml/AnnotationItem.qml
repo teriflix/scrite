@@ -30,6 +30,9 @@ Rectangle {
     }
     opacity: annotation.attributes.opacity / 100
 
+    TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
+    TightBoundingBoxItem.stackOrder: 1.0 + (index/scriteDocument.structure.annotationCount)
+
     function grip() {
         annotationGripLoader.annotationItem = annotationItem
         annotationGripLoader.annotation = annotation

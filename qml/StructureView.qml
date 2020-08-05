@@ -119,7 +119,7 @@ Item {
                 enabled: !scriteDocument.readOnly && scriteDocument.structure.elementCount >= 2
                 iconSource: "../icons/content/select_all.png"
                 ToolTip.text: "Select All"
-                onClicked: selection.init(elementItems, elementsBoundingBox.boundingBox)
+                onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox)
             }
 
             ToolButton3 {
@@ -205,20 +205,20 @@ Item {
             }
 
             TightBoundingBoxEvaluator {
-                id: elementsBoundingBox
+                id: canvasItemsBoundingBox
             }
 
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.max( Math.ceil(elementsBoundingBox.right / 100) * 100, 60000 )
+                set: Math.max( Math.ceil(canvasItemsBoundingBox.right / 100) * 100, 60000 )
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.max( Math.ceil(elementsBoundingBox.bottom / 100) * 100, 60000 )
+                set: Math.max( Math.ceil(canvasItemsBoundingBox.bottom / 100) * 100, 60000 )
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -659,64 +659,118 @@ Item {
         }
     }
 
-    FlickablePreview {
+    Item {
         id: canvasPreview
+        visible: structureCanvasSettings.showPreview
         anchors.right: canvasScroll.right
         anchors.bottom: canvasScroll.bottom
         anchors.margins: 30
-        flickable: canvasScroll
-        content: canvas
-        maximumWidth: 150
-        maximumHeight: 150
-        onViewportRectRequest: canvasScroll.ensureVisible(rect, canvas.scale, 0)
-        visible: structureCanvasSettings.showPreview
 
-        TrackerPack {
-            delay: 100
-            enabled: !scriteDocument.loading && canvasPreview.visible
+        readonly property real maxSize: 150
+        property size previewSize: {
+            var w = Math.max(canvasItemsBoundingBox.width, 500)
+            var h = Math.max(canvasItemsBoundingBox.height, 500)
 
-            TrackProperty { target: scriteDocument; property: "modified" }
-            TrackProperty { target: canvas; property: "width" }
-            TrackProperty { target: canvas; property: "height" }
-            TrackProperty { target: canvasScroll; property: "width" }
-            TrackProperty { target: canvasScroll; property: "height" }
-            TrackProperty { target: selection; property: active }
-            TrackSignal { target: scriteDocument.structure; signal: "structureChanged()" }
+            var scale = 1
+            if(w < h)
+                scale = maxSize / w
+            else
+                scale = maxSize / h
 
-            onTracked: {
-                var sh = 150
-                var mw = sh
-                var mh = sh
-                if(canvas.width !== canvas.height) {
-                    var maxSize = Qt.size(canvasScroll.width-canvasPreview.anchors.rightMargin-12,canvasScroll.height-canvasPreview.anchors.bottomMargin-12)
-                    if(maxSize.width < 0 || maxSize.height < 0) {
-                        canvasPreview.maximumWidth = sh
-                        canvasPreview.maximumHeight = sh
-                        return // dont generate any preview yet.
-                    }
-                    var ar = Math.max(canvas.width,canvas.height)/Math.min(canvas.width,canvas.height)
-                    if(canvas.width > canvas.height)
-                        mw = ar * sh
-                    else
-                        mh = ar * sh
-                    var size = app.scaledSize( Qt.size(mw,mh), maxSize )
-                    mw = size.width
-                    mh = size.height
+            w *= scale
+            h *= scale
 
-                    if(mh > sh && mw > sh) {
-                        if(mh > sh) {
-                            mw *= sh/mh;
-                            mh = sh
-                        } else if(mw > sh) {
-                            mh *= sh/mw;
-                            mw = sh
-                        }
-                    }
+            if(w > parent.width-60)
+                scale = (parent.width-60)/w
+            else if(h >= parent.height-60)
+                scale = (parent.height-60)/h
+            else
+                scale = 1
+
+            w *= scale
+            h *= scale
+
+            return Qt.size(w+10, h+10)
+        }
+        width: previewSize.width
+        height: previewSize.height
+
+        BoxShadow {
+            anchors.fill: parent
+            opacity: 0.55 * previewArea.opacity
+        }
+
+        TightBoundingBoxPreview {
+            id: previewArea
+            anchors.fill: parent
+            anchors.margins: 5
+            evaluator: canvasItemsBoundingBox
+            backgroundColor: primaryColors.c50.background
+            backgroundOpacity: 0.25
+
+            Rectangle {
+                id: viewportIndicator
+                color: primaryColors.highlight.background
+                opacity: 0.5
+
+                property rect geometry: {
+                    if(!canvasPreview.visible)
+                        return Qt.rect(0,0,0,0)
+
+                    var visibleRect = Qt.rect( canvasScroll.visibleArea.xPosition * canvasScroll.contentWidth / canvas.scale,
+                                               canvasScroll.visibleArea.yPosition * canvasScroll.contentHeight / canvas.scale,
+                                               canvasScroll.visibleArea.widthRatio * canvasScroll.contentWidth / canvas.scale,
+                                               canvasScroll.visibleArea.heightRatio * canvasScroll.contentHeight / canvas.scale )
+                    if( app.isRectangleInRectangle(visibleRect,canvasItemsBoundingBox.boundingBox) )
+                        return Qt.rect(0,0,0,0)
+
+                    var intersect = app.intersectedRectangle(visibleRect, canvasItemsBoundingBox.boundingBox)
+                    var scale = previewArea.width / Math.max(canvasItemsBoundingBox.width, 500)
+                    var ret = Qt.rect( (intersect.x-canvasItemsBoundingBox.left)*scale,
+                                       (intersect.y-canvasItemsBoundingBox.top)*scale,
+                                       (intersect.width*scale),
+                                       (intersect.height*scale) )
+                    return ret
+                }
+                x: geometry.x
+                y: geometry.y
+                width: geometry.width
+                height: geometry.height
+            }
+
+            Item {
+                x: viewportIndicator.x
+                y: viewportIndicator.y
+                width: viewportIndicator.width
+                height: viewportIndicator.height
+
+                onXChanged: panViewport()
+                onYChanged: panViewport()
+
+                function panViewport() {
+                    if(!panMouseArea.drag.active)
+                        return
+
+                    var scale = previewArea.width / Math.max(canvasItemsBoundingBox.width, 500)
+                    var ix = (x/scale)+canvasItemsBoundingBox.left
+                    var iy = (y/scale)+canvasItemsBoundingBox.top
+                    canvasScroll.contentX = ix * canvas.scale
+                    canvasScroll.contentY = iy * canvas.scale
                 }
 
-                canvasPreview.maximumWidth = mw
-                canvasPreview.maximumHeight = mh
-                canvasPreview.updateThumbnail()
+                MouseArea {
+                    id: panMouseArea
+                    anchors.fill: parent
+                    drag.target: parent
+                    drag.axis: Drag.XAndYAxis
+                    drag.minimumX: 0
+                    drag.minimumY: 0
+                    drag.maximumX: previewArea.width - parent.width
+                    drag.maximumY: previewArea.height - parent.height
+                    enabled: parent.width > 0 && parent.height > 0
+                    hoverEnabled: drag.active
+                    cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                }
             }
         }
     }
@@ -759,7 +813,11 @@ Item {
             Component.onCompleted: element.follow = elementItem
             enabled: selection.active === false
 
-            TightBoundingBoxItem.evaluator: elementsBoundingBox
+            TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
+            TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
+            TightBoundingBoxItem.livePreview: false
+            TightBoundingBoxItem.previewFillColor: background.color
+            TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
 
             readonly property bool selected: scriteDocument.structure.currentElementIndex === index
             readonly property bool editing: titleText.readOnly === false
@@ -794,7 +852,7 @@ Item {
                 id: background
                 anchors.fill: parent
                 border.width: elementItem.selected ? 2 : 1
-                border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "lightgray" : element.scene.color)
+                border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
                 color: Qt.tint(element.scene.color, "#C0FFFFFF")
                 Behavior on border.width {
                     enabled: screenplayEditorSettings.enableAnimations
@@ -1032,8 +1090,6 @@ Item {
                 drag.target: annotationItem
                 drag.minimumX: 0
                 drag.minimumY: 0
-                drag.maximumX: canvas.width - parent.width
-                drag.maximumY: canvas.height - parent.height
                 drag.axis: Drag.XAndYAxis
                 enabled: annotation.movable
                 propagateComposedEvents: true
@@ -1144,7 +1200,11 @@ Item {
     Component {
         id: rectangleAnnotationComponent
 
-        AnnotationItem { }
+        AnnotationItem {
+            TightBoundingBoxItem.previewFillColor: color
+            TightBoundingBoxItem.previewBorderColor: border.color
+            TightBoundingBoxItem.livePreview: false
+        }
     }
 
     function createNewTextAnnotation(x, y) {
@@ -1299,6 +1359,10 @@ Item {
                 mipmap: smooth
                 source: annotation.imageUrl(annotation.attributes.image)
                 asynchronous: true
+                onStatusChanged: {
+                    if(status === Ready)
+                        parent.TightBoundingBoxItem.markPreviewDirty()
+                }
             }
 
             Text {
