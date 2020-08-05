@@ -31,8 +31,18 @@ Item {
         spacing: 20
         property bool scrollBarVisible: contentHeight > height
         header: Item {
-            width: propertyEditorView.width - 20
-            height: 10
+            width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+            height: 80
+
+            Button2 {
+                text: "Delete Annotation"
+                anchors.centerIn: parent
+                onClicked: {
+                    var a = annotationGripLoader.annotation
+                    annotationGripLoader.reset()
+                    scriteDocument.structure.removeAnnotation(a)
+                }
+            }
         }
         footer: Item {
             width: propertyEditorView.width - 20
@@ -206,9 +216,21 @@ Item {
     Component {
         id: urlEditor
 
-        TextField {
-            text: propertyValue
-            onAccepted: changePropertyValue(text)
+        Column {
+            TextField {
+                id: urlField
+                text: propertyValue
+                onAccepted: changePropertyValue(text)
+                placeholderText: "Enter URL and press " + (app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
+                width: parent.width
+            }
+
+            Text {
+                width: parent.width
+                font.pointSize: app.idealFontPointSize-1
+                visible: propertyValue != urlField.text
+                text: "Press " + (app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
+            }
         }
     }
 

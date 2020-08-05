@@ -1080,6 +1080,44 @@ Item {
                 }
             }
 
+            EventFilter.target: app
+            EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus
+            EventFilter.events: [6]
+            EventFilter.onFilter: {
+                switch(event.key) {
+                case Qt.Key_Left:
+                    if(event.shiftModifier)
+                        annotationGripItem.width -= annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    else
+                        annotationGripItem.x -= annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    break
+                case Qt.Key_Right:
+                    if(event.shiftModifier)
+                        annotationGripItem.width += annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    else
+                        annotationGripItem.x += annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    break
+                case Qt.Key_Up:
+                    if(event.shiftModifier)
+                        annotationGripItem.height -= annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    else
+                        annotationGripItem.y -= annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    break
+                case Qt.Key_Down:
+                    if(event.shiftModifier)
+                        annotationGripItem.height += annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    else
+                        annotationGripItem.y += annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                    break
+                }
+            }
+
+            function deleteAnnotation() {
+                var a = annotationGripLoader.annotation
+                annotationGripLoader.reset()
+                scriteDocument.structure.removeAnnotation(a)
+            }
+
             onXChanged: annotGeoUpdateTimer.start()
             onYChanged: annotGeoUpdateTimer.start()
             onWidthChanged: annotGeoUpdateTimer.start()
@@ -1096,6 +1134,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
+                acceptedButtons: Qt.LeftButton|Qt.RightButton
                 cursorShape: Qt.SizeAllCursor
                 drag.target: annotationItem
                 drag.minimumX: 0
@@ -1272,6 +1311,7 @@ Item {
         id: urlAnnotationComponent
 
         AnnotationItem {
+            id: urlAnnotItem
             color: primaryColors.c50.background
             border {
                 width: 1
@@ -1340,7 +1380,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pointSize: app.idealFontPointSize
-                text: app.isMacOSPlatform ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
+                text: app.isMacOSPlatform && annotationGripLoader.annotationItem !== urlAnnotItem ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
                 visible: urlAttribs.url == ""
             }
         }

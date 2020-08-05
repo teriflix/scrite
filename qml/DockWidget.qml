@@ -22,6 +22,7 @@ Item {
     property real contentY
     property real contentWidth
     property real contentHeight
+    property bool contentHasFocus: contentLoader.FocusTracker.hasFocus
     property Item sourceItem
 
     signal moved()
@@ -151,6 +152,7 @@ Item {
             clip: true
             transformOrigin: Item.TopLeft
             scale: parent.t
+            FocusTracker.window: qmlWindow
         }
     }
 
