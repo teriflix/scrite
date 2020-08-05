@@ -39,34 +39,13 @@ Item {
                 id: newSceneButton
                 down: newSceneColorMenuLoader.active
                 enabled: !scriteDocument.readOnly
-                onClicked: newSceneColorMenuLoader.active = true
+                onClicked: {
+                    canvasMenu.isContextMenu = false
+                    canvasMenu.popup()
+                }
                 iconSource: "../icons/content/add_box.png"
                 ToolTip.text: "Add Scene"
                 property color activeColor: "white"
-
-                Loader {
-                    id: newSceneColorMenuLoader
-                    width: parent.width; height: 1
-                    anchors.top: parent.bottom
-                    sourceComponent: ColorMenu {
-                        selectedColor: newSceneButton.activeColor
-                    }
-                    active: false
-                    onItemChanged: {
-                        if(item)
-                            item.open()
-                    }
-
-                    Connections {
-                        target: newSceneColorMenuLoader.item
-                        onAboutToHide: newSceneColorMenuLoader.active = false
-                        onMenuItemClicked: {
-                            newSceneButton.activeColor = color
-                            createElementMouseHandler.enabled = true
-                            newSceneColorMenuLoader.active = false
-                        }
-                    }
-                }
             }
 
             ToolButton3 {
@@ -190,7 +169,20 @@ Item {
             tickDistance: scriteDocument.structure.canvasGridSize
             transformOrigin: Item.TopLeft
 
+            function createItem(what, where) {
+                if(scriteDocument.readOnly)
+                    return
+
+                if(what === undefined || what === "" | what === "element")
+                    createElement(where.x-130, where.y-22, newSceneButton.activeColor)
+                else
+                    createAnnotation(what, where.x, where.y)
+            }
+
             function createElement(x, y, c) {
+                if(scriteDocument.readOnly)
+                    return
+
                 var props = {
                     "x": Math.max(scriteDocument.structure.snapToGrid(x), 130),
                     "y": Math.max(scriteDocument.structure.snapToGrid(y), 50)
@@ -202,6 +194,41 @@ Item {
                 scriteDocument.structure.currentElementIndex = scriteDocument.structure.elementCount-1
                 requestEditor()
                 element.scene.undoRedoEnabled = true
+            }
+
+            readonly property var annotationsList: [
+                { "title": "Horizontal Line", "what": "hline" },
+                { "title": "Vertical Line", "what": "vline" },
+                { "title": "Rectangle", "what": "rectangle" },
+                { "title": "Text", "what": "text" },
+                { "title": "Website Link", "what": "url" },
+                { "title": "Image", "what": "image" }
+            ]
+
+            function createAnnotation(type, x, y) {
+                if(scriteDocument.readOnly)
+                    return
+
+                switch(type) {
+                case "hline":
+                    structureView.createNewLineAnnotation(x,y)
+                    break
+                case "vline":
+                    structureView.createNewLineAnnotation(x,y, "Vertical")
+                    break
+                case "rectangle":
+                    structureView.createNewRectangleAnnotation(x,y)
+                    break
+                case "text":
+                    structureView.createNewTextAnnotation(x,y)
+                    break
+                case "url":
+                    structureView.createNewUrlAnnotation(x,y)
+                    break
+                case "image":
+                    structureView.createNewImageAnnotation(x,y)
+                    break
+                }
             }
 
             TightBoundingBoxEvaluator {
@@ -227,14 +254,22 @@ Item {
             FocusTracker.indicator.property: "structureEditorActive"
 
             MouseArea {
-                id: createElementMouseHandler
+                id: createItemMouseHandler
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton
                 enabled: false
                 cursorShape: Qt.CrossCursor
+
+                property string what
+                function handle(_what) {
+                    what = _what
+                    enabled = true
+                }
+
                 onClicked: {
                     if(!scriteDocument.readOnly)
-                        canvas.createElement(mouse.x-130, mouse.y-22, newSceneButton.activeColor)
+                        canvas.createItem(what, Qt.point(mouse.x, mouse.y))
+                    what = ""
                     enabled = false
                 }
             }
@@ -242,7 +277,7 @@ Item {
             Item {
                 id: annotationsLayer
                 anchors.fill: parent
-                enabled: !createElementMouseHandler.enabled
+                enabled: !createItemMouseHandler.enabled
 
                 MouseArea {
                     anchors.fill: parent
@@ -261,6 +296,7 @@ Item {
                             case "text": return textAnnotationComponent
                             case "url": return urlAnnotationComponent
                             case "image": return imageAnnotationComponent
+                            case "line": return lineAnnotationComponent
                             }
                             return null
                         }
@@ -298,7 +334,7 @@ Item {
                     }
 
                     Connections {
-                        target: createElementMouseHandler
+                        target: createItemMouseHandler
                         onEnabledChanged: {
                             if(canvasScroll.enabled)
                                 annotationGripLoader.reset()
@@ -314,9 +350,9 @@ Item {
                     }
 
                     Connections {
-                        target: canvasContextMenu
+                        target: canvasMenu
                         onVisibleChanged: {
-                            if(canvasContextMenu.visible)
+                            if(canvasMenu.visible)
                                 annotationGripLoader.reset()
                         }
                     }
@@ -334,7 +370,7 @@ Item {
 
             RubberBand {
                 id: rubberBand
-                enabled: !createElementMouseHandler.enabled
+                enabled: !createItemMouseHandler.enabled
                 anchors.fill: parent
                 z: active ? 1000 : -1
                 selectionMode: selectionModeButton.checked
@@ -378,7 +414,10 @@ Item {
                 anchors.fill: parent
                 enabled: canvasScroll.editItem === null && !selection.active
                 acceptedButtons: Qt.RightButton
-                onPressed: canvasContextMenu.popup()
+                onPressed: {
+                    canvasMenu.isContextMenu = true
+                    canvasMenu.popup()
+                }
             }
 
             Repeater {
@@ -545,14 +584,18 @@ Item {
             }
 
             Menu2 {
-                id: canvasContextMenu
+                id: canvasMenu
+
+                property bool isContextMenu: false
 
                 MenuItem2 {
                     text: "New Scene"
                     enabled: !scriteDocument.readOnly
                     onClicked: {
-                        canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
-                        canvasContextMenu.close()
+                        if(canvasMenu.isContextMenu)
+                            canvas.createItem("element", Qt.point(canvasMenu.x-130,canvasMenu.y-22), newSceneButton.activeColor)
+                        else
+                            createItemMouseHandler.handle("element")
                     }
                 }
 
@@ -562,8 +605,11 @@ Item {
                     enabled: !scriteDocument.readOnly
                     onMenuItemClicked: {
                         newSceneButton.activeColor = color
-                        canvas.createElement(canvasContextMenu.x-130, canvasContextMenu.y-22, newSceneButton.activeColor)
-                        canvasContextMenu.close()
+                        if(canvasMenu.isContextMenu)
+                            canvas.createItem("element", Qt.point(canvasMenu.x-130,canvasMenu.y-22), newSceneButton.activeColor)
+                        else
+                            createItemMouseHandler.handle("element")
+                        canvasMenu.close()
                     }
                 }
 
@@ -572,24 +618,20 @@ Item {
                 Menu2 {
                     title: "Annotation"
 
-                    MenuItem2 {
-                        text: "Rectangle"
-                        onClicked: structureView.createNewRectangleAnnotation(canvasContextMenu.x,canvasContextMenu.y)
-                    }
+                    Repeater {
+                        model: canvas.annotationsList
 
-                    MenuItem2 {
-                        text: "Text"
-                        onClicked: structureView.createNewTextAnnotation(canvasContextMenu.x,canvasContextMenu.y)
-                    }
-
-                    MenuItem2 {
-                        text: "Website Link"
-                        onClicked: structureView.createNewUrlAnnotation(canvasContextMenu.x,canvasContextMenu.y)
-                    }
-
-                    MenuItem2 {
-                        text: "Image"
-                        onClicked: structureView.createNewImageAnnotation(canvasContextMenu.x,canvasContextMenu.y)
+                        MenuItem2 {
+                            property var annotationInfo: canvas.annotationsList[index]
+                            text: annotationInfo.title
+                            enabled: !scriteDocument.readOnly && what !== ""
+                            onClicked: {
+                                if(canvasMenu.isContextMenu)
+                                    canvas.createItem(annotationInfo.what, Qt.point(canvasMenu.x, canvasMenu.y))
+                                else
+                                    createItemMouseHandler.handle(annotationInfo.what)
+                            }
+                        }
                     }
                 }
             }
@@ -1240,7 +1282,12 @@ Item {
     }
 
     function createNewRectangleAnnotation(x, y, w, h) {
-        var rect = Qt.rect(x, y, w ? w : 200, h ? h : 200)
+        if(scriteDocument.readOnly)
+            return
+
+        w = w ? w : 200
+        h = h ? h : 200
+        var rect = Qt.rect(x - w/2, y-h/2, w, h)
         var annot = annotationObject.createObject(canvas)
         annot.type = "rectangle"
         annot.geometry = rect
@@ -1258,9 +1305,15 @@ Item {
     }
 
     function createNewTextAnnotation(x, y) {
+        if(scriteDocument.readOnly)
+            return
+
+        var w = 200
+        var h = 40
+
         var annot = annotationObject.createObject(canvas)
         annot.type = "text"
-        annot.geometry = Qt.rect(x, y, 200, 40)
+        annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
         scriteDocument.structure.addAnnotation(annot)
     }
 
@@ -1300,10 +1353,16 @@ Item {
     }
 
     function createNewUrlAnnotation(x, y) {
+        if(scriteDocument.readOnly)
+            return
+
+        var w = 300
+        var h = app.isMacOSPlatform ? 60 : 350
+
         var annot = annotationObject.createObject(canvas)
         annot.type = "url"
         annot.resizable = false
-        annot.geometry = app.isMacOSPlatform ? Qt.rect(x, y, 300, 60) : Qt.rect(x, y, 300, 350)
+        annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
         scriteDocument.structure.addAnnotation(annot)
     }
 
@@ -1387,9 +1446,15 @@ Item {
     }
 
     function createNewImageAnnotation(x, y) {
+        if(scriteDocument.readOnly)
+            return
+
+        var w = 300
+        var h = 160
+
         var annot = annotationObject.createObject(canvas)
         annot.type = "image"
-        annot.geometry = Qt.rect(x, y, 300, 169)
+        annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
         scriteDocument.structure.addAnnotation(annot)
     }
 
@@ -1397,10 +1462,13 @@ Item {
         id: imageAnnotationComponent
 
         AnnotationItem {
+            id: imageAnnotItem
             clip: true
+            color: image.isSet ? (annotation.attributes.fillBackground ? annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)) : primaryColors.c100.background
 
             Image {
                 id: image
+                property bool isSet: annotation.attributes.image !== "" && status === Image.Ready
                 width: parent.width - 10
                 anchors.top: parent.top
                 anchors.topMargin: 5
@@ -1423,7 +1491,7 @@ Item {
                 wrapMode: Text.WordWrap
                 elide: Text.ElideRight
                 font.pointSize: app.idealFontPointSize
-                text: annotation.attributes.caption
+                text: image.isSet ? annotation.attributes.caption : (annotationGripLoader.annotationItem === imageAnnotItem ? "Set an image" : "Click to set an image")
                 color: annotation.attributes.captionColor
                 anchors.top: image.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1435,6 +1503,45 @@ Item {
                     }
                     return Text.AlignHCenter
                 }
+                verticalAlignment: image.isSet ? Text.AlignTop : Text.AlignVCenter
+            }
+        }
+    }
+
+    function createNewLineAnnotation(x, y, orientation) {
+        if(scriteDocument.readOnly)
+            return
+
+        var w = 300
+        var h = 20
+
+        var annot = annotationObject.createObject(canvas)
+        annot.type = "line"
+        annot.geometry = Qt.rect(x, y, 300, 20)
+        var attrs = annot.attributes
+        if(orientation && orientation === "Vertical") {
+            attrs.orientation = orientation
+            annot.attributes = attrs
+            w = 20
+            h = 300
+        }
+        annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
+        scriteDocument.structure.addAnnotation(annot)
+    }
+
+    Component {
+        id: lineAnnotationComponent
+
+        AnnotationItem {
+            color: Qt.rgba(0,0,0,0)
+            border.width: 0
+
+            Rectangle {
+                anchors.centerIn: parent
+                width: annotation.attributes.orientation === "Horizontal" ? parent.width : annotation.attributes.lineWidth
+                height: annotation.attributes.orientation === "Vertical" ? parent.height : annotation.attributes.lineWidth
+                color: annotation.attributes.lineColor
+                opacity: annotation.attributes.opacity
             }
         }
     }

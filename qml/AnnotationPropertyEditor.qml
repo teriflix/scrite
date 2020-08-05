@@ -88,6 +88,7 @@ Item {
                     annotation.attributes = attrs
                 }
 
+                active: propertyInfo.visible === true
                 sourceComponent: {
                     switch(propertyInfo.type) {
                     case "color": return colorEditor

@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "undoredo.h"
+#include "hourglass.h"
 #include "autoupdate.h"
 #include "application.h"
 #include "execlatertimer.h"
@@ -216,6 +217,8 @@ UndoStack *Application::findUndoStack(const QString &objectName) const
 
 QJsonObject Application::systemFontInfo() const
 {
+    HourGlass hourGlass;
+
     QFontDatabase fontdb;
 
     static QJsonObject ret;

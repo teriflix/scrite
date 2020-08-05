@@ -23,7 +23,7 @@ Rectangle {
     y: annotation.geometry.y
     width: annotation.geometry.width
     height: annotation.geometry.height
-    color: annotation.attributes.fillBackground ? (annotation.attributes.color ? annotation.attributes.color : annotation.attributes.backgroundColor)  : Qt.rgba(0,0,0,0)
+    color: annotation.attributes.fillBackground ? (annotation.attributes.color ? annotation.attributes.color : annotation.attributes.backgroundColor) : Qt.rgba(0,0,0,0)
     border {
         width: annotation.attributes.borderWidth
         color: annotation.attributes.borderColor

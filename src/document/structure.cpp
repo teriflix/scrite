@@ -442,6 +442,16 @@ void Annotation::setMetaData(const QJsonArray &val)
         return;
 
     m_metaData = val;
+    for(int i=0; i<m_metaData.count(); i++)
+    {
+        QJsonObject obj = m_metaData.at(i).toObject();
+        if( !obj.contains("visible") )
+        {
+            obj.insert("visible", true);
+            m_metaData.replace(i, obj);
+        }
+    }
+
     this->polishAttributes();
     emit metaDataChanged();
 }
