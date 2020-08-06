@@ -240,6 +240,8 @@ DISTFILES += \
     packaging/windows/package-x64.bat \
     packaging/windows/installer-x86.nsi \
     packaging/windows/installer-x64.nsi \
+    packaging/windows/installer-x86.nsi.in \
+    packaging/windows/installer-x64.nsi.in \
     packaging/mac/package.sh \
     packaging/mac/prepare.sh \
     packaging/mac/dmgbackdrop.qml \
