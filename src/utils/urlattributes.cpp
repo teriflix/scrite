@@ -94,10 +94,10 @@ void UrlAttributes::onWebPageLoadFinished(bool ok)
 
     QJsonObject defaultAttribs;
     defaultAttribs.insert(QStringLiteral("url"), webPage->url().toString());
-    defaultAttribs.insert(QStringLiteral("type"), "website");
-    defaultAttribs.insert((QStringLiteral("title"), webPage->title());
-    defaultAttribs.insert((QStringLiteral("image"), QStringLiteral(""));
-    defaultAtrribs.insert((QStringLiteral("description"), (QStringLiteral(""));
+    defaultAttribs.insert(QStringLiteral("type"), QStringLiteral("website"));
+    defaultAttribs.insert(QStringLiteral("title"), webPage->title());
+    defaultAttribs.insert(QStringLiteral("image"), QStringLiteral(""));
+    defaultAttribs.insert(QStringLiteral("description"), QStringLiteral(""));
 
     if(jsCode.isEmpty())
     {
