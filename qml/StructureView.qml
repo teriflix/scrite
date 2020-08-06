@@ -1297,9 +1297,11 @@ Item {
         if(scriteDocument.readOnly)
             return
 
+        var doNotAlignRect = w && h
+
         w = w ? w : 200
         h = h ? h : 200
-        var rect = Qt.rect(x - w/2, y-h/2, w, h)
+        var rect = doNotAlignRect ? Qt.rect(x, y, w, h) : Qt.rect(x - w/2, y-h/2, w, h)
         var annot = annotationObject.createObject(canvas)
         annot.type = "rectangle"
         annot.geometry = rect
