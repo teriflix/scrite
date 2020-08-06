@@ -199,6 +199,10 @@ bool StructureExporter::doExport(QIODevice *device)
     paint.translate(-structureRect.left(), -structureRect.top());
     paint.scale(scale, scale);
 
+    QFont font = qApp->font();
+    font.setPixelSize( Application::instance()->idealFontPointSize() );
+    paint.setFont(font);
+
     for(int i=0; i<structure->annotationCount(); i++)
     {
         const Annotation *annotation = structure->annotationAt(i);
@@ -207,8 +211,7 @@ bool StructureExporter::doExport(QIODevice *device)
         paint.restore();
     }
 
-    QFont font;
-    font.setPixelSize(13);
+    font.setPixelSize(12);
     paint.setFont(font);
 
     // Draw connector lines in the first pass
