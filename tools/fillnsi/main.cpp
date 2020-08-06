@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
     const QString outputFileName = parser.value(outputFileOption);
     QFile outputFile(outputFileName);
-    if( !inputFile.open(QFile::WriteOnly) )
+    if( !outputFile.open(QFile::WriteOnly) )
     {
         qWarning("Cannot open file '%s' for writing.", qPrintable(outputFileName));
         return -1;
@@ -155,11 +155,17 @@ int main(int argc, char **argv)
         file = file.trimmed();
 
         QFileInfo fi( outputFileDir.absoluteFilePath(file) );
+        const QString fullPath = fi.absoluteFilePath();
         if( !fi.exists() )
         {
-            const QString fullPath = fi.absoluteFilePath();
-            qWarning("Cannot find path '%s' listed in the '%s'.", qPrintable(fullPath), qPrintable(listFileName));
-            return -1;
+            qWarning("Cannot find path '%s' listed in the '%s'. Skipping.", qPrintable(fullPath), qPrintable(listFileName));
+            continue;
+        }
+
+        if( fi.suffix() == QStringLiteral("qmlc") )
+        {
+            qWarning("Skipping '%s'", qPrintable(fullPath));
+            continue;
         }
 
         const int lastSlashIndex = file.lastIndexOf("\\");

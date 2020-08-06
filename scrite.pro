@@ -238,8 +238,6 @@ DISTFILES += \
     packaging/linux/Scrite.desktop \
     packaging/windows/package-x86.bat \
     packaging/windows/package-x64.bat \
-    packaging/windows/installer-x86.nsi \
-    packaging/windows/installer-x64.nsi \
     packaging/windows/installer-x86.nsi.in \
     packaging/windows/installer-x64.nsi.in \
     packaging/mac/package.sh \

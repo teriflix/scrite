@@ -1,5 +1,5 @@
 QT += core
-DESTDIR = $$PWD/../Release/
+DESTDIR = $$PWD/../../../Release/
 TARGET = fillnsi
 CONFIG += console
 
