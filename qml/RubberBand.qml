@@ -21,6 +21,7 @@ Item {
 
     property bool selectionMode: false
     property bool active: false
+    property bool selecting: false
 
     Rectangle {
         id: selection
@@ -54,6 +55,7 @@ Item {
                 if(rubberband.active) {
                     selection.from = pos
                     selection.to = selection.from
+                    selecting = true
                     mouse.accepted = true
                 } else
                     mouse.accepted = false
@@ -73,6 +75,7 @@ Item {
             if(rubberband.active) {
                 selection.to = Qt.point(mouse.x, mouse.y)
                 rubberband.select(selection.rectangle)
+                selecting = false
                 rubberband.active = false
                 mouse.accepted = true
             } else

@@ -277,7 +277,13 @@ Item {
             Item {
                 id: annotationsLayer
                 anchors.fill: parent
-                enabled: !createItemMouseHandler.enabled
+                enabled: !createItemMouseHandler.enabled && opacity === 1
+                opacity: rubberBand.selectionMode || rubberBand.selecting ? 0.1 : 1
+
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
 
                 MouseArea {
                     anchors.fill: parent
