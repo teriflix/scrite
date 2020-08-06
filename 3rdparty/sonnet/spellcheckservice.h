@@ -19,7 +19,7 @@
 #include <QQmlParserStatus>
 
 #include "modifiable.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 
 struct TextFragment
 {
@@ -112,7 +112,7 @@ private:
     Method m_method = OnDemand;
     bool m_asynchronous = true;
     bool m_requiresSpellCheck = false;
-    SimpleTimer m_updateTimer;
+    ExecLaterTimer m_updateTimer;
     Modifiable m_textModifiable;
     ModificationTracker m_textTracker;
     QJsonArray m_misspelledFragmentsJson;

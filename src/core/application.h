@@ -143,6 +143,7 @@ public:
 
     Q_INVOKABLE QJsonObject systemFontInfo() const;
     Q_INVOKABLE QColor pickColor(const QColor &initial) const;
+    Q_INVOKABLE QString colorName(const QColor &color) const { return color.name(); }
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
     Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
     Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;

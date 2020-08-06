@@ -89,6 +89,17 @@ public:
     QVariant fromJson(const QJsonValue &value, int type) const override;
 };
 
+class QRectFHelper : public QObjectSerializer::Helper
+{
+public:
+    QRectFHelper();
+    ~QRectFHelper() override;
+
+    bool canHandle(int type) const override;
+    QJsonValue toJson(const QVariant &value) const override;
+    QVariant fromJson(const QJsonValue &value, int type) const override;
+};
+
 class ObjectSerializerHelperRegistry : public QList<QObjectSerializer::Helper*>
 {
 public:
@@ -104,6 +115,7 @@ ObjectSerializerHelperRegistry::ObjectSerializerHelperRegistry()
     this->append(new QMarginsFHelper);
     this->append(new QListHelper);
     this->append(new QFontHelper);
+    this->append(new QRectFHelper);
 }
 
 ObjectSerializerHelperRegistry::~ObjectSerializerHelperRegistry()
@@ -864,6 +876,54 @@ QVariant QFontHelper::fromJson(const QJsonValue &value, int type) const
         font.setStyle( QFont::Style(enumValue("Style", json.value("style"))) );
 
     return QVariant::fromValue<QFont>(font);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+QRectFHelper::QRectFHelper()
+{
+
+}
+
+QRectFHelper::~QRectFHelper()
+{
+
+}
+
+bool QRectFHelper::canHandle(int type) const
+{
+    return type == QMetaType::QRect || type == QMetaType::QRectF;
+}
+
+QJsonValue QRectFHelper::toJson(const QVariant &value) const
+{
+    QRectF rect;
+    if(value.userType() == QMetaType::QRect)
+        rect = value.value<QRect>();
+    else
+        rect = value.value<QRectF>();
+
+    QJsonObject ret;
+    ret.insert("x", rect.x());
+    ret.insert("y", rect.y());
+    ret.insert("width", rect.width());
+    ret.insert("height", rect.height());
+    return ret;
+}
+
+QVariant QRectFHelper::fromJson(const QJsonValue &value, int type) const
+{
+    const QJsonObject object = value.toObject();
+
+    const QRectF rect( object.value("x").toDouble(),
+                 object.value("y").toDouble(),
+                 object.value("width").toDouble(),
+                 object.value("height").toDouble() );
+
+    if(type == QMetaType::QRectF)
+        return rect;
+
+    return rect.toRect();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

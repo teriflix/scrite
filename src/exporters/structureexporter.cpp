@@ -12,11 +12,13 @@
 ****************************************************************************/
 
 #include "structureexporter.h"
+#include "application.h"
 
 #include <QPainter>
 #include <QFileInfo>
 #include <QPdfWriter>
 #include <QPainterPath>
+#include <QAbstractTextDocumentLayout>
 
 StructureExporter::StructureExporter(QObject *parent)
     :AbstractExporter(parent)
@@ -29,7 +31,7 @@ StructureExporter::~StructureExporter()
 
 }
 
-QPainterPath evaluateConnectorPath(const QRectF &r1, const QRectF &r2)
+QPainterPath evaluateConnectorPath(const QRectF &r1, const QRectF &r2, QPointF *labelPos=nullptr)
 {
     const QLineF line(r1.center(), r2.center());
     QPointF p1, p2;
@@ -142,6 +144,15 @@ QPainterPath evaluateConnectorPath(const QRectF &r1, const QRectF &r2)
     const qreal angle = path.angleAtPercent(0.5);
     const QPointF lineCenter = path.pointAtPercent(0.5);
 
+    if(labelPos)
+    {
+        const qreal labelT = 0.45 - (30.0 / path.length());
+        if( labelT < 0 || labelT >= 1 )
+            *labelPos = lineCenter;
+        else
+            *labelPos = path.pointAtPercent(labelT);
+    }
+
     QTransform tx;
     tx.translate(lineCenter.x(), lineCenter.y());
     tx.rotate(-angle);
@@ -164,6 +175,12 @@ bool StructureExporter::doExport(QIODevice *device)
         structureRect |= QRectF(element->x(), element->y(), element->width(), element->height());
     }
 
+    for(int i=0; i<structure->annotationCount(); i++)
+    {
+        const Annotation *annotation = structure->annotationAt(i);
+        structureRect |= annotation->geometry();
+    }
+
     QPdfWriter pdfWriter(device);
     pdfWriter.setTitle(screenplay->title() + " - Structure");
     pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
@@ -182,10 +199,19 @@ bool StructureExporter::doExport(QIODevice *device)
     paint.translate(-structureRect.left(), -structureRect.top());
     paint.scale(scale, scale);
 
+    for(int i=0; i<structure->annotationCount(); i++)
+    {
+        const Annotation *annotation = structure->annotationAt(i);
+        paint.save();
+        this->paintAnnotation(&paint, annotation);
+        paint.restore();
+    }
+
     QFont font;
     font.setPixelSize(13);
     paint.setFont(font);
 
+    // Draw connector lines in the first pass
     const StructureElement *previousElement = nullptr;
     QRectF previousElementRect;
     QColor previousElementColor;
@@ -203,6 +229,54 @@ bool StructureExporter::doExport(QIODevice *device)
         const QRectF currentElementRect( currentElement->x(), currentElement->y(), currentElement->width(), currentElement->height() );
         const QColor currentElementColor( currentElement->scene()->color() );
 
+        if(previousElement != nullptr)
+        {
+            QPointF labelPos;
+            const QPainterPath path = evaluateConnectorPath(previousElementRect, currentElementRect, &labelPos);
+            const QColor pathColor = QColor::fromRgbF( (previousElementColor.redF()+currentElementColor.redF())/2.0,
+                                                 (previousElementColor.greenF()+currentElementColor.greenF())/2.0,
+                                                 (previousElementColor.blueF()+currentElementColor.blueF())/2.0 );
+            paint.setPen( QPen(pathColor, 2.0) );
+            paint.setBrush( Qt::NoBrush );
+            paint.drawPath(path);
+
+            paint.setPen( QPen(pathColor, 1.0) );
+            paint.setBrush(Qt::white);
+            const QString label = QString::number(i);
+            QRectF labelRect = paint.fontMetrics().boundingRect(label);
+            labelRect.setWidth( qMax(labelRect.width(),labelRect.height()) );
+            labelRect.setHeight(labelRect.width());
+            labelRect.adjust(-5, -5, 5, 5);
+            labelRect.moveCenter(labelPos);
+            paint.drawRoundedRect(labelRect, 50, 50, Qt::RelativeSize);
+            paint.setPen(Qt::black);
+            paint.drawText(labelRect, Qt::AlignCenter, label);
+        }
+
+        previousElement = currentElement;
+        previousElementRect = currentElementRect;
+    }
+
+    // Draw elements in second pass.
+    for(int i=0; i<screenplay->elementCount(); i++)
+    {
+        const ScreenplayElement *element = screenplay->elementAt(i);
+        if(element == nullptr || element->scene() == nullptr)
+            continue;
+
+        const int elementIndex = structure->indexOfScene(element->scene());
+        const StructureElement *currentElement = structure->elementAt(elementIndex);
+        if(currentElement->scene() == nullptr)
+            continue;
+
+        const QRectF currentElementRect( currentElement->x(), currentElement->y(), currentElement->width(), currentElement->height() );
+        const QColor currentElementColor( currentElement->scene()->color() );
+
+        const qreal radius = qMin(currentElement->width(), currentElement->height())*0.1;
+        paint.setBrush(Qt::white);
+        paint.setPen(Qt::NoPen);
+        paint.drawRoundedRect(currentElementRect, radius, radius, Qt::AbsoluteSize);
+
         QColor fillColor = currentElementColor;
         fillColor.setAlphaF(0.2);
         paint.setBrush( QBrush(fillColor) );
@@ -211,27 +285,11 @@ bool StructureExporter::doExport(QIODevice *device)
         if(outlineColor == Qt::white || outlineColor == Qt::yellow)
             outlineColor = Qt::black;
         paint.setPen( QPen(outlineColor,2.0) );
-
-        const qreal radius = qMin(currentElement->width(), currentElement->height())*0.1;
         paint.drawRoundedRect(currentElementRect, radius, radius, Qt::AbsoluteSize);
 
         paint.setPen(Qt::black);
         paint.drawText( currentElementRect.adjusted(10,10,-10,-10),
                         Qt::AlignCenter|Qt::TextWordWrap, currentElement->scene()->title() );
-
-        if(previousElement != nullptr)
-        {
-            const QPainterPath path = evaluateConnectorPath(previousElementRect, currentElementRect);
-            const QColor pathColor = QColor::fromRgbF( (previousElementColor.redF()+currentElementColor.redF())/2.0,
-                                                 (previousElementColor.greenF()+currentElementColor.greenF())/2.0,
-                                                 (previousElementColor.blueF()+currentElementColor.blueF())/2.0 );
-            paint.setPen( QPen(pathColor, 2.0) );
-            paint.setBrush( Qt::NoBrush );
-            paint.drawPath(path);
-        }
-
-        previousElement = currentElement;
-        previousElementRect = currentElementRect;
     }
 
     paint.end();
@@ -245,4 +303,219 @@ QString StructureExporter::polishFileName(const QString &fileName) const
     if(fi.suffix().toLower() != "pdf")
         return fileName + ".pdf";
     return fileName;
+}
+
+void StructureExporter::paintAnnotation(QPainter *painter, const Annotation *annotation)
+{
+    const QJsonObject attributes = annotation->attributes();
+    const QRectF geometry = annotation->geometry();
+
+    auto paintRectangleAnnotation = [=](const QString &bgColorAttr = QStringLiteral("color")) {
+        const QColor backgroundColor = QColor(attributes.value(bgColorAttr).toString());
+        const QColor borderColor = QColor(attributes.value(QStringLiteral("borderColor")).toString());
+        const qreal borderWidth = attributes.value(QStringLiteral("borderWidth")).toDouble();
+        const bool fillBackground = attributes.value(QStringLiteral("fillBackground")).toBool();
+        const qreal opacity = qBound(0.0, attributes.value(QStringLiteral("opacity")).toDouble(), 100.0)/100.0;
+
+        QBrush brush(Qt::NoBrush);
+        if(fillBackground)
+            brush = QBrush(backgroundColor);
+
+        QPen pen(Qt::NoPen);
+        if(borderWidth > 0)
+            pen = QPen(borderColor, borderWidth);
+
+        painter->setOpacity(opacity);
+        painter->setPen(pen);
+        painter->setBrush(brush);
+        painter->drawRect(geometry);
+        painter->setOpacity(1);
+    };
+
+    auto paintTextAnnotation = [=]() {
+        paintRectangleAnnotation( QStringLiteral("backgroundColor") );
+
+        const QString fontFamily = attributes.value(QStringLiteral("fontFamily")).toString();
+        const int fontSize = attributes.value(QStringLiteral("fontSize")).toInt();
+        const QJsonArray fontStyles = attributes.value(QStringLiteral("fontStyle")).toArray();
+        const QString hAlign = attributes.value(QStringLiteral("hAlign")).toString();
+        const QString vAlign = attributes.value(QStringLiteral("vAlign")).toString();
+        const QString text = attributes.value(QStringLiteral("text")).toString();
+        const QColor textColor = QColor(attributes.value(QStringLiteral("textColor")).toString());
+
+        if(text.isEmpty())
+            return;
+
+        QFont font(fontFamily);
+        font.setPixelSize(fontSize);
+        for(int i=0; i<fontStyles.size(); i++) {
+            const QString fontStyle = fontStyles.at(i).toString();
+            if(!font.bold())
+                font.setBold(fontStyle == QStringLiteral("bold"));
+            if(!font.italic())
+                font.setItalic(fontStyle == QStringLiteral("italic"));
+            if(!font.underline())
+                font.setUnderline(fontStyle == QStringLiteral("underline"));
+        }
+
+        painter->setFont(font);
+
+        int flags = Qt::TextWordWrap;
+        if(hAlign == QStringLiteral("center"))
+            flags |= Qt::AlignHCenter;
+        else if(hAlign == QStringLiteral("left"))
+            flags |= Qt::AlignLeft;
+        else if(hAlign == QStringLiteral("right"))
+            flags |= Qt::AlignRight;
+
+        if(vAlign == QStringLiteral("center"))
+            flags |= Qt::AlignVCenter;
+        else if(vAlign == QStringLiteral("top"))
+            flags |= Qt::AlignTop;
+        else if(vAlign == QStringLiteral("bottom"))
+            flags |= Qt::AlignBottom;
+
+        painter->setPen(textColor);
+
+        const QRectF textRect = geometry.adjusted(10, 10, -10, -10);
+        painter->drawText( textRect, flags, text );
+    };
+
+    auto paintUrlAnnotation = [=]() {
+        const QString imageName = attributes.value(QStringLiteral("imageName")).toString();
+        const QString imagePath = imageName.isEmpty() ? QString() : this->document()->fileSystem()->absolutePath(imageName);
+        const QString url = attributes.value(QStringLiteral("url")).toString();
+        const QString title = attributes.value(QStringLiteral("title")).toString();
+        const QString description = attributes.value(QStringLiteral("description")).toString();
+
+        painter->setBrush(Qt::white);
+        painter->setPen(QPen(Qt::black,0));
+        painter->drawRect(geometry);
+
+        QFont font = qApp->font();
+        font.setPixelSize( Application::instance()->idealFontPointSize() );
+        painter->setFont(font);
+
+        if(url.isEmpty()) {
+            painter->drawText(geometry.adjusted(10,10,-10,-10), Qt::TextWordWrap|Qt::AlignCenter, QStringLiteral("No URL was set."));
+            return;
+        }
+
+        QRectF rect = geometry.adjusted(8,8,-8,-8);
+        rect.setHeight( rect.width()*9.0/16.0 );
+        if(imagePath.isEmpty())
+            painter->fillRect(rect, Qt::lightGray);
+        else {
+            const QImage image(imagePath);
+            painter->drawImage(rect, image);
+        }
+
+        font.setPixelSize( Application::instance()->idealFontPointSize()+2 );
+        font.setBold(true);
+        painter->setFont(font);
+
+        rect.moveTop(rect.bottom() + 8);
+        rect.setHeight(painter->fontMetrics().lineSpacing()*2);
+        painter->drawText(rect, Qt::TextWordWrap, title);
+
+        font.setPixelSize( Application::instance()->idealFontPointSize() );
+        font.setBold(false);
+        painter->setFont(font);
+
+        rect.moveTop(rect.bottom() + 8);
+        rect.setHeight(painter->fontMetrics().lineSpacing()*4);
+        painter->drawText(rect, Qt::TextWordWrap, description);
+
+        font.setPixelSize( Application::instance()->idealFontPointSize()-2 );
+        font.setBold(false);
+        painter->setFont(font);
+
+        rect.moveTop(rect.bottom() + 8);
+        rect.setHeight(painter->fontMetrics().lineSpacing()*1);
+
+        QTextDocument doc;
+        doc.setDefaultFont(font);
+        doc.setHtml( QStringLiteral("<a href=\"") + url + QStringLiteral("\">Click here to open link.</a>") );
+        QAbstractTextDocumentLayout::PaintContext context;
+        painter->save();
+        painter->translate(rect.left(), rect.top());
+        doc.documentLayout()->draw(painter, context);
+        painter->restore();
+    };
+
+    auto paintImageAnnotation = [=]() {
+        paintRectangleAnnotation(QStringLiteral("backgroundColor"));
+
+        const QString image = attributes.value(QStringLiteral("image")).toString();
+        const QString imagePath = image.isEmpty() ? QString() : this->document()->fileSystem()->absolutePath(image);
+        const QString caption = attributes.value(QStringLiteral("caption")).toString();
+        const QString captionAlignment = attributes.value(QStringLiteral("captionAlignment")).toString();
+        const QColor captionColor = QColor(attributes.value(QStringLiteral("captionColor")).toString());
+
+        QRectF rect = geometry.adjusted(5,5,-5,-5);
+        if(!imagePath.isEmpty()) {
+            QImage image(imagePath);
+            QSizeF size = QSizeF(image.size()).scaled(rect.size(), Qt::KeepAspectRatio);
+            rect.setSize(size);
+            rect.moveCenter(geometry.center());
+            rect.moveTop(geometry.top()+5);
+            painter->drawImage(rect, image);
+        }
+
+        if(!caption.isEmpty()) {
+            rect.moveTop(rect.bottom() + 5);
+            rect.setBottom(geometry.bottom()-5);
+
+            int flags = Qt::TextWordWrap;
+            if(captionAlignment == QStringLiteral("center"))
+                flags |= Qt::AlignHCenter;
+            else if(captionAlignment == QStringLiteral("left"))
+                flags |= Qt::AlignLeft;
+            else if(captionAlignment == QStringLiteral("right"))
+                flags |= Qt::AlignRight;
+
+            painter->setPen(captionColor);
+            painter->drawText(rect, flags, caption);
+        }
+    };
+
+    auto paintLineAnnotation = [=]() {
+        const QColor lineColor = QColor(attributes.value(QStringLiteral("lineColor")).toString());
+        const int lineWidth = attributes.value(QStringLiteral("lineWidth")).toInt();
+        const qreal opacity = attributes.value(QStringLiteral("opacity")).toDouble();
+        const QString orientation = attributes.value(QStringLiteral("orientation")).toString();
+
+        const QPointF center = geometry.center();
+        QLineF line;
+
+        if(orientation == QStringLiteral("Vertical"))
+            line = QLineF(center.x(), geometry.top(), center.x(), geometry.bottom());
+        else
+            line = QLineF(geometry.left(), center.y(), geometry.right(), center.y());
+
+        QPen pen(lineColor, lineWidth);
+        painter->setPen(pen);
+        painter->setOpacity(opacity);
+        painter->drawLine(line);
+        painter->setOpacity(1);
+    };
+
+    const QString type = annotation->type();
+    if(type == QStringLiteral("rectangle"))
+        paintRectangleAnnotation();
+    else if(type == QStringLiteral("text"))
+        paintTextAnnotation();
+    else if(type == QStringLiteral("url"))
+        paintUrlAnnotation();
+    else if(type == QStringLiteral("image"))
+        paintImageAnnotation();
+    else if(type == QStringLiteral("line"))
+        paintLineAnnotation();
+    else
+    {
+        QPen pen(Qt::black, 1, Qt::DashDotDotLine);
+        painter->setPen(pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(annotation->geometry());
+    }
 }

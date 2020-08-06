@@ -28,7 +28,7 @@
 
 #include "note.h"
 #include "modifiable.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "spellcheckservice.h"
@@ -418,7 +418,7 @@ private:
     bool m_componentComplete = false;
     bool m_trackSceneChanges = true;
     bool m_trackFormatChanges = true;
-    SimpleTimer m_updateTimer;
+    ExecLaterTimer m_updateTimer;
     bool m_hasPendingComputeSize = false;
     QObjectProperty<Scene> m_scene;
     QObjectProperty<ScreenplayFormat> m_format;

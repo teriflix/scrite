@@ -29,6 +29,7 @@ public:
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+    void paintAnnotation(QPainter *painter, const Annotation *annotation);
 };
 
 #endif // STRUCTUREEXPORTER_H

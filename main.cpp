@@ -35,6 +35,7 @@
 #include "notification.h"
 #include "searchengine.h"
 #include "standardpaths.h"
+#include "urlattributes.h"
 #include "textshapeitem.h"
 #include "resetonchange.h"
 #include "scritedocument.h"
@@ -89,7 +90,7 @@ void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, 
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 4, 13);
+    const QVersionNumber applicationVersion(0, 4, 14);
     Application::setApplicationName("Scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
@@ -220,6 +221,7 @@ int main(int argc, char **argv)
     qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
 
     qmlRegisterType<TightBoundingBoxEvaluator>("Scrite", 1, 0, "TightBoundingBoxEvaluator");
+    qmlRegisterType<TightBoundingBoxPreview>("Scrite", 1, 0, "TightBoundingBoxPreview");
     qmlRegisterUncreatableType<TightBoundingBoxItem>("Scrite", 1, 0, "TightBoundingBoxItem", "Use as attached property.");
 
     qmlRegisterType<FileInfo>("Scrite", 1, 0, "FileInfo");
@@ -228,6 +230,8 @@ int main(int argc, char **argv)
 
     qmlRegisterType<LibraryService>("Scrite", 1, 0, "LibraryService");
     qmlRegisterUncreatableType<Library>("Scrite", 1, 0, "Library", "Use from LibraryService.library");
+
+    qmlRegisterType<UrlAttributes>("Scrite", 1, 0, "UrlAttributes");
 
     NotificationManager notificationManager;
 

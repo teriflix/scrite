@@ -46,6 +46,7 @@ public:
     void remove(const QString &path);
 
     QString absolutePath(const QString &path, bool mkpath=false) const;
+    QString relativePath(const QString &path) const;
     bool contains(const QString &path) const;
 
     bool exists(const QString &path) const;

@@ -12,9 +12,10 @@
 ****************************************************************************/
 
 #include "undoredo.h"
+#include "hourglass.h"
 #include "autoupdate.h"
 #include "application.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "scritedocument.h"
 
 #include <QDir>
@@ -216,16 +217,27 @@ UndoStack *Application::findUndoStack(const QString &objectName) const
 
 QJsonObject Application::systemFontInfo() const
 {
+    HourGlass hourGlass;
+
     QFontDatabase fontdb;
 
-    QJsonObject ret;
-    ret.insert("families", QJsonArray::fromStringList(fontdb.families()));
+    static QJsonObject ret;
+    if(ret.isEmpty())
+    {
+        const QStringList allFamilies = fontdb.families( QFontDatabase::Latin );
+        QStringList families;
+        std::copy_if (allFamilies.begin(), allFamilies.end(),
+                      std::back_inserter(families), [fontdb](const QString &family) {
+            return !fontdb.isPrivateFamily(family);
+        });
+        ret.insert("families", QJsonArray::fromStringList(families));
 
-    QJsonArray sizes;
-    QList<int> stdSizes = fontdb.standardSizes();
-    Q_FOREACH(int stdSize, stdSizes)
-        sizes.append( QJsonValue(stdSize) );
-    ret.insert("standardSizes", sizes);
+        QJsonArray sizes;
+        QList<int> stdSizes = fontdb.standardSizes();
+        Q_FOREACH(int stdSize, stdSizes)
+            sizes.append( QJsonValue(stdSize) );
+        ret.insert("standardSizes", sizes);
+    }
 
     return ret;
 }
@@ -407,7 +419,7 @@ public:
     void timerEvent(QTimerEvent *event);
 
 private:
-    SimpleTimer m_timer;
+    ExecLaterTimer m_timer;
     QJSValue m_function;
     QJSValueList m_arguments;
 };
@@ -436,8 +448,13 @@ void ExecLater::timerEvent(QTimerEvent *event)
 }
 
 void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args)
-{
+{    
     QObject *parent = context ? context : this;
+
+#ifndef QT_NO_DEBUG
+    qDebug() << "Registering Exec Later for " << context << " after " << howMuchLater;
+#endif
+
     new ExecLater(howMuchLater, function, args, parent);
 }
 
@@ -681,7 +698,7 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
     {
         const QString objectName = evaluateObjectName(object, objectNameMap);
         QTimerEvent *te = static_cast<QTimerEvent*>(event);
-        SimpleTimer *timer = SimpleTimer::get(te->timerId());
+        ExecLaterTimer *timer = ExecLaterTimer::get(te->timerId());
         qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
     }
 #else

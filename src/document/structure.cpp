@@ -16,6 +16,9 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QDateTime>
+#include <QJsonDocument>
+
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent)),
@@ -354,7 +357,9 @@ Annotation::Annotation(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
 {
-
+    connect(this, &Annotation::typeChanged, this, &Annotation::annotationChanged);
+    connect(this, &Annotation::geometryChanged, this, &Annotation::annotationChanged);
+    connect(this, &Annotation::attributesChanged, this, &Annotation::annotationChanged);
 }
 
 Annotation::~Annotation()
@@ -362,27 +367,132 @@ Annotation::~Annotation()
     emit aboutToDelete(this);
 }
 
-void Annotation::setType(const QJsonValue &val)
+void Annotation::setType(const QString &val)
 {
-    if(m_type == val || !m_type.isUndefined())
+    // Can be set only once.
+    if(m_type == val || !m_type.isEmpty())
         return;
 
     m_type = val;
     emit typeChanged();
+
+    static QJsonObject metaDataDict;
+    if(metaDataDict.isEmpty())
+    {
+        QFile file(":/misc/annotations_metadata.json");
+        file.open(QFile::ReadOnly);
+        metaDataDict = QJsonDocument::fromJson(file.readAll()).object();
+    }
+
+    const QJsonArray metaData = metaDataDict.value(m_type).toArray();
+    this->setMetaData(metaData);
 }
 
-void Annotation::setAttributes(const QJsonValue &val)
+void Annotation::setResizable(bool val)
+{
+    if(m_resizable == val)
+        return;
+
+    m_resizable = val;
+    emit resizableChanged();
+}
+
+void Annotation::setMovable(bool val)
+{
+    if(m_movable == val)
+        return;
+
+    m_movable = val;
+    emit movableChanged();
+}
+
+void Annotation::setGeometry(const QRectF &val)
+{
+    if(m_geometry == val)
+        return;
+
+    QRectF val2;
+    val2.setSize( m_resizable || m_geometry.size().isEmpty() ? val.size() : m_geometry.size() );
+    val2.moveTopLeft( m_movable || m_geometry.topLeft().isNull() ? val.topLeft() : m_geometry.topLeft() );
+    if(m_geometry == val2)
+        return;
+
+    m_geometry = val;
+    emit geometryChanged();
+}
+
+void Annotation::setAttributes(const QJsonObject &val)
 {
     if(m_attributes == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "type");
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "attributes");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
     if(!info->isLocked())
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_attributes = val;
+    this->polishAttributes();
     emit attributesChanged();
+}
+
+void Annotation::setMetaData(const QJsonArray &val)
+{
+    // Can be set only once.
+    if(m_metaData == val || !m_metaData.isEmpty())
+        return;
+
+    m_metaData = val;
+    for(int i=0; i<m_metaData.count(); i++)
+    {
+        QJsonObject obj = m_metaData.at(i).toObject();
+        if( !obj.contains("visible") )
+        {
+            obj.insert("visible", true);
+            m_metaData.replace(i, obj);
+        }
+    }
+
+    this->polishAttributes();
+    emit metaDataChanged();
+}
+
+bool Annotation::removeImage(const QString &name) const
+{
+    if(name.isEmpty())
+        return false;
+
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    if(dfs->contains(name))
+    {
+        dfs->remove(name);
+        return true;
+    }
+
+    return false;
+}
+
+QString Annotation::addImage(const QString &path) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    const QString addedPath = dfs->add(path, QStringLiteral("annotation"));
+    return dfs->relativePath(addedPath);
+}
+
+QString Annotation::addImage(const QVariant &image) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    const QString path = QStringLiteral("annotation/") + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".jpg");
+    const QString absPath = dfs->absolutePath(path, true);
+    const QImage img = image.value<QImage>();
+    img.save(absPath, "JPG");
+    return dfs->relativePath(absPath);
+}
+
+QUrl Annotation::imageUrl(const QString &name) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    return QUrl::fromLocalFile(dfs->absolutePath(name));
 }
 
 bool Annotation::event(QEvent *event)
@@ -391,6 +501,46 @@ bool Annotation::event(QEvent *event)
         m_structure = qobject_cast<Structure*>(this->parent());
 
     return QObject::event(event);
+}
+
+void Annotation::polishAttributes()
+{
+    QJsonArray::const_iterator it = m_metaData.begin();
+    QJsonArray::const_iterator end = m_metaData.end();
+    while(it != end)
+    {
+        const QJsonObject meta = (*it).toObject();
+        if(meta.isEmpty())
+        {
+            ++it;
+            continue;
+        }
+
+        const QString key = meta.value( QStringLiteral("name") ).toString();
+        if(key.isEmpty())
+        {
+            ++it;
+            continue;
+        }
+
+        QJsonValue attrVal = m_attributes.value(key);
+        if(attrVal.isUndefined())
+            m_attributes.insert(key, meta.value(QStringLiteral("default")));
+        else
+        {
+            const bool isNumber = meta.value(QStringLiteral("type")).toString() == QStringLiteral("number");
+            if(isNumber)
+            {
+                const qreal min = meta.value(QStringLiteral("min")).toDouble();
+                const qreal max = meta.value(QStringLiteral("max")).toDouble();
+                const qreal val = qBound(min, attrVal.toDouble(), max);
+                if(val != attrVal.toDouble())
+                    m_attributes.insert(key, val);
+            }
+        }
+
+        ++it;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -966,8 +1116,7 @@ void Structure::addAnnotation(Annotation *ptr)
 
     ptr->setParent(this);
     connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
-    connect(ptr, &Annotation::typeChanged, this, &Structure::structureChanged);
-    connect(ptr, &Annotation::attributesChanged, this, &Structure::structureChanged);
+    connect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
 
     emit annotationCountChanged();
 }
@@ -992,8 +1141,7 @@ void Structure::removeAnnotation(Annotation *ptr)
     m_annotations.removeAt(index);
 
     disconnect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
-    disconnect(ptr, &Annotation::typeChanged, this, &Structure::structureChanged);
-    disconnect(ptr, &Annotation::attributesChanged, this, &Structure::structureChanged);
+    disconnect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
 
     emit annotationCountChanged();
 
@@ -1003,6 +1151,42 @@ void Structure::removeAnnotation(Annotation *ptr)
 Annotation *Structure::annotationAt(int index) const
 {
     return index < 0 || index >= m_annotations.size() ? nullptr : m_annotations.at(index);
+}
+
+void Structure::bringToFront(Annotation *ptr)
+{
+    if(ptr == nullptr || m_annotations.empty())
+        return;
+
+    if(m_annotations.last() == ptr)
+        return;
+
+    const int index = m_annotations.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    m_annotations.takeAt(index);
+    m_annotations.append(ptr);
+    emit annotationCountChanged(); // Although the count did not change, we use the same
+                                   // signal to announce change in the annotations list property
+}
+
+void Structure::sendToBack(Annotation *ptr)
+{
+    if(ptr == nullptr || m_annotations.empty())
+        return;
+
+    if(m_annotations.first() == ptr)
+        return;
+
+    const int index = m_annotations.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    m_annotations.takeAt(index);
+    m_annotations.prepend(ptr);
+    emit annotationCountChanged(); // Although the count did not change, we use the same
+                                   // signal to announce change in the annotations list property
 }
 
 void Structure::clearAnnotations()

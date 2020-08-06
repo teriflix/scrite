@@ -250,7 +250,6 @@ Rectangle {
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds
                     boundsMovement: Flickable.StopAtBounds
-                    cacheBuffer: 10
                     ScrollBar.vertical: verticalScrollBar
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
@@ -945,8 +944,16 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             enabled: !scriteDocument.readOnly
                             menu: Menu2 {
-                                onAboutToShow: sceneTextEditor.persistentSelection = true
-                                onAboutToHide: sceneTextEditor.persistentSelection = false
+                                property int cursorPosition: -1
+                                onAboutToShow: {
+                                    cursorPosition = sceneTextEditor.cursorPosition
+                                    sceneTextEditor.persistentSelection = true
+                                }
+                                onAboutToHide: {
+                                    sceneTextEditor.persistentSelection = false
+                                    sceneTextEditor.forceActiveFocus()
+                                    sceneTextEditor.cursorPosition = cursorPosition
+                                }
 
                                 Repeater {
                                     model: sceneDocumentBinder.spellingSuggestions
@@ -956,7 +963,7 @@ Rectangle {
                                         focusPolicy: Qt.NoFocus
                                         onClicked: {
                                             spellingSuggestionsMenu.close()
-                                            sceneDocumentBinder.replaceWordUnderCursor(modelData)
+                                            sceneDocumentBinder.replaceWordAt(cursorPosition, modelData)
                                         }
                                     }
                                 }
@@ -1839,7 +1846,7 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.leftMargin: leftMargin
                             anchors.right: parent.right
-                            anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 0) + 5
+                            anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 5) + 5
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType

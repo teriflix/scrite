@@ -16,7 +16,7 @@
 
 #include "note.h"
 #include "scene.h"
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "qobjectproperty.h"
 #include "abstractshapeitem.h"
 
@@ -179,23 +179,56 @@ public:
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
     Structure* structure() const { return m_structure; }
 
-    Q_PROPERTY(QJsonValue type READ type WRITE setType NOTIFY typeChanged)
-    void setType(const QJsonValue &val);
-    QJsonValue type() const { return m_type; }
+    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
+    void setType(const QString &val);
+    QString type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QJsonValue attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
-    void setAttributes(const QJsonValue &val);
-    QJsonValue attributes() const { return m_attributes; }
+    Q_PROPERTY(bool resizable READ isResizable WRITE setResizable NOTIFY resizableChanged STORED false)
+    void setResizable(bool val);
+    bool isResizable() const { return m_resizable; }
+    Q_SIGNAL void resizableChanged();
+
+    Q_PROPERTY(bool movable READ isMovable WRITE setMovable NOTIFY movableChanged STORED false)
+    void setMovable(bool val);
+    bool isMovable() const { return m_movable; }
+    Q_SIGNAL void movableChanged();
+
+    Q_PROPERTY(QRectF geometry READ geometry WRITE setGeometry NOTIFY geometryChanged)
+    void setGeometry(const QRectF &val);
+    QRectF geometry() const { return m_geometry; }
+    Q_SIGNAL void geometryChanged();
+
+    Q_PROPERTY(QJsonObject attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
+    void setAttributes(const QJsonObject &val);
+    QJsonObject attributes() const { return m_attributes; }
     Q_SIGNAL void attributesChanged();
+
+    Q_PROPERTY(QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged STORED false)
+    void setMetaData(const QJsonArray &val);
+    QJsonArray metaData() const { return m_metaData; }
+    Q_SIGNAL void metaDataChanged();
+
+    Q_INVOKABLE bool removeImage(const QString &name) const;
+    Q_INVOKABLE QString addImage(const QString &path) const;
+    Q_INVOKABLE QString addImage(const QVariant &image) const;
+    Q_INVOKABLE QUrl imageUrl(const QString &name) const;
+
+signals:
+    void annotationChanged();
 
 protected:
     bool event(QEvent *event);
+    void polishAttributes();
 
 private:
-    QJsonValue m_type = QJsonValue(QJsonValue::Undefined);
+    QRectF m_geometry;
+    QString m_type;
+    bool m_movable = true;
+    bool m_resizable = true;
     Structure *m_structure = nullptr;
-    QJsonValue m_attributes = QJsonValue(QJsonValue::Undefined);
+    QJsonArray m_metaData;
+    QJsonObject m_attributes;
 };
 
 class Structure : public QObject
@@ -311,6 +344,8 @@ public:
     Q_INVOKABLE void addAnnotation(Annotation *ptr);
     Q_INVOKABLE void removeAnnotation(Annotation *ptr);
     Q_INVOKABLE Annotation *annotationAt(int index) const;
+    Q_INVOKABLE void bringToFront(Annotation *ptr);
+    Q_INVOKABLE void sendToBack(Annotation *ptr);
     Q_PROPERTY(int annotationCount READ annotationCount NOTIFY annotationCountChanged)
     int annotationCount() const { return m_annotations.size(); }
     Q_INVOKABLE void clearAnnotations();
@@ -356,7 +391,7 @@ private:
 
     void updateLocationHeadingMap();
     void updateLocationHeadingMapLater();
-    SimpleTimer m_locationHeadingsMapTimer;
+    ExecLaterTimer m_locationHeadingsMapTimer;
     QMap< QString, QList<SceneHeading*> > m_locationHeadingsMap;
 
     void onStructureElementSceneChanged(StructureElement *element=nullptr);
@@ -429,7 +464,7 @@ private:
 private:
     LineType m_lineType = StraightLine;
     QPointF m_arrowPosition;
-    SimpleTimer m_updateTimer;
+    ExecLaterTimer m_updateTimer;
     qreal m_arrowAndLabelSpacing = 30;
     QObjectProperty<StructureElement> m_toElement;
     QObjectProperty<StructureElement> m_fromElement;

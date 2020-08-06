@@ -63,10 +63,10 @@ HEADERS += \
     src/quick/items/abstractshapeitem.h \
     src/quick/items/gridbackgrounditem.h \
     src/quick/items/painterpathitem.h \
+    src/utils/execlatertimer.h \
     src/utils/timeprofiler.h \
     src/utils/garbagecollector.h \
     src/utils/hourglass.h \
-    src/utils/simpletimer.h \
     src/utils/genericarraymodel.h \
     src/utils/qobjectfactory.h \
     src/utils/qobjectserializer.h \
@@ -106,7 +106,8 @@ HEADERS += \
     src/reports/locationscreenplayreport.h \
     src/reports/characterreportgenerator.h \
     src/reports/scenecharactermatrixreportgenerator.h \
-    src/reports/locationreportgenerator.h 
+    src/reports/locationreportgenerator.h  \
+    src/utils/urlattributes.h
 
 SOURCES += \
     main.cpp \
@@ -145,10 +146,10 @@ SOURCES += \
     src/quick/items/textshapeitem.cpp \
     src/quick/items/abstractshapeitem.cpp \
     src/quick/items/ruleritem.cpp \
+    src/utils/execlatertimer.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/timeprofiler.cpp \
     src/utils/garbagecollector.cpp \
-    src/utils/simpletimer.cpp \
     src/utils/qobjectserializer.cpp \
     src/document/scritedocument.cpp \
     src/document/screenplay.cpp \
@@ -186,6 +187,7 @@ SOURCES += \
     src/reports/locationscreenplayreport.cpp \
     src/reports/characterreportgenerator.cpp \
     src/reports/scenecharactermatrixreportgenerator.cpp \
+    src/utils/urlattributes.cpp
 
 RESOURCES += \
     scrite_bengali_font.qrc \
@@ -194,6 +196,7 @@ RESOURCES += \
     scrite_hindi_font.qrc \
     scrite_kannada_font.qrc \
     scrite_malayalam_font.qrc \
+    scrite_misc.qrc \
     scrite_oriya_font.qrc \
     scrite_punjabi_font.qrc \
     scrite_sanskrit_font.qrc \
@@ -204,6 +207,9 @@ RESOURCES += \
     scrite_images.qrc \
     scrite_ui.qrc
 
+# https://doc.qt.io/qt-5/qtwebengine-deploying.html#javascript-files-in-qt-resource-files
+QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
+
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
@@ -211,6 +217,8 @@ macx {
     HEADERS += src/core/systemtextinputmanager_macos.h
     OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
     LIBS += -framework Carbon
+} else {
+    QT += webenginewidgets
 }
 
 win32 {

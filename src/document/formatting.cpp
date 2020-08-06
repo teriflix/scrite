@@ -1884,7 +1884,7 @@ public:
 
 private:
     QTextBlock m_block;
-    SimpleTimer m_timer;
+    ExecLaterTimer m_timer;
     SceneDocumentBinder *m_binder = nullptr;
 };
 

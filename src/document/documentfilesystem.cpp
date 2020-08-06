@@ -230,12 +230,14 @@ QString DocumentFileSystem::add(const QString &fileName, const QString &ns)
     const QString suffix = fi.suffix().toLower();
     const QString path = ns + "/" + QString::number(QDateTime::currentSecsSinceEpoch()) + "." + suffix;
     const QString absPath = this->absolutePath(path, true);
-    if( QFile::copy(fileName, path) )
+    if( QFile::copy(fileName, absPath) )
     {
-        QFile::remove(absPath);
+        QFile copiedFile(absPath);
+        copiedFile.setPermissions(QFileDevice::ReadOwner|QFileDevice::WriteOwner|QFileDevice::ReadUser|QFileDevice::WriteUser|QFileDevice::ReadGroup|QFileDevice::WriteGroup|QFileDevice::ReadOther|QFileDevice::WriteOther);
         return path;
     }
 
+    QFile::remove(absPath);
     return QString();
 }
 
@@ -261,6 +263,14 @@ QString DocumentFileSystem::absolutePath(const QString &path, bool mkpath) const
             return QString();
     }
     return ret;
+}
+
+QString DocumentFileSystem::relativePath(const QString &path) const
+{
+    if(path.isEmpty())
+        return QString();
+
+    return QDir(d->folder->path()).relativeFilePath(path);
 }
 
 bool DocumentFileSystem::contains(const QString &path) const

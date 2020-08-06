@@ -11,20 +11,20 @@
 **
 ****************************************************************************/
 
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "application.h"
 
 #include <QList>
 #include <QThread>
 
 #ifndef QT_NO_DEBUG
-Q_GLOBAL_STATIC(QList<SimpleTimer*>, SimpleTimerList)
+Q_GLOBAL_STATIC(QList<ExecLaterTimer*>, ExecLaterTimerList)
 #endif
 
-SimpleTimer *SimpleTimer::get(int timerId)
+ExecLaterTimer *ExecLaterTimer::get(int timerId)
 {
 #ifndef QT_NO_DEBUG
-    Q_FOREACH(SimpleTimer *timer, *SimpleTimerList)
+    Q_FOREACH(ExecLaterTimer *timer, *ExecLaterTimerList)
     {
         if(timer->timerId() == timerId)
             return timer;
@@ -36,29 +36,29 @@ SimpleTimer *SimpleTimer::get(int timerId)
     return nullptr;
 }
 
-SimpleTimer::SimpleTimer(const QString &name, QObject *parent)
+ExecLaterTimer::ExecLaterTimer(const QString &name, QObject *parent)
     : QObject(parent), m_name(name)
 {
 #ifndef QT_NO_DEBUG
-    SimpleTimerList->append(this);
+    ExecLaterTimerList->append(this);
 #endif
 
     m_timer.setObjectName("SimpleTimer");
-    m_timer.setSingleShot(false);
-    connect(&m_timer, &QTimer::timeout, this, &SimpleTimer::onTimeout);
+    m_timer.setSingleShot(true);
+    connect(&m_timer, &QTimer::timeout, this, &ExecLaterTimer::onTimeout);
 }
 
-SimpleTimer::~SimpleTimer()
+ExecLaterTimer::~ExecLaterTimer()
 {
     m_destroyed = true;
     this->stop();
 
 #ifndef QT_NO_DEBUG
-    SimpleTimerList->removeOne(this);
+    ExecLaterTimerList->removeOne(this);
 #endif
 }
 
-void SimpleTimer::setName(const QString &val)
+void ExecLaterTimer::setName(const QString &val)
 {
     if(m_name == val)
         return;
@@ -67,7 +67,7 @@ void SimpleTimer::setName(const QString &val)
     emit nameChanged();
 }
 
-void SimpleTimer::start(int msec, QObject *object)
+void ExecLaterTimer::start(int msec, QObject *object)
 {
     if(m_timer.isActive())
         this->stop();
@@ -78,12 +78,12 @@ void SimpleTimer::start(int msec, QObject *object)
     if(object != m_object)
     {
         if(object)
-            disconnect(object, &QObject::destroyed, this, &SimpleTimer::onObjectDestroyed);
+            disconnect(object, &QObject::destroyed, this, &ExecLaterTimer::onObjectDestroyed);
 
         m_object = object;
 
         if(m_object)
-            connect(object, &QObject::destroyed, this, &SimpleTimer::onObjectDestroyed);
+            connect(object, &QObject::destroyed, this, &ExecLaterTimer::onObjectDestroyed);
     }
 
     if(this->thread() != nullptr && this->thread()->eventDispatcher() != nullptr)
@@ -95,7 +95,13 @@ void SimpleTimer::start(int msec, QObject *object)
         m_timerId = -1;
 }
 
-void SimpleTimer::onTimeout()
+void ExecLaterTimer::stop()
+{
+    m_timer.stop();
+    m_timerId = -1;
+}
+
+void ExecLaterTimer::onTimeout()
 {
     if(m_object != nullptr && m_timerId >= 0)
     {
@@ -106,7 +112,7 @@ void SimpleTimer::onTimeout()
     }
 }
 
-void SimpleTimer::onObjectDestroyed(QObject *ptr)
+void ExecLaterTimer::onObjectDestroyed(QObject *ptr)
 {
     if(m_object == ptr)
     {

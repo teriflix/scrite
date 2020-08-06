@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import Scrite 1.0
 
 Item {
     id: dockWidget
@@ -21,11 +22,14 @@ Item {
     property real contentY
     property real contentWidth
     property real contentHeight
+    property bool contentHasFocus: contentLoader.FocusTracker.hasFocus
     property Item sourceItem
 
     signal moved()
 
     function show() {
+        if(visible)
+            return
         if(sourceItem && screenplayEditorSettings.enableAnimations)
             showAnimation.start()
         else
@@ -33,6 +37,8 @@ Item {
     }
 
     function hide() {
+        if(!visible)
+            return
         if(sourceItem && screenplayEditorSettings.enableAnimations)
             hideAnimation.start()
         else
@@ -44,6 +50,15 @@ Item {
             hide()
         else
             show()
+    }
+
+    TrackerPack {
+        TrackProperty { target: dockWidget; property: "width" }
+        TrackProperty { target: dockWidget; property: "height" }
+
+        delay: 50
+
+        onTracked: container.returnToBounds()
     }
 
     signal closeRequest()
@@ -61,6 +76,17 @@ Item {
                 sourceGeometry = Qt.rect(pt.x, pt.y, sourceItem.width, sourceItem.height)
             } else
                 sourceGeometry = Qt.rect(0, 0, 100, 100)
+        }
+
+        function returnToBounds() {
+            var newX = dockWidget.contentX
+            var newY = dockWidget.contentY
+            if(dockWidget.contentX + dockWidget.contentWidth > dockWidget.width)
+                newX = dockWidget.width - dockWidget.contentWidth
+            if(dockWidget.contentY + dockWidget.contentHeight > dockWidget.height)
+                newY = dockWidget.height - dockWidget.contentHeight
+            dockWidget.contentX = newX
+            dockWidget.contentY = newY
         }
 
         property rect sourceGeometry: Qt.rect(0, 0, 100, 100)
@@ -95,8 +121,11 @@ Item {
                 drag.axis: Drag.XAndYAxis
                 drag.onActiveChanged: {
                     if(!drag.active) {
-                        contentX = container.x
-                        contentY = container.y
+                        var newX = container.x
+                        var newY = container.y
+                        contentX = newX
+                        contentY = newY
+                        container.returnToBounds()
                         moved()
                     }
                 }
@@ -123,6 +152,7 @@ Item {
             clip: true
             transformOrigin: Item.TopLeft
             scale: parent.t
+            FocusTracker.window: qmlWindow
         }
     }
 

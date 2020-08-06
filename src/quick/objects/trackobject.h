@@ -14,7 +14,7 @@
 #ifndef TRACKPROPERTYCHANGES_H
 #define TRACKPROPERTYCHANGES_H
 
-#include "simpletimer.h"
+#include "execlatertimer.h"
 #include "qobjectproperty.h"
 
 #include <QObject>
@@ -194,7 +194,7 @@ protected:
 private:
     int m_delay = 0;
     bool m_enabled = true;
-    SimpleTimer m_timer;
+    ExecLaterTimer m_timer;
     bool m_emitCallsWhileDisabled = false;
 
     static void staticAppendTracker(QQmlListProperty<AbstractObjectTracker> *list, AbstractObjectTracker *ptr);

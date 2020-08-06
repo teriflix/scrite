@@ -806,18 +806,18 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
 
 void ScriteDocument::evaluateStructureElementSequence()
 {
+    QJsonArray array;
+
     if(m_structure == nullptr || m_screenplay == nullptr)
     {
         if(!m_structureElementSequence.isEmpty())
         {
-            m_structureElementSequence = QJsonArray();
+            m_structureElementSequence = array;
             emit structureElementSequenceChanged();
         }
 
         return;
     }
-
-    QJsonArray array;
 
     const int nrElements = m_screenplay->elementCount();
     if(nrElements == 0)
@@ -1260,7 +1260,7 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
         }
     }
 
-    // From version 0.4.13 onwards we allow users to set their own custom fonts
+    // From version 0.4.14 onwards we allow users to set their own custom fonts
     // for each language. This is a deviation from using "Courier Prime" as the
     // default Latin font.
     m_formatting->useUserSpecifiedFonts();

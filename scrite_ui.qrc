@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>LICENSE.txt</file>
         <file>main.qml</file>
-        <file>material_colors_db.json</file>
         <file>qml/AboutBox.qml</file>
         <file>qml/AlphabetMappings.qml</file>
         <file>qml/Button2.qml</file>
@@ -12,7 +11,6 @@
         <file>qml/ComboBox2.qml</file>
         <file>qml/DialogOverlay.qml</file>
         <file>qml/ExporterConfiguration.qml</file>
-        <file>qml/FlickablePreview.qml</file>
         <file>qml/FocusIndicator.qml</file>
         <file>qml/Menu2.qml</file>
         <file>qml/MenuItem2.qml</file>
@@ -52,5 +50,7 @@
         <file>qml/OpenFromLibrary.qml</file>
         <file>qml/TabView2.qml</file>
         <file>qml/PageView.qml</file>
+        <file>qml/AnnotationPropertyEditor.qml</file>
+        <file>qml/AnnotationItem.qml</file>
     </qresource>
 </RCC>
