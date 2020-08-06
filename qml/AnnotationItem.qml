@@ -33,6 +33,11 @@ Rectangle {
     TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
     TightBoundingBoxItem.stackOrder: 1.0 + (index/scriteDocument.structure.annotationCount)
 
+    Connections {
+        target: annotation
+        onAttributesChanged: annotationItem.TightBoundingBoxItem.markPreviewDirty()
+    }
+
     function grip() {
         annotationGripLoader.annotationItem = annotationItem
         annotationGripLoader.annotation = annotation

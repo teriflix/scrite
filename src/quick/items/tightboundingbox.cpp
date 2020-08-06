@@ -228,6 +228,11 @@ void TightBoundingBoxItem::setLivePreview(bool val)
     this->updatePreviewLater();
 }
 
+void TightBoundingBoxItem::markPreviewDirty()
+{
+    this->updatePreviewLater();
+}
+
 void TightBoundingBoxItem::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_updatePreviewTimer.timerId())

@@ -125,9 +125,30 @@
     "url": [
         {
             "name": "url",
-            "title": "URL",
+            "title": "Website Address",
             "type": "url",
             "default": ""
+        },
+        {
+            "name": "title",
+            "title": "Title",
+            "type": "text",
+            "default": "",
+            "placeHolderText": "Set website title"
+        },
+        {
+            "name": "description",
+            "title": "Description",
+            "type": "text",
+            "default": "",
+            "placeHolderText": "Set website description"
+        },
+        {
+            "name": "imageUrl",
+            "title": "Image URL",
+            "type": "url",
+            "default": "",
+            "placeHolderText": "Set preview image URL"
         }
     ],
     "image": [

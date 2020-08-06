@@ -1194,6 +1194,7 @@ Item {
                 x: parent.width - width/2
                 y: (parent.height - height)/2
                 visible: annotation.resizable
+                enabled: visible
 
                 onXChanged: widthUpdateTimer.start()
 
@@ -1222,6 +1223,7 @@ Item {
                 x: (parent.width - width)/2
                 y: parent.height - height/2
                 visible: annotation.resizable
+                enabled: visible
 
                 onYChanged: heightUpdateTimer.start()
 
@@ -1250,6 +1252,7 @@ Item {
                 x: parent.width - width/2
                 y: parent.height - height/2
                 visible: annotation.resizable
+                enabled: visible
 
                 onXChanged: sizeUpdateTimer.start()
                 onYChanged: sizeUpdateTimer.start()
@@ -1357,12 +1360,11 @@ Item {
             return
 
         var w = 300
-        var h = app.isMacOSPlatform ? 60 : 350
+        var h = 350 // app.isMacOSPlatform ? 60 : 350
 
         var annot = annotationObject.createObject(canvas)
         annot.type = "url"
-        annot.resizable = false
-        annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
+        annot.geometry = Qt.rect(x-w/2, y-20, w, h)
         scriteDocument.structure.addAnnotation(annot)
     }
 
@@ -1378,46 +1380,92 @@ Item {
             }
             opacity: 1
 
+            Component.onCompleted: annotation.resizable = false
+
             UrlAttributes {
                 id: urlAttribs
-                url: annotation.attributes.url
+                url: annotation.attributes.url2 !== annotation.attributes.url ? annotation.attributes.url : ""
+                onUrlChanged: {
+                    if(url !== "") {
+                        var annotAttrs = annotation.attributes
+                        annotation.removeImage(annotAttrs.imageName)
+                        annotAttrs.imageName = ""
+                        annotation.attributes = annotAttrs
+                    }
+                }
+                onStatusChanged: {
+                    if(status === UrlAttributes.Ready) {
+                        var annotAttrs = annotation.attributes
+                        var urlAttrs = attributes
+                        if(annotAttrs.title === "")
+                            annotAttrs.title = urlAttrs.title
+                        if(annotAttrs.description === "")
+                            annotAttrs.description = urlAttrs.description
+                        if(annotAttrs.imageUrl === "") {
+                            annotAttrs.imageUrl = urlAttrs.image
+                            annotAttrs.imageName = ""
+                        }
+                        annotAttrs.url2 = annotAttrs.url
+                        annotation.attributes = annotAttrs
+                    }
+                }
             }
 
             Loader {
                 anchors.fill: parent
                 anchors.margins: 8
-                active: urlAttribs.status === UrlAttributes.Ready
+                active: anotation.attributes.url !== ""
                 clip: true
                 sourceComponent: Column {
-                    spacing: 4
+                    spacing: 8
 
-                    Image {
+                    Rectangle {
                         width: parent.width
-                        fillMode: Image.PreserveAspectFit
-                        source: urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.image : ""
-                        visible: !app.isMacOSPlatform
+                        height: (width/16)*9
+                        color: anotation.attributes.imageName === "" ? primaryColors.c500.background : Qt.rgba(0,0,0,0)
+
+                        Image {
+                            id: imageItem
+                            anchors.fill: parent
+                            fillMode: Image.PreserveAspectCrop
+                            source: annotation.attributes.imageName === "" ? annotation.attributes.imageUrl : annotation.imageUrl(annotation.attributes.imageName)
+                            onStatusChanged: {
+                                if(status === Image.Ready) {
+                                    if(annotation.attributes.imageName === "") {
+                                        imageItem.grabToImage(function(result) {
+                                            var attrs = annotation.attributes
+                                            attrs.imageName = annotation.addImage(result.image)
+                                            annotation.attributes = attrs
+                                        })
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     Text {
                         font.bold: true
                         font.pointSize: app.idealFontPointSize + 2
-                        text: urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.title : "Loading ..."
+                        text: annotation.attributes.title
                         width: parent.width
+                        maximumLineCount: 2
+                        wrapMode: Text.WordWrap
                         elide: Text.ElideRight
                     }
 
                     Text {
                         font.pointSize: app.idealFontPointSize
-                        text: urlAttribs.status === UrlAttributes.Ready ? urlAttribs.attributes.description : "Loading ..."
-                        visible: !app.isMacOSPlatform
+                        text: annotation.attributes.description
                         width: parent.width
+                        wrapMode: Text.WordWrap
                         elide: Text.ElideRight
+                        maximumLineCount: 4
                     }
 
                     Text {
                         font.pointSize: app.idealFontPointSize - 2
                         color: urlAttribs.status === UrlAttributes.Error ? "red" : "blue"
-                        text: urlAttribs.url
+                        text: annotation.attributes.url
                         width: parent.width
                         elide: Text.ElideRight
                         font.underline: urlMouseArea.containsMouse
@@ -1427,10 +1475,15 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             enabled: urlAttribs.status !== UrlAttributes.Error
-                            onClicked: Qt.openUrlExternally(urlAttribs.url)
+                            onClicked: Qt.openUrlExternally(annotation.attributes.url)
                         }
                     }
                 }
+            }
+
+            BusyIndicator {
+                anchors.centerIn: parent
+                running: urlAttribs.status === UrlAttributes.Loading
             }
 
             Text {
@@ -1440,7 +1493,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 font.pointSize: app.idealFontPointSize
                 text: app.isMacOSPlatform && annotationGripLoader.annotationItem !== urlAnnotItem ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
-                visible: urlAttribs.url == ""
+                visible: annotation.attributes.url === ""
             }
         }
     }

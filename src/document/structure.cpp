@@ -16,6 +16,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QDateTime>
 #include <QJsonDocument>
 
 StructureElement::StructureElement(QObject *parent)
@@ -474,8 +475,18 @@ bool Annotation::removeImage(const QString &name) const
 QString Annotation::addImage(const QString &path) const
 {
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
-    const QString addedPath = dfs->add(path, "annotation");
+    const QString addedPath = dfs->add(path, QStringLiteral("annotation"));
     return dfs->relativePath(addedPath);
+}
+
+QString Annotation::addImage(const QVariant &image) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    const QString path = QStringLiteral("annotation/") + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".jpg");
+    const QString absPath = dfs->absolutePath(path, true);
+    const QImage img = image.value<QImage>();
+    img.save(absPath, "JPG");
+    return dfs->relativePath(absPath);
 }
 
 QUrl Annotation::imageUrl(const QString &name) const

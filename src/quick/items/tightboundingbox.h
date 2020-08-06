@@ -142,6 +142,8 @@ public:
     bool isLivePreview() const { return m_livePreview; }
     Q_SIGNAL void livePreviewChanged();
 
+    Q_INVOKABLE void markPreviewDirty();
+
     QImage preview() const { return m_preview; }
     Q_SIGNAL void previewUpdated();
 

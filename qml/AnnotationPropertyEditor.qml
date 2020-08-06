@@ -88,6 +88,7 @@ Item {
             property var propertyInfo: annotation.metaData[index]
             spacing: 3
             width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+            visible: propertyInfo.visible === true
 
             Text {
                 width: parent.width
@@ -231,6 +232,7 @@ Item {
             selectByKeyboard: true
             selectByMouse: true
             wrapMode: Text.WordWrap
+            placeholderText: propertyInfo.placeHolderText
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus

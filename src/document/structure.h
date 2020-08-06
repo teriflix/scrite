@@ -211,6 +211,7 @@ public:
 
     Q_INVOKABLE bool removeImage(const QString &name) const;
     Q_INVOKABLE QString addImage(const QString &path) const;
+    Q_INVOKABLE QString addImage(const QVariant &image) const;
     Q_INVOKABLE QUrl imageUrl(const QString &name) const;
 
 signals:
