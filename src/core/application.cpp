@@ -136,6 +136,16 @@ int Application::launchCounter() const
     return m_settings->value("Installation/launchCount", 0).toInt();
 }
 
+QUrl Application::toHttpUrl(const QUrl &url) const
+{
+    if(url.scheme() != QStringLiteral("https"))
+        return url;
+
+    QUrl url2 = url;
+    url2.setScheme( QStringLiteral("http") );
+    return url2;
+}
+
 #ifdef Q_OS_MAC
 Application::Platform Application::platform() const
 {

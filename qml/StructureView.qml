@@ -37,7 +37,7 @@ Item {
 
             ToolButton3 {
                 id: newSceneButton
-                down: newSceneColorMenuLoader.active
+                down: canvasMenu.visible
                 enabled: !scriteDocument.readOnly
                 onClicked: {
                     canvasMenu.isContextMenu = false
@@ -296,6 +296,7 @@ Item {
                     model: scriteDocument.loading ? 0 : scriteDocument.structure.annotations
                     delegate: Loader {
                         property Annotation annotation: modelData
+                        property int annotationIndex: index
                         sourceComponent: {
                             switch(annotation.type) {
                             case "rectangle": return rectangleAnnotationComponent
@@ -319,6 +320,8 @@ Item {
                         if(!active)
                             floatingDockWidget.hide()
                     }
+
+                    Component.onDestruction: reset()
 
                     function reset() {
                         floatingDockWidget.hide()
@@ -630,7 +633,7 @@ Item {
                         MenuItem2 {
                             property var annotationInfo: canvas.annotationsList[index]
                             text: annotationInfo.title
-                            enabled: !scriteDocument.readOnly && what !== ""
+                            enabled: !scriteDocument.readOnly && annotationInfo.what !== ""
                             onClicked: {
                                 if(canvasMenu.isContextMenu)
                                     canvas.createItem(annotationInfo.what, Qt.point(canvasMenu.x, canvasMenu.y))
@@ -1385,7 +1388,7 @@ Item {
                 color: primaryColors.borderColor
             }
             opacity: 1
-
+            property bool annotationHasLocalImage: annotation.attributes.imageName !== undefined && annotation.attributes.imageName !== ""
             Component.onCompleted: annotation.resizable = false
 
             UrlAttributes {
@@ -1400,7 +1403,7 @@ Item {
                     }
                 }
                 onStatusChanged: {
-                    if(status === UrlAttributes.Ready) {
+                    if(status === UrlAttributes.Ready && url !== "") {
                         var annotAttrs = annotation.attributes
                         var urlAttrs = attributes
                         if(annotAttrs.title === "")
@@ -1408,8 +1411,8 @@ Item {
                         if(annotAttrs.description === "")
                             annotAttrs.description = urlAttrs.description
                         if(annotAttrs.imageUrl === "") {
-                            annotAttrs.imageUrl = urlAttrs.image
                             annotAttrs.imageName = ""
+                            annotAttrs.imageUrl = urlAttrs.image
                         }
                         annotAttrs.url2 = annotAttrs.url
                         annotation.attributes = annotAttrs
@@ -1420,7 +1423,7 @@ Item {
             Loader {
                 anchors.fill: parent
                 anchors.margins: 8
-                active: anotation.attributes.url !== ""
+                active: annotation.attributes.url !== ""
                 clip: true
                 sourceComponent: Column {
                     spacing: 8
@@ -1428,16 +1431,22 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: (width/16)*9
-                        color: anotation.attributes.imageName === "" ? primaryColors.c500.background : Qt.rgba(0,0,0,0)
+                        color: annotationHasLocalImage ? Qt.rgba(0,0,0,0) : primaryColors.c500.background
 
                         Image {
                             id: imageItem
                             anchors.fill: parent
                             fillMode: Image.PreserveAspectCrop
-                            source: annotation.attributes.imageName === "" ? annotation.attributes.imageUrl : annotation.imageUrl(annotation.attributes.imageName)
+                            source: {
+                                if(annotationHasLocalImage)
+                                    annotation.imageUrl(annotation.attributes.imageName)
+                                // Lets avoid using HTTPS for as long as possible
+                                // Want to avoid having to bundle OpenSSL with Scrite.
+                                return app.toHttpUrl(annotation.attributes.imageUrl)
+                            }
                             onStatusChanged: {
                                 if(status === Image.Ready) {
-                                    if(annotation.attributes.imageName === "") {
+                                    if(!annotationHasLocalImage) {
                                         imageItem.grabToImage(function(result) {
                                             var attrs = annotation.attributes
                                             attrs.imageName = annotation.addImage(result.image)

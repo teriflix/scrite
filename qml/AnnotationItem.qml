@@ -31,7 +31,7 @@ Rectangle {
     opacity: annotation.attributes.opacity / 100
 
     TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-    TightBoundingBoxItem.stackOrder: 1.0 + (index/scriteDocument.structure.annotationCount)
+    TightBoundingBoxItem.stackOrder: 1.0 + (annotationIndex/scriteDocument.structure.annotationCount)
 
     Connections {
         target: annotation

@@ -59,7 +59,8 @@ public:
     int idealFontPointSize() const { return m_idealFontPointSize; }
     Q_SIGNAL void idealFontPointSizeChanged();
 
-    Q_INVOKABLE QString urlToLocalFile(const QUrl &url) { return url.toLocalFile(); }
+    Q_INVOKABLE QString urlToLocalFile(const QUrl &url) const { return url.toLocalFile(); }
+    Q_INVOKABLE QUrl toHttpUrl(const QUrl &url) const;
 
     enum Platform { LinuxDesktop, WindowsDesktop, MacOS };
     Q_ENUM(Platform)

@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "hourglass.h"
 #include "urlattributes.h"
 #include "garbagecollector.h"
 
@@ -54,10 +55,12 @@ void UrlAttributes::setUrl(const QUrl &val)
     static const QStringList allowedSchemas = QStringList() << QStringLiteral("http") << QStringLiteral("https");
     if(!m_url.isEmpty() && m_url.isValid() && allowedSchemas.contains(m_url.scheme(), Qt::CaseInsensitive))
     {
+        HourGlass hourGlass;
+        this->setStatus(Loading);
+
         m_webPage = new QWebEnginePage(this);
         m_webPage->setUrl(m_url);
         connect(m_webPage, &QWebEnginePage::loadFinished, this, &UrlAttributes::onWebPageLoadFinished);
-        this->setStatus(Loading);
     }
     else
         this->setStatus(m_url.isEmpty() ? Null : Error);

@@ -105,6 +105,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     Application::setAttribute(Qt::AA_Use96Dpi);
+    Application::setAttribute(Qt::AA_UseDesktopOpenGL);
 #endif
 
     qInstallMessageHandler(ScriteQtMessageHandler);
@@ -265,8 +266,10 @@ int main(int argc, char **argv)
     QQuickStyle::setStyle("Material");
 
     QQuickView qmlView;
-    // qmlView.setFormat(format);
-    qmlView.setSceneGraphBackend(QSGRendererInterface::Software);
+    qmlView.setFormat(format);
+#ifdef Q_OS_WIN
+    qmlView.setSceneGraphBackend(QSGRendererInterface::Direct3D12);
+#endif
     scriteDocument->formatting()->setSreeenFromWindow(&qmlView);
     scriteDocument->clearModified();
     a.initializeStandardColors(qmlView.engine());
