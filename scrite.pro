@@ -233,7 +233,6 @@ include($$PWD/3rdparty/sonnet/sonnet.pri)
 DISTFILES += \
     Info.plist \
     README \
-    packaging/linux/install.sh \
     packaging/linux/package.sh \
     packaging/linux/Scrite.desktop \
     packaging/windows/package-x86.bat \

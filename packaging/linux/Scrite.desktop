@@ -6,3 +6,4 @@ Icon=Scrite
 Comment=Multilingual Screenplay Writing App from TERIFLIX
 Terminal=false
 Categories=Office;WordProcessor;
+X-AppImage-Version=0.4.14-beta

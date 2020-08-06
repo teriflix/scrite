@@ -12,5 +12,5 @@ cp ../../../images/appicon.png share/icons/hicolor/512x512/apps/Scrite.png
 mkdir -p share/icons/hicolor/256x256/apps/
 convert ../../../images/appicon.png -resize 256x256 share/icons/hicolor/256x256/apps/Scrite.png
 cd ../
-linuxdeployqt Scrite-0.4.14-beta.AppImage/share/applications/Scrite.desktop -appimage -qmldir=../../qml -verbose=2 -always-overwrite -no-translations
+linuxdeployqt Scrite-0.4.14-beta.AppImage/share/applications/Scrite.desktop -appimage -qmldir=../../qml -verbose=2 -no-translations -no-copy-copyright-files
 cd ../
