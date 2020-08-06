@@ -880,7 +880,14 @@ void ScriteDocument::setModified(bool val)
     if(m_modified == val)
         return;
 
-    if((m_structure && m_structure->elementCount() > 0) || (m_screenplay && m_screenplay->elementCount() > 0))
+    if(m_structure == nullptr || m_screenplay == nullptr)
+        return;
+
+    const int objectCount = m_structure->elementCount() +
+                            m_structure->annotationCount() +
+                            m_screenplay->elementCount() +
+                            m_structure->noteCount();
+    if(objectCount > 0)
         m_modified = val;
     else
         m_modified = false;
