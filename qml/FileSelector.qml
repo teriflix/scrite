@@ -22,6 +22,7 @@ Item {
     property var allowedExtensions: []
     property var selectedExtension
     property string filePathPrefix: "File will be saved as: "
+    property alias nameFilters: folderPathDialog.nameFilters
 
     width: 400
     height: layout.height
@@ -47,11 +48,6 @@ Item {
         selectFolder: true
         selectMultiple: false
         selectExisting: false
-        nameFilters: {
-            if(generator.format === AbstractReportGenerator.AdobePDF)
-                return "Adobe PDF (*.pdf)"
-            return "Open Document Format (*.odt)"
-        }
         onAccepted: fileInfo.absolutePath = app.urlToLocalFile(fileUrl)
     }
 

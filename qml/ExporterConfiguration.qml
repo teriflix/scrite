@@ -77,10 +77,12 @@ Item {
                     }
 
                     FileSelector {
+                        id: fileSelector
                         width: parent.width-20
                         label: "Select a file to export into"
                         absoluteFilePath: exporter.fileName
                         onAbsoluteFilePathChanged: exporter.fileName = absoluteFilePath
+                        nameFilters: exporter.nameFilters
                     }
 
                     Loader {
@@ -157,7 +159,7 @@ Item {
                 }
 
                 Button2 {
-                    enabled: filePathField.text !== ""
+                    enabled: fileSelector.absoluteFilePath !== ""
                     text: "Export"
                     onClicked: {
                         if(exporter.write())

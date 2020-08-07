@@ -187,6 +187,11 @@ Item {
                                                 "enabled": generator.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
                                             }
                                         ]
+                                        nameFilters: {
+                                            if(generator.format === AbstractReportGenerator.AdobePDF)
+                                                return "Adobe PDF (*.pdf)"
+                                            return "Open Document Format (*.odt)"
+                                        }
                                         onSelectedExtensionChanged: generator.format = selectedExtension.value
                                         onAbsoluteFilePathChanged: generator.fileName = absoluteFilePath
                                     }
