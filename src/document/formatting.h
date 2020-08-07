@@ -448,6 +448,7 @@ public:
     Q_INVOKABLE bool canGoUp();
     Q_INVOKABLE bool canGoDown();
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE void reload();
 
     Q_INVOKABLE int lastCursorPosition() const;
     Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;

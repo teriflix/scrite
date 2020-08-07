@@ -943,6 +943,14 @@ Rectangle {
                             id: spellingSuggestionsMenu
                             anchors.bottom: parent.bottom
                             enabled: !scriteDocument.readOnly
+
+                            function replace(cursorPosition, suggestion) {
+                                sceneDocumentBinder.replaceWordAt(cursorPosition, suggestion)
+                                sceneDocumentBinder.reload()
+                                if(cursorPosition >= 0)
+                                    sceneTextEditor.cursorPosition = cursorPosition
+                            }
+
                             menu: Menu2 {
                                 property int cursorPosition: -1
                                 onAboutToShow: {
@@ -962,8 +970,10 @@ Rectangle {
                                         text: modelData
                                         focusPolicy: Qt.NoFocus
                                         onClicked: {
+                                            Qt.callLater(function() {
+                                                spellingSuggestionsMenu.replace(cursorPosition, modelData)
+                                            })
                                             spellingSuggestionsMenu.close()
-                                            sceneDocumentBinder.replaceWordAt(cursorPosition, modelData)
                                         }
                                     }
                                 }

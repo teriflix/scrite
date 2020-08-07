@@ -355,6 +355,10 @@ public:
 
     Q_SIGNAL void structureChanged();
 
+    Q_PROPERTY(bool canPaste READ canPaste NOTIFY canPasteChanged STORED false)
+    bool canPaste() const { return m_canPaste; }
+    Q_SIGNAL void canPasteChanged();
+
     Q_INVOKABLE void copy(QObject *elementOrAnnotation);
     Q_INVOKABLE void paste(const QPointF &pos=QPointF());
 
@@ -362,6 +366,8 @@ protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *event);
     void resetCurentElementIndex();
+    void setCanPaste(bool val);
+    void onClipboardDataChanged();
 
 private:
     friend class Screenplay;
@@ -409,6 +415,7 @@ private:
     static Annotation* staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
     static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
     QList<Annotation *> m_annotations;
+    bool m_canPaste = false;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

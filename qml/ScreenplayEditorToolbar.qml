@@ -133,7 +133,12 @@ Row {
         shortcutText: ""
         ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: binder && !showScreenplayPreview ? true : false
-        onClicked: binder.refresh()
+        onClicked: {
+            var cp = editor.cursorPosition
+            binder.reload()
+            if(cp >= 0)
+                editor.cursorPosition = cp
+        }
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Refresh"

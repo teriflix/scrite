@@ -1387,6 +1387,11 @@ void SceneDocumentBinder::refresh()
     }
 }
 
+void SceneDocumentBinder::reload()
+{
+    this->initializeDocument();
+}
+
 class SpellCheckCursor : public QTextCursor
 {
 public:

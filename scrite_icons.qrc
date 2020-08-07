@@ -119,5 +119,9 @@
         <file>icons/action/library_inverted.png</file>
         <file>icons/action/help.png</file>
         <file>icons/action/help_inverted.png</file>
+        <file>icons/content/content_copy.png</file>
+        <file>icons/content/content_copy_inverted.png</file>
+        <file>icons/content/content_paste_inverted.png</file>
+        <file>icons/content/content_paste.png</file>
     </qresource>
 </RCC>

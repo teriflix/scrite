@@ -128,6 +128,57 @@ Item {
                 ToolTip.text: "Flow Vertically"
                 onClicked: selection.layout(Structure.FlowVerticalLayout)
             }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            ToolButton3 {
+                enabled: !selection.hasItems && (annotationGripLoader.active || currentElementItemBinder.get !== null)
+                iconSource: "../icons/content/content_copy.png"
+                ToolTip.text: "Copy the selected scene or annotation."
+                onClicked: {
+                    if(annotationGripLoader.active) {
+                        scriteDocument.structure.copy(annotationGripLoader.annotation)
+                        statusText.show("Annotation Copied")
+                    } else {
+                        var spe = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
+                        if(spe !== null) {
+                            scriteDocument.structure.copy(spe)
+                            statusText.show("Scene Copied")
+                        }
+                    }
+                }
+                shortcut: "Ctrl+C"
+                ShortcutsModelItem.group: "Edit"
+                ShortcutsModelItem.title: "Copy Annotation"
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay("Ctrl+C")
+            }
+
+            ToolButton3 {
+                enabled: !scriteDocument.readOnly && scriteDocument.structure.canPaste
+                iconSource: "../icons/content/content_paste.png"
+                ToolTip.text: "Paste from clipboard"
+                onClicked: {
+                    var gpos = app.globalMousePosition()
+                    var pos = canvasScroll.mapFromGlobal(gpos.x, gpos.y)
+                    if(pos.x < 0 || pos.y < 0 || pos.x >= canvasScroll.width || pos.y >= canvasScroll.height)
+                        scriteDocument.structure.paste()
+                    else {
+                        pos = canvas.mapFromGlobal(gpos.x, gpos.y)
+                        scriteDocument.structure.paste(Qt.point(pos.x,pos.y))
+                    }
+                }
+                shortcut: "Ctrl+V"
+                ShortcutsModelItem.group: "Edit"
+                ShortcutsModelItem.title: "Paste"
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
+            }
         }
     }
 
@@ -168,25 +219,6 @@ Item {
             minorTickColor: structureCanvasSettings.gridColor
             tickDistance: scriteDocument.structure.canvasGridSize
             transformOrigin: Item.TopLeft
-
-            Shortcut {
-                enabled: !scriteDocument.readOnly
-                sequence: "Ctrl+V"
-                onActivated: {
-                    var gpos = app.globalMousePosition()
-                    var pos = canvasScroll.mapFromGlobal(gpos.x, gpos.y)
-                    if(pos.x < 0 || pos.y < 0 || pos.x >= canvasScroll.width || pos.y >= canvasScroll.height)
-                        scriteDocument.structure.paste()
-                    else {
-                        pos = canvas.mapFromGlobal(gpos.x, gpos.y)
-                        scriteDocument.structure.paste(Qt.point(pos.x,pos.y))
-                    }
-                }
-                context: Qt.ApplicationShortcut
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Paste"
-                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay("Ctrl+V")
-            }
 
             function createItem(what, where) {
                 if(scriteDocument.readOnly)
@@ -969,13 +1001,6 @@ Item {
                 bottomPadding: 5
             }
 
-            QtObject {
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Copy Scene"
-                ShortcutsModelItem.visible: elementItem.EventFilter.active
-                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay("Ctrl+C")
-            }
-
             EventFilter.target: app
             EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && selected && !selection.hasItems
             EventFilter.events: [6]
@@ -1001,14 +1026,6 @@ Item {
                     element.y += dist
                     result.accept = true
                     result.filter = true
-                    break
-                case Qt.Key_C:
-                    if(event.controlModifier) {
-                        scriteDocument.structure.copy(element)
-                        statusText.show("Element Copied")
-                        result.accept = true
-                        result.filter = true
-                    }
                     break
                 }
             }
@@ -1200,13 +1217,6 @@ Item {
                 }
             }
 
-            QtObject {
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Copy Annotation"
-                ShortcutsModelItem.visible: annotationGripItem.EventFilter.active
-                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay("Ctrl+C")
-            }
-
             EventFilter.target: app
             EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus
             EventFilter.events: [6]
@@ -1245,13 +1255,6 @@ Item {
                     result.accept = true
                     result.filter = true
                     break
-                case Qt.Key_C:
-                    if(event.controlModifier) {
-                        scriteDocument.structure.copy(annotation)
-                        statusText.show("Annotation Copied")
-                        result.accept = true
-                        result.filter = true
-                    }
                 }
             }
 
