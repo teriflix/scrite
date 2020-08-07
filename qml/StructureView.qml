@@ -170,6 +170,7 @@ Item {
             transformOrigin: Item.TopLeft
 
             Shortcut {
+                enabled: !scriteDocument.readOnly
                 sequence: "Ctrl+V"
                 onActivated: {
                     var gpos = app.globalMousePosition()

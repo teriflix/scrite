@@ -1257,6 +1257,12 @@ void Structure::copy(QObject *elementOrAnnotation)
 
 void Structure::paste(const QPointF &pos)
 {
+    ScriteDocument *sdoc = this->scriteDocument();
+    if(sdoc == nullptr)
+        sdoc = ScriteDocument::instance();
+    if(sdoc->isReadOnly())
+        return;
+
     const QClipboard *clipboard = qApp->clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
     if(mimeData == nullptr)
