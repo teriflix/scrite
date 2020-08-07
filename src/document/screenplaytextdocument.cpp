@@ -579,6 +579,22 @@ void ScreenplayTextDocument::setCurrentPage(int val)
     emit currentPageChanged();
 }
 
+inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
+{
+    const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
+    Q_FOREACH(TransliterationEngine::Boundary item, items)
+    {
+        if(item.string.isEmpty())
+            continue;
+
+        const QFont font = TransliterationEngine::instance()->languageFont(item.language);
+        QTextCharFormat format;
+        format.setFontFamily(font.family());
+        cursor.mergeCharFormat(format);
+        cursor.insertText(item.string);
+    }
+};
+
 void ScreenplayTextDocument::loadScreenplay()
 {
     HourGlass hourGlass;
@@ -769,6 +785,9 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         QTextCursor cursor(block);
         cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
 
+        const QTextBlockFormat restoreBlockFormat = cursor.blockFormat();
+        const QTextCharFormat restoreCharFormat = cursor.charFormat();
+
         QTextBlockFormat pageBreakFormat;
         pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
         cursor.mergeBlockFormat(pageBreakFormat);
@@ -786,7 +805,11 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         QTextCharFormat characterCharFormat = characterFormat->createCharFormat();
         characterBlockFormat.setTopMargin(0);
         cursor.insertBlock(characterBlockFormat, characterCharFormat);
-        cursor.insertText(characterName);
+        // cursor.insertText(characterName);
+        if(m_purpose == ForDisplay)
+            cursor.insertText(characterName);
+        else
+            polishFontsAndInsertTextAtCursor(cursor, characterName);
 
         QTextCharFormat contdMarkerFormat;
         contdMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
@@ -883,12 +906,18 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     QTextBlockFormat dialogBlockFormat = dialogueFormat->createBlockFormat();
                     QTextCharFormat dialogCharFormat = dialogueFormat->createCharFormat();
                     cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
-                    cursor.insertText(blockTextPart1);
+                    if(m_purpose == ForDisplay)
+                        cursor.insertText(blockTextPart1);
+                    else
+                        polishFontsAndInsertTextAtCursor(cursor, blockTextPart1);
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
                     cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
-                    cursor.insertText(blockTextPart2);
+                    if(m_purpose == ForDisplay)
+                        cursor.insertText(blockTextPart2);
+                    else
+                        polishFontsAndInsertTextAtCursor(cursor, blockTextPart2);
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
@@ -1438,19 +1467,6 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 {
     Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element),
                "ScreenplayTextDocument", "Screenplay element can be loaded only after a frame for it has been created");
-
-    auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
-        const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
-        Q_FOREACH(TransliterationEngine::Boundary item, items) {
-            if(item.string.isEmpty())
-                continue;
-            const QFont font = TransliterationEngine::instance()->languageFont(item.language);
-            QTextCharFormat format;
-            format.setFontFamily(font.family());
-            cursor.mergeCharFormat(format);
-            cursor.insertText(item.string);
-        }
-    };
 
     QTextCharFormat highlightCharFormat;
     highlightCharFormat.setBackground(Qt::yellow);
