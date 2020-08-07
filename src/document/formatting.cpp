@@ -300,41 +300,32 @@ void SceneElementFormat::resetToDefaults()
     this->setTextColor(Qt::black);
     this->setBackgroundColor(Qt::transparent);
     this->setTextAlignment(Qt::AlignLeft);
+    this->setDefaultLanguage(Default);
 
-    const QSettings *settings = Application::instance()->settings();
+    QSettings *settings = Application::instance()->settings();
     QString defaultLanguage = QStringLiteral("Default");
     switch(m_elementType)
     {
     case SceneElement::Action:
-        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/actionLanguage"), defaultLanguage).toString();
+        settings->setValue(QStringLiteral("Paragraph Language/actionLanguage"), defaultLanguage);
         break;
     case SceneElement::Character:
-        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/characterLanguage"), defaultLanguage).toString();
+        settings->setValue(QStringLiteral("Paragraph Language/characterLanguage"), defaultLanguage);
         break;
     case SceneElement::Parenthetical:
-        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/parentheticalLanguage"), defaultLanguage).toString();
+        settings->setValue(QStringLiteral("Paragraph Language/parentheticalLanguage"), defaultLanguage);
         break;
     case SceneElement::Dialogue:
-        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/dialogueLanguage"), defaultLanguage).toString();
+        settings->setValue(QStringLiteral("Paragraph Language/dialogueLanguage"), defaultLanguage);
         break;
     case SceneElement::Shot:
-        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/shotLanguage"), defaultLanguage).toString();
+        settings->setValue(QStringLiteral("Paragraph Language/shotLanguage"), defaultLanguage);
         break;
     case SceneElement::Transition:
-        defaultLanguage = settings->value(QStringLiteral("Paragraph Language/transitionLanguage"), defaultLanguage).toString();
+        settings->setValue(QStringLiteral("Paragraph Language/transitionLanguage"), defaultLanguage);
         break;
     default:
         break;
-    }
-
-    const QMetaObject *mo = this->metaObject();
-    const QMetaEnum enumerator = mo->enumerator( mo->indexOfEnumerator("DefaultLanguage") );
-    if(enumerator.isValid())
-    {
-        bool ok = false;
-        const int value = enumerator.keyToValue( qPrintable(defaultLanguage), &ok );
-        if(ok)
-            this->setDefaultLanguageInt(value);
     }
 }
 
