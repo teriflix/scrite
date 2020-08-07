@@ -170,6 +170,7 @@ Item {
                                     Item { width: parent.width; height: 10 }
 
                                     FileSelector {
+                                        id: fileSelector
                                         width: parent.width-20
                                         label: "Select a file to export into"
                                         absoluteFilePath: generator.fileName
@@ -283,7 +284,7 @@ Item {
                 }
 
                 Button2 {
-                    enabled: filePathField.text !== ""
+                    enabled: fileSelector.absoluteFilePath !== ""
                     text: "Generate"
                     Material.background: primaryColors.c100.background
                     Material.foreground: primaryColors.c100.text
@@ -502,14 +503,61 @@ Item {
             Text {
                 width: parent.width
                 wrapMode: Text.WordWrap
-                text: fieldInfo.note
+                text:fieldInfo.note ? (fieldInfo.note + ". Filter by: ") : "Filter by: "
                 font.pixelSize: 10
                 font.italic: true
             }
 
+            Row {
+                spacing: 10
+                width: parent.width - 20
+
+                function split(string) {
+                    string = string.trim()
+                    if(string === "")
+                        return []
+                    var items = string.split(",")
+                    for(var i=0; i<items.length; i++)
+                        items[i] = items[i].trim().toUpperCase()
+                    items.contains = function(string) {
+                        for(var i=0; i<this.length; i++) {
+                            if(string.indexOf(this[i]) >= 0)
+                                return true
+                        }
+                        return false
+                    }
+
+                    return items
+                }
+
+                TextField2 {
+                    id: locTypeFilter
+                    width: (parent.width - parent.spacing*2)/3
+                    placeholderText: "INT, EXT ..."
+                    property var items: parent.split(text)
+                    font.capitalization: Font.AllUppercase
+                }
+
+                TextField2 {
+                    id: locFilter
+                    width: (parent.width - parent.spacing*2)/3
+                    placeholderText: scriteDocument.structure.allLocations()[0] + " ..."
+                    property var items: parent.split(text)
+                    font.capitalization: Font.AllUppercase
+                }
+
+                TextField2 {
+                    id: momentFilter
+                    width: (parent.width - parent.spacing*2)/3
+                    placeholderText: "DAY, NIGHT ..."
+                    property var items: parent.split(text)
+                    font.capitalization: Font.AllUppercase
+                }
+            }
+
             ScrollView {
                 width: parent.width - 20
-                height: 350
+                height: 320
                 background: Rectangle {
                     color: primaryColors.c50.background
                     border.width: 1
@@ -519,27 +567,107 @@ Item {
                     id: sceneListView
                     model: scriteDocument.screenplay
                     clip: true
-                    delegate: CheckBox2 {
-                        width: sceneListView.width-1
-                        font.family: scriteDocument.formatting.defaultFont.family
-                        text: {
-                            var scene = screenplayElement.scene
-                            if(scene && scene.heading.enabled)
-                                return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
-                            return "NO SCENE HEADING"
+                    property var selectedSceneNumbers: []
+
+                    function filter(scene) {
+                        if(scene && scene.heading.enabled) {
+                            var ret = true
+                            if(ret && locTypeFilter.items.length > 0)
+                                ret &= locTypeFilter.items.contains(scene.heading.locationType)
+                            if(ret && momentFilter.items.length > 0)
+                                ret &= momentFilter.items.contains(scene.heading.moment)
+                            if(ret && locFilter.items.length > 0)
+                                ret &= locFilter.items.contains(scene.heading.location)
+                            return ret
                         }
-                        enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
-                        onToggled: {
-                            var numbers = generator.getConfigurationValue(fieldInfo.name)
-                            if(checked)
-                                numbers.push(screenplayElement.sceneNumber)
-                            else {
-                                var idx = numbers.indexOf(screenplayElement.sceneNumber)
+                        return true
+                    }
+
+                    function select(sceneNumber, flag) {
+                        var numbers = generator.getConfigurationValue(fieldInfo.name)
+                        var idx = numbers.indexOf(sceneNumber)
+                        if(flag) {
+                            if(idx < 0)
+                                numbers.push(sceneNumber)
+                            else
+                                return
+                        } else {
+                            if(idx >= 0)
                                 numbers.splice(idx, 1)
+                            else
+                                return
+                        }
+                        selectedSceneNumbers = numbers
+                        generator.setConfigurationValue(fieldInfo.name, numbers)
+                    }
+
+                    delegate: Item {
+                        width: sceneListView.width-1
+                        height: sceneCheckBox.visible ? sceneCheckBox.height : 0
+
+                        CheckBox2 {
+                            id: sceneCheckBox
+                            width: parent.width-1
+                            font.pointSize: app.idealFontPointSize
+                            font.family: scriteDocument.formatting.defaultFont.family
+                            visible: sceneListView.filter(screenplayElement.scene)
+                            text: {
+                                var scene = screenplayElement.scene
+                                if(scene && scene.heading.enabled)
+                                    return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
+                                return "NO SCENE HEADING"
                             }
-                            generator.setConfigurationValue(fieldInfo.name, numbers)
+                            checked: sceneListView.selectedSceneNumbers.indexOf(screenplayElement.sceneNumber) >= 0
+                            enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
+                            onToggled: sceneListView.select(screenplayElement.sceneNumber, checked)
                         }
                     }
+                }
+            }
+
+            Row {
+                spacing: 10
+
+                Button2 {
+                    text: "Select All"
+                    onClicked: {
+                        var count = scriteDocument.screenplay.elementCount
+                        var numbers = generator.getConfigurationValue(fieldInfo.name)
+                        for(var i=0; i<count; i++) {
+                            var element = scriteDocument.screenplay.elementAt(i)
+                            if( sceneListView.filter(element.scene) ) {
+                                if(numbers.indexOf(element.sceneNumber) < 0)
+                                    numbers.push(element.sceneNumber)
+                            }
+                        }
+                        sceneListView.selectedSceneNumbers = numbers
+                        generator.setConfigurationValue(fieldInfo.name, numbers)
+                    }
+                }
+
+                Button2 {
+                    text: "Unselect All"
+                    onClicked: {
+                        var count = scriteDocument.screenplay.elementCount
+                        var numbers = generator.getConfigurationValue(fieldInfo.name)
+                        for(var i=0; i<count; i++) {
+                            var element = scriteDocument.screenplay.elementAt(i)
+                            if( sceneListView.filter(element.scene) ) {
+                                var idx = numbers.indexOf(element.sceneNumber)
+                                if(idx >= 0)
+                                    numbers.splice(idx, 1)
+                            }
+                        }
+                        sceneListView.selectedSceneNumbers = numbers
+                        generator.setConfigurationValue(fieldInfo.name, numbers)
+                    }
+                }
+
+                Text {
+                    font.pointSize: app.idealFontPointSize
+                    text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Will Be Printed" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Will Be Printed")
+                    anchors.verticalCenter: parent.verticalCenter
+                    padding: 5
                 }
             }
         }
