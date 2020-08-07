@@ -578,6 +578,9 @@ Structure::Structure(QObject *parent)
     connect(this, &Structure::elementCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::currentElementIndexChanged, this, &Structure::structureChanged);
+
+    QClipboard *clipboard = qApp->clipboard();
+    connect(clipboard, &QClipboard::dataChanged, this, &Structure::onClipboardDataChanged);
 }
 
 Structure::~Structure()
@@ -1255,38 +1258,51 @@ void Structure::copy(QObject *elementOrAnnotation)
     }
 }
 
-void Structure::paste(const QPointF &pos)
+static inline QJsonObject fetchPasteDataFromClipboard(QString *className=nullptr)
 {
-    ScriteDocument *sdoc = this->scriteDocument();
-    if(sdoc == nullptr)
-        sdoc = ScriteDocument::instance();
+    QJsonObject ret;
+
+    ScriteDocument *sdoc = ScriteDocument::instance();
     if(sdoc->isReadOnly())
-        return;
+        return ret;
 
     const QClipboard *clipboard = qApp->clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
     if(mimeData == nullptr)
-        return;
+        return ret;
 
     const QByteArray clipboardText = mimeData->data(QStringLiteral("scrite/structure"));
     if(clipboardText.isEmpty())
-        return;
+        return ret;
 
     QJsonParseError parseError;
     const QJsonDocument jsonDoc = QJsonDocument::fromJson(clipboardText, &parseError);
     if(parseError.error != QJsonParseError::NoError)
-        return;
+        return ret;
 
     const QString appString = qApp->applicationName() + QStringLiteral("-") + qApp->applicationVersion();
 
     const QJsonObject clipboardJson = jsonDoc.object();
     if( clipboardJson.value( QStringLiteral("app") ).toString() != appString )
-        return; // We dont want to support copy/paste between different versions of Scrite.
+        return ret; // We dont want to support copy/paste between different versions of Scrite.
 
     if( clipboardJson.value(QStringLiteral("source")).toString() != QStringLiteral("Structure") )
+        return ret;
+
+    const QJsonObject data = clipboardJson.value("data").toObject();
+    if(!data.isEmpty() && className)
+        *className = clipboardJson.value( QStringLiteral("class") ).toString();
+
+    return data;
+}
+
+void Structure::paste(const QPointF &pos)
+{
+    QString className;
+    const QJsonObject data = fetchPasteDataFromClipboard(&className);
+    if(data.isEmpty())
         return;
 
-    const QString className = clipboardJson.value( QStringLiteral("class") ).toString();
     QObjectFactory factory;
     factory.addClass<Annotation>();
     factory.addClass<StructureElement>();
@@ -1295,7 +1311,6 @@ void Structure::paste(const QPointF &pos)
     if(object == nullptr)
         return;
 
-    const QJsonObject data = clipboardJson.value("data").toObject();
     bool success = QObjectSerializer::fromJson(data, object);
     if(!success)
     {
@@ -1319,6 +1334,10 @@ void Structure::paste(const QPointF &pos)
         annotation->setGeometry(geometry);
 
         this->addAnnotation(annotation);
+
+        // We copy the newly pasted annotation once more, so that the next paste will
+        // happen relative to the newly pasted annotation
+        this->copy(annotation);
         return;
     }
 
@@ -1331,6 +1350,10 @@ void Structure::paste(const QPointF &pos)
             element->setPosition(pos);
 
         this->addElement(element);
+
+        // We copy the newly pasted annotation once more, so that the next paste will
+        // happen relative to the newly pasted element
+        this->copy(element);
         return;
     }
 }
@@ -1365,6 +1388,21 @@ void Structure::resetCurentElementIndex()
     m_currentElementIndex = -2;
 
     this->setCurrentElementIndex(val);
+}
+
+void Structure::setCanPaste(bool val)
+{
+    if(m_canPaste == val)
+        return;
+
+    m_canPaste = val;
+    emit canPasteChanged();
+}
+
+void Structure::onClipboardDataChanged()
+{
+    const QJsonObject data = fetchPasteDataFromClipboard();
+    this->setCanPaste(!data.isEmpty());
 }
 
 StructureElement *Structure::splitElement(StructureElement *ptr, SceneElement *element, int textPosition)
