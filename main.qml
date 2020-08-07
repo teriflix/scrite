@@ -72,6 +72,7 @@ Rectangle {
         active: false
         anchors.fill: parent
         property string text
+        property bool enableAnimations: true
         function show(t) {
             text = t
             active = true
@@ -87,9 +88,9 @@ Rectangle {
                 anchors.centerIn: parent
                 font.pixelSize: parent.height * 0.075
                 text: statusText.text
-                property real t: 0
+                property real t: statusText.enableAnimations ? 0 : 1
                 scale: 0.5 + t/1.0
-                opacity: 1.0 - t*0.75
+                opacity: statusText.enableAnimations ? (1.0 - t*0.75) : 0.8
             }
 
             SequentialAnimation {
@@ -100,11 +101,12 @@ Rectangle {
                     properties: "t"
                     from: 0
                     to: 1
-                    duration: 500
+                    duration: statusText.enableAnimations ? 250 : 0
+                    easing.type: Easing.OutQuint
                 }
 
                 PauseAnimation {
-                    duration: 100
+                    duration: statusText.enableAnimations ? 0 : 250
                 }
 
                 ScriptAction {
