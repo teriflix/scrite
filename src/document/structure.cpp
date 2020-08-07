@@ -11,12 +11,15 @@
 **
 ****************************************************************************/
 
-#include "structure.h"
 #include "undoredo.h"
+#include "structure.h"
+#include "application.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QMimeData>
 #include <QDateTime>
+#include <QClipboard>
 #include <QJsonDocument>
 
 StructureElement::StructureElement(QObject *parent)
@@ -493,6 +496,26 @@ QUrl Annotation::imageUrl(const QString &name) const
 {
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
     return QUrl::fromLocalFile(dfs->absolutePath(name));
+}
+
+void Annotation::createCopyOfFileAttributes()
+{
+    for(int i=0; i<m_metaData.size(); i++)
+    {
+        const QJsonObject item = m_metaData.at(i).toObject();
+        const QJsonValue isFileVal = item.value(QStringLiteral("isFile"));
+        if( isFileVal.isBool() && isFileVal.toBool() )
+        {
+            const QString attrName = item.value(QStringLiteral("name")).toString();
+            const QString fileName = m_attributes.value(attrName).toString();
+            if(fileName.isEmpty())
+                continue;
+
+            DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+            m_attributes.insert(attrName, dfs->duplicate(fileName, QStringLiteral("annotation")));
+            emit attributesChanged();
+        }
+    }
 }
 
 bool Annotation::event(QEvent *event)
@@ -1193,6 +1216,117 @@ void Structure::clearAnnotations()
 {
     while(m_annotations.size())
         this->removeAnnotation(m_annotations.first());
+}
+
+void Structure::copy(QObject *elementOrAnnotation)
+{
+    if(elementOrAnnotation == nullptr)
+        return;
+
+    StructureElement *element = qobject_cast<StructureElement*>(elementOrAnnotation);
+    Annotation *annotation = element ? nullptr : qobject_cast<Annotation*>(elementOrAnnotation);
+    if(element != nullptr || annotation != nullptr)
+    {
+        QClipboard *clipboard = qApp->clipboard();
+
+        QJsonObject objectJson = QObjectSerializer::toJson(elementOrAnnotation);
+        if(element != nullptr)
+        {
+            QJsonObject sceneJson = objectJson.value(QStringLiteral("scene")).toObject();
+            sceneJson.remove( QStringLiteral("id") );
+            objectJson.insert(QStringLiteral("scene"), sceneJson);
+        }
+
+        QJsonObject clipboardJson;
+        clipboardJson.insert(QStringLiteral("class"), QString::fromLatin1(elementOrAnnotation->metaObject()->className()));
+        clipboardJson.insert(QStringLiteral("data"), objectJson);
+        clipboardJson.insert(QStringLiteral("app"), qApp->applicationName() + QStringLiteral("-") + qApp->applicationVersion());
+        clipboardJson.insert(QStringLiteral("source"), QStringLiteral("Structure"));
+
+        const QByteArray clipboardText = QJsonDocument(clipboardJson).toJson();
+
+        QMimeData *mimeData = new QMimeData;
+        mimeData->setData(QStringLiteral("scrite/structure"), clipboardText);
+#ifndef QT_NO_DEBUG
+        mimeData->setData(QStringLiteral("text/plain"), clipboardText);
+#endif
+        clipboard->setMimeData(mimeData);
+        return;
+    }
+}
+
+void Structure::paste(const QPointF &pos)
+{
+    const QClipboard *clipboard = qApp->clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    if(mimeData == nullptr)
+        return;
+
+    const QByteArray clipboardText = mimeData->data(QStringLiteral("scrite/structure"));
+    if(clipboardText.isEmpty())
+        return;
+
+    QJsonParseError parseError;
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(clipboardText, &parseError);
+    if(parseError.error != QJsonParseError::NoError)
+        return;
+
+    const QString appString = qApp->applicationName() + QStringLiteral("-") + qApp->applicationVersion();
+
+    const QJsonObject clipboardJson = jsonDoc.object();
+    if( clipboardJson.value( QStringLiteral("app") ).toString() != appString )
+        return; // We dont want to support copy/paste between different versions of Scrite.
+
+    if( clipboardJson.value(QStringLiteral("source")).toString() != QStringLiteral("Structure") )
+        return;
+
+    const QString className = clipboardJson.value( QStringLiteral("class") ).toString();
+    QObjectFactory factory;
+    factory.addClass<Annotation>();
+    factory.addClass<StructureElement>();
+
+    QObject *object = factory.create(className.toLatin1(), this);
+    if(object == nullptr)
+        return;
+
+    const QJsonObject data = clipboardJson.value("data").toObject();
+    bool success = QObjectSerializer::fromJson(data, object);
+    if(!success)
+    {
+        delete object;
+        return;
+    }
+
+    Annotation *annotation = qobject_cast<Annotation*>(object);
+    if(annotation != nullptr)
+    {
+        annotation->createCopyOfFileAttributes();
+        annotation->setObjectName(QStringLiteral("ica"));
+
+        QRectF geometry = annotation->geometry();
+
+        if(pos.isNull())
+            geometry.moveTopLeft( geometry.topLeft() + QPointF(50, 50) );
+        else
+            geometry.moveCenter(pos);
+
+        annotation->setGeometry(geometry);
+
+        this->addAnnotation(annotation);
+        return;
+    }
+
+    StructureElement *element = qobject_cast<StructureElement*>(object);
+    if(element != nullptr)
+    {
+        if(pos.isNull())
+            element->setPosition( element->position() + QPointF(50,50) );
+        else
+            element->setPosition(pos);
+
+        this->addElement(element);
+        return;
+    }
 }
 
 bool Structure::event(QEvent *event)

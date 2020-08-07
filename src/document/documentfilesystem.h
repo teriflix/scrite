@@ -43,6 +43,7 @@ public:
     bool write(const QString &path, const QByteArray &bytes);
 
     QString add(const QString &fileName, const QString &ns=QString());
+    QString duplicate(const QString &fileName, const QString &ns=QString());
     void remove(const QString &path);
 
     QString absolutePath(const QString &path, bool mkpath=false) const;

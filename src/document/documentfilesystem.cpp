@@ -241,6 +241,31 @@ QString DocumentFileSystem::add(const QString &fileName, const QString &ns)
     return QString();
 }
 
+QString DocumentFileSystem::duplicate(const QString &fileName, const QString &ns)
+{
+    if(fileName.isEmpty())
+        return QString();
+
+    if(!this->contains(fileName))
+        return QString();
+
+    const QFileInfo fi( this->absolutePath(fileName) );
+    if(!fi.exists() || !fi.isFile())
+        return QString();
+
+    const QString path = ns + "/" + QString::number(QDateTime::currentSecsSinceEpoch()) + "." + fi.suffix();
+    const QString absPath = this->absolutePath(path, true);
+    if( QFile::copy(fi.absoluteFilePath(), absPath) )
+    {
+        QFile copiedFile(absPath);
+        copiedFile.setPermissions(QFileDevice::ReadOwner|QFileDevice::WriteOwner|QFileDevice::ReadUser|QFileDevice::WriteUser|QFileDevice::ReadGroup|QFileDevice::WriteGroup|QFileDevice::ReadOther|QFileDevice::WriteOther);
+        return path;
+    }
+
+    QFile::remove(absPath);
+    return QString();
+}
+
 void DocumentFileSystem::remove(const QString &path)
 {
     if(path.isEmpty())

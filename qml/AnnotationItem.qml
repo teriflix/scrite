@@ -25,8 +25,8 @@ Rectangle {
     height: annotation.geometry.height
     color: annotation.attributes.fillBackground ? (annotation.attributes.color ? annotation.attributes.color : annotation.attributes.backgroundColor) : Qt.rgba(0,0,0,0)
     border {
-        width: annotation.attributes.borderWidth
-        color: annotation.attributes.borderColor
+        width: annotation.attributes.borderWidth ? annotation.attributes.borderWidth : 0
+        color: annotation.attributes.borderColor ? annotation.attributes.borderColor : Qt.rgba(0,0,0,0)
     }
     opacity: annotation.attributes.opacity / 100
 

@@ -23,6 +23,7 @@
 #include <QtMath>
 #include <QScreen>
 #include <QtDebug>
+#include <QCursor>
 #include <QWindow>
 #include <QPointer>
 #include <QProcess>
@@ -855,6 +856,11 @@ QScreen *Application::windowScreen(QObject *window) const
 QString Application::getEnvironmentVariable(const QString &name) const
 {
     return QProcessEnvironment::systemEnvironment().value(name);
+}
+
+QPointF Application::globalMousePosition() const
+{
+    return QCursor::pos();
 }
 
 void Application::initializeStandardColors(QQmlEngine *)

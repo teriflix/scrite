@@ -214,6 +214,8 @@ public:
     Q_INVOKABLE QString addImage(const QVariant &image) const;
     Q_INVOKABLE QUrl imageUrl(const QString &name) const;
 
+    void createCopyOfFileAttributes();
+
 signals:
     void annotationChanged();
 
@@ -352,6 +354,9 @@ public:
     Q_SIGNAL void annotationCountChanged();
 
     Q_SIGNAL void structureChanged();
+
+    Q_INVOKABLE void copy(QObject *elementOrAnnotation);
+    Q_INVOKABLE void paste(const QPointF &pos=QPointF());
 
 protected:
     bool event(QEvent *event);

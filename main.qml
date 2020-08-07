@@ -67,6 +67,53 @@ Rectangle {
         anchors.fill: parent
     }
 
+    Loader {
+        id: statusText
+        active: false
+        anchors.fill: parent
+        property string text
+        function show(t) {
+            text = t
+            active = true
+        }
+        onActiveChanged: {
+            if(!active)
+                text = ""
+        }
+        sourceComponent: Item {
+
+            Text {
+                id: textItem
+                anchors.centerIn: parent
+                font.pixelSize: parent.height * 0.075
+                text: statusText.text
+                property real t: 0
+                scale: 0.5 + t/1.0
+                opacity: 1.0 - t*0.75
+            }
+
+            SequentialAnimation {
+                running: true
+
+                NumberAnimation {
+                    target: textItem
+                    properties: "t"
+                    from: 0
+                    to: 1
+                    duration: 500
+                }
+
+                PauseAnimation {
+                    duration: 100
+                }
+
+                ScriptAction {
+                    script: statusText.active = false
+                }
+            }
+        }
+    }
+
     Item {
         id: blur
         anchors.fill: ui

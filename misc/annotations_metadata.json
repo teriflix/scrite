@@ -156,7 +156,8 @@
             "name": "image",
             "title": "Image",
             "type": "image",
-            "default": ""
+            "default": "",
+            "isFile": true
         },
         {
             "name": "caption",

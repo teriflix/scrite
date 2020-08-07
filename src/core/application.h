@@ -208,6 +208,8 @@ public:
 
     Q_INVOKABLE QString getEnvironmentVariable(const QString &name) const;
 
+    Q_INVOKABLE QPointF globalMousePosition() const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 
