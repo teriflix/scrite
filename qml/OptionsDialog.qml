@@ -761,6 +761,7 @@ Item {
                             SpinBox {
                                 width: 300
                                 from: -180; to: 180
+                                editable: true
                                 value: pageSetupSettings.watermarkRotation
                                 textFromValue: function(value,locale) { return value + " degrees" }
                                 validator: IntValidator { top: 360; bottom: 0 }
@@ -1443,6 +1444,7 @@ Item {
                         from: 25
                         to: 300
                         stepSize: 5
+                        editable: true
                         value: displayElementFormat.lineHeight * 100
                         onValueModified: {
                             displayElementFormat.lineHeight = value/100

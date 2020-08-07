@@ -22,55 +22,15 @@ import Scrite 1.0
 Item {
     property Annotation annotation
 
-    ListView {
+    Flickable {
         id: propertyEditorView
         anchors.fill: parent
         anchors.leftMargin: 10
         anchors.rightMargin: scrollBarVisible ? 0 : 10
-        model: annotation ? annotation.metaData : 0
-        spacing: 20
+        contentWidth: propertyEditorItems.width
+        contentHeight: propertyEditorItems.height
+
         property bool scrollBarVisible: contentHeight > height
-        header: Item {
-            width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
-            height: 80
-
-            Button2 {
-                text: "Delete Annotation"
-                anchors.centerIn: parent
-                onClicked: {
-                    var a = annotationGripLoader.annotation
-                    annotationGripLoader.reset()
-                    scriteDocument.structure.removeAnnotation(a)
-                }
-            }
-        }
-        footer: Item {
-            width: propertyEditorView.width - 20
-            height: 80
-
-            Row {
-                spacing: 10
-                anchors.centerIn: parent
-
-                Button2 {
-                    text: "Bring To Front"
-                    onClicked: {
-                        var a = annotationGripLoader.annotation
-                        annotationGripLoader.reset()
-                        scriteDocument.structure.bringToFront(a)
-                    }
-                }
-
-                Button2 {
-                    text: "Send To Back"
-                    onClicked: {
-                        var a = annotationGripLoader.annotation
-                        annotationGripLoader.reset()
-                        scriteDocument.structure.sendToBack(a)
-                    }
-                }
-            }
-        }
         ScrollBar.vertical: ScrollBar {
             policy: propertyEditorView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
@@ -84,49 +44,103 @@ Item {
                 NumberAnimation { duration: 250 }
             }
         }
-        delegate: Column {
-            property var propertyInfo: annotation.metaData[index]
-            spacing: 3
-            width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
-            visible: propertyInfo.visible === true
 
-            Text {
+        Column {
+            id: propertyEditorItems
+            width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+            spacing: 20
+
+            Item {
                 width: parent.width
-                text: propertyInfo.title
-                font.pointSize: app.idealFontPointSize
-                font.bold: true
+                height: 80
+
+                Button2 {
+                    text: "Delete Annotation"
+                    anchors.centerIn: parent
+                    onClicked: {
+                        var a = annotationGripLoader.annotation
+                        annotationGripLoader.reset()
+                        scriteDocument.structure.removeAnnotation(a)
+                    }
+                }
             }
 
-            Loader {
-                id: editorLoader
-                width: parent.width - 20
-                anchors.right: parent.right
-                enabled: !scriteDocument.readOnly
+            Repeater {
+                model: annotation ? annotation.metaData : 0
 
-                property var propertyInfo: parent.propertyInfo
-                property var propertyValue: annotation.attributes[ propertyInfo.name ]
+                Column {
+                    property var propertyInfo: annotation.metaData[index]
+                    spacing: 3
+                    width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+                    visible: propertyInfo.visible === true
 
-                function changePropertyValue(newValue) {
-                    var attrs = annotation.attributes
-                    attrs[propertyInfo.name] = newValue
-                    annotation.attributes = attrs
-                }
-
-                active: propertyInfo.visible === true
-                sourceComponent: {
-                    switch(propertyInfo.type) {
-                    case "color": return colorEditor
-                    case "number": return numberEditor
-                    case "boolean": return booleanEditor
-                    case "text": return textEditor
-                    case "url": return urlEditor
-                    case "fontFamily": return fontFamilyEditor
-                    case "fontStyle": return fontStyleEditor
-                    case "hAlign": return hAlignEditor
-                    case "vAlign": return vAlignEditor
-                    case "image": return imageEditor
+                    Text {
+                        width: parent.width
+                        text: propertyInfo.title
+                        font.pointSize: app.idealFontPointSize
+                        font.bold: true
                     }
-                    return unknownEditor
+
+                    Loader {
+                        id: editorLoader
+                        width: parent.width - 20
+                        anchors.right: parent.right
+                        enabled: !scriteDocument.readOnly
+
+                        property var propertyInfo: parent.propertyInfo
+                        property var propertyValue: annotation.attributes[ propertyInfo.name ]
+
+                        function changePropertyValue(newValue) {
+                            var attrs = annotation.attributes
+                            attrs[propertyInfo.name] = newValue
+                            annotation.attributes = attrs
+                        }
+
+                        active: propertyInfo.visible === true
+                        sourceComponent: {
+                            switch(propertyInfo.type) {
+                            case "color": return colorEditor
+                            case "number": return numberEditor
+                            case "boolean": return booleanEditor
+                            case "text": return textEditor
+                            case "url": return urlEditor
+                            case "fontFamily": return fontFamilyEditor
+                            case "fontStyle": return fontStyleEditor
+                            case "hAlign": return hAlignEditor
+                            case "vAlign": return vAlignEditor
+                            case "image": return imageEditor
+                            }
+                            return unknownEditor
+                        }
+                    }
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: 80
+
+                Row {
+                    spacing: 10
+                    anchors.centerIn: parent
+
+                    Button2 {
+                        text: "Bring To Front"
+                        onClicked: {
+                            var a = annotationGripLoader.annotation
+                            annotationGripLoader.reset()
+                            scriteDocument.structure.bringToFront(a)
+                        }
+                    }
+
+                    Button2 {
+                        text: "Send To Back"
+                        onClicked: {
+                            var a = annotationGripLoader.annotation
+                            annotationGripLoader.reset()
+                            scriteDocument.structure.sendToBack(a)
+                        }
+                    }
                 }
             }
         }
@@ -196,6 +210,7 @@ Item {
                 from: propertyInfo.min
                 to: propertyInfo.max
                 stepSize: propertyInfo.step
+                editable: true
                 onValueModified: changePropertyValue(value)
             }
         }
@@ -223,7 +238,7 @@ Item {
             }
             text: propertyValue
             font.pointSize: app.idealFontPointSize
-            height: 150
+            height: Math.max(80, contentHeight) + topPadding + bottomPadding
             padding: 7.5
             onTextChanged: Qt.callLater(commitTextChanges)
             function commitTextChanges() {
@@ -236,6 +251,15 @@ Item {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
+            onCursorRectangleChanged: {
+                if(activeFocus) {
+                    var pt = mapToItem(propertyEditorItems, cursorRectangle.x, cursorRectangle.y)
+                    if(pt.y < propertyEditorView.contentY)
+                        propertyEditorView.contentY = Math.max(pt.y-10, 0)
+                    else if(pt.y + cursorRectangle.height > propertyEditorView.contentY + propertyEditorView.height)
+                        propertyEditorView.contentY = (pt.y + cursorRectangle.height + 10 - propertyEditorView.height)
+                }
+            }
         }
     }
 
@@ -263,12 +287,98 @@ Item {
     Component {
         id: fontFamilyEditor
 
-        ComboBox2 {
-            readonly property var systemFontInfo: app.systemFontInfo()
-            model: systemFontInfo.families
-            editable: true
-            currentIndex: systemFontInfo.families.indexOf(propertyValue)
-            onActivated: changePropertyValue(currentText)
+        Column {
+            id: fontFamilyEditorItem
+
+            Text {
+                rightPadding: changeFontButton.width + 5
+                font.pointSize: app.idealFontPointSize
+                text: propertyValue
+                height: 42
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+                width: parent.width
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: fontListViewArea.visible = !fontListViewArea.visible
+                }
+
+                ToolButton3 {
+                    id: changeFontButton
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: parent.height
+                    down: fontListViewArea.visible
+                    iconSource: fontListViewArea.visible ? "../icons/action/keyboard_arrow_up.png" : "../icons/action/keyboard_arrow_down.png"
+                    onClicked: fontListViewArea.visible = !fontListViewArea.visible
+                }
+            }
+
+            Rectangle {
+                id: fontListViewArea
+                color: primaryColors.c50.background
+                width: parent.width - 10
+                border.width: 1
+                border.color: primaryColors.borderColor
+                height: 200
+                visible: false
+                anchors.right: parent.right
+                onVisibleChanged: {
+                    if(visible && fontListView.systemFontInfo === undefined)
+                        fontListView.systemFontInfo = app.systemFontInfo()
+                    if(visible)
+                        app.execLater(fontListViewArea, 100, adjustScroll)
+                }
+
+                function adjustScroll() {
+                    var pt = fontFamilyEditorItem.mapToItem(propertyEditorItems, 0, 0)
+                    if(pt.y < propertyEditorView.contentY)
+                        propertyEditorView.contentY = Math.max(pt.y-10, 0)
+                    else if(pt.y + fontFamilyEditorItem.height > propertyEditorView.contentY + propertyEditorView.height)
+                        propertyEditorView.contentY = (pt.y + fontFamilyEditorItem.height + 10 - propertyEditorView.height)
+                }
+
+                ListView {
+                    id: fontListView
+                    property var systemFontInfo
+                    anchors.fill: parent
+                    model: systemFontInfo ? systemFontInfo.families : 0
+                    highlight: Rectangle {
+                        color: app.palette.highlight
+                    }
+                    highlightMoveDuration: 0
+                    clip: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    delegate: Text {
+                        font.family: modelData
+                        font.pointSize: app.idealFontPointSize
+                        text: modelData
+                        width: fontListView.width-20
+                        color: fontListView.currentIndex === index ? app.palette.highlightedText : "black"
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: changePropertyValue(modelData)
+                        }
+                        padding: 4
+                    }
+                    ScrollBar.vertical: ScrollBar {
+                        policy: propertyEditorView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        minimumSize: 0.1
+                        palette {
+                            mid: Qt.rgba(0,0,0,0.25)
+                            dark: Qt.rgba(0,0,0,0.75)
+                        }
+                        opacity: active ? 1 : 0.2
+                        Behavior on opacity {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
+                    }
+                    currentIndex: systemFontInfo ? systemFontInfo.families.indexOf(propertyValue) : -1
+                }
+            }
         }
     }
 

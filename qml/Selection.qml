@@ -13,6 +13,7 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
+import Scrite 1.0
 
 Item {
     id: selection
@@ -100,6 +101,35 @@ Item {
         onPressed: {
             selection.clear()
             mouse.accepted = false
+        }
+    }
+
+    EventFilter.target: app
+    EventFilter.active: hasItems
+    EventFilter.events: [6]
+    EventFilter.onFilter: {
+        var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
+        switch(event.key) {
+        case Qt.Key_Left:
+            tightRect.x -= dist
+            result.accept = true
+            result.filter = true
+            break
+        case Qt.Key_Right:
+            tightRect.x += dist
+            result.accept = true
+            result.filter = true
+            break
+        case Qt.Key_Up:
+            tightRect.y -= dist
+            result.accept = true
+            result.filter = true
+            break
+        case Qt.Key_Down:
+            tightRect.y += dist
+            result.accept = true
+            result.filter = true
+            break
         }
     }
 

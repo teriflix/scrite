@@ -398,6 +398,12 @@ Item {
                 visible: currentElementItem !== null && !annotationGripLoader.active
                 property Item currentElementItem: currentElementItemBinder.get
                 onCurrentElementItemChanged: canvasScroll.ensureItemVisible(currentElementItem, canvas.scale)
+                opacity: canvas.activeFocus && !selection.hasItems ? 1 : 0.25
+
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
 
                 DelayedPropertyBinder {
                     id: currentElementItemBinder
@@ -944,6 +950,35 @@ Item {
                 bottomPadding: 5
             }
 
+            EventFilter.target: app
+            EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && selected && !selection.hasItems
+            EventFilter.events: [6]
+            EventFilter.onFilter: {
+                var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
+                switch(event.key) {
+                case Qt.Key_Left:
+                    element.x -= dist
+                    result.accept = true
+                    result.filter = true
+                    break
+                case Qt.Key_Right:
+                    element.x += dist
+                    result.accept = true
+                    result.filter = true
+                    break
+                case Qt.Key_Up:
+                    element.y -= dist
+                    result.accept = true
+                    result.filter = true
+                    break
+                case Qt.Key_Down:
+                    element.y += dist
+                    result.accept = true
+                    result.filter = true
+                    break
+                }
+            }
+
             MouseArea {
                 anchors.fill: titleText
                 enabled: titleText.readOnly === true
@@ -1135,30 +1170,39 @@ Item {
             EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus
             EventFilter.events: [6]
             EventFilter.onFilter: {
+                var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
                 switch(event.key) {
                 case Qt.Key_Left:
                     if(event.shiftModifier)
-                        annotationGripItem.width -= annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.width -= annotation.resizable ? dist : 0
                     else
-                        annotationGripItem.x -= annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.x -= annotation.movable ? dist : 0
+                    result.accept = true
+                    result.filter = true
                     break
                 case Qt.Key_Right:
                     if(event.shiftModifier)
-                        annotationGripItem.width += annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.width += annotation.resizable ? dist : 0
                     else
-                        annotationGripItem.x += annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.x += annotation.movable ? dist : 0
+                    result.accept = true
+                    result.filter = true
                     break
                 case Qt.Key_Up:
                     if(event.shiftModifier)
-                        annotationGripItem.height -= annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.height -= annotation.resizable ? dist : 0
                     else
-                        annotationGripItem.y -= annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.y -= annotation.movable ? dist : 0
+                    result.accept = true
+                    result.filter = true
                     break
                 case Qt.Key_Down:
                     if(event.shiftModifier)
-                        annotationGripItem.height += annotation.resizable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.height += annotation.resizable ? dist : 0
                     else
-                        annotationGripItem.y += annotation.movable ? (event.controlModifier ? 1 : canvas.tickDistance) : 0
+                        annotationGripItem.y += annotation.movable ? dist : 0
+                    result.accept = true
+                    result.filter = true
                     break
                 }
             }
