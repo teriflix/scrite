@@ -174,8 +174,8 @@ Rectangle {
         fileName: app.settingsFilePath
         category: "Structure Tab"
 
-        property bool showGrid: false
-        property color gridColor: primaryColors.c900.background
+        property bool showGrid: true
+        property color gridColor: primaryColors.c400.background
         property color canvasColor: accentColors.c50.background
         property bool showPreview: true
     }

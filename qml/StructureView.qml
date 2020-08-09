@@ -293,14 +293,14 @@ Item {
             DelayedPropertyBinder {
                 id: widthBinder
                 initial: 1000
-                set: Math.max( Math.ceil(canvasItemsBoundingBox.right / 100) * 100, 60000 )
+                set: Math.max( Math.ceil(canvasItemsBoundingBox.right / 100) * 100, 120000 )
                 onGetChanged: scriteDocument.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
-                set: Math.max( Math.ceil(canvasItemsBoundingBox.bottom / 100) * 100, 60000 )
+                set: Math.max( Math.ceil(canvasItemsBoundingBox.bottom / 100) * 100, 120000 )
                 onGetChanged: scriteDocument.structure.canvasHeight = get
             }
 
@@ -779,6 +779,22 @@ Item {
                         elementContextMenu.element = null
                     }
                 }
+            }
+        }
+    }
+
+    Timer {
+        id: initializeTimer
+        running: !scriteDocument.loading
+        repeat: false
+        interval: 100
+        onTriggered: {
+            if(scriteDocument.structure.elementCount === 0) {
+                var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
+                                         (canvas.height-canvasScroll.height)/2,
+                                         canvasScroll.width,
+                                         canvasScroll.height)
+                canvasScroll.ensureVisible(middleArea)
             }
         }
     }
