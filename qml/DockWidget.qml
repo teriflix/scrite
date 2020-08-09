@@ -62,6 +62,7 @@ Item {
         onTracked: container.returnToBounds()
     }
 
+    function close() { closeRequest() }
     signal closeRequest()
 
     BoxShadow {

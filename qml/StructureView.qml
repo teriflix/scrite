@@ -179,6 +179,25 @@ Item {
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
             }
+
+            ToolButton3 {
+                enabled: annotationGripLoader.active
+                iconSource: "../icons/navigation/property_editor.png"
+                ToolTip.text: "Display properties of selected annotation"
+                down: floatingDockWidget.visible
+                onClicked: {
+                    structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
+                    if(structureCanvasSettings.displayAnnotationProperties)
+                        floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
+                    else
+                        floatingDockWidget.close()
+                }
+
+                Connections {
+                    target: floatingDockWidget
+                    onCloseRequest: structureCanvasSettings.displayAnnotationProperties = false
+                }
+            }
         }
     }
 
@@ -395,7 +414,8 @@ Item {
                                 floatingDockWidget.contentY = (documentUI.height - floatingDockWidget.contentHeight)/2
                             }
 
-                            floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
+                            if(structureCanvasSettings.displayAnnotationProperties)
+                                floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
                         }
                     }
 

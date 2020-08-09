@@ -178,6 +178,7 @@ Rectangle {
         property color gridColor: primaryColors.c400.background
         property color canvasColor: accentColors.c50.background
         property bool showPreview: true
+        property bool displayAnnotationProperties: true
     }
 
     function showInformation(params, popupSource) {

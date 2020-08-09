@@ -123,5 +123,7 @@
         <file>icons/content/content_copy_inverted.png</file>
         <file>icons/content/content_paste_inverted.png</file>
         <file>icons/content/content_paste.png</file>
+        <file>icons/navigation/property_editor.png</file>
+        <file>icons/navigation/property_editor_inverted.png</file>
     </qresource>
 </RCC>
