@@ -43,6 +43,11 @@ Flickable {
             return
 
         var s = Math.min(width/area.width, height/area.height)
+        var center = Qt.point(area.x + area.width/2, area.y + area.height/2)
+        var w = width/s
+        var h = height/s
+        area = Qt.rect(Math.max(center.x-w/2,0), Math.max(center.y-h/2,0), w, h)
+
         zoomScale = s
         ensureVisible(area, s)
     }
