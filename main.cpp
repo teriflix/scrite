@@ -169,6 +169,7 @@ int main(int argc, char **argv)
     qmlRegisterType<CloseSubpathElement>("Scrite", 1, 0, "CloseSubpath");
     qmlRegisterType<CubicToElement>("Scrite", 1, 0, "CubicTo");
     qmlRegisterType<QuadToElement>("Scrite", 1, 0, "QuadTo");
+    qmlRegisterType<ArcToElement>("Scrite", 1, 0, "ArcTo");
     qmlRegisterType<TextShapeItem>("Scrite", 1, 0, "TextShapeItem");
     qmlRegisterType<UndoStack>("Scrite", 1, 0, "UndoStack");
 

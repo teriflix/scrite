@@ -215,4 +215,35 @@ private:
     QPointF m_controlPoint;
 };
 
+class ArcToElement : public AbstractPathElement
+{
+    Q_OBJECT
+
+public:
+    ArcToElement(QObject *parent=nullptr);
+    ~ArcToElement();
+
+    Q_PROPERTY(QRectF rectangle READ rectangle WRITE setRectangle NOTIFY rectangleChanged)
+    void setRectangle(const QRectF &val);
+    QRectF rectangle() const {return m_rectangle; }
+    Q_SIGNAL void rectangleChanged();
+
+    Q_PROPERTY(qreal startAngle READ startAngle WRITE setStartAngle NOTIFY startAngleChanged)
+    void setStartAngle(qreal val);
+    qreal startAngle() const {return m_startAngle; }
+    Q_SIGNAL void startAngleChanged();
+
+    Q_PROPERTY(qreal sweepLength READ sweepLength WRITE setSweepLength NOTIFY sweepLengthChanged)
+    void setSweepLength(qreal val);
+    qreal sweepLength() const {return m_sweepLength; }
+    Q_SIGNAL void sweepLengthChanged();
+
+    void apply(QPainterPath &path);
+
+private:
+    QRectF m_rectangle = QRectF(0, 0, 100, 100);
+    qreal m_startAngle = 0;
+    qreal m_sweepLength = 360;
+};
+
 #endif // PATHITEM_H

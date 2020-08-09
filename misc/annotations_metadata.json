@@ -1,11 +1,50 @@
 {
+   "oval":[
+      {
+         "name":"fillBackground",
+         "title":"Fill Background",
+         "text":"Fill with 'Color'",
+         "type":"boolean",
+         "default":true
+      },
+      {
+         "name":"color",
+         "title":"Color",
+         "type":"color",
+         "default":"white"
+      },
+      {
+         "name":"borderColor",
+         "title":"Border Color",
+         "type":"color",
+         "default":"black"
+      },
+      {
+         "name":"borderWidth",
+         "title":"Border Width",
+         "type":"number",
+         "default":1,
+         "step":1,
+         "min":0,
+         "max":5
+      },
+      {
+         "name":"opacity",
+         "title":"Opacity",
+         "type":"number",
+         "default":50,
+         "step":10,
+         "min":0,
+         "max":100
+      }
+   ],
    "rectangle":[
       {
-         "name": "fillBackground",
-         "title": "Fill Background",
-         "text": "Fill with 'Color'",
-         "type": "boolean",
-         "default": true
+         "name":"fillBackground",
+         "title":"Fill Background",
+         "text":"Fill with 'Color'",
+         "type":"boolean",
+         "default":true
       },
       {
          "name":"color",
@@ -70,7 +109,9 @@
          "name":"fontStyle",
          "title":"Font Style",
          "type":"fontStyle",
-         "default":[]
+         "default":[
+
+         ]
       },
       {
          "name":"hAlign",
@@ -85,11 +126,11 @@
          "default":"center"
       },
       {
-         "name": "fillBackground",
-         "title": "Fill Background",
-         "text": "Fill with 'Background Color'",
-         "type": "boolean",
-         "default": false
+         "name":"fillBackground",
+         "title":"Fill Background",
+         "text":"Fill with 'Background Color'",
+         "type":"boolean",
+         "default":false
       },
       {
          "name":"backgroundColor",
@@ -122,131 +163,134 @@
          "max":100
       }
    ],
-    "url": [
-        {
-            "name": "url",
-            "title": "Website Address",
-            "type": "url",
-            "default": ""
-        },
-        {
-            "name": "title",
-            "title": "Title",
-            "type": "text",
-            "default": "",
-            "placeHolderText": "Set website title"
-        },
-        {
-            "name": "description",
-            "title": "Description",
-            "type": "text",
-            "default": "",
-            "placeHolderText": "Set website description"
-        },
-        {
-            "name": "imageUrl",
-            "title": "Image URL",
-            "type": "url",
-            "default": "",
-            "placeHolderText": "Set preview image URL"
-        }
-    ],
-    "image": [
-        {
-            "name": "image",
-            "title": "Image",
-            "type": "image",
-            "default": "",
-            "isFile": true
-        },
-        {
-            "name": "caption",
-            "title": "Caption",
-            "type": "text",
-            "default": ""
-        },
-        {
-           "name":"captionColor",
-           "title":"Caption Text Color",
-           "type":"color",
-           "default":"black"
-        },
-        {
-           "name":"captionAlignment",
-           "title":"Caption Alignment",
-           "type":"hAlign",
-           "default":"center"
-        },
-        {
-           "name": "fillBackground",
-           "title": "Fill Background",
-           "text": "Fill with 'Background Color'",
-           "type": "boolean",
-           "default": false
-        },
-        {
-           "name":"backgroundColor",
-           "title":"Background Color",
-           "type":"color",
-           "default":"white"
-        },
-        {
-           "name":"borderColor",
-           "title":"Border Color",
-           "type":"color",
-           "default":"black"
-        },
-        {
-           "name":"borderWidth",
-           "title":"Border Width",
-           "type":"number",
-           "default":0,
-           "step":1,
-           "min":0,
-           "max":5
-        },
-        {
-           "name":"opacity",
-           "title":"Opacity",
-           "type":"number",
-           "default":100,
-           "step":10,
-           "min":0,
-           "max":100
-        }
-    ],
-    "line": [
-        {
-            "name": "orientation",
-            "title": "Orientation",
-            "type": "choice",
-            "choices": ["Horizontal", "Vertical"],
-            "default": "Horizontal",
-            "visible": false
-        },
-        {
-            "name": "lineColor",
-            "title": "Line Color",
-            "type": "color",
-            "default": "black"
-        },
-        {
-            "name": "lineWidth",
-            "title": "Line Width",
-            "type":"number",
-            "default":4,
-            "step":1,
-            "min":1,
-            "max":20
-        },
-        {
-           "name":"opacity",
-           "title":"Opacity",
-           "type":"number",
-           "default":100,
-           "step":10,
-           "min":0,
-           "max":100
-        }
-    ]
+   "url":[
+      {
+         "name":"url",
+         "title":"Website Address",
+         "type":"url",
+         "default":""
+      },
+      {
+         "name":"title",
+         "title":"Title",
+         "type":"text",
+         "default":"",
+         "placeHolderText":"Set website title"
+      },
+      {
+         "name":"description",
+         "title":"Description",
+         "type":"text",
+         "default":"",
+         "placeHolderText":"Set website description"
+      },
+      {
+         "name":"imageUrl",
+         "title":"Image URL",
+         "type":"url",
+         "default":"",
+         "placeHolderText":"Set preview image URL"
+      }
+   ],
+   "image":[
+      {
+         "name":"image",
+         "title":"Image",
+         "type":"image",
+         "default":"",
+         "isFile":true
+      },
+      {
+         "name":"caption",
+         "title":"Caption",
+         "type":"text",
+         "default":""
+      },
+      {
+         "name":"captionColor",
+         "title":"Caption Text Color",
+         "type":"color",
+         "default":"black"
+      },
+      {
+         "name":"captionAlignment",
+         "title":"Caption Alignment",
+         "type":"hAlign",
+         "default":"center"
+      },
+      {
+         "name":"fillBackground",
+         "title":"Fill Background",
+         "text":"Fill with 'Background Color'",
+         "type":"boolean",
+         "default":false
+      },
+      {
+         "name":"backgroundColor",
+         "title":"Background Color",
+         "type":"color",
+         "default":"white"
+      },
+      {
+         "name":"borderColor",
+         "title":"Border Color",
+         "type":"color",
+         "default":"black"
+      },
+      {
+         "name":"borderWidth",
+         "title":"Border Width",
+         "type":"number",
+         "default":0,
+         "step":1,
+         "min":0,
+         "max":5
+      },
+      {
+         "name":"opacity",
+         "title":"Opacity",
+         "type":"number",
+         "default":100,
+         "step":10,
+         "min":0,
+         "max":100
+      }
+   ],
+   "line":[
+      {
+         "name":"orientation",
+         "title":"Orientation",
+         "type":"choice",
+         "choices":[
+            "Horizontal",
+            "Vertical"
+         ],
+         "default":"Horizontal",
+         "visible":false
+      },
+      {
+         "name":"lineColor",
+         "title":"Line Color",
+         "type":"color",
+         "default":"black"
+      },
+      {
+         "name":"lineWidth",
+         "title":"Line Width",
+         "type":"number",
+         "default":4,
+         "step":1,
+         "min":1,
+         "max":20
+      },
+      {
+         "name":"opacity",
+         "title":"Opacity",
+         "type":"number",
+         "default":100,
+         "step":10,
+         "min":0,
+         "max":100
+      }
+   ]
 }

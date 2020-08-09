@@ -391,3 +391,51 @@ void QuadToElement::apply(QPainterPath &path)
 {
     path.quadTo(m_controlPoint, m_endPoint);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+ArcToElement::ArcToElement(QObject *parent)
+    :AbstractPathElement(parent)
+{
+
+}
+
+ArcToElement::~ArcToElement()
+{
+
+}
+
+void ArcToElement::setRectangle(const QRectF &val)
+{
+    if(m_rectangle == val)
+        return;
+
+    m_rectangle = val;
+    emit rectangleChanged();
+    emit updated();
+}
+
+void ArcToElement::setStartAngle(qreal val)
+{
+    if( qFuzzyCompare(m_startAngle, val) )
+        return;
+
+    m_startAngle = val;
+    emit startAngleChanged();
+    emit updated();
+}
+
+void ArcToElement::setSweepLength(qreal val)
+{
+    if( qFuzzyCompare(m_sweepLength, val) )
+        return;
+
+    m_sweepLength = val;
+    emit sweepLengthChanged();
+    emit updated();
+}
+
+void ArcToElement::apply(QPainterPath &path)
+{
+    path.arcTo(m_rectangle, m_startAngle, m_sweepLength);
+}

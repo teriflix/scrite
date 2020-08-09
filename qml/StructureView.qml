@@ -199,7 +199,7 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: scriteDocument.structure.elementCount >= 1
-        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting) && mouseOverItem === null && editItem === null
+        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null
         property Item mouseOverItem
         property Item editItem
 
@@ -248,12 +248,13 @@ Item {
             }
 
             readonly property var annotationsList: [
-                { "title": "Horizontal Line", "what": "hline" },
-                { "title": "Vertical Line", "what": "vline" },
-                { "title": "Rectangle", "what": "rectangle" },
                 { "title": "Text", "what": "text" },
+                { "title": "Oval", "what": "oval" },
+                { "title": "Image", "what": "image" },
+                { "title": "Rectangle", "what": "rectangle" },
                 { "title": "Website Link", "what": "url" },
-                { "title": "Image", "what": "image" }
+                { "title": "Vertical Line", "what": "vline" },
+                { "title": "Horizontal Line", "what": "hline" }
             ]
 
             function createAnnotation(type, x, y) {
@@ -278,6 +279,9 @@ Item {
                     break
                 case "image":
                     structureView.createNewImageAnnotation(x,y)
+                    break
+                case "oval":
+                    structureView.createNewOvalAnnotation(x,y)
                     break
                 }
             }
@@ -355,6 +359,7 @@ Item {
                             case "url": return urlAnnotationComponent
                             case "image": return imageAnnotationComponent
                             case "line": return lineAnnotationComponent
+                            case "oval": return ovalAnnotationComponent
                             }
                             return null
                         }
@@ -1411,6 +1416,51 @@ Item {
             TightBoundingBoxItem.previewFillColor: color
             TightBoundingBoxItem.previewBorderColor: border.color
             TightBoundingBoxItem.livePreview: false
+        }
+    }
+
+    function createNewOvalAnnotation(x, y) {
+        if(scriteDocument.readOnly)
+            return
+
+        var w = 80
+        var h = 80
+        var rect =Qt.rect(x - w/2, y-h/2, w, h)
+        var annot = annotationObject.createObject(canvas)
+        annot.type = "oval"
+        annot.geometry = rect
+        scriteDocument.structure.addAnnotation(annot)
+    }
+
+    Component {
+        id: ovalAnnotationComponent
+
+        AnnotationItem {
+            color: Qt.rgba(0,0,0,0)
+            border.width: 0
+            border.color: Qt.rgba(0,0,0,0)
+
+            PainterPathItem {
+                id: ovalPathItem
+                anchors.fill: parent
+                anchors.margins: annotation.attributes.borderWidth
+                renderType: annotation.attributes.fillBackground ? PainterPathItem.OutlineAndFill : PainterPathItem.OutlineOnly
+                renderingMechanism: PainterPathItem.UseOpenGL
+                fillColor: annotation.attributes.color
+                outlineColor: annotation.attributes.borderColor
+                outlineWidth: annotation.attributes.borderWidth
+                painterPath: PainterPath {
+                    MoveTo {
+                        x: ovalPathItem.width
+                        y: ovalPathItem.height/2
+                    }
+                    ArcTo {
+                        rectangle: Qt.rect(0, 0, ovalPathItem.width, ovalPathItem.height)
+                        startAngle: 0
+                        sweepLength: 360
+                    }
+                }
+            }
         }
     }
 
