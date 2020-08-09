@@ -1246,9 +1246,10 @@ Item {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
                 switch(event.key) {
                 case Qt.Key_Left:
-                    if(event.shiftModifier)
+                    if(event.shiftModifier) {
                         annotationGripItem.width -= annotation.resizable ? dist : 0
-                    else
+                        annotationGripItem.width = Math.max(annotationGripItem.width, 20)
+                    } else
                         annotationGripItem.x -= annotation.movable ? dist : 0
                     result.accept = true
                     result.filter = true
@@ -1262,8 +1263,10 @@ Item {
                     result.filter = true
                     break
                 case Qt.Key_Up:
-                    if(event.shiftModifier)
+                    if(event.shiftModifier) {
                         annotationGripItem.height -= annotation.resizable ? dist : 0
+                        annotationGripItem.height = Math.max(annotationGripItem.height, 20)
+                    }
                     else
                         annotationGripItem.y -= annotation.movable ? dist : 0
                     result.accept = true
@@ -1338,6 +1341,7 @@ Item {
                     cursorShape: Qt.SizeHorCursor
                     drag.target: parent
                     drag.axis: Drag.XAxis
+                    drag.minimumX: 20
                 }
             }
 
@@ -1367,6 +1371,7 @@ Item {
                     cursorShape: Qt.SizeVerCursor
                     drag.target: parent
                     drag.axis: Drag.YAxis
+                    drag.minimumY: 20
                 }
             }
 
@@ -1397,6 +1402,8 @@ Item {
                     cursorShape: Qt.SizeFDiagCursor
                     drag.target: parent
                     drag.axis: Drag.XAndYAxis
+                    drag.minimumX: 20
+                    drag.minimumY: 20
                 }
             }
         }

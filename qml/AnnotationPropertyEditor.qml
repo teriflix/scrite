@@ -50,19 +50,32 @@ Item {
             width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
             spacing: 20
 
-            Item {
+            Column {
                 width: parent.width
-                height: 80
+                spacing: parent.spacing/4
 
-                Button2 {
-                    text: "Delete Annotation"
-                    anchors.centerIn: parent
-                    onClicked: {
-                        var a = annotationGripLoader.annotation
-                        annotationGripLoader.reset()
-                        scriteDocument.structure.removeAnnotation(a)
-                    }
+                Text {
+                    width: parent.width
+                    font.pointSize: app.idealFontPointSize + 2
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    padding: 10
+                    text: annotation.type.toUpperCase()
                 }
+
+                Text {
+                    width: parent.width
+                    font.pointSize: app.idealFontPointSize
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "<b>Position:</b> " + Math.round(annotation.geometry.x-canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: primaryColors.separatorColor
+                opacity: 0.5
             }
 
             Repeater {
@@ -116,32 +129,49 @@ Item {
                 }
             }
 
-            Item {
+            Rectangle {
                 width: parent.width
-                height: 80
+                height: 1
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
 
-                Row {
-                    spacing: 10
-                    anchors.centerIn: parent
+            Row {
+                spacing: 10
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                    Button2 {
-                        text: "Bring To Front"
-                        onClicked: {
-                            var a = annotationGripLoader.annotation
-                            annotationGripLoader.reset()
-                            scriteDocument.structure.bringToFront(a)
-                        }
-                    }
-
-                    Button2 {
-                        text: "Send To Back"
-                        onClicked: {
-                            var a = annotationGripLoader.annotation
-                            annotationGripLoader.reset()
-                            scriteDocument.structure.sendToBack(a)
-                        }
+                Button2 {
+                    text: "Bring To Front"
+                    onClicked: {
+                        var a = annotationGripLoader.annotation
+                        annotationGripLoader.reset()
+                        scriteDocument.structure.bringToFront(a)
                     }
                 }
+
+                Button2 {
+                    text: "Send To Back"
+                    onClicked: {
+                        var a = annotationGripLoader.annotation
+                        annotationGripLoader.reset()
+                        scriteDocument.structure.sendToBack(a)
+                    }
+                }
+            }
+
+            Button2 {
+                text: "Delete Annotation"
+                anchors.horizontalCenter: parent.horizontalCenter
+                onClicked: {
+                    var a = annotationGripLoader.annotation
+                    annotationGripLoader.reset()
+                    scriteDocument.structure.removeAnnotation(a)
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: 10
             }
         }
     }
