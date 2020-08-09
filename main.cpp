@@ -21,6 +21,7 @@
 #include <QQmlContext>
 #include <QQuickStyle>
 #include <QFontDatabase>
+#include <QOperatingSystemVersion>
 
 #include "fileinfo.h"
 #include "undoredo.h"
@@ -268,7 +269,10 @@ int main(int argc, char **argv)
     QQuickView qmlView;
     qmlView.setFormat(format);
 #ifdef Q_OS_WIN
-    qmlView.setSceneGraphBackend(QSGRendererInterface::Direct3D12);
+    if( QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10 )
+        qmlView.setSceneGraphBackend(QSGRendererInterface::Direct3D12);
+    else
+        qmlView.setSceneGraphBackend(QSGRendererInterface::Software);
 #endif
     scriteDocument->formatting()->setSreeenFromWindow(&qmlView);
     scriteDocument->clearModified();
