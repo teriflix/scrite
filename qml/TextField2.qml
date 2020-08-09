@@ -67,12 +67,10 @@ TextField {
             userTypedSomeText = true
     }
 
-    Keys.onReturnPressed: {
-        if(tabItem)
-            tabItem.forceActiveFocus()
-    }
+    Keys.onReturnPressed: autoCompleteOrFocusNext()
+    Keys.onTabPressed: autoCompleteOrFocusNext()
 
-    Keys.onTabPressed: {
+    function autoCompleteOrFocusNext() {
         if(completer.hasSuggestion && completer.suggestion !== text) {
             text = completer.suggestion
             editingFinished()
