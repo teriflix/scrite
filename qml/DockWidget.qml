@@ -55,6 +55,7 @@ Item {
     TrackerPack {
         TrackProperty { target: dockWidget; property: "width" }
         TrackProperty { target: dockWidget; property: "height" }
+        TrackProperty { target: dockWidget; property: "visible" }
 
         delay: 50
 

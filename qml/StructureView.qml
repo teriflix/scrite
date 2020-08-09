@@ -385,7 +385,8 @@ Item {
                             floatingDockWidget.hide()
                         else {
                             if(floatingDockWidget.contentX < 0) {
-                                floatingDockWidget.contentX = documentUI.mapFromItem(structureView, 0, 0).x + structureView.width + 40
+                                var maxContentX = (documentUI.width - floatingDockWidget.contentWidth - 20)
+                                floatingDockWidget.contentX = Math.min(documentUI.mapFromItem(structureView, 0, 0).x + structureView.width + 40, maxContentX)
                                 floatingDockWidget.contentY = (documentUI.height - floatingDockWidget.contentHeight)/2
                             }
 
