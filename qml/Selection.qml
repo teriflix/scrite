@@ -81,6 +81,10 @@ Item {
         tightRect.width = (bounds.p2.x-bounds.p1.x+20)
         tightRect.height = (bounds.p2.y-bounds.p1.y+20)
         tightRect.topLeft = Qt.point(tightRect.x, tightRect.y)
+
+        selectedItems.sort( function(i1, i2) {
+            return (i1.x === i2.x) ? i1.y - i2.y : i1.x - i2.x
+        })
         items = selectedItems
     }
 

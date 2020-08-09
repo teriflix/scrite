@@ -441,6 +441,16 @@ void Screenplay::addElement(ScreenplayElement *ptr)
     this->insertElementAt(ptr, -1);
 }
 
+void Screenplay::addScene(Scene *scene)
+{
+    if(scene == nullptr)
+        return;
+
+    ScreenplayElement *element = new ScreenplayElement(this);
+    element->setScene(scene);
+    this->addElement(element);
+}
+
 static void screenplayAppendElement(Screenplay *screenplay, ScreenplayElement *ptr) { screenplay->addElement(ptr); }
 static void screenplayRemoveElement(Screenplay *screenplay, ScreenplayElement *ptr) { screenplay->removeElement(ptr); }
 static void screenplayInsertElement(Screenplay *screenplay, ScreenplayElement *ptr, int index) { screenplay->insertElementAt(ptr, index); }

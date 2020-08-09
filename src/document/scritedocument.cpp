@@ -375,6 +375,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     m_progressReport->start();
 
+    emit aboutToSave();
+
     const QJsonObject json = QObjectSerializer::toJson(this);
     const QByteArray bytes = QJsonDocument(json).toBinaryData();
     m_docFileSystem.setHeader(bytes);
@@ -392,6 +394,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         file2.write(QJsonDocument(json).toJson());
     }
 #endif
+
+    emit justSaved();
 
     m_progressReport->finish();
 

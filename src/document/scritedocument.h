@@ -123,6 +123,9 @@ public:
     Q_INVOKABLE void saveAs(const QString &fileName);
     Q_INVOKABLE void save();
 
+    Q_SIGNAL void aboutToSave();
+    Q_SIGNAL void justSaved();
+
     Q_PROPERTY(QStringList supportedImportFormats READ supportedImportFormats CONSTANT)
     QStringList supportedImportFormats() const;
     Q_INVOKABLE QString importFormatFileSuffix(const QString &format) const;

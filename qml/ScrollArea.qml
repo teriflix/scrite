@@ -17,7 +17,7 @@ import Scrite 1.0
 
 Flickable {
     id: flickable
-    readonly property rect visibleRect: Qt.rect(contentX, contentY, width, height)
+    property rect visibleRect: Qt.rect(contentX, contentY, width, height)
     property real initialContentWidth: 100
     property real initialContentHeight: 100
     property real suggestedScale: zoomScale

@@ -193,6 +193,7 @@ public:
     Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<ScreenplayElement> elements();
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
+    Q_INVOKABLE void addScene(Scene *scene);
     Q_INVOKABLE void insertElementAt(ScreenplayElement *ptr, int index);
     Q_INVOKABLE void removeElement(ScreenplayElement *ptr);
     Q_INVOKABLE void moveElement(ScreenplayElement *ptr, int toRow);

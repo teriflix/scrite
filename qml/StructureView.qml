@@ -185,14 +185,7 @@ Item {
                 iconSource: "../icons/navigation/property_editor.png"
                 ToolTip.text: "Display properties of selected annotation"
                 down: floatingDockWidget.visible
-                onClicked: {
-                    structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
-                    if(structureCanvasSettings.displayAnnotationProperties)
-                        floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
-                    else
-                        floatingDockWidget.close()
-                }
-
+                onClicked: structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
                 Connections {
                     target: floatingDockWidget
                     onCloseRequest: structureCanvasSettings.displayAnnotationProperties = false
@@ -221,6 +214,21 @@ Item {
         interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null
         property Item mouseOverItem
         property Item editItem
+
+        property rect visibleArea: Qt.rect( visibleArea.xPosition * contentWidth / canvas.scale,
+                                           visibleArea.yPosition * contentHeight / canvas.scale,
+                                           visibleArea.widthRatio * contentWidth / canvas.scale,
+                                           visibleArea.heightRatio * contentHeight / canvas.scale )
+
+//        Connections {
+//            target: scriteDocument
+//            onAboutToSave: scriteDocument.structure.visibleArea = canvasScroll.visibleArea
+//        }
+
+//        Connections {
+//            target: mainTabBar
+//            onCurrentIndexChanged: scriteDocument.structure.visibleArea = canvasScroll.visibleArea
+//        }
 
         GridBackground {
             id: canvas
@@ -402,6 +410,16 @@ Item {
                         floatingDockWidget.hide()
                         annotation = null
                         annotationItem = null
+                    }
+
+                    Connections {
+                        target: structureCanvasSettings
+                        onDisplayAnnotationPropertiesChanged: {
+                            if(structureCanvasSettings.displayAnnotationProperties)
+                                floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
+                            else
+                                floatingDockWidget.close()
+                        }
                     }
 
                     onAnnotationChanged: {
@@ -602,6 +620,16 @@ Item {
                         onClicked: {
                             createNewRectangleAnnotation(selection.rect.x-10, selection.rect.y-10, selection.rect.width+20, selection.rect.height+20)
                             selection.clear()
+                        }
+                    }
+
+                    MenuItem2 {
+                        text: "Add To Timeline"
+                        onClicked: {
+                            var items = selection.items
+                            items.forEach( function(item) {
+                                scriteDocument.screenplay.addScene(item.element.scene)
+                            })
                         }
                     }
                 }
@@ -815,6 +843,9 @@ Item {
                                          canvasScroll.width,
                                          canvasScroll.height)
                 canvasScroll.ensureVisible(middleArea)
+            } else {
+                if(scriteDocument.structure.isVisibleAreaValid)
+                    canvasScroll.ensureVisible(scriteDocument.structure.visibleArea)
             }
         }
     }
@@ -1300,6 +1331,12 @@ Item {
                     result.accept = true
                     result.filter = true
                     break
+                case Qt.Key_F2:
+                    if(structureCanvasSettings.displayAnnotationProperties === false) {
+                        structureCanvasSettings.displayAnnotationProperties = true
+                        result.accept = true
+                        result.filter = true
+                    }
                 }
             }
 
@@ -1333,6 +1370,10 @@ Item {
                 drag.axis: Drag.XAndYAxis
                 enabled: annotation.movable
                 propagateComposedEvents: true
+                onDoubleClicked: {
+                    if(structureCanvasSettings.displayAnnotationProperties === false)
+                        structureCanvasSettings.displayAnnotationProperties = true
+                }
             }
 
             Rectangle {
