@@ -412,6 +412,11 @@ Rectangle {
                 property real bottomMarginPx: pageLayout.bottomMargin * Screen.devicePixelRatio * zoomLevel
             }
         }
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: scriteDocument.loading || screenplayTextDocument.updating
+        }
     }
 
     ScrollBar {
