@@ -825,7 +825,7 @@ Item {
         id: initializeTimer
         running: !scriteDocument.loading
         repeat: false
-        interval: 100
+        interval: 1000
         onTriggered: {
             if(scriteDocument.structure.elementCount === 0) {
                 var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
@@ -835,8 +835,9 @@ Item {
                 canvasScroll.ensureVisible(middleArea)
             } else {
                 var item = currentElementItemBinder.get
-                if(item)
-                    canvasScroll.ensureItemVisible(item, canvas.scale, canvasScroll.width*0.33, canvasScroll.height*0.33)
+                if(item === null)
+                    item = elementItems.at(0)
+                canvasScroll.ensureItemVisible(item)
             }
         }
     }
