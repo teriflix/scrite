@@ -38,6 +38,15 @@ Flickable {
         zoomScale = 1
     }
 
+    function zoomFit(area) {
+        if(!area)
+            return
+
+        var s = Math.min(width/area.width, height/area.height)
+        zoomScale = s
+        ensureVisible(area, s)
+    }
+
     Behavior on contentX {
         enabled: screenplayEditorSettings.enableAnimations
         NumberAnimation { duration: 250 }

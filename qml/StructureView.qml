@@ -78,6 +78,13 @@ Item {
                 ToolTip.text: "Zoom Out"
             }
 
+            ToolButton3 {
+                onClicked: canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox)
+                iconSource: "../icons/navigation/zoom_fit.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom Fit"
+            }
+
             Rectangle {
                 width: 1
                 height: parent.height

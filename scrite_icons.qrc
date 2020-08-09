@@ -125,5 +125,7 @@
         <file>icons/content/content_paste.png</file>
         <file>icons/navigation/property_editor.png</file>
         <file>icons/navigation/property_editor_inverted.png</file>
+        <file>icons/navigation/zoom_fit_inverted.png</file>
+        <file>icons/navigation/zoom_fit.png</file>
     </qresource>
 </RCC>
