@@ -411,7 +411,25 @@ void ScriteDocument::save()
     {
         const QString backupDirPath(fi.absolutePath() + "/" + fi.baseName() + " Backups");
         QDir().mkpath(backupDirPath);
-        const QString backupFileName = backupDirPath + "/" + fi.baseName() + " [" + QString::number(QDateTime::currentSecsSinceEpoch()) + "].scrite";
+
+        const qint64 now = QDateTime::currentSecsSinceEpoch();
+
+        const QDir backupDir(backupDirPath);
+        const QFileInfoList backupEntries = backupDir.entryInfoList(QDir::Files, QDir::Time|QDir::Reversed);
+        if(!backupEntries.isEmpty())
+        {
+            const QFileInfo latestEntry = backupEntries.first();
+            if(latestEntry.suffix() == QStringLiteral("scrite"))
+            {
+                const QString baseName = latestEntry.baseName();
+                const QString thenStr = baseName.section('[', 1).section(']', 0, 0);
+                const qint64 then = thenStr.toLongLong();
+                if(now - then < 60)
+                    QFile::remove(latestEntry.absoluteFilePath());
+            }
+        }
+
+        const QString backupFileName = backupDirPath + "/" + fi.baseName() + " [" + QString::number(now) + "].scrite";
         QFile::copy(m_fileName, backupFileName);
     }
 
