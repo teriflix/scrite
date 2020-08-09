@@ -220,16 +220,6 @@ Item {
                                            visibleArea.widthRatio * contentWidth / canvas.scale,
                                            visibleArea.heightRatio * contentHeight / canvas.scale )
 
-//        Connections {
-//            target: scriteDocument
-//            onAboutToSave: scriteDocument.structure.visibleArea = canvasScroll.visibleArea
-//        }
-
-//        Connections {
-//            target: mainTabBar
-//            onCurrentIndexChanged: scriteDocument.structure.visibleArea = canvasScroll.visibleArea
-//        }
-
         GridBackground {
             id: canvas
             antialiasing: false
@@ -844,8 +834,9 @@ Item {
                                          canvasScroll.height)
                 canvasScroll.ensureVisible(middleArea)
             } else {
-                if(scriteDocument.structure.isVisibleAreaValid)
-                    canvasScroll.ensureVisible(scriteDocument.structure.visibleArea)
+                var item = currentElementItemBinder.get
+                if(item)
+                    canvasScroll.ensureItemVisible(item, canvas.scale, canvasScroll.width*0.33, canvasScroll.height*0.33)
             }
         }
     }

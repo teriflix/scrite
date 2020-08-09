@@ -256,14 +256,6 @@ public:
     qreal canvasGridSize() const { return m_canvasGridSize; }
     Q_SIGNAL void canvasGridSizeChanged();
 
-    Q_PROPERTY(QRectF visibleArea READ visibleArea WRITE setVisibleArea NOTIFY visibleAreaChanged)
-    void setVisibleArea(const QRectF &val);
-    QRectF visibleArea() const {return m_visibleArea; }
-    Q_SIGNAL void visibleAreaChanged();
-
-    Q_PROPERTY(bool isVisibleAreaValid READ isVisibleAreaValid NOTIFY visibleAreaChanged)
-    bool isVisibleAreaValid() const;
-
     Q_INVOKABLE qreal snapToGrid(qreal val) const;
     static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize=10.0);
 
@@ -382,7 +374,6 @@ private:
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
 
 private:
-    QRectF m_visibleArea;
     qreal m_canvasWidth = 1000;
     qreal m_canvasHeight = 1000;
     qreal m_canvasGridSize = 10;

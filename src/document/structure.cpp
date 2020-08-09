@@ -578,7 +578,6 @@ Structure::Structure(QObject *parent)
     connect(this, &Structure::elementCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::currentElementIndexChanged, this, &Structure::structureChanged);
-    connect(this, &Structure::visibleAreaChanged, this, &Structure::visibleAreaChanged);
 
     QClipboard *clipboard = qApp->clipboard();
     connect(clipboard, &QClipboard::dataChanged, this, &Structure::onClipboardDataChanged);
@@ -614,20 +613,6 @@ void Structure::setCanvasGridSize(qreal val)
 
     m_canvasGridSize = val;
     emit canvasGridSizeChanged();
-}
-
-void Structure::setVisibleArea(const QRectF &val)
-{
-    if(m_visibleArea == val)
-        return;
-
-    m_visibleArea = val;
-    emit visibleAreaChanged();
-}
-
-bool Structure::isVisibleAreaValid() const
-{
-    return m_visibleArea.x() >= 0 && m_visibleArea.y() >= 0 && visibleArea().size().isValid();
 }
 
 qreal Structure::snapToGrid(qreal val) const
