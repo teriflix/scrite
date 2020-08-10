@@ -1006,7 +1006,7 @@ Item {
                 visible: appToolBar.visible
                 onVisibleChanged: currentIndex = 0
 
-                property Item currentTab: currentIndex >= 0 ? mainTabBarRepeater.itemAt(currentIndex) : null
+                property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
                 property var tabs: ["Screenplay", "Structure", "Notebook"]
                 property var currentTabP1: currentTabExtents.value.p1
@@ -1018,17 +1018,27 @@ Item {
                         shortcutsDockWidget.hide()
                 }
 
-                ResetOnChange {
+                TrackerPack {
                     id: currentTabExtents
-                    trackChangesOn: appToolBarArea.width
-                    from: {
+                    TrackProperty { target: mainTabBar; property: "visible" }
+                    TrackProperty { target: appToolBarArea; property: "width" }
+                    TrackProperty { target: mainTabBar; property: "currentTab" }
+
+                    property var value: fallback
+                    readonly property var fallback: {
                         "p1": { "x": 0, "y": 0 },
                         "p2": { "x": 0, "y": 0 }
                     }
-                    to: mainTabBar.visible && mainTabBar.currentTab ? {
-                        "p1": mainTabBar.mapFromItem(mainTabBar.currentTab, 0, 0),
-                        "p2": mainTabBar.mapFromItem(mainTabBar.currentTab, mainTabBar.currentTab.width, 0)
-                    } : from
+
+                    onTracked:  {
+                        if(mainTabBar.visible && mainTabBar.currentTab !== null) {
+                            value = {
+                                "p1": mainTabBar.mapFromItem(mainTabBar.currentTab, 0, 0),
+                                "p2": mainTabBar.mapFromItem(mainTabBar.currentTab, mainTabBar.currentTab.width, 0)
+                            }
+                        } else
+                            value = fallback
+                    }
                 }
 
                 Component.onCompleted: currentIndex = 0

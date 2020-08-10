@@ -84,6 +84,10 @@ public:
     QJsonObject itemRect() const;
     Q_SIGNAL void itemRectChanged();
 
+    Q_PROPERTY(bool dirty READ isDirty NOTIFY dirtyChanged)
+    bool isDirty() const { return m_dirty; }
+    Q_SIGNAL void dirtyChanged();
+
     Q_INVOKABLE QPointF pointInLine(const QPointF &p1, const QPointF &p2, qreal t, bool absolute=false) const;
 
     Q_INVOKABLE QPointF pointAtPercent(qreal t) const;

@@ -164,6 +164,7 @@ QPainterPath PainterPath::path()
 void PainterPath::markDirty()
 {
     m_dirty = true;
+    emit dirtyChanged();
     emit updated();
 }
 
@@ -174,6 +175,9 @@ void PainterPath::composePath()
         if(element->isEnabled())
             element->apply(m_path);
     }
+
+    m_dirty = false;
+    emit dirtyChanged();
 }
 
 AbstractPathElement *PainterPath::elements_at(QQmlListProperty<AbstractPathElement> *list, int index)
