@@ -18,8 +18,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QJsonObject>
-
-class QNetworkReply;
+#include <QNetworkReply>
 
 class UrlAttributes : public QObject
 {
@@ -62,8 +61,8 @@ private:
 private:
     QUrl m_url;
     Status m_status = Null;
-    QNetworkReply *m_reply = nullptr;
     QJsonObject m_attributes;
+    QPointer<QNetworkReply> m_reply;
 };
 
 #endif // URLATTRIBUTES_H

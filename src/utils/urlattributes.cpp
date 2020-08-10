@@ -42,7 +42,7 @@ void UrlAttributes::setUrl(const QUrl &val)
     emit urlChanged();
 
     static QNetworkAccessManager nam;
-    if(m_reply != nullptr)
+    if(!m_reply.isNull())
         delete m_reply;
     m_reply = nullptr;
 
@@ -101,8 +101,6 @@ void UrlAttributes::onHttpRequestFinished()
     QJsonObject jsonObj = parseError.error == QJsonParseError::NoError ? jsonDoc.object() : QJsonObject();
     if(jsonObj.isEmpty())
         jsonObj = this->createDefaultAttributes();
-    else
-        jsonObj.insert(QStringLiteral("url"), m_url.toString());
     this->setAttributes(jsonObj);
     this->setStatus(Ready);
 }
@@ -113,6 +111,8 @@ void UrlAttributes::setAttributes(const QJsonObject &val)
         return;
 
     m_attributes = val;
+    if(m_attributes.value(QStringLiteral("url")).toString() != m_url.toString())
+        m_attributes.insert(QStringLiteral("url"), m_url.toString());
     emit attributesChanged();
 }
 

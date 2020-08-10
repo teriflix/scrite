@@ -293,7 +293,7 @@ Item {
                 text: "Save"
                 shortcut: "Ctrl+S"
                 shortcutText: "S"
-                enabled: scriteDocument.structure.elementCount > 0 && !scriteDocument.readOnly
+                enabled: scriteDocument.modified && !scriteDocument.readOnly
                 onClicked: doClick()
                 function doClick() {
                     if(scriteDocument.fileName === "")
@@ -313,9 +313,11 @@ Item {
                 shortcut: "Ctrl+Shift+S"
                 shortcutText: "Shift+S"
                 iconSource: "../icons/content/archive.png"
-                enabled: scriteDocument.structure.elementCount > 0
                 onClicked: fileDialog.launch("SAVE")
-
+                enabled: scriteDocument.structure.elementCount > 0 ||
+                         scriteDocument.structure.noteCount > 0 ||
+                         scriteDocument.structure.annotationCount > 0 ||
+                         scriteDocument.screenplay.elementCount > 0
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
                 ShortcutsModelItem.shortcut: shortcut

@@ -1641,8 +1641,7 @@ Item {
                         annotAttrs.description = urlAttrs.description
                         annotAttrs.imageName = ""
                         annotAttrs.imageUrl = urlAttrs.image
-                        annotAttrs.url = url
-                        annotAttrs.url2 = url
+                        annotAttrs.url2 = annotAttrs.url
                         annotation.attributes = annotAttrs
                     }
                 }
@@ -1766,10 +1765,11 @@ Item {
                 id: image
                 property bool isSet: annotation.attributes.image !== "" && status === Image.Ready
                 width: parent.width - 10
+                height: sourceSize.height / sourceSize.width * width
                 anchors.top: parent.top
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                fillMode: Image.PreserveAspectFit
+                fillMode: Image.Stretch
                 smooth: canvasScroll.moving || canvasScroll.flicking ? false : true
                 mipmap: smooth
                 source: annotation.imageUrl(annotation.attributes.image)
