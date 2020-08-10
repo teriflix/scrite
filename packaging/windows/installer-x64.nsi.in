@@ -62,6 +62,7 @@ Section "MainSection" SEC01
   Sleep 5000
 
 beginInsallation:
+  SetOutPath "$INSTDIR"
 $$WINDEPLOYQT_INSTALLS
 
   SetOutPath "$INSTDIR"
