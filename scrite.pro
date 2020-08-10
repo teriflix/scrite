@@ -217,8 +217,6 @@ macx {
     HEADERS += src/core/systemtextinputmanager_macos.h
     OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
     LIBS += -framework Carbon
-} else {
-    QT += webenginewidgets
 }
 
 win32 {
@@ -242,6 +240,8 @@ DISTFILES += \
     packaging/mac/package.sh \
     packaging/mac/prepare.sh \
     packaging/mac/dmgbackdrop.qml \
-    3rdparty/poly2tri/License.txt
+    3rdparty/poly2tri/License.txt \
+    tools/urlattribs/urlattribs.php \
+    tools/urlattribs/OpenGraph.php
 
 

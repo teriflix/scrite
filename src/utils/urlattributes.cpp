@@ -17,15 +17,11 @@
 
 #include <QFile>
 #include <QTimer>
-
-/**
- * https://bugreports.qt.io/browse/QTBUG-78240
- *
- * Qt 5.13.x on macOS crashes whenever QWebEnginePage is initialized. This happens
- * when it tries to query for the default font family on macOS. The issue has been
- * fixed in Qt 5.14. Until we move past 5.13, we have to unfortunately turn off
- * fetching Open Graph Attributes in UrlAttributes class on macOS.
- */
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QNetworkAccessManager>
+#include <QUrlQuery>
+#include <QJsonDocument>
 
 UrlAttributes::UrlAttributes(QObject *parent)
     : QObject(parent)
@@ -39,115 +35,47 @@ UrlAttributes::~UrlAttributes()
 
 void UrlAttributes::setUrl(const QUrl &val)
 {
-    if(m_url == val
-#ifndef Q_OS_MAC
-            || !m_webPage.isNull()
-#endif
-      )
+    if(m_url == val)
         return;
 
     m_url = val;
     emit urlChanged();
 
-    this->setAttributes(QJsonObject());
+    static QNetworkAccessManager nam;
+    if(m_reply != nullptr)
+        delete m_reply;
+    m_reply = nullptr;
 
-#ifndef Q_OS_MAC
-    static const QStringList allowedSchemas = QStringList() << QStringLiteral("http") << QStringLiteral("https");
-    if(!m_url.isEmpty() && m_url.isValid() && allowedSchemas.contains(m_url.scheme(), Qt::CaseInsensitive))
+    if(!m_url.isEmpty() && m_url.isValid())
     {
-        HourGlass hourGlass;
+        this->setAttributes(this->createDefaultAttributes());
         this->setStatus(Loading);
 
-        m_webPage = new QWebEnginePage(this);
-        m_webPage->setUrl(m_url);
-        connect(m_webPage, &QWebEnginePage::loadFinished, this, &UrlAttributes::onWebPageLoadFinished);
+        static const QUrl url( QStringLiteral("http://www.teriflix.in/scrite/urlattribs/urlattribs.php") );
+        const QNetworkRequest request(url);
+
+        QUrlQuery postData;
+        postData.addQueryItem("url", m_url.toString());
+
+        const QByteArray postDataBytes = postData.toString(QUrl::FullyEncoded).toLatin1();
+
+        m_reply = nam.post(request, postDataBytes);
+        if(m_reply != nullptr)
+        {
+            connect(m_reply, &QNetworkReply::finished, this, &UrlAttributes::onHttpRequestFinished);
+            connect(m_reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+                [=](QNetworkReply::NetworkError){
+                m_reply->deleteLater();
+                m_reply = nullptr;
+                this->setStatus(Error);
+            });
+        }
     }
     else
-        this->setStatus(m_url.isEmpty() ? Null : Error);
-#else
-    this->setAttributes(this->createDefaultAttributes());
-    this->setStatus(Ready);
-#endif
-}
-
-void UrlAttributes::onWebPageLoadFinished(bool ok)
-{
-#ifndef Q_OS_MAC
-    QWebEnginePage *webPage = qobject_cast<QWebEnginePage*>(this->sender());
-    if(webPage != m_webPage)
     {
-        webPage->deleteLater();
-        return;
-    }
-
-    if(!ok)
-    {
-        this->setStatus(Error);
-        webPage->deleteLater();
-        return;
-    }
-
-    static QString jsCode;
-    if(jsCode.isEmpty())
-    {
-        QFile jsFile(QStringLiteral(":/misc/fetchogattribs.js"));
-        if(jsFile.open(QFile::ReadOnly))
-            jsCode = jsFile.readAll();
-    }
-
-    QJsonObject defaultAttribs;
-    defaultAttribs.insert(QStringLiteral("url"), webPage->url().toString());
-    defaultAttribs.insert(QStringLiteral("type"), QStringLiteral("website"));
-    defaultAttribs.insert(QStringLiteral("title"), webPage->title());
-    defaultAttribs.insert(QStringLiteral("image"), QStringLiteral(""));
-    defaultAttribs.insert(QStringLiteral("description"), QStringLiteral(""));
-
-    if(jsCode.isEmpty())
-    {
-        this->setAttributes(defaultAttribs);
+        this->setAttributes(QJsonObject());
         this->setStatus(Ready);
-        return;
     }
-
-    webPage->runJavaScript(jsCode, [this](const QVariant &result) {
-        this->setAttributes(result.toJsonObject());
-        this->setStatus(Ready);
-    });
-
-    /**
-      Ref: https://doc.qt.io/qt-5/qwebenginepage.html#runJavaScript-3
-
-      Documentation for runJavaScript says
-
-      Warning: We guarantee that the callback (resultCallback) is always called,
-      but it might be done during page destruction. When QWebEnginePage is deleted,
-      the callback is triggered with an invalid value and it is not safe to use
-      the corresponding QWebEnginePage or QWebEngineView instance inside it.
-
-      So, lets give the web-page a few seconds time to run the JavaScript code and
-      give us the result. Otherwise, we can delete the web-page to incentivise
-      QWebEnginePage to run the JS for us and return the result.
-      */
-
-    QTimer *timer = new QTimer(webPage);
-    timer->setInterval(500);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, webPage, &QWebEnginePage::deleteLater);
-    timer->start();
-
-    /**
-      By the time the web-page deletes itself, if we have not received the result
-      then we can simply emit title and webpage attribus.
-      */
-    connect(webPage, &QWebEnginePage::destroyed, [this,defaultAttribs]() {
-        if(m_status != Ready) {
-            this->setAttributes(defaultAttribs);
-            this->setStatus(Ready);
-        }
-    });
-#else
-    Q_UNUSED(ok)
-#endif
 }
 
 void UrlAttributes::setStatus(UrlAttributes::Status val)
@@ -157,6 +85,21 @@ void UrlAttributes::setStatus(UrlAttributes::Status val)
 
     m_status = val;
     emit statusChanged();
+}
+
+void UrlAttributes::onHttpRequestFinished()
+{
+    if(m_reply == nullptr)
+        return;
+
+    const QByteArray bytes = m_reply->readAll();
+    m_reply->deleteLater();
+    m_reply = nullptr;
+
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(bytes);
+    const QJsonObject jsonObj = jsonDoc.object();
+    this->setAttributes(jsonObj);
+    this->setStatus(Ready);
 }
 
 void UrlAttributes::setAttributes(const QJsonObject &val)

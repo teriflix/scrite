@@ -19,9 +19,7 @@
 #include <QPointer>
 #include <QJsonObject>
 
-#ifndef Q_OS_MAC
-#include <QWebEnginePage>
-#endif
+class QNetworkReply;
 
 class UrlAttributes : public QObject
 {
@@ -53,18 +51,16 @@ public:
     Q_SIGNAL void attributesChanged();
 
 private:
-    void onWebPageLoadFinished(bool ok);
     void setStatus(Status val);
+    void onHttpRequestFinished();
     void setAttributes(const QJsonObject &val);
     QJsonObject createDefaultAttributes() const;
 
 private:
     QUrl m_url;
     Status m_status = Null;
+    QNetworkReply *m_reply = nullptr;
     QJsonObject m_attributes;
-#ifndef Q_OS_MAC
-    QPointer<QWebEnginePage> m_webPage;
-#endif
 };
 
 #endif // URLATTRIBUTES_H
