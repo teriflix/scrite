@@ -1626,7 +1626,7 @@ Item {
                 id: urlAttribs
                 url: annotation.attributes.url2 !== annotation.attributes.url ? annotation.attributes.url : ""
                 onUrlChanged: {
-                    if(url !== "") {
+                    if(isUrlValid) {
                         var annotAttrs = annotation.attributes
                         annotation.removeImage(annotAttrs.imageName)
                         annotAttrs.imageName = ""
@@ -1634,18 +1634,15 @@ Item {
                     }
                 }
                 onStatusChanged: {
-                    if(status === UrlAttributes.Ready && url !== "") {
+                    if(status === UrlAttributes.Ready && isUrlValid) {
                         var annotAttrs = annotation.attributes
                         var urlAttrs = attributes
-                        if(annotAttrs.title === "")
-                            annotAttrs.title = urlAttrs.title
-                        if(annotAttrs.description === "")
-                            annotAttrs.description = urlAttrs.description
-                        if(annotAttrs.imageUrl === "") {
-                            annotAttrs.imageName = ""
-                            annotAttrs.imageUrl = urlAttrs.image
-                        }
-                        annotAttrs.url2 = annotAttrs.url
+                        annotAttrs.title = urlAttrs.title
+                        annotAttrs.description = urlAttrs.description
+                        annotAttrs.imageName = ""
+                        annotAttrs.imageUrl = urlAttrs.image
+                        annotAttrs.url = url
+                        annotAttrs.url2 = url
                         annotation.attributes = annotAttrs
                     }
                 }

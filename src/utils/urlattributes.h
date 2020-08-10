@@ -46,6 +46,9 @@ public:
     QUrl url() const { return m_url; }
     Q_SIGNAL void urlChanged();
 
+    Q_PROPERTY(bool isUrlValid READ isUrlValid NOTIFY urlChanged)
+    bool isUrlValid() const { return !m_url.isEmpty() && m_url.isValid(); }
+
     Q_PROPERTY(QJsonObject attributes READ attributes NOTIFY attributesChanged)
     QJsonObject attributes() const { return m_attributes; }
     Q_SIGNAL void attributesChanged();
