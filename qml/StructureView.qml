@@ -222,7 +222,7 @@ Item {
         property Item mouseOverItem
         property Item editItem
 
-        property rect visibleArea: Qt.rect( visibleArea.xPosition * contentWidth / canvas.scale,
+        property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth / canvas.scale,
                                            visibleArea.yPosition * contentHeight / canvas.scale,
                                            visibleArea.widthRatio * contentWidth / canvas.scale,
                                            visibleArea.heightRatio * contentHeight / canvas.scale )
@@ -903,44 +903,43 @@ Item {
                 color: primaryColors.highlight.background
                 opacity: 0.5
 
-                property rect geometry: {
-                    if(!canvasPreview.visible)
-                        return Qt.rect(0,0,0,0)
+                DelayedPropertyBinder {
+                    id: geometryBinder
+                    initial: Qt.rect(0,0,0,0)
+                    set: {
+                        if(!canvasPreview.visible)
+                            return Qt.rect(0,0,0,0)
 
-                    var visibleRect = Qt.rect( canvasScroll.visibleArea.xPosition * canvasScroll.contentWidth / canvas.scale,
-                                               canvasScroll.visibleArea.yPosition * canvasScroll.contentHeight / canvas.scale,
-                                               canvasScroll.visibleArea.widthRatio * canvasScroll.contentWidth / canvas.scale,
-                                               canvasScroll.visibleArea.heightRatio * canvasScroll.contentHeight / canvas.scale )
-                    if( app.isRectangleInRectangle(visibleRect,canvasItemsBoundingBox.boundingBox) )
-                        return Qt.rect(0,0,0,0)
+                        var visibleRect = canvasScroll.viewportRect
+                        if( app.isRectangleInRectangle(visibleRect,canvasItemsBoundingBox.boundingBox) )
+                            return Qt.rect(0,0,0,0)
 
-                    var intersect = app.intersectedRectangle(visibleRect, canvasItemsBoundingBox.boundingBox)
-                    var scale = previewArea.width / Math.max(canvasItemsBoundingBox.width, 500)
-                    var ret = Qt.rect( (intersect.x-canvasItemsBoundingBox.left)*scale,
-                                       (intersect.y-canvasItemsBoundingBox.top)*scale,
-                                       (intersect.width*scale),
-                                       (intersect.height*scale) )
-                    return ret
+                        var intersect = app.intersectedRectangle(visibleRect, canvasItemsBoundingBox.boundingBox)
+                        var scale = previewArea.width / Math.max(canvasItemsBoundingBox.width, 500)
+                        var ret = Qt.rect( (intersect.x-canvasItemsBoundingBox.left)*scale,
+                                           (intersect.y-canvasItemsBoundingBox.top)*scale,
+                                           (intersect.width*scale),
+                                           (intersect.height*scale) )
+                        return ret
+                    }
+                    delay: 10
                 }
-                x: geometry.x
-                y: geometry.y
-                width: geometry.width
-                height: geometry.height
-            }
 
-            Item {
-                x: viewportIndicator.x
-                y: viewportIndicator.y
-                width: viewportIndicator.width
-                height: viewportIndicator.height
+                x: geometryBinder.get.x
+                y: geometryBinder.get.y
+                width: geometryBinder.get.width
+                height: geometryBinder.get.height
 
-                onXChanged: panViewport()
-                onYChanged: panViewport()
+                onXChanged: {
+                    if(panMouseArea.drag.active)
+                        panViewport()
+                }
+                onYChanged: {
+                    if(panMouseArea.drag.active)
+                        panViewport()
+                }
 
                 function panViewport() {
-                    if(!panMouseArea.drag.active)
-                        return
-
                     var scale = previewArea.width / Math.max(canvasItemsBoundingBox.width, 500)
                     var ix = (x/scale)+canvasItemsBoundingBox.left
                     var iy = (y/scale)+canvasItemsBoundingBox.top
@@ -1006,7 +1005,7 @@ Item {
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
             TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
             TightBoundingBoxItem.livePreview: false
-            TightBoundingBoxItem.previewFillColor: background.color
+            TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
             TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
 
             readonly property bool selected: scriteDocument.structure.currentElementIndex === index
@@ -1496,8 +1495,8 @@ Item {
         id: rectangleAnnotationComponent
 
         AnnotationItem {
-            TightBoundingBoxItem.previewFillColor: color
-            TightBoundingBoxItem.previewBorderColor: border.color
+            TightBoundingBoxItem.previewFillColor: app.translucent(color, opacity)
+            TightBoundingBoxItem.previewBorderColor: app.translucent(border.color, opacity)
             TightBoundingBoxItem.livePreview: false
         }
     }
