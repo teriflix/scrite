@@ -96,8 +96,13 @@ void UrlAttributes::onHttpRequestFinished()
     m_reply->deleteLater();
     m_reply = nullptr;
 
-    const QJsonDocument jsonDoc = QJsonDocument::fromJson(bytes);
-    const QJsonObject jsonObj = jsonDoc.object();
+    QJsonParseError parseError;
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(bytes, &parseError);
+    QJsonObject jsonObj = parseError.error == QJsonParseError::NoError ? jsonDoc.object() : QJsonObject();
+    if(jsonObj.isEmpty())
+        jsonObj = this->createDefaultAttributes();
+    else
+        jsonObj.insert(QStringLiteral("url"), m_url.toString());
     this->setAttributes(jsonObj);
     this->setStatus(Ready);
 }
