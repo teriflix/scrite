@@ -1076,7 +1076,7 @@ Item {
             }
 
             EventFilter.target: app
-            EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && selected && !selection.hasItems && visible
+            EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && canvasScroll.interactive && selected && !selection.hasItems && visible
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
