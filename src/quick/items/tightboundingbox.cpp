@@ -143,6 +143,7 @@ TightBoundingBoxItem::TightBoundingBoxItem(QObject *parent)
     : QObject(parent),
       m_item(qobject_cast<QQuickItem*>(parent)),
       m_updatePreviewTimer("TightBoundingBoxItem.updatePreviewTimer"),
+      m_viewportItem(this, "viewportItem"),
       m_evaluator(this, "evaluator")
 {
     if(m_item)
@@ -228,6 +229,39 @@ void TightBoundingBoxItem::setLivePreview(bool val)
     this->updatePreviewLater();
 }
 
+void TightBoundingBoxItem::setVisibilityMode(TightBoundingBoxItem::VisibilityMode val)
+{
+    if(m_visibilityMode == val)
+        return;
+
+    m_visibilityMode = val;
+    emit visibilityModeChanged();
+
+    this->determineVisibility();
+}
+
+void TightBoundingBoxItem::setViewportItem(QQuickItem *val)
+{
+    if(m_viewportItem == val)
+        return;
+
+    m_viewportItem = val;
+    emit viewportItemChanged();
+
+    this->determineVisibility();
+}
+
+void TightBoundingBoxItem::setViewportRect(const QRectF &val)
+{
+    if(m_viewportRect == val)
+        return;
+
+    m_viewportRect = val;
+    emit viewportRectChanged();
+
+    this->determineVisibility();
+}
+
 void TightBoundingBoxItem::markPreviewDirty()
 {
     this->updatePreviewLater();
@@ -254,6 +288,14 @@ void TightBoundingBoxItem::resetEvaluator()
 {
     m_evaluator = nullptr;
     emit evaluatorChanged();
+}
+
+void TightBoundingBoxItem::resetViewportItem()
+{
+    m_viewportItem = nullptr;
+    emit viewportItemChanged();
+
+    this->determineVisibility();
 }
 
 void TightBoundingBoxItem::updatePreview()
@@ -302,6 +344,36 @@ void TightBoundingBoxItem::setPreview(const QImage &image)
 
     m_preview = image;
     emit previewUpdated();
+}
+
+void TightBoundingBoxItem::determineVisibility()
+{
+    if(m_item == nullptr)
+        return;
+
+    QRectF itemRect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
+    if(!m_viewportItem.isNull())
+    {
+        const QPointF pos = m_item->mapToItem(m_viewportItem, QPointF(0,0));
+        itemRect.moveTopLeft(pos);
+    }
+
+    bool visible = m_item->isVisible();
+
+    switch(m_visibilityMode)
+    {
+    case AlwaysVisible:
+        visible = true;
+        break;
+    case VisibleUponViewportIntersection:
+        visible = m_viewportRect.isValid() && itemRect.isValid() ? m_viewportRect.intersects(itemRect) : true;
+        break;
+    case VisibleUponViewportContains:
+        visible = m_viewportRect.isValid() && itemRect.isValid() ? m_viewportRect.contains(itemRect) : true;
+        break;
+    }
+
+    m_item->setVisible(visible);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

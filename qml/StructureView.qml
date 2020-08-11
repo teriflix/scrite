@@ -1007,6 +1007,9 @@ Item {
             TightBoundingBoxItem.livePreview: false
             TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
             TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
+            TightBoundingBoxItem.viewportItem: canvas
+            TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
+            TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
             readonly property bool selected: scriteDocument.structure.currentElementIndex === index
             readonly property bool editing: titleText.readOnly === false
@@ -1073,7 +1076,7 @@ Item {
             }
 
             EventFilter.target: app
-            EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && selected && !selection.hasItems
+            EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && selected && !selection.hasItems && visible
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance

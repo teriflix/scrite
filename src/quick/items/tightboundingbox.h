@@ -142,6 +142,28 @@ public:
     bool isLivePreview() const { return m_livePreview; }
     Q_SIGNAL void livePreviewChanged();
 
+    enum VisibilityMode
+    {
+        AlwaysVisible,
+        VisibleUponViewportIntersection,
+        VisibleUponViewportContains
+    };
+    Q_ENUMS(VisibilityMode)
+    Q_PROPERTY(VisibilityMode visibilityMode READ visibilityMode WRITE setVisibilityMode NOTIFY visibilityModeChanged)
+    void setVisibilityMode(VisibilityMode val);
+    VisibilityMode visibilityMode() const { return m_visibilityMode; }
+    Q_SIGNAL void visibilityModeChanged();
+
+    Q_PROPERTY(QQuickItem* viewportItem READ viewportItem WRITE setViewportItem NOTIFY viewportItemChanged RESET resetViewportItem)
+    void setViewportItem(QQuickItem* val);
+    QQuickItem* viewportItem() const { return m_viewportItem; }
+    Q_SIGNAL void viewportItemChanged();
+
+    Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
+    void setViewportRect(const QRectF &val);
+    QRectF viewportRect() const { return m_viewportRect; }
+    Q_SIGNAL void viewportRectChanged();
+
     Q_INVOKABLE void markPreviewDirty();
 
     QImage preview() const { return m_preview; }
@@ -153,18 +175,23 @@ protected:
 private:
     void requestReevaluation();
     void resetEvaluator();
+    void resetViewportItem();
     void updatePreview();
     void updatePreviewLater();
     void setPreview(const QImage &image);
+    void determineVisibility();
 
 private:
     QImage m_preview;
     qreal m_stackOrder = 0;
     bool m_livePreview = true;
+    QRectF m_viewportRect;
     QPointer<QQuickItem> m_item;
     QColor m_previewFillColor = Qt::white;
     QColor m_previewBorderColor = Qt::black;
+    VisibilityMode m_visibilityMode = AlwaysVisible;
     ExecLaterTimer m_updatePreviewTimer;
+    QObjectProperty<QQuickItem> m_viewportItem;
     QSharedPointer<QQuickItemGrabResult> m_itemGrabResult;
     QObjectProperty<TightBoundingBoxEvaluator> m_evaluator;
 };

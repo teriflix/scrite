@@ -46,7 +46,7 @@ Loader {
         id: fontMetrics
     }
 
-    sourceComponent: readOnly ? textViewComponent : textEditComponent
+    sourceComponent: visible ? (readOnly ? textViewComponent : textEditComponent) : null
 
     Component {
         id: textViewComponent
