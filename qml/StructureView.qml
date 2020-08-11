@@ -1228,6 +1228,7 @@ Item {
             toElement: scriteDocument.structure.elementAt(modelData.to)
             arrowAndLabelSpacing: labelBg.width
             outlineWidth: canvasPreview.updatingThumbnail ? 0.1 : app.devicePixelRatio*canvas.scale
+            visible: fromElement.visible || toElement.visible
 
             Rectangle {
                 id: labelBg
