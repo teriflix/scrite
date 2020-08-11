@@ -32,6 +32,11 @@ public:
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
+    Q_PROPERTY(bool repeat READ isRepeat WRITE setRepeat NOTIFY repeatChanged)
+    void setRepeat(bool val);
+    bool isRepeat() const {return m_repeat; }
+    Q_SIGNAL void repeatChanged();
+
     void start(int msec, QObject *object);
     void stop();
     int timerId() const { return m_timerId; }
@@ -43,6 +48,7 @@ private:
 
 private:
     int m_timerId = -1;
+    bool m_repeat = false;
     QTimer m_timer;
     QString m_name;
     bool m_destroyed = false;

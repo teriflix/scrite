@@ -118,6 +118,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
     const QVariant asd = Application::instance()->settings()->value("AutoSave/autoSaveInterval");
     this->setAutoSaveDurationInSeconds( asd.isValid() ? asd.toInt() : m_autoSaveDurationInSeconds );
 
+    m_autoSaveTimer.setRepeat(true);
     this->prepareAutoSave();
 }
 

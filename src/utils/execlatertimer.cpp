@@ -44,7 +44,7 @@ ExecLaterTimer::ExecLaterTimer(const QString &name, QObject *parent)
 #endif
 
     m_timer.setObjectName("SimpleTimer");
-    m_timer.setSingleShot(true);
+    m_timer.setSingleShot(!m_repeat);
     connect(&m_timer, &QTimer::timeout, this, &ExecLaterTimer::onTimeout);
 }
 
@@ -65,6 +65,16 @@ void ExecLaterTimer::setName(const QString &val)
 
     m_name = val;
     emit nameChanged();
+}
+
+void ExecLaterTimer::setRepeat(bool val)
+{
+    if(m_repeat == val)
+        return;
+
+    m_repeat = val;
+    m_timer.setSingleShot(!m_repeat);
+    emit repeatChanged();
 }
 
 void ExecLaterTimer::start(int msec, QObject *object)
