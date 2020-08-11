@@ -428,6 +428,10 @@ void TightBoundingBoxPreview::setEvaluator(TightBoundingBoxEvaluator *val)
 
 void TightBoundingBoxPreview::paint(QPainter *painter)
 {
+#ifndef QT_NO_DEBUG
+    qDebug("TightBoundingBoxPreview is painting");
+#endif
+
     const QRectF itemRect(0, 0, this->width(), this->height());
     painter->setOpacity(m_backgroundOpacity);
     painter->fillRect(itemRect, m_backgroundColor);

@@ -116,7 +116,7 @@ void ExecLaterTimer::onTimeout()
     if(m_object != nullptr && m_timerId >= 0)
     {
 #ifndef QT_NO_DEBUG
-        qDebug() << "Posting Timer " << m_timerId << " to " << m_object;
+        qDebug() << "Posting Timer [" << m_name << "]." << m_timerId << " to " << m_object;
 #endif
         qApp->postEvent(m_object, new QTimerEvent(m_timerId));
     }

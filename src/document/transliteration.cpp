@@ -1120,6 +1120,10 @@ void TransliteratedText::setColor(const QColor &val)
 
 void TransliteratedText::paint(QPainter *painter)
 {
+#ifndef QT_NO_DEBUG
+    qDebug("TransliteratedText is painting %s", qPrintable(m_text));
+#endif
+
     m_textDocument->setTextWidth(this->width());
 
     QAbstractTextDocumentLayout::PaintContext context;

@@ -138,6 +138,10 @@ bool AbstractShapeItem::updateShape()
 
 QSGNode *AbstractShapeItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *nodeData)
 {
+#ifndef QT_NO_DEBUG
+    qDebug("AbstractShapeItem is painting.");
+#endif
+
     const bool pathUpdated = this->updateShape();
     static const bool isSoftwareContext = qgetenv("QMLSCENE_DEVICE") == QByteArray("softwarecontext");
     if( isSoftwareContext || m_renderingMechanism == UseQPainter )

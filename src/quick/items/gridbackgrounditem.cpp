@@ -162,6 +162,10 @@ void GridBackgroundItem::setGridIsVisible(bool val)
 
 QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *nodeData)
 {
+#ifndef QT_NO_DEBUG
+    qDebug("GridBackgroundItem is painting.");
+#endif
+
     if(oldNode)
         delete oldNode;
     Q_UNUSED(nodeData)

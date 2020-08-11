@@ -1020,6 +1020,7 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
     : QSyntaxHighlighter(parent),
       m_scene(this, "scene"),
+      m_rehighlightTimer("SceneDocumentBinder.m_rehighlightTimer"),
       m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer"),
       m_currentElement(this, "currentElement"),
       m_textDocument(this, "textDocument"),

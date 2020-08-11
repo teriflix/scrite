@@ -242,6 +242,10 @@ qreal RulerItem::Convert(qreal val, RulerItem::Unit from, RulerItem::Unit to, co
 
 void RulerItem::paint(QPainter *painter)
 {
+#ifndef QT_NO_DEBUG
+    qDebug("RulerItem is painting");
+#endif
+
     const QRectF rect(0, 0, this->width(), this->height());
     if(rect.isEmpty())
         return;
