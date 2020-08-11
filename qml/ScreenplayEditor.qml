@@ -416,6 +416,7 @@ Rectangle {
         BusyIndicator {
             anchors.centerIn: parent
             running: scriteDocument.loading || screenplayTextDocument.updating
+            visible: running
         }
     }
 
@@ -862,20 +863,10 @@ Rectangle {
                         SequentialAnimation {
                             running: !sceneTextEditor.justReceivedFocus && sceneTextEditor.activeFocus
                             loops: Animation.Infinite
-
-                            NumberAnimation {
-                                target: cursorRectangle
-                                property: "opacity"
-                                duration: 350
-                                from: 1; to: 0.25
-                            }
-
-                            NumberAnimation {
-                                target: cursorRectangle
-                                property: "opacity"
-                                duration: 350
-                                from: 0.25; to: 1
-                            }
+                            ScriptAction { script: cursorRectangle.opacity = 0.1 }
+                            PauseAnimation { duration: 500 }
+                            ScriptAction { script: cursorRectangle.opacity = 1 }
+                            PauseAnimation { duration: 500 }
                         }
                     }
 
