@@ -1288,7 +1288,7 @@ Item {
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                         property bool editCurrentSceneInStructure: true
                         readonly property int screenplayZoomLevelModifier: -3
-                        active: screenplayEditor2Active.value
+                        active: screenplayEditor2Active.value && width >= 50
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
                     }
                 }
@@ -1300,19 +1300,16 @@ Item {
                 }
             }
 
-            Item {
-                SplitView.preferredHeight: screenplayView.preferredHeight + 40
+            Loader {
+                SplitView.preferredHeight: 155
                 SplitView.minimumHeight: SplitView.preferredHeight
                 SplitView.maximumHeight: SplitView.preferredHeight
-
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 2
+                active: height >= 50
+                sourceComponent: Rectangle {
                     color: accentColors.c200.background
                     border { width: 1; color: accentColors.borderColor }
 
                     ScreenplayView {
-                        id: screenplayView
                         anchors.fill: parent
                         anchors.margins: 5
                         onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = false
@@ -1333,19 +1330,17 @@ Item {
                 SplitView.fillHeight: true
             }
 
-            Item {
-                SplitView.preferredHeight: screenplayView2.preferredHeight + 40
+            Loader {
+                SplitView.preferredHeight: 155
                 SplitView.minimumHeight: SplitView.preferredHeight
                 SplitView.maximumHeight: SplitView.preferredHeight
+                active: height >= 50
 
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 2
+                sourceComponent: Rectangle {
                     color: accentColors.c200.background
                     border { width: 1; color: accentColors.borderColor }
 
                     ScreenplayView {
-                        id: screenplayView2
                         anchors.fill: parent
                         anchors.margins: 5
                     }
