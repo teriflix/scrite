@@ -1267,6 +1267,7 @@ SceneSizeHintItem::SceneSizeHintItem(QQuickItem *parent)
       m_format(this, "format")
 {
     this->setFlag(QQuickItem::ItemHasContents,false);
+    this->setVisible(false);
 }
 
 SceneSizeHintItem::~SceneSizeHintItem()

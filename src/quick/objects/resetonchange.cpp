@@ -18,6 +18,7 @@ ResetOnChange::ResetOnChange(QQuickItem *parent)
       m_timer("ResetOnChange.m_timer")
 {
     this->setFlag(ItemHasContents, false);
+    this->setVisible(false);
 }
 
 ResetOnChange::~ResetOnChange()

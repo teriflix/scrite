@@ -17,6 +17,7 @@ DelayedPropertyBinder::DelayedPropertyBinder(QQuickItem *parent)
     : QQuickItem(parent)
 {
     this->setFlag(ItemHasContents, false);
+    this->setVisible(false);
     connect(this, &QQuickItem::enabledChanged, this, &DelayedPropertyBinder::schedule);
 
 #ifndef QT_NO_DEBUG
