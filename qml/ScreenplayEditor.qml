@@ -881,6 +881,7 @@ Rectangle {
 
                     // Support for transliteration.
                     property bool userIsTyping: false
+                    EventFilter.active: sceneTextEditor.activeFocus
                     EventFilter.events: [51,6] // Wheel, ShortcutOverride
                     EventFilter.onFilter: {
                         if(event.type === 51) {

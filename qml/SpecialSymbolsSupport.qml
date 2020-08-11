@@ -25,7 +25,7 @@ Item {
     signal symbolSelected(string text)
 
     EventFilter.target: textEditor
-    EventFilter.active: textEditor !== null && specialSymbolsSupport.enabled
+    EventFilter.active: textEditor !== null && specialSymbolsSupport.enabled && textEditor.activeFocus
     EventFilter.events: [6]
     EventFilter.onFilter: {
         if(!specialSymbolsSupport.enabled)
