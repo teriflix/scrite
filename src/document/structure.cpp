@@ -1673,6 +1673,16 @@ void StructureElementConnector::setArrowAndLabelSpacing(qreal val)
     this->updateArrowAndLabelPositions();
 }
 
+bool StructureElementConnector::intersects(const QRectF &rect) const
+{
+    const QPainterPath shape = this->currentShape();
+    if(shape.isEmpty())
+        return true;
+
+    const QRectF shapeBoundingRect = this->currentShape().boundingRect();
+    return rect.isValid() && !rect.isNull() ? rect.intersects( shapeBoundingRect ) : true;
+}
+
 QPainterPath StructureElementConnector::shape() const
 {
     QPainterPath path;

@@ -458,6 +458,8 @@ public:
     QPointF suggestedLabelPosition() const { return m_suggestedLabelPosition; }
     Q_SIGNAL void suggestedLabelPositionChanged();
 
+    Q_INVOKABLE bool intersects(const QRectF &rect) const;
+
     QPainterPath shape() const;
 
 protected:

@@ -1000,6 +1000,7 @@ Item {
             id: elementItem
             property StructureElement element: modelData
             Component.onCompleted: element.follow = elementItem
+            Component.onDestruction: element.follow = null
             enabled: selection.active === false
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1228,10 +1229,7 @@ Item {
             toElement: scriteDocument.structure.elementAt(modelData.to)
             arrowAndLabelSpacing: labelBg.width
             outlineWidth: canvasPreview.updatingThumbnail ? 0.1 : app.devicePixelRatio*canvas.scale
-
-            property Item fromItem: elementItems.itemAt(modelData.from)
-            property Item toItem: elementItems.itemAt(modelData.to)
-            visible: fromItem && toItem && (fromItem.visible || toItem.visible)
+            visible: intersects(canvasScroll.viewportRect)
 
             Rectangle {
                 id: labelBg
