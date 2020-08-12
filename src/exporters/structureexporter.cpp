@@ -503,6 +503,28 @@ void StructureExporter::paintAnnotation(QPainter *painter, const Annotation *ann
         painter->setOpacity(1);
     };
 
+    auto paintOvalAnnotation = [=]() {
+        const QColor backgroundColor = QColor(attributes.value(QStringLiteral("color")).toString());
+        const QColor borderColor = QColor(attributes.value(QStringLiteral("borderColor")).toString());
+        const qreal borderWidth = attributes.value(QStringLiteral("borderWidth")).toDouble();
+        const bool fillBackground = attributes.value(QStringLiteral("fillBackground")).toBool();
+        const qreal opacity = qBound(0.0, attributes.value(QStringLiteral("opacity")).toDouble(), 100.0)/100.0;
+
+        QBrush brush(Qt::NoBrush);
+        if(fillBackground)
+            brush = QBrush(backgroundColor);
+
+        QPen pen(Qt::NoPen);
+        if(borderWidth > 0)
+            pen = QPen(borderColor, borderWidth);
+
+        painter->setOpacity(opacity);
+        painter->setPen(pen);
+        painter->setBrush(brush);
+        painter->drawEllipse(geometry);
+        painter->setOpacity(1);
+    };
+
     const QString type = annotation->type();
     if(type == QStringLiteral("rectangle"))
         paintRectangleAnnotation();
@@ -514,6 +536,8 @@ void StructureExporter::paintAnnotation(QPainter *painter, const Annotation *ann
         paintImageAnnotation();
     else if(type == QStringLiteral("line"))
         paintLineAnnotation();
+    else if(type == QStringLiteral("oval"))
+        paintOvalAnnotation();
     else
     {
         QPen pen(Qt::black, 1, Qt::DashDotDotLine);
