@@ -249,7 +249,7 @@ Item {
                     return
 
                 if(what === undefined || what === "" | what === "element")
-                    createElement(where.x-130, where.y-22, newSceneButton.activeColor)
+                    createElement(where.x, where.y, newSceneButton.activeColor)
                 else
                     createAnnotation(what, where.x, where.y)
             }
@@ -346,8 +346,12 @@ Item {
                 }
 
                 onClicked: {
-                    if(!scriteDocument.readOnly)
-                        canvas.createItem(what, Qt.point(mouse.x, mouse.y))
+                    if(!scriteDocument.readOnly) {
+                        var where = Qt.point(mouse.x, mouse.y)
+                        if(what === "element")
+                            where = Qt.point(mouse.x-130, mouse.y-22)
+                        canvas.createItem(what, where)
+                    }
                     what = ""
                     enabled = false
                 }
