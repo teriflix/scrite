@@ -402,7 +402,6 @@ Item {
                 ShortcutsModelItem.title: "Redo"
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: shortcut
-
             }
 
             Rectangle {

@@ -879,7 +879,7 @@ Rectangle {
                             // We want to avoid TextArea from processing Ctrl+Z
                             // and other such shortcuts.
                             result.acceptEvent = false
-                            result.filter = true
+                            result.filter = (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
                         } else if(event.type === 6) {
                             // Enter, Tab and other keys must not trigger
                             // Transliteration. Only space should.
