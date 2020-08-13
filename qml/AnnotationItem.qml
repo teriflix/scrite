@@ -42,6 +42,7 @@ Rectangle {
     }
 
     function grip() {
+        annotationGripLoader.reset()
         annotationGripLoader.annotationItem = annotationItem
         annotationGripLoader.annotation = annotation
     }
