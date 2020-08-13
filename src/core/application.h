@@ -49,6 +49,9 @@ public:
     QDateTime installationTimestamp() const;
     int launchCounter() const;
 
+    Q_PROPERTY(QString buildTimestamp READ buildTimestamp CONSTANT)
+    QString buildTimestamp() const { return QString::fromLatin1(__TIMESTAMP__); }
+
     Q_PROPERTY(QPalette palette READ palette CONSTANT)
     Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio CONSTANT)
     Q_PROPERTY(QFont font READ applicationFont NOTIFY applicationFontChanged)

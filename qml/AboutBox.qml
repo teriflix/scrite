@@ -61,6 +61,15 @@ Item {
                 }
             }
 
+            Text {
+                font.pixelSize: 12
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Build Timestamp:\n" + app.buildTimestamp
+                anchors.left: versionText.left
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: versionText.x
+            }
+
             Column {
                 spacing: 10
                 anchors.centerIn: parent
