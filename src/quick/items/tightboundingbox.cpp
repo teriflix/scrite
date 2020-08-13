@@ -152,6 +152,11 @@ TightBoundingBoxItem::TightBoundingBoxItem(QObject *parent)
         connect(m_item, &QQuickItem::yChanged, this, &TightBoundingBoxItem::requestReevaluation);
         connect(m_item, &QQuickItem::widthChanged, this, &TightBoundingBoxItem::requestReevaluation);
         connect(m_item, &QQuickItem::heightChanged, this, &TightBoundingBoxItem::requestReevaluation);
+
+        connect(m_item, &QQuickItem::xChanged, this, &TightBoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::yChanged, this, &TightBoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::widthChanged, this, &TightBoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::heightChanged, this, &TightBoundingBoxItem::determineVisibility);
     }
 }
 
@@ -346,6 +351,8 @@ void TightBoundingBoxItem::setPreview(const QImage &image)
     emit previewUpdated();
 }
 
+#include "timeprofiler.h"
+
 void TightBoundingBoxItem::determineVisibility()
 {
     if(m_item == nullptr)
@@ -354,8 +361,16 @@ void TightBoundingBoxItem::determineVisibility()
     QRectF itemRect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
     if(!m_viewportItem.isNull())
     {
-        const QPointF pos = m_item->mapToItem(m_viewportItem, QPointF(0,0));
-        itemRect.moveTopLeft(pos);
+        /**
+          QQuickItem::mapToItem() is slightly time-consuming function call. Maybe a good idea
+          to avoid calling it if we can avoid. If the items parent is same as viewport, then
+          item's position is its position with respect to the parent.
+          */
+        if(m_item->parentItem() != m_viewportItem)
+        {
+            const QPointF pos = m_item->mapToItem(m_viewportItem, QPointF(0,0));
+            itemRect.moveTopLeft(pos);
+        }
     }
 
     bool visible = m_item->isVisible();
