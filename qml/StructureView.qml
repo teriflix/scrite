@@ -836,11 +836,14 @@ Item {
                 }
 
                 MenuItem2 {
-                    text: "Duplicate"
+                    text: "Add To Timeline"
                     enabled: elementContextMenu.element !== null
                     onClicked: {
-                        releaseEditor()
-                        elementContextMenu.element.duplicate()
+                        var lastScreenplayScene = null
+                        if(scriteDocument.screenplay.elementCount > 0)
+                            lastScreenplayScene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.elementCount-1).scene
+                        if(lastScreenplayScene === null || elementContextMenu.element.scene !== lastScreenplayScene)
+                            scriteDocument.screenplay.addScene(elementContextMenu.element.scene)
                         elementContextMenu.element = null
                     }
                 }
@@ -1166,6 +1169,7 @@ Item {
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
                     elementContextMenu.element = elementItem.element
+                    elementContextMenu.popup()
                 }
             }
 

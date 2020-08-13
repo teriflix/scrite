@@ -447,6 +447,9 @@ void TightBoundingBoxPreview::paint(QPainter *painter)
     qDebug("TightBoundingBoxPreview is painting");
 #endif
 
+    if(!this->isVisible())
+        return;
+
     const QRectF itemRect(0, 0, this->width(), this->height());
     painter->setOpacity(m_backgroundOpacity);
     painter->fillRect(itemRect, m_backgroundColor);
