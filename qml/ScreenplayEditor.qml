@@ -225,12 +225,8 @@ Rectangle {
                     onJustReset: {
                         if(screenplayAdapter.currentIndex < 0)
                             contentView.positionViewAtBeginning()
-                        else {
+                        else
                             contentView.positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
-                            var contentItem = contentView.itemAtIndex(screenplayAdapter.currentIndex)
-                            if(contentItem)
-                                contentItem.item.assumeFocusAt(Math.max(screenplayAdapter.currentScene.cursorPosition,0))
-                        }
                     }
                 }
 

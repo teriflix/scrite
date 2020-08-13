@@ -502,6 +502,39 @@ Item {
                     initial: null
                     set: elementItems.count > scriteDocument.structure.currentElementIndex ? elementItems.itemAt(scriteDocument.structure.currentElementIndex) : null
                 }
+
+                EventFilter.target: app
+                EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1
+                EventFilter.events: [6]
+                EventFilter.onFilter: {
+                    var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
+                    var element = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
+                    if(element === null)
+                        return
+
+                    switch(event.key) {
+                    case Qt.Key_Left:
+                        element.x -= dist
+                        result.accept = true
+                        result.filter = true
+                        break
+                    case Qt.Key_Right:
+                        element.x += dist
+                        result.accept = true
+                        result.filter = true
+                        break
+                    case Qt.Key_Up:
+                        element.y -= dist
+                        result.accept = true
+                        result.filter = true
+                        break
+                    case Qt.Key_Down:
+                        element.y += dist
+                        result.accept = true
+                        result.filter = true
+                        break
+                    }
+                }
             }
 
             Repeater {
@@ -1076,35 +1109,6 @@ Item {
                 bottomPadding: 5
             }
 
-            EventFilter.target: app
-            EventFilter.active: !scriteDocument.readOnly && canvas.activeFocus && canvasScroll.interactive && selected && !selection.hasItems && visible
-            EventFilter.events: [6]
-            EventFilter.onFilter: {
-                var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
-                switch(event.key) {
-                case Qt.Key_Left:
-                    element.x -= dist
-                    result.accept = true
-                    result.filter = true
-                    break
-                case Qt.Key_Right:
-                    element.x += dist
-                    result.accept = true
-                    result.filter = true
-                    break
-                case Qt.Key_Up:
-                    element.y -= dist
-                    result.accept = true
-                    result.filter = true
-                    break
-                case Qt.Key_Down:
-                    element.y += dist
-                    result.accept = true
-                    result.filter = true
-                    break
-                }
-            }
-
             MouseArea {
                 anchors.fill: titleText
                 enabled: titleText.readOnly === true
@@ -1272,6 +1276,8 @@ Item {
             enabled: !scriteDocument.readOnly
             readonly property int geometryUpdateInterval: 50
 
+            Component.onCompleted: canvas.forceActiveFocus()
+
             property real gripSize: 10 * onePxSize
             property real onePxSize: Math.max(1, 1/canvas.scale)
 
@@ -1373,6 +1379,7 @@ Item {
                 drag.axis: Drag.XAndYAxis
                 enabled: annotation.movable
                 propagateComposedEvents: true
+                onPressed: canvas.forceActiveFocus()
                 onDoubleClicked: {
                     if(structureCanvasSettings.displayAnnotationProperties === false)
                         structureCanvasSettings.displayAnnotationProperties = true
@@ -1406,6 +1413,7 @@ Item {
                     drag.target: parent
                     drag.axis: Drag.XAxis
                     drag.minimumX: 20
+                    onPressed: canvas.forceActiveFocus()
                 }
             }
 
@@ -1436,6 +1444,7 @@ Item {
                     drag.target: parent
                     drag.axis: Drag.YAxis
                     drag.minimumY: 20
+                    onPressed: canvas.forceActiveFocus()
                 }
             }
 
@@ -1468,6 +1477,7 @@ Item {
                     drag.axis: Drag.XAndYAxis
                     drag.minimumX: 20
                     drag.minimumY: 20
+                    onPressed: canvas.forceActiveFocus()
                 }
             }
         }

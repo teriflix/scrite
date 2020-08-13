@@ -445,6 +445,7 @@ Rectangle {
     Connections {
         target: qmlWindow
         onScreenChanged: scriteDocument.formatting.setSreeenFromWindow(qmlWindow)
+        // onActiveFocusItemChanged: console.log("PA: " + qmlWindow.activeFocusItem)
     }
 
     Loader {
