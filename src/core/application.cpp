@@ -826,6 +826,36 @@ qreal Application::distanceBetweenPoints(const QPointF &p1, const QPointF &p2) c
     return QLineF(p1, p2).length();
 }
 
+QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, const QSizeF &atBest) const
+{
+    QRectF around2;
+    if(atBest.width() > in.width() || atBest.height() > in.height())
+        around2 = QRectF(0, 0, qMin(atBest.width(), in.width()), qMin(atBest.height(), in.height()));
+    else
+        around2 = QRectF(0, 0, atBest.width(), atBest.height());
+    around2.moveCenter(around.center());
+
+    const QSizeF aroundSize = around2.size();
+
+    around2 = in.intersected(around2);
+    if(around2.width() == aroundSize.width() && around2.height() == aroundSize.height())
+        return around2;
+
+    around2.setSize(aroundSize);
+
+    if(around2.left() < in.left())
+        around2.moveLeft(in.left());
+    else if(around2.right() > in.right())
+        around2.moveRight(in.right());
+
+    if(around2.top() < in.top())
+        around2.moveTop(in.top());
+    else if(around2.bottom() > in.bottom())
+        around2.moveBottom(in.bottom());
+
+    return around2;
+}
+
 QString Application::fileContents(const QString &fileName) const
 {
     QFile file(fileName);

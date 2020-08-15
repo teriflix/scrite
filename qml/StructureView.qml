@@ -887,11 +887,17 @@ Item {
                                          canvasScroll.height)
                 canvasScroll.ensureVisible(middleArea)
             } else {
-                canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox)
                 var item = currentElementItemBinder.get
+                var bbox = canvasItemsBoundingBox.boundingBox
+
                 if(item === null)
-                    item = elementItems.at(0)
-                canvasScroll.ensureItemVisible(item)
+                    canvasScroll.zoomFit(bbox)
+                else {
+                    var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
+                    var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
+                    var visibleArea = app.querySubRectangle(bbox, itemRect, atBest)
+                    canvasScroll.zoomFit(visibleArea)
+                }
             }
         }
     }
