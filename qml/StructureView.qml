@@ -841,7 +841,8 @@ Item {
 
                 MenuItem2 {
                     text: "Add To Timeline"
-                    enabled: elementContextMenu.element !== null
+                    property Scene lastScene: scriteDocument.screenplay.elementCount > 0 && scriteDocument.screenplay.elementAt(scriteDocument.screenplay.elementCount-1).scene
+                    enabled: elementContextMenu.element !== null && elementContextMenu.element.scene !== lastScene
                     onClicked: {
                         var lastScreenplayScene = null
                         if(scriteDocument.screenplay.elementCount > 0)
@@ -874,6 +875,11 @@ Item {
         repeat: false
         interval: 1000
         onTriggered: {
+            if(scriteDocument.structure.elementCount > elementItems.count || scriteDocument.structure.annotationCount > annotationItems.count) {
+                Qt.callLater(start)
+                return
+            }
+
             if(scriteDocument.structure.elementCount === 0) {
                 var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
                                          (canvas.height-canvasScroll.height)/2,
@@ -881,6 +887,7 @@ Item {
                                          canvasScroll.height)
                 canvasScroll.ensureVisible(middleArea)
             } else {
+                canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox)
                 var item = currentElementItemBinder.get
                 if(item === null)
                     item = elementItems.at(0)
