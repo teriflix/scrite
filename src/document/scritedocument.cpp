@@ -408,6 +408,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
 void ScriteDocument::save()
 {
+    HourGlass hourGlass;
+
     if(m_readOnly)
         return;
 
@@ -419,17 +421,28 @@ void ScriteDocument::save()
 
         const qint64 now = QDateTime::currentSecsSinceEpoch();
 
+        auto timeGapInSeconds = [now](const QFileInfo &fi) {
+            const QString baseName = fi.baseName();
+            const QString thenStr = baseName.section('[', 1).section(']', 0, 0);
+            const qint64 then = thenStr.toLongLong();
+            return now - then;
+        };
+
         const QDir backupDir(backupDirPath);
-        const QFileInfoList backupEntries = backupDir.entryInfoList(QDir::Files, QDir::Time|QDir::Reversed);
+        QFileInfoList backupEntries = backupDir.entryInfoList(QStringList() << QStringLiteral("*.scrite"), QDir::Files, QDir::Name);
         if(!backupEntries.isEmpty())
         {
-            const QFileInfo latestEntry = backupEntries.first();
+            static const int maxBackups = 20;
+            while(backupEntries.size() > maxBackups-1)
+            {
+                const QFileInfo oldestEntry = backupEntries.takeFirst();
+                QFile::remove(oldestEntry.absoluteFilePath());
+            }
+
+            const QFileInfo latestEntry = backupEntries.takeLast();
             if(latestEntry.suffix() == QStringLiteral("scrite"))
             {
-                const QString baseName = latestEntry.baseName();
-                const QString thenStr = baseName.section('[', 1).section(']', 0, 0);
-                const qint64 then = thenStr.toLongLong();
-                if(now - then < 60)
+                if(timeGapInSeconds(latestEntry) < 60)
                     QFile::remove(latestEntry.absoluteFilePath());
             }
         }
