@@ -152,8 +152,10 @@ Loader {
                 if(completer.hasSuggestion) {
                     textArea.text = completer.suggestion
                     textArea.cursorPosition = textArea.length
-                }
-                editingFinished()
+                } else if(event.modifiers !== Qt.NoModifier)
+                    textArea.append("\n")
+                else
+                    editingFinished()
             }
         }
     }
