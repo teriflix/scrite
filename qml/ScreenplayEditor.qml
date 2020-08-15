@@ -242,6 +242,7 @@ Rectangle {
                         width: contentView.width
                         property var componentData: modelData
                         sourceComponent: modelData.scene ? contentComponent : breakComponent
+                        z: contentViewModel.value.currentIndex === index ? 2 : 1
                     }
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds
@@ -587,6 +588,7 @@ Rectangle {
             property int theIndex: componentData.rowNumber
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
+            property bool isCurrent: theElement === screenplayAdapter.currentElement
 
             width: contentArea.width
             height: contentItemLayout.height
@@ -631,15 +633,21 @@ Rectangle {
 
             SidePanel {
                 id: synopsisSidePanel
-                z: 1
-                buttonText: ""
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
                 borderColor: expanded ? primaryColors.borderColor : Qt.rgba(0,0,0,0)
                 anchors.top: parent.top
                 anchors.left: parent.right
                 // anchors.leftMargin: expanded ? 0 : -minPanelWidth
-                height: expanded ? Math.min(300, parent.height) : sceneHeadingAreaLoader.height
+                buttonText: contentItem.isCurrent && expanded ? ("Scene #" + contentItem.theElement.sceneNumber + " Synopsis") : ""
+                height: {
+                    if(expanded) {
+                        if(contentItem.isCurrent)
+                            return contentInstance ? Math.max(contentInstance.contentHeight+50, 300) : 300
+                        return Math.min(300, parent.height)
+                    }
+                    return sceneHeadingAreaLoader.height
+                }
                 property bool synopsisExpanded: contentView.synopsisExpanded
                 expanded: synopsisExpanded
                 onSynopsisExpandedChanged: expanded = synopsisExpanded
@@ -792,8 +800,6 @@ Rectangle {
                             running: sceneTextEditor.justReceivedFocus && screenplayEditorSettings.enableAnimations
 
                             ParallelAnimation {
-                                running: true
-
                                 NumberAnimation {
                                     target: cursorRectangle
                                     property: "width"
@@ -820,8 +826,6 @@ Rectangle {
                             }
 
                             ParallelAnimation {
-                                running: true
-
                                 NumberAnimation {
                                     target: cursorRectangle
                                     property: "width"

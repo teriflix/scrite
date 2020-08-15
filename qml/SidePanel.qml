@@ -26,7 +26,7 @@ Item {
 
     property bool expanded: false
     property alias content: contentLoader.sourceComponent
-    property alias contentItem: contentLoader.item
+    property alias contentInstance: contentLoader.item
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
