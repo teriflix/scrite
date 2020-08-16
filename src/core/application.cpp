@@ -137,6 +137,11 @@ int Application::launchCounter() const
     return m_settings->value("Installation/launchCount", 0).toInt();
 }
 
+QString Application::buildTimestamp() const
+{
+    return QString::fromLatin1(__TIMESTAMP__);
+}
+
 QUrl Application::toHttpUrl(const QUrl &url) const
 {
     if(url.scheme() != QStringLiteral("https"))

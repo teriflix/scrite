@@ -50,7 +50,7 @@ public:
     int launchCounter() const;
 
     Q_PROPERTY(QString buildTimestamp READ buildTimestamp CONSTANT)
-    QString buildTimestamp() const { return QString::fromLatin1(__TIMESTAMP__); }
+    QString buildTimestamp() const;
 
     Q_PROPERTY(QPalette palette READ palette CONSTANT)
     Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio CONSTANT)
