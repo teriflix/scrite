@@ -885,7 +885,8 @@ void Structure::insertElement(StructureElement *ptr, int index)
     emit elementCountChanged();
     emit elementsChanged();
 
-    this->setCurrentElementIndex(index);
+    if(this->scriteDocument() && !this->scriteDocument()->isLoading())
+        this->setCurrentElementIndex(index);
 }
 
 void Structure::moveElement(StructureElement *ptr, int toRow)

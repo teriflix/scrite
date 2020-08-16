@@ -60,8 +60,8 @@ Rectangle {
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: screenplayAdapter.screenplay
-        formatting: scriteDocument.printFormat
+        screenplay: scriteDocument.loading ? null : screenplayAdapter.screenplay
+        formatting: scriteDocument.loading ? null : scriteDocument.printFormat
         syncEnabled: true
     }
 

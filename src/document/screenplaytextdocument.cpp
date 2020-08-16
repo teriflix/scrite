@@ -493,18 +493,7 @@ void ScreenplayTextDocument::setInjection(QObject *val)
 
 void ScreenplayTextDocument::syncNow()
 {
-    const bool timerWasOn = m_loadScreenplayTimer.isActive();
-
-    if(timerWasOn)
-        m_loadScreenplayTimer.stop();
-
     this->loadScreenplay();
-
-    if(timerWasOn)
-    {
-        this->connectToScreenplaySignals();
-        this->connectToScreenplayFormatSignals();
-    }
 }
 
 void ScreenplayTextDocument::classBegin()
@@ -524,7 +513,11 @@ void ScreenplayTextDocument::componentComplete()
 void ScreenplayTextDocument::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_loadScreenplayTimer.timerId())
+    {
         this->syncNow();
+        this->connectToScreenplaySignals();
+        this->connectToScreenplayFormatSignals();
+    }
     else if(event->timerId() == m_pageBoundaryEvalTimer.timerId())
     {
         m_pageBoundaryEvalTimer.stop();
