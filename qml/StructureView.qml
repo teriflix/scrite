@@ -1263,7 +1263,7 @@ Item {
             fromElement: scriteDocument.structure.elementAt(modelData.from)
             toElement: scriteDocument.structure.elementAt(modelData.to)
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: canvasPreview.updatingThumbnail ? 0.1 : app.devicePixelRatio*canvas.scale
+            outlineWidth: app.devicePixelRatio*canvas.scale
             visible: intersects(canvasScroll.viewportRect)
 
             Rectangle {
