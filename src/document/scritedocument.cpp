@@ -215,14 +215,15 @@ Scene *ScriteDocument::createNewScene()
     QScopedValueRollback<bool> createNewSceneRollback(m_inCreateNewScene, true);
 
     StructureElement *structureElement = nullptr;
+    int structureElementIndex = m_structure->elementCount()-1;
     if(m_structure->currentElementIndex() >= 0)
-        structureElement = m_structure->elementAt(m_structure->currentElementIndex());
-    else
-        structureElement = m_structure->elementAt(m_structure->elementCount()-1);
+        structureElementIndex = m_structure->currentElementIndex();
 
-    const qreal xOffset = (structureElement && structureElement->x() > 275) ? -275 : 275;
-    const qreal x = structureElement ? (structureElement->x() + xOffset) : 100;
-    const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 50) : 50;
+    structureElement = m_structure->elementAt(structureElementIndex);
+
+    const qreal xOffset = (structureElement && structureElementIndex%2) ? -275 : 275;
+    const qreal x = structureElement ? (structureElement->x() + xOffset) : m_structure->canvasWidth() * 0.4;
+    const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 50) : m_structure->canvasHeight() * 0.4;
 
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 

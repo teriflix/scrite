@@ -218,9 +218,10 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: scriteDocument.structure.elementCount >= 1
-        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null
+        interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null && maybeDragItem === null
         property Item mouseOverItem
         property Item editItem
+        property Item maybeDragItem
 
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth / canvas.scale,
                                            visibleArea.yPosition * contentHeight / canvas.scale,
@@ -1144,8 +1145,11 @@ Item {
                     annotationGripLoader.reset()
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
-                    if(!scriteDocument.readOnly)
+                    if(!scriteDocument.readOnly) {
                         titleText.editMode = true
+                        if(canvasScroll.mouseOverItem === elementItem)
+                            canvasScroll.mouseOverItem = null
+                    }
                 }
                 onClicked: {
                     annotationGripLoader.reset()
@@ -1194,8 +1198,8 @@ Item {
             Drag.active: dragMouseArea.drag.active
             Drag.dragType: Drag.Automatic
             Drag.supportedActions: Qt.LinkAction
-            Drag.hotSpot.x: dragHandle.x + dragHandle.width/2
-            Drag.hotSpot.y: dragHandle.y + dragHandle.height/2
+            Drag.hotSpot.x: elementItem.width/2 // dragHandle.x + dragHandle.width/2
+            Drag.hotSpot.y: elementItem.height/2 // dragHandle.y + dragHandle.height/2
             Drag.mimeData: {
                 "scrite/sceneID": element.scene.id
             }
@@ -1234,6 +1238,12 @@ Item {
                     anchors.fill: parent
                     drag.target: parent
                     cursorShape: Qt.SizeAllCursor
+                    onContainsMouseChanged: {
+                        if(containsMouse)
+                            canvasScroll.maybeDragItem = elementItem
+                        else if(canvasScroll.maybeDragItem === elementItem)
+                            canvasScroll.maybeDragItem = null
+                    }
                     onPressed: {
                         canvas.forceActiveFocus()
                         elementItem.grabToImage(function(result) {
