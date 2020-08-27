@@ -109,7 +109,7 @@ AbstractSystemTextInputSource *SystemTextInputManager::findSourceById(const QStr
 AbstractSystemTextInputSource *SystemTextInputManager::fallbackInputSource(int fallbackLanguage) const
 {
     AbstractSystemTextInputSource *fallbackSource = this->defaultInputSource();
-    if(fallbackSource->language() != fallbackLanguage)
+    if(fallbackSource == nullptr || fallbackSource->language() != fallbackLanguage)
     {
         QList<AbstractSystemTextInputSource*> fallbackSources = this->sourcesForLanguage(fallbackLanguage);
         if(!fallbackSources.isEmpty())
