@@ -121,15 +121,14 @@ Item {
     DropArea {
         anchors.fill: parent
         keys: [dropAreaKey]
+        enabled: screenplayElementList.count === 0
 
         onEntered: {
             screenplayElementList.forceActiveFocus()
-            screenplayElementList.somethingIsBeingDropped = true
             screenplayElementList.footerItem.highlightAsDropArea = true
         }
 
         onExited: {
-            screenplayElementList.somethingIsBeingDropped = false
             screenplayElementList.footerItem.highlightAsDropArea = false
         }
 
@@ -150,7 +149,7 @@ Item {
         anchors.bottomMargin: 0
         clip: true
         property bool somethingIsBeingDropped: false
-        visible: count > 0 || somethingIsBeingDropped
+        // visible: count > 0 || somethingIsBeingDropped
         model: scriteDocument.loading ? 0 : scriteDocument.screenplay
         property real minimumDelegateWidth: 100
         property real perElementWidth: 2.5
@@ -204,6 +203,49 @@ Item {
                 height: parent.height
                 color: parent.highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
             }
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.leftMargin: 7.5
+                anchors.rightMargin: 2.5
+                anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
+                color: primaryColors.button
+                border.color: primaryColors.borderColor
+                border.width: 1
+                opacity: parent.highlightAsDropArea ? 0.75 : 0.5
+                visible: scriteDocument.structure.elementCount > 0
+
+                Text {
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    font.pointSize: app.idealFontPointSize-2
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    wrapMode: Text.WordWrap
+                    text: screenplayElementList.count === 0 ? "Drop the first scene here." : "Drop the last scene here."
+                }
+            }
+
+            DropArea {
+                anchors.fill: parent
+                keys: [dropAreaKey]
+
+                onEntered: {
+                    screenplayElementList.forceActiveFocus()
+                    parent.highlightAsDropArea = true
+                }
+
+                onExited: {
+                    parent.highlightAsDropArea = false
+                }
+
+                onDropped: {
+                    screenplayElementList.footerItem.highlightAsDropArea = false
+                    dropSceneAt(drop.source, -1)
+                    drop.acceptProposedAction()
+                }
+            }
         }
 
         highlight: Item {
@@ -242,6 +284,7 @@ Item {
                 anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
                 active: element !== null // && (isBreakElement || element.scene !== null)
+                enabled: !dragArea.containsDrag
                 sourceComponent: Rectangle {
                     color: Qt.tint(sceneColor, "#C0FFFFFF")
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
@@ -357,14 +400,20 @@ Item {
             }
 
             DropArea {
+                id: dragArea
                 anchors.fill: parent
                 keys: [dropAreaKey]
 
                 onEntered: {
                     screenplayElementList.forceActiveFocus()
+                    drag.accepted = true
                     dropAreaIndicator.highlightAsDropArea = true
                 }
-                onExited: dropAreaIndicator.highlightAsDropArea = false
+
+                onExited: {
+                    drag.accepted = true
+                    dropAreaIndicator.highlightAsDropArea = false
+                }
 
                 onDropped: {
                     dropAreaIndicator.highlightAsDropArea = false
