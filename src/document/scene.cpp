@@ -13,6 +13,7 @@
 
 #include "scene.h"
 #include "undoredo.h"
+#include "hourglass.h"
 #include "application.h"
 #include "searchengine.h"
 #include "timeprofiler.h"
@@ -676,6 +677,8 @@ void Scene::setCursorPosition(int val)
 
 void Scene::addMuteCharacter(const QString &characterName)
 {
+    HourGlass hourGlass;
+
     const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
     if(!elements.isEmpty())
         return;
