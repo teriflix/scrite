@@ -707,8 +707,6 @@ Item {
                         id: languageMenu
                         width: 250
 
-                        ButtonGroup { id: languageMenuGroup }
-
                         Repeater {
                             model: app.enumerationModel(app.transliterationEngine, "Language")
 
@@ -874,6 +872,8 @@ Item {
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
                     menu: Menu2 {
+                        width: 300
+
                         MenuItem2 {
                             text: "New File"
                             onTriggered: fileNewButton.click()
@@ -923,48 +923,93 @@ Item {
                         MenuSeparator { }
 
                         Menu2 {
-                            title: "Import"
+                            title: "Import, Export & Reports"
 
-                            Repeater {
-                                model: scriteDocument.supportedImportFormats
+                            Menu2 {
+                                title: "Import"
 
-                                MenuItem2 {
-                                    text: modelData
-                                    onClicked: importMenu.itemAt(index).click()
+                                Repeater {
+                                    model: scriteDocument.supportedImportFormats
+
+                                    MenuItem2 {
+                                        text: modelData
+                                        onClicked: importMenu.itemAt(index).click()
+                                    }
+                                }
+                            }
+
+                            Menu2 {
+                                id: exportMenu2
+                                title: "Export"
+                                width: 250
+
+                                Component.onCompleted: {
+                                    var formats = scriteDocument.supportedExportFormats
+                                    for(var i=0; i<formats.length; i++) {
+                                        var format = formats[i]
+                                        if(format === "")
+                                            exportMenu2.addItem(menuSeparatorComponent.createObject(exportMenu))
+                                        else
+                                            exportMenu2.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
+                                    }
+                                }
+                            }
+
+                            Menu2 {
+                                title: "Reports"
+                                width: 300
+
+                                Repeater {
+                                    model: scriteDocument.supportedReports
+
+                                    MenuItem2 {
+                                        text: modelData.name
+                                        onClicked: reportsMenu.itemAt(index).click()
+                                        enabled: documentUI.width >= 800
+                                    }
                                 }
                             }
                         }
 
-                        Menu2 {
-                            id: exportMenu2
-                            title: "Export"
-                            width: 250
+                        MenuSeparator { }
 
-                            Component.onCompleted: {
-                                var formats = scriteDocument.supportedExportFormats
-                                for(var i=0; i<formats.length; i++) {
-                                    var format = formats[i]
-                                    if(format === "")
-                                        exportMenu2.addItem(menuSeparatorComponent.createObject(exportMenu))
-                                    else
-                                        exportMenu2.addItem(menuItemComponent.createObject(exportMenu, {"format": format}))
+                        Menu2 {
+                            // FIXME: This is a duplicate of the languageMenu.
+                            // We should remove this when we build an ActionManager.
+                            title: "Language"
+
+                            Repeater {
+                                model: app.enumerationModel(app.transliterationEngine, "Language")
+
+                                MenuItem2 {
+                                    property string baseText: modelData.key
+                                    property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
+                                    text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
+                                    font.bold: app.transliterationEngine.language === modelData.value
+                                    onClicked: {
+                                        app.transliterationEngine.language = modelData.value
+                                        scriteDocument.formatting.defaultLanguage = modelData.value
+                                        paragraphLanguageSettings.defaultLanguage = modelData.key
+                                    }
+                                }
+                            }
+
+                            MenuSeparator { }
+
+                            MenuItem2 {
+                                text: "Next-Language (F10)"
+                                onClicked: {
+                                    app.transliterationEngine.cycleLanguage()
+                                    scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
+                                    paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
                                 }
                             }
                         }
 
-                        Menu2 {
-                            title: "Reports"
-                            width: 300
-
-                            Repeater {
-                                model: scriteDocument.supportedReports
-
-                                MenuItem2 {
-                                    text: modelData.name
-                                    onClicked: reportsMenu.itemAt(index).click()
-                                    enabled: documentUI.width >= 800
-                                }
-                            }
+                        MenuItem2 {
+                            text: "Alphabet Mappings For " + app.transliterationEngine.languageAsString
+                            enabled: app.transliterationEngine.language !== TransliterationEngine.English
+                            onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                         }
 
                         MenuSeparator { }
