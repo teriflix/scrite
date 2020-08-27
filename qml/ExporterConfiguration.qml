@@ -31,7 +31,8 @@ Item {
             modalDialog.closeable = true
             var exportKind = modalDialog.arguments.split("/").last()
             notice.text = exportKind + " Export"
-        }
+        } else if(app.verifyType(exporter, "StructureExporter"))
+            mainTabBar.currentIndex = 1 // FIXME: Ugly hack to ensure that structure tab is active for StructureExporter.
         modalDialog.arguments = undefined
     }
 
