@@ -1109,7 +1109,7 @@ Rectangle {
                         ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
-                        ShortcutsModelItem.title: sceneDocumentBinder.nextTabFormatAsString
+                        ShortcutsModelItem.title: completer.hasSuggestion ? "Auto-complete" : sceneDocumentBinder.nextTabFormatAsString
                         ShortcutsModelItem.shortcut: "Tab"
                     }
 
@@ -1118,13 +1118,7 @@ Rectangle {
                         ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
-                        ShortcutsModelItem.title: {
-                            if( (binder.currentElement === null || binder.currentElement.text === "") && completer.suggestion !== "")
-                                return "Show Format Menu"
-                            if( completer.suggestion !== "" )
-                                return "Auto Complete"
-                            return "Create New Paragraph"
-                        }
+                        ShortcutsModelItem.title: "Create New Paragraph"
                         ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Return" : "Enter"
                     }
 
@@ -1147,8 +1141,16 @@ Rectangle {
                     }
 
                     Keys.onTabPressed: {
-                        if(!scriteDocument.readOnly)
-                            sceneDocumentBinder.tab()
+                        if(!scriteDocument.readOnly) {
+                            if(completer.suggestion !== "") {
+                                userIsTyping = false
+                                insert(cursorPosition, completer.suggestion)
+                                userIsTyping = true
+                                Transliterator.enableFromNextWord()
+                            } else
+                                sceneDocumentBinder.tab()
+                            event.accepted = true
+                        }
                     }
                     Keys.onBacktabPressed: {
                         if(!scriteDocument.readOnly)
@@ -1168,14 +1170,7 @@ Rectangle {
                             return
                         }
 
-                        if(completer.suggestion !== "") {
-                            userIsTyping = false
-                            insert(cursorPosition, completer.suggestion)
-                            userIsTyping = true
-                            Transliterator.enableFromNextWord()
-                            event.accepted = true
-                        } else
-                            event.accepted = false
+                        event.accepted = false
                     }
 
                     // Context menu
