@@ -464,7 +464,7 @@ void ExecLater::timerEvent(QTimerEvent *event)
 }
 
 void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args)
-{    
+{
     QObject *parent = context ? context : this;
 
 #ifndef QT_NO_DEBUG
@@ -725,15 +725,18 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
     return false;
 }
 
+Q_DECL_IMPORT int qt_defaultDpi();
+
 void Application::computeIdealFontPointSize()
 {
-#ifdef Q_OS_WIN
+#ifndef Q_OS_MAC
     m_idealFontPointSize = 12;
 #else
-    const qreal minInch = 0.12;
-    const qreal nrPointsPerInch = 72.0;
+    const qreal minInch = 0.12; // Font should occupy atleast 0.12 inches on the screen
+    const qreal nrPointsPerInch = qt_defaultDpi(); // These many dots make up one inch on the screen
     const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
-    m_idealFontPointSize = qCeil(minInch * nrPointsPerInch * scale);
+    const qreal dpr = this->primaryScreen()->devicePixelRatio();
+    m_idealFontPointSize = qCeil(minInch * nrPointsPerInch * qMax(dpr,scale));
 #endif
 }
 
@@ -995,7 +998,7 @@ bool Application::loadScript() { return false; }
 bool Application::registerFileTypes()
 {
 #ifdef Q_OS_WIN
-    const QString appFilePath = this->applicationFilePath();   
+    const QString appFilePath = this->applicationFilePath();
     QSettings classes(QStringLiteral("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES"), QSettings::NativeFormat);
 
     const QString ns = QStringLiteral("com.teriflix.scrite");
