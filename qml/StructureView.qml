@@ -1234,7 +1234,7 @@ Item {
 
                 MouseArea {
                     id: dragMouseArea
-                    hoverEnabled: true
+                    hoverEnabled: !canvasScroll.flicking && !canvasScroll.moving && elementItem.selected
                     anchors.fill: parent
                     drag.target: parent
                     cursorShape: Qt.SizeAllCursor

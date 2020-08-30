@@ -923,7 +923,7 @@ Item {
                         MenuSeparator { }
 
                         Menu2 {
-                            title: "Import, Export & Reports"
+                            title: "Import, Export &amp; Reports"
 
                             Menu2 {
                                 title: "Import"
