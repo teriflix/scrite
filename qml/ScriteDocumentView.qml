@@ -1505,15 +1505,6 @@ Item {
         Notification.autoClose: false
     }
 
-    Item {
-        property ProgressReport progressReport: Aggregation.findProgressReport(app)
-        Notification.active: progressReport ? progressReport.progress < 1 : false
-        Notification.title: progressReport ? progressReport.progressText : ""
-        Notification.text: progressReport ? ("Progress: " + Math.floor(progressReport.progress*100) + "%") : ""
-        Notification.autoCloseDelay: 1000
-        Notification.autoClose: true
-    }
-
     Component {
         id: reportGeneratorConfigurationComponent
 

@@ -22,7 +22,7 @@ AbstractExporter::AbstractExporter(QObject *parent)
 
 AbstractExporter::~AbstractExporter()
 {
-
+    emit aboutToDelete(this);
 }
 
 QString AbstractExporter::format() const
@@ -81,8 +81,6 @@ bool AbstractExporter::write()
     this->progress()->start();
     const bool ret = this->doExport(&file);
     this->progress()->finish();
-
-    GarbageCollector::instance()->add(this);
 
     return ret;
 }

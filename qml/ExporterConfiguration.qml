@@ -163,14 +163,21 @@ Item {
                     enabled: fileSelector.absoluteFilePath !== ""
                     text: "Export"
                     onClicked: {
-                        if(exporter.write())
+                        if(exporter.write()) {
                             app.revealFileOnDesktop(exporter.fileName)
-                        modalDialog.close()
+                            modalDialog.close()
+                        }
                     }
                 }
             }
         }
     }
+
+    property ErrorReport exporterErrors: Aggregation.findErrorReport(exporter)
+    Notification.title: exporter.formatName + " - Export"
+    Notification.text: exporterErrors.errorMessage
+    Notification.active: exporterErrors.hasError
+    Notification.autoClose: false
 
     function loadFieldEditor(kind) {
         if(kind === "IntegerSpinBox")

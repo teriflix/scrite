@@ -62,7 +62,12 @@ Rectangle {
 
     property real t: active ? 1 : 0
     visible: t > 0
-    onVisibleChanged: blur.visible = visible
+    onVisibleChanged: {
+        if(visible)
+            blur.show()
+        else
+            blur.hide()
+    }
 
     Behavior on t {
         enabled: animationsEnabled

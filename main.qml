@@ -121,12 +121,26 @@ Rectangle {
         anchors.fill: ui
         property color color: primaryColors.windowColor
 
+        property int visibilityCounter: 0
+        function show() {
+            visible = true
+            visibilityCounter = Math.max(visibilityCounter+1,1)
+        }
+
+        function hide() {
+            visibilityCounter = visibilityCounter-1
+            if(visibilityCounter <= 0)
+                visible = false
+        }
+
         property real maxRadius: 32
         property real radius: maxRadius
         visible: false
         onVisibleChanged: {
-            if(!visible)
+            if(!visible) {
                 color = primaryColors.windowColor
+                visibilityCounter = 0
+            }
         }
 
         /*
@@ -155,9 +169,9 @@ Rectangle {
         onVisibleChanged: {
             if(visible) {
                 blur.radius = blur.maxRadius
-                blur.visible = true
+                blur.show()
             } else {
-                blur.visible = false
+                blur.hide()
             }
         }
     }
@@ -243,6 +257,7 @@ Rectangle {
         id: modalDialog
         active: false
         anchors.fill: parent
+        enabled: notificationManager.count === 0
         onCloseRequest: {
             active = false
             closeable = true
@@ -255,7 +270,7 @@ Rectangle {
                 initItemCallback(dialogItem)
             initItemCallback = undefined
         }
-        opacity: scriteDocument.busy ? 0.5 : 1
+        opacity: !enabled || scriteDocument.busy ? 0.5 : 1
     }
 
     Component {
@@ -439,7 +454,12 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: -1
         width: parent.width * 0.7
-        onVisibleChanged: blur.visible = visible
+        onVisibleChanged: {
+            if(visible)
+                blur.show()
+            else
+                blur.hide()
+        }
     }
 
     Connections {
@@ -452,8 +472,8 @@ Rectangle {
         id: splashLoader
         anchors.fill: parent
         sourceComponent: UI.SplashScreen {
-            Component.onCompleted: blur.visible = true
-            Component.onDestruction: blur.visible = false
+            Component.onCompleted: blur.show()
+            Component.onDestruction: blur.hide()
             onDone: {
                 splashLoader.active = false
                 if(app.isWindowsPlatform && app.isNotWindows10)

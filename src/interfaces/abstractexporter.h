@@ -24,6 +24,7 @@ class AbstractExporter : public AbstractDeviceIO
 
 public:
     ~AbstractExporter();
+    Q_SIGNAL void aboutToDelete(AbstractExporter *ptr);
 
     Q_PROPERTY(QString format READ format CONSTANT)
     QString format() const;

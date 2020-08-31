@@ -150,6 +150,12 @@ bool AbstractReportGenerator::generate()
     this->progress()->start();
     const bool ret = this->doGenerate(&textDocument);
 
+    if(!ret)
+    {
+        this->progress()->finish();
+        return ret;
+    }
+
     if(m_format == OpenDocumentFormat)
     {
         QTextDocumentWriter writer;

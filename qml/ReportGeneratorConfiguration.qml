@@ -290,14 +290,22 @@ Item {
                     Material.foreground: primaryColors.c100.text
 
                     onClicked: {
-                        if(generator.generate())
+                        if(generator.generate()) {
                             app.revealFileOnDesktop(generator.fileName)
-                        modalDialog.close()
+                            modalDialog.close()
+                        }
                     }
                 }
             }
         }
     }
+
+    property ErrorReport generatorErrors: Aggregation.findErrorReport(generator)
+
+    Notification.title: formInfo.title
+    Notification.text: generatorErrors.errorMessage
+    Notification.active: generatorErrors.hasError
+    Notification.autoClose: false
 
     function loadFieldEditor(kind) {
         if(kind === "MultipleCharacterNameSelector")

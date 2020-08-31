@@ -474,6 +474,13 @@ void Application::execLater(QObject *context, int howMuchLater, const QJSValue &
     new ExecLater(howMuchLater, function, args, parent);
 }
 
+QColor Application::translucent(const QColor &input, qreal alpha) const
+{
+    QColor ret = input;
+    ret.setAlphaF(qBound(0.0, ret.alphaF() * alpha, 1.0));
+    return ret;
+}
+
 AutoUpdate *Application::autoUpdate() const
 {
     return AutoUpdate::instance();
