@@ -1043,7 +1043,6 @@ Item {
                 editor: sceneEditor ? sceneEditor.editor : null
             }
 
-            // We move the main-tab bar here based on UI/UX suggestions from Surya Vasishta
             Row {
                 id: mainTabBar
                 height: parent.height
@@ -1052,10 +1051,10 @@ Item {
 
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
-                property var tabs: ["Screenplay", "Structure", "Notebook"]
+                readonly property var tabs: ["Screenplay", "Structure", "Notebook"]
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
-                property color activeTabColor: primaryColors.windowColor
+                readonly property color activeTabColor: primaryColors.windowColor
 
                 onCurrentIndexChanged: {
                     if(currentIndex !== 0)
@@ -1238,25 +1237,18 @@ Item {
                 }
             }
 
-            StackLayout {
-                id: uiLayoutTabView
+            Loader {
                 anchors.fill: parent
                 anchors.margins: 5
                 clip: true
-                currentIndex: mainTabBar.currentIndex
-
-                Loader {
-                    readonly property bool editCurrentSceneInStructure: false
-                    readonly property int screenplayZoomLevelModifier: 0
-                    sourceComponent: mainTabBar.currentIndex === 0 ? screenplayEditorComponent : null
-                }
-
-                Loader {
-                    sourceComponent: mainTabBar.currentIndex === 1 ? structureEditorComponent : null
-                }
-
-                Loader {
-                    sourceComponent: mainTabBar.currentIndex === 2 ? notebookEditorComponent : null
+                readonly property bool editCurrentSceneInStructure: false
+                readonly property int screenplayZoomLevelModifier: 0
+                sourceComponent: {
+                    switch(mainTabBar.currentIndex) {
+                    case 1: return structureEditorComponent
+                    case 2: return notebookEditorComponent
+                    }
+                    return screenplayEditorComponent
                 }
             }
         }
