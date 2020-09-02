@@ -76,8 +76,8 @@ public:
         return mos.isEmpty() ? nullptr : mos.last();
     }
 
-    T *create(const QByteArray &className, T *parent=nullptr) const {
-        const QMetaObject *mo = this->find(className);
+    T *create(const QByteArray &key, T *parent=nullptr) const {
+        const QMetaObject *mo = this->find(key);
         if(mo == nullptr)
             return nullptr;
         const char *t = this->type();
