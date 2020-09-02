@@ -11,21 +11,21 @@
 **
 ****************************************************************************/
 
-#include "locationreportgenerator.h"
+#include "locationreport.h"
 #include "transliteration.h"
 
-LocationReportGenerator::LocationReportGenerator(QObject *parent)
+LocationReport::LocationReport(QObject *parent)
     : AbstractReportGenerator(parent)
 {
 
 }
 
-LocationReportGenerator::~LocationReportGenerator()
+LocationReport::~LocationReport()
 {
 
 }
 
-bool LocationReportGenerator::doGenerate(QTextDocument *textDocument)
+bool LocationReport::doGenerate(QTextDocument *textDocument)
 {
     static const int snippetLength = 40;
     const Structure *structure = this->document()->structure();

@@ -11,20 +11,20 @@
 **
 ****************************************************************************/
 
-#ifndef LOCATIONREPORTGENERATOR_H
-#define LOCATIONREPORTGENERATOR_H
+#ifndef LOCATIONREPORT_H
+#define LOCATIONREPORT_H
 
 #include "abstractreportgenerator.h"
 
-class LocationReportGenerator : public AbstractReportGenerator
+class LocationReport : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Location Report")
     Q_CLASSINFO("Description", "Generate a summary report of all locations in the screenplay.")
 
 public:
-    Q_INVOKABLE LocationReportGenerator(QObject *parent=nullptr);
-    ~LocationReportGenerator();
+    Q_INVOKABLE LocationReport(QObject *parent=nullptr);
+    ~LocationReport();
 
     bool requiresConfiguration() const { return true; }
 
@@ -33,4 +33,4 @@ protected:
     bool doGenerate(QTextDocument *textDocument);
 };
 
-#endif // LOCATIONREPORTGENERATOR_H
+#endif // LOCATIONREPORT_H

@@ -11,20 +11,20 @@
 **
 ****************************************************************************/
 
-#ifndef SCENECHARACTERMATRIXREPORTGENERATOR_H
-#define SCENECHARACTERMATRIXREPORTGENERATOR_H
+#ifndef SCENECHARACTERMATRIXREPORT_H
+#define SCENECHARACTERMATRIXREPORT_H
 
 #include "abstractreportgenerator.h"
 
-class SceneCharacterMatrixReportGenerator : public AbstractReportGenerator
+class SceneCharacterMatrixReport : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Scene Character Matrix")
     Q_CLASSINFO("Description", "Generate a table of scene names and characters.")
 
 public:
-    Q_INVOKABLE SceneCharacterMatrixReportGenerator(QObject *parent=nullptr);
-    ~SceneCharacterMatrixReportGenerator();
+    Q_INVOKABLE SceneCharacterMatrixReport(QObject *parent=nullptr);
+    ~SceneCharacterMatrixReport();
 
     bool requiresConfiguration() const { return true; }
 
@@ -66,4 +66,4 @@ private:
     int m_type = SceneVsCharacter;
 };
 
-#endif // SCENECHARACTERMATRIXREPORTGENERATOR_H
+#endif // SCENECHARACTERMATRIXREPORT_H

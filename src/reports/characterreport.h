@@ -11,20 +11,20 @@
 **
 ****************************************************************************/
 
-#ifndef CHARACTERREPORTGENERATOR_H
-#define CHARACTERREPORTGENERATOR_H
+#ifndef CHARACTERREPORT_H
+#define CHARACTERREPORT_H
 
 #include "abstractreportgenerator.h"
 
-class CharacterReportGenerator : public AbstractReportGenerator
+class CharacterReport : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Report")
     Q_CLASSINFO("Description", "Generate a report with dialogues and notes for one or more selected characters.")
 
 public:
-    Q_INVOKABLE CharacterReportGenerator(QObject *parent=nullptr);
-    ~CharacterReportGenerator();
+    Q_INVOKABLE CharacterReport(QObject *parent=nullptr);
+    ~CharacterReport();
 
     bool requiresConfiguration() const { return true; }
 
@@ -72,4 +72,4 @@ private:
 
 };
 
-#endif // CHARACTERREPORTGENERATOR_H
+#endif // CHARACTERREPORT_H

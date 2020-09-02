@@ -63,6 +63,9 @@ HEADERS += \
     src/quick/items/abstractshapeitem.h \
     src/quick/items/gridbackgrounditem.h \
     src/quick/items/painterpathitem.h \
+    src/reports/characterreport.h \
+    src/reports/locationreport.h \
+    src/reports/scenecharactermatrixreport.h \
     src/utils/execlatertimer.h \
     src/utils/timeprofiler.h \
     src/utils/garbagecollector.h \
@@ -104,9 +107,6 @@ HEADERS += \
     src/reports/progressreport.h \
     src/reports/screenplaysubsetreport.h \
     src/reports/locationscreenplayreport.h \
-    src/reports/characterreportgenerator.h \
-    src/reports/scenecharactermatrixreportgenerator.h \
-    src/reports/locationreportgenerator.h  \
     src/utils/urlattributes.h
 
 SOURCES += \
@@ -146,6 +146,9 @@ SOURCES += \
     src/quick/items/textshapeitem.cpp \
     src/quick/items/abstractshapeitem.cpp \
     src/quick/items/ruleritem.cpp \
+    src/reports/characterreport.cpp \
+    src/reports/locationreport.cpp \
+    src/reports/scenecharactermatrixreport.cpp \
     src/utils/execlatertimer.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/timeprofiler.cpp \
@@ -180,13 +183,10 @@ SOURCES += \
     src/interfaces/abstractscreenplaysubsetreport.cpp \
     src/interfaces/abstractimporter.cpp \
     src/interfaces/abstractreportgenerator.cpp \
-    src/reports/locationreportgenerator.cpp \
     src/reports/screenplaysubsetreport.cpp \
     src/reports/characterscreenplayreport.cpp \
     src/reports/progressreport.cpp \
     src/reports/locationscreenplayreport.cpp \
-    src/reports/characterreportgenerator.cpp \
-    src/reports/scenecharactermatrixreportgenerator.cpp \
     src/utils/urlattributes.cpp
 
 RESOURCES += \

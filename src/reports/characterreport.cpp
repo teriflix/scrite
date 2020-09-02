@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "characterreportgenerator.h"
+#include "characterreport.h"
 #include "transliteration.h"
 
 #include <QTextTable>
@@ -20,18 +20,18 @@
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
 
-CharacterReportGenerator::CharacterReportGenerator(QObject *parent)
+CharacterReport::CharacterReport(QObject *parent)
     : AbstractReportGenerator(parent)
 {
 
 }
 
-CharacterReportGenerator::~CharacterReportGenerator()
+CharacterReport::~CharacterReport()
 {
 
 }
 
-void CharacterReportGenerator::setCharacterNames(const QStringList &val)
+void CharacterReport::setCharacterNames(const QStringList &val)
 {
     if(m_characterNames == val)
         return;
@@ -40,7 +40,7 @@ void CharacterReportGenerator::setCharacterNames(const QStringList &val)
     emit characterNamesChanged();
 }
 
-void CharacterReportGenerator::setIncludeSceneHeadings(bool val)
+void CharacterReport::setIncludeSceneHeadings(bool val)
 {
     if(m_includeSceneHeadings == val)
         return;
@@ -49,7 +49,7 @@ void CharacterReportGenerator::setIncludeSceneHeadings(bool val)
     emit includeSceneHeadingsChanged();
 }
 
-void CharacterReportGenerator::setIncludeDialogues(bool val)
+void CharacterReport::setIncludeDialogues(bool val)
 {
     if(m_includeDialogues == val)
         return;
@@ -58,7 +58,7 @@ void CharacterReportGenerator::setIncludeDialogues(bool val)
     emit includeDialoguesChanged();
 }
 
-void CharacterReportGenerator::setIncludeNotes(bool val)
+void CharacterReport::setIncludeNotes(bool val)
 {
     if(m_includeNotes == val)
         return;
@@ -67,7 +67,7 @@ void CharacterReportGenerator::setIncludeNotes(bool val)
     emit includeNotesChanged();
 }
 
-bool CharacterReportGenerator::doGenerate(QTextDocument *textDocument)
+bool CharacterReport::doGenerate(QTextDocument *textDocument)
 {
     if(m_characterNames.isEmpty())
     {

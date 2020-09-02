@@ -109,6 +109,9 @@ private:
 };
 
 typedef QtFactory<QObject> QObjectFactory;
+
+#ifdef QT_WIDGETS_LIB
 typedef QtFactory<QWidget> QWidgetFactory;
+#endif
 
 #endif // QOBJECTFACTORY_H

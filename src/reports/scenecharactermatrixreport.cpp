@@ -11,14 +11,14 @@
 **
 ****************************************************************************/
 
-#include "scenecharactermatrixreportgenerator.h"
+#include "scenecharactermatrixreport.h"
 #include "transliteration.h"
 
 #include <QPainter>
 #include <QPdfWriter>
 #include <QTextTable>
 
-SceneCharacterMatrixReportGenerator::SceneCharacterMatrixReportGenerator(QObject *parent)
+SceneCharacterMatrixReport::SceneCharacterMatrixReport(QObject *parent)
     : AbstractReportGenerator(parent)
 {
     connect(this, &AbstractReportGenerator::documentChanged, [=]() {
@@ -27,12 +27,12 @@ SceneCharacterMatrixReportGenerator::SceneCharacterMatrixReportGenerator(QObject
     });
 }
 
-SceneCharacterMatrixReportGenerator::~SceneCharacterMatrixReportGenerator()
+SceneCharacterMatrixReport::~SceneCharacterMatrixReport()
 {
 
 }
 
-void SceneCharacterMatrixReportGenerator::setType(int val)
+void SceneCharacterMatrixReport::setType(int val)
 {
     if(m_type == val)
         return;
@@ -44,7 +44,7 @@ void SceneCharacterMatrixReportGenerator::setType(int val)
     emit typeChanged();
 }
 
-void SceneCharacterMatrixReportGenerator::setCharacterNames(const QStringList &val)
+void SceneCharacterMatrixReport::setCharacterNames(const QStringList &val)
 {
     if(m_characterNames == val)
         return;
@@ -53,7 +53,7 @@ void SceneCharacterMatrixReportGenerator::setCharacterNames(const QStringList &v
     emit characterNamesChanged();
 }
 
-bool SceneCharacterMatrixReportGenerator::supportsFormat(AbstractReportGenerator::Format format) const
+bool SceneCharacterMatrixReport::supportsFormat(AbstractReportGenerator::Format format) const
 {
     return format == AdobePDF;
 }
@@ -91,7 +91,7 @@ struct CreateColumnHeadingImageFunctor
     }
 };
 
-bool SceneCharacterMatrixReportGenerator::doGenerate(QTextDocument *document)
+bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
 {
     const Screenplay *screenplay = this->document()->screenplay();
     const Structure *structure = this->document()->structure();
@@ -264,7 +264,7 @@ bool SceneCharacterMatrixReportGenerator::doGenerate(QTextDocument *document)
     return true;
 }
 
-void SceneCharacterMatrixReportGenerator::configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const
+void SceneCharacterMatrixReport::configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const
 {
     const QSizeF idealSizeInPixels = document->size();
     if(idealSizeInPixels.width() > idealSizeInPixels.height())

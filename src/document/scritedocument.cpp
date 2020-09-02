@@ -31,11 +31,11 @@
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
 #include "screenplaysubsetreport.h"
-#include "locationreportgenerator.h"
-#include "characterreportgenerator.h"
+#include "locationreport.h"
+#include "characterreport.h"
 #include "locationscreenplayreport.h"
 #include "characterscreenplayreport.h"
-#include "scenecharactermatrixreportgenerator.h"
+#include "scenecharactermatrixreport.h"
 
 #include <QDir>
 #include <QDateTime>
@@ -55,13 +55,13 @@ public:
 
     QObjectFactory ImporterFactory;
     QObjectFactory ExporterFactory;
-    QObjectFactory ReportGeneratorFactory;
+    QObjectFactory ReportsFactory;
 };
 
 DeviceIOFactories::DeviceIOFactories()
-    : ImporterFactory("Format"),
-      ExporterFactory("Format"),
-      ReportGeneratorFactory("Title")
+    : ImporterFactory(QByteArrayLiteral("Format")),
+      ExporterFactory(QByteArrayLiteral("Format")),
+      ReportsFactory(QByteArrayLiteral("Title"))
 {
     ImporterFactory.addClass<HtmlImporter>();
     ImporterFactory.addClass<FountainImporter>();
@@ -75,12 +75,12 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<StructureExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
 
-    ReportGeneratorFactory.addClass<ScreenplaySubsetReport>();
-    ReportGeneratorFactory.addClass<LocationReportGenerator>();
-    ReportGeneratorFactory.addClass<LocationScreenplayReport>();
-    ReportGeneratorFactory.addClass<CharacterReportGenerator>();
-    ReportGeneratorFactory.addClass<CharacterScreenplayReport>();
-    ReportGeneratorFactory.addClass<SceneCharacterMatrixReportGenerator>();
+    ReportsFactory.addClass<ScreenplaySubsetReport>();
+    ReportsFactory.addClass<LocationReport>();
+    ReportsFactory.addClass<LocationScreenplayReport>();
+    ReportsFactory.addClass<CharacterReport>();
+    ReportsFactory.addClass<CharacterScreenplayReport>();
+    ReportsFactory.addClass<SceneCharacterMatrixReport>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()
@@ -521,7 +521,7 @@ QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
 
 QJsonArray ScriteDocument::supportedReports() const
 {
-    static QList<QByteArray> keys = deviceIOFactories->ReportGeneratorFactory.keys();
+    static QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
     static QJsonArray reports;
     if(reports.isEmpty())
     {
@@ -530,7 +530,7 @@ QJsonArray ScriteDocument::supportedReports() const
             QJsonObject item;
             item.insert("name", QString::fromLatin1(key));
 
-            const QMetaObject *mo = deviceIOFactories->ReportGeneratorFactory.find(key);
+            const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
             const int ciIndex = mo->indexOfClassInfo("Description");
             if(ciIndex >= 0)
                 item.insert("description", QString::fromLatin1(mo->classInfo(ciIndex).value()));
@@ -659,7 +659,7 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
 AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)
 {
     const QByteArray reportKey = report.toLatin1();
-    AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportGeneratorFactory.create<AbstractReportGenerator>(reportKey, this);
+    AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportsFactory.create<AbstractReportGenerator>(reportKey, this);
     if(reportGenerator == nullptr)
         return nullptr;
 
