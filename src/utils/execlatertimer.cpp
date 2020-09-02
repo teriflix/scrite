@@ -43,7 +43,7 @@ ExecLaterTimer::ExecLaterTimer(const QString &name, QObject *parent)
     ExecLaterTimerList->append(this);
 #endif
 
-    m_timer.setObjectName("SimpleTimer");
+    m_timer.setObjectName("ExecLaterTimer");
     m_timer.setSingleShot(!m_repeat);
     connect(&m_timer, &QTimer::timeout, this, &ExecLaterTimer::onTimeout);
 }

@@ -24,7 +24,7 @@ class ExecLaterTimer : public QObject
 public:
     static ExecLaterTimer *get(int timerId);
 
-    ExecLaterTimer(const QString &name=QStringLiteral("Scrite Timer"), QObject *parent=nullptr);
+    ExecLaterTimer(const QString &name=QStringLiteral("Scrite ExecLaterTimer"), QObject *parent=nullptr);
     ~ExecLaterTimer();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
