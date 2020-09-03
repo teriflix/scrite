@@ -36,6 +36,7 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
+    src/core/objectlistpropertymodel.h \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
     src/importers/openfromlibrary.h \

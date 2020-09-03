@@ -377,7 +377,7 @@ Item {
 
                 Repeater {
                     id: annotationItems
-                    model: scriteDocument.loading ? 0 : scriteDocument.structure.annotations
+                    model: scriteDocument.loading ? 0 : scriteDocument.structure.annotationsModel
                     delegate: Loader {
                         property Annotation annotation: modelData
                         property int annotationIndex: index
@@ -567,7 +567,7 @@ Item {
 
             Repeater {
                 id: elementItems
-                model: scriteDocument.loading ? 0 : scriteDocument.structure.elements
+                model: scriteDocument.loading ? 0 : scriteDocument.structure.elementsModel
                 delegate: structureElementDelegate
             }
 
@@ -1054,7 +1054,6 @@ Item {
             id: elementItem
             property StructureElement element: modelData
             Component.onCompleted: element.follow = elementItem
-            Component.onDestruction: element.follow = null
             enabled: selection.active === false
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox

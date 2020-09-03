@@ -19,6 +19,7 @@
 #include "execlatertimer.h"
 #include "qobjectproperty.h"
 #include "abstractshapeitem.h"
+#include "objectlistpropertymodel.h"
 
 #include <QColor>
 #include <QPointer>
@@ -265,6 +266,9 @@ public:
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 
+    Q_PROPERTY(QAbstractListModel* charactersModel READ charactersModel CONSTANT)
+    QAbstractListModel *charactersModel() const { return &((const_cast<Structure*>(this))->m_characters); }
+
     Q_PROPERTY(QQmlListProperty<Character> characters READ characters NOTIFY characterCountChanged)
     QQmlListProperty<Character> characters();
     Q_INVOKABLE void addCharacter(Character *ptr);
@@ -281,6 +285,9 @@ public:
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
 
+    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
+    QAbstractListModel *notesModel() const { return &((const_cast<Structure*>(this))->m_notes); }
+
     Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
     QQmlListProperty<Note> notes();
     Q_INVOKABLE void addNote(Note *ptr);
@@ -291,7 +298,9 @@ public:
     Q_INVOKABLE void clearNotes();
     Q_SIGNAL void noteCountChanged();
 
-    // NOTE: Elements has to be the last of QQmlListProperty in this class.
+    Q_PROPERTY(QAbstractListModel* elementsModel READ elementsModel CONSTANT)
+    QAbstractListModel *elementsModel() const { return &((const_cast<Structure*>(this))->m_elements); }
+
     Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
@@ -341,6 +350,9 @@ public:
     QStringList characterNames() const { return m_characterElementMap.characterNames(); }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_PROPERTY(QAbstractListModel* annotationsModel READ annotationsModel CONSTANT)
+    QAbstractListModel *annotationsModel() const { return &((const_cast<Structure*>(this))->m_annotations); }
+
     Q_PROPERTY(QQmlListProperty<Annotation> annotations READ annotations NOTIFY annotationCountChanged)
     QQmlListProperty<Annotation> annotations();
     Q_INVOKABLE void addAnnotation(Annotation *ptr);
@@ -383,20 +395,20 @@ private:
     static void staticClearCharacters(QQmlListProperty<Character> *list);
     static Character* staticCharacterAt(QQmlListProperty<Character> *list, int index);
     static int staticCharacterCount(QQmlListProperty<Character> *list);
-    QList<Character *> m_characters;
+    ObjectListPropertyModel<Character *> m_characters;
 
     static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
     static void staticClearNotes(QQmlListProperty<Note> *list);
     static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
     static int staticNoteCount(QQmlListProperty<Note> *list);
-    QList<Note *> m_notes;
+    ObjectListPropertyModel<Note *> m_notes;
 
     friend class StructureLayout;
     static void staticAppendElement(QQmlListProperty<StructureElement> *list, StructureElement *ptr);
     static void staticClearElements(QQmlListProperty<StructureElement> *list);
     static StructureElement* staticElementAt(QQmlListProperty<StructureElement> *list, int index);
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
-    QList<StructureElement *> m_elements;
+    ObjectListPropertyModel<StructureElement *> m_elements;
     int m_currentElementIndex = -1;
     qreal m_zoomLevel = 1.0;
 
@@ -414,7 +426,7 @@ private:
     static void staticClearAnnotations(QQmlListProperty<Annotation> *list);
     static Annotation* staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
     static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
-    QList<Annotation *> m_annotations;
+    ObjectListPropertyModel<Annotation *> m_annotations;
     bool m_canPaste = false;
 };
 

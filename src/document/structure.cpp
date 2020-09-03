@@ -735,7 +735,7 @@ void Structure::addCharacters(const QStringList &names)
 Character *Structure::findCharacter(const QString &name) const
 {
     const QString name2 = name.toUpper();
-    Q_FOREACH(Character *character, m_characters)
+    Q_FOREACH(Character *character, m_characters.list())
     {
         if(character->name() == name2)
             return character;
@@ -940,7 +940,7 @@ int Structure::indexOfElement(StructureElement *element) const
 
 StructureElement *Structure::findElementBySceneID(const QString &id) const
 {
-    Q_FOREACH(StructureElement *element, m_elements)
+    Q_FOREACH(StructureElement *element, m_elements.list())
     {
         if(element->scene()->id() == id)
             return element;
@@ -954,7 +954,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     QRectF newBoundingRect;
 
     QList<StructureElement*> elementsToLayout;
-    Q_FOREACH(StructureElement *element, m_elements)
+    Q_FOREACH(StructureElement *element, m_elements.list())
         if(element->isSelected())
             elementsToLayout << element;
 
@@ -1070,7 +1070,7 @@ void Structure::scanForMuteCharacters()
     m_scriteDocument->setBusyMessage("Scanning for mute characters..");
 
     const QStringList characterNames = this->characterNames();
-    Q_FOREACH(StructureElement *element, m_elements)
+    Q_FOREACH(StructureElement *element, m_elements.list())
         element->scene()->scanMuteCharacters(characterNames);
 
     m_scriteDocument->clearBusyMessage();
@@ -1494,7 +1494,7 @@ int Structure::staticElementCount(QQmlListProperty<StructureElement> *list)
 void Structure::updateLocationHeadingMap()
 {
     QMap< QString, QList<SceneHeading*> > map;
-    Q_FOREACH(StructureElement *element, m_elements)
+    Q_FOREACH(StructureElement *element, m_elements.list())
     {
         Scene *scene = element->scene();
         if(scene == nullptr || !scene->heading()->isEnabled())
