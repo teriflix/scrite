@@ -239,7 +239,7 @@ Item {
             scale: canvasScroll.suggestedScale
             border.width: 2
             border.color: structureCanvasSettings.gridColor
-            gridIsVisible: canvasPreview.updatingThumbnail ? false : structureCanvasSettings.showGrid
+            gridIsVisible: structureCanvasSettings.showGrid
             majorTickColor: structureCanvasSettings.gridColor
             minorTickColor: structureCanvasSettings.gridColor
             tickDistance: scriteDocument.structure.canvasGridSize
