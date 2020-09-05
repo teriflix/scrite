@@ -949,6 +949,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.title = text
                                 font.pixelSize: 20
+                                maximumLength: 100
+                                placeholderText: "(max 100 letters)"
                             }
                         }
 
@@ -971,6 +973,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.subtitle = text
                                 font.pixelSize: 20
+                                maximumLength: 100
+                                placeholderText: "(max 100 letters)"
                             }
                         }
 
@@ -993,6 +997,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.basedOn = text
                                 font.pixelSize: 20
+                                maximumLength: 100
+                                placeholderText: "(max 100 letters)"
                             }
                         }
 
@@ -1015,6 +1021,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.version = text
                                 font.pixelSize: 20
+                                maximumLength: 20
+                                placeholderText: "(max 20 letters)"
                             }
                         }
 
@@ -1037,6 +1045,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.author = text
                                 font.pixelSize: 20
+                                maximumLength: 100
+                                placeholderText: "(max 100 letters)"
                             }
                         }
                     }
@@ -1063,7 +1073,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.contact = text
                                 font.pixelSize: 20
-                                placeholderText: "(Optional) Production company or Studio name"
+                                placeholderText: "(Optional) Company / Studio name (max 100 letters)"
+                                maximumLength: 100
                             }
                         }
 
@@ -1086,7 +1097,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.address = text
                                 font.pixelSize: 20
-                                placeholderText: "(Optional) Optional"
+                                maximumLength: 100
+                                placeholderText: "(Optional) Address (max 100 letters)"
                             }
                         }
 
@@ -1109,7 +1121,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.email = text
                                 font.pixelSize: 20
-                                placeholderText: "(Optional)"
+                                maximumLength: 100
+                                placeholderText: "(Optional) Email (max 100 letters)"
                             }
                         }
 
@@ -1132,7 +1145,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.phoneNumber = text
                                 font.pixelSize: 20
-                                placeholderText: "(Optional)"
+                                maximumLength: 20
+                                placeholderText: "(Optional) Phone number (max 20 digits/letters)"
                             }
                         }
 
@@ -1155,7 +1169,8 @@ Item {
                                 selectByMouse: true
                                 onTextEdited: scriteDocument.screenplay.website = text
                                 font.pixelSize: 20
-                                placeholderText: "(Optional)"
+                                maximumLength: 150
+                                placeholderText: "(Optional) Website (max 150 letters)"
                             }
                         }
                     }

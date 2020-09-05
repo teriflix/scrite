@@ -2115,20 +2115,20 @@ Rectangle {
 
         Column {
             property int defaultFontSize: screenplayFormat.defaultFont2.pointSize
+            property real maxWidth: parent.width - 2*ruler.leftMarginPx
             spacing: 10 * zoomLevel
 
             Image { width: parent.width; height: 35 * zoomLevel }
 
             Image {
-                property real maxWidth: parent.width - 2*ruler.leftMarginPx
                 width: {
                     switch(scriteDocument.screenplay.coverPagePhotoSize) {
                     case Screenplay.SmallCoverPhoto:
-                        return maxWidth / 4
+                        return parent.maxWidth / 4
                     case Screenplay.MediumCoverPhoto:
-                        return maxWidth / 2
+                        return parent.maxWidth / 2
                     }
-                    return maxWidth
+                    return parent.maxWidth
                 }
 
                 source: visible ? "file:///" + scriteDocument.screenplay.coverPagePhoto : ""
@@ -2140,18 +2140,43 @@ Rectangle {
 
             Image { width: parent.width; height: scriteDocument.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
 
+            Text {
+                font.family: scriteDocument.formatting.defaultFont.family
+                font.pointSize: defaultFontSize + 2
+                font.bold: true
+                width: parent.width
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                horizontalAlignment: Text.AlignHCenter
+                text: scriteDocument.screenplay.title === "" ? "<untitled>" : scriteDocument.screenplay.title
+                anchors.horizontalCenter: parent.horizontalCenter
+                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
+                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
+            }
+
+            Text {
+                font.family: scriteDocument.formatting.defaultFont.family
+                font.pointSize: defaultFontSize
+                width: parent.width
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                horizontalAlignment: Text.AlignHCenter
+                text: scriteDocument.screenplay.subtitle
+                visible: scriteDocument.screenplay.subtitle !== ""
+                anchors.horizontalCenter: parent.horizontalCenter
+                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
+                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
+            }
+
             Column {
                 width: parent.width
-                spacing: parent.spacing/1
+                spacing: 0
 
                 Text {
                     font.family: scriteDocument.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize + 2
-                    font.bold: true
+                    font.pointSize: defaultFontSize
                     width: parent.width
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     horizontalAlignment: Text.AlignHCenter
-                    text: scriteDocument.screenplay.title === "" ? "<untitled>" : scriteDocument.screenplay.title
+                    text: "Written By"
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -2159,11 +2184,12 @@ Rectangle {
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.pointSize: defaultFontSize
                     width: parent.width
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     horizontalAlignment: Text.AlignHCenter
-                    text: scriteDocument.screenplay.subtitle
-                    visible: scriteDocument.screenplay.subtitle !== ""
+                    text: (scriteDocument.screenplay.author === "" ? "<unknown author>" : scriteDocument.screenplay.author)
                     anchors.horizontalCenter: parent.horizontalCenter
+                    leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
+                    rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
                 }
             }
 
@@ -2171,31 +2197,25 @@ Rectangle {
                 font.family: scriteDocument.formatting.defaultFont.family
                 font.pointSize: defaultFontSize
                 width: parent.width
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                text: "Written By\n" + (scriteDocument.screenplay.author === "" ? "<unknown author>" : scriteDocument.screenplay.author)
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Text {
-                font.family: scriteDocument.formatting.defaultFont.family
-                font.pointSize: defaultFontSize
-                width: parent.width
-                wrapMode: Text.WordWrap
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 horizontalAlignment: Text.AlignHCenter
                 text: scriteDocument.screenplay.version === "" ? "Initial Version" : scriteDocument.screenplay.version
                 anchors.horizontalCenter: parent.horizontalCenter
+                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
+                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
             }
 
             Text {
                 font.family: scriteDocument.formatting.defaultFont.family
                 font.pointSize: defaultFontSize
                 width: parent.width
-                wrapMode: Text.WordWrap
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 horizontalAlignment: Text.AlignHCenter
                 text: scriteDocument.screenplay.basedOn
                 visible: scriteDocument.screenplay.basedOn !== ""
                 anchors.horizontalCenter: parent.horizontalCenter
+                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
+                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
             }
 
             Column {
@@ -2213,7 +2233,7 @@ Rectangle {
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.pointSize: defaultFontSize - 2
                     width: parent.width
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: scriteDocument.screenplay.contact
                     visible: text !== ""
                 }
@@ -2222,7 +2242,7 @@ Rectangle {
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.pointSize: defaultFontSize - 2
                     width: parent.width
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: scriteDocument.screenplay.address
                     visible: text !== ""
                 }
@@ -2231,7 +2251,7 @@ Rectangle {
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.pointSize: defaultFontSize - 2
                     width: parent.width
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: scriteDocument.screenplay.phoneNumber
                     visible: text !== ""
                 }
@@ -2242,7 +2262,7 @@ Rectangle {
                     font.underline: true
                     color: "blue"
                     width: parent.width
-                    elide: Text.ElideMiddle
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: scriteDocument.screenplay.email
                     visible: text !== ""
 
