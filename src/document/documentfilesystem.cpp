@@ -352,6 +352,12 @@ bool DocumentFileSystem::unpack(QDataStream &ds)
         QString relativeFilePath;
         ds >> relativeFilePath;
 
+        qint64 fileSize = 0;
+        ds >> fileSize;
+
+        if(fileSize == 0)
+            continue;
+
         const QString absoluteFilePath = folderPath.absoluteFilePath(relativeFilePath);
         const QFileInfo fi(absoluteFilePath);
 
@@ -361,11 +367,6 @@ bool DocumentFileSystem::unpack(QDataStream &ds)
         QFile file(absoluteFilePath);
         if( !file.open(QFile::WriteOnly) )
             return false;
-
-        qint64 fileSize = 0;
-        ds >> fileSize;
-        if(fileSize == 0)
-            continue;
 
         qint64 bytesRead = 0;
         const int bufferSize = 65535;
