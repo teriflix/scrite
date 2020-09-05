@@ -72,6 +72,8 @@ bool AbstractImporter::read()
     UndoStack::clearAllStacks();
     this->progress()->finish();
 
+    GarbageCollector::instance()->add(this);
+
     return ret;
 }
 

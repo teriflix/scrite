@@ -34,6 +34,15 @@ void LocationScreenplayReport::setLocations(const QStringList &val)
     emit locationsChanged();
 }
 
+void LocationScreenplayReport::setGenerateSummary(bool val)
+{
+    if(m_generateSummary == val)
+        return;
+
+    m_generateSummary = val;
+    emit generateSummaryChanged();
+}
+
 bool LocationScreenplayReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
     const Scene *scene = element->scene();
@@ -77,6 +86,9 @@ void LocationScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDoc
 void LocationScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
     AbstractScreenplaySubsetReport::inject(cursor, location);
+
+    if(!m_generateSummary)
+        return;
 
     if(location == AfterTitlePage)
     {

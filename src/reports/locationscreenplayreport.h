@@ -34,6 +34,14 @@ public:
     QStringList locations() const { return m_locations; }
     Q_SIGNAL void locationsChanged();
 
+    Q_CLASSINFO("generateSummary_FieldGroup", "PDF Options")
+    Q_CLASSINFO("generateSummary_FieldLabel", "Generate summary")
+    Q_CLASSINFO("generateSummary_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool generateSummary READ generateSummary WRITE setGenerateSummary NOTIFY generateSummaryChanged)
+    void setGenerateSummary(bool val);
+    bool generateSummary() const { return m_generateSummary; }
+    Q_SIGNAL void generateSummaryChanged();
+
 protected:
     // AbstractScreenplaySubsetReport interface
     bool includeScreenplayElement(const ScreenplayElement *) const;
@@ -46,6 +54,7 @@ protected:
 private:
     int m_summaryLocation = -1;
     QStringList m_locations;
+    bool m_generateSummary = true;
     mutable QMap< QString, QList<const ScreenplayElement *> > m_locationSceneNumberList;
 };
 

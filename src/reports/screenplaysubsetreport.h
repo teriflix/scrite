@@ -35,6 +35,14 @@ public:
     QList<int> sceneNumbers() const { return m_sceneNumbers; }
     Q_SIGNAL void sceneNumbersChanged();
 
+    Q_CLASSINFO("generateSummary_FieldGroup", "PDF Options")
+    Q_CLASSINFO("generateSummary_FieldLabel", "Generate summary")
+    Q_CLASSINFO("generateSummary_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool generateSummary READ generateSummary WRITE setGenerateSummary NOTIFY generateSummaryChanged)
+    void setGenerateSummary(bool val);
+    bool generateSummary() const { return m_generateSummary; }
+    Q_SIGNAL void generateSummaryChanged();
+
 protected:
     // AbstractScreenplaySubsetReport interface
     bool includeScreenplayElement(const ScreenplayElement *) const;
@@ -46,6 +54,7 @@ protected:
 
 private:
     QList<int> m_sceneNumbers;
+    bool m_generateSummary = true;
 };
 
 #endif // SCREENPLAYSUBSETREPORT_H

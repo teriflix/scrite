@@ -1013,7 +1013,10 @@ bool Application::loadScript()
     if(!document->isReadOnly())
         globalObject.setProperty("document", jsEngine.newQObject(document));
 
+    qApp->setOverrideCursor(Qt::WaitCursor);
     const QJSValue result = jsEngine.evaluate(program, scriptFile);
+    qApp->restoreOverrideCursor();
+
     if(result.isError())
     {
         const QString msg = "Uncaught exception at line " +

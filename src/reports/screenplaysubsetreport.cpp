@@ -34,6 +34,15 @@ void ScreenplaySubsetReport::setSceneNumbers(const QList<int> &val)
     emit sceneNumbersChanged();
 }
 
+void ScreenplaySubsetReport::setGenerateSummary(bool val)
+{
+    if(m_generateSummary == val)
+        return;
+
+    m_generateSummary = val;
+    emit generateSummaryChanged();
+}
+
 bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
     if(element->scene() == nullptr)
@@ -59,7 +68,7 @@ void ScreenplaySubsetReport::inject(QTextCursor &cursor, AbstractScreenplayTextD
 {
     AbstractScreenplaySubsetReport::inject(cursor, location);
 
-    if(location != AfterTitlePage)
+    if(location != AfterTitlePage || !m_generateSummary)
         return;
 
     const QFont defaultFont = this->document()->printFormat()->defaultFont();

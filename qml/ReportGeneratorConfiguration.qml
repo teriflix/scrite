@@ -673,7 +673,7 @@ Item {
 
                 Text {
                     font.pointSize: app.idealFontPointSize
-                    text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Will Be Printed" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Will Be Printed")
+                    text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
                     anchors.verticalCenter: parent.verticalCenter
                     padding: 5
                 }

@@ -82,5 +82,7 @@ bool AbstractExporter::write()
     const bool ret = this->doExport(&file);
     this->progress()->finish();
 
+    GarbageCollector::instance()->add(this);
+
     return ret;
 }
