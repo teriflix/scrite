@@ -1556,7 +1556,7 @@ Rectangle {
                 TextField2 {
                     id: locTypeEdit
                     font: headingFontMetrics.font
-                    width: Math.max(contentWidth, 80)
+                    width: Math.min(contentWidth, 120*zoomLevel)
                     anchors.verticalCenter: parent.verticalCenter
                     text: sceneHeading.locationType
                     completionStrings: scriteDocument.structure.standardLocationTypes()
@@ -1596,7 +1596,7 @@ Rectangle {
                 TextField2 {
                     id: momentEdit
                     font: headingFontMetrics.font
-                    width: Math.max(contentWidth, 150);
+                    width: Math.min(contentWidth, 200*zoomLevel)
                     anchors.verticalCenter: parent.verticalCenter
                     text: sceneHeading.moment
                     enableTransliteration: true
