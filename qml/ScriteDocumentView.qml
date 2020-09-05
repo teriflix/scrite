@@ -1379,6 +1379,8 @@ Item {
                     ScreenplayView {
                         anchors.fill: parent
                         anchors.margins: 5
+                        showNotesIcon: true
+                        enableDragDrop: false
                     }
                 }
             }

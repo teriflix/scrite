@@ -127,5 +127,7 @@
         <file>icons/navigation/property_editor_inverted.png</file>
         <file>icons/navigation/zoom_fit_inverted.png</file>
         <file>icons/navigation/zoom_fit.png</file>
+        <file>icons/content/bookmark.png</file>
+        <file>icons/content/bookmark_outline.png</file>
     </qresource>
 </RCC>

@@ -24,6 +24,8 @@ Item {
     property color dropAreaHighlightColor: "#cfd8dc"
     property string dropAreaKey: "scrite/sceneID"
     property real preferredHeight: screenplayToolsLayout.height
+    property bool showNotesIcon: false
+    property bool enableDragDrop: true
 
     Connections {
         target: scriteDocument.screenplay
@@ -121,7 +123,7 @@ Item {
     DropArea {
         anchors.fill: parent
         keys: [dropAreaKey]
-        enabled: screenplayElementList.count === 0
+        enabled: screenplayElementList.count === 0 && enableDragDrop
 
         onEntered: {
             screenplayElementList.forceActiveFocus()
@@ -214,7 +216,7 @@ Item {
                 border.color: primaryColors.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
-                visible: scriteDocument.structure.elementCount > 0
+                visible: scriteDocument.structure.elementCount > 0 && enableDragDrop
 
                 Text {
                     anchors.fill: parent
@@ -230,6 +232,7 @@ Item {
             DropArea {
                 anchors.fill: parent
                 keys: [dropAreaKey]
+                enabled: enableDragDrop
 
                 onEntered: {
                     screenplayElementList.forceActiveFocus()
@@ -299,7 +302,7 @@ Item {
                         anchors.right: parent.right
                         anchors.top: parent.top
                         anchors.bottom: dragTriggerButton.top
-                        anchors.topMargin: 10
+                        anchors.topMargin: showNotesIcon ? 30 : 10
                         anchors.margins: 5
 
                         Text {
@@ -356,6 +359,18 @@ Item {
                         screenplayElementList.moveMode = Drag.active
                     }
 
+                    Loader {
+                        active: showNotesIcon && (elementItemDelegate.element.scene && elementItemDelegate.element.scene.noteCount >= 1)
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.margins: 5
+                        width: 24; height: 24
+                        opacity: 0.4
+                        sourceComponent: Image {
+                            source: "../icons/content/bookmark_outline.png"
+                        }
+                    }
+
                     SceneTypeImage {
                         anchors.left: parent.left
                         anchors.bottom: parent.bottom
@@ -376,7 +391,7 @@ Item {
                         anchors.rightMargin: 5
                         opacity: dragMouseArea.containsMouse ? 1 : 0.1
                         scale: dragMouseArea.containsMouse ? 2 : 1
-                        visible: !scriteDocument.readOnly
+                        visible: !scriteDocument.readOnly && enableDragDrop
                         enabled: visible
                         Behavior on scale {
                             enabled: screenplayEditorSettings.enableAnimations
@@ -389,6 +404,7 @@ Item {
                             anchors.fill: parent
                             drag.target: parent
                             cursorShape: Qt.SizeAllCursor
+                            enabled: enableDragDrop
                             onPressed: {
                                 elementItemDelegate.grabToImage(function(result) {
                                     elementItemDelegate.Drag.imageSource = result.url
