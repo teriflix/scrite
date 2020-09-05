@@ -544,7 +544,7 @@ Item {
 
             Repeater {
                 id: elementConnectorItems
-                model: scriteDocument.loading ? 0 : scriteDocument.structureElementSequence
+                model: scriteDocument.loading ? 0 : scriteDocument.structureElementConnectors
                 delegate: elementConnectorComponent
             }
 
@@ -1259,15 +1259,15 @@ Item {
 
         StructureElementConnector {
             lineType: StructureElementConnector.CurvedLine
-            fromElement: scriteDocument.structure.elementAt(modelData.from)
-            toElement: scriteDocument.structure.elementAt(modelData.to)
+            fromElement: connectorFromElement
+            toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: app.devicePixelRatio*canvas.scale
+            outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
             visible: intersects(canvasScroll.viewportRect)
 
             Rectangle {
                 id: labelBg
-                width: Math.max(label.width,label.height)+20
+                width: Math.max(labelItem.width,labelItem.height)+20
                 height: width; radius: width/2
                 border.width: 1; border.color: primaryColors.borderColor
                 x: parent.suggestedLabelPosition.x - radius
@@ -1276,10 +1276,10 @@ Item {
                 visible: !canvasPreview.updatingThumbnail
 
                 Text {
-                    id: label
+                    id: labelItem
                     anchors.centerIn: parent
                     font.pixelSize: 12
-                    text: (index+1)
+                    text: connectorLabel
                 }
             }
         }

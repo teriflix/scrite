@@ -100,6 +100,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
                   m_autoSaveTimer("ScriteDocument.m_autoSaveTimer"),
                   m_clearModifyTimer("ScriteDocument.m_clearModifyTimer"),
                   m_structure(this, "structure"),
+                  m_connectors(this),
                   m_screenplay(this, "screenplay"),
                   m_formatting(this, "formatting"),
                   m_printFormat(this, "printFormat"),
@@ -274,6 +275,8 @@ Scene *ScriteDocument::createNewScene()
 void ScriteDocument::reset()
 {
     HourGlass hourGlass;
+
+    m_connectors.clear();
 
     if(m_structure != nullptr)
     {
@@ -698,6 +701,12 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
     return reportGenerator;
 }
 
+QAbstractListModel *ScriteDocument::structureElementConnectors() const
+{
+    ScriteDocument *that = const_cast<ScriteDocument*>(this);
+    return &(that->m_connectors);
+}
+
 void ScriteDocument::clearModified()
 {
     if(m_screenplay->elementCount() == 0 && m_structure->elementCount() == 0)
@@ -843,70 +852,12 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
 
 void ScriteDocument::evaluateStructureElementSequence()
 {
-    QJsonArray array;
-
-    if(m_structure == nullptr || m_screenplay == nullptr)
-    {
-        if(!m_structureElementSequence.isEmpty())
-        {
-            m_structureElementSequence = array;
-            emit structureElementSequenceChanged();
-        }
-
-        return;
-    }
-
-    const int nrElements = m_screenplay->elementCount();
-    if(nrElements == 0)
-    {
-        if(!m_structureElementSequence.isEmpty())
-        {
-            m_structureElementSequence = array;
-            emit structureElementSequenceChanged();
-        }
-
-        return;
-    }
-
-    ScreenplayElement *fromElement = nullptr;
-    ScreenplayElement *toElement = nullptr;
-    int fromIndex = -1;
-    int toIndex = -1;
-
-    for(int i=0; i<nrElements-1; i++)
-    {
-        fromElement = fromElement ? fromElement : m_screenplay->elementAt(i);
-        toElement = toElement ? toElement : m_screenplay->elementAt(i+1);
-        fromIndex = fromIndex >= 0 ? fromIndex : m_structure->indexOfScene(fromElement->scene());
-        toIndex = toIndex >= 0 ? toIndex : m_structure->indexOfScene(toElement->scene());
-
-        if(fromIndex >= 0 && toIndex >= 0)
-        {
-            QJsonObject item;
-            item.insert("from", fromIndex);
-            item.insert("to", toIndex);
-            array.append(item);
-
-            fromElement = toElement;
-            fromIndex = toIndex;
-        }
-        else
-        {
-            fromElement = nullptr;
-            fromIndex = -1;
-        }
-
-        toElement = nullptr;
-        toIndex = -1;
-    }
-
-    m_structureElementSequence = array;
-    emit structureElementSequenceChanged();
+    m_connectors.reload();
 }
 
 void ScriteDocument::evaluateStructureElementSequenceLater()
 {
-    m_evaluateStructureElementSequenceTimer.start(100, this);
+    m_evaluateStructureElementSequenceTimer.start(0, this);
 }
 
 void ScriteDocument::setModified(bool val)
@@ -1325,4 +1276,186 @@ QString ScriteDocument::polishFileName(const QString &givenFileName) const
     }
 
     return fileName;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StructureElementConnectors::StructureElementConnectors(ScriteDocument *parent)
+    : QAbstractListModel(parent),
+      m_document(parent)
+{
+
+}
+
+StructureElementConnectors::~StructureElementConnectors()
+{
+
+}
+
+StructureElement *StructureElementConnectors::fromElement(int row) const
+{
+    if(row < 0 || row >= m_items.size())
+        return nullptr;
+
+    const Item item = m_items.at(row);
+    return item.from;
+}
+
+StructureElement *StructureElementConnectors::toElement(int row) const
+{
+    if(row < 0 || row >= m_items.size())
+        return nullptr;
+
+    const Item item = m_items.at(row);
+    return item.to;
+}
+
+QString StructureElementConnectors::label(int row) const
+{
+    if(row < 0 || row >= m_items.size())
+        return nullptr;
+
+    const Item item = m_items.at(row);
+    return item.label;
+}
+
+int StructureElementConnectors::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_items.size();
+}
+
+QVariant StructureElementConnectors::data(const QModelIndex &index, int role) const
+{
+    if(index.row() < 0 || index.row() >= m_items.size())
+        return QVariant();
+
+    const Item item = m_items.at(index.row());
+    switch(role)
+    {
+    case FromElementRole: return QVariant::fromValue<QObject*>(item.from);
+    case ToElementRole: return QVariant::fromValue<QObject*>(item.to);
+    case LabelRole: return item.label;
+    default: break;
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> StructureElementConnectors::roleNames() const {
+    QHash<int,QByteArray> roles;
+    roles[FromElementRole] = QByteArrayLiteral("connectorFromElement");
+    roles[ToElementRole] = QByteArrayLiteral("connectorToElement");
+    roles[LabelRole] = QByteArrayLiteral("connectorLabel");
+    return roles;
+}
+
+void StructureElementConnectors::clear()
+{
+    if(m_items.isEmpty())
+        return;
+
+    this->beginResetModel();
+    m_items.clear();
+    this->endResetModel();
+    emit countChanged();
+}
+
+void StructureElementConnectors::reload()
+{
+    const Structure *structure = m_document->structure();
+    const Screenplay *screenplay = m_document->screenplay();
+    if(structure == nullptr || screenplay == nullptr)
+    {
+        this->clear();
+        return;
+    }
+
+    const int nrElements = screenplay->elementCount();
+    if(nrElements <= 1)
+    {
+        this->clear();
+        return;
+    }
+
+    ScreenplayElement *fromElement = nullptr;
+    ScreenplayElement *toElement = nullptr;
+    int fromIndex = -1;
+    int toIndex = -1;
+    int itemIndex = 0;
+
+    const bool itemsWasEmpty = m_items.isEmpty();
+    if(itemsWasEmpty)
+        this->beginResetModel();
+
+    for(int i=0; i<nrElements-1; i++)
+    {
+        fromElement = fromElement ? fromElement : screenplay->elementAt(i);
+        toElement = toElement ? toElement : screenplay->elementAt(i+1);
+        fromIndex = fromIndex >= 0 ? fromIndex : structure->indexOfScene(fromElement->scene());
+        toIndex = toIndex >= 0 ? toIndex : structure->indexOfScene(toElement->scene());
+
+        if(fromIndex >= 0 && toIndex >= 0)
+        {
+            Item item;
+            item.from = structure->elementAt(fromIndex);
+            item.to = structure->elementAt(toIndex);
+            item.label = QString::number(itemIndex+1);
+
+            if(itemsWasEmpty)
+                m_items.append(item);
+            else
+            {
+                if(itemIndex < m_items.size())
+                {
+                    if( !(m_items.at(itemIndex) == item) )
+                    {
+                        this->beginRemoveRows(QModelIndex(), itemIndex, itemIndex);
+                        m_items.removeAt(itemIndex);
+                        this->endRemoveRows();
+
+                        this->beginInsertRows(QModelIndex(), itemIndex, itemIndex);
+                        m_items.insert(itemIndex, item);
+                        this->endInsertRows();
+                    }
+                }
+                else
+                {
+                    this->beginInsertRows(QModelIndex(), itemIndex, itemIndex);
+                    m_items.append(item);
+                    this->endInsertRows();
+                    emit countChanged();
+                }
+            }
+
+            ++itemIndex;
+
+            fromElement = toElement;
+            fromIndex = toIndex;
+        }
+        else
+        {
+            fromElement = nullptr;
+            fromIndex = -1;
+        }
+
+        toElement = nullptr;
+        toIndex = -1;
+    }
+
+    if(itemsWasEmpty)
+    {
+        this->endResetModel();
+        emit countChanged();
+    }
+    else
+    {
+        const int expectedCount = itemIndex;
+        if(m_items.size() > expectedCount)
+        {
+            this->beginRemoveRows(QModelIndex(), expectedCount, m_items.size()-1);
+            while(m_items.size() != expectedCount)
+                m_items.removeLast();
+            this->endRemoveRows();
+        }
+    }
 }

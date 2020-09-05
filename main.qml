@@ -193,6 +193,7 @@ Rectangle {
         property color canvasColor: accentColors.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true
+        property real connectorLineWidth: 2
     }
 
     function showInformation(params, popupSource) {

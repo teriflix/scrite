@@ -1111,11 +1111,24 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
         cursor = m_textDocument->rootFrame()->lastCursorPosition();
     else if(index > 0)
     {
-        ScreenplayElement *before = m_screenplay->elementAt(index-1);
-        QTextFrame *beforeFrame = this->findTextFrame(before);
-        Q_ASSERT_X(beforeFrame != nullptr, "ScreenplayTextDocument", "Attempting to insert scene before screenplay is loaded.");
-        cursor = beforeFrame->lastCursorPosition();
-        cursor.movePosition(QTextCursor::Down);
+        ScreenplayElement *before = nullptr;
+        while(before == nullptr)
+        {
+            before = m_screenplay->elementAt(--index);
+            if(before->scene() == nullptr)
+            {
+                before = nullptr;
+                continue;
+            }
+        }
+
+        if(before != nullptr)
+        {
+            QTextFrame *beforeFrame = this->findTextFrame(before);
+            Q_ASSERT_X(beforeFrame != nullptr, "ScreenplayTextDocument", "Attempting to insert scene before screenplay is loaded.");
+            cursor = beforeFrame->lastCursorPosition();
+            cursor.movePosition(QTextCursor::Down);
+        }
     }
 
     QTextFrame *frame = cursor.insertFrame(m_sceneFrameFormat);

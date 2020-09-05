@@ -29,6 +29,48 @@
 class AbstractExporter;
 class AbstractReportGenerator;
 
+class StructureElementConnectors : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    ~StructureElementConnectors();
+
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const { return m_items.size(); }
+    Q_SIGNAL void countChanged();
+
+    StructureElement *fromElement(int row) const;
+    StructureElement *toElement(int row) const;
+    QString label(int row) const;
+
+    // QAbstractItemModel interface
+    enum  {  FromElementRole = Qt::UserRole, ToElementRole, LabelRole };
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
+
+private:
+    StructureElementConnectors(ScriteDocument *parent=nullptr);
+    void clear();
+    void reload();
+
+private:
+    friend class ScriteDocument;
+    ScriteDocument *m_document = nullptr;
+
+    struct Item
+    {
+        StructureElement *from = nullptr;
+        StructureElement *to = nullptr;
+        QString label;
+        bool operator == (const Item &other) const {
+            return from == other.from && to == other.to && label == other.label;
+        }
+    };
+    QList<Item> m_items;
+};
+
 class ScriteDocument : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
@@ -145,9 +187,8 @@ public:
     Q_INVOKABLE AbstractExporter *createExporter(const QString &format);
     Q_INVOKABLE AbstractReportGenerator *createReportGenerator(const QString &report);
 
-    Q_PROPERTY(QJsonArray structureElementSequence READ structureElementSequence NOTIFY structureElementSequenceChanged)
-    QJsonArray structureElementSequence() const { return m_structureElementSequence; }
-    Q_SIGNAL void structureElementSequenceChanged();
+    Q_PROPERTY(QAbstractListModel* structureElementConnectors READ structureElementConnectors CONSTANT STORED false)
+    QAbstractListModel *structureElementConnectors() const;
 
     void clearModified();
 
@@ -208,6 +249,7 @@ private:
     QStringList m_spellCheckIgnoreList;
     QJsonArray m_structureElementSequence;
     QObjectProperty<Structure> m_structure;
+    StructureElementConnectors m_connectors;
     QObjectProperty<Screenplay> m_screenplay;
     QObjectProperty<ScreenplayFormat> m_formatting;
     QObjectProperty<ScreenplayFormat> m_printFormat;
