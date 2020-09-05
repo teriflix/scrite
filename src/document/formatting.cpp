@@ -387,7 +387,12 @@ void ScreenplayPageLayout::loadCustomResolutionFromSettings()
     if(qFuzzyIsNull(m_customResolution))
     {
         QSettings *settings = Application::instance()->settings();
-        this->setCustomResolution(settings->value("ScreenplayPageLayout/customResolution", 0.0).toDouble());
+#ifdef Q_OS_MAC
+        const qreal fallback = 72.0;
+#else
+        const qreal fallback = 0;
+#endif
+        this->setCustomResolution(settings->value("ScreenplayPageLayout/customResolution", fallback).toDouble());
     }
 }
 
