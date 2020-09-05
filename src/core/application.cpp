@@ -747,6 +747,32 @@ void Application::computeIdealFontPointSize()
 #endif
 }
 
+QString Application::sanitiseFileName(const QString &fileName) const
+{
+    const QFileInfo fi(fileName);
+
+    QString baseName = fi.baseName();
+    bool changed = false;
+    for(int i=baseName.length()-1; i>=0; i--)
+    {
+        const QChar ch = baseName.at(i);
+        if(ch.isLetterOrNumber())
+            continue;
+
+        static const QList<QChar> allowedChars = QList<QChar>() << QChar('_') << QChar('-') << QChar(' ');
+        if(allowedChars.contains(ch))
+            continue;
+
+        baseName = baseName.remove(i, 1);
+        changed = true;
+    }
+
+    if(changed)
+        return fi.absoluteDir().absoluteFilePath( baseName + QStringLiteral(".") + fi.suffix().toLower() );
+
+    return fileName;
+}
+
 bool Application::event(QEvent *event)
 {
 #ifdef Q_OS_MAC

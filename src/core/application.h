@@ -229,6 +229,8 @@ public:
 
     Q_SIGNAL void openFileRequest(const QString &filePath);
 
+    QString sanitiseFileName(const QString &fileName) const;
+
     bool event(QEvent *event);
 
 signals:

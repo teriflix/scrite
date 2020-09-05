@@ -361,6 +361,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 {
     HourGlass hourGlass;
     QString fileName = this->polishFileName(givenFileName.trimmed());
+    fileName = Application::instance()->sanitiseFileName(fileName);
 
     m_errorReport->clear();
     if(fileName.isEmpty())
