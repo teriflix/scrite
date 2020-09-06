@@ -57,12 +57,13 @@ Item {
         id: applicationSettingsComponent
 
         PageView {
-            pagesArray: ["Settings", "Fonts", "Transliteration"]
+            pagesArray: ["Settings", "Fonts", "Transliteration", "Additional"]
             currentIndex: 0
             pageContent: {
                 switch(currentIndex) {
                 case 1: return fontSettingsComponent
                 case 2: return transliterationSettingsComponent
+                case 3: return additionalSettingsComponent
                 }
                 return coreSettingsComponent
             }
@@ -73,228 +74,85 @@ Item {
     Component {
         id: coreSettingsComponent
 
-        Row {
+        Column {
             spacing: 20
 
             Item {
-                width: (parent.width - parent.spacing)/2
-                height: parent.height - parent.spacing
-                anchors.verticalCenter: parent.verticalCenter
+                height: 30
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
 
-                Column {
-                    anchors.fill: parent
-                    anchors.topMargin: 20
-                    anchors.leftMargin: 20
-                    spacing: 20
+            GroupBox {
+                label: Text { text: "Active Languages" }
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                    GroupBox {
-                        width: parent.width
-                        label: Text { text: "Auto Save" }
+                Grid {
+                    id: activeLanguagesView
+                    width: parent.width
+                    spacing: 5
+                    columns: 4
 
-                        Column {
-                            width: parent.width
-                            spacing: 10
-
-                            CheckBox2 {
-                                text: "Enable AutoSave"
-                                checked: scriteDocument.autoSave
-                                onToggled: scriteDocument.autoSave = checked
-                            }
-
-                            Text {
-                                width: parent.width
-                                text: "Auto Save Interval (in seconds)"
-                            }
-
-                            TextField2 {
-                                width: parent.width
-                                enabled: scriteDocument.autoSave
-                                text: scriteDocument.autoSaveDurationInSeconds
-                                validator: IntValidator {
-                                    bottom: 1; top: 3600
-                                }
-                                onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
-                            }
-                        }
-                    }
-
-                    GroupBox {
-                        width: parent.width
-
-                        Column {
-                            width: parent.width
-                            spacing: 10
-
-                            CheckBox2 {
-                                checkable: true
-                                checked: structureCanvasSettings.showGrid
-                                text: "Show Grid in Structure Tab"
-                                onToggled: structureCanvasSettings.showGrid = checked
-                            }
-
-                            // Colors
-                            Row {
-                                spacing: 10
-                                width: parent.width
-
-                                Text {
-                                    font.pixelSize: 14
-                                    text: "Background Color"
-                                    horizontalAlignment: Text.AlignRight
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Rectangle {
-                                    border.width: 1
-                                    border.color: primaryColors.borderColor
-                                    width: 30; height: 30
-                                    color: structureCanvasSettings.canvasColor
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: structureCanvasSettings.canvasColor = app.pickColor(structureCanvasSettings.canvasColor)
-                                    }
-                                }
-
-                                Text {
-                                    text: "Grid Color"
-                                    font.pixelSize: 14
-                                    horizontalAlignment: Text.AlignRight
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Rectangle {
-                                    border.width: 1
-                                    border.color: primaryColors.borderColor
-                                    width: 30; height: 30
-                                    color: structureCanvasSettings.gridColor
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: structureCanvasSettings.gridColor = app.pickColor(structureCanvasSettings.gridColor)
-                                    }
-                                }
-                            }
-
-                            Row {
-                                spacing: 10
-                                width: parent.width
-                                visible: app.isWindowsPlatform || app.isLinuxPlatform
-
-                                Text {
-                                    id: wzfText
-                                    text: "Zoom Speed"
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Slider {
-                                    from: 1
-                                    to: 20
-                                    orientation: Qt.Horizontal
-                                    snapMode: Slider.SnapAlways
-                                    value: scrollAreaSettings.zoomFactor * 100
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width-wzfText.width-parent.spacing
-                                    onMoved: scrollAreaSettings.zoomFactor = value / 100
-                                }
-                            }
-                        }
-                    }
-
-                    GroupBox {
-                        width: parent.width
-                        label: Text {
-                            text: "Screenplay Editor"
-                        }
-
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.enableSpellCheck
-                            text: "Enable spell check"
-                            onToggled: screenplayEditorSettings.enableSpellCheck = checked
-                        }
-                    }
-
-                    GroupBox {
-                        width: parent.width
-                        label: Text {
-                            text: "Animations"
-                        }
-
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.enableAnimations
-                            text: "Enable Animations"
-                            onToggled: screenplayEditorSettings.enableAnimations = checked
+                    Repeater {
+                        model: app.transliterationEngine.getLanguages()
+                        delegate: CheckBox2 {
+                            width: activeLanguagesView.width/activeLanguagesView.columns
+                            checkable: true
+                            checked: modelData.active
+                            text: modelData.key
+                            onToggled: app.transliterationEngine.markLanguage(modelData.value,checked)
                         }
                     }
                 }
             }
 
-            Item {
-                width: (parent.width - parent.spacing)/2
-                height: parent.height - parent.spacing
-                anchors.verticalCenter: parent.verticalCenter
+            Row {
+                spacing: 20
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                Column {
-                    anchors.fill: parent
-                    anchors.topMargin: 20
-                    anchors.rightMargin: 20
-                    spacing: 20
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text { text: "Auto Save" }
 
-                    GroupBox {
-                        label: Text { text: "Active Languages" }
+                    Column {
                         width: parent.width
+                        spacing: 10
 
-                        Grid {
-                            id: activeLanguagesView
+                        CheckBox2 {
+                            text: "Enable AutoSave"
+                            checked: scriteDocument.autoSave
+                            onToggled: scriteDocument.autoSave = checked
+                        }
+
+                        Text {
                             width: parent.width
-                            spacing: 5
-                            columns: 2
+                            text: "Auto Save Interval (in seconds)"
+                        }
 
-                            Repeater {
-                                model: app.transliterationEngine.getLanguages()
-                                delegate: CheckBox2 {
-                                    width: activeLanguagesView.width/activeLanguagesView.columns
-                                    checkable: true
-                                    checked: modelData.active
-                                    text: modelData.key
-                                    onToggled: app.transliterationEngine.markLanguage(modelData.value,checked)
-                                }
+                        TextField2 {
+                            width: parent.width
+                            enabled: scriteDocument.autoSave
+                            text: scriteDocument.autoSaveDurationInSeconds
+                            validator: IntValidator {
+                                bottom: 1; top: 3600
                             }
+                            onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
                         }
                     }
+                }
 
-                    GroupBox {
-                        id: pageLayoutGroupBox
-                        label: Text { text: "Page Layout (Display)" }
-                        width: parent.width
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text {
+                        text: "Screenplay Editor"
+                    }
 
-                        Column {
-                            width: parent.width
-                            spacing: 10
-
-                            Text {
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                text: "Default Resolution: <strong>" + scriteDocument.displayFormat.pageLayout.defaultResolution + "</strong>"
-                            }
-
-                            TextField2 {
-                                width: parent.width
-                                placeholderText: "leave empty for default, or enter a custom value."
-                                text: scriteDocument.displayFormat.pageLayout.customResolution > 0 ? scriteDocument.displayFormat.pageLayout.customResolution : ""
-                                onEditingComplete: {
-                                    var value = parseFloat(text)
-                                    if(isNaN(value))
-                                        scriteDocument.displayFormat.pageLayout.customResolution = 0
-                                    else
-                                        scriteDocument.displayFormat.pageLayout.customResolution = value
-                                }
-                            }
-                        }
+                    CheckBox2 {
+                        checked: screenplayEditorSettings.enableSpellCheck
+                        text: "Enable spell check"
+                        onToggled: screenplayEditorSettings.enableSpellCheck = checked
                     }
                 }
             }
@@ -427,6 +285,156 @@ Item {
                             }
                         }
                     }                    
+                }
+            }
+        }
+    }
+
+    Component {
+        id: additionalSettingsComponent
+
+        Column {
+            spacing: 20
+
+            Item {
+                height: 30
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            GroupBox {
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Column {
+                    width: parent.width
+                    spacing: 10
+
+                    CheckBox2 {
+                        checkable: true
+                        checked: structureCanvasSettings.showGrid
+                        text: "Show Grid in Structure Tab"
+                        onToggled: structureCanvasSettings.showGrid = checked
+                    }
+
+                    // Colors
+                    Row {
+                        spacing: 10
+                        width: parent.width
+
+                        Text {
+                            font.pixelSize: 14
+                            text: "Background Color"
+                            horizontalAlignment: Text.AlignRight
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Rectangle {
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+                            width: 30; height: 30
+                            color: structureCanvasSettings.canvasColor
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: structureCanvasSettings.canvasColor = app.pickColor(structureCanvasSettings.canvasColor)
+                            }
+                        }
+
+                        Text {
+                            text: "Grid Color"
+                            font.pixelSize: 14
+                            horizontalAlignment: Text.AlignRight
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Rectangle {
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+                            width: 30; height: 30
+                            color: structureCanvasSettings.gridColor
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: structureCanvasSettings.gridColor = app.pickColor(structureCanvasSettings.gridColor)
+                            }
+                        }
+                    }
+
+                    Row {
+                        spacing: 10
+                        width: parent.width
+                        visible: app.isWindowsPlatform || app.isLinuxPlatform
+
+                        Text {
+                            id: wzfText
+                            text: "Zoom Speed"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Slider {
+                            from: 1
+                            to: 20
+                            orientation: Qt.Horizontal
+                            snapMode: Slider.SnapAlways
+                            value: scrollAreaSettings.zoomFactor * 100
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width-wzfText.width-parent.spacing
+                            onMoved: scrollAreaSettings.zoomFactor = value / 100
+                        }
+                    }
+                }
+            }
+
+            Row {
+                spacing: 20
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text {
+                        text: "Animations"
+                    }
+
+                    CheckBox2 {
+                        checked: screenplayEditorSettings.enableAnimations
+                        text: "Enable Animations"
+                        onToggled: screenplayEditorSettings.enableAnimations = checked
+                    }
+                }
+
+                GroupBox {
+                    label: Text { text: "Page Layout (Display)" }
+                    width: (parent.width - parent.spacing)/2
+
+                    Column {
+                        width: parent.width
+                        spacing: 10
+
+                        Text {
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            text: "Default Resolution: <strong>" + scriteDocument.displayFormat.pageLayout.defaultResolution + "</strong>"
+                        }
+
+                        TextField2 {
+                            width: parent.width
+                            placeholderText: "leave empty for default, or enter a custom value."
+                            text: scriteDocument.displayFormat.pageLayout.customResolution > 0 ? scriteDocument.displayFormat.pageLayout.customResolution : ""
+                            onEditingComplete: {
+                                var value = parseFloat(text)
+                                if(isNaN(value))
+                                    scriteDocument.displayFormat.pageLayout.customResolution = 0
+                                else
+                                    scriteDocument.displayFormat.pageLayout.customResolution = value
+                            }
+                        }
+                    }
                 }
             }
         }
