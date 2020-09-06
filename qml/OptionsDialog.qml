@@ -698,6 +698,7 @@ Item {
                                 text: pageSetupSettings.watermarkText
                                 onTextEdited: pageSetupSettings.watermarkText = text
                                 enabled: pageSetupSettings.watermarkEnabled
+                                enableTransliteration: true
                             }
 
                             Text {
@@ -962,6 +963,7 @@ Item {
                                 placeholderText: "(max 100 letters)"
                                 tabItem: subtitleField
                                 backTabItem: websiteField
+                                enableTransliteration: true
                             }
                         }
 
@@ -989,6 +991,7 @@ Item {
                                 placeholderText: "(max 100 letters)"
                                 tabItem: basedOnField
                                 backTabItem: titleField
+                                enableTransliteration: true
                             }
                         }
 
@@ -1016,6 +1019,7 @@ Item {
                                 placeholderText: "(max 100 letters)"
                                 tabItem: versionField
                                 backTabItem: subtitleField
+                                enableTransliteration: true
                             }
                         }
 
@@ -1043,6 +1047,7 @@ Item {
                                 placeholderText: "(max 20 letters)"
                                 tabItem: authorField
                                 backTabItem:  basedOnField
+                                enableTransliteration: true
                             }
                         }
 
@@ -1070,6 +1075,7 @@ Item {
                                 placeholderText: "(max 100 letters)"
                                 tabItem: contactField
                                 backTabItem: versionField
+                                enableTransliteration: true
                             }
                         }
                     }
@@ -1101,6 +1107,7 @@ Item {
                                 maximumLength: 100
                                 tabItem: addressField
                                 backTabItem: authorField
+                                enableTransliteration: true
                             }
                         }
 
