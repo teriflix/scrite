@@ -869,6 +869,13 @@ qreal Application::distanceBetweenPoints(const QPointF &p1, const QPointF &p2) c
 
 QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, const QSizeF &atBest) const
 {
+    if( in.width() < atBest.width() || in.height() < atBest.height() )
+    {
+        QRectF ret(0, 0, atBest.width(), atBest.height());
+        ret.moveCenter(around.center());
+        return ret;
+    }
+
     QRectF around2;
     if(atBest.width() > in.width() || atBest.height() > in.height())
         around2 = QRectF(0, 0, qMin(atBest.width(), in.width()), qMin(atBest.height(), in.height()));

@@ -79,6 +79,24 @@ Item {
             }
 
             ToolButton3 {
+                onClicked: {
+                    var item = currentElementItemBinder.get
+                    if(item === null) {
+                        if(elementItems.count > 0)
+                            item = elementItems.itemAt(0)
+                        if(item === null) {
+                            canvasScroll.zoomOneMiddleArea()
+                            return
+                        }
+                    }
+                    canvasScroll.zoomOneToItem(item)
+                }
+                iconSource: "../icons/navigation/zoom_one.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom One"
+            }
+
+            ToolButton3 {
                 onClicked: canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox)
                 iconSource: "../icons/navigation/zoom_fit.png"
                 autoRepeat: true
@@ -228,11 +246,29 @@ Item {
                                            visibleArea.widthRatio * contentWidth / canvas.scale,
                                            visibleArea.heightRatio * contentHeight / canvas.scale )
 
+        function zoomOneMiddleArea() {
+            var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
+                                     (canvas.height-canvasScroll.height)/2,
+                                     canvasScroll.width,
+                                     canvasScroll.height)
+            canvasScroll.ensureVisible(middleArea)
+        }
+
+        function zoomOneToItem(item) {
+            if(item === null)
+                return
+            var bbox = canvasItemsBoundingBox.boundingBox
+            var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
+            var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
+            var visibleArea = app.querySubRectangle(bbox, itemRect, atBest)
+            canvasScroll.zoomFit(visibleArea)
+        }
+
         GridBackground {
             id: canvas
             antialiasing: false
-            majorTickLineWidth: 2
-            minorTickLineWidth: 1
+            majorTickLineWidth: 2*app.devicePixelRatio
+            minorTickLineWidth: 1*app.devicePixelRatio
             width: widthBinder.get
             height: heightBinder.get
             tickColorOpacity: 0.25 * scale
@@ -882,23 +918,14 @@ Item {
             }
 
             if(scriteDocument.structure.elementCount === 0) {
-                var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
-                                         (canvas.height-canvasScroll.height)/2,
-                                         canvasScroll.width,
-                                         canvasScroll.height)
-                canvasScroll.ensureVisible(middleArea)
+                canvasScroll.zoomOneMiddleArea()
             } else {
                 var item = currentElementItemBinder.get
                 var bbox = canvasItemsBoundingBox.boundingBox
-
                 if(item === null)
                     canvasScroll.zoomFit(bbox)
-                else {
-                    var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
-                    var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
-                    var visibleArea = app.querySubRectangle(bbox, itemRect, atBest)
-                    canvasScroll.zoomFit(visibleArea)
-                }
+                else
+                    canvasScroll.zoomOneToItem(item)
             }
         }
     }

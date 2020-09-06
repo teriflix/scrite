@@ -129,5 +129,6 @@
         <file>icons/navigation/zoom_fit.png</file>
         <file>icons/content/bookmark.png</file>
         <file>icons/content/bookmark_outline.png</file>
+        <file>icons/navigation/zoom_one.png</file>
     </qresource>
 </RCC>
