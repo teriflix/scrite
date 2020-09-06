@@ -955,9 +955,11 @@ void ScreenplayTextDocument::connectToScreenplaySignals()
         return;
 
     connect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved);
+    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset);
     connect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayTextDocument::onSceneRemoved);
     connect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayTextDocument::onSceneInserted);
     connect(m_screenplay, &Screenplay::activeSceneChanged, this, &ScreenplayTextDocument::onActiveSceneChanged);
+    connect(m_screenplay, &Screenplay::modelAboutToBeReset, this, &ScreenplayTextDocument::onScreenplayAboutToReset);
 
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
@@ -998,8 +1000,11 @@ void ScreenplayTextDocument::disconnectFromScreenplaySignals()
         return;
 
     disconnect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved);
+    disconnect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset);
     disconnect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayTextDocument::onSceneRemoved);
     disconnect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayTextDocument::onSceneInserted);
+    disconnect(m_screenplay, &Screenplay::activeSceneChanged, this, &ScreenplayTextDocument::onActiveSceneChanged);
+    disconnect(m_screenplay, &Screenplay::modelAboutToBeReset, this, &ScreenplayTextDocument::onScreenplayAboutToReset);
 
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
@@ -1064,6 +1069,17 @@ void ScreenplayTextDocument::disconnectFromSceneSignals(Scene *scene)
     disconnect(heading, &SceneHeading::textChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged);
 }
 
+void ScreenplayTextDocument::onScreenplayAboutToReset()
+{
+    m_screenplayIsBeingReset = true;
+}
+
+void ScreenplayTextDocument::onScreenplayReset()
+{
+    m_screenplayIsBeingReset = false;
+    this->loadScreenplay();
+}
+
 void ScreenplayTextDocument::onSceneMoved(ScreenplayElement *element, int from, int to)
 {
     this->onSceneRemoved(element, from);
@@ -1072,6 +1088,9 @@ void ScreenplayTextDocument::onSceneMoved(ScreenplayElement *element, int from, 
 
 void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int index)
 {
+    if(m_screenplayIsBeingReset)
+        return;
+
     Q_UNUSED(index)
     Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating while new scene was removed.");
 

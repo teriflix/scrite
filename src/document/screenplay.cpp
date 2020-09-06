@@ -715,12 +715,25 @@ void Screenplay::clearElements()
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
     if(info) info->lock();
 
+    this->beginResetModel();
+
     QStringList sceneIds;
     while(m_elements.size())
     {
         sceneIds << m_elements.first()->sceneID();
-        this->removeElement(m_elements.first());
+        // this->removeElement(m_elements.first());
+
+        ScreenplayElement *ptr = m_elements.takeLast();
+        emit elementRemoved(ptr, m_elements.size());
+        disconnect(ptr, nullptr, this, nullptr);
+        GarbageCollector::instance()->add(ptr);
     }
+
+    this->endResetModel();
+
+    emit elementCountChanged();
+    emit elementsChanged();
+    this->validateCurrentElementIndex();
 
     if(UndoStack::active())
         UndoStack::active()->push(new UndoClearScreenplayCommand(this, sceneIds));

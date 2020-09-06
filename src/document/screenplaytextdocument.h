@@ -198,6 +198,10 @@ private:
     void connectToSceneSignals(Scene *scene);
     void disconnectFromSceneSignals(Scene *scene);
 
+    // When screenplay is being cleared
+    void onScreenplayAboutToReset();
+    void onScreenplayReset();
+
     // Hook to signals that convey change in sequencing of scenes
     void onSceneMoved(ScreenplayElement *ptr, int from, int to);
     void onSceneRemoved(ScreenplayElement *ptr, int index);
@@ -256,8 +260,9 @@ private:
     bool m_componentComplete = true;
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
-    ExecLaterTimer m_sceneResetTimer;
+    bool m_screenplayIsBeingReset = false;
     QList<Scene*> m_sceneResetList;
+    ExecLaterTimer m_sceneResetTimer;
     bool m_printEachSceneOnANewPage = false;
     ExecLaterTimer m_loadScreenplayTimer;
     QStringList m_highlightDialoguesOf;
