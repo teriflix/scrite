@@ -20,8 +20,8 @@ Item {
     readonly property real splashWidth: 1464
     readonly property real splashHeight: 978
     readonly property real iscale: (Screen.width * 0.5)/splashWidth
-    width: iscale * splashWidth
-    height: iscale * splashHeight
+    width: Math.max(iscale * splashWidth, 897)
+    height: Math.max(iscale * splashHeight, 600)
 
     Component.onCompleted: {
         modalDialog.closeUponClickOutsideContentArea = true
