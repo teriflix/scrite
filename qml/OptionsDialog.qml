@@ -944,6 +944,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: titleField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.title
                                 selectByMouse: true
@@ -951,6 +952,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
+                                tabItem: subtitleField
+                                backTabItem: websiteField
                             }
                         }
 
@@ -968,6 +971,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: subtitleField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.subtitle
                                 selectByMouse: true
@@ -975,6 +979,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
+                                tabItem: basedOnField
+                                backTabItem: titleField
                             }
                         }
 
@@ -992,6 +998,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: basedOnField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.basedOn
                                 selectByMouse: true
@@ -999,6 +1006,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
+                                tabItem: versionField
+                                backTabItem: subtitleField
                             }
                         }
 
@@ -1016,6 +1025,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: versionField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.version
                                 selectByMouse: true
@@ -1023,6 +1033,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 20
                                 placeholderText: "(max 20 letters)"
+                                tabItem: authorField
+                                backTabItem:  basedOnField
                             }
                         }
 
@@ -1040,6 +1052,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: authorField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.author
                                 selectByMouse: true
@@ -1047,6 +1060,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
+                                tabItem: contactField
+                                backTabItem: versionField
                             }
                         }
                     }
@@ -1068,6 +1083,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: contactField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.contact
                                 selectByMouse: true
@@ -1075,6 +1091,8 @@ Item {
                                 font.pixelSize: 20
                                 placeholderText: "(Optional) Company / Studio name (max 100 letters)"
                                 maximumLength: 100
+                                tabItem: addressField
+                                backTabItem: authorField
                             }
                         }
 
@@ -1092,6 +1110,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: addressField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.address
                                 selectByMouse: true
@@ -1099,6 +1118,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Address (max 100 letters)"
+                                tabItem: emailField
+                                backTabItem: contactField
                             }
                         }
 
@@ -1116,6 +1137,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: emailField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.email
                                 selectByMouse: true
@@ -1123,6 +1145,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Email (max 100 letters)"
+                                tabItem: phoneField
+                                backTabItem: addressField
                             }
                         }
 
@@ -1140,6 +1164,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: phoneField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.phoneNumber
                                 selectByMouse: true
@@ -1147,6 +1172,8 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 20
                                 placeholderText: "(Optional) Phone number (max 20 digits/letters)"
+                                tabItem: websiteField
+                                backTabItem: emailField
                             }
                         }
 
@@ -1164,6 +1191,7 @@ Item {
                             }
 
                             TextField2 {
+                                id: websiteField
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.website
                                 selectByMouse: true
@@ -1171,12 +1199,15 @@ Item {
                                 font.pixelSize: 20
                                 maximumLength: 150
                                 placeholderText: "(Optional) Website (max 150 letters)"
+                                tabItem: titleField
+                                backTabItem: phoneField
                             }
                         }
                     }
                 }
 
                 CheckBox2 {
+                    id: includeInTitlePageCheckBox
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Include Title Page In Preview"
                     checked: screenplayEditorSettings.includeTitlePageInPreview
