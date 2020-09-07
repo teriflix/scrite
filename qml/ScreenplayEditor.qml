@@ -631,6 +631,13 @@ Rectangle {
                 delay: 100
             }
 
+            BoxShadow {
+                visible: screenplayAdapter.currentIndex === contentItem.theIndex && synopsisSidePanel.expanded
+                anchors.fill: synopsisSidePanel
+                anchors.leftMargin: 9
+                opacity: 1
+            }
+
             SidePanel {
                 id: synopsisSidePanel
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
@@ -656,6 +663,11 @@ Rectangle {
                 width: maxPanelWidth
                 clip: true
                 visible: width >= 100 && screenplayEditorSettings.displaySceneNotes
+                opacity: expanded ? (screenplayAdapter.currentIndex < 0 || screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
                 content: TextArea {
                     id: synopsisEdit
                     background: Rectangle {
@@ -672,6 +684,10 @@ Rectangle {
                     topPadding: 10
                     bottomPadding: 10
                     readOnly: scriteDocument.readOnly
+                    onActiveFocusChanged: {
+                        if(activeFocus)
+                            screenplayAdapter.currentIndex = contentItem.theIndex
+                    }
 
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
