@@ -141,6 +141,9 @@ public:
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
+    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
+    QAbstractListModel *notesModel() const { return &((const_cast<Character*>(this))->m_notes); }
+
     Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
     QQmlListProperty<Note> notes();
     Q_INVOKABLE void addNote(Note *ptr);
@@ -164,7 +167,7 @@ private:
 
 private:
     QString m_name;
-    QList<Note *> m_notes;
+    ObjectListPropertyModel<Note *> m_notes;
     Structure* m_structure = nullptr;
 };
 

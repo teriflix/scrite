@@ -32,6 +32,7 @@
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "spellcheckservice.h"
+#include "objectlistpropertymodel.h"
 
 class Scene;
 class SceneHeading;
@@ -257,6 +258,9 @@ public:
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
 
+    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
+    QAbstractListModel *notesModel() const { return &((const_cast<Scene*>(this))->m_notes); }
+
     Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
     QQmlListProperty<Note> notes();
     Q_INVOKABLE void addNote(Note *ptr);
@@ -323,7 +327,7 @@ private:
     static void staticClearNotes(QQmlListProperty<Note> *list);
     static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
     static int staticNoteCount(QQmlListProperty<Note> *list);
-    QList<Note *> m_notes;
+    ObjectListPropertyModel<Note *> m_notes;
 };
 
 class ScreenplayFormat;
