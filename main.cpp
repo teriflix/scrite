@@ -28,6 +28,7 @@
 #include "completer.h"
 #include "ruleritem.h"
 #include "autoupdate.h"
+#include "automation.h"
 #include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
@@ -269,6 +270,7 @@ int main(int argc, char **argv)
     QQuickStyle::setStyle("Material");
 
     QQuickView qmlView;
+    qmlView.setObjectName(QStringLiteral("ScriteQmlWindow"));
     qmlView.setFormat(format);
 #ifdef Q_OS_WIN
     if( QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10 )
@@ -287,9 +289,26 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("shortcutsModel", ShortcutsModel::instance());
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
+    Automation::init(&qmlView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(qMin(600,primaryScreenSize.width()), qMin(375,primaryScreenSize.height())));
-    qmlView.showMaximized();
+
+    const QByteArray windowSize = qgetenv("SCRITE_WINDOW_SIZE");
+    if(windowSize.isEmpty())
+        qmlView.showMaximized();
+    else
+    {
+        QTextStream ts(windowSize);
+        int width = 0, height = 0;
+        ts >> width >> height;
+        if(width == 0 || height == 0)
+            qmlView.showFullScreen();
+        else
+        {
+            qmlView.resize( qMax(width,1366), qMax(height,766) );
+            qmlView.show();
+        }
+    }
     qmlView.raise();
 
 #ifdef Q_OS_MAC
@@ -317,3 +336,4 @@ int main(int argc, char **argv)
 
     return a.exec();
 }
+

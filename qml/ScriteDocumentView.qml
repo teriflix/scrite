@@ -1723,4 +1723,10 @@ Item {
             }
         }
     }
+
+    Loader {
+        active: automationScript !== ""
+        source: automationScript
+        onSourceChanged: console.log("PA: " + source)
+    }
 }

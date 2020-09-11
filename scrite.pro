@@ -4,6 +4,9 @@ TARGET = Scrite
 
 DEFINES += PHTRANSLATE_STATICLIB
 
+DEFINES += SCRITE_ENABLE_AUTOMATION
+QT += testlib
+
 CONFIG(release, debug|release): {
     DEFINES += QT_NO_DEBUG_OUTPUT
     CONFIG += qtquickcompiler
@@ -21,7 +24,8 @@ INCLUDEPATH += . \
         ./src/utils \
         ./src/document \
         ./src/interfaces \
-        ./src/reports
+        ./src/reports \
+        ./src/automation
 
 HEADERS += \
     3rdparty/phtranslator/LanguageCodes.h \
@@ -36,6 +40,12 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
+    src/automation/automation.h \
+    src/automation/automationrecorder.h \
+    src/automation/eventautomationstep.h \
+    src/automation/pausestep.h \
+    src/automation/scriptautomationstep.h \
+    src/automation/windowcapture.h \
     src/core/objectlistpropertymodel.h \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
@@ -120,6 +130,13 @@ SOURCES += \
     3rdparty/poly2tri/sweep/cdt.cc \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
+    src/automation/automation.cpp \
+    src/automation/automation_module.cpp \
+    src/automation/automationrecorder.cpp \
+    src/automation/eventautomationstep.cpp \
+    src/automation/pausestep.cpp \
+    src/automation/scriptautomationstep.cpp \
+    src/automation/windowcapture.cpp \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
     src/importers/openfromlibrary.cpp \

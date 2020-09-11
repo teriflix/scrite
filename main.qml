@@ -494,11 +494,18 @@ Rectangle {
             var timestamp = (new Date()).getTime()
             if(timestamp - lastSnapshotTimestamp > 500) {
                 lastSnapshotTimestamp = timestamp
-                window.grabToImage( function(result) {
-                    result.saveToFile("/Users/prashanthudupa/Pictures/scrite-ui-" + timestamp + ".jpg")
-                }, Qt.size(window.width*2,window.height*2))
+                windowCapture.start()
             }
         }
+    }
+
+    WindowCapture {
+        id: windowCapture
+        fileName: "scrite-window-capture.jpg"
+        format: WindowCapture.JPGFormat
+        forceCounterInFileName: true
+        window: qmlWindow
+        maxImageSize: Qt.size(1920, 1080)
     }
 
     Component.onCompleted: qmlWindow.raise()
