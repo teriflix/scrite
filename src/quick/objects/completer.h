@@ -32,6 +32,11 @@ public:
     QStringList strings() const { return m_strings; }
     Q_SIGNAL void stringsChanged();
 
+    Q_PROPERTY(int minimumPrefixLength READ minimumPrefixLength WRITE setMinimumPrefixLength NOTIFY minimumPrefixLengthChanged)
+    void setMinimumPrefixLength(int val);
+    int minimumPrefixLength() const { return m_minimumPrefixLength; }
+    Q_SIGNAL void minimumPrefixLengthChanged();
+
     // model() method is available in parent class.
     Q_PROPERTY(QAbstractItemModel* completionModel READ completionModel CONSTANT)
 
@@ -62,6 +67,7 @@ private:
 
 private:
     QStringList m_strings;
+    int m_minimumPrefixLength = 1;
     QStringList m_suggestions;
     SuggestionMode m_suggestionMode = AutoCompleteSuggestion;
     QStringListModel *m_stringsModel = nullptr;

@@ -51,6 +51,15 @@ void Completer::setStrings(const QStringList &val)
     emit stringsChanged();
 }
 
+void Completer::setMinimumPrefixLength(int val)
+{
+    if(m_minimumPrefixLength == val)
+        return;
+
+    m_minimumPrefixLength = val;
+    emit minimumPrefixLengthChanged();
+}
+
 void Completer::setSuggestionMode(Completer::SuggestionMode val)
 {
     if(m_suggestionMode == val)
@@ -84,6 +93,10 @@ void Completer::setSuggestions(const QStringList &val)
 
 void Completer::updateSuggestions()
 {
+    const QString prefix = this->completionPrefix();
+    if(m_minimumPrefixLength > 0 && prefix.length() < m_minimumPrefixLength)
+        return;
+
     const QAbstractItemModel *cmodel = this->completionModel();
     const int rows = qMin(cmodel->rowCount(), this->maxVisibleItems());
     QStringList vals;
@@ -93,7 +106,7 @@ void Completer::updateSuggestions()
         const QModelIndex index = cmodel->index(i, 0);
         QString val = index.data(Qt::DisplayRole).toString();
         if(m_suggestionMode == AutoCompleteSuggestion)
-            val = val.remove(0, this->completionPrefix().length());
+            val = val.remove(0, prefix.length());
         if(!val.isEmpty())
             vals << val;
     }
