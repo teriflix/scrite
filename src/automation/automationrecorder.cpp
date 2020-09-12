@@ -72,6 +72,7 @@ void AutomationRecorder::stopRecording()
     ts << "import Scrite 1.0\n\n";
     ts << "Automation {\n";
     ts << "    id: automation\n\n";
+    ts << "    ScriptStep { onRunScript: splashLoader.active = false }\n\n";
     ts << "    PauseStep { duration: 500 }\n\n";
 
     Q_FOREACH(QVariant statement, m_recordedStatements)
@@ -239,6 +240,13 @@ void AutomationRecorder::setRecording(bool val)
         return;
 
     m_recording = val;
+    if(this->parent())
+    {
+        if(m_recording)
+            this->parent()->setProperty("windowTitle", "Recording");
+        else
+            this->parent()->setProperty("windowTitle", "Done");
+    }
     emit recordingChanged();
 }
 
