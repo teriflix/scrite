@@ -61,6 +61,8 @@ private:
     QString m_errorMessage;
 };
 
+#ifdef SCRITE_ENABLE_AUTOMATION
+
 class Automation : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -125,4 +127,16 @@ private:
     bool m_quitAppWhenFinished = true;
 };
 
+#else
+
+class QQuickView;
+class Automation
+{
+public:
+    static void init(QQuickView *qmlWindow);
+};
+
+#endif // SCRITE_ENABLE_AUTOMATION
+
 #endif // AUTOMATION_H
+

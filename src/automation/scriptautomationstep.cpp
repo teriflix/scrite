@@ -11,6 +11,8 @@
 **
 ****************************************************************************/
 
+#ifdef SCRITE_ENABLE_AUTOMATION
+
 #include "scriptautomationstep.h"
 
 ScriptAutomationStep::ScriptAutomationStep(QObject *parent)
@@ -29,3 +31,5 @@ void ScriptAutomationStep::run()
     emit runScript();
     this->finish();
 }
+
+#endif // SCRITE_ENABLE_AUTOMATION

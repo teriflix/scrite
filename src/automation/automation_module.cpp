@@ -40,6 +40,8 @@ void Automation::init(QQuickView *qmlWindow)
     if( QFile::exists(automationScript) )
         qmlWindow->engine()->rootContext()->setContextProperty("automationScript", QUrl::fromLocalFile(automationScript));
     else
+#else
+    Q_UNUSED(qmlWindow)
 #endif
         qmlWindow->engine()->rootContext()->setContextProperty("automationScript", QString());
 }

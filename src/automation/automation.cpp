@@ -59,6 +59,8 @@ void AbstractAutomationStep::setErrorMessage(const QString &val)
     emit errorMessageChanged();
 }
 
+#ifdef SCRITE_ENABLE_AUTOMATION
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Automation::Automation(QObject *parent)
@@ -226,3 +228,5 @@ void Automation::setRunning(bool val)
     m_running = val;
     emit runningChanged();
 }
+
+#endif // SCRITE_ENABLE_AUTOMATION

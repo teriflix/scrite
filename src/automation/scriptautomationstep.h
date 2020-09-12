@@ -11,6 +11,8 @@
 **
 ****************************************************************************/
 
+#ifdef SCRITE_ENABLE_AUTOMATION
+
 #ifndef SCRIPTAUTOMATIONSTEP_H
 #define SCRIPTAUTOMATIONSTEP_H
 
@@ -31,3 +33,5 @@ protected:
 };
 
 #endif // SCRIPTAUTOMATIONSTEP_H
+
+#endif // SCRITE_ENABLE_AUTOMATION
