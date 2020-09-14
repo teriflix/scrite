@@ -1554,6 +1554,8 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     QTextCursor cursor(this->document());
     cursor.setPosition(fromPosition);
 
+    QStringList lines;
+
     QTextBlock block = cursor.block();
     while(block.isValid() && toPosition > block.position())
     {
@@ -1572,12 +1574,11 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         SceneElement *element = userData->sceneElement();
 
         QJsonObject para;
-#ifndef QT_NO_DEBUG
-        para.insert(QStringLiteral("typeString"), element->typeAsString());
-#endif
         para.insert(QStringLiteral("type"), element->type());
         para.insert(QStringLiteral("text"), cursor.selectedText());
         content.append(para);
+
+        lines += cursor.selectedText();
 
         block = block.next();
     }
@@ -1587,9 +1588,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     QClipboard *clipboard = Application::instance()->clipboard();
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(QStringLiteral("scrite/screenplay"), contentJson);
-#ifndef QT_NO_DEBUG
-    mimeData->setText(contentJson);
-#endif
+    mimeData->setText(lines.join("\n"));
     clipboard->setMimeData(mimeData);
 }
 
