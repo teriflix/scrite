@@ -1572,7 +1572,9 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         SceneElement *element = userData->sceneElement();
 
         QJsonObject para;
+#ifndef QT_NO_DEBUG
         para.insert(QStringLiteral("typeString"), element->typeAsString());
+#endif
         para.insert(QStringLiteral("type"), element->type());
         para.insert(QStringLiteral("text"), cursor.selectedText());
         content.append(para);
