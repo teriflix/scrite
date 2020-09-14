@@ -1334,8 +1334,10 @@ Rectangle {
                     }
 
                     function paste2() {
-                        if(canPaste)
-                            sceneDocumentBinder.paste(sceneTextEditor.cursorPosition)
+                        if(canPaste) {
+                            if(!sceneDocumentBinder.paste(sceneTextEditor.cursorPosition))
+                                sceneTextEditor.paste()
+                        }
                     }
                 }
             }

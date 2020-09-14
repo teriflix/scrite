@@ -497,7 +497,7 @@ public:
     Q_SIGNAL void documentInitialized();
 
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
-    Q_INVOKABLE void paste(int fromPosition=-1);
+    Q_INVOKABLE bool paste(int fromPosition=-1);
 
     // QQmlParserStatus interface
     void classBegin();
