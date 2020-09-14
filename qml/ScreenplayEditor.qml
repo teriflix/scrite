@@ -1034,14 +1034,14 @@ Rectangle {
                                     focusPolicy: Qt.NoFocus
                                     text: "Copy\t" + app.polishShortcutTextForDisplay("Ctrl+C")
                                     enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
-                                    onClicked: { sceneTextEditor.copy(); editorContextMenu.close() }
+                                    onClicked: { sceneTextEditor.copy2(); editorContextMenu.close() }
                                 }
 
                                 MenuItem2 {
                                     focusPolicy: Qt.NoFocus
                                     text: "Paste\t" + app.polishShortcutTextForDisplay("Ctrl+V")
                                     enabled: sceneTextEditor.canPaste
-                                    onClicked: { sceneTextEditor.paste(); editorContextMenu.close() }
+                                    onClicked: { sceneTextEditor.paste2(); editorContextMenu.close() }
                                 }
 
                                 MenuSeparator {  }
@@ -1246,19 +1246,43 @@ Rectangle {
                         }
                     }
                     Keys.onPressed: {
-                        if(event.key === Qt.Key_PageUp) {
+                        event.accepted = false
+
+                        switch(event.key) {
+                        case Qt.Key_PageUp:
                             event.accepted = true
                             contentItem.scrollToPreviousScene()
-                        } else if(event.key === Qt.Key_PageDown) {
+                            break
+                        case Qt.Key_PageDown:
                             event.accepted = true
                             contentItem.scrollToNextScene()
-                        } else if(event.modifiers & Qt.ControlModifier && sceneTextEditor.cursorPosition === 0) {
-                            if(app.isMacOSPlatform && event.key === Qt.Key_Delete)
-                                contentItem.mergeWithPreviousScene()
-                            else if(event.key === Qt.Key_Backspace)
-                                contentItem.mergeWithPreviousScene()
-                        } else
-                            event.accepted = false
+                            break
+                        }
+
+                        if(event.modifiers && Qt.ControlModifier) {
+                            switch(event.key) {
+                            case Qt.Key_Delete:
+                                if(app.isMacOSPlatform && sceneTextEditor.cursorPosition === 0) {
+                                    event.accepted = true
+                                    contentItem.mergeWithPreviousScene()
+                                }
+                                break
+                            case Qt.Key_Backspace:
+                                if(sceneTextEditor.cursorPosition === 0) {
+                                    event.accepted = true
+                                    contentItem.mergeWithPreviousScene()
+                                }
+                                break
+                            case Qt.Key_C:
+                                event.accepted = true
+                                copy2()
+                                break
+                            case Qt.Key_V:
+                                event.accepted = true
+                                paste2()
+                                break
+                            }
+                        }
                     }
 
                     // Search & Replace
@@ -1301,6 +1325,17 @@ Rectangle {
                                 contentItem.theScene.endUndoCapture()
                             }
                         }
+                    }
+
+                    // Custom Copy & Paste
+                    function copy2() {
+                        if(hasSelection)
+                            sceneDocumentBinder.copy(selectionStart, selectionEnd)
+                    }
+
+                    function paste2() {
+                        if(canPaste)
+                            sceneDocumentBinder.paste(sceneTextEditor.cursorPosition)
                     }
                 }
             }

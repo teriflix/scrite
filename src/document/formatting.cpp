@@ -27,6 +27,9 @@
 #include <QPageLayout>
 #include <QFontDatabase>
 #include <QTextBlockUserData>
+#include <QClipboard>
+#include <QMimeData>
+#include <QJsonDocument>
 
 static const int IsWordMisspelledProperty = QTextCharFormat::UserProperty+100;
 static const int WordSuggestionsProperty = IsWordMisspelledProperty+1;
@@ -1539,6 +1542,91 @@ QFont SceneDocumentBinder::currentFont() const
 
     QTextCharFormat format = cursor.charFormat();
     return format.font();
+}
+
+void SceneDocumentBinder::copy(int fromPosition, int toPosition)
+{
+    if(this->document() == nullptr)
+        return;
+
+    QJsonArray content;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(fromPosition);
+
+    QTextBlock block = cursor.block();
+    while(block.isValid() && toPosition > block.position())
+    {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if(userData == nullptr)
+        {
+            block = block.next();
+            continue;
+        }
+
+        const int bstart = block.position();
+        const int bend = block.position() + block.length() - 1;
+        cursor.setPosition( qMax(fromPosition, bstart) );
+        cursor.setPosition( qMin(toPosition, bend), QTextCursor::KeepAnchor );
+
+        SceneElement *element = userData->sceneElement();
+
+        QJsonObject para;
+        para.insert(QStringLiteral("typeString"), element->typeAsString());
+        para.insert(QStringLiteral("type"), element->type());
+        para.insert(QStringLiteral("text"), cursor.selectedText());
+        content.append(para);
+
+        block = block.next();
+    }
+
+    const QByteArray contentJson = QJsonDocument(content).toJson();
+
+    QClipboard *clipboard = Application::instance()->clipboard();
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData(QStringLiteral("scrite/screenplay"), contentJson);
+#ifndef QT_NO_DEBUG
+    mimeData->setText(contentJson);
+#endif
+    clipboard->setMimeData(mimeData);
+}
+
+void SceneDocumentBinder::paste(int fromPosition)
+{
+    if(this->document() == nullptr)
+        return;
+
+    const QClipboard *clipboard = Application::instance()->clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/screenplay"));
+    if(contentJson.isEmpty())
+        return;
+
+    const QJsonArray content = QJsonDocument::fromJson(contentJson).array();
+    if(content.isEmpty())
+        return;
+
+    fromPosition = fromPosition >= 0 ? fromPosition : m_cursorPosition;
+
+    QTextCursor cursor(this->document());
+    cursor.setPosition(fromPosition >= 0 ? fromPosition : m_cursorPosition);
+
+    for(int i=0; i<content.size(); i++)
+    {
+        const QJsonObject item = content.at(i).toObject();
+        const int type = item.value( QStringLiteral("type") ).toInt();
+        if(type < SceneElement::Min || type > SceneElement::Max || type == SceneElement::Heading)
+            continue;
+
+        const QString text = item.value( QStringLiteral("text") ).toString();
+        cursor.insertText(text);
+
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(cursor.block());
+        if(userData)
+            userData->sceneElement()->setType( SceneElement::Type(type) );
+
+        cursor.insertBlock();
+    }
 }
 
 void SceneDocumentBinder::classBegin()
