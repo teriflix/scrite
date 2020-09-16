@@ -650,7 +650,7 @@ Rectangle {
                 height: {
                     if(expanded) {
                         if(contentItem.isCurrent)
-                            return contentInstance ? Math.max(contentInstance.contentHeight+50, 300) : 300
+                            return contentInstance ? Math.max(contentInstance.contentHeight+40, 300) : 300
                         return Math.min(300, parent.height)
                     }
                     return sceneHeadingAreaLoader.height

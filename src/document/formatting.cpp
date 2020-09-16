@@ -1612,6 +1612,8 @@ bool SceneDocumentBinder::paste(int fromPosition)
     QTextCursor cursor(this->document());
     cursor.setPosition(fromPosition >= 0 ? fromPosition : m_cursorPosition);
 
+    const bool pasteFormatting = content.size() > 1;
+
     for(int i=0; i<content.size(); i++)
     {
         const QJsonObject item = content.at(i).toObject();
@@ -1619,14 +1621,18 @@ bool SceneDocumentBinder::paste(int fromPosition)
         if(type < SceneElement::Min || type > SceneElement::Max || type == SceneElement::Heading)
             continue;
 
+        if(i > 0)
+            cursor.insertBlock();
+
         const QString text = item.value( QStringLiteral("text") ).toString();
         cursor.insertText(text);
 
-        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(cursor.block());
-        if(userData)
-            userData->sceneElement()->setType( SceneElement::Type(type) );
-
-        cursor.insertBlock();
+        if(pasteFormatting)
+        {
+            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(cursor.block());
+            if(userData)
+                userData->sceneElement()->setType( SceneElement::Type(type) );
+        }
     }
 
     return true;
