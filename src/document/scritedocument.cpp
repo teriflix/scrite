@@ -230,7 +230,7 @@ Scene *ScriteDocument::createNewScene()
 
     Scene *scene = new Scene(m_structure);
     scene->setColor(activeScene ? activeScene->color() : QColor("white"));
-    scene->setTitle("[" + QString::number(m_structure->elementCount()+1) + "] - Scene");
+    scene->setTitle("New Scene");
     scene->heading()->setEnabled(true);
     scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : "EXT");
     scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "SOMEWHERE");
