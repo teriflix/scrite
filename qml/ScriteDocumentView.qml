@@ -1033,6 +1033,7 @@ Item {
             id: editTools
             x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x) / 2)
             height: parent.height
+            spacing: 2
 
             ScreenplayEditorToolbar {
                 id: globalScreenplayEditorToolbar
