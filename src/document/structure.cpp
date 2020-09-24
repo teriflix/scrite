@@ -252,12 +252,168 @@ void StructureElement::syncWithFollowItem()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+Relationship::Relationship(QObject *parent)
+    : QObject(parent),
+      m_with(this, "with")
+{
+    m_of = qobject_cast<Character*>(parent);
+
+    connect(this, &Relationship::ofChanged, this, &Relationship::relationshipChanged);
+    connect(this, &Relationship::nameChanged, this, &Relationship::relationshipChanged);
+    connect(this, &Relationship::withChanged, this, &Relationship::relationshipChanged);
+    connect(this, &Relationship::directionChanged, this, &Relationship::relationshipChanged);
+    connect(this, &Relationship::noteCountChanged, this, &Relationship::relationshipChanged);
+}
+
+Relationship::~Relationship()
+{
+    emit aboutToDelete(this);
+}
+
+void Relationship::setDirection(Relationship::Direction val)
+{
+    if(m_direction == val)
+        return;
+
+    m_direction = val;
+    emit directionChanged();
+}
+
+void Relationship::setName(const QString &val)
+{
+    if(m_name == val)
+        return;
+
+    m_name = val;
+    emit nameChanged();
+}
+
+void Relationship::setWith(Character *val)
+{
+    if(m_with == val)
+        return;
+
+    m_with = val;
+    emit withChanged();
+}
+
+QQmlListProperty<Note> Relationship::notes()
+{
+    return QQmlListProperty<Note>(
+                reinterpret_cast<QObject*>(this),
+                static_cast<void*>(this),
+                &Relationship::staticAppendNote,
+                &Relationship::staticNoteCount,
+                &Relationship::staticNoteAt,
+                &Relationship::staticClearNotes);
+}
+
+void Relationship::addNote(Note *ptr)
+{
+    if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
+        return;
+
+    connect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
+    connect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
+
+    m_notes.append(ptr);
+    emit noteCountChanged();
+}
+
+void Relationship::removeNote(Note *ptr)
+{
+    if(ptr == nullptr)
+        return;
+
+    const int index = m_notes.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    m_notes.removeAt(index);
+
+    disconnect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
+    disconnect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
+
+    emit noteCountChanged();
+}
+
+Note *Relationship::noteAt(int index) const
+{
+    return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
+}
+
+void Relationship::clearNotes()
+{
+    while(m_notes.size())
+        this->removeNote(m_notes.first());
+}
+
+void Relationship::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
+{
+    reinterpret_cast< Relationship* >(list->data)->addNote(ptr);
+}
+
+void Relationship::staticClearNotes(QQmlListProperty<Note> *list)
+{
+    reinterpret_cast< Relationship* >(list->data)->clearNotes();
+}
+
+Note *Relationship::staticNoteAt(QQmlListProperty<Note> *list, int index)
+{
+    return reinterpret_cast< Relationship* >(list->data)->noteAt(index);
+}
+
+int Relationship::staticNoteCount(QQmlListProperty<Note> *list)
+{
+    return reinterpret_cast< Relationship* >(list->data)->noteCount();
+}
+
+bool Relationship::event(QEvent *event)
+{
+    if(event->type() == QEvent::ParentChange)
+    {
+        if(m_of == nullptr)
+        {
+            m_of = qobject_cast<Character*>(this->parent());
+            emit ofChanged();
+        }
+        else if(m_of != this->parent())
+            qFatal("Relationship of a character, once set, cannot be changed.");
+    }
+
+    return QObject::event(event);
+}
+
+void Relationship::setOf(Character *val)
+{
+    if(m_of == val)
+        return;
+
+    m_of = val;
+    emit ofChanged();
+}
+
+void Relationship::resetWith()
+{
+    m_with = nullptr;
+    emit withChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Character::Character(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
 {
+    connect(this, &Character::ageChanged, this, &Character::characterChanged);
     connect(this, &Character::nameChanged, this, &Character::characterChanged);
+    connect(this, &Character::typeChanged, this, &Character::characterChanged);
+    connect(this, &Character::heightChanged, this, &Character::characterChanged);
+    connect(this, &Character::genderChanged, this, &Character::characterChanged);
+    connect(this, &Character::aliasesChanged, this, &Character::characterChanged);
     connect(this, &Character::noteCountChanged, this, &Character::characterChanged);
+    connect(this, &Character::designationChanged, this, &Character::characterChanged);
+    connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
 }
 
 Character::~Character()
@@ -326,6 +482,152 @@ void Character::clearNotes()
         this->removeNote(m_notes.first());
 }
 
+void Character::setType(const QString &val)
+{
+    if(m_type == val)
+        return;
+
+    m_type = val;
+    emit typeChanged();
+}
+
+void Character::setDesignation(const QString &val)
+{
+    if(m_designation == val)
+        return;
+
+    m_designation = val;
+    emit designationChanged();
+}
+
+void Character::setGender(const QString &val)
+{
+    if(m_gender == val)
+        return;
+
+    m_gender = val;
+    emit genderChanged();
+}
+
+void Character::setAge(qreal val)
+{
+    if( qFuzzyCompare(m_age, val) )
+        return;
+
+    m_age = val;
+    emit ageChanged();
+}
+
+void Character::setHeight(qreal val)
+{
+    if( qFuzzyCompare(m_height, val) )
+        return;
+
+    m_height = val;
+    emit heightChanged();
+}
+
+void Character::setAliases(const QStringList &val)
+{
+    if(m_aliases == val)
+        return;
+
+    m_aliases = val;
+    emit aliasesChanged();
+}
+
+QQmlListProperty<Relationship> Character::relationships()
+{
+    return QQmlListProperty<Relationship>(
+                reinterpret_cast<QObject*>(this),
+                static_cast<void*>(this),
+                &Character::staticAppendRelationship,
+                &Character::staticRelationshipCount,
+                &Character::staticRelationshipAt,
+                &Character::staticClearRelationships);
+}
+
+void Character::addRelationship(Relationship *ptr)
+{
+    if(ptr == nullptr || m_relationships.indexOf(ptr) >= 0)
+        return;
+
+    connect(ptr, &Relationship::aboutToDelete, this, &Character::removeRelationship);
+    connect(ptr, &Relationship::relationshipChanged, this, &Character::characterChanged);
+
+    ptr->setParent(this);
+
+    m_relationships.append(ptr);
+
+    emit relationshipCountChanged();
+}
+
+void Character::removeRelationship(Relationship *ptr)
+{
+    if(ptr == nullptr)
+        return;
+
+    const int index = m_relationships.indexOf(ptr);
+    if(index < 0)
+        return;
+
+    m_relationships.removeAt(index);
+
+    disconnect(ptr, &Relationship::aboutToDelete, this, &Character::removeRelationship);
+    disconnect(ptr, &Relationship::relationshipChanged, this, &Character::characterChanged);
+
+    emit relationshipCountChanged();
+}
+
+Relationship *Character::relationshipAt(int index) const
+{
+    return index < 0 || index >= m_relationships.size() ? nullptr : m_relationships.at(index);
+}
+
+void Character::clearRelationships()
+{
+    while(m_relationships.size())
+        this->removeRelationship(m_relationships.first());
+}
+
+Relationship *Character::addRelationship(const QString &name, Character *with)
+{
+    Relationship *relationship = nullptr;
+    if(with == nullptr || with == this)
+        return nullptr;
+
+    // Find out if we have already established this relationsip.
+    const QString upperName = name.toUpper();
+    for(int i=0; i<m_relationships.size(); i++)
+    {
+        relationship = m_relationships.at(i);
+        if(relationship->name().toUpper() == upperName && relationship->with() == with)
+            return relationship;
+    }
+
+    // Create a new with-of relationship
+    Relationship *withOf = new Relationship(with);
+    withOf->setName(name);
+    withOf->setWith(this);
+    withOf->setDirection(Relationship::WithOf);
+    with->addRelationship(withOf);
+
+    // Create new of-with relationship
+    Relationship *ofWith = new Relationship(this);
+    ofWith->setName(name);
+    ofWith->setWith(with);
+    ofWith->setDirection(Relationship::OfWith);
+    this->addRelationship(ofWith);
+
+    // Ensure that if one of the relationships is destroyed, the other
+    // must destroy itself.
+    connect(withOf, &Relationship::aboutToDelete, ofWith, &Relationship::deleteLater);
+    connect(ofWith, &Relationship::aboutToDelete, withOf, &Relationship::deleteLater);
+
+    // Return the newly created relationship
+    return ofWith;
+}
+
 bool Character::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -352,6 +654,26 @@ Note *Character::staticNoteAt(QQmlListProperty<Note> *list, int index)
 int Character::staticNoteCount(QQmlListProperty<Note> *list)
 {
     return reinterpret_cast< Character* >(list->data)->noteCount();
+}
+
+void Character::staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr)
+{
+    reinterpret_cast< Character* >(list->data)->addRelationship(ptr);
+}
+
+void Character::staticClearRelationships(QQmlListProperty<Relationship> *list)
+{
+    reinterpret_cast< Character* >(list->data)->clearRelationships();
+}
+
+Relationship *Character::staticRelationshipAt(QQmlListProperty<Relationship> *list, int index)
+{
+    return reinterpret_cast< Character* >(list->data)->relationshipAt(index);
+}
+
+int Character::staticRelationshipCount(QQmlListProperty<Relationship> *list)
+{
+    return reinterpret_cast< Character* >(list->data)->relationshipCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

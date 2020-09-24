@@ -121,6 +121,75 @@ private:
     QObjectProperty<QQuickItem> m_follow;
 };
 
+class Relationship : public QObject
+{
+    Q_OBJECT
+
+public:
+    Q_INVOKABLE Relationship(QObject *parent=nullptr);
+    ~Relationship();
+    Q_SIGNAL void aboutToDelete(Relationship *ptr);
+
+    enum Direction
+    {
+        OfWith,
+        WithOf
+    };
+    Q_ENUM(Direction)
+    Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+    void setDirection(Direction val);
+    Direction direction() const { return m_direction; }
+    Q_SIGNAL void directionChanged();
+
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    void setName(const QString &val);
+    QString name() const { return m_name; }
+    Q_SIGNAL void nameChanged();
+
+    Q_PROPERTY(Character* with READ with WRITE setWith NOTIFY withChanged RESET resetWith)
+    void setWith(Character* val);
+    Character* with() const { return m_with; }
+    Q_SIGNAL void withChanged();
+
+    Q_PROPERTY(Character* of READ of NOTIFY ofChanged)
+    Character* of() const { return m_of; }
+    Q_SIGNAL void ofChanged();
+
+    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
+    QAbstractListModel *notesModel() const { return &((const_cast<Relationship*>(this))->m_notes); }
+
+    Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
+    QQmlListProperty<Note> notes();
+    Q_INVOKABLE void addNote(Note *ptr);
+    Q_INVOKABLE void removeNote(Note *ptr);
+    Q_INVOKABLE Note *noteAt(int index) const;
+    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
+    int noteCount() const { return m_notes.size(); }
+    Q_INVOKABLE void clearNotes();
+    Q_SIGNAL void noteCountChanged();
+
+    Q_SIGNAL void relationshipChanged();
+
+protected:
+    bool event(QEvent *event);
+
+private:
+    void setOf(Character* val);
+    void resetWith();
+
+    static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
+    static void staticClearNotes(QQmlListProperty<Note> *list);
+    static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
+    static int staticNoteCount(QQmlListProperty<Note> *list);
+
+private:
+    QString m_name = QStringLiteral("Friend");
+    Character *m_of;
+    Direction m_direction = OfWith;
+    QObjectProperty<Character> m_with;
+    ObjectListPropertyModel<Note *> m_notes;
+};
+
 class Character : public QObject
 {
     Q_OBJECT
@@ -154,6 +223,51 @@ public:
     Q_INVOKABLE void clearNotes();
     Q_SIGNAL void noteCountChanged();
 
+    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
+    void setType(const QString &val);
+    QString type() const { return m_type; }
+    Q_SIGNAL void typeChanged();
+
+    Q_PROPERTY(QString designation READ designation WRITE setDesignation NOTIFY designationChanged)
+    void setDesignation(const QString &val);
+    QString designation() const { return m_designation; }
+    Q_SIGNAL void designationChanged();
+
+    Q_PROPERTY(QString gender READ gender WRITE setGender NOTIFY genderChanged)
+    void setGender(const QString &val);
+    QString gender() const { return m_gender; }
+    Q_SIGNAL void genderChanged();
+
+    Q_PROPERTY(qreal age READ age WRITE setAge NOTIFY ageChanged)
+    void setAge(qreal val);
+    qreal age() const { return m_age; }
+    Q_SIGNAL void ageChanged();
+
+    Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged)
+    void setHeight(qreal val);
+    qreal height() const { return m_height; }
+    Q_SIGNAL void heightChanged();
+
+    Q_PROPERTY(QStringList aliases READ aliases WRITE setAliases NOTIFY aliasesChanged)
+    void setAliases(const QStringList &val);
+    QStringList aliases() const { return m_aliases; }
+    Q_SIGNAL void aliasesChanged();
+
+    Q_PROPERTY(QAbstractListModel* relationshipsModel READ relationshipsModel CONSTANT)
+    QAbstractListModel *relationshipsModel() const { return &((const_cast<Character*>(this))->m_relationships); }
+
+    Q_PROPERTY(QQmlListProperty<Relationship> relationships READ relationships)
+    QQmlListProperty<Relationship> relationships();
+    Q_INVOKABLE void addRelationship(Relationship *ptr);
+    Q_INVOKABLE void removeRelationship(Relationship *ptr);
+    Q_INVOKABLE Relationship *relationshipAt(int index) const;
+    Q_PROPERTY(int relationshipCount READ relationshipCount NOTIFY relationshipCountChanged)
+    int relationshipCount() const { return m_relationships.size(); }
+    Q_INVOKABLE void clearRelationships();
+    Q_SIGNAL void relationshipCountChanged();
+
+    Q_INVOKABLE Relationship *addRelationship(const QString &name, Character *with);
+
     Q_SIGNAL void characterChanged();
 
 protected:
@@ -165,10 +279,22 @@ private:
     static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
     static int staticNoteCount(QQmlListProperty<Note> *list);
 
+    static void staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr);
+    static void staticClearRelationships(QQmlListProperty<Relationship> *list);
+    static Relationship* staticRelationshipAt(QQmlListProperty<Relationship> *list, int index);
+    static int staticRelationshipCount(QQmlListProperty<Relationship> *list);
+
 private:
+    qreal m_age = 0;
     QString m_name;
+    QString m_type = QStringLiteral("Human");
+    qreal m_height = 0;
+    QString m_gender;
+    QString m_designation;
+    QStringList m_aliases;
     ObjectListPropertyModel<Note *> m_notes;
     Structure* m_structure = nullptr;
+    ObjectListPropertyModel<Relationship *> m_relationships;
 };
 
 class Annotation : public QObject
