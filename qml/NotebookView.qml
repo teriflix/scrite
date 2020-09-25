@@ -138,9 +138,9 @@ Item {
     property var notesPack: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
 
     Rectangle {
-        anchors.left: notesGrid.left
-        anchors.top: notesGrid.top
-        anchors.bottom: notesGrid.bottom
+        anchors.left: notesView.left
+        anchors.top: notesView.top
+        anchors.bottom: notesView.bottom
         anchors.right: notebookTabsView.left
         anchors.leftMargin: -2
         anchors.topMargin: -2
@@ -152,281 +152,20 @@ Item {
         border.color: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].color : "black"
     }
 
-    GridView {
-        id: notesGrid
-        width: notesGrid.width
+    NotesView {
+        id: notesView
         anchors.left: parent.left
         anchors.right: notebookTabsView.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 5
-        clip: true
-        ScrollBar.vertical: ScrollBar {
-            policy: ScrollBar.AlwaysOn
-            opacity: active ? 1 : 0.2
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
-
-        property real minimumCellWidth: 450
-        property int nrCells: Math.floor(width/minimumCellWidth)
-
-        cellWidth: width/nrCells
-        cellHeight: 500
-
-        model: notesPack ? notesPack.noteCount+1 : 0
-
-        delegate: Item {
-            width: notesGrid.cellWidth
-            height: notesGrid.cellHeight
-
-            Loader {
-                anchors.fill: parent
-                anchors.rightMargin: ((index+1)%notesGrid.nrCells)===0 ? 20 : 5
-                property int noteIndex: index < notesPack.noteCount ? index : -1
-                sourceComponent: noteIndex >= 0 ? noteDelegate : newNoteDelegate
-                active: true
-            }
-        }
-    }
-
-    Loader {
-        anchors.left: notesGrid.left
-        anchors.right: notesGrid.right
-        anchors.bottom: notesGrid.bottom
-        anchors.top: notesGrid.verticalCenter
-        active: notesPack ? notesPack.noteCount === 0 : false
-        sourceComponent: Item {
-            Text {
-                anchors.fill: parent
-                anchors.margins: 30
-                font.pixelSize: 30
-                font.letterSpacing: 1
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                lineHeight: 1.2
-                text: {
-                    if(notebookTabsView.currentIndex > 0)
-                        return "You can capture your thoughts, ideas and research related to '<b>" + notesPack.name + "</b>' here.";
-                    return "You can capture your thoughts, ideas and research about your screenplay here.";
-                }
-            }
-        }
-    }
-
-    Component {
-        id: noteDelegate
-
-        Item {
-            id: noteItem
-            property Note note: notesPack.noteAt(noteIndex)
-
-            Loader {
-                anchors.fill: parent
-                anchors.margins: 10
-                active: parent.note !== null
-                sourceComponent: Item {
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Qt.tint(note.color, "#C0FFFFFF")
-                        border.width: 2
-                        border.color: (note.color === Qt.rgba(1,1,1,1)) ? "black" : note.color
-                        radius: 5
-                        Behavior on color {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            ColorAnimation { duration: 500 }
-                        }
-                    }
-
-                    ScrollView {
-                        id: noteScrollView
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        clip: true
-
-                        Column {
-                            width: noteScrollView.width
-                            spacing: 10
-
-                            Rectangle {
-                                id: noteTitleBar
-                                width: parent.width
-                                height: noteTitleBarLayout.height+8
-                                color: notesGrid.currentIndex === noteIndex ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0)
-                                radius: 5
-
-                                Row {
-                                    id: noteTitleBarLayout
-                                    spacing: 5
-                                    width: parent.width-4
-                                    anchors.centerIn: parent
-
-                                    TextArea {
-                                        id: headingEdit
-                                        width: parent.width-menuButton.width-deleteButton.width-2*parent.spacing
-                                        wrapMode: Text.WordWrap
-                                        text: note.heading
-                                        font.bold: true
-                                        font.pixelSize: 20
-                                        background: Item { }
-                                        leftPadding: 10
-                                        rightPadding: 10
-                                        // renderType: Text.NativeRendering
-                                        selectByMouse: true
-                                        selectByKeyboard: true
-                                        onTextChanged: {
-                                            if(activeFocus)
-                                                note.heading = text
-                                        }
-                                        readOnly: scriteDocument.readOnly
-                                        palette: app.palette
-                                        Keys.onReturnPressed: editingFinished()
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        KeyNavigation.tab: contentEdit
-                                        Transliterator.textDocument: textDocument
-                                        Transliterator.cursorPosition: cursorPosition
-                                        Transliterator.hasActiveFocus: activeFocus
-
-                                        SpecialSymbolsSupport {
-                                            anchors.top: parent.bottom
-                                            anchors.left: parent.left
-                                            textEditor: headingEdit
-                                            textEditorHasCursorInterface: true
-                                        }
-                                    }
-
-                                    ToolButton3 {
-                                        id: menuButton
-                                        iconSource: "../icons/navigation/menu.png"
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        down: noteMenuLoader.item.visible
-                                        enabled: !scriteDocument.readOnly
-                                        onClicked: {
-                                            if(noteMenuLoader.item.visible)
-                                                noteMenuLoader.item.close()
-                                            else
-                                                noteMenuLoader.item.open()
-                                        }
-
-                                        Loader {
-                                            id: noteMenuLoader
-                                            width: parent.width; height: 1
-                                            anchors.top: parent.bottom
-                                            sourceComponent: ColorMenu { }
-                                            active: true
-
-                                            Connections {
-                                                target: noteMenuLoader.item
-                                                onMenuItemClicked: note.color = color
-                                            }
-                                        }
-                                    }
-
-                                    ToolButton3 {
-                                        id: deleteButton
-                                        iconSource: "../icons/action/delete.png"
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        onClicked: notesPack.removeNote(note)
-                                        enabled: !scriteDocument.readOnly
-                                    }
-                                }
-                            }
-
-                            TextArea {
-                                id: contentEdit
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                text: note.content
-                                textFormat: TextArea.PlainText
-                                background: Item { }
-                                leftPadding: 10
-                                rightPadding: 10
-                                // renderType: Text.NativeRendering
-                                font.pixelSize: 18
-                                onTextChanged: {
-                                    if(activeFocus)
-                                        note.content = text
-                                }
-                                readOnly: scriteDocument.readOnly
-                                palette: app.palette
-                                selectByMouse: true
-                                selectByKeyboard: true
-                                placeholderText: "type the contents of your note here.."
-                                KeyNavigation.tab: headingEdit
-                                Transliterator.textDocument: textDocument
-                                Transliterator.cursorPosition: cursorPosition
-                                Transliterator.hasActiveFocus: activeFocus
-
-                                SpecialSymbolsSupport {
-                                    anchors.top: parent.bottom
-                                    anchors.left: parent.left
-                                    textEditor: contentEdit
-                                    textEditorHasCursorInterface: true
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: notesGrid.currentIndex !== noteIndex
-                onClicked: notesGrid.currentIndex = noteIndex
-            }
-        }
-    }
-
-    Component {
-        id: newNoteDelegate
-
-        Item {
-            visible: !scriteDocument.readOnly
-            enabled: !scriteDocument.readOnly
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: 10
-                radius: 5
-                color: primaryColors.windowColor
-                opacity: 0.25
-            }
-
-            RoundButton {
-                width: 80; height: 80
-                anchors.centerIn: parent
-                icon.width: 48
-                icon.height: 48
-                icon.source: "../icons/action/note_add.png"
-                down: noteMenuLoader.item.visible
-                onClicked: {
-                    if(noteMenuLoader.item.visible)
-                        noteMenuLoader.item.close()
-                    else
-                        noteMenuLoader.item.open()
-                }
-
-                Loader {
-                    id: noteMenuLoader
-                    width: parent.width; height: 1
-                    anchors.top: parent.bottom
-                    sourceComponent: ColorMenu { }
-                    active: true
-
-                    Connections {
-                        target: noteMenuLoader.item
-                        onMenuItemClicked: {
-                            var props = {"color": color}
-                            var note = noteComponent.createObject(scriteDocument.structure, props)
-                            notesPack.addNote(note)
-                            notesGrid.currentIndex = notesPack.noteCount-1
-                        }
-                    }
-                }
-            }
+        notesModel: scriteDocument.loading ? null : (notesPack ? notesPack.notesModel : null)
+        onNewNoteRequest: notesPack.addNote(noteComponent.createObject(notesPack))
+        onRemoveNoteRequest: notesPack.removeNote(notesPack.noteAt(index))
+        title: {
+            if(notebookTabsView.currentIndex > 0)
+                return "You can capture your thoughts, ideas and research related to '<b>" + notesPack.name + "</b>' here.";
+            return "You can capture your thoughts, ideas and research about your screenplay here.";
         }
     }
 
@@ -435,54 +174,11 @@ Item {
 
         Note {
             heading: "Note Heading"
-        }
-    }
-
-    Component {
-        id: newCharactersDialogUi
-
-        Rectangle {
-            width: 800
-            height: 680
-            color: primaryColors.c10.background
-
-            Item {
-                anchors.fill: parent
-                anchors.margins: 10
-
-                Text {
-                    id: title
-                    width: parent.width
-                    anchors.top: parent.top
-                    font.pixelSize: 18
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Check the characters for which you want to create sections in the notebook"
-                    wrapMode: Text.WordWrap
-                }
-
-                CharactersView {
-                    id: charactersListView
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: title.bottom
-                    anchors.bottom: createSectionsButton.top
-                    anchors.topMargin: 20
-                    anchors.bottomMargin: 10
-                    charactersModel.array: scriteDocument.structure.detectCharacters()
-                    charactersModel.objectMembers: ["name", "added"]
-                    sortFilterRole: charactersModel.objectMemberRole("name")
-                }
-
-                Button2 {
-                    id: createSectionsButton
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    text: "Create Sections"
-                    onClicked: {
-                        scriteDocument.structure.addCharacters(charactersListView.selectedCharacters)
-                        modalDialog.closeRequest()
-                    }
-                }
+            color: {
+                var lastNote = notesPack.notesModel.objectAt(notesPack.notesModel.objectCount-1)
+                if(lastNote)
+                    return lastNote.color
+                return "white"
             }
         }
     }

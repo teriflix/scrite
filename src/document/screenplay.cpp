@@ -384,6 +384,7 @@ void Screenplay::setCoverPagePhoto(const QString &val)
 {
     HourGlass hourGlass;
 
+#if 0
     QImage image = val.isEmpty() ? QImage() : QImage(val);
     if( image.isNull() )
     {
@@ -407,6 +408,11 @@ void Screenplay::setCoverPagePhoto(const QString &val)
                 m_coverPagePhoto.clear();
         }
     }
+#else
+    const QSize fullHdSize(1920, 1080);
+    const QString val2 = m_scriteDocument->fileSystem()->addImage(val, coverPagePhotoPath, fullHdSize);
+    m_coverPagePhoto = val2.isEmpty() ? val2 : m_scriteDocument->fileSystem()->absolutePath(val2);
+#endif
 
     emit coverPagePhotoChanged();
 }

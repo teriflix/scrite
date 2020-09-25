@@ -238,6 +238,8 @@ int main(int argc, char **argv)
 
     qmlRegisterType<UrlAttributes>("Scrite", 1, 0, "UrlAttributes");
 
+    qmlRegisterUncreatableType<QAbstractItemModel>("Scrite", 1, 0, "Model", "Base type of models (QAbstractItemModel)");
+
     NotificationManager notificationManager;
 
     DocumentFileSystem::setMarker( QByteArrayLiteral("SCRITE") );

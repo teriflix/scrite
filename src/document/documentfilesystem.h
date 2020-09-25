@@ -17,6 +17,8 @@
 #include <QObject>
 
 #include <QFile>
+#include <QSize>
+#include <QImage>
 #include <QFileInfo>
 
 class DocumentFile;
@@ -44,7 +46,7 @@ public:
 
     QString add(const QString &fileName, const QString &ns=QString());
     QString duplicate(const QString &fileName, const QString &ns=QString());
-    void remove(const QString &path);
+    bool remove(const QString &path);
 
     QString absolutePath(const QString &path, bool mkpath=false) const;
     QString relativePath(const QString &path) const;
@@ -52,6 +54,11 @@ public:
 
     bool exists(const QString &path) const;
     QFileInfo fileInfo(const QString &path) const;
+
+    // API to add/replace/remove an external file into the DFS under a specific path/name
+    QString addFile(const QString &srcFile, const QString &dstPath, bool replaceIfExists=true);
+    QString addImage(const QString &srcFile, const QString &dstPath, const QSize &scaleTo=QSize(), bool replaceIfExists=true);
+    QString addImage(const QImage &srcImage, const QString &dstPath, const QSize &scaleTo=QSize(), bool replaceIfExists=true);
 
 private:
     bool pack(QDataStream &ds);

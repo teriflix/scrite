@@ -17,12 +17,32 @@
 #include <QList>
 #include <QAbstractListModel>
 
+class ObjectListPropertyModelBase : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    ObjectListPropertyModelBase(QObject *parent=nullptr) :
+        QAbstractListModel(parent) {
+        connect(this, &QAbstractListModel::rowsInserted, this, &ObjectListPropertyModelBase::objectCountChanged);
+        connect(this, &QAbstractListModel::rowsRemoved, this, &ObjectListPropertyModelBase::objectCountChanged);
+        connect(this, &QAbstractListModel::modelReset, this, &ObjectListPropertyModelBase::objectCountChanged);
+    }
+    ~ObjectListPropertyModelBase() { }
+
+    Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
+    virtual int objectCount() const = 0;
+    Q_SIGNAL void objectCountChanged();
+
+    Q_INVOKABLE virtual QObject *objectAt(int row) const = 0;
+};
+
 template <class T>
-class ObjectListPropertyModel : public QAbstractListModel
+class ObjectListPropertyModel : public ObjectListPropertyModelBase
 {
 public:
     ObjectListPropertyModel(QObject *parent=nullptr)
-        : QAbstractListModel(parent) { }
+        : ObjectListPropertyModelBase(parent) { }
     ~ObjectListPropertyModel() { }
 
     operator QList<T> () { return m_list; }
@@ -76,7 +96,7 @@ public:
     }
 
     int size() const { return m_list.size(); }
-    T at(int row) const { return m_list.at(row); }
+    T at(int row) const { return row < 0 || row >= m_list.size() ? nullptr : m_list.at(row); }
 
     T first() const { return m_list.isEmpty() ? nullptr : m_list.first(); }
     T takeFirst() {
@@ -122,6 +142,10 @@ public:
         roles[ModelDataRole] = QByteArrayLiteral("modelData");
         return roles;
     }
+
+    // ObjectListPropertyModelBase interface
+    int objectCount() const { return m_list.size(); }
+    QObject *objectAt(int row) const { return this->at(row); }
 
 private:
     QList<T> m_list;

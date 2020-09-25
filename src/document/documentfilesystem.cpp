@@ -266,19 +266,27 @@ QString DocumentFileSystem::duplicate(const QString &fileName, const QString &ns
     return QString();
 }
 
-void DocumentFileSystem::remove(const QString &path)
+bool DocumentFileSystem::remove(const QString &path)
 {
     if(path.isEmpty())
-        return;
+        return false;
 
     const QString completePath = this->absolutePath(path);
-    QFile::remove(completePath);
+    return QFile::remove(completePath);
 }
 
 QString DocumentFileSystem::absolutePath(const QString &path, bool mkpath) const
 {
     if(path.isEmpty())
         return QString();
+
+    if(QDir::isAbsolutePath(path))
+    {
+        if( path.startsWith(d->folder->path()) )
+            return path;
+
+        return QString();
+    }
 
     const QString ret = d->folder->filePath(path);
     const QFileInfo fi(ret);
@@ -287,6 +295,7 @@ QString DocumentFileSystem::absolutePath(const QString &path, bool mkpath) const
         if( !QDir().mkpath(fi.absolutePath()) )
             return QString();
     }
+
     return ret;
 }
 
@@ -326,6 +335,94 @@ QFileInfo DocumentFileSystem::fileInfo(const QString &path) const
 
     const QString completePath = this->absolutePath(path);
     return QFileInfo(completePath);
+}
+
+QString DocumentFileSystem::addFile(const QString &srcFile, const QString &dstPath, bool replaceIfExists)
+{
+    // Verify that srcFile isnt already a part of the document file system.
+    if( this->contains(srcFile) )
+        return QDir::isAbsolutePath(srcFile) ? this->relativePath(srcFile) : this->absolutePath(srcFile);
+
+    // Verify that the srcFile exists.
+    if( !QFile::exists(srcFile) )
+        return QString();
+
+    // Verify that dstPath is relative path.
+    if( QDir::isAbsolutePath(dstPath) )
+        return QString();
+
+    // Compose absolute path for destination, make sure it is a file.
+    QString absDstPath = this->absolutePath(dstPath, true);
+    if( QFileInfo(absDstPath).isDir() )
+        return QString();
+
+    // Delete previous file, if replacement is requested
+    if( QFile::exists(absDstPath) )
+    {
+        if(!replaceIfExists)
+            return QString();
+
+        QFile::remove(absDstPath);
+    }
+
+    // Copy the file into the DFS.
+    if( !QFile::copy(srcFile, dstPath) )
+        return QString();
+
+    // That's it
+    return this->relativePath(absDstPath);
+}
+
+QString DocumentFileSystem::addImage(const QString &srcFile, const QString &dstPath, const QSize &scaleTo, bool replaceIfExists)
+{
+    // Verify that srcFile isnt already a part of the document file system.
+    if( this->contains(srcFile) )
+        return QDir::isAbsolutePath(srcFile) ? this->relativePath(srcFile) : this->absolutePath(srcFile);
+
+    const QImage image(srcFile);
+    return this->addImage(image, dstPath, scaleTo, replaceIfExists);
+}
+
+QString DocumentFileSystem::addImage(const QImage &srcImage, const QString &dstPath, const QSize &scaleTo, bool replaceIfExists)
+{
+    // Verify that dstPath is relative path.
+    if( QDir::isAbsolutePath(dstPath) )
+        return QString();
+
+    // Compose absolute path for destination, make sure it is a file.
+    QString absDstPath = this->absolutePath(dstPath, true);
+    if( QFileInfo(absDstPath).isDir() )
+        return QString();
+
+    // If the image passed to this function is empty, we just have
+    // to delete a previously existing file.
+    if(srcImage.isNull())
+    {
+        if( QFile::exists(absDstPath) )
+            QFile::remove(absDstPath);
+
+        return QString();
+    }
+
+    // Delete previous file, if replacement is requested
+    if( QFile::exists(absDstPath) )
+    {
+        if(!replaceIfExists)
+            return QString();
+
+        QFile::remove(absDstPath);
+    }
+
+    QImage imageToSave = srcImage;
+    if(!scaleTo.isEmpty())
+    {
+        if(imageToSave.width() > scaleTo.width() || imageToSave.height() > scaleTo.height())
+            imageToSave = imageToSave.scaled(scaleTo, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+
+    const QString suffix = QFileInfo(absDstPath).suffix().toUpper();
+    const bool ret = imageToSave.save(absDstPath, qPrintable(suffix));
+    return ret ? this->relativePath(absDstPath) : QString();
 }
 
 bool DocumentFileSystem::pack(QDataStream &ds)

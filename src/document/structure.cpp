@@ -482,6 +482,66 @@ void Character::clearNotes()
         this->removeNote(m_notes.first());
 }
 
+void Character::setPhotos(const QStringList &val)
+{
+    if(m_photos == val || !m_photos.isEmpty())
+        return;
+
+    DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
+
+    m_photos.reserve(val.size());
+    Q_FOREACH(QString item, val)
+    {
+        if( dfs->contains(item) )
+            m_photos << dfs->absolutePath(item);
+    }
+
+    emit photosChanged();
+}
+
+void Character::addPhoto(const QString &photoPath)
+{
+    DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
+
+    const QString dstPath = QStringLiteral("characters/") + QDateTime::currentMSecsSinceEpoch() + QStringLiteral(".jpg");
+    const QString dfsPath = dfs->addImage(photoPath, dstPath, QSize(512,512), true);
+    if(dfsPath.isEmpty())
+        return;
+
+    m_photos << dfs->absolutePath(dfsPath);
+    emit photosChanged();
+}
+
+void Character::removePhoto(int index)
+{
+    if(index < 0 || index >= m_photos.size())
+        return;
+
+    DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
+
+    const QString dfsPath = dfs->relativePath(m_photos.at(index));
+    if(dfsPath.isEmpty())
+        return;
+
+    if(dfs->remove(dfsPath))
+    {
+        m_photos.removeAt(index);
+        emit photosChanged();
+    }
+}
+
+void Character::removePhoto(const QString &photoPath)
+{
+    DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
+
+    const QString dfsPath = dfs->absolutePath(photoPath);
+    if(dfsPath.isEmpty())
+        return;
+
+    const int index = m_photos.indexOf(photoPath);
+    this->removePhoto(index);
+}
+
 void Character::setType(const QString &val)
 {
     if(m_type == val)

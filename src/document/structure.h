@@ -223,6 +223,15 @@ public:
     Q_INVOKABLE void clearNotes();
     Q_SIGNAL void noteCountChanged();
 
+    Q_PROPERTY(QStringList photos READ photos WRITE setPhotos NOTIFY photosChanged)
+    void setPhotos(const QStringList &val);
+    QStringList photos() const { return m_photos; }
+    Q_SIGNAL void photosChanged();
+
+    Q_INVOKABLE void addPhoto(const QString &photoPath);
+    Q_INVOKABLE void removePhoto(int index);
+    Q_INVOKABLE void removePhoto(const QString &photoPath);
+
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     void setType(const QString &val);
     QString type() const { return m_type; }
@@ -290,6 +299,7 @@ private:
     QString m_type = QStringLiteral("Human");
     qreal m_height = 0;
     QString m_gender;
+    QStringList m_photos;
     QString m_designation;
     QStringList m_aliases;
     ObjectListPropertyModel<Note *> m_notes;
