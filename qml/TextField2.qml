@@ -111,7 +111,7 @@ TextField {
         text: parent.placeholderText
         font.pointSize: app.idealFontPointSize/2
         anchors.left: parent.left
-        anchors.bottom: parent.top
+        anchors.verticalCenter: parent.top
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
     }
 }

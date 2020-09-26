@@ -1344,6 +1344,11 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     return counter;
 }
 
+void Screenplay::serializeToJson(QJsonObject &json) const
+{
+    json.insert("hasCoverPagePhoto", !m_coverPagePhoto.isEmpty());
+}
+
 void Screenplay::deserializeFromJson(const QJsonObject &)
 {
     const QString cpPhotoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath);

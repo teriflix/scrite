@@ -17,10 +17,11 @@ import Scrite 1.0
 
 Item {
     id: notesView
+    property Component listHeader
     property Model notesModel: null
     property string title: "Notes list"
 
-    signal newNoteRequest()
+    signal newNoteRequest(color noteColor)
     signal removeNoteRequest(int index)
     onNotesModelChanged: notesList.currentIndex = 0
 
@@ -30,12 +31,14 @@ Item {
         model: notesModel
         orientation: Qt.Horizontal
         flickableDirection: Flickable.HorizontalFlick
-        property real itemSize: Math.max((notesView.width-2*spacing)/3, 300)
-        highlightMoveDuration: 0
-        highlightResizeDuration: 0
+        property bool scrollBarNeeded: true // contentWidth > width
+        property real itemWidth: Math.max( Math.floor(notesView.width/3.1), 300)
+        property real itemHeight: height - (scrollBarNeeded ? 20 : 0)
+        highlightMoveDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
+        highlightResizeDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
         clip: true
         ScrollBar.horizontal: ScrollBar {
-            policy: notesList.contentWidth > notesList.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            policy: ScrollBar.AlwaysOn
             minimumSize: 0.1
             palette {
                 mid: Qt.rgba(0,0,0,0.25)
@@ -47,18 +50,29 @@ Item {
                 NumberAnimation { duration: 250 }
             }
         }
+        header: Item {
+            width: listHeader ? notesList.itemWidth : 0
+            height: notesList.itemHeight
+
+            Loader {
+                visible: listHeader !== null
+                anchors.fill: parent
+                anchors.margins: 6
+                sourceComponent: listHeader
+            }
+        }
         delegate: Item {
             property Note note: modelData
-            width: notesList.itemSize
-            height: notesList.contentWidth > notesList.width ? notesList.height - 20 : notesList.height
+            width: notesList.itemWidth
+           height: notesList.itemHeight
 
             Rectangle {
                 id: noteItemArea
                 anchors.fill: parent
-                anchors.margins: 10
+                anchors.margins: 6
                 border.width: notesList.currentIndex === index ? 2 : 1
                 border.color: note.color
-                color: app.translucent(note.color, 0.25)
+                color: notesList.currentIndex === index ? Qt.tint(note.color, "#c0ffffff") : app.translucent(note.color, 0.25)
                 radius: 6
 
                 Flickable {
@@ -71,7 +85,7 @@ Item {
                     clip: true
 
                     ScrollBar.vertical: ScrollBar {
-                        policy: noteItemScroll.contentHeight > notesList.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        policy: noteItemScroll.contentHeight > noteItemScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         minimumSize: 0.1
                         palette {
                             mid: Qt.rgba(0,0,0,0.25)
@@ -87,60 +101,86 @@ Item {
                     Column {
                         id: noteItemContent
                         spacing: 10
-                        width: noteItemScroll.width - (noteItemScroll.contentHeight > notesList.height ? 20 : 0)
+                        width: noteItemScroll.width - (noteItemScroll.contentHeight > noteItemScroll.height ? 20 : 0)
+
+                        Rectangle {
+                            color: notesList.currentIndex === index ? Qt.tint(note.color, "#c0ffffff") : app.translucent(note.color, 0.25)
+                            width: parent.width
+                            height: colorNoteButton.height + 4
+                            border.width: notesList.currentIndex === index ? 1 : 0
+                            border.color: app.textColorFor(note.color)
+                            radius: 6
+
+                            Row {
+                                width: parent.width - 10
+                                spacing: 5
+                                anchors.centerIn: parent
+
+                                Text {
+                                    id: noteTitleText
+                                    font.pointSize: app.idealFontPointSize
+                                    font.letterSpacing: 1
+                                    text: "Note #" + (index+1)
+                                    leftPadding: 10
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - colorNoteButton.width - removeNoteButton.width - 2*parent.spacing
+                                }
+
+                                ToolButton3 {
+                                    id: colorNoteButton
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    iconSource: "../icons/navigation/menu.png"
+                                    onClicked: colorMenu.open()
+                                    down: colorMenu.visible
+
+                                    Item {
+                                        anchors.left: parent.left
+                                        anchors.top: parent.bottom
+
+                                        ColorMenu {
+                                            id: colorMenu
+                                            onMenuItemClicked: note.color = color
+                                        }
+                                    }
+                                }
+
+                                ToolButton3 {
+                                    id: removeNoteButton
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    iconSource: "../icons/action/delete.png"
+                                    onClicked: {
+                                        if(index+1 < notesModel.objectCount)
+                                            notesList.currentIndex = index+1
+                                        else
+                                            notesList.currentIndex = 0
+                                        removeNoteRequest(index)
+                                    }
+                                }
+                            }
+                        }
 
                         Item {
                             width: parent.width
-                            height: Math.max(removeNoteButton.height, headingField.height) + 20
+                            height: 5
+                        }
 
-                            TextField2 {
-                                id: headingField
-                                anchors.left: parent.left
-                                anchors.right: colorNoteButton.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                height: Math.max(colorNoteButton.height, contentHeight)
-                                anchors.margins: 10
-                                label: "Heading"
-                                placeholderText: "Heading"
-                                font.pointSize: app.idealFontPointSize + 2
-                                font.bold: true
-                                text: note.heading
-                                onTextChanged: note.heading = text
-                                wrapMode: Text.WordWrap
-                                width: parent.width
-                                tabItem: contentField
-                                enableTransliteration: true
-                                readOnly: scriteDocument.readOnly
-                                onActiveFocusChanged: notesList.currentIndex = index
-                            }
-
-                            ToolButton3 {
-                                id: colorNoteButton
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.right: removeNoteButton.left
-                                anchors.margins: 10
-                                iconSource: "../icons/navigation/menu.png"
-                                onClicked: colorMenu.open()
-
-                                ColorMenu {
-                                    id: colorMenu
-                                    onMenuItemClicked: note.color = color
-                                }
-                            }
-
-                            ToolButton3 {
-                                id: removeNoteButton
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.right: parent.right
-                                iconSource: "../icons/action/delete.png"
-                                onClicked: {
-                                    if(index+1 < notesModel.objectCount)
-                                        notesList.currentIndex = index+1
-                                    else
-                                        notesList.currentIndex = 0
-                                    removeNoteRequest(index)
-                                }
-                            }
+                        TextField2 {
+                            id: headingField
+                            width: parent.width
+                            height: Math.max(colorNoteButton.height, contentHeight+app.idealFontPointSize+8)
+                            anchors.margins: 10
+                            label: "Heading"
+                            placeholderText: "Heading"
+                            font.pointSize: app.idealFontPointSize + 2
+                            maximumLength: 256
+                            font.bold: true
+                            text: note.heading
+                            onTextChanged: note.heading = text
+                            wrapMode: Text.WordWrap
+                            tabItem: contentField
+                            enableTransliteration: true
+                            readOnly: scriteDocument.readOnly
+                            onActiveFocusChanged: notesList.currentIndex = index
                         }
 
                         TextArea {
@@ -188,27 +228,39 @@ Item {
             }
         }
         footer: Item {
-            width: notesList.itemSize
-            height: notesList.height
+            width: titleLoader.active ? notesList.width : notesList.itemWidth
+            height: notesList.itemHeight
 
             Button2 {
                 anchors.centerIn: parent
                 text: "Add Note"
                 enabled: !scriteDocument.readOnly
-                onClicked: {
-                    newNoteRequest()
-                    notesList.currentIndex = notesModel.objectCount - 1
+                onClicked: newNoteColor.open()
+                down: newNoteColor.visible
+
+                Item {
+                    anchors.left: parent.left
+                    anchors.top: parent.bottom
+
+                    ColorMenu {
+                        id: newNoteColor
+                        onMenuItemClicked: {
+                            newNoteRequest(color)
+                            notesList.currentIndex = notesModel.objectCount - 1
+                        }
+                    }
                 }
             }
         }
     }
 
     Loader {
+        id: titleLoader
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: parent.verticalCenter
-        active: notesModel ? notesModel.objectCount === 0 : false
+        active: notesModel && !listHeader ? notesModel.objectCount === 0 : false
         sourceComponent: Item {
             Text {
                 anchors.fill: parent

@@ -19,7 +19,7 @@ import QtQuick.Controls.Material 2.12
 Item {
     id: tabBarTab
     width: implicitTabSize
-    height: structureEditorTabs.height
+    height: app.idealFontPointSize + 16
 
     readonly property real tabTextWidth: tabText.width
     readonly property real implicitTabSize: tabTextWidth*1.1 + 2*tabShapeOffset

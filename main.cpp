@@ -147,6 +147,7 @@ int main(int argc, char **argv)
     qmlRegisterType<StructureElementConnector>("Scrite", 1, 0, "StructureElementConnector");
 
     qmlRegisterType<Note>("Scrite", 1, 0, "Note");
+    qmlRegisterType<Relationship>("Scrite", 1, 0, "Relationship");
     qmlRegisterUncreatableType<Character>("Scrite", 1, 0, "Character", reason);
 
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);

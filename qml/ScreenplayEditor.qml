@@ -806,7 +806,7 @@ Rectangle {
 
                         Rectangle {
                             id: cursorRectangle
-                            width: parent.width*1.5
+                            width: parent.width*Screen.devicePixelRatio
                             height: parent.height
                             anchors.centerIn: parent
                             color: scriteDocument.readOnly ? primaryColors.borderColor : "black"
@@ -820,7 +820,7 @@ Rectangle {
                                     target: cursorRectangle
                                     property: "width"
                                     duration: 250
-                                    from: sceneTextEditor.cursorRectangle.width*1.5
+                                    from: sceneTextEditor.cursorRectangle.width*Screen.devicePixelRatio
                                     to: sceneTextEditor.cursorRectangle.width*10
                                 }
 

@@ -135,37 +135,59 @@ Item {
         }
     }
 
-    property var notesPack: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
+    property var currentSource: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
 
     Rectangle {
-        anchors.left: notesView.left
-        anchors.top: notesView.top
-        anchors.bottom: notesView.bottom
+        anchors.left: parent.left
         anchors.right: notebookTabsView.left
-        anchors.leftMargin: -2
-        anchors.topMargin: -2
-        anchors.bottomMargin: -2
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 3
+        anchors.topMargin: 3
+        anchors.bottomMargin: 3
         anchors.rightMargin: -1
         color: app.translucent(border.color, 0.04)
         radius: 4
         border.width: 2
         border.color: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].color : "black"
+
+        Loader {
+            anchors.fill: parent
+            anchors.margins: 2
+            active: !scriteDocument.loading
+            sourceComponent: {
+                if( app.verifyType(currentSource, "Character") )
+                    return characterNotesComponent
+                return notesViewComponent
+            }
+        }
     }
 
-    NotesView {
-        id: notesView
-        anchors.left: parent.left
-        anchors.right: notebookTabsView.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.margins: 5
-        notesModel: scriteDocument.loading ? null : (notesPack ? notesPack.notesModel : null)
-        onNewNoteRequest: notesPack.addNote(noteComponent.createObject(notesPack))
-        onRemoveNoteRequest: notesPack.removeNote(notesPack.noteAt(index))
-        title: {
-            if(notebookTabsView.currentIndex > 0)
-                return "You can capture your thoughts, ideas and research related to '<b>" + notesPack.name + "</b>' here.";
-            return "You can capture your thoughts, ideas and research about your screenplay here.";
+    Component {
+        id: characterNotesComponent
+
+        CharacterNotes {
+            character: currentSource
+            colorHint: noteSources[notebookTabsView.currentIndex].color
+        }
+    }
+
+    Component {
+        id: notesViewComponent
+
+        NotesView {
+            notesModel: scriteDocument.loading ? null : (currentSource ? currentSource.notesModel : null)
+            onNewNoteRequest: {
+                var note = noteComponent.createObject(currentSource)
+                note.color = noteColor
+                currentSource.addNote(note)
+            }
+            onRemoveNoteRequest: currentSource.removeNote(currentSource.noteAt(index))
+            title: {
+                if(notebookTabsView.currentIndex > 0)
+                    return "You can capture your thoughts, ideas and research related to '<b>" + currentSource.name + "</b>' here.";
+                return "You can capture your thoughts, ideas and research about your screenplay here.";
+            }
         }
     }
 
@@ -174,11 +196,61 @@ Item {
 
         Note {
             heading: "Note Heading"
-            color: {
-                var lastNote = notesPack.notesModel.objectAt(notesPack.notesModel.objectCount-1)
+            Component.onCompleted: {
+                var lastNote = currentSource.notesModel.objectAt(currentSource.notesModel.objectCount-1)
                 if(lastNote)
-                    return lastNote.color
-                return "white"
+                    color = lastNote.color
+                else
+                    color = "white"
+            }
+        }
+    }
+
+    Component {
+        id: newCharactersDialogUi
+
+        Rectangle {
+            width: 800
+            height: 680
+            color: primaryColors.c10.background
+
+            Item {
+                anchors.fill: parent
+                anchors.margins: 20
+
+                Text {
+                    id: title
+                    width: parent.width
+                    anchors.top: parent.top
+                    font.pixelSize: 18
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "Check the characters for which you want to create sections in the notebook."
+                    wrapMode: Text.WordWrap
+                }
+
+                CharactersView {
+                    id: charactersListView
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: title.bottom
+                    anchors.bottom: createSectionsButton.top
+                    anchors.topMargin: 20
+                    anchors.bottomMargin: 10
+                    charactersModel.array: scriteDocument.structure.detectCharacters()
+                    charactersModel.objectMembers: ["name", "added"]
+                    sortFilterRole: charactersModel.objectMemberRole("name")
+                }
+
+                Button2 {
+                    id: createSectionsButton
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    text: "Create Sections"
+                    onClicked: {
+                        scriteDocument.structure.addCharacters(charactersListView.selectedCharacters)
+                        modalDialog.closeRequest()
+                    }
+                }
             }
         }
     }
