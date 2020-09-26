@@ -169,7 +169,7 @@ public:
     QString version() const { return m_version; }
     Q_SIGNAL void versionChanged();
 
-    Q_PROPERTY(QString coverPagePhoto READ coverPagePhoto NOTIFY coverPagePhotoChanged)
+    Q_PROPERTY(QString coverPagePhoto READ coverPagePhoto NOTIFY coverPagePhotoChanged STORED false)
     Q_INVOKABLE void setCoverPagePhoto(const QString &val);
     Q_INVOKABLE void clearCoverPagePhoto();
     QString coverPagePhoto() const { return m_coverPagePhoto; }
@@ -247,6 +247,7 @@ public:
     Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags=0);
 
     // QObjectSerializer::Interface interface
+    void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
 
     // QAbstractItemModel interface

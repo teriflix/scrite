@@ -212,7 +212,7 @@ Item {
                 anchors.rightMargin: 2.5
                 anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
-                color: primaryColors.button
+                color: primaryColors.button.background
                 border.color: primaryColors.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5

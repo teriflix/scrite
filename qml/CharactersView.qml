@@ -26,7 +26,7 @@ Rectangle {
     implicitWidth: charactersListLayout.width
 
     property GenericArrayModel charactersModel: GenericArrayModel {
-        array: scriteDocument.structure.allCharacterNames()
+        array: scriteDocument.structure.characterNames
     }
 
     SearchBar {

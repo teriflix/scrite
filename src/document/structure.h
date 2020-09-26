@@ -121,9 +121,10 @@ private:
     QObjectProperty<QQuickItem> m_follow;
 };
 
-class Relationship : public QObject
+class Relationship : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Q_INVOKABLE Relationship(QObject *parent=nullptr);
@@ -141,17 +142,20 @@ public:
     Direction direction() const { return m_direction; }
     Q_SIGNAL void directionChanged();
 
+    static QString polishName(const QString &name);
+
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     void setName(const QString &val);
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
-    Q_PROPERTY(Character* with READ with WRITE setWith NOTIFY withChanged RESET resetWith)
+    Q_PROPERTY(Character* withCharacter READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
+    Q_PROPERTY(Character* with READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
     void setWith(Character* val);
     Character* with() const { return m_with; }
     Q_SIGNAL void withChanged();
 
-    Q_PROPERTY(Character* of READ of NOTIFY ofChanged)
+    Q_PROPERTY(Character* of READ of NOTIFY ofChanged STORED false)
     Character* of() const { return m_of; }
     Q_SIGNAL void ofChanged();
 
@@ -170,6 +174,12 @@ public:
 
     Q_SIGNAL void relationshipChanged();
 
+    // QObjectSerializer::Interface interface
+    void serializeToJson(QJsonObject &) const;
+    void deserializeFromJson(const QJsonObject &);
+
+    void resolveRelationship();
+
 protected:
     bool event(QEvent *event);
 
@@ -185,14 +195,16 @@ private:
 private:
     QString m_name = QStringLiteral("Friend");
     Character *m_of;
+    QString m_withName; // for delayed resolution during load
     Direction m_direction = OfWith;
     QObjectProperty<Character> m_with;
     ObjectListPropertyModel<Note *> m_notes;
 };
 
-class Character : public QObject
+class Character : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Q_INVOKABLE Character(QObject *parent=nullptr);
@@ -210,6 +222,11 @@ public:
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
+    Q_PROPERTY(bool visibleOnNotebook READ isVisibleOnNotebook WRITE setVisibleOnNotebook NOTIFY visibleOnNotebookChanged)
+    void setVisibleOnNotebook(bool val);
+    bool isVisibleOnNotebook() const { return m_visibleOnNotebook; }
+    Q_SIGNAL void visibleOnNotebookChanged();
+
     Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
     QAbstractListModel *notesModel() const { return &((const_cast<Character*>(this))->m_notes); }
 
@@ -223,7 +240,7 @@ public:
     Q_INVOKABLE void clearNotes();
     Q_SIGNAL void noteCountChanged();
 
-    Q_PROPERTY(QStringList photos READ photos WRITE setPhotos NOTIFY photosChanged)
+    Q_PROPERTY(QStringList photos READ photos WRITE setPhotos NOTIFY photosChanged STORED false)
     void setPhotos(const QStringList &val);
     QStringList photos() const { return m_photos; }
     Q_SIGNAL void photosChanged();
@@ -247,15 +264,25 @@ public:
     QString gender() const { return m_gender; }
     Q_SIGNAL void genderChanged();
 
-    Q_PROPERTY(qreal age READ age WRITE setAge NOTIFY ageChanged)
-    void setAge(qreal val);
-    qreal age() const { return m_age; }
+    Q_PROPERTY(QString age READ age WRITE setAge NOTIFY ageChanged)
+    void setAge(const QString &val);
+    QString age() const { return m_age; }
     Q_SIGNAL void ageChanged();
 
-    Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged)
-    void setHeight(qreal val);
-    qreal height() const { return m_height; }
+    Q_PROPERTY(QString height READ height WRITE setHeight NOTIFY heightChanged)
+    void setHeight(const QString &val);
+    QString height() const { return m_height; }
     Q_SIGNAL void heightChanged();
+
+    Q_PROPERTY(QString weight READ weight WRITE setWeight NOTIFY weightChanged)
+    void setWeight(const QString &val);
+    QString weight() const { return m_weight; }
+    Q_SIGNAL void weightChanged();
+
+    Q_PROPERTY(QString bodyType READ bodyType WRITE setBodyType NOTIFY bodyTypeChanged)
+    void setBodyType(const QString &val);
+    QString bodyType() const { return m_bodyType; }
+    Q_SIGNAL void bodyTypeChanged();
 
     Q_PROPERTY(QStringList aliases READ aliases WRITE setAliases NOTIFY aliasesChanged)
     void setAliases(const QStringList &val);
@@ -277,7 +304,24 @@ public:
 
     Q_INVOKABLE Relationship *addRelationship(const QString &name, Character *with);
 
+    Q_INVOKABLE Relationship *findRelationship(const QString &with) const;
+    Q_INVOKABLE Relationship *findRelationship(const Character *with) const;
+    Q_INVOKABLE bool hasRelationship(const QString &with) const {
+        return this->findRelationship(with) != nullptr;
+    }
+    Q_INVOKABLE bool hasRelationship(const Character *with) const {
+        return this->findRelationship(with) != nullptr;
+    }
+    Q_INVOKABLE QList<Relationship*> findRelationships(const QString &name=QString()) const;
+    Q_INVOKABLE QStringList unrelatedCharacterNames() const;
+
     Q_SIGNAL void characterChanged();
+
+    // QObjectSerializer::Interface interface
+    void serializeToJson(QJsonObject &) const;
+    void deserializeFromJson(const QJsonObject &);
+
+    void resolveRelationships();
 
 protected:
     bool event(QEvent *event);
@@ -294,16 +338,19 @@ private:
     static int staticRelationshipCount(QQmlListProperty<Relationship> *list);
 
 private:
-    qreal m_age = 0;
+    QString m_age;
     QString m_name;
     QString m_type = QStringLiteral("Human");
-    qreal m_height = 0;
+    QString m_weight;
+    QString m_height;
     QString m_gender;
+    QString m_bodyType;
     QStringList m_photos;
     QString m_designation;
     QStringList m_aliases;
-    ObjectListPropertyModel<Note *> m_notes;
+    bool m_visibleOnNotebook = true;
     Structure* m_structure = nullptr;
+    ObjectListPropertyModel<Note *> m_notes;
     ObjectListPropertyModel<Relationship *> m_relationships;
 };
 
@@ -373,9 +420,10 @@ private:
     QJsonObject m_attributes;
 };
 
-class Structure : public QObject
+class Structure : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Structure(QObject *parent=nullptr);
@@ -420,7 +468,8 @@ public:
 
     Q_INVOKABLE QStringList allCharacterNames() const { return this->characterNames(); }
     Q_INVOKABLE QJsonArray detectCharacters() const;
-    Q_INVOKABLE void addCharacters(const QStringList &names);
+    Q_INVOKABLE Character *addCharacter(const QString &name);
+    Q_INVOKABLE QList<Character*> addCharacters(const QStringList &names);
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
 
@@ -512,6 +561,10 @@ public:
 
     Q_INVOKABLE void copy(QObject *elementOrAnnotation);
     Q_INVOKABLE void paste(const QPointF &pos=QPointF());
+
+    // QObjectSerializer::Interface interface
+    void serializeToJson(QJsonObject &) const;
+    void deserializeFromJson(const QJsonObject &);
 
 protected:
     bool event(QEvent *event);

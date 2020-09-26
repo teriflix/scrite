@@ -17,6 +17,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QDir>
 #include <QMimeData>
 #include <QDateTime>
 #include <QClipboard>
@@ -279,12 +280,34 @@ void Relationship::setDirection(Relationship::Direction val)
     emit directionChanged();
 }
 
+QString Relationship::polishName(const QString &val)
+{
+    const QString space = QStringLiteral(" ");
+
+    const bool endsWithSpace = val.endsWith(space);
+
+    QStringList comps = val.simplified().trimmed().split(space);
+    for(int i=0; i<comps.size(); i++)
+    {
+        QString &comp = comps[i];
+        comp = comp.toLower();
+        comp[0] = comp[0].toUpper();
+    }
+
+    QString ret = comps.join(space);
+    if(endsWithSpace)
+        ret += space;
+
+    return ret;
+}
+
 void Relationship::setName(const QString &val)
 {
-    if(m_name == val)
+    const QString val2 = polishName(val);
+    if(m_name == val2)
         return;
 
-    m_name = val;
+    m_name = val2;
     emit nameChanged();
 }
 
@@ -348,6 +371,38 @@ void Relationship::clearNotes()
         this->removeNote(m_notes.first());
 }
 
+void Relationship::serializeToJson(QJsonObject &json) const
+{
+
+    if(m_with != nullptr)
+        json.insert("with", m_with->name());
+}
+
+void Relationship::deserializeFromJson(const QJsonObject &json)
+{
+    m_withName = json.value("with").toString();
+}
+
+void Relationship::resolveRelationship()
+{
+    if(!m_withName.isEmpty())
+    {
+        Structure *structure = nullptr;
+        if(m_of != nullptr)
+            structure = m_of->structure();
+        else
+            structure = ScriteDocument::instance()->structure();
+
+        m_with = structure->findCharacter(m_withName);
+        m_withName.clear();
+
+        if(m_with != nullptr)
+            emit withChanged();
+        else
+            this->deleteLater();
+    }
+}
+
 void Relationship::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
 {
     reinterpret_cast< Relationship* >(list->data)->addNote(ptr);
@@ -408,9 +463,12 @@ Character::Character(QObject *parent)
     connect(this, &Character::ageChanged, this, &Character::characterChanged);
     connect(this, &Character::nameChanged, this, &Character::characterChanged);
     connect(this, &Character::typeChanged, this, &Character::characterChanged);
+    connect(this, &Character::weightChanged, this, &Character::characterChanged);
+    connect(this, &Character::photosChanged, this, &Character::characterChanged);
     connect(this, &Character::heightChanged, this, &Character::characterChanged);
     connect(this, &Character::genderChanged, this, &Character::characterChanged);
     connect(this, &Character::aliasesChanged, this, &Character::characterChanged);
+    connect(this, &Character::bodyTypeChanged, this, &Character::characterChanged);
     connect(this, &Character::noteCountChanged, this, &Character::characterChanged);
     connect(this, &Character::designationChanged, this, &Character::characterChanged);
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
@@ -428,6 +486,15 @@ void Character::setName(const QString &val)
 
     m_name = val.toUpper().trimmed();
     emit nameChanged();
+}
+
+void Character::setVisibleOnNotebook(bool val)
+{
+    if(m_visibleOnNotebook == val)
+        return;
+
+    m_visibleOnNotebook = val;
+    emit visibleOnNotebookChanged();
 }
 
 QQmlListProperty<Note> Character::notes()
@@ -503,7 +570,7 @@ void Character::addPhoto(const QString &photoPath)
 {
     DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
 
-    const QString dstPath = QStringLiteral("characters/") + QDateTime::currentMSecsSinceEpoch() + QStringLiteral(".jpg");
+    const QString dstPath = QStringLiteral("characters/") + QString::number(QDateTime::currentMSecsSinceEpoch()) + QStringLiteral(".jpg");
     const QString dfsPath = dfs->addImage(photoPath, dstPath, QSize(512,512), true);
     if(dfsPath.isEmpty())
         return;
@@ -569,22 +636,40 @@ void Character::setGender(const QString &val)
     emit genderChanged();
 }
 
-void Character::setAge(qreal val)
+void Character::setAge(const QString &val)
 {
-    if( qFuzzyCompare(m_age, val) )
+    if( m_age == val )
         return;
 
     m_age = val;
     emit ageChanged();
 }
 
-void Character::setHeight(qreal val)
+void Character::setHeight(const QString &val)
 {
-    if( qFuzzyCompare(m_height, val) )
+    if( m_height == val )
         return;
 
     m_height = val;
     emit heightChanged();
+}
+
+void Character::setWeight(const QString &val)
+{
+    if(m_weight == val)
+        return;
+
+    m_weight = val;
+    emit weightChanged();
+}
+
+void Character::setBodyType(const QString &val)
+{
+    if(m_bodyType == val)
+        return;
+
+    m_bodyType = val;
+    emit bodyTypeChanged();
 }
 
 void Character::setAliases(const QStringList &val)
@@ -592,7 +677,10 @@ void Character::setAliases(const QStringList &val)
     if(m_aliases == val)
         return;
 
-    m_aliases = val;
+    m_aliases.clear();
+    Q_FOREACH(QString item, val)
+        m_aliases << item.trimmed();
+
     emit aliasesChanged();
 }
 
@@ -657,12 +745,11 @@ Relationship *Character::addRelationship(const QString &name, Character *with)
         return nullptr;
 
     // Find out if we have already established this relationsip.
-    const QString upperName = name.toUpper();
-    for(int i=0; i<m_relationships.size(); i++)
+    relationship = this->findRelationship(with);
+    if(relationship != nullptr)
     {
-        relationship = m_relationships.at(i);
-        if(relationship->name().toUpper() == upperName && relationship->with() == with)
-            return relationship;
+        relationship->setName(name);
+        return relationship;
     }
 
     // Create a new with-of relationship
@@ -686,6 +773,110 @@ Relationship *Character::addRelationship(const QString &name, Character *with)
 
     // Return the newly created relationship
     return ofWith;
+}
+
+Relationship *Character::findRelationship(const QString &with) const
+{
+    const QString with2 = with.toUpper().simplified().trimmed();
+    if(with2 == m_name)
+        return nullptr;
+
+    Q_FOREACH(Relationship *rel, m_relationships.list())
+    {
+        if(rel->with()->name() == with2)
+            return rel;
+    }
+
+    return nullptr;
+}
+
+Relationship *Character::findRelationship(const Character *with) const
+{
+    if(with == nullptr)
+        return nullptr;
+
+    Q_FOREACH(Relationship *rel, m_relationships.list())
+    {
+        if(rel->with() == with)
+            return rel;
+    }
+
+    return nullptr;
+}
+
+QList<Relationship *> Character::findRelationships(const QString &name) const
+{
+    QList<Relationship*> ret;
+
+    const QString name2 = Relationship::polishName(name);
+    Q_FOREACH(Relationship *rel, m_relationships.list())
+    {
+        if(rel->name() == name2)
+            ret << rel;
+    }
+
+    return ret;
+}
+
+QStringList Character::unrelatedCharacterNames() const
+{
+    const QStringList names = this->structure()->characterNames();
+
+    QStringList ret;
+    Q_FOREACH(QString name, names)
+    {
+        if(this->name() == name || this->hasRelationship(name))
+            continue;
+
+        ret << name;
+    }
+
+    return ret;
+}
+
+void Character::serializeToJson(QJsonObject &json) const
+{
+    DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
+    QJsonArray array;
+    Q_FOREACH(QString photo, m_photos)
+        array.append( dfs->relativePath(photo) );
+    json.insert("photos", array);
+}
+
+void Character::deserializeFromJson(const QJsonObject &json)
+{
+    DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
+    const QJsonArray array = json.value("photos").toArray();
+
+    QStringList photoPaths;
+    for(int i=0; i<array.size(); i++)
+    {
+        QString path = array.at(i).toString();
+        if( QDir::isAbsolutePath(path) )
+            continue;
+
+        path = dfs->absolutePath(path);
+        if( path.isEmpty() || !QFile::exists(path) )
+            continue;
+
+        QImage image(path);
+        if(image.isNull())
+            continue;
+
+        photoPaths.append(path);
+    }
+
+    if(m_photos != photoPaths)
+    {
+        m_photos = photoPaths;
+        emit photosChanged();
+    }
+}
+
+void Character::resolveRelationships()
+{
+    Q_FOREACH(Relationship *rel, m_relationships.list())
+        rel->resolveRelationship();
 }
 
 bool Character::event(QEvent *event)
@@ -1100,18 +1291,36 @@ QJsonArray Structure::detectCharacters() const
     return ret;
 }
 
-void Structure::addCharacters(const QStringList &names)
+Character *Structure::addCharacter(const QString &name)
 {
+    const QString name2 = name.toUpper().simplified().trimmed();
+    if(name2.isEmpty())
+        return nullptr;
+
+    Character *character = this->findCharacter(name2);
+    if(character == nullptr)
+    {
+        character = new Character(this);
+        character->setName(name2);
+        this->addCharacter(character);
+    }
+
+    return character;
+}
+
+QList<Character*> Structure::addCharacters(const QStringList &names)
+{
+    QList<Character*> ret;
+    ret.reserve(names.size());
+
     Q_FOREACH(QString name, names)
     {
-        Character *character = this->findCharacter(name);
-        if(character == nullptr)
-        {
-            character = new Character(this);
-            character->setName(name);
-            this->addCharacter(character);
-        }
+        Character *character = this->addCharacter(name);
+        if(character != nullptr)
+            ret << character;
     }
+
+    return ret;
 }
 
 Character *Structure::findCharacter(const QString &name) const
@@ -1739,6 +1948,17 @@ void Structure::paste(const QPointF &pos)
         this->copy(element);
         return;
     }
+}
+
+void Structure::serializeToJson(QJsonObject &) const
+{
+    // Do nothing
+}
+
+void Structure::deserializeFromJson(const QJsonObject &)
+{
+    Q_FOREACH(Character *character, m_characters.list())
+        character->resolveRelationships();
 }
 
 bool Structure::event(QEvent *event)
