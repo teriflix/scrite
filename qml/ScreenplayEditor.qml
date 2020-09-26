@@ -1259,7 +1259,7 @@ Rectangle {
                             break
                         }
 
-                        if(event.modifiers && Qt.ControlModifier) {
+                        if(event.modifiers === Qt.ControlModifier) {
                             switch(event.key) {
                             case Qt.Key_Delete:
                                 if(app.isMacOSPlatform && sceneTextEditor.cursorPosition === 0) {
