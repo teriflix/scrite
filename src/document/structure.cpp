@@ -1308,19 +1308,10 @@ Character *Structure::addCharacter(const QString &name)
     return character;
 }
 
-QList<Character*> Structure::addCharacters(const QStringList &names)
+void Structure::addCharacters(const QStringList &names)
 {
-    QList<Character*> ret;
-    ret.reserve(names.size());
-
     Q_FOREACH(QString name, names)
-    {
-        Character *character = this->addCharacter(name);
-        if(character != nullptr)
-            ret << character;
-    }
-
-    return ret;
+        this->addCharacter(name);
 }
 
 Character *Structure::findCharacter(const QString &name) const

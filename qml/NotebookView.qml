@@ -135,7 +135,7 @@ Item {
         }
     }
 
-    property var currentSource: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
+    property var currentSource: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
 
     Rectangle {
         anchors.left: parent.left

@@ -469,7 +469,7 @@ public:
     Q_INVOKABLE QStringList allCharacterNames() const { return this->characterNames(); }
     Q_INVOKABLE QJsonArray detectCharacters() const;
     Q_INVOKABLE Character *addCharacter(const QString &name);
-    Q_INVOKABLE QList<Character*> addCharacters(const QStringList &names);
+    Q_INVOKABLE void addCharacters(const QStringList &names);
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
 
