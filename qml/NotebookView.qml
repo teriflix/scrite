@@ -117,7 +117,10 @@ Item {
     }
     Connections {
         target: scriteDocument.screenplay
-        onActiveSceneChanged: evaluateNoteSources()
+        onActiveSceneChanged: {
+            evaluateNoteSources()
+            notebookTabsView.currentIndex = 1
+        }
     }
     Component.onCompleted: evaluateNoteSources()
 
