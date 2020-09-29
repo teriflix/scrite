@@ -95,6 +95,18 @@ public:
         this->endMoveRows();
     }
 
+    void assign(const QList<T> &list) {
+        this->beginResetModel();
+        m_list = list;
+        this->endResetModel();
+    }
+
+    void clear() {
+        this->beginResetModel();
+        m_list.clear();
+        this->endResetModel();
+    }
+
     int size() const { return m_list.size(); }
     T at(int row) const { return row < 0 || row >= m_list.size() ? nullptr : m_list.at(row); }
 
