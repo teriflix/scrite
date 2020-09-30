@@ -304,15 +304,15 @@ public:
 
     Q_INVOKABLE Relationship *addRelationship(const QString &name, Character *with);
 
-    Q_INVOKABLE Relationship *findRelationship(const QString &with) const;
-    Q_INVOKABLE Relationship *findRelationship(const Character *with) const;
-    Q_INVOKABLE bool hasRelationship(const QString &with) const {
+    Q_INVOKABLE Relationship *findRelationshipWith(const QString &with) const;
+    Q_INVOKABLE Relationship *findRelationship(Character *with) const;
+    Q_INVOKABLE bool hasRelationshipWith(const QString &with) const {
+        return this->findRelationshipWith(with) != nullptr;
+    }
+    Q_INVOKABLE bool isRelatedTo(Character *with) const {
         return this->findRelationship(with) != nullptr;
     }
-    Q_INVOKABLE bool hasRelationship(const Character *with) const {
-        return this->findRelationship(with) != nullptr;
-    }
-    Q_INVOKABLE QList<Relationship*> findRelationships(const QString &name=QString()) const;
+    Q_INVOKABLE QList<Relationship*> findRelationshipsWith(const QString &name=QString()) const;
     Q_INVOKABLE QStringList unrelatedCharacterNames() const;
 
     Q_SIGNAL void characterChanged();

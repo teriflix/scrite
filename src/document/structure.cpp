@@ -783,7 +783,7 @@ Relationship *Character::addRelationship(const QString &name, Character *with)
     return ofWith;
 }
 
-Relationship *Character::findRelationship(const QString &with) const
+Relationship *Character::findRelationshipWith(const QString &with) const
 {
     const QString with2 = with.toUpper().simplified().trimmed();
     if(with2 == m_name)
@@ -798,9 +798,9 @@ Relationship *Character::findRelationship(const QString &with) const
     return nullptr;
 }
 
-Relationship *Character::findRelationship(const Character *with) const
+Relationship *Character::findRelationship(Character *with) const
 {
-    if(with == nullptr)
+    if(with == nullptr || with == this)
         return nullptr;
 
     Q_FOREACH(Relationship *rel, m_relationships.list())
@@ -812,7 +812,7 @@ Relationship *Character::findRelationship(const Character *with) const
     return nullptr;
 }
 
-QList<Relationship *> Character::findRelationships(const QString &name) const
+QList<Relationship *> Character::findRelationshipsWith(const QString &name) const
 {
     QList<Relationship*> ret;
 
@@ -833,7 +833,7 @@ QStringList Character::unrelatedCharacterNames() const
     QStringList ret;
     Q_FOREACH(QString name, names)
     {
-        if(this->name() == name || this->hasRelationship(name))
+        if(this->name() == name || this->hasRelationshipWith(name))
             continue;
 
         ret << name;

@@ -58,104 +58,147 @@ Item {
             scale: scrollArea.suggestedScale
 
             function zoomFit() {
-                scrollArea.zoomFit( Qt.rect(graphContainer.x, graphContainer.y, graphContainer.width, graphContainer.height) )
+                scrollArea.zoomFit( Qt.rect(graphArea.x, graphArea.y, graphArea.width, graphArea.height) )
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: graphArea.activeCharacter !== null
+                onClicked: graphArea.activeCharacter = null
             }
 
             Item {
-                id: graphContainer
+                id: graphArea
                 anchors.centerIn: parent
                 width: crgraph.graphBoundingRect.width
                 height: crgraph.graphBoundingRect.height
 
-                onWidthChanged: console.log("PA: " + width)
-                onHeightChanged: console.log("PA: " + height)
+                property Character activeCharacter
 
-                Repeater {
-                    model: crgraph.edges
+                Item {
+                    id: edgeItems
 
-                    PainterPathItem {
-                        outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
-                        outlineColor: primaryColors.c700.background
-                        renderType: PainterPathItem.OutlineOnly
-                        renderingMechanism: PainterPathItem.UseOpenGL
+                    Repeater {
+                        model: crgraph.edges
 
-                        property string pathString: modelData.pathString
-                        onPathStringChanged: setPathFromString(pathString)
+                        PainterPathItem {
+                            outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
+                            outlineColor: primaryColors.c700.background
+                            renderType: PainterPathItem.OutlineOnly
+                            renderingMechanism: PainterPathItem.UseOpenGL
+                            opacity: {
+                                if(graphArea.activeCharacter)
+                                    return (modelData.relationship.of === graphArea.activeCharacter || modelData.relationship.withCharacter === graphArea.activeCharacter) ? 1 : 0.2
+                                return 1
+                            }
+                            z: opacity
+                            Behavior on opacity {
+                                enabled: screenplayEditorSettings.enableAnimations
+                                NumberAnimation { duration: 250 }
+                            }
 
-                        Rectangle {
-                            x: modelData.labelPosition.x - width/2
-                            y: modelData.labelPosition.y - height/2
-                            rotation: modelData.labelAngle
-                            width: nameLabel.width + 10
-                            height: nameLabel.height + 4
-                            color: primaryColors.c700.background
+                            property string pathString: modelData.pathString
+                            onPathStringChanged: setPathFromString(pathString)
 
-                            Text {
-                                id: nameLabel
-                                text: modelData.relationship.name
-                                font.pointSize: app.idealFontPointSize
-                                anchors.centerIn: parent
-                                color: primaryColors.c700.text
+                            Rectangle {
+                                x: modelData.labelPosition.x - width/2
+                                y: modelData.labelPosition.y - height/2
+                                rotation: modelData.labelAngle
+                                width: nameLabel.width + 10
+                                height: nameLabel.height + 4
+                                color: primaryColors.c700.background
+
+                                Text {
+                                    id: nameLabel
+                                    text: modelData.relationship.name
+                                    font.pointSize: app.idealFontPointSize
+                                    anchors.centerIn: parent
+                                    color: primaryColors.c700.text
+                                }
                             }
                         }
                     }
                 }
 
-                Repeater {
-                    model: crgraph.nodes
+                Item {
+                    id: nodeItems
 
-                    Image {
-                        property Character character: modelData.character
-                        x: modelData.rect.x
-                        y: modelData.rect.y
-                        width: modelData.rect.width
-                        height: modelData.rect.height
-                        source: {
-                            if(character.photos.length > 0)
-                                return "file:///" + character.photos[0]
-                            return "../icons/content/person_outline.png"
-                        }
-                        fillMode: Image.PreserveAspectCrop
-                        mipmap: true; smooth: true
+                    Repeater {
+                        model: crgraph.nodes
 
-                        Rectangle {
-                            anchors.fill: parent
-                            border.width: 1
-                            border.color: primaryColors.borderColor
-                            color: Qt.rgba(0,0,0,0)
-                        }
+                        Image {
+                            property Character character: modelData.character
+                            x: modelData.rect.x
+                            y: modelData.rect.y
+                            width: modelData.rect.width
+                            height: modelData.rect.height
+                            source: {
+                                if(character.photos.length > 0)
+                                    return "file:///" + character.photos[0]
+                                return "../icons/content/person_outline.png"
+                            }
+                            fillMode: Image.PreserveAspectCrop
+                            mipmap: true; smooth: true
+                            z: character === graphArea.activeCharacter ? 1 : 0
 
-                        Rectangle {
-                            anchors.fill: infoLabel
-                            anchors.margins: -4
-                            radius: 4
-                            color: primaryColors.windowColor
-                            opacity: 0.8
-                        }
+                            Rectangle {
+                                anchors.fill: infoLabel
+                                anchors.margins: -4
+                                radius: 4
+                                color: primaryColors.windowColor
+                                opacity: 0.8
+                            }
 
-                        Text {
-                            id: infoLabel
-                            width: Math.min(parent.width - 30, contentWidth)
-                            anchors.bottom: parent.bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottomMargin: 15
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            horizontalAlignment: Text.AlignHCenter
-                            font.pixelSize: 10
-                            maximumLineCount: 3
-                            text: {
-                                var fields = []
-                                var addField = function(val, prefix) {
-                                    if(val && val !== "") {
-                                        if(prefix)
-                                            fields.push(prefix + ": " + val)
-                                        else
-                                            fields.push(val)
+                            Text {
+                                id: infoLabel
+                                width: Math.min(parent.width - 30, contentWidth)
+                                anchors.bottom: parent.bottom
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.bottomMargin: 15
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: Text.AlignHCenter
+                                font.pixelSize: 10
+                                maximumLineCount: 3
+                                text: {
+                                    var fields = []
+                                    var addField = function(val, prefix) {
+                                        if(val && val !== "") {
+                                            if(prefix)
+                                                fields.push(prefix + ": " + val)
+                                            else
+                                                fields.push(val)
+                                        }
                                     }
+                                    addField("<b>" + character.name + "</b>");
+                                    addField("<i>" + character.designation + "</i>")
+                                    return fields.join("<br/>")
                                 }
-                                addField("<b>" + character.name + "</b>");
-                                addField("<i>" + character.designation + "</i>")
-                                return fields.join("<br/>")
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                border.width: parent.character === graphArea.activeCharacter ? 3 : 1
+                                border.color: parent.character === graphArea.activeCharacter ? "black" : primaryColors.borderColor
+                                color: Qt.rgba(1,1,1,alpha)
+                                property real alpha: {
+                                    if(graphArea.activeCharacter === null || parent.character === graphArea.activeCharacter)
+                                        return 0
+                                    return parent.character.isRelatedTo(graphArea.activeCharacter) ? 0 : 0.75
+                                }
+                                Behavior on alpha {
+                                    enabled: screenplayEditorSettings.enableAnimations
+                                    NumberAnimation { duration: 250 }
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(graphArea.activeCharacter === parent.character)
+                                        graphArea.activeCharacter = null
+                                    else
+                                        graphArea.activeCharacter = parent.character
+                                }
                             }
                         }
                     }
