@@ -54,5 +54,7 @@
         <file>qml/AnnotationItem.qml</file>
         <file>qml/CharacterNotes.qml</file>
         <file>qml/NotesView.qml</file>
+        <file>qml/CharacterRelationshipsGraphView.qml</file>
+        <file>qml/CharacterBox.qml</file>
     </qresource>
 </RCC>

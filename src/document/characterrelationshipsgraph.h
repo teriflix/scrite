@@ -66,6 +66,9 @@ public:
     QPainterPath path() const { return m_path; }
     Q_SIGNAL void pathChanged();
 
+    Q_PROPERTY(QString pathString READ pathString NOTIFY pathChanged)
+    QString pathString() const;
+
 protected:
     friend class CharacterRelationshipsGraph;
     CharacterRelationshipsGraphEdge(QObject *parent=nullptr);
@@ -78,9 +81,10 @@ private:
     QObjectProperty<Relationship> m_relationship;
 };
 
-class CharacterRelationshipsGraph : public QObject
+class CharacterRelationshipsGraph : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     CharacterRelationshipsGraph(QObject *parent = nullptr);
@@ -116,15 +120,26 @@ public:
     int maxTime() const { return m_maxTime; }
     Q_SIGNAL void maxTimeChanged();
 
+    Q_PROPERTY(QRectF graphBoundingRect READ graphBoundingRect NOTIFY graphBoundingRectChanged)
+    QRectF graphBoundingRect() const { return m_graphBoundingRect; }
+    Q_SIGNAL void graphBoundingRectChanged();
+
     Q_INVOKABLE void reload();
 
+    // QQmlParserStatus interface
+    void classBegin();
+    void componentComplete();
+
 private:
+    void setGraphBoundingRect(const QRectF &val);
     void resetStructure();
     void load();
 
 private:
     int m_maxTime = 1000;
-    QSizeF m_nodeSize;
+    QSizeF m_nodeSize = QSizeF(350,100);
+    bool m_componentLoaded = false;
+    QRectF m_graphBoundingRect;
     QStringList m_filterByCharacterNames;
     QObjectProperty<Structure> m_structure;
     ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;

@@ -57,6 +57,7 @@
 #include "screenplaytextdocument.h"
 #include "abstractreportgenerator.h"
 #include "qtextdocumentpagedprinter.h"
+#include "characterrelationshipsgraph.h"
 
 void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, const QString &message)
 {
@@ -149,6 +150,7 @@ int main(int argc, char **argv)
     qmlRegisterType<Note>("Scrite", 1, 0, "Note");
     qmlRegisterType<Relationship>("Scrite", 1, 0, "Relationship");
     qmlRegisterUncreatableType<Character>("Scrite", 1, 0, "Character", reason);
+    qmlRegisterType<CharacterRelationshipsGraph>("Scrite", 1, 0, "CharacterRelationshipsGraph");
 
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
     qmlRegisterUncreatableType<ScreenplayFormat>("Scrite", 1, 0, "ScreenplayFormat", reason);

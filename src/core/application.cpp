@@ -747,6 +747,26 @@ void Application::computeIdealFontPointSize()
 #endif
 }
 
+QString Application::painterPathToString(const QPainterPath &val) const
+{
+    QByteArray ret;
+    {
+        QDataStream ds(&ret, QIODevice::WriteOnly);
+        ds << val;
+    }
+
+    return QString::fromLatin1(ret.toHex());
+}
+
+QPainterPath Application::stringToPainterPath(const QString &val) const
+{
+    const QByteArray bytes = QByteArray::fromHex(val.toLatin1());
+    QDataStream ds(bytes);
+    QPainterPath path;
+    ds >> path;
+    return path;
+}
+
 QString Application::sanitiseFileName(const QString &fileName) const
 {
     const QFileInfo fi(fileName);

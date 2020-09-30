@@ -119,7 +119,7 @@ Item {
         target: scriteDocument.screenplay
         onActiveSceneChanged: {
             evaluateNoteSources()
-            notebookTabsView.currentIndex = 1
+            notebookTabsView.currentIndex = 2
         }
     }
     Component.onCompleted: evaluateNoteSources()
@@ -158,11 +158,19 @@ Item {
             anchors.fill: parent
             anchors.margins: 2
             active: !scriteDocument.loading
-            sourceComponent: {
+            sourceComponent: {                
                 if( app.verifyType(currentSource, "Character") )
                     return characterNotesComponent
                 return notesViewComponent
             }
+        }
+    }
+
+    Component {
+        id: characterGraphComponent
+
+        CharacterRelationshipsGraphView {
+
         }
     }
 

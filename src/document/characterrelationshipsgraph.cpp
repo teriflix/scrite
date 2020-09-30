@@ -11,8 +11,10 @@
 **
 ****************************************************************************/
 
-#include "hourglass.h"
 #include "characterrelationshipsgraph.h"
+
+#include "hourglass.h"
+#include "application.h"
 
 #include <QtMath>
 #include <QElapsedTimer>
@@ -69,6 +71,11 @@ CharacterRelationshipsGraphEdge::CharacterRelationshipsGraphEdge(QObject *parent
 CharacterRelationshipsGraphEdge::~CharacterRelationshipsGraphEdge()
 {
 
+}
+
+QString CharacterRelationshipsGraphEdge::pathString() const
+{
+    return Application::instance()->painterPathToString(m_path);
 }
 
 void CharacterRelationshipsGraphEdge::setRelationship(Relationship *val)
@@ -158,6 +165,26 @@ void CharacterRelationshipsGraph::reload()
     this->load();
 }
 
+void CharacterRelationshipsGraph::classBegin()
+{
+    m_componentLoaded = false;
+}
+
+void CharacterRelationshipsGraph::componentComplete()
+{
+    m_componentLoaded = true;
+    this->load();
+}
+
+void CharacterRelationshipsGraph::setGraphBoundingRect(const QRectF &val)
+{
+    if(m_graphBoundingRect == val)
+        return;
+
+    m_graphBoundingRect = val;
+    emit graphBoundingRectChanged();
+}
+
 void CharacterRelationshipsGraph::resetStructure()
 {
     m_structure = nullptr;
@@ -179,7 +206,7 @@ void CharacterRelationshipsGraph::load()
     qDeleteAll(edges);
     edges.clear();
 
-    if(m_structure.isNull())
+    if(m_structure.isNull() || !m_componentLoaded)
         return;
 
     // For the moment, we ignore the filter-by-character-names list.
@@ -293,7 +320,7 @@ void CharacterRelationshipsGraph::load()
         }
     }
 
-    const qreal minNodeSpacingPx = 0.75 * QLineF( QPointF(0,0), QPointF(m_nodeSize.width(),m_nodeSize.height()) ).length();
+    const qreal minNodeSpacingPx = QLineF( QPointF(0,0), QPointF(m_nodeSize.width(),m_nodeSize.height()) ).length();
     const qreal scale = minNodeSpacingPx / minNodeSpacing;
 
     QRectF boundingRect;
@@ -326,6 +353,8 @@ void CharacterRelationshipsGraph::load()
     boundingRect = QRectF();
     for(CharacterRelationshipsGraphNode *node : nodes)
         boundingRect |= node->rect();
+    const qreal margin = qMin(qMax(boundingRect.width(),boundingRect.height())*0.1, 50.0);
+    boundingRect.adjust(-margin, -margin, margin, margin);
 
     const QPointF dp = -boundingRect.topLeft();
 
@@ -336,7 +365,23 @@ void CharacterRelationshipsGraph::load()
         node->setRect(rect);
     }
 
+    // Get all edges to evaluate their nodes.
+    for(CharacterRelationshipsGraphEdge *edge : edges)
+    {
+        CharacterRelationshipsGraphNode *n1 = nodeMap.value(edge->relationship()->of());
+        CharacterRelationshipsGraphNode *n2 = nodeMap.value(edge->relationship()->with());;
+
+        QPainterPath path;
+        path.moveTo( n1->rect().center() );
+        path.lineTo( n2->rect().center() );
+        edge->setPath(path);
+    }
+
     // Update the nodes and edges properties
     m_nodes.assign(nodes);
     m_edges.assign(edges);
+
+    // Announce changes to the bounding rectangle of the whole graph
+    boundingRect.moveTopLeft( QPointF(0,0) );
+    this->setGraphBoundingRect(boundingRect);
 }

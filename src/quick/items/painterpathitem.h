@@ -36,12 +36,20 @@ public:
     PainterPath* painterPath() const { return m_painterPath; }
     Q_SIGNAL void painterPathChanged();
 
+    Q_PROPERTY(QPainterPath path READ path WRITE setPath NOTIFY pathChanged)
+    void setPath(QPainterPath val);
+    QPainterPath path() const { return m_path; }
+    Q_SIGNAL void pathChanged();
+
+    Q_INVOKABLE void setPathFromString(const QString &val);
+
     QPainterPath shape() const;
 
 private:
     void resetPainterPath();
 
 protected:
+    QPainterPath m_path;
     QObjectProperty<PainterPath> m_painterPath;
 };
 

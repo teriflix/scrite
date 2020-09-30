@@ -227,6 +227,9 @@ public:
     void setHandleFileOpenEvents(bool val=true) { m_handleFileOpenEvents = val; }
 #endif
 
+    QString painterPathToString(const QPainterPath &val) const;
+    QPainterPath stringToPainterPath(const QString &val) const;
+
     Q_SIGNAL void openFileRequest(const QString &filePath);
 
     QString sanitiseFileName(const QString &fileName) const;

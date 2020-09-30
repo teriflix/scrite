@@ -66,6 +66,7 @@ private:
 class Automation : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     static void init(QQuickView *qmlWindow);
