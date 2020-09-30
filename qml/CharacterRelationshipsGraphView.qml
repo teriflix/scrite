@@ -18,46 +18,147 @@ Item {
     CharacterRelationshipsGraph {
         id: crgraph
         structure: scriteDocument.loading ? null : scriteDocument.structure
-        nodeSize: Qt.size(350,100)
-        maxTime: 500
+        nodeSize: Qt.size(150,150)
+        maxTime: 1000
+        maxIterations: -1
+        onUpdated: app.execLater(crgraph, 100, function() {
+            canvas.zoomFit()
+        })
+    }
+
+    onVisibleChanged: {
+        if(visible)
+            canvas.zoomFit()
     }
 
     ScrollArea {
         id: scrollArea
+        clip: true
         anchors.fill: parent
-        contentWidth: scrollAreaItem.width
-        contentHeight: scrollAreaItem.height
+        contentWidth: canvas.width * canvas.scale
+        contentHeight: canvas.height * canvas.scale
+        initialContentWidth: canvas.width
+        initialContentHeight: canvas.height
+        showScrollBars: true
         handlePinchZoom: true
 
-        Item {
-            id: scrollAreaItem
-            width: Math.max(crgraph.graphBoundingRect.width, 1000)
-            height: Math.max(crgraph.graphBoundingRect.height, 1000)
+        GridBackground {
+            id: canvas
+            width: 120000
+            height: 120000
+            antialiasing: false
+            tickColorOpacity: 0.25 * scale
+            majorTickLineWidth: 2*app.devicePixelRatio
+            minorTickLineWidth: 1*app.devicePixelRatio
+            gridIsVisible: structureCanvasSettings.showGrid
+            majorTickColor: structureCanvasSettings.gridColor
+            minorTickColor: structureCanvasSettings.gridColor
+            tickDistance: scriteDocument.structure.canvasGridSize
+            transformOrigin: Item.TopLeft
             scale: scrollArea.suggestedScale
 
-            Repeater {
-                model: crgraph.edges
-
-                PainterPathItem {
-                    outlineWidth: 3
-                    outlineColor: "black"
-                    renderType: PainterPathItem.OutlineOnly
-                    renderingMechanism: PainterPathItem.UseOpenGL
-
-                    property string pathString: modelData.pathString
-                    onPathStringChanged: setPathFromString(pathString)
-                }
+            function zoomFit() {
+                scrollArea.zoomFit( Qt.rect(graphContainer.x, graphContainer.y, graphContainer.width, graphContainer.height) )
             }
 
-            Repeater {
-                model: crgraph.nodes
+            Item {
+                id: graphContainer
+                anchors.centerIn: parent
+                width: crgraph.graphBoundingRect.width
+                height: crgraph.graphBoundingRect.height
 
-                CharacterBox {
-                    character: modelData.character
-                    x: modelData.rect.x
-                    y: modelData.rect.y
-                    width: modelData.rect.width
-                    height: modelData.rect.height
+                onWidthChanged: console.log("PA: " + width)
+                onHeightChanged: console.log("PA: " + height)
+
+                Repeater {
+                    model: crgraph.edges
+
+                    PainterPathItem {
+                        outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
+                        outlineColor: primaryColors.c700.background
+                        renderType: PainterPathItem.OutlineOnly
+                        renderingMechanism: PainterPathItem.UseOpenGL
+
+                        property string pathString: modelData.pathString
+                        onPathStringChanged: setPathFromString(pathString)
+
+                        Rectangle {
+                            x: modelData.labelPosition.x - width/2
+                            y: modelData.labelPosition.y - height/2
+                            rotation: modelData.labelAngle
+                            width: nameLabel.width + 10
+                            height: nameLabel.height + 4
+                            color: primaryColors.c700.background
+
+                            Text {
+                                id: nameLabel
+                                text: modelData.relationship.name
+                                font.pointSize: app.idealFontPointSize
+                                anchors.centerIn: parent
+                                color: primaryColors.c700.text
+                            }
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: crgraph.nodes
+
+                    Image {
+                        property Character character: modelData.character
+                        x: modelData.rect.x
+                        y: modelData.rect.y
+                        width: modelData.rect.width
+                        height: modelData.rect.height
+                        source: {
+                            if(character.photos.length > 0)
+                                return "file:///" + character.photos[0]
+                            return "../icons/content/person_outline.png"
+                        }
+                        fillMode: Image.PreserveAspectCrop
+                        mipmap: true; smooth: true
+
+                        Rectangle {
+                            anchors.fill: parent
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+                            color: Qt.rgba(0,0,0,0)
+                        }
+
+                        Rectangle {
+                            anchors.fill: infoLabel
+                            anchors.margins: -4
+                            radius: 4
+                            color: primaryColors.windowColor
+                            opacity: 0.8
+                        }
+
+                        Text {
+                            id: infoLabel
+                            width: Math.min(parent.width - 30, contentWidth)
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottomMargin: 15
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pixelSize: 10
+                            maximumLineCount: 3
+                            text: {
+                                var fields = []
+                                var addField = function(val, prefix) {
+                                    if(val && val !== "") {
+                                        if(prefix)
+                                            fields.push(prefix + ": " + val)
+                                        else
+                                            fields.push(val)
+                                    }
+                                }
+                                addField("<b>" + character.name + "</b>");
+                                addField("<i>" + character.designation + "</i>")
+                                return fields.join("<br/>")
+                            }
+                        }
+                    }
                 }
             }
         }

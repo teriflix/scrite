@@ -140,6 +140,8 @@ void Automation::addStep(AbstractAutomationStep *ptr)
     if(ptr == nullptr || m_steps.indexOf(ptr) >= 0)
         return;
 
+    ptr->setParent(this);
+
     m_steps.append(ptr);
     emit stepCountChanged();
 }
@@ -152,6 +154,9 @@ void Automation::removeStep(AbstractAutomationStep *ptr)
     const int index = m_steps.indexOf(ptr);
     if(index < 0)
         return ;
+
+    if(ptr->parent() == this)
+        GarbageCollector::instance()->add(ptr);
 
     m_steps.removeAt(index);
     emit stepCountChanged();

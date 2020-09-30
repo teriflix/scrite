@@ -351,7 +351,7 @@ Item {
         Note {
             heading: "Note Heading"
             Component.onCompleted: {
-                var lastNote = currentSource.notesModel.objectAt(currentSource.notesModel.objectCount-1)
+                var lastNote = currentTabNotesSource.notesModel.objectAt(currentTabNotesSource.notesModel.objectCount-1)
                 if(lastNote)
                     color = lastNote.color
                 else
@@ -455,13 +455,20 @@ Item {
 
                             TextField2 {
                                 id: relationshipField
-                                width: parent.width - relationshipIndexLabel.width - parent.spacing
+                                width: parent.width - relationshipIndexLabel.width - removeRelationshipButton.width - 2*parent.spacing
                                 label: "Relationship:"
                                 labelAlwaysVisible: true
                                 placeholderText: "friend, spouse, etc.. <max 50 characters>"
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 text: modelData.name
                                 onTextEdited: modelData.name = text
+                            }
+
+                            ToolButton3 {
+                                id: removeRelationshipButton
+                                iconSource: "../icons/action/delete.png"
+                                anchors.top: parent.top
+                                onClicked: character.removeRelationship(modelData)
                             }
                         }
 

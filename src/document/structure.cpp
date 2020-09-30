@@ -336,6 +336,8 @@ void Relationship::addNote(Note *ptr)
     if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
         return;
 
+    ptr->setParent(this);
+
     connect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
     connect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
 
@@ -353,6 +355,8 @@ void Relationship::removeNote(Note *ptr)
         return;
 
     m_notes.removeAt(index);
+    if(ptr->parent() == this)
+        GarbageCollector::instance()->add(ptr);
 
     disconnect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
     disconnect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
@@ -528,9 +532,11 @@ void Character::removeNote(Note *ptr)
 
     const int index = m_notes.indexOf(ptr);
     if(index < 0)
-        return ;
+        return;
 
     m_notes.removeAt(index);
+    if(ptr->parent() == this)
+        GarbageCollector::instance()->add(ptr);
 
     disconnect(ptr, &Note::aboutToDelete, this, &Character::removeNote);
     disconnect(ptr, &Note::noteChanged, this, &Character::characterChanged);
@@ -700,10 +706,10 @@ void Character::addRelationship(Relationship *ptr)
     if(ptr == nullptr || m_relationships.indexOf(ptr) >= 0)
         return;
 
+    ptr->setParent(this);
+
     connect(ptr, &Relationship::aboutToDelete, this, &Character::removeRelationship);
     connect(ptr, &Relationship::relationshipChanged, this, &Character::characterChanged);
-
-    ptr->setParent(this);
 
     m_relationships.append(ptr);
 
@@ -720,6 +726,8 @@ void Character::removeRelationship(Relationship *ptr)
         return;
 
     m_relationships.removeAt(index);
+    if(ptr->parent() == this)
+        GarbageCollector::instance()->add(ptr);
 
     disconnect(ptr, &Relationship::aboutToDelete, this, &Character::removeRelationship);
     disconnect(ptr, &Relationship::relationshipChanged, this, &Character::characterChanged);
@@ -1754,7 +1762,8 @@ void Structure::removeAnnotation(Annotation *ptr)
 
     emit annotationCountChanged();
 
-    GarbageCollector::instance()->add(ptr);
+    if(ptr->parent() == this)
+        GarbageCollector::instance()->add(ptr);
 }
 
 Annotation *Structure::annotationAt(int index) const

@@ -17,6 +17,7 @@
 #include "application.h"
 
 #include <QtMath>
+#include <QFontMetrics>
 #include <QElapsedTimer>
 
 CharacterRelationshipsGraphNode::CharacterRelationshipsGraphNode(QObject *parent)
@@ -102,6 +103,18 @@ void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
         return;
 
     m_path = val;
+
+    if(m_path.isEmpty())
+    {
+        m_labelPos = QPointF(0,0);
+        m_labelAngle = 0;
+    }
+    else
+    {
+        m_labelPos = m_path.pointAtPercent(0.5);
+        m_labelAngle = qRadiansToDegrees( qAtan(m_path.slopeAtPercent(0.5)) );
+    }
+
     emit pathChanged();
 }
 
@@ -126,6 +139,8 @@ void CharacterRelationshipsGraph::setNodeSize(const QSizeF &val)
 
     m_nodeSize = val;
     emit nodeSizeChanged();
+
+    this->load();
 }
 
 void CharacterRelationshipsGraph::setStructure(Structure *val)
@@ -160,6 +175,15 @@ void CharacterRelationshipsGraph::setMaxTime(int val)
     emit maxTimeChanged();
 }
 
+void CharacterRelationshipsGraph::setMaxIterations(int val)
+{
+    if(m_maxIterations == val)
+        return;
+
+    m_maxIterations = val;
+    emit maxIterationsChanged();
+}
+
 void CharacterRelationshipsGraph::reload()
 {
     this->load();
@@ -182,6 +206,8 @@ void CharacterRelationshipsGraph::setGraphBoundingRect(const QRectF &val)
         return;
 
     m_graphBoundingRect = val;
+    if(m_graphBoundingRect.isEmpty())
+        m_graphBoundingRect.setSize(QSizeF(500,500));
     emit graphBoundingRectChanged();
 }
 
@@ -207,11 +233,16 @@ void CharacterRelationshipsGraph::load()
     edges.clear();
 
     if(m_structure.isNull() || !m_componentLoaded)
+    {
+        this->setGraphBoundingRect( QRectF(0,0,0,0) );
+        emit updated();
         return;
+    }
 
     // For the moment, we ignore the filter-by-character-names list.
 
     // First we collect all nodes and edges
+    QString longestRelationshipName;
     QList<Character*> loneCharacters;
     QMap<Character*,CharacterRelationshipsGraphNode*> nodeMap;
     for(int i=0; i<m_structure->characterCount(); i++)
@@ -241,6 +272,9 @@ void CharacterRelationshipsGraph::load()
             CharacterRelationshipsGraphEdge *edge = new CharacterRelationshipsGraphEdge(this);
             edge->setRelationship(relationship);
             edges.append(edge);
+
+            if( relationship->name().length() > longestRelationshipName.length() )
+                longestRelationshipName = relationship->name();
         }
     }
 
@@ -255,9 +289,13 @@ void CharacterRelationshipsGraph::load()
         angle += angleStep;
     }
 
+    int nrIterations = 0;
+
+    // https://en.wikipedia.org/wiki/Force-directed_graph_drawing
     QElapsedTimer timer;
-    timer.start();
-    while(timer.elapsed() < m_maxTime)
+    if(!nodes.isEmpty())
+        timer.start();
+    while(timer.elapsed() < m_maxTime && !nodes.isEmpty())
     {
         // Initialize Force Vector
         QVector<QPointF> forces(nodes.size(), QPointF(0,0));
@@ -295,16 +333,24 @@ void CharacterRelationshipsGraph::load()
         }
 
         // Place nodes
+        bool moved = false;
         for(int i=0; i<nodes.size(); i++)
         {
             CharacterRelationshipsGraphNode *node = nodes.at(i);
 
             const QPointF force = forces.at(i);
+            if( qFuzzyIsNull(force.x()) && qFuzzyIsNull(force.y()) )
+                continue;
 
             QRectF rect = node->rect();
             rect.moveCenter(rect.center() + force);
             node->setRect(rect);
+            moved = true;
         }
+
+        ++nrIterations;
+        if(!moved || (m_maxIterations > 0 && nrIterations >= m_maxIterations))
+            break;
     }
 
     // Scale the placement of nodes such that we consider the node sizes.
@@ -320,7 +366,9 @@ void CharacterRelationshipsGraph::load()
         }
     }
 
-    const qreal minNodeSpacingPx = QLineF( QPointF(0,0), QPointF(m_nodeSize.width(),m_nodeSize.height()) ).length();
+    const QFontMetricsF fm(qApp->font());
+
+    const qreal minNodeSpacingPx = QLineF( QPointF(0,0), QPointF(m_nodeSize.width(),m_nodeSize.height()) ).length() + fm.horizontalAdvance(longestRelationshipName);
     const qreal scale = minNodeSpacingPx / minNodeSpacing;
 
     QRectF boundingRect;
@@ -384,4 +432,10 @@ void CharacterRelationshipsGraph::load()
     // Announce changes to the bounding rectangle of the whole graph
     boundingRect.moveTopLeft( QPointF(0,0) );
     this->setGraphBoundingRect(boundingRect);
+
+#ifndef QT_NO_DEBUG
+    qDebug() << "PA: Layout Iterations: " << nrIterations;
+#endif
+
+    emit updated();
 }

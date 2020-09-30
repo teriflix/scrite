@@ -69,6 +69,12 @@ public:
     Q_PROPERTY(QString pathString READ pathString NOTIFY pathChanged)
     QString pathString() const;
 
+    Q_PROPERTY(QPointF labelPosition READ labelPosition NOTIFY pathChanged)
+    QPointF labelPosition() const { return m_labelPos; }
+
+    Q_PROPERTY(qreal labelAngle READ labelAngle NOTIFY pathChanged)
+    qreal labelAngle() const { return m_labelAngle; }
+
 protected:
     friend class CharacterRelationshipsGraph;
     CharacterRelationshipsGraphEdge(QObject *parent=nullptr);
@@ -77,6 +83,8 @@ protected:
     void setPath(const QPainterPath &val);
 
 private:
+    QPointF m_labelPos;
+    qreal m_labelAngle = 0;
     QPainterPath m_path;
     QObjectProperty<Relationship> m_relationship;
 };
@@ -120,11 +128,18 @@ public:
     int maxTime() const { return m_maxTime; }
     Q_SIGNAL void maxTimeChanged();
 
+    Q_PROPERTY(int maxIterations READ maxIterations WRITE setMaxIterations NOTIFY maxIterationsChanged)
+    void setMaxIterations(int val);
+    int maxIterations() const { return m_maxIterations; }
+    Q_SIGNAL void maxIterationsChanged();
+
     Q_PROPERTY(QRectF graphBoundingRect READ graphBoundingRect NOTIFY graphBoundingRectChanged)
     QRectF graphBoundingRect() const { return m_graphBoundingRect; }
     Q_SIGNAL void graphBoundingRectChanged();
 
     Q_INVOKABLE void reload();
+
+    Q_SIGNAL void updated();
 
     // QQmlParserStatus interface
     void classBegin();
@@ -136,10 +151,11 @@ private:
     void load();
 
 private:
-    int m_maxTime = 1000;
-    QSizeF m_nodeSize = QSizeF(350,100);
+    int m_maxTime = 100;
+    QSizeF m_nodeSize = QSizeF(100,100);
+    int m_maxIterations = -1;
     bool m_componentLoaded = false;
-    QRectF m_graphBoundingRect;
+    QRectF m_graphBoundingRect = QRectF(0,0,500,500);
     QStringList m_filterByCharacterNames;
     QObjectProperty<Structure> m_structure;
     ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;

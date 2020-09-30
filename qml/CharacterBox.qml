@@ -22,6 +22,7 @@ Rectangle {
     color: "white"
     border.width: 1
     border.color: "black"
+    radius: 6
 
     Row {
         anchors.fill: parent

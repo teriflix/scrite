@@ -119,7 +119,7 @@ Item {
         target: scriteDocument.screenplay
         onActiveSceneChanged: {
             evaluateNoteSources()
-            notebookTabsView.currentIndex = 2
+            notebookTabsView.currentIndex = 1
         }
     }
     Component.onCompleted: evaluateNoteSources()
@@ -138,7 +138,8 @@ Item {
         }
     }
 
-    property var currentSource: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
+    property color currentTabNoteColor: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].color : "black"
+    property var currentTabNotesSource: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
 
     Rectangle {
         anchors.left: parent.left
@@ -152,14 +153,14 @@ Item {
         color: app.translucent(border.color, 0.04)
         radius: 4
         border.width: 2
-        border.color: notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].color : "black"
+        border.color: currentTabNoteColor
 
         Loader {
             anchors.fill: parent
             anchors.margins: 2
             active: !scriteDocument.loading
-            sourceComponent: {                
-                if( app.verifyType(currentSource, "Character") )
+            sourceComponent: {
+                if( app.verifyType(currentTabNotesSource, "Character") )
                     return characterNotesComponent
                 return notesViewComponent
             }
@@ -167,37 +168,84 @@ Item {
     }
 
     Component {
-        id: characterGraphComponent
-
-        CharacterRelationshipsGraphView {
-
-        }
-    }
-
-    Component {
         id: characterNotesComponent
 
         CharacterNotes {
-            character: currentSource
-            colorHint: noteSources[notebookTabsView.currentIndex].color
+            character: currentTabNotesSource
+            colorHint: currentTabNoteColor
         }
     }
 
     Component {
         id: notesViewComponent
 
-        NotesView {
-            notesModel: scriteDocument.loading ? null : (currentSource ? currentSource.notesModel : null)
-            onNewNoteRequest: {
-                var note = noteComponent.createObject(currentSource)
-                note.color = noteColor
-                currentSource.addNote(note)
-            }
-            onRemoveNoteRequest: currentSource.removeNote(currentSource.noteAt(index))
-            title: {
-                if(notebookTabsView.currentIndex > 0)
-                    return "You can capture your thoughts, ideas and research related to '<b>" + currentSource.name + "</b>' here.";
-                return "You can capture your thoughts, ideas and research about your screenplay here.";
+        Item {
+            Item {
+                anchors.fill: parent
+                anchors.margins: 2
+
+                Row {
+                    id: notesViewTabBar
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+                    spacing: -height*0.4
+                    property int currentIndex: 0
+
+                    Repeater {
+                        model: ["Notes", "Relationships"]
+
+                        TabBarTab {
+                            tabFillColor: active ? currentTabNoteColor : Qt.tint(currentTabNoteColor, "#C0FFFFFF")
+                            tabBorderColor: currentTabNoteColor
+                            tabBorderWidth: 1
+                            text: modelData
+                            tabIndex: index
+                            tabCount: 2
+                            textColor: active ? app.textColorFor(currentTabNoteColor) : "black"
+                            font.pixelSize: active ? 20 : 16
+                            font.bold: active
+                            currentTabIndex: notesViewTabBar.currentIndex
+                            onRequestActivation: notesViewTabBar.currentIndex = index
+                        }
+                    }
+                }
+
+                Rectangle {
+                    anchors.top: notesViewTabBar.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    color: Qt.rgba(1,1,1,0.25)
+                    border.width: 1
+                    border.color: currentTabNoteColor
+                    radius: 6
+
+                    NotesView {
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        visible: notesViewTabBar.currentIndex === 0
+                        z: visible ? 1 : 0
+                        notesModel: scriteDocument.loading ? null : (currentTabNotesSource ? currentTabNotesSource.notesModel : null)
+                        onNewNoteRequest: {
+                            var note = noteComponent.createObject(currentTabNotesSource)
+                            note.color = noteColor
+                            currentTabNotesSource.addNote(note)
+                        }
+                        onRemoveNoteRequest: currentTabNotesSource.removeNote(currentTabNotesSource.noteAt(index))
+                        title: {
+                            if(notebookTabsView.currentIndex > 0)
+                                return "You can capture your thoughts, ideas and research related to '<b>" + currentTabNotesSource.name + "</b>' here.";
+                            return "You can capture your thoughts, ideas and research about your screenplay here.";
+                        }
+                    }
+
+                    CharacterRelationshipsGraphView {
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        visible: notesViewTabBar.currentIndex === 1
+                        z: visible ? 1 : 0
+                    }
+                }
             }
         }
     }
@@ -208,7 +256,7 @@ Item {
         Note {
             heading: "Note Heading"
             Component.onCompleted: {
-                var lastNote = currentSource.notesModel.objectAt(currentSource.notesModel.objectCount-1)
+                var lastNote = currentTabNotesSource.notesModel.objectAt(currentTabNotesSource.notesModel.objectCount-1)
                 if(lastNote)
                     color = lastNote.color
                 else
