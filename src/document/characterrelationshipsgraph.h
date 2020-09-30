@@ -37,6 +37,8 @@ public:
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
 
+    bool isPlaced() const { return !m_rect.isNull(); }
+
 protected:
     friend class CharacterRelationshipsGraph;
     CharacterRelationshipsGraphNode(QObject *parent=nullptr);
@@ -109,11 +111,19 @@ public:
     QStringList filterByCharacterNames() const { return m_filterByCharacterNames; }
     Q_SIGNAL void filterByCharacterNamesChanged();
 
+    Q_PROPERTY(int maxTime READ maxTime WRITE setMaxTime NOTIFY maxTimeChanged)
+    void setMaxTime(int val);
+    int maxTime() const { return m_maxTime; }
+    Q_SIGNAL void maxTimeChanged();
+
+    Q_INVOKABLE void reload();
+
 private:
     void resetStructure();
     void load();
 
 private:
+    int m_maxTime = 1000;
     QSizeF m_nodeSize;
     QStringList m_filterByCharacterNames;
     QObjectProperty<Structure> m_structure;
