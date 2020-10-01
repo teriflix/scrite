@@ -1144,6 +1144,15 @@ Scene *Scene::fromByteArray(const QByteArray &bytes)
     return nullptr;
 }
 
+void Scene::setCharacterRelationshipGraph(const QJsonObject &val)
+{
+    if(m_characterRelationshipGraph == val)
+        return;
+
+    m_characterRelationshipGraph = val;
+    emit characterRelationshipGraphChanged();
+}
+
 void Scene::serializeToJson(QJsonObject &json) const
 {
     const QStringList names = m_characterElementMap.characterNames();

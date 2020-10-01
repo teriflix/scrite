@@ -378,7 +378,7 @@ Item {
                         width: 24; height: 24
                         opacity: 0.5
                         showTooltip: false
-                        sceneType: elementItemDelegate.element.scene.type
+                        sceneType: elementItemDelegate.element.scene ? elementItemDelegate.element.scene.type : Scene.Standard
                     }
 
                     Image {

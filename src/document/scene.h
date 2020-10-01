@@ -287,6 +287,11 @@ public:
     bool resetFromByteArray(const QByteArray &bytes);
     static Scene *fromByteArray(const QByteArray &bytes);
 
+    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    void setCharacterRelationshipGraph(const QJsonObject &val);
+    QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
+    Q_SIGNAL void characterRelationshipGraphChanged();
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &json) const;
     void deserializeFromJson(const QJsonObject &json);
@@ -315,6 +320,7 @@ private:
     bool m_undoRedoEnabled = false;
     bool m_inSetElementsList = false;
     PushSceneUndoCommand *m_pushUndoCommand = nullptr;
+    QJsonObject m_characterRelationshipGraph;
     CharacterElementMap m_characterElementMap;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);

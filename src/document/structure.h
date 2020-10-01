@@ -562,6 +562,11 @@ public:
     Q_INVOKABLE void copy(QObject *elementOrAnnotation);
     Q_INVOKABLE void paste(const QPointF &pos=QPointF());
 
+    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    void setCharacterRelationshipGraph(const QJsonObject &val);
+    QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
+    Q_SIGNAL void characterRelationshipGraphChanged();
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
@@ -620,6 +625,8 @@ private:
     static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
     ObjectListPropertyModel<Annotation *> m_annotations;
     bool m_canPaste = false;
+
+    QJsonObject m_characterRelationshipGraph;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

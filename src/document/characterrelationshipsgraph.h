@@ -37,6 +37,11 @@ public:
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
 
+    Q_PROPERTY(QQuickItem* item READ item WRITE setItem NOTIFY itemChanged RESET resetItem)
+    void setItem(QQuickItem* val);
+    QQuickItem* item() const { return m_item; }
+    Q_SIGNAL void itemChanged();
+
     bool isPlaced() const { return !m_rect.isNull(); }
 
 protected:
@@ -44,10 +49,17 @@ protected:
     CharacterRelationshipsGraphNode(QObject *parent=nullptr);
     void setCharacter(Character* val);
     void resetCharacter();
+    void resetItem();
+    void updateRectFromItem();
+    void updateRectFromItemLater();
     void setRect(const QRectF &val);
+
+    void timerEvent(QTimerEvent *te);
 
 private:
     QRectF m_rect;
+    ExecLaterTimer m_updateRectTimer;
+    QObjectProperty<QQuickItem> m_item;
     QObjectProperty<Character> m_character;
 };
 
@@ -75,11 +87,14 @@ public:
     Q_PROPERTY(qreal labelAngle READ labelAngle NOTIFY pathChanged)
     qreal labelAngle() const { return m_labelAngle; }
 
+    void evaluatePath(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to);
+
 protected:
     friend class CharacterRelationshipsGraph;
     CharacterRelationshipsGraphEdge(QObject *parent=nullptr);
     void setRelationship(Relationship* val);
     void resetRelationship();
+    void reevaluatePath();
     void setPath(const QPainterPath &val);
 
 private:
@@ -87,6 +102,8 @@ private:
     qreal m_labelAngle = 0;
     QPainterPath m_path;
     QObjectProperty<Relationship> m_relationship;
+    QPointer<CharacterRelationshipsGraphNode> m_toNode;
+    QPointer<CharacterRelationshipsGraphNode> m_fromNode;
 };
 
 class CharacterRelationshipsGraph : public QObject, public QQmlParserStatus
@@ -118,10 +135,10 @@ public:
     Structure* structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(QStringList filterByCharacterNames READ filterByCharacterNames WRITE setFilterByCharacterNames NOTIFY filterByCharacterNamesChanged)
-    void setFilterByCharacterNames(const QStringList &val);
-    QStringList filterByCharacterNames() const { return m_filterByCharacterNames; }
-    Q_SIGNAL void filterByCharacterNamesChanged();
+    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
+    void setScene(Scene* val);
+    Scene* scene() const { return m_scene; }
+    Q_SIGNAL void sceneChanged();
 
     Q_PROPERTY(int maxTime READ maxTime WRITE setMaxTime NOTIFY maxTimeChanged)
     void setMaxTime(int val);
@@ -148,15 +165,16 @@ public:
 private:
     void setGraphBoundingRect(const QRectF &val);
     void resetStructure();
+    void resetScene();
     void load();
 
 private:
     int m_maxTime = 100;
     QSizeF m_nodeSize = QSizeF(100,100);
     int m_maxIterations = -1;
+    QObjectProperty<Scene> m_scene;
     bool m_componentLoaded = false;
     QRectF m_graphBoundingRect = QRectF(0,0,500,500);
-    QStringList m_filterByCharacterNames;
     QObjectProperty<Structure> m_structure;
     ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;
     ObjectListPropertyModel<CharacterRelationshipsGraphEdge*> m_edges;

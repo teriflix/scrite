@@ -1950,6 +1950,15 @@ void Structure::paste(const QPointF &pos)
     }
 }
 
+void Structure::setCharacterRelationshipGraph(const QJsonObject &val)
+{
+    if(m_characterRelationshipGraph == val)
+        return;
+
+    m_characterRelationshipGraph = val;
+    emit characterRelationshipGraphChanged();
+}
+
 void Structure::serializeToJson(QJsonObject &) const
 {
     // Do nothing

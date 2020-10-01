@@ -17,20 +17,44 @@
 #include "application.h"
 
 #include <QtMath>
+#include <QtDebug>
+#include <QQuickItem>
 #include <QFontMetrics>
 #include <QElapsedTimer>
 
 CharacterRelationshipsGraphNode::CharacterRelationshipsGraphNode(QObject *parent)
     : QObject(parent),
+      m_item(this, "item"),
       m_character(this, "character")
 {
 
 }
 
-
 CharacterRelationshipsGraphNode::~CharacterRelationshipsGraphNode()
 {
 
+}
+
+void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
+{
+    if(m_item == val)
+        return;
+
+    if(!m_item.isNull())
+    {
+        disconnect(m_item, &QQuickItem::xChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+        disconnect(m_item, &QQuickItem::yChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+    }
+
+    m_item = val;
+
+    if(!m_item.isNull())
+    {
+        connect(m_item, &QQuickItem::xChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+        connect(m_item, &QQuickItem::yChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+    }
+
+    emit itemChanged();
 }
 
 void CharacterRelationshipsGraphNode::setCharacter(Character *val)
@@ -51,6 +75,26 @@ void CharacterRelationshipsGraphNode::resetCharacter()
     emit rectChanged();
 }
 
+void CharacterRelationshipsGraphNode::resetItem()
+{
+    m_item = nullptr;
+    emit itemChanged();
+}
+
+void CharacterRelationshipsGraphNode::updateRectFromItem()
+{
+    if(m_item.isNull())
+        return;
+
+    const QRectF rect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
+    this->setRect(rect);
+}
+
+void CharacterRelationshipsGraphNode::updateRectFromItemLater()
+{
+    m_updateRectTimer.start(0, this);
+}
+
 void CharacterRelationshipsGraphNode::setRect(const QRectF &val)
 {
     if(m_rect == val)
@@ -58,6 +102,17 @@ void CharacterRelationshipsGraphNode::setRect(const QRectF &val)
 
     m_rect = val;
     emit rectChanged();
+}
+
+void CharacterRelationshipsGraphNode::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_updateRectTimer.timerId())
+    {
+        m_updateRectTimer.stop();
+        this->updateRectFromItem();
+    }
+    else
+        QObject::timerEvent(te);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,6 +134,39 @@ QString CharacterRelationshipsGraphEdge::pathString() const
     return Application::instance()->painterPathToString(m_path);
 }
 
+void CharacterRelationshipsGraphEdge::evaluatePath(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to)
+{
+    if(m_fromNode != from)
+    {
+        if(!m_fromNode.isNull())
+            disconnect(m_fromNode, &CharacterRelationshipsGraphNode::rectChanged,
+                       this, &CharacterRelationshipsGraphEdge::reevaluatePath);
+
+        m_fromNode = from;
+
+        if(!m_fromNode.isNull())
+            connect(m_fromNode, &CharacterRelationshipsGraphNode::rectChanged,
+                    this, &CharacterRelationshipsGraphEdge::reevaluatePath,
+                    Qt::UniqueConnection);
+    }
+
+    if(m_toNode != to)
+    {
+        if(!m_toNode.isNull())
+            disconnect(m_toNode, &CharacterRelationshipsGraphNode::rectChanged,
+                       this, &CharacterRelationshipsGraphEdge::reevaluatePath);
+
+        m_toNode = to;
+
+        if(!m_toNode.isNull())
+            connect(m_toNode, &CharacterRelationshipsGraphNode::rectChanged,
+                    this, &CharacterRelationshipsGraphEdge::reevaluatePath,
+                    Qt::UniqueConnection);
+    }
+
+    this->reevaluatePath();
+}
+
 void CharacterRelationshipsGraphEdge::setRelationship(Relationship *val)
 {
     if(m_relationship == val)
@@ -95,6 +183,19 @@ void CharacterRelationshipsGraphEdge::resetRelationship()
 
     m_path = QPainterPath();
     emit pathChanged();
+}
+
+void CharacterRelationshipsGraphEdge::reevaluatePath()
+{
+    QPainterPath path;
+
+    if(!m_fromNode.isNull() && !m_toNode.isNull())
+    {
+        path.moveTo( m_fromNode->rect().center() );
+        path.lineTo( m_toNode->rect().center() );
+    }
+
+    this->setPath(path);
 }
 
 void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
@@ -122,6 +223,7 @@ void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
 
 CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
     : QObject(parent),
+      m_scene(this, "scene"),
       m_structure(this, "structure")
 {
 
@@ -154,15 +256,15 @@ void CharacterRelationshipsGraph::setStructure(Structure *val)
     this->load();
 }
 
-void CharacterRelationshipsGraph::setFilterByCharacterNames(const QStringList &val)
+void CharacterRelationshipsGraph::setScene(Scene *val)
 {
-    if(m_filterByCharacterNames == val)
+    if(m_scene == val)
         return;
 
-    m_filterByCharacterNames = val;
-    emit filterByCharacterNamesChanged();
+    m_scene = val;
+    emit sceneChanged();
 
-    // this->load();
+    this->load();
 }
 
 void CharacterRelationshipsGraph::setMaxTime(int val)
@@ -216,6 +318,13 @@ void CharacterRelationshipsGraph::resetStructure()
     m_structure = nullptr;
     this->load();
     emit structureChanged();
+}
+
+void CharacterRelationshipsGraph::resetScene()
+{
+    m_scene = nullptr;
+    this->load();
+    emit sceneChanged();
 }
 
 void CharacterRelationshipsGraph::load()
@@ -417,12 +526,8 @@ void CharacterRelationshipsGraph::load()
     for(CharacterRelationshipsGraphEdge *edge : edges)
     {
         CharacterRelationshipsGraphNode *n1 = nodeMap.value(edge->relationship()->of());
-        CharacterRelationshipsGraphNode *n2 = nodeMap.value(edge->relationship()->with());;
-
-        QPainterPath path;
-        path.moveTo( n1->rect().center() );
-        path.lineTo( n2->rect().center() );
-        edge->setPath(path);
+        CharacterRelationshipsGraphNode *n2 = nodeMap.value(edge->relationship()->with());
+        edge->evaluatePath(n1, n2);
     }
 
     // Update the nodes and edges properties

@@ -140,6 +140,7 @@ Item {
                             fillMode: Image.PreserveAspectCrop
                             mipmap: true; smooth: true
                             z: character === graphArea.activeCharacter ? 1 : 0
+                            Component.onCompleted: modelData.item = this
 
                             Rectangle {
                                 anchors.fill: infoLabel
@@ -193,6 +194,8 @@ Item {
 
                             MouseArea {
                                 anchors.fill: parent
+                                drag.target: parent
+                                drag.axis: Drag.XAndYAxis
                                 onClicked: {
                                     if(graphArea.activeCharacter === parent.character)
                                         graphArea.activeCharacter = null
