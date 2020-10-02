@@ -132,5 +132,6 @@
         <file>icons/navigation/zoom_one.png</file>
         <file>icons/content/person_outline.png</file>
         <file>icons/content/person_outline_inverted.png</file>
+        <file>icons/content/character_icon.png</file>
     </qresource>
 </RCC>

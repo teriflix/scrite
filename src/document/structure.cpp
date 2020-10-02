@@ -1159,6 +1159,7 @@ Structure::Structure(QObject *parent)
     connect(this, &Structure::elementCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::currentElementIndexChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::characterRelationshipGraphChanged, this, &Structure::structureChanged);
 
     QClipboard *clipboard = qApp->clipboard();
     connect(clipboard, &QClipboard::dataChanged, this, &Structure::onClipboardDataChanged);

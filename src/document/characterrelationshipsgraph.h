@@ -43,6 +43,7 @@ public:
     Q_SIGNAL void itemChanged();
 
     bool isPlaced() const { return !m_rect.isNull(); }
+    bool isPlacedByUser() const { return m_placedByUser; }
 
 protected:
     friend class CharacterRelationshipsGraph;
@@ -58,6 +59,7 @@ protected:
 
 private:
     QRectF m_rect;
+    bool m_placedByUser = false;
     ExecLaterTimer m_updateRectTimer;
     QObjectProperty<QQuickItem> m_item;
     QObjectProperty<Character> m_character;
@@ -155,8 +157,11 @@ public:
     Q_SIGNAL void graphBoundingRectChanged();
 
     Q_INVOKABLE void reload();
+    Q_INVOKABLE void reset();
 
     Q_SIGNAL void updated();
+
+    void updateGraphJsonFromNode(CharacterRelationshipsGraphNode *node);
 
     // QQmlParserStatus interface
     void classBegin();

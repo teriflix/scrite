@@ -19,7 +19,7 @@ import Scrite 1.0
 Item {
     readonly property real splashWidth: 1464
     readonly property real splashHeight: 978
-    readonly property real iscale: (Screen.width * 0.5)/splashWidth
+    readonly property real iscale: (ui.width * 0.5)/splashWidth
     width: Math.max(iscale * splashWidth, 897)
     height: Math.max(iscale * splashHeight, 600)
 

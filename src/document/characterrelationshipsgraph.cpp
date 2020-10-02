@@ -52,6 +52,14 @@ void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
     {
         connect(m_item, &QQuickItem::xChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
         connect(m_item, &QQuickItem::yChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+
+        if(m_character->relationshipCount() > 0)
+        {
+            m_placedByUser = true;
+            CharacterRelationshipsGraph *graph = qobject_cast<CharacterRelationshipsGraph*>(this->parent());
+            if(graph)
+                graph->updateGraphJsonFromNode(this);
+        }
     }
 
     emit itemChanged();
@@ -87,7 +95,17 @@ void CharacterRelationshipsGraphNode::updateRectFromItem()
         return;
 
     const QRectF rect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
-    this->setRect(rect);
+    if(rect != m_rect)
+    {
+        this->setRect(rect);
+
+        if(m_placedByUser)
+        {
+            CharacterRelationshipsGraph *graph = qobject_cast<CharacterRelationshipsGraph*>(this->parent());
+            if(graph)
+                graph->updateGraphJsonFromNode(this);
+        }
+    }
 }
 
 void CharacterRelationshipsGraphNode::updateRectFromItemLater()
@@ -291,6 +309,39 @@ void CharacterRelationshipsGraph::reload()
     this->load();
 }
 
+void CharacterRelationshipsGraph::reset()
+{
+    if(!m_structure.isNull())
+    {
+        if(m_scene.isNull())
+            m_structure->setCharacterRelationshipGraph(QJsonObject());
+        else
+            m_scene->setCharacterRelationshipGraph(QJsonObject());
+    }
+
+    this->reload();
+}
+
+void CharacterRelationshipsGraph::updateGraphJsonFromNode(CharacterRelationshipsGraphNode *node)
+{
+    if(m_structure.isNull() || m_nodes.indexOf(node) < 0)
+        return;
+
+    const QRectF rect = node->rect();
+
+    QJsonObject graphJson = m_scene.isNull() ? m_structure->characterRelationshipGraph() : m_scene->characterRelationshipGraph();
+    QJsonObject rectJson;
+    rectJson.insert("x", rect.x());
+    rectJson.insert("y", rect.y());
+    rectJson.insert("width", rect.width());
+    rectJson.insert("height", rect.height());
+    graphJson.insert(node->character()->name(), rectJson);
+    if(m_scene.isNull())
+        m_structure->setCharacterRelationshipGraph(graphJson);
+    else
+        m_scene->setCharacterRelationshipGraph(graphJson);
+}
+
 void CharacterRelationshipsGraph::classBegin()
 {
     m_componentLoaded = false;
@@ -348,6 +399,9 @@ void CharacterRelationshipsGraph::load()
         return;
     }
 
+    // Lets fetch information about the graph as previously placed by the user.
+    const QJsonObject previousGraphJson = m_scene.isNull() ? m_structure->characterRelationshipGraph() : m_scene->characterRelationshipGraph();
+
     // For the moment, we ignore the filter-by-character-names list.
 
     // First we collect all nodes and edges
@@ -366,6 +420,21 @@ void CharacterRelationshipsGraph::load()
         CharacterRelationshipsGraphNode *node = new CharacterRelationshipsGraphNode(this);
         node->setCharacter(character);
         nodes.append(node);
+
+        const QJsonValue rectJsonValue = previousGraphJson.value(character->name());
+        if(!rectJsonValue.isUndefined() && rectJsonValue.isObject())
+        {
+            const QJsonObject rectJson = rectJsonValue.toObject();
+            const QRectF rect( rectJson.value("x").toDouble(),
+                               rectJson.value("y").toDouble(),
+                               rectJson.value("width").toDouble(),
+                               rectJson.value("height").toDouble() );
+            if(rect.isValid())
+            {
+                node->setRect(rect);
+                node->m_placedByUser = true;
+            }
+        }
 
         nodeMap[character] = node;
 
@@ -392,9 +461,13 @@ void CharacterRelationshipsGraph::load()
     qreal angle = 0;
     for(CharacterRelationshipsGraphNode *node : nodes)
     {
-        QRectF rect( QPointF(0,0), m_nodeSize );
-        rect.moveCenter( QPointF(qCos(angle), qSin(angle)) );
-        node->setRect(rect);
+        if(!node->isPlacedByUser())
+        {
+            QRectF rect( QPointF(0,0), m_nodeSize );
+            rect.moveCenter( QPointF(qCos(angle), qSin(angle)) );
+            node->setRect(rect);
+        }
+
         angle += angleStep;
     }
 
@@ -446,6 +519,8 @@ void CharacterRelationshipsGraph::load()
         for(int i=0; i<nodes.size(); i++)
         {
             CharacterRelationshipsGraphNode *node = nodes.at(i);
+            if(node->isPlacedByUser())
+                continue;
 
             const QPointF force = forces.at(i);
             if( qFuzzyIsNull(force.x()) && qFuzzyIsNull(force.y()) )
