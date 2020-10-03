@@ -79,6 +79,7 @@ HEADERS += \
     src/reports/locationreport.h \
     src/reports/scenecharactermatrixreport.h \
     src/utils/execlatertimer.h \
+    src/utils/graphlayout.h \
     src/utils/timeprofiler.h \
     src/utils/garbagecollector.h \
     src/utils/hourglass.h \
@@ -171,6 +172,7 @@ SOURCES += \
     src/reports/scenecharactermatrixreport.cpp \
     src/utils/execlatertimer.cpp \
     src/utils/genericarraymodel.cpp \
+    src/utils/graphlayout.cpp \
     src/utils/timeprofiler.cpp \
     src/utils/garbagecollector.cpp \
     src/utils/qobjectserializer.cpp \

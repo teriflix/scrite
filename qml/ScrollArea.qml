@@ -42,6 +42,9 @@ Flickable {
         if(!area)
             return
 
+        if(area.width <= 0 || area.height <= 0)
+            return
+
         var s = Math.min(width/area.width, height/area.height)
         var center = Qt.point(area.x + area.width/2, area.y + area.height/2)
         var w = width/s

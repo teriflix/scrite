@@ -18,6 +18,7 @@
 #include "garbagecollector.h"
 
 #include <QDir>
+#include <QStack>
 #include <QMimeData>
 #include <QDateTime>
 #include <QClipboard>
@@ -284,7 +285,7 @@ QString Relationship::polishName(const QString &val)
 {
     const QString space = QStringLiteral(" ");
 
-    const bool endsWithSpace = val.endsWith(space);
+    const bool endsWithSpace = val.isEmpty() ? false : val.endsWith(space);
 
     QStringList comps = val.simplified().trimmed().split(space);
     for(int i=0; i<comps.size(); i++)
@@ -295,7 +296,7 @@ QString Relationship::polishName(const QString &val)
     }
 
     QString ret = comps.join(space);
-    if(endsWithSpace)
+    if(!ret.isEmpty() && endsWithSpace)
         ret += space;
 
     return ret;
@@ -812,6 +813,12 @@ Relationship *Character::findRelationship(Character *with) const
     return nullptr;
 }
 
+bool Character::isRelatedTo(Character *with) const
+{
+    QStack<Character*> stack;
+    return this->isRelatedToImpl(with, stack);
+}
+
 QList<Relationship *> Character::findRelationshipsWith(const QString &name) const
 {
     QList<Relationship*> ret;
@@ -893,6 +900,35 @@ bool Character::event(QEvent *event)
         m_structure = qobject_cast<Structure*>(this->parent());
 
     return QObject::event(event);
+}
+
+bool Character::isRelatedToImpl(Character *with, QStack<Character *> &stack) const
+{
+    if(with == nullptr || with == this)
+        return false;
+
+    QList<Relationship*> rels = m_relationships.list();
+    for(Relationship *rel : rels)
+    {
+        Character *rwith = rel->with();
+        if(rwith == nullptr)
+            continue;
+
+        if(rwith == with)
+            return true;
+
+        if(stack.contains(rwith))
+            continue;
+
+        stack.push(rwith);
+        const bool flag = rwith->isRelatedToImpl(with, stack);
+        stack.pop();
+
+        if(flag)
+            return flag;
+    }
+
+    return false;
 }
 
 void Character::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)

@@ -309,9 +309,10 @@ public:
     Q_INVOKABLE bool hasRelationshipWith(const QString &with) const {
         return this->findRelationshipWith(with) != nullptr;
     }
-    Q_INVOKABLE bool isRelatedTo(Character *with) const {
+    Q_INVOKABLE bool isDirectlyRelatedTo(Character *with) const {
         return this->findRelationship(with) != nullptr;
     }
+    Q_INVOKABLE bool isRelatedTo(Character *with) const;
     Q_INVOKABLE QList<Relationship*> findRelationshipsWith(const QString &name=QString()) const;
     Q_INVOKABLE QStringList unrelatedCharacterNames() const;
 
@@ -327,6 +328,8 @@ protected:
     bool event(QEvent *event);
 
 private:
+    bool isRelatedToImpl(Character *with, QStack<Character*> &stack) const;
+
     static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
     static void staticClearNotes(QQmlListProperty<Note> *list);
     static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);

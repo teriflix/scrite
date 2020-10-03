@@ -17,12 +17,13 @@
 #include <QObject>
 
 #include "structure.h"
+#include "graphlayout.h"
 #include "qobjectproperty.h"
 #include "objectlistpropertymodel.h"
 
 class CharacterRelationshipsGraph;
 
-class CharacterRelationshipsGraphNode : public QObject
+class CharacterRelationshipsGraphNode : public QObject, public GraphLayout::AbstractNode
 {
     Q_OBJECT
 
@@ -45,6 +46,16 @@ public:
     bool isPlaced() const { return !m_rect.isNull(); }
     bool isPlacedByUser() const { return m_placedByUser; }
 
+    // GraphLayout::AbstractNode interface
+    bool canBeMoved() const { return !m_placedByUser; }
+    QSizeF size() const { return m_rect.size(); }
+    QObject *containerObject() { return this; }
+    const QObject *containerObject() const { return this; }
+
+protected:
+    // GraphLayout::AbstractNode interface
+    void move(const QPointF &pos);
+
 protected:
     friend class CharacterRelationshipsGraph;
     CharacterRelationshipsGraphNode(QObject *parent=nullptr);
@@ -65,7 +76,7 @@ private:
     QObjectProperty<Character> m_character;
 };
 
-class CharacterRelationshipsGraphEdge : public QObject
+class CharacterRelationshipsGraphEdge : public QObject, public GraphLayout::AbstractEdge
 {
     Q_OBJECT
 
@@ -89,14 +100,20 @@ public:
     Q_PROPERTY(qreal labelAngle READ labelAngle NOTIFY pathChanged)
     qreal labelAngle() const { return m_labelAngle; }
 
-    void evaluatePath(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to);
+    // GraphLayout::AbstractEdge interface
+    GraphLayout::AbstractNode *node1() const { return m_fromNode; }
+    GraphLayout::AbstractNode *node2() const { return m_toNode; }
+    void evaluateEdge() { this->evaluatePath(); }
+    QObject *containerObject() { return this; }
+    const QObject *containerObject() const { return this; }
+
+    void evaluatePath();
 
 protected:
     friend class CharacterRelationshipsGraph;
-    CharacterRelationshipsGraphEdge(QObject *parent=nullptr);
+    CharacterRelationshipsGraphEdge(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to, QObject *parent=nullptr);
     void setRelationship(Relationship* val);
     void resetRelationship();
-    void reevaluatePath();
     void setPath(const QPainterPath &val);
 
 private:
@@ -156,6 +173,26 @@ public:
     QRectF graphBoundingRect() const { return m_graphBoundingRect; }
     Q_SIGNAL void graphBoundingRectChanged();
 
+    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    void setLeftMargin(qreal val);
+    qreal leftMargin() const { return m_leftMargin; }
+    Q_SIGNAL void leftMarginChanged();
+
+    Q_PROPERTY(qreal topMargin READ topMargin WRITE setTopMargin NOTIFY topMarginChanged)
+    void setTopMargin(qreal val);
+    qreal topMargin() const { return m_topMargin; }
+    Q_SIGNAL void topMarginChanged();
+
+    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
+    void setRightMargin(qreal val);
+    qreal rightMargin() const { return m_rightMargin; }
+    Q_SIGNAL void rightMarginChanged();
+
+    Q_PROPERTY(qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
+    void setBottomMargin(qreal val);
+    qreal bottomMargin() const { return m_bottomMargin; }
+    Q_SIGNAL void bottomMarginChanged();
+
     Q_INVOKABLE void reload();
     Q_INVOKABLE void reset();
 
@@ -176,6 +213,10 @@ private:
 private:
     int m_maxTime = 100;
     QSizeF m_nodeSize = QSizeF(100,100);
+    qreal m_topMargin = 0;
+    qreal m_leftMargin = 0;
+    qreal m_rightMargin = 0;
+    qreal m_bottomMargin = 0;
     int m_maxIterations = -1;
     QObjectProperty<Scene> m_scene;
     bool m_componentLoaded = false;

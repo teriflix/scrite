@@ -65,6 +65,13 @@ void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
     emit itemChanged();
 }
 
+void CharacterRelationshipsGraphNode::move(const QPointF &pos)
+{
+    QRectF rect = m_rect;
+    rect.moveCenter(pos);
+    this->setRect(rect);
+}
+
 void CharacterRelationshipsGraphNode::setCharacter(Character *val)
 {
     if(m_character == val)
@@ -135,11 +142,19 @@ void CharacterRelationshipsGraphNode::timerEvent(QTimerEvent *te)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterRelationshipsGraphEdge::CharacterRelationshipsGraphEdge(QObject *parent)
+CharacterRelationshipsGraphEdge::CharacterRelationshipsGraphEdge(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to, QObject *parent)
     : QObject(parent),
       m_relationship(this, "relationship")
 {
+    m_fromNode = from;
+    if(!m_fromNode.isNull())
+        connect(m_fromNode, &CharacterRelationshipsGraphNode::rectChanged,
+                this, &CharacterRelationshipsGraphEdge::evaluatePath);
 
+    m_toNode = to;
+    if(!m_toNode.isNull())
+        connect(m_toNode, &CharacterRelationshipsGraphNode::rectChanged,
+                this, &CharacterRelationshipsGraphEdge::evaluatePath);
 }
 
 CharacterRelationshipsGraphEdge::~CharacterRelationshipsGraphEdge()
@@ -152,37 +167,17 @@ QString CharacterRelationshipsGraphEdge::pathString() const
     return Application::instance()->painterPathToString(m_path);
 }
 
-void CharacterRelationshipsGraphEdge::evaluatePath(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to)
+void CharacterRelationshipsGraphEdge::evaluatePath()
 {
-    if(m_fromNode != from)
+    QPainterPath path;
+
+    if(!m_fromNode.isNull() && !m_toNode.isNull())
     {
-        if(!m_fromNode.isNull())
-            disconnect(m_fromNode, &CharacterRelationshipsGraphNode::rectChanged,
-                       this, &CharacterRelationshipsGraphEdge::reevaluatePath);
-
-        m_fromNode = from;
-
-        if(!m_fromNode.isNull())
-            connect(m_fromNode, &CharacterRelationshipsGraphNode::rectChanged,
-                    this, &CharacterRelationshipsGraphEdge::reevaluatePath,
-                    Qt::UniqueConnection);
+        path.moveTo( m_fromNode->rect().center() );
+        path.lineTo( m_toNode->rect().center() );
     }
 
-    if(m_toNode != to)
-    {
-        if(!m_toNode.isNull())
-            disconnect(m_toNode, &CharacterRelationshipsGraphNode::rectChanged,
-                       this, &CharacterRelationshipsGraphEdge::reevaluatePath);
-
-        m_toNode = to;
-
-        if(!m_toNode.isNull())
-            connect(m_toNode, &CharacterRelationshipsGraphNode::rectChanged,
-                    this, &CharacterRelationshipsGraphEdge::reevaluatePath,
-                    Qt::UniqueConnection);
-    }
-
-    this->reevaluatePath();
+    this->setPath(path);
 }
 
 void CharacterRelationshipsGraphEdge::setRelationship(Relationship *val)
@@ -201,19 +196,6 @@ void CharacterRelationshipsGraphEdge::resetRelationship()
 
     m_path = QPainterPath();
     emit pathChanged();
-}
-
-void CharacterRelationshipsGraphEdge::reevaluatePath()
-{
-    QPainterPath path;
-
-    if(!m_fromNode.isNull() && !m_toNode.isNull())
-    {
-        path.moveTo( m_fromNode->rect().center() );
-        path.lineTo( m_toNode->rect().center() );
-    }
-
-    this->setPath(path);
 }
 
 void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
@@ -302,6 +284,50 @@ void CharacterRelationshipsGraph::setMaxIterations(int val)
 
     m_maxIterations = val;
     emit maxIterationsChanged();
+}
+
+void CharacterRelationshipsGraph::setLeftMargin(qreal val)
+{
+    if( qFuzzyCompare(m_leftMargin, val) )
+        return;
+
+    m_leftMargin = val;
+    emit leftMarginChanged();
+
+    this->load();
+}
+
+void CharacterRelationshipsGraph::setTopMargin(qreal val)
+{
+    if( qFuzzyCompare(m_topMargin, val) )
+        return;
+
+    m_topMargin = val;
+    emit topMarginChanged();
+
+    this->load();
+}
+
+void CharacterRelationshipsGraph::setRightMargin(qreal val)
+{
+    if( qFuzzyCompare(m_rightMargin, val) )
+        return;
+
+    m_rightMargin = val;
+    emit rightMarginChanged();
+
+    this->load();
+}
+
+void CharacterRelationshipsGraph::setBottomMargin(qreal val)
+{
+    if( qFuzzyCompare(m_bottomMargin, val) )
+        return;
+
+    m_bottomMargin = val;
+    emit bottomMarginChanged();
+
+    this->load();
 }
 
 void CharacterRelationshipsGraph::reload()
@@ -400,222 +426,186 @@ void CharacterRelationshipsGraph::load()
     }
 
     // Lets fetch information about the graph as previously placed by the user.
-    const QJsonObject previousGraphJson = m_scene.isNull() ? m_structure->characterRelationshipGraph() : m_scene->characterRelationshipGraph();
+    const QJsonObject previousGraphJson = m_scene.isNull() ?
+                 m_structure->characterRelationshipGraph() :
+                 m_scene->characterRelationshipGraph();
 
-    // For the moment, we ignore the filter-by-character-names list.
-
-    // First we collect all nodes and edges
-    QString longestRelationshipName;
-    QList<Character*> loneCharacters;
     QMap<Character*,CharacterRelationshipsGraphNode*> nodeMap;
+
+    // Lets begin by create graph groups. Each group consists of nodes and edges
+    // of characters related to each other.
+    QList< GraphLayout::Graph > graphs;
+
+    // The first graph consists of zombie characters. As in those characters who
+    // dont have any relationship with anybody else in the screenplay.
+    graphs.append( GraphLayout::Graph() );
+
     for(int i=0; i<m_structure->characterCount(); i++)
     {
         Character *character = m_structure->characterAt(i);
+
+        CharacterRelationshipsGraphNode *node = new CharacterRelationshipsGraphNode(this);
+        node->setCharacter(character);
+        node->setRect( QRectF( QPointF(0,0), m_nodeSize) );
+        nodes.append(node);
+        nodeMap[character] = node;
+
         if(character->relationshipCount() == 0)
         {
-            loneCharacters.append(character);
+            // This is a lone character with no relationship to other
+            // characters in the screenplay. We will lay them out in one corner
+            // of the graph at the end.
+            QRectF nodeRect = node->rect();
+            nodeRect.moveTop( graphs.first().nodes.size()*m_nodeSize.height()*1.5 );
+            node->setRect(nodeRect);
+            graphs.first().nodes.append(node);
             continue;
         }
 
-        CharacterRelationshipsGraphNode *node = new CharacterRelationshipsGraphNode(this);
-        node->setCharacter(character);
-        nodes.append(node);
+        bool grouped = false;
 
-        const QJsonValue rectJsonValue = previousGraphJson.value(character->name());
-        if(!rectJsonValue.isUndefined() && rectJsonValue.isObject())
+        // This is a character which has a relationship. We group it into a graph/group
+        // in which this character has relationships. Otherwise, we create a new group.
+        for(int j=1; j<graphs.size(); j++)
         {
-            const QJsonObject rectJson = rectJsonValue.toObject();
-            const QRectF rect( rectJson.value("x").toDouble(),
-                               rectJson.value("y").toDouble(),
-                               rectJson.value("width").toDouble(),
-                               rectJson.value("height").toDouble() );
-            if(rect.isValid())
+            GraphLayout::Graph &graph = graphs[j];
+
+            for(GraphLayout::AbstractNode *agnode : graph.nodes)
             {
-                node->setRect(rect);
-                node->m_placedByUser = true;
+                CharacterRelationshipsGraphNode *gnode =
+                        qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
+                if(character->isRelatedTo(gnode->character()))
+                {
+                    graph.nodes.append(node);
+                    grouped = true;
+                    break;
+                }
+            }
+
+            if(grouped)
+                break;
+        }
+
+        if(grouped)
+            continue;
+
+        // Since we did not find a graph to which this node can belong, we are adding
+        // this to a new graph all together.
+        GraphLayout::Graph newGraph;
+        newGraph.nodes.append(node);
+        graphs.append(newGraph);
+    }
+
+    // Lets now loop over all nodes within each graph (except for the first one, which only
+    // constains lone character nodes) and bundle relationships.
+    for(int i=1; i<graphs.size(); i++)
+    {
+        GraphLayout::Graph &graph = graphs[i];
+
+        for(GraphLayout::AbstractNode *agnode : graph.nodes)
+        {
+            CharacterRelationshipsGraphNode *node1 =
+                    qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
+            Character *character = node1->character();
+
+            for(int j=0; j<character->relationshipCount(); j++)
+            {
+                Relationship *relationship = character->relationshipAt(j);
+                if(relationship->direction() != Relationship::OfWith)
+                    continue;
+
+                CharacterRelationshipsGraphNode *node2 = nodeMap.value(relationship->with());
+
+                CharacterRelationshipsGraphEdge *edge = new CharacterRelationshipsGraphEdge(node1, node2, this);
+                edge->setRelationship(relationship);
+                edges.append(edge);
+                graph.edges.append(edge);
             }
         }
-
-        nodeMap[character] = node;
-
-        for(int j=0; j<character->relationshipCount(); j++)
-        {
-            Relationship *relationship = character->relationshipAt(j);
-            if(relationship->direction() != Relationship::OfWith)
-                continue;
-
-            if(relationship->of() != character || relationship->with() == nullptr || relationship->with() == character)
-                continue;
-
-            CharacterRelationshipsGraphEdge *edge = new CharacterRelationshipsGraphEdge(this);
-            edge->setRelationship(relationship);
-            edges.append(edge);
-
-            if( relationship->name().length() > longestRelationshipName.length() )
-                longestRelationshipName = relationship->name();
-        }
     }
 
-    // Initialize positions of all nodes so that we place them in a circle.
-    const qreal angleStep = 2*M_PI / qreal(nodes.size());
-    qreal angle = 0;
-    for(CharacterRelationshipsGraphNode *node : nodes)
+    // Now lets layout all the graphs and arrange them in a row
+    QRectF boundingRect(m_leftMargin,m_topMargin,0,0);
+    for(int i=0; i<graphs.size(); i++)
     {
-        if(!node->isPlacedByUser())
+        const GraphLayout::Graph &graph = graphs[i];
+        if(graph.nodes.isEmpty())
+            continue;
+
+        if(i >= 1)
         {
-            QRectF rect( QPointF(0,0), m_nodeSize );
-            rect.moveCenter( QPointF(qCos(angle), qSin(angle)) );
-            node->setRect(rect);
-        }
-
-        angle += angleStep;
-    }
-
-    int nrIterations = 0;
-
-    // https://en.wikipedia.org/wiki/Force-directed_graph_drawing
-    QElapsedTimer timer;
-    if(!nodes.isEmpty())
-        timer.start();
-    while(timer.elapsed() < m_maxTime && !nodes.isEmpty())
-    {
-        // Initialize Force Vector
-        QVector<QPointF> forces(nodes.size(), QPointF(0,0));
-
-        // Calculate Repulsion
-        const qreal k = 0.001;
-        for(int i=0; i<=nodes.size()-2; i++)
-        {
-            for(int j=i+1; j<=nodes.size()-1; j++)
+            QString longestRelationshipName;
+            for(GraphLayout::AbstractEdge *agedge : graph.edges)
             {
-                const CharacterRelationshipsGraphNode *n1 = nodes.at(i);
-                const CharacterRelationshipsGraphNode *n2 = nodes.at(j);
-                const QPointF dp = n2->rect().center() - n1->rect().center();
-                const qreal force = k / qSqrt((qPow(dp.x(), 2.0) + qPow(dp.y(), 2.0)));
-                const qreal angle = qAtan2(dp.y(), dp.x());
-                const QPointF delta( force*qCos(angle), force*qSin(angle) );
-                forces[i] -= delta;
-                forces[j] += delta;
+                CharacterRelationshipsGraphEdge *gedge =
+                        qobject_cast<CharacterRelationshipsGraphEdge*>(agedge->containerObject());
+                const QString relationshipName = gedge->relationship()->name();
+                if(relationshipName.length() > longestRelationshipName.length())
+                    longestRelationshipName = relationshipName;
             }
+
+            const QFontMetricsF fm(qApp->font());
+
+            GraphLayout::ForceDirectedLayout layout;
+            layout.setMaxTime(m_maxTime);
+            layout.setMaxIterations(m_maxIterations);
+            layout.setMinimumEdgeLength(fm.horizontalAdvance(longestRelationshipName));
+            layout.layout(graph);
         }
 
-        // Calculate Attraction
-        for(CharacterRelationshipsGraphEdge *edge : edges)
+        // Compute bounding rect of the nodes.
+        QRectF graphRect;
+        for(GraphLayout::AbstractNode *agnode : graph.nodes)
         {
-            CharacterRelationshipsGraphNode *n1 = nodeMap.value(edge->relationship()->of());
-            CharacterRelationshipsGraphNode *n2 = nodeMap.value(edge->relationship()->with());;
-            const QPointF dp = n2->rect().center() - n1->rect().center();
-            const int i = nodes.indexOf(n1);
-            const int j = nodes.indexOf(n2);
-            const qreal force = k * (qPow(dp.x(), 2.0) + qPow(dp.y(), 2.0));
-            const qreal angle = qAtan2(dp.y(), dp.x());
-            const QPointF delta( force*qCos(angle), force*qSin(angle) );
-            forces[i] += delta;
-            forces[j] -= delta;
+            CharacterRelationshipsGraphNode *gnode =
+                    qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
+
+            const Character *character = gnode->character();
+
+            const QJsonValue rectJsonValue = previousGraphJson.value(character->name());
+            if(!rectJsonValue.isUndefined() && rectJsonValue.isObject())
+            {
+                const QJsonObject rectJson = rectJsonValue.toObject();
+                const QRectF rect( rectJson.value("x").toDouble(),
+                                   rectJson.value("y").toDouble(),
+                                   rectJson.value("width").toDouble(),
+                                   rectJson.value("height").toDouble() );
+                if(rect.isValid())
+                {
+                    gnode->setRect(rect);
+                    gnode->m_placedByUser = true;
+                }
+            }
+
+            graphRect |= gnode->rect();
         }
 
-        // Place nodes
-        bool moved = false;
-        for(int i=0; i<nodes.size(); i++)
+        // Move the nodes such that they are layed out in a row.
+        const QPointF dp = -graphRect.topLeft() + boundingRect.topRight();
+        for(GraphLayout::AbstractNode *agnode : graph.nodes)
         {
-            CharacterRelationshipsGraphNode *node = nodes.at(i);
-            if(node->isPlacedByUser())
-                continue;
+            CharacterRelationshipsGraphNode *gnode =
+                    qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
 
-            const QPointF force = forces.at(i);
-            if( qFuzzyIsNull(force.x()) && qFuzzyIsNull(force.y()) )
-                continue;
-
-            QRectF rect = node->rect();
-            rect.moveCenter(rect.center() + force);
-            node->setRect(rect);
-            moved = true;
+            QRectF rect = gnode->rect();
+            rect.moveTopLeft( rect.topLeft() + dp );
+            gnode->setRect(rect);
         }
+        graphRect.moveTopLeft( graphRect.topLeft() + dp );
 
-        ++nrIterations;
-        if(!moved || (m_maxIterations > 0 && nrIterations >= m_maxIterations))
-            break;
+        boundingRect |= graphRect;
+        if(i < graphs.size()-1)
+            boundingRect.setRight( boundingRect.right() + 100 );
     }
 
-    // Scale the placement of nodes such that we consider the node sizes.
-    qreal minNodeSpacing = MAXFLOAT;
-    for(CharacterRelationshipsGraphNode *n1 : nodes)
-    {
-        for(CharacterRelationshipsGraphNode *n2 : nodes)
-        {
-            if(n1 == n2)
-                continue;
-            const qreal nodeSpacing = QLineF( n1->rect().center(), n2->rect().center() ).length();
-            minNodeSpacing = qMin(nodeSpacing, minNodeSpacing);
-        }
-    }
-
-    const QFontMetricsF fm(qApp->font());
-
-    const qreal minNodeSpacingPx = QLineF( QPointF(0,0), QPointF(m_nodeSize.width(),m_nodeSize.height()) ).length() + fm.horizontalAdvance(longestRelationshipName);
-    const qreal scale = minNodeSpacingPx / minNodeSpacing;
-
-    QRectF boundingRect;
-    for(CharacterRelationshipsGraphNode *node : nodes)
-    {
-        QRectF rect = node->rect();
-        rect.moveCenter(rect.center()*scale);
-        node->setRect(rect);
-
-        boundingRect |= rect;
-    }
-
-    // Place lone characters along the left side of the bounding rect.
-    QRectF rect( QPointF(0,0), m_nodeSize );
-    rect.setX( boundingRect.left() - m_nodeSize.width() * 1.25 );
-    rect.setY( boundingRect.center().y() - ((m_nodeSize.height() * loneCharacters.size()) + (loneCharacters.size()-1)*m_nodeSize.height()*0.5) );
-    for(Character *character : loneCharacters)
-    {
-        CharacterRelationshipsGraphNode *node = new CharacterRelationshipsGraphNode(this);
-        node->setCharacter(character);
-        node->setRect(rect);
-        m_nodes.append(node);
-
-        nodeMap[character] = node;
-
-        rect.setY( rect.y() + m_nodeSize.height()*1.5 );
-    }
-
-    // Move all the nodes so that the top-left is from 0,0
-    boundingRect = QRectF();
-    for(CharacterRelationshipsGraphNode *node : nodes)
-        boundingRect |= node->rect();
-    const qreal margin = qMin(qMax(boundingRect.width(),boundingRect.height())*0.1, 50.0);
-    boundingRect.adjust(-margin, -margin, margin, margin);
-
-    const QPointF dp = -boundingRect.topLeft();
-
-    for(CharacterRelationshipsGraphNode *node : nodes)
-    {
-        QRectF rect = node->rect();
-        rect.moveTopLeft( rect.topLeft() + dp );
-        node->setRect(rect);
-    }
-
-    // Get all edges to evaluate their nodes.
-    for(CharacterRelationshipsGraphEdge *edge : edges)
-    {
-        CharacterRelationshipsGraphNode *n1 = nodeMap.value(edge->relationship()->of());
-        CharacterRelationshipsGraphNode *n2 = nodeMap.value(edge->relationship()->with());
-        edge->evaluatePath(n1, n2);
-    }
-
-    // Update the nodes and edges properties
+    // Update the models and bounding rectangle
     m_nodes.assign(nodes);
     m_edges.assign(edges);
 
-    // Announce changes to the bounding rectangle of the whole graph
-    boundingRect.moveTopLeft( QPointF(0,0) );
+    boundingRect.setRight( boundingRect.right() + m_rightMargin );
+    boundingRect.setBottom( boundingRect.bottom() + m_bottomMargin );
     this->setGraphBoundingRect(boundingRect);
-
-#ifndef QT_NO_DEBUG
-    qDebug() << "PA: Layout Iterations: " << nrIterations;
-#endif
 
     emit updated();
 }
+
