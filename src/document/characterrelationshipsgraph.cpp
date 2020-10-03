@@ -35,6 +35,15 @@ CharacterRelationshipsGraphNode::~CharacterRelationshipsGraphNode()
 
 }
 
+void CharacterRelationshipsGraphNode::setMarked(bool val)
+{
+    if(m_marked == val)
+        return;
+
+    m_marked = val;
+    emit markedChanged();
+}
+
 void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
 {
     if(m_item == val)
@@ -425,6 +434,12 @@ void CharacterRelationshipsGraph::load()
         return;
     }
 
+    // If the graph is being requested for a specific scene, then we will have
+    // to consider this character, only and only if it shows up in the scene
+    // or is related to one of the characters in the scene.
+    const QStringList sceneCharacterNames = m_scene.isNull() ? QStringList() : m_scene->characterNames();
+    const QList<Character*> sceneCharacters = m_structure->findCharacters(sceneCharacterNames);
+
     // Lets fetch information about the graph as previously placed by the user.
     const QJsonObject previousGraphJson = m_scene.isNull() ?
                  m_structure->characterRelationshipGraph() :
@@ -444,9 +459,31 @@ void CharacterRelationshipsGraph::load()
     {
         Character *character = m_structure->characterAt(i);
 
+        // If the graph is being requested for a specific scene, then we will have
+        // to consider this character, only and only if it shows up in the scene
+        // or is related to one of the characters in the scene.
+        if(!m_scene.isNull())
+        {
+            bool include = sceneCharacters.contains(character);
+            if(!include)
+            {
+                for(Character *sceneCharacter : sceneCharacters)
+                {
+                    include = character->isRelatedTo(sceneCharacter);
+                    if(include)
+                        break;
+                }
+            }
+
+            if(!include)
+                continue;
+        }
+
         CharacterRelationshipsGraphNode *node = new CharacterRelationshipsGraphNode(this);
         node->setCharacter(character);
         node->setRect( QRectF( QPointF(0,0), m_nodeSize) );
+        if(!m_scene.isNull())
+            node->setMarked( sceneCharacters.contains(node->character()) );
         nodes.append(node);
         nodeMap[character] = node;
 

@@ -16,15 +16,17 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
+    property alias scene: crgraph.scene
+
     CharacterRelationshipsGraph {
         id: crgraph
         structure: scriteDocument.loading ? null : scriteDocument.structure
         nodeSize: Qt.size(150,150)
         maxTime: 1000
         maxIterations: 5000
-        leftMargin: 5000
-        topMargin: 5000
-        onUpdated: app.execLater(crgraph, 100, function() {
+        leftMargin: 1000
+        topMargin: 1000
+        onUpdated: app.execLater(crgraph, 250, function() {
             canvas.zoomFit()
         })
     }
@@ -65,9 +67,9 @@ Item {
                 id: grid
                 x: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.x - 50) : 0
                 y: crgraph.nodes.objectCount > 0 ? nodeItemsBox.boundingBox.y - 50 : 0
-                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.width + 100) : 5000
-                height: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.height + 100) : 5000
-                tickColorOpacity: 0.25 * scale
+                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.width + 100) : Math.floor(Math.min(scrollArea.width,scrollArea.height)/100)*100
+                height: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.height + 100) : width
+                tickColorOpacity: 0.25 * canvas.scale
                 majorTickLineWidth: 2*app.devicePixelRatio
                 minorTickLineWidth: 1*app.devicePixelRatio
                 gridIsVisible: structureCanvasSettings.showGrid
@@ -81,8 +83,7 @@ Item {
             }
 
             function zoomFit() {
-                if(crgraph.nodes.objectCount > 0)
-                    scrollArea.zoomFit(Qt.rect(grid.x,grid.y,grid.width,grid.height))
+                scrollArea.zoomFit(Qt.rect(grid.x,grid.y,grid.width,grid.height))
             }
 
             Item {
@@ -162,10 +163,10 @@ Item {
                                 anchors.fill: infoLabel
                                 anchors.margins: -4
                                 radius: 4
-                                color: "white"
+                                color: modelData.marked ? accentColors.a700.background : "white"
                                 opacity: character.photos.length === 0 ? 1 : 0.8
                                 border.width: 1
-                                border.color: "black"
+                                border.color: modelData.marked ? accentColors.a700.text : "black"
                             }
 
                             Text {
@@ -178,6 +179,7 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pixelSize: 10
                                 maximumLineCount: 3
+                                color: modelData.marked ? accentColors.a700.text : "black"
                                 text: {
                                     var fields = []
                                     fields.push("<b>" + character.name + "</b>");

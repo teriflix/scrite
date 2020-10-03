@@ -192,7 +192,7 @@ Item {
                     property int currentIndex: 0
 
                     Repeater {
-                        model: ["Notes", "Relationships"]
+                        model: ["Relationships", "Notes"]
 
                         TabBarTab {
                             tabFillColor: active ? currentTabNoteColor : Qt.tint(currentTabNoteColor, "#C0FFFFFF")
@@ -220,10 +220,18 @@ Item {
                     border.color: currentTabNoteColor
                     radius: 6
 
-                    NotesView {
+                    CharacterRelationshipsGraphView {
                         anchors.fill: parent
                         anchors.margins: 2
                         visible: notesViewTabBar.currentIndex === 0
+                        z: visible ? 1 : 0
+                        scene: app.verifyType(currentTabNotesSource, "Scene") ? currentTabNotesSource : null
+                    }
+
+                    NotesView {
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        visible: notesViewTabBar.currentIndex === 1
                         z: visible ? 1 : 0
                         notesModel: scriteDocument.loading ? null : (currentTabNotesSource ? currentTabNotesSource.notesModel : null)
                         onNewNoteRequest: {
@@ -237,13 +245,6 @@ Item {
                                 return "You can capture your thoughts, ideas and research related to '<b>" + currentTabNotesSource.name + "</b>' here.";
                             return "You can capture your thoughts, ideas and research about your screenplay here.";
                         }
-                    }
-
-                    CharacterRelationshipsGraphView {
-                        anchors.fill: parent
-                        anchors.margins: 2
-                        visible: notesViewTabBar.currentIndex === 1
-                        z: visible ? 1 : 0
                     }
                 }
             }

@@ -475,6 +475,7 @@ public:
     Q_INVOKABLE void addCharacters(const QStringList &names);
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
+    QList<Character*> findCharacters(const QStringList &names, bool returnAssociativeList=false) const;
 
     Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
     QAbstractListModel *notesModel() const { return &((const_cast<Structure*>(this))->m_notes); }

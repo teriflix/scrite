@@ -34,6 +34,11 @@ public:
     Character* character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
+    Q_PROPERTY(bool marked READ isMarked WRITE setMarked NOTIFY markedChanged)
+    void setMarked(bool val);
+    bool isMarked() const { return m_marked; }
+    Q_SIGNAL void markedChanged();
+
     Q_PROPERTY(QRectF rect READ rect NOTIFY rectChanged)
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
@@ -70,6 +75,7 @@ protected:
 
 private:
     QRectF m_rect;
+    bool m_marked = false;
     bool m_placedByUser = false;
     ExecLaterTimer m_updateRectTimer;
     QObjectProperty<QQuickItem> m_item;

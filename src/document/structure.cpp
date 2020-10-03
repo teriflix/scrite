@@ -1361,7 +1361,7 @@ void Structure::addCharacters(const QStringList &names)
 
 Character *Structure::findCharacter(const QString &name) const
 {
-    const QString name2 = name.toUpper();
+    const QString name2 = name.trimmed().toUpper();
     Q_FOREACH(Character *character, m_characters.list())
     {
         if(character->name() == name2)
@@ -1369,6 +1369,19 @@ Character *Structure::findCharacter(const QString &name) const
     }
 
     return nullptr;
+}
+
+QList<Character *> Structure::findCharacters(const QStringList &names, bool returnAssociativeList) const
+{
+    QList<Character*> ret;
+    for(const QString &name: names)
+    {
+        Character *character = this->findCharacter(name);
+        if(returnAssociativeList || character != nullptr)
+            ret << character;
+    }
+
+    return ret;
 }
 
 QQmlListProperty<Note> Structure::notes()
