@@ -93,6 +93,14 @@ public:
     Relationship* relationship() const { return m_relationship; }
     Q_SIGNAL void relationshipChanged();
 
+    Q_PROPERTY(QString forwardLabel READ forwardLabel NOTIFY forwardLabelChanged)
+    QString forwardLabel() const { return m_forwardLabel; }
+    Q_SIGNAL void forwardLabelChanged();
+
+    Q_PROPERTY(QString reverseLabel READ reverseLabel NOTIFY reverseLabelChanged)
+    QString reverseLabel() const { return m_reverseLabel; }
+    Q_SIGNAL void reverseLabelChanged();
+
     Q_PROPERTY(QPainterPath path READ path NOTIFY pathChanged)
     QPainterPath path() const { return m_path; }
     Q_SIGNAL void pathChanged();
@@ -121,11 +129,15 @@ protected:
     void setRelationship(Relationship* val);
     void resetRelationship();
     void setPath(const QPainterPath &val);
+    void setForwardLabel(const QString &val);
+    void setReverseLabel(const QString &val);
 
 private:
     QPointF m_labelPos;
     qreal m_labelAngle = 0;
     QPainterPath m_path;
+    QString m_forwardLabel;
+    QString m_reverseLabel;
     QObjectProperty<Relationship> m_relationship;
     QPointer<CharacterRelationshipsGraphNode> m_toNode;
     QPointer<CharacterRelationshipsGraphNode> m_fromNode;

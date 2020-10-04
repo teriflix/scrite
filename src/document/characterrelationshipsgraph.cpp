@@ -228,6 +228,24 @@ void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
     emit pathChanged();
 }
 
+void CharacterRelationshipsGraphEdge::setForwardLabel(const QString &val)
+{
+    if(m_forwardLabel == val)
+        return;
+
+    m_forwardLabel = val;
+    emit forwardLabelChanged();
+}
+
+void CharacterRelationshipsGraphEdge::setReverseLabel(const QString &val)
+{
+    if(m_reverseLabel == val)
+        return;
+
+    m_reverseLabel = val;
+    emit reverseLabelChanged();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
@@ -551,10 +569,17 @@ void CharacterRelationshipsGraph::load()
                 if(relationship->direction() != Relationship::OfWith)
                     continue;
 
-                CharacterRelationshipsGraphNode *node2 = nodeMap.value(relationship->with());
+                Character *with = relationship->with();
+                CharacterRelationshipsGraphNode *node2 = nodeMap.value(with);
+                if(node2 == nullptr)
+                    continue;
 
                 CharacterRelationshipsGraphEdge *edge = new CharacterRelationshipsGraphEdge(node1, node2, this);
                 edge->setRelationship(relationship);
+                edge->setForwardLabel(relationship->name());
+                const Relationship *reverseRelationship = with->findRelationship(character);
+                if(reverseRelationship != nullptr)
+                    edge->setReverseLabel(reverseRelationship->name());
                 edges.append(edge);
                 graph.edges.append(edge);
             }
@@ -562,6 +587,9 @@ void CharacterRelationshipsGraph::load()
     }
 
     // Now lets layout all the graphs and arrange them in a row
+    auto longerText = [](const QString &s1, const QString &s2) {
+        return s1.length() > s2.length() ? s1 : s2;
+    };
     QRectF boundingRect(m_leftMargin,m_topMargin,0,0);
     for(int i=0; i<graphs.size(); i++)
     {
@@ -577,8 +605,8 @@ void CharacterRelationshipsGraph::load()
                 CharacterRelationshipsGraphEdge *gedge =
                         qobject_cast<CharacterRelationshipsGraphEdge*>(agedge->containerObject());
                 const QString relationshipName = gedge->relationship()->name();
-                if(relationshipName.length() > longestRelationshipName.length())
-                    longestRelationshipName = relationshipName;
+                longestRelationshipName = longerText(gedge->forwardLabel(), longestRelationshipName);
+                longestRelationshipName = longerText(gedge->reverseLabel(), longestRelationshipName);
             }
 
             const QFontMetricsF fm(qApp->font());

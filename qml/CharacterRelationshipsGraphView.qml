@@ -121,10 +121,19 @@ Item {
 
                             Text {
                                 id: nameLabel
-                                text: modelData.relationship.name
+                                text: {
+                                    if(modelData.forwardLabel === "" && modelData.reverseLabel === "")
+                                        return "Related To"
+                                    if(modelData.forwardLabel === modelData.reverseLabel || modelData.reverseLabel === "")
+                                        return modelData.forwardLabel
+                                    if(modelData.forwardLabel === "")
+                                        return modelData.reverseLabel
+                                    return modelData.forwardLabel + "<br/>" + modelData.reverseLabel
+                                }
                                 font.pointSize: app.idealFontPointSize
                                 anchors.centerIn: parent
                                 color: primaryColors.c700.text
+                                horizontalAlignment: Text.AlignHCenter
                             }
                         }
                     }
