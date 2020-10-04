@@ -12,9 +12,12 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Rectangle {
+    id: characterBox
     property Character character
 
     width: 150
@@ -23,6 +26,8 @@ Rectangle {
     border.width: 1
     border.color: "black"
     radius: 6
+
+    signal doubleClicked()
 
     Row {
         anchors.fill: parent
@@ -47,6 +52,15 @@ Rectangle {
                 }
                 fillMode: Image.PreserveAspectFit
                 mipmap: true; smooth: true
+            }
+
+            MouseArea {
+                hoverEnabled: true
+                anchors.fill: parent
+                onDoubleClicked: characterBox.doubleClicked()
+                ToolTip.delay: 1500
+                ToolTip.text: "Double click to switch to " + character.name + " tab"
+                ToolTip.visible: containsMouse
             }
         }
 

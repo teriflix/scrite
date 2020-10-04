@@ -177,6 +177,14 @@ Item {
         CharacterNotes {
             character: currentTabNotesSource
             colorHint: currentTabNoteColor
+            onCharacterDoubleClicked: {
+                for(var i=noteSources.length-1; i>=1; i--) {
+                    if(noteSources[i].label === characterName) {
+                        notebookTabsView.currentIndex = i
+                        break
+                    }
+                }
+            }
         }
     }
 
@@ -230,6 +238,14 @@ Item {
                         visible: notesViewTabBar.currentIndex === 0
                         z: visible ? 1 : 0
                         scene: app.verifyType(currentTabNotesSource, "Scene") ? currentTabNotesSource : null
+                        onCharacterDoubleClicked: {
+                            for(var i=noteSources.length-1; i>=1; i--) {
+                                if(noteSources[i].label === characterName) {
+                                    notebookTabsView.currentIndex = i
+                                    break
+                                }
+                            }
+                        }
                     }
 
                     NotesView {

@@ -24,6 +24,8 @@ Item {
     property Character character
     property color colorHint: primaryColors.borderColor
 
+    signal characterDoubleClicked(string characterName)
+
     Rectangle {
         id: contextPanelArea
         anchors.left: parent.left
@@ -501,6 +503,7 @@ Item {
                                 anchors.right: parent.right
                                 color: Qt.rgba(0,0,0,0)
                                 border.width: 0
+                                onDoubleClicked: characterDoubleClicked(modelData.withCharacter.name)
                             }
                         }
                     }

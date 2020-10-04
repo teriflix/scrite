@@ -18,6 +18,8 @@ import Scrite 1.0
 Item {
     property alias scene: crgraph.scene
 
+    signal characterDoubleClicked(string characterName)
+
     CharacterRelationshipsGraph {
         id: crgraph
         structure: scriteDocument.loading ? null : scriteDocument.structure
@@ -212,6 +214,7 @@ Item {
                             anchors.fill: parent
                             drag.target: parent
                             drag.axis: Drag.XAndYAxis
+                            hoverEnabled: true
                             onPressed: {
                                 scrollArea.interactive = false
                                 if(canvas.selectedNodeItem === parent)
@@ -220,6 +223,10 @@ Item {
                                     canvas.selectedNodeItem = parent
                             }
                             onReleased: scrollArea.interactive = true
+                            onDoubleClicked: characterDoubleClicked(character.name)
+                            ToolTip.text: "Double click to switch to " + character.name + " tab"
+                            ToolTip.delay: 1500
+                            ToolTip.visible: containsMouse
                         }
                     }
                 }
