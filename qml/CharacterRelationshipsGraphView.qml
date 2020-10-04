@@ -63,27 +63,20 @@ Item {
             property Character activeCharacter: selectedNodeItem ? selectedNodeItem.character : null
             property Item selectedNodeItem
 
-            GridBackground {
-                id: grid
-                x: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.x - 50) : 0
-                y: crgraph.nodes.objectCount > 0 ? nodeItemsBox.boundingBox.y - 50 : 0
-                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.width + 100) : Math.floor(Math.min(scrollArea.width,scrollArea.height)/100)*100
-                height: crgraph.nodes.objectCount > 0 ? (nodeItemsBox.boundingBox.height + 100) : width
-                tickColorOpacity: 0.25 * canvas.scale
-                majorTickLineWidth: 2*app.devicePixelRatio
-                minorTickLineWidth: 1*app.devicePixelRatio
-                gridIsVisible: structureCanvasSettings.showGrid
-                majorTickColor: structureCanvasSettings.gridColor
-                minorTickColor: structureCanvasSettings.gridColor
-                tickDistance: scriteDocument.structure.canvasGridSize
+            Item {
+                id: nodeItemsBox
+                x: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.x - 50) : 0
+                y: crgraph.nodes.objectCount > 0 ? nodeItemsBoxEvaluator.boundingBox.y - 50 : 0
+                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.width + 100) : Math.floor(Math.min(scrollArea.width,scrollArea.height)/100)*100
+                height: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.height + 100) : width
             }
 
             TightBoundingBoxEvaluator {
-                id: nodeItemsBox
+                id: nodeItemsBoxEvaluator
             }
 
             function zoomFit() {
-                scrollArea.zoomFit(Qt.rect(grid.x,grid.y,grid.width,grid.height))
+                scrollArea.zoomFit(Qt.rect(nodeItemsBox.x,nodeItemsBox.y,nodeItemsBox.width,nodeItemsBox.height))
             }
 
             Item {
@@ -155,7 +148,7 @@ Item {
                         color: character.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                         Component.onCompleted: modelData.item = this
 
-                        TightBoundingBoxItem.evaluator: nodeItemsBox
+                        TightBoundingBoxItem.evaluator: nodeItemsBoxEvaluator
 
                         Image {
                             anchors.fill: parent
@@ -219,12 +212,14 @@ Item {
                             anchors.fill: parent
                             drag.target: parent
                             drag.axis: Drag.XAndYAxis
-                            onClicked: {
+                            onPressed: {
+                                scrollArea.interactive = false
                                 if(canvas.selectedNodeItem === parent)
                                     canvas.selectedNodeItem = null
                                 else
                                     canvas.selectedNodeItem = parent
                             }
+                            onReleased: scrollArea.interactive = true
                         }
                     }
                 }
