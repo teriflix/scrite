@@ -433,49 +433,63 @@ Item {
                             NumberAnimation { duration: 250 }
                         }
                     }
-                    delegate: Column {
+                    delegate: Rectangle {
                         width: relationshipView.width - (relationshipView.contentHeight > relationshipView.height ? 20 : 0)
-                        spacing: 2
+                        height: delegateLayout.height
+                        color: "white"
+                        border.color: primaryColors.borderColor
+                        border.width: 1
+                        radius: 6
 
-                        Item {
-                            width: parent.width
-                            height: 10
-                        }
-
-                        Row {
-                            width: parent.width
-                            spacing: 10
-
-                            Text {
-                                id: relationshipIndexLabel
-                                font.pixelSize: relationshipField.height * 0.7
-                                text: (index+1) + ". "
-                                anchors.top: parent.top
-                            }
-
-                            TextField2 {
-                                id: relationshipField
-                                width: parent.width - relationshipIndexLabel.width - removeRelationshipButton.width - 2*parent.spacing
-                                label: "Relationship:"
-                                labelAlwaysVisible: true
-                                placeholderText: "friend, spouse, etc.. <max 50 characters>"
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                text: modelData.name
-                                onTextEdited: modelData.name = text
-                            }
-
-                            ToolButton3 {
-                                id: removeRelationshipButton
-                                iconSource: "../icons/action/delete.png"
-                                anchors.top: parent.top
-                                onClicked: character.removeRelationship(modelData)
-                            }
-                        }
-
-                        CharacterBox {
-                            character: modelData.withCharacter
-                            width: parent.width - 30
+                        Column {
+                            id: delegateLayout
+                            spacing: 2
+                            width: parent.width - 10
+                            anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
+
+                            Item {
+                                width: parent.width
+                                height: 10
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: 10
+
+                                Text {
+                                    id: relationshipIndexLabel
+                                    font.pixelSize: relationshipField.height * 0.7
+                                    text: (index+1) + ". "
+                                    anchors.top: parent.top
+                                }
+
+                                TextField2 {
+                                    id: relationshipField
+                                    width: parent.width - relationshipIndexLabel.width - removeRelationshipButton.width - 2*parent.spacing
+                                    label: "Relationship:"
+                                    labelAlwaysVisible: true
+                                    placeholderText: "friend, spouse, etc.. <max 50 characters>"
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    text: modelData.name
+                                    onTextEdited: modelData.name = text
+                                }
+
+                                ToolButton3 {
+                                    id: removeRelationshipButton
+                                    iconSource: "../icons/action/delete.png"
+                                    anchors.top: parent.top
+                                    onClicked: character.removeRelationship(modelData)
+                                }
+                            }
+
+                            CharacterBox {
+                                character: modelData.withCharacter
+                                width: parent.width - 30
+                                anchors.right: parent.right
+                                color: Qt.rgba(0,0,0,0)
+                                border.width: 0
+                            }
                         }
                     }
                 }
@@ -487,8 +501,8 @@ Item {
         id: addRelationshipDialogComponent
 
         Rectangle {
-            width: Math.max(Math.min(800, height*1.2), addRelationshipDialogButtons.width+80)
-            height: Math.min(unrelatedCharacterNames.length, 10) * 50 + title.height + addRelationshipDialogButtons.height + 60
+            width: 800
+            height: Math.min(charactersList.height, 600) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80
             color: primaryColors.c10.background
 
             readonly property var unrelatedCharacterNames: character.unrelatedCharacterNames()
@@ -503,15 +517,16 @@ Item {
                     anchors.top: parent.top
                     font.pixelSize: 18
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Check the characters with whom you want to establish relationship for <strong>" + character.name + "</strong>."
+                    text: "Name and check application relationships for <strong>" + character.name + "</strong>."
                     wrapMode: Text.WordWrap
                 }
 
                 Rectangle {
-                    anchors.fill: charactersFlowScroll
+                    anchors.fill: charactersListScroll
                     anchors.margins: -1
                     border.width: 1
                     border.color: primaryColors.borderColor
+                    visible: charactersListScroll.height >= 600
                 }
 
                 SearchBar {
@@ -524,52 +539,94 @@ Item {
                 }
 
                 ScrollArea {
-                    id: charactersFlowScroll
+                    id: charactersListScroll
                     anchors.top: searchBar.bottom
                     anchors.bottom: addRelationshipDialogButtons.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.topMargin: 10
                     anchors.bottomMargin: 10
-                    contentWidth: charactersFlow.width
-                    contentHeight: charactersFlow.height
-                    ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-                    ScrollBar.horizontal.policy: charactersFlow.width > width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                    ScrollBar.horizontal.opacity: active ? 1 : 0.2
+                    contentWidth: charactersList.width
+                    contentHeight: charactersList.height
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                    ScrollBar.vertical.policy: charactersList.height > height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    ScrollBar.vertical.opacity: active ? 1 : 0.2
 
-                    Flow {
-                        id: charactersFlow
-                        flow: Flow.TopToBottom
-                        height: charactersFlowScroll.height - 4
-                        property real columnWidth: 100
+                    Column {
+                        id: charactersList
+                        width: charactersListScroll.width-20
 
                         Repeater {
-                            id: characterCheckBoxes
+                            id: otherCharacterItems
                             model: unrelatedCharacterNames
 
-                            CheckBox2 {
-                                id: characterCheckBox
-                                text: modelData
-                                width: charactersFlow.columnWidth
-                                Component.onCompleted: charactersFlow.columnWidth = Math.max(charactersFlow.columnWidth, implicitWidth)
-                                checked: false
+                            Rectangle {
+                                id: characterRowItem
+                                property string otherCharacterName: modelData
+                                property bool checked: checkBox.enabled && checkBox.checked
+                                property string relationship: relationshipName.text
+                                width: charactersList.width
+                                height: characterRow.height
 
-                                property bool highlight: false
-                                background: Rectangle {
-                                    color: characterCheckBox.Material.background
+                                Row {
+                                    id: characterRow
+                                    width: parent.width - 20
+                                    anchors.right: parent.right
+                                    spacing: 10
+
+                                    CheckBox2 {
+                                        id: checkBox
+                                        width: charactersList.columnWidth
+                                        checked: false
+                                        Material.background: backgroundColor
+                                        Material.foreground: foregroundColor
+                                        enabled: relationshipName.length > 0
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Text {
+                                        font.pointSize: app.idealFontPointSize
+                                        text: "is"
+                                        color: foregroundColor
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    TextField2 {
+                                        id: relationshipName
+                                        width: 280
+                                        label: ""
+                                        placeholderText: "relationship name"
+                                        font.pointSize: app.idealFontPointSize
+                                        color: foregroundColor
+                                        Material.background: backgroundColor
+                                        Material.foreground: foregroundColor
+                                        onLengthChanged: checkBox.checked = length > 0
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Text {
+                                        width: 400
+                                        color: foregroundColor
+                                        font.pointSize: app.idealFontPointSize
+                                        text: "of <strong>" + otherCharacterName + "</strong>"
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    }
                                 }
-                                Material.background: highlight ? accentColors.c300.background : primaryColors.c10.background
-                                Material.foreground: highlight ? accentColors.c300.text : primaryColors.c10.text
+
+                                color: backgroundColor
+                                property bool highlight: false
+                                property color backgroundColor: highlight ? accentColors.c100.background : primaryColors.c10.background
+                                property color foregroundColor: highlight ? accentColors.c100.text : primaryColors.c10.text
 
                                 SearchAgent.engine: searchBar.searchEngine
                                 SearchAgent.onSearchRequest: {
-                                    SearchAgent.searchResultCount = SearchAgent.indexesOf(string, characterCheckBox.text).length > 0 ? 1 : 0
+                                    SearchAgent.searchResultCount = SearchAgent.indexesOf(string, otherCharacterName).length > 0 ? 1 : 0
                                 }
                                 SearchAgent.onCurrentSearchResultIndexChanged: {
-                                    characterCheckBox.highlight = SearchAgent.currentSearchResultIndex >= 0
-                                    charactersFlowScroll.ensureItemVisible(characterCheckBox,1,10)
+                                    highlight = SearchAgent.currentSearchResultIndex >= 0
+                                    charactersListScroll.ensureItemVisible(characterRowItem,1,10)
                                 }
-                                SearchAgent.onClearSearchRequest: characterCheckBox.font.bold = false
                             }
                         }
                     }
@@ -589,12 +646,12 @@ Item {
                     Button2 {
                         text: "Create Relationships"
                         onClicked: {
-                            for(var i=0; i<characterCheckBoxes.count; i++) {
-                                var checkBox = characterCheckBoxes.itemAt(i)
-                                if(checkBox.checked) {
-                                    var ch = scriteDocument.structure.addCharacter(checkBox.text)
+                            for(var i=0; i<otherCharacterItems.count; i++) {
+                                var item = otherCharacterItems.itemAt(i)
+                                if(item.checked) {
+                                    var ch = scriteDocument.structure.addCharacter(item.otherCharacterName)
                                     if(ch)
-                                        character.addRelationship("Related To", ch)
+                                        character.addRelationship(item.relationship, ch)
                                 }
                             }
                             modalDialog.close()

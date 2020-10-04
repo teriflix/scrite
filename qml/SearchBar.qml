@@ -105,6 +105,10 @@ Item {
                     clear()
                     searchEngine.clearSearch()
                 }
+                onActiveFocusChanged: {
+                    if(activeFocus)
+                        selectAll()
+                }
             }
 
             Row {

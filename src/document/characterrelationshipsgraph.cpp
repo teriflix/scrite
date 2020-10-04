@@ -269,7 +269,7 @@ void CharacterRelationshipsGraph::setNodeSize(const QSizeF &val)
     m_nodeSize = val;
     emit nodeSizeChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::setStructure(Structure *val)
@@ -280,7 +280,7 @@ void CharacterRelationshipsGraph::setStructure(Structure *val)
     m_structure = val;
     emit structureChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::setScene(Scene *val)
@@ -291,7 +291,7 @@ void CharacterRelationshipsGraph::setScene(Scene *val)
     m_scene = val;
     emit sceneChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::setMaxTime(int val)
@@ -321,7 +321,7 @@ void CharacterRelationshipsGraph::setLeftMargin(qreal val)
     m_leftMargin = val;
     emit leftMarginChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::setTopMargin(qreal val)
@@ -332,7 +332,7 @@ void CharacterRelationshipsGraph::setTopMargin(qreal val)
     m_topMargin = val;
     emit topMarginChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::setRightMargin(qreal val)
@@ -343,7 +343,7 @@ void CharacterRelationshipsGraph::setRightMargin(qreal val)
     m_rightMargin = val;
     emit rightMarginChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::setBottomMargin(qreal val)
@@ -354,12 +354,12 @@ void CharacterRelationshipsGraph::setBottomMargin(qreal val)
     m_bottomMargin = val;
     emit bottomMarginChanged();
 
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::reload()
 {
-    this->load();
+    this->loadLater();
 }
 
 void CharacterRelationshipsGraph::reset()
@@ -403,7 +403,16 @@ void CharacterRelationshipsGraph::classBegin()
 void CharacterRelationshipsGraph::componentComplete()
 {
     m_componentLoaded = true;
-    this->load();
+    this->loadLater();
+}
+
+void CharacterRelationshipsGraph::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_loadTimer.timerId())
+    {
+        m_loadTimer.stop();
+        this->load();
+    }
 }
 
 void CharacterRelationshipsGraph::setGraphBoundingRect(const QRectF &val)
@@ -420,14 +429,14 @@ void CharacterRelationshipsGraph::setGraphBoundingRect(const QRectF &val)
 void CharacterRelationshipsGraph::resetStructure()
 {
     m_structure = nullptr;
-    this->load();
+    this->loadLater();
     emit structureChanged();
 }
 
 void CharacterRelationshipsGraph::resetScene()
 {
     m_scene = nullptr;
-    this->load();
+    this->loadLater();
     emit sceneChanged();
 }
 
@@ -672,5 +681,10 @@ void CharacterRelationshipsGraph::load()
     this->setGraphBoundingRect(boundingRect);
 
     emit updated();
+}
+
+void CharacterRelationshipsGraph::loadLater()
+{
+    m_loadTimer.start(0, this);
 }
 

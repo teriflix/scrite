@@ -222,11 +222,15 @@ public:
     void classBegin();
     void componentComplete();
 
+protected:
+    void timerEvent(QTimerEvent *te);
+
 private:
     void setGraphBoundingRect(const QRectF &val);
     void resetStructure();
     void resetScene();
     void load();
+    void loadLater();
 
 private:
     int m_maxTime = 100;
@@ -239,6 +243,7 @@ private:
     QObjectProperty<Scene> m_scene;
     bool m_componentLoaded = false;
     QRectF m_graphBoundingRect = QRectF(0,0,500,500);
+    ExecLaterTimer m_loadTimer;
     QObjectProperty<Structure> m_structure;
     ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;
     ObjectListPropertyModel<CharacterRelationshipsGraphEdge*> m_edges;

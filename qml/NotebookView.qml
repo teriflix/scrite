@@ -97,7 +97,7 @@ Item {
         var sources = []
         sources.push( {"source": scriteDocument.structure, "label": "Story", "color": "purple" })
 
-        var activeScene = scriteDocument.screenplay.activeScene
+        var activeScene = scriteDocument.loading ? null : scriteDocument.screenplay.activeScene
         if(activeScene)
             sources.push({"source": activeScene, "label": activeScene.title, "color": activeScene.color})
 
@@ -111,6 +111,10 @@ Item {
         notebookTabsView.currentIndex = currentIndex
     }
 
+    Connections {
+        target: scriteDocument
+        onLoadingChanged: evaluateNoteSources()
+    }
     Connections {
         target: scriteDocument.structure
         onCharacterCountChanged: evaluateNoteSources()

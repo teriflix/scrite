@@ -30,16 +30,23 @@ Rectangle {
         spacing: 8
         clip: true
 
-        Image {
+        Rectangle {
             width: parent.height
             height: parent.height
-            source: {
-                if(character.photos.length > 0)
-                    return "file:///" + character.photos[0]
-                return "../icons/content/person_outline.png"
+            border.width: 1
+            border.color: primaryColors.borderColor
+
+            Image {
+                anchors.fill: parent
+                anchors.margins: 1
+                source: {
+                    if(character.photos.length > 0)
+                        return "file:///" + character.photos[0]
+                    return "../icons/content/character_icon.png"
+                }
+                fillMode: Image.PreserveAspectFit
+                mipmap: true; smooth: true
             }
-            fillMode: Image.PreserveAspectFit
-            mipmap: true; smooth: true
         }
 
         Column {
