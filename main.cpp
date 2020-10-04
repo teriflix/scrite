@@ -51,6 +51,7 @@
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
 #include "spellcheckservice.h"
+#include "tabsequencemanager.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
 #include "delayedpropertybinder.h"
@@ -242,6 +243,9 @@ int main(int argc, char **argv)
     qmlRegisterType<UrlAttributes>("Scrite", 1, 0, "UrlAttributes");
 
     qmlRegisterUncreatableType<QAbstractItemModel>("Scrite", 1, 0, "Model", "Base type of models (QAbstractItemModel)");
+
+    qmlRegisterType<TabSequenceManager>("Scrite", 1, 0, "TabSequenceManager");
+    qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", "Use as attached property.");
 
     NotificationManager notificationManager;
 

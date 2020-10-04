@@ -81,6 +81,11 @@ Item {
                 }
             }
 
+            TabSequenceManager {
+                id: characterInfoTabSequence
+                wrapAround: true
+            }
+
             Flickable {
                 id: characterQuickInfoView
                 anchors.fill: parent
@@ -198,8 +203,8 @@ Item {
                         placeholderText: "Hero/Heroine/Villian/Other <max 50 letters>"
                         maximumLength: 50
                         text: character.designation
-                        backTabItem: weightField
-                        tabItem: aliasesField
+                        TabSequenceItem.sequence: 0
+                        TabSequenceItem.manager: characterInfoTabSequence
                         onTextEdited: character.designation = text
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
@@ -213,8 +218,8 @@ Item {
                         placeholderText: "<max 100 letters>"
                         maximumLength: 50
                         text: character.aliases.join(", ")
-                        backTabItem: designationField
-                        tabItem: typeField
+                        TabSequenceItem.sequence: 1
+                        TabSequenceItem.manager: characterInfoTabSequence
                         onTextEdited: character.aliases = text.split(",")
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
@@ -232,8 +237,8 @@ Item {
                             placeholderText: "Human/Animal/Robot <max 25 letters>"
                             maximumLength: 25
                             text: character.type
-                            backTabItem: aliasesField
-                            tabItem: genderField
+                            TabSequenceItem.sequence: 2
+                            TabSequenceItem.manager: characterInfoTabSequence
                             onTextEdited: character.type = text
                             enableTransliteration: true
                             readOnly: scriteDocument.readOnly
@@ -247,8 +252,8 @@ Item {
                             placeholderText: "<max 20 letters>"
                             maximumLength: 20
                             text: character.gender
-                            backTabItem: typeField
-                            tabItem: ageField
+                            TabSequenceItem.sequence: 3
+                            TabSequenceItem.manager: characterInfoTabSequence
                             onTextEdited: character.gender = text
                             enableTransliteration: true
                             readOnly: scriteDocument.readOnly
@@ -267,8 +272,8 @@ Item {
                             placeholderText: "<max 20 letters>"
                             maximumLength: 20
                             text: character.age
-                            backTabItem: genderField
-                            tabItem: bodyTypeField
+                            TabSequenceItem.sequence: 4
+                            TabSequenceItem.manager: characterInfoTabSequence
                             onTextEdited: character.age = text
                             enableTransliteration: true
                             readOnly: scriteDocument.readOnly
@@ -282,8 +287,8 @@ Item {
                             placeholderText: "<max 20 letters>"
                             maximumLength: 20
                             text: character.bodyType
-                            backTabItem: ageField
-                            tabItem: heightField
+                            TabSequenceItem.sequence: 5
+                            TabSequenceItem.manager: characterInfoTabSequence
                             onTextEdited: character.bodyType = text
                             enableTransliteration: true
                             readOnly: scriteDocument.readOnly
@@ -302,8 +307,8 @@ Item {
                             placeholderText: "<max 20 letters>"
                             maximumLength: 20
                             text: character.height
-                            backTabItem: bodyTypeField
-                            tabItem: weightField
+                            TabSequenceItem.sequence: 6
+                            TabSequenceItem.manager: characterInfoTabSequence
                             onTextEdited: character.height = text
                             enableTransliteration: true
                             readOnly: scriteDocument.readOnly
@@ -317,8 +322,8 @@ Item {
                             placeholderText: "<max 20 letters>"
                             maximumLength: 20
                             text: character.weight
-                            backTabItem: heightField
-                            tabItem: designationField
+                            TabSequenceItem.sequence: 7
+                            TabSequenceItem.manager: characterInfoTabSequence
                             onTextEdited: character.weight = text
                             enableTransliteration: true
                             readOnly: scriteDocument.readOnly
@@ -413,6 +418,11 @@ Item {
                     }
                 }
 
+                TabSequenceManager {
+                    id: relationshipTabSequence
+                    wrapAround: true
+                }
+
                 ListView {
                     id: relationshipView
                     width: parent.width
@@ -435,7 +445,7 @@ Item {
                     }
                     delegate: Rectangle {
                         width: relationshipView.width - (relationshipView.contentHeight > relationshipView.height ? 20 : 0)
-                        height: delegateLayout.height
+                        height: delegateLayout.height + 10
                         color: "white"
                         border.color: primaryColors.borderColor
                         border.width: 1
@@ -473,6 +483,8 @@ Item {
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     text: modelData.name
                                     onTextEdited: modelData.name = text
+                                    TabSequenceItem.manager: relationshipTabSequence
+                                    TabSequenceItem.sequence: index
                                 }
 
                                 ToolButton3 {
@@ -536,6 +548,10 @@ Item {
                     anchors.top: title.bottom
                     anchors.topMargin: 10
                     searchEngine.objectName: "Characters Search Engine"
+                }
+
+                TabSequenceManager {
+                    id: characterListTabManager
                 }
 
                 ScrollArea {
@@ -602,6 +618,8 @@ Item {
                                         Material.foreground: foregroundColor
                                         onLengthChanged: checkBox.checked = length > 0
                                         anchors.verticalCenter: parent.verticalCenter
+                                        TabSequenceItem.manager: characterListTabManager
+                                        TabSequenceItem.sequence: index
                                     }
 
                                     Text {

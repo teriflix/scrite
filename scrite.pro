@@ -53,6 +53,7 @@ HEADERS += \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
+    src/quick/items/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
     src/quick/objects/notification.h \
     src/quick/objects/fileinfo.h \
@@ -145,6 +146,7 @@ SOURCES += \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
+    src/quick/items/tabsequencemanager.cpp \
     src/quick/objects/fileinfo.cpp \
     src/quick/objects/focustracker.cpp \
     src/quick/objects/delayedpropertybinder.cpp \
