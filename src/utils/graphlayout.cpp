@@ -1,10 +1,10 @@
 #include "graphlayout.h"
 
+#include <QMap>
 #include <QtMath>
 #include <QLineF>
 #include <QTransform>
 #include <QElapsedTimer>
-#include <QMap>
 
 using namespace GraphLayout;
 
@@ -91,7 +91,7 @@ bool ForceDirectedLayout::layout(const Graph &graph)
 
     // Now, lets find out the least space between any two nodes in the layed out
     // graph.
-    qreal minNodeSpacing = MAXFLOAT;
+    qreal minNodeSpacing = 240000.0;
     for(AbstractNode *n1 : graph.nodes)
     {
         for(AbstractNode *n2 : graph.nodes)
