@@ -2018,6 +2018,38 @@ void Structure::deserializeFromJson(const QJsonObject &)
 {
     Q_FOREACH(Character *character, m_characters.list())
         character->resolveRelationships();
+
+    // Forward and reverse relationships must be a tuple. If one is deleted, the other must
+    // get deleted right away. We cannot afford to have zombie relationships.
+    Q_FOREACH(Character *character, m_characters.list())
+    {
+        for(int i=0; i<character->relationshipCount(); i++)
+        {
+            Relationship *ofWith = character->relationshipAt(i);
+            if(ofWith->direction() == Relationship::OfWith)
+            {
+                Relationship *withOf = ofWith->with()->findRelationship(character);
+                if(withOf == nullptr)
+                {
+                    ofWith->deleteLater();
+                    continue;
+                }
+
+                if(withOf->direction() == Relationship::WithOf)
+                {
+                    // Ensure that if one of the relationships is destroyed, the other
+                    // must destroy itself.
+                    connect(withOf, &Relationship::aboutToDelete, ofWith, &Relationship::deleteLater);
+                    connect(ofWith, &Relationship::aboutToDelete, withOf, &Relationship::deleteLater);
+                }
+                else
+                {
+                    ofWith->deleteLater();
+                    withOf->deleteLater();
+                }
+            }
+        }
+    }
 }
 
 bool Structure::event(QEvent *event)

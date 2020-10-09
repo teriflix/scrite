@@ -382,7 +382,6 @@ Item {
                 spacing: 10
                 anchors.fill: parent
                 anchors.margins: 20
-                width: relashionshipScroll.width - (relashionshipScroll.contentHeight > relashionshipScroll.height ? 20 : 0)
 
                 Rectangle {
                     id: titleBar
@@ -582,56 +581,44 @@ Item {
                             Rectangle {
                                 id: characterRowItem
                                 property string otherCharacterName: modelData
-                                property bool checked: checkBox.enabled && checkBox.checked
+                                property bool checked: relationshipName.length > 0
                                 property string relationship: relationshipName.text
                                 width: charactersList.width
-                                height: characterRow.height
+                                height: characterRow.height*1.15
 
                                 Row {
                                     id: characterRow
                                     width: parent.width - 20
                                     anchors.right: parent.right
-                                    spacing: 10
+                                    spacing: 5
 
-                                    CheckBox2 {
-                                        id: checkBox
-                                        width: charactersList.columnWidth
-                                        checked: false
-                                        Material.background: backgroundColor
-                                        Material.foreground: foregroundColor
-                                        enabled: relationshipName.length > 0
+                                    Image {
+                                        width: 24; height: 24
+                                        source: "../icons/navigation/check.png"
                                         anchors.verticalCenter: parent.verticalCenter
+                                        opacity: relationshipName.length > 0
                                     }
 
                                     Text {
+                                        id: characterRowLabel
                                         font.pointSize: app.idealFontPointSize
-                                        text: "is"
+                                        text: character.name + " & " + otherCharacterName + " are "
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
 
                                     TextField2 {
                                         id: relationshipName
-                                        width: 280
-                                        label: ""
-                                        placeholderText: "relationship name"
-                                        font.pointSize: app.idealFontPointSize
+                                        width: parent.width - 32 - characterRowLabel.width - 2*parent.spacing
+                                        label: "Relationship Name:"
                                         color: foregroundColor
+                                        font.pointSize: app.idealFontPointSize
+                                        placeholderText: "husband/wife, mother/son, father/daughter, friends ..."
                                         Material.background: backgroundColor
                                         Material.foreground: foregroundColor
-                                        onLengthChanged: checkBox.checked = length > 0
                                         anchors.verticalCenter: parent.verticalCenter
                                         TabSequenceItem.manager: characterListTabManager
                                         TabSequenceItem.sequence: index
-                                    }
-
-                                    Text {
-                                        width: 400
-                                        color: foregroundColor
-                                        font.pointSize: app.idealFontPointSize
-                                        text: "of <strong>" + otherCharacterName + "</strong>"
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     }
                                 }
 
@@ -670,9 +657,9 @@ Item {
                             for(var i=0; i<otherCharacterItems.count; i++) {
                                 var item = otherCharacterItems.itemAt(i)
                                 if(item.checked) {
-                                    var ch = scriteDocument.structure.addCharacter(item.otherCharacterName)
-                                    if(ch)
-                                        character.addRelationship(item.relationship, ch)
+                                    var otherCharacter = scriteDocument.structure.addCharacter(item.otherCharacterName)
+                                    if(otherCharacter)
+                                        character.addRelationship(item.relationship, otherCharacter)
                                 }
                             }
                             modalDialog.close()

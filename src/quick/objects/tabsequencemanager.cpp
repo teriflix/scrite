@@ -88,6 +88,9 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
                 return false;
 
             TabSequenceItem *item = m_tabSequenceItems.at(nextIndex);
+            if(item == nullptr)
+                return false;
+
             QQuickItem *qmlItem = qobject_cast<QQuickItem*>(item->parent());
             if(qmlItem != nullptr)
                 qmlItem->setFocus(true);
@@ -150,7 +153,8 @@ TabSequenceItem::TabSequenceItem(QObject *parent)
 
 TabSequenceItem::~TabSequenceItem()
 {
-
+    if(!m_manager.isNull())
+        m_manager->remove(this);
 }
 
 TabSequenceItem *TabSequenceItem::qmlAttachedProperties(QObject *object)
