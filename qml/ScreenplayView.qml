@@ -453,7 +453,7 @@ Item {
     }
 
     Loader {
-        active: scriteDocument.screenplay.elementCount === 0
+        active: enableDragDrop && scriteDocument.screenplay.elementCount === 0
         width: parent.width*0.5
         anchors.centerIn: parent
         sourceComponent: TextArea {
