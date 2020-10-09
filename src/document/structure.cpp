@@ -283,23 +283,23 @@ void Relationship::setDirection(Relationship::Direction val)
 
 QString Relationship::polishName(const QString &val)
 {
-    const QString space = QStringLiteral(" ");
+    QString val2 = val;
 
-    const bool endsWithSpace = val.isEmpty() ? false : val.endsWith(space);
-
-    QStringList comps = val.simplified().trimmed().split(space);
-    for(int i=0; i<comps.size(); i++)
+    bool capitalize = true;
+    for(int i=0; i<val2.length(); i++)
     {
-        QString &comp = comps[i];
-        comp = comp.toLower();
-        comp[0] = comp[0].toUpper();
+        QCharRef ch = val2[i];
+        if(capitalize)
+        {
+            if(ch.isLetterOrNumber() && ch.script() == QChar::Script_Latin)
+                ch = ch.toUpper();
+            capitalize = false;
+        }
+        else
+            capitalize = !ch.isLetterOrNumber();
     }
 
-    QString ret = comps.join(space);
-    if(!ret.isEmpty() && endsWithSpace)
-        ret += space;
-
-    return ret;
+    return val2;
 }
 
 void Relationship::setName(const QString &val)
