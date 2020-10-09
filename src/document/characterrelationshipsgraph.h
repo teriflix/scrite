@@ -121,6 +121,9 @@ public:
     QObject *containerObject() { return this; }
     const QObject *containerObject() const { return this; }
 
+    void setEvaluatePathAllowed(bool val);
+    bool isEvaluatePathAllowed() const { return m_evaluatePathAllowed; }
+
     void evaluatePath();
 
 protected:
@@ -138,6 +141,7 @@ private:
     QPainterPath m_path;
     QString m_forwardLabel;
     QString m_reverseLabel;
+    bool m_evaluatePathAllowed = false;
     QObjectProperty<Relationship> m_relationship;
     QPointer<CharacterRelationshipsGraphNode> m_toNode;
     QPointer<CharacterRelationshipsGraphNode> m_fromNode;

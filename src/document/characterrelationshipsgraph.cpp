@@ -176,14 +176,68 @@ QString CharacterRelationshipsGraphEdge::pathString() const
     return Application::instance()->painterPathToString(m_path);
 }
 
+void CharacterRelationshipsGraphEdge::setEvaluatePathAllowed(bool val)
+{
+    if(m_evaluatePathAllowed == val)
+        return;
+
+    m_evaluatePathAllowed = val;
+    if(val)
+        this->evaluatePath();
+}
+
 void CharacterRelationshipsGraphEdge::evaluatePath()
 {
+    if(!m_evaluatePathAllowed)
+        return;
+
     QPainterPath path;
 
     if(!m_fromNode.isNull() && !m_toNode.isNull())
     {
+#if 0
         path.moveTo( m_fromNode->rect().center() );
         path.lineTo( m_toNode->rect().center() );
+#else
+        auto pickIntersectionEdge = [](const QRectF &rect, const QLineF &line, int *type=nullptr) {
+            if(!rect.contains(line.p1()) && !rect.contains(line.p2()))
+                return QLineF();
+            const QList<QLineF> edges = QList<QLineF>()
+                    << QLineF( rect.topLeft(), rect.bottomLeft() )
+                    << QLineF( rect.topLeft(), rect.topRight() )
+                    << QLineF( rect.topRight(), rect.bottomRight() )
+                    << QLineF( rect.bottomRight(), rect.bottomLeft() );
+            const QList<int> types = QList<int>()
+                    << Qt::LeftEdge << Qt::TopEdge << Qt::RightEdge << Qt::BottomEdge;
+            for(int i=0; i<edges.size(); i++) {
+                const QLineF edge = edges.at(i);
+                if(line.intersect(edge, nullptr) == QLineF::BoundedIntersection) {
+                    if(type)
+                        *type = types[i];
+                    return edge;
+                }
+            }
+            return QLineF();
+        };
+
+        const QRectF r1 = m_fromNode->rect();
+        const QRectF r2 = m_toNode->rect();
+        const QLineF centerLine(r1.center(), r2.center());
+        int edgeType1 = 0, edgeType2 = 0;
+        const QLineF edge1 = pickIntersectionEdge(r1, centerLine, &edgeType1);
+        const QLineF edge2 = pickIntersectionEdge(r2, centerLine, &edgeType2);
+        const QPointF p1 = edge1.center();
+        const QPointF p2 = edge2.center();
+        const QLineF line(p1, p2);
+        const QPointF cp = line.center();
+
+        const QPointF cp1 = (edgeType1 == Qt::LeftEdge || edgeType1 == Qt::RightEdge) ? QPointF(cp.x(), p1.y()) : QPointF(p1.x(), cp.y());
+        const QPointF cp2 = (edgeType2 == Qt::LeftEdge || edgeType2 == Qt::RightEdge) ? QPointF(cp.x(), p2.y()) : QPointF(p2.x(), cp.y());
+
+        path.moveTo(p1);
+        path.quadTo(cp1, cp);
+        path.quadTo(cp2, p2);
+#endif
     }
 
     this->setPath(path);
@@ -222,7 +276,7 @@ void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
     else
     {
         m_labelPos = m_path.pointAtPercent(0.5);
-        m_labelAngle = qRadiansToDegrees( qAtan(m_path.slopeAtPercent(0.5)) );
+        m_labelAngle = 0; // qRadiansToDegrees( qAtan(m_path.slopeAtPercent(0.5)) );
     }
 
     emit pathChanged();
@@ -671,6 +725,9 @@ void CharacterRelationshipsGraph::load()
         if(i < graphs.size()-1)
             boundingRect.setRight( boundingRect.right() + 100 );
     }
+
+    for(CharacterRelationshipsGraphEdge *edge : edges)
+        edge->setEvaluatePathAllowed(true);
 
     // Update the models and bounding rectangle
     m_nodes.assign(nodes);

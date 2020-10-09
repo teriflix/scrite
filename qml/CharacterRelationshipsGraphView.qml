@@ -125,7 +125,7 @@ Item {
                                         return modelData.reverseLabel
                                     return modelData.forwardLabel + "<br/>" + modelData.reverseLabel
                                 }
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Math.floor(app.idealFontPointSize*0.75)
                                 anchors.centerIn: parent
                                 color: primaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
