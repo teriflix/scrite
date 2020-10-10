@@ -413,7 +413,7 @@ Item {
                     anchors.top: parent.top
                     font.pixelSize: 18
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Name and check application relationships for <strong>" + character.name + "</strong>."
+                    text: "Name applicable relationships between <strong>" + character.name + "</strong> and others in the screenplay."
                     wrapMode: Text.WordWrap
                 }
 
@@ -432,6 +432,7 @@ Item {
                     anchors.top: title.bottom
                     anchors.topMargin: 10
                     searchEngine.objectName: "Characters Search Engine"
+                    visible: charactersList.height > charactersListScroll.height
                 }
 
                 TabSequenceManager {
@@ -493,7 +494,7 @@ Item {
                                         id: relationshipName
                                         enableTransliteration: true
                                         width: parent.width - 32 - characterRowLabel.width - 2*parent.spacing
-                                        label: "Relationship Name:"
+                                        label: ""
                                         color: foregroundColor
                                         font.pointSize: app.idealFontPointSize
                                         placeholderText: "husband/wife, mother/son, father/daughter, friends ..."
@@ -542,8 +543,10 @@ Item {
                                 var item = otherCharacterItems.itemAt(i)
                                 if(item.checked) {
                                     var otherCharacter = scriteDocument.structure.addCharacter(item.otherCharacterName)
-                                    if(otherCharacter)
+                                    if(otherCharacter) {
                                         character.addRelationship(item.relationship, otherCharacter)
+                                        character.characterRelationshipGraph = {}
+                                    }
                                 }
                             }
                             modalDialog.close()

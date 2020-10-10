@@ -313,6 +313,13 @@ void Relationship::setName(const QString &val)
 
     m_name = val2;
     emit nameChanged();
+
+    if(m_with != nullptr)
+    {
+        Relationship *rel = m_with->findRelationship(m_of);
+        if(rel && rel != this)
+            rel->setName(m_name);
+    }
 }
 
 void Relationship::setWith(Character *val)
