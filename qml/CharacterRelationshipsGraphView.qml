@@ -135,23 +135,32 @@ Item {
                             rotation: modelData.labelAngle
                             width: nameLabel.width + 10
                             height: nameLabel.height + 4
-                            color: primaryColors.c700.background
+                            color: nameLabelMouseArea.containsMouse ? accentColors.c700.background : primaryColors.c700.background
 
                             Text {
                                 id: nameLabel
-                                text: {
-                                    if(modelData.forwardLabel === "" && modelData.reverseLabel === "")
-                                        return "Related To"
-                                    if(modelData.forwardLabel === modelData.reverseLabel || modelData.reverseLabel === "")
-                                        return modelData.forwardLabel
-                                    if(modelData.forwardLabel === "")
-                                        return modelData.reverseLabel
-                                    return modelData.forwardLabel + "<br/>" + modelData.reverseLabel
-                                }
+                                text: modelData.relationship.name
                                 font.pointSize: Math.floor(app.idealFontPointSize*0.75)
                                 anchors.centerIn: parent
-                                color: primaryColors.c700.text
+                                color: nameLabelMouseArea.containsMouse ? accentColors.c700.text : primaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
+                            }
+
+                            MouseArea {
+                                id: nameLabelMouseArea
+                                hoverEnabled: editRelationshipsEnabled
+                                anchors.fill: parent
+                                enabled: editRelationshipsEnabled
+                                cursorShape: editRelationshipsEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                onClicked: {
+                                    modalDialog.closeable = false
+                                    modalDialog.popupSource = parent
+                                    modalDialog.initItemCallback = function(item) {
+                                        item.relationship = modelData.relationship
+                                    }
+                                    modalDialog.sourceComponent = relationshipNameEditorDialog
+                                    modalDialog.active = true
+                                }
                             }
                         }
                     }
@@ -251,10 +260,7 @@ Item {
                             hoverEnabled: true
                             onPressed: {
                                 scrollArea.interactive = false
-                                if(canvas.selectedNodeItem === parent)
-                                    canvas.selectedNodeItem = null
-                                else
-                                    canvas.selectedNodeItem = parent
+                                canvas.selectedNodeItem = parent
                             }
                             onReleased: scrollArea.interactive = true
                             onDoubleClicked: characterDoubleClicked(character.name)
@@ -357,6 +363,112 @@ Item {
                 ToolTip.text: "Add A New Relationship"
                 enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled
                 visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled
+            }
+        }
+    }
+
+    Component {
+        id: relationshipNameEditorDialog
+
+        Rectangle {
+            property Relationship relationship
+            width: 800
+            height: dialogLayout.height + 20
+
+            Column {
+                id: dialogLayout
+                spacing: 30
+                width: parent.width - 20
+                anchors.centerIn: parent
+
+                Text {
+                    font.pointSize: app.idealFontPointSize + 4
+                    text: "Edit Relationship Name"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.bold: true
+                }
+
+                Row {
+                    spacing: 10
+
+                    Column {
+                        spacing: 10
+                        width: 180
+
+                        Rectangle {
+                            width: 150; height: 150
+                            color: relationship.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            border.width: 1
+                            border.color: "black"
+
+                            Image {
+                                anchors.fill: parent
+                                source: {
+                                    if(relationship.ofCharacter.photos.length > 0)
+                                        return "file:///" + relationship.ofCharacter.photos[0]
+                                    return "../icons/content/character_icon.png"
+                                }
+                                fillMode: Image.PreserveAspectCrop
+                                mipmap: true; smooth: true
+                            }
+                        }
+
+                        Text {
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            text: relationship.ofCharacter.name
+                        }
+                    }
+
+                    TextField2 {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: relationship.name
+                        label: "Relationship Name:"
+                        maximumLength: 50
+                        width: 400
+                        onTextEdited: relationship.name = text
+                    }
+
+                    Column {
+                        spacing: 10
+                        width: 180
+
+                        Rectangle {
+                            width: 150; height: 150
+                            color: relationship.withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            border.width: 1
+                            border.color: "black"
+
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 1
+                                source: {
+                                    if(relationship.withCharacter.photos.length > 0)
+                                        return "file:///" + relationship.withCharacter.photos[0]
+                                    return "../icons/content/character_icon.png"
+                                }
+                                fillMode: Image.PreserveAspectCrop
+                                mipmap: true; smooth: true
+                            }
+                        }
+
+                        Text {
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            text: relationship.withCharacter.name
+                        }
+                    }
+                }
+
+                Button {
+                    text: "Done"
+                    onClicked: modalDialog.close()
+                    anchors.right: parent.right
+                }
             }
         }
     }

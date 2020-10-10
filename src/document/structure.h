@@ -155,6 +155,7 @@ public:
     Character* with() const { return m_with; }
     Q_SIGNAL void withChanged();
 
+    Q_PROPERTY(Character* ofCharacter READ of NOTIFY ofChanged STORED false)
     Q_PROPERTY(Character* of READ of NOTIFY ofChanged STORED false)
     Character* of() const { return m_of; }
     Q_SIGNAL void ofChanged();

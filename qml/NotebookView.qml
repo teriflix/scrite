@@ -249,7 +249,7 @@ Item {
                         onCharacterDoubleClicked: {
                             for(var i=noteSources.length-1; i>=1; i--) {
                                 if(noteSources[i].label === characterName) {
-                                    notebookTabsView.currentTabIndex = i
+                                    notebookTabsView.currentIndex = i
                                     break
                                 }
                             }

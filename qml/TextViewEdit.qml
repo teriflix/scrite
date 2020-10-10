@@ -37,6 +37,7 @@ Loader {
     property real rightPadding: 0
     property real topPadding: 0
     property real bottomPadding: 0
+    property color textColor: "black"
 
     signal textEdited(string text)
     signal editingFinished()
@@ -60,6 +61,7 @@ Loader {
             horizontalAlignment: textViewEdit.horizontalAlignment
             verticalAlignment: textViewEdit.verticalAlignment
             padding: 5
+            color: textColor
             textFormat: markupText === "" ? Text.PlainText : Text.RichText
             leftPadding: textViewEdit.leftPadding
             topPadding: textViewEdit.topPadding

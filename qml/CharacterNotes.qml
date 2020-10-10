@@ -501,6 +501,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         TabSequenceItem.manager: characterListTabManager
                                         TabSequenceItem.sequence: index
+                                        maximumLength: 50
                                     }
                                 }
 

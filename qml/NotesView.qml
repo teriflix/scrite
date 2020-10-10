@@ -32,7 +32,7 @@ Item {
         orientation: Qt.Horizontal
         flickableDirection: Flickable.HorizontalFlick
         property bool scrollBarNeeded: true // contentWidth > width
-        property real itemWidth: Math.max( Math.floor(notesView.width/3.1), 300)
+        property real itemWidth: Math.max( Math.floor(notesView.width/3.1), 350 )
         property real itemHeight: height - (scrollBarNeeded ? 20 : 0)
         highlightMoveDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
         highlightResizeDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
