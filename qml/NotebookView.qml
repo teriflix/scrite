@@ -27,7 +27,7 @@ Item {
         id: notebookTabsView
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: tabScrollButtons.top
         anchors.rightMargin: 3
         anchors.topMargin: 8
         anchors.bottomMargin: 8
@@ -38,7 +38,7 @@ Item {
         currentIndex: 0
         footer: Item {
             width: notebookTabsView.width
-            height: width
+            height: width * 1.5
 
             RoundButton {
                 anchors.centerIn: parent
@@ -86,6 +86,36 @@ Item {
                 characterItemMenu.character = modelData.source
                 characterItemMenu.popup(this)
             }
+        }
+    }
+
+    Column {
+        id: tabScrollButtons
+        width: notebookTabsView.width
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        spacing: -10
+
+        ToolButton {
+            icon.source: "../icons/navigation/keyboard_arrow_up.png"
+            width: parent.width
+            enabled: notebookTabsView.currentIndex > 0
+            onClicked: notebookTabsView.currentIndex = Math.max(0, notebookTabsView.currentIndex-1)
+            ToolTip.text: "Click to switch to the previous tab"
+            ToolTip.visible: hovered
+            ToolTip.delay: 1000
+            hoverEnabled: true
+        }
+
+        ToolButton {
+            icon.source: "../icons/navigation/keyboard_arrow_down.png"
+            width: parent.width
+            enabled: notebookTabsView.currentIndex < notebookTabsView.count-1
+            onClicked: notebookTabsView.currentIndex = Math.min(notebookTabsView.count-1, notebookTabsView.currentIndex+1)
+            ToolTip.text: "Click to switch to the next tab"
+            ToolTip.visible: hovered
+            ToolTip.delay: 1000
+            hoverEnabled: true
         }
     }
 

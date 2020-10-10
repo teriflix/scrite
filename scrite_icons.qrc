@@ -133,5 +133,9 @@
         <file>icons/content/person_outline.png</file>
         <file>icons/content/person_outline_inverted.png</file>
         <file>icons/content/character_icon.png</file>
+        <file>icons/navigation/keyboard_arrow_up.png</file>
+        <file>icons/navigation/keyboard_arrow_up_inverted.png</file>
+        <file>icons/navigation/keyboard_arrow_down.png</file>
+        <file>icons/navigation/keyboard_arrow_down_inverted.png</file>
     </qresource>
 </RCC>
