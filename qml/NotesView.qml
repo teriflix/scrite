@@ -132,6 +132,7 @@ Item {
                                     iconSource: "../icons/navigation/menu.png"
                                     onClicked: colorMenu.open()
                                     down: colorMenu.visible
+                                    enabled: !scriteDocument.readOnly
 
                                     Item {
                                         anchors.left: parent.left
@@ -147,6 +148,7 @@ Item {
                                 ToolButton3 {
                                     id: removeNoteButton
                                     anchors.verticalCenter: parent.verticalCenter
+                                    enabled: !scriteDocument.readOnly
                                     iconSource: "../icons/action/delete.png"
                                     onClicked: {
                                         if(index+1 < notesModel.objectCount)

@@ -68,7 +68,7 @@ Item {
                     visible: detailsTab.currentTabIndex === 0
                     z: visible ? 1 : 0
                     character: characterNotes.character
-                    editRelationshipsEnabled: true
+                    editRelationshipsEnabled: !scriteDocument.readOnly
                     onCharacterDoubleClicked: characterNotes.characterDoubleClicked(characterName)
                     onAddNewRelationshipRequest: {
                         modalDialog.closeable = false
@@ -491,6 +491,7 @@ Item {
 
                                     TextField2 {
                                         id: relationshipName
+                                        enableTransliteration: true
                                         width: parent.width - 32 - characterRowLabel.width - 2*parent.spacing
                                         label: "Relationship Name:"
                                         color: foregroundColor

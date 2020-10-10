@@ -148,10 +148,10 @@ Item {
 
                             MouseArea {
                                 id: nameLabelMouseArea
-                                hoverEnabled: editRelationshipsEnabled
+                                hoverEnabled: enabled
                                 anchors.fill: parent
-                                enabled: editRelationshipsEnabled
-                                cursorShape: editRelationshipsEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                enabled: editRelationshipsEnabled && !scriteDocument.readOnly
+                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                                 onClicked: {
                                     modalDialog.closeable = false
                                     modalDialog.popupSource = parent
@@ -255,7 +255,7 @@ Item {
 
                         MouseArea {
                             anchors.fill: parent
-                            drag.target: parent
+                            drag.target: !scriteDocument.readOnly ? parent : null
                             drag.axis: Drag.XAndYAxis
                             hoverEnabled: true
                             onPressed: {
@@ -337,6 +337,7 @@ Item {
                 iconSource: "../icons/navigation/refresh.png"
                 autoRepeat: true
                 ToolTip.text: "Refresh"
+                visible: !scriteDocument.readOnly
             }
 
             Rectangle {
@@ -344,7 +345,7 @@ Item {
                 height: parent.height
                 color: primaryColors.separatorColor
                 opacity: 0.5
-                visible: editRelationshipsEnabled
+                visible: editRelationshipsEnabled && !scriteDocument.readOnly
             }
 
             ToolButton3 {
@@ -352,8 +353,8 @@ Item {
                 iconSource: "../icons/content/add_circle_outline.png"
                 autoRepeat: false
                 ToolTip.text: "Add A New Relationship"
-                enabled: crgraph.character !== null && editRelationshipsEnabled
-                visible: crgraph.character !== null && editRelationshipsEnabled
+                enabled: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
+                visible: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
             }
 
             ToolButton3 {
@@ -361,8 +362,8 @@ Item {
                 iconSource: "../icons/action/delete.png"
                 autoRepeat: false
                 ToolTip.text: "Add A New Relationship"
-                enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled
-                visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled
+                enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
+                visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
             }
         }
     }
@@ -429,6 +430,8 @@ Item {
                         maximumLength: 50
                         width: 400
                         onTextEdited: relationship.name = text
+                        enableTransliteration: true
+                        readOnly: scriteDocument.readOnly
                     }
 
                     Column {
@@ -466,7 +469,10 @@ Item {
 
                 Button {
                     text: "Done"
-                    onClicked: modalDialog.close()
+                    onClicked: {
+                        relationship.name = relationship.name.trim()
+                        modalDialog.close()
+                    }
                     anchors.right: parent.right
                 }
             }

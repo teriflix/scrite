@@ -516,6 +516,14 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
     if(wordPositions.isEmpty())
         return paragraph;
 
+    if(!includingLastWord)
+    {
+        const QChar lastCharacter = paragraph.at(paragraph.length()-1);
+        const bool endsWithSpaceOrPunctuation = lastCharacter.isSpace() || lastCharacter.isPunct() || lastCharacter.isDigit();
+        if(endsWithSpaceOrPunctuation)
+            includingLastWord = true;
+    }
+
     QString ret;
     Sonnet::TextBreaks::Position wordPosition;
     for(int i=0; i<wordPositions.size(); i++)

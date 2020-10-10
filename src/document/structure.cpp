@@ -283,6 +283,9 @@ void Relationship::setDirection(Relationship::Direction val)
 
 QString Relationship::polishName(const QString &val)
 {
+    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
+        return val;
+
     QString val2 = val;
 
     bool capitalize = true;
