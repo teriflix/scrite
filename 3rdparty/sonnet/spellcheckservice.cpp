@@ -49,7 +49,7 @@ public:
     EnglishLanguageSpeller() : Sonnet::Speller("en") { }
 #else
 #ifdef Q_OS_WIN
-    EnglishLanguageSpeller() : Sonnet::Speller("en-US") { }
+    EnglishLanguageSpeller() : Sonnet::Speller() { }
 #else
     EnglishLanguageSpeller() : Sonnet::Speller("en_US") { }
 #endif

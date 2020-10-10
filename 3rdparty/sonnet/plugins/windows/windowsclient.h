@@ -41,6 +41,8 @@ public:
     QStringList languages() const;
     QString name() const { return QStringLiteral("Windows"); }
 
+    QString defaultEnglishLanguage() const;
+
 private:
     WindowsClientData *d = nullptr;
 };

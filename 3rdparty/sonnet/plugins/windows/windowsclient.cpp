@@ -13,7 +13,10 @@
 
 #include "windowsclient.h"
 #include <QtDebug>
+#include <QTimer>
 
+#include <loader_p.h>
+#include <settings_p.h>
 #include <spellcheck.h>
 
 Q_LOGGING_CATEGORY(SONNET_WINDOWS_ISPELLCHECKER, "SONNET_NSSPELLCHECKER")
@@ -158,7 +161,7 @@ Sonnet::SpellerPlugin *WindowsClient::createSpeller(const QString &language)
 {
     const int languageIndex = d->supportedLanguages.contains(language);
     if(languageIndex < 0)
-        return new WindowsSpellerPlugin("en-US", d);
+        return nullptr;
 
     return new WindowsSpellerPlugin(language, d);
 }
@@ -166,6 +169,28 @@ Sonnet::SpellerPlugin *WindowsClient::createSpeller(const QString &language)
 QStringList WindowsClient::languages() const
 {
     return d->supportedLanguages;
+}
+
+QString WindowsClient::defaultEnglishLanguage() const
+{
+    // Pick an English dictionary in the given order.
+    const QStringList engLangs = QStringList() << QStringLiteral("en-IN")
+                                               << QStringLiteral("en-US")
+                                               << QStringLiteral("en-GB");
+    for(QString engLang : engLangs)
+    {
+        if(d->supportedLanguages.contains(engLang))
+            return engLang;
+    }
+
+    // Pick any en- language.
+    for(QString lang : d->supportedLanguages)
+    {
+        if(lang.startsWith(QStringLiteral("en-")))
+            return lang;
+    }
+
+    return QString();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -376,6 +376,18 @@ void Loader::loadPlugin(const QString &pluginPath)
             languageClients.prepend(client);    // more reliable, to the front
         }
     }
+
+#ifdef Q_OS_WIN
+    {
+        WindowsClient *winClient = qobject_cast<WindowsClient*>(client);
+        if(winClient)
+        {
+            const QString defLang = winClient->defaultEnglishLanguage();
+            if(!defLang.isEmpty())
+                d->settings->setDefaultLanguage(defLang);
+        }
+    }
+#endif
 }
 
 void Loader::changed()
