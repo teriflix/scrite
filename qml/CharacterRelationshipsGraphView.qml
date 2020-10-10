@@ -73,12 +73,16 @@ Item {
             property Item selectedNodeItem
             property Item mainCharacterNodeItem
 
-            Item {
+            Rectangle {
                 id: nodeItemsBox
                 x: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.x - 50) : 0
                 y: crgraph.nodes.objectCount > 0 ? nodeItemsBoxEvaluator.boundingBox.y - 50 : 0
                 width: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.width + 100) : Math.floor(Math.min(scrollArea.width,scrollArea.height)/100)*100
                 height: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.height + 100) : width
+                color: Qt.rgba(0,0,0,0)
+                border.width: crgraph.nodes.objectCount > 0 ? 1 : 0
+                border.color: primaryColors.borderColor
+                radius: 6
             }
 
             TightBoundingBoxEvaluator {
@@ -86,7 +90,17 @@ Item {
             }
 
             function zoomFit() {
-                scrollArea.zoomFit(Qt.rect(nodeItemsBox.x,nodeItemsBox.y,nodeItemsBox.width,nodeItemsBox.height))
+                if(nodeItemsBox.width > scrollArea.width || nodeItemsBox.height > scrollArea.height)
+                    scrollArea.zoomFit(Qt.rect(nodeItemsBox.x,nodeItemsBox.y,nodeItemsBox.width,nodeItemsBox.height))
+                else {
+                    var centerX = nodeItemsBox.x + nodeItemsBox.width/2
+                    var centerY = nodeItemsBox.y + nodeItemsBox.height/2
+                    var w = scrollArea.width
+                    var h = scrollArea.height
+                    var x = centerX - w/2
+                    var y = centerY - h/2
+                    scrollArea.zoomFit(Qt.rect(x,y,w,h))
+                }
             }
 
             Item {
@@ -146,6 +160,11 @@ Item {
 
             Item {
                 id: nodeItems
+
+                BoxShadow {
+                    anchors.fill: canvas.selectedNodeItem
+                    visible: canvas.selectedNodeItem !== null
+                }
 
                 Repeater {
                     id: nodeItemsRepeater

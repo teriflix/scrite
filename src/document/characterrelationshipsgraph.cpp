@@ -629,12 +629,6 @@ void CharacterRelationshipsGraph::load()
 
         if(character->relationshipCount() == 0)
         {
-            // This is a lone character with no relationship to other
-            // characters in the screenplay. We will lay them out in one corner
-            // of the graph at the end.
-            QRectF nodeRect = node->rect();
-            nodeRect.moveTop( graphs.first().nodes.size()*m_nodeSize.height()*1.5 );
-            node->setRect(nodeRect);
             graphs.first().nodes.append(node);
             continue;
         }
@@ -672,6 +666,29 @@ void CharacterRelationshipsGraph::load()
         newGraph.nodes.append(node);
         graphs.append(newGraph);
     }
+
+    // Layout the first graph in the form of a regular grid.
+    auto layoutNodesInAGrid = [](const GraphLayout::Graph &graph) {
+        const int nrNodes = graph.nodes.size();
+        const int nrCols = qFloor( qSqrt(qreal(nrNodes)) );
+
+        int col = 0;
+        QPointF pos;
+        for(GraphLayout::AbstractNode *agnode : graph.nodes) {
+            CharacterRelationshipsGraphNode *node =
+                    qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
+            node->move(pos);
+            ++col;
+            if(col < nrCols)
+                pos.setX( pos.x() + node->size().width()*1.5 );
+            else {
+                pos.setX(0);
+                pos.setY( pos.y() + node->size().height()*1.5 );
+                col = 0;
+            }
+        }
+    };
+    layoutNodesInAGrid(graphs[0]);
 
     // Lets now loop over all nodes within each graph (except for the first one, which only
     // constains lone character nodes) and bundle relationships.
