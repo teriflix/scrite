@@ -56,5 +56,6 @@
         <file>qml/NotesView.qml</file>
         <file>qml/CharacterRelationshipsGraphView.qml</file>
         <file>qml/CharacterBox.qml</file>
+        <file>qml/TabView3.qml</file>
     </qresource>
 </RCC>

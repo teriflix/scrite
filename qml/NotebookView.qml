@@ -12,7 +12,9 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Item {
@@ -21,6 +23,13 @@ Item {
         source: "../images/notebookpage.jpg"
         fillMode: Image.Stretch
         smooth: true
+    }
+
+    Settings {
+        id: notebookSettings
+        fileName: app.settingsFilePath
+        category: "Notebook"
+        property int activeTab: 0 // 0 = Relationships, 1 = Notes
     }
 
     ListView {
@@ -222,56 +231,25 @@ Item {
         id: notesViewComponent
 
         Item {
-            Item {
+            TabView3 {
+                id: notesTabView
                 anchors.fill: parent
                 anchors.margins: 2
-
-                Row {
-                    id: notesViewTabBar
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                    spacing: -height*0.4
-                    property int currentIndex: 0
-
-                    Repeater {
-                        model: ["Relationships", "Notes"]
-
-                        TabBarTab {
-                            tabFillColor: active ? currentTabNoteColor : Qt.tint(currentTabNoteColor, "#C0FFFFFF")
-                            tabBorderColor: currentTabNoteColor
-                            tabBorderWidth: 1
-                            text: modelData
-                            tabIndex: index
-                            tabCount: 2
-                            textColor: active ? app.textColorFor(currentTabNoteColor) : "black"
-                            font.pixelSize: active ? 20 : 16
-                            font.bold: active
-                            currentTabIndex: notesViewTabBar.currentIndex
-                            onRequestActivation: notesViewTabBar.currentIndex = index
-                        }
-                    }
-                }
-
-                Rectangle {
-                    anchors.top: notesViewTabBar.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    color: Qt.rgba(1,1,1,0.25)
-                    border.width: 1
-                    border.color: currentTabNoteColor
-                    radius: 6
-
+                tabNames: ["Relationships", "(" + currentTabNotesSource.noteCount + ") Notes"]
+                currentTabIndex: notebookSettings.activeTab
+                onCurrentTabIndexChanged: notebookSettings.activeTab = currentTabIndex
+                tabColor: currentTabNoteColor
+                currentTabContent: Item {
                     CharacterRelationshipsGraphView {
                         anchors.fill: parent
                         anchors.margins: 2
-                        visible: notesViewTabBar.currentIndex === 0
+                        visible: notesTabView.currentTabIndex === 0
                         z: visible ? 1 : 0
                         scene: app.verifyType(currentTabNotesSource, "Scene") ? currentTabNotesSource : null
                         onCharacterDoubleClicked: {
                             for(var i=noteSources.length-1; i>=1; i--) {
                                 if(noteSources[i].label === characterName) {
-                                    notebookTabsView.currentIndex = i
+                                    notebookTabsView.currentTabIndex = i
                                     break
                                 }
                             }
@@ -281,7 +259,7 @@ Item {
                     NotesView {
                         anchors.fill: parent
                         anchors.margins: 2
-                        visible: notesViewTabBar.currentIndex === 1
+                        visible: notesTabView.currentTabIndex === 1
                         z: visible ? 1 : 0
                         notesModel: scriteDocument.loading ? null : (currentTabNotesSource ? currentTabNotesSource.notesModel : null)
                         onNewNoteRequest: {
@@ -291,7 +269,7 @@ Item {
                         }
                         onRemoveNoteRequest: currentTabNotesSource.removeNote(currentTabNotesSource.noteAt(index))
                         title: {
-                            if(notebookTabsView.currentIndex > 0)
+                            if(notebookTabsView.currentTabIndex > 0)
                                 return "You can capture your thoughts, ideas and research related to '<b>" + currentTabNotesSource.name + "</b>' here.";
                             return "You can capture your thoughts, ideas and research about your screenplay here.";
                         }

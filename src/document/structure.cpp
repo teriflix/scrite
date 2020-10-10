@@ -477,6 +477,7 @@ Character::Character(QObject *parent)
     connect(this, &Character::noteCountChanged, this, &Character::characterChanged);
     connect(this, &Character::designationChanged, this, &Character::characterChanged);
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
+    connect(this, &Character::characterRelationshipGraphChanged, this, &Character::characterChanged);
 }
 
 Character::~Character()
@@ -847,6 +848,15 @@ QStringList Character::unrelatedCharacterNames() const
     }
 
     return ret;
+}
+
+void Character::setCharacterRelationshipGraph(const QJsonObject &val)
+{
+    if(m_characterRelationshipGraph == val)
+        return;
+
+    m_characterRelationshipGraph = val;
+    emit characterRelationshipGraphChanged();
 }
 
 void Character::serializeToJson(QJsonObject &json) const

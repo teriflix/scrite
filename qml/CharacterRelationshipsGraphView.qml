@@ -17,8 +17,12 @@ import Scrite 1.0
 
 Item {
     property alias scene: crgraph.scene
+    property alias character: crgraph.character
+    property bool editRelationshipsEnabled: false
 
     signal characterDoubleClicked(string characterName)
+    signal addNewRelationshipRequest(Item sourceItem)
+    signal removeRelationshipWithRequest(Character otherCharacter, Item sourceItem)
 
     CharacterRelationshipsGraph {
         id: crgraph
@@ -30,12 +34,15 @@ Item {
         topMargin: 1000
         onUpdated: app.execLater(crgraph, 250, function() {
             canvas.zoomFit()
+            canvas.selectedNodeItem = canvas.mainCharacterNodeItem
         })
     }
 
     onVisibleChanged: {
-        if(visible)
+        if(visible) {
             canvas.zoomFit()
+            canvas.selectedNodeItem = canvas.mainCharacterNodeItem
+        }
     }
 
     ScrollArea {
@@ -64,6 +71,7 @@ Item {
 
             property Character activeCharacter: selectedNodeItem ? selectedNodeItem.character : null
             property Item selectedNodeItem
+            property Item mainCharacterNodeItem
 
             Item {
                 id: nodeItemsBox
@@ -85,6 +93,7 @@ Item {
                 id: edgeItems
 
                 Repeater {
+                    id: edgeItemsRepeater
                     model: crgraph.edges
 
                     PainterPathItem {
@@ -139,16 +148,22 @@ Item {
                 id: nodeItems
 
                 Repeater {
+                    id: nodeItemsRepeater
                     model: crgraph.nodes
 
                     Rectangle {
+                        id: nodeItem
                         property Character character: modelData.character
                         x: modelData.rect.x
                         y: modelData.rect.y
                         width: modelData.rect.width
                         height: modelData.rect.height
                         color: character.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
-                        Component.onCompleted: modelData.item = this
+                        Component.onCompleted: {
+                            modelData.item = nodeItem
+                            if(crgraph.character === modelData.character)
+                                canvas.mainCharacterNodeItem = nodeItem
+                        }
 
                         TightBoundingBoxItem.evaluator: nodeItemsBoxEvaluator
 
@@ -297,6 +312,32 @@ Item {
                 iconSource: "../icons/navigation/refresh.png"
                 autoRepeat: true
                 ToolTip.text: "Refresh"
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+                visible: editRelationshipsEnabled
+            }
+
+            ToolButton3 {
+                onClicked: addNewRelationshipRequest(this)
+                iconSource: "../icons/content/add_circle_outline.png"
+                autoRepeat: false
+                ToolTip.text: "Add A New Relationship"
+                enabled: crgraph.character !== null && editRelationshipsEnabled
+                visible: crgraph.character !== null && editRelationshipsEnabled
+            }
+
+            ToolButton3 {
+                onClicked: removeRelationshipWithRequest(canvas.activeCharacter, this)
+                iconSource: "../icons/action/delete.png"
+                autoRepeat: false
+                ToolTip.text: "Add A New Relationship"
+                enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled
+                visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled
             }
         }
     }

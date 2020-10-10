@@ -181,6 +181,11 @@ public:
     Scene* scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
+    Q_PROPERTY(Character* character READ character WRITE setCharacter NOTIFY characterChanged RESET resetCharacter)
+    void setCharacter(Character* val);
+    Character* character() const { return m_character; }
+    Q_SIGNAL void characterChanged();
+
     Q_PROPERTY(int maxTime READ maxTime WRITE setMaxTime NOTIFY maxTimeChanged)
     void setMaxTime(int val);
     int maxTime() const { return m_maxTime; }
@@ -220,6 +225,8 @@ public:
 
     Q_SIGNAL void updated();
 
+    QObject *graphJsonObject() const;
+
     void updateGraphJsonFromNode(CharacterRelationshipsGraphNode *node);
 
     // QQmlParserStatus interface
@@ -233,6 +240,7 @@ private:
     void setGraphBoundingRect(const QRectF &val);
     void resetStructure();
     void resetScene();
+    void resetCharacter();
     void load();
     void loadLater();
 
@@ -248,6 +256,7 @@ private:
     bool m_componentLoaded = false;
     QRectF m_graphBoundingRect = QRectF(0,0,500,500);
     ExecLaterTimer m_loadTimer;
+    QObjectProperty<Character> m_character;
     QObjectProperty<Structure> m_structure;
     ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;
     ObjectListPropertyModel<CharacterRelationshipsGraphEdge*> m_edges;

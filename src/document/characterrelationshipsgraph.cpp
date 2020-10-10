@@ -305,6 +305,7 @@ void CharacterRelationshipsGraphEdge::setReverseLabel(const QString &val)
 CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
     : QObject(parent),
       m_scene(this, "scene"),
+      m_character(this, "character"),
       m_structure(this, "structure")
 {
 
@@ -331,8 +332,14 @@ void CharacterRelationshipsGraph::setStructure(Structure *val)
     if(m_structure == val)
         return;
 
+    if(!m_structure.isNull())
+        disconnect(m_structure, &Structure::characterCountChanged, this, &CharacterRelationshipsGraph::loadLater);
+
     m_structure = val;
     emit structureChanged();
+
+    if(!m_structure.isNull())
+        connect(m_structure, &Structure::characterCountChanged, this, &CharacterRelationshipsGraph::loadLater);
 
     this->loadLater();
 }
@@ -342,8 +349,31 @@ void CharacterRelationshipsGraph::setScene(Scene *val)
     if(m_scene == val)
         return;
 
+    if(!m_scene.isNull())
+        disconnect(m_scene, &Scene::characterNamesChanged, this, &CharacterRelationshipsGraph::loadLater);
+
     m_scene = val;
     emit sceneChanged();
+
+    if(!m_scene.isNull())
+        connect(m_scene, &Scene::characterNamesChanged, this, &CharacterRelationshipsGraph::loadLater);
+
+    this->loadLater();
+}
+
+void CharacterRelationshipsGraph::setCharacter(Character *val)
+{
+    if(m_character == val)
+        return;
+
+    if(!m_character.isNull())
+        disconnect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::loadLater);
+
+    m_character = val;
+    emit characterChanged();
+
+    if(!m_character.isNull())
+        connect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::loadLater);
 
     this->loadLater();
 }
@@ -418,15 +448,25 @@ void CharacterRelationshipsGraph::reload()
 
 void CharacterRelationshipsGraph::reset()
 {
-    if(!m_structure.isNull())
-    {
-        if(m_scene.isNull())
-            m_structure->setCharacterRelationshipGraph(QJsonObject());
-        else
-            m_scene->setCharacterRelationshipGraph(QJsonObject());
-    }
+    QObject *gjObject = this->graphJsonObject();
+    if(gjObject != nullptr)
+        gjObject->setProperty("characterRelationshipGraph", QVariant::fromValue<QJsonObject>(QJsonObject()));
 
     this->reload();
+}
+
+QObject *CharacterRelationshipsGraph::graphJsonObject() const
+{
+    if(m_structure.isNull())
+        return nullptr;
+
+    if(m_scene.isNull() && m_character.isNull())
+        return m_structure;
+
+    if(m_character.isNull())
+        return m_scene;
+
+    return m_character;
 }
 
 void CharacterRelationshipsGraph::updateGraphJsonFromNode(CharacterRelationshipsGraphNode *node)
@@ -436,17 +476,14 @@ void CharacterRelationshipsGraph::updateGraphJsonFromNode(CharacterRelationships
 
     const QRectF rect = node->rect();
 
-    QJsonObject graphJson = m_scene.isNull() ? m_structure->characterRelationshipGraph() : m_scene->characterRelationshipGraph();
+    QJsonObject graphJson = this->graphJsonObject()->property("characterRelationshipGraph").value<QJsonObject>();
     QJsonObject rectJson;
     rectJson.insert("x", rect.x());
     rectJson.insert("y", rect.y());
     rectJson.insert("width", rect.width());
     rectJson.insert("height", rect.height());
     graphJson.insert(node->character()->name(), rectJson);
-    if(m_scene.isNull())
-        m_structure->setCharacterRelationshipGraph(graphJson);
-    else
-        m_scene->setCharacterRelationshipGraph(graphJson);
+    this->graphJsonObject()->setProperty("characterRelationshipGraph", QVariant::fromValue<QJsonObject>(graphJson));
 }
 
 void CharacterRelationshipsGraph::classBegin()
@@ -494,16 +531,29 @@ void CharacterRelationshipsGraph::resetScene()
     emit sceneChanged();
 }
 
+void CharacterRelationshipsGraph::resetCharacter()
+{
+    m_character = nullptr;
+    this->loadLater();
+    emit characterChanged();
+}
+
 void CharacterRelationshipsGraph::load()
 {
     HourGlass hourGlass;
 
     QList<CharacterRelationshipsGraphNode*> nodes = m_nodes.list();
+    for(CharacterRelationshipsGraphNode *node : nodes)
+        disconnect(node->character(), &Character::aboutToDelete,
+                   this, &CharacterRelationshipsGraph::loadLater);
     m_nodes.clear();
     qDeleteAll(nodes);
     nodes.clear();
 
     QList<CharacterRelationshipsGraphEdge*> edges = m_edges.list();
+    for(CharacterRelationshipsGraphEdge *edge : edges)
+        disconnect(edge->relationship(), &Relationship::aboutToDelete,
+                   this, &CharacterRelationshipsGraph::loadLater);
     m_edges.clear();
     qDeleteAll(edges);
     edges.clear();
@@ -518,13 +568,13 @@ void CharacterRelationshipsGraph::load()
     // If the graph is being requested for a specific scene, then we will have
     // to consider this character, only and only if it shows up in the scene
     // or is related to one of the characters in the scene.
-    const QStringList sceneCharacterNames = m_scene.isNull() ? QStringList() : m_scene->characterNames();
+    const QStringList sceneCharacterNames = m_character.isNull() ?
+                (m_scene.isNull() ? QStringList() : m_scene->characterNames()) :
+                QStringList() << m_character->name();
     const QList<Character*> sceneCharacters = m_structure->findCharacters(sceneCharacterNames);
 
     // Lets fetch information about the graph as previously placed by the user.
-    const QJsonObject previousGraphJson = m_scene.isNull() ?
-                 m_structure->characterRelationshipGraph() :
-                 m_scene->characterRelationshipGraph();
+    const QJsonObject previousGraphJson = this->graphJsonObject()->property("characterRelationshipGraph").value<QJsonObject>();
 
     QMap<Character*,CharacterRelationshipsGraphNode*> nodeMap;
 
@@ -556,6 +606,15 @@ void CharacterRelationshipsGraph::load()
                 }
             }
 
+            if(!include)
+                continue;
+        }
+
+        // If graph is being requested for a specific character, then we have to
+        // consider only those characters with whom it has a direct relationship.
+        if(!m_character.isNull())
+        {
+            const bool include = (m_character == character || m_character->findRelationship(character) != nullptr);
             if(!include)
                 continue;
         }
@@ -677,7 +736,7 @@ void CharacterRelationshipsGraph::load()
             GraphLayout::ForceDirectedLayout layout;
             layout.setMaxTime(m_maxTime);
             layout.setMaxIterations(m_maxIterations);
-            layout.setMinimumEdgeLength(fm.horizontalAdvance(longestRelationshipName));
+            layout.setMinimumEdgeLength(fm.horizontalAdvance(longestRelationshipName) * 0.5);
             layout.layout(graph);
         }
 
@@ -726,8 +785,18 @@ void CharacterRelationshipsGraph::load()
             boundingRect.setRight( boundingRect.right() + 100 );
     }
 
+    for(CharacterRelationshipsGraphNode *node : nodes)
+        connect(node->character(), &Character::aboutToDelete,
+                this, &CharacterRelationshipsGraph::loadLater,
+                Qt::UniqueConnection);
+
     for(CharacterRelationshipsGraphEdge *edge : edges)
+    {
+        connect(edge->relationship(), &Relationship::aboutToDelete,
+                this, &CharacterRelationshipsGraph::loadLater,
+                Qt::UniqueConnection);
         edge->setEvaluatePathAllowed(true);
+    }
 
     // Update the models and bounding rectangle
     m_nodes.assign(nodes);

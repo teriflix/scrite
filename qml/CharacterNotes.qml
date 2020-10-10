@@ -55,7 +55,49 @@ Item {
         anchors.bottom: parent.bottom
         anchors.margins: 5
         anchors.leftMargin: 10
-        sourceComponent: notesComponent
+        sourceComponent: TabView3 {
+            id: detailsTab
+            tabNames: ["Relationships", "(" + character.noteCount + ") Notes"]
+            tabColor: colorHint
+            currentTabIndex: notebookSettings.activeTab
+            onCurrentTabIndexChanged: notebookSettings.activeTab = currentTabIndex
+            currentTabContent: Item {
+                CharacterRelationshipsGraphView {
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    visible: detailsTab.currentTabIndex === 0
+                    z: visible ? 1 : 0
+                    character: characterNotes.character
+                    editRelationshipsEnabled: true
+                    onCharacterDoubleClicked: characterNotes.characterDoubleClicked(characterName)
+                    onAddNewRelationshipRequest: {
+                        modalDialog.closeable = false
+                        modalDialog.popupSource = sourceItem
+                        modalDialog.sourceComponent = addRelationshipDialogComponent
+                        modalDialog.active = true
+                    }
+                    onRemoveRelationshipWithRequest: {
+                        var relationship = character.findRelationship(otherCharacter)
+                        character.removeRelationship(relationship)
+                    }
+                }
+
+                NotesView {
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    visible: detailsTab.currentTabIndex === 1
+                    z: visible ? 1 : 0
+                    notesModel: character.notesModel
+                    onNewNoteRequest: {
+                        var note = noteComponent.createObject(character)
+                        note.color = noteColor
+                        character.addNote(note)
+                    }
+                    onRemoveNoteRequest: character.removeNote(character.noteAt(index))
+                    title: "You can capture your thoughts, ideas and research related to '<b>" + character.name + "</b>' here."
+                }
+            }
+        }
     }
 
     Component {
@@ -337,22 +379,6 @@ Item {
     }
 
     Component {
-        id: notesComponent
-
-        NotesView {
-            notesModel: character.notesModel
-            title: "You can capture your thoughts, ideas and research related to '<b>" + character.name + "</b>' here."
-            listHeader: relationshipsHeaderComponent
-            onNewNoteRequest: {
-                var note = noteComponent.createObject(character)
-                note.color = noteColor
-                character.addNote(note)
-            }
-            onRemoveNoteRequest: character.removeNote(character.noteAt(index))
-        }
-    }
-
-    Component {
         id: noteComponent
 
         Note {
@@ -363,150 +389,6 @@ Item {
                     color = lastNote.color
                 else
                     color = "white"
-            }
-        }
-    }
-
-
-    Component {
-        id: relationshipsHeaderComponent
-
-        Rectangle {
-            color: "#80ffffff"
-            border.width: 1
-            border.color: "black"
-            radius: 6
-
-            Column {
-                id: relationshipContent
-                spacing: 10
-                anchors.fill: parent
-                anchors.margins: 20
-
-                Rectangle {
-                    id: titleBar
-                    color: "#c0ffffff"
-                    width: parent.width
-                    height: 46
-                    border.width: 1
-                    border.color: "black"
-                    radius: 6
-
-                    Text {
-                        id: noteTitleText
-                        width: parent.width
-                        leftPadding: 10
-                        text: character.relationshipCount > 0 ? (character.relationshipCount + " Relationship(s)") : "Relationships"
-                        font.pointSize: app.idealFontPointSize
-                        font.letterSpacing: 1
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    ToolButton3 {
-                        id: addRelationshipButton
-                        iconSource: "../icons/content/add_circle_outline.png"
-                        anchors.right: parent.right
-                        anchors.rightMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        ToolTip.text: "Add Relationship"
-                        ToolTip.visible: hovered
-                        onClicked: {
-                            modalDialog.closeable = false
-                            modalDialog.popupSource = addRelationshipButton
-                            modalDialog.sourceComponent = addRelationshipDialogComponent
-                            modalDialog.active = true
-                        }
-                    }
-                }
-
-                TabSequenceManager {
-                    id: relationshipTabSequence
-                    wrapAround: true
-                }
-
-                ListView {
-                    id: relationshipView
-                    width: parent.width
-                    height: parent.height - titleBar.height - parent.spacing
-                    clip: true
-                    model: character.relationshipsModel
-                    spacing: 10
-                    ScrollBar.vertical: ScrollBar {
-                        policy: relationshipView.contentHeight > relationshipView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-                    }
-                    delegate: Rectangle {
-                        width: relationshipView.width - (relationshipView.contentHeight > relationshipView.height ? 20 : 0)
-                        height: delegateLayout.height + 10
-                        color: "white"
-                        border.color: primaryColors.borderColor
-                        border.width: 1
-                        radius: 6
-
-                        Column {
-                            id: delegateLayout
-                            spacing: 2
-                            width: parent.width - 10
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: parent.right
-
-                            Item {
-                                width: parent.width
-                                height: 10
-                            }
-
-                            Row {
-                                width: parent.width
-                                spacing: 10
-
-                                Text {
-                                    id: relationshipIndexLabel
-                                    font.pixelSize: relationshipField.height * 0.7
-                                    text: (index+1) + ". "
-                                    anchors.top: parent.top
-                                }
-
-                                TextField2 {
-                                    id: relationshipField
-                                    width: parent.width - relationshipIndexLabel.width - removeRelationshipButton.width - 2*parent.spacing
-                                    label: "Relationship:"
-                                    labelAlwaysVisible: true
-                                    placeholderText: "friend, spouse, etc.. <max 50 characters>"
-                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    text: modelData.name
-                                    onTextEdited: modelData.name = text
-                                    TabSequenceItem.manager: relationshipTabSequence
-                                    TabSequenceItem.sequence: index
-                                }
-
-                                ToolButton3 {
-                                    id: removeRelationshipButton
-                                    iconSource: "../icons/action/delete.png"
-                                    anchors.top: parent.top
-                                    onClicked: character.removeRelationship(modelData)
-                                }
-                            }
-
-                            CharacterBox {
-                                character: modelData.withCharacter
-                                width: parent.width - 30
-                                anchors.right: parent.right
-                                color: Qt.rgba(0,0,0,0)
-                                border.width: 0
-                                onDoubleClicked: characterDoubleClicked(modelData.withCharacter.name)
-                            }
-                        }
-                    }
-                }
             }
         }
     }

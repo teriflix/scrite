@@ -316,6 +316,11 @@ public:
     Q_INVOKABLE QList<Relationship*> findRelationshipsWith(const QString &name=QString()) const;
     Q_INVOKABLE QStringList unrelatedCharacterNames() const;
 
+    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    void setCharacterRelationshipGraph(const QJsonObject &val);
+    QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
+    Q_SIGNAL void characterRelationshipGraphChanged();
+
     Q_SIGNAL void characterChanged();
 
     // QObjectSerializer::Interface interface
@@ -354,6 +359,7 @@ private:
     bool m_visibleOnNotebook = true;
     Structure* m_structure = nullptr;
     ObjectListPropertyModel<Note *> m_notes;
+    QJsonObject m_characterRelationshipGraph;
     ObjectListPropertyModel<Relationship *> m_relationships;
 };
 
