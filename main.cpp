@@ -314,7 +314,7 @@ int main(int argc, char **argv)
             qmlView.showFullScreen();
         else
         {
-            qmlView.resize( qMax(width,1366), qMax(height,766) );
+            qmlView.resize(width, height);
             qmlView.show();
         }
     }

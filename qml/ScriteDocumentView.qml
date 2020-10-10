@@ -874,42 +874,46 @@ Item {
                     menu: Menu2 {
                         width: 300
 
-                        MenuItem2 {
-                            text: "New File"
-                            onTriggered: fileNewButton.click()
-                        }
-
-                        MenuItem2 {
-                            text: "Open File"
-                            onTriggered: fileOpenButton.doOpen()
-                        }
-
                         Menu2 {
-                            title: "Open Recent"
-                            onAboutToShow: recentFilesMenu.prepareRecentFilesList()
-                            width: Math.min(documentUI.width * 0.75, 350)
+                            title: "File"
 
-                            Repeater {
-                                model: recentFilesMenu.recentFiles
+                            MenuItem2 {
+                                text: "New"
+                                onTriggered: fileNewButton.click()
+                            }
 
-                                MenuItem2 {
-                                    property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
-                                    text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
-                                    ToolTip.text: filePath
-                                    ToolTip.visible: hovered
-                                    onClicked: fileOpenButton.doOpen(filePath)
+                            MenuItem2 {
+                                text: "Open"
+                                onTriggered: fileOpenButton.doOpen()
+                            }
+
+                            Menu2 {
+                                title: "Recent"
+                                onAboutToShow: recentFilesMenu.prepareRecentFilesList()
+                                width: Math.min(documentUI.width * 0.75, 350)
+
+                                Repeater {
+                                    model: recentFilesMenu.recentFiles
+
+                                    MenuItem2 {
+                                        property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
+                                        text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                        ToolTip.text: filePath
+                                        ToolTip.visible: hovered
+                                        onClicked: fileOpenButton.doOpen(filePath)
+                                    }
                                 }
                             }
-                        }
 
-                        MenuItem2 {
-                            text: "Save"
-                            onTriggered: cmdSave.doClick()
-                        }
+                            MenuItem2 {
+                                text: "Save"
+                                onTriggered: cmdSave.doClick()
+                            }
 
-                        MenuItem2 {
-                            text: "Save As"
-                            onTriggered: fileDialog.launch("SAVE")
+                            MenuItem2 {
+                                text: "Save As"
+                                onTriggered: fileDialog.launch("SAVE")
+                            }
                         }
 
                         MenuSeparator { }
@@ -923,7 +927,7 @@ Item {
                         MenuSeparator { }
 
                         Menu2 {
-                            title: "Import, Export &amp; Reports"
+                            title: "Import, Export, Reports"
 
                             Menu2 {
                                 title: "Import"
@@ -1014,6 +1018,30 @@ Item {
 
                         MenuSeparator { }
 
+                        Menu {
+                            title: "View"
+
+                            MenuItem2 {
+                                text: "Screenplay"
+                                onTriggered: mainTabBar.currentIndex = 0
+                                font.bold: mainTabBar.currentIndex === 0
+                            }
+
+                            MenuItem2 {
+                                text: "Structure"
+                                onTriggered: mainTabBar.currentIndex = 1
+                                font.bold: mainTabBar.currentIndex === 1
+                            }
+
+                            MenuItem2 {
+                                text: "Notebook"
+                                onTriggered: mainTabBar.currentIndex = 2
+                                font.bold: mainTabBar.currentIndex === 2
+                            }
+                        }
+
+                        MenuSeparator { }
+
                         MenuItem2 {
                             text: "Settings"
                             enabled: documentUI.width >= 1100
@@ -1048,7 +1076,6 @@ Item {
                 id: mainTabBar
                 height: parent.height
                 visible: appToolBar.visible
-                onVisibleChanged: currentIndex = 0
 
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
