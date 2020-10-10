@@ -62,13 +62,10 @@ void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
         connect(m_item, &QQuickItem::xChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
         connect(m_item, &QQuickItem::yChanged, this, &CharacterRelationshipsGraphNode::updateRectFromItemLater);
 
-        if(m_character->relationshipCount() > 0)
-        {
-            m_placedByUser = true;
-            CharacterRelationshipsGraph *graph = qobject_cast<CharacterRelationshipsGraph*>(this->parent());
-            if(graph)
-                graph->updateGraphJsonFromNode(this);
-        }
+        m_placedByUser = true;
+        CharacterRelationshipsGraph *graph = qobject_cast<CharacterRelationshipsGraph*>(this->parent());
+        if(graph)
+            graph->updateGraphJsonFromNode(this);
     }
 
     emit itemChanged();
@@ -790,6 +787,8 @@ void CharacterRelationshipsGraph::load()
         {
             CharacterRelationshipsGraphNode *gnode =
                     qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
+            if(gnode->m_placedByUser)
+                continue;
 
             QRectF rect = gnode->rect();
             rect.moveTopLeft( rect.topLeft() + dp );
@@ -828,6 +827,6 @@ void CharacterRelationshipsGraph::load()
 
 void CharacterRelationshipsGraph::loadLater()
 {
-    m_loadTimer.start(0, this);
+    m_loadTimer.start(100, this);
 }
 

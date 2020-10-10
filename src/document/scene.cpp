@@ -547,6 +547,7 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
+    connect(this, &Scene::characterRelationshipGraphChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::sceneChanged, [=](){
         this->markAsModified();
