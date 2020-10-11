@@ -1716,7 +1716,7 @@ Item {
     }
 
     QtObject {
-        ShortcutsModelItem.enabled: qmlWindow.activeFocusItem !== null
+        ShortcutsModelItem.enabled: app.isTextInputItem(qmlWindow.activeFocusItem)
         ShortcutsModelItem.priority: 10
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: "Symbols & Smileys"

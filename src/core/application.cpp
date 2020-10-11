@@ -216,6 +216,11 @@ bool Application::verifyType(QObject *object, const QString &name) const
     return object && object->inherits(qPrintable(name));
 }
 
+bool Application::isTextInputItem(QQuickItem *item) const
+{
+    return item && item->flags() & QQuickItem::ItemAcceptsInputMethod;
+}
+
 UndoStack *Application::findUndoStack(const QString &objectName) const
 {
     const QList<QUndoStack*> stacks = m_undoGroup->stacks();
