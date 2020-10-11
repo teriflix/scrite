@@ -1261,6 +1261,15 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // default Latin font.
     m_formatting->useUserSpecifiedFonts();
     m_printFormat->useUserSpecifiedFonts();
+
+    // Although its not specified anywhere that transitions must be right aligned,
+    // many writers who are early adopters of Scrite are insisting on it.
+    // So, going forward transition paragraphs will be right aligned by default.
+    if(version <= QVersionNumber(0,4,18))
+    {
+        SceneElementFormat *format = m_formatting->elementFormat(SceneElement::Transition);
+        format->setTextAlignment(Qt::AlignRight);
+    }
 }
 
 QString ScriteDocument::polishFileName(const QString &givenFileName) const

@@ -710,7 +710,7 @@ void ScreenplayFormat::resetToDefaults()
       Character      | 3.70"       | 7.36"        | 1 Line
       Parenthetical  | 3.10"       | 5.63"        | 0 Lines
       Dialogue       | 2.50"       | 6.55"        | 0 Lines
-      Transition     | 5.60"       | 7.6"         | 1 Lines
+      Transition     | 4.78"       | 8.05"        | 1 Lines
       Shot           | 1.50"       | 7.6"         | 1 Lines
       */
 
@@ -762,10 +762,11 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Dialogue]->setRightMargin( (right-6.55)/contentWidth );
     m_elementFormats[SceneElement::Dialogue]->setLineSpacingBefore(0);
 
-    m_elementFormats[SceneElement::Transition]->setLeftMargin( (5.6-left)/contentWidth );
-    m_elementFormats[SceneElement::Transition]->setRightMargin( (right-7.6)/contentWidth );
+    m_elementFormats[SceneElement::Transition]->setLeftMargin( (4.78-left)/contentWidth );
+    m_elementFormats[SceneElement::Transition]->setRightMargin( (right-8.05)/contentWidth );
     m_elementFormats[SceneElement::Transition]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Transition]->setFontCapitalization(QFont::AllUppercase);
+    m_elementFormats[SceneElement::Transition]->setTextAlignment(Qt::AlignRight);
 
     m_elementFormats[SceneElement::Shot]->setLeftMargin( (1.5-left)/contentWidth );
     m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );

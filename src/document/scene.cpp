@@ -414,10 +414,10 @@ QString SceneElement::formattedText() const
 
     switch(m_type)
     {
-    case SceneElement::Character:
     case SceneElement::Shot:
-    case SceneElement::Transition:
     case SceneElement::Heading:
+    case SceneElement::Character:
+    case SceneElement::Transition:
         return m_text.toUpper();
     default:
         break;
