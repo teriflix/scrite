@@ -28,8 +28,8 @@ Item {
         id: crgraph
         structure: scriteDocument.loading ? null : scriteDocument.structure
         nodeSize: Qt.size(150,150)
-        maxTime: 1000
-        maxIterations: 5000
+        maxTime: notebookSettings.graphLayoutMaxTime
+        maxIterations: notebookSettings.graphLayoutMaxIterations
         leftMargin: 1000
         topMargin: 1000
         onUpdated: app.execLater(crgraph, 250, function() {

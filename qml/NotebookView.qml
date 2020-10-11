@@ -25,13 +25,6 @@ Item {
         smooth: true
     }
 
-    Settings {
-        id: notebookSettings
-        fileName: app.settingsFilePath
-        category: "Notebook"
-        property int activeTab: 0 // 0 = Relationships, 1 = Notes
-    }
-
     ListView {
         id: notebookTabsView
         anchors.right: parent.right

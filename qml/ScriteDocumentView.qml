@@ -76,6 +76,15 @@ Item {
         property string parentheticalLanguage: "Default"
     }
 
+    Settings {
+        id: notebookSettings
+        fileName: app.settingsFilePath
+        category: "Notebook"
+        property int activeTab: 0 // 0 = Relationships, 1 = Notes
+        property int graphLayoutMaxTime: 1000
+        property int graphLayoutMaxIterations: 50000
+    }
+
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+C"
