@@ -112,6 +112,36 @@ Item {
         onActivated: screenplayEditorSettings.enableAnimations = !screenplayEditorSettings.enableAnimations
     }
 
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Alt+1"
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Screenplay"
+        ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 0
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: mainTabBar.currentIndex = 0
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Alt+2"
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Structure"
+        ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 1
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: mainTabBar.currentIndex = 1
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Alt+3"
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Notebook"
+        ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 2
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: mainTabBar.currentIndex = 2
+    }
+
     Rectangle {
         id: appToolBarArea
         anchors.left: parent.left
@@ -1020,21 +1050,22 @@ Item {
 
                         Menu {
                             title: "View"
+                            width: 250
 
                             MenuItem2 {
-                                text: "Screenplay"
+                                text: "Screenplay (" + app.polishShortcutTextForDisplay("Alt+1") + ")"
                                 onTriggered: mainTabBar.currentIndex = 0
                                 font.bold: mainTabBar.currentIndex === 0
                             }
 
                             MenuItem2 {
-                                text: "Structure"
+                                text: "Structure (" + app.polishShortcutTextForDisplay("Alt+2") + ")"
                                 onTriggered: mainTabBar.currentIndex = 1
                                 font.bold: mainTabBar.currentIndex === 1
                             }
 
                             MenuItem2 {
-                                text: "Notebook"
+                                text: "Notebook (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.currentIndex = 2
                                 font.bold: mainTabBar.currentIndex === 2
                             }
