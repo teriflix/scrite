@@ -157,6 +157,14 @@ Item {
                     }
                 }
             }
+
+            CheckBox2 {
+                checked: workspaceSettings.showNotebookInStructure
+                text: "Move Notebook into the Structure tab"
+                onToggled: workspaceSettings.showNotebookInStructure = checked
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
         }
     }
 

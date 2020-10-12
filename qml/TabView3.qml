@@ -16,13 +16,11 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
 Item {
-    anchors.fill: parent
-    anchors.margins: 2
-
     property var tabNames: ["Default"]
     property var tabColor: primaryColors.windowColor
     property alias currentTabIndex: tabBar.currentIndex
     property alias currentTabContent: tabContentLoader.sourceComponent
+    property alias tabBarVisible: tabBar.visible
 
     Row {
         id: tabBar
@@ -51,12 +49,12 @@ Item {
     }
 
     Rectangle {
-        anchors.top: tabBar.bottom
+        anchors.top: tabBar.visible ? tabBar.bottom : parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         color: Qt.rgba(1,1,1,0.25)
-        border.width: 1
+        border.width: tabBar.visible ? 1 : 0
         border.color: tabColor
         radius: 6
 

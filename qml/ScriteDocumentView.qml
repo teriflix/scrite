@@ -43,6 +43,7 @@ Item {
         property real workspaceHeight
         property real screenplayEditorWidth: -1
         property bool scriptalayIntroduced: false
+        property bool showNotebookInStructure: false
     }
 
     Settings {
@@ -146,8 +147,10 @@ Item {
         sequence: "Alt+3"
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Notebook"
-        ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 2
+        ShortcutsModelItem.enabled: enabled && mainTabBar.currentIndex !== 2
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.visible: enabled
+        enabled: !workspaceSettings.showNotebookInStructure
         onActivated: mainTabBar.currentIndex = 2
     }
 
@@ -1077,6 +1080,7 @@ Item {
                                 text: "Notebook (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.currentIndex = 2
                                 font.bold: mainTabBar.currentIndex === 2
+                                enabled: !workspaceSettings.showNotebookInStructure
                             }
                         }
 
@@ -1119,7 +1123,7 @@ Item {
 
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
-                readonly property var tabs: ["Screenplay", "Structure", "Notebook"]
+                readonly property var tabs: workspaceSettings.showNotebookInStructure ? ["Screenplay", "Structure"] : ["Screenplay", "Structure", "Notebook"]
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
                 readonly property color activeTabColor: primaryColors.windowColor
@@ -1378,11 +1382,29 @@ Item {
                             color: primaryColors.borderColor
                         }
 
-                        StructureView {
+                        TabView3 {
+                            id: structureEditorTabs
                             anchors.fill: parent
                             anchors.margins: 1
-                            onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
-                            onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                            tabNames: workspaceSettings.showNotebookInStructure ? ["Canvas", "Notebook"] : ["Canvas"]
+                            tabColor: accentColors.windowColor
+                            tabBarVisible: workspaceSettings.showNotebookInStructure
+                            currentTabContent: Item {
+                                Loader {
+                                    anchors.fill: parent
+                                    active: structureEditorTabs.currentTabIndex === 0
+                                    sourceComponent: StructureView {
+                                        onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
+                                        onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                                    }
+                                }
+
+                                Loader {
+                                    anchors.fill: parent
+                                    active: structureEditorTabs.currentTabIndex === 1
+                                    sourceComponent: NotebookView { }
+                                }
+                            }
                         }
                     }
 
@@ -1417,6 +1439,7 @@ Item {
                         anchors.fill: parent
                         anchors.margins: 5
                         onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = false
+                        showNotesIcon: workspaceSettings.showNotebookInStructure
                     }
                 }
             }
