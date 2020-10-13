@@ -32,6 +32,7 @@
 #include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
+#include "announcement.h"
 #include "imageprinter.h"
 #include "focustracker.h"
 #include "notification.h"
@@ -246,6 +247,8 @@ int main(int argc, char **argv)
 
     qmlRegisterType<TabSequenceManager>("Scrite", 1, 0, "TabSequenceManager");
     qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", "Use as attached property.");
+
+    qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", "Use as attached property.");
 
     NotificationManager notificationManager;
 

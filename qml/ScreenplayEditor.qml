@@ -28,6 +28,8 @@ Rectangle {
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: screenplayAdapter.source
     property bool toolBarVisible: toolbar.visible
+    property var additionalCharacterMenuItems: []
+    signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
 
     property alias zoomLevel: zoomSlider.zoomLevel
     property int zoomLevelModifier: 0
@@ -2159,6 +2161,21 @@ Rectangle {
                     characterMenu.close()
                     characterMenu.characterName = ""
                 }
+            }
+        }
+
+        Repeater {
+            model: characterMenu.characterReports.length > 0 ? (additionalCharacterMenuItems.length ? 1 : 0) : 0
+
+            MenuSeparator { }
+        }
+
+        Repeater {
+            model: characterMenu.characterReports.length > 0 ? additionalCharacterMenuItems : []
+
+            MenuItem2 {
+                text: modelData
+                onTriggered: additionalCharacterMenuItemClicked(characterMenu.characterName, text)
             }
         }
     }

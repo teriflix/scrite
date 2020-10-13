@@ -38,6 +38,7 @@ Item {
         model: noteSources
         spacing: -width*0.4
         currentIndex: 0
+        highlightMoveDuration: 0
         footer: Item {
             width: notebookTabsView.width
             height: width * 1.5
@@ -143,6 +144,15 @@ Item {
         notebookTabsView.currentIndex = currentIndex
     }
 
+    function switchToCharacterTab(name) {
+        for(var i=noteSources.length-1; i>=1; i--) {
+            if(noteSources[i].label === name) {
+                notebookTabsView.currentIndex = i
+                break
+            }
+        }
+    }
+
     Connections {
         target: scriteDocument
         onLoadingChanged: evaluateNoteSources()
@@ -239,14 +249,7 @@ Item {
                         visible: notesTabView.currentTabIndex === 0
                         z: visible ? 1 : 0
                         scene: app.verifyType(currentTabNotesSource, "Scene") ? currentTabNotesSource : null
-                        onCharacterDoubleClicked: {
-                            for(var i=noteSources.length-1; i>=1; i--) {
-                                if(noteSources[i].label === characterName) {
-                                    notebookTabsView.currentIndex = i
-                                    break
-                                }
-                            }
-                        }
+                        onCharacterDoubleClicked: switchToCharacterTab(characterName)
                     }
 
                     NotesView {

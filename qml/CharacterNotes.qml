@@ -264,7 +264,7 @@ Item {
                         text: character.aliases.join(", ")
                         TabSequenceItem.sequence: 1
                         TabSequenceItem.manager: characterInfoTabSequence
-                        onTextEdited: character.aliases = text.split(",")
+                        onEditingComplete: character.aliases = text.split(",")
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
                     }

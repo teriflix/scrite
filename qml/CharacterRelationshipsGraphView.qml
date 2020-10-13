@@ -218,7 +218,7 @@ Item {
 
                             Text {
                                 id: infoLabel
-                                width: Math.min(parent.width - 30, contentWidth)
+                                width: parent.width - 30
                                 anchors.bottom: parent.bottom
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 anchors.bottomMargin: 15

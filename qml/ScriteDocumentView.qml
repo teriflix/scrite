@@ -1332,6 +1332,17 @@ Item {
         ScreenplayEditor {
             zoomLevelModifier: screenplayZoomLevelModifier
             source: sourceBinder.get
+            additionalCharacterMenuItems: {
+                if(mainTabBar.currentIndex === 1) {
+                    if(workspaceSettings.showNotebookInStructure)
+                        return ["Show Notes"]
+                }
+                return []
+            }
+            onAdditionalCharacterMenuItemClicked: {
+                if(menuItemName === "Show Notes" && workspaceSettings.showNotebookInStructure)
+                    Announcement.shout("7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8", characterName)
+            }
 
             DelayedPropertyBinder {
                 id: sourceBinder
@@ -1402,7 +1413,12 @@ Item {
                                 Loader {
                                     anchors.fill: parent
                                     active: structureEditorTabs.currentTabIndex === 1
-                                    sourceComponent: NotebookView { }
+                                    sourceComponent: NotebookView {
+                                        Announcement.onIncoming: {
+                                            if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8" && workspaceSettings.showNotebookInStructure)
+                                                switchToCharacterTab(data)
+                                        }
+                                    }
                                 }
                             }
                         }
