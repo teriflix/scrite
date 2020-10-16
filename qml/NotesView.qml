@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
@@ -32,7 +33,7 @@ Item {
         orientation: Qt.Horizontal
         flickableDirection: Flickable.HorizontalFlick
         property bool scrollBarNeeded: true // contentWidth > width
-        property real itemWidth: Math.max( Math.floor(notesView.width/3.1), 350 )
+        property real itemWidth: Math.max( Math.floor(Screen.width/4.5), 350 )
         property real itemHeight: height - (scrollBarNeeded ? 20 : 0)
         highlightMoveDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
         highlightResizeDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
@@ -64,7 +65,7 @@ Item {
         delegate: Item {
             property Note note: modelData
             width: notesList.itemWidth
-           height: notesList.itemHeight
+            height: notesList.itemHeight
 
             Rectangle {
                 id: noteItemArea
@@ -191,18 +192,14 @@ Item {
                             selectByMouse: true
                             selectByKeyboard: true
                             text: note.content
-                            leftPadding: 10
-                            rightPadding: 10
-                            topPadding: 10
-                            bottomPadding: 10
                             readOnly: scriteDocument.readOnly
-                            wrapMode: Text.WordWrap
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             Transliterator.textDocument: textDocument
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus
                             onTextChanged: note.content = text
                             placeholderText: "Type note content here"
-                            width: parent.width - 20
+                            width: parent.width
                             height: Math.max(contentHeight+50, parent.width)
                             onActiveFocusChanged: notesList.currentIndex = index
                             onCursorRectangleChanged: {

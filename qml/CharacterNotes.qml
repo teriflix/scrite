@@ -23,6 +23,7 @@ Item {
     id: characterNotes
     property Character character
     property color colorHint: primaryColors.borderColor
+    property bool showCharacterInfoInNotesTab: false
 
     signal characterDoubleClicked(string characterName)
 
@@ -35,6 +36,7 @@ Item {
         anchors.margins: 1
         anchors.rightMargin: -10
         color: "#80ffffff"
+        visible: !showCharacterInfoInNotesTab
     }
 
     Loader {
@@ -44,12 +46,14 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 20
+        active: !showCharacterInfoInNotesTab
         sourceComponent: characterInfoComponent
+        visible: !showCharacterInfoInNotesTab
     }
 
     Loader {
         id: detailsPanel
-        anchors.left: contextPanelArea.right
+        anchors.left: showCharacterInfoInNotesTab ? parent.left : contextPanelArea.right
         anchors.top: contextPanelArea.top
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -93,6 +97,7 @@ Item {
                         note.color = noteColor
                         character.addNote(note)
                     }
+                    listHeader: showCharacterInfoInNotesTab ? characterInfoComponent : null
                     onRemoveNoteRequest: character.removeNote(character.noteAt(index))
                     title: "You can capture your thoughts, ideas and research related to '<b>" + character.name + "</b>' here."
                 }
@@ -158,6 +163,7 @@ Item {
                     Text {
                         font.bold: true
                         font.pointSize: app.idealFontPointSize
+                        topPadding: 8
                         text: character.name
                         width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere

@@ -25,6 +25,8 @@ Item {
     width: 1350
     height: 700
 
+    enabled: !scriteDocument.loading
+
     FontMetrics {
         id: sceneEditorFontMetrics
         readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
@@ -44,6 +46,12 @@ Item {
         property real screenplayEditorWidth: -1
         property bool scriptalayIntroduced: false
         property bool showNotebookInStructure: false
+
+        onShowNotebookInStructureChanged: {
+            app.execLater(workspaceSettings, 100, function() {
+                mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
+            })
+        }
     }
 
     Settings {
@@ -1335,7 +1343,7 @@ Item {
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(workspaceSettings.showNotebookInStructure)
-                        return ["Show Notes"]
+                        return [{"name": "Show Notes", "description": "Show notes for the character in notebook"}]
                 }
                 return []
             }
@@ -1401,9 +1409,22 @@ Item {
                             tabColor: accentColors.windowColor
                             tabBarVisible: workspaceSettings.showNotebookInStructure
                             currentTabContent: Item {
+                                Announcement.onIncoming: {
+                                    if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8" && workspaceSettings.showNotebookInStructure) {
+                                        if(workspaceSettings.showNotebookInStructure) {
+                                            if(structureEditorTabs.currentTabIndex === 0)
+                                                structureEditorTabs.currentTabIndex = 1
+                                            app.execLater(notebookViewLoader, 100, function() {
+                                                notebookViewLoader.item.switchToCharacterTab(data)
+                                            })
+                                        }
+                                    }
+                                }
+
                                 Loader {
+                                    id: structureViewLoader
                                     anchors.fill: parent
-                                    active: structureEditorTabs.currentTabIndex === 0
+                                    active: !workspaceSettings.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                     sourceComponent: StructureView {
                                         onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
                                         onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
@@ -1411,13 +1432,11 @@ Item {
                                 }
 
                                 Loader {
+                                    id: notebookViewLoader
                                     anchors.fill: parent
-                                    active: structureEditorTabs.currentTabIndex === 1
+                                    active: workspaceSettings.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
                                     sourceComponent: NotebookView {
-                                        Announcement.onIncoming: {
-                                            if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8" && workspaceSettings.showNotebookInStructure)
-                                                switchToCharacterTab(data)
-                                        }
+
                                     }
                                 }
                             }

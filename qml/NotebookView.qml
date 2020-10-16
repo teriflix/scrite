@@ -219,6 +219,7 @@ Item {
         CharacterNotes {
             character: currentTabNotesSource
             colorHint: currentTabNoteColor
+            showCharacterInfoInNotesTab: workspaceSettings.showNotebookInStructure
             onCharacterDoubleClicked: {
                 for(var i=noteSources.length-1; i>=1; i--) {
                     if(noteSources[i].label === characterName) {

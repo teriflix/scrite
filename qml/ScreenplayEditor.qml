@@ -2155,7 +2155,7 @@ Rectangle {
                     }
                 }
 
-                onClicked: {
+                onTriggered: {
                     reportGeneratorTimer.requestSource = this
                     reportGeneratorTimer.reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
                     characterMenu.close()
@@ -2174,8 +2174,32 @@ Rectangle {
             model: characterMenu.characterReports.length > 0 ? additionalCharacterMenuItems : []
 
             MenuItem2 {
-                text: modelData
-                onTriggered: additionalCharacterMenuItemClicked(characterMenu.characterName, text)
+                leftPadding: 15
+                rightPadding: 15
+                topPadding: 5
+                bottomPadding: 5
+                width: reportsMenu.width
+                height: 65
+                contentItem: Column {
+                    width: characterMenu.width - 30
+                    spacing: 5
+
+                    Text {
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: modelData.name
+                    }
+
+                    Text {
+                        text: modelData.description
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: 12
+                        font.italic: true
+                    }
+                }
+
+                onTriggered: additionalCharacterMenuItemClicked(characterMenu.characterName, modelData.name)
             }
         }
     }
