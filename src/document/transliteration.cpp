@@ -989,7 +989,7 @@ void Transliterator::resetTextDocument()
 void Transliterator::processTransliteration(int from, int charsRemoved, int charsAdded)
 {
     Q_UNUSED(charsRemoved)
-    if(this->document() == nullptr || !m_hasActiveFocus || !m_enabled)
+    if(this->document() == nullptr || !m_hasActiveFocus || !m_enabled || charsAdded == 0)
         return;
 
     if(m_enableFromNextWord == true)
@@ -1007,6 +1007,8 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
     cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, charsAdded);
 
     const QString original = cursor.selectedText();
+    if(original.isEmpty())
+        return;
 
     if(charsAdded == 1)
     {

@@ -220,6 +220,14 @@ public:
     qreal bottomMargin() const { return m_bottomMargin; }
     Q_SIGNAL void bottomMarginChanged();
 
+    Q_PROPERTY(bool dirty READ isDirty NOTIFY dirtyChanged)
+    bool isDirty() const { return m_dirty; }
+    Q_SIGNAL void dirtyChanged();
+
+    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    bool isBusy() const { return m_busy; }
+    Q_SIGNAL void busyChanged();
+
     Q_INVOKABLE void reload();
     Q_INVOKABLE void reset();
 
@@ -243,8 +251,13 @@ private:
     void resetCharacter();
     void load();
     void loadLater();
+    void markDirty() { this->setDirty(true); }
+    void setDirty(bool val);
+    void setBusy(bool val);
 
 private:
+    bool m_busy = false;
+    bool m_dirty = false;
     int m_maxTime = 100;
     QSizeF m_nodeSize = QSizeF(100,100);
     qreal m_topMargin = 0;

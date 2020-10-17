@@ -330,13 +330,13 @@ void CharacterRelationshipsGraph::setStructure(Structure *val)
         return;
 
     if(!m_structure.isNull())
-        disconnect(m_structure, &Structure::characterCountChanged, this, &CharacterRelationshipsGraph::loadLater);
+        disconnect(m_structure, &Structure::characterCountChanged, this, &CharacterRelationshipsGraph::markDirty);
 
     m_structure = val;
     emit structureChanged();
 
     if(!m_structure.isNull())
-        connect(m_structure, &Structure::characterCountChanged, this, &CharacterRelationshipsGraph::loadLater);
+        connect(m_structure, &Structure::characterCountChanged, this, &CharacterRelationshipsGraph::markDirty);
 
     this->loadLater();
 }
@@ -347,13 +347,13 @@ void CharacterRelationshipsGraph::setScene(Scene *val)
         return;
 
     if(!m_scene.isNull())
-        disconnect(m_scene, &Scene::characterNamesChanged, this, &CharacterRelationshipsGraph::loadLater);
+        disconnect(m_scene, &Scene::characterNamesChanged, this, &CharacterRelationshipsGraph::markDirty);
 
     m_scene = val;
     emit sceneChanged();
 
     if(!m_scene.isNull())
-        connect(m_scene, &Scene::characterNamesChanged, this, &CharacterRelationshipsGraph::loadLater);
+        connect(m_scene, &Scene::characterNamesChanged, this, &CharacterRelationshipsGraph::markDirty);
 
     this->loadLater();
 }
@@ -364,13 +364,13 @@ void CharacterRelationshipsGraph::setCharacter(Character *val)
         return;
 
     if(!m_character.isNull())
-        disconnect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::loadLater);
+        disconnect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::markDirty);
 
     m_character = val;
     emit characterChanged();
 
     if(!m_character.isNull())
-        connect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::loadLater);
+        connect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::markDirty);
 
     this->loadLater();
 }
@@ -538,6 +538,7 @@ void CharacterRelationshipsGraph::resetCharacter()
 void CharacterRelationshipsGraph::load()
 {
     HourGlass hourGlass;
+    this->setBusy(true);
 
     QList<CharacterRelationshipsGraphNode*> nodes = m_nodes.list();
     for(CharacterRelationshipsGraphNode *node : nodes)
@@ -557,6 +558,8 @@ void CharacterRelationshipsGraph::load()
 
     if(m_structure.isNull() || !m_componentLoaded)
     {
+        this->setBusy(false);
+        this->setDirty(false);
         this->setGraphBoundingRect( QRectF(0,0,0,0) );
         emit updated();
         return;
@@ -822,6 +825,9 @@ void CharacterRelationshipsGraph::load()
     boundingRect.setBottom( boundingRect.bottom() + m_bottomMargin );
     this->setGraphBoundingRect(boundingRect);
 
+    this->setBusy(false);
+    this->setDirty(false);
+
     emit updated();
 }
 
@@ -829,4 +835,23 @@ void CharacterRelationshipsGraph::loadLater()
 {
     m_loadTimer.start(100, this);
 }
+
+void CharacterRelationshipsGraph::setDirty(bool val)
+{
+    if(m_dirty == val)
+        return;
+
+    m_dirty = val;
+    emit dirtyChanged();
+}
+
+void CharacterRelationshipsGraph::setBusy(bool val)
+{
+    if(m_busy == val)
+        return;
+
+    m_busy = val;
+    emit busyChanged();
+}
+
 

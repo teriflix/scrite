@@ -40,6 +40,7 @@ Item {
 
     onVisibleChanged: {
         if(visible) {
+            canvas.reloadIfDirty()
             canvas.zoomFit()
             canvas.selectedNodeItem = canvas.mainCharacterNodeItem
         }
@@ -65,8 +66,8 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvas.selectedNodeItem !== null
-                onClicked: canvas.selectedNodeItem = null
+                enabled: canvas.selectedNodeItem !== null || crgraph.dirty
+                onClicked: { canvas.selectedNodeItem = null; canvas.reloadIfDirty(); }
             }
 
             property Character activeCharacter: selectedNodeItem ? selectedNodeItem.character : null
@@ -87,6 +88,11 @@ Item {
 
             TightBoundingBoxEvaluator {
                 id: nodeItemsBoxEvaluator
+            }
+
+            function reloadIfDirty() {
+                if(crgraph.dirty)
+                    crgraph.reload()
             }
 
             function zoomFit() {
@@ -261,6 +267,7 @@ Item {
                             onPressed: {
                                 scrollArea.interactive = false
                                 canvas.selectedNodeItem = parent
+                                canvas.reloadIfDirty()
                             }
                             onReleased: scrollArea.interactive = true
                             onDoubleClicked: characterDoubleClicked(character.name)
@@ -281,7 +288,7 @@ Item {
         anchors.top: scrollArea.top
         anchors.left: scrollArea.left
         anchors.margins: 20
-        color: primaryColors.c100.background
+        color: crgraph.dirty ? primaryColors.c200.background : primaryColors.c100.background
         border.color: primaryColors.c100.text
         border.width: 1
         radius: 6
@@ -292,14 +299,14 @@ Item {
             spacing: 5
 
             ToolButton3 {
-                onClicked: scrollArea.zoomIn()
+                onClicked: { canvas.reloadIfDirty(); scrollArea.zoomIn() }
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom In"
             }
 
             ToolButton3 {
-                onClicked: scrollArea.zoomOut()
+                onClicked: { canvas.reloadIfDirty(); scrollArea.zoomOut() }
                 iconSource: "../icons/navigation/zoom_out.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Out"
@@ -307,6 +314,7 @@ Item {
 
             ToolButton3 {
                 onClicked: {
+                    canvas.reloadIfDirty()
                     var item = canvas.selectedNodeItem
                     if(item === null)
                         canvasScroll.zoomOneMiddleArea()
@@ -319,7 +327,7 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: canvas.zoomFit()
+                onClicked: { canvas.reloadIfDirty(); canvas.zoomFit() }
                 iconSource: "../icons/navigation/zoom_fit.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Fit"
@@ -349,7 +357,7 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: addNewRelationshipRequest(this)
+                onClicked: { canvas.reloadIfDirty(); addNewRelationshipRequest(this) }
                 iconSource: "../icons/content/add_circle_outline.png"
                 autoRepeat: false
                 ToolTip.text: "Add A New Relationship"
@@ -358,13 +366,38 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: removeRelationshipWithRequest(canvas.activeCharacter, this)
+                onClicked: { canvas.reloadIfDirty(); removeRelationshipWithRequest(canvas.activeCharacter, this) }
                 iconSource: "../icons/action/delete.png"
                 autoRepeat: false
                 ToolTip.text: "Add A New Relationship"
                 enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
                 visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
             }
+        }
+    }
+
+    Item {
+        anchors.fill: parent
+        visible: crgraph.dirty
+
+        Text {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.margins: 25
+            font.pointSize: app.idealFontPointSize
+            width: parent.width * 0.65
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            text: "Graph will be refreshed when you use it next."
+            color: primaryColors.c900.background
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: crgraph.busy
+        }
+
+        BusyIndicator {
+            running: crgraph.busy
         }
     }
 
