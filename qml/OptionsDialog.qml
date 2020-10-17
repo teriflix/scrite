@@ -157,14 +157,6 @@ Item {
                     }
                 }
             }
-
-            CheckBox2 {
-                checked: workspaceSettings.showNotebookInStructure
-                text: "Move Notebook into the Structure tab"
-                onToggled: workspaceSettings.showNotebookInStructure = checked
-                width: parent.width - 60
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
         }
     }
 
@@ -443,6 +435,30 @@ Item {
                                     scriteDocument.displayFormat.pageLayout.customResolution = value
                             }
                         }
+                    }
+                }
+            }
+
+            GroupBox {
+                title: "Window Tabs"
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                        width: parent.width
+                        font.pointSize: app.idealFontPointSize
+                        text: "By default Scrite shows Screenplay, Structure and Notebook in separate tabs on the main window. If you have a large display, you can move Notebook into the Structure tab and see all aspects of your screenplay within the Structure tab itself."
+                        wrapMode: Text.WordWrap
+                    }
+
+                    CheckBox2 {
+                        checked: workspaceSettings.showNotebookInStructure
+                        text: "Move Notebook into the Structure tab"
+                        onToggled: workspaceSettings.showNotebookInStructure = checked
                     }
                 }
             }

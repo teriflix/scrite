@@ -1397,7 +1397,7 @@ Item {
                         SplitView.fillWidth: true
                         color: primaryColors.c10.background
                         border {
-                            width: 1
+                            width: workspaceSettings.showNotebookInStructure ? 0 : 1
                             color: primaryColors.borderColor
                         }
 
@@ -1406,7 +1406,7 @@ Item {
                             anchors.fill: parent
                             anchors.margins: 1
                             tabNames: workspaceSettings.showNotebookInStructure ? ["Canvas", "Notebook"] : ["Canvas"]
-                            tabColor: accentColors.windowColor
+                            tabColor: primaryColors.c700.background
                             tabBarVisible: workspaceSettings.showNotebookInStructure
                             currentTabContent: Item {
                                 Announcement.onIncoming: {
