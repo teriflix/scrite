@@ -50,6 +50,7 @@ HEADERS += \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
     src/document/characterrelationshipsgraph.h \
+    src/document/notebooktabmodel.h \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
@@ -144,6 +145,7 @@ SOURCES += \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/characterrelationshipsgraph.cpp \
+    src/document/notebooktabmodel.cpp \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \

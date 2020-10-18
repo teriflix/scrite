@@ -49,6 +49,7 @@
 #include "openfromlibrary.h"
 #include "abstractexporter.h"
 #include "tightboundingbox.h"
+#include "notebooktabmodel.h"
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
 #include "spellcheckservice.h"
@@ -249,6 +250,8 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", "Use as attached property.");
 
     qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", "Use as attached property.");
+
+    qmlRegisterType<NotebookTabModel>("Scrite", 1, 0, "NotebookTabModel");
 
     NotificationManager notificationManager;
 

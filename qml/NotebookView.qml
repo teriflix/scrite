@@ -25,6 +25,32 @@ Item {
         smooth: true
     }
 
+    NotebookTabModel {
+        id: noteSources
+        structure: scriteDocument.loading ? null : scriteDocument.structure
+        activeScene: scriteDocument.screenplay.activeScene
+
+        property int currentIndex: notebookTabsView.currentIndex
+        onCurrentIndexChanged: fetchCurrents()
+        onRefreshed: fetchCurrents()
+
+        function fetchCurrents() {
+            currentSource = sourceAt(currentIndex)
+            currentColor = colorAt(currentIndex)
+            currentLabel = labelAt(currentIndex)
+        }
+
+        property var currentSource
+        property color currentColor: "white"
+        property string currentLabel: "none"
+    }
+
+    function switchToCharacterTab(name) {
+        var idx = noteSources.indexOfLabel(name);
+        if(idx >= 0)
+            notebookTabsView.currentIndex = idx
+    }
+
     ListView {
         id: notebookTabsView
         anchors.right: parent.right
@@ -122,54 +148,6 @@ Item {
         }
     }
 
-    property var noteSources: []
-    function evaluateNoteSources() {
-        var currentIndex = notebookTabsView.currentIndex
-        notebookTabsView.currentIndex = -1
-
-        var sources = []
-        sources.push( {"source": scriteDocument.structure, "label": "Story", "color": "purple" })
-
-        var activeScene = scriteDocument.loading ? null : scriteDocument.screenplay.activeScene
-        if(activeScene)
-            sources.push({"source": activeScene, "label": activeScene.title, "color": activeScene.color})
-
-        var nrCharacters = scriteDocument.structure.characterCount
-        for(var i=0; i<nrCharacters; i++) {
-            var character = scriteDocument.structure.characterAt(i)
-            sources.push({"source": character, "label":character.name, "color": app.pickStandardColor(i)})
-        }
-
-        noteSources = sources
-        notebookTabsView.currentIndex = currentIndex
-    }
-
-    function switchToCharacterTab(name) {
-        for(var i=noteSources.length-1; i>=1; i--) {
-            if(noteSources[i].label === name) {
-                notebookTabsView.currentIndex = i
-                break
-            }
-        }
-    }
-
-    Connections {
-        target: scriteDocument
-        onLoadingChanged: evaluateNoteSources()
-    }
-    Connections {
-        target: scriteDocument.structure
-        onCharacterCountChanged: evaluateNoteSources()
-    }
-    Connections {
-        target: scriteDocument.screenplay
-        onActiveSceneChanged: {
-            evaluateNoteSources()
-            notebookTabsView.currentIndex = 1
-        }
-    }
-    Component.onCompleted: evaluateNoteSources()
-
     Menu2 {
         id: characterItemMenu
         property Character character
@@ -184,8 +162,8 @@ Item {
         }
     }
 
-    property color currentTabNoteColor: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].color : "black"
-    property var currentTabNotesSource: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources[notebookTabsView.currentIndex].source : scriteDocument.structure
+    property color currentTabNoteColor: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources.currentColor : "black"
+    property var currentTabNotesSource: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources.currentSource : scriteDocument.structure
 
     Rectangle {
         anchors.left: parent.left
@@ -220,14 +198,7 @@ Item {
             character: currentTabNotesSource
             colorHint: currentTabNoteColor
             showCharacterInfoInNotesTab: workspaceSettings.showNotebookInStructure
-            onCharacterDoubleClicked: {
-                for(var i=noteSources.length-1; i>=1; i--) {
-                    if(noteSources[i].label === characterName) {
-                        notebookTabsView.currentIndex = i
-                        break
-                    }
-                }
-            }
+            onCharacterDoubleClicked: switchToCharacterTab(characterName)
         }
     }
 
