@@ -1343,13 +1343,17 @@ Item {
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(workspaceSettings.showNotebookInStructure)
-                        return [{"name": "Show Notes", "description": "Show notes for the character in notebook"}]
+                        return [{"name": "Character Notes", "description": "Create/switch to notes for the character in notebook"}]
                 }
                 return []
             }
             onAdditionalCharacterMenuItemClicked: {
-                if(menuItemName === "Show Notes" && workspaceSettings.showNotebookInStructure)
+                if(menuItemName === "Character Notes" && workspaceSettings.showNotebookInStructure) {
+                    var ch = scriteDocument.structure.findCharacter(characterName)
+                    if(ch === null)
+                        scriteDocument.structure.addCharacter(characterName)
                     Announcement.shout("7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8", characterName)
+                }
             }
 
             DelayedPropertyBinder {
