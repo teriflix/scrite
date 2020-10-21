@@ -79,7 +79,8 @@ TextField {
         } else if(tabItem) {
             editingFinished()
             tabItem.forceActiveFocus()
-        }
+        } else
+            editingFinished()
     }
 
     KeyNavigation.tab: tabItem

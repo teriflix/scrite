@@ -379,13 +379,13 @@ void CharacterRelationshipsGraph::setCharacter(Character *val)
         return;
 
     if(!m_character.isNull())
-        disconnect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::markDirty);
+        disconnect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::loadLater);
 
     m_character = val;
     emit characterChanged();
 
     if(!m_character.isNull())
-        connect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::markDirty);
+        connect(m_character, &Character::relationshipCountChanged, this, &CharacterRelationshipsGraph::loadLater);
 
     this->loadLater();
 }
@@ -555,21 +555,25 @@ void CharacterRelationshipsGraph::load()
     HourGlass hourGlass;
     this->setBusy(true);
 
-    QList<CharacterRelationshipsGraphNode*> nodes = m_nodes.list();
-    for(CharacterRelationshipsGraphNode *node : nodes)
-        disconnect(node->character(), &Character::aboutToDelete,
-                   this, &CharacterRelationshipsGraph::loadLater);
-    m_nodes.clear();
-    qDeleteAll(nodes);
-    nodes.clear();
-
     QList<CharacterRelationshipsGraphEdge*> edges = m_edges.list();
+    m_edges.clear();
     for(CharacterRelationshipsGraphEdge *edge : edges)
+    {
         disconnect(edge->relationship(), &Relationship::aboutToDelete,
                    this, &CharacterRelationshipsGraph::loadLater);
-    m_edges.clear();
-    qDeleteAll(edges);
+        GarbageCollector::instance()->add(edge);
+    }
     edges.clear();
+
+    QList<CharacterRelationshipsGraphNode*> nodes = m_nodes.list();
+    m_nodes.clear();
+    for(CharacterRelationshipsGraphNode *node : nodes)
+    {
+        disconnect(node->character(), &Character::aboutToDelete,
+                   this, &CharacterRelationshipsGraph::loadLater);
+        GarbageCollector::instance()->add(node);
+    }
+    nodes.clear();
 
     if(m_structure.isNull() || !m_componentLoaded)
     {

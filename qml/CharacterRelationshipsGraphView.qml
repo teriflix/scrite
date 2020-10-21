@@ -157,7 +157,7 @@ Item {
                                 id: nameLabelMouseArea
                                 hoverEnabled: enabled
                                 anchors.fill: parent
-                                enabled: editRelationshipsEnabled && !scriteDocument.readOnly
+                                enabled: !scriteDocument.readOnly
                                 cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                                 onClicked: {
                                     modalDialog.closeable = false
@@ -379,7 +379,7 @@ Item {
                 onClicked: { canvas.reloadIfDirty(); removeRelationshipWithRequest(canvas.activeCharacter, this) }
                 iconSource: "../icons/action/delete.png"
                 autoRepeat: false
-                ToolTip.text: "Add A New Relationship"
+                ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
                 enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
                 visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
             }
@@ -418,8 +418,14 @@ Item {
             property Relationship relationship
             property Character ofCharacter: relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter
             property Character withCharacter: relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter
+            property string originalRelationshipName
             width: 800
             height: dialogLayout.height + 50
+
+            onRelationshipChanged: {
+                if(relationship)
+                    originalRelationshipName = relationship.name
+            }
 
             Column {
                 id: dialogLayout
@@ -488,6 +494,7 @@ Item {
                         onTextEdited: relationship.name = text
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
+                        onEditingFinished: doneButton.click()
                     }
 
                     Text {
@@ -534,15 +541,33 @@ Item {
                     }
                 }
 
-                Button {
-                    text: "Done"
-                    onClicked: {
-                        relationship.name = relationship.name.trim()
-                        modalDialog.close()
-                    }
+                Row {
+                    spacing: 20
                     anchors.right: parent.right
+
+                    Button {
+                        id: revertButton
+                        text: "Revert"
+                        enabled: originalRelationshipName !== relationship.name
+                        onClicked: click()
+                        function click() {
+                            relationship.name = originalRelationshipName
+                        }
+                    }
+
+                    Button {
+                        id: doneButton
+                        text: "Done"
+                        onClicked: click()
+                        function click() {
+                            relationship.name = relationship.name.trim()
+                            modalDialog.close()
+                        }
+                    }
                 }
             }
         }
     }
 }
+
+
