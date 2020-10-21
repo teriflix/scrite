@@ -211,6 +211,8 @@ public:
 
     Q_INVOKABLE QPointF globalMousePosition() const;
 
+    Q_INVOKABLE QString camelCased(const QString &val) const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

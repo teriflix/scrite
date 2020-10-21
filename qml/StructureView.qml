@@ -65,6 +65,15 @@ Item {
             }
 
             ToolButton3 {
+                iconSource: "../icons/hardware/mouse.png"
+                autoRepeat: false
+                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
+                checkable: true
+                checked: workspaceSettings.mouseWheelZoomsInStructureCanvas
+                onCheckedChanged: workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
+            }
+
+            ToolButton3 {
                 onClicked: canvasScroll.zoomIn()
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
@@ -236,6 +245,7 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: scriteDocument.structure.elementCount >= 1
+        zoomOnScroll: workspaceSettings.mouseWheelZoomsInStructureCanvas
         interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null && maybeDragItem === null
         property Item mouseOverItem
         property Item editItem

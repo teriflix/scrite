@@ -966,6 +966,30 @@ QPointF Application::globalMousePosition() const
     return QCursor::pos();
 }
 
+QString Application::camelCased(const QString &val) const
+{
+    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
+        return val;
+
+    QString val2 = val.toLower();
+
+    bool capitalize = true;
+    for(int i=0; i<val2.length(); i++)
+    {
+        QCharRef ch = val2[i];
+        if(capitalize)
+        {
+            if(ch.isLetterOrNumber() && ch.script() == QChar::Script_Latin)
+                ch = ch.toUpper();
+            capitalize = false;
+        }
+        else
+            capitalize = !ch.isLetterOrNumber();
+    }
+
+    return val2;
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())

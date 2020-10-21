@@ -56,6 +56,7 @@ Item {
         initialContentHeight: canvas.height
         showScrollBars: true
         handlePinchZoom: true
+        zoomOnScroll: workspaceSettings.mouseWheelZoomsInCharacterGraph
 
         Item {
             id: canvas
@@ -299,6 +300,15 @@ Item {
             spacing: 5
 
             ToolButton3 {
+                iconSource: "../icons/hardware/mouse.png"
+                autoRepeat: false
+                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
+                checkable: true
+                checked: workspaceSettings.mouseWheelZoomsInCharacterGraph
+                onCheckedChanged: workspaceSettings.mouseWheelZoomsInCharacterGraph = checked
+            }
+
+            ToolButton3 {
                 onClicked: { canvas.reloadIfDirty(); scrollArea.zoomIn() }
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
@@ -406,13 +416,15 @@ Item {
 
         Rectangle {
             property Relationship relationship
+            property Character ofCharacter: relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter
+            property Character withCharacter: relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter
             width: 800
-            height: dialogLayout.height + 20
+            height: dialogLayout.height + 50
 
             Column {
                 id: dialogLayout
                 spacing: 30
-                width: parent.width - 20
+                width: parent.width - 50
                 anchors.centerIn: parent
 
                 Text {
@@ -424,6 +436,7 @@ Item {
 
                 Row {
                     spacing: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
 
                     Column {
                         spacing: 10
@@ -431,7 +444,7 @@ Item {
 
                         Rectangle {
                             width: 150; height: 150
-                            color: relationship.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            color: ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                             anchors.horizontalCenter: parent.horizontalCenter
                             border.width: 1
                             border.color: "black"
@@ -439,8 +452,8 @@ Item {
                             Image {
                                 anchors.fill: parent
                                 source: {
-                                    if(relationship.ofCharacter.photos.length > 0)
-                                        return "file:///" + relationship.ofCharacter.photos[0]
+                                    if(ofCharacter.photos.length > 0)
+                                        return "file:///" + ofCharacter.photos[0]
                                     return "../icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -452,8 +465,18 @@ Item {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            text: relationship.ofCharacter.name
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                            text: app.camelCased(ofCharacter.name)
+                            font.pointSize: app.idealFontPointSize
                         }
+                    }
+
+                    Text {
+                        font.pointSize: app.idealFontPointSize
+                        font.bold: true
+                        text: " is "
+                        anchors.verticalCenter: parent.verticalCenter
                     }
 
                     TextField2 {
@@ -461,10 +484,18 @@ Item {
                         text: relationship.name
                         label: "Relationship Name:"
                         maximumLength: 50
-                        width: 400
+                        width: 300
                         onTextEdited: relationship.name = text
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
+                    }
+
+                    Text {
+                        font.pointSize: app.idealFontPointSize
+                        font.bold: true
+                        font.italic: true
+                        text: " of "
+                        anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Column {
@@ -473,7 +504,7 @@ Item {
 
                         Rectangle {
                             width: 150; height: 150
-                            color: relationship.withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            color: withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                             anchors.horizontalCenter: parent.horizontalCenter
                             border.width: 1
                             border.color: "black"
@@ -482,8 +513,8 @@ Item {
                                 anchors.fill: parent
                                 anchors.margins: 1
                                 source: {
-                                    if(relationship.withCharacter.photos.length > 0)
-                                        return "file:///" + relationship.withCharacter.photos[0]
+                                    if(withCharacter.photos.length > 0)
+                                        return "file:///" + withCharacter.photos[0]
                                     return "../icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -495,7 +526,10 @@ Item {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            text: relationship.withCharacter.name
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                            text: app.camelCased(withCharacter.name)
+                            font.pointSize: app.idealFontPointSize
                         }
                     }
                 }

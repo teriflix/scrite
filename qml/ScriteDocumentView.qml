@@ -46,6 +46,8 @@ Item {
         property real screenplayEditorWidth: -1
         property bool scriptalayIntroduced: false
         property bool showNotebookInStructure: false
+        property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
+        property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
 
         onShowNotebookInStructureChanged: {
             app.execLater(workspaceSettings, 100, function() {

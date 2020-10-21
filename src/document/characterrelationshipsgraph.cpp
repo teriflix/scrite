@@ -234,6 +234,21 @@ void CharacterRelationshipsGraphEdge::evaluatePath()
         path.moveTo(p1);
         path.quadTo(cp1, cp);
         path.quadTo(cp2, p2);
+
+        static const QList<QPointF> arrowPoints = QList<QPointF>()
+                << QPointF(-10,-5) << QPointF(0, 0) << QPointF(-10,5);
+        const qreal arrowT = (m_relationship->direction() == Relationship::OfWith) ? 0.85 : 0.15;
+        const QPointF arrowTip = path.pointAtPercent(arrowT);
+        const qreal arrowAngle = path.angleAtPercent(arrowT);
+
+        QTransform tx;
+        tx.translate(arrowTip.x(), arrowTip.y());
+        tx.rotate(-arrowAngle);
+        if(m_relationship->direction() == Relationship::WithOf)
+            tx.scale(-1, 1);
+        path.moveTo( tx.map(arrowPoints.at(0)) );
+        path.lineTo( tx.map(arrowPoints.at(1)) );
+        path.lineTo( tx.map(arrowPoints.at(2)) );
 #endif
     }
 

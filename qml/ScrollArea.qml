@@ -22,9 +22,11 @@ Flickable {
     property real initialContentHeight: 100
     property real suggestedScale: zoomScale
     property alias handlePinchZoom: pinchHandler.enabled
+    property bool showScrollBars: true
+    property bool zoomOnScroll: app.isWindowsPlatform || app.isLinuxPlatform
+
     boundsBehavior: Flickable.StopAtBounds
     clip: true
-    property bool showScrollBars: true
 
     function zoomIn() {
         zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), pinchHandler.maximumScale)
@@ -214,7 +216,7 @@ Flickable {
         }
     }
 
-    EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
+    EventFilter.active: zoomOnScroll
     EventFilter.events: [31]
     EventFilter.onFilter: {
         if(event.delta < 0)

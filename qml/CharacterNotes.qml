@@ -403,7 +403,7 @@ Item {
         id: addRelationshipDialogComponent
 
         Rectangle {
-            width: 800
+            width: Math.max(800, ui.width*0.6)
             height: Math.min(charactersList.height, 600) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80
             color: primaryColors.c10.background
 
@@ -469,6 +469,7 @@ Item {
 
                             Rectangle {
                                 id: characterRowItem
+                                property string thisCharacterName: app.camelCased(character.name)
                                 property string otherCharacterName: modelData
                                 property bool checked: relationshipName.length > 0
                                 property string relationship: relationshipName.text
@@ -479,37 +480,50 @@ Item {
                                     id: characterRow
                                     width: parent.width - 20
                                     anchors.right: parent.right
-                                    spacing: 5
+                                    spacing: 10
 
                                     Image {
                                         width: 24; height: 24
                                         source: "../icons/navigation/check.png"
                                         anchors.verticalCenter: parent.verticalCenter
-                                        opacity: relationshipName.length > 0
+                                        opacity: relationshipName.length > 0 ? 1 : 0.05
                                     }
 
                                     Text {
-                                        id: characterRowLabel
+                                        id: characterRowLabel1
                                         font.pointSize: app.idealFontPointSize
-                                        text: character.name + " & " + otherCharacterName + " are "
+                                        text: thisCharacterName + " <b>is</b>"
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
+                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                        width: Math.min(implicitWidth, (parent.width-100)/3)
+                                        horizontalAlignment: Text.AlignRight
                                     }
 
                                     TextField2 {
                                         id: relationshipName
                                         enableTransliteration: true
-                                        width: parent.width - 32 - characterRowLabel.width - 2*parent.spacing
+                                        width: parent.width - 32 - characterRowLabel1.width - characterRowLabel2.width - 3*parent.spacing
                                         label: ""
                                         color: foregroundColor
                                         font.pointSize: app.idealFontPointSize
-                                        placeholderText: "husband/wife, mother/son, father/daughter, friends ..."
+                                        placeholderText: "husband, wife, friend, boss ..."
                                         Material.background: backgroundColor
                                         Material.foreground: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
                                         TabSequenceItem.manager: characterListTabManager
                                         TabSequenceItem.sequence: index
                                         maximumLength: 50
+                                    }
+
+                                    Text {
+                                        id: characterRowLabel2
+                                        font.pointSize: app.idealFontPointSize
+                                        text: "<b><i>of</i></b> " + app.camelCased(otherCharacterName) + "."
+                                        color: foregroundColor
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                        width: Math.min(implicitWidth, (parent.width-100)/3)
                                     }
                                 }
 
