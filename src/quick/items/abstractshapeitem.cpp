@@ -283,19 +283,22 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
     QSGOpacityNode *outlinesNode = static_cast<QSGOpacityNode*>(rootNode->childAtIndex(1));
     outlinesNode->setOpacity(m_renderType & OutlineAlso ? 1 : 0);
 
-    QSGGeometryNode *outlineNode = static_cast<QSGGeometryNode*>(outlinesNode->firstChild());
-    if(outlineNode != nullptr)
+    for(int i=0; i<outlinesNode->childCount(); i++)
     {
-        QSGGeometry *outlineGeometry = outlineNode->geometry();
-        if(outlineGeometry != nullptr)
-            outlineGeometry->setLineWidth( float(m_outlineWidth) );
-
-        QSGFlatColorMaterial *outlineMaterial = static_cast<QSGFlatColorMaterial*>(outlineNode->material());
-        if(outlineMaterial != nullptr)
+        QSGGeometryNode *outlineNode = static_cast<QSGGeometryNode*>(outlinesNode->childAtIndex(i));
+        if(outlineNode != nullptr)
         {
-            QColor outlineColor = m_outlineColor;
-            outlineColor.setAlphaF(outlineColor.alphaF() * this->opacity());
-            outlineMaterial->setColor(outlineColor);
+            QSGGeometry *outlineGeometry = outlineNode->geometry();
+            if(outlineGeometry != nullptr)
+                outlineGeometry->setLineWidth( float(m_outlineWidth) );
+
+            QSGFlatColorMaterial *outlineMaterial = static_cast<QSGFlatColorMaterial*>(outlineNode->material());
+            if(outlineMaterial != nullptr)
+            {
+                QColor outlineColor = m_outlineColor;
+                outlineColor.setAlphaF(outlineColor.alphaF() * this->opacity());
+                outlineMaterial->setColor(outlineColor);
+            }
         }
     }
 
