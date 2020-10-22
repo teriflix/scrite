@@ -28,7 +28,17 @@ Item {
     NotebookTabModel {
         id: noteSources
         structure: scriteDocument.loading ? null : scriteDocument.structure
-        activeScene: scriteDocument.screenplay.activeScene
+        activeScene: {
+            if(scriteDocument.screenplay.activeScene)
+                return scriteDocument.screenplay.activeScene
+            var idx = scriteDocument.structure.currentElementIndex
+            if(idx >= 0) {
+                var se = scriteDocument.structure.elementAt(idx)
+                if(se.scene)
+                    return se.scene
+            }
+            return null
+        }
 
         property int currentIndex: notebookTabsView.currentIndex
         onCurrentIndexChanged: fetchCurrents()
