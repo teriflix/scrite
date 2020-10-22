@@ -418,13 +418,13 @@ Item {
             property Relationship relationship
             property Character ofCharacter: relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter
             property Character withCharacter: relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter
-            property string originalRelationshipName
             width: 800
             height: dialogLayout.height + 50
 
-            onRelationshipChanged: {
-                if(relationship)
-                    originalRelationshipName = relationship.name
+            Component.onCompleted: {
+                app.execLater(dialogLayout, 100, function() {
+                    txtRelationshipName.forceActiveFocus()
+                })
             }
 
             Column {
@@ -479,6 +479,7 @@ Item {
                     }
 
                     TextField2 {
+                        id: txtRelationshipName
                         anchors.verticalCenter: parent.verticalCenter
                         text: relationship.name
                         label: "Relationship:"
@@ -486,10 +487,10 @@ Item {
                         placeholderText: "husband of, wife of, friends with, reports to ..."
                         maximumLength: 50
                         width: 300
-                        onTextEdited: relationship.name = text
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
-                        onEditingFinished: doneButton.click()
+                        onReturnPressed: doneButton.click()
+                        focus: true
                     }
 
                     Column {
@@ -528,29 +529,30 @@ Item {
                     }
                 }
 
-                Row {
-                    spacing: 20
-                    anchors.right: parent.right
+                Item {
+                    width: parent.width
+                    height: Math.max(revertButton.height, doneButton.height)
 
                     Button {
                         id: revertButton
                         text: "Revert"
-                        enabled: originalRelationshipName !== relationship.name
-                        onClicked: click()
-                        function click() {
-                            relationship.name = originalRelationshipName
+                        enabled: txtRelationshipName.text !== relationship.name
+                        onClicked: {
+                            txtRelationshipName.text = relationship.name
                         }
+                        anchors.left: parent.left
                     }
 
                     Button {
                         id: doneButton
-                        text: "Done"
-                        enabled: relationship.name !== ""
+                        text: revertButton.enabled ? "Change" : "Ok"
+                        enabled: txtRelationshipName.length > 0
                         onClicked: click()
                         function click() {
-                            relationship.name = relationship.name.trim()
+                            relationship.name = txtRelationshipName.text.trim()
                             modalDialog.close()
                         }
+                        anchors.right: parent.right
                     }
                 }
             }

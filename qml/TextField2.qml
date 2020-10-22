@@ -30,6 +30,7 @@ TextField {
     selectByMouse: true
 
     signal editingComplete()
+    signal returnPressed()
 
     onEditingFinished: {
         transliterate(true)
@@ -69,7 +70,15 @@ TextField {
             userTypedSomeText = true
     }
 
-    Keys.onReturnPressed: autoCompleteOrFocusNext()
+    Keys.onReturnPressed: {
+        autoCompleteOrFocusNext()
+        returnPressed()
+    }
+    Keys.onEnterPressed: {
+        autoCompleteOrFocusNext()
+        returnPressed()
+    }
+
     Keys.onTabPressed: autoCompleteOrFocusNext()
 
     function autoCompleteOrFocusNext() {
