@@ -1349,6 +1349,14 @@ Item {
                 }
                 return []
             }
+            additionalSceneMenuItems: {
+                if(mainTabBar.currentIndex === 1) {
+                    if(workspaceSettings.showNotebookInStructure)
+                        return ["Scene Notes"]
+                }
+                return []
+            }
+
             onAdditionalCharacterMenuItemClicked: {
                 if(menuItemName === "Character Notes" && workspaceSettings.showNotebookInStructure) {
                     var ch = scriteDocument.structure.findCharacter(characterName)
@@ -1356,6 +1364,11 @@ Item {
                         scriteDocument.structure.addCharacter(characterName)
                     Announcement.shout("7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8", characterName)
                 }
+            }
+
+            onAdditionalSceneMenuItemClicked: {
+                if(menuItemName === "Scene Notes")
+                    Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", scene)
             }
 
             DelayedPropertyBinder {
@@ -1416,14 +1429,18 @@ Item {
                             tabBarVisible: workspaceSettings.showNotebookInStructure
                             currentTabContent: Item {
                                 Announcement.onIncoming: {
-                                    if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8" && workspaceSettings.showNotebookInStructure) {
-                                        if(workspaceSettings.showNotebookInStructure) {
-                                            if(structureEditorTabs.currentTabIndex === 0)
-                                                structureEditorTabs.currentTabIndex = 1
+                                    if(workspaceSettings.showNotebookInStructure) {
+                                        if(structureEditorTabs.currentTabIndex === 0)
+                                            structureEditorTabs.currentTabIndex = 1
+
+                                        if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8")
                                             app.execLater(notebookViewLoader, 100, function() {
                                                 notebookViewLoader.item.switchToCharacterTab(data)
                                             })
-                                        }
+                                        else if(type === "41EE5E06-FF97-4DB6-B32D-F938418C9529")
+                                            app.execLater(notebookViewLoader, 100, function() {
+                                                notebookViewLoader.item.switchToSceneTab(data)
+                                            })
                                     }
                                 }
 

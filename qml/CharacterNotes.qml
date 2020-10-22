@@ -403,7 +403,7 @@ Item {
         id: addRelationshipDialogComponent
 
         Rectangle {
-            width: Math.max(800, ui.width*0.6)
+            width: Math.max(800, ui.width*0.5)
             height: Math.min(charactersList.height, 600) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80
             color: primaryColors.c10.background
 
@@ -492,7 +492,7 @@ Item {
                                     Text {
                                         id: characterRowLabel1
                                         font.pointSize: app.idealFontPointSize
-                                        text: thisCharacterName + " <b>is</b>"
+                                        text: thisCharacterName + ": "
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
                                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -507,7 +507,7 @@ Item {
                                         label: ""
                                         color: foregroundColor
                                         font.pointSize: app.idealFontPointSize
-                                        placeholderText: "husband, wife, friend, boss ..."
+                                        placeholderText: "husband of, wife of, friends with, reports to ..."
                                         Material.background: backgroundColor
                                         Material.foreground: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
@@ -519,11 +519,12 @@ Item {
                                     Text {
                                         id: characterRowLabel2
                                         font.pointSize: app.idealFontPointSize
-                                        text: "<b><i>of</i></b> " + app.camelCased(otherCharacterName) + "."
+                                        text: app.camelCased(otherCharacterName) + "."
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
                                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                         width: Math.min(implicitWidth, (parent.width-100)/3)
+                                        rightPadding: 10
                                     }
                                 }
 

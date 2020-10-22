@@ -435,7 +435,7 @@ Item {
 
                 Text {
                     font.pointSize: app.idealFontPointSize + 4
-                    text: "Edit Relationship Name"
+                    text: "Edit Relationship"
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.bold: true
                 }
@@ -478,31 +478,18 @@ Item {
                         }
                     }
 
-                    Text {
-                        font.pointSize: app.idealFontPointSize
-                        font.bold: true
-                        text: " is "
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
                     TextField2 {
                         anchors.verticalCenter: parent.verticalCenter
                         text: relationship.name
-                        label: "Relationship Name:"
+                        label: "Relationship:"
+                        font.pointSize: app.idealFontPointSize
+                        placeholderText: "husband of, wife of, friends with, reports to ..."
                         maximumLength: 50
                         width: 300
                         onTextEdited: relationship.name = text
                         enableTransliteration: true
                         readOnly: scriteDocument.readOnly
                         onEditingFinished: doneButton.click()
-                    }
-
-                    Text {
-                        font.pointSize: app.idealFontPointSize
-                        font.bold: true
-                        font.italic: true
-                        text: " of "
-                        anchors.verticalCenter: parent.verticalCenter
                     }
 
                     Column {
@@ -558,6 +545,7 @@ Item {
                     Button {
                         id: doneButton
                         text: "Done"
+                        enabled: relationship.name !== ""
                         onClicked: click()
                         function click() {
                             relationship.name = relationship.name.trim()

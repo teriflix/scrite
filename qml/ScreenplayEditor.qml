@@ -29,7 +29,9 @@ Rectangle {
     property alias source: screenplayAdapter.source
     property bool toolBarVisible: toolbar.visible
     property var additionalCharacterMenuItems: []
+    property var additionalSceneMenuItems: []
     signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
+    signal additionalSceneMenuItemClicked(Scene scene, string menuItemName)
 
     property alias zoomLevel: zoomSlider.zoomLevel
     property int zoomLevelModifier: 0
@@ -716,6 +718,7 @@ Rectangle {
                     sourceComponent: sceneHeadingArea
                     onItemChanged: {
                         if(item) {
+                            item.theElementIndex = contentItem.theIndex
                             item.theScene = contentItem.theScene
                             item.theElement = contentItem.theElement
                             item.sceneTextEditor = sceneTextEditor
@@ -1404,6 +1407,7 @@ Rectangle {
         Rectangle {
             id: headingItem
             property Scene theScene
+            property int theElementIndex: -1
             property bool sceneHasFocus: false
             property ScreenplayElement theElement
             property TextArea sceneTextEditor
@@ -1528,6 +1532,30 @@ Rectangle {
                                             onTriggered: headingItem.theScene.type = modelData.value
                                         }
                                     }
+                                }
+
+                                Repeater {
+                                    model: additionalSceneMenuItems.length ? 1 : 0
+
+                                    MenuSeparator { }
+                                }
+
+                                Repeater {
+                                    model: additionalSceneMenuItems
+
+                                    MenuItem2 {
+                                        text: modelData
+                                        onTriggered: {
+                                            scriteDocument.screenplay.currentElementIndex = headingItem.theElementIndex
+                                            additionalSceneMenuItemClicked(headingItem.theScene, modelData)
+                                        }
+                                    }
+                                }
+
+                                Repeater {
+                                    model: additionalSceneMenuItems.length ? 1 : 0
+
+                                    MenuSeparator { }
                                 }
 
                                 MenuItem2 {

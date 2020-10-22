@@ -8,7 +8,7 @@
 
 using namespace GraphLayout;
 
-static const qreal fdg_constant = 0.001;
+static const qreal fdg_constant = 0.0001;
 
 ForceDirectedLayout::ForceDirectedLayout()
 {

@@ -55,6 +55,15 @@ Item {
         property string currentLabel: "none"
     }
 
+    function switchToStoryTab() {
+        notebookTabsView.currentIndex = 0
+    }
+
+    function switchToSceneTab(scene) {
+        // if(noteSources.activeScene === scene)
+        notebookTabsView.currentIndex = 1
+    }
+
     function switchToCharacterTab(name) {
         var idx = noteSources.indexOfLabel(name);
         if(idx >= 0)
