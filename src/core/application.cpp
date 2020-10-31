@@ -40,6 +40,7 @@
 #include <QFontDatabase>
 #include <QStandardPaths>
 #include <QOperatingSystemVersion>
+#include <QScreen>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -990,6 +991,65 @@ QString Application::camelCased(const QString &val) const
     return val2;
 }
 
+void Application::saveWindowGeometry(QWindow *window, const QString &group)
+{
+    if(window == nullptr)
+        return;
+
+    const QRect geometry = window->geometry();
+    if(window->visibility() == QWindow::Windowed)
+    {
+        const QString geometryString = QString("%1 %2 %3 %4")
+                .arg(geometry.x()).arg(geometry.y())
+                .arg(geometry.width()).arg(geometry.height());
+        m_settings->setValue( group + QStringLiteral("/windowGeometry"), geometryString );
+    }
+    else
+        m_settings->setValue( group + QStringLiteral("/windowGeometry"), QStringLiteral("Maximized") );
+}
+
+bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
+{
+    if(window == nullptr)
+        return false;
+
+    const QScreen *screen = window->screen();
+    const QRect screenGeo = screen->availableGeometry();
+
+    const QString geometryString = m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
+    if(geometryString == QStringLiteral("Maximized"))
+    {
+        window->setGeometry(screenGeo);
+        return true;
+    }
+
+    const QStringList geometry = geometryString.split(QStringLiteral(" "), QString::SkipEmptyParts);
+    if(geometry.length() != 4)
+    {
+        window->setGeometry(screenGeo);
+        return false;
+    }
+
+    const int x = geometry.at(0).toInt();
+    const int y = geometry.at(1).toInt();
+    const int w = geometry.at(2).toInt();
+    const int h = geometry.at(3).toInt();
+    QRect geo(x, y, w, h);
+    if(!screenGeo.contains(geo))
+    {
+        if(w > screenGeo.width() || h > screenGeo.height())
+        {
+            window->setGeometry(screenGeo);
+            return false;
+        }
+
+        geo.moveCenter(screenGeo.center());
+    }
+
+    window->setGeometry(geo);
+    return true;
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())
@@ -1120,3 +1180,4 @@ bool Application::registerFileTypes()
 #endif
 #endif
 }
+

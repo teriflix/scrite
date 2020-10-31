@@ -1468,7 +1468,7 @@ Item {
 
                     Loader {
                         id: screenplayEditor2
-                        SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? scriteDocument.formatting.pageLayout.paperWidth * 1.4 : workspaceSettings.screenplayEditorWidth
+                        SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? ui.width * 0.5 : workspaceSettings.screenplayEditorWidth
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                         property bool editCurrentSceneInStructure: true
                         readonly property int screenplayZoomLevelModifier: -3
@@ -1776,6 +1776,8 @@ Item {
             target: qmlWindow
             onClosing: {
                 if(closeEventHandler.handleCloseEvent) {
+                    app.saveWindowGeometry(qmlWindow, "Workspace")
+
                     if(!scriteDocument.modified) {
                         close.accepted = true
                         return
@@ -1877,5 +1879,10 @@ Item {
         active: automationScript !== ""
         source: automationScript
         onSourceChanged: console.log("PA: " + source)
+    }
+
+    Component.onCompleted: {
+        if(!app.restoreWindowGeometry(qmlWindow, "Workspace"))
+            workspaceSettings.screenplayEditorWidth = -1
     }
 }

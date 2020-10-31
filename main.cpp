@@ -308,6 +308,7 @@ int main(int argc, char **argv)
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(qMin(600,primaryScreenSize.width()), qMin(375,primaryScreenSize.height())));
 
+#if 0
     const QByteArray windowSize = qgetenv("SCRITE_WINDOW_SIZE");
     if(windowSize.isEmpty())
         qmlView.showMaximized();
@@ -324,6 +325,9 @@ int main(int argc, char **argv)
             qmlView.show();
         }
     }
+#else
+    qmlView.show();
+#endif
     qmlView.raise();
 
 #ifdef Q_OS_MAC

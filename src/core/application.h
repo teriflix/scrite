@@ -213,6 +213,9 @@ public:
 
     Q_INVOKABLE QString camelCased(const QString &val) const;
 
+    Q_INVOKABLE void saveWindowGeometry(QWindow *window, const QString &group);
+    Q_INVOKABLE bool restoreWindowGeometry(QWindow *window, const QString &group);
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 
