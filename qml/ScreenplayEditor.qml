@@ -1347,6 +1347,16 @@ Rectangle {
                 }
             }
 
+
+            Rectangle {
+                width: parent.width * 0.01
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                color: Qt.tint(contentItem.theScene.color, "#A7FFFFFF")
+                visible: screenplayAdapter.currentIndex === contentItem.theIndex
+            }
+
             function mergeWithPreviousScene() {
                 if(!contentItem.canJoinToPreviousScene)
                     return
