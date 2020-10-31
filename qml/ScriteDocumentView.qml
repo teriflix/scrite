@@ -1375,7 +1375,7 @@ Item {
                 id: sourceBinder
                 initial: null
                 set: {
-                    if(editCurrentSceneInStructure) {
+                    if(editCurrentSceneInStructure && scriteDocument.screenplay.currentElementIndex < 0) {
                         var index = scriteDocument.structure.currentElementIndex
                         var element = scriteDocument.structure.elementAt(index)
                         return element ? element.scene : null
@@ -1449,7 +1449,7 @@ Item {
                                     anchors.fill: parent
                                     active: !workspaceSettings.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                     sourceComponent: StructureView {
-                                        onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = true
+                                        onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = scriteDocument.screenplay.currentElementIndex < 0
                                         onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
                                     }
                                 }

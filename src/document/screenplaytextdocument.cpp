@@ -22,6 +22,7 @@
 
 #include <QDate>
 #include <QtMath>
+#include <QtDebug>
 #include <QPainter>
 #include <QDateTime>
 #include <QQmlEngine>
