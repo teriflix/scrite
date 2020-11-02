@@ -69,10 +69,10 @@ Rectangle {
                 }
 
                 Grid {
-                    id: vowelsGrid
                     rows: 10
                     columns: Math.ceil(modelData.array.length/rows)
                     flow: Grid.TopToBottom
+                    columnSpacing: 10
 
                     Repeater {
                         model: modelData.array

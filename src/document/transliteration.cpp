@@ -217,7 +217,12 @@ public:
         if(item == nullptr)
             return ret;
         ret.insert("latin", QString::fromLatin1(item->phRep));
-        ret.insert("unicode", QString::fromWCharArray(&(item->uCode), 1));
+        if(sizeof(T) == sizeof(PhTranslation::VowelDef)) {
+            const PhTranslation::VowelDef *vitem = reinterpret_cast<const PhTranslation::VowelDef*>(item);
+            ret.insert("unicode", QString::fromWCharArray(&(vitem->uCode), 1) + QStringLiteral(", ") +
+                                  QString::fromWCharArray(&(vitem->dCode), 1));
+        } else
+            ret.insert("unicode", QString::fromWCharArray(&(item->uCode), 1));
         return ret;
     }
 
