@@ -44,8 +44,8 @@ public:
     // Must be manually kept in sync with SceneElementFormat::DefaultLanguage & SystemInputSource::Language
     enum Language
     {
-        Bengali,
         English,
+        Bengali,
         Gujarati,
         Hindi,
         Kannada,

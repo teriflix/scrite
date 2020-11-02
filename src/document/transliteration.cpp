@@ -42,6 +42,8 @@ static QStringList getCustomFontFilePaths()
          QStringLiteral(":/font/Punjabi/BalooPaaji2-Bold.ttf") <<
          QStringLiteral(":/font/Malayalam/BalooChettan2-Regular.ttf") <<
          QStringLiteral(":/font/Malayalam/BalooChettan2-Bold.ttf") <<
+         QStringLiteral(":/font/Marathi/Mukta-Regular.ttf") <<
+         QStringLiteral(":/font/Marathi/Mukta-Bold.ttf") <<
          QStringLiteral(":/font/Hindi/Mukta-Regular.ttf") <<
          QStringLiteral(":/font/Hindi/Mukta-Bold.ttf") <<
          QStringLiteral(":/font/Telugu/HindGuntur-Regular.ttf") <<
@@ -279,6 +281,9 @@ QJsonObject TransliterationEngine::alphabetMappingsFor(TransliterationEngine::La
     case Malayalam:
         LOAD_ARRAYS(Malayalam)
         break;
+    case Marathi:
+        LOAD_ARRAYS(Hindi)
+        break;
     case Oriya:
         LOAD_ARRAYS(Oriya)
         break;
@@ -406,6 +411,8 @@ void *TransliterationEngine::transliteratorFor(TransliterationEngine::Language l
         return GetKannadaTranslator();
     case Malayalam:
         return GetMalayalamTranslator();
+    case Marathi:
+        return GetMarathiTranslator();
     case Oriya:
         return GetOriyaTranslator();
     case Punjabi:
@@ -657,6 +664,8 @@ QChar::Script TransliterationEngine::scriptForLanguage(Language language)
     {
         languageScriptMap[English] = QChar::Script_Latin;
         languageScriptMap[Hindi] = QChar::Script_Devanagari;
+        languageScriptMap[Marathi] = QChar::Script_Devanagari;
+        languageScriptMap[Sanskrit] = QChar::Script_Devanagari;
         languageScriptMap[Bengali] = QChar::Script_Bengali;
         languageScriptMap[Punjabi] = QChar::Script_Gurmukhi;
         languageScriptMap[Gujarati] = QChar::Script_Gujarati;
@@ -681,6 +690,7 @@ QFontDatabase::WritingSystem TransliterationEngine::writingSystemForLanguage(Tra
         languageWritingSystemMap[Hindi] = QFontDatabase::Devanagari;
         languageWritingSystemMap[Kannada] = QFontDatabase::Kannada;
         languageWritingSystemMap[Malayalam] = QFontDatabase::Malayalam;
+        languageWritingSystemMap[Marathi] = QFontDatabase::Devanagari;
         languageWritingSystemMap[Oriya] = QFontDatabase::Oriya;
         languageWritingSystemMap[Punjabi] = QFontDatabase::Gurmukhi;
         languageWritingSystemMap[Sanskrit] = QFontDatabase::Devanagari;

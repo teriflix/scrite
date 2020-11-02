@@ -118,8 +118,8 @@ SystemTextInputSource_macOS::SystemTextInputSource_macOS(TISInputSourceRef input
         const QString primaryLanguage = QString::fromCFString( (CFStringRef)CFArrayGetValueAtIndex(languages, 0) ).left(2);
         static const QStringList languageCodes = QStringList() << QStringLiteral("en") << QStringLiteral("bn") <<
             QStringLiteral("gu") << QStringLiteral("hi") << QStringLiteral("kn") << QStringLiteral("ml") <<
-            QStringLiteral("or") << QStringLiteral("pa") << QStringLiteral("sa") << QStringLiteral("ta") <<
-            QStringLiteral("te");
+            QStringLiteral("mr") << QStringLiteral("or") << QStringLiteral("pa") << QStringLiteral("sa") <<
+            QStringLiteral("ta") << QStringLiteral("te");
         const int languageIndex = languageCodes.indexOf(primaryLanguage);
         m_language = languageIndex;
     }

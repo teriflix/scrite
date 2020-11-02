@@ -39,6 +39,10 @@ extern "C"
     // The output of this method must be sent as input to the Translate Method.
     PHTRANSLATELIB_API void* GetHindiTranslator();
 
+    // Get the Marathi Translator.
+    // The output of this method must be sent as input to the Translate Method.
+    PHTRANSLATELIB_API void* GetMarathiTranslator();
+
     // Get the Kannada Translator.
     // The output of this method must be sent as input to the Translate Method.
     PHTRANSLATELIB_API void* GetKannadaTranslator();

@@ -174,6 +174,7 @@ Item {
                 "हिन्दी",
                 "ಕನ್ನಡ",
                 "മലയാളം",
+                "मराठी",
                 "ଓଡିଆ",
                 "ਪੰਜਾਬੀ",
                 "संस्कृत",
@@ -224,6 +225,8 @@ Item {
                     }
                 }
             }
+
+            Item { width: parent.width; height: 20 }
         }
     }
 
@@ -288,6 +291,8 @@ Item {
                     }
                 }
             }
+
+            Item { width: parent.width; height: 10 }
         }
     }
 

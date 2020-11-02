@@ -105,8 +105,8 @@ SystemTextInputSource_Windows::SystemTextInputSource_Windows(HKL keyboardLayoutH
 
     static const QStringList languageCodes = QStringList() << QStringLiteral("en") << QStringLiteral("bn") <<
         QStringLiteral("gu") << QStringLiteral("hi") << QStringLiteral("kn") << QStringLiteral("ml") <<
-        QStringLiteral("or") << QStringLiteral("pa") << QStringLiteral("sa") << QStringLiteral("ta") <<
-        QStringLiteral("te");
+        QStringLiteral("mr") << QStringLiteral("or") << QStringLiteral("pa") << QStringLiteral("sa") <<
+        QStringLiteral("ta") << QStringLiteral("te");
     m_language = languageCodes.indexOf(languageCode);
 
     this->setSelected( GetKeyboardLayout(0) == m_hkl );

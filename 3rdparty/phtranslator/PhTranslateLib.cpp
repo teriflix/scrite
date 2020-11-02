@@ -121,6 +121,19 @@ extern "C"
         return &Translator;		
 	}
 
+    // Creates a Marathi Translator, which is exactly like the Hindi translator
+    // but with Marathi font in the UI.
+    PHTRANSLATELIB_API void* GetMarathiTranslator()
+    {
+        static PhTranslator Translator (Hindi::Vowels, __countof(Hindi::Vowels),
+                        Hindi::Consonants, __countof(Hindi::Consonants),
+                        Hindi::Digits, __countof(Hindi::Digits),
+                        Hindi::SpecialSymbols, __countof(Hindi::SpecialSymbols),
+                        Hindi::uHalant);
+
+        return &Translator;
+    }
+
     // Creates a Kannada Translator.
     // The output of this method must be sent as input to the Translate Method.
     PHTRANSLATELIB_API void* GetKannadaTranslator()

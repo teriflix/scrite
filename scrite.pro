@@ -224,6 +224,7 @@ RESOURCES += \
     scrite_hindi_font.qrc \
     scrite_kannada_font.qrc \
     scrite_malayalam_font.qrc \
+    scrite_marathi_font.qrc \
     scrite_misc.qrc \
     scrite_oriya_font.qrc \
     scrite_punjabi_font.qrc \

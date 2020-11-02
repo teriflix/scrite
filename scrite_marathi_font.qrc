@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/Marathi/Mukta-Bold.ttf</file>
+        <file>font/Marathi/Mukta-Regular.ttf</file>
+    </qresource>
+</RCC>
