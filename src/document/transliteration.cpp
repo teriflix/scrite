@@ -42,8 +42,7 @@ static QStringList getCustomFontFilePaths()
          QStringLiteral(":/font/Punjabi/BalooPaaji2-Bold.ttf") <<
          QStringLiteral(":/font/Malayalam/BalooChettan2-Regular.ttf") <<
          QStringLiteral(":/font/Malayalam/BalooChettan2-Bold.ttf") <<
-         QStringLiteral(":/font/Marathi/Mukta-Regular.ttf") <<
-         QStringLiteral(":/font/Marathi/Mukta-Bold.ttf") <<
+         QStringLiteral(":/font/Marathi/Shusha-Normal.ttf") <<
          QStringLiteral(":/font/Hindi/Mukta-Regular.ttf") <<
          QStringLiteral(":/font/Hindi/Mukta-Bold.ttf") <<
          QStringLiteral(":/font/Telugu/HindGuntur-Regular.ttf") <<
@@ -184,7 +183,9 @@ QString TransliterationEngine::languageAsString(TransliterationEngine::Language 
 QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language val) const
 {
     if(val == Tamil)
-        return QString("L");
+        return QStringLiteral("L");
+    if(val == Marathi)
+        return QStringLiteral("R");
 
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
@@ -597,6 +598,16 @@ QJsonObject TransliterationEngine::availableLanguageFontFamilies(Transliteration
                       std::back_inserter(filteredLanguageFontFamilies), [fontDb,language](const QString &family) {
             return fontDb.isPrivateFamily(family) ? false : (language == TransliterationEngine::English ? fontDb.isFixedPitch(family) : true);
         });
+
+        const int builtInFontId = m_languageBundledFontId.value(language);
+        if(builtInFontId >= 0)
+        {
+            const QString builtInFont = QFontDatabase::applicationFontFamilies(builtInFontId).first();
+            filteredLanguageFontFamilies.removeOne(builtInFont);
+            filteredLanguageFontFamilies.append(builtInFont);
+            std::sort(filteredLanguageFontFamilies.begin(), filteredLanguageFontFamilies.end());
+        }
+
         m_availableLanguageFontFamilies[language] = filteredLanguageFontFamilies;
     }
 
@@ -615,11 +626,10 @@ void TransliterationEngine::setPreferredFontFamilyForLanguage(TransliterationEng
 {
     const QString before = m_languageFontFamily.value(language);
 
-    if(fontFamily.isEmpty())
-    {
-        const int id = m_languageBundledFontId.value(language);
-        m_languageFontFamily[language] = id < 0 ? QString() : QFontDatabase::applicationFontFamilies(id).first();
-    }
+    const int builtInFontId = m_languageBundledFontId.value(language);
+    const QString builtInFontFamily = builtInFontId < 0 ? QString() : QFontDatabase::applicationFontFamilies(builtInFontId).first();
+    if(fontFamily.isEmpty() || (!fontFamily.isEmpty() && !builtInFontFamily.isEmpty() && fontFamily == builtInFontFamily))
+        m_languageFontFamily[language] = builtInFontFamily;
     else
     {
         const QFontDatabase fontDb;
