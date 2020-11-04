@@ -1013,6 +1013,18 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     if(window == nullptr)
         return false;
 
+    const QString geometryArg = QStringLiteral("-geometry");
+    const int geometryArgPos = this->arguments().indexOf(geometryArg);
+    if(geometryArgPos >= 0 && this->arguments().size() >= geometryArgPos+5)
+    {
+        const int x = this->arguments().at(geometryArgPos+1).toInt();
+        const int y = this->arguments().at(geometryArgPos+2).toInt();
+        const int w = this->arguments().at(geometryArgPos+3).toInt();
+        const int h = this->arguments().at(geometryArgPos+4).toInt();
+        window->setGeometry(x, y, w, h);
+        return true;
+    }
+
     const QScreen *screen = window->screen();
     const QRect screenGeo = screen->availableGeometry();
 
@@ -1030,10 +1042,14 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
         return false;
     }
 
-    const int x = geometry.at(0).toInt();
-    const int y = geometry.at(1).toInt();
-    const int w = geometry.at(2).toInt();
-    const int h = geometry.at(3).toInt();
+    const QString geoDeltaArg = QStringLiteral("-geodelta");
+    const int geoDeltaArgPos = this->arguments().indexOf(geoDeltaArg);
+    const int geoDelta = qBound(0, geoDeltaArgPos >= 0 && this->arguments().size() >= geoDeltaArgPos+2 ? this->arguments().at(geoDeltaArgPos+1).toInt() : 0, 100);
+
+    const int x = geometry.at(0).toInt() + geoDelta;
+    const int y = geometry.at(1).toInt() + geoDelta;
+    const int w = geometry.at(2).toInt() + geoDelta;
+    const int h = geometry.at(3).toInt() + geoDelta;
     QRect geo(x, y, w, h);
     if(!screenGeo.contains(geo))
     {
@@ -1048,6 +1064,20 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
 
     window->setGeometry(geo);
     return true;
+}
+
+void Application::launchNewInstance(QWindow *window)
+{
+    const QString appPath = this->applicationFilePath();
+    if(window != nullptr)
+    {
+        const QRect geometry = window->geometry();
+        QProcess::startDetached(appPath, QStringList() << QStringLiteral("-geometry") <<
+                                QString::number(geometry.x()+30) << QString::number(geometry.y()+30) <<
+                                QString::number(geometry.width()) << QString::number(geometry.height()));
+    }
+    else
+        QProcess::startDetached(appPath, QStringList() << QStringLiteral("-geodelta") << QStringLiteral("30"));
 }
 
 void Application::initializeStandardColors(QQmlEngine *)

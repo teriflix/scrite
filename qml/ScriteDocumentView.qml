@@ -134,6 +134,17 @@ Item {
 
     Shortcut {
         context: Qt.ApplicationShortcut
+        sequence: "Ctrl+M"
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "New Scrite Window"
+        ShortcutsModelItem.enabled: true
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.visible: enabled
+        onActivated: app.launchNewInstance(qmlWindow)
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
         sequence: "Alt+1"
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Screenplay"

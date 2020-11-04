@@ -215,6 +215,7 @@ public:
 
     Q_INVOKABLE void saveWindowGeometry(QWindow *window, const QString &group);
     Q_INVOKABLE bool restoreWindowGeometry(QWindow *window, const QString &group);
+    Q_INVOKABLE void launchNewInstance(QWindow *window);
 
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
