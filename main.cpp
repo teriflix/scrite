@@ -361,8 +361,8 @@ int main(int argc, char **argv)
             QStringList args = a.arguments();
             args.takeFirst();
             scriteDocument->open( args.join(QStringLiteral(" ")) );
-        }
 #endif
+        }
     }
 #endif
 
