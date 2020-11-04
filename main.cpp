@@ -341,7 +341,7 @@ int main(int argc, char **argv)
         scriteDocument->open(a.fileToOpen());
     a.setHandleFileOpenEvents(true);
 #else
-    if(a.arguments().size() > 1)
+    if(a.arguments().size() > 1 && !a.arguments().at(1).startsWith("-"))
     {
 #ifdef Q_OS_WIN
         scriteDocument->open( a.arguments().last() );
