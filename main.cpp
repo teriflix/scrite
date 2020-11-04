@@ -341,14 +341,27 @@ int main(int argc, char **argv)
         scriteDocument->open(a.fileToOpen());
     a.setHandleFileOpenEvents(true);
 #else
-    if(a.arguments().size() > 1 && !a.arguments().at(1).startsWith("-"))
+    if(a.arguments().size() > 1)
     {
+        bool hasOptions = false;
+        Q_FOREACH(QString arg, a.arguments())
+        {
+            if(arg.startsWith(QStringLiteral("--")))
+            {
+                hasOptions = true;
+                break;
+            }
+        }
+
+        if(!hasOptions)
+        {
 #ifdef Q_OS_WIN
-        scriteDocument->open( a.arguments().last() );
+            scriteDocument->open( a.arguments().last() );
 #else
-        QStringList args = a.arguments();
-        args.takeFirst();
-        scriteDocument->open( args.join(QStringLiteral(" ")) );
+            QStringList args = a.arguments();
+            args.takeFirst();
+            scriteDocument->open( args.join(QStringLiteral(" ")) );
+        }
 #endif
     }
 #endif

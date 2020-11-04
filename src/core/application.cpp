@@ -1013,7 +1013,7 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     if(window == nullptr)
         return false;
 
-    const QString geometryArg = QStringLiteral("-geometry");
+    const QString geometryArg = QStringLiteral("--windowGeometry");
     const int geometryArgPos = this->arguments().indexOf(geometryArg);
     if(geometryArgPos >= 0 && this->arguments().size() >= geometryArgPos+5)
     {
@@ -1042,7 +1042,7 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
         return false;
     }
 
-    const QString geoDeltaArg = QStringLiteral("-geodelta");
+    const QString geoDeltaArg = QStringLiteral("--geodelta");
     const int geoDeltaArgPos = this->arguments().indexOf(geoDeltaArg);
     const int geoDelta = qBound(0, geoDeltaArgPos >= 0 && this->arguments().size() >= geoDeltaArgPos+2 ? this->arguments().at(geoDeltaArgPos+1).toInt() : 0, 100);
 
@@ -1072,12 +1072,12 @@ void Application::launchNewInstance(QWindow *window)
     if(window != nullptr)
     {
         const QRect geometry = window->geometry();
-        QProcess::startDetached(appPath, QStringList() << QStringLiteral("-geometry") <<
+        QProcess::startDetached(appPath, QStringList() << QStringLiteral("--windowGeometry") <<
                                 QString::number(geometry.x()+30) << QString::number(geometry.y()+30) <<
                                 QString::number(geometry.width()) << QString::number(geometry.height()));
     }
     else
-        QProcess::startDetached(appPath, QStringList() << QStringLiteral("-geodelta") << QStringLiteral("30"));
+        QProcess::startDetached(appPath, QStringList() << QStringLiteral("--geodelta") << QStringLiteral("30"));
 }
 
 void Application::initializeStandardColors(QQmlEngine *)
