@@ -139,5 +139,7 @@
         <file>icons/navigation/keyboard_arrow_down_inverted.png</file>
         <file>icons/hardware/mouse_inverted.png</file>
         <file>icons/hardware/mouse.png</file>
+        <file>icons/content/camera_alt.png</file>
+        <file>icons/content/camera_alt_inverted.png</file>
     </qresource>
 </RCC>

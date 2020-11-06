@@ -26,6 +26,7 @@ Image {
         switch(sceneType) {
         case Scene.Song: return "../icons/content/queue_mus24px.png"
         case Scene.Action: return "../icons/content/fight_scene.png"
+        case Scene.Montage: return "../icons/content/camera_alt.png"
         default: break
         }
         return ""
@@ -36,6 +37,7 @@ Image {
         switch(sceneType) {
         case Scene.Song: return "This is a Song scene."
         case Scene.Action: return "This is a Action scene."
+        case Scene.Montage: return "This is a Montage scene."
         default: break
         }
         return ""
