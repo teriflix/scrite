@@ -246,6 +246,7 @@ macx {
     HEADERS += src/core/systemtextinputmanager_macos.h
     OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
     LIBS += -framework Carbon
+    CONFIG+=sdk_no_version_check
 }
 
 win32 {

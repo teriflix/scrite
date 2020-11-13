@@ -734,7 +734,7 @@ Rectangle {
                     // Basic editing functionality
                     id: sceneTextEditor
                     width: parent.width
-                    height: Math.ceil(contentHeight + topPadding + bottomPadding + sceneEditorFontMetrics.lineSpacing*2)
+                    height: Math.ceil(contentHeight + topPadding + bottomPadding + sceneEditorFontMetrics.lineSpacing)
                     topPadding: sceneEditorFontMetrics.height
                     bottomPadding: sceneEditorFontMetrics.height
                     leftPadding: ruler.leftMarginPx

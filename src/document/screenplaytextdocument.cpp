@@ -1381,9 +1381,13 @@ void ScreenplayTextDocument::onActiveSceneCursorPositionChanged()
 
 void ScreenplayTextDocument::evaluateCurrentPage()
 {
-    if(m_screenplay == nullptr || m_screenplay->currentElementIndex() < 0 ||
-       m_activeScene == nullptr || m_textDocument == nullptr || m_textDocument->isEmpty() ||
-       m_formatting == nullptr)
+    if(m_screenplay == nullptr || m_activeScene == nullptr || m_textDocument == nullptr || m_formatting == nullptr)
+    {
+        this->setCurrentPage(0);
+        return;
+    }
+
+    if(m_screenplay->currentElementIndex() < 0 || m_textDocument->isEmpty())
     {
         this->setCurrentPage(0);
         return;

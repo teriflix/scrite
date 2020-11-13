@@ -1352,7 +1352,6 @@ Item {
 
         ScreenplayEditor {
             zoomLevelModifier: screenplayZoomLevelModifier
-            source: sourceBinder.get
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(workspaceSettings.showNotebookInStructure)
@@ -1367,6 +1366,34 @@ Item {
                 }
                 return []
             }
+            Behavior on opacity {
+                enabled: screenplayEditorSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
+
+            function evaluateSource() {
+                if(editCurrentSceneInStructure && scriteDocument.screenplay.currentElementIndex < 0) {
+                    var index = scriteDocument.structure.currentElementIndex
+                    var element = scriteDocument.structure.elementAt(index)
+                    return element ? element.scene : null
+                }
+                return scriteDocument.loading ? null : scriteDocument.screenplay
+            }
+
+            Timer {
+                property bool changed: parent.evaluateSource() !== parent.source
+                onChangedChanged: {
+                    parent.opacity = 0
+                    start()
+                }
+                running: true
+                interval: 250
+                repeat: false
+                onTriggered: {
+                    parent.source = parent.evaluateSource()
+                    parent.opacity = 1
+                }
+            }
 
             onAdditionalCharacterMenuItemClicked: {
                 if(menuItemName === "Character Notes" && workspaceSettings.showNotebookInStructure) {
@@ -1380,20 +1407,6 @@ Item {
             onAdditionalSceneMenuItemClicked: {
                 if(menuItemName === "Scene Notes")
                     Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", scene)
-            }
-
-            DelayedPropertyBinder {
-                id: sourceBinder
-                initial: null
-                set: {
-                    if(editCurrentSceneInStructure && scriteDocument.screenplay.currentElementIndex < 0) {
-                        var index = scriteDocument.structure.currentElementIndex
-                        var element = scriteDocument.structure.elementAt(index)
-                        return element ? element.scene : null
-                    }
-                    return scriteDocument.loading ? null : scriteDocument.screenplay
-                }
-                delay: 50
             }
         }
     }
