@@ -1340,6 +1340,10 @@ Rectangle {
 
                     function paste2() {
                         if(canPaste) {
+                            // Fix for https://github.com/teriflix/scrite/issues/195
+                            // [0.5.2 All] Pasting doesnt replace the selected text #195
+                            if(sceneTextEditor.hasSelection)
+                                sceneTextEditor.remove(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd)
                             if(!sceneDocumentBinder.paste(sceneTextEditor.cursorPosition))
                                 sceneTextEditor.paste()
                         }
