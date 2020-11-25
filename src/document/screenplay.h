@@ -79,6 +79,11 @@ public:
     QJsonValue userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
+    Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged)
+    void setSelected(bool val);
+    bool isSelected() const { return m_selected; }
+    Q_SIGNAL void selectedChanged();
+
     Q_SIGNAL void elementChanged();
 
     Q_SIGNAL void sceneAboutToReset();
@@ -96,6 +101,7 @@ private:
     friend class Screenplay;
     bool m_expanded = true;
     int m_breakType = -1;
+    bool m_selected = false;
     int m_sceneNumber = -1;
     QString m_sceneID;
     QJsonValue m_userData;
@@ -197,6 +203,7 @@ public:
     Q_INVOKABLE void insertElementAt(ScreenplayElement *ptr, int index);
     Q_INVOKABLE void removeElement(ScreenplayElement *ptr);
     Q_INVOKABLE void moveElement(ScreenplayElement *ptr, int toRow);
+    Q_INVOKABLE void moveSelectedElements(int toRow);
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const;

@@ -17,6 +17,7 @@
 #include <QtDebug>
 #include <QDateTime>
 #include <QQmlEngine>
+#include <QPainterPath>
 #include <QPaintEngine>
 
 class ImagePrinterImageProvider : public QObject, public QQuickImageProvider

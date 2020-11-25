@@ -186,6 +186,15 @@ void ScreenplayElement::setUserData(const QJsonValue &val)
     emit userDataChanged();
 }
 
+void ScreenplayElement::setSelected(bool val)
+{
+    if(m_selected == val)
+        return;
+
+    m_selected = val;
+    emit selectedChanged();
+}
+
 bool ScreenplayElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -632,6 +641,56 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
 
     if(UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
         UndoStack::active()->push(new ScreenplayElementMoveCommand(this, ptr, fromRow, toRow));
+}
+
+void Screenplay::moveSelectedElements(int toRow)
+{
+    QList<ScreenplayElement*> selectedElements;
+    int startRow=-1, endRow=-1;
+
+    auto removeRows = [&]() {
+        if(startRow < 0 || endRow < 0)
+            return;
+        this->beginRemoveRows(QModelIndex(), startRow, endRow);
+        for(int r=endRow; r>=startRow; r--)
+            m_elements.removeAt(r);
+        this->endRemoveRows();
+        startRow = -1;
+        endRow = -1;
+    };
+
+    for(int i=m_elements.size()-1; i>=0; i--)
+    {
+        ScreenplayElement *element = m_elements.at(i);
+        if(!element->isSelected())
+            continue;
+
+        if(startRow < 0 || endRow < 0)
+        {
+            startRow = i;
+            endRow = i;
+        }
+        else
+        {
+            if( qAbs(startRow-i) > 1 )
+            {
+                removeRows();
+                startRow = i;
+                endRow = i;
+            }
+            else
+                startRow = i;
+        }
+
+        selectedElements.prepend(element);
+    }
+
+    removeRows();
+
+    this->beginInsertRows(QModelIndex(), toRow, toRow+selectedElements.size()-1);
+    while(!selectedElements.isEmpty())
+        m_elements.insert(toRow, selectedElements.takeLast());
+    this->endInsertRows();
 }
 
 ScreenplayElement *Screenplay::elementAt(int index) const
