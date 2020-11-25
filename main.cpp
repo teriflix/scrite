@@ -103,7 +103,8 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_MAC
     Application::setApplicationVersion(applicationVersion.toString() + "-beta");
-    qputenv("QT_MAC_WANTS_LAYER", QByteArrayLiteral("1"));
+    if(QOperatingSystemVersion::current() > QOperatingSystemVersion::MacOSCatalina)
+        qputenv("QT_MAC_WANTS_LAYER", QByteArrayLiteral("1"));
 #else
     if(QSysInfo::WordSize == 32)
         Application::setApplicationVersion(applicationVersion.toString() + "-beta-x86");
