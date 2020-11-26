@@ -268,6 +268,8 @@ Item {
         highlightMoveDuration: 0
         highlightResizeDuration: 0
 
+        property bool mutiSelectionMode: false
+
         delegate: Item {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
@@ -280,7 +282,15 @@ Item {
                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
             height: screenplayElementList.height
 
+            Rectangle {
+                visible: element.selected
+                anchors.fill: elementItemBox
+                anchors.margins: -5
+                color: accentColors.a700.background
+            }
+
             Loader {
+                id: elementItemBox
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
@@ -332,6 +342,11 @@ Item {
                         onClicked: {
                             if(!isBreakElement) {
                                 parent.forceActiveFocus()
+                                screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
+                                if(screenplayElementList.mutiSelectionMode)
+                                    elementItemDelegate.element.toggleSelection()
+                                else
+                                    scriteDocument.screenplay.clearSelection()
                                 scriteDocument.screenplay.currentElementIndex = index
                                 requestEditor()
                             }
@@ -349,10 +364,10 @@ Item {
                     Drag.supportedActions: Qt.MoveAction
                     Drag.hotSpot.x: width/2
                     Drag.hotSpot.y: height/2
+                    Drag.source: elementItemDelegate.element
                     Drag.mimeData: {
                         "scrite/sceneID": element.sceneID
                     }
-                    Drag.source: element
                     Drag.onActiveChanged: {
                         if(!isBreakElement)
                             scriteDocument.screenplay.currentElementIndex = index
@@ -491,7 +506,12 @@ Item {
             var fromIndex = scriteDocument.screenplay.indexOfElement(source)
             if(fromIndex < index)
                 --index
-            scriteDocument.screenplay.moveElement(source, index)
+            if(screenplayElementList.mutiSelectionMode)
+                app.execLater(screenplayElementList, 100, function() {
+                    scriteDocument.screenplay.moveSelectedElements(index)
+                })
+            else
+                scriteDocument.screenplay.moveElement(source, index)
             return
         }
 

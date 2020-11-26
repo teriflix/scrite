@@ -79,10 +79,12 @@ public:
     QJsonValue userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
-    Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged)
+    Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
     void setSelected(bool val);
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
+
+    Q_INVOKABLE void toggleSelection() { this->setSelected(!m_selected); }
 
     Q_SIGNAL void elementChanged();
 
@@ -204,6 +206,8 @@ public:
     Q_INVOKABLE void removeElement(ScreenplayElement *ptr);
     Q_INVOKABLE void moveElement(ScreenplayElement *ptr, int toRow);
     Q_INVOKABLE void moveSelectedElements(int toRow);
+    Q_INVOKABLE void removeSelectedElements();
+    Q_INVOKABLE void clearSelection();
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const;
@@ -222,6 +226,9 @@ public:
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
     Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max=-1) const;
     QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
+
+    QList<ScreenplayElement*> getElements() const { return m_elements; }
+    bool setElements(const QList<ScreenplayElement*> &list);
 
     enum BreakType
     {
@@ -274,6 +281,7 @@ protected:
     void setHasNonStandardScenes(bool val);
     void setHasTitlePageAttributes(bool val);
     void evaluateHasTitlePageAttributes();
+    QList<ScreenplayElement*> takeSelectedElements();
 
 private:
     QString m_title;

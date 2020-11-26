@@ -57,9 +57,9 @@ QUndoStack *UndoStack::active()
     if(ignoreUndoCommands)
         return nullptr;
 
-    return Application::instance()->undoGroup()->activeStack();
+    QUndoStack *ret = Application::instance()->undoGroup()->activeStack();
+    return ret;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
