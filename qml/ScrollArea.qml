@@ -28,6 +28,8 @@ Flickable {
     boundsBehavior: Flickable.StopAtBounds
     clip: true
 
+    signal zoomScaleChangedInteractively()
+
     function zoomIn() {
         zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), pinchHandler.maximumScale)
     }
@@ -213,6 +215,7 @@ Flickable {
             if(flickable === null)
                 return
             zoomScale = activeScale
+            zoomScaleChangedInteractively()
         }
     }
 
@@ -223,6 +226,7 @@ Flickable {
             zoomOut()
         else
             zoomIn()
+        zoomScaleChangedInteractively()
         result.acceptEvent = true
         result.filter = true
     }

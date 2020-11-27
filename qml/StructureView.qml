@@ -74,14 +74,14 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: canvasScroll.zoomIn()
+                onClicked: { canvasScroll.zoomIn(); canvasScroll.storeZoomLevel() }
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom In"
             }
 
             ToolButton3 {
-                onClicked: canvasScroll.zoomOut()
+                onClicked: { canvasScroll.zoomOut(); canvasScroll.storeZoomLevel() }
                 iconSource: "../icons/navigation/zoom_out.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Out"
@@ -95,10 +95,12 @@ Item {
                             item = elementItems.itemAt(0)
                         if(item === null) {
                             canvasScroll.zoomOneMiddleArea()
+                            canvasScroll.storeZoomLevel()
                             return
                         }
                     }
                     canvasScroll.zoomOneToItem(item)
+                    canvasScroll.storeZoomLevel()
                 }
                 iconSource: "../icons/navigation/zoom_one.png"
                 autoRepeat: true
@@ -106,7 +108,7 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox)
+                onClicked: { canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox); canvasScroll.storeZoomLevel() }
                 iconSource: "../icons/navigation/zoom_fit.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Fit"
@@ -255,6 +257,12 @@ Item {
                                            visibleArea.yPosition * contentHeight / canvas.scale,
                                            visibleArea.widthRatio * contentWidth / canvas.scale,
                                            visibleArea.heightRatio * contentHeight / canvas.scale )
+
+        onZoomScaleChangedInteractively: storeZoomLevel()
+
+        function storeZoomLevel() {
+            scriteDocument.structure.zoomLevel = suggestedScale
+        }
 
         function zoomOneMiddleArea() {
             var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
@@ -921,6 +929,8 @@ Item {
         running: !scriteDocument.loading
         repeat: false
         interval: 1000
+        property real storedScale: 1
+
         onTriggered: {
             if(scriteDocument.structure.elementCount > elementItems.count || scriteDocument.structure.annotationCount > annotationItems.count) {
                 Qt.callLater(start)
@@ -932,10 +942,25 @@ Item {
             } else {
                 var item = currentElementItemBinder.get
                 var bbox = canvasItemsBoundingBox.boundingBox
-                if(item === null)
+                if(item === null) {
+                    if(scriteDocument.structure.zoomLevel != canvasScroll.zoomScale) {
+                        var bboxCenterX = bbox.x + bbox.width/2
+                        var bboxCenterY = bbox.y + bbox.height/2
+                        var newWidth = bbox.width / scriteDocument.structure.zoomLevel
+                        var newHeight = bbox.height / scriteDocument.structure.zoomLevel
+                        bbox = Qt.rect(bboxCenterX - newWidth/2,
+                                       bboxCenterY - newHeight/2,
+                                       newWidth,
+                                       newHeight)
+                    }
                     canvasScroll.zoomFit(bbox)
-                else
-                    canvasScroll.zoomOneToItem(item)
+                } else {
+                    if(scriteDocument.structure.zoomLevel != canvasScroll.zoomScale) {
+                        canvasScroll.zoomScale = scriteDocument.structure.zoomLevel
+                        app.execLater(canvasScroll, 100, function() { canvasScroll.ensureItemVisible(item, canvas.scale) })
+                    } else
+                        canvasScroll.zoomOneToItem(item)
+                }
             }
         }
     }
