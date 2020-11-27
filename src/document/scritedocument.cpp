@@ -190,6 +190,15 @@ void ScriteDocument::setBusyMessage(const QString &val)
     this->setBusy(!m_busyMessage.isEmpty());
 }
 
+void ScriteDocument::setLogLine(const QString &val)
+{
+    if(m_logLine == val)
+        return;
+
+    m_logLine = val;
+    emit logLineChanged();
+}
+
 void ScriteDocument::setSpellCheckIgnoreList(const QStringList &val)
 {
     QStringList val2 = val.toSet().toList(); // so that we eliminate all duplicates
@@ -312,6 +321,7 @@ void ScriteDocument::reset()
     else
         m_printFormat->resetToDefaults();
 
+    this->setLogLine(QString());
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
     this->setSpellCheckIgnoreList(QStringList());

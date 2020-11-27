@@ -255,7 +255,7 @@ Rectangle {
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
                         width: contentView.width
-                        height: (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
+                        height: logLineEditor.contentHeight + (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
                         property real padding: width * 0.1
 
                         function editTitlePage(source) {
@@ -288,9 +288,66 @@ Rectangle {
                             text: "Edit Title Page"
                             visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
-                            anchors.centerIn: parent
+                            anchors.top: parent.top
+                            anchors.topMargin: (ruler.topMarginPx-height)/2
+                            anchors.horizontalCenter: parent.horizontalCenter
                             onClicked: editTitlePage(this)
                             enabled: !scriteDocument.readOnly
+                        }
+
+                        Item {
+                            id: logLineEditor
+                            anchors.top: titleCardLoader.active ? titleCardLoader.bottom : editTitlePageButton.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.leftMargin: ruler.leftMarginPx
+                            anchors.rightMargin: ruler.rightMarginPx
+                            anchors.topMargin: Math.max(ruler.topMarginPx * 0.1, 10)
+                            anchors.bottomMargin: Math.max(ruler.topMarginPx * 0.1, 10)
+                            property real contentHeight: visible ? logLineEditorLayout.height + anchors.topMargin + anchors.bottomMargin : 0
+                            visible: screenplayAdapter.isSourceScreenplay
+
+                            Column {
+                                id: logLineEditorLayout
+                                width: parent.width
+                                anchors.centerIn: parent
+                                spacing: 13
+
+                                Text {
+                                    id: logLineFieldHeading
+                                    text: "Logline:"
+                                    font: screenplayFormat.defaultFont2
+                                }
+
+                                TextArea {
+                                    id: logLineField
+                                    width: parent.width
+                                    height: Math.max(contentHeight+50*zoomLevel, 2*logLineFieldHeading.height)
+                                    font: screenplayFormat.defaultFont2
+                                    readOnly: scriteDocument.readOnly
+                                    palette: app.palette
+                                    selectByMouse: true
+                                    selectByKeyboard: true
+                                    background: Item {
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: -3
+                                            color: app.translucent(accentColors.windowColor, 0.05)
+                                            border.width: 1
+                                            border.color: accentColors.borderColor
+                                            opacity: scriteDocument.logLine === "" ? 1 : 0.25
+                                        }
+                                    }
+                                    text: scriteDocument.logLine
+                                    Transliterator.textDocument: textDocument
+                                    Transliterator.cursorPosition: cursorPosition
+                                    Transliterator.hasActiveFocus: activeFocus
+                                    onTextChanged: scriteDocument.logLine = text
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    placeholderText: "Enter the logline of your screenplay here.."
+                                }
+                            }
                         }
                     }
                     footer: Item {
