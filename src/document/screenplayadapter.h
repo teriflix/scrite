@@ -70,6 +70,7 @@ public:
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
     Q_INVOKABLE QVariant at(int row) const;
+    Q_INVOKABLE void refresh();
 
     enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, ModelDataRole, RowNumberRole };
     Q_ENUMS(Roles)

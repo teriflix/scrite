@@ -25,7 +25,7 @@ Item {
     property string dropAreaKey: "scrite/sceneID"
     property real preferredHeight: screenplayToolsLayout.height
     property bool showNotesIcon: false
-    property bool enableDragDrop: true
+    property bool enableDragDrop: !scriteDocument.readOnly
 
     Connections {
         target: scriteDocument.screenplay

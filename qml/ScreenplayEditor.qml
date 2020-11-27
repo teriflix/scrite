@@ -1851,6 +1851,13 @@ Rectangle {
 
             content: Item {
                 Text {
+                    id: dragHotspotItem
+                    font.family: "Courier Prime"
+                    font.pixelSize: app.idealFontPointSize + 4
+                    visible: false
+                }
+
+                Text {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -1918,6 +1925,7 @@ Rectangle {
                     }
 
                     delegate: Rectangle {
+                        id: delegateItem
                         width: sceneListView.width-1
                         height: 40
                         color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF")) : Qt.rgba(0,0,0,0)
@@ -1941,6 +1949,7 @@ Rectangle {
                         }
 
                         Text {
+                            id: delegateText
                             property real leftMargin: 6 + (sceneTypeImage.width+12)*sceneTypeImage.t
                             anchors.left: parent.left
                             anchors.leftMargin: leftMargin
@@ -1965,9 +1974,18 @@ Rectangle {
                         }
 
                         MouseArea {
+                            id: delegateMouseArea
                             anchors.fill: parent
                             enabled: screenplayElementType === ScreenplayElement.SceneElementType
                             onClicked: navigateToScene()
+                            drag.target: screenplayAdapter.isSourceScreenplay && !scriteDocument.readOnly ? parent : null
+                            drag.axis: Drag.YAxis
+                            onPressed: {
+                                dragHotspotItem.text = scene.heading.text
+                                dragHotspotItem.grabToImage(function(result) {
+                                    delegateItem.Drag.imageSource = result.url
+                                })
+                            }
                             onDoubleClicked: {
                                 navigateToScene()
                                 sceneListSidePanel.expanded = false
@@ -1978,6 +1996,100 @@ Rectangle {
                                 screenplayAdapter.currentIndex = index
                             }
                         }
+
+                        Drag.active: delegateMouseArea.drag.active
+                        Drag.dragType: Drag.Automatic
+                        Drag.supportedActions: Qt.MoveAction
+                        Drag.hotSpot.x: dragHotspotItem.width/2
+                        Drag.hotSpot.y: dragHotspotItem.height/2
+                        Drag.source: screenplayElement
+                        Drag.mimeData: {
+                            "sceneListView/sceneID": screenplayElement.sceneID
+                        }
+                        Drag.onActiveChanged: {
+                            if(screenplayElementType === ScreenplayElement.BreakElementType)
+                                scriteDocument.screenplay.currentElementIndex = index
+                        }
+
+                        DropArea {
+                            anchors.fill: parent
+                            keys: ["sceneListView/sceneID"]
+
+                            onEntered: {
+                                drag.accepted = true
+                                dropIndicator.visible = true
+                                sceneListView.forceActiveFocus()
+                            }
+
+                            onExited: {
+                                drag.accepted = true
+                                dropIndicator.visible = false
+                            }
+
+                            onDropped: {
+                                dropIndicator.visible = false
+                                var dropSource = drop.source
+                                app.execLater(sceneListView, 100, function() { sceneListView.dropSceneAt(dropSource, index) })
+                                drop.acceptProposedAction()
+                            }
+                        }
+
+                        Rectangle {
+                            id: dropIndicator
+                            width: parent.width
+                            height: 2
+                            color: primaryColors.borderColor
+                            visible: false
+                        }
+                    }
+
+                    footer: Item {
+                        width: sceneListView.width-1
+                        height: 40
+
+                        DropArea {
+                            anchors.fill: parent
+                            keys: ["sceneListView/sceneID"]
+
+                            onEntered: {
+                                drag.accepted = true
+                                dropIndicator2.visible = true
+                                sceneListView.forceActiveFocus()
+                            }
+
+                            onExited: {
+                                drag.accepted = true
+                                dropIndicator2.visible = false
+                            }
+
+                            onDropped: {
+                                dropIndicator2.visible = false
+                                var dropSource = drop.source
+                                app.execLater(sceneListView, 100, function() { sceneListView.dropSceneAt(dropSource, -1) })
+                                drop.acceptProposedAction()
+                            }
+                        }
+
+                        Rectangle {
+                            id: dropIndicator2
+                            width: parent.width
+                            height: 2
+                            color: primaryColors.borderColor
+                            visible: false
+                        }
+                    }
+
+                    function dropSceneAt(scene, index) {
+                        if(!screenplayAdapter.isSourceScreenplay)
+                            return
+
+                        var fromIndex = scriteDocument.screenplay.indexOfElement(scene)
+                        var toIndex = index < 0 ? index : (fromIndex < index ? index-1 : index)
+                        var curIndex = index < 0 ? scriteDocument.screenplay.elementCount-1 : toIndex
+                        scriteDocument.screenplay.moveElement(scene, toIndex)
+                        screenplayAdapter.refresh()
+                        positionViewAtIndex(curIndex, ListView.Contain)
+                        screenplayAdapter.currentIndex = curIndex
                     }
                 }
             }

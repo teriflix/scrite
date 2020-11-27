@@ -201,6 +201,12 @@ QVariant ScreenplayAdapter::at(int row) const
     return QVariant();
 }
 
+void ScreenplayAdapter::refresh()
+{
+    this->beginResetModel();
+    this->endResetModel();
+}
+
 QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
 {
     static QHash<int, QByteArray> roles;
@@ -214,6 +220,7 @@ QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
         roles[ModelDataRole] = "modelData";
         roles[RowNumberRole] = "rowNumber";
     }
+
     return roles;
 }
 
