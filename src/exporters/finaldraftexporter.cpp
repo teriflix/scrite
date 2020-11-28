@@ -105,6 +105,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             contentE.appendChild(paragraphE);
 
             paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
+            if(element->hasUserSceneNumber())
+                paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
+
             addTextToParagraph(paragraphE, heading->text());
             locations.append(heading->location());
 

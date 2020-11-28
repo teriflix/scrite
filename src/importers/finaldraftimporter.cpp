@@ -94,9 +94,12 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
         switch(typeIndex)
         {
-        case 0:
+        case 0: {
             scene = this->createScene(text);
-            break;
+            const QString number = paragraphE.attribute("Number");
+            ScreenplayElement *element = this->document()->screenplay()->elementAt(this->document()->screenplay()->elementCount()-1);
+            element->setUserSceneNumber(number);
+            } break;
         case 1:
             this->addSceneElement(scene, SceneElement::Action, text);
             break;

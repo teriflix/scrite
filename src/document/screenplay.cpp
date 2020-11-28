@@ -28,9 +28,13 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
 
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::elementChanged, [=](){
         this->markAsModified();
     });
+
+    connect(this, &ScreenplayElement::sceneNumberChanged, this, &ScreenplayElement::resolvedSceneNumberChanged);
+    connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::resolvedSceneNumberChanged);
 }
 
 ScreenplayElement::~ScreenplayElement()
@@ -148,6 +152,20 @@ QString ScreenplayElement::sceneID() const
     }
 
     return m_scene ? m_scene->id() : m_sceneID;
+}
+
+void ScreenplayElement::setUserSceneNumber(const QString &val)
+{
+    if(m_userSceneNumber == val)
+        return;
+
+    m_userSceneNumber = val;
+    emit userSceneNumberChanged();
+}
+
+QString ScreenplayElement::resolvedSceneNumber() const
+{
+    return m_userSceneNumber.isEmpty() ? QString::number(this->sceneNumber()) : m_userSceneNumber;
 }
 
 void ScreenplayElement::setScene(Scene *val)

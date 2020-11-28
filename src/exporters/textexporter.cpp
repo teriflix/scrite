@@ -116,7 +116,7 @@ bool TextExporter::doExport(QIODevice *device)
         if(heading->isEnabled())
         {
             ++nrHeadings;
-            ts << "\n[" << nrHeadings << "] " << heading->text() << "\n";
+            ts << "\n[" << screenplayElement->resolvedSceneNumber() << "] " << heading->text() << "\n";
         }
 
         const int nrElements = scene->elementCount();

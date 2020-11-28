@@ -236,6 +236,7 @@ public:
 
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements)
     QQmlListProperty<SceneElement> elements();
+    Q_INVOKABLE SceneElement *appendElement(const QString &text, int type=SceneElement::Action);
     Q_INVOKABLE void addElement(SceneElement *ptr);
     Q_INVOKABLE void insertElementAfter(SceneElement *ptr, SceneElement *after);
     Q_INVOKABLE void insertElementBefore(SceneElement *ptr, SceneElement *before);

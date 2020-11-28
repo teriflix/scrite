@@ -28,6 +28,15 @@ OdtExporter::~OdtExporter()
 
 }
 
+void OdtExporter::setIncludeSceneNumbers(bool val)
+{
+    if(m_includeSceneNumbers == val)
+        return;
+
+    m_includeSceneNumbers = val;
+    emit includeSceneNumbersChanged();
+}
+
 bool OdtExporter::doExport(QIODevice *device)
 {
     const qreal pageWidth = 0; // pdfWriter.width();

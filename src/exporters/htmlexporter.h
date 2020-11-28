@@ -26,7 +26,7 @@ public:
     Q_INVOKABLE HtmlExporter(QObject *parent=nullptr);
     ~HtmlExporter();
 
-    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
+    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated HTML.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
     void setIncludeSceneNumbers(bool val);

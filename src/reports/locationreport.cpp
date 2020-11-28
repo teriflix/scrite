@@ -155,6 +155,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
                 {
                     Scene *scene = heading->scene();
                     int sceneNr = screenplay->firstIndexOfScene(scene)+1;
+                    ScreenplayElement *screenplayElement = screenplay->elementAt(sceneNr-1);
                     QString snippet = scene->title();
                     if(snippet.length() > snippetLength)
                         snippet = snippet.left(snippetLength-3) + "...";
@@ -164,7 +165,10 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
                     charFormat = defaultCharFormat;
 
                     cursor.insertBlock(blockFormat, charFormat);
-                    cursor.insertText( "Scene #" + QString::number(sceneNr) + + ": ");
+                    if(screenplayElement)
+                        cursor.insertText( "Scene #" + screenplayElement->resolvedSceneNumber() + + ": ");
+                    else
+                        cursor.insertText( "Scene #" + QString::number(sceneNr) + + ": ");
                     TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, snippet);
                 }
 

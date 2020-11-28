@@ -123,7 +123,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
             const ScreenplayElement *element = screenplay->elementAt(i);
             const Scene *scene = element->scene();
             if(scene) {
-                QString title = QStringLiteral("[") + QString::number(++sceneNumber) + QStringLiteral("]: ")
+                QString title = QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("]: ")
                         + (scene->heading()->isEnabled() ? scene->heading()->text() : QStringLiteral("NO SCENE HEADING"));
                 if(title.length() > 25)
                     title = title.left(23) + "...";

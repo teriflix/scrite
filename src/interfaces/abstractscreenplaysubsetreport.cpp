@@ -122,6 +122,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
                 element2->setBreakType(element->breakType());
             element2->setScene(element->scene());
             element2->setProperty("#sceneNumber", element->sceneNumber());
+            element2->setUserSceneNumber(element->userSceneNumber());
             m_screenplaySubset->addElement(element2);
         }
     }

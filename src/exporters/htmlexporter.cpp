@@ -249,7 +249,7 @@ bool HtmlExporter::doExport(QIODevice *device)
         {
             ++nrHeadings;
             if(m_includeSceneNumbers)
-                writeParagraph(SceneElement::Heading, "[" + QString::number(nrHeadings) + "] " + heading->text());
+                writeParagraph(SceneElement::Heading, "[" + screenplayElement->resolvedSceneNumber() + "] " + heading->text());
             else
                 writeParagraph(SceneElement::Heading, heading->text());
         }

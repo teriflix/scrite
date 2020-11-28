@@ -26,11 +26,21 @@ public:
     Q_INVOKABLE OdtExporter(QObject *parent=nullptr);
     ~OdtExporter();
 
+    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated document.")
+    Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
+    void setIncludeSceneNumbers(bool val);
+    bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
+    Q_SIGNAL void includeSceneNumbersChanged();
+
     bool generateTitlePage() const { return false; }
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+
+private:
+    bool m_includeSceneNumbers = false;
 };
 
 #endif // ODTEXPORTER_H

@@ -1539,12 +1539,17 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             if(m_sceneNumbers)
             {
-                QTextCharFormat sceneNumberFormat;
-                sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
-                sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
-                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
-                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, element->sceneNumber());
-                cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
+                if(this->purpose() == ForPrinting)
+                {
+                    QTextCharFormat sceneNumberFormat;
+                    sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
+                    sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
+                    sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
+                    sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, element->resolvedSceneNumber());
+                    cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
+                }
+                else
+                    cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] "));
             }
 
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
@@ -2097,14 +2102,14 @@ void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRe
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    const int sceneNumber = format.property(DataProperty).toInt();
-    if(sceneNumber < 0)
+    const QString sceneNumber = format.property(DataProperty).toString();
+    if(sceneNumber.isEmpty())
         return;
 
     QRectF rect = givenRect;
-    rect.setLeft( rect.left()*0.6 );
+    rect.setLeft(rect.left()*0.55);
 
-    const QString sceneNumberText = QString::number(sceneNumber) + QStringLiteral(".");
+    const QString sceneNumberText = sceneNumber + QStringLiteral(".");
     this->drawText(painter, rect, sceneNumberText);
 }
 

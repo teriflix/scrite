@@ -1371,9 +1371,13 @@ Item {
             }
 
             source: {
-                if(scriteDocument.structure.elementCount > 0 && scriteDocument.screenplay.currentElementIndex < 0) {
+                if(mainTabBar.currentIndex !== 0 &&
+                   scriteDocument.structure.elementCount > 0 &&
+                   scriteDocument.screenplay.currentElementIndex < 0) {
                     var index = scriteDocument.structure.currentElementIndex
                     var element = scriteDocument.structure.elementAt(index)
+                    if(scriteDocument.screenplay.firstIndexOfScene(element.scene) >= 0)
+                        return scriteDocument.loading ? null : scriteDocument.screenplay
                     return element ? element.scene : scriteDocument.screenplay
                 }
                 return scriteDocument.loading ? null : scriteDocument.screenplay

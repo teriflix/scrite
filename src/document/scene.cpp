@@ -788,6 +788,15 @@ QQmlListProperty<SceneElement> Scene::elements()
                 &Scene::staticClearElements);
 }
 
+SceneElement *Scene::appendElement(const QString &text, int type)
+{
+    SceneElement *element = new SceneElement(this);
+    element->setType(SceneElement::Type(type));
+    element->setText(text);
+    this->addElement(element);
+    return element;
+}
+
 void Scene::addElement(SceneElement *ptr)
 {
     this->insertElementAt(ptr, m_elements.size());

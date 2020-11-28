@@ -64,6 +64,18 @@ public:
     int sceneNumber() const { return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber; }
     Q_SIGNAL void sceneNumberChanged();
 
+    Q_PROPERTY(QString userSceneNumber READ userSceneNumber WRITE setUserSceneNumber NOTIFY userSceneNumberChanged)
+    void setUserSceneNumber(const QString &val);
+    QString userSceneNumber() const { return m_userSceneNumber; }
+    Q_SIGNAL void userSceneNumberChanged();
+
+    Q_PROPERTY(bool hasUserSceneNumber READ hasUserSceneNumber NOTIFY userSceneNumberChanged)
+    bool hasUserSceneNumber() const { return !m_userSceneNumber.isEmpty(); }
+
+    Q_PROPERTY(QString resolvedSceneNumber READ resolvedSceneNumber NOTIFY resolvedSceneNumberChanged)
+    QString resolvedSceneNumber() const;
+    Q_SIGNAL void resolvedSceneNumberChanged();
+
     Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false RESET resetScene)
     void setScene(Scene *val);
     Scene* scene() const { return m_scene; }
@@ -109,6 +121,7 @@ private:
     QJsonValue m_userData;
     int m_customSceneNumber = -1;
     bool m_elementTypeIsSet = false;
+    QString m_userSceneNumber;
     ElementType m_elementType = SceneElementType;
     QObjectProperty<Scene> m_scene;
     QObjectProperty<Screenplay> m_screenplay;

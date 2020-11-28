@@ -231,7 +231,8 @@ QVariant ScreenplayAdapter::data(const QModelIndex &index, int role) const
 
     const QModelIndex srcIndex = this->mapToSource(index);
     const QVariant srcData = this->sourceModel()->data(srcIndex, Screenplay::ScreenplayElementRole);
-    ScreenplayElement *element = srcData.value<ScreenplayElement*>();
+    QObject *elementObject = srcData.value<QObject*>();
+    ScreenplayElement *element = qobject_cast<ScreenplayElement*>(elementObject);
     return this->data(element, index.row(), role);
 }
 

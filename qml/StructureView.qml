@@ -260,6 +260,11 @@ Item {
 
         onZoomScaleChangedInteractively: storeZoomLevel()
 
+        Connections {
+            target: mainTabBar
+            onCurrentIndexChanged: canvasScroll.storeZoomLevel()
+        }
+
         function storeZoomLevel() {
             scriteDocument.structure.zoomLevel = suggestedScale
         }

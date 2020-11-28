@@ -567,7 +567,7 @@ Rectangle {
                         scene = data ? data.scene : null
                         element = data ? data.screenplayElement : null
                     }
-                    return scene && scene.heading.enabled ? "[" + element.sceneNumber + "] " + scene.heading.text : ''
+                    return scene && scene.heading.enabled ? "[" + element.resolvedSceneNumber + "] " + scene.heading.text : ''
                 }
             }
         }
@@ -1495,23 +1495,31 @@ Rectangle {
                 width: ruler.leftMarginPx
                 height: sceneHeadingLoader.height + 16
 
-                Text {
-                    font: headingFontMetrics.font
-                    text: "[" + theElement.sceneNumber + "]"
-                    height: sceneHeadingLoader.height
-                    anchors.verticalCenter: parent.verticalCenter
+                Row {
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
-                    visible: theElement.sceneNumber > 0 && screenplayAdapter.isSourceScreenplay
-                }
-
-                SceneTypeImage {
-                    width: sceneHeadingLoader.height
-                    height: width
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: parent.width * 0.2
-                    sceneType: headingItem.theScene.type
+                    spacing: 20
+
+                    SceneTypeImage {
+                        width: sceneHeadingLoader.height
+                        height: width
+                        anchors.verticalCenter: parent.verticalCenter
+                        sceneType: headingItem.theScene.type
+                    }
+
+                    TextField2 {
+                        label: "Scene No."
+                        labelAlwaysVisible: true
+                        width: headingFontMetrics.averageCharacterWidth*maximumLength
+                        text: theElement.userSceneNumber
+                        anchors.bottom: parent.bottom
+                        font: headingFontMetrics.font
+                        onTextChanged: theElement.userSceneNumber = text
+                        maximumLength: 5
+                        placeholderText: theElement.sceneNumber
+                        visible: theElement.sceneNumber > 0 && screenplayAdapter.isSourceScreenplay
+                    }
                 }
             }
 
@@ -2022,7 +2030,7 @@ Rectangle {
                             font.capitalization: Font.AllUppercase
                             text: {
                                 if(scene && scene.heading.enabled)
-                                    return "[" + screenplayElement.sceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
+                                    return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
                                 if(screenplayElementType === ScreenplayElement.BreakElementType)
                                     return screenplayElement.sceneID
                                 return "NO SCENE HEADING"

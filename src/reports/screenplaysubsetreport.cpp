@@ -110,7 +110,7 @@ void ScreenplaySubsetReport::inject(QTextCursor &cursor, AbstractScreenplayTextD
             continue;
 
         cursor.insertBlock(blockFormat, charFormat);
-        cursor.insertText( QStringLiteral("[") + QString::number(element->sceneNumber()) + QStringLiteral("] - ") + element->scene()->heading()->text() );
+        cursor.insertText( QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] - ") + element->scene()->heading()->text() );
     }
 
     blockFormat = defaultBlockFormat;

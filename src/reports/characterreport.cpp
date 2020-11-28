@@ -231,7 +231,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
         {
             QTextTable *dialogueTable = nullptr;
             bool sceneInfoWritten = false;
-            Scene *scene = screenplay->elementAt(i)->scene();
+            ScreenplayElement *element = screenplay->elementAt(i);
+            Scene *scene = element->scene();
             if(scene == nullptr)
                 continue;
 
@@ -257,7 +258,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
 
                         cursor.insertBlock(blockFormat, charFormat);
                         // cursor.insertText("Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
-                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, "Scene [" + QString::number(i+1) + "]: " + scene->heading()->text());
+                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, "Scene [" + element->resolvedSceneNumber() + "]: " + scene->heading()->text());
                         sceneInfoWritten = true;
                     }
 
