@@ -1371,10 +1371,10 @@ Item {
             }
 
             source: {
-                if(scriteDocument.screenplay.currentElementIndex < 0) {
+                if(scriteDocument.structure.elementCount > 0 && scriteDocument.screenplay.currentElementIndex < 0) {
                     var index = scriteDocument.structure.currentElementIndex
                     var element = scriteDocument.structure.elementAt(index)
-                    return element ? element.scene : null
+                    return element ? element.scene : scriteDocument.screenplay
                 }
                 return scriteDocument.loading ? null : scriteDocument.screenplay
             }
@@ -1659,105 +1659,6 @@ Item {
         id: openFromLibraryComponent
 
         OpenFromLibrary { }
-    }
-
-    Loader {
-        id: openingAnimationLoader
-        active: splashLoader.active === false
-        anchors.fill: parent
-        sourceComponent: SequentialAnimation {
-            running: true
-
-            PauseAnimation {
-                duration: screenplayEditorSettings.enableAnimations ? 500 : 0
-            }
-
-            ScriptAction {
-                script: appLogo.ToolTip.visible = true
-            }
-
-            PropertyAnimation {
-                target: appLogo
-                properties: "scale"
-                from: 1; to: 1.5
-                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
-            }
-
-            PropertyAnimation {
-                target: appLogo
-                properties: "scale"
-                from: 1.5; to: 1
-                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
-            }
-
-            PauseAnimation {
-                duration: screenplayEditorSettings.enableAnimations ? 0 : 2000
-            }
-
-            ScriptAction {
-                script: {
-                    appLogo.ToolTip.visible = false
-                    if(workspaceSettings.scriptalayIntroduced)
-                        openingAnimationLoader.active = false
-                    else {
-                        var r = openingAnimationLoader.mapFromItem(openFromLibrary, 0, 0, openFromLibrary.width, openFromLibrary.height)
-                        openFromLibraryIntro.parent.x = r.x
-                        openFromLibraryIntro.parent.y = r.y
-                        openFromLibraryIntro.parent.width = r.width
-                        openFromLibraryIntro.parent.height = r.height
-                        openFromLibraryIntro.visible = true
-                    }
-                }
-            }
-
-            PropertyAnimation {
-                target: openFromLibrary.toolButtonImage
-                properties: "scale"
-                from: 1; to: 3
-                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
-            }
-
-            PropertyAnimation {
-                target: openFromLibrary.toolButtonImage
-                properties: "scale"
-                from: 3; to: 1
-                duration: screenplayEditorSettings.enableAnimations ? 1000 : 0
-            }
-
-            PauseAnimation {
-                duration: 5000
-            }
-
-            ScriptAction {
-                script: {
-                    openFromLibraryIntro.visible = false
-                    openingAnimationLoader.active = false
-                    workspaceSettings.scriptalayIntroduced = true
-                }
-            }
-        }
-
-        Item {
-            Rectangle {
-                id: openFromLibraryIntro
-                anchors.top: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: openFromLibraryIntroText.width + 40
-                height: openFromLibraryIntroText.height + 40
-                color: primaryColors.c600.background
-                visible: false
-
-                Text {
-                    id: openFromLibraryIntroText
-                    anchors.centerIn: parent
-                    width: 250
-                    text: "Introducing <strong>Scriptalay</strong>! Click this button to browse through and download from a repository of screenpalys in Scrite format."
-                    wrapMode: Text.WordWrap
-                    font.pointSize: app.idealFontPointSize
-                    color: primaryColors.c600.text
-                }
-            }
-        }
     }
 
     Item {

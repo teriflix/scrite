@@ -875,7 +875,7 @@ Rectangle {
                         }
 
                         SequentialAnimation {
-                            running: sceneTextEditor.justReceivedFocus && screenplayEditorSettings.enableAnimations
+                            running: sceneTextEditor.justReceivedFocus /*&& screenplayEditorSettings.enableAnimations*/
 
                             ParallelAnimation {
                                 NumberAnimation {
