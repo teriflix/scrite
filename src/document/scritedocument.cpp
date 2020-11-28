@@ -811,6 +811,7 @@ void ScriteDocument::setStructure(Structure *val)
 
     m_structure = val;
     m_structure->setParent(this);
+    m_structure->setObjectName("Document Structure");
 
     emit structureChanged();
 }
@@ -825,6 +826,7 @@ void ScriteDocument::setScreenplay(Screenplay *val)
 
     m_screenplay = val;
     m_screenplay->setParent(this);
+    m_screenplay->setObjectName("Document Screenplay");
 
     emit screenplayChanged();
 }

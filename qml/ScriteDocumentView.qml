@@ -1334,7 +1334,6 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 5
                 clip: true
-                readonly property bool editCurrentSceneInStructure: false
                 readonly property int screenplayZoomLevelModifier: 0
                 sourceComponent: {
                     switch(mainTabBar.currentIndex) {
@@ -1371,28 +1370,13 @@ Item {
                 NumberAnimation { duration: 250 }
             }
 
-            function evaluateSource() {
-                if(editCurrentSceneInStructure && scriteDocument.screenplay.currentElementIndex < 0) {
+            source: {
+                if(scriteDocument.screenplay.currentElementIndex < 0) {
                     var index = scriteDocument.structure.currentElementIndex
                     var element = scriteDocument.structure.elementAt(index)
                     return element ? element.scene : null
                 }
                 return scriteDocument.loading ? null : scriteDocument.screenplay
-            }
-
-            Timer {
-                property bool changed: parent.evaluateSource() !== parent.source
-                onChangedChanged: {
-                    parent.opacity = 0
-                    start()
-                }
-                running: true
-                interval: 250
-                repeat: false
-                onTriggered: {
-                    parent.source = parent.evaluateSource()
-                    parent.opacity = 1
-                }
             }
 
             onAdditionalCharacterMenuItemClicked: {
@@ -1472,19 +1456,14 @@ Item {
                                     id: structureViewLoader
                                     anchors.fill: parent
                                     active: !workspaceSettings.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
-                                    sourceComponent: StructureView {
-                                        onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = scriteDocument.screenplay.currentElementIndex < 0
-                                        onReleaseEditor: screenplayEditor2.editCurrentSceneInStructure = false
-                                    }
+                                    sourceComponent: StructureView { }
                                 }
 
                                 Loader {
                                     id: notebookViewLoader
                                     anchors.fill: parent
                                     active: workspaceSettings.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
-                                    sourceComponent: NotebookView {
-
-                                    }
+                                    sourceComponent: NotebookView { }
                                 }
                             }
                         }
@@ -1494,17 +1473,10 @@ Item {
                         id: screenplayEditor2
                         SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? ui.width * 0.5 : workspaceSettings.screenplayEditorWidth
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
-                        property bool editCurrentSceneInStructure: true
                         readonly property int screenplayZoomLevelModifier: -3
                         active: screenplayEditor2Active.value && width >= 50
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
                     }
-                }
-
-                ResetOnChange {
-                    id: screenplayEditor2Active
-                    trackChangesOn: screenplayEditor2.editCurrentSceneInStructure
-                    from: false; to: true
                 }
             }
 
@@ -1520,7 +1492,6 @@ Item {
                     ScreenplayView {
                         anchors.fill: parent
                         anchors.margins: 5
-                        onRequestEditor: screenplayEditor2.editCurrentSceneInStructure = false
                         showNotesIcon: workspaceSettings.showNotebookInStructure
                     }
                 }

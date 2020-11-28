@@ -18,6 +18,7 @@ import Scrite 1.0
 Item {
     id: screenplayView
     signal requestEditor()
+
     clip: true
 
     property real zoomLevel: 1
@@ -348,7 +349,7 @@ Item {
                                 else
                                     scriteDocument.screenplay.clearSelection()
                                 scriteDocument.screenplay.currentElementIndex = index
-                                requestEditor()
+                                requestEditorLater()
                             }
 
                             if(mouse.button === Qt.RightButton) {
@@ -526,7 +527,7 @@ Item {
         var element = screenplayElementComponent.createObject()
         element.sceneID = sceneID
         scriteDocument.screenplay.insertElementAt(element, index)
-        requestEditor()
+        requestEditorLater()
     }
 
     Component {
@@ -535,5 +536,9 @@ Item {
         ScreenplayElement {
             screenplay: scriteDocument.screenplay
         }
+    }
+
+    function requestEditorLater() {
+        app.execLater(screenplayView, 100, function() { requestEditor() })
     }
 }

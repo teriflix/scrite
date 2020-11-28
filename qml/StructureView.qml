@@ -322,7 +322,7 @@ Item {
                 element.scene.color = c
                 scriteDocument.structure.addElement(element)
                 scriteDocument.structure.currentElementIndex = scriteDocument.structure.elementCount-1
-                requestEditor()
+                requestEditorLater()
                 element.scene.undoRedoEnabled = true
             }
 
@@ -1216,7 +1216,7 @@ Item {
                     annotationGripLoader.reset()
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
-                    requestEditor()
+                    requestEditorLater()
                 }
 
                 drag.target: scriteDocument.readOnly ? null : elementItem
@@ -1956,5 +1956,9 @@ Item {
             x: annotation.geometry.x
             y: annotation.geometry.y
         }
+    }
+
+    function requestEditorLater() {
+        app.execLater(screenplayView, 100, function() { requestEditor() })
     }
 }
