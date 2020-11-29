@@ -729,6 +729,20 @@ Item {
                                 onActivated: shortcutsMenuItem.activate()
                             }
                         }
+
+                        MenuItem2 {
+                            text: "Toggle Fullscreen\tF7"
+                            icon.source: "../icons/navigation/fullscreen.png"
+                            onClicked: app.execLater(app, 100, function() { app.toggleFullscreen(qmlWindow) })
+                            ShortcutsModelItem.group: "Application"
+                            ShortcutsModelItem.title: "Toggle Fullscreen"
+                            ShortcutsModelItem.shortcut: "F7"
+                            Shortcut {
+                                context: Qt.ApplicationShortcut
+                                sequence: "F7"
+                                onActivated: app.execLater(app, 100, function() { app.toggleFullscreen(qmlWindow) })
+                            }
+                        }
                     }
                 }
             }

@@ -1080,6 +1080,24 @@ void Application::launchNewInstance(QWindow *window)
         QProcess::startDetached(appPath, QStringList() << QStringLiteral("--geodelta") << QStringLiteral("30"));
 }
 
+void Application::toggleFullscreen(QWindow *window)
+{
+    const char *propName = "#previouslyMaximised";
+    if(window->windowStates() & Qt::WindowFullScreen)
+    {
+        const bool waxMaxed = window->property(propName).toBool();
+        if(waxMaxed)
+            window->showMaximized();
+        else
+            window->showNormal();
+    }
+    else
+    {
+        window->setProperty(propName, window->windowStates().testFlag(Qt::WindowMaximized));
+        window->showFullScreen();
+    }
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())

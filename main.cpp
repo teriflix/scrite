@@ -287,6 +287,9 @@ int main(int argc, char **argv)
     QQuickStyle::setStyle("Material");
 
     QQuickView qmlView;
+#ifdef Q_OS_MAC
+    qmlView.setFlag(Qt::WindowFullscreenButtonHint); // [0.5.2 All] Full Screen Mode #194
+#endif
     qmlView.setObjectName(QStringLiteral("ScriteQmlWindow"));
     qmlView.setFormat(format);
 #ifdef Q_OS_WIN
