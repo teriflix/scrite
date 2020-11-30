@@ -344,6 +344,11 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
+    Q_PROPERTY(int secondsPerPage READ secondsPerPage WRITE setSecondsPerPage NOTIFY secondsPerPageChanged)
+    void setSecondsPerPage(int val);
+    int secondsPerPage() const { return m_secondsPerPage; }
+    Q_SIGNAL void secondsPerPageChanged();
+
     Q_INVOKABLE void resetToDefaults();
 
     void useUserSpecifiedFonts();
@@ -357,6 +362,7 @@ private:
     char  m_padding[4];
     QFont m_defaultFont;
     qreal m_pageWidth = 750.0;
+    int m_secondsPerPage = 60;
     int   m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
     QList<int> m_fontPointSizes;

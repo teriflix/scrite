@@ -152,6 +152,10 @@ public:
     qreal currentPosition() const { return m_currentPosition; }
     Q_SIGNAL void currentPositionChanged();
 
+    Q_PROPERTY(int secondsPerPage READ secondsPerPage WRITE setSecondsPerPage NOTIFY timePerPageChanged)
+    void setSecondsPerPage(int val);
+    int secondsPerPage() const;
+
     Q_PROPERTY(QTime timePerPage READ timePerPage WRITE setTimePerPage NOTIFY timePerPageChanged)
     void setTimePerPage(const QTime &val);
     QTime timePerPage() const { return m_timePerPage; }

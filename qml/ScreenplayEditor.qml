@@ -67,6 +67,7 @@ Rectangle {
         screenplay: scriteDocument.loading ? null : screenplayAdapter.screenplay
         formatting: scriteDocument.loading ? null : scriteDocument.printFormat
         syncEnabled: true
+        secondsPerPage: scriteDocument.printFormat.secondsPerPage
     }
 
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
@@ -541,7 +542,7 @@ Rectangle {
                 if(screenplayTextDocument.pageCount > 1)
                     ret += " | " + "Time: " + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
                 else
-                    ret += " | " + "Time: < 1 min."
+                    ret += " | " + "Time: < " + screenplayTextDocument.timePerPageAsString
                 return ret
             }
 

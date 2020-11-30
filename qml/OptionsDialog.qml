@@ -613,25 +613,55 @@ Item {
 
                 Row {
                     spacing: 20
-                    width: parent.width/2 - 5
+                    width: parent.width
 
-                    Text {
-                        id: paperSizeLabel
-                        text: "Paper Size"
-                        anchors.verticalCenter: parent.verticalCenter
+                    Row {
+                        spacing: 20
+                        width: (parent.width-parent.spacing)/2
+
+                        Text {
+                            id: paperSizeLabel
+                            text: "Paper Size"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        ComboBox2 {
+                            width: parent.width - parent.spacing - paperSizeLabel.width
+                            textRole: "key"
+                            currentIndex: pageSetupSettings.paperSize
+                            anchors.verticalCenter: parent.verticalCenter
+                            onActivated: {
+                                pageSetupSettings.paperSize = currentIndex
+                                scriteDocument.formatting.pageLayout.paperSize = currentIndex
+                                scriteDocument.printFormat.pageLayout.paperSize = currentIndex
+                            }
+                            model: app.enumerationModelForType("ScreenplayPageLayout", "PaperSize")
+                        }
                     }
 
-                    ComboBox2 {
-                        width: parent.width - parent.spacing - paperSizeLabel.width
-                        textRole: "key"
-                        currentIndex: pageSetupSettings.paperSize
-                        anchors.verticalCenter: parent.verticalCenter
-                        onActivated: {
-                            pageSetupSettings.paperSize = currentIndex
-                            scriteDocument.formatting.pageLayout.paperSize = currentIndex
-                            scriteDocument.printFormat.pageLayout.paperSize = currentIndex
+                    Row {
+                        spacing: 20
+                        width: (parent.width-parent.spacing)/2
+
+                        Text {
+                            id: timePerPageLabel
+                            text: "Time Per Page:"
+                            anchors.verticalCenter: parent.verticalCenter
                         }
-                        model: app.enumerationModelForType("ScreenplayPageLayout", "PaperSize")
+
+                        TextField2 {
+                            label: "Seconds (15 - 300)"
+                            labelAlwaysVisible: true
+                            text: scriteDocument.printFormat.secondsPerPage
+                            validator: IntValidator { bottom: 15; top: 300 }
+                            onTextEdited: scriteDocument.printFormat.secondsPerPage = parseInt(text)
+                            width: sceneEditorFontMetrics.averageCharacterWidth*3
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "seconds per page."
+                        }
                     }
                 }
 

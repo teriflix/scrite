@@ -118,7 +118,6 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
     // Lets compile a list of scene names.
     auto compileSceneTitles = [screenplay]() {
         QStringList ret;
-        int sceneNumber = 0;
         for(int i=0; i<screenplay->elementCount(); i++) {
             const ScreenplayElement *element = screenplay->elementAt(i);
             const Scene *scene = element->scene();

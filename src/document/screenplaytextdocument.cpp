@@ -358,6 +358,19 @@ void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setSecondsPerPage(int val)
+{
+    val = qBound(15, val, 300);
+    const int secs = val % 60;
+    const int mins = (val - secs)/60;
+    this->setTimePerPage( QTime(0,mins,secs) );
+}
+
+int ScreenplayTextDocument::secondsPerPage() const
+{
+    return m_timePerPage.minute()*60 + m_timePerPage.second();
+}
+
 void ScreenplayTextDocument::setTimePerPage(const QTime &val)
 {
     if(m_timePerPage == val)
@@ -365,6 +378,8 @@ void ScreenplayTextDocument::setTimePerPage(const QTime &val)
 
     m_timePerPage = val;
     emit timePerPageChanged();
+
+    this->evaluatePageBoundariesLater();
 }
 
 inline QString timeToString(const QTime &t)
@@ -608,7 +623,7 @@ void ScreenplayTextDocument::setPageCount(qreal val)
         emit pageCountChanged();
     }
 
-    static const int secsPerPage = m_timePerPage.hour()*60*60 + m_timePerPage.minute()*60 + m_timePerPage.second();
+    const int secsPerPage = m_timePerPage.hour()*60*60 + m_timePerPage.minute()*60 + m_timePerPage.second();
     const int totalSecs = int( qCeil(val * secsPerPage) );
     const QTime totalT = ::secondsToTime(totalSecs);
     if(m_totalTime != totalT)

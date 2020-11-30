@@ -689,6 +689,15 @@ QHash<int, QByteArray> ScreenplayFormat::roleNames() const
     return roles;
 }
 
+void ScreenplayFormat::setSecondsPerPage(int val)
+{
+    if(m_secondsPerPage == val)
+        return;
+
+    m_secondsPerPage = val;
+    emit secondsPerPageChanged();
+}
+
 void ScreenplayFormat::resetToDefaults()
 {
     QSettings *settings = Application::instance()->settings();
@@ -697,6 +706,8 @@ void ScreenplayFormat::resetToDefaults()
         this->pageLayout()->setPaperSize(ScreenplayPageLayout::A4);
     else
         this->pageLayout()->setPaperSize(ScreenplayPageLayout::Letter);
+
+    this->setSecondsPerPage(60);
 
     /**
       Here is how Final Draft formats its screenplays.
