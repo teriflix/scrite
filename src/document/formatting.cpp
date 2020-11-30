@@ -696,6 +696,8 @@ void ScreenplayFormat::setSecondsPerPage(int val)
 
     m_secondsPerPage = val;
     emit secondsPerPageChanged();
+
+    emit formatChanged();
 }
 
 void ScreenplayFormat::resetToDefaults()
