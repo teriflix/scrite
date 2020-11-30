@@ -534,7 +534,26 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: toggleLockButton.right
             anchors.leftMargin: 20
-            text: "Page " + screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
+            font.family: headingFontMetrics.font.family
+            font.pixelSize: parent.height * 0.5
+            text: {
+                var ret = "Page " + screenplayTextDocument.currentPage + "/" + screenplayTextDocument.pageCount
+                if(screenplayTextDocument.pageCount > 1)
+                    ret += " | " + "Time: " + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
+                else
+                    ret += " | " + "Time: < 1 min."
+                return ret
+            }
+
+            ToolTip.text: "Page count and time estimates are approximate, assuming " + screenplayTextDocument.timePerPageAsString + " per page."
+            ToolTip.delay: 1000
+            ToolTip.visible: pageNumberDisplayMouseArea.containsMouse
+
+            MouseArea {
+                id: pageNumberDisplayMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+            }
         }
 
         Item {

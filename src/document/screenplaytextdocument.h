@@ -18,6 +18,7 @@
 #include <QQmlParserStatus>
 #include <QPagedPaintDevice>
 #include <QAbstractTextDocumentLayout>
+#include <QTime>
 
 #include "scene.h"
 #include "formatting.h"
@@ -146,6 +147,32 @@ public:
     int currentPage() const { return m_currentPage; }
     Q_SIGNAL void currentPageChanged();
 
+    Q_PROPERTY(qreal currentPosition READ currentPosition NOTIFY currentPositionChanged)
+    qreal currentPosition() const { return m_currentPosition; }
+    Q_SIGNAL void currentPositionChanged();
+
+    Q_PROPERTY(QTime timePerPage READ timePerPage WRITE setTimePerPage NOTIFY timePerPageChanged)
+    void setTimePerPage(const QTime &val);
+    QTime timePerPage() const { return m_timePerPage; }
+    Q_SIGNAL void timePerPageChanged();
+
+    Q_PROPERTY(QString timePerPageAsString READ timePerPageAsString NOTIFY timePerPageChanged)
+    QString timePerPageAsString() const;
+
+    Q_PROPERTY(QTime totalTime READ totalTime NOTIFY totalTimeChanged)
+    QTime totalTime() const { return m_totalTime; }
+    Q_SIGNAL void totalTimeChanged();
+
+    Q_PROPERTY(QString totalTimeAsString READ totalTimeAsString NOTIFY totalTimeChanged)
+    QString totalTimeAsString() const;
+
+    Q_PROPERTY(QTime currentTime READ currentTime NOTIFY currentTimeChanged)
+    QTime currentTime() const { return m_currentTime; }
+    Q_SIGNAL void currentTimeChanged();
+
+    Q_PROPERTY(QString currentTimeAsString READ currentTimeAsString NOTIFY currentTimeChanged)
+    QString currentTimeAsString() const;
+
     Q_INVOKABLE void print(QObject *printerObject);
 
     QList< QPair<int,int> > pageBreaksFor(ScreenplayElement *element) const;
@@ -180,7 +207,7 @@ private:
     void init();
     void setUpdating(bool val);
     void setPageCount(int val);
-    void setCurrentPage(int val);
+    void setCurrentPageAndPosition(int page, qreal pos);
     void resetFormatting();
     void resetTextDocument();
 
@@ -229,7 +256,7 @@ private:
     void onActiveSceneCursorPositionChanged();
 
     // Other methods
-    void evaluateCurrentPage();
+    void evaluateCurrentPageAndPosition();
     void evaluatePageBoundaries();
     void evaluatePageBoundariesLater();
     void formatAllBlocks();
@@ -254,9 +281,13 @@ private:
     int m_currentPage = 0;
     bool m_sceneIcons = true;
     Purpose m_purpose = ForDisplay;
+    QTime m_totalTime = QTime(0, 0, 0);
     bool m_syncEnabled = true;
+    QTime m_timePerPage = QTime(0, 1, 0);
+    QTime m_currentTime = QTime(0, 0, 0);
     bool m_sceneNumbers = true;
     Scene *m_activeScene = nullptr;
+    qreal m_currentPosition = 0;
     bool m_componentComplete = true;
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;

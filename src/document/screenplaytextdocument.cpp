@@ -358,6 +358,41 @@ void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setTimePerPage(const QTime &val)
+{
+    if(m_timePerPage == val)
+        return;
+
+    m_timePerPage = val;
+    emit timePerPageChanged();
+}
+
+inline QString timeToString(const QTime &t)
+{
+    if(t == QTime(0,0,0))
+        return QStringLiteral("00:00 min");
+
+    if(t.hour() > 0)
+        return t.toString(QStringLiteral("H:mm:ss")) + QStringLiteral(" hrs");
+
+    return t.toString(QStringLiteral("m:ss")) + QStringLiteral(" min");
+}
+
+QString ScreenplayTextDocument::timePerPageAsString() const
+{
+    return timeToString(m_timePerPage);
+}
+
+QString ScreenplayTextDocument::totalTimeAsString() const
+{
+    return timeToString(m_totalTime);
+}
+
+QString ScreenplayTextDocument::currentTimeAsString() const
+{
+    return timeToString(m_currentTime);
+}
+
 void ScreenplayTextDocument::print(QObject *printerObject)
 {
     HourGlass hourGlass;
@@ -563,14 +598,49 @@ void ScreenplayTextDocument::setPageCount(int val)
     emit pageCountChanged();
 }
 
-void ScreenplayTextDocument::setCurrentPage(int val)
+void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
 {
-    val = m_pageCount > 0 ? qBound(1, val, m_pageCount) : 0;
-    if(m_currentPage == val)
-        return;
+    page = m_pageCount > 0 ? qBound(1, page, m_pageCount) : 0;
+    if(m_currentPage != page)
+    {
+        m_currentPage = page;
+        emit currentPageChanged();
+    }
 
-    m_currentPage = val;
-    emit currentPageChanged();
+    pos = m_pageCount > 0 ? qBound(0.0, pos, 1.0) : 0;
+    if( !qFuzzyCompare(pos, m_currentPosition) )
+    {
+        m_currentPosition = pos;
+        emit currentPositionChanged();
+    }
+
+    const int secsPerPage = m_timePerPage.hour()*60*60 + m_timePerPage.minute()*60 + m_timePerPage.second();
+    const int totalSecs = m_pageCount * secsPerPage;
+    const int currentSecs = int(m_currentPosition * qreal(totalSecs));
+
+    auto secondsToTime = [](int seconds) {
+        if(seconds == 0)
+            return QTime(0,0,0);
+        const int s = seconds > 60 ? seconds % 60 : seconds;
+        const int tm = seconds > 60 ? (seconds-s)/60 : 0;
+        const int m = tm > 60 ? tm%60 : tm;
+        const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
+        return QTime(h, m, s);
+    };
+
+    const QTime totalT = secondsToTime(totalSecs);
+    const QTime currentT = secondsToTime(currentSecs);
+    if(m_totalTime != totalT)
+    {
+        m_totalTime = totalT;
+        emit currentTimeChanged();
+    }
+
+    if(m_currentTime != currentT)
+    {
+        m_currentTime = currentT;
+        emit currentTimeChanged();
+    }
 }
 
 inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
@@ -1365,7 +1435,7 @@ void ScreenplayTextDocument::onActiveSceneChanged()
         }
     }
 
-    this->evaluateCurrentPage();
+    this->evaluateCurrentPageAndPosition();
 }
 
 void ScreenplayTextDocument::onActiveSceneDestroyed(Scene *ptr)
@@ -1376,20 +1446,20 @@ void ScreenplayTextDocument::onActiveSceneDestroyed(Scene *ptr)
 
 void ScreenplayTextDocument::onActiveSceneCursorPositionChanged()
 {
-    this->evaluateCurrentPage();
+    this->evaluateCurrentPageAndPosition();
 }
 
-void ScreenplayTextDocument::evaluateCurrentPage()
+void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
 {
     if(m_screenplay == nullptr || m_activeScene == nullptr || m_textDocument == nullptr || m_formatting == nullptr)
     {
-        this->setCurrentPage(0);
+        this->setCurrentPageAndPosition(0, 0);
         return;
     }
 
     if(m_screenplay->currentElementIndex() < 0 || m_textDocument->isEmpty())
     {
-        this->setCurrentPage(0);
+        this->setCurrentPageAndPosition(0, 0);
         return;
     }
 
@@ -1397,7 +1467,7 @@ void ScreenplayTextDocument::evaluateCurrentPage()
     QTextFrame *frame = element && element->scene() && element->scene() == m_activeScene ? this->findTextFrame(element) : nullptr;
     if(frame == nullptr)
     {
-        this->setCurrentPage(0);
+        this->setCurrentPageAndPosition(0, 0);
         return;
     }
 
@@ -1406,9 +1476,11 @@ void ScreenplayTextDocument::evaluateCurrentPage()
 
     if(endCursor.position() == 0)
     {
-        this->setCurrentPage(0);
+        this->setCurrentPageAndPosition(0, 0);
         return;
     }
+
+    const int documentLength = endCursor.position();
 
     QTextCursor userCursor = frame->firstCursorPosition();
     QTextBlock block = userCursor.block();
@@ -1422,14 +1494,14 @@ void ScreenplayTextDocument::evaluateCurrentPage()
         const QPair<int,int> pgBoundary = m_pageBoundaries.at(i);
         if(cursorPosition >= pgBoundary.first-1 && cursorPosition < pgBoundary.second)
         {
-            this->setCurrentPage(i+1);
+            this->setCurrentPageAndPosition(i+1, qreal(cursorPosition)/qreal(documentLength));
             return;
         }
     }
 
     // If we are here, then the cursor position was not found anywhere in the pageBoundaries.
     // So, we estimate the current page to be the last page.
-    this->setCurrentPage(m_pageCount);
+    this->setCurrentPageAndPosition(m_pageCount, 1.0);
 }
 
 void ScreenplayTextDocument::evaluatePageBoundaries()
@@ -1471,7 +1543,7 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
     m_pageBoundaries = pgBoundaries;
     emit pageBoundariesChanged();
 
-    this->evaluateCurrentPage();
+    this->evaluateCurrentPageAndPosition();
 }
 
 void ScreenplayTextDocument::evaluatePageBoundariesLater()
