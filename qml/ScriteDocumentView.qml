@@ -1277,7 +1277,7 @@ Item {
 
     Loader {
         id: contentLoader
-        active: true
+        active: !scriteDocument.loading
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right

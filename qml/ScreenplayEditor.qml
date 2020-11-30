@@ -318,28 +318,21 @@ Rectangle {
                                 Text {
                                     id: logLineFieldHeading
                                     text: "Logline:"
-                                    font: screenplayFormat.defaultFont2
+                                    font.family: screenplayFormat.defaultFont2.family
+                                    font.pointSize: screenplayFormat.defaultFont2.pointSize-2
+                                    visible: logLineField.length > 0
+                                    color: primaryColors.a700.background
                                 }
 
                                 TextArea {
                                     id: logLineField
                                     width: parent.width
-                                    height: Math.max(contentHeight+50*zoomLevel, 2*logLineFieldHeading.height)
+                                    height: Math.max(contentHeight+defaultFontMetrics.height, 2*logLineFieldHeading.height)
                                     font: screenplayFormat.defaultFont2
                                     readOnly: scriteDocument.readOnly
                                     palette: app.palette
                                     selectByMouse: true
                                     selectByKeyboard: true
-                                    background: Item {
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            anchors.margins: -3
-                                            color: app.translucent(accentColors.windowColor, 0.05)
-                                            border.width: 1
-                                            border.color: accentColors.borderColor
-                                            opacity: scriteDocument.logLine === "" ? 1 : 0.25
-                                        }
-                                    }
                                     text: scriteDocument.logLine
                                     Transliterator.textDocument: textDocument
                                     Transliterator.cursorPosition: cursorPosition
