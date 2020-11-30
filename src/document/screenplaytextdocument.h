@@ -14,11 +14,12 @@
 #ifndef SCREENPLAYTEXTDOCUMENT_H
 #define SCREENPLAYTEXTDOCUMENT_H
 
+#include <QTime>
+#include <QtMath>
 #include <QTextDocument>
 #include <QQmlParserStatus>
 #include <QPagedPaintDevice>
 #include <QAbstractTextDocumentLayout>
-#include <QTime>
 
 #include "scene.h"
 #include "formatting.h"
@@ -206,7 +207,7 @@ protected:
 private:
     void init();
     void setUpdating(bool val);
-    void setPageCount(int val);
+    void setPageCount(qreal val);
     void setCurrentPageAndPosition(int page, qreal pos);
     void resetFormatting();
     void resetTextDocument();

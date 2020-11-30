@@ -589,18 +589,38 @@ void ScreenplayTextDocument::setUpdating(bool val)
     }
 }
 
-void ScreenplayTextDocument::setPageCount(int val)
+inline QTime secondsToTime(int seconds)
 {
-    if(m_pageCount == val)
-        return;
+    if(seconds == 0)
+        return QTime(0,0,0);
+    const int s = seconds > 60 ? seconds % 60 : seconds;
+    const int tm = seconds > 60 ? (seconds-s)/60 : 0;
+    const int m = tm > 60 ? tm%60 : tm;
+    const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
+    return QTime(h, m, s);
+}
 
-    m_pageCount = val;
-    emit pageCountChanged();
+void ScreenplayTextDocument::setPageCount(qreal val)
+{
+    if(qCeil(val) != m_pageCount)
+    {
+        m_pageCount = qCeil(val);
+        emit pageCountChanged();
+    }
+
+    static const int secsPerPage = m_timePerPage.hour()*60*60 + m_timePerPage.minute()*60 + m_timePerPage.second();
+    const int totalSecs = int( qCeil(val * secsPerPage) );
+    const QTime totalT = ::secondsToTime(totalSecs);
+    if(m_totalTime != totalT)
+    {
+        m_totalTime = totalT;
+        emit currentTimeChanged();
+    }
 }
 
 void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
 {
-    page = m_pageCount > 0 ? qBound(1, page, m_pageCount) : 0;
+    page = m_pageCount > 0 ? qBound(1, page, qCeil(m_pageCount)) : 0;
     if(m_currentPage != page)
     {
         m_currentPage = page;
@@ -614,28 +634,10 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
         emit currentPositionChanged();
     }
 
-    const int secsPerPage = m_timePerPage.hour()*60*60 + m_timePerPage.minute()*60 + m_timePerPage.second();
-    const int totalSecs = m_pageCount * secsPerPage;
+    const int totalSecs = m_totalTime.hour()*60*60 + m_totalTime.minute()*60 + m_totalTime.second();
     const int currentSecs = int(m_currentPosition * qreal(totalSecs));
 
-    auto secondsToTime = [](int seconds) {
-        if(seconds == 0)
-            return QTime(0,0,0);
-        const int s = seconds > 60 ? seconds % 60 : seconds;
-        const int tm = seconds > 60 ? (seconds-s)/60 : 0;
-        const int m = tm > 60 ? tm%60 : tm;
-        const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
-        return QTime(h, m, s);
-    };
-
-    const QTime totalT = secondsToTime(totalSecs);
-    const QTime currentT = secondsToTime(currentSecs);
-    if(m_totalTime != totalT)
-    {
-        m_totalTime = totalT;
-        emit currentTimeChanged();
-    }
-
+    const QTime currentT = ::secondsToTime(currentSecs);
     if(m_currentTime != currentT)
     {
         m_currentTime = currentT;
@@ -886,9 +888,6 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
 
     while(pageIndex < nrPages)
     {
-        if(pageIndex == 38)
-            qDebug("Check this.");
-
         paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
         const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
         const int lastPosition = pageIndex == nrPages-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
@@ -1515,8 +1514,6 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
         m_textDocument->setDefaultFont(m_formatting->defaultFont());
         m_formatting->pageLayout()->configure(m_textDocument);
 
-        this->setPageCount(m_textDocument->pageCount());
-
         const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
         const QMarginsF pageMargins = pageLayout->margins();
 
@@ -1525,6 +1522,8 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
 
         QTextCursor endCursor(m_textDocument);
         endCursor.movePosition(QTextCursor::End);
+
+        qreal fpageCount = 0.1;
 
         const int pageCount = m_textDocument->pageCount();
         int pageIndex = 0;
@@ -1537,7 +1536,28 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
             pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : endCursor.position());
 
             ++pageIndex;
+
+            if(pageIndex == pageCount)
+            {
+                ScreenplayElement *lastElement = m_screenplay->elementAt(m_screenplay->elementCount()-1);
+                if(lastElement == nullptr)
+                    fpageCount = 0.01;
+                else
+                {
+                    QTextFrame *lastFrame = this->findTextFrame(lastElement);
+                    if(lastFrame == nullptr)
+                        fpageCount = m_textDocument->pageCount();
+                    else
+                    {
+                        const QRectF lastFrameRect = m_textDocument->documentLayout()->frameBoundingRect(lastFrame);
+                        fpageCount = m_textDocument->pageCount()-1;
+                        fpageCount += (lastFrameRect.bottom() - contentsRect.top())/contentsRect.height();
+                    }
+                }
+            }
         }
+
+        this->setPageCount(fpageCount);
     }
 
     m_pageBoundaries = pgBoundaries;
