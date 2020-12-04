@@ -406,14 +406,15 @@ Item {
                 }
 
                 onClicked: {
-                    if(!scriteDocument.readOnly) {
-                        var where = Qt.point(mouse.x, mouse.y)
-                        if(what === "element")
-                            where = Qt.point(mouse.x-130, mouse.y-22)
-                        canvas.createItem(what, where)
-                    }
+                    var _what = what
                     what = ""
                     enabled = false
+                    if(!scriteDocument.readOnly) {
+                        var where = Qt.point(mouse.x, mouse.y)
+                        if(_what === "element")
+                            where = Qt.point(mouse.x-130, mouse.y-22)
+                        canvas.createItem(_what, where)
+                    }
                 }
             }
 
