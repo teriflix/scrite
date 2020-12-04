@@ -1136,6 +1136,63 @@ Item {
             }
         }
 
+        Item {
+            id: globalTimeDisplay
+            anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
+            anchors.right: editTools.visible ? editTools.left : parent.right
+            anchors.margins: 10
+            height: parent.height
+            property ScreenplayTextDocument screenplayTextDocument
+            visible: screenplayTextDocument !== null
+            property alias visibleToUser: currentTimeDisplay.visible
+
+            Rectangle {
+                visible: currentTimeDisplay.visible
+                anchors.fill: currentTimeDisplay
+                anchors.margins: -5
+                color: primaryColors.c800.background
+                border.color: primaryColors.c300.background
+                border.width: 1
+                radius: 3
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    ToolTip.text: "Time estimates are approximate, assuming " + globalTimeDisplay.screenplayTextDocument.timePerPageAsString + " per page."
+                    ToolTip.delay: 1000
+                    ToolTip.visible: containsMouse
+                }
+            }
+
+            Column {
+                id: currentTimeDisplay
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                visible: width <= parent.width
+
+                Text {
+                    id: currentTimeLabel
+                    font.pixelSize: globalTimeDisplay.height*0.45
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: primaryColors.c800.text
+                    text: {
+                        if(globalTimeDisplay.screenplayTextDocument.totalTime.getHours() > 0)
+                            return Qt.formatTime(globalTimeDisplay.screenplayTextDocument.currentTime, "H:mm:ss")
+                        return Qt.formatTime(globalTimeDisplay.screenplayTextDocument.currentTime, "mm:ss")
+                    }
+                }
+
+                Text {
+                    font.pixelSize: globalTimeDisplay.height*0.15
+                    color: primaryColors.c800.text
+                    text: "( Current Time )"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+        }
+
         Row {
             id: editTools
             x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x) / 2)

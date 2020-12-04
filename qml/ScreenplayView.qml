@@ -31,7 +31,16 @@ Item {
     Connections {
         target: scriteDocument.screenplay
         onCurrentElementIndexChanged: {
-            screenplayElementList.positionViewAtIndex(scriteDocument.screenplay.currentElementIndex, ListView.Contain)
+            if(!scriteDocument.loading) {
+                app.execLater(screenplayElementList, 150, function() {
+                    if(screenplayElementList.currentIndex === 0)
+                        screenplayElementList.positionViewAtBeginning()
+                    else if(screenplayElementList.currentIndex === screenplayElementList.count-1)
+                        screenplayElementList.positionViewAtEnd()
+                    else
+                        screenplayElementList.positionViewAtIndex(scriteDocument.screenplay.currentElementIndex, ListView.Contain)
+                })
+            }
         }
     }
 
@@ -153,7 +162,7 @@ Item {
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
-        model: scriteDocument.loading ? 0 : scriteDocument.screenplay
+        model: scriteDocument.loading ? null : scriteDocument.screenplay
         property real minimumDelegateWidth: 100
         property real perElementWidth: 2.5
         property bool moveMode: false

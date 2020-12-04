@@ -68,6 +68,7 @@ Rectangle {
         formatting: scriteDocument.loading ? null : scriteDocument.printFormat
         syncEnabled: true
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
+        Component.onCompleted: globalTimeDisplay.screenplayTextDocument = screenplayTextDocument
     }
 
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
@@ -531,11 +532,15 @@ Rectangle {
             font.family: headingFontMetrics.font.family
             font.pixelSize: parent.height * 0.5
             text: {
-                var ret = "Page " + screenplayTextDocument.currentPage + "/" + screenplayTextDocument.pageCount
-                if(screenplayTextDocument.pageCount > 1)
-                    ret += " | " + "Time: " + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
-                else
-                    ret += " | " + "Time: < " + screenplayTextDocument.timePerPageAsString
+                var ret = "Page " + screenplayTextDocument.currentPage + "/" + screenplayTextDocument.pageCount + " | "
+                if(screenplayTextDocument.pageCount > 1) {
+                    if(globalTimeDisplay.visibleToUser) {
+                        ret += "Time Est: ~" + screenplayTextDocument.totalTimeAsString
+                    } else {
+                        ret += "Time: ~" + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
+                    }
+                } else
+                    ret += "Time Est: < ~" + screenplayTextDocument.timePerPageAsString
                 return ret
             }
 
