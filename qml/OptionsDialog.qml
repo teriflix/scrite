@@ -311,86 +311,127 @@ Item {
             GroupBox {
                 width: parent.width - 60
                 anchors.horizontalCenter: parent.horizontalCenter
+                title: "Structure Canvas"
 
-                Column {
+                Row {
                     width: parent.width
-                    spacing: 10
+                    spacing: 20
 
-                    CheckBox2 {
-                        checkable: true
-                        checked: structureCanvasSettings.showGrid
-                        text: "Show Grid in Structure Tab"
-                        onToggled: structureCanvasSettings.showGrid = checked
-                    }
-
-                    // Colors
-                    Row {
+                    Column {
+                        width: (parent.width-parent.spacing)/2
                         spacing: 10
-                        width: parent.width
 
-                        Text {
-                            font.pixelSize: 14
-                            text: "Background Color"
-                            horizontalAlignment: Text.AlignRight
-                            anchors.verticalCenter: parent.verticalCenter
+                        CheckBox2 {
+                            checkable: true
+                            checked: structureCanvasSettings.showGrid
+                            text: "Show Grid in Structure Tab"
+                            onToggled: structureCanvasSettings.showGrid = checked
+                            width: parent.width
                         }
 
-                        Rectangle {
-                            border.width: 1
-                            border.color: primaryColors.borderColor
-                            width: 30; height: 30
-                            color: structureCanvasSettings.canvasColor
-                            anchors.verticalCenter: parent.verticalCenter
+                        // Colors
+                        Row {
+                            spacing: 10
+                            width: parent.width
 
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: structureCanvasSettings.canvasColor = app.pickColor(structureCanvasSettings.canvasColor)
+                            Text {
+                                font.pixelSize: 14
+                                text: "Background Color"
+                                horizontalAlignment: Text.AlignRight
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Rectangle {
+                                border.width: 1
+                                border.color: primaryColors.borderColor
+                                width: 30; height: 30
+                                color: structureCanvasSettings.canvasColor
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: structureCanvasSettings.canvasColor = app.pickColor(structureCanvasSettings.canvasColor)
+                                }
+                            }
+
+                            Text {
+                                text: "Grid Color"
+                                font.pixelSize: 14
+                                horizontalAlignment: Text.AlignRight
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Rectangle {
+                                border.width: 1
+                                border.color: primaryColors.borderColor
+                                width: 30; height: 30
+                                color: structureCanvasSettings.gridColor
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: structureCanvasSettings.gridColor = app.pickColor(structureCanvasSettings.gridColor)
+                                }
                             }
                         }
 
-                        Text {
-                            text: "Grid Color"
-                            font.pixelSize: 14
-                            horizontalAlignment: Text.AlignRight
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                        Row {
+                            spacing: 10
+                            width: parent.width
+                            visible: app.isWindowsPlatform || app.isLinuxPlatform
 
-                        Rectangle {
-                            border.width: 1
-                            border.color: primaryColors.borderColor
-                            width: 30; height: 30
-                            color: structureCanvasSettings.gridColor
-                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                id: wzfText
+                                text: "Zoom Speed"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: structureCanvasSettings.gridColor = app.pickColor(structureCanvasSettings.gridColor)
+                            Slider {
+                                from: 1
+                                to: 20
+                                orientation: Qt.Horizontal
+                                snapMode: Slider.SnapAlways
+                                value: scrollAreaSettings.zoomFactor * 100
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width-wzfText.width-parent.spacing
+                                onMoved: scrollAreaSettings.zoomFactor = value / 100
                             }
                         }
                     }
 
-                    Row {
-                        spacing: 10
-                        width: parent.width
-                        visible: app.isWindowsPlatform || app.isLinuxPlatform
+                    Column {
+                        width: (parent.width-parent.spacing)/2
 
                         Text {
-                            id: wzfText
-                            text: "Zoom Speed"
-                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            text: "Starting with version 0.5.3, Scrite documents use Index Card UI by default. Older projects continue to use synopsis editor as before."
                         }
 
-                        Slider {
-                            from: 1
-                            to: 20
-                            orientation: Qt.Horizontal
-                            snapMode: Slider.SnapAlways
-                            value: scrollAreaSettings.zoomFactor * 100
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width-wzfText.width-parent.spacing
-                            onMoved: scrollAreaSettings.zoomFactor = value / 100
+                        CheckBox2 {
+                            text: "Use Index Card UI On Canvas"
+                            checkable: true
+                            checked: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI
+                            onToggled: {
+                                var toggleCanvasUI = function() {
+                                    if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI)
+                                        scriteDocument.structure.canvasUIMode = Structure.SynopsisEditorUI
+                                    else
+                                        scriteDocument.structure.canvasUIMode = Structure.IndexCardUI
+                                }
+
+                                if(mainTabBar.currentIndex === 0) {
+                                    toggleCanvasUI()
+                                } else {
+                                    contentLoader.active = false
+                                    app.execLater(contentLoader, 100, function() {
+                                        toggleCanvasUI()
+                                        contentLoader.active = true
+                                    })
+                                }
+                            }
                         }
                     }
                 }

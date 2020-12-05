@@ -1354,6 +1354,15 @@ Item {
         ScriptAction {
             script: {
                 contentLoader.active = false
+            }
+        }
+
+        PauseAnimation {
+            duration: 100
+        }
+
+        ScriptAction {
+            script: {
                 if(resetContentAnimation.filePath === "")
                     scriteDocument.reset()
                 else

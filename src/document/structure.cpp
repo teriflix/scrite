@@ -1235,6 +1235,15 @@ void Structure::setCanvasGridSize(qreal val)
     emit canvasGridSizeChanged();
 }
 
+void Structure::setCanvasUIMode(Structure::CanvasUIMode val)
+{
+    if(m_canvasUIMode == val)
+        return;
+
+    m_canvasUIMode = val;
+    emit canvasUIModeChanged();
+}
+
 qreal Structure::snapToGrid(qreal val) const
 {
     return Structure::snapToGrid(val, this);
@@ -1623,10 +1632,10 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     Q_FOREACH(StructureElement *element, elementsToLayout)
         oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
 
-    static const qreal verticalLayoutSpacing = 50;
-    static const qreal horizontalLayoutSpacing = 50;
-    static const qreal flowVerticalLayoutSpacing = 20;
-    static const qreal flowHorizontalLayoutSpacing = 20;
+    const qreal verticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 50;
+    const qreal horizontalLayoutSpacing = verticalLayoutSpacing;
+    const qreal flowVerticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 20;
+    const qreal flowHorizontalLayoutSpacing = flowVerticalLayoutSpacing;
 
     int direction = 1;
     QRectF elementRect;

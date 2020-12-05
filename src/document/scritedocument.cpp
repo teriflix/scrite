@@ -1286,6 +1286,11 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
         format = m_printFormat->elementFormat(SceneElement::Transition);
         format->setTextAlignment(Qt::AlignRight);
     }
+
+    // Documents created using Scrite version 0.5.2 or before use SynopsisEditorUI
+    // by default.
+    if(version <= QVersionNumber(0,5,2))
+        m_structure->setCanvasUIMode(Structure::SynopsisEditorUI);
 }
 
 QString ScriteDocument::polishFileName(const QString &givenFileName) const

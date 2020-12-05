@@ -629,6 +629,24 @@ void Scene::setTitle(const QString &val)
     emit titleChanged();
 }
 
+void Scene::setEmotionalChange(const QString &val)
+{
+    if(m_emotionalChange == val)
+        return;
+
+    m_emotionalChange = val;
+    emit emotionalChangeChanged();
+}
+
+void Scene::setCharactersInConflict(const QString &val)
+{
+    if(m_charactersInConflict == val)
+        return;
+
+    m_charactersInConflict = val;
+    emit charactersInConflictChanged();
+}
+
 void Scene::setColor(const QColor &val)
 {
     if(m_color == val)

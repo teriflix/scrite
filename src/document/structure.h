@@ -454,6 +454,17 @@ public:
     qreal canvasGridSize() const { return m_canvasGridSize; }
     Q_SIGNAL void canvasGridSizeChanged();
 
+    enum CanvasUIMode
+    {
+        SynopsisEditorUI,
+        IndexCardUI
+    };
+    Q_ENUM(CanvasUIMode)
+    Q_PROPERTY(CanvasUIMode canvasUIMode READ canvasUIMode WRITE setCanvasUIMode NOTIFY canvasUIModeChanged)
+    void setCanvasUIMode(CanvasUIMode val);
+    CanvasUIMode canvasUIMode() const { return m_canvasUIMode; }
+    Q_SIGNAL void canvasUIModeChanged();
+
     Q_INVOKABLE qreal snapToGrid(qreal val) const;
     static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize=10.0);
 
@@ -597,6 +608,7 @@ private:
     qreal m_canvasWidth = 1000;
     qreal m_canvasHeight = 1000;
     qreal m_canvasGridSize = 10;
+    CanvasUIMode m_canvasUIMode = IndexCardUI;
     ScriteDocument *m_scriteDocument = nullptr;
 
     static void staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr);

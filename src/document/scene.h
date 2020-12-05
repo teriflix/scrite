@@ -191,6 +191,16 @@ public:
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
+    Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY emotionalChangeChanged)
+    void setEmotionalChange(const QString &val);
+    QString emotionalChange() const { return m_emotionalChange; }
+    Q_SIGNAL void emotionalChangeChanged();
+
+    Q_PROPERTY(QString charactersInConflict READ charactersInConflict WRITE setCharactersInConflict NOTIFY charactersInConflictChanged)
+    void setCharactersInConflict(const QString &val);
+    QString charactersInConflict() const { return m_charactersInConflict; }
+    Q_SIGNAL void charactersInConflictChanged();
+
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
@@ -312,6 +322,9 @@ private:
     Type m_type = Standard;
     QColor m_color = QColor(Qt::white);
     QString m_title;
+    QString m_emotionalChange;
+    QString m_charactersInConflict;
+
     bool m_enabled = true;
     char m_padding[7];
     mutable QString m_id;

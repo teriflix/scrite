@@ -627,8 +627,8 @@ Item {
 
             Repeater {
                 id: elementItems
-                model: scriteDocument.loading ? 0 : scriteDocument.structure.elementsModel
-                delegate: structureElementDelegate
+                model: scriteDocument.loading ? null : scriteDocument.structure.elementsModel
+                delegate: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? structureElementIndexCardUIDelegate : structureElementSynopsisEditorUIDelegate
             }
 
             Selection {
@@ -819,12 +819,12 @@ Item {
                     selectedColor: newSceneButton.activeColor
                     enabled: !scriteDocument.readOnly
                     onMenuItemClicked: {
+                        Qt.callLater( function() { canvasMenu.close() } )
                         newSceneButton.activeColor = color
                         if(canvasMenu.isContextMenu)
                             canvas.createItem("element", Qt.point(canvasMenu.x-130,canvasMenu.y-22), newSceneButton.activeColor)
                         else
                             createItemMouseHandler.handle("element")
-                        canvasMenu.close()
                     }
                 }
 
@@ -841,6 +841,7 @@ Item {
                             text: annotationInfo.title
                             enabled: !scriteDocument.readOnly && annotationInfo.what !== ""
                             onClicked: {
+                                Qt.callLater( function() { canvasMenu.close() } )
                                 if(canvasMenu.isContextMenu)
                                     canvas.createItem(annotationInfo.what, Qt.point(canvasMenu.x, canvasMenu.y))
                                 else
@@ -1115,8 +1116,9 @@ Item {
         }
     }
 
+    // This is the old style structure element delegate, where we were only showing the synopsis.
     Component {
-        id: structureElementDelegate
+        id: structureElementSynopsisEditorUIDelegate
 
         Item {
             id: elementItem
@@ -1318,6 +1320,234 @@ Item {
                         })
                     }
                 }
+            }
+        }
+    }
+
+    // This is the new style structure element delegate, where we are showing index cards like UI
+    // on the structure canvas.
+    Component {
+        id: structureElementIndexCardUIDelegate
+
+        Item {
+            id: elementItem
+            property StructureElement element: modelData
+            property bool selected: scriteDocument.structure.currentElementIndex === index
+            z: selected ? 1 : 0
+
+            function select() {
+                scriteDocument.structure.currentElementIndex = index
+            }
+
+            Component.onCompleted: element.follow = elementItem
+
+            TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
+            TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
+            TightBoundingBoxItem.livePreview: false
+            TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
+            TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
+            TightBoundingBoxItem.viewportItem: canvas
+            TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
+            TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
+
+            x: positionBinder.get.x
+            y: positionBinder.get.y
+            DelayedPropertyBinder {
+                id: positionBinder
+                initial: Qt.point(element.x, element.y)
+                set: element.position
+                onGetChanged: {
+                    elementItem.x = get.x
+                    elementItem.y = get.y
+                }
+            }
+
+            width: 350
+            height: indexCardLayout.height + 20
+
+            Rectangle {
+                id: background
+                anchors.fill: parent
+                color: Qt.tint(element.scene.color, selected ? "#C0FFFFFF" : "#F0FFFFFF")
+                border.width: elementItem.selected ? 2 : 1
+                border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
+
+                // Move index-card around
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton
+                    onClicked: {
+                        annotationGripLoader.reset()
+                        canvas.forceActiveFocus()
+                        scriteDocument.structure.currentElementIndex = index
+                        requestEditorLater()
+                    }
+
+                    drag.target: scriteDocument.readOnly ? null : elementItem
+                    drag.axis: Drag.XAndYAxis
+                    drag.minimumX: 0
+                    drag.minimumY: 0
+                    drag.onActiveChanged: {
+                        canvas.forceActiveFocus()
+                        scriteDocument.structure.currentElementIndex = index
+                        if(drag.active === false) {
+                            elementItem.x = scriteDocument.structure.snapToGrid(elementItem.x)
+                            elementItem.y = scriteDocument.structure.snapToGrid(elementItem.y)
+                        }
+                    }
+                }
+
+                // Context menu support for index card
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.RightButton
+                    onClicked: {
+                        canvas.forceActiveFocus()
+                        elementItem.select()
+                        elementContextMenu.element = elementItem.element
+                        elementContextMenu.popup()
+                    }
+                }
+            }
+
+            TabSequenceManager {
+                id: indexCardTabSequence
+                wrapAround: true
+            }
+
+            Column {
+                id: indexCardLayout
+                width: parent.width - 20
+                anchors.centerIn: parent
+                spacing: 10
+
+                Rectangle {
+                    width: parent.width
+                    height: 10
+                    color: selected ? element.scene.color : Qt.tint(element.scene.color, "#90FFFFFF")
+                }
+
+                TextField2 {
+                    id: headingField
+                    width: parent.width
+                    text: element.scene.heading.text
+                    enabled: element.scene.heading.enabled
+                    label: "Scene Heading"
+                    labelAlwaysVisible: true
+                    placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+                    font.family: scriteDocument.formatting.defaultFont.family
+                    font.bold: true
+                    font.pointSize: app.idealFontPointSize
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    onEditingComplete: element.scene.heading.parseFrom(text)
+                    TabSequenceItem.manager: indexCardTabSequence
+                    TabSequenceItem.sequence: 0
+                    onActiveFocusChanged: if(activeFocus) elementItem.select()
+                }
+
+                TextField2 {
+                    id: synopsisField
+                    width: parent.width
+                    label: "Synopsis"
+                    labelAlwaysVisible: true
+                    placeholderText: "Describe what happens in this scene."
+                    font.pointSize: app.idealFontPointSize
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    TabSequenceItem.manager: indexCardTabSequence
+                    TabSequenceItem.sequence: 1
+                    text: element.scene.title
+                    onTextEdited: element.scene.title = text
+                    onActiveFocusChanged: if(activeFocus) elementItem.select()
+                }
+
+                TextField2 {
+                    id: emotionChangeField
+                    width: parent.width
+                    label: "Emotional Change"
+                    labelAlwaysVisible: true
+                    placeholderText: "+/- emotional change in this scene..."
+                    font.pointSize: app.idealFontPointSize - 2
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    TabSequenceItem.manager: indexCardTabSequence
+                    TabSequenceItem.sequence: 2
+                    text: element.scene.emotionalChange
+                    onTextEdited: element.scene.emotionalChange = text
+                    onActiveFocusChanged: if(activeFocus) elementItem.select()
+                }
+
+                TextField2 {
+                    id: conflictCharsField
+                    width: parent.width
+                    label: "Conflicting Characters"
+                    labelAlwaysVisible: true
+                    placeholderText: ">< characters in conflict in this scene..."
+                    font.pointSize: app.idealFontPointSize - 2
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    TabSequenceItem.manager: indexCardTabSequence
+                    TabSequenceItem.sequence: 3
+                    text: element.scene.charactersInConflict
+                    onTextEdited: element.scene.charactersInConflict = text
+                    onActiveFocusChanged: if(activeFocus) elementItem.select()
+                }
+
+                Item {
+                    width: parent.width
+                    height: 24
+
+                    SceneTypeImage {
+                        width: 24; height: 24
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        opacity: 0.5
+                        showTooltip: false
+                        sceneType: element.scene.type
+                    }
+
+                    Image {
+                        id: dragHandle
+                        source: "../icons/action/view_array.png"
+                        width: 24; height: 24
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        scale: dragHandleMouseArea.containsMouse ? 2 : 1
+                        opacity: dragHandleMouseArea.containsMouse ? 1 : 0.1
+                        Behavior on scale {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
+
+                        MouseArea {
+                            id: dragHandleMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: !canvasScroll.flicking && !canvasScroll.moving && elementItem.selected
+                            drag.target: parent
+                            cursorShape: Qt.SizeAllCursor
+                            drag.onActiveChanged: {
+                                if(drag.active)
+                                    canvas.forceActiveFocus()
+                            }
+                            onContainsMouseChanged: {
+                                if(containsMouse)
+                                    canvasScroll.maybeDragItem = elementItem
+                                else if(canvasScroll.maybeDragItem === elementItem)
+                                    canvasScroll.maybeDragItem = null
+                            }
+                            onPressed: {
+                                canvas.forceActiveFocus()
+                                elementItem.grabToImage(function(result) {
+                                    elementItem.Drag.imageSource = result.url
+                                })
+                            }
+                        }
+                    }
+                }
+
+                // Drag to timeline support
+                Drag.active: dragHandleMouseArea.drag.active
+                Drag.dragType: Drag.Automatic
+                Drag.supportedActions: Qt.LinkAction
+                Drag.mimeData: { "scrite/sceneID": element.scene.id }
+                Drag.source: element.scene
             }
         }
     }
