@@ -149,6 +149,7 @@ public:
     bool include(SceneElement *element);
     bool remove(SceneElement *element);
     bool remove(const QString &name);
+    bool isEmpty() const { return m_forwardMap.isEmpty() && m_reverseMap.isEmpty(); }
 
     QStringList characterNames() const;
     QList<SceneElement*> characterElements() const;
@@ -234,6 +235,9 @@ public:
 
     Q_PROPERTY(SceneHeading* heading READ heading CONSTANT)
     SceneHeading* heading() const { return m_heading; }
+
+    Q_PROPERTY(bool hasCharacters READ hasCharacters NOTIFY characterNamesChanged)
+    bool hasCharacters() const { return !m_characterElementMap.isEmpty(); }
 
     Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
     QStringList characterNames() const { return m_characterElementMap.characterNames(); }

@@ -1425,6 +1425,8 @@ Item {
                     width: parent.width
                     height: 10
                     color: selected ? element.scene.color : Qt.tint(element.scene.color, "#90FFFFFF")
+                    border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
+                    border.width: 1
                 }
 
                 TextField2 {
@@ -1490,25 +1492,39 @@ Item {
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                 }
 
-                Item {
+                Row {
                     width: parent.width
-                    height: 24
+                    spacing: 5
 
                     SceneTypeImage {
+                        id: sceneTypeImage
                         width: 24; height: 24
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
                         opacity: 0.5
                         showTooltip: false
                         sceneType: element.scene.type
+                        anchors.bottom: parent.bottom
+                        visible: sceneType !== Scene.Standard
+                    }
+
+                    Text {
+                        font.pointSize: app.idealAppFontSize - 2
+                        width: parent.width - dragHandle.width - parent.spacing - (sceneTypeImage.visible ? (sceneTypeImage.width+parent.spacing) : 0)
+                        anchors.verticalCenter: parent.verticalCenter
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
+                        opacity: element.scene.hasCharacters ? 1 : 0
+                        text: {
+                            if(element.scene.hasCharacters)
+                                return "<b>Characters</b>: " + element.scene.characterNames.join(", ")
+                            return ""
+                        }
                     }
 
                     Image {
                         id: dragHandle
                         source: "../icons/action/view_array.png"
                         width: 24; height: 24
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.bottom: parent.bottom
                         scale: dragHandleMouseArea.containsMouse ? 2 : 1
                         opacity: dragHandleMouseArea.containsMouse ? 1 : 0.1
                         Behavior on scale {

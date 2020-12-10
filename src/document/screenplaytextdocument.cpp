@@ -1219,7 +1219,7 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
         while(before == nullptr)
         {
             before = m_screenplay->elementAt(--index);
-            if(before->scene() == nullptr)
+            if(before == nullptr || before->scene() == nullptr)
             {
                 before = nullptr;
                 continue;

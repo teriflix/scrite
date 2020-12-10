@@ -199,6 +199,8 @@ public:
 
     // Callers must be responsible for how they use this.
     DocumentFileSystem *fileSystem() { return &m_docFileSystem; }
+    Q_INVOKABLE void blockUI() { this->setLoading(true); }
+    Q_INVOKABLE void unblockUI() { this->setLoading(false); }
 
 protected:
     void timerEvent(QTimerEvent *event);
