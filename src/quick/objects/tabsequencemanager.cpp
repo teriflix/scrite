@@ -38,6 +38,27 @@ void TabSequenceManager::setWrapAround(bool val)
     this->reworkSequenceLater();
 }
 
+void TabSequenceManager::assumeFocusAt(int index)
+{
+    if(index < 0 || index >= m_tabSequenceItems.size())
+        return;
+
+    TabSequenceItem *item = m_tabSequenceItems.at(index);
+    QQuickItem *qitem = qobject_cast<QQuickItem*>(item->parent());
+    if(qitem)
+        qitem->setFocus(true);
+}
+
+void TabSequenceManager::releaseFocus()
+{
+    for(TabSequenceItem *item : m_tabSequenceItems)
+    {
+        QQuickItem *qitem = qobject_cast<QQuickItem*>(item->parent());
+        if(qitem)
+            qitem->setFocus(false);
+    }
+}
+
 void TabSequenceManager::timerEvent(QTimerEvent *te)
 {
     if(m_timer.timerId() == te->timerId())

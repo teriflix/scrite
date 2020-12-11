@@ -35,6 +35,10 @@ public:
     bool isWrapAround() const { return m_wrapAround; }
     Q_SIGNAL void wrapAroundChanged();
 
+    Q_INVOKABLE void assumeFocus() { this->assumeFocusAt(0); }
+    Q_INVOKABLE void assumeFocusAt(int index);
+    Q_INVOKABLE void releaseFocus();
+
 protected:
     void timerEvent(QTimerEvent *te);
     bool eventFilter(QObject *watched, QEvent *event);

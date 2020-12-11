@@ -1377,6 +1377,7 @@ Item {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
                     onClicked: {
+                        indexCardTabSequence.releaseFocus()
                         annotationGripLoader.reset()
                         canvas.forceActiveFocus()
                         scriteDocument.structure.currentElementIndex = index
@@ -1402,6 +1403,7 @@ Item {
                     anchors.fill: parent
                     acceptedButtons: Qt.RightButton
                     onClicked: {
+                        indexCardTabSequence.releaseFocus()
                         canvas.forceActiveFocus()
                         elementItem.select()
                         elementContextMenu.element = elementItem.element
@@ -1719,11 +1721,19 @@ Item {
             onWidthChanged: annotGeoUpdateTimer.start()
             onHeightChanged: annotGeoUpdateTimer.start()
 
+            function snapAnnotationGeometryToGrid(rect) {
+                var gx = scriteDocument.structure.snapToGrid(rect.x)
+                var gy = scriteDocument.structure.snapToGrid(rect.y)
+                var gw = scriteDocument.structure.snapToGrid(rect.width)
+                var gh = scriteDocument.structure.snapToGrid(rect.height)
+                annotation.geometry = Qt.rect(gx, gy, gw, gh)
+            }
+
             Timer {
                 id: annotGeoUpdateTimer
                 interval: geometryUpdateInterval
                 onTriggered: {
-                    annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, annotationGripItem.width, annotationGripItem.height)
+                    snapAnnotationGeometryToGrid(Qt.rect(annotationGripItem.x,annotationGripItem.y,annotationGripItem.width,annotationGripItem.height))
                 }
             }
 
@@ -1761,7 +1771,7 @@ Item {
                     id: widthUpdateTimer
                     interval: geometryUpdateInterval
                     onTriggered: {
-                        annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, rightGrip.x + rightGrip.width/2, annotationGripItem.height)
+                        snapAnnotationGeometryToGrid(Qt.rect(annotationGripItem.x, annotationGripItem.y, rightGrip.x + rightGrip.width/2, annotationGripItem.height))
                     }
                 }
 
@@ -1792,7 +1802,7 @@ Item {
                     id: heightUpdateTimer
                     interval: geometryUpdateInterval
                     onTriggered: {
-                        annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, annotationGripItem.width, bottomGrip.y + bottomGrip.height/2)
+                        snapAnnotationGeometryToGrid(Qt.rect(annotationGripItem.x, annotationGripItem.y, annotationGripItem.width, bottomGrip.y + bottomGrip.height/2))
                     }
                 }
 
@@ -1824,7 +1834,7 @@ Item {
                     id: sizeUpdateTimer
                     interval: geometryUpdateInterval
                     onTriggered: {
-                        annotation.geometry = Qt.rect(annotationGripItem.x, annotationGripItem.y, bottomRightGrip.x + bottomRightGrip.width/2, bottomRightGrip.y + bottomRightGrip.height/2)
+                        snapAnnotationGeometryToGrid(Qt.rect(annotationGripItem.x, annotationGripItem.y, bottomRightGrip.x + bottomRightGrip.width/2, bottomRightGrip.y + bottomRightGrip.height/2))
                     }
                 }
 
