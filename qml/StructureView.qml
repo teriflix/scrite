@@ -1468,7 +1468,7 @@ Item {
                     label: "Emotional Change"
                     labelAlwaysVisible: true
                     placeholderText: "+/- emotional change in this scene..."
-                    font.pointSize: app.idealFontPointSize - 2
+                    font.pointSize: app.idealFontPointSize - 3
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     TabSequenceItem.manager: indexCardTabSequence
                     TabSequenceItem.sequence: 2
@@ -1483,12 +1483,27 @@ Item {
                     label: "Conflicting Characters"
                     labelAlwaysVisible: true
                     placeholderText: ">< characters in conflict in this scene..."
-                    font.pointSize: app.idealFontPointSize - 2
+                    font.pointSize: app.idealFontPointSize - 3
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     TabSequenceItem.manager: indexCardTabSequence
                     TabSequenceItem.sequence: 3
                     text: element.scene.charactersInConflict
                     onTextEdited: element.scene.charactersInConflict = text
+                    onActiveFocusChanged: if(activeFocus) elementItem.select()
+                }
+
+                TextField2 {
+                    id: pageTargetField
+                    width: parent.width
+                    label: "Page Target"
+                    labelAlwaysVisible: true
+                    placeholderText: "5, 10-20 etc.."
+                    font.pointSize: app.idealFontPointSize - 3
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    TabSequenceItem.manager: indexCardTabSequence
+                    TabSequenceItem.sequence: 4
+                    text: element.scene.pageTarget
+                    onTextEdited: element.scene.pageTarget = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                 }
 

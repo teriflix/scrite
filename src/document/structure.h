@@ -396,10 +396,23 @@ public:
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
 
+    Q_INVOKABLE void move(qreal x, qreal y) {
+        this->setGeometry( QRectF(x,y,m_geometry.width(),m_geometry.height()) );
+    }
+    Q_INVOKABLE void resize(qreal w, qreal h) {
+        this->setGeometry( QRectF(m_geometry.x(), m_geometry.y(), w, h) );
+    }
+    Q_INVOKABLE void place(qreal x, qreal y, qreal w, qreal h) {
+        this->setGeometry(QRectF(x,y,w,h));
+    }
+
     Q_PROPERTY(QJsonObject attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
     void setAttributes(const QJsonObject &val);
     QJsonObject attributes() const { return m_attributes; }
     Q_SIGNAL void attributesChanged();
+
+    Q_INVOKABLE void setAttribute(const QString &key, const QJsonValue &value);
+    Q_INVOKABLE void removeAttribute(const QString &key);
 
     Q_PROPERTY(QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged STORED false)
     void setMetaData(const QJsonArray &val);
@@ -574,6 +587,8 @@ public:
     int annotationCount() const { return m_annotations.size(); }
     Q_INVOKABLE void clearAnnotations();
     Q_SIGNAL void annotationCountChanged();
+
+    Q_INVOKABLE Annotation *createAnnotation(const QString &type);
 
     Q_SIGNAL void structureChanged();
 

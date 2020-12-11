@@ -82,7 +82,8 @@ Row {
 
                 MenuItem2 {
                     text: "Display Scene Synopsis"
-                    icon.source: screenplayEditorSettings.displaySceneNotes ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    enabled: mainTabBar.currentIndex === 0
+                    icon.source: screenplayEditorSettings.displaySceneNotes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: screenplayEditorSettings.displaySceneNotes = !screenplayEditorSettings.displaySceneNotes
                 }
             }

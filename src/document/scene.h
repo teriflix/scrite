@@ -207,6 +207,15 @@ public:
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
+    // Stored as a string, but it must be either a page number or a page range.
+    // Valid values will be of the form "20", "30-50", "10,20,30", "35 45" etc..
+    Q_PROPERTY(QString pageTarget READ pageTarget WRITE setPageTarget NOTIFY pageTargetChanged)
+    void setPageTarget(const QString &val);
+    QString pageTarget() const { return m_pageTarget; }
+    Q_SIGNAL void pageTargetChanged();
+
+    Q_INVOKABLE bool validatePageTarget(int pageNumber) const;
+
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
@@ -328,6 +337,7 @@ private:
     QString m_title;
     QString m_emotionalChange;
     QString m_charactersInConflict;
+    QString m_pageTarget;
 
     bool m_enabled = true;
     char m_padding[7];

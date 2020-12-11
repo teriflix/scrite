@@ -28,6 +28,7 @@ Rectangle {
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: screenplayAdapter.source
     property bool toolBarVisible: toolbar.visible
+    property bool synopsisPanelAllowed: true
     property var additionalCharacterMenuItems: []
     property var additionalSceneMenuItems: []
     signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
@@ -242,7 +243,7 @@ Rectangle {
                     model: contentViewModel.value
                     property int synopsisExpandCounter: 0
                     property bool synopsisExpanded: false
-                    property real spaceForSynopsis: screenplayEditorSettings.displaySceneNotes ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
+                    property real spaceForSynopsis: screenplayEditorSettings.displaySceneNotes && synopsisPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
                     onSynopsisExpandedChanged: synopsisExpandCounter = synopsisExpandCounter+1
                     delegate: Loader {
                         width: contentView.width

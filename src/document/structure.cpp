@@ -1038,7 +1038,7 @@ void Annotation::setGeometry(const QRectF &val)
     if(m_geometry == val2)
         return;
 
-    m_geometry = val;
+    m_geometry = val2;
     emit geometryChanged();
 }
 
@@ -1054,6 +1054,18 @@ void Annotation::setAttributes(const QJsonObject &val)
 
     m_attributes = val;
     this->polishAttributes();
+    emit attributesChanged();
+}
+
+void Annotation::setAttribute(const QString &key, const QJsonValue &value)
+{
+    m_attributes.insert(key, value);
+    emit attributesChanged();
+}
+
+void Annotation::removeAttribute(const QString &key)
+{
+    m_attributes.remove(key);
     emit attributesChanged();
 }
 
@@ -1872,6 +1884,13 @@ void Structure::clearAnnotations()
 {
     while(m_annotations.size())
         this->removeAnnotation(m_annotations.first());
+}
+
+Annotation *Structure::createAnnotation(const QString &type)
+{
+    Annotation *ret = new Annotation(this);
+    ret->setType(type);
+    return ret;
 }
 
 void Structure::copy(QObject *elementOrAnnotation)

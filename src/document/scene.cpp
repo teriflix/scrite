@@ -658,6 +658,39 @@ void Scene::setColor(const QColor &val)
     emit colorChanged();
 }
 
+void Scene::setPageTarget(const QString &val)
+{
+    if(m_pageTarget == val)
+        return;
+
+    m_pageTarget = val;
+    emit pageTargetChanged();
+}
+
+bool Scene::validatePageTarget(int pageNumber) const
+{
+    if(m_pageTarget.isEmpty())
+        return true;
+
+    if(pageNumber < 0)
+        return false;
+
+    const QStringList fields = m_pageTarget.split(QStringLiteral(","), QString::SkipEmptyParts);
+    for(QString field : fields)
+    {
+        const QStringList nos = field.trimmed().split(QStringLiteral("-"), QString::SkipEmptyParts);
+        if(nos.isEmpty())
+            continue;
+
+        const int nr1 = nos.first().trimmed().toInt();
+        const int nr2 = nos.size() == 1 ? nr1 : nos.last().trimmed().toInt();
+        if(pageNumber >= qMin(nr1,nr2) && pageNumber <= qMax(nr1,nr2))
+            return true;
+    }
+
+    return false;
+}
+
 void Scene::setEnabled(bool val)
 {
     if(m_enabled == val)
