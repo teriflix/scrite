@@ -141,5 +141,7 @@
         <file>icons/hardware/mouse.png</file>
         <file>icons/content/camera_alt.png</file>
         <file>icons/content/camera_alt_inverted.png</file>
+        <file>icons/action/layout_beat_sheet.png</file>
+        <file>icons/action/layout_beat_sheet_inverted.png</file>
     </qresource>
 </RCC>

@@ -551,6 +551,8 @@ public:
     Q_ENUM(LayoutType)
     Q_INVOKABLE QRectF layoutElements(LayoutType layoutType);
 
+    Q_INVOKABLE QRectF layoutElementsInBeatSheet(Screenplay *screenplay);
+
     Q_INVOKABLE void scanForMuteCharacters();
 
     Q_INVOKABLE QStringList standardLocationTypes() const;

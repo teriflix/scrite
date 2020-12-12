@@ -1728,6 +1728,65 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     return newBoundingRect;
 }
 
+QRectF Structure::layoutElementsInBeatSheet(Screenplay *screenplay)
+{
+    QRectF newBoundingRect;
+
+    if(screenplay == nullptr)
+        return newBoundingRect;
+
+    QList< QList<StructureElement*> > beats;
+    beats.append( QList<StructureElement*>() );
+
+    for(int i=0; i<screenplay->elementCount(); i++)
+    {
+        ScreenplayElement *element = screenplay->elementAt(i);
+        if(element->elementType() == ScreenplayElement::BreakElementType)
+        {
+            QList<StructureElement*> newBeat;
+            beats.append(newBeat);
+        }
+        else
+        {
+            Scene *scene = element->scene();
+            int index = this->indexOfScene(scene);
+            StructureElement *selement = this->elementAt(index);
+            if(selement != nullptr)
+                beats.last().append(selement);
+        }
+    }
+
+    const qreal x = 5000;
+    const qreal y = 5000;
+    const qreal xSpacing = 100;
+    const qreal ySpacing = 100;
+
+    QRectF elementRect(x, y, 0, 0);
+
+    for(QList<StructureElement*> beat : beats)
+    {
+        if(beat.isEmpty())
+            continue;
+
+        QRectF beatRect;
+        for(StructureElement *element : beat)
+        {
+            elementRect.setWidth(element->width());
+            elementRect.setHeight(element->height());
+            beatRect |= elementRect;
+            newBoundingRect |= elementRect;
+
+            element->setPosition(elementRect.topLeft());
+
+            elementRect.moveTopLeft( elementRect.topRight() + QPointF(xSpacing,0) );
+        }
+
+        elementRect.moveTopLeft(QPointF(x, beatRect.bottom()+ySpacing));
+    }
+
+    return newBoundingRect;
+}
+
 void Structure::scanForMuteCharacters()
 {
     m_scriteDocument->setBusyMessage("Scanning for mute characters..");

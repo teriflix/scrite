@@ -165,6 +165,16 @@ Item {
                 onClicked: selection.layout(Structure.FlowVerticalLayout)
             }
 
+            ToolButton3 {
+                enabled: !scriteDocument.readOnly && scriteDocument.screenplay.elementCount > 0
+                iconSource: "../icons/action/layout_beat_sheet.png"
+                ToolTip.text: "Beat Sheet Layout"
+                onClicked: {
+                    var rect = scriteDocument.structure.layoutElementsInBeatSheet(scriteDocument.screenplay)
+                    canvasScroll.zoomFit(rect)
+                }
+            }
+
             Rectangle {
                 width: 1
                 height: parent.height
@@ -734,7 +744,8 @@ Item {
                         return
 
                     if(!hasItems) {
-                        scriteDocument.structure.layoutElements(type)
+                        var rect = scriteDocument.structure.layoutElements(type)
+                        canvasScroll.zoomFit(rect)
                         return
                     }
 
