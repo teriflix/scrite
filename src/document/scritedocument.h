@@ -117,11 +117,6 @@ public:
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
 
-    Q_PROPERTY(QString logLine READ logLine WRITE setLogLine NOTIFY logLineChanged)
-    void setLogLine(const QString &val);
-    QString logLine() const { return m_logLine; }
-    Q_SIGNAL void logLineChanged();
-
     Q_PROPERTY(Structure* structure READ structure NOTIFY structureChanged)
     Structure* structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
@@ -245,7 +240,6 @@ private:
     bool m_autoSave = true;
     bool m_readOnly = false;
     bool m_autoSaveMode = false;
-    QString m_logLine;
     QString m_fileName;
     QString m_busyMessage;
     bool m_inCreateNewScene = false;

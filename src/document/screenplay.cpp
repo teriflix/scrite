@@ -303,6 +303,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::emailChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::loglineChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::websiteChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::basedOnChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::contactChanged, this, &Screenplay::screenplayChanged);
@@ -344,6 +345,15 @@ void Screenplay::setSubtitle(const QString &val)
 
     m_subtitle = val;
     emit subtitleChanged();
+}
+
+void Screenplay::setLogline(const QString &val)
+{
+    if(m_logline == val)
+        return;
+
+    m_logline = val;
+    emit loglineChanged();
 }
 
 void Screenplay::setBasedOn(const QString &val)

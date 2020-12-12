@@ -335,11 +335,11 @@ Rectangle {
                                     palette: app.palette
                                     selectByMouse: true
                                     selectByKeyboard: true
-                                    text: scriteDocument.logLine
+                                    text: scriteDocument.screenplay.logline
                                     Transliterator.textDocument: textDocument
                                     Transliterator.cursorPosition: cursorPosition
                                     Transliterator.hasActiveFocus: activeFocus
-                                    onTextChanged: scriteDocument.logLine = text
+                                    onTextChanged: scriteDocument.screenplay.logline = text
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     placeholderText: "Enter the logline of your screenplay here.."
                                 }
@@ -649,7 +649,8 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width-8
                 horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 30
+                font.pointSize: headingFontMetrics.font.pointSize + 2
+                font.family: headingFontMetrics.font.family
                 font.bold: true
                 text: parent.theElement.breakTitle
                 onTextEdited: parent.theElement.breakTitle = text

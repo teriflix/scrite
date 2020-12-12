@@ -156,6 +156,11 @@ public:
     QString subtitle() const { return m_subtitle; }
     Q_SIGNAL void subtitleChanged();
 
+    Q_PROPERTY(QString logline READ logline WRITE setLogline NOTIFY loglineChanged)
+    void setLogline(const QString &val);
+    QString logline() const { return m_logline; }
+    Q_SIGNAL void loglineChanged();
+
     Q_PROPERTY(QString basedOn READ basedOn WRITE setBasedOn NOTIFY basedOnChanged)
     void setBasedOn(const QString &val);
     QString basedOn() const { return m_basedOn; }
@@ -310,6 +315,7 @@ private:
     QString m_email;
     QString m_author;
     QString m_basedOn;
+    QString m_logline;
     QString m_contact;
     QString m_version;
     QString m_website;

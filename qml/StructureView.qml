@@ -656,15 +656,17 @@ Item {
                     y: modelData.geometry.y - 20
                     width: modelData.geometry.width + 40
                     height: modelData.geometry.height + 40
-                    radius: 8
-                    color: Qt.rgba(0,0,0,0.1)
+                    radius: 0
+                    color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 1
-                    border.color: primaryColors.borderColor
+                    border.color: accentColors.borderColor
 
                     Rectangle {
                         anchors.fill: beatLabel
                         anchors.margins: -parent.radius
-                        color: "black"
+                        border.width: parent.border.width
+                        border.color: parent.border.color
+                        color: app.translucent(accentColors.windowColor, 0.4)
                     }
 
                     Text {
@@ -674,10 +676,10 @@ Item {
                         font.pointSize: app.idealFontPointSize + 3
                         anchors.bottom: parent.top
                         anchors.left: parent.left
-                        anchors.margins: parent.radius
-                        leftPadding: parent.radius
-                        rightPadding: parent.radius
-                        color: "white"
+                        anchors.leftMargin: parent.radius*2
+                        anchors.bottomMargin: parent.radius-parent.border.width
+                        padding: 10
+                        color: "black"
                     }
                 }
             }
