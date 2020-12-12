@@ -612,6 +612,76 @@ Item {
                 }
             }
 
+            property var beats: scriteDocument.structure.evaluateBeats(scriteDocument.screenplay)
+
+            TrackerPack {
+                delay: 250
+
+                TrackProperty {
+                    target: elementConnectorItems
+                    property: "count"
+                }
+
+                TrackSignal {
+                    target: scriteDocument.screenplay
+                    signal: "elementsChanged()"
+                }
+
+                TrackSignal {
+                    target: scriteDocument.screenplay
+                    signal: "breakTitleChanged()"
+                }
+
+                TrackSignal {
+                    target: scriteDocument
+                    signal: "loadingChanged()"
+                }
+
+                TrackSignal {
+                    target: scriteDocument.structure
+                    signal: "structureChanged()"
+                }
+
+                onTracked: {
+                    var beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay)
+                    canvas.beats = beats
+                }
+            }
+
+            Repeater {
+                model: canvas.beats
+
+                Rectangle {
+                    x: modelData.geometry.x - 20
+                    y: modelData.geometry.y - 20
+                    width: modelData.geometry.width + 40
+                    height: modelData.geometry.height + 40
+                    radius: 8
+                    color: Qt.rgba(0,0,0,0.1)
+                    border.width: 1
+                    border.color: primaryColors.borderColor
+
+                    Rectangle {
+                        anchors.fill: beatLabel
+                        anchors.margins: -parent.radius
+                        color: "black"
+                    }
+
+                    Text {
+                        id: beatLabel
+                        text: modelData.name + " (" + modelData.sceneCount + ")"
+                        font.bold: true
+                        font.pointSize: app.idealFontPointSize + 3
+                        anchors.bottom: parent.top
+                        anchors.left: parent.left
+                        anchors.margins: parent.radius
+                        leftPadding: parent.radius
+                        rightPadding: parent.radius
+                        color: "white"
+                    }
+                }
+            }
+
             Repeater {
                 id: elementConnectorItems
                 model: scriteDocument.loading ? 0 : scriteDocument.structureElementConnectors
@@ -1359,16 +1429,9 @@ Item {
             }
 
             function finishEditing() {
-                indexCardTabSequence.releaseFocus()
-            }
-
-            FocusTracker.window: qmlWindow
-            FocusTracker.onHasFocusChanged: {
-                if(FocusTracker.hasFocus) {
-                    canvasScroll.editItem = elementItem
-
-                } else if(canvasScroll.editItem === elementItem)
+                if(canvasScroll.editItem === elementItem)
                     canvasScroll.editItem = null
+                indexCardTabSequence.releaseFocus()
             }
 
             Component.onCompleted: element.follow = elementItem
@@ -1441,6 +1504,14 @@ Item {
             TabSequenceManager {
                 id: indexCardTabSequence
                 wrapAround: true
+            }
+
+            property bool focus2: headingField.activeFocus | synopsisField.activeFocus | emotionChangeField.activeFocus | conflictCharsField.activeFocus | pageTargetField.activeFocus
+            onFocus2Changed: {
+                if(focus2)
+                    canvasScroll.editItem = elementItem
+                else if(canvasScroll.editItem === elementItem)
+                    canvasScroll.editItem = null
             }
 
             Column {

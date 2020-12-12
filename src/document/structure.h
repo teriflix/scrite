@@ -551,7 +551,8 @@ public:
     Q_ENUM(LayoutType)
     Q_INVOKABLE QRectF layoutElements(LayoutType layoutType);
 
-    Q_INVOKABLE QRectF layoutElementsInBeatSheet(Screenplay *screenplay);
+    Q_INVOKABLE QRectF layoutElementsInBeatSheet(Screenplay *screenplay) const;
+    Q_INVOKABLE QJsonArray evaluateBeats(Screenplay *screenplay) const;
 
     Q_INVOKABLE void scanForMuteCharacters();
 
@@ -620,6 +621,7 @@ protected:
 private:
     friend class Screenplay;
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
+    QList< QPair<QString, QList<StructureElement *> > > evaluateBeatsImpl(Screenplay *screenplay) const;
 
 private:
     qreal m_canvasWidth = 1000;

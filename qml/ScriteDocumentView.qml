@@ -1540,14 +1540,19 @@ Item {
                                 Loader {
                                     id: structureViewLoader
                                     anchors.fill: parent
-                                    active: !workspaceSettings.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+                                    visible: !workspaceSettings.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                     sourceComponent: StructureView { }
                                 }
 
                                 Loader {
                                     id: notebookViewLoader
                                     anchors.fill: parent
-                                    active: workspaceSettings.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                    active: false
+                                    visible: workspaceSettings.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                    onVisibleChanged: {
+                                        if(visible && !active)
+                                            active = true
+                                    }
                                     sourceComponent: NotebookView { }
                                 }
                             }

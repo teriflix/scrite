@@ -1728,48 +1728,29 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     return newBoundingRect;
 }
 
-QRectF Structure::layoutElementsInBeatSheet(Screenplay *screenplay)
+QRectF Structure::layoutElementsInBeatSheet(Screenplay *screenplay) const
 {
     QRectF newBoundingRect;
 
     if(screenplay == nullptr)
         return newBoundingRect;
 
-    QList< QList<StructureElement*> > beats;
-    beats.append( QList<StructureElement*>() );
-
-    for(int i=0; i<screenplay->elementCount(); i++)
-    {
-        ScreenplayElement *element = screenplay->elementAt(i);
-        if(element->elementType() == ScreenplayElement::BreakElementType)
-        {
-            QList<StructureElement*> newBeat;
-            beats.append(newBeat);
-        }
-        else
-        {
-            Scene *scene = element->scene();
-            int index = this->indexOfScene(scene);
-            StructureElement *selement = this->elementAt(index);
-            if(selement != nullptr)
-                beats.last().append(selement);
-        }
-    }
+    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
 
     const qreal x = 5000;
     const qreal y = 5000;
     const qreal xSpacing = 100;
-    const qreal ySpacing = 100;
+    const qreal ySpacing = 150;
 
     QRectF elementRect(x, y, 0, 0);
 
-    for(QList<StructureElement*> beat : beats)
+    for(QPair<QString, QList<StructureElement*>> beat : beats)
     {
-        if(beat.isEmpty())
+        if(beat.second.isEmpty())
             continue;
 
         QRectF beatRect;
-        for(StructureElement *element : beat)
+        for(StructureElement *element : beat.second)
         {
             elementRect.setWidth(element->width());
             elementRect.setHeight(element->height());
@@ -1785,6 +1766,74 @@ QRectF Structure::layoutElementsInBeatSheet(Screenplay *screenplay)
     }
 
     return newBoundingRect;
+}
+
+QJsonArray Structure::evaluateBeats(Screenplay *screenplay) const
+{
+    QJsonArray ret;
+    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
+
+    for(QPair<QString, QList<StructureElement*>> beat : beats)
+    {
+        if(beat.second.isEmpty())
+            continue;
+
+        QJsonArray sceneIds;
+
+        QRectF beatBox;
+        for(StructureElement *element : beat.second)
+        {
+            beatBox |= QRectF(element->x(), element->y(), element->width(), element->height());
+            sceneIds.append( element->scene()->id() );
+        }
+
+        QJsonObject beatJson;
+        beatJson.insert("name", beat.first);
+        beatJson.insert("sceneIds", sceneIds);
+        beatJson.insert("sceneCount", sceneIds.size());
+
+        QJsonObject beatGeo;
+        beatGeo.insert("x", beatBox.x());
+        beatGeo.insert("y", beatBox.y());
+        beatGeo.insert("width", beatBox.width());
+        beatGeo.insert("height", beatBox.height());
+        beatJson.insert("geometry", beatGeo);
+
+        ret.append(beatJson);
+    }
+
+    return ret;
+}
+
+QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl(Screenplay *screenplay) const
+{
+    QList< QPair<QString, QList<StructureElement *> > > ret;
+    if(screenplay == nullptr)
+        return ret;
+
+    ret.append( qMakePair(QStringLiteral("Opening Act"), QList<StructureElement*>()) );
+
+    for(int i=0; i<screenplay->elementCount(); i++)
+    {
+        ScreenplayElement *element = screenplay->elementAt(i);
+        if(element->elementType() == ScreenplayElement::BreakElementType)
+        {
+            if(i == 0)
+                ret.last().first = element->breakTitle();
+            else
+                ret.append( qMakePair(element->breakTitle(), QList<StructureElement*>()) );
+        }
+        else
+        {
+            Scene *scene = element->scene();
+            int index = this->indexOfScene(scene);
+            StructureElement *selement = this->elementAt(index);
+            if(selement != nullptr)
+                ret.last().second.append(selement);
+        }
+    }
+
+    return ret;
 }
 
 void Structure::scanForMuteCharacters()
@@ -2473,7 +2522,7 @@ QPainterPath StructureElementConnector::shape() const
         return path;
 
     auto getElementRect = [](StructureElement *e) {
-        QRectF r(e->x(), e->y(), e->width(), e->height());
+        QRectF r(e->x(), e->y(), e->width(), qMin(e->height(),100.0));
         // r.moveCenter(QPointF(e->x(), e->y()));
         return r;
     };

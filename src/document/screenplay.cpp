@@ -532,6 +532,8 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
     connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
+    if(ptr->elementType() == ScreenplayElement::BreakElementType)
+        connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
     this->endInsertRows();
 
