@@ -1339,6 +1339,27 @@ Item {
                 scriteDocument.structure.currentElementIndex = index
             }
 
+            function activate() {
+                indexCardTabSequence.releaseFocus()
+                annotationGripLoader.reset()
+                canvas.forceActiveFocus()
+                scriteDocument.structure.currentElementIndex = index
+                requestEditorLater()
+            }
+
+            function finishEditing() {
+                indexCardTabSequence.releaseFocus()
+            }
+
+            FocusTracker.window: qmlWindow
+            FocusTracker.onHasFocusChanged: {
+                if(FocusTracker.hasFocus) {
+                    canvasScroll.editItem = elementItem
+
+                } else if(canvasScroll.editItem === elementItem)
+                    canvasScroll.editItem = null
+            }
+
             Component.onCompleted: element.follow = elementItem
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1376,13 +1397,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
-                    onClicked: {
-                        indexCardTabSequence.releaseFocus()
-                        annotationGripLoader.reset()
-                        canvas.forceActiveFocus()
-                        scriteDocument.structure.currentElementIndex = index
-                        requestEditorLater()
-                    }
+                    onClicked: elementItem.activate()
 
                     drag.target: scriteDocument.readOnly ? null : elementItem
                     drag.axis: Drag.XAndYAxis
@@ -1509,9 +1524,9 @@ Item {
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                 }
 
-                Row {
+                Item {
                     width: parent.width
-                    spacing: 5
+                    height: Math.max(characterList.height, dragHandle.height)
 
                     SceneTypeImage {
                         id: sceneTypeImage
@@ -1519,13 +1534,17 @@ Item {
                         opacity: 0.5
                         showTooltip: false
                         sceneType: element.scene.type
+                        anchors.left: parent.left
                         anchors.bottom: parent.bottom
                         visible: sceneType !== Scene.Standard
                     }
 
                     Text {
+                        id: characterList
                         font.pointSize: app.idealAppFontSize - 2
-                        width: parent.width - dragHandle.width - parent.spacing - (sceneTypeImage.visible ? (sceneTypeImage.width+parent.spacing) : 0)
+                        anchors.left: sceneTypeImage.right
+                        anchors.right: dragHandle.left
+                        anchors.margins: 5
                         anchors.verticalCenter: parent.verticalCenter
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
@@ -1541,6 +1560,7 @@ Item {
                         id: dragHandle
                         source: "../icons/action/view_array.png"
                         width: 24; height: 24
+                        anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         scale: dragHandleMouseArea.containsMouse ? 2 : 1
                         opacity: dragHandleMouseArea.containsMouse ? 1 : 0.1

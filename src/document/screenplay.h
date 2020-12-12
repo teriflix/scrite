@@ -51,6 +51,11 @@ public:
     int breakType() const { return m_breakType; }
     Q_SIGNAL void breakTypeChanged();
 
+    Q_PROPERTY(QString breakTitle READ breakTitle WRITE setBreakTitle NOTIFY breakTitleChanged)
+    void setBreakTitle(const QString &val);
+    QString breakTitle() const { return m_breakTitle.isEmpty() ? this->sceneID() : m_breakTitle; }
+    Q_SIGNAL void breakTitleChanged();
+
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged STORED false RESET resetScreenplay)
     void setScreenplay(Screenplay *val);
     Screenplay* screenplay() const { return m_screenplay; }
@@ -118,6 +123,7 @@ private:
     bool m_selected = false;
     int m_sceneNumber = -1;
     QString m_sceneID;
+    QString m_breakTitle;
     QJsonValue m_userData;
     int m_customSceneNumber = -1;
     bool m_elementTypeIsSet = false;

@@ -286,7 +286,7 @@ Item {
             property bool isBreakElement: element.elementType === ScreenplayElement.BreakElementType
             property bool active: element.scene ? scriteDocument.screenplay.activeScene === element.scene : false
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
-            property string sceneTitle: element.scene ? element.scene.title : element.sceneID
+            property string sceneTitle: element.scene ? element.scene.title : element.breakTitle
             property color sceneColor: element.scene ? element.scene.color : "white"
             width: isBreakElement ? 70 :
                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)

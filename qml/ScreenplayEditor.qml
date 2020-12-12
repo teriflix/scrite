@@ -638,24 +638,29 @@ Rectangle {
             property int theIndex: componentData.rowNumber
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
-            height: breakText.contentHeight+16
+            height: breakTitle.height+20
 
             Rectangle {
-                anchors.fill: breakText
+                anchors.fill: breakTitle
                 anchors.margins: -4
-                color: primaryColors.windowColor
+                color: accentColors.windowColor
                 border.width: 1
-                border.color: primaryColors.borderColor
+                border.color: accentColors.borderColor
+                opacity: 0.25
             }
 
-            Text {
-                id: breakText
-                anchors.centerIn: parent
-                width: parent.width-16
+            TextField2 {
+                id: breakTitle
+                anchors.top: parent.top
+                anchors.topMargin: 5
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width-8
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 30
                 font.bold: true
-                text: parent.theElement.sceneID
+                text: parent.theElement.breakTitle
+                onTextEdited: parent.theElement.breakTitle = text
+                maximumLength: 50
             }
         }
     }
