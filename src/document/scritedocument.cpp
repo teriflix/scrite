@@ -232,9 +232,10 @@ Scene *ScriteDocument::createNewScene()
 
     structureElement = m_structure->elementAt(structureElementIndex);
 
-    const qreal xOffset = (structureElement && structureElementIndex%2) ? -275 : 275;
-    const qreal x = structureElement ? (structureElement->x() + xOffset) : m_structure->canvasWidth() * 0.4;
-    const qreal y = structureElement ? (structureElement->y() + structureElement->height() + 50) : m_structure->canvasHeight() * 0.4;
+    const qreal xOffset = (structureElement && structureElementIndex%2) ? -450 : 450;
+    const qreal yOffset = 350;
+    const qreal x = structureElement ? (structureElement->x() + xOffset) : m_structure->canvasWidth() * 0.25;
+    const qreal y = structureElement ? (structureElement->y() + yOffset) : m_structure->canvasHeight() * 0.25;
 
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
@@ -261,8 +262,17 @@ Scene *ScriteDocument::createNewScene()
     int newScreenplayElementIndex = -1;
     if(m_screenplay->currentElementIndex() >= 0)
     {
-        newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
-        m_screenplay->insertElementAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
+        if(m_screenplay->currentElementIndex() == m_screenplay->elementCount()-2 &&
+           m_screenplay->elementAt(m_screenplay->elementCount()-1)->elementType() == ScreenplayElement::BreakElementType)
+        {
+            newScreenplayElementIndex = m_screenplay->elementCount();
+            m_screenplay->addElement(newScreenplayElement);
+        }
+        else
+        {
+            newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
+            m_screenplay->insertElementAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
+        }
     }
     else
     {

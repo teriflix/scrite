@@ -129,6 +129,26 @@ Row {
     }
 
     ToolButton3 {
+        iconSource: "../icons/content/add_box.png"
+        shortcut: "Ctrl+Shift+B"
+        shortcutText: ""
+        ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+        onClicked: {
+            requestScreenplayEditor()
+            if(scriteDocument.screenplay.currentElementIndex < 0)
+                scriteDocument.screenplay.addBreakElement(Screenplay.Act)
+            else
+                scriteDocument.screenplay.insertBreakElement(Screenplay.Act, scriteDocument.screenplay.currentElementIndex+1)
+        }
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Create New Scene"
+        ShortcutsModelItem.enabled: !scriteDocument.readOnly
+        ShortcutsModelItem.shortcut: shortcut
+    }
+
+    ToolButton3 {
         iconSource: "../icons/navigation/refresh.png"
         shortcut: "F5"
         shortcutText: ""

@@ -350,43 +350,36 @@ Rectangle {
                         width: contentView.width
                         height: ruler.bottomMarginPx
 
-                        Column {
+                        Row {
                             anchors.centerIn: parent
                             visible: screenplayAdapter.screenplay === scriteDocument.screenplay && enabled
-                            spacing: 5
                             enabled: !scriteDocument.readOnly
+                            spacing: 20
 
-                            Image {
+                            ToolButton2 {
                                 id: addSceneButton
-                                source: "../icons/content/add_circle_outline.png"
-                                height: ruler.bottomMarginPx * 0.6
-                                width: height
-                                smooth: true
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                opacity: defaultOpacity
-                                Behavior on opacity {
-                                    enabled: screenplayEditorSettings.enableAnimations
-                                    NumberAnimation { duration: 250 }
-                                }
-                                property real defaultOpacity: screenplayAdapter.elementCount === 0 ? 0.5 : 0.05
-                                MouseArea {
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onContainsMouseChanged: parent.opacity = containsMouse ? 1 : parent.defaultOpacity
-                                    onClicked: {
-                                        scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.elementCount-1
-                                        if(!scriteDocument.readOnly)
-                                            scriteDocument.createNewScene()
-                                    }
+                                text: "Add Scene"
+                                shortcutText: app.polishShortcutTextForDisplay("Ctrl+Shift+N")
+                                icon.source: "../icons/content/add_circle_outline.png"
+                                ToolTip.text: "Adds a new scene at the end of the screenplay."
+                                width: implicitWidth * 1.5
+                                onClicked: {
+                                    scriteDocument.screenplay.currentElementIndex = -1
+                                    if(!scriteDocument.readOnly)
+                                        scriteDocument.createNewScene()
                                 }
                             }
 
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: app.idealFontPointSize
-                                text: (screenplayAdapter.elementCount === 0 ? "Create your first scene" : "Add a new scene") + "\n(" + app.polishShortcutTextForDisplay("Ctrl+Shift+N") + ")"
-                                opacity: addSceneButton.opacity
+                            ToolButton2 {
+                                id: addBreakButton
+                                text: "Add Break"
+                                shortcutText: app.polishShortcutTextForDisplay("Ctrl+Shift+B")
+                                icon.source: "../icons/content/add_box.png"
+                                ToolTip.text: "Adds an act break at the end of the screenplay."
+                                width: implicitWidth * 1.5
+                                onClicked: {
+                                    scriteDocument.screenplay.addBreakElement(Screenplay.Act)
+                                }
                             }
                         }
                     }
@@ -2056,7 +2049,7 @@ Rectangle {
                                 if(scene && scene.heading.enabled)
                                     return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
                                 if(screenplayElementType === ScreenplayElement.BreakElementType)
-                                    return screenplayElement.sceneID
+                                    return screenplayElement.breakTitle
                                 return "NO SCENE HEADING"
                             }
                             elide: Text.ElideMiddle
