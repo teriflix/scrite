@@ -506,15 +506,15 @@ Rectangle {
                     question = "By locking this document, you will be able to edit it only on this computer. Do you want to lock?"
 
                 askQuestion({
-                    "question": question,
-                    "okButtonText": "Yes",
-                    "cancelButtonText": "No",
-                    "callback": function(val) {
-                        if(val) {
-                            scriteDocument.locked = !scriteDocument.locked
-                        }
-                    }
-                }, this)
+                                "question": question,
+                                "okButtonText": "Yes",
+                                "cancelButtonText": "No",
+                                "callback": function(val) {
+                                    if(val) {
+                                        scriteDocument.locked = !scriteDocument.locked
+                                    }
+                                }
+                            }, this)
             }
         }
 
@@ -710,78 +710,6 @@ Rectangle {
                 delay: 100
             }
 
-            BoxShadow {
-                visible: screenplayAdapter.currentIndex === contentItem.theIndex && synopsisSidePanel.expanded
-                anchors.fill: synopsisSidePanel
-                anchors.leftMargin: 9
-                opacity: 1
-            }
-
-            SidePanel {
-                id: synopsisSidePanel
-                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
-                backgroundColor: buttonColor
-                borderColor: expanded ? primaryColors.borderColor : Qt.rgba(0,0,0,0)
-                anchors.top: parent.top
-                anchors.left: parent.right
-                // anchors.leftMargin: expanded ? 0 : -minPanelWidth
-                buttonText: contentItem.isCurrent && expanded ? ("Scene #" + contentItem.theElement.sceneNumber + " Synopsis") : ""
-                height: {
-                    if(expanded) {
-                        if(contentItem.isCurrent)
-                            return contentInstance ? Math.max(contentInstance.contentHeight+40, 300) : 300
-                        return Math.min(300, parent.height)
-                    }
-                    return sceneHeadingAreaLoader.height
-                }
-                property bool synopsisExpanded: contentView.synopsisExpanded
-                expanded: synopsisExpanded
-                onSynopsisExpandedChanged: expanded = synopsisExpanded
-                onExpandedChanged: contentView.synopsisExpanded = expanded
-                maxPanelWidth: contentView.spaceForSynopsis
-                width: maxPanelWidth
-                clip: true
-                visible: width >= 100 && screenplayEditorSettings.displaySceneNotes
-                opacity: expanded ? (screenplayAdapter.currentIndex < 0 || screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
-                Behavior on opacity {
-                    enabled: screenplayEditorSettings.enableAnimations
-                    NumberAnimation { duration: 250 }
-                }
-                content: TextArea {
-                    id: synopsisEdit
-                    background: Rectangle {
-                        color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
-                    }
-                    font.pointSize: app.idealFontPointSize + 1
-                    onTextChanged: contentItem.theScene.title = text
-                    wrapMode: Text.WordWrap
-                    text: contentItem.theScene.title
-                    selectByMouse: true
-                    selectByKeyboard: true
-                    leftPadding: 10
-                    rightPadding: 10
-                    topPadding: 10
-                    bottomPadding: 10
-                    readOnly: scriteDocument.readOnly
-                    onActiveFocusChanged: {
-                        if(activeFocus)
-                            screenplayAdapter.currentIndex = contentItem.theIndex
-                    }
-
-                    Transliterator.textDocument: textDocument
-                    Transliterator.cursorPosition: cursorPosition
-                    Transliterator.hasActiveFocus: activeFocus
-
-                    SpecialSymbolsSupport {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-                        textEditor: synopsisEdit
-                        textEditorHasCursorInterface: true
-                        enabled: !scriteDocument.readOnly
-                    }
-                }
-            }
-
             Column {
                 id: contentItemLayout
                 width: parent.width
@@ -802,6 +730,47 @@ Rectangle {
                     function edit() {
                         if(item)
                             item.edit()
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: synopsisEditorLayout.height + 10
+                    color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
+                    visible: screenplayEditorSettings.displaySceneNotes
+
+                    Column {
+                        id: synopsisEditorLayout
+                        width: parent.width-10
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.leftMargin: ruler.leftMarginPx
+                        anchors.rightMargin: ruler.rightMarginPx
+
+                        Text {
+                            id: synopsisEditorHeading
+                            text: "<b>Synopsis:</b> " + (scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? "(The text you type below will be synced with this scene's index card on the Structure Canvas.)" : "")
+                            font.pointSize: 12
+                            visible: logLineField.length > 0
+                        }
+
+                        TextArea {
+                            id: synopsisEditorField
+                            width: parent.width
+                            font.pointSize: screenplayFormat.defaultFont2.pointSize
+                            readOnly: scriteDocument.readOnly
+                            palette: app.palette
+                            selectByMouse: true
+                            selectByKeyboard: true
+                            text: contentItem.theScene.title
+                            Transliterator.textDocument: textDocument
+                            Transliterator.cursorPosition: cursorPosition
+                            Transliterator.hasActiveFocus: activeFocus
+                            onTextChanged: contentItem.theScene.title = text
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            placeholderText: "Enter the synopsis of your scene here."
+                        }
                     }
                 }
 
@@ -1506,12 +1475,12 @@ Rectangle {
                     sceneHeadingLoader.viewOnly = false
             }
 
-            height: sceneHeadingLayout.height + 16
+            height: sceneHeadingLayout.height + 24
             color: Qt.tint(theScene.color, "#E7FFFFFF")
 
             Item {
                 width: ruler.leftMarginPx
-                height: sceneHeadingLoader.height + 16
+                height: parent.height
 
                 Row {
                     anchors.right: parent.right
@@ -1549,6 +1518,7 @@ Rectangle {
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 8
 
                 Row {
                     spacing: 5
