@@ -168,9 +168,9 @@ Item {
             ToolButton3 {
                 enabled: !scriteDocument.readOnly && scriteDocument.screenplay.elementCount > 0
                 iconSource: "../icons/action/layout_beat_sheet.png"
-                ToolTip.text: "Beat Sheet Layout"
+                ToolTip.text: "Beat Board Layout"
                 onClicked: {
-                    var rect = scriteDocument.structure.layoutElementsInBeatSheet(scriteDocument.screenplay)
+                    var rect = scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
                     canvasScroll.zoomFit(rect)
                 }
             }
@@ -1211,7 +1211,11 @@ Item {
         Item {
             id: elementItem
             property StructureElement element: modelData
-            Component.onCompleted: element.follow = elementItem
+            Component.onCompleted: {
+                if(element.width == 0 || element.height == 0)
+                    forceLayoutTimer.start()
+                element.follow = elementItem
+            }
             enabled: selection.active === false
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1441,7 +1445,11 @@ Item {
                 indexCardTabSequence.releaseFocus()
             }
 
-            Component.onCompleted: element.follow = elementItem
+            Component.onCompleted: {
+                if(element.width == 0 || element.height == 0)
+                    forceLayoutTimer.start()
+                element.follow = elementItem
+            }
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
             TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
@@ -2347,5 +2355,13 @@ Item {
 
     function requestEditorLater() {
         app.execLater(screenplayView, 100, function() { requestEditor() })
+    }
+
+    Timer {
+        id: forceLayoutTimer
+        running: false
+        interval: 250
+        repeat: false
+        onTriggered: scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
     }
 }

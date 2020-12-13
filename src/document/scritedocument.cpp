@@ -225,11 +225,6 @@ Scene *ScriteDocument::createNewScene()
 
     structureElement = m_structure->elementAt(structureElementIndex);
 
-    const qreal xOffset = (structureElement && structureElementIndex%2) ? -450 : 450;
-    const qreal yOffset = 350;
-    const qreal x = structureElement ? (structureElement->x() + xOffset) : m_structure->canvasWidth() * 0.25;
-    const qreal y = structureElement ? (structureElement->y() + yOffset) : m_structure->canvasHeight() * 0.25;
-
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
     Scene *scene = new Scene(m_structure);
@@ -246,36 +241,29 @@ Scene *ScriteDocument::createNewScene()
 
     StructureElement *newStructureElement = new StructureElement(m_structure);
     newStructureElement->setScene(scene);
-    newStructureElement->setX(x);
-    newStructureElement->setY(y);
     m_structure->addElement(newStructureElement);
+
+    const bool asLastScene = m_screenplay->currentElementIndex() < 0 ||
+                            (m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
 
     ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
     newScreenplayElement->setScene(scene);
     int newScreenplayElementIndex = -1;
-    if(m_screenplay->currentElementIndex() >= 0)
-    {
-        if(m_screenplay->currentElementIndex() == m_screenplay->elementCount()-2 &&
-           m_screenplay->elementAt(m_screenplay->elementCount()-1)->elementType() == ScreenplayElement::BreakElementType)
-        {
-            newScreenplayElementIndex = m_screenplay->elementCount();
-            m_screenplay->addElement(newScreenplayElement);
-        }
-        else
-        {
-            newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
-            m_screenplay->insertElementAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
-        }
-    }
-    else
+    if(asLastScene)
     {
         newScreenplayElementIndex = m_screenplay->elementCount();
         m_screenplay->addElement(newScreenplayElement);
+    }
+    else
+    {
+        newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
+        m_screenplay->insertElementAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
     }
 
     if(m_screenplay->elementAt(newScreenplayElementIndex) != newScreenplayElement)
         newScreenplayElementIndex = m_screenplay->indexOfElement(newScreenplayElement);
 
+    m_structure->placeElement(newStructureElement, m_screenplay);
     m_structure->setCurrentElementIndex(m_structure->elementCount()-1);
     m_screenplay->setCurrentElementIndex(newScreenplayElementIndex);
 

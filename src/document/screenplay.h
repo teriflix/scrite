@@ -250,6 +250,8 @@ public:
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
     Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max=-1) const;
     QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
+    Q_INVOKABLE int firstSceneIndex() const;
+    Q_INVOKABLE int lastSceneIndex() const;
 
     QList<ScreenplayElement*> getElements() const { return m_elements; }
     bool setElements(const QList<ScreenplayElement*> &list);

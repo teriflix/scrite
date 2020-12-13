@@ -551,7 +551,13 @@ public:
     Q_ENUM(LayoutType)
     Q_INVOKABLE QRectF layoutElements(LayoutType layoutType);
 
-    Q_INVOKABLE QRectF layoutElementsInBeatSheet(Screenplay *screenplay) const;
+    Q_PROPERTY(bool forceBeatBoardLayout READ isForceBeatBoardLayout WRITE setForceBeatBoardLayout NOTIFY forceBeatBoardLayoutChanged)
+    void setForceBeatBoardLayout(bool val);
+    bool isForceBeatBoardLayout() const { return m_forceBeatBoardLayout; }
+    Q_SIGNAL void forceBeatBoardLayoutChanged();
+
+    Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay) const;
+    Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay) const;
     Q_INVOKABLE QJsonArray evaluateBeats(Screenplay *screenplay) const;
 
     Q_INVOKABLE void scanForMuteCharacters();
@@ -620,12 +626,13 @@ protected:
 
 private:
     friend class Screenplay;
+    friend class ScriteDocument;
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
     QList< QPair<QString, QList<StructureElement *> > > evaluateBeatsImpl(Screenplay *screenplay) const;
 
 private:
-    qreal m_canvasWidth = 1000;
-    qreal m_canvasHeight = 1000;
+    qreal m_canvasWidth = 120000;
+    qreal m_canvasHeight = 120000;
     qreal m_canvasGridSize = 10;
     CanvasUIMode m_canvasUIMode = IndexCardUI;
     ScriteDocument *m_scriteDocument = nullptr;
@@ -668,6 +675,7 @@ private:
     ObjectListPropertyModel<Annotation *> m_annotations;
     bool m_canPaste = false;
 
+    bool m_forceBeatBoardLayout = false;
     QJsonObject m_characterRelationshipGraph;
 };
 

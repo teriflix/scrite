@@ -1420,6 +1420,36 @@ QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) cons
     return elements;
 }
 
+int Screenplay::firstSceneIndex() const
+{
+    int index = 0;
+    while(index < m_elements.size())
+    {
+        ScreenplayElement *element = m_elements.at(index);
+        if(element->scene() != nullptr)
+            return index;
+
+        ++index;
+    }
+
+    return -1;
+}
+
+int Screenplay::lastSceneIndex() const
+{
+    int index = m_elements.size()-1;
+    while(index >= 0)
+    {
+        ScreenplayElement *element = m_elements.at(index);
+        if(element->scene() != nullptr)
+            return index;
+
+        --index;
+    }
+
+    return -1;
+}
+
 bool Screenplay::setElements(const QList<ScreenplayElement *> &list)
 {
     // Works only if the elements in the list supplied as parameters already

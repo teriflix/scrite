@@ -1728,7 +1728,89 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     return newBoundingRect;
 }
 
-QRectF Structure::layoutElementsInBeatSheet(Screenplay *screenplay) const
+void Structure::setForceBeatBoardLayout(bool val)
+{
+    if(m_forceBeatBoardLayout == val)
+        return;
+
+    m_forceBeatBoardLayout = val;
+    if(val && ScriteDocument::instance()->structure() == this)
+        this->placeElementsInBeatBoardLayout(ScriteDocument::instance()->screenplay());
+
+    emit forceBeatBoardLayoutChanged();
+}
+
+void Structure::placeElement(StructureElement *element, Screenplay *screenplay) const
+{
+    if(element == nullptr || m_elements.indexOf(element) < 0)
+        return;
+
+    if(m_elements.size() == 1)
+    {
+        element->setX(m_canvasWidth * 0.25);
+        element->setY(m_canvasHeight * 0.25);
+        return;
+    }
+
+    const qreal spacing = 100.0;
+
+    auto evaluateBoundingRect = [=]() {
+        QRectF ret;
+        for(StructureElement *e : m_elements.list()) {
+            if(e == element)
+                continue;
+            ret |= QRectF(e->x(), e->y(), e->width(), e->height());
+        }
+        return ret;
+    };
+
+    if(screenplay == nullptr)
+    {
+        const QRectF boundingRect = evaluateBoundingRect();
+        element->setX(boundingRect.right() + spacing);
+        element->setY(boundingRect.top());
+        return;
+    }
+
+    if(m_forceBeatBoardLayout)
+    {
+        this->placeElementsInBeatBoardLayout(screenplay);
+        return;
+    }
+
+    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
+    for(QPair<QString, QList<StructureElement*> > beat : beats)
+    {
+        const int index = beat.second.indexOf(element);
+        if(index < 0)
+            continue;
+
+        if(index == 0)
+        {
+            if(beat.second.size() == 1)
+            {
+                const QRectF boundingRect = evaluateBoundingRect();
+                element->setX(boundingRect.left());
+                element->setY(boundingRect.bottom() + 2*spacing);
+                return;
+            }
+        }
+
+        StructureElement *before = beat.second.at(index-1);
+        if(beat.second.last() == element)
+        {
+            element->setX(before->x()+before->width()+spacing);
+            element->setY(before->y());
+            return;
+        }
+
+        element->setX(before->x());
+        element->setY(before->y()+before->height()+spacing);
+        return;
+    }
+}
+
+QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
 {
     QRectF newBoundingRect;
 
