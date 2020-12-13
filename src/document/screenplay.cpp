@@ -107,6 +107,11 @@ void ScreenplayElement::setBreakTitle(const QString &val)
     if(m_breakTitle == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "breakTitle");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_breakTitle = val;
     emit breakTitleChanged();
 }

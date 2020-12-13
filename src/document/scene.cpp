@@ -623,7 +623,10 @@ void Scene::setTitle(const QString &val)
     if(m_title == val)
         return;
 
-    PushSceneUndoCommand cmd(this);
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "title");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_title = val;
     emit titleChanged();
@@ -634,6 +637,11 @@ void Scene::setEmotionalChange(const QString &val)
     if(m_emotionalChange == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "emotionalChange");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_emotionalChange = val;
     emit emotionalChangeChanged();
 }
@@ -642,6 +650,11 @@ void Scene::setCharactersInConflict(const QString &val)
 {
     if(m_charactersInConflict == val)
         return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "charactersInConflict");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_charactersInConflict = val;
     emit charactersInConflictChanged();
@@ -652,7 +665,10 @@ void Scene::setColor(const QColor &val)
     if(m_color == val)
         return;
 
-    PushSceneUndoCommand cmd(this);
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "color");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_color = val;
     emit colorChanged();
@@ -662,6 +678,11 @@ void Scene::setPageTarget(const QString &val)
 {
     if(m_pageTarget == val)
         return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "pageTarget");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_pageTarget = val;
     emit pageTargetChanged();
