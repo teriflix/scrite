@@ -617,13 +617,16 @@ Item {
                 }
             }
 
-            property var beats: scriteDocument.structure.evaluateBeats(scriteDocument.screenplay)
+            property var beats: []
+            Component.onCompleted: app.execLater(canvas, 250, function() {
+                canvas.beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay)
+            })
 
             TrackerPack {
                 delay: 250
 
                 TrackProperty {
-                    target: elementConnectorItems
+                    target: elementItems
                     property: "count"
                 }
 
@@ -1211,11 +1214,7 @@ Item {
         Item {
             id: elementItem
             property StructureElement element: modelData
-            Component.onCompleted: {
-                if(element.width == 0 || element.height == 0)
-                    forceLayoutTimer.unplacedItems = forceLayoutTimer.unplacedItems+1
-                element.follow = elementItem
-            }
+            Component.onCompleted: element.follow = elementItem
             enabled: selection.active === false
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1445,11 +1444,7 @@ Item {
                 indexCardTabSequence.releaseFocus()
             }
 
-            Component.onCompleted: {
-                if(element.width == 0 || element.height == 0)
-                    forceLayoutTimer.unplacedItems = forceLayoutTimer.unplacedItems+1
-                element.follow = elementItem
-            }
+            Component.onCompleted: element.follow = elementItem
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
             TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
@@ -2355,17 +2350,5 @@ Item {
 
     function requestEditorLater() {
         app.execLater(screenplayView, 100, function() { requestEditor() })
-    }
-
-    Timer {
-        id: forceLayoutTimer
-        running: unplacedItems === scriteDocument.structure.elementCount
-        interval: 250
-        repeat: false
-        property int unplacedItems: 0
-        onTriggered: {
-            unplacedItems = 0
-            scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-        }
     }
 }
