@@ -96,6 +96,11 @@ public:
     GridBackgroundItemBorder* border() const { return m_border; }
     Q_SIGNAL void borderChanged();
 
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    void setBackgroundColor(const QColor &val);
+    QColor backgroundColor() const { return m_backgroundColor; }
+    Q_SIGNAL void backgroundColorChanged();
+
 protected:
     // QQuickItem interface
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData);
@@ -109,6 +114,7 @@ private:
     qreal m_majorTickLineWidth = 2;
     QColor m_minorTickColor = QColor("lightsteelblue");
     QColor m_majorTickColor = QColor("blue");
+    QColor m_backgroundColor = QColor(Qt::transparent);
     GridBackgroundItemBorder *m_border = new GridBackgroundItemBorder(this);
 };
 

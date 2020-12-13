@@ -160,6 +160,17 @@ void GridBackgroundItem::setGridIsVisible(bool val)
     this->update();
 }
 
+void GridBackgroundItem::setBackgroundColor(const QColor &val)
+{
+    if(m_backgroundColor == val)
+        return;
+
+    m_backgroundColor = val;
+    emit backgroundColorChanged();
+
+    this->update();
+}
+
 QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *nodeData)
 {
 #ifndef QT_NO_DEBUG
@@ -171,11 +182,56 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
     Q_UNUSED(nodeData)
 
     QSGNode *rootNode = new QSGNode;
+    const qreal w = this->width();
+    const qreal h = this->height();
+
+    {
+        if(!qFuzzyIsNull(m_backgroundColor.alphaF()))
+        {
+            QSGOpacityNode *backgroundNode = new QSGOpacityNode;
+            backgroundNode->setFlag(QSGGeometryNode::OwnedByParent);
+            backgroundNode->setOpacity(this->opacity());
+            rootNode->appendChildNode(backgroundNode);
+
+            QSGGeometryNode *geometryNode = new QSGGeometryNode;
+            geometryNode->setFlags(QSGNode::OwnsGeometry|QSGNode::OwnsMaterial|QSGNode::OwnedByParent);
+
+            QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 6);
+            geometry->setDrawingMode(QSGGeometry::DrawTriangles);
+            geometryNode->setGeometry(geometry);
+
+            QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
+
+            points[0].x = 0.0f;
+            points[0].y = 0.0f;
+
+            points[1].x = float(w)-1.0f;
+            points[1].y = 0.0f;
+
+            points[2].x = float(w)-1.0f;
+            points[2].y = float(h)-1.0f;
+
+            points[3].x = 0.0f;
+            points[3].y = 0.0f;
+
+            points[4].x = float(w)-1.0f;
+            points[4].y = float(h)-1.0f;
+
+            points[5].x = 0.0f;
+            points[5].y = float(h)-1.0f;
+
+            QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
+            geometryNode->setMaterial(material);
+            material->setFlag(QSGMaterial::Blending);
+            material->setColor(m_backgroundColor);
+
+            backgroundNode->appendChildNode(geometryNode);
+        }
+    }
+
     if( !m_gridIsVisible || qFuzzyIsNull(m_tickColorOpacity) )
         return rootNode;
 
-    const qreal w = this->width();
-    const qreal h = this->height();
     const int nrXTicks = int( qCeil(w/m_tickDistance) ) - 1;
     const int nrYTicks = int( qCeil(h/m_tickDistance) ) - 1;
     const int nrXMajorTicks = int( qCeil(w/(m_tickDistance*m_majorTickStride)) ) - 1;

@@ -308,11 +308,16 @@ Item {
             scale: canvasScroll.suggestedScale
             border.width: 2
             border.color: structureCanvasSettings.gridColor
-            gridIsVisible: structureCanvasSettings.showGrid
+            gridIsVisible: structureCanvasSettings.showGrid && canvasScroll.interactive
             majorTickColor: structureCanvasSettings.gridColor
             minorTickColor: structureCanvasSettings.gridColor
             tickDistance: scriteDocument.structure.canvasGridSize
             transformOrigin: Item.TopLeft
+            backgroundColor: canvasScroll.interactive ? primaryColors.c10.background : app.translucent(primaryColors.c300.background, 0.75)
+            Behavior on backgroundColor {
+                enabled: screenplayEditorSettings.enableAnimations
+                ColorAnimation { duration: 250 }
+            }
 
             function createItem(what, where) {
                 if(scriteDocument.readOnly)
@@ -1540,6 +1545,7 @@ Item {
                     placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.bold: true
+                    font.capitalization: Font.AllUppercase
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     onEditingComplete: element.scene.heading.parseFrom(text)
