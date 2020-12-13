@@ -1199,7 +1199,7 @@ Item {
         StructureElement {
             objectName: "newElement"
             scene: Scene {
-                title: "New Scene"
+                title: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? "" : "New Scene"
                 heading.locationType: "INT"
                 heading.location: "SOMEWHERE"
                 heading.moment: "DAY"

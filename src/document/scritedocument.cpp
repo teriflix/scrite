@@ -46,6 +46,7 @@
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QRandomGenerator>
 #include <QScopedValueRollback>
 
 class DeviceIOFactories
@@ -227,13 +228,17 @@ Scene *ScriteDocument::createNewScene()
 
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
+    const QVector<QColor> standardColors = Application::standardColors(QVersionNumber());
+    const QColor defaultColor = standardColors.at( QRandomGenerator::global()->bounded(standardColors.size()-1) );
+
     Scene *scene = new Scene(m_structure);
-    scene->setColor(activeScene ? activeScene->color() : QColor("white"));
-    scene->setTitle("New Scene");
+    scene->setColor(activeScene ? activeScene->color() : defaultColor);
+    if(m_structure->canvasUIMode() != Structure::IndexCardUI)
+        scene->setTitle( QStringLiteral("New Scene") );
     scene->heading()->setEnabled(true);
-    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : "EXT");
-    scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : "SOMEWHERE");
-    scene->heading()->setMoment(activeScene ? "LATER" : "DAY");
+    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : QStringLiteral("EXT"));
+    scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : QStringLiteral("SOMEWHERE"));
+    scene->heading()->setMoment(activeScene ? QStringLiteral("LATER") : QStringLiteral("DAY"));
 
     SceneElement *firstPara = new SceneElement(scene);
     firstPara->setType(SceneElement::Action);
