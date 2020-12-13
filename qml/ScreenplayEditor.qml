@@ -286,9 +286,13 @@ Rectangle {
                             }
                         }
 
-                        Button2 {
+                        ToolButton2 {
                             id: editTitlePageButton
                             text: "Edit Title Page"
+                            icon.source: "../icons/action/edit.png"
+                            flat: false
+                            width: implicitWidth * 1.5
+                            height: implicitHeight * 1.25
                             visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
                             anchors.top: parent.top
@@ -363,6 +367,8 @@ Rectangle {
                                 icon.source: "../icons/content/add_circle_outline.png"
                                 ToolTip.text: "Adds a new scene at the end of the screenplay."
                                 width: implicitWidth * 1.5
+                                height: implicitHeight * 1.5
+                                flat: false
                                 onClicked: {
                                     scriteDocument.screenplay.currentElementIndex = -1
                                     if(!scriteDocument.readOnly)
@@ -377,6 +383,8 @@ Rectangle {
                                 icon.source: "../icons/content/add_box.png"
                                 ToolTip.text: "Adds an act break at the end of the screenplay."
                                 width: implicitWidth * 1.5
+                                height: implicitHeight * 1.5
+                                flat: false
                                 onClicked: {
                                     scriteDocument.screenplay.addBreakElement(Screenplay.Act)
                                 }
@@ -758,7 +766,7 @@ Rectangle {
                         TextArea {
                             id: synopsisEditorField
                             width: parent.width
-                            font.pointSize: screenplayFormat.defaultFont2.pointSize
+                            font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                             readOnly: scriteDocument.readOnly
                             palette: app.palette
                             selectByMouse: true
@@ -770,6 +778,14 @@ Rectangle {
                             onTextChanged: contentItem.theScene.title = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
+                            onActiveFocusChanged: {
+                                if(activeFocus) {
+                                    contentView.ensureVisible(synopsisEditorField, cursorRectangle)
+                                    screenplayAdapter.currentIndex = contentItem.theIndex
+                                }
+                                sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
+                                contentItem.theScene.undoRedoEnabled = activeFocus
+                            }
                         }
                     }
                 }
@@ -2419,7 +2435,7 @@ Rectangle {
             property real maxWidth: parent.width - 2*ruler.leftMarginPx
             spacing: 10 * zoomLevel
 
-            Image { width: parent.width; height: 35 * zoomLevel }
+            Item { width: parent.width; height: 35 * zoomLevel }
 
             Image {
                 width: {
@@ -2439,7 +2455,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            Image { width: parent.width; height: scriteDocument.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
+            Item { width: parent.width; height: scriteDocument.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
 
             Text {
                 font.family: scriteDocument.formatting.defaultFont.family
@@ -2592,7 +2608,7 @@ Rectangle {
                 }
             }
 
-            Image { width: parent.width; height: 35 * zoomLevel }
+            Item { width: parent.width; height: 35 * zoomLevel }
         }
     }
 }

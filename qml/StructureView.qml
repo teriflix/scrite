@@ -1213,7 +1213,7 @@ Item {
             property StructureElement element: modelData
             Component.onCompleted: {
                 if(element.width == 0 || element.height == 0)
-                    forceLayoutTimer.start()
+                    forceLayoutTimer.unplacedItems = forceLayoutTimer.unplacedItems+1
                 element.follow = elementItem
             }
             enabled: selection.active === false
@@ -1447,7 +1447,7 @@ Item {
 
             Component.onCompleted: {
                 if(element.width == 0 || element.height == 0)
-                    forceLayoutTimer.start()
+                    forceLayoutTimer.unplacedItems = forceLayoutTimer.unplacedItems+1
                 element.follow = elementItem
             }
 
@@ -2359,9 +2359,13 @@ Item {
 
     Timer {
         id: forceLayoutTimer
-        running: false
+        running: unplacedItems === scriteDocument.structure.elementCount
         interval: 250
         repeat: false
-        onTriggered: scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+        property int unplacedItems: 0
+        onTriggered: {
+            unplacedItems = 0
+            scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+        }
     }
 }

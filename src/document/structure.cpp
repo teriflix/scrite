@@ -14,6 +14,7 @@
 #include "undoredo.h"
 #include "structure.h"
 #include "application.h"
+#include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
@@ -1742,24 +1743,31 @@ void Structure::setForceBeatBoardLayout(bool val)
 
 void Structure::placeElement(StructureElement *element, Screenplay *screenplay) const
 {
-    if(element == nullptr || m_elements.indexOf(element) < 0)
+    if(m_elements.isEmpty() || element == nullptr || m_elements.indexOf(element) < 0)
         return;
+
+    const qreal x = 5000;
+    const qreal y = 5000;
+    const qreal xSpacing = 100;
+    const qreal ySpacing = 150;
+    const qreal elementWidthHint = 350;
+    const qreal elementHeightHint = 375;
 
     if(m_elements.size() == 1)
     {
-        element->setX(m_canvasWidth * 0.25);
-        element->setY(m_canvasHeight * 0.25);
+        element->setX(x);
+        element->setY(y);
         return;
     }
-
-    const qreal spacing = 100.0;
 
     auto evaluateBoundingRect = [=]() {
         QRectF ret;
         for(StructureElement *e : m_elements.list()) {
             if(e == element)
                 continue;
-            ret |= QRectF(e->x(), e->y(), e->width(), e->height());
+            const qreal ew = qFuzzyIsNull(e->width()) ? elementWidthHint : e->width();
+            const qreal eh = qFuzzyIsNull(e->height()) ? elementHeightHint : e->height();
+            ret |= QRectF(e->x(), e->y(), ew, eh);
         }
         return ret;
     };
@@ -1767,7 +1775,7 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
     if(screenplay == nullptr)
     {
         const QRectF boundingRect = evaluateBoundingRect();
-        element->setX(boundingRect.right() + spacing);
+        element->setX(boundingRect.right() + xSpacing);
         element->setY(boundingRect.top());
         return;
     }
@@ -1791,7 +1799,7 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
             {
                 const QRectF boundingRect = evaluateBoundingRect();
                 element->setX(boundingRect.left());
-                element->setY(boundingRect.bottom() + 2*spacing);
+                element->setY(boundingRect.bottom() + ySpacing);
                 return;
             }
         }
@@ -1799,13 +1807,15 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
         StructureElement *before = beat.second.at(index-1);
         if(beat.second.last() == element)
         {
-            element->setX(before->x()+before->width()+spacing);
+            const qreal bw = qFuzzyIsNull(before->width()) ? elementWidthHint : before->width();
+            element->setX(before->x()+bw+xSpacing);
             element->setY(before->y());
             return;
         }
 
+        const qreal bh = qFuzzyIsNull(before->height()) ? elementHeightHint : before->height();
         element->setX(before->x());
-        element->setY(before->y()+before->height()+spacing);
+        element->setY(before->y()+bh+ySpacing/2);
         return;
     }
 }

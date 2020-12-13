@@ -36,7 +36,12 @@ ToolButton {
     hoverEnabled: true
     display: AbstractButton.TextBesideIcon
     opacity: enabled ? 1 : 0.5
-    contentItem: Item {
+    contentItem: Rectangle {
+        color: primaryColors.c10.background
+        border.width: toolButton.flat ? 0 : 1
+        border.color: primaryColors.borderColor
+        radius: 8
+
         Row {
             anchors.centerIn: parent
             spacing: 10
@@ -51,25 +56,28 @@ ToolButton {
                 mipmap: true
             }
 
-            Text {
-                text: toolButton.action.text
-                font.pixelSize: toolButton.font.pixelSize
-                font.bold: toolButton.down
+            Column {
+                spacing: parent.spacing/2
                 anchors.verticalCenter: parent.verticalCenter
-                Behavior on color {
-                    enabled: screenplayEditorSettings.enableAnimations
-                    ColorAnimation { duration: 250 }
-                }
-                visible: toolButton.display !== AbstractButton.IconOnly
-            }
-        }
 
-        Text {
-            font.pixelSize: 9
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            text: "[" + toolButton.shortcutText + "]"
-            visible: toolButton.shortcutText !== ""
+                Text {
+                    text: toolButton.action.text
+                    font.pixelSize: toolButton.font.pixelSize
+                    font.bold: toolButton.down
+                    Behavior on color {
+                        enabled: screenplayEditorSettings.enableAnimations
+                        ColorAnimation { duration: 250 }
+                    }
+                    visible: toolButton.display !== AbstractButton.IconOnly
+                }
+
+                Text {
+                    font.pixelSize: 9
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "[" + toolButton.shortcutText + "]"
+                    visible: toolButton.shortcutText !== ""
+                }
+            }
         }
     }
     action: Action {
