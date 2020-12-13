@@ -761,6 +761,8 @@ Rectangle {
                             text: "<b>Synopsis:</b> " + (scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? "(The text you type below will be synced with this scene's index card on the Structure Canvas.)" : "")
                             font.pointSize: 12
                             visible: logLineField.length > 0
+                            width: parent.width
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         }
 
                         TextArea {
