@@ -829,6 +829,9 @@ QJsonValue QFontHelper::toJson(const QVariant &value) const
     if(font.style() != defaultFont.style())
         ret.insert("style", enumValue("Style", font.style()));
 
+    if(font.underline() != defaultFont.underline())
+        ret.insert("underline", font.underline());
+
     return ret;
 }
 
@@ -874,6 +877,9 @@ QVariant QFontHelper::fromJson(const QJsonValue &value, int type) const
 
     if( json.contains("style") )
         font.setStyle( QFont::Style(enumValue("Style", json.value("style"))) );
+
+    if( json.contains("underline") )
+        font.setUnderline( json.value("underline").toBool() );
 
     return QVariant::fromValue<QFont>(font);
 }
