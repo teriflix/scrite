@@ -840,12 +840,7 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
 void ScreenplayFormat::evaluateFontZoomLevels()
 {
     QFont font2 = m_defaultFont;
-#ifdef Q_OS_MAC
     font2.setPointSize( int(font2.pointSize()*this->screenDevicePixelRatio()) );
-#else
-    if(m_screen)
-        font2.setPointSize( int(qreal(font2.pointSize())*m_screen->physicalDotsPerInch()/qreal(qt_defaultDpi())) );
-#endif
 
     QFontInfo defaultFontInfo(font2);
     font2.setPointSize(defaultFontInfo.pointSize());
