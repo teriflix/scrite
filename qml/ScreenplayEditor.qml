@@ -1517,13 +1517,13 @@ Rectangle {
                         label: "Scene No."
                         labelAlwaysVisible: true
                         width: headingFontMetrics.averageCharacterWidth*maximumLength
-                        text: theElement.userSceneNumber
+                        text: headingItem.theElement.userSceneNumber
                         anchors.bottom: parent.bottom
                         font: headingFontMetrics.font
-                        onTextChanged: theElement.userSceneNumber = text
+                        onTextChanged: headingItem.theElement.userSceneNumber = text
                         maximumLength: 5
-                        placeholderText: theElement.sceneNumber
-                        visible: theElement.sceneNumber > 0 && screenplayAdapter.isSourceScreenplay
+                        placeholderText: headingItem.theElement.sceneNumber
+                        visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType && screenplayAdapter.isSourceScreenplay
                     }
                 }
             }
