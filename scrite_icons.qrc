@@ -143,5 +143,7 @@
         <file>icons/content/camera_alt_inverted.png</file>
         <file>icons/action/layout_beat_sheet.png</file>
         <file>icons/action/layout_beat_sheet_inverted.png</file>
+        <file>icons/action/flag.png</file>
+        <file>icons/action/flag_inverted.png</file>
     </qresource>
 </RCC>

@@ -47,8 +47,8 @@ Row {
     }
 
     ToolButton3 {
-        iconSource: "../icons/screenplay/character.png"
-        ToolTip.text: "Toggle display of character names under scene headings and scan for hidden characters in each scene."
+        iconSource: "../icons/action/flag.png"
+        ToolTip.text: "Toggle display of character names & synopsis under scene headings and scan for hidden characters in each scene."
         ToolTip.delay: 1000
         down: sceneCharactersMenu.visible
         onClicked: sceneCharactersMenu.visible = true
