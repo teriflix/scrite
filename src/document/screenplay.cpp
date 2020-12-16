@@ -41,6 +41,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
 
     connect(this, &ScreenplayElement::sceneNumberChanged, this, &ScreenplayElement::resolvedSceneNumberChanged);
     connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::resolvedSceneNumberChanged);
+    connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
 }
 
 ScreenplayElement::~ScreenplayElement()
@@ -179,7 +180,7 @@ void ScreenplayElement::setUserSceneNumber(const QString &val)
     if(m_userSceneNumber == val)
         return;
 
-    m_userSceneNumber = val;
+    m_userSceneNumber = val.toUpper();
     emit userSceneNumberChanged();
 }
 
@@ -258,6 +259,8 @@ bool ScreenplayElement::event(QEvent *event)
 void ScreenplayElement::evaluateSceneNumber(int &number)
 {
     int sn = -1;
+    if(!m_userSceneNumber.isEmpty())
+        return;
 
     if(m_scene != nullptr && m_scene->heading()->isEnabled())
     {
