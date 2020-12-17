@@ -178,7 +178,7 @@ bool FountainImporter::doImport(QIODevice *device)
             if(locationForTitle.length() > 25)
                 locationForTitle = locationForTitle.left(22) + "...";
 
-            currentScene->setTitle("[" + QString::number(sceneCounter) + "]: @ " + locationForTitle);
+            currentScene->setTitle( QString("Scene number #%1 at %2").arg(sceneCounter+1).arg(locationForTitle) );
             continue;
         }
 
@@ -200,6 +200,8 @@ bool FountainImporter::doImport(QIODevice *device)
                 else
                     screenplay->setTitle(title);
             }
+            else if(line.startsWith("Credit:", Qt::CaseInsensitive))
+                continue;
             else if(line.startsWith("Author:", Qt::CaseInsensitive))
                 screenplay->setAuthor(line.section(':',1));
             else if(line.startsWith("Version:", Qt::CaseInsensitive))
@@ -240,8 +242,19 @@ bool FountainImporter::doImport(QIODevice *device)
                     note->setContent(line);
                 }
             }
+            else
+            {
+                currentScene = this->createScene(QStringLiteral("INT. SOMEWHERE - DAY"));
+                currentScene->heading()->setEnabled(false);
+                currentScene->setTitle(QString());
 
-            continue; // ignore lines until we get atleast one heading.
+                SceneElement *para = new SceneElement;
+                para->setText(line);
+                para->setType(SceneElement::Action);
+                currentScene->addElement(para);
+            }
+
+            continue;
         }
 
         SceneElement *para = new SceneElement;

@@ -103,29 +103,38 @@ bool HtmlImporter::importFrom(const QByteArray &bytes)
         if(text.isEmpty())
             continue;
 
-        switch(typeIndex)
-        {
-        case 0:
+        if(typeIndex == 0)
             scene = this->createScene(text);
-            break;
-        case 1:
-            this->addSceneElement(scene, SceneElement::Action, text);
-            break;
-        case 2:
-            this->addSceneElement(scene, SceneElement::Character, text);
-            break;
-        case 3:
-            this->addSceneElement(scene, SceneElement::Dialogue, text);
-            break;
-        case 4:
-            this->addSceneElement(scene, SceneElement::Parenthetical, text);
-            break;
-        case 5:
-            this->addSceneElement(scene, SceneElement::Shot, text);
-            break;
-        case 6:
-            this->addSceneElement(scene, SceneElement::Transition, text);
-            break;
+        else
+        {
+            if(scene == nullptr)
+            {
+                scene = this->createScene(QStringLiteral("INT. SOMEWHERE - DAY"));
+                scene->heading()->setEnabled(false);
+                scene->setTitle(QString());
+            }
+
+            switch(typeIndex)
+            {
+            case 1:
+                this->addSceneElement(scene, SceneElement::Action, text);
+                break;
+            case 2:
+                this->addSceneElement(scene, SceneElement::Character, text);
+                break;
+            case 3:
+                this->addSceneElement(scene, SceneElement::Dialogue, text);
+                break;
+            case 4:
+                this->addSceneElement(scene, SceneElement::Parenthetical, text);
+                break;
+            case 5:
+                this->addSceneElement(scene, SceneElement::Shot, text);
+                break;
+            case 6:
+                this->addSceneElement(scene, SceneElement::Transition, text);
+                break;
+            }
         }
     }
 

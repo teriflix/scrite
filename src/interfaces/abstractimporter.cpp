@@ -16,6 +16,7 @@
 #include "abstractimporter.h"
 
 #include <QFile>
+#include <QRandomGenerator>
 #include <QRegularExpression>
 
 AbstractImporter::AbstractImporter(QObject *parent)
@@ -77,10 +78,10 @@ bool AbstractImporter::read()
     return ret;
 }
 
-static const qreal elementX = 100;
-static const qreal elementY = 100;
-static const qreal elementXSpacing = 275;
-static const qreal elementYSpacing = 75;
+static const qreal elementX = 5000;
+static const qreal elementY = 5000;
+static const qreal elementXSpacing = 400;
+static const qreal elementYSpacing = 400;
 static const qreal canvasSpaceBuffer = 500;
 
 void AbstractImporter::configureCanvas(int nrBlocks)
@@ -108,7 +109,8 @@ Scene *AbstractImporter::createScene(const QString &heading)
 #if 0
     scene->setColor(sceneColors.at(sceneIndex%sceneColors.length()));
 #else
-    scene->setColor(Qt::white);
+    QRandomGenerator *rand = QRandomGenerator::global();
+    scene->setColor( sceneColors.at(rand->bounded(sceneColors.length()-1)) );
 #endif
     structureElement->setScene(scene);
     structureElement->setX(elementX + (sceneIndex%2 ? elementXSpacing : 0));
@@ -124,7 +126,7 @@ Scene *AbstractImporter::createScene(const QString &heading)
 
     const QString location = scene->heading()->location();
     const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
-    scene->setTitle( QString("[%1] %2").arg(sceneIndex+1).arg(titleBit.toLower()) );
+    scene->setTitle( QString("Scene number #%1 at %2").arg(sceneIndex+1).arg(titleBit.toLower()) );
 
     return scene;
 }

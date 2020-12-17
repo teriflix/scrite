@@ -1523,7 +1523,9 @@ Rectangle {
                         onTextChanged: headingItem.theElement.userSceneNumber = text
                         maximumLength: 5
                         placeholderText: headingItem.theElement.sceneNumber
-                        visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType && screenplayAdapter.isSourceScreenplay
+                        visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType &&
+                                 headingItem.theScene.heading.enabled &&
+                                 screenplayAdapter.isSourceScreenplay
                     }
                 }
             }
