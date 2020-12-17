@@ -439,39 +439,24 @@ Item {
                 opacity: 0.5
             }
 
-            ToolButton3 {
-                shortcut: "Ctrl+Z"
-                shortcutText: "Z"
-                iconSource: "../icons/content/undo.png"
-                enabled: app.canUndo && !scriteDocument.readOnly
-                onClicked: app.undoGroup.undo()
-                ToolTip.text: "Undo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
-
+            /*
+              Most users already know that Ctrl+Z is undo and Ctrl+Y is redo.
+              Therefore simply listing these shortcuts in shortcuts dockwidget
+              should be sufficient to establish their existence. Showing these
+              toolbuttons is robbing us of some really good screenspace.
+            */
+            QtObject {
                 ShortcutsModelItem.group: "Edit"
                 ShortcutsModelItem.title: "Undo"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.enabled: app.canUndo && !scriteDocument.readOnly // enabled
+                ShortcutsModelItem.shortcut: "Ctrl+Z" // shortcut
             }
 
-            ToolButton3 {
-                shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y"
-                shortcutText: app.isMacOSPlatform ? "Shift+Z" : "Y"
-                iconSource: "../icons/content/redo.png"
-                enabled: app.canRedo && !scriteDocument.readOnly
-                onClicked: app.undoGroup.redo()
-                ToolTip.text: "Redo" + "\t" + app.polishShortcutTextForDisplay(shortcut)
-
+            QtObject {
                 ShortcutsModelItem.group: "Edit"
                 ShortcutsModelItem.title: "Redo"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: shortcut
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.separatorColor
-                opacity: 0.5
+                ShortcutsModelItem.enabled: app.canRedo && !scriteDocument.readOnly // enabled
+                ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y" // shortcut
             }
 
             ToolButton3 {

@@ -360,6 +360,11 @@ void Screenplay::setLogline(const QString &val)
     if(m_logline == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "logline");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_logline = val;
     emit loglineChanged();
 }
