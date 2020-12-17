@@ -323,6 +323,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::coverPagePhotoChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
     connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::titlePageIsCenteredChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::screenplayChanged, [=](){ this->markAsModified(); });
 
     m_author = QSysInfo::machineHostName();
@@ -494,6 +495,15 @@ void Screenplay::setCoverPagePhotoSize(Screenplay::CoverPagePhotoSize val)
 
     m_coverPagePhotoSize = val;
     emit coverPagePhotoSizeChanged();
+}
+
+void Screenplay::setTitlePageIsCentered(bool val)
+{
+    if(m_titlePageIsCentered == val)
+        return;
+
+    m_titlePageIsCentered = val;
+    emit titlePageIsCenteredChanged();
 }
 
 QQmlListProperty<ScreenplayElement> Screenplay::elements()

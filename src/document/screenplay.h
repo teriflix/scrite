@@ -214,6 +214,11 @@ public:
     CoverPagePhotoSize coverPagePhotoSize() const { return m_coverPagePhotoSize; }
     Q_SIGNAL void coverPagePhotoSizeChanged();
 
+    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered NOTIFY titlePageIsCenteredChanged)
+    void setTitlePageIsCentered(bool val);
+    bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
+    Q_SIGNAL void titlePageIsCenteredChanged();
+
     Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY hasTitlePageAttributesChanged)
     bool hasTitlePageAttributes() const { return m_hasTitlePageAttributes; }
     Q_SIGNAL void hasTitlePageAttributesChanged();
@@ -325,6 +330,7 @@ private:
     QString m_subtitle;
     QString m_phoneNumber;
     QString m_coverPagePhoto;
+    bool m_titlePageIsCentered = true;
     bool m_hasTitlePageAttributes = false;
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;

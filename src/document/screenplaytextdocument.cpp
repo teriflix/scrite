@@ -358,6 +358,17 @@ void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setTitlePageIsCentered(bool val)
+{
+    if(m_titlePageIsCentered == val)
+        return;
+
+    m_titlePageIsCentered = val;
+    emit titlePageIsCenteredChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSecondsPerPage(int val)
 {
     val = qBound(15, val, 300);
@@ -753,6 +764,7 @@ void ScreenplayTextDocument::loadScreenplay()
         QTextCharFormat titlePageFormat;
         titlePageFormat.setObjectType(ScreenplayTitlePageObjectInterface::Kind);
         titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::ScreenplayProperty, QVariant::fromValue<QObject*>(m_screenplay));
+        titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::TitlePageIsCentered, m_titlePageIsCentered);
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), titlePageFormat);
     }
 
@@ -1990,7 +2002,7 @@ QSizeF ScreenplayTitlePageObjectInterface::intrinsicSize(QTextDocument *doc, int
     return ret;
 }
 
-void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
 {
     Q_UNUSED(posInDocument)
 
@@ -2016,6 +2028,14 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
       Written or Generated using Scrite
       https://www.scrite.io
       */
+    auto evaluateCenteredPaintRect = [=]() {
+        const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
+        const qreal margin = (rootFrameFormat.rightMargin() + rootFrameFormat.leftMargin())/2;
+        QRectF ret = givenRect;
+        ret.moveLeft(margin);
+        return ret;
+    };
+    const QRectF rect = format.property(TitlePageIsCentered).toBool() ? evaluateCenteredPaintRect() : givenRect;
 
     const Screenplay *screenplay = qobject_cast<Screenplay*>(format.property(ScreenplayProperty).value<QObject*>());
     if(screenplay == nullptr)

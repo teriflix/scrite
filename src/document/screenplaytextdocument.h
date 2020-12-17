@@ -136,6 +136,11 @@ public:
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
+    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered NOTIFY titlePageIsCenteredChanged)
+    void setTitlePageIsCentered(bool val);
+    bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
+    Q_SIGNAL void titlePageIsCenteredChanged();
+
     Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
     bool isUpdating() const { return m_updating; }
     Q_SIGNAL void updatingChanged();
@@ -294,6 +299,7 @@ private:
     Scene *m_activeScene = nullptr;
     qreal m_currentPosition = 0;
     bool m_componentComplete = true;
+    bool m_titlePageIsCentered = true;
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
     bool m_screenplayIsBeingReset = false;
@@ -366,6 +372,7 @@ public:
     enum Property
     {
         ScreenplayProperty = QTextFormat::UserProperty+10,
+        TitlePageIsCentered
     };
 
     QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);

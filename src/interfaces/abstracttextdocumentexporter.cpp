@@ -70,6 +70,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
         stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);
     stDoc.setScreenplay(this->document()->screenplay());
     stDoc.setFormatting(this->document()->printFormat());
+    stDoc.setTitlePageIsCentered(this->document()->screenplay()->isTitlePageIsCentered());
     stDoc.setTextDocument(textDoc);
     stDoc.setInjection(this);
     stDoc.syncNow();

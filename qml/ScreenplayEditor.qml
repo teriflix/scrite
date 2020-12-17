@@ -2189,6 +2189,7 @@ Rectangle {
                 formatting: screenplayTextDocument.formatting
                 sceneNumbers: true
                 titlePage: screenplayEditorSettings.includeTitlePageInPreview
+                titlePageIsCentered: scriteDocument.screenplay.titlePageIsCentered
                 purpose: ScreenplayTextDocument.ForPrinting
                 syncEnabled: false
             }

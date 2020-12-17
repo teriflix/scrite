@@ -1428,12 +1428,21 @@ Item {
                     }
                 }
 
-                CheckBox2 {
-                    id: includeInTitlePageCheckBox
+                Row {
+                    spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Include Title Page In Preview"
-                    checked: screenplayEditorSettings.includeTitlePageInPreview
-                    onToggled: screenplayEditorSettings.includeTitlePageInPreview = checked
+
+                    CheckBox2 {
+                        text: "Include Title Page In Preview"
+                        checked: screenplayEditorSettings.includeTitlePageInPreview
+                        onToggled: screenplayEditorSettings.includeTitlePageInPreview = checked
+                    }
+
+                    CheckBox2 {
+                        text: "Center Align Title Page"
+                        checked: scriteDocument.screenplay.titlePageIsCentered
+                        onToggled: scriteDocument.screenplay.titlePageIsCentered = checked
+                    }
                 }
             }
         }
