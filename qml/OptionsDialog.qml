@@ -497,7 +497,7 @@ Item {
                     Text {
                         width: parent.width
                         font.pointSize: app.idealFontPointSize
-                        text: "By default Scrite shows Screenplay, Structure and Notebook in separate tabs on the main window. If you have a large display, you can move Notebook into the Structure tab and see all aspects of your screenplay within the Structure tab itself."
+                        text: "By default Scrite shows Screenplay, Structure and Notebook in separate tabs on the main window. If you have a small display, you can move Notebook into a separate tab. Otherwise its productive to see all aspects of your screenplay within the Structure tab itself."
                         wrapMode: Text.WordWrap
                     }
 

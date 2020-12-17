@@ -45,7 +45,7 @@ Item {
         property real workspaceHeight
         property real screenplayEditorWidth: -1
         property bool scriptalayIntroduced: false
-        property bool showNotebookInStructure: false
+        property bool showNotebookInStructure: true
         property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
         property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
 
