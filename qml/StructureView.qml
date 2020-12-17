@@ -450,9 +450,17 @@ Item {
                     onClicked: annotationGripLoader.reset()
                 }
 
+                StructureCanvasViewportFilterModel {
+                    id: annotationsFilter
+                    structure: scriteDocument.loading ? null : scriteDocument.structure
+                    type: StructureCanvasViewportFilterModel.AnnotationType
+                    viewportRect: canvasScroll.viewportRect
+                    computeStrategy: StructureCanvasViewportFilterModel.PreComputeStrategy
+                }
+
                 Repeater {
                     id: annotationItems
-                    model: scriteDocument.loading ? 0 : scriteDocument.structure.annotationsModel
+                    model: annotationsFilter
                     delegate: Loader {
                         property Annotation annotation: modelData
                         property int annotationIndex: index

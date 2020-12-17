@@ -39,6 +39,11 @@ StructureElement::StructureElement(QObject *parent)
     connect(this, &StructureElement::widthChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::heightChanged, this, &StructureElement::elementChanged);
 
+    connect(this, &StructureElement::xChanged, this, &StructureElement::geometryChanged);
+    connect(this, &StructureElement::yChanged, this, &StructureElement::geometryChanged);
+    connect(this, &StructureElement::widthChanged, this, &StructureElement::geometryChanged);
+    connect(this, &StructureElement::heightChanged, this, &StructureElement::geometryChanged);
+
     if(m_structure)
     {
         connect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
@@ -1542,6 +1547,8 @@ void Structure::insertElement(StructureElement *ptr, int index)
     connect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
     connect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
     connect(ptr, &StructureElement::sceneLocationChanged, this, &Structure::updateLocationHeadingMapLater);
+    connect(ptr, &StructureElement::geometryChanged, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectChanged);
+    connect(ptr, &StructureElement::aboutToDelete, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectDestroyed);
     this->updateLocationHeadingMapLater();
 
     this->onStructureElementSceneChanged(ptr);
@@ -2007,6 +2014,8 @@ void Structure::addAnnotation(Annotation *ptr)
     ptr->setParent(this);
     connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
     connect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
+    connect(ptr, &Annotation::geometryChanged, &m_annotations, &ObjectListPropertyModel<Annotation*>::objectChanged);
+    connect(ptr, &Annotation::aboutToDelete, &m_annotations, &ObjectListPropertyModel<Annotation*>::objectDestroyed);
 
     emit annotationCountChanged();
 }
@@ -2836,3 +2845,192 @@ void StructureElementConnector::setSuggestedLabelPosition(const QPointF &val)
     m_suggestedLabelPosition = val;
     emit suggestedLabelPositionChanged();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+StructureCanvasViewportFilterModel::StructureCanvasViewportFilterModel(QObject *parent)
+    : QSortFilterProxyModel(parent),
+      m_structure(this, "structure")
+{
+
+}
+
+StructureCanvasViewportFilterModel::~StructureCanvasViewportFilterModel()
+{
+
+}
+
+void StructureCanvasViewportFilterModel::setStructure(Structure *val)
+{
+    if(m_structure == val)
+        return;
+
+    m_structure = val;
+    this->updateSourceModel();
+    emit structureChanged();
+}
+
+void StructureCanvasViewportFilterModel::setType(StructureCanvasViewportFilterModel::Type val)
+{
+    if(m_type == val)
+        return;
+
+    m_type = val;
+    emit typeChanged();
+
+    this->updateSourceModel();
+}
+
+void StructureCanvasViewportFilterModel::setViewportRect(const QRectF &val)
+{
+    if(m_viewportRect == val)
+        return;
+
+    m_viewportRect = val;
+    emit viewportRectChanged();
+
+    this->invalidateSelfLater();
+}
+
+void StructureCanvasViewportFilterModel::setComputeStrategy(StructureCanvasViewportFilterModel::ComputeStrategy val)
+{
+    if(m_computeStrategy == val)
+        return;
+
+    m_computeStrategy = val;
+    emit computeStrategyChanged();
+}
+
+void StructureCanvasViewportFilterModel::setFilterStrategy(StructureCanvasViewportFilterModel::FilterStrategy val)
+{
+    if(m_filterStrategy == val)
+        return;
+
+    m_filterStrategy = val;
+    emit filterStrategyChanged();
+
+    this->invalidateSelfLater();
+}
+
+int StructureCanvasViewportFilterModel::mapFromSourceRow(int source_row) const
+{
+    if(this->sourceModel() == nullptr)
+        return source_row;
+
+    const QModelIndex source_index = this->sourceModel()->index(source_row, 0, QModelIndex());
+    const QModelIndex filter_index = this->mapFromSource(source_index);
+    return filter_index.row();
+}
+
+int StructureCanvasViewportFilterModel::mapToSourceRow(int filter_row) const
+{
+    if(this->sourceModel() == nullptr)
+        return filter_row;
+
+    const QModelIndex filter_index = this->index(filter_row, 0, QModelIndex());
+    const QModelIndex source_index = this->mapToSource(filter_index);
+    return source_index.row();
+}
+
+void StructureCanvasViewportFilterModel::setSourceModel(QAbstractItemModel *model)
+{
+    if(m_structure.isNull())
+        this->QSortFilterProxyModel::setSourceModel(nullptr);
+    else
+    {
+        if(m_type == AnnotationType && model == m_structure->annotationsModel())
+            this->QSortFilterProxyModel::setSourceModel(model);
+        else if(model == m_structure->elementsModel())
+            this->QSortFilterProxyModel::setSourceModel(model);
+        else
+            this->QSortFilterProxyModel::setSourceModel(nullptr);
+    }
+}
+
+bool StructureCanvasViewportFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    Q_UNUSED(source_parent)
+
+    if(m_computeStrategy == PreComputeStrategy)
+    {
+        if(source_row < 0 || source_row >= m_visibleSourceRows.size())
+            return false;
+
+        return m_visibleSourceRows.at(source_row);
+    }
+
+    const ObjectListPropertyModelBase *model = qobject_cast<ObjectListPropertyModelBase*>(this->sourceModel());
+    if(model == nullptr)
+        return false;
+
+    const QObject *object = model->objectAt(source_row);
+    const QRectF objectRect = (m_type == AnnotationType) ?
+                (qobject_cast<const Annotation*>(object))->geometry() :
+                (qobject_cast<const StructureElement*>(object))->geometry();
+    if(m_filterStrategy == ContainsStrategy)
+        return m_viewportRect.contains(objectRect);
+    return m_viewportRect.intersects(objectRect);
+}
+
+void StructureCanvasViewportFilterModel::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_invalidateTimer.timerId())
+    {
+        m_invalidateTimer.stop();
+        this->invalidateSelf();
+    }
+    else
+        QObject::timerEvent(te);
+}
+
+void StructureCanvasViewportFilterModel::resetStructure()
+{
+    m_structure = nullptr;
+    this->setSourceModel(nullptr);
+    emit structureChanged();
+}
+
+void StructureCanvasViewportFilterModel::updateSourceModel()
+{
+    if(m_structure.isNull())
+        this->setSourceModel(nullptr);
+    else
+    {
+        if(m_type == AnnotationType)
+            this->setSourceModel(m_structure->annotationsModel());
+        else
+            this->setSourceModel(m_structure->elementsModel());
+    }
+}
+
+void StructureCanvasViewportFilterModel::invalidateSelf()
+{
+    m_visibleSourceRows.clear();
+    const ObjectListPropertyModelBase *model = m_computeStrategy == OnDemandComputeStrategy ? nullptr : qobject_cast<ObjectListPropertyModelBase*>(this->sourceModel());
+    if(model == nullptr || m_computeStrategy == OnDemandComputeStrategy)
+    {
+        this->invalidateFilter();
+        return;
+    }
+
+    m_visibleSourceRows.reserve(model->objectCount());
+    for(int i=0; i<model->objectCount(); i++)
+    {
+        const QObject *object = model->objectAt(i);
+        const QRectF objectRect = (m_type == AnnotationType) ?
+                    (qobject_cast<const Annotation*>(object))->geometry() :
+                    (qobject_cast<const StructureElement*>(object))->geometry();
+        if(m_filterStrategy == ContainsStrategy)
+            m_visibleSourceRows << m_viewportRect.contains(objectRect);
+        else
+            m_visibleSourceRows << m_viewportRect.intersects(objectRect);
+    }
+
+    this->invalidateFilter();
+}
+
+void StructureCanvasViewportFilterModel::invalidateSelfLater()
+{
+    m_invalidateTimer.start(0, this);
+}
+

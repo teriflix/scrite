@@ -351,12 +351,16 @@ void TightBoundingBoxItem::setPreview(const QImage &image)
     emit previewUpdated();
 }
 
-#include "timeprofiler.h"
-
 void TightBoundingBoxItem::determineVisibility()
 {
     if(m_item == nullptr)
         return;
+
+    if(m_visibilityMode == AlwaysVisible)
+    {
+        m_item->setVisible(true);
+        return;
+    }
 
     QRectF itemRect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
     if(!m_viewportItem.isNull())

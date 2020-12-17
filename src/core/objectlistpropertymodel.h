@@ -15,6 +15,7 @@
 #define OBJECTLISTPROPERTYMODEL_H
 
 #include <QList>
+#include <QMetaMethod>
 #include <QAbstractListModel>
 
 class ObjectListPropertyModelBase : public QAbstractListModel
@@ -69,12 +70,15 @@ public:
             return;
 
         this->beginRemoveRows(QModelIndex(), row, row);
+        T ptr = m_list.at(row);
+        ptr->disconnect(this);
         m_list.removeAt(row);
         this->endRemoveRows();
     }
 
     void insert(int row, T ptr) {
         int iidx = row < 0 || row >= m_list.size() ? m_list.size() : row;
+
         this->beginInsertRows(QModelIndex(), iidx, iidx);
         m_list.insert(iidx, ptr);
         this->endInsertRows();
@@ -103,6 +107,8 @@ public:
 
     void clear() {
         this->beginResetModel();
+        for(T ptr : m_list)
+            ptr->disconnect(this);
         m_list.clear();
         this->endResetModel();
     }
@@ -158,6 +164,27 @@ public:
     // ObjectListPropertyModelBase interface
     int objectCount() const { return m_list.size(); }
     QObject *objectAt(int row) const { return this->at(row); }
+
+public:
+    void objectChanged() {
+        T ptr = qobject_cast<T>(this->sender());
+        if(ptr == nullptr)
+            return;
+        const int row = m_list.indexOf(ptr);
+        if(row < 0)
+            return;
+        const QModelIndex index = this->index(row, 0, QModelIndex());
+        emit dataChanged(index, index);
+    }
+
+    void objectDestroyed(T ptr) {
+        if(ptr == nullptr)
+            return;
+        const int row = m_list.indexOf(ptr);
+        if(row < 0)
+            return;
+        this->removeAt(row);
+    }
 
 private:
     QList<T> m_list;

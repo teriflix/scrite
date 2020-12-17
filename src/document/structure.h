@@ -26,6 +26,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QUndoCommand>
+#include <QSortFilterProxyModel>
 
 class Structure;
 class Character;
@@ -68,6 +69,10 @@ public:
     void setHeight(qreal val);
     qreal height() const { return m_height; }
     Q_SIGNAL void heightChanged();
+
+    Q_PROPERTY(QRectF geometry READ geometry NOTIFY geometryChanged)
+    QRectF geometry() const { return QRectF(m_x, m_y, m_width, m_height); }
+    Q_SIGNAL void geometryChanged();
 
     Q_PROPERTY(QQuickItem* follow READ follow WRITE setFollow NOTIFY followChanged RESET resetFollow STORED false)
     void setFollow(QQuickItem* val);
@@ -744,6 +749,74 @@ private:
     QObjectProperty<StructureElement> m_toElement;
     QObjectProperty<StructureElement> m_fromElement;
     QPointF m_suggestedLabelPosition;
+};
+
+class StructureCanvasViewportFilterModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+
+public:
+    StructureCanvasViewportFilterModel(QObject *parent=nullptr);
+    ~StructureCanvasViewportFilterModel();
+
+    Q_PROPERTY(Structure* structure READ structure WRITE setStructure RESET resetStructure NOTIFY structureChanged)
+    void setStructure(Structure* val);
+    Structure* structure() const { return m_structure; }
+    Q_SIGNAL void structureChanged();
+
+    enum Type { AnnotationType, StructureElementType };
+    Q_ENUM(Type)
+    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    void setType(Type val);
+    Type type() const { return m_type; }
+    Q_SIGNAL void typeChanged();
+
+    Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
+    void setViewportRect(const QRectF &val);
+    QRectF viewportRect() const { return m_viewportRect; }
+    Q_SIGNAL void viewportRectChanged();
+
+    enum ComputeStrategy { PreComputeStrategy, OnDemandComputeStrategy };
+    Q_ENUM(ComputeStrategy)
+    Q_PROPERTY(ComputeStrategy computeStrategy READ computeStrategy WRITE setComputeStrategy NOTIFY computeStrategyChanged)
+    void setComputeStrategy(ComputeStrategy val);
+    ComputeStrategy computeStrategy() const { return m_computeStrategy; }
+    Q_SIGNAL void computeStrategyChanged();
+
+    enum FilterStrategy { ContainsStrategy, IntersectsStrategy };
+    Q_ENUM(FilterStrategy)
+    Q_PROPERTY(FilterStrategy filterStrategy READ filterStrategy WRITE setFilterStrategy NOTIFY filterStrategyChanged)
+    void setFilterStrategy(FilterStrategy val);
+    FilterStrategy filterStrategy() const { return m_filterStrategy; }
+    Q_SIGNAL void filterStrategyChanged();
+
+    Q_INVOKABLE int mapFromSourceRow(int source_row) const;
+    Q_INVOKABLE int mapToSourceRow(int filter_row) const;
+
+    // QAbstractProxyModel interface
+    void setSourceModel(QAbstractItemModel *model);
+
+protected:
+    // QSortFilterProxyModel interface
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+
+    // QObject interface
+    void timerEvent(QTimerEvent *te);
+
+private:
+    void resetStructure();
+    void updateSourceModel();
+    void invalidateSelf();
+    void invalidateSelfLater();
+
+private:
+    QRectF m_viewportRect;
+    QList<bool> m_visibleSourceRows;
+    ExecLaterTimer m_invalidateTimer;
+    Type m_type = StructureElementType;
+    QObjectProperty<Structure> m_structure;
+    FilterStrategy m_filterStrategy = IntersectsStrategy;
+    ComputeStrategy m_computeStrategy = OnDemandComputeStrategy;
 };
 
 #endif // STRUCTURE_H

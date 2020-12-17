@@ -151,6 +151,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Structure>("Scrite", 1, 0, "Structure", reason);
     qmlRegisterType<StructureElement>("Scrite", 1, 0, "StructureElement");
     qmlRegisterType<StructureElementConnector>("Scrite", 1, 0, "StructureElementConnector");
+    qmlRegisterType<StructureCanvasViewportFilterModel>("Scrite", 1, 0, "StructureCanvasViewportFilterModel");
 
     qmlRegisterType<Note>("Scrite", 1, 0, "Note");
     qmlRegisterType<Relationship>("Scrite", 1, 0, "Relationship");
