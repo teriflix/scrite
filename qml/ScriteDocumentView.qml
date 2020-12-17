@@ -1130,6 +1130,7 @@ Item {
             property ScreenplayTextDocument screenplayTextDocument
             visible: screenplayTextDocument !== null
             property alias visibleToUser: currentTimeDisplay.visible
+            property real contentWidth: currentTimeLabel.visible ? currentTimeLabel.width + 10 : 0
 
             Rectangle {
                 visible: currentTimeDisplay.visible
@@ -1180,7 +1181,7 @@ Item {
 
         Row {
             id: editTools
-            x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x) / 2)
+            x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2 + (globalTimeDisplay.visible ? globalTimeDisplay.contentWidth/2 : 0))
             height: parent.height
             spacing: 2
 
