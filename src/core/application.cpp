@@ -24,6 +24,7 @@
 #include <QScreen>
 #include <QtDebug>
 #include <QCursor>
+#include <QScreen>
 #include <QWindow>
 #include <QPointer>
 #include <QProcess>
@@ -40,7 +41,6 @@
 #include <QFontDatabase>
 #include <QStandardPaths>
 #include <QOperatingSystemVersion>
-#include <QScreen>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -95,6 +95,27 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
         m_settings->setValue("Screenplay Editor/enableSpellCheck", false);
     }
     m_settings->setValue( QStringLiteral("Installation/version"), m_versionNumber.toString() );
+
+    if(sversion.isNull() || sversion <= QVersionNumber(0,5,3))
+    {
+        const QString customResKey = QStringLiteral("ScreenplayPageLayout/customResolution");
+        const QString forceCustomResKey = QStringLiteral("ScreenplayPageLayout/forceCustomResolution");
+        const bool customResAlreadySet = m_settings->value(customResKey, 0).toDouble() > 0;
+        const bool forceCustomRes = !customResAlreadySet && m_settings->value(forceCustomResKey, true).toBool();
+        if(forceCustomRes)
+        {
+#ifdef Q_OS_MAC
+            m_settings->setValue(customResKey, 72);
+#endif
+#ifdef Q_OS_WIN
+            m_settings->setValue(customResKey, 96);
+#endif
+        }
+
+        m_settings->setValue(forceCustomResKey, false);
+    }
+
+    m_settings->sync();
 
     TransliterationEngine::instance(this);
     SystemTextInputManager::instance();
