@@ -1549,7 +1549,7 @@ Item {
                         SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? ui.width * 0.5 : workspaceSettings.screenplayEditorWidth
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                         readonly property int screenplayZoomLevelModifier: -3
-                        active: screenplayEditor2Active.value && width >= 50
+                        active: width >= 50
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
                     }
                 }

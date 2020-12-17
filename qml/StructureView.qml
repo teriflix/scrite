@@ -25,15 +25,19 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.margins: 1
         color: primaryColors.c100.background
         height: toolbarLayout.height+4
+        border.width: 1
+        border.color: primaryColors.borderColor
+        radius: 6
 
-        Row {
+        Flow {
             id: toolbarLayout
             spacing: 3
             width: parent.width-4
             anchors.verticalCenter: parent.verticalCenter
+            layoutDirection: Flow.LeftToRight
+            property real rowHeight: newSceneButton.height
 
             ToolButton3 {
                 id: newSceneButton
@@ -59,7 +63,7 @@ Item {
 
             Rectangle {
                 width: 1
-                height: parent.height
+                height: parent.rowHeight
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
@@ -116,7 +120,7 @@ Item {
 
             Rectangle {
                 width: 1
-                height: parent.height
+                height: parent.rowHeight
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
@@ -177,7 +181,7 @@ Item {
 
             Rectangle {
                 width: 1
-                height: parent.height
+                height: parent.rowHeight
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
