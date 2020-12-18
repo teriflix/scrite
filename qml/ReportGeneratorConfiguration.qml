@@ -195,6 +195,8 @@ Item {
                                         }
                                         onSelectedExtensionChanged: generator.format = selectedExtension.value
                                         onAbsoluteFilePathChanged: generator.fileName = absoluteFilePath
+                                        folder: workspaceSettings.lastOpenReportsFolderUrl
+                                        onFolderChanged: workspaceSettings.lastOpenReportsFolderUrl = folder
                                     }
 
                                     Repeater {

@@ -122,6 +122,9 @@ Item {
                 selectMultiple: false
                 sidebarVisible: true
                 selectExisting: true
+                folder: workspaceSettings.lastOpenPhotosFolderUrl
+                onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
+
                 onAccepted: {
                     if(fileUrl != "") {
                         character.addPhoto(app.urlToLocalFile(fileUrl))

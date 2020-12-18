@@ -649,7 +649,12 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
         if(fi.exists())
             exporter->setFileName( fi.absoluteDir().absoluteFilePath(suggestedName) );
         else
-            exporter->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
+        {
+            const QUrl folderUrl( Application::instance()->settings()->value(QStringLiteral("Workspace/lastOpenExportFolderUrl")).toString() );
+            const QString path = folderUrl.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+                                                     : folderUrl.toLocalFile();
+            exporter->setFileName( path + QStringLiteral("/") + suggestedName );
+        }
     }
 
     ProgressReport *progressReport = exporter->findChild<ProgressReport*>();
@@ -691,7 +696,12 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
         if(fi.exists())
             reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(suggestedName) );
         else
-            reportGenerator->setFileName( QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/" + suggestedName );
+        {
+            const QUrl folderUrl( Application::instance()->settings()->value(QStringLiteral("Workspace/lastOpenReportsFolderUrl")).toString() );
+            const QString path = folderUrl.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+                                                     : folderUrl.toLocalFile();
+            reportGenerator->setFileName( path + QStringLiteral("/") + suggestedName );
+        }
     }
 
     ProgressReport *progressReport = reportGenerator->findChild<ProgressReport*>();

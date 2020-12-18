@@ -17,12 +17,14 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Controls 2.13
 
 Item {
+    id: fileSelector
     property string label: "Select a file to export into"
     property alias absoluteFilePath: fileInfo.absoluteFilePath
     property var allowedExtensions: []
     property var selectedExtension
     property string filePathPrefix: "File will be saved as: "
     property alias nameFilters: folderPathDialog.nameFilters
+    property url folder
 
     width: 400
     height: layout.height
@@ -43,8 +45,9 @@ Item {
                 if(fileInfo.exists)
                     return "file:///" + fileInfo.absolutePath
             }
-            return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+            return fileSelector.folder
         }
+        onFolderChanged: fileSelector.folder = folder
         selectFolder: true
         selectMultiple: false
         selectExisting: false

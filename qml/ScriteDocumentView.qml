@@ -48,6 +48,11 @@ Item {
         property bool showNotebookInStructure: true
         property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
         property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
+        property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenPhotosFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.PicturesLocation)
+        property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenExportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
 
         onShowNotebookInStructureChanged: {
             app.execLater(workspaceSettings, 100, function() {
@@ -1622,13 +1627,11 @@ Item {
         nameFilters: modes[mode].nameFilters
         selectFolder: false
         selectMultiple: false
-        folder: {
-            if(scriteDocument.fileName !== "") {
-                var fileInfo = app.fileInfo(scriteDocument.fileName)
-                if(fileInfo.exists)
-                    return "file:///" + fileInfo.absolutePath
-            }
-            return "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        onFolderChanged: {
+            if(mode === "OPEN")
+                workspaceSettings.lastOpenFolderUrl = folder
+            else
+                workspaceSettings.lastOpenImportFolderUrl = folder
         }
         sidebarVisible: true
         selectExisting: modes[mode].selectExisting
@@ -1684,6 +1687,7 @@ Item {
 
         function launch(launchMode, filePath) {
             mode = launchMode
+            folder = mode === "OPEN" ? workspaceSettings.lastOpenFolderUrl : workspaceSettings.lastOpenImportFolderUrl
 
             if(filePath)
                 app.execLater(qmlWindow, 250, function() { processFile(filePath) } )

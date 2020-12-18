@@ -1134,6 +1134,8 @@ Item {
                             if(fileUrl != "")
                                 scriteDocument.screenplay.setCoverPagePhoto(app.urlToLocalFile(fileUrl))
                         }
+                        folder: workspaceSettings.lastOpenPhotosFolderUrl
+                        onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
                     }
                 }
 
