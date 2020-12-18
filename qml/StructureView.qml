@@ -1569,18 +1569,32 @@ Item {
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                 }
 
-                TextField2 {
+                TextArea {
                     id: synopsisField
                     width: parent.width
-                    label: "Synopsis"
-                    labelAlwaysVisible: true
+                    background: Item {
+                        Text {
+                            id: labelText
+                            text: "Synopsis"
+                            font.pointSize: app.idealFontPointSize/2
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.top
+                        }
+                        Rectangle {
+                            width: parent.width
+                            height: synopsisField.hovered ? 2 : 1
+                            color: synopsisField.hovered ? "black" : primaryColors.borderColor
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: app.idealFontPointSize/2
+                        }
+                    }
                     placeholderText: "Describe what happens in this scene."
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     TabSequenceItem.manager: indexCardTabSequence
                     TabSequenceItem.sequence: 1
                     text: element.scene.title
-                    onTextEdited: element.scene.title = text
+                    onTextChanged: element.scene.title = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                 }
 
