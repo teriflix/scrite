@@ -2951,19 +2951,22 @@ bool StructureCanvasViewportFilterModel::filterAcceptsRow(int source_row, const 
 {
     Q_UNUSED(source_parent)
 
-    if(m_computeStrategy == PreComputeStrategy)
-    {
-        if(source_row < 0 || source_row >= m_visibleSourceRows.size())
-            return false;
-
-        return m_visibleSourceRows.at(source_row);
-    }
-
     const ObjectListPropertyModelBase *model = qobject_cast<ObjectListPropertyModelBase*>(this->sourceModel());
     if(model == nullptr)
         return false;
 
     const QObject *object = model->objectAt(source_row);
+    if(m_computeStrategy == PreComputeStrategy)
+    {
+        if(source_row < 0 || source_row >= m_visibleSourceRows.size() || object != m_visibleSourceRows.at(source_row).first)
+        {
+            (const_cast<StructureCanvasViewportFilterModel*>(this))->invalidateSelfLater();
+            return false;
+        }
+
+        return m_visibleSourceRows.at(source_row).second;
+    }
+
     const QRectF objectRect = (m_type == AnnotationType) ?
                 (qobject_cast<const Annotation*>(object))->geometry() :
                 (qobject_cast<const StructureElement*>(object))->geometry();
@@ -3017,13 +3020,19 @@ void StructureCanvasViewportFilterModel::invalidateSelf()
     for(int i=0; i<model->objectCount(); i++)
     {
         const QObject *object = model->objectAt(i);
-        const QRectF objectRect = (m_type == AnnotationType) ?
-                    (qobject_cast<const Annotation*>(object))->geometry() :
-                    (qobject_cast<const StructureElement*>(object))->geometry();
-        if(m_filterStrategy == ContainsStrategy)
-            m_visibleSourceRows << m_viewportRect.contains(objectRect);
+
+        if(m_viewportRect.isEmpty())
+            m_visibleSourceRows << qMakePair(object, true);
         else
-            m_visibleSourceRows << m_viewportRect.intersects(objectRect);
+        {
+            const QRectF objectRect = (m_type == AnnotationType) ?
+                        (qobject_cast<const Annotation*>(object))->geometry() :
+                        (qobject_cast<const StructureElement*>(object))->geometry();
+            if(m_filterStrategy == ContainsStrategy)
+                m_visibleSourceRows << qMakePair(object, m_viewportRect.contains(objectRect));
+            else
+                m_visibleSourceRows << qMakePair(object, m_viewportRect.intersects(objectRect));
+        }
     }
 
     this->invalidateFilter();

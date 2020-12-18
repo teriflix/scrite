@@ -811,12 +811,12 @@ private:
 
 private:
     QRectF m_viewportRect;
-    QList<bool> m_visibleSourceRows;
     ExecLaterTimer m_invalidateTimer;
     Type m_type = StructureElementType;
     QObjectProperty<Structure> m_structure;
     FilterStrategy m_filterStrategy = IntersectsStrategy;
     ComputeStrategy m_computeStrategy = OnDemandComputeStrategy;
+    QList< QPair<const QObject*,bool> > m_visibleSourceRows;
 };
 
 #endif // STRUCTURE_H
