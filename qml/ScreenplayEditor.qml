@@ -28,7 +28,7 @@ Rectangle {
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: screenplayAdapter.source
     property bool toolBarVisible: toolbar.visible
-    property bool synopsisPanelAllowed: true
+    property bool commentsPanelAllowed: true
     property var additionalCharacterMenuItems: []
     property var additionalSceneMenuItems: []
     signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
@@ -58,8 +58,8 @@ Rectangle {
         }
         onSourceChanged: {
             globalScreenplayEditorToolbar.showScreenplayPreview = false
-            contentView.synopsisExpandCounter = 0
-            contentView.synopsisExpanded = false
+            contentView.commentsExpandCounter = 0
+            contentView.commentsExpanded = false
         }
     }
 
@@ -200,9 +200,9 @@ Rectangle {
             height: parent.height
             anchors.left: parent.left
             anchors.leftMargin: leftMargin
-            property real leftMargin: contentView.synopsisExpanded && sidePanels.expanded ? 80 : (parent.width-width)/2
+            property real leftMargin: contentView.commentsExpanded && sidePanels.expanded ? 80 : (parent.width-width)/2
             Behavior on leftMargin {
-                enabled: screenplayEditorSettings.enableAnimations && contentView.synopsisExpandCounter > 0
+                enabled: screenplayEditorSettings.enableAnimations && contentView.commentsExpandCounter > 0
                 NumberAnimation { duration: 50 }
             }
 
@@ -241,10 +241,10 @@ Rectangle {
                     id: contentView
                     anchors.fill: parent
                     model: contentViewModel.value
-                    property int synopsisExpandCounter: 0
-                    property bool synopsisExpanded: false
-                    property real spaceForSynopsis: screenplayEditorSettings.displaySceneNotes && synopsisPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
-                    onSynopsisExpandedChanged: synopsisExpandCounter = synopsisExpandCounter+1
+                    property int commentsExpandCounter: 0
+                    property bool commentsExpanded: false
+                    property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
+                    onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     delegate: Loader {
                         width: contentView.width
                         property var componentData: modelData
@@ -718,6 +718,78 @@ Rectangle {
                 delay: 100
             }
 
+            BoxShadow {
+                visible: screenplayAdapter.currentIndex === contentItem.theIndex && commentsSidePanel.expanded && commentsSidePanel.visible
+                anchors.fill: commentsSidePanel
+                anchors.leftMargin: 9
+                opacity: 1
+            }
+
+            SidePanel {
+                id: commentsSidePanel
+                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
+                backgroundColor: buttonColor
+                borderColor: expanded ? primaryColors.borderColor : Qt.rgba(0,0,0,0)
+                anchors.top: parent.top
+                anchors.left: parent.right
+                // anchors.leftMargin: expanded ? 0 : -minPanelWidth
+                buttonText: contentItem.isCurrent && expanded ? ("Scene #" + contentItem.theElement.sceneNumber + " Comments") : ""
+                height: {
+                    if(expanded) {
+                        if(contentItem.isCurrent)
+                            return contentInstance ? Math.max(contentInstance.contentHeight+40, 350) : 300
+                        return Math.min(300, parent.height)
+                    }
+                    return sceneHeadingAreaLoader.height
+                }
+                property bool commentsExpanded: contentView.commentsExpanded
+                expanded: commentsExpanded
+                onCommentsExpandedChanged: expanded = commentsExpanded
+                onExpandedChanged: contentView.commentsExpanded = expanded
+                maxPanelWidth: Math.min(contentView.spaceForComments, 400)
+                width: maxPanelWidth
+                clip: true
+                visible: width >= 100 && screenplayEditorSettings.displaySceneComments
+                opacity: expanded ? (screenplayAdapter.currentIndex < 0 || screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
+                content: TextArea {
+                    id: synopsisEdit
+                    background: Rectangle {
+                        color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
+                    }
+                    font.pointSize: app.idealFontPointSize + 1
+                    onTextChanged: contentItem.theScene.comments = text
+                    wrapMode: Text.WordWrap
+                    text: contentItem.theScene.comments
+                    selectByMouse: true
+                    selectByKeyboard: true
+                    leftPadding: 10
+                    rightPadding: 10
+                    topPadding: 10
+                    bottomPadding: 10
+                    readOnly: scriteDocument.readOnly
+                    onActiveFocusChanged: {
+                        if(activeFocus)
+                            screenplayAdapter.currentIndex = contentItem.theIndex
+                    }
+
+                    Transliterator.textDocument: textDocument
+                    Transliterator.cursorPosition: cursorPosition
+                    Transliterator.hasActiveFocus: activeFocus
+
+                    SpecialSymbolsSupport {
+                        anchors.top: parent.bottom
+                        anchors.left: parent.left
+                        textEditor: synopsisEdit
+                        textEditorHasCursorInterface: true
+                        enabled: !scriteDocument.readOnly
+                    }
+                }
+            }
+
             Column {
                 id: contentItemLayout
                 width: parent.width
@@ -745,7 +817,7 @@ Rectangle {
                     width: parent.width
                     height: synopsisEditorLayout.height + 10
                     color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
-                    visible: screenplayEditorSettings.displaySceneNotes
+                    visible: screenplayEditorSettings.displaySceneSynopsis
 
                     Column {
                         id: synopsisEditorLayout
@@ -1913,7 +1985,7 @@ Rectangle {
         anchors.bottomMargin: 5
         width: sceneListSidePanel.width // Math.max(sceneListSidePanel.width, notesSidePanel.width)
         property bool expanded: sceneListSidePanel.expanded
-        onExpandedChanged: contentView.synopsisExpandCounter = 0
+        onExpandedChanged: contentView.commentsExpandCounter = 0
 
         SidePanel {
             id: sceneListSidePanel

@@ -82,9 +82,14 @@ Row {
 
                 MenuItem2 {
                     text: "Display Scene Synopsis"
-                    enabled: mainTabBar.currentIndex === 0
-                    icon.source: screenplayEditorSettings.displaySceneNotes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneNotes = !screenplayEditorSettings.displaySceneNotes
+                    icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
+                }
+
+                MenuItem2 {
+                    text: "Display Scene Comments"
+                    icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
                 }
             }
         }

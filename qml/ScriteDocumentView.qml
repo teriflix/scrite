@@ -66,7 +66,8 @@ Item {
         fileName: app.settingsFilePath
         category: "Screenplay Editor"
         property bool displaySceneCharacters: true
-        property bool displaySceneNotes: true
+        property bool displaySceneSynopsis: true
+        property bool displaySceneComments: false
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true
@@ -114,9 +115,18 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+S"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneNotes ? "Hide Synopsis" : "Show Synopsis"
+        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneSynopsis ? "Hide Synopsis" : "Show Synopsis"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: screenplayEditorSettings.displaySceneNotes = !screenplayEditorSettings.displaySceneNotes
+        onActivated: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Alt+M"
+        ShortcutsModelItem.group: "Settings"
+        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneComments ? "Hide Comments" : "Show Comments"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
     }
 
     Shortcut {
@@ -1422,7 +1432,6 @@ Item {
 
         ScreenplayEditor {
             zoomLevelModifier: screenplayZoomLevelModifier
-            synopsisPanelAllowed: mainTabBar.currentIndex === 0
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(workspaceSettings.showNotebookInStructure)

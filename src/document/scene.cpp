@@ -730,6 +730,20 @@ void Scene::setType(Scene::Type val)
     emit typeChanged();
 }
 
+void Scene::setComments(const QString &val)
+{
+    if(m_comments == val)
+        return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "comments");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
+    m_comments = val;
+    emit commentsChanged();
+}
+
 void Scene::setUndoRedoEnabled(bool val)
 {
     if(m_undoRedoEnabled == val)

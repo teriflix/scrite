@@ -228,6 +228,11 @@ public:
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
+    Q_PROPERTY(QString comments READ comments WRITE setComments NOTIFY commentsChanged)
+    void setComments(const QString &val);
+    QString comments() const { return m_comments; }
+    Q_SIGNAL void commentsChanged();
+
     Q_PROPERTY(bool isBeingReset READ isBeingReset NOTIFY resetStateChanged)
     bool isBeingReset() const { return m_isBeingReset; }
     Q_SIGNAL void resetStateChanged();
@@ -335,6 +340,7 @@ private:
     Type m_type = Standard;
     QColor m_color = QColor(Qt::white);
     QString m_title;
+    QString m_comments;
     QString m_emotionalChange;
     QString m_charactersInConflict;
     QString m_pageTarget;
