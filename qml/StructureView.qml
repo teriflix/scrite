@@ -571,7 +571,7 @@ Item {
 
             BoxShadow {
                 anchors.fill: currentElementItem
-                visible: currentElementItem !== null && !annotationGripLoader.active
+                visible: currentElementItem !== null && !annotationGripLoader.active && currentElementItem.visible
                 property Item currentElementItem: currentElementItemBinder.get
                 onCurrentElementItemChanged: canvasScroll.ensureItemVisible(currentElementItem, canvas.scale)
                 opacity: canvas.activeFocus && !selection.hasItems ? 1 : 0.25
@@ -672,6 +672,13 @@ Item {
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 1
                     border.color: accentColors.borderColor
+
+                    TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
+                    TightBoundingBoxItem.stackOrder: 2.0 + (index/canvas.beats.length)
+                    TightBoundingBoxItem.livePreview: false
+                    TightBoundingBoxItem.viewportItem: canvas
+                    TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
+                    TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
                     Rectangle {
                         anchors.fill: beatLabel
@@ -1222,7 +1229,7 @@ Item {
             enabled: selection.active === false
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-            TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
+            TightBoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
             TightBoundingBoxItem.livePreview: false
             TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
             TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
@@ -1451,7 +1458,7 @@ Item {
             Component.onCompleted: element.follow = elementItem
 
             TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-            TightBoundingBoxItem.stackOrder: 2.0 + (index/scriteDocument.structure.elementCount)
+            TightBoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
             TightBoundingBoxItem.livePreview: false
             TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
             TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
