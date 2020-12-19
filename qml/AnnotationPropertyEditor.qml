@@ -353,7 +353,7 @@ Item {
                 width: parent.width - 10
                 border.width: 1
                 border.color: primaryColors.borderColor
-                height: 200
+                height: 200 + fontSearchBar.height
                 visible: false
                 anchors.right: parent.right
                 onVisibleChanged: {
@@ -371,10 +371,34 @@ Item {
                         propertyEditorView.contentY = (pt.y + fontFamilyEditorItem.height + 10 - propertyEditorView.height)
                 }
 
+                TextField {
+                    id: fontSearchBar
+                    width: parent.width
+                    placeholderText: "search for a font"
+                    anchors.top: parent.top
+                    font.pointSize: app.idealFontPointSize
+                    onTextEdited: Qt.callLater(highlightFont)
+                    function highlightFont() {
+                        var utext = text.toUpperCase()
+                        var checkFn = function(arg) {
+                            return arg.toUpperCase().indexOf(utext) === 0
+                        }
+                        var families = fontListView.systemFontInfo.families
+                        var index = families.findIndex(checkFn)
+                        if(index >= 0) {
+                            fontListView.currentIndex = index
+                            changePropertyValue(families[index])
+                        }
+                    }
+                }
+
                 ListView {
                     id: fontListView
                     property var systemFontInfo
-                    anchors.fill: parent
+                    anchors.top: fontSearchBar.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
                     model: systemFontInfo ? systemFontInfo.families : 0
                     highlight: Rectangle {
                         color: app.palette.highlight
