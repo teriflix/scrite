@@ -58,9 +58,9 @@ public:
     }
 
     void prepend(T ptr) {
-        this->beginRemoveRows(QModelIndex(), 0, 0);
+        this->beginInsertRows(QModelIndex(), 0, 0);
         m_list.prepend(ptr);
-        this->endRemoveRows();
+        this->beginInsertRows();
     }
 
     int indexOf(T ptr) const { return m_list.indexOf(ptr); }
