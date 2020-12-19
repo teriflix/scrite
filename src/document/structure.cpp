@@ -991,6 +991,9 @@ public:
     bool update(const QString &type, const QJsonObject &attributes);
 
 private:
+    void save();
+
+private:
     QJsonObject m_metaData;
     QString m_metaDataFile;
 };
@@ -1000,12 +1003,11 @@ AnnotationMetaData::AnnotationMetaData()
     const QString qrcFileName = QStringLiteral(":/misc/annotations_metadata.json");
     const QString revisionKey = QStringLiteral("#revision");
     m_metaDataFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath( QStringLiteral("annotations_metadata.json") );
-    if( !QFile::exists(m_metaDataFile) )
-        QFile::copy( qrcFileName, m_metaDataFile );
 
     auto loadMetaData = [](const QString &fileName) {
         QFile file(fileName);
-        file.open(QFile::ReadOnly);
+        if( !file.open(QFile::ReadOnly) )
+            return QJsonObject();
         return QJsonDocument::fromJson(file.readAll()).object();
     };
 
@@ -1017,8 +1019,8 @@ AnnotationMetaData::AnnotationMetaData()
     if(qrcRevision > diskRevision)
     {
         // TODO: see if it is possible to merge changes from the qrcFile into the diskFile
-        QFile::copy( qrcFileName, m_metaDataFile );
         m_metaData = qrcMetaData;
+        this->save();
     }
     else
         m_metaData = diskMetaData;
@@ -1026,9 +1028,7 @@ AnnotationMetaData::AnnotationMetaData()
 
 AnnotationMetaData::~AnnotationMetaData()
 {
-    QFile file(m_metaDataFile);
-    file.open(QFile::WriteOnly);
-    file.write( QJsonDocument(m_metaData).toJson() );
+    this->save();
 }
 
 QJsonArray AnnotationMetaData::get(const QString &type)
@@ -1060,7 +1060,16 @@ bool AnnotationMetaData::update(const QString &type, const QJsonObject &attribut
 
     m_metaData.insert(type, info);
 
+    this->save();
+
     return true;
+}
+
+void AnnotationMetaData::save()
+{
+    QFile file(m_metaDataFile);
+    file.open(QFile::WriteOnly);
+    file.write( QJsonDocument(m_metaData).toJson() );
 }
 
 Q_GLOBAL_STATIC(AnnotationMetaData, GlobalAnnotationMetaData)
