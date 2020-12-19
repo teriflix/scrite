@@ -719,7 +719,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvasScroll.editItem === null && !selection.active
+                enabled: canvasScroll.editItem === null && !selection.active && !initializeTimer.running
                 acceptedButtons: Qt.RightButton
                 onPressed: {
                     canvasMenu.isContextMenu = true
