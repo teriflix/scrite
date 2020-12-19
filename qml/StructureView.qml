@@ -1567,6 +1567,7 @@ Item {
                     TabSequenceItem.manager: indexCardTabSequence
                     TabSequenceItem.sequence: 0
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
+                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
                 TextArea {
@@ -1596,6 +1597,7 @@ Item {
                     text: element.scene.title
                     onTextChanged: element.scene.title = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
+                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
                 TextField2 {
@@ -1611,6 +1613,7 @@ Item {
                     text: element.scene.emotionalChange
                     onTextEdited: element.scene.emotionalChange = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
+                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
                 TextField2 {
@@ -1626,6 +1629,7 @@ Item {
                     text: element.scene.charactersInConflict
                     onTextEdited: element.scene.charactersInConflict = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
+                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
                 TextField2 {
@@ -1641,6 +1645,7 @@ Item {
                     text: element.scene.pageTarget
                     onTextEdited: element.scene.pageTarget = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
+                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
                 Item {
@@ -1846,6 +1851,10 @@ Item {
                         result.accept = true
                         result.filter = true
                     }
+                    break
+                case Qt.Key_Escape:
+                    annotationGripLoader.reset()
+                    break
                 }
             }
 
