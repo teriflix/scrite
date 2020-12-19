@@ -407,7 +407,7 @@ Item {
                         Text {
                             width: parent.width
                             wrapMode: Text.WordWrap
-                            text: "Starting with version 0.5.4, Scrite documents use Index Card UI by default. Older projects continue to use synopsis editor as before."
+                            text: "Starting with version 0.5.5, Scrite documents use Index Card UI by default. Older projects continue to use synopsis editor as before."
                         }
 
                         CheckBox2 {
