@@ -107,6 +107,7 @@ Item {
                             var attrs = annotation.attributes
                             attrs[propertyInfo.name] = newValue
                             annotation.attributes = attrs
+                            annotation.saveAttributesAsDefault()
                         }
 
                         active: propertyInfo.visible === true

@@ -418,6 +418,7 @@ public:
 
     Q_INVOKABLE void setAttribute(const QString &key, const QJsonValue &value);
     Q_INVOKABLE void removeAttribute(const QString &key);
+    Q_INVOKABLE void saveAttributesAsDefault();
 
     Q_PROPERTY(QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged STORED false)
     void setMetaData(const QJsonArray &val);

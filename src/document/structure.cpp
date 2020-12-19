@@ -24,6 +24,7 @@
 #include <QDateTime>
 #include <QClipboard>
 #include <QJsonDocument>
+#include <QStandardPaths>
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
@@ -980,6 +981,90 @@ int Character::staticRelationshipCount(QQmlListProperty<Relationship> *list)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+class AnnotationMetaData
+{
+public:
+    AnnotationMetaData();
+    ~AnnotationMetaData();
+
+    QJsonArray get(const QString &type);
+    bool update(const QString &type, const QJsonObject &attributes);
+
+private:
+    QJsonObject m_metaData;
+    QString m_metaDataFile;
+};
+
+AnnotationMetaData::AnnotationMetaData()
+{
+    const QString qrcFileName = QStringLiteral(":/misc/annotations_metadata.json");
+    const QString revisionKey = QStringLiteral("#revision");
+    m_metaDataFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath( QStringLiteral("annotations_metadata.json") );
+    if( !QFile::exists(m_metaDataFile) )
+        QFile::copy( qrcFileName, m_metaDataFile );
+
+    auto loadMetaData = [](const QString &fileName) {
+        QFile file(fileName);
+        file.open(QFile::ReadOnly);
+        return QJsonDocument::fromJson(file.readAll()).object();
+    };
+
+    const QJsonObject qrcMetaData = loadMetaData(qrcFileName);
+    const QJsonObject diskMetaData = loadMetaData(m_metaDataFile);
+    const int qrcRevision = qrcMetaData.value(revisionKey).toInt();
+    const int diskRevision = diskMetaData.value(revisionKey).toInt();
+
+    if(qrcRevision > diskRevision)
+    {
+        // TODO: see if it is possible to merge changes from the qrcFile into the diskFile
+        QFile::copy( qrcFileName, m_metaDataFile );
+        m_metaData = qrcMetaData;
+    }
+    else
+        m_metaData = diskMetaData;
+}
+
+AnnotationMetaData::~AnnotationMetaData()
+{
+    QFile file(m_metaDataFile);
+    file.open(QFile::WriteOnly);
+    file.write( QJsonDocument(m_metaData).toJson() );
+}
+
+QJsonArray AnnotationMetaData::get(const QString &type)
+{
+    const QJsonArray info = m_metaData.value(type).toArray();
+    return info;
+}
+
+bool AnnotationMetaData::update(const QString &type, const QJsonObject &attributes)
+{
+    QJsonArray info = m_metaData.value(type).toArray();
+    if(info.isEmpty())
+        return false;
+
+    for(int i=0; i<info.size(); i++)
+    {
+        QJsonObject attrInfo = info.at(i).toObject();
+        if(attrInfo.value(QStringLiteral("cache")).toBool() == false)
+            continue;
+
+        const QString attrName = attrInfo.value(QStringLiteral("name")).toString();
+        const QJsonValue attrValue = attributes.value(attrName);
+        if(attrValue.isNull() || attrValue.isUndefined())
+            continue;
+
+        attrInfo.insert(QStringLiteral("default"), attrValue);
+        info[i] = attrInfo;
+    }
+
+    m_metaData.insert(type, info);
+
+    return true;
+}
+
+Q_GLOBAL_STATIC(AnnotationMetaData, GlobalAnnotationMetaData)
+
 Annotation::Annotation(QObject *parent)
     : QObject(parent),
       m_structure(qobject_cast<Structure*>(parent))
@@ -1003,15 +1088,7 @@ void Annotation::setType(const QString &val)
     m_type = val;
     emit typeChanged();
 
-    static QJsonObject metaDataDict;
-    if(metaDataDict.isEmpty())
-    {
-        QFile file(":/misc/annotations_metadata.json");
-        file.open(QFile::ReadOnly);
-        metaDataDict = QJsonDocument::fromJson(file.readAll()).object();
-    }
-
-    const QJsonArray metaData = metaDataDict.value(m_type).toArray();
+    const QJsonArray metaData = ::GlobalAnnotationMetaData->get(m_type);
     this->setMetaData(metaData);
 }
 
@@ -1073,6 +1150,11 @@ void Annotation::removeAttribute(const QString &key)
 {
     m_attributes.remove(key);
     emit attributesChanged();
+}
+
+void Annotation::saveAttributesAsDefault()
+{
+    ::GlobalAnnotationMetaData->update(m_type, m_attributes);
 }
 
 void Annotation::setMetaData(const QJsonArray &val)
