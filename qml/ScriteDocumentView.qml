@@ -1696,7 +1696,7 @@ Item {
 
         function launch(launchMode, filePath) {
             mode = launchMode
-            folder = mode === "OPEN" ? workspaceSettings.lastOpenFolderUrl : workspaceSettings.lastOpenImportFolderUrl
+            folder = mode === "IMPORT" ? workspaceSettings.lastOpenImportFolderUrl : workspaceSettings.lastOpenFolderUrl
 
             if(filePath)
                 app.execLater(qmlWindow, 250, function() { processFile(filePath) } )

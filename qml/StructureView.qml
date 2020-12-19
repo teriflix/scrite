@@ -454,17 +454,9 @@ Item {
                     onClicked: annotationGripLoader.reset()
                 }
 
-                StructureCanvasViewportFilterModel {
-                    id: annotationsFilter
-                    structure: scriteDocument.loading ? null : scriteDocument.structure
-                    type: StructureCanvasViewportFilterModel.AnnotationType
-                    viewportRect: canvasScroll.viewportRect
-                    computeStrategy: StructureCanvasViewportFilterModel.PreComputeStrategy
-                }
-
                 Repeater {
                     id: annotationItems
-                    model: annotationsFilter
+                    model: scriteDocument.loading ? null : scriteDocument.structure.annotationsModel
                     delegate: Loader {
                         property Annotation annotation: modelData
                         property int annotationIndex: index
@@ -719,7 +711,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvasScroll.editItem === null && !selection.active && !initializeTimer.running
+                enabled: canvasScroll.editItem === null && !selection.active
                 acceptedButtons: Qt.RightButton
                 onPressed: {
                     canvasMenu.isContextMenu = true
@@ -2232,7 +2224,7 @@ Item {
                         width: parent.width
                         wrapMode: Text.WordWrap
                         elide: Text.ElideRight
-                        maximumLineCount: 4
+                        maximumLineCount: 3
                     }
 
                     Text {

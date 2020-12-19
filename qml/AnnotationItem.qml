@@ -31,7 +31,7 @@ Rectangle {
     opacity: annotation.attributes.opacity / 100
 
     TightBoundingBoxItem.viewportItem: canvas
-    TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.AlwaysVisible // because we are using a filter model anyway
+    TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
     TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
     TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
     TightBoundingBoxItem.stackOrder: 1.0 + (annotationIndex/scriteDocument.structure.annotationCount)

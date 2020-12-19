@@ -3041,10 +3041,12 @@ void StructureCanvasViewportFilterModel::setSourceModel(QAbstractItemModel *mode
 bool StructureCanvasViewportFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
     Q_UNUSED(source_parent)
+    if(m_viewportRect.size().isEmpty())
+        return true;
 
     const ObjectListPropertyModelBase *model = qobject_cast<ObjectListPropertyModelBase*>(this->sourceModel());
     if(model == nullptr)
-        return false;
+        return true;
 
     const QObject *object = model->objectAt(source_row);
     if(m_computeStrategy == PreComputeStrategy)
