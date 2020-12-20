@@ -457,7 +457,7 @@ Item {
 
                 StructureCanvasViewportFilterModel {
                     id: annotationsFilterModel
-                    enabled: scriteDocument.loading ? false : scriteDocument.structure.annotationCount > 200
+                    enabled: scriteDocument.loading ? false : scriteDocument.structure.annotationCount > 100
                     structure: scriteDocument.structure
                     type: StructureCanvasViewportFilterModel.AnnotationType
                     viewportRect: canvasScroll.viewportRect

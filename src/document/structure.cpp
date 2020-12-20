@@ -2986,6 +2986,8 @@ void StructureCanvasViewportFilterModel::setEnabled(bool val)
 
     m_enabled = val;
     emit enabledChanged();
+
+    this->invalidateSelfLater();
 }
 
 void StructureCanvasViewportFilterModel::setType(StructureCanvasViewportFilterModel::Type val)
