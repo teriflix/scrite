@@ -48,7 +48,7 @@
 #include "transliteration.h"
 #include "openfromlibrary.h"
 #include "abstractexporter.h"
-#include "tightboundingbox.h"
+#include "boundingboxevaluator.h"
 #include "notebooktabmodel.h"
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
@@ -234,9 +234,9 @@ int main(int argc, char **argv)
 
     qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
 
-    qmlRegisterType<TightBoundingBoxEvaluator>("Scrite", 1, 0, "TightBoundingBoxEvaluator");
-    qmlRegisterType<TightBoundingBoxPreview>("Scrite", 1, 0, "TightBoundingBoxPreview");
-    qmlRegisterUncreatableType<TightBoundingBoxItem>("Scrite", 1, 0, "TightBoundingBoxItem", "Use as attached property.");
+    qmlRegisterType<BoundingBoxEvaluator>("Scrite", 1, 0, "BoundingBoxEvaluator");
+    qmlRegisterType<BoundingBoxPreview>("Scrite", 1, 0, "BoundingBoxPreview");
+    qmlRegisterUncreatableType<BoundingBoxItem>("Scrite", 1, 0, "BoundingBoxItem", "Use as attached property.");
 
     qmlRegisterType<FileInfo>("Scrite", 1, 0, "FileInfo");
 

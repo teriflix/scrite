@@ -30,17 +30,6 @@ Rectangle {
     }
     opacity: annotation.attributes.opacity / 100
 
-    TightBoundingBoxItem.viewportItem: canvas
-    TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
-    TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
-    TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-    TightBoundingBoxItem.stackOrder: 1.0 + (annotationIndex/scriteDocument.structure.annotationCount)
-
-    Connections {
-        target: annotation
-        onAttributesChanged: annotationItem.TightBoundingBoxItem.markPreviewDirty()
-    }
-
     function grip() {
         annotationGripLoader.reset()
         annotationGripLoader.annotationItem = annotationItem

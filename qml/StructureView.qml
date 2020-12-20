@@ -389,8 +389,9 @@ Item {
                 }
             }
 
-            TightBoundingBoxEvaluator {
+            BoundingBoxEvaluator {
                 id: canvasItemsBoundingBox
+                initialRect: scriteDocument.structure.annotationsBoundingBox
             }
 
             DelayedPropertyBinder {
@@ -454,12 +455,29 @@ Item {
                     onClicked: annotationGripLoader.reset()
                 }
 
+                StructureCanvasViewportFilterModel {
+                    id: annotationsFilterModel
+                    enabled: scriteDocument.loading ? false : scriteDocument.structure.annotationCount > 200
+                    structure: scriteDocument.structure
+                    type: StructureCanvasViewportFilterModel.AnnotationType
+                    viewportRect: canvasScroll.viewportRect
+                    computeStrategy: StructureCanvasViewportFilterModel.PreComputeStrategy
+                    filterStrategy: StructureCanvasViewportFilterModel.IntersectsStrategy
+                }
+
                 Repeater {
                     id: annotationItems
-                    model: scriteDocument.loading ? null : scriteDocument.structure.annotationsModel
+                    model: annotationsFilterModel
                     delegate: Loader {
                         property Annotation annotation: modelData
                         property int annotationIndex: index
+                        active: !annotationsFilterModel.enabled
+                        property bool canvasIsChanging: active ? false :canvasScroll.changing
+                        onCanvasIsChangingChanged: {
+                            if(!canvasIsChanging)
+                                active = true
+                        }
+                        asynchronous: true
                         sourceComponent: {
                             switch(annotation.type) {
                             case "rectangle": return rectangleAnnotationComponent
@@ -673,12 +691,14 @@ Item {
                     border.width: 1
                     border.color: accentColors.borderColor
 
-                    TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-                    TightBoundingBoxItem.stackOrder: 2.0 + (index/canvas.beats.length)
-                    TightBoundingBoxItem.livePreview: false
-                    TightBoundingBoxItem.viewportItem: canvas
-                    TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
-                    TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
+                    BoundingBoxItem.evaluator: canvasItemsBoundingBox
+                    BoundingBoxItem.stackOrder: 2.0 + (index/canvas.beats.length)
+                    BoundingBoxItem.livePreview: false
+                    BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.viewportItem: canvas
+                    BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
+                    BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
                     Rectangle {
                         anchors.fill: beatLabel
@@ -1115,7 +1135,7 @@ Item {
             opacity: 0.55 * previewArea.opacity
         }
 
-        TightBoundingBoxPreview {
+        BoundingBoxPreview {
             id: previewArea
             anchors.fill: parent
             anchors.margins: 5
@@ -1228,14 +1248,14 @@ Item {
             Component.onCompleted: element.follow = elementItem
             enabled: selection.active === false
 
-            TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-            TightBoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
-            TightBoundingBoxItem.livePreview: false
-            TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
-            TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
-            TightBoundingBoxItem.viewportItem: canvas
-            TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
-            TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
+            BoundingBoxItem.evaluator: canvasItemsBoundingBox
+            BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
+            BoundingBoxItem.livePreview: false
+            BoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
+            BoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
+            BoundingBoxItem.viewportItem: canvas
+            BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
+            BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
             readonly property bool selected: scriteDocument.structure.currentElementIndex === index
             readonly property bool editing: titleText.readOnly === false
@@ -1457,14 +1477,14 @@ Item {
 
             Component.onCompleted: element.follow = elementItem
 
-            TightBoundingBoxItem.evaluator: canvasItemsBoundingBox
-            TightBoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
-            TightBoundingBoxItem.livePreview: false
-            TightBoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
-            TightBoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
-            TightBoundingBoxItem.viewportItem: canvas
-            TightBoundingBoxItem.visibilityMode: TightBoundingBoxItem.VisibleUponViewportIntersection
-            TightBoundingBoxItem.viewportRect: canvasScroll.viewportRect
+            BoundingBoxItem.evaluator: canvasItemsBoundingBox
+            BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
+            BoundingBoxItem.livePreview: false
+            BoundingBoxItem.previewFillColor: background.color
+            BoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
+            BoundingBoxItem.viewportItem: canvas
+            BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
+            BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
             x: positionBinder.get.x
             y: positionBinder.get.y
@@ -2026,9 +2046,9 @@ Item {
         id: rectangleAnnotationComponent
 
         AnnotationItem {
-            TightBoundingBoxItem.previewFillColor: app.translucent(color, opacity)
-            TightBoundingBoxItem.previewBorderColor: app.translucent(border.color, opacity)
-            TightBoundingBoxItem.livePreview: false
+            BoundingBoxItem.previewFillColor: app.translucent(color, opacity)
+            BoundingBoxItem.previewBorderColor: app.translucent(border.color, opacity)
+            BoundingBoxItem.livePreview: false
         }
     }
 
@@ -2306,7 +2326,7 @@ Item {
                 asynchronous: true
                 onStatusChanged: {
                     if(status === Image.Ready)
-                        parent.TightBoundingBoxItem.markPreviewDirty()
+                        parent.BoundingBoxItem.markPreviewDirty()
                 }
             }
 

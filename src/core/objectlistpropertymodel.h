@@ -60,7 +60,7 @@ public:
     void prepend(T ptr) {
         this->beginInsertRows(QModelIndex(), 0, 0);
         m_list.prepend(ptr);
-        this->beginInsertRows();
+        this->endInsertRows();
     }
 
     int indexOf(T ptr) const { return m_list.indexOf(ptr); }

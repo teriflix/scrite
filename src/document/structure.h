@@ -17,6 +17,7 @@
 #include "note.h"
 #include "scene.h"
 #include "execlatertimer.h"
+#include "modelaggregator.h"
 #include "qobjectproperty.h"
 #include "abstractshapeitem.h"
 #include "objectlistpropertymodel.h"
@@ -530,6 +531,10 @@ public:
     Q_PROPERTY(QAbstractListModel* elementsModel READ elementsModel CONSTANT)
     QAbstractListModel *elementsModel() const { return &((const_cast<Structure*>(this))->m_elements); }
 
+    Q_PROPERTY(QRectF elementsBoundingBox READ elementsBoundingBox NOTIFY elementsBoundingBoxChanged)
+    QRectF elementsBoundingBox() const { return m_elementsBoundingBoxAggregator.aggregateValue().toRectF(); }
+    Q_SIGNAL void elementsBoundingBoxChanged();
+
     Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
@@ -590,6 +595,10 @@ public:
 
     Q_PROPERTY(QAbstractListModel* annotationsModel READ annotationsModel CONSTANT)
     QAbstractListModel *annotationsModel() const { return &((const_cast<Structure*>(this))->m_annotations); }
+
+    Q_PROPERTY(QRectF annotationsBoundingBox READ annotationsBoundingBox NOTIFY annotationsBoundingBoxChanged)
+    QRectF annotationsBoundingBox() const { return m_annotationsBoundingBoxAggregator.aggregateValue().toRectF(); }
+    Q_SIGNAL void annotationsBoundingBoxChanged();
 
     Q_PROPERTY(QQmlListProperty<Annotation> annotations READ annotations NOTIFY annotationCountChanged)
     QQmlListProperty<Annotation> annotations();
@@ -661,6 +670,7 @@ private:
     static StructureElement* staticElementAt(QQmlListProperty<StructureElement> *list, int index);
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     ObjectListPropertyModel<StructureElement *> m_elements;
+    ModelAggregator m_elementsBoundingBoxAggregator;
     int m_currentElementIndex = -1;
     qreal m_zoomLevel = 1.0;
 
@@ -679,6 +689,7 @@ private:
     static Annotation* staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
     static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
     ObjectListPropertyModel<Annotation *> m_annotations;
+    ModelAggregator m_annotationsBoundingBoxAggregator;
     bool m_canPaste = false;
 
     bool m_forceBeatBoardLayout = false;
@@ -765,6 +776,11 @@ public:
     Structure* structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
     enum Type { AnnotationType, StructureElementType };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
@@ -811,6 +827,7 @@ private:
     void invalidateSelfLater();
 
 private:
+    bool m_enabled = true;
     QRectF m_viewportRect;
     ExecLaterTimer m_invalidateTimer;
     Type m_type = StructureElementType;

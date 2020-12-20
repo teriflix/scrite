@@ -1310,6 +1310,24 @@ Structure::Structure(QObject *parent)
 
     QClipboard *clipboard = qApp->clipboard();
     connect(clipboard, &QClipboard::dataChanged, this, &Structure::onClipboardDataChanged);
+
+    m_elementsBoundingBoxAggregator.setModel(&m_elements);
+    m_elementsBoundingBoxAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
+        QRectF rect = value.toRectF();
+        const StructureElement *element = m_elements.at(index.row());
+        rect |= element->geometry();
+        value = rect;
+    });
+    connect(&m_elementsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::elementsBoundingBoxChanged);
+
+    m_annotationsBoundingBoxAggregator.setModel(&m_annotations);
+    m_annotationsBoundingBoxAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
+        QRectF rect = value.toRectF();
+        const Annotation *annot = m_annotations.at(index.row());
+        rect |= annot->geometry();
+        value = rect;
+    });
+    connect(&m_annotationsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::annotationsBoundingBoxChanged);
 }
 
 Structure::~Structure()
@@ -2961,6 +2979,15 @@ void StructureCanvasViewportFilterModel::setStructure(Structure *val)
     emit structureChanged();
 }
 
+void StructureCanvasViewportFilterModel::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}
+
 void StructureCanvasViewportFilterModel::setType(StructureCanvasViewportFilterModel::Type val)
 {
     if(m_type == val)
@@ -3025,6 +3052,16 @@ int StructureCanvasViewportFilterModel::mapToSourceRow(int filter_row) const
 
 void StructureCanvasViewportFilterModel::setSourceModel(QAbstractItemModel *model)
 {
+    QAbstractItemModel *oldModel = this->sourceModel();
+    if(oldModel != nullptr)
+    {
+        connect(oldModel, &QAbstractItemModel::rowsInserted, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(oldModel, &QAbstractItemModel::rowsRemoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(oldModel, &QAbstractItemModel::rowsMoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(oldModel, &QAbstractItemModel::dataChanged, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(oldModel, &QAbstractItemModel::modelReset, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    }
+
     if(m_structure.isNull())
         this->QSortFilterProxyModel::setSourceModel(nullptr);
     else
@@ -3036,12 +3073,18 @@ void StructureCanvasViewportFilterModel::setSourceModel(QAbstractItemModel *mode
         else
             this->QSortFilterProxyModel::setSourceModel(nullptr);
     }
+
+    connect(model, &QAbstractItemModel::rowsInserted, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    connect(model, &QAbstractItemModel::rowsRemoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    connect(model, &QAbstractItemModel::rowsMoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    connect(model, &QAbstractItemModel::dataChanged, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    connect(model, &QAbstractItemModel::modelReset, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
 }
 
 bool StructureCanvasViewportFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
     Q_UNUSED(source_parent)
-    if(m_viewportRect.size().isEmpty())
+    if(!m_enabled || m_viewportRect.size().isEmpty())
         return true;
 
     const ObjectListPropertyModelBase *model = qobject_cast<ObjectListPropertyModelBase*>(this->sourceModel());
@@ -3114,7 +3157,7 @@ void StructureCanvasViewportFilterModel::invalidateSelf()
     {
         const QObject *object = model->objectAt(i);
 
-        if(m_viewportRect.isEmpty())
+        if(m_viewportRect.size().isEmpty())
             m_visibleSourceRows << qMakePair(object, true);
         else
         {
@@ -3133,6 +3176,9 @@ void StructureCanvasViewportFilterModel::invalidateSelf()
 
 void StructureCanvasViewportFilterModel::invalidateSelfLater()
 {
-    m_invalidateTimer.start(0, this);
+    if(m_enabled && m_computeStrategy == PreComputeStrategy)
+        m_invalidateTimer.start(0, this);
+    else
+        m_invalidateTimer.stop();
 }
 

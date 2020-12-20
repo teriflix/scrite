@@ -87,7 +87,7 @@ Item {
                 radius: 6
             }
 
-            TightBoundingBoxEvaluator {
+            BoundingBoxEvaluator {
                 id: nodeItemsBoxEvaluator
             }
 
@@ -200,7 +200,7 @@ Item {
                                 canvas.mainCharacterNodeItem = nodeItem
                         }
 
-                        TightBoundingBoxItem.evaluator: nodeItemsBoxEvaluator
+                        BoundingBoxItem.evaluator: nodeItemsBoxEvaluator
 
                         Image {
                             anchors.fill: parent

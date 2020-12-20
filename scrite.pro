@@ -54,7 +54,9 @@ HEADERS += \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
+    src/quick/items/boundingboxevaluator.h \
     src/quick/objects/announcement.h \
+    src/quick/objects/modelaggregator.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
     src/quick/objects/notification.h \
@@ -73,7 +75,6 @@ HEADERS += \
     src/quick/objects/standardpaths.h \
     src/quick/objects/aggregation.h \
     src/quick/items/textshapeitem.h \
-    src/quick/items/tightboundingbox.h \
     src/quick/items/ruleritem.h \
     src/quick/items/abstractshapeitem.h \
     src/quick/items/gridbackgrounditem.h \
@@ -149,7 +150,9 @@ SOURCES += \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
+    src/quick/items/boundingboxevaluator.cpp \
     src/quick/objects/announcement.cpp \
+    src/quick/objects/modelaggregator.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/fileinfo.cpp \
     src/quick/objects/focustracker.cpp \
@@ -167,7 +170,6 @@ SOURCES += \
     src/quick/objects/standardpaths.cpp \
     src/quick/objects/polygontesselator.cpp \
     src/quick/objects/searchengine.cpp \
-    src/quick/items/tightboundingbox.cpp \
     src/quick/items/gridbackgrounditem.cpp \
     src/quick/items/painterpathitem.cpp \
     src/quick/items/textshapeitem.cpp \

@@ -28,6 +28,34 @@ Flickable {
     boundsBehavior: Flickable.StopAtBounds
     clip: true
 
+    property bool changing: false
+    TrackerPack {
+        delay: 250
+
+        TrackProperty {
+            target: flickable
+            property: "contentX"
+            onTracked: flickable.changing = true
+        }
+        TrackProperty {
+            target: flickable
+            property: "contentY"
+            onTracked: flickable.changing = true
+        }
+        TrackProperty {
+            target: flickable
+            property: "moving"
+            onTracked: flickable.changing = true
+        }
+        TrackProperty {
+            target: flickable
+            property: "flicking"
+            onTracked: flickable.changing = true
+        }
+
+        onTracked: flickable.changing = false
+    }
+
     signal zoomScaleChangedInteractively()
 
     function zoomIn() {

@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef TIGHTBOUNDINGBOX_H
-#define TIGHTBOUNDINGBOX_H
+#ifndef BOUNDINGBOXEVALUATOR_H
+#define BOUNDINGBOXEVALUATOR_H
 
 #include "execlatertimer.h"
 
@@ -29,16 +29,17 @@
 /**
  * QQuickItem::childrenRect() doesn't ever shrink, even though items have moved
  * inside the previously know childrenRect(). It only always expands. We need
- * a bounding box that can shrink for use with StructureView -> canvas. Tha'ts why this class.
+ * a bounding box that can shrink for use with StructureView -> canvas. That's
+ * why this class.
  */
-class TightBoundingBoxItem;
-class TightBoundingBoxEvaluator : public QObject
+class BoundingBoxItem;
+class BoundingBoxEvaluator : public QObject
 {
     Q_OBJECT
 
 public:
-    TightBoundingBoxEvaluator(QObject *parent = nullptr);
-    ~TightBoundingBoxEvaluator();
+    BoundingBoxEvaluator(QObject *parent = nullptr);
+    ~BoundingBoxEvaluator();
 
     Q_PROPERTY(QRectF boundingBox READ boundingBox NOTIFY boundingBoxChanged)
     QRectF boundingBox() const { return m_boundingBox; }
@@ -71,6 +72,11 @@ public:
     Q_PROPERTY(QPointF center READ center NOTIFY boundingBoxChanged)
     QPointF center() const { return m_boundingBox.center(); }
 
+    Q_PROPERTY(QRectF initialRect READ initialRect WRITE setInitialRect NOTIFY initialRectChanged)
+    void setInitialRect(const QRectF &val);
+    QRectF initialRect() const { return m_initialRect; }
+    Q_SIGNAL void initialRectChanged();
+
     Q_PROPERTY(qreal previewScale READ previewScale WRITE setPreviewScale NOTIFY previewScaleChanged)
     void setPreviewScale(qreal val);
     qreal previewScale() const { return m_previewScale; }
@@ -83,43 +89,44 @@ public:
 
 protected:
     void timerEvent(QTimerEvent *event);
-
-private:
     void setBoundingBox(const QRectF &val);
-
-    void addItem(TightBoundingBoxItem *item);
-    void removeItem(TightBoundingBoxItem* item);
-    void markDirty(TightBoundingBoxItem *) { this->evaluateLater(); }
     void evaluateLater() { m_evaluationTimer.start(100, this); }
     void evaluateNow();
 
 private:
-    friend class TightBoundingBoxItem;
+    void addItem(BoundingBoxItem *item);
+    void removeItem(BoundingBoxItem* item);
+    void markDirty(BoundingBoxItem *) { this->evaluateLater(); }
+
+private:
+    friend class BoundingBoxItem;
     QImage m_preview;
+    QRectF m_initialRect;
     QRectF m_boundingBox;
     qreal m_previewScale = 1.0;
     ExecLaterTimer m_evaluationTimer;
-    QList<TightBoundingBoxItem*> m_items;
+    QList<BoundingBoxItem*> m_items;
 };
 
-class TightBoundingBoxItem : public QObject
+class BoundingBoxItem : public QObject
 {
     Q_OBJECT
 
 public:
-    TightBoundingBoxItem(QObject *parent=nullptr);
-    ~TightBoundingBoxItem();
+    BoundingBoxItem(QObject *parent=nullptr);
+    ~BoundingBoxItem();
 
-    Q_SIGNAL void aboutToDestroy(TightBoundingBoxItem *ptr);
+    Q_SIGNAL void aboutToDestroy(BoundingBoxItem *ptr);
 
-    static TightBoundingBoxItem *qmlAttachedProperties(QObject *object);
+    static BoundingBoxItem *qmlAttachedProperties(QObject *object);
 
     QQuickItem *item() const { return m_item; }
-    QRectF itemRect() const { return m_item ? QRectF(m_item->x(), m_item->y(), m_item->width(), m_item->height()) : QRectF(); }
 
-    Q_PROPERTY(TightBoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
-    void setEvaluator(TightBoundingBoxEvaluator* val);
-    TightBoundingBoxEvaluator* evaluator() const { return m_evaluator; }
+    QRectF boundingRect() const;
+
+    Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
+    void setEvaluator(BoundingBoxEvaluator* val);
+    BoundingBoxEvaluator* evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
     Q_PROPERTY(qreal stackOrder READ stackOrder WRITE setStackOrder NOTIFY stackOrderChanged)
@@ -193,16 +200,16 @@ private:
     ExecLaterTimer m_updatePreviewTimer;
     QObjectProperty<QQuickItem> m_viewportItem;
     QSharedPointer<QQuickItemGrabResult> m_itemGrabResult;
-    QObjectProperty<TightBoundingBoxEvaluator> m_evaluator;
+    QObjectProperty<BoundingBoxEvaluator> m_evaluator;
 };
 
-class TightBoundingBoxPreview : public QQuickPaintedItem
+class BoundingBoxPreview : public QQuickPaintedItem
 {
     Q_OBJECT
 
 public:
-    TightBoundingBoxPreview(QQuickItem *parent=nullptr);
-    ~TightBoundingBoxPreview();
+    BoundingBoxPreview(QQuickItem *parent=nullptr);
+    ~BoundingBoxPreview();
 
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
     void setBackgroundColor(const QColor &val);
@@ -214,9 +221,9 @@ public:
     qreal backgroundOpacity() const { return m_backgroundOpacity; }
     Q_SIGNAL void backgroundOpacityChanged();
 
-    Q_PROPERTY(TightBoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
-    void setEvaluator(TightBoundingBoxEvaluator* val);
-    TightBoundingBoxEvaluator* evaluator() const { return m_evaluator; }
+    Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
+    void setEvaluator(BoundingBoxEvaluator* val);
+    BoundingBoxEvaluator* evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
     // QQuickPaintedItem interface
@@ -229,10 +236,10 @@ private:
 private:
     QColor m_backgroundColor = Qt::white;
     qreal m_backgroundOpacity = 1.0;
-    QObjectProperty<TightBoundingBoxEvaluator> m_evaluator;
+    QObjectProperty<BoundingBoxEvaluator> m_evaluator;
 };
 
-Q_DECLARE_METATYPE(TightBoundingBoxItem*)
-QML_DECLARE_TYPEINFO(TightBoundingBoxItem, QML_HAS_ATTACHED_PROPERTIES)
+Q_DECLARE_METATYPE(BoundingBoxItem*)
+QML_DECLARE_TYPEINFO(BoundingBoxItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // ITEMSBOUNDINGBOX_H

@@ -11,24 +11,35 @@
 **
 ****************************************************************************/
 
-#include "tightboundingbox.h"
-#include "tightboundingbox.h"
+#include "boundingboxevaluator.h"
+#include "boundingboxevaluator.h"
 
 #include <QPainter>
 #include <QQuickItemGrabResult>
 
-TightBoundingBoxEvaluator::TightBoundingBoxEvaluator(QObject *parent)
+BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent)
     : QObject(parent)
 {
 
 }
 
-TightBoundingBoxEvaluator::~TightBoundingBoxEvaluator()
+BoundingBoxEvaluator::~BoundingBoxEvaluator()
 {
 
 }
 
-void TightBoundingBoxEvaluator::setPreviewScale(qreal val)
+void BoundingBoxEvaluator::setInitialRect(const QRectF &val)
+{
+    if(m_initialRect == val)
+        return;
+
+    m_initialRect = val;
+    emit initialRectChanged();
+
+    this->evaluateLater();
+}
+
+void BoundingBoxEvaluator::setPreviewScale(qreal val)
 {
     if( qFuzzyCompare(m_previewScale, val) )
         return;
@@ -37,7 +48,7 @@ void TightBoundingBoxEvaluator::setPreviewScale(qreal val)
     emit previewScaleChanged();
 }
 
-void TightBoundingBoxEvaluator::updatePreview()
+void BoundingBoxEvaluator::updatePreview()
 {
     if(!m_preview.isNull())
         return;
@@ -47,7 +58,7 @@ void TightBoundingBoxEvaluator::updatePreview()
     if(boxSize.isEmpty())
         return;
 
-    auto lessThan = [](TightBoundingBoxItem *e1, TightBoundingBoxItem *e2) -> bool {
+    auto lessThan = [](BoundingBoxItem *e1, BoundingBoxItem *e2) -> bool {
         return e1->stackOrder() < e2->stackOrder();
     };
     std::sort(m_items.begin(), m_items.end(), lessThan);
@@ -64,17 +75,17 @@ void TightBoundingBoxEvaluator::updatePreview()
     paint.setRenderHint(QPainter::SmoothPixmapTransform);
     paint.setTransform(tx);
 
-    Q_FOREACH(TightBoundingBoxItem *item, m_items)
+    Q_FOREACH(BoundingBoxItem *item, m_items)
     {
         if(item->item() == nullptr)
             continue;
 
-        const QRectF itemRect = item->itemRect();
+        const QRectF itemRect = item->boundingRect();
         const QImage itemPreview = item->preview();
 
         if(item->isLivePreview() && !itemPreview.isNull())
             paint.drawImage(itemRect, itemPreview);
-        else
+        else if(item->previewBorderColor().alpha() > 0 && item->previewFillColor().alpha() > 0)
         {
             paint.setPen( QPen(item->previewBorderColor()) );
             paint.setBrush( QBrush(item->previewFillColor()) );
@@ -85,7 +96,7 @@ void TightBoundingBoxEvaluator::updatePreview()
     paint.end();
 }
 
-void TightBoundingBoxEvaluator::timerEvent(QTimerEvent *event)
+void BoundingBoxEvaluator::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_evaluationTimer.timerId())
     {
@@ -94,7 +105,7 @@ void TightBoundingBoxEvaluator::timerEvent(QTimerEvent *event)
     }
 }
 
-void TightBoundingBoxEvaluator::setBoundingBox(const QRectF &val)
+void BoundingBoxEvaluator::setBoundingBox(const QRectF &val)
 {
     if(m_boundingBox == val)
         return;
@@ -103,35 +114,36 @@ void TightBoundingBoxEvaluator::setBoundingBox(const QRectF &val)
     emit boundingBoxChanged();
 }
 
-void TightBoundingBoxEvaluator::addItem(TightBoundingBoxItem *item)
+void BoundingBoxEvaluator::addItem(BoundingBoxItem *item)
 {
-    connect(item, &TightBoundingBoxItem::aboutToDestroy, this, &TightBoundingBoxEvaluator::removeItem);
-    connect(item, &TightBoundingBoxItem::previewUpdated, this, &TightBoundingBoxEvaluator::markPreviewDirty);
+    connect(item, &BoundingBoxItem::aboutToDestroy, this, &BoundingBoxEvaluator::removeItem);
+    connect(item, &BoundingBoxItem::previewUpdated, this, &BoundingBoxEvaluator::markPreviewDirty);
     m_items.append(item);
     this->evaluateLater();
 }
 
-void TightBoundingBoxEvaluator::removeItem(TightBoundingBoxItem *item)
+void BoundingBoxEvaluator::removeItem(BoundingBoxItem *item)
 {
-    disconnect(item, &TightBoundingBoxItem::aboutToDestroy, this, &TightBoundingBoxEvaluator::removeItem);
-    disconnect(item, &TightBoundingBoxItem::previewUpdated, this, &TightBoundingBoxEvaluator::markPreviewDirty);
+    disconnect(item, &BoundingBoxItem::aboutToDestroy, this, &BoundingBoxEvaluator::removeItem);
+    disconnect(item, &BoundingBoxItem::previewUpdated, this, &BoundingBoxEvaluator::markPreviewDirty);
     m_items.removeOne(item);
     this->evaluateLater();
 }
 
-void TightBoundingBoxEvaluator::evaluateNow()
+void BoundingBoxEvaluator::evaluateNow()
 {
-    QRectF rect;
-    Q_FOREACH(TightBoundingBoxItem *item, m_items)
+    QRectF rect = m_initialRect;
+
+    for(BoundingBoxItem *item : m_items)
     {
         if(item->item())
-            rect |= item->itemRect();
+            rect |= item->boundingRect();
     }
 
     this->setBoundingBox(rect);
 }
 
-void TightBoundingBoxEvaluator::markPreviewDirty()
+void BoundingBoxEvaluator::markPreviewDirty()
 {
     m_preview = QImage();
     emit previewNeedsUpdate();
@@ -139,40 +151,45 @@ void TightBoundingBoxEvaluator::markPreviewDirty()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TightBoundingBoxItem::TightBoundingBoxItem(QObject *parent)
+BoundingBoxItem::BoundingBoxItem(QObject *parent)
     : QObject(parent),
       m_item(qobject_cast<QQuickItem*>(parent)),
-      m_updatePreviewTimer("TightBoundingBoxItem.updatePreviewTimer"),
+      m_updatePreviewTimer("BoundingBoxItem.updatePreviewTimer"),
       m_viewportItem(this, "viewportItem"),
       m_evaluator(this, "evaluator")
 {
     if(m_item)
     {
-        connect(m_item, &QQuickItem::xChanged, this, &TightBoundingBoxItem::requestReevaluation);
-        connect(m_item, &QQuickItem::yChanged, this, &TightBoundingBoxItem::requestReevaluation);
-        connect(m_item, &QQuickItem::widthChanged, this, &TightBoundingBoxItem::requestReevaluation);
-        connect(m_item, &QQuickItem::heightChanged, this, &TightBoundingBoxItem::requestReevaluation);
+        connect(m_item, &QQuickItem::xChanged, this, &BoundingBoxItem::requestReevaluation);
+        connect(m_item, &QQuickItem::yChanged, this, &BoundingBoxItem::requestReevaluation);
+        connect(m_item, &QQuickItem::widthChanged, this, &BoundingBoxItem::requestReevaluation);
+        connect(m_item, &QQuickItem::heightChanged, this, &BoundingBoxItem::requestReevaluation);
 
-        connect(m_item, &QQuickItem::xChanged, this, &TightBoundingBoxItem::determineVisibility);
-        connect(m_item, &QQuickItem::yChanged, this, &TightBoundingBoxItem::determineVisibility);
-        connect(m_item, &QQuickItem::widthChanged, this, &TightBoundingBoxItem::determineVisibility);
-        connect(m_item, &QQuickItem::heightChanged, this, &TightBoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::xChanged, this, &BoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::yChanged, this, &BoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::widthChanged, this, &BoundingBoxItem::determineVisibility);
+        connect(m_item, &QQuickItem::heightChanged, this, &BoundingBoxItem::determineVisibility);
     }
 }
 
-TightBoundingBoxItem::~TightBoundingBoxItem()
+BoundingBoxItem::~BoundingBoxItem()
 {
     m_item = nullptr;
     m_evaluator = nullptr;
     emit aboutToDestroy(this);
 }
 
-TightBoundingBoxItem *TightBoundingBoxItem::qmlAttachedProperties(QObject *object)
+BoundingBoxItem *BoundingBoxItem::qmlAttachedProperties(QObject *object)
 {
-    return new TightBoundingBoxItem(object);
+    return new BoundingBoxItem(object);
 }
 
-void TightBoundingBoxItem::setEvaluator(TightBoundingBoxEvaluator *val)
+QRectF BoundingBoxItem::boundingRect() const
+{
+    return m_item ? QRectF(m_item->x(), m_item->y(), m_item->width(), m_item->height()) : QRectF();
+}
+
+void BoundingBoxItem::setEvaluator(BoundingBoxEvaluator *val)
 {
     if(m_evaluator == val)
         return;
@@ -190,7 +207,7 @@ void TightBoundingBoxItem::setEvaluator(TightBoundingBoxEvaluator *val)
     emit evaluatorChanged();
 }
 
-void TightBoundingBoxItem::setStackOrder(qreal val)
+void BoundingBoxItem::setStackOrder(qreal val)
 {
     if( qFuzzyCompare(m_stackOrder, val) )
         return;
@@ -201,7 +218,7 @@ void TightBoundingBoxItem::setStackOrder(qreal val)
     this->updatePreviewLater();
 }
 
-void TightBoundingBoxItem::setPreviewFillColor(const QColor &val)
+void BoundingBoxItem::setPreviewFillColor(const QColor &val)
 {
     if(m_previewFillColor == val)
         return;
@@ -212,7 +229,7 @@ void TightBoundingBoxItem::setPreviewFillColor(const QColor &val)
     this->updatePreviewLater();
 }
 
-void TightBoundingBoxItem::setPreviewBorderColor(const QColor &val)
+void BoundingBoxItem::setPreviewBorderColor(const QColor &val)
 {
     if(m_previewBorderColor == val)
         return;
@@ -223,7 +240,7 @@ void TightBoundingBoxItem::setPreviewBorderColor(const QColor &val)
     this->updatePreviewLater();
 }
 
-void TightBoundingBoxItem::setLivePreview(bool val)
+void BoundingBoxItem::setLivePreview(bool val)
 {
     if(m_livePreview == val)
         return;
@@ -234,7 +251,7 @@ void TightBoundingBoxItem::setLivePreview(bool val)
     this->updatePreviewLater();
 }
 
-void TightBoundingBoxItem::setVisibilityMode(TightBoundingBoxItem::VisibilityMode val)
+void BoundingBoxItem::setVisibilityMode(BoundingBoxItem::VisibilityMode val)
 {
     if(m_visibilityMode == val)
         return;
@@ -245,7 +262,7 @@ void TightBoundingBoxItem::setVisibilityMode(TightBoundingBoxItem::VisibilityMod
     this->determineVisibility();
 }
 
-void TightBoundingBoxItem::setViewportItem(QQuickItem *val)
+void BoundingBoxItem::setViewportItem(QQuickItem *val)
 {
     if(m_viewportItem == val)
         return;
@@ -256,7 +273,7 @@ void TightBoundingBoxItem::setViewportItem(QQuickItem *val)
     this->determineVisibility();
 }
 
-void TightBoundingBoxItem::setViewportRect(const QRectF &val)
+void BoundingBoxItem::setViewportRect(const QRectF &val)
 {
     if(m_viewportRect == val)
         return;
@@ -267,12 +284,12 @@ void TightBoundingBoxItem::setViewportRect(const QRectF &val)
     this->determineVisibility();
 }
 
-void TightBoundingBoxItem::markPreviewDirty()
+void BoundingBoxItem::markPreviewDirty()
 {
     this->updatePreviewLater();
 }
 
-void TightBoundingBoxItem::timerEvent(QTimerEvent *event)
+void BoundingBoxItem::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_updatePreviewTimer.timerId())
     {
@@ -281,7 +298,7 @@ void TightBoundingBoxItem::timerEvent(QTimerEvent *event)
     }
 }
 
-void TightBoundingBoxItem::requestReevaluation()
+void BoundingBoxItem::requestReevaluation()
 {
     if(m_evaluator)
         m_evaluator->markDirty(this);
@@ -289,13 +306,13 @@ void TightBoundingBoxItem::requestReevaluation()
     this->updatePreviewLater();
 }
 
-void TightBoundingBoxItem::resetEvaluator()
+void BoundingBoxItem::resetEvaluator()
 {
     m_evaluator = nullptr;
     emit evaluatorChanged();
 }
 
-void TightBoundingBoxItem::resetViewportItem()
+void BoundingBoxItem::resetViewportItem()
 {
     m_viewportItem = nullptr;
     emit viewportItemChanged();
@@ -303,7 +320,7 @@ void TightBoundingBoxItem::resetViewportItem()
     this->determineVisibility();
 }
 
-void TightBoundingBoxItem::updatePreview()
+void BoundingBoxItem::updatePreview()
 {
     if(m_item == nullptr)
     {
@@ -336,13 +353,13 @@ void TightBoundingBoxItem::updatePreview()
     }
 }
 
-void TightBoundingBoxItem::updatePreviewLater()
+void BoundingBoxItem::updatePreviewLater()
 {
     if(m_item != nullptr)
         m_updatePreviewTimer.start(500, this);
 }
 
-void TightBoundingBoxItem::setPreview(const QImage &image)
+void BoundingBoxItem::setPreview(const QImage &image)
 {
     if(image.isNull() && m_preview.isNull())
         return;
@@ -351,7 +368,7 @@ void TightBoundingBoxItem::setPreview(const QImage &image)
     emit previewUpdated();
 }
 
-void TightBoundingBoxItem::determineVisibility()
+void BoundingBoxItem::determineVisibility()
 {
     if(m_item == nullptr)
         return;
@@ -397,19 +414,19 @@ void TightBoundingBoxItem::determineVisibility()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TightBoundingBoxPreview::TightBoundingBoxPreview(QQuickItem *parent)
+BoundingBoxPreview::BoundingBoxPreview(QQuickItem *parent)
     : QQuickPaintedItem(parent),
       m_evaluator(this, "evaluator")
 {
 
 }
 
-TightBoundingBoxPreview::~TightBoundingBoxPreview()
+BoundingBoxPreview::~BoundingBoxPreview()
 {
 
 }
 
-void TightBoundingBoxPreview::setBackgroundColor(const QColor &val)
+void BoundingBoxPreview::setBackgroundColor(const QColor &val)
 {
     if(m_backgroundColor == val)
         return;
@@ -418,7 +435,7 @@ void TightBoundingBoxPreview::setBackgroundColor(const QColor &val)
     emit backgroundColorChanged();
 }
 
-void TightBoundingBoxPreview::setBackgroundOpacity(qreal val)
+void BoundingBoxPreview::setBackgroundOpacity(qreal val)
 {
     if( qFuzzyCompare(m_backgroundOpacity, val) )
         return;
@@ -427,25 +444,25 @@ void TightBoundingBoxPreview::setBackgroundOpacity(qreal val)
     emit backgroundOpacityChanged();
 }
 
-void TightBoundingBoxPreview::setEvaluator(TightBoundingBoxEvaluator *val)
+void BoundingBoxPreview::setEvaluator(BoundingBoxEvaluator *val)
 {
     if(m_evaluator == val)
         return;
 
     if(m_evaluator != nullptr)
-        disconnect(m_evaluator, &TightBoundingBoxEvaluator::previewNeedsUpdate, this, &TightBoundingBoxPreview::redraw);
+        disconnect(m_evaluator, &BoundingBoxEvaluator::previewNeedsUpdate, this, &BoundingBoxPreview::redraw);
 
     m_evaluator = val;
 
     if(m_evaluator != nullptr)
-        connect(m_evaluator, &TightBoundingBoxEvaluator::previewNeedsUpdate, this, &TightBoundingBoxPreview::redraw);
+        connect(m_evaluator, &BoundingBoxEvaluator::previewNeedsUpdate, this, &BoundingBoxPreview::redraw);
 
     emit evaluatorChanged();
 
     this->update();
 }
 
-void TightBoundingBoxPreview::paint(QPainter *painter)
+void BoundingBoxPreview::paint(QPainter *painter)
 {
 #ifndef QT_NO_DEBUG
     qDebug("TightBoundingBoxPreview is painting");
@@ -478,7 +495,7 @@ void TightBoundingBoxPreview::paint(QPainter *painter)
     }
 }
 
-void TightBoundingBoxPreview::resetEvaluator()
+void BoundingBoxPreview::resetEvaluator()
 {
     m_evaluator = nullptr;
     emit evaluatorChanged();
