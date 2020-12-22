@@ -22,9 +22,10 @@ licenses compatible with GPLv3.
    is directly taken from the KDE project. Read 3rdparty/sonnet/README file for
    more information.
 
-5. 3rdparty/quazip: This library uses ZLib already available with Qt for
-   providing zip/unzip functionality used by Scrite for loading and saving
-   Scrite documents.
+5. 3rdparty/quazip: This library offers a way to use the ZLib already available
+   with Qt for providing zip/unzip functionality used by Scrite for loading and
+   saving Scrite documents. We use QuaZip as is, statically linked with Scrite,
+   to load and save Scrite documents from version 0.5.5 onwards.
 
 ===============================================================================
 
