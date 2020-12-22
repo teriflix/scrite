@@ -22,6 +22,10 @@ licenses compatible with GPLv3.
    is directly taken from the KDE project. Read 3rdparty/sonnet/README file for
    more information.
 
+5. 3rdparty/quazip: This library uses ZLib already available with Qt for
+   providing zip/unzip functionality used by Scrite for loading and saving
+   Scrite documents.
+
 ===============================================================================
 
 Scrite is originally developed by TERIFLIX Entertainment Spaces Pvt. Ltd.

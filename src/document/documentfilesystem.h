@@ -32,8 +32,10 @@ public:
     DocumentFileSystem(QObject *parent=nullptr);
     ~DocumentFileSystem();
 
+    enum Format { UnknownFormat, ScriteFormat, ZipFormat };
+
     void reset();
-    bool load(const QString &fileName);
+    bool load(const QString &fileName, Format *format=nullptr);
     bool save(const QString &fileName);
 
     void setHeader(const QByteArray &header);

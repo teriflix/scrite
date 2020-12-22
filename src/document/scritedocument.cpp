@@ -390,7 +390,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     emit aboutToSave();
 
     const QJsonObject json = QObjectSerializer::toJson(this);
-    const QByteArray bytes = QJsonDocument(json).toBinaryData();
+    const QByteArray bytes = QJsonDocument(json).toJson();
     m_docFileSystem.setHeader(bytes);
     m_docFileSystem.save(fileName);
 
@@ -403,7 +403,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";
         QFile file2(fileName2);
         file2.open(QFile::WriteOnly);
-        file2.write(QJsonDocument(json).toJson());
+        file2.write(bytes);
     }
 #endif
 
@@ -921,9 +921,10 @@ bool ScriteDocument::load(const QString &fileName)
         return false;
     }
 
+    int format = DocumentFileSystem::ScriteFormat;
     bool loaded = this->classicLoad(fileName);
     if(!loaded)
-        loaded = this->modernLoad(fileName);
+        loaded = this->modernLoad(fileName, &format);
 
     if(!loaded)
     {
@@ -957,7 +958,9 @@ bool ScriteDocument::load(const QString &fileName)
         ScriteDocument *m_document;
     } loadCleanup(this);
 
-    const QJsonDocument jsonDoc = QJsonDocument::fromBinaryData(m_docFileSystem.header());
+    const QJsonDocument jsonDoc = format == DocumentFileSystem::ZipFormat ?
+                                  QJsonDocument::fromJson(m_docFileSystem.header()) :
+                                  QJsonDocument::fromBinaryData(m_docFileSystem.header());
 
 #ifndef QT_NO_DEBUG
     {
@@ -1051,9 +1054,13 @@ bool ScriteDocument::classicLoad(const QString &fileName)
     return true;
 }
 
-bool ScriteDocument::modernLoad(const QString &fileName)
+bool ScriteDocument::modernLoad(const QString &fileName, int *format)
 {
-    return m_docFileSystem.load(fileName);
+    DocumentFileSystem::Format dfsFormat;
+    const bool ret = m_docFileSystem.load(fileName, &dfsFormat);
+    if(format)
+        *format = dfsFormat;
+    return ret;
 }
 
 void ScriteDocument::structureElementIndexChanged()

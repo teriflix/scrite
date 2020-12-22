@@ -19,11 +19,14 @@
 #include <QDataStream>
 #include <QTemporaryDir>
 
+#include "quazip.h"
+#include "quazipfile.h"
+
 struct DocumentFileSystemData
 {
-    QScopedPointer<QTemporaryDir> folder;
     QByteArray header;
     QList<DocumentFile*> files;
+    QScopedPointer<QTemporaryDir> folder;
 
     void pack(QDataStream &ds, const QString &path);
 };
@@ -108,9 +111,71 @@ void DocumentFileSystem::reset()
     qDebug() << "PA: " << d->folder->path();
 }
 
-bool DocumentFileSystem::load(const QString &fileName)
+bool doUnzip(const QFileInfo &fileInfo, const QTemporaryDir &dstDir)
+{
+    const QString zipFileName = fileInfo.absoluteFilePath();
+
+    QuaZip qzip(zipFileName);
+    qzip.setUtf8Enabled(true);
+    if( !qzip.open(QuaZip::mdUnzip) )
+    {
+        qInfo("Could not open %s", qPrintable(zipFileName));
+        return false;
+    }
+
+    qzip.goToFirstFile();
+
+    while(1)
+    {
+        QuaZipFileInfo qfileInfo;
+        if( !qzip.getCurrentFileInfo(&qfileInfo) )
+            break;
+
+        const QFileInfo dstFileInfo = dstDir.filePath(qfileInfo.name);
+        const QString dstFileName = dstFileInfo.absoluteFilePath();
+        QDir().mkpath(dstFileInfo.absolutePath());
+
+        QuaZipFile srcFile(&qzip);
+        if( !srcFile.open(QFile::ReadOnly) )
+        {
+            qInfo("Could not open '%s' for reading.", qPrintable(qfileInfo.name));
+            qzip.goToNextFile();
+            continue;
+        }
+
+        QFile dstFile(dstFileName);
+        if( !dstFile.open(QFile::WriteOnly) )
+        {
+            qInfo("Could not open '%s' for writing.", qPrintable(dstFileName));
+            qzip.goToNextFile();
+            continue;
+        }
+
+        const int bufferLength = 65535;
+        char buffer[bufferLength];
+        while(!srcFile.atEnd())
+        {
+            const int nrBytes = srcFile.read(buffer, bufferLength);
+            dstFile.write(buffer, nrBytes);
+            if(nrBytes < bufferLength)
+                break;
+        }
+
+        dstFile.close();
+        srcFile.close();
+        qzip.goToNextFile();
+    }
+
+    qzip.close();
+
+    return true;
+}
+
+bool DocumentFileSystem::load(const QString &fileName, Format *format)
 {
     this->reset();
+    if(format)
+        *format = UnknownFormat;
 
     if(fileName.isEmpty())
         return false;
@@ -121,11 +186,93 @@ bool DocumentFileSystem::load(const QString &fileName)
 
     const int markerLength = ::DocumentFileSystemMaker->length();
     const QByteArray marker = file.read(markerLength);
-    if(marker != *::DocumentFileSystemMaker)
-        return false;
+    if(marker == *::DocumentFileSystemMaker)
+    {
+        QDataStream ds(&file);
+        const bool ret = this->unpack(ds);
+        if(format)
+            *format = ScriteFormat;
+        return ret;
+    }
 
-    QDataStream ds(&file);
-    return this->unpack(ds);
+    // If we are here, then we can use a QuaZip to unpack the Scrite
+    // document as a ZIP file.
+    file.close();
+
+    if( doUnzip( QFileInfo(fileName), *d->folder ) )
+    {
+        const QString headerFileName = d->folder->filePath(QStringLiteral("_header.json"));
+        QFile headerFile(headerFileName);
+        d->header = headerFile.open(QFile::ReadOnly) ? headerFile.readAll() : QByteArray();
+        if(format)
+            *format = ZipFormat;
+    }
+
+    return !d->header.isEmpty();
+}
+
+void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
+{
+    const QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::Files|QDir::Dirs, QDir::Name|QDir::DirsLast);
+    for(const QFileInfo &entry : entries)
+    {
+        if(entry.isDir())
+        {
+            doZipRecursively(entry.absoluteFilePath(), rootDir, qzip);
+            continue;
+        }
+
+        const QString srcFilePath = entry.absoluteFilePath();
+        const QString dstFilePath = rootDir.relativeFilePath(srcFilePath);
+
+        QFile srcFile(srcFilePath);
+        if( !srcFile.open(QFile::ReadOnly) )
+        {
+            qInfo("Could not open '%s' for reading.", qPrintable(srcFilePath));
+            continue;
+        }
+
+        QuaZipFile dstFile(&qzip);
+        if( !dstFile.open(QFile::WriteOnly, QuaZipNewInfo(dstFilePath,srcFilePath)) )
+        {
+            qInfo("Could not open '%s' for writing.", qPrintable(srcFilePath));
+            continue;
+        }
+
+        const int bufferLength = 65535;
+        char buffer[bufferLength];
+        while(!srcFile.atEnd())
+        {
+            const int nrBytes = srcFile.read(buffer, bufferLength);
+            dstFile.write(buffer, nrBytes);
+            if(nrBytes < bufferLength)
+                break;
+        }
+
+        dstFile.close();
+        srcFile.close();
+    }
+}
+
+bool doZip(const QFileInfo &fileInfo, const QTemporaryDir &srcDir)
+{
+    const QString zipFileName = fileInfo.absoluteFilePath();
+
+    QuaZip qzip(zipFileName);
+    qzip.setUtf8Enabled(true);
+    if( !qzip.open(QuaZip::mdCreate) )
+    {
+        qInfo("Could not create %s", qPrintable(zipFileName));
+        return false;
+    }
+
+    const QDir rootDir(srcDir.path());
+
+    doZipRecursively(rootDir, rootDir, qzip);
+
+    qzip.close();
+
+    return true;
 }
 
 bool DocumentFileSystem::save(const QString &fileName)
@@ -133,6 +280,7 @@ bool DocumentFileSystem::save(const QString &fileName)
     if(fileName.isEmpty())
         return false;
 
+#if 0
     QFile file(fileName);
     if( !file.open(QFile::WriteOnly) )
         return false;
@@ -149,6 +297,19 @@ bool DocumentFileSystem::save(const QString &fileName)
 
     file.close();
     return true;
+#else
+    // Starting with 0.5.5 Scrite documents are basically ZIP files.
+    const QString headerFileName = d->folder->filePath(QStringLiteral("_header.json"));
+    QFile headerFile(headerFileName);
+    if( !headerFile.open(QFile::WriteOnly) )
+        return false;
+
+    headerFile.write(d->header);
+    headerFile.close();
+
+    const QFileInfo fileInfo(fileName);
+    return doZip(fileInfo, *d->folder);
+#endif
 }
 
 void DocumentFileSystem::setHeader(const QByteArray &header)

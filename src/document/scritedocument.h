@@ -217,7 +217,7 @@ private:
     void setFileName(const QString &val);
     bool load(const QString &fileName);
     bool classicLoad(const QString &fileName);
-    bool modernLoad(const QString &fileName);
+    bool modernLoad(const QString &fileName, int *format=nullptr);
     void structureElementIndexChanged();
     void screenplayElementIndexChanged();
 

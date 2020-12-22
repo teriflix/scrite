@@ -259,6 +259,7 @@ win32 {
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)
+include($$PWD/3rdparty/quazip/quazip.pri)
 
 DISTFILES += \
     Info.plist \
