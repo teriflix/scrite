@@ -1,5 +1,10 @@
 QT += core
-LIBS += -lz
+
+macx: LIBS += -lz
+win32: {
+    DEFINES += QUAZIP_STATIC
+    INCLUDEPATH += $$[QT_INSTALL_HEADERS]/QtZlib
+}
 
 INCLUDEPATH += $$PWD/quazip
 
