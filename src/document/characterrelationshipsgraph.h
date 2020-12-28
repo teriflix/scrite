@@ -156,12 +156,12 @@ public:
     CharacterRelationshipsGraph(QObject *parent = nullptr);
     ~CharacterRelationshipsGraph();
 
-    Q_PROPERTY(QAbstractListModel* nodes READ nodes CONSTANT)
+    Q_PROPERTY(QAbstractListModel* nodes READ nodes CONSTANT STORED false)
     QAbstractListModel *nodes() const {
         return &((const_cast<CharacterRelationshipsGraph*>(this))->m_nodes);
     }
 
-    Q_PROPERTY(QAbstractListModel* edges READ edges CONSTANT)
+    Q_PROPERTY(QAbstractListModel* edges READ edges CONSTANT STORED false)
     QAbstractListModel *edges() const {
         return &(const_cast<CharacterRelationshipsGraph*>(this))->m_edges;
     }

@@ -967,11 +967,30 @@ void Scene::removeElement(SceneElement *ptr)
         GarbageCollector::instance()->add(ptr);
 }
 
-
-
 SceneElement *Scene::elementAt(int index) const
 {
     return index < 0 || index >= m_elements.size() ? nullptr : m_elements.at(index);
+}
+
+void Scene::setElements(const QList<SceneElement *> &list)
+{
+    if(!m_elements.isEmpty() || list.isEmpty())
+        return;
+
+    this->beginResetModel();
+
+    for(SceneElement *ptr : list)
+    {
+        ptr->setParent(this);
+        connect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
+        connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
+        connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
+        m_elements.append(ptr);
+    }
+
+    this->endResetModel();
+
+    emit elementCountChanged();
 }
 
 int Scene::elementCount() const
@@ -1047,6 +1066,23 @@ void Scene::removeNote(Note *ptr)
 Note *Scene::noteAt(int index) const
 {
     return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
+}
+
+void Scene::setNotes(const QList<Note *> &list)
+{
+    if(!m_notes.isEmpty() || list.isEmpty())
+        return;
+
+    for(Note *ptr : list)
+    {
+        ptr->setParent(this);
+
+        connect(ptr, &Note::aboutToDelete, this, &Scene::removeNote);
+        connect(ptr, &Note::noteChanged, this, &Scene::sceneChanged);
+    }
+
+    m_notes.assign(list);
+    emit noteCountChanged();
 }
 
 void Scene::clearNotes()
@@ -1272,6 +1308,23 @@ void Scene::deserializeFromJson(const QJsonObject &json)
 
     for(int i=0; i<invisibleCharacters.size(); i++)
         this->addMuteCharacter(invisibleCharacters.at(i).toString());
+}
+
+bool Scene::canSetPropertyFromObjectList(const QString &propName) const
+{
+    if(propName == QStringLiteral("elements"))
+        return m_elements.isEmpty();
+
+    return false;
+}
+
+void Scene::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
+{
+    if(propName == QStringLiteral("elements"))
+    {
+        this->setElements(qobject_list_cast<SceneElement*>(objects));
+        return;
+    }
 }
 
 void Scene::setElementsList(const QList<SceneElement *> &list)

@@ -408,14 +408,17 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                 const QJsonArray list = jsonPropValue.toArray();
 
                 QQmlListReference listRef(const_cast<QObject*>(object), prop.name());
-                const QByteArray className(listRef.listElementType()->className());
+                const bool canAddObjects = interface && interface->canSetPropertyFromObjectList(propName) && listRef.canAppend();
 
                 QObjectFactory listItemFactory;
-                if(listRef.canAppend())
-                {
+                const QByteArray className(listRef.listElementType()->className());
+                listItemFactory.add(listRef.listElementType());
+
+                QList<QObject*> propertyObjects;
+                if(canAddObjects)
+                    propertyObjects.reserve(list.size());
+                else if(listRef.canAppend())
                     listRef.clear();
-                    listItemFactory.add(listRef.listElementType());
-                }
 
                 for(int i=0; i<list.size(); i++)
                 {
@@ -425,7 +428,10 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                     {
                         QObject *listItemObject = listItemFactory.create(className, listRef.object());
                         QObjectSerializer::fromJson(listItem, listItemObject, factory);
-                        listRef.append(listItemObject);
+                        if(canAddObjects)
+                            propertyObjects.append(listItemObject);
+                        else
+                            listRef.append(listItemObject);
                     }
                     else
                     {
@@ -435,6 +441,9 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                         QObjectSerializer::fromJson(listItem, listItemObject, factory);
                     }
                 }
+
+                if(canAddObjects)
+                    interface->setPropertyFromObjectList(propName, propertyObjects);
 
                 continue;
             }

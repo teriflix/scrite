@@ -43,6 +43,9 @@ namespace QObjectSerializer
         virtual bool canSerialize(const QMetaObject *, const QMetaProperty &) const { return true; }
         virtual void serializeToJson(QJsonObject &) const { }
         virtual void deserializeFromJson(const QJsonObject &) { }
+
+        virtual bool canSetPropertyFromObjectList(const QString &/*propName*/) const { return false; }
+        virtual void setPropertyFromObjectList(const QString &/*propName*/, const QList<QObject*> &/*objects*/) { }
     };
 
     QString toJsonString(const QObject *object);

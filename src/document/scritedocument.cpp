@@ -48,6 +48,7 @@
 #include <QStandardPaths>
 #include <QRandomGenerator>
 #include <QScopedValueRollback>
+#include <QPainter>
 
 class DeviceIOFactories
 {
@@ -617,6 +618,84 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     this->clearBusyMessage();
 
     return ret;
+}
+
+bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx, const QString &imageFileName)
+{
+    const int nrScenes = m_screenplay->elementCount();
+    if(fromSceneIdx < 0 || fromSceneIdx >= nrScenes)
+        return false;
+
+    if(toSceneIdx < 0 || toSceneIdx >= nrScenes)
+        return false;
+
+    QTextDocument document;
+    // m_printFormat->pageLayout()->configure(&document);
+    document.setTextWidth(m_printFormat->pageLayout()->contentWidth());
+
+    QTextCursor cursor(&document);
+
+    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
+        const qreal pageWidth = m_printFormat->pageLayout()->contentWidth();
+        const SceneElementFormat *format = m_printFormat->elementFormat(paraType);
+        QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+        QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
+        cursor.setCharFormat(charFormat);
+        cursor.setBlockFormat(blockFormat);
+    };
+
+    for(int i=fromSceneIdx; i<=toSceneIdx; i++)
+    {
+        const ScreenplayElement *element = m_screenplay->elementAt(i);
+        if(element->scene() == nullptr)
+            continue;
+
+        const Scene *scene = element->scene();
+        int startParaIdx = -1, endParaIdx = -1;
+
+        if(cursor.position() > 0)
+        {
+            cursor.insertBlock();
+            startParaIdx = qMax(fromParaIdx, 0);
+        }
+        else
+            startParaIdx = 0;
+
+        endParaIdx = (i == toSceneIdx) ? qMin(toParaIdx, scene->elementCount()-1) : toParaIdx;
+        if(endParaIdx < 0)
+            endParaIdx = scene->elementCount()-1;
+
+        if(startParaIdx == 0 && scene->heading()->isEnabled())
+        {
+            prepareCursor(cursor, SceneElement::Heading);
+            cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] "));
+            cursor.insertText(scene->heading()->text());
+            cursor.insertBlock();
+        }
+
+        for(int p=startParaIdx; p<=endParaIdx; p++)
+        {
+            const SceneElement *para = scene->elementAt(p);
+            prepareCursor(cursor, para->type());
+            cursor.insertText(para->text());
+            if(p < endParaIdx)
+                cursor.insertBlock();
+        }
+    }
+
+    const QSizeF docSize = document.documentLayout()->documentSize() * 2.0;
+
+    QImage image(docSize.toSize(), QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+    QPainter paint(&image);
+    paint.scale(2.0, 2.0);
+    document.drawContents(&paint, QRectF( QPointF(0,0), docSize) );
+    paint.end();
+
+    const QString format = QFileInfo(imageFileName).suffix().toUpper();
+
+    return image.save(imageFileName, qPrintable(format));
 }
 
 inline QString createTimestampString(const QDateTime &dt = QDateTime::currentDateTime())

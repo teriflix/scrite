@@ -183,6 +183,7 @@ public:
 
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
     Q_INVOKABLE bool exportFile(const QString &fileName, const QString &format);
+    Q_INVOKABLE bool exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx, const QString &imageFileName);
 
     Q_INVOKABLE AbstractExporter *createExporter(const QString &format);
     Q_INVOKABLE AbstractReportGenerator *createReportGenerator(const QString &report);

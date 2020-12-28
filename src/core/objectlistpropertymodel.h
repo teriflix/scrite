@@ -190,4 +190,21 @@ private:
     QList<T> m_list;
 };
 
+template <class T>
+inline QList<T> qobject_list_cast(const QList<QObject*> &list, bool deleteUncasedObjects=true)
+{
+    QList<T> ret;
+    ret.reserve(list.size());
+    for(QObject *ptr : list)
+    {
+        T item = qobject_cast<T>(ptr);
+        if(item != nullptr)
+            ret.append(item);
+        else if(deleteUncasedObjects)
+            ptr->deleteLater();
+    }
+
+    return ret;
+}
+
 #endif // OBJECTLISTPROPERTYMODEL_H

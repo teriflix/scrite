@@ -262,7 +262,7 @@ public:
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
     void scanMuteCharacters(const QStringList &characterNames=QStringList());
 
-    Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements)
+    Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements NOTIFY elementCountChanged)
     QQmlListProperty<SceneElement> elements();
     Q_INVOKABLE SceneElement *appendElement(const QString &text, int type=SceneElement::Action);
     Q_INVOKABLE void addElement(SceneElement *ptr);
@@ -272,6 +272,7 @@ public:
     Q_INVOKABLE void removeElement(SceneElement *ptr);
     Q_INVOKABLE int  indexOfElement(SceneElement *ptr) { return m_elements.indexOf(ptr); }
     Q_INVOKABLE SceneElement *elementAt(int index) const;
+    void setElements(const QList<SceneElement *> &list);
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const;
     Q_INVOKABLE void clearElements();
@@ -287,7 +288,7 @@ public:
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
 
-    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT)
+    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT STORED false)
     QAbstractListModel *notesModel() const { return &((const_cast<Scene*>(this))->m_notes); }
 
     Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
@@ -295,6 +296,7 @@ public:
     Q_INVOKABLE void addNote(Note *ptr);
     Q_INVOKABLE void removeNote(Note *ptr);
     Q_INVOKABLE Note *noteAt(int index) const;
+    void setNotes(const QList<Note*> &list);
     Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
     int noteCount() const { return m_notes.size(); }
     Q_INVOKABLE void clearNotes();
@@ -324,6 +326,8 @@ public:
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &json) const;
     void deserializeFromJson(const QJsonObject &json);
+    bool canSetPropertyFromObjectList(const QString &propName) const;
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
 private:
     QList<SceneElement *> elementsList() const { return m_elements; }

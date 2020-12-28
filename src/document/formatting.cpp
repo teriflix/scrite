@@ -1074,7 +1074,7 @@ void SceneDocumentBinder::setScreenplayFormat(ScreenplayFormat *val)
 
     emit screenplayFormatChanged();
 
-    this->initializeDocument();
+    this->initializeDocumentLater();
 }
 
 void SceneDocumentBinder::setScene(Scene *val)
@@ -1106,7 +1106,7 @@ void SceneDocumentBinder::setScene(Scene *val)
 
     emit sceneChanged();
 
-    this->initializeDocument();
+    this->initializeDocumentLater();
 }
 
 void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
@@ -1143,7 +1143,7 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
 
     emit textDocumentChanged();
 
-    this->initializeDocument();
+    this->initializeDocumentLater();
 
     if(m_textDocument != nullptr)
     {
@@ -1862,7 +1862,7 @@ void SceneDocumentBinder::resetScene()
     m_scene = nullptr;
     emit sceneChanged();
 
-    this->initializeDocument();
+    this->initializeDocumentLater();
 }
 
 void SceneDocumentBinder::resetTextDocument()
@@ -1932,7 +1932,7 @@ void SceneDocumentBinder::initializeDocument()
 
 void SceneDocumentBinder::initializeDocumentLater()
 {
-    m_initializeDocumentTimer.start(100, this);
+    m_initializeDocumentTimer.start(0, this);
 }
 
 void SceneDocumentBinder::setDocumentLoadCount(int val)

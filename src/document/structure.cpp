@@ -336,7 +336,6 @@ void Relationship::addNote(Note *ptr)
         return;
 
     ptr->setParent(this);
-
     connect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
     connect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
 
@@ -368,6 +367,22 @@ Note *Relationship::noteAt(int index) const
     return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
 }
 
+void Relationship::setNotes(const QList<Note *> &list)
+{
+    if(!m_notes.isEmpty() || list.isEmpty())
+        return;
+
+    for(Note *ptr : list)
+    {
+        ptr->setParent(this);
+        connect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
+        connect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
+    }
+
+    m_notes.assign(list);
+    emit noteCountChanged();
+}
+
 void Relationship::clearNotes()
 {
     while(m_notes.size())
@@ -384,6 +399,23 @@ void Relationship::serializeToJson(QJsonObject &json) const
 void Relationship::deserializeFromJson(const QJsonObject &json)
 {
     m_withName = json.value("with").toString();
+}
+
+bool Relationship::canSetPropertyFromObjectList(const QString &propName) const
+{
+    if(propName == QStringLiteral("notes"))
+        return m_notes.isEmpty();
+
+    return false;
+}
+
+void Relationship::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
+{
+    if(propName == QStringLiteral("notes"))
+    {
+        this->setNotes(qobject_list_cast<Note*>(objects));
+        return;
+    }
 }
 
 void Relationship::resolveRelationship()
@@ -547,6 +579,22 @@ void Character::removeNote(Note *ptr)
 Note *Character::noteAt(int index) const
 {
     return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
+}
+
+void Character::setNotes(const QList<Note *> &list)
+{
+    if(!m_notes.isEmpty() || list.isEmpty())
+        return;
+
+    for(Note *ptr : list)
+    {
+        ptr->setParent(this);
+        connect(ptr, &Note::aboutToDelete, this, &Character::removeNote);
+        connect(ptr, &Note::noteChanged, this, &Character::characterChanged);
+    }
+
+    m_notes.assign(list);
+    emit noteCountChanged();
 }
 
 void Character::clearNotes()
@@ -740,6 +788,23 @@ Relationship *Character::relationshipAt(int index) const
     return index < 0 || index >= m_relationships.size() ? nullptr : m_relationships.at(index);
 }
 
+void Character::setRelationships(const QList<Relationship *> &list)
+{
+    if(!m_relationships.isEmpty() || list.isEmpty())
+        return;
+
+    for(Relationship *ptr : list)
+    {
+        ptr->setParent(this);
+
+        connect(ptr, &Relationship::aboutToDelete, this, &Character::removeRelationship);
+        connect(ptr, &Relationship::relationshipChanged, this, &Character::characterChanged);
+    }
+
+    m_relationships.assign(list);
+    emit relationshipCountChanged();
+}
+
 void Character::clearRelationships()
 {
     while(m_relationships.size())
@@ -893,6 +958,32 @@ void Character::deserializeFromJson(const QJsonObject &json)
     {
         m_photos = photoPaths;
         emit photosChanged();
+    }
+}
+
+bool Character::canSetPropertyFromObjectList(const QString &propName) const
+{
+    if(propName == QStringLiteral("notes"))
+        return m_notes.isEmpty();
+
+    if(propName == QStringLiteral("relationships"))
+        return m_relationships.isEmpty();
+
+    return false;
+}
+
+void Character::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
+{
+    if(propName == QStringLiteral("notes"))
+    {
+        this->setNotes(qobject_list_cast<Note*>(objects));
+        return;
+    }
+
+    if(propName == QStringLiteral("relationships"))
+    {
+        this->setRelationships(qobject_list_cast<Relationship*>(objects));
+        return;
     }
 }
 
@@ -1449,6 +1540,36 @@ Character *Structure::characterAt(int index) const
     return index < 0 || index >= m_characters.size() ? nullptr : m_characters.at(index);
 }
 
+void Structure::setCharacters(const QList<Character *> &list)
+{
+    if(!m_characters.isEmpty() || list.isEmpty())
+        return;
+
+    // We dont have to capture this as an undoable action, because this method
+    // is only called as a part of loading the Structure. What's the point in
+    // undoing a Structure loaded from file.
+
+    QList<Character*> list2;
+    list2.reserve(list.size());
+
+    for(Character *ptr : list)
+    {
+        if(!ptr->isValid() || this->findCharacter(ptr->name()) != nullptr)
+        {
+            GarbageCollector::instance()->add(ptr);
+            continue;
+        }
+
+        ptr->setParent(this);
+        connect(ptr, &Character::aboutToDelete, this, &Structure::removeCharacter);
+        connect(ptr, &Character::characterChanged, this, &Structure::structureChanged);
+        list2.append(ptr);
+    }
+
+    m_characters.assign(list2);
+    emit characterCountChanged();
+}
+
 void Structure::clearCharacters()
 {
     while(m_characters.size())
@@ -1572,6 +1693,26 @@ Note *Structure::noteAt(int index) const
     return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
 }
 
+void Structure::setNotes(const QList<Note *> &list)
+{
+    if(!m_notes.isEmpty() || list.isEmpty())
+        return;
+
+    // We dont have to capture this as an undoable action, because this method
+    // is only called as a part of loading the Structure. What's the point in
+    // undoing a Structure loaded from file.
+
+    for(Note *ptr : list)
+    {
+        ptr->setParent(this);
+        connect(ptr, &Note::aboutToDelete, this, &Structure::removeNote);
+        connect(ptr, &Note::noteChanged, this, &Structure::structureChanged);
+    }
+
+    m_notes.assign(list);
+    emit noteCountChanged();
+}
+
 void Structure::clearNotes()
 {
     while(m_notes.size())
@@ -1685,6 +1826,33 @@ void Structure::moveElement(StructureElement *ptr, int toRow)
     emit elementsChanged();
 
     this->resetCurentElementIndex();
+}
+
+void Structure::setElements(const QList<StructureElement *> &list)
+{
+    if(!m_elements.isEmpty() || list.isEmpty())
+        return;
+
+    // We dont have to capture this as an undoable action, because this method
+    // is only called as a part of loading the Structure. What's the point in
+    // undoing a Structure loaded from file.
+
+    for(StructureElement *element : list)
+    {
+        element->setParent(this);
+
+        connect(element, &StructureElement::elementChanged, this, &Structure::structureChanged);
+        connect(element, &StructureElement::aboutToDelete, this, &Structure::removeElement);
+        connect(element, &StructureElement::sceneLocationChanged, this, &Structure::updateLocationHeadingMapLater);
+        connect(element, &StructureElement::geometryChanged, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectChanged);
+        connect(element, &StructureElement::aboutToDelete, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectDestroyed);
+        this->onStructureElementSceneChanged(element);
+    }
+
+    m_elements.assign(list);
+    this->setCurrentElementIndex(0);
+    emit elementCountChanged();
+    emit elementsChanged();
 }
 
 StructureElement *Structure::elementAt(int index) const
@@ -2195,7 +2363,29 @@ void Structure::sendToBack(Annotation *ptr)
     m_annotations.takeAt(index);
     m_annotations.prepend(ptr);
     emit annotationCountChanged(); // Although the count did not change, we use the same
-                                   // signal to announce change in the annotations list property
+    // signal to announce change in the annotations list property
+}
+
+void Structure::setAnnotations(const QList<Annotation *> &list)
+{
+    if(!m_annotations.isEmpty() || list.isEmpty())
+        return;
+
+    // We dont have to capture this as an undoable action, because this method
+    // is only called as a part of loading the Structure. What's the point in
+    // undoing a Structure loaded from file.
+
+    for(Annotation *ptr : list)
+    {
+        ptr->setParent(this);
+        connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
+        connect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
+        connect(ptr, &Annotation::geometryChanged, &m_annotations, &ObjectListPropertyModel<Annotation*>::objectChanged);
+        connect(ptr, &Annotation::aboutToDelete, &m_annotations, &ObjectListPropertyModel<Annotation*>::objectDestroyed);
+    }
+
+    m_annotations.assign(list);
+    emit annotationCountChanged();
 }
 
 void Structure::clearAnnotations()
@@ -2397,6 +2587,41 @@ void Structure::deserializeFromJson(const QJsonObject &)
                 }
             }
         }
+    }
+}
+
+bool Structure::canSetPropertyFromObjectList(const QString &propName) const
+{
+    if(propName == QStringLiteral("elements"))
+        return m_elements.isEmpty();
+
+    if(propName == QStringLiteral("characters"))
+        return m_characters.isEmpty();
+
+    if(propName == QStringLiteral("notes"))
+        return m_notes.isEmpty();
+
+    return false;
+}
+
+void Structure::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
+{
+    if(propName == QStringLiteral("elements"))
+    {
+        this->setElements(qobject_list_cast<StructureElement*>(objects));
+        return;
+    }
+
+    if(propName == QStringLiteral("characters"))
+    {
+        this->setCharacters(qobject_list_cast<Character*>(objects));
+        return;
+    }
+
+    if(propName == QStringLiteral("notes"))
+    {
+        this->setNotes(qobject_list_cast<Note*>(objects));
+        return;
     }
 }
 

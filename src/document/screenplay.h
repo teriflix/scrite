@@ -297,6 +297,8 @@ public:
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
+    bool canSetPropertyFromObjectList(const QString &propName) const;
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
     // QAbstractItemModel interface
     enum Roles { ScreenplayElementRole = Qt::UserRole };
@@ -339,7 +341,8 @@ private:
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);
     static ScreenplayElement* staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index);
     static int staticElementCount(QQmlListProperty<ScreenplayElement> *list);
-    QList<ScreenplayElement *> m_elements;
+    QList<ScreenplayElement *> m_elements; // We dont use ObjectListPropertyModel<ScreenplayElement*> for this because
+                                           // the Screenplay class is already a list model of screenplay elements.
     int m_currentElementIndex = -1;
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;

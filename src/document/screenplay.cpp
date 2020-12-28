@@ -1711,6 +1711,49 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
     }
 }
 
+bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const
+{
+    if(propName == QStringLiteral("elements"))
+        return m_elements.isEmpty();
+
+    return false;
+}
+
+void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
+{
+    if(propName == QStringLiteral("elements"))
+    {
+        const QList<ScreenplayElement*> list = qobject_list_cast<ScreenplayElement*>(objects);
+        if(!m_elements.isEmpty() || list.isEmpty())
+            return;
+
+        this->beginResetModel();
+
+        for(ScreenplayElement *ptr : list)
+        {
+            ptr->setParent(this);
+            connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
+            connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
+            connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
+            connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
+            connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
+            if(ptr->elementType() == ScreenplayElement::BreakElementType)
+                connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+
+            m_elements.append(ptr);
+        }
+
+        this->endResetModel();
+
+        emit elementCountChanged();
+        emit elementsChanged();
+
+        this->setCurrentElementIndex(0);
+
+        return;
+    }
+}
+
 int Screenplay::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_elements.size();
