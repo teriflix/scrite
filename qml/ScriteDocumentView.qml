@@ -53,6 +53,7 @@ Item {
         property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenExportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
 
         onShowNotebookInStructureChanged: {
             app.execLater(workspaceSettings, 100, function() {
@@ -188,6 +189,17 @@ Item {
         ShortcutsModelItem.visible: enabled
         enabled: !workspaceSettings.showNotebookInStructure
         onActivated: mainTabBar.currentIndex = 2
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Alt+4"
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Scrited"
+        ShortcutsModelItem.enabled: enabled && mainTabBar.currentIndex !== 3
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.visible: enabled
+        onActivated: mainTabBar.currentIndex = 3
     }
 
     Rectangle {
@@ -775,6 +787,7 @@ Item {
                 ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                 onClicked: languageMenu.visible = true
                 down: languageMenu.visible
+                visible: mainTabBar.currentIndex <= 2
 
                 Item {
                     anchors.top: parent.bottom
@@ -859,6 +872,7 @@ Item {
                 onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                 down: alphabetMappingsPopup.visible
                 enabled: app.transliterationEngine.language !== TransliterationEngine.English
+                visible: mainTabBar.currentIndex <= 2
 
                 ShortcutsModelItem.priority: 1
                 ShortcutsModelItem.group: "Language"
@@ -918,6 +932,7 @@ Item {
                 font.pointSize: app.idealFontPointSize-2
                 property string fullText: app.transliterationEngine.languageAsString
                 width: 80
+                visible: mainTabBar.currentIndex <= 2
 
                 MouseArea {
                     anchors.fill: parent
@@ -1117,6 +1132,12 @@ Item {
                                 font.bold: mainTabBar.currentIndex === 2
                                 enabled: !workspaceSettings.showNotebookInStructure
                             }
+
+                            MenuItem2 {
+                                text: "Scrited (" + app.polishShortcutTextForDisplay("Alt+4") + ")"
+                                onTriggered: mainTabBar.currentIndex = 3
+                                font.bold: mainTabBar.currentIndex === 3
+                            }
                         }
 
                         MenuSeparator { }
@@ -1198,7 +1219,7 @@ Item {
             id: editTools
             x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2 + (globalTimeDisplay.visible ? globalTimeDisplay.contentWidth/2 : 0))
             height: parent.height
-            spacing: 2
+            spacing: 20
 
             ScreenplayEditorToolbar {
                 id: globalScreenplayEditorToolbar
@@ -1207,6 +1228,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
+                visible: mainTabBar.currentIndex === 1 || mainTabBar.currentIndex === 0
             }
 
             Row {
@@ -1216,7 +1238,12 @@ Item {
 
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
-                readonly property var tabs: workspaceSettings.showNotebookInStructure ? ["Screenplay", "Structure"] : ["Screenplay", "Structure", "Notebook"]
+                readonly property var tabs: [
+                    { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true },
+                    { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true },
+                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !workspaceSettings.showNotebookInStructure },
+                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": true }
+                ]
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
                 readonly property color activeTabColor: primaryColors.windowColor
@@ -1258,7 +1285,9 @@ Item {
                     Item {
                         property bool active: mainTabBar.currentIndex === index
                         height: mainTabBar.height
-                        width: tabBarFontMetrics.advanceWidth(modelData) + (documentUI.width >= 1485 ? 30 : 20)
+                        width: height
+                        visible: modelData.visible
+                        enabled: modelData.visible
 
                         PainterPathItem {
                             anchors.fill: parent
@@ -1285,20 +1314,27 @@ Item {
                             font.pointSize: app.idealFontPointSize
                         }
 
-                        Text {
-                            id: tabBarText
-                            text: modelData
+                        Image {
+                            source: modelData.icon
+                            width: parent.active ? 32 : 24; height: width
+                            Behavior on width {
+                                enabled: screenplayEditorSettings.enableAnimations
+                                NumberAnimation { duration: 250 }
+                            }
+
+                            fillMode: Image.PreserveAspectFit
                             anchors.centerIn: parent
-                            anchors.verticalCenterOffset:parent.active ? 0 : 1
-                            font.pointSize: app.idealFontPointSize
-                            font.bold: parent.active
+                            anchors.verticalCenterOffset: parent.active ? 0 : 1
+                            opacity: parent.active ? 1 : 0.75
                         }
 
                         MouseArea {
-                            id: tabBarMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: mainTabBar.currentIndex = index
+                            ToolTip.text: modelData.name + "\t" + app.polishShortcutTextForDisplay("Alt+"+(index+1))
+                            ToolTip.delay: 1000
+                            ToolTip.visible: containsMouse
                         }
                     }
                 }
@@ -1420,6 +1456,7 @@ Item {
                     switch(mainTabBar.currentIndex) {
                     case 1: return structureEditorComponent
                     case 2: return notebookEditorComponent
+                    case 3: return scritedComponent
                     }
                     return screenplayEditorComponent
                 }
@@ -1618,6 +1655,14 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    Component {
+        id: scritedComponent
+
+        ScritedView {
+
         }
     }
 

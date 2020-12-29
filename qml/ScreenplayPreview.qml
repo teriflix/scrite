@@ -1,0 +1,211 @@
+/****************************************************************************
+**
+** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+import Scrite 1.0
+
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+
+Rectangle {
+    id: previewItem
+    property Screenplay screenplay: scriteDocument.loading ? null : scriteDocument.screenplay
+    property ScreenplayFormat screenplayFormat: scriteDocument.loading ? null : scriteDocument.printFormat
+    property alias titlePage: screenplayTextDocument.titlePage
+    property alias titlePageIsCentered: screenplayTextDocument.titlePageIsCentered
+    property bool fitPageToWidth: false
+    property alias purpose: screenplayTextDocument.purpose
+    property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
+        timePerPage: screenplayTextDocument.timePerPage
+    }
+
+    color: primaryColors.windowColor
+
+    Component.onCompleted: {
+        app.execLater(screenplayTextDocument, 250, function() {
+            textDocumentOffsets.enabled = true
+            screenplay.currentElementIndex = 0
+            screenplayTextDocument.print(screenplayImagePrinter)
+            textDocumentOffsets.enabled = false
+            Qt.callLater( function() { pageView.scrollToCurrentScene() })
+        })
+    }
+
+    ScreenplayTextDocument {
+        id: screenplayTextDocument
+        screenplay: previewItem.screenplay
+        formatting: previewItem.screenplayFormat
+        sceneNumbers: true
+        purpose: ScreenplayTextDocument.ForPrinting
+        secondsPerPage: formatting ? formatting.secondsPerPage : 60
+        syncEnabled: true
+    }
+
+    ImagePrinter {
+        id: screenplayImagePrinter
+        scale: 2
+    }
+
+    Connections {
+        target: scriteDocument.loading ? null : scriteDocument.screenplay
+        onCurrentElementIndexChanged: {
+            Qt.callLater( function() { pageView.scrollToCurrentScene() })
+        }
+    }
+
+    Text {
+        id: noticeText
+        font.pixelSize: 30
+        anchors.centerIn: parent
+        text: "Generating preview ..."
+        visible: screenplayImagePrinter.printing || (screenplayImagePrinter.pageCount === 0 && screenplayTextDocument.pageCount > 0)
+    }
+
+    Flickable {
+        id: pageView
+        anchors.fill: parent
+        anchors.bottomMargin: statusBar.height
+        contentWidth: pageViewContent.width
+        contentHeight: pageViewContent.height
+        clip: true
+
+        function scrollToCurrentScene() {
+            var idx = scriteDocument.screenplay.currentElementIndex
+            if(idx < 0) return
+            var element = scriteDocument.screenplay.elementAt(idx)
+            if(element === null) return
+            var sceneNr = element.resolvedSceneNumber
+            var info = textDocumentOffsets.offsetInfoOf(sceneNr)
+            if(info) {
+                pageView.currentIndex = info.pageNumber-1
+                pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + info.sceneHeadingRect.y*previewZoomSlider.value
+            }
+        }
+
+        ScrollBar.horizontal: ScrollBar {
+            policy: pageLayout.width > pageView.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            minimumSize: 0.1
+            palette {
+                mid: Qt.rgba(0,0,0,0.25)
+                dark: Qt.rgba(0,0,0,0.75)
+            }
+            opacity: active ? 1 : 0.2
+            Behavior on opacity {
+                enabled: screenplayEditorSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
+        }
+
+        ScrollBar.vertical: ScrollBar {
+            policy: pageLayout.height > pageView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            minimumSize: 0.1
+            palette {
+                mid: Qt.rgba(0,0,0,0.25)
+                dark: Qt.rgba(0,0,0,0.75)
+            }
+            opacity: active ? 1 : 0.2
+            Behavior on opacity {
+                enabled: screenplayEditorSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
+        }
+
+        property real cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + 40
+        property real cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + 40
+        property int nrColumns: Math.max(Math.floor(width/cellWidth), 1)
+        property int nrRows: Math.ceil(screenplayImagePrinter.pageCount / nrColumns)
+        property int currentIndex: 0
+
+        Item {
+            id: pageViewContent
+            width: Math.max(pageLayout.width, pageView.width)
+            height: pageLayout.height
+
+            Flow {
+                id: pageLayout
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: pageView.cellWidth * pageView.nrColumns
+                height: pageView.cellHeight * pageView.nrRows
+
+                Repeater {
+                    id: pageRepeater
+
+                    model: screenplayImagePrinter.printing ? null : screenplayImagePrinter
+                    delegate: Item {
+                        readonly property int pageIndex: index
+                        width: pageView.cellWidth
+                        height: pageView.cellHeight
+
+                        property bool itemIsVisible: {
+                            var firstRow = Math.max(Math.floor(pageView.contentY / pageView.cellHeight), 0)
+                            var lastRow = Math.min(Math.ceil( (pageView.contentY+pageView.height)/pageView.cellHeight ), pageRepeater.count-1)
+                            var myRow = Math.floor(pageIndex/pageView.nrColumns)
+                            return firstRow <= myRow && myRow <= lastRow;
+                        }
+
+                        BoxShadow {
+                            anchors.fill: pageImage
+                            opacity: pageView.currentIndex === index ? 1 : 0.15
+                        }
+
+                        Rectangle {
+                            anchors.fill: pageImage
+                            color: "white"
+                        }
+
+                        Image {
+                            id: pageImage
+                            width: pageWidth*previewZoomSlider.value
+                            height: pageHeight*previewZoomSlider.value
+                            source: parent.itemIsVisible ? pageUrl : ""
+                            anchors.centerIn: parent
+                            smooth: true
+                            mipmap: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: pageView.currentIndex = index
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 30
+        color: primaryColors.windowColor
+        border.width: 1
+        border.color: primaryColors.borderColor
+        visible: !fitPageToWidth
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            text: noticeText.visible ? "Generating preview ..." : ("Page " + (Math.max(pageView.currentIndex,0)+1) + " of " + pageRepeater.count)
+        }
+
+        ZoomSlider {
+            id: previewZoomSlider
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            from: 0.5
+            to: (pageView.width*0.9 / screenplayImagePrinter.pageWidth)
+            value: fitPageToWidth ? to : 1
+        }
+    }
+}

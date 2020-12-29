@@ -252,7 +252,7 @@ public:
 
     Q_INVOKABLE void removeSceneElements(Scene *scene);
     Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;
-    Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
+    Q_INVOKABLE int indexOfElement(const ScreenplayElement *element) const;
     Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max=-1) const;
     QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
     Q_INVOKABLE int firstSceneIndex() const;
@@ -301,7 +301,7 @@ public:
     void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
     // QAbstractItemModel interface
-    enum Roles { ScreenplayElementRole = Qt::UserRole };
+    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, RowNumberRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int,QByteArray> roleNames() const;

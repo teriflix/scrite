@@ -36,6 +36,7 @@ ToolButton {
     hoverEnabled: true
     display: AbstractButton.TextBesideIcon
     opacity: enabled ? 1 : 0.5
+    flat: true
     contentItem: Rectangle {
         color: primaryColors.c10.background
         border.width: toolButton.flat ? 0 : 1

@@ -73,6 +73,11 @@ public:
     QList<int> events() const { return m_events; }
     Q_SIGNAL void eventsChanged();
 
+    Q_PROPERTY(bool acceptHoverEvents READ isAcceptHoverEvents WRITE setAcceptHoverEvents NOTIFY acceptHoverEventsChanged)
+    void setAcceptHoverEvents(bool val);
+    bool isAcceptHoverEvents() const;
+    Q_SIGNAL void acceptHoverEventsChanged();
+
     // Forwards the event currently being filtered
     Q_INVOKABLE bool forwardEventTo(QObject *object);
 

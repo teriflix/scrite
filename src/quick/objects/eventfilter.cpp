@@ -115,6 +115,26 @@ void EventFilter::setEvents(const QList<int> &val)
     emit eventsChanged();
 }
 
+void EventFilter::setAcceptHoverEvents(bool val)
+{
+    QQuickItem *item = qobject_cast<QQuickItem*>(m_target);
+    if(item)
+    {
+        item->setAcceptHoverEvents(val);
+        emit acceptHoverEventsChanged();
+        return;
+    }
+}
+
+bool EventFilter::isAcceptHoverEvents() const
+{
+    QQuickItem *item = qobject_cast<QQuickItem*>(m_target);
+    if(item)
+        return item->acceptHoverEvents();
+
+    return false;
+}
+
 bool EventFilter::forwardEventTo(QObject *object)
 {
     if(object == nullptr || object == m_target)
@@ -202,6 +222,19 @@ inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
     object.insert("altModifier", event->modifiers()&Qt::AltModifier ? true : false);
 }
 
+inline void packIntoJson(QHoverEvent *event, QJsonObject &object)
+{
+    auto pointToJson = [](const QPointF &pos) {
+        QJsonObject ret;
+        ret.insert("x", pos.x());
+        ret.insert("y", pos.y());
+        return ret;
+    };
+
+    object.insert("pos", pointToJson(event->posF()));
+    object.insert("oldPos", pointToJson(event->pos()));
+}
+
 inline bool eventToJson(QEvent *event, QJsonObject &object)
 {
     const QMetaObject *eventMetaObject = &QEvent::staticMetaObject;
@@ -236,6 +269,11 @@ inline bool eventToJson(QEvent *event, QJsonObject &object)
         break;
     case QEvent::Wheel:
         packIntoJson(static_cast<QWheelEvent*>(event), object);
+        break;
+    case QEvent::HoverEnter:
+    case QEvent::HoverLeave:
+    case QEvent::HoverMove:
+        packIntoJson(static_cast<QHoverEvent*>(event), object);
         break;
     default:
         break;

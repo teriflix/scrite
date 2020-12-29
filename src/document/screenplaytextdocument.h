@@ -19,6 +19,7 @@
 #include <QTextDocument>
 #include <QQmlParserStatus>
 #include <QPagedPaintDevice>
+#include <QQuickTextDocument>
 #include <QAbstractTextDocumentLayout>
 
 #include "scene.h"
@@ -220,6 +221,7 @@ private:
     void setCurrentPageAndPosition(int page, qreal pos);
     void resetFormatting();
     void resetTextDocument();
+    void resetQQTextDocument();
 
     void loadScreenplay();
     void includeMoreAndContdMarkers();
@@ -405,6 +407,72 @@ private:
     void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawText(QPainter *painter, const QRectF &rect, const QString &text);
+};
+
+class PrintedTextDocumentOffsets : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    PrintedTextDocumentOffsets(QObject *parent=nullptr);
+    ~PrintedTextDocumentOffsets();
+
+    enum Type { PageOffsets, SceneOffsets };
+    Q_ENUM(Type)
+    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    void setType(Type val);
+    Type type() const { return m_type; }
+    Q_SIGNAL void typeChanged();
+
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
+    Q_PROPERTY(QTime timePerPage READ timePerPage WRITE setTimePerPage NOTIFY timePerPageChanged)
+    void setTimePerPage(const QTime &val);
+    QTime timePerPage() const { return m_timePerPage; }
+    Q_SIGNAL void timePerPageChanged();
+
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const { return m_offsets.size(); }
+    Q_SIGNAL void countChanged();
+
+    Q_INVOKABLE QJsonObject offsetInfoAt(int index) const;
+    Q_INVOKABLE QJsonObject offsetInfoOf(const QVariant &pageOrSceneNumber) const;
+
+    // QAbstractItemModel interface
+    enum Role { ModelDataRole=Qt::UserRole, OffsetInfoRole };
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event);
+
+private:
+    qreal m_pageScale = 1.0;
+    struct _OffsetInfo
+    {
+        _OffsetInfo() { }
+        int pageNumber = -1;
+        QRectF pageRect;
+        QTime pageTime;
+        int sceneIndex = -1;
+        QString sceneNumber;
+        QString sceneHeading;
+        QRectF sceneHeadingRect;
+        QTime sceneTime;
+        void computeTimes(const QTime &timePerPage);
+        QJsonObject toJsonObject() const;
+    };
+    QList<_OffsetInfo> m_offsets;
+
+    int m_currentPageNumber = -1;
+    QRectF m_currentPageRect;
+    Type m_type = SceneOffsets;
+    QTime m_timePerPage = QTime(0, 1, 0);
+    bool m_enabled = false;
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H

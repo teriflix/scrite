@@ -819,7 +819,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
 void ScreenplayTextDocument::includeMoreAndContdMarkers()
 {
-    if(m_purpose != ForPrinting || m_syncEnabled)
+    if(m_purpose != ForPrinting/* || m_syncEnabled*/)
         return;
 
     /**
@@ -1507,6 +1507,8 @@ void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
     }
 
     const int documentLength = endCursor.position();
+    if(documentLength > 0 && m_pageBoundaries.isEmpty())
+        this->evaluatePageBoundaries();
 
     QTextCursor userCursor = frame->firstCursorPosition();
     QTextBlock block = userCursor.block();
@@ -1658,17 +1660,13 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             if(m_sceneNumbers)
             {
-                if(this->purpose() == ForPrinting)
-                {
-                    QTextCharFormat sceneNumberFormat;
-                    sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
-                    sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
-                    sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
-                    sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, element->resolvedSceneNumber());
-                    cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
-                }
-                else
-                    cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] "));
+                QTextCharFormat sceneNumberFormat;
+                sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
+                sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
+                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
+                const QVariantList data = QVariantList() << element->resolvedSceneNumber() << scene->heading()->text() << m_screenplay->indexOfElement(element);
+                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, data);
+                cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
 
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
@@ -2229,12 +2227,23 @@ void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRe
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    const QString sceneNumber = format.property(DataProperty).toString();
+    const QVariantList data = format.property(DataProperty).toList();
+    const QString sceneNumber = data.at(0).toString();
     if(sceneNumber.isEmpty())
         return;
 
+    const QString sceneHeading = data.at(1).toString();
+
     QRectF rect = givenRect;
     rect.setLeft(rect.left()*0.55);
+
+    const QRectF sceneHeadingRect = painter->worldTransform().map(givenRect).boundingRect();
+    QTextDocumentPagedPrintEvent printEvent(QTextDocumentPagedPrintEvent::SceneEvent);
+    printEvent.m_sceneIndex = data.at(2).toInt();
+    printEvent.m_sceneNumber = sceneNumber;
+    printEvent.m_sceneHeadingRect = sceneHeadingRect;
+    printEvent.m_sceneHeading = sceneHeading;
+    qApp->sendEvent(this->parent(), &printEvent);
 
     const QString sceneNumberText = sceneNumber + QStringLiteral(".");
     this->drawText(painter, rect, sceneNumberText);
@@ -2307,3 +2316,201 @@ void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &re
         painter->drawText(rect.bottomLeft(), text);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+PrintedTextDocumentOffsets::PrintedTextDocumentOffsets(QObject *parent)
+    : QAbstractListModel(parent)
+{
+
+}
+
+PrintedTextDocumentOffsets::~PrintedTextDocumentOffsets()
+{
+
+}
+
+void PrintedTextDocumentOffsets::setType(PrintedTextDocumentOffsets::Type val)
+{
+    if(m_type == val)
+        return;
+
+    m_type = val;
+    emit typeChanged();
+}
+
+void PrintedTextDocumentOffsets::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+
+    if(val)
+        qApp->installEventFilter(this);
+    else
+        qApp->removeEventFilter(this);
+}
+
+void PrintedTextDocumentOffsets::setTimePerPage(const QTime &val)
+{
+    if(m_timePerPage == val)
+        return;
+
+    m_timePerPage = val;
+    emit timePerPageChanged();
+}
+
+QJsonObject PrintedTextDocumentOffsets::offsetInfoAt(int index) const
+{
+    if(index < 0 || index >= m_offsets.size())
+        return QJsonObject();
+
+    return m_offsets.at(index).toJsonObject();
+}
+
+QJsonObject PrintedTextDocumentOffsets::offsetInfoOf(const QVariant &pageOrSceneNumber) const
+{
+    for(const _OffsetInfo &offset : m_offsets)
+    {
+        if(m_type == PageOffsets && offset.pageNumber == pageOrSceneNumber.toInt())
+            return offset.toJsonObject();
+
+        if(m_type == SceneOffsets && offset.sceneNumber == pageOrSceneNumber.toString())
+            return offset.toJsonObject();
+    }
+
+    return QJsonObject();
+}
+
+int PrintedTextDocumentOffsets::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_offsets.size();
+}
+
+QVariant PrintedTextDocumentOffsets::data(const QModelIndex &index, int role) const
+{
+    if(index.row() < 0 || index.row() >= m_offsets.size())
+        return QVariant();
+
+    const _OffsetInfo offset = m_offsets.at(index.row());
+    switch(role)
+    {
+    case ModelDataRole:
+    case OffsetInfoRole:
+        return offset.toJsonObject();
+    default:
+        break;
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> PrintedTextDocumentOffsets::roleNames() const
+{
+    static QHash<int,QByteArray> roles;
+    if(roles.isEmpty())
+    {
+        roles[ModelDataRole] = "modelData";
+        roles[OffsetInfoRole] = "offsetInfo";
+    }
+
+    return roles;
+}
+
+bool PrintedTextDocumentOffsets::eventFilter(QObject *watched, QEvent *event)
+{
+    if(event->type() != QTextDocumentPagedPrintEvent::qeventType())
+        return false;
+
+    Q_UNUSED(watched);
+    QTextDocumentPagedPrintEvent *printEvent = static_cast<QTextDocumentPagedPrintEvent*>(event);
+    switch(printEvent->printEventType())
+    {
+    case QTextDocumentPagedPrintEvent::UnknownEvent:
+        break;
+    case QTextDocumentPagedPrintEvent::BeginEvent:
+        this->beginResetModel();
+        m_offsets.clear();
+        emit countChanged();
+        break;
+    case QTextDocumentPagedPrintEvent::EndEvent:
+        this->endResetModel();
+        emit countChanged();
+        break;
+    case QTextDocumentPagedPrintEvent::PageEvent:
+        m_currentPageNumber = printEvent->pageNumber();
+        m_currentPageRect = printEvent->pageRect();
+        if(m_type == PageOffsets)
+        {
+            _OffsetInfo offset;
+            offset.pageNumber = m_currentPageNumber;
+            offset.pageRect = m_currentPageRect;
+            offset.computeTimes(m_timePerPage);
+            m_offsets.append(offset);
+        }
+        break;
+    case QTextDocumentPagedPrintEvent::SceneEvent:
+        if(m_type == SceneOffsets)
+        {
+            _OffsetInfo offset;
+            offset.pageNumber = m_currentPageNumber;
+            offset.pageRect = m_currentPageRect;
+            offset.sceneIndex = printEvent->sceneIndex();
+            offset.sceneNumber = printEvent->sceneNumber();
+            offset.sceneHeading = printEvent->sceneHeading();
+            offset.sceneHeadingRect = printEvent->sceneHeadingRect();
+            offset.computeTimes(m_timePerPage);
+            m_offsets.append(offset);
+        }
+        break;
+    }
+
+    return false;
+}
+
+void PrintedTextDocumentOffsets::_OffsetInfo::computeTimes(const QTime &timePerPage)
+{
+    const int secondsPerPage = QTime(0,0,1).secsTo(timePerPage) - 1;
+    const int pageSeconds = (this->pageNumber-1) * secondsPerPage;
+    this->pageTime = QTime(0,0,1).addSecs(pageSeconds-1);
+
+    if(sceneNumber.isEmpty())
+        return;
+
+    const int sceneSecondsOffset = qRound(qreal(secondsPerPage) * this->sceneHeadingRect.y() / this->pageRect.height());
+    this->sceneTime = this->pageTime.addSecs(sceneSecondsOffset);
+}
+
+QJsonObject PrintedTextDocumentOffsets::_OffsetInfo::toJsonObject() const
+{
+    auto rectToJson = [](const QRectF &rect) {
+        QJsonObject ret;
+        ret.insert("x", rect.x());
+        ret.insert("y", rect.y());
+        ret.insert("width", rect.width());
+        ret.insert("height", rect.height());
+        return ret;
+    };
+
+    auto timeToJson = [](const QTime &time) {
+        QJsonObject ret;
+        ret.insert("hour", time.hour());
+        ret.insert("minute", time.minute());
+        ret.insert("second", time.second());
+        ret.insert("text", timeToString(time));
+        ret.insert("position", (time.hour()*3600 + time.minute()*60 + time.second())*1000);
+        return ret;
+    };
+
+    QJsonObject item;
+    item.insert("pageNumber", pageNumber);
+    item.insert("pageRect", rectToJson(pageRect));
+    item.insert("pageTime", timeToJson(pageTime));
+    item.insert("sceneIndex", sceneIndex);
+    item.insert("sceneNumber", sceneNumber);
+    item.insert("sceneHeading", sceneHeading);
+    item.insert("sceneTime", timeToJson(sceneTime));
+    item.insert("sceneHeadingRect", rectToJson(sceneHeadingRect));
+    return item;
+}

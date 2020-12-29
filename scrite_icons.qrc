@@ -145,5 +145,21 @@
         <file>icons/action/layout_beat_sheet_inverted.png</file>
         <file>icons/action/flag.png</file>
         <file>icons/action/flag_inverted.png</file>
+        <file>icons/navigation/structure_tab_inverted.png</file>
+        <file>icons/navigation/structure_tab.png</file>
+        <file>icons/navigation/notebook_tab.png</file>
+        <file>icons/navigation/notebook_tab_inverted.png</file>
+        <file>icons/navigation/screenplay_tab.png</file>
+        <file>icons/navigation/screenplay_tab_inverted.png</file>
+        <file>icons/navigation/scrited_tab.png</file>
+        <file>icons/navigation/scrited_tab_inverted.png</file>
+        <file>icons/mediaplayer/forward_10.png</file>
+        <file>icons/mediaplayer/forward_10_inverted.png</file>
+        <file>icons/mediaplayer/pause.png</file>
+        <file>icons/mediaplayer/pause_inverted.png</file>
+        <file>icons/mediaplayer/play_arrow.png</file>
+        <file>icons/mediaplayer/play_arrow_inverted.png</file>
+        <file>icons/mediaplayer/rewind_10.png</file>
+        <file>icons/mediaplayer/rewind_10_inverted.png</file>
     </qresource>
 </RCC>

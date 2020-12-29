@@ -14,10 +14,11 @@
 #ifndef QTEXTDOCUMENTPAGEDPRINTER_H
 #define QTEXTDOCUMENTPAGEDPRINTER_H
 
+#include <QColor>
+#include <QEvent>
 #include <QObject>
 #include <QTextDocument>
 #include <QPagedPaintDevice>
-#include <QColor>
 
 #include "errorreport.h"
 #include "progressreport.h"
@@ -230,6 +231,47 @@ private:
     QTextDocument* m_textDocument = nullptr;
     QRectF m_headerRect;
     QRectF m_footerRect;
+};
+
+class QTextDocumentPagedPrintEvent : public QEvent
+{
+public:
+    enum PrintEventType
+    {
+        UnknownEvent,
+        PageEvent,
+        SceneEvent,
+        BeginEvent,
+        EndEvent
+    };
+
+    static Type qeventType();
+
+    QTextDocumentPagedPrintEvent(PrintEventType petype);
+    ~QTextDocumentPagedPrintEvent();
+
+    PrintEventType printEventType() const { return m_printEventType; }
+
+    int pageNumber() const { return m_pageNumber; }
+    QRectF pageRect() const { return m_pageRect; }
+
+    int sceneIndex() const { return m_sceneIndex; }
+    QString sceneNumber() const { return m_sceneNumber; }
+    QString sceneHeading() const { return m_sceneHeading; }
+    QRectF sceneHeadingRect() const { return m_sceneHeadingRect; }
+
+private:
+    friend class QTextDocumentPagedPrinter;
+    friend class ScreenplayTextObjectInterface;
+    PrintEventType m_printEventType = UnknownEvent;
+
+    int m_pageNumber = -1;
+    QRectF m_pageRect;
+
+    int m_sceneIndex;
+    QString m_sceneNumber;
+    QString m_sceneHeading;
+    QRectF m_sceneHeadingRect;
 };
 
 #endif // QTEXTDOCUMENTPAGEDPRINTER_H

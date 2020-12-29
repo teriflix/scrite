@@ -1404,9 +1404,9 @@ int Screenplay::firstIndexOfScene(Scene *scene) const
     return indexes.isEmpty() ? -1 : indexes.first();
 }
 
-int Screenplay::indexOfElement(ScreenplayElement *element) const
+int Screenplay::indexOfElement(const ScreenplayElement *element) const
 {
-    return m_elements.indexOf(element);
+    return m_elements.indexOf(const_cast<ScreenplayElement*>(element));
 }
 
 QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const
@@ -1761,16 +1761,44 @@ int Screenplay::rowCount(const QModelIndex &parent) const
 
 QVariant Screenplay::data(const QModelIndex &index, int role) const
 {
-    if(role == ScreenplayElementRole && index.isValid())
-        return QVariant::fromValue<QObject*>(this->elementAt(index.row()));
+    if(!index.isValid())
+        return QVariant();
+
+    ScreenplayElement *element = this->elementAt(index.row());
+    switch(role)
+    {
+    case IdRole:
+        return element->sceneID();
+    case ScreenplayElementRole:
+        return QVariant::fromValue<ScreenplayElement*>(element);
+    case ScreenplayElementTypeRole:
+        return element->elementType();
+    case BreakTypeRole:
+        return element->breakType();
+    case SceneRole:
+        return QVariant::fromValue<Scene*>(element->scene());
+    case RowNumberRole:
+        return index.row();
+    default:
+        break;
+    }
 
     return QVariant();
 }
 
 QHash<int, QByteArray> Screenplay::roleNames() const
 {
-    QHash<int,QByteArray> roles;
-    roles[ScreenplayElementRole] = "screenplayElement";
+    static QHash<int, QByteArray> roles;
+    if(roles.isEmpty())
+    {
+        roles[IdRole] = "id";
+        roles[ScreenplayElementRole] = "screenplayElement";
+        roles[ScreenplayElementTypeRole] = "screenplayElementType";
+        roles[BreakTypeRole] = "breakType";
+        roles[SceneRole] = "scene";
+        roles[RowNumberRole] = "rowNumber";
+    }
+
     return roles;
 }
 

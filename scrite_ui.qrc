@@ -57,5 +57,7 @@
         <file>qml/CharacterRelationshipsGraphView.qml</file>
         <file>qml/CharacterBox.qml</file>
         <file>qml/TabView3.qml</file>
+        <file>qml/ScritedView.qml</file>
+        <file>qml/ScreenplayPreview.qml</file>
     </qresource>
 </RCC>
