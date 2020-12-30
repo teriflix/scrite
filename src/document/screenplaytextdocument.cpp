@@ -2383,6 +2383,36 @@ QJsonObject PrintedTextDocumentOffsets::offsetInfoOf(const QVariant &pageOrScene
     return QJsonObject();
 }
 
+QJsonObject PrintedTextDocumentOffsets::nearestOffsetInfo(int pageNumber, qreal yOffset) const
+{
+    if(m_offsets.isEmpty())
+        return QJsonObject();
+
+    if(m_type == PageOffsets)
+    {
+        for(const _OffsetInfo &offset : m_offsets)
+        {
+            if(offset.pageNumber == pageNumber)
+                return offset.toJsonObject();
+        }
+    }
+
+    for(int i=0; i<m_offsets.size(); i++)
+    {
+        _OffsetInfo offset = m_offsets.at(i);
+        if(offset.pageNumber < pageNumber)
+            continue;
+
+        if(offset.pageNumber > pageNumber || offset.sceneHeadingRect.y() > yOffset)
+        {
+            offset = m_offsets.at( qMax(0,i-1) );
+            return offset.toJsonObject();
+        }
+    }
+
+    return m_offsets.last().toJsonObject();
+}
+
 int PrintedTextDocumentOffsets::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_offsets.size();
@@ -2444,6 +2474,7 @@ bool PrintedTextDocumentOffsets::eventFilter(QObject *watched, QEvent *event)
         if(m_type == PageOffsets)
         {
             _OffsetInfo offset;
+            offset.rowNumber = m_offsets.size();
             offset.pageNumber = m_currentPageNumber;
             offset.pageRect = m_currentPageRect;
             offset.computeTimes(m_timePerPage);
@@ -2454,6 +2485,7 @@ bool PrintedTextDocumentOffsets::eventFilter(QObject *watched, QEvent *event)
         if(m_type == SceneOffsets)
         {
             _OffsetInfo offset;
+            offset.rowNumber = m_offsets.size();
             offset.pageNumber = m_currentPageNumber;
             offset.pageRect = m_currentPageRect;
             offset.sceneIndex = printEvent->sceneIndex();
@@ -2504,6 +2536,7 @@ QJsonObject PrintedTextDocumentOffsets::_OffsetInfo::toJsonObject() const
     };
 
     QJsonObject item;
+    item.insert("row", rowNumber);
     item.insert("pageNumber", pageNumber);
     item.insert("pageRect", rectToJson(pageRect));
     item.insert("pageTime", timeToJson(pageTime));

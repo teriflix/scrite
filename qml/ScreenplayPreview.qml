@@ -30,6 +30,8 @@ Rectangle {
 
     color: primaryColors.windowColor
 
+    signal currentOffsetChanged(int row)
+
     Component.onCompleted: {
         app.execLater(screenplayTextDocument, 250, function() {
             textDocumentOffsets.enabled = true
@@ -57,9 +59,7 @@ Rectangle {
 
     Connections {
         target: scriteDocument.loading ? null : scriteDocument.screenplay
-        onCurrentElementIndexChanged: {
-            Qt.callLater( function() { pageView.scrollToCurrentScene() })
-        }
+        onCurrentElementIndexChanged: pageView.scrollToCurrentScene()
     }
 
     Text {
@@ -78,7 +78,10 @@ Rectangle {
         contentHeight: pageViewContent.height
         clip: true
 
+        property bool lockScrollToCurrentScene: false
         function scrollToCurrentScene() {
+            if(lockScrollToCurrentScene)
+                return
             var idx = scriteDocument.screenplay.currentElementIndex
             if(idx < 0) return
             var element = scriteDocument.screenplay.elementAt(idx)
@@ -86,9 +89,31 @@ Rectangle {
             var sceneNr = element.resolvedSceneNumber
             var info = textDocumentOffsets.offsetInfoOf(sceneNr)
             if(info) {
+                lockUpdateCurrentScene = true
                 pageView.currentIndex = info.pageNumber-1
                 pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + info.sceneHeadingRect.y*previewZoomSlider.value
+                lockUpdateCurrentScene = false
             }
+        }
+
+        property bool lockUpdateCurrentScene: false
+        function updateCurrentScene() {
+            if(!fitPageToWidth || textDocumentOffsets.count === 0 || lockUpdateCurrentScene)
+                return
+            var pageIdx = Math.floor(contentY/cellHeight)
+            var yOffset = (contentY - pageIdx*cellHeight)/previewZoomSlider.value
+            var info = textDocumentOffsets.nearestOffsetInfo(pageIdx+1,yOffset)
+            if(scriteDocument.screenplay.currentElementIndex !== info.sceneIndex) {
+                lockScrollToCurrentScene = true
+                scriteDocument.screenplay.currentElementIndex = info.sceneIndex
+                currentOffsetChanged(info.row)
+                lockScrollToCurrentScene = false
+            }
+        }
+
+        onContentYChanged: {
+            if(fitPageToWidth && !lockUpdateCurrentScene)
+                Qt.callLater(updateCurrentScene)
         }
 
         ScrollBar.horizontal: ScrollBar {

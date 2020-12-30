@@ -211,6 +211,7 @@ Item {
                     SplitView.fillHeight: true
                     fitPageToWidth: true
                     purpose: ScreenplayTextDocument.ForDisplay
+                    onCurrentOffsetChanged: screenplaySplitsView.currentIndex = row
                 }
             }
         }
@@ -369,14 +370,15 @@ Item {
                     }
                 }
 
-                onCountChanged: Qt.callLater(initialize)
+                property int offsetCount: screenplayPreview.textDocumentOffsets.count
+                onOffsetCountChanged: Qt.callLater(initialize)
                 function initialize() {
                     if(count === 0) {
                         screenplaySplitsView.currentIndex = -1
                         return
                     }
                     var offsetInfo = screenplayPreview.textDocumentOffsets.offsetInfoAt(0)
-                    screenplaySplitsView.currentIndex = index
+                    screenplaySplitsView.currentIndex = offsetInfo.row
                     scriteDocument.screenplay.currentElementIndex = offsetInfo.sceneIndex
                     if(mediaPlayer.status !== MediaPlayer.NoMedia)
                         mediaPlayer.seek(offsetInfo.sceneTime.position)

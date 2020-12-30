@@ -440,6 +440,7 @@ public:
 
     Q_INVOKABLE QJsonObject offsetInfoAt(int index) const;
     Q_INVOKABLE QJsonObject offsetInfoOf(const QVariant &pageOrSceneNumber) const;
+    Q_INVOKABLE QJsonObject nearestOffsetInfo(int pageNumber, qreal yOffset) const;
 
     // QAbstractItemModel interface
     enum Role { ModelDataRole=Qt::UserRole, OffsetInfoRole };
@@ -455,6 +456,7 @@ private:
     struct _OffsetInfo
     {
         _OffsetInfo() { }
+        int rowNumber = -1;
         int pageNumber = -1;
         QRectF pageRect;
         QTime pageTime;
