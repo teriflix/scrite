@@ -65,6 +65,15 @@ Item {
                     MediaPlayer {
                         id: mediaPlayer
                         notifyInterval: 250
+                        function togglePlayback() {
+                            if(status == MediaPlayer.NoMedia)
+                                return
+
+                            if(playbackState === MediaPlayer.PlayingState)
+                                pause()
+                            else
+                                play()
+                        }
                     }
 
                     VideoOutput {
@@ -140,6 +149,7 @@ Item {
                                     onClicked: fileDialog.open()
                                     suggestedHeight: 36
                                     ToolTip.text: "Load a video file for this screenplay."
+                                    focusPolicy: Qt.NoFocus
                                 }
 
                                 ToolButton2 {
@@ -148,15 +158,11 @@ Item {
                                             return "../icons/mediaplayer/pause_inverted.png"
                                         return "../icons/mediaplayer/play_arrow_inverted.png"
                                     }
-                                    onClicked: {
-                                        if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                                            mediaPlayer.pause()
-                                        else
-                                            mediaPlayer.play()
-                                    }
+                                    onClicked: mediaPlayer.togglePlayback()
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia
                                     suggestedHeight: 36
                                     ToolTip.text: "Play / Pause"
+                                    focusPolicy: Qt.NoFocus
                                 }
 
                                 Text {
@@ -167,6 +173,8 @@ Item {
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia
                                     horizontalAlignment: Text.AlignHCenter
                                     color: "white"
+                                    font.pointSize: 16
+                                    font.family: "Courier Prime"
                                     text: {
                                         var msToTime = function(ms) {
                                             var secs = Math.round(ms/1000)
@@ -187,6 +195,7 @@ Item {
                                     suggestedHeight: 36
                                     onClicked: mediaPlayer.seek( Math.max(mediaPlayer.position-skipDuration, 0 ) )
                                     ToolTip.text: "Rewind by " + (skipDuration/1000) + " seconds"
+                                    focusPolicy: Qt.NoFocus
                                 }
 
                                 ToolButton2 {
@@ -195,6 +204,7 @@ Item {
                                     suggestedHeight: 36
                                     onClicked: mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
                                     ToolTip.text: "Forward by " + (skipDuration/1000) + " seconds"
+                                    focusPolicy: Qt.NoFocus
                                 }
                             }
                         }
@@ -377,13 +387,57 @@ Item {
                         screenplaySplitsView.currentIndex = -1
                         return
                     }
-                    var offsetInfo = screenplayPreview.textDocumentOffsets.offsetInfoAt(0)
-                    screenplaySplitsView.currentIndex = offsetInfo.row
+                    scrollToRow(0)
+                }
+
+                function scrollToRow(row, seekMedia) {
+                    if(currentIndex === row)
+                        return
+                    var offsetInfo = screenplayPreview.textDocumentOffsets.offsetInfoAt(row)
+                    currentIndex = offsetInfo.row
                     scriteDocument.screenplay.currentElementIndex = offsetInfo.sceneIndex
-                    if(mediaPlayer.status !== MediaPlayer.NoMedia)
+                    if(seekMedia !== false && mediaPlayer.status !== MediaPlayer.NoMedia)
                         mediaPlayer.seek(offsetInfo.sceneTime.position)
                 }
             }
+        }
+    }
+
+    EventFilter.target: qmlWindow
+    EventFilter.events: [6] // KeyPress
+    EventFilter.onFilter: {
+        switch(event.key) {
+        case Qt.Key_Space:
+            mediaPlayer.togglePlayback()
+            break
+        case Qt.Key_Up:
+            if(event.controlModifier)
+                screenplaySplitsView.scrollToRow(Math.max(screenplaySplitsView.currentIndex-1,0))
+            else
+                screenplayPreview.contentY = Math.max(screenplayPreview.contentY - (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), 0)
+            break
+        case Qt.Key_Down:
+            if(event.controlModifier)
+                screenplaySplitsView.scrollToRow(Math.min(screenplaySplitsView.currentIndex+1,screenplaySplitsView.count-1))
+            else
+                screenplayPreview.contentY = Math.min(screenplayPreview.contentY + (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), screenplayPreview.contentHeight-screenplayPreview.height)
+            break
+        case Qt.Key_Left:
+            if(event.controlModifier)
+                mediaPlayer.seek( Math.max(mediaPlayer.position-skipDuration, 0 ) )
+            else
+                mediaPlayer.seek( Math.max(mediaPlayer.position-500, 0) )
+            break
+        case Qt.Key_Right:
+            if(event.controlModifier)
+                mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
+            else
+                mediaPlayer.seek( Math.min(mediaPlayer.position+500, mediaPlayer.duration) )
+            break
+        case Qt.Key_Greater:
+        case Qt.Key_Period:
+            // TODO: apply time offset from the media player and update
+            // the Offsets model. Have the model class store the offsets into a file.
         }
     }
 }

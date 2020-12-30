@@ -24,6 +24,12 @@ Rectangle {
     property alias titlePageIsCentered: screenplayTextDocument.titlePageIsCentered
     property bool fitPageToWidth: false
     property alias purpose: screenplayTextDocument.purpose
+    property alias contentY: pageView.contentY
+    property alias contentX: pageView.contentX
+    property real contentWidth: pageView.contentWidth
+    property real contentHeight: pageView.contentHeight
+    property real pageHeight: pageView.cellHeight
+    property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.scale
     property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
         timePerPage: screenplayTextDocument.timePerPage
     }
@@ -50,6 +56,11 @@ Rectangle {
         purpose: ScreenplayTextDocument.ForPrinting
         secondsPerPage: formatting ? formatting.secondsPerPage : 60
         syncEnabled: true
+    }
+
+    FontMetrics {
+        id: fontMetrics
+        font: previewItem.screenplayFormat.defaultFont
     }
 
     ImagePrinter {
