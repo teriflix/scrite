@@ -32,6 +32,13 @@ Rectangle {
     property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.scale
     property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
         timePerPage: screenplayTextDocument.timePerPage
+        screenplay: previewItem.screenplay
+
+        Notification.title: "Time Offsets Error"
+        Notification.text: errorMessage
+        Notification.active: hasError
+        Notification.autoClose: false
+        Notification.onDismissed: clearErrorMessage()
     }
 
     color: primaryColors.windowColor

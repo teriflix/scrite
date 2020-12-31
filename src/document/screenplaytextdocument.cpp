@@ -20,6 +20,7 @@
 #include "garbagecollector.h"
 #include "screenplaytextdocument.h"
 
+#include <QDir>
 #include <QDate>
 #include <QtMath>
 #include <QtDebug>
@@ -36,6 +37,7 @@
 #include <QTextBlockUserData>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
+#include <QJsonDocument>
 
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
@@ -2319,7 +2321,8 @@ void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &re
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintedTextDocumentOffsets::PrintedTextDocumentOffsets(QObject *parent)
-    : QAbstractListModel(parent)
+    : QAbstractListModel(parent),
+      m_screenplay(this, "screenplay")
 {
 
 }
@@ -2327,6 +2330,43 @@ PrintedTextDocumentOffsets::PrintedTextDocumentOffsets(QObject *parent)
 PrintedTextDocumentOffsets::~PrintedTextDocumentOffsets()
 {
 
+}
+
+void PrintedTextDocumentOffsets::setFileName(const QString &val)
+{
+    if(m_fileName == val)
+        return;
+
+    m_fileName = val;
+    emit fileNameChanged();
+
+    if( QFile::exists(val) )
+        this->loadOffsets();
+    else
+        this->saveOffsets();
+}
+
+QString PrintedTextDocumentOffsets::fileNameFrom(const QString &mediaFileNameOrUrl) const
+{
+    QString mediaFileName;
+    if(mediaFileNameOrUrl.startsWith(QStringLiteral("file://")))
+        mediaFileName = QUrl(mediaFileNameOrUrl).toLocalFile();
+    else
+        mediaFileName = mediaFileNameOrUrl;
+
+    QFileInfo fi(mediaFileName);
+    return fi.absoluteDir().absoluteFilePath( fi.baseName() + QStringLiteral(" Scrited View Offsets.json") );
+}
+
+void PrintedTextDocumentOffsets::setScreenplay(Screenplay *val)
+{
+    if(m_screenplay == val)
+        return;
+
+    m_screenplay = val;
+    emit screenplayChanged();
+
+    this->loadOffsets();
 }
 
 void PrintedTextDocumentOffsets::setType(PrintedTextDocumentOffsets::Type val)
@@ -2413,6 +2453,47 @@ QJsonObject PrintedTextDocumentOffsets::nearestOffsetInfo(int pageNumber, qreal 
     return m_offsets.last().toJsonObject();
 }
 
+void PrintedTextDocumentOffsets::setTime(int row, const QTime &time, bool adjustFollowingRows)
+{
+    if(row < 0 || row >= m_offsets.size())
+        return;
+
+    int timeDifferenceInSecs = 0;
+    for(int i=row; i<m_offsets.size(); i++)
+    {
+        _OffsetInfo &offset = m_offsets[i];
+
+        QTime *offsetTime = nullptr;
+        if(m_type == PageOffsets)
+            offsetTime = &offset.pageTime;
+        else
+            offsetTime = &offset.sceneTime;
+
+        if(i == row)
+            timeDifferenceInSecs = offsetTime->secsTo(time);
+
+        *offsetTime = offsetTime->addSecs(timeDifferenceInSecs);
+
+        if(!adjustFollowingRows)
+            break;
+    }
+
+    const QModelIndex start = this->index(row);
+    const QModelIndex end = adjustFollowingRows ? this->index(m_offsets.size()-1) : start;
+    emit dataChanged(start, end);
+
+    this->saveOffsets();
+}
+
+void PrintedTextDocumentOffsets::setTimeInMillisecond(int row, int ms, bool adjustFollowingRows)
+{
+    const QTime time = QTime::fromMSecsSinceStartOfDay(ms);
+    if(!time.isValid())
+        return;
+
+    this->setTime(row, time, adjustFollowingRows);
+}
+
 int PrintedTextDocumentOffsets::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_offsets.size();
@@ -2467,6 +2548,13 @@ bool PrintedTextDocumentOffsets::eventFilter(QObject *watched, QEvent *event)
     case QTextDocumentPagedPrintEvent::EndEvent:
         this->endResetModel();
         emit countChanged();
+        if(!m_fileName.isEmpty())
+        {
+            if( QFile::exists(m_fileName) )
+                this->loadOffsets();
+            else
+                this->saveOffsets();
+        }
         break;
     case QTextDocumentPagedPrintEvent::PageEvent:
         m_currentPageNumber = printEvent->pageNumber();
@@ -2499,6 +2587,122 @@ bool PrintedTextDocumentOffsets::eventFilter(QObject *watched, QEvent *event)
     }
 
     return false;
+}
+
+void PrintedTextDocumentOffsets::setErrorMessage(const QString &val)
+{
+    if(m_errorMessage == val)
+        return;
+
+    m_errorMessage = val;
+    emit errorMessageChanged();
+}
+
+void PrintedTextDocumentOffsets::loadOffsets()
+{
+    this->clearErrorMessage();
+
+    if(m_fileName.isEmpty() || m_screenplay.isNull() || m_offsets.isEmpty())
+        return;
+
+    QFile file(m_fileName);
+    if( !file.open(QFile::ReadOnly) )
+        return;
+
+    const QString errMsg = QStringLiteral("Data stored in offsets-file is out of sync with the current screenplay. Recomputed time offsets will be used instead.");
+
+    const QJsonArray array = QJsonDocument::fromJson(file.readAll()).array();
+    if(array.isEmpty())
+        return;
+
+    if(array.size() != m_offsets.size())
+    {
+        this->setErrorMessage(errMsg);
+        return;
+    }
+
+    QList<_OffsetInfo> offsets = m_offsets;
+
+    for(int i=0; i<array.size(); i++)
+    {
+        const QJsonObject item = array.at(i).toObject();
+        const QString sceneId = item.value("sceneId").toString();
+        const int sceneIndex = item.value("sceneIndex").toInt();
+
+        _OffsetInfo &offset = offsets[i];
+        if(offset.sceneIndex != sceneIndex)
+        {
+            this->setErrorMessage(errMsg);
+            return;
+        }
+
+        const ScreenplayElement *element = m_screenplay->elementAt(offset.sceneIndex);
+        if(element == nullptr)
+        {
+            this->setErrorMessage(errMsg);
+            return;
+        }
+
+        const Scene *scene = element->scene();
+        if(scene == nullptr)
+        {
+            this->setErrorMessage(errMsg);
+            return;
+        }
+
+        /*auto jsonToRect = [](const QJsonObject &json) {
+            return QRectF(json.value("x").toDouble(), json.value("y").toDouble(), json.value("width").toDouble(), json.value("height").toDouble());
+        };*/
+
+        if(scene->id() != sceneId /*||
+           offset.pageNumber != item.value("pageNumber").toInt() ||
+           offset.sceneHeadingRect != jsonToRect(item.value("sceneHeadingRect").toObject()) ||
+           offset.sceneHeadingRect != jsonToRect(item.value("pageRect").toObject())*/)
+        {
+            this->setErrorMessage(errMsg);
+            return;
+        }
+
+        const QJsonObject pageTime = item.value("pageTime").toObject();
+        offset.pageTime = QTime(pageTime.value("hour").toInt(), pageTime.value("minute").toInt(), pageTime.value("second").toInt());
+
+        const QJsonObject sceneTime = item.value("sceneTime").toObject();
+        offset.sceneTime = QTime(sceneTime.value("hour").toInt(), sceneTime.value("minute").toInt(), sceneTime.value("second").toInt());
+    }
+
+    m_offsets = offsets;
+
+    const QModelIndex start = this->index(0);
+    const QModelIndex end = this->index(m_offsets.size()-1);
+    emit dataChanged(start, end);
+}
+
+void PrintedTextDocumentOffsets::saveOffsets()
+{
+    if(m_fileName.isEmpty() || m_screenplay.isNull())
+        return;
+
+    QJsonArray array;
+    for(const _OffsetInfo &offset : m_offsets)
+    {
+        const ScreenplayElement *element = m_screenplay->elementAt(offset.sceneIndex);
+        if(element == nullptr)
+            continue;
+
+        const Scene *scene = element->scene();
+        if(scene == nullptr)
+            continue;
+
+        QJsonObject item = offset.toJsonObject();
+        item.insert("sceneId", scene->id());
+        array.append(item);
+    }
+
+    QFile file(m_fileName);
+    if( !file.open(QFile::WriteOnly) )
+        return;
+
+    file.write( QJsonDocument(array).toJson() );
 }
 
 void PrintedTextDocumentOffsets::_OffsetInfo::computeTimes(const QTime &timePerPage)

@@ -43,6 +43,8 @@ Item {
         onAccepted: {
             mediaPlayer.source = fileUrl
             mediaPlayer.play()
+
+            screenplayPreview.textDocumentOffsets.fileName = screenplayPreview.textDocumentOffsets.fileNameFrom(fileUrl)
         }
     }
 
@@ -81,6 +83,30 @@ Item {
                         source: mediaPlayer
                         anchors.fill: parent
                         fillMode: VideoOutput.PreserveAspectFit
+                    }
+
+                    Text {
+                        width: parent.width * 0.75
+                        wrapMode: Text.WordWrap
+                        font.pointSize: 16
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.centerIn: parent
+                        color: "white"
+                        visible: mediaPlayer.status === MediaPlayer.NoMedia
+                        text: {
+                            if(scriteDocument.screenplay.elementCount > 0)
+                                return "Click here to load movie of \"" + scriteDocument.screenplay.title + "\"."
+                            return "Load a screenplay and then click here to load its movie for syncing."
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            enabled: scriteDocument.screenplay.elementCount > 0 && mediaPlayer.status === MediaPlayer.NoMedia
+                            onClicked: fileDialog.open()
+                            hoverEnabled: true
+                            onEntered: parent.font.underline = true
+                            onExited: parent.font.underline = false
+                        }
                     }
 
                     Rectangle {
@@ -150,6 +176,7 @@ Item {
                                     suggestedHeight: 36
                                     ToolTip.text: "Load a video file for this screenplay."
                                     focusPolicy: Qt.NoFocus
+                                    enabled: scriteDocument.screenplay.elementCount > 0
                                 }
 
                                 ToolButton2 {
@@ -210,7 +237,7 @@ Item {
                         }
                     }
 
-                    EventFilter.active: true
+                    EventFilter.active: scriteDocument.screenplay.elementCount > 0
                     EventFilter.acceptHoverEvents: true
                     EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
                     EventFilter.onFilter: mediaPlayerControls.visible = event.type === 127 || event.type === 129
@@ -438,6 +465,8 @@ Item {
         case Qt.Key_Period:
             // TODO: apply time offset from the media player and update
             // the Offsets model. Have the model class store the offsets into a file.
+            screenplayPreview.textDocumentOffsets.setTimeInMillisecond(screenplaySplitsView.currentIndex, mediaPlayer.position, event.controlModifier)
+            break
         }
     }
 }

@@ -417,6 +417,18 @@ public:
     PrintedTextDocumentOffsets(QObject *parent=nullptr);
     ~PrintedTextDocumentOffsets();
 
+    Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileNameChanged)
+    void setFileName(const QString &val);
+    QString fileName() const { return m_fileName; }
+    Q_SIGNAL void fileNameChanged();
+
+    Q_INVOKABLE QString fileNameFrom(const QString &mediaFileNameOrUrl) const;
+
+    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    void setScreenplay(Screenplay* val);
+    Screenplay* screenplay() const { return m_screenplay; }
+    Q_SIGNAL void screenplayChanged();
+
     enum Type { PageOffsets, SceneOffsets };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
@@ -442,6 +454,18 @@ public:
     Q_INVOKABLE QJsonObject offsetInfoOf(const QVariant &pageOrSceneNumber) const;
     Q_INVOKABLE QJsonObject nearestOffsetInfo(int pageNumber, qreal yOffset) const;
 
+    Q_INVOKABLE void setTime(int row, const QTime &time, bool adjustFollowingRows);
+    Q_INVOKABLE void setTimeInMillisecond(int row, int ms, bool adjustFollowingRows);
+
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    QString errorMessage() const { return m_errorMessage; }
+    Q_SIGNAL void errorMessageChanged();
+
+    Q_PROPERTY(bool hasError READ hasError NOTIFY errorMessageChanged)
+    bool hasError() const { return !m_errorMessage.isEmpty(); }
+
+    Q_INVOKABLE void clearErrorMessage() { this->setErrorMessage(QString()); }
+
     // QAbstractItemModel interface
     enum Role { ModelDataRole=Qt::UserRole, OffsetInfoRole };
     int rowCount(const QModelIndex &parent) const;
@@ -450,6 +474,13 @@ public:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
+
+private:
+    void setErrorMessage(const QString &val);
+
+    void syncOffsets();
+    void loadOffsets();
+    void saveOffsets();
 
 private:
     qreal m_pageScale = 1.0;
@@ -470,11 +501,14 @@ private:
     };
     QList<_OffsetInfo> m_offsets;
 
+    QString m_fileName;
+    bool m_enabled = false;
     int m_currentPageNumber = -1;
+    QString m_errorMessage;
     QRectF m_currentPageRect;
     Type m_type = SceneOffsets;
     QTime m_timePerPage = QTime(0, 1, 0);
-    bool m_enabled = false;
+    QObjectProperty<Screenplay> m_screenplay;
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H
