@@ -34,7 +34,19 @@ Item {
     property alias screenplaySplitsCount: screenplaySplitsView.count
     property alias playbackScreenplaySync: mediaPlayer.keepScreenplayInSyncWithPosition
 
-    Component.onCompleted: scritedToolbar.scritedView = scritedView
+    Component.onCompleted: {
+        scritedToolbar.scritedView = scritedView
+        if(!scritedViewSettings.experimentalFeatureNoticeDisplayed) {
+            app.execLater(scritedView, 250, function() {
+                showInformation({
+                    "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
+                    "callback": function() {
+                        scritedViewSettings.experimentalFeatureNoticeDisplayed = true
+                    }
+                })
+            })
+        }
+    }
     Component.onDestruction: scritedToolbar.scritedView = null
 
     function loadMedia() {
@@ -96,6 +108,7 @@ Item {
         fileName: app.settingsFilePath
         category: "Scrited"
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
+        property bool experimentalFeatureNoticeDisplayed: false
     }
 
     FileDialog {
