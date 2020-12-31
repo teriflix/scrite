@@ -59,5 +59,6 @@
         <file>qml/TabView3.qml</file>
         <file>qml/ScritedView.qml</file>
         <file>qml/ScreenplayPreview.qml</file>
+        <file>qml/ScritedToolbar.qml</file>
     </qresource>
 </RCC>

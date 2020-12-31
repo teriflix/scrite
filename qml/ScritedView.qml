@@ -25,6 +25,70 @@ Item {
     id: scritedView
 
     property int skipDuration: 10*1000
+    property bool mediaIsLoaded: mediaPlayer.status !== MediaPlayer.NoMedia
+    property bool mediaIsPlaying: mediaPlayer.playbackState === MediaPlayer.PlayingState
+    property bool mediaIsPaused: mediaPlayer.playbackState === MediaPlayer.PausedState
+    property alias timeOffsetVisible: screenplaySplitsView.displayTimeOffset
+    property bool nextSceneAvailable: screenplaySplitsView.currentIndex+1 < screenplaySplitsView.count
+    property bool previousSceneAvailable: screenplaySplitsView.currentIndex > 0
+    property alias screenplaySplitsCount: screenplaySplitsView.count
+
+    Component.onCompleted: scritedToolbar.scritedView = scritedView
+    Component.onDestruction: scritedToolbar.scritedView = null
+
+    function loadMedia() {
+        fileDialog.open()
+    }
+
+    function togglePlayback() {
+        mediaPlayer.togglePlayback()
+    }
+
+    function rewind() {
+        mediaPlayer.seek( Math.max(mediaPlayer.position-skipDuration, 0 ) )
+    }
+
+    function forward() {
+        mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
+    }
+
+    function miniRewind() {
+        mediaPlayer.seek( Math.max(mediaPlayer.position-500, 0) )
+    }
+
+    function miniForward() {
+        mediaPlayer.seek( Math.min(mediaPlayer.position+500, mediaPlayer.duration) )
+    }
+
+    function syncVideoTimeWithScreenplayOffsets(adjustFollowingRows) {
+        screenplayPreview.textDocumentOffsets.setTimeInMillisecond(screenplaySplitsView.currentIndex, mediaPlayer.position, adjustFollowingRows === true)
+    }
+
+    function resetScreenplayOffsets() {
+        screenplayPreview.textDocumentOffsets.resetTime()
+    }
+
+    function scrollUp() {
+        var newY = Math.max(screenplayPreview.contentY - screenplayPreview.lineHeight, 0)
+        screenplayScrollAnimation.go(newY, 50)
+    }
+
+    function scrollPreviousScene() {
+        screenplaySplitsView.scrollToRow(Math.max(screenplaySplitsView.currentIndex-1,0))
+    }
+
+    function scrollDown() {
+        var newY = Math.min(screenplayPreview.contentY + screenplayPreview.lineHeight, screenplayPreview.contentHeight-screenplayPreview.height)
+        screenplayScrollAnimation.go(newY, 50)
+    }
+
+    function scrollNextScene() {
+        screenplaySplitsView.scrollToRow(Math.min(screenplaySplitsView.currentIndex+1,screenplaySplitsView.count-1))
+    }
+
+    function toggleTimeOffsetDisplay() {
+        screenplaySplitsView.displayTimeOffset = !screenplaySplitsView.displayTimeOffset
+    }
 
     Settings {
         id: scritedViewSettings
@@ -61,12 +125,12 @@ Item {
                 orientation: Qt.Vertical
 
                 Rectangle {
-                    SplitView.preferredHeight: scritedView.height * 0.4
+                    SplitView.preferredHeight: width / 16 * 9
                     color: "black"
 
                     MediaPlayer {
                         id: mediaPlayer
-                        notifyInterval: 250
+                        notifyInterval: 1000
                         function togglePlayback() {
                             if(status == MediaPlayer.NoMedia)
                                 return
@@ -75,6 +139,37 @@ Item {
                                 pause()
                             else
                                 play()
+                        }
+
+                        property bool keepScreenplayInSyncWithPosition: false
+
+                        onPositionChanged: {
+                            if(keepScreenplayInSyncWithPosition === false)
+                                return
+
+                            if(screenplayPreview.textDocumentOffsets.count === 0 || playbackState !== MediaPlayer.PlayingState)
+                                return
+
+                            var from = screenplayPreview.textDocumentOffsets.offsetInfoAt(screenplaySplitsView.currentIndex)
+                            if(from.row < 0)
+                                return
+
+                            if(from.sceneTime.position >= mediaPlayer.position)
+                                return
+
+                            var to = screenplayPreview.textDocumentOffsets.offsetInfoAt(from.row+1)
+
+                            var fromY = (from.pageNumber-1)*screenplayPreview.pageHeight + (from.sceneHeadingRect.y+1) * screenplayPreview.zoomScale
+                            var toY = to.row < 0 ? screenplayPreview.contentHeight : (to.pageNumber-1)*screenplayPreview.pageHeight + to.sceneHeadingRect.y * screenplayPreview.zoomScale
+                            if(toY < fromY || toY < screenplayPreview.contentY)
+                                return
+
+                            var fromTime = from.sceneTime.position
+                            var toTime = to.row < 0 ? mediaPlayer.duration : to.sceneTime.position
+
+                            var timeRatio = (mediaPlayer.position - fromTime) / (toTime - fromTime)
+                            var y = (toY - fromY)*timeRatio + fromY
+                            screenplayScrollAnimation.go(y, notifyInterval-50)
                         }
                     }
 
@@ -93,6 +188,7 @@ Item {
                         anchors.centerIn: parent
                         color: "white"
                         visible: mediaPlayer.status === MediaPlayer.NoMedia
+                        padding: 20
                         text: {
                             if(scriteDocument.screenplay.elementCount > 0)
                                 return "Click here to load movie of \"" + scriteDocument.screenplay.title + "\"."
@@ -171,7 +267,7 @@ Item {
                                 width: parent.width
 
                                 ToolButton2 {
-                                    icon.source: "../icons/file/folder_open_inverted.png"
+                                    icon.source: "../icons/mediaplayer/movie_inverted.png"
                                     onClicked: fileDialog.open()
                                     suggestedHeight: 36
                                     ToolTip.text: "Load a video file for this screenplay."
@@ -247,8 +343,26 @@ Item {
                     id: screenplayPreview
                     SplitView.fillHeight: true
                     fitPageToWidth: true
-                    purpose: ScreenplayTextDocument.ForDisplay
-                    onCurrentOffsetChanged: screenplaySplitsView.currentIndex = row
+                    purpose: ScreenplayTextDocument.ForPrinting
+                    onCurrentOffsetChanged: {
+                        screenplayScrollAnimation.stop()
+                        screenplaySplitsView.currentIndex = row
+                    }
+
+                    NumberAnimation {
+                        id: screenplayScrollAnimation
+                        target: screenplayPreview
+                        property: "contentY"
+                        running: false
+
+                        function go(newContentY, inDurartion) {
+                            stop()
+                            from = screenplayPreview.contentY
+                            to = newContentY
+                            duration = inDurartion
+                            start()
+                        }
+                    }
                 }
             }
         }
@@ -276,7 +390,7 @@ Item {
 
                 Text {
                     padding: 5
-                    width: parent.width * 0.6
+                    width: parent.width * (screenplaySplitsView.displayTimeOffset ? 0.6 : 0.8)
                     font.bold: true
                     text: "Scene Heading"
                     font.family: "Courier Prime"
@@ -307,6 +421,7 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     anchors.verticalCenter: parent.verticalCenter
                     clip: true
+                    visible: screenplaySplitsView.displayTimeOffset
                 }
             }
 
@@ -326,6 +441,7 @@ Item {
                 anchors.bottom: parent.bottom
                 model: screenplayPreview.textDocumentOffsets
                 clip: true
+                property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
                 ScrollBar.vertical: ScrollBar {
                     policy: screenplaySplitsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -367,7 +483,7 @@ Item {
 
                         Text {
                             padding: 5
-                            width: parent.width * 0.6
+                            width: parent.width * (screenplaySplitsView.displayTimeOffset ? 0.6 : 0.8)
                             text: offsetInfo.sceneHeading
                             font.family: "Courier Prime"
                             font.pointSize: 14
@@ -393,12 +509,14 @@ Item {
                             font.pointSize: 14
                             horizontalAlignment: Text.AlignRight
                             anchors.verticalCenter: parent.verticalCenter
+                            visible: screenplaySplitsView.displayTimeOffset
                         }
                     }
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
+                            screenplayScrollAnimation.stop()
                             screenplaySplitsView.currentIndex = index
                             scriteDocument.screenplay.currentElementIndex = offsetInfo.sceneIndex
                             if(mediaPlayer.status !== MediaPlayer.NoMedia)
@@ -421,6 +539,7 @@ Item {
                     if(currentIndex === row)
                         return
                     var offsetInfo = screenplayPreview.textDocumentOffsets.offsetInfoAt(row)
+                    screenplayScrollAnimation.stop()
                     currentIndex = offsetInfo.row
                     scriteDocument.screenplay.currentElementIndex = offsetInfo.sceneIndex
                     if(seekMedia !== false && mediaPlayer.status !== MediaPlayer.NoMedia)
@@ -433,39 +552,55 @@ Item {
     EventFilter.target: qmlWindow
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {
+        var newY = 0
         switch(event.key) {
         case Qt.Key_Space:
             mediaPlayer.togglePlayback()
             break
         case Qt.Key_Up:
             if(event.controlModifier)
-                screenplaySplitsView.scrollToRow(Math.max(screenplaySplitsView.currentIndex-1,0))
-            else
-                screenplayPreview.contentY = Math.max(screenplayPreview.contentY - (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), 0)
+                scrollPreviousScene()
+            else {
+                newY = Math.max(screenplayPreview.contentY - (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), 0)
+                if(event.altModifier)
+                    screenplayPreview.contentY = newY
+                else
+                    screenplayScrollAnimation.go(newY, 50)
+            }
             break
         case Qt.Key_Down:
             if(event.controlModifier)
-                screenplaySplitsView.scrollToRow(Math.min(screenplaySplitsView.currentIndex+1,screenplaySplitsView.count-1))
-            else
-                screenplayPreview.contentY = Math.min(screenplayPreview.contentY + (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), screenplayPreview.contentHeight-screenplayPreview.height)
+                scrollNextScene()
+            else {
+                newY = Math.min(screenplayPreview.contentY + (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), screenplayPreview.contentHeight-screenplayPreview.height)
+                if(event.altModifier)
+                    screenplayPreview.contentY = newY
+                else
+                    screenplayScrollAnimation.go(newY, 50)
+            }
             break
         case Qt.Key_Left:
             if(event.controlModifier)
-                mediaPlayer.seek( Math.max(mediaPlayer.position-skipDuration, 0 ) )
+                rewind()
             else
-                mediaPlayer.seek( Math.max(mediaPlayer.position-500, 0) )
+                miniRewind()
             break
         case Qt.Key_Right:
             if(event.controlModifier)
-                mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
+                forward()
             else
-                mediaPlayer.seek( Math.min(mediaPlayer.position+500, mediaPlayer.duration) )
+                miniForward()
+            break
+        case Qt.Key_T:
+            toggleTimeOffsetDisplay()
+            break
+        case Qt.Key_Plus:
+        case Qt.Key_Equal:
+            mediaPlayer.keepScreenplayInSyncWithPosition = !mediaPlayer.keepScreenplayInSyncWithPosition
             break
         case Qt.Key_Greater:
         case Qt.Key_Period:
-            // TODO: apply time offset from the media player and update
-            // the Offsets model. Have the model class store the offsets into a file.
-            screenplayPreview.textDocumentOffsets.setTimeInMillisecond(screenplaySplitsView.currentIndex, mediaPlayer.position, event.controlModifier)
+            syncVideoTimeWithScreenplayOffsets(event.controlModifier)
             break
         }
     }

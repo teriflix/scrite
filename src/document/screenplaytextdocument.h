@@ -454,8 +454,12 @@ public:
     Q_INVOKABLE QJsonObject offsetInfoOf(const QVariant &pageOrSceneNumber) const;
     Q_INVOKABLE QJsonObject nearestOffsetInfo(int pageNumber, qreal yOffset) const;
 
+    Q_INVOKABLE QJsonObject offsetInfoAtTime(const QTime &time, int from=0) const;
+    Q_INVOKABLE QJsonObject offsetInfoAtTimeInMillisecond(int ms, int from=0) const;
+
     Q_INVOKABLE void setTime(int row, const QTime &time, bool adjustFollowingRows);
     Q_INVOKABLE void setTimeInMillisecond(int row, int ms, bool adjustFollowingRows);
+    Q_INVOKABLE void resetTime();
 
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
     QString errorMessage() const { return m_errorMessage; }

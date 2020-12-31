@@ -161,5 +161,17 @@
         <file>icons/mediaplayer/play_arrow_inverted.png</file>
         <file>icons/mediaplayer/rewind_10.png</file>
         <file>icons/mediaplayer/rewind_10_inverted.png</file>
+        <file>icons/mediaplayer/movie.png</file>
+        <file>icons/mediaplayer/movie_inverted.png</file>
+        <file>icons/mediaplayer/fast_rewind.png</file>
+        <file>icons/mediaplayer/fast_rewind_inverted.png</file>
+        <file>icons/mediaplayer/fast_forward.png</file>
+        <file>icons/mediaplayer/fast_forward_inverted.png</file>
+        <file>icons/mediaplayer/sync_with_screenplay.png</file>
+        <file>icons/mediaplayer/sync_with_screenplay_inverted.png</file>
+        <file>icons/mediaplayer/time_column.png</file>
+        <file>icons/mediaplayer/time_column_inverted.png</file>
+        <file>icons/mediaplayer/reset_screenplay_offsets_inverted.png</file>
+        <file>icons/mediaplayer/reset_screenplay_offsets.png</file>
     </qresource>
 </RCC>

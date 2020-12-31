@@ -2399,12 +2399,15 @@ void PrintedTextDocumentOffsets::setTimePerPage(const QTime &val)
 
     m_timePerPage = val;
     emit timePerPageChanged();
+
+    if(!m_offsets.isEmpty())
+        this->resetTime();
 }
 
 QJsonObject PrintedTextDocumentOffsets::offsetInfoAt(int index) const
 {
     if(index < 0 || index >= m_offsets.size())
-        return QJsonObject();
+        return _OffsetInfo().toJsonObject();
 
     return m_offsets.at(index).toJsonObject();
 }
@@ -2420,13 +2423,13 @@ QJsonObject PrintedTextDocumentOffsets::offsetInfoOf(const QVariant &pageOrScene
             return offset.toJsonObject();
     }
 
-    return QJsonObject();
+    return _OffsetInfo().toJsonObject();
 }
 
 QJsonObject PrintedTextDocumentOffsets::nearestOffsetInfo(int pageNumber, qreal yOffset) const
 {
     if(m_offsets.isEmpty())
-        return QJsonObject();
+        return _OffsetInfo().toJsonObject();
 
     if(m_type == PageOffsets)
     {
@@ -2451,6 +2454,37 @@ QJsonObject PrintedTextDocumentOffsets::nearestOffsetInfo(int pageNumber, qreal 
     }
 
     return m_offsets.last().toJsonObject();
+}
+
+QJsonObject PrintedTextDocumentOffsets::offsetInfoAtTime(const QTime &time, int from) const
+{
+    if(m_offsets.isEmpty())
+        return _OffsetInfo().toJsonObject();
+
+    from = qBound(0, from, m_offsets.size()-1);
+
+    for(int i=0; i<m_offsets.size(); i++)
+    {
+        _OffsetInfo offset = m_offsets.at(i);
+
+        const QTime offsetTime = m_type == PageOffsets ? offset.pageTime : offset.sceneTime;
+        if(offsetTime.secsTo(time) > 0)
+            continue;
+
+        offset = m_offsets.at( qMax(0,i-1) );
+        return offset.toJsonObject();
+    }
+
+    return m_offsets.last().toJsonObject();
+}
+
+QJsonObject PrintedTextDocumentOffsets::offsetInfoAtTimeInMillisecond(int ms, int from) const
+{
+    const QTime time = QTime::fromMSecsSinceStartOfDay(ms);
+    if(!time.isValid())
+        return _OffsetInfo().toJsonObject();
+
+    return this->offsetInfoAtTime(time, from);
 }
 
 void PrintedTextDocumentOffsets::setTime(int row, const QTime &time, bool adjustFollowingRows)
@@ -2492,6 +2526,19 @@ void PrintedTextDocumentOffsets::setTimeInMillisecond(int row, int ms, bool adju
         return;
 
     this->setTime(row, time, adjustFollowingRows);
+}
+
+void PrintedTextDocumentOffsets::resetTime()
+{
+    if(m_offsets.isEmpty())
+        return;
+
+    for(_OffsetInfo &offset : m_offsets)
+        offset.computeTimes(m_timePerPage);
+
+    const QModelIndex start = this->index(0);
+    const QModelIndex end =this->index(m_offsets.size()-1);
+    emit dataChanged(start, end);
 }
 
 int PrintedTextDocumentOffsets::rowCount(const QModelIndex &parent) const

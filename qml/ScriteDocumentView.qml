@@ -1215,6 +1215,15 @@ Item {
             }
         }
 
+        ScritedToolbar {
+            id: scritedToolbar
+            anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
+            anchors.right: editTools.visible ? editTools.left : parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: 10
+            visible: scritedView !== null
+        }
+
         Row {
             id: editTools
             x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2 + (globalTimeDisplay.visible ? globalTimeDisplay.contentWidth/2 : 0))

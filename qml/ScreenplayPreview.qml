@@ -29,7 +29,9 @@ Rectangle {
     property real contentWidth: pageView.contentWidth
     property real contentHeight: pageView.contentHeight
     property real pageHeight: pageView.cellHeight
-    property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.scale
+    property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.value
+    property real zoomScale: previewZoomSlider.value
+
     property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
         timePerPage: screenplayTextDocument.timePerPage
         screenplay: previewItem.screenplay
@@ -109,7 +111,7 @@ Rectangle {
             if(info) {
                 lockUpdateCurrentScene = true
                 pageView.currentIndex = info.pageNumber-1
-                pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + info.sceneHeadingRect.y*previewZoomSlider.value
+                pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + (info.sceneHeadingRect.y+1)*previewZoomSlider.value
                 lockUpdateCurrentScene = false
             }
         }
@@ -134,6 +136,8 @@ Rectangle {
                 Qt.callLater(updateCurrentScene)
         }
 
+        property bool containsMouse: false
+
         ScrollBar.horizontal: ScrollBar {
             policy: pageLayout.width > pageView.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
@@ -141,7 +145,7 @@ Rectangle {
                 mid: Qt.rgba(0,0,0,0.25)
                 dark: Qt.rgba(0,0,0,0.75)
             }
-            opacity: active ? 1 : 0.2
+            opacity: pageView.containsMouse ? (active ? 1 : 0.2) : 0
             Behavior on opacity {
                 enabled: screenplayEditorSettings.enableAnimations
                 NumberAnimation { duration: 250 }
@@ -155,7 +159,7 @@ Rectangle {
                 mid: Qt.rgba(0,0,0,0.25)
                 dark: Qt.rgba(0,0,0,0.75)
             }
-            opacity: active ? 1 : 0.2
+            opacity: pageView.containsMouse ? (active ? 1 : 0.2) : 0
             Behavior on opacity {
                 enabled: screenplayEditorSettings.enableAnimations
                 NumberAnimation { duration: 250 }
@@ -223,6 +227,10 @@ Rectangle {
                 }
             }
         }
+
+        EventFilter.acceptHoverEvents: true
+        EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
+        EventFilter.onFilter: pageView.containsMouse = event.type === 127 || event.type === 129
     }
 
     Rectangle {
@@ -247,7 +255,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             from: 0.5
-            to: (pageView.width*0.9 / screenplayImagePrinter.pageWidth)
+            to: ((pageView.width-44) / screenplayImagePrinter.pageWidth)
             value: fitPageToWidth ? to : 1
         }
     }
