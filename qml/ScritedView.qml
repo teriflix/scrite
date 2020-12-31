@@ -32,6 +32,7 @@ Item {
     property bool nextSceneAvailable: screenplaySplitsView.currentIndex+1 < screenplaySplitsView.count
     property bool previousSceneAvailable: screenplaySplitsView.currentIndex > 0
     property alias screenplaySplitsCount: screenplaySplitsView.count
+    property alias playbackScreenplaySync: mediaPlayer.keepScreenplayInSyncWithPosition
 
     Component.onCompleted: scritedToolbar.scritedView = scritedView
     Component.onDestruction: scritedToolbar.scritedView = null
@@ -100,7 +101,7 @@ Item {
     FileDialog {
         id: fileDialog
         folder: scritedViewSettings.lastOpenScritedFolderUrl
-        onFolderChanged: scritedViewSettings.lastOpenScritedFolderUrl = folder
+        onFolderChanged: Qt.callLater( function() { scritedViewSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
         selectFolder: false
         selectMultiple: false
         selectExisting: true
@@ -146,37 +147,6 @@ Item {
                             if(playbackState !== MediaPlayer.PlayingState)
                                 screenplayScrollAnimation.stop()
                         }
-
-                        onPositionChanged: {
-                            if(keepScreenplayInSyncWithPosition === false)
-                                return
-
-                            if(screenplayPreview.textDocumentOffsets.count === 0 || playbackState !== MediaPlayer.PlayingState)
-                                return
-
-                            var from = screenplayPreview.textDocumentOffsets.offsetInfoAt(screenplaySplitsView.currentIndex)
-                            if(from.row < 0)
-                                return
-
-                            if(from.sceneTime.position >= mediaPlayer.position)
-                                return
-
-                            var to = screenplayPreview.textDocumentOffsets.offsetInfoAt(from.row+1)
-
-                            if(from.sceneIndex === screenplayScrollAnimation.fromSceneIndex && to.sceneIndex === screenplayScrollAnimation.toSceneIndex)
-                                return
-
-                            screenplayScrollAnimation.stop()
-                            screenplayScrollAnimation.fromPage = from.pageNumber
-                            screenplayScrollAnimation.fromY = from.sceneHeadingRect.y
-                            screenplayScrollAnimation.toPage = to.pageNumber
-                            screenplayScrollAnimation.toY = to.sceneHeadingRect.y
-                            screenplayScrollAnimation.fromSceneIndex = from.sceneIndex
-                            screenplayScrollAnimation.toSceneIndex = to.sceneIndex
-                            screenplayScrollAnimation.duration = to.sceneTime.position - from.sceneTime.position
-                            screenplayScrollAnimation.setupNow()
-                            screenplayScrollAnimation.start()
-                        }
                     }
 
                     PageScrollAnimation {
@@ -189,15 +159,16 @@ Item {
                         pageSpacing: screenplayPreview.pageSpacing
                         pageScale: screenplayPreview.zoomScale
                         pageSkipDuration: 250
-                        property int fromSceneIndex: -1
-                        property int toSceneIndex: -1
-                        onStateChanged: {
-                            if(state === PageScrollAnimation.Stopped) {
-                                fromSceneIndex = -1
-                                toSceneIndex = -1
-                            }
-                        }
-                        onSetupRequired: stop()
+
+                        property var fromOffsetInfo: screenplayPreview.textDocumentOffsets.offsetInfoAt(screenplaySplitsView.currentIndex)
+                        property var toOffsetInfo: screenplayPreview.textDocumentOffsets.offsetInfoAt(screenplaySplitsView.currentIndex+1)
+
+                        enabled: mediaPlayer.playbackState === MediaPlayer.PlayingState && mediaPlayer.keepScreenplayInSyncWithPosition
+                        fromPage: fromOffsetInfo.pageNumber
+                        toPage: toOffsetInfo.pageNumber
+                        fromY: fromOffsetInfo.sceneHeadingRect.y
+                        toY: toOffsetInfo.sceneHeadingRect.y
+                        duration: toOffsetInfo.row > fromOffsetInfo.row ? toOffsetInfo.sceneTime.position - fromOffsetInfo.sceneTime.position : 0
                     }
 
                     VideoOutput {
@@ -381,7 +352,7 @@ Item {
 
         Rectangle {
             SplitView.fillWidth: true
-            color: primaryColors.c100.background
+            color: "white"
 
             Row {
                 id: screenplaySplitsHeading
@@ -561,6 +532,7 @@ Item {
         }
     }
 
+    EventFilter.active: !modalDialog.active && !notificationsView.visible
     EventFilter.target: qmlWindow
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {

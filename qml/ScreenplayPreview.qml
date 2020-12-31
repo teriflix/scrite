@@ -31,7 +31,7 @@ Rectangle {
     property real pageHeight: pageView.cellHeight
     property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.value
     property real zoomScale: previewZoomSlider.value
-    readonly property real pageSpacing: 40
+    readonly property real pageSpacing: fitPageToWidth ? 1 : 40
 
     property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
         timePerPage: screenplayTextDocument.timePerPage
@@ -94,7 +94,7 @@ Rectangle {
     Flickable {
         id: pageView
         anchors.fill: parent
-        anchors.bottomMargin: statusBar.height
+        anchors.bottomMargin: statusBar.visible ? statusBar.height : 0
         contentWidth: pageViewContent.width
         contentHeight: pageViewContent.height
         clip: true
@@ -112,7 +112,7 @@ Rectangle {
             if(info) {
                 lockUpdateCurrentScene = true
                 pageView.currentIndex = info.pageNumber-1
-                pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + (info.sceneHeadingRect.y+1)*previewZoomSlider.value
+                pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + (info.sceneHeadingRect.y)*previewZoomSlider.value
                 lockUpdateCurrentScene = false
             }
         }
@@ -203,6 +203,7 @@ Rectangle {
                         BoxShadow {
                             anchors.fill: pageImage
                             opacity: pageView.currentIndex === index ? 1 : 0.15
+                            visible: !fitPageToWidth
                         }
 
                         Rectangle {
@@ -235,6 +236,7 @@ Rectangle {
     }
 
     Rectangle {
+        id: statusBar
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -256,7 +258,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             from: 0.5
-            to: ((pageView.width-44) / screenplayImagePrinter.pageWidth)
+            to: pageView.width / screenplayImagePrinter.pageWidth
             value: fitPageToWidth ? to : 1
         }
     }

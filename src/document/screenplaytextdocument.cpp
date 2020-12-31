@@ -2918,7 +2918,7 @@ void PageScrollAnimation::setDuration(int val)
     if(m_duration == val)
         return;
 
-    m_duration = val;
+    m_duration = qMax(val,0);
     emit durationChanged();
 
     this->setupAnimationLater();
@@ -2929,7 +2929,7 @@ void PageScrollAnimation::setPageSkipDuration(int val)
     if(m_pageSkipDuration == val)
         return;
 
-    m_pageSkipDuration = val;
+    m_pageSkipDuration = qMax(val,0);
     emit pageSkipDurationChanged();
 
     this->setupAnimationLater();
@@ -2957,6 +2957,20 @@ void PageScrollAnimation::setPropertyName(const QByteArray &val)
     this->setupAnimationLater();
 }
 
+void PageScrollAnimation::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    if(val)
+        this->start();
+    else
+        this->stop();
+
+    emit enabledChanged();
+}
+
 void PageScrollAnimation::setupNow()
 {
     m_setupTimer.stop();
@@ -2975,14 +2989,12 @@ struct AnimationStep
 {
     qreal from = 0;
     qreal to = 0;
-    enum { Content, PageBreak } type = Content;
+    qreal pixelLength = 0;
 };
 
 void PageScrollAnimation::setupAnimation()
 {
-    const bool running = this->state() == QAbstractAnimation::Running;
-
-    if(running)
+    if(m_enabled)
         this->stop();
 
     this->clear();
@@ -2993,64 +3005,60 @@ void PageScrollAnimation::setupAnimation()
     if(m_fromPage > m_toPage || m_fromPage < 0 || m_toPage < 0)
         return;
 
-    if(m_pageRect.isEmpty() || m_contentRect.isEmpty())
+    if(m_pageRect.isEmpty() || m_contentRect.isEmpty() || m_viewportRect.isEmpty())
         return;
 
     if(m_fromY < m_contentRect.top() || m_fromY > m_contentRect.bottom() ||
-       m_toY < m_contentRect.top() || m_toY > m_contentRect.bottom() )
+       m_toY < m_contentRect.top() || m_toY > m_contentRect.bottom() ||
+       m_duration == 0)
         return;
 
     // First lets break the scrolling into animation steps
     qreal nrContentPixels = 0;
     int nrBreaks = 0;
     QList<AnimationStep> steps;
+
+    const qreal bottomMarginPx = (m_pageRect.bottom()-m_contentRect.bottom())*m_pageScale;
+    const qreal topMarginPx = m_contentRect.top()*m_pageScale;
+
     for(int i=m_fromPage; i<=m_toPage; i++)
     {
         const qreal pageStartY = (i-1)*(m_pageRect.height()*m_pageScale + m_pageSpacing);
 
         AnimationStep contentStep;
-        contentStep.from = pageStartY + (i==m_fromPage ? m_fromY : m_contentRect.top()) * m_pageScale;
+        contentStep.from = steps.isEmpty() ? (pageStartY + m_fromY*m_pageScale) : steps.last().to;
         contentStep.to = pageStartY + (i==m_toPage ? m_toY : m_contentRect.bottom()) * m_pageScale;
-        contentStep.type = AnimationStep::Content;
-        nrContentPixels += contentStep.to - contentStep.from;
+        contentStep.pixelLength = contentStep.to - contentStep.from;
+        nrContentPixels += contentStep.pixelLength;
         steps.append(contentStep);
 
         if(i == m_toPage)
             break;
 
-        nrContentPixels += m_viewportRect.height() - (m_pageRect.bottom()-m_contentRect.bottom())*m_pageScale;
-
-        AnimationStep breakStep;
-        breakStep.from = pageStartY + m_contentRect.bottom()*m_pageScale;
-        breakStep.to = pageStartY + (m_pageRect.height() + m_contentRect.top())*m_pageScale + m_pageSpacing;
-        breakStep.type = AnimationStep::PageBreak;
-        steps.append(breakStep);
+        steps.last().to += bottomMarginPx + m_pageSpacing + topMarginPx;
         ++nrBreaks;
     }
 
-    const int availableDuration = qMax(m_duration - nrBreaks*m_pageSkipDuration, 0);
-    const qreal durationPerPixel = qreal(availableDuration) / nrContentPixels;
+    const qreal durationPerPixel = qreal(m_duration) / nrContentPixels;
 
     int totalDuration = 0;
-    for(const AnimationStep &step : steps)
+    for(int i=0; i<steps.size(); i++)
     {
+        const AnimationStep step = steps.at(i);
+
         QPropertyAnimation *animation = new QPropertyAnimation(m_target, m_propertyName, this);
         animation->setStartValue(step.from);
         animation->setEndValue(step.to);
-        if(step.type == AnimationStep::Content)
-            animation->setDuration( qRound(durationPerPixel*(step.to-step.from)) );
-        else
-            animation->setDuration( m_pageSkipDuration );
+        animation->setDuration( qRound(durationPerPixel*step.pixelLength) );
         totalDuration += animation->duration();
         this->addAnimation(animation);
     }
 
-    if(running)
+    if(m_enabled)
         this->start();
 }
 
 void PageScrollAnimation::setupAnimationLater()
 {
     m_setupTimer.start(0, this);
-    emit setupRequired();
 }

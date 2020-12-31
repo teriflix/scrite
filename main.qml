@@ -451,6 +451,7 @@ Rectangle {
     }
 
     UI.NotificationsView {
+        id: notificationsView
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: -1

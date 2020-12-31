@@ -26,7 +26,7 @@ Item {
         active: scritedView !== null
         anchors.centerIn: parent
         sourceComponent: Row {
-            spacing: 5
+            spacing: 1
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/movie.png"
@@ -70,12 +70,6 @@ Item {
                 onClicked: scritedView.forward()
             }
 
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.borderColor
-            }
-
             ToolButton3 {
                 iconSource: "../icons/action/keyboard_arrow_up.png"
                 ToolTip.text: "Previous Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + Up Arrow)"
@@ -90,16 +84,10 @@ Item {
                 onClicked: scritedView.scrollNextScene()
             }
 
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.borderColor
-            }
-
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/sync_with_screenplay.png"
                 ToolTip.text: "Use video time as current scene time offset.\t(> or .)"
-                enabled: scritedView.screenplaySplitsCount > 0
+                enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
                 onClicked: scritedView.syncVideoTimeWithScreenplayOffsets()
             }
 
@@ -110,18 +98,24 @@ Item {
                 onClicked: scritedView.resetScreenplayOffsets()
             }
 
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.borderColor
-            }
-
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/time_column.png"
                 ToolTip.text: "Toggle time column."
                 enabled: scritedView.screenplaySplitsCount > 0
                 down: scritedView.timeOffsetVisible
                 onClicked: scritedView.toggleTimeOffsetDisplay()
+            }
+
+            CheckBox2 {
+                anchors.verticalCenter: parent.verticalCenter
+                checked: scritedView.playbackScreenplaySync
+                onToggled: scritedView.playbackScreenplaySync = checked
+                hoverEnabled: true
+                ToolTip.text: "Check this to keep media playback and screenplay in sync."
+                ToolTip.visible: hovered
+                text: "Auto Scroll"
+                enabled: scritedView.mediaIsLoaded
+                focusPolicy: Qt.NoFocus
             }
         }
     }

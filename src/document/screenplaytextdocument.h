@@ -589,10 +589,12 @@ public:
     QByteArray propertyName() const { return m_propertyName; }
     Q_SIGNAL void propertyNameChanged();
 
-    Q_INVOKABLE void setupNow();
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
 
-signals:
-    void setupRequired();
+    Q_INVOKABLE void setupNow();
 
 protected:
     void timerEvent(QTimerEvent *te);
@@ -608,7 +610,7 @@ private:
     qreal m_fromY = 0;
     int m_duration = 1000;
     int m_fromPage = 0;
-    bool m_running = false;
+    bool m_enabled = false;
     qreal m_pageScale = 1;
     QRectF m_pageRect;
     QRectF m_contentRect;
