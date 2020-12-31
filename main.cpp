@@ -230,6 +230,7 @@ int main(int argc, char **argv)
     qmlRegisterType<ScreenplayElementPageBreaks>("Scrite", 1, 0, "ScreenplayElementPageBreaks");
     qmlRegisterType<ImagePrinter>("Scrite", 1, 0, "ImagePrinter");
     qmlRegisterType<PrintedTextDocumentOffsets>("Scrite", 1, 0, "PrintedTextDocumentOffsets");
+    qmlRegisterType<PageScrollAnimation>("Scrite", 1, 0, "PageScrollAnimation");
 
     qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
 

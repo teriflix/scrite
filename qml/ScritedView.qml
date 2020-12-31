@@ -70,7 +70,7 @@ Item {
 
     function scrollUp() {
         var newY = Math.max(screenplayPreview.contentY - screenplayPreview.lineHeight, 0)
-        screenplayScrollAnimation.go(newY, 50)
+        screenplayPreview.contentY = newY
     }
 
     function scrollPreviousScene() {
@@ -79,7 +79,7 @@ Item {
 
     function scrollDown() {
         var newY = Math.min(screenplayPreview.contentY + screenplayPreview.lineHeight, screenplayPreview.contentHeight-screenplayPreview.height)
-        screenplayScrollAnimation.go(newY, 50)
+        screenplayPreview.contentY = newY
     }
 
     function scrollNextScene() {
@@ -142,6 +142,10 @@ Item {
                         }
 
                         property bool keepScreenplayInSyncWithPosition: false
+                        onPlaybackStateChanged: {
+                            if(playbackState !== MediaPlayer.PlayingState)
+                                screenplayScrollAnimation.stop()
+                        }
 
                         onPositionChanged: {
                             if(keepScreenplayInSyncWithPosition === false)
@@ -159,18 +163,41 @@ Item {
 
                             var to = screenplayPreview.textDocumentOffsets.offsetInfoAt(from.row+1)
 
-                            var fromY = (from.pageNumber-1)*screenplayPreview.pageHeight + (from.sceneHeadingRect.y+1) * screenplayPreview.zoomScale
-                            var toY = to.row < 0 ? screenplayPreview.contentHeight : (to.pageNumber-1)*screenplayPreview.pageHeight + to.sceneHeadingRect.y * screenplayPreview.zoomScale
-                            if(toY < fromY || toY < screenplayPreview.contentY)
+                            if(from.sceneIndex === screenplayScrollAnimation.fromSceneIndex && to.sceneIndex === screenplayScrollAnimation.toSceneIndex)
                                 return
 
-                            var fromTime = from.sceneTime.position
-                            var toTime = to.row < 0 ? mediaPlayer.duration : to.sceneTime.position
-
-                            var timeRatio = (mediaPlayer.position - fromTime) / (toTime - fromTime)
-                            var y = (toY - fromY)*timeRatio + fromY
-                            screenplayScrollAnimation.go(y, notifyInterval-50)
+                            screenplayScrollAnimation.stop()
+                            screenplayScrollAnimation.fromPage = from.pageNumber
+                            screenplayScrollAnimation.fromY = from.sceneHeadingRect.y
+                            screenplayScrollAnimation.toPage = to.pageNumber
+                            screenplayScrollAnimation.toY = to.sceneHeadingRect.y
+                            screenplayScrollAnimation.fromSceneIndex = from.sceneIndex
+                            screenplayScrollAnimation.toSceneIndex = to.sceneIndex
+                            screenplayScrollAnimation.duration = to.sceneTime.position - from.sceneTime.position
+                            screenplayScrollAnimation.setupNow()
+                            screenplayScrollAnimation.start()
                         }
+                    }
+
+                    PageScrollAnimation {
+                        id: screenplayScrollAnimation
+                        target: screenplayPreview
+                        propertyName: "contentY"
+                        pageRect: screenplayPreview.screenplayFormat.pageLayout.paperRect
+                        contentRect: screenplayPreview.screenplayFormat.pageLayout.contentRect
+                        viewportRect: Qt.rect(0, 0, screenplayPreview.width, screenplayPreview.height)
+                        pageSpacing: screenplayPreview.pageSpacing
+                        pageScale: screenplayPreview.zoomScale
+                        pageSkipDuration: 250
+                        property int fromSceneIndex: -1
+                        property int toSceneIndex: -1
+                        onStateChanged: {
+                            if(state === PageScrollAnimation.Stopped) {
+                                fromSceneIndex = -1
+                                toSceneIndex = -1
+                            }
+                        }
+                        onSetupRequired: stop()
                     }
 
                     VideoOutput {
@@ -346,22 +373,7 @@ Item {
                     purpose: ScreenplayTextDocument.ForPrinting
                     onCurrentOffsetChanged: {
                         screenplayScrollAnimation.stop()
-                        screenplaySplitsView.currentIndex = row
-                    }
-
-                    NumberAnimation {
-                        id: screenplayScrollAnimation
-                        target: screenplayPreview
-                        property: "contentY"
-                        running: false
-
-                        function go(newContentY, inDurartion) {
-                            stop()
-                            from = screenplayPreview.contentY
-                            to = newContentY
-                            duration = inDurartion
-                            start()
-                        }
+                        screenplaySplitsView.currentIndex =  row
                     }
                 }
             }
@@ -562,10 +574,7 @@ Item {
                 scrollPreviousScene()
             else {
                 newY = Math.max(screenplayPreview.contentY - (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), 0)
-                if(event.altModifier)
-                    screenplayPreview.contentY = newY
-                else
-                    screenplayScrollAnimation.go(newY, 50)
+                screenplayPreview.contentY = newY
             }
             break
         case Qt.Key_Down:
@@ -573,10 +582,7 @@ Item {
                 scrollNextScene()
             else {
                 newY = Math.min(screenplayPreview.contentY + (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), screenplayPreview.contentHeight-screenplayPreview.height)
-                if(event.altModifier)
-                    screenplayPreview.contentY = newY
-                else
-                    screenplayScrollAnimation.go(newY, 50)
+                screenplayPreview.contentY = newY
             }
             break
         case Qt.Key_Left:

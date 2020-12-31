@@ -20,6 +20,7 @@
 #include <QQmlParserStatus>
 #include <QPagedPaintDevice>
 #include <QQuickTextDocument>
+#include <QSequentialAnimationGroup>
 #include <QAbstractTextDocumentLayout>
 
 #include "scene.h"
@@ -513,6 +514,110 @@ private:
     Type m_type = SceneOffsets;
     QTime m_timePerPage = QTime(0, 1, 0);
     QObjectProperty<Screenplay> m_screenplay;
+};
+
+class PageScrollAnimation : public QSequentialAnimationGroup
+{
+    Q_OBJECT
+
+public:
+    PageScrollAnimation(QObject *parent=nullptr);
+    ~PageScrollAnimation();
+
+    Q_PROPERTY(QRectF pageRect READ pageRect WRITE setPageRect NOTIFY pageRectChanged)
+    void setPageRect(const QRectF &val);
+    QRectF pageRect() const { return m_pageRect; }
+    Q_SIGNAL void pageRectChanged();
+
+    Q_PROPERTY(QRectF contentRect READ contentRect WRITE setContentRect NOTIFY contentRectChanged)
+    void setContentRect(const QRectF &val);
+    QRectF contentRect() const { return m_contentRect; }
+    Q_SIGNAL void contentRectChanged();
+
+    Q_PROPERTY(qreal pageScale READ pageScale WRITE setPageScale NOTIFY pageScaleChanged)
+    void setPageScale(qreal val);
+    qreal pageScale() const { return m_pageScale; }
+    Q_SIGNAL void pageScaleChanged();
+
+    Q_PROPERTY(qreal pageSpacing READ pageSpacing WRITE setPageSpacing NOTIFY pageSpacingChanged)
+    void setPageSpacing(const qreal &val);
+    qreal pageSpacing() const { return m_pageSpacing; }
+    Q_SIGNAL void pageSpacingChanged();
+
+    Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
+    void setViewportRect(const QRectF &val);
+    QRectF viewportRect() const { return m_viewportRect; }
+    Q_SIGNAL void viewportRectChanged();
+
+    Q_PROPERTY(int fromPage READ fromPage WRITE setFromPage NOTIFY fromPageChanged)
+    void setFromPage(int val);
+    int fromPage() const { return m_fromPage; }
+    Q_SIGNAL void fromPageChanged();
+
+    Q_PROPERTY(int toPage READ toPage WRITE setToPage NOTIFY toPageChanged)
+    void setToPage(int val);
+    int toPage() const { return m_toPage; }
+    Q_SIGNAL void toPageChanged();
+
+    Q_PROPERTY(qreal fromY READ fromY WRITE setFromY NOTIFY fromYChanged)
+    void setFromY(qreal val);
+    qreal fromY() const { return m_fromY; }
+    Q_SIGNAL void fromYChanged();
+
+    Q_PROPERTY(qreal toY READ toY WRITE setToY NOTIFY toYChanged)
+    void setToY(qreal val);
+    qreal toY() const { return m_toY; }
+    Q_SIGNAL void toYChanged();
+
+    Q_PROPERTY(int duration READ duration WRITE setDuration NOTIFY durationChanged)
+    void setDuration(int val);
+    int duration() const { return m_duration; }
+    Q_SIGNAL void durationChanged();
+
+    Q_PROPERTY(int pageSkipDuration READ pageSkipDuration WRITE setPageSkipDuration NOTIFY pageSkipDurationChanged)
+    void setPageSkipDuration(int val);
+    int pageSkipDuration() const { return m_pageSkipDuration; }
+    Q_SIGNAL void pageSkipDurationChanged();
+
+    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged)
+    void setTarget(QObject* val);
+    QObject* target() const { return m_target; }
+    Q_SIGNAL void targetChanged();
+
+    Q_PROPERTY(QByteArray propertyName READ propertyName WRITE setPropertyName NOTIFY propertyNameChanged)
+    void setPropertyName(const QByteArray &val);
+    QByteArray propertyName() const { return m_propertyName; }
+    Q_SIGNAL void propertyNameChanged();
+
+    Q_INVOKABLE void setupNow();
+
+signals:
+    void setupRequired();
+
+protected:
+    void timerEvent(QTimerEvent *te);
+
+private:
+    void setupAnimation();
+    void setupAnimationLater();
+
+private:
+    qreal m_y = 0;
+    qreal m_toY = 0;
+    int m_toPage = 0;
+    qreal m_fromY = 0;
+    int m_duration = 1000;
+    int m_fromPage = 0;
+    bool m_running = false;
+    qreal m_pageScale = 1;
+    QRectF m_pageRect;
+    QRectF m_contentRect;
+    qreal m_pageSpacing = 0;
+    QRectF m_viewportRect;
+    int m_pageSkipDuration = 50;
+    QByteArray m_propertyName;
+    ExecLaterTimer m_setupTimer;
+    QObjectProperty<QObject> m_target;
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H

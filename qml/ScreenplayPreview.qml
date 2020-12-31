@@ -31,6 +31,7 @@ Rectangle {
     property real pageHeight: pageView.cellHeight
     property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.value
     property real zoomScale: previewZoomSlider.value
+    readonly property real pageSpacing: 40
 
     property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
         timePerPage: screenplayTextDocument.timePerPage
@@ -166,8 +167,8 @@ Rectangle {
             }
         }
 
-        property real cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + 40
-        property real cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + 40
+        property real cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + pageSpacing
+        property real cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + pageSpacing
         property int nrColumns: Math.max(Math.floor(width/cellWidth), 1)
         property int nrRows: Math.ceil(screenplayImagePrinter.pageCount / nrColumns)
         property int currentIndex: 0
