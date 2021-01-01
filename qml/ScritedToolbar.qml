@@ -40,48 +40,111 @@ Item {
                 ToolTip.text: "Toggle media playback.\t(Space)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.togglePlayback()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: scritedView.mediaIsPlaying ? "Pause" : "Play"
+                ShortcutsModelItem.shortcut: "Space"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/rewind_10.png"
-                ToolTip.text: "Rewind 10 seconds.\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + Left Arrow)"
+                ToolTip.text: "Rewind 10 seconds.\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + ←)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.rewind()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Rewind 10s"
+                ShortcutsModelItem.shortcut: "Ctrl+←"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/fast_rewind.png"
-                ToolTip.text: "Rewind 10 seconds.\t(Left Arrow)"
+                ToolTip.text: "Rewind half second.\t(←)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniRewind()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Rewind 0.5s"
+                ShortcutsModelItem.shortcut: "←"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/fast_forward.png"
-                ToolTip.text: "Rewind 10 seconds.\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + Right Arrow)"
+                ToolTip.text: "Forward half second.\t(" + app.polishShortcutTextForDisplay("Ctrl") + "+→)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniForward()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Forward 0.5s"
+                ShortcutsModelItem.shortcut: "→"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/forward_10.png"
-                ToolTip.text: "Forward 10 seconds.\t(Right Arrow)"
+                ToolTip.text: "Forward 10 seconds.\t(→)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.forward()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Forward 10s"
+                ShortcutsModelItem.shortcut: "Ctrl+→"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
                 iconSource: "../icons/action/keyboard_arrow_up.png"
-                ToolTip.text: "Previous Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + Up Arrow)"
+                ToolTip.text: "Previous Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + "+↑)"
                 enabled: scritedView.previousSceneAvailable
                 onClicked: scritedView.scrollPreviousScene()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Previous Scene"
+                ShortcutsModelItem.shortcut: "Ctrl+↑"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
                 iconSource: "../icons/action/keyboard_arrow_down.png"
-                ToolTip.text: "Previous Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + Down Arrow)"
+                ToolTip.text: "Next Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + "+↓)"
                 enabled: scritedView.nextSceneAvailable
                 onClicked: scritedView.scrollNextScene()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Next Scene"
+                ShortcutsModelItem.shortcut: "Ctrl+↓"
+                ShortcutsModelItem.enabled: enabled
+            }
+
+            QtObject {
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Scroll Up"
+                ShortcutsModelItem.shortcut: "↑"
+                ShortcutsModelItem.enabled: scritedView.canScrollUp
+            }
+
+            QtObject {
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Scroll Down"
+                ShortcutsModelItem.shortcut: "↓"
+                ShortcutsModelItem.enabled: scritedView.canScrollDown
+            }
+
+            QtObject {
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Previous Page"
+                ShortcutsModelItem.shortcut: "Alt+↑"
+                ShortcutsModelItem.enabled: scritedView.canScrollUp
+            }
+
+            QtObject {
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Next Page"
+                ShortcutsModelItem.shortcut: "Alt+↓"
+                ShortcutsModelItem.enabled: scritedView.canScrollDown
             }
 
             ToolButton3 {
@@ -89,6 +152,18 @@ Item {
                 ToolTip.text: "Use video time as current scene time offset.\t(> or .)"
                 enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
                 onClicked: scritedView.syncVideoTimeWithScreenplayOffsets()
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Sync Time"
+                ShortcutsModelItem.shortcut: "> ."
+                ShortcutsModelItem.enabled: enabled
+            }
+
+            QtObject {
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Adjust Offsets"
+                ShortcutsModelItem.shortcut: "Ctrl+>"
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
@@ -116,6 +191,11 @@ Item {
                 text: "Auto Scroll"
                 enabled: scritedView.mediaIsLoaded
                 focusPolicy: Qt.NoFocus
+
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Auto Scroll " + (checked ? "OFF" : "ON")
+                ShortcutsModelItem.shortcut: "+"
+                ShortcutsModelItem.enabled: enabled
             }
         }
     }

@@ -558,6 +558,7 @@ void ScreenplayTextDocument::setInjection(QObject *val)
 
 void ScreenplayTextDocument::syncNow()
 {
+    m_loadScreenplayTimer.stop();
     this->loadScreenplay();
 }
 

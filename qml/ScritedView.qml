@@ -33,6 +33,8 @@ Item {
     property bool previousSceneAvailable: screenplaySplitsView.currentIndex > 0
     property alias screenplaySplitsCount: screenplaySplitsView.count
     property alias playbackScreenplaySync: mediaPlayer.keepScreenplayInSyncWithPosition
+    property bool canScrollUp: screenplayPreview.contentY > 0
+    property bool canScrollDown: screenplayPreview.contentY < screenplayPreview.contentHeight - screenplayPreview.height
 
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
