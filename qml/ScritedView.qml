@@ -601,12 +601,16 @@ Item {
 
     QtObject {
         Notification.title: "Install Video Codecs"
-        Notification.text: "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
-        Notification.active: !scritedViewSettings.codecsNoticeDisplayed && !modalDialog.active && app.isWindowsPlatform
-        Notification.buttons: ["Download", "Dismiss"]
+        Notification.text: {
+            if(app.isWindowsPlatform)
+                return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
+            return "Please install GStreamer codecs to load videos in this tab."
+        }
+        Notification.active: !scritedViewSettings.codecsNoticeDisplayed && !modalDialog.active && (app.isWindowsPlatform || app.isLinuxPlatform)
+        Notification.buttons: app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
-                Qt.openUrlExternally("https://github.com/Nevcairiel/LAVFilters/releases")
+                Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
             scritedViewSettings.codecsNoticeDisplayed = true
         }
     }
