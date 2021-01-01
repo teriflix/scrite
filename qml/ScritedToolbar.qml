@@ -41,6 +41,7 @@ Item {
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.togglePlayback()
 
+                ShortcutsModelItem.priority: 0
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: scritedView.mediaIsPlaying ? "Pause" : "Play"
                 ShortcutsModelItem.shortcut: "Space"
@@ -53,6 +54,7 @@ Item {
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.rewind()
 
+                ShortcutsModelItem.priority: -1
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Rewind 10s"
                 ShortcutsModelItem.shortcut: "Ctrl+←"
@@ -65,6 +67,7 @@ Item {
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniRewind()
 
+                ShortcutsModelItem.priority: -2
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Rewind 0.5s"
                 ShortcutsModelItem.shortcut: "←"
@@ -77,6 +80,7 @@ Item {
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniForward()
 
+                ShortcutsModelItem.priority: -3
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Forward 0.5s"
                 ShortcutsModelItem.shortcut: "→"
@@ -89,6 +93,7 @@ Item {
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.forward()
 
+                ShortcutsModelItem.priority: -4
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Forward 10s"
                 ShortcutsModelItem.shortcut: "Ctrl+→"
@@ -101,6 +106,7 @@ Item {
                 enabled: scritedView.previousSceneAvailable
                 onClicked: scritedView.scrollPreviousScene()
 
+                ShortcutsModelItem.priority: -5
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Previous Scene"
                 ShortcutsModelItem.shortcut: "Ctrl+↑"
@@ -113,6 +119,7 @@ Item {
                 enabled: scritedView.nextSceneAvailable
                 onClicked: scritedView.scrollNextScene()
 
+                ShortcutsModelItem.priority: -6
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Next Scene"
                 ShortcutsModelItem.shortcut: "Ctrl+↓"
@@ -120,6 +127,7 @@ Item {
             }
 
             QtObject {
+                ShortcutsModelItem.priority: -7
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Scroll Up"
                 ShortcutsModelItem.shortcut: "↑"
@@ -127,6 +135,7 @@ Item {
             }
 
             QtObject {
+                ShortcutsModelItem.priority: -8
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Scroll Down"
                 ShortcutsModelItem.shortcut: "↓"
@@ -134,6 +143,7 @@ Item {
             }
 
             QtObject {
+                ShortcutsModelItem.priority: -9
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Previous Page"
                 ShortcutsModelItem.shortcut: "Alt+↑"
@@ -141,6 +151,7 @@ Item {
             }
 
             QtObject {
+                ShortcutsModelItem.priority: -10
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Next Page"
                 ShortcutsModelItem.shortcut: "Alt+↓"
@@ -153,6 +164,7 @@ Item {
                 enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
                 onClicked: scritedView.syncVideoTimeWithScreenplayOffsets()
 
+                ShortcutsModelItem.priority: -11
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Sync Time"
                 ShortcutsModelItem.shortcut: "> ."
@@ -160,6 +172,7 @@ Item {
             }
 
             QtObject {
+                ShortcutsModelItem.priority: -12
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Adjust Offsets"
                 ShortcutsModelItem.shortcut: "Ctrl+>"
@@ -192,6 +205,7 @@ Item {
                 enabled: scritedView.mediaIsLoaded
                 focusPolicy: Qt.NoFocus
 
+                ShortcutsModelItem.priority: -13
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Auto Scroll " + (checked ? "OFF" : "ON")
                 ShortcutsModelItem.shortcut: "+"
