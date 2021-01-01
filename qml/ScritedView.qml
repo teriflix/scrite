@@ -92,6 +92,11 @@ Item {
         screenplaySplitsView.scrollToRow(Math.max(screenplaySplitsView.currentIndex-1,0))
     }
 
+    function scrollPreviousScreen() {
+        var newY = Math.max(screenplayPreview.contentY - screenplayPreview.height, 0)
+        screenplayPreview.contentY = newY
+    }
+
     function scrollDown() {
         var newY = Math.min(screenplayPreview.contentY + screenplayPreview.lineHeight, screenplayPreview.contentHeight-screenplayPreview.height)
         screenplayPreview.contentY = newY
@@ -99,6 +104,11 @@ Item {
 
     function scrollNextScene() {
         screenplaySplitsView.scrollToRow(Math.min(screenplaySplitsView.currentIndex+1,screenplaySplitsView.count-1))
+    }
+
+    function scrollNextScreen() {
+        var newY = Math.min(screenplayPreview.contentY + screenplayPreview.height, screenplayPreview.contentHeight-screenplayPreview.height)
+        screenplayPreview.contentY = newY
     }
 
     function toggleTimeOffsetDisplay() {
@@ -565,6 +575,8 @@ Item {
         case Qt.Key_Up:
             if(event.controlModifier)
                 scrollPreviousScene()
+            else if(event.shiftModifier)
+                scrollPreviousScreen()
             else {
                 newY = Math.max(screenplayPreview.contentY - (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), 0)
                 screenplayPreview.contentY = newY
@@ -573,6 +585,8 @@ Item {
         case Qt.Key_Down:
             if(event.controlModifier)
                 scrollNextScene()
+            else if(event.shiftModifier)
+                scrollNextScreen()
             else {
                 newY = Math.min(screenplayPreview.contentY + (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), screenplayPreview.contentHeight-screenplayPreview.height)
                 screenplayPreview.contentY = newY
