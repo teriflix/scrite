@@ -111,6 +111,7 @@ Item {
         category: "Scrited"
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
         property bool experimentalFeatureNoticeDisplayed: false
+        property bool codecsNoticeDisplayed: false
     }
 
     FileDialog {
@@ -595,6 +596,18 @@ Item {
         case Qt.Key_Period:
             syncVideoTimeWithScreenplayOffsets(event.controlModifier)
             break
+        }
+    }
+
+    QtObject {
+        Notification.title: "Install Video Codecs"
+        Notification.text: "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
+        Notification.active: !scritedViewSettings.codecsNoticeDisplayed && !modalDialog.active && app.isWindowsPlatform
+        Notification.buttons: ["Download", "Dismiss"]
+        Notification.onButtonClicked: {
+            if(index === 0)
+                Qt.openUrlExternally("https://github.com/Nevcairiel/LAVFilters/releases")
+            scritedViewSettings.codecsNoticeDisplayed = true
         }
     }
 }
