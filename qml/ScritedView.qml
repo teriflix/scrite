@@ -362,6 +362,11 @@ Item {
                         screenplayScrollAnimation.stop()
                         screenplaySplitsView.currentIndex =  row
                     }
+
+                    Behavior on contentY {
+                        enabled: screenplayEditorSettings.enableAnimations && !screenplayScrollAnimation.enabled && animateScrolling
+                        NumberAnimation { duration: 100 }
+                    }
                 }
             }
         }

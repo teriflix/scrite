@@ -134,7 +134,15 @@ Rectangle {
 
         onContentYChanged: {
             if(fitPageToWidth && !lockUpdateCurrentScene)
-                Qt.callLater(updateCurrentScene)
+                currentSceneUpdateTimer.start()
+        }
+
+        Timer {
+            id: currentSceneUpdateTimer
+            running: false
+            repeat: false
+            interval: 250
+            onTriggered: parent.updateCurrentScene()
         }
 
         property bool containsMouse: false

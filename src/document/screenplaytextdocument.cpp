@@ -2450,7 +2450,8 @@ QJsonObject PrintedTextDocumentOffsets::nearestOffsetInfo(int pageNumber, qreal 
 
         if(offset.pageNumber > pageNumber || offset.sceneHeadingRect.y() > yOffset)
         {
-            offset = m_offsets.at( qMax(0,i-1) );
+            if( qAbs(yOffset-offset.sceneHeadingRect.y()) > 10 )
+                offset = m_offsets.at( qMax(0,i-1) );
             return offset.toJsonObject();
         }
     }
