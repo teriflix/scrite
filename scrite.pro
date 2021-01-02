@@ -51,10 +51,12 @@ HEADERS += \
     src/core/systemtextinputmanager.h \
     src/document/characterrelationshipsgraph.h \
     src/document/notebooktabmodel.h \
+    src/document/screenplaytextdocumentoffsets.h \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
     src/quick/items/boundingboxevaluator.h \
+    src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/tabsequencemanager.h \
@@ -147,10 +149,12 @@ SOURCES += \
     src/core/systemtextinputmanager.cpp \
     src/document/characterrelationshipsgraph.cpp \
     src/document/notebooktabmodel.cpp \
+    src/document/screenplaytextdocumentoffsets.cpp \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
     src/quick/items/boundingboxevaluator.cpp \
+    src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/tabsequencemanager.cpp \

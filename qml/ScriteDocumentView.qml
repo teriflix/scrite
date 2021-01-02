@@ -1200,6 +1200,8 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: primaryColors.c800.text
                     text: {
+                        if(globalTimeDisplay.screenplayTextDocument === null)
+                            return "00:00"
                         if(globalTimeDisplay.screenplayTextDocument.totalTime.getHours() > 0)
                             return Qt.formatTime(globalTimeDisplay.screenplayTextDocument.currentTime, "H:mm:ss")
                         return Qt.formatTime(globalTimeDisplay.screenplayTextDocument.currentTime, "mm:ss")

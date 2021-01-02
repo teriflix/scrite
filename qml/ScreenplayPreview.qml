@@ -32,17 +32,7 @@ Rectangle {
     property real lineHeight: fontMetrics.lineSpacing * previewZoomSlider.value
     property real zoomScale: previewZoomSlider.value
     readonly property real pageSpacing: fitPageToWidth ? 1 : 40
-
-    property PrintedTextDocumentOffsets textDocumentOffsets: PrintedTextDocumentOffsets {
-        timePerPage: screenplayTextDocument.timePerPage
-        screenplay: previewItem.screenplay
-
-        Notification.title: "Time Offsets Error"
-        Notification.text: errorMessage
-        Notification.active: hasError
-        Notification.autoClose: false
-        Notification.onDismissed: clearErrorMessage()
-    }
+    property alias document: screenplayTextDocument.textDocument
 
     color: primaryColors.windowColor
 
@@ -50,11 +40,8 @@ Rectangle {
 
     Component.onCompleted: {
         app.execLater(screenplayTextDocument, 250, function() {
-            textDocumentOffsets.enabled = true
             screenplay.currentElementIndex = 0
             screenplayTextDocument.print(screenplayImagePrinter)
-            textDocumentOffsets.enabled = false
-            Qt.callLater( function() { pageView.scrollToCurrentScene() })
         })
     }
 
@@ -78,11 +65,6 @@ Rectangle {
         scale: 2
     }
 
-    Connections {
-        target: scriteDocument.loading ? null : scriteDocument.screenplay
-        onCurrentElementIndexChanged: pageView.scrollToCurrentScene()
-    }
-
     Text {
         id: noticeText
         font.pixelSize: 30
@@ -99,54 +81,7 @@ Rectangle {
         contentHeight: pageViewContent.height
         clip: true
 
-        property bool lockScrollToCurrentScene: false
-        function scrollToCurrentScene() {
-            if(lockScrollToCurrentScene)
-                return
-            var idx = scriteDocument.screenplay.currentElementIndex
-            if(idx < 0) return
-            var element = scriteDocument.screenplay.elementAt(idx)
-            if(element === null) return
-            var sceneNr = element.resolvedSceneNumber
-            var info = textDocumentOffsets.offsetInfoOf(sceneNr)
-            if(info) {
-                lockUpdateCurrentScene = true
-                pageView.currentIndex = info.pageNumber-1
-                pageView.contentY = (info.pageNumber-1)*pageView.cellHeight + (info.sceneHeadingRect.y)*previewZoomSlider.value
-                lockUpdateCurrentScene = false
-            }
-        }
-
-        property bool lockUpdateCurrentScene: false
-        function updateCurrentScene() {
-            if(!fitPageToWidth || textDocumentOffsets.count === 0 || lockUpdateCurrentScene)
-                return
-            var pageIdx = Math.floor(contentY/cellHeight)
-            var yOffset = (contentY - pageIdx*cellHeight)/previewZoomSlider.value
-            var info = textDocumentOffsets.nearestOffsetInfo(pageIdx+1,yOffset)
-            if(scriteDocument.screenplay.currentElementIndex !== info.sceneIndex) {
-                lockScrollToCurrentScene = true
-                scriteDocument.screenplay.currentElementIndex = info.sceneIndex
-                currentOffsetChanged(info.row)
-                lockScrollToCurrentScene = false
-            }
-        }
-
-        onContentYChanged: {
-            if(fitPageToWidth && !lockUpdateCurrentScene)
-                currentSceneUpdateTimer.start()
-        }
-
-        Timer {
-            id: currentSceneUpdateTimer
-            running: false
-            repeat: false
-            interval: 250
-            onTriggered: parent.updateCurrentScene()
-        }
-
         property bool containsMouse: false
-
         ScrollBar.horizontal: ScrollBar {
             policy: pageLayout.width > pageView.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
             minimumSize: 0.1
@@ -267,7 +202,7 @@ Rectangle {
             anchors.right: parent.right
             from: 0.5
             to: pageView.width / screenplayImagePrinter.pageWidth
-            value: fitPageToWidth ? to : 1
+            value: fitPageToWidth ? to : (pageView.width-2*pageSpacing) / (2*screenplayImagePrinter.pageWidth)
         }
     }
 }

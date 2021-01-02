@@ -48,7 +48,7 @@
 #include "transliteration.h"
 #include "openfromlibrary.h"
 #include "abstractexporter.h"
-#include "boundingboxevaluator.h"
+#include "textdocumentitem.h"
 #include "notebooktabmodel.h"
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
@@ -56,11 +56,13 @@
 #include "tabsequencemanager.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
+#include "boundingboxevaluator.h"
 #include "delayedpropertybinder.h"
 #include "screenplaytextdocument.h"
 #include "abstractreportgenerator.h"
 #include "qtextdocumentpagedprinter.h"
 #include "characterrelationshipsgraph.h"
+#include "screenplaytextdocumentoffsets.h"
 
 void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, const QString &message)
 {
@@ -229,8 +231,8 @@ int main(int argc, char **argv)
     qmlRegisterType<ScreenplayTextDocument>("Scrite", 1, 0, "ScreenplayTextDocument");
     qmlRegisterType<ScreenplayElementPageBreaks>("Scrite", 1, 0, "ScreenplayElementPageBreaks");
     qmlRegisterType<ImagePrinter>("Scrite", 1, 0, "ImagePrinter");
-    qmlRegisterType<PrintedTextDocumentOffsets>("Scrite", 1, 0, "PrintedTextDocumentOffsets");
-    qmlRegisterType<PageScrollAnimation>("Scrite", 1, 0, "PageScrollAnimation");
+    qmlRegisterType<TextDocumentItem>("Scrite", 1, 0, "TextDocumentItem");
+    qmlRegisterType<ScreenplayTextDocumentOffsets>("Scrite", 1, 0, "ScreenplayTextDocumentOffsets");
 
     qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
 

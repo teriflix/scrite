@@ -539,11 +539,6 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
 
     const bool isPdfDevice = printer->paintEngine()->type() == QPaintEngine::Pdf;
 
-    {
-        QTextDocumentPagedPrintEvent printEvent(QTextDocumentPagedPrintEvent::BeginEvent);
-        qApp->sendEvent(m_textDocument, &printEvent);
-    }
-
     // Print away!
     while (pageNr <= toPageNr)
     {
@@ -572,11 +567,6 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     m_header->finish();
     m_footer->finish();
     m_progressReport->finish();
-
-    {
-        QTextDocumentPagedPrintEvent printEvent(QTextDocumentPagedPrintEvent::EndEvent);
-        qApp->sendEvent(m_textDocument, &printEvent);
-    }
 
     return true;
 }
@@ -647,11 +637,6 @@ void QTextDocumentPagedPrinter::printPageContents(int pageNr, int pageCount, QPa
     painter->translate(body.left(), body.top() - (pageNr - 1) * body.height());
     const QRectF pageRect(0, (pageNr - 1) * body.height(), body.width(), body.height());
 
-    QTextDocumentPagedPrintEvent printEvent(QTextDocumentPagedPrintEvent::PageEvent);
-    printEvent.m_pageNumber = pageNr;
-    printEvent.m_pageRect = pageRect;
-    qApp->sendEvent(m_textDocument, &printEvent);
-
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     QAbstractTextDocumentLayout::PaintContext ctx;
 
@@ -679,20 +664,3 @@ void QTextDocumentPagedPrinter::printHeaderFooterWatermark(int pageNr, int pageC
 #endif
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-QEvent::Type QTextDocumentPagedPrintEvent::qeventType()
-{
-    static int ret = QEvent::registerEventType();
-    return QEvent::Type(ret);
-}
-
-QTextDocumentPagedPrintEvent::QTextDocumentPagedPrintEvent(QTextDocumentPagedPrintEvent::PrintEventType petype)
-    : QEvent(QTextDocumentPagedPrintEvent::qeventType()), m_printEventType(petype)
-{
-
-}
-
-QTextDocumentPagedPrintEvent::~QTextDocumentPagedPrintEvent()
-{
-}

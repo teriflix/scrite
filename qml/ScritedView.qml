@@ -28,13 +28,13 @@ Item {
     property bool mediaIsLoaded: mediaPlayer.status !== MediaPlayer.NoMedia
     property bool mediaIsPlaying: mediaPlayer.playbackState === MediaPlayer.PlayingState
     property bool mediaIsPaused: mediaPlayer.playbackState === MediaPlayer.PausedState
-    property alias timeOffsetVisible: screenplaySplitsView.displayTimeOffset
-    property bool nextSceneAvailable: screenplaySplitsView.currentIndex+1 < screenplaySplitsView.count
-    property bool previousSceneAvailable: screenplaySplitsView.currentIndex > 0
-    property alias screenplaySplitsCount: screenplaySplitsView.count
+    property alias timeOffsetVisible: screenplayOffsetsView.displayTimeOffset
+    property bool nextSceneAvailable: screenplayOffsetsView.currentIndex+1 < screenplayOffsetsView.count
+    property bool previousSceneAvailable: screenplayOffsetsView.currentIndex > 0
+    property alias screenplaySplitsCount: screenplayOffsetsView.count
     property alias playbackScreenplaySync: mediaPlayer.keepScreenplayInSyncWithPosition
-    property bool canScrollUp: screenplayPreview.contentY > 0
-    property bool canScrollDown: screenplayPreview.contentY < screenplayPreview.contentHeight - screenplayPreview.height
+    property bool canScrollUp: textDocumentFlick.contentY > 0
+    property bool canScrollDown: textDocumentFlick.contentY < textDocumentFlick.contentHeight - textDocumentFlick.height
 
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
@@ -68,51 +68,61 @@ Item {
     }
 
     function miniRewind() {
-        mediaPlayer.seek( Math.max(mediaPlayer.position-500, 0) )
+        mediaPlayer.seek( Math.max(mediaPlayer.position-Math.max(500,mediaPlayer.notifyInterval), 0) )
     }
 
     function miniForward() {
-        mediaPlayer.seek( Math.min(mediaPlayer.position+500, mediaPlayer.duration) )
+        mediaPlayer.seek( Math.min(mediaPlayer.position+Math.max(500,mediaPlayer.notifyInterval), mediaPlayer.duration) )
     }
 
     function syncVideoTimeWithScreenplayOffsets(adjustFollowingRows) {
-        screenplayPreview.textDocumentOffsets.setTimeInMillisecond(screenplaySplitsView.currentIndex, mediaPlayer.position, adjustFollowingRows === true)
+        screenplayOffsetsModel.setTime(screenplayOffsetsView.currentIndex, mediaPlayer.position, adjustFollowingRows === true)
     }
 
     function resetScreenplayOffsets() {
-        screenplayPreview.textDocumentOffsets.resetTime()
+        screenplayOffsetsModel.resetAllTimes()
     }
 
     function scrollUp() {
-        var newY = Math.max(screenplayPreview.contentY - screenplayPreview.lineHeight, 0)
-        screenplayPreview.contentY = newY
+        var newY = Math.max(textDocumentFlick.contentY - textDocumentFlick.lineHeight, 0)
+        textDocumentFlick.contentY = newY
     }
 
     function scrollPreviousScene() {
-        screenplaySplitsView.scrollToRow(Math.max(screenplaySplitsView.currentIndex-1,0))
+        screenplayOffsetsView.currentIndex = Math.max(screenplayOffsetsView.currentIndex-1,0)
     }
 
     function scrollPreviousScreen() {
-        var newY = Math.max(screenplayPreview.contentY - screenplayPreview.height, 0)
-        screenplayPreview.contentY = newY
+        var newY = Math.max(textDocumentFlick.contentY - textDocumentFlick.height, 0)
+        textDocumentFlick.contentY = newY
+    }
+
+    function scrollPreviousPage() {
+        var newY = Math.max(textDocumentFlick.contentY - textDocumentFlick.pageHeight, 0)
+        textDocumentFlick.contentY = newY
     }
 
     function scrollDown() {
-        var newY = Math.min(screenplayPreview.contentY + screenplayPreview.lineHeight, screenplayPreview.contentHeight-screenplayPreview.height)
-        screenplayPreview.contentY = newY
+        var newY = Math.min(textDocumentFlick.contentY + textDocumentFlick.lineHeight, textDocumentFlick.contentHeight-textDocumentFlick.height)
+        textDocumentFlick.contentY = newY
     }
 
     function scrollNextScene() {
-        screenplaySplitsView.scrollToRow(Math.min(screenplaySplitsView.currentIndex+1,screenplaySplitsView.count-1))
+        screenplayOffsetsView.currentIndex = Math.min(screenplayOffsetsView.currentIndex+1,screenplayOffsetsView.count-1)
     }
 
     function scrollNextScreen() {
-        var newY = Math.min(screenplayPreview.contentY + screenplayPreview.height, screenplayPreview.contentHeight-screenplayPreview.height)
-        screenplayPreview.contentY = newY
+        var newY = Math.min(textDocumentFlick.contentY + textDocumentFlick.height, textDocumentFlick.contentHeight-textDocumentFlick.height)
+        textDocumentFlick.contentY = newY
+    }
+
+    function scrollNextPage() {
+        var newY = Math.min(textDocumentFlick.contentY + textDocumentFlick.pageHeight)
+        textDocumentFlick.contentY = newY
     }
 
     function toggleTimeOffsetDisplay() {
-        screenplaySplitsView.displayTimeOffset = !screenplaySplitsView.displayTimeOffset
+        screenplayOffsetsView.displayTimeOffset = !screenplayOffsetsView.displayTimeOffset
     }
 
     Settings {
@@ -134,8 +144,12 @@ Item {
         onAccepted: {
             mediaPlayer.source = fileUrl
             mediaPlayer.play()
-
-            screenplayPreview.textDocumentOffsets.fileName = screenplayPreview.textDocumentOffsets.fileNameFrom(fileUrl)
+            Qt.callLater( function() {
+                mediaPlayer.pause()
+                mediaPlayer.seek(0)
+                screenplayOffsetsView.adjustTextDocumentAndMedia()
+            })
+            screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
         }
     }
 
@@ -157,7 +171,7 @@ Item {
 
                     MediaPlayer {
                         id: mediaPlayer
-                        notifyInterval: 1000
+                        notifyInterval: 250
                         function togglePlayback() {
                             if(status == MediaPlayer.NoMedia)
                                 return
@@ -169,32 +183,19 @@ Item {
                         }
 
                         property bool keepScreenplayInSyncWithPosition: false
-                        onPlaybackStateChanged: {
-                            if(playbackState !== MediaPlayer.PlayingState)
-                                screenplayScrollAnimation.stop()
+                        onPositionChanged: {
+                            if(keepScreenplayInSyncWithPosition && playbackState === MediaPlayer.PlayingState) {
+                                var offsetInfo = screenplayOffsetsModel.offsetInfoAtTime(position, screenplayOffsetsView.currentIndex)
+                                if(offsetInfo.row < 0)
+                                    return
+
+                                if(screenplayOffsetsView.currentIndex !== offsetInfo.row)
+                                    screenplayOffsetsView.currentIndex = offsetInfo.row
+
+                                var newY = screenplayOffsetsModel.evaluatePointAtTime(position, offsetInfo.row).y * textDocumentView.documentScale
+                                textDocumentFlick.contentY = newY
+                            }
                         }
-                    }
-
-                    PageScrollAnimation {
-                        id: screenplayScrollAnimation
-                        target: screenplayPreview
-                        propertyName: "contentY"
-                        pageRect: screenplayPreview.screenplayFormat.pageLayout.paperRect
-                        contentRect: screenplayPreview.screenplayFormat.pageLayout.contentRect
-                        viewportRect: Qt.rect(0, 0, screenplayPreview.width, screenplayPreview.height)
-                        pageSpacing: screenplayPreview.pageSpacing
-                        pageScale: screenplayPreview.zoomScale
-                        pageSkipDuration: 250
-
-                        property var fromOffsetInfo: screenplayPreview.textDocumentOffsets.offsetInfoAt(screenplaySplitsView.currentIndex)
-                        property var toOffsetInfo: screenplayPreview.textDocumentOffsets.offsetInfoAt(screenplaySplitsView.currentIndex+1)
-
-                        enabled: mediaPlayer.playbackState === MediaPlayer.PlayingState && mediaPlayer.keepScreenplayInSyncWithPosition
-                        fromPage: fromOffsetInfo.pageNumber
-                        toPage: toOffsetInfo.pageNumber
-                        fromY: fromOffsetInfo.sceneHeadingRect.y
-                        toY: toOffsetInfo.sceneHeadingRect.y
-                        duration: toOffsetInfo.row > fromOffsetInfo.row ? toOffsetInfo.sceneTime.position - fromOffsetInfo.sceneTime.position : 0
                     }
 
                     VideoOutput {
@@ -363,19 +364,95 @@ Item {
                     EventFilter.onFilter: mediaPlayerControls.visible = event.type === 127 || event.type === 129
                 }
 
-                ScreenplayPreview {
-                    id: screenplayPreview
+                Rectangle {
                     SplitView.fillHeight: true
-                    fitPageToWidth: true
-                    purpose: ScreenplayTextDocument.ForPrinting
-                    onCurrentOffsetChanged: {
-                        screenplayScrollAnimation.stop()
-                        screenplaySplitsView.currentIndex =  row
+
+                    ScreenplayTextDocumentOffsets {
+                        id: screenplayOffsetsModel
+                        screenplay: scriteDocument.loading ? null : scriteDocument.screenplay
+                        format: scriteDocument.loading ? null : scriteDocument.printFormat
+
+                        Notification.title: "Time Offsets Error"
+                        Notification.text: errorMessage
+                        Notification.active: hasError
+                        Notification.autoClose: false
+                        Notification.onDismissed: clearErrorMessage()
                     }
 
-                    Behavior on contentY {
-                        enabled: screenplayEditorSettings.enableAnimations && !screenplayScrollAnimation.enabled && animateScrolling
-                        NumberAnimation { duration: 100 }
+                    FontMetrics {
+                        id: screenplayFontMetrics
+                        font: screenplayOffsetsModel.format.font
+                    }
+
+                    Flickable {
+                        id: textDocumentFlick
+                        anchors.fill: parent
+                        contentWidth: width
+                        contentHeight: textDocumentView.height + height
+                        boundsBehavior: Flickable.StopAtBounds
+                        clip: true
+
+                        property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
+                        property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
+                        property bool containsMouse: false
+                        ScrollBar.vertical: ScrollBar {
+                            policy: textDocumentFlick.contentHeight > textDocumentFlick.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                            minimumSize: 0.1
+                            palette {
+                                mid: Qt.rgba(0,0,0,0.25)
+                                dark: Qt.rgba(0,0,0,0.75)
+                            }
+                            opacity: textDocumentFlick.containsMouse ? (active ? 1 : 0.2) : 0
+                            Behavior on opacity {
+                                enabled: screenplayEditorSettings.enableAnimations
+                                NumberAnimation { duration: 250 }
+                            }
+                        }
+
+                        TextDocumentItem {
+                            id: textDocumentView
+                            width: textDocumentFlick.width
+                            document: screenplayOffsetsModel.document
+                            documentScale: (textDocumentFlick.width*0.9) / screenplayOffsetsModel.format.pageLayout.contentWidth
+                            flickable: textDocumentFlick
+
+                            Image {
+                                width: textDocumentView.width
+                                height: Math.max(textDocumentFlick.contentHeight, textDocumentFlick.height)
+                                fillMode: Image.Tile
+                                source: "../images/notebookpage.jpg"
+                                z: -1
+                                opacity: 0.25
+                            }
+                        }
+
+                        Behavior on contentY {
+                            enabled: mediaIsLoaded && mediaIsPlaying
+                            NumberAnimation {
+                                id: contentYAnimation
+                                duration: mediaPlayer.notifyInterval-50
+                            }
+                        }
+
+                        onContentYChanged: app.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
+                        function updateCurrentIndexOnScreenplayOffsetsView() {
+                            var offsetInfo = screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/textDocumentView.documentScale))
+                            if(offsetInfo.row < 0)
+                                return
+                            screenplayOffsetsView.currentIndex = offsetInfo.row
+                        }
+
+                        ResetOnChange {
+                            id: textDocumentFlickInteraction
+                            from: true
+                            to: false
+                            trackChangesOn: textDocumentFlick.contentY
+                            delay: mediaPlayer.notifyInterval-50
+                        }
+
+                        EventFilter.acceptHoverEvents: true
+                        EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
+                        EventFilter.onFilter: textDocumentFlick.containsMouse = event.type === 127 || event.type === 129
                     }
                 }
             }
@@ -386,9 +463,9 @@ Item {
             color: "white"
 
             Row {
-                id: screenplaySplitsHeading
-                width: screenplaySplitsView.width-(screenplaySplitsView.scrollBarVisible ? 20 : 1)
-                visible: screenplaySplitsView.count > 0
+                id: screenplayOffsesHeading
+                width: screenplayOffsetsView.width-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
+                visible: screenplayOffsetsView.count > 0
 
                 Text {
                     padding: 5
@@ -404,7 +481,7 @@ Item {
 
                 Text {
                     padding: 5
-                    width: parent.width * (screenplaySplitsView.displayTimeOffset ? 0.6 : 0.8)
+                    width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
                     font.bold: true
                     text: "Scene Heading"
                     font.family: "Courier Prime"
@@ -435,30 +512,31 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     anchors.verticalCenter: parent.verticalCenter
                     clip: true
-                    visible: screenplaySplitsView.displayTimeOffset
+                    visible: screenplayOffsetsView.displayTimeOffset
                 }
             }
 
             Rectangle {
                 width: parent.width
                 height: 1
-                anchors.bottom: screenplaySplitsHeading.bottom
+                anchors.bottom: screenplayOffsesHeading.bottom
                 color: primaryColors.borderColor
-                visible: screenplaySplitsHeading.visible
+                visible: screenplayOffsesHeading.visible
             }
 
             ListView {
-                id: screenplaySplitsView
-                anchors.top: screenplaySplitsHeading.bottom
+                id: screenplayOffsetsView
+                anchors.top: screenplayOffsesHeading.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                model: screenplayPreview.textDocumentOffsets
+                model: screenplayOffsetsModel
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
+
                 ScrollBar.vertical: ScrollBar {
-                    policy: screenplaySplitsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                    policy: screenplayOffsetsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                     minimumSize: 0.1
                     palette {
                         mid: Qt.rgba(0,0,0,0.25)
@@ -479,7 +557,7 @@ Item {
                 }
                 delegate: Item {
                     // Columns: SceneNr, Heading, PageNumber, Time
-                    width: screenplaySplitsView.width-(screenplaySplitsView.scrollBarVisible ? 20 : 1)
+                    width: screenplayOffsetsView.width-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
                     height: 40
 
                     Row {
@@ -497,7 +575,7 @@ Item {
 
                         Text {
                             padding: 5
-                            width: parent.width * (screenplaySplitsView.displayTimeOffset ? 0.6 : 0.8)
+                            width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
                             text: offsetInfo.sceneHeading
                             font.family: "Courier Prime"
                             font.pointSize: 14
@@ -523,41 +601,31 @@ Item {
                             font.pointSize: 14
                             horizontalAlignment: Text.AlignRight
                             anchors.verticalCenter: parent.verticalCenter
-                            visible: screenplaySplitsView.displayTimeOffset
+                            visible: screenplayOffsetsView.displayTimeOffset
                         }
                     }
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            screenplayScrollAnimation.stop()
-                            screenplaySplitsView.currentIndex = index
-                            scriteDocument.screenplay.currentElementIndex = offsetInfo.sceneIndex
-                            if(mediaPlayer.status !== MediaPlayer.NoMedia)
-                                mediaPlayer.seek(offsetInfo.sceneTime.position)
+                            screenplayOffsetsView.currentIndex = index
+                            if(mediaIsLoaded && mediaIsPaused)
+                                screenplayOffsetsView.adjustTextDocumentAndMedia()
                         }
                     }
                 }
 
-                property int offsetCount: screenplayPreview.textDocumentOffsets.count
-                onOffsetCountChanged: Qt.callLater(initialize)
-                function initialize() {
-                    if(count === 0) {
-                        screenplaySplitsView.currentIndex = -1
-                        return
-                    }
-                    scrollToRow(0)
+                onCountChanged: currentIndex = 0
+                onCurrentIndexChanged: {
+                    if(!mediaIsPlaying)
+                        adjustTextDocumentAndMedia()
                 }
 
-                function scrollToRow(row, seekMedia) {
-                    if(currentIndex === row)
-                        return
-                    var offsetInfo = screenplayPreview.textDocumentOffsets.offsetInfoAt(row)
-                    screenplayScrollAnimation.stop()
-                    currentIndex = offsetInfo.row
-                    scriteDocument.screenplay.currentElementIndex = offsetInfo.sceneIndex
-                    if(seekMedia !== false && mediaPlayer.status !== MediaPlayer.NoMedia)
-                        mediaPlayer.seek(offsetInfo.sceneTime.position)
+                function adjustTextDocumentAndMedia() {
+                    var offsetInfo = screenplayOffsetsModel.offsetInfoAt(screenplayOffsetsView.currentIndex)
+                    if(!textDocumentFlickInteraction.value)
+                        textDocumentFlick.contentY = offsetInfo.pixelOffset * textDocumentView.documentScale
+                    mediaPlayer.seek(offsetInfo.sceneTime.timestamp)
                 }
             }
         }
@@ -577,20 +645,20 @@ Item {
                 scrollPreviousScene()
             else if(event.shiftModifier)
                 scrollPreviousScreen()
-            else {
-                newY = Math.max(screenplayPreview.contentY - (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), 0)
-                screenplayPreview.contentY = newY
-            }
+            else if(event.altModifier)
+                scrollPreviousPage()
+            else
+                scrollUp()
             break
         case Qt.Key_Down:
             if(event.controlModifier)
                 scrollNextScene()
             else if(event.shiftModifier)
                 scrollNextScreen()
-            else {
-                newY = Math.min(screenplayPreview.contentY + (event.altModifier ? screenplayPreview.pageHeight : screenplayPreview.lineHeight), screenplayPreview.contentHeight-screenplayPreview.height)
-                screenplayPreview.contentY = newY
-            }
+            else if(event.altModifier)
+                scrollNextPage()
+            else
+                scrollDown()
             break
         case Qt.Key_Left:
             if(event.controlModifier)
