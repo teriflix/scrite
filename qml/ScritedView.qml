@@ -205,6 +205,34 @@ Item {
                         fillMode: VideoOutput.PreserveAspectFit
                     }
 
+                    Image {
+                        id: logoOverlay
+                        x: videoOutput.contentRect.x + 20
+                        y: videoOutput.contentRect.y + 20
+                        width: Math.min(videoOutput.width, videoOutput.height)*0.15
+                        height: width
+                        opacity: 0.25
+                        visible: mediaIsLoaded
+                        source: "../images/appicon.png"
+                        smooth: true
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    Text {
+                        text: "scrite.io"
+                        font.family: "Courier Prime"
+                        font.bold: true
+                        font.pointSize: app.idealFontPointSize * 1.5
+                        horizontalAlignment: Text.AlignRight
+                        anchors.bottom: parent.bottom
+                        anchors.right: videoOutput.right
+                        anchors.rightMargin: 20
+                        anchors.bottomMargin: mediaPlayerControls.visible ? mediaPlayerControls.height + mediaPlayerControls.anchors.bottomMargin + 20 : 20
+                        opacity: logoOverlay.opacity * 1.5
+                        color: "white"
+                        visible: logoOverlay.visible
+                    }
+
                     Text {
                         width: parent.width * 0.75
                         wrapMode: Text.WordWrap
@@ -453,6 +481,42 @@ Item {
                         EventFilter.acceptHoverEvents: true
                         EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
                         EventFilter.onFilter: textDocumentFlick.containsMouse = event.type === 127 || event.type === 129
+                    }
+
+                    Item {
+                        x: textDocumentFlick.width * 0.025
+                        anchors.verticalCenter: textDocumentFlick.verticalCenter
+                        rotation: -90
+                        transformOrigin: Item.Center
+                        opacity: 0.1
+                        visible: mediaIsLoaded
+
+                        Text {
+                            font.family: "Courier Prime"
+                            text: "SCRITE"
+                            font.pixelSize: textDocumentFlick.width * 0.05 * 0.65
+                            font.letterSpacing: 5
+                            font.bold: true
+                            anchors.centerIn: parent
+                        }
+                    }
+
+                    Item {
+                        x: textDocumentFlick.width - textDocumentFlick.width * 0.025 - (textDocumentFlick.containsMouse ? 20 : 0)
+                        anchors.verticalCenter: textDocumentFlick.verticalCenter
+                        rotation: 90
+                        transformOrigin: Item.Center
+                        opacity: 0.1
+                        visible: mediaIsLoaded
+
+                        Text {
+                            text: "scrite.io"
+                            font.family: "Courier Prime"
+                            font.pixelSize: textDocumentFlick.width * 0.05 * 0.65
+                            font.letterSpacing: 2
+                            font.bold: true
+                            anchors.centerIn: parent
+                        }
                     }
                 }
             }
