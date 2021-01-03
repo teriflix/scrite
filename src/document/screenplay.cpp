@@ -1709,6 +1709,8 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
         m_coverPagePhoto = cpPhotoPath;
         emit coverPagePhotoChanged();
     }
+
+    this->evaluateSceneNumbers();
 }
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const
