@@ -187,6 +187,16 @@ TimeProfile TimeProfile::put(const TimeProfile &profile)
 
 Q_GLOBAL_STATIC( QThreadStorage< QStack<TimeProfiler*> >, TimeProfilerStack )
 
+static void addPostRoutine()
+{
+    static bool postRoutineAdded = false;
+    if( !postRoutineAdded && qApp )
+    {
+        qAddPostRoutine(dump_time_profile_data);
+        postRoutineAdded = true;
+    }
+}
+
 inline QString evaluateContextPrefix()
 {
     return qApp->thread() == QThread::currentThread() ? QStringLiteral(" [MainThread]") : QStringLiteral(" [BackgroundThread]");
@@ -195,13 +205,7 @@ inline QString evaluateContextPrefix()
 TimeProfiler::TimeProfiler(const QString &context, bool print)
     : m_context(context + evaluateContextPrefix()), m_printInDestructor(print)
 {
-    static bool postRoutingAdded = false;
-    if( !postRoutingAdded && qApp )
-    {
-        qAddPostRoutine(dump_time_profile_data);
-        postRoutingAdded = true;
-    }
-
+    addPostRoutine();
     ::TimeProfilerStack()->localData().push(this);
     m_timer.start();
 }
@@ -227,4 +231,68 @@ TimeProfile TimeProfiler::profile(bool aggregate) const
     return p;
 }
 
-#endif
+///////////////////////////////////////////////////////////////////////////////
+
+ProfilerItem::ProfilerItem(QObject *parent)
+    : QObject(parent)
+{
+    addPostRoutine();
+    m_context = QString::fromLatin1(parent->metaObject()->className());
+}
+
+ProfilerItem::~ProfilerItem()
+{
+    if(m_active)
+        this->setActive(false);
+
+    if(m_timer)
+        delete m_timer;
+    m_timer = nullptr;
+}
+
+ProfilerItem *ProfilerItem::qmlAttachedProperties(QObject *object)
+{
+    return new ProfilerItem(object);
+}
+
+void ProfilerItem::setContext(const QString &val)
+{
+    if(m_context == val)
+        return;
+
+    m_context = val;
+    emit contextChanged();
+}
+
+void ProfilerItem::setActive(bool val)
+{
+    if(m_active == val)
+        return;
+
+    m_active = val;
+
+    if(m_active)
+    {
+        if(m_timer)
+            delete m_timer;
+        m_timer = new QElapsedTimer;
+        m_timer->start();
+    }
+    else
+    {
+        if(m_timer)
+        {
+            const qint64 nsecs = m_timer->nsecsElapsed();
+            delete m_timer;
+            m_timer = nullptr;
+
+            const QString ctx = m_context + evaluateContextPrefix();
+            TimeProfile::put( TimeProfile(ctx, nsecs) );
+        }
+    }
+
+    emit activeChanged();
+}
+
+#endif // ENABLE_TIME_PROFILING
+

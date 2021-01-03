@@ -16,10 +16,12 @@
 
 #define ENABLE_TIME_PROFILING
 
-#include <QElapsedTimer>
 #include <QString>
+#include <QElapsedTimer>
 
 class TimeProfiler;
+class ProfilerItem;
+
 class TimeProfile
 {
 public:
@@ -78,6 +80,9 @@ public:
     void printSelf(int indent=0, TimeProfile::PrintFormat format=TimeProfile::NormalFormat) const;
 
 private:
+    friend class TimeProfiler;
+    friend class ProfilerItem;
+
     static TimeProfile put(const TimeProfile &profile);
 
     TimeProfile operator + (const TimeProfile &other) const {
@@ -116,11 +121,11 @@ private:
         else if( m_counter > 0 ) m_avgTime = qint64( qreal(m_time)/qreal(m_counter) );
     }
 
-    friend class TimeProfiler;
     TimeProfile(const QString &context, qint64 time, int counter=1)
         : m_context(context), m_time(time), m_counter(counter) {
         this->computeAverageTime();
     }
+
     QString m_context;
     qint64 m_time = 0;
     qint64 m_avgTime = 0;
@@ -128,6 +133,9 @@ private:
 };
 
 #ifdef ENABLE_TIME_PROFILING
+
+#include <QQmlEngine>
+
 class TimeProfiler
 {
 public:
@@ -142,6 +150,35 @@ private:
     QElapsedTimer m_timer;
     bool m_printInDestructor = false;
 };
+
+class ProfilerItem : public QObject
+{
+    Q_OBJECT
+
+public:
+    ProfilerItem(QObject *parent=nullptr);
+    ~ProfilerItem();
+
+    static ProfilerItem *qmlAttachedProperties(QObject *object);
+
+    Q_PROPERTY(QString context READ context WRITE setContext NOTIFY contextChanged)
+    void setContext(const QString &val);
+    QString context() const { return m_context; }
+    Q_SIGNAL void contextChanged();
+
+    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+    void setActive(bool val);
+    bool isActive() const { return m_active; }
+    Q_SIGNAL void activeChanged();
+
+private:
+    bool m_active = false;
+    QString m_context;
+    QElapsedTimer *m_timer = nullptr;
+};
+
+Q_DECLARE_METATYPE(ProfilerItem*)
+QML_DECLARE_TYPEINFO(ProfilerItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #define PROFILE_THIS_FUNCTION TimeProfiler profiler##__LINE__(Q_FUNC_INFO, false)
 #define PROFILE_THIS_FUNCTION2 TimeProfiler profiler##__LINE__(Q_FUNC_INFO, true)

@@ -250,6 +250,12 @@ Rectangle {
                         property var componentData: modelData
                         sourceComponent: modelData.scene ? contentComponent : breakComponent
                         z: contentViewModel.value.currentIndex === index ? 2 : 1
+                        /*Profiler.context: "ScreenplayEditorContentDelegate"
+                        Profiler.active: true
+                        onStatusChanged: {
+                            if(status === Ready)
+                                Profiler.active = false
+                        }*/
                     }
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds

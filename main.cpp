@@ -32,6 +32,7 @@
 #include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
+#include "timeprofiler.h"
 #include "announcement.h"
 #include "imageprinter.h"
 #include "focustracker.h"
@@ -139,7 +140,13 @@ int main(int argc, char **argv)
         return new StandardPaths(engine);
     });
 
+    const QString apreason("Use as attached property.");
     const QString reason("Instantiation from QML not allowed.");
+
+#ifdef ENABLE_TIME_PROFILING
+    qmlRegisterUncreatableType<ProfilerItem>("Scrite", 1, 0, "Profiler", apreason);
+#endif
+
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
 
     qmlRegisterType<Scene>("Scrite", 1, 0, "Scene");
@@ -172,7 +179,7 @@ int main(int argc, char **argv)
     qmlRegisterType<Completer>("Scrite", 1, 0, "Completer");
 
     qmlRegisterUncreatableType<EventFilterResult>("Scrite", 1, 0, "EventFilterResult", "Use the instance provided by EventFilter.onFilter signal.");
-    qmlRegisterUncreatableType<EventFilter>("Scrite", 1, 0, "EventFilter", "Use as attached property.");
+    qmlRegisterUncreatableType<EventFilter>("Scrite", 1, 0, "EventFilter", apreason);
 
     qmlRegisterType<PainterPathItem>("Scrite", 1, 0, "PainterPathItem");
     qmlRegisterUncreatableType<AbstractPathElement>("Scrite", 1, 0, "PathElement", "Use subclasses of AbstractPathElement.");
@@ -188,16 +195,16 @@ int main(int argc, char **argv)
 
     qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
     qmlRegisterType<TextDocumentSearch>("Scrite", 1, 0, "TextDocumentSearch");
-    qmlRegisterUncreatableType<SearchAgent>("Scrite", 1, 0, "SearchAgent", "Use as attached property.");
+    qmlRegisterUncreatableType<SearchAgent>("Scrite", 1, 0, "SearchAgent", apreason);
 
-    qmlRegisterUncreatableType<Notification>("Scrite", 1, 0, "Notification", "Use as attached property.");
+    qmlRegisterUncreatableType<Notification>("Scrite", 1, 0, "Notification", apreason);
     qmlRegisterUncreatableType<NotificationManager>("Scrite", 1, 0, "NotificationManager", "Use notificationManager instead.");
 
     qmlRegisterUncreatableType<ErrorReport>("Scrite", 1, 0, "ErrorReport", reason);
     qmlRegisterUncreatableType<ProgressReport>("Scrite", 1, 0, "ProgressReport", reason);
 
     qmlRegisterUncreatableType<TransliterationEngine>("Scrite", 1, 0, "TransliterationEngine", "Use app.transliterationEngine instead.");
-    qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", "Use as attached property.");
+    qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", apreason);
     qmlRegisterType<TransliteratedText>("Scrite", 1, 0, "TransliteratedText");
 
     qmlRegisterUncreatableType<AbstractExporter>("Scrite", 1, 0, "AbstractExporter", reason);
@@ -240,11 +247,11 @@ int main(int argc, char **argv)
 
     qmlRegisterType<BoundingBoxEvaluator>("Scrite", 1, 0, "BoundingBoxEvaluator");
     qmlRegisterType<BoundingBoxPreview>("Scrite", 1, 0, "BoundingBoxPreview");
-    qmlRegisterUncreatableType<BoundingBoxItem>("Scrite", 1, 0, "BoundingBoxItem", "Use as attached property.");
+    qmlRegisterUncreatableType<BoundingBoxItem>("Scrite", 1, 0, "BoundingBoxItem", apreason);
 
     qmlRegisterType<FileInfo>("Scrite", 1, 0, "FileInfo");
 
-    qmlRegisterUncreatableType<ShortcutsModelItem>("Scrite", 1, 0, "ShortcutsModelItem", "Use as attached property.");
+    qmlRegisterUncreatableType<ShortcutsModelItem>("Scrite", 1, 0, "ShortcutsModelItem", apreason);
 
     qmlRegisterType<LibraryService>("Scrite", 1, 0, "LibraryService");
     qmlRegisterUncreatableType<Library>("Scrite", 1, 0, "Library", "Use from LibraryService.library");
@@ -254,9 +261,9 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<QAbstractItemModel>("Scrite", 1, 0, "Model", "Base type of models (QAbstractItemModel)");
 
     qmlRegisterType<TabSequenceManager>("Scrite", 1, 0, "TabSequenceManager");
-    qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", "Use as attached property.");
+    qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", apreason);
 
-    qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", "Use as attached property.");
+    qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", apreason);
 
     qmlRegisterType<NotebookTabModel>("Scrite", 1, 0, "NotebookTabModel");
 
