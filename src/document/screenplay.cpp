@@ -1404,9 +1404,9 @@ int Screenplay::firstIndexOfScene(Scene *scene) const
     return indexes.isEmpty() ? -1 : indexes.first();
 }
 
-int Screenplay::indexOfElement(const ScreenplayElement *element) const
+int Screenplay::indexOfElement(ScreenplayElement *element) const
 {
-    return m_elements.indexOf(const_cast<ScreenplayElement*>(element));
+    return m_elements.indexOf(element);
 }
 
 QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const

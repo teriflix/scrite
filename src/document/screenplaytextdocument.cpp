@@ -1668,7 +1668,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
                 sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
                 sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
-                const QVariantList data = QVariantList() << element->resolvedSceneNumber() << scene->heading()->text() << m_screenplay->indexOfElement(element);
+                const QVariantList data = QVariantList() << element->resolvedSceneNumber() << scene->heading()->text() << m_screenplay->indexOfElement(const_cast<ScreenplayElement*>(element));
                 sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, data);
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
