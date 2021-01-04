@@ -53,4 +53,5 @@ private:
     QTimer *m_documentChangeHandler = nullptr;
     TextDocumentViewportItem *m_viewportItem = nullptr;
 };
+
 #endif // TEXTDOCUMENTITEM_H

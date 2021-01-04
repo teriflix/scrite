@@ -16,6 +16,7 @@
 #include <QImage>
 #include <QTimer>
 #include <QPainter>
+#include <QQuickWindow>
 #include <QQuickPaintedItem>
 #include <QAbstractTextDocumentLayout>
 
@@ -138,7 +139,11 @@ void TextDocumentItem::updateViewport()
         return;
     }
 
-    QImage image(qAbs(width*m_documentScale), qAbs(height*m_documentScale), QImage::Format_ARGB32 );
+    const qreal dpr = this->window() ? this->window()->devicePixelRatio() : 1.0;
+    const QSizeF viewportSize(width*m_documentScale, height*m_documentScale);
+
+    QImage image( (viewportSize*dpr).toSize(), QImage::Format_ARGB32 );
+    image.setDevicePixelRatio(dpr);
     image.fill(Qt::transparent);
 
     QPainter paint;
@@ -158,10 +163,10 @@ void TextDocumentItem::updateViewport()
 
     m_viewportItem->setViewportImage(image);
 
-    m_viewportItem->setX( qMax((this->width()-image.width())/2, 0.0) );
+    m_viewportItem->setX( qMax((this->width()-viewportSize.width())/2, 0.0) );
     m_viewportItem->setY( contentY );
-    m_viewportItem->setWidth( image.width() );
-    m_viewportItem->setHeight( image.height() );
+    m_viewportItem->setWidth( viewportSize.width() );
+    m_viewportItem->setHeight( viewportSize.height() );
     m_viewportItem->setVisible(true);
 }
 
