@@ -30,6 +30,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::breakTitleChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::editorHintsChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::elementChanged, [=](){
         this->markAsModified();
     });
@@ -223,6 +224,15 @@ void ScreenplayElement::setUserData(const QJsonValue &val)
 
     m_userData = val;
     emit userDataChanged();
+}
+
+void ScreenplayElement::setEditorHints(const QJsonValue &val)
+{
+    if(m_editorHints == val)
+        return;
+
+    m_editorHints = val;
+    emit editorHintsChanged();
 }
 
 void ScreenplayElement::setSelected(bool val)

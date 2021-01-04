@@ -246,16 +246,99 @@ Rectangle {
                     property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     delegate: Loader {
-                        width: contentView.width
+                        id: contentViewDelegateLoader
                         property var componentData: modelData
-                        sourceComponent: modelData.scene ? contentComponent : breakComponent
+
                         z: contentViewModel.value.currentIndex === index ? 2 : 1
-                        /*Profiler.context: "ScreenplayEditorContentDelegate"
+                        width: contentView.width
+
+                        active: false
+                        sourceComponent: modelData.scene ? contentComponent : breakComponent
+
+                        /*
+                        Profiler.context: "ScreenplayEditorContentDelegate"
                         Profiler.active: true
                         onStatusChanged: {
-                            if(status === Ready)
+                            if(status === Loader.Ready)
                                 Profiler.active = false
-                        }*/
+                        }
+                        */
+
+                        property bool initialized: false
+                        property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex)
+                        onIsVisibleToUserChanged: {
+                            if(!active && isVisibleToUser)
+                                Qt.callLater(load)
+                        }
+
+                        function load() {
+                            if(active)
+                                return
+                            active = true
+                            app.resetObjectProperty(contentViewDelegateLoader, "height")
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            visible: !parent.active
+                            border.width: 1
+                            border.color: scene.color
+                            color: modelData.screenplayElement.scene ? Qt.tint(modelData.screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
+
+                            Text {
+                                anchors.top: parent.top
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.topMargin: 10
+
+                                width: parent.width - 20
+                                font.family: screenplayFormat.defaultFont2.family
+                                font.pointSize: screenplayFormat.defaultFont2.pointSize
+                                font.capitalization: Font.AllUppercase
+
+                                color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                                elide: Text.ElideMiddle
+                                text: {
+                                    if(scene && scene.heading.enabled)
+                                        return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
+                                    if(screenplayElementType === ScreenplayElement.BreakElementType)
+                                        return screenplayElement.breakTitle
+                                    return "NO SCENE HEADING"
+                                }
+                            }
+
+                            BusyIndicator {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.top: parent.top
+                                anchors.topMargin: 28
+                                running: parent.visible
+                            }
+                        }
+
+                        Component.onCompleted: {
+                            var editorHints = scriteDocument.isCreatedOnThisComputer ? componentData.screenplayElement.editorHints : false
+                            if(!editorHints || !scriteDocument.isCreatedOnThisComputer ||
+                                editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
+                                editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis) {
+                                active = true
+                                initialized = true
+                                return
+                            }
+
+                            height = editorHints.height * zoomLevel
+                            active = false
+                            initialized = true
+                        }
+
+                        Component.onDestruction: {
+                            if(!active)
+                                return
+                            var editorHints = {
+                                "height": height / zoomLevel,
+                                "displaySceneCharacters": screenplayEditorSettings.displaySceneCharacters,
+                                "displaySceneSynopsis": screenplayEditorSettings.displaySceneSynopsis
+                            }
+                            componentData.screenplayElement.editorHints = editorHints
+                        }
                     }
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds
@@ -404,8 +487,21 @@ Rectangle {
 
                     Component.onCompleted: positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
 
-                    property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(width/2, contentY+1), 0) : 0
-                    property int lastItemIndex: screenplayAdapter.elementCount > 0 ? validOrLastIndex(indexAt(width/2, contentY+height-2)) : 0
+                    property point firstPoint: mapToItem(contentItem, width/2, 1)
+                    property point lastPoint: mapToItem(contentItem, width/2, height-2)
+                    property int firstItemIndex: screenplayAdapter.elementCount > 0 ? Math.max(indexAt(firstPoint.x, firstPoint.y), 0) : 0
+                    property int lastItemIndex: screenplayAdapter.elementCount > 0 ? validOrLastIndex(indexAt(lastPoint.x, lastPoint.y)) : 0
+
+                    onContentYChanged: Qt.callLater(evaluateFirstAndLastPoint)
+                    onOriginYChanged: Qt.callLater(evaluateFirstAndLastPoint)
+
+                    function evaluateFirstAndLastPoint() {
+                        firstPoint = mapToItem(contentItem, width/2, 1)
+                        lastPoint = mapToItem(contentItem, width/2, height-2)
+                    }
+
+                    onFirstItemIndexChanged: console.log("PA: " + firstItemIndex + "-" + lastItemIndex)
+                    onLastItemIndexChanged: console.log("PA: " + firstItemIndex + "-" + lastItemIndex)
 
                     function validOrLastIndex(val) { return val < 0 ? screenplayAdapter.elementCount-1 : val }
 

@@ -1174,6 +1174,15 @@ void ScriteDocument::screenplayElementIndexChanged()
     }
 }
 
+void ScriteDocument::setCreatedOnThisComputer(bool val)
+{
+    if(m_createdOnThisComputer == val)
+        return;
+
+    m_createdOnThisComputer = val;
+    emit createdOnThisComputerChanged();
+}
+
 void ScriteDocument::prepareForSerialization()
 {
     // Nothing to do
@@ -1217,6 +1226,12 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
 void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 {
     const QJsonObject metaInfo = json.value("meta").toObject();
+    const QJsonObject systemInfo = metaInfo.value("system").toObject();
+
+    const QString thisMachineId = QString::fromLatin1(QSysInfo::machineUniqueId());
+    const QString jsonMachineId = systemInfo.value("machineUniqueId").toString() ;
+    this->setCreatedOnThisComputer(jsonMachineId == thisMachineId);
+
     const QString appVersion = metaInfo.value("appVersion").toString();
     const QVersionNumber version = QVersionNumber::fromString(appVersion);
     if( version <= QVersionNumber(0,1,9) )

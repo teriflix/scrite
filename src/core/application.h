@@ -218,6 +218,8 @@ public:
     Q_INVOKABLE void launchNewInstance(QWindow *window);
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
 
+    Q_INVOKABLE bool resetObjectProperty(QObject *object, const QString &propName);
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

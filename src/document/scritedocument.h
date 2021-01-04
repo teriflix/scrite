@@ -158,6 +158,10 @@ public:
     bool isLoading() const { return m_loading; }
     Q_SIGNAL void loadingChanged();
 
+    Q_PROPERTY(bool isCreatedOnThisComputer READ isCreatedOnThisComputer NOTIFY createdOnThisComputerChanged)
+    bool isCreatedOnThisComputer() const { return m_createdOnThisComputer; }
+    Q_SIGNAL void createdOnThisComputerChanged();
+
     Q_INVOKABLE void reset();
 
     Q_INVOKABLE void open(const QString &fileName);
@@ -221,6 +225,7 @@ private:
     bool modernLoad(const QString &fileName, int *format=nullptr);
     void structureElementIndexChanged();
     void screenplayElementIndexChanged();
+    void setCreatedOnThisComputer(bool val);
 
 public:
     // QObjectSerializer::Interface implementation
@@ -244,6 +249,7 @@ private:
     QString m_fileName;
     QString m_busyMessage;
     bool m_inCreateNewScene = false;
+    bool m_createdOnThisComputer = true;
     ExecLaterTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     ExecLaterTimer m_clearModifyTimer;

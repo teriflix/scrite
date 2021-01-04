@@ -1131,6 +1131,23 @@ void Application::toggleFullscreen(QWindow *window)
     }
 }
 
+bool Application::resetObjectProperty(QObject *object, const QString &propName)
+{
+    if(object == nullptr || propName.isEmpty())
+        return false;
+
+    const QMetaObject *mo = object->metaObject();
+    const int propIndex = mo->indexOfProperty(qPrintable(propName));
+    if(propIndex < 0)
+        return false;
+
+    const QMetaProperty prop = mo->property(propIndex);
+    if(!prop.isResettable())
+        return false;
+
+    return prop.reset(object);
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())

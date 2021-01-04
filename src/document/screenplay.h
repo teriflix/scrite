@@ -96,6 +96,11 @@ public:
     QJsonValue userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
+    Q_PROPERTY(QJsonValue editorHints READ editorHints WRITE setEditorHints NOTIFY editorHintsChanged)
+    void setEditorHints(const QJsonValue &val);
+    QJsonValue editorHints() const { return m_editorHints; }
+    Q_SIGNAL void editorHintsChanged();
+
     Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
     void setSelected(bool val);
     bool isSelected() const { return m_selected; }
@@ -127,6 +132,7 @@ private:
     QJsonValue m_userData;
     int m_customSceneNumber = -1;
     bool m_elementTypeIsSet = false;
+    QJsonValue m_editorHints;
     QString m_userSceneNumber;
     ElementType m_elementType = SceneElementType;
     QObjectProperty<Scene> m_scene;
