@@ -10,5 +10,6 @@
         <file>images/library_inverted.png</file>
         <file>images/library_woicon.png</file>
         <file>images/library_woicon_inverted.png</file>
+        <file>images/sample_scene.png</file>
     </qresource>
 </RCC>

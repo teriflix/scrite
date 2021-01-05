@@ -254,15 +254,12 @@ Rectangle {
 
                         active: false
                         sourceComponent: modelData.scene ? contentComponent : breakComponent
-
-                        /*
                         Profiler.context: "ScreenplayEditorContentDelegate"
                         Profiler.active: true
                         onStatusChanged: {
                             if(status === Loader.Ready)
                                 Profiler.active = false
                         }
-                        */
 
                         property bool initialized: false
                         property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex)
@@ -286,31 +283,39 @@ Rectangle {
                             color: modelData.screenplayElement.scene ? Qt.tint(modelData.screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
 
                             Text {
+                                id: sceneHeadingText
+                                anchors.left: parent.left
+                                anchors.leftMargin: ruler.leftMarginPx
+                                anchors.right: parent.right
+                                anchors.rightMargin: ruler.rightMarginPx
                                 anchors.top: parent.top
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.topMargin: 10
+                                anchors.topMargin: 20
 
                                 width: parent.width - 20
-                                font.family: screenplayFormat.defaultFont2.family
-                                font.pointSize: screenplayFormat.defaultFont2.pointSize
-                                font.capitalization: Font.AllUppercase
+                                property SceneElementFormat headingFormat: screenplayFormat.elementFormat(SceneElement.Heading)
+                                font: headingFormat.font2
 
                                 color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
                                 elide: Text.ElideMiddle
                                 text: {
                                     if(scene && scene.heading.enabled)
-                                        return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
+                                        return scene.heading.text
                                     if(screenplayElementType === ScreenplayElement.BreakElementType)
                                         return screenplayElement.breakTitle
                                     return "NO SCENE HEADING"
                                 }
                             }
 
-                            BusyIndicator {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.top: parent.top
-                                anchors.topMargin: 28
-                                running: parent.visible
+                            Image {
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                anchors.top: sceneHeadingText.bottom
+                                anchors.topMargin: 20
+                                anchors.bottomMargin: 20
+                                fillMode: Image.TileVertically
+                                source: "../images/sample_scene.png"
+                                opacity: 0.5
                             }
                         }
 
@@ -328,6 +333,7 @@ Rectangle {
                             height = editorHints.height * zoomLevel
                             active = false
                             initialized = true
+                            app.execLater(contentViewDelegateLoader, 2000, load)
                         }
 
                         Component.onDestruction: {
@@ -500,9 +506,6 @@ Rectangle {
                         firstPoint = mapToItem(contentItem, width/2, 1)
                         lastPoint = mapToItem(contentItem, width/2, height-2)
                     }
-
-                    onFirstItemIndexChanged: console.log("PA: " + firstItemIndex + "-" + lastItemIndex)
-                    onLastItemIndexChanged: console.log("PA: " + firstItemIndex + "-" + lastItemIndex)
 
                     function validOrLastIndex(val) { return val < 0 ? screenplayAdapter.elementCount-1 : val }
 
