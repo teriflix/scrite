@@ -254,12 +254,15 @@ Rectangle {
 
                         active: false
                         sourceComponent: modelData.scene ? contentComponent : breakComponent
+
+                        /*
                         Profiler.context: "ScreenplayEditorContentDelegate"
                         Profiler.active: true
                         onStatusChanged: {
                             if(status === Loader.Ready)
                                 Profiler.active = false
                         }
+                        */
 
                         property bool initialized: false
                         property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex)
