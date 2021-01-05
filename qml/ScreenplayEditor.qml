@@ -316,7 +316,8 @@ Rectangle {
 
                         Component.onCompleted: {
                             var editorHints = scriteDocument.isCreatedOnThisComputer ? componentData.screenplayElement.editorHints : false
-                            if(!editorHints || !scriteDocument.isCreatedOnThisComputer ||
+                            if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
+                                !editorHints || !scriteDocument.isCreatedOnThisComputer ||
                                 editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
                                 editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis) {
                                 active = true
@@ -330,7 +331,7 @@ Rectangle {
                         }
 
                         Component.onDestruction: {
-                            if(!active)
+                            if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType )
                                 return
                             var editorHints = {
                                 "height": height / zoomLevel,
