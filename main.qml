@@ -482,6 +482,8 @@ Rectangle {
                     showInformation({
                         "message": "The Windows version of Scrite works best on Windows 10. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on Windows 10 PCs."
                     })
+                if(fileNameToOpen !== "")
+                    scriteDocument.open(fileNameToOpen)
             }
         }
     }

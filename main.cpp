@@ -320,6 +320,40 @@ int main(int argc, char **argv)
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);
     qmlView.engine()->rootContext()->setContextProperty("shortcutsModel", ShortcutsModel::instance());
     qmlView.engine()->rootContext()->setContextProperty("notificationManager", &notificationManager);
+
+    QString fileNameToOpen;
+
+#ifdef Q_OS_MAC
+    if(!a.fileToOpen().isEmpty())
+        fileNameToOpen = a.fileToOpen();
+    a.setHandleFileOpenEvents(true);
+#else
+    if(a.arguments().size() > 1)
+    {
+        bool hasOptions = false;
+        Q_FOREACH(QString arg, a.arguments())
+        {
+            if(arg.startsWith(QStringLiteral("--")))
+            {
+                hasOptions = true;
+                break;
+            }
+        }
+
+        if(!hasOptions)
+        {
+#ifdef Q_OS_WIN
+            fileNameToOpen = a.arguments().last();
+#else
+            QStringList args = a.arguments();
+            args.takeFirst();
+            fileNameToOpen = args.join( QStringLiteral(" ") );
+#endif
+        }
+    }
+#endif
+
+    qmlView.rootContext()->setContextProperty(QStringLiteral("fileNameToOpen"), fileNameToOpen);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
     Automation::init(&qmlView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
@@ -352,36 +386,6 @@ int main(int argc, char **argv)
 #endif
 
     QObject::connect(&a, &Application::minimizeWindowRequest, &qmlView, &QQuickView::showMinimized);
-
-#ifdef Q_OS_MAC
-    if(!a.fileToOpen().isEmpty())
-        scriteDocument->open(a.fileToOpen());
-    a.setHandleFileOpenEvents(true);
-#else
-    if(a.arguments().size() > 1)
-    {
-        bool hasOptions = false;
-        Q_FOREACH(QString arg, a.arguments())
-        {
-            if(arg.startsWith(QStringLiteral("--")))
-            {
-                hasOptions = true;
-                break;
-            }
-        }
-
-        if(!hasOptions)
-        {
-#ifdef Q_OS_WIN
-            scriteDocument->open( a.arguments().last() );
-#else
-            QStringList args = a.arguments();
-            args.takeFirst();
-            scriteDocument->open( args.join(QStringLiteral(" ")) );
-#endif
-        }
-    }
-#endif
 
     return a.exec();
 }
