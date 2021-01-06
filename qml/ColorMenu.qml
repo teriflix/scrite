@@ -17,7 +17,7 @@ import QtQuick.Controls 2.13
 Menu2 {
     id: colorMenu
     width: minCellSize * 5 + 10
-    height: minCellSize * 4 + 10
+    height: minCellSize * (4 + Math.ceil((workspaceSettings.customColors.length+1)/4)) +  10
 
     signal menuItemClicked(string color)
     readonly property real minCellSize: 50
@@ -38,37 +38,65 @@ Menu2 {
 
             Repeater {
                 model: app.standardColors
+                delegate: colorItemDelegate
+            }
 
-                Rectangle {
-                    width: parent.cellSize
-                    height: parent.cellSize
-                    color: (colorGrid.currentIndex === index) ? app.translucent(app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
-                    Component.onCompleted: {
-                        if(modelData == selectedColor)
-                            colorGrid.currentIndex = index
-                    }
+            Repeater {
+                model: workspaceSettings.customColors
+                delegate: colorItemDelegate
+            }
 
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        border {
-                            width: (colorGrid.currentIndex === index) ? 3 : 1;
-                            color: Qt.darker(modelData)
-                        }
-                        color: modelData
-                    }
+            ToolButton2 {
+                icon.source: "../icons/content/add_circle_outline.png"
+                suggestedWidth: colorGrid.cellSize
+                suggestedHeight: colorGrid.cellSize
+                ToolTip.text: "Pick a custom color"
+                onClicked: {
+                    var color = app.pickColor("white")
+                    var colors = workspaceSettings.customColors
+                    colors.unshift(color)
+                    if(colors.length > 10)
+                        colors.pop()
+                    workspaceSettings.customColors = colors
 
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            colorMenu.menuItemClicked(modelData)
-                            colorMenu.close()
-                        }
-                        onEntered: colorGrid.currentIndex = index
-                    }
+                    colorMenu.menuItemClicked(modelData)
+                    colorMenu.close()
                 }
+            }
+        }
+    }
+
+    Component {
+        id: colorItemDelegate
+
+        Rectangle {
+            width: parent.cellSize
+            height: parent.cellSize
+            color: (colorGrid.currentIndex === index) ? app.translucent(app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            Component.onCompleted: {
+                if(modelData == selectedColor)
+                    colorGrid.currentIndex = index
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 4
+                border {
+                    width: (colorGrid.currentIndex === index) ? 3 : 1;
+                    color: Qt.darker(modelData)
+                }
+                color: modelData
+            }
+
+            MouseArea {
+                id: mouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    colorMenu.menuItemClicked(modelData)
+                    colorMenu.close()
+                }
+                onEntered: colorGrid.currentIndex = index
             }
         }
     }
