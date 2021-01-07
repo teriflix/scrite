@@ -173,5 +173,11 @@
         <file>icons/mediaplayer/time_column_inverted.png</file>
         <file>icons/mediaplayer/reset_screenplay_offsets_inverted.png</file>
         <file>icons/mediaplayer/reset_screenplay_offsets.png</file>
+        <file>icons/editor/format_bold_inverted.png</file>
+        <file>icons/editor/format_bold.png</file>
+        <file>icons/editor/format_ital24px_inverted.png</file>
+        <file>icons/editor/format_ital24px.png</file>
+        <file>icons/editor/format_underline_inverted.png</file>
+        <file>icons/editor/format_underline.png</file>
     </qresource>
 </RCC>

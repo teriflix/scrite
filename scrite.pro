@@ -58,6 +58,7 @@ HEADERS += \
     src/quick/items/boundingboxevaluator.h \
     src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
+    src/quick/objects/colorimageprovider.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
@@ -156,6 +157,7 @@ SOURCES += \
     src/quick/items/boundingboxevaluator.cpp \
     src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
+    src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/fileinfo.cpp \

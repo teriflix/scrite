@@ -912,6 +912,135 @@ int ScreenplayFormat::staticElementFormatCount(QQmlListProperty<SceneElementForm
 
 ///////////////////////////////////////////////////////////////////////////////
 
+TextFormat::TextFormat(QObject *parent)
+    : QObject(parent)
+{
+    connect(this, &TextFormat::boldChanged, this, &TextFormat::formatChanged);
+    connect(this, &TextFormat::italicChanged, this, &TextFormat::formatChanged);
+    connect(this, &TextFormat::underlineChanged, this, &TextFormat::formatChanged);
+    connect(this, &TextFormat::textColorChanged, this, &TextFormat::formatChanged);
+    connect(this, &TextFormat::backgroundColorChanged, this, &TextFormat::formatChanged);
+}
+
+TextFormat::~TextFormat()
+{
+
+}
+
+void TextFormat::setBold(bool val)
+{
+    if(m_bold == val)
+        return;
+
+    m_bold = val;
+    emit boldChanged();
+
+    qDebug() << "PA: " << this << val;
+}
+
+void TextFormat::setItalic(bool val)
+{
+    if(m_italic == val)
+        return;
+
+    m_italic = val;
+    emit italicChanged();
+
+    qDebug() << "PA: " << this << val;
+}
+
+void TextFormat::setUnderline(bool val)
+{
+    if(m_underline == val)
+        return;
+
+    m_underline = val;
+    emit underlineChanged();
+
+    qDebug() << "PA: " << this << val;
+}
+
+void TextFormat::setTextColor(const QColor &val)
+{
+    if(m_textColor == val)
+        return;
+
+    m_textColor = val;
+    emit textColorChanged();
+}
+
+void TextFormat::setBackgroundColor(const QColor &val)
+{
+    if(m_backgroundColor == val)
+        return;
+
+    m_backgroundColor = val;
+    emit backgroundColorChanged();
+}
+
+void TextFormat::reset()
+{
+    this->resetTextColor();
+    this->resetBackgroundColor();
+    this->setBold(false);
+    this->setItalic(false);
+    this->setUnderline(false);
+}
+
+void TextFormat::updateFromFormat(const QTextCharFormat &format)
+{
+    if(format.hasProperty(QTextFormat::ForegroundBrush))
+        this->setTextColor(format.foreground().color());
+    else
+        this->resetTextColor();
+
+    if(format.hasProperty(QTextFormat::BackgroundBrush))
+        this->setBackgroundColor(format.background().color());
+    else
+        this->resetBackgroundColor();
+
+    if(format.hasProperty(QTextFormat::FontWeight))
+        this->setBold(format.fontWeight() == QFont::Bold);
+    else
+        this->setBold(false);
+
+    if(format.hasProperty(QTextFormat::FontItalic))
+        this->setItalic(format.fontItalic());
+    else
+        this->setItalic(false);
+
+    if(format.hasProperty(QTextFormat::FontUnderline))
+        this->setUnderline(format.fontUnderline());
+    else
+        this->setUnderline(false);
+
+    emit formatChanged();
+}
+
+QTextCharFormat TextFormat::toFormat() const
+{
+    QTextCharFormat format;
+
+    if(m_textColor.alpha() > 0)
+        format.setForeground(m_textColor);
+
+    if(m_backgroundColor.alpha() > 0)
+        format.setBackground(m_backgroundColor);
+
+    if(m_bold)
+        format.setFontWeight(QFont::Bold);
+
+    if(m_italic)
+        format.setFontItalic(true);
+
+    if(m_underline)
+        format.setFontUnderline(true);
+
+    return format;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 class SceneDocumentBlockUserData : public QTextBlockUserData
 {    
 public:
@@ -1212,6 +1341,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     {
         m_cursorPosition = -1;
         m_currentElementCursorPosition = -1;
+        m_textFormat->reset();
         emit cursorPositionChanged();
 		return;
     }
@@ -1226,12 +1356,14 @@ void SceneDocumentBinder::setCursorPosition(int val)
 
     if(m_cursorPosition < 0)
     {
+        m_textFormat->reset();
         emit cursorPositionChanged();
         return;
     }
 
     if(this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount())
     {
+        m_textFormat->reset();
         emit cursorPositionChanged();
         return;
     }
@@ -1244,6 +1376,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     {
         qDebug("[%d] There is no block at the cursor position %d.", __LINE__, val);
         emit cursorPositionChanged();
+        m_textFormat->reset();
         return;
     }
 
@@ -1257,6 +1390,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if(userData == nullptr)
     {
         this->setCurrentElement(nullptr);
+        m_textFormat->reset();
         qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, val);
     }
     else
@@ -1268,6 +1402,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
         const QTextCharFormat format = cursor.charFormat();
         this->setWordUnderCursorIsMisspelled(format.property(IsWordMisspelledProperty).toBool());
         this->setSpellingSuggestions(format.property(WordSuggestionsProperty).toStringList());
+        m_textFormat->updateFromFormat(format);
     }
 
     m_currentElementCursorPosition = m_cursorPosition - block.position();
@@ -2404,4 +2539,9 @@ void SceneDocumentBinder::rehighlightBlockLater(const QTextBlock &block)
     this->rehighlightLater();
 }
 
+void SceneDocumentBinder::onTextFormatChanged()
+{
+    // TODO: here is where we can take changes made to text format
+    // and apply it to the text document at the current cursor.
+}
 

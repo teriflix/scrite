@@ -54,6 +54,7 @@ Item {
         property string lastOpenExportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
+        property var customColors: []
 
         onShowNotebookInStructureChanged: {
             app.execLater(workspaceSettings, 100, function() {
@@ -78,6 +79,9 @@ Item {
             modalDialog.animationsEnabled = enableAnimations
             statusText.enableAnimations = enableAnimations
         }
+
+        property real textFormatDockWidgetX: -1
+        property real textFormatDockWidgetY: -1
     }
 
     Settings {

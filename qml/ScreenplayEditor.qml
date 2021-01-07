@@ -79,8 +79,8 @@ Rectangle {
         onNewSceneCreated: {
             app.execLater(screenplayAdapter.screenplay, 100, function() {
                 contentView.positionViewAtIndex(screenplayIndex, ListView.Visible)
-                var delegate = contentView.itemAtIndex(screenplayIndex)
-                delegate.item.assumeFocus()
+                var item = contentView.loadedItemAtIndex(screenplayIndex)
+                item.assumeFocus()
             })
         }
         onLoadingChanged: zoomSlider.reset()
@@ -286,6 +286,16 @@ Rectangle {
                             color: modelData.screenplayElement.scene ? Qt.tint(modelData.screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
 
                             Text {
+                                font: sceneHeadingText.font
+                                anchors.verticalCenter: sceneHeadingText.verticalCenter
+                                anchors.right: sceneHeadingText.left
+                                anchors.rightMargin: 20
+                                width: headingFontMetrics.averageCharacterWidth*5
+                                color: screenplayElement.hasUserSceneNumber ? "black" : "gray"
+                                text: screenplayElement.resolvedSceneNumber
+                            }
+
+                            Text {
                                 id: sceneHeadingText
                                 anchors.left: parent.left
                                 anchors.leftMargin: ruler.leftMarginPx
@@ -323,9 +333,9 @@ Rectangle {
                         }
 
                         Component.onCompleted: {
-                            var editorHints = scriteDocument.isCreatedOnThisComputer ? componentData.screenplayElement.editorHints : false
+                            var editorHints = componentData.screenplayElement.editorHints
                             if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                                !editorHints || !scriteDocument.isCreatedOnThisComputer ||
+                                !editorHints ||
                                 editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
                                 editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis) {
                                 active = true
@@ -556,6 +566,13 @@ Rectangle {
                             contentView.contentY = pt.y
                         else
                             contentView.contentY = (pt.y + 2*rect.height) - contentView.height
+                    }
+
+                    function loadedItemAtIndex(index) {
+                        var loader = contentView.itemAtIndex(index)
+                        if(loader.item === null)
+                            loader.load()
+                        return loader.item
                     }
                 }
             }
@@ -1639,7 +1656,7 @@ Rectangle {
                 }
 
                 contentView.scrollIntoView(idx)
-                var item = contentView.itemAtIndex(idx).item
+                var item = contentView.loadedItemAtIndex(idx)
                 item.assumeFocusAt(-1)
             }
 
@@ -1652,7 +1669,7 @@ Rectangle {
                 }
 
                 contentView.scrollIntoView(idx)
-                var item = contentView.itemAtIndex(idx).item
+                var item = contentView.loadedItemAtIndex(idx)
                 item.assumeFocusAt(0)
             }
         }
@@ -1707,6 +1724,7 @@ Rectangle {
                         visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType &&
                                  headingItem.theScene.heading.enabled &&
                                  screenplayAdapter.isSourceScreenplay
+                        onActiveFocusChanged: screenplayAdapter.currentIndex = headingItem.theElementIndex
                     }
                 }
             }
@@ -1730,6 +1748,7 @@ Rectangle {
                         width: parent.width - sceneMenuButton.width - parent.spacing
                         height: item ? item.contentHeight : headingFontMetrics.lineSpacing
                         property bool viewOnly: true
+                        property int sceneIndex: headingItem.theElementIndex
                         property SceneHeading sceneHeading: headingItem.theScene.heading
                         property TextArea sceneTextEditor: headingItem.sceneTextEditor
                         sourceComponent: {
@@ -1887,6 +1906,7 @@ Rectangle {
             height: layout.height + 4
             Component.onCompleted: {
                 locTypeEdit.forceActiveFocus()
+                screenplayAdapter.currentIndex = sceneIndex
             }
 
             signal editingFinished()
@@ -1907,7 +1927,7 @@ Rectangle {
                 TextField2 {
                     id: locTypeEdit
                     font: headingFontMetrics.font
-                    width: Math.min(contentWidth, 120*zoomLevel)
+                    width: Math.max(headingFontMetrics.averageCharacterWidth*5, Math.min(contentWidth, 120*zoomLevel))
                     anchors.verticalCenter: parent.verticalCenter
                     text: sceneHeading.locationType
                     completionStrings: scriteDocument.structure.standardLocationTypes()
@@ -1915,6 +1935,7 @@ Rectangle {
                     onEditingComplete: sceneHeading.locationType = text
                     tabItem: locEdit
                     includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
+                    onActiveFocusChanged: screenplayAdapter.currentIndex = sceneIndex
                 }
 
                 Text {
@@ -1935,6 +1956,7 @@ Rectangle {
                     onEditingComplete: sceneHeading.location = text
                     tabItem: momentEdit
                     includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
+                    onActiveFocusChanged: screenplayAdapter.currentIndex = sceneIndex
                 }
 
                 Text {
@@ -1947,7 +1969,7 @@ Rectangle {
                 TextField2 {
                     id: momentEdit
                     font: headingFontMetrics.font
-                    width: Math.min(contentWidth, 200*zoomLevel)
+                    width: Math.max(headingFontMetrics.averageCharacterWidth*5, Math.min(contentWidth, 200*zoomLevel))
                     anchors.verticalCenter: parent.verticalCenter
                     text: sceneHeading.moment
                     enableTransliteration: true
@@ -1955,6 +1977,7 @@ Rectangle {
                     onEditingComplete: sceneHeading.moment = text
                     tabItem: sceneTextEditor
                     includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
+                    onActiveFocusChanged: screenplayAdapter.currentIndex = sceneIndex
                 }
             }
         }
@@ -2648,4 +2671,126 @@ Rectangle {
             Item { width: parent.width; height: 35 * zoomLevel }
         }
     }
+
+    /*
+    DockWidget {
+        id: textFormatDockWindow
+        anchors.fill: parent
+        contentX: Math.min( screenplayEditorSettings.textFormatDockWidgetX, parent.width-contentWidth )
+        contentY: Math.min( screenplayEditorSettings.textFormatDockWidgetY, parent.height-contentHeight )
+        contentWidth: 250
+        contentHeight: 225
+        onContentXChanged: Qt.callLater( updatePositionInSettings )
+        onContentYChanged: Qt.callLater( updatePositionInSettings )
+        function updatePositionInSettings() {
+            screenplayEditorSettings.textFormatDockWidgetX = contentX
+            screenplayEditorSettings.textFormatDockWidgetY = contentY
+        }
+
+        title: "Text Formatting"
+        property SceneDocumentBinder binder: globalScreenplayEditorToolbar.binder
+        active: binder !== null
+        visible: active
+        content: Item {
+            implicitWidth: toolBarLayout.width + 10
+            implicitHeight: toolBarLayout.height + 10
+
+            readonly property real buttonSize: 55
+            readonly property TextFormat textFormat: textFormatDockWindow.binder.textFormat
+
+            Column {
+                id: toolBarLayout
+                width: buttonSize * 4
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 5
+                spacing: 5
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    ToolButton3 {
+                        iconSource: "../icons/editor/format_bold.png"
+                        ToolTip.visible: false
+                        checkable: true
+                        checked: textFormat.bold
+                        onToggled: textFormat.bold = checked
+                    }
+
+                    ToolButton3 {
+                        iconSource: "../icons/editor/format_ital24px.png"
+                        ToolTip.visible: false
+                        checkable: true
+                        checked: textFormat.italic
+                        onToggled: textFormat.italic = checked
+                    }
+
+                    ToolButton3 {
+                        iconSource: "../icons/editor/format_underline.png"
+                        ToolTip.visible: false
+                        checkable: true
+                        checked: textFormat.underline
+                        onToggled: textFormat.underline = checked
+                    }
+                }
+
+                Row {
+                    width: parent.width
+
+                    Text {
+                        text: "Text Color: "
+                        width: parent.width - 44
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pointSize: app.idealFontPointSize
+                    }
+
+                    Rectangle {
+                        color: textFormat.hasTextColor ? textFormat.textColor : Qt.rgba(0,0,0,0)
+                        width: 42; height: width
+                        border.width: 1
+                        border.color: "black"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: textColorMenu.popup()
+                        }
+
+                        ColorMenu {
+                            id: textColorMenu
+                            onMenuItemClicked: textFormat.textColor = color
+                        }
+                    }
+                }
+
+                Row {
+                    width: parent.width
+
+                    Text {
+                        text: "Background Color: "
+                        width: parent.width - 44
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pointSize: app.idealFontPointSize
+                    }
+
+                    Rectangle {
+                        color: textFormat.hasBackgroundColor ? textFormat.backgroundColor : Qt.rgba(0,0,0,0)
+                        width: 42; height: width
+                        border.width: 1
+                        border.color: "black"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: backgroundColorMenu.popup()
+                        }
+
+                        ColorMenu {
+                            id: backgroundColorMenu
+                            onMenuItemClicked: textFormat.backgroundColor = color
+                        }
+                    }
+                }
+            }
+        }
+    }
+    */
 }

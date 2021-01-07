@@ -51,7 +51,7 @@ Item {
         id: downIndicator
         anchors.fill: parent
         color: Qt.rgba(0,0,0,0.15)
-        visible: parent.checkable & parent.checked || parent.down
+        visible: parent.checkable && parent.checked || parent.down
         radius: 6
     }
 

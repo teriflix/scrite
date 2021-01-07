@@ -380,6 +380,63 @@ private:
     QList<SceneElementFormat*> m_elementFormats;
 };
 
+class TextFormat : public QObject
+{
+    Q_OBJECT
+
+public:
+    TextFormat(QObject *parent=nullptr);
+    ~TextFormat();
+
+    Q_PROPERTY(bool bold READ isBold WRITE setBold NOTIFY boldChanged)
+    void setBold(bool val);
+    bool isBold() const { return m_bold; }
+    Q_SIGNAL void boldChanged();
+
+    Q_PROPERTY(bool italic READ isItalic WRITE setItalic NOTIFY italicChanged)
+    void setItalic(bool val);
+    bool isItalic() const { return m_italic; }
+    Q_SIGNAL void italicChanged();
+
+    Q_PROPERTY(bool underline READ isUnderline WRITE setUnderline NOTIFY underlineChanged)
+    void setUnderline(bool val);
+    bool isUnderline() const { return m_underline; }
+    Q_SIGNAL void underlineChanged();
+
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    void setTextColor(const QColor &val);
+    QColor textColor() const { return m_textColor; }
+    Q_SIGNAL void textColorChanged();
+
+    Q_PROPERTY(bool hasTextColor READ hasTextColor NOTIFY textColorChanged)
+    bool hasTextColor() const { return m_textColor.alpha() > 0 ; }
+
+    Q_INVOKABLE void resetTextColor() { this->setTextColor(Qt::transparent); }
+
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    void setBackgroundColor(const QColor &val);
+    QColor backgroundColor() const { return m_backgroundColor; }
+    Q_SIGNAL void backgroundColorChanged();
+
+    Q_PROPERTY(bool hasBackgroundColor READ hasBackgroundColor NOTIFY backgroundColorChanged)
+    bool hasBackgroundColor() const { return m_backgroundColor.alpha() > 0; }
+
+    Q_INVOKABLE void resetBackgroundColor() { this->setBackgroundColor(Qt::transparent); }
+
+    void reset();
+    void updateFromFormat(const QTextCharFormat &format);
+    QTextCharFormat toFormat() const;
+
+    Q_SIGNAL void formatChanged();
+
+private:
+    bool m_bold = false;
+    bool m_italic = false;
+    bool m_underline = false;
+    QColor m_textColor = Qt::transparent;
+    QColor m_backgroundColor = Qt::transparent;
+};
+
 class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
 {
     Q_OBJECT
@@ -423,6 +480,9 @@ public:
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
+
+    Q_PROPERTY(TextFormat* textFormat READ textFormat CONSTANT)
+    TextFormat* textFormat() const { return m_textFormat; }
 
     Q_SIGNAL void requestCursorPosition(int position);
 
@@ -545,11 +605,14 @@ private:
     void rehighlightLater();
     void rehighlightBlockLater(const QTextBlock &block);
 
+    void onTextFormatChanged();
+
 private:
     friend class SpellCheckService;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
     int m_documentLoadCount = 0;
+    TextFormat* m_textFormat = new TextFormat(this);
     bool m_sceneIsBeingReset = false;
     bool m_forceSyncDocument = false;
     bool m_spellCheckEnabled = true;

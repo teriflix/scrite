@@ -1721,6 +1721,12 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
     }
 
     this->evaluateSceneNumbers();
+
+    if(!m_scriteDocument->isCreatedOnThisComputer())
+    {
+        for(ScreenplayElement *element : m_elements)
+            element->setEditorHints(QJsonValue());
+    }
 }
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const

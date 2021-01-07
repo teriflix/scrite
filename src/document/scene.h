@@ -19,12 +19,13 @@
 #include <QColor>
 #include <QPointer>
 #include <QJsonArray>
+#include <QTextLayout>
 #include <QUndoCommand>
 #include <QReadWriteLock>
 #include <QQmlListProperty>
+#include <QQuickPaintedItem>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
-#include <QQuickPaintedItem>
 
 #include "note.h"
 #include "modifiable.h"

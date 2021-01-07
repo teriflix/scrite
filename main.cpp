@@ -54,6 +54,7 @@
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
 #include "spellcheckservice.h"
+#include "colorimageprovider.h"
 #include "tabsequencemanager.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
@@ -173,6 +174,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<ScreenplayPageLayout>("Scrite", 1, 0, "ScreenplayPageLayout", reason);
 
     qmlRegisterType<SceneDocumentBinder>("Scrite", 1, 0, "SceneDocumentBinder");
+    qmlRegisterUncreatableType<TextFormat>("Scrite", 1, 0, "TextFormat", "Use the instance provided by SceneDocumentBinder.textFormat property.");
 
     qmlRegisterType<GridBackgroundItem>("Scrite", 1, 0, "GridBackground");
     qmlRegisterUncreatableType<GridBackgroundItemBorder>("Scrite", 1, 0, "GridBackgroundItemBorder", reason);
@@ -315,6 +317,7 @@ int main(int argc, char **argv)
     a.initializeStandardColors(qmlView.engine());
     qmlView.setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
+    qmlView.engine()->addImageProvider(QStringLiteral("color"), new ColorImageProvider);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
     qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);

@@ -17,6 +17,7 @@ import Scrite 1.0
 Item {
     id: dockWidget
     property alias title: titleText.text
+    property alias active: contentLoader.active
     property alias content: contentLoader.sourceComponent
     property real contentX
     property real contentY
