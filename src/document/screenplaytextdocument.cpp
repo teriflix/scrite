@@ -1697,9 +1697,56 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 if(insertBlock)
                     cursor.insertBlock();
 
-                prepareCursor(cursor, SceneElement::Heading, !insertBlock);
-                cursor.mergeCharFormat(highlightCharFormat);
-                cursor.insertText( QStringLiteral("{") + sceneCharacters.join(", ") + QStringLiteral("}") );
+                prepareCursor(cursor, SceneElement::Action, !insertBlock);
+
+                if(m_purpose == ForDisplay)
+                {
+                    cursor.insertHtml( QStringLiteral("<strong>Characters: </strong>") );
+                    cursor.insertHtml( sceneCharacters.join(QStringLiteral(", ") ) );
+                }
+                else
+                {
+                    QFont font = m_textDocument->defaultFont();
+                    font.setPointSize(font.pointSize()-2);
+
+                    const QFontMetrics fontMetrics(font);
+                    const qreal ipr = 2.0; // Image Pixel Ratio
+                    const int padding = 6;
+
+                    auto insertTextAsImage = [&](const QString &text, bool withBackground) {
+                        QRect textRect = fontMetrics.boundingRect(text);
+                        textRect.moveTopLeft( QPoint(0,0) );
+                        textRect.setWidth( textRect.width() + 2*fontMetrics.averageCharWidth() );
+                        textRect.adjust(padding, padding, padding, padding);
+
+                        const QSize imageSize = (textRect.size() + QSize(padding,padding)*2)*ipr;
+
+                        QImage image(imageSize, QImage::Format_ARGB32);
+                        image.setDevicePixelRatio(ipr);
+                        image.fill(Qt::transparent);
+
+                        const QRect bgRect = textRect.adjusted(-padding/2, -padding/2, padding/2, padding/2);
+
+                        QPainter paint(&image);
+                        paint.setRenderHint(QPainter::Antialiasing);
+                        paint.setRenderHint(QPainter::TextAntialiasing);
+                        paint.setFont(font);
+                        paint.setPen( QPen(Qt::black,0.5) );
+                        if(withBackground) {
+                            paint.setBrush(QColor(245,245,245));
+                            paint.drawRoundedRect(bgRect, bgRect.height()/2, bgRect.height()/2);
+                        }
+                        paint.drawText(textRect, Qt::AlignCenter, text);
+                        paint.end();
+
+                        cursor.insertImage(image);
+                    };
+
+                    insertTextAsImage(QStringLiteral("Characters:"), false);
+                    for(const QString &sceneCharacter : sceneCharacters)
+                        insertTextAsImage(sceneCharacter, true);
+                }
+
                 insertBlock = true;
             }
         }
