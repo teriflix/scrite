@@ -288,7 +288,8 @@ DISTFILES += \
 # modified to current time stamp before every build. This ensures that build
 # timestamp is always accurate whenever we initialte a build of Scrite.
 win32 {
-    QMAKE_POST_LINK = 'call COPY /B $$PWD/src/core/application_build_timestamp.cpp++,,$$PWD/src/core/application_build_timestamp.cpp'
+    CODE_PATH=$$shell_path($$PWD)
+    QMAKE_POST_LINK = 'call COPY /B $$CODE_PATH\\src\\core\\application_build_timestamp.cpp+,,$$CODE_PATH\\src\\core\\application_build_timestamp.cpp'
 } else {
     QMAKE_POST_LINK = '/bin/bash -c "touch $$PWD/src/core/application_build_timestamp.cpp"'
 }
