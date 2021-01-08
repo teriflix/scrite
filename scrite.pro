@@ -146,6 +146,7 @@ SOURCES += \
     src/automation/pausestep.cpp \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
+    src/core/application_build_timestamp.cpp \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/characterrelationshipsgraph.cpp \
@@ -283,4 +284,12 @@ DISTFILES += \
     tools/urlattribs/urlattribs.php \
     tools/urlattribs/OpenGraph.php
 
+# The following lines ensure that timestamp of application_build_timestamp.cpp is
+# modified to current time stamp before every build. This ensures that build
+# timestamp is always accurate whenever we initialte a build of Scrite.
+win32 {
+    QMAKE_POST_LINK = 'call COPY /B $$PWD/src/core/application_build_timestamp.cpp++,,$$PWD/src/core/application_build_timestamp.cpp'
+} else {
+    QMAKE_POST_LINK = '/bin/bash -c "touch $$PWD/src/core/application_build_timestamp.cpp"'
+}
 
