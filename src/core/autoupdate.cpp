@@ -331,7 +331,7 @@ QString AutoUpdate::getClientId() const
     if(ret.isEmpty())
     {
         ret = "scrite-";
-        ret += Application::instance()->applicationVersion() + " ";
+        ret += Application::instance()->applicationVersion() + "[" + Application::instance()->buildTimestamp() + "] ";
         QString prodName = QSysInfo::prettyProductName() + "-" + QSysInfo::currentCpuArchitecture();
         prodName.replace(" ", "_");
         ret += prodName + " ";
