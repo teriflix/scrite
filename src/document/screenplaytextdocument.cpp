@@ -39,6 +39,7 @@
 #include <QAbstractTextDocumentLayout>
 #include <QJsonDocument>
 #include <QPropertyAnimation>
+#include <QUrl>
 
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
@@ -708,6 +709,7 @@ void ScreenplayTextDocument::loadScreenplay()
     this->clearTextFrames();
     m_sceneResetList.clear();
     m_textDocument->clear();
+    m_textDocument->setProperty("#characterImageResourceUrls", QVariant());
     m_sceneResetTimer.stop();
     m_pageBoundaryEvalTimer.stop();
 
@@ -734,7 +736,7 @@ void ScreenplayTextDocument::loadScreenplay()
         }
     }
 
-    const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
+    // const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
 
     // So that QTextDocumentPrinter can pick up this for header and footer fields.
     m_textDocument->setProperty("#title", m_screenplay->title());
@@ -1713,38 +1715,57 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     const qreal ipr = 2.0; // Image Pixel Ratio
                     const int padding = 6;
 
-                    auto insertTextAsImage = [&](const QString &text, bool withBackground) {
-                        QRect textRect = fontMetrics.boundingRect(text);
-                        textRect.moveTopLeft( QPoint(0,0) );
-                        textRect.setWidth( textRect.width() + 2*fontMetrics.averageCharWidth() );
-                        textRect.adjust(padding, padding, padding, padding);
+                    QVariantMap characterImageResourceUrls = m_textDocument->property("#characterImageResourceUrls").toMap();
 
-                        const QSize imageSize = (textRect.size() + QSize(padding,padding)*2)*ipr;
+                    auto insertTextAsImage = [&](const QString &name, const QString &text, bool withBackground) {
+                        QUrl url;
 
-                        QImage image(imageSize, QImage::Format_ARGB32);
-                        image.setDevicePixelRatio(ipr);
-                        image.fill(Qt::transparent);
+                        if(characterImageResourceUrls.contains(name)) {
+                            url = characterImageResourceUrls.value(name).toUrl();
+                        } else {
+                            url = QStringLiteral("scrite://character_") + QString::number(characterImageResourceUrls.size()) + QStringLiteral(".png");
 
-                        const QRect bgRect = textRect.adjusted(-padding/2, -padding/2, padding/2, padding/2);
+                            QRect textRect = fontMetrics.boundingRect(text);
+                            textRect.moveTopLeft( QPoint(0,0) );
+                            textRect.setWidth( textRect.width() + 2*fontMetrics.averageCharWidth() );
+                            textRect.adjust(padding, padding, padding, padding);
 
-                        QPainter paint(&image);
-                        paint.setRenderHint(QPainter::Antialiasing);
-                        paint.setRenderHint(QPainter::TextAntialiasing);
-                        paint.setFont(font);
-                        paint.setPen( QPen(Qt::black,0.5) );
-                        if(withBackground) {
-                            paint.setBrush(QColor(245,245,245));
-                            paint.drawRoundedRect(bgRect, bgRect.height()/2, bgRect.height()/2);
+                            const QSize imageSize = (textRect.size() + QSize(padding,padding)*2)*ipr;
+
+                            QImage image(imageSize, QImage::Format_ARGB32);
+                            image.setDevicePixelRatio(ipr);
+                            image.fill(Qt::transparent);
+
+                            const QRect bgRect = textRect.adjusted(-padding/2, -padding/2, padding/2, padding/2);
+
+                            QPainter paint(&image);
+                            paint.setRenderHint(QPainter::Antialiasing);
+                            paint.setRenderHint(QPainter::TextAntialiasing);
+                            paint.setFont(font);
+                            paint.setPen( QPen(Qt::black,0.5) );
+                            if(withBackground) {
+                                paint.setBrush(QColor(245,245,245));
+                                paint.drawRoundedRect(bgRect, bgRect.height()/2, bgRect.height()/2);
+                            }
+                            paint.drawText(textRect, Qt::AlignCenter, text);
+                            paint.end();
+
+                            characterImageResourceUrls.insert(name, url);
+                            m_textDocument->addResource(QTextDocument::ImageResource, url, QVariant::fromValue<QImage>(image));
                         }
-                        paint.drawText(textRect, Qt::AlignCenter, text);
-                        paint.end();
 
-                        cursor.insertImage(image);
+                        QTextImageFormat imageFormat;
+                        imageFormat.setName(url.toString());
+                        cursor.insertImage(imageFormat);
+
+                        return url;
                     };
 
-                    insertTextAsImage(QStringLiteral("Characters:"), false);
+                    insertTextAsImage(QString(), QStringLiteral("Characters:"), false);
                     for(const QString &sceneCharacter : sceneCharacters)
-                        insertTextAsImage(sceneCharacter, true);
+                        insertTextAsImage(sceneCharacter, sceneCharacter, true);
+
+                    m_textDocument->setProperty("#characterImageResourceUrls", characterImageResourceUrls);
                 }
 
                 insertBlock = true;
