@@ -1213,12 +1213,12 @@ Item {
         width: parent.width*0.7
         anchors.centerIn: parent
         active: scriteDocument.structure.elementCount === 0 && scriteDocument.structure.annotationCount === 0
-        sourceComponent: TextArea {
-            readOnly: true
+        sourceComponent: Text {
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 30
             enabled: false
+            color: primaryColors.c600.background
             // renderType: Text.NativeRendering
             text: "Create scenes by clicking on the 'Add Scene' button OR right click to see options."
         }
@@ -1608,6 +1608,8 @@ Item {
                             anchors.bottomMargin: app.idealFontPointSize/2
                         }
                     }
+                    selectByMouse: true
+                    selectByKeyboard: true
                     placeholderText: "Describe what happens in this scene."
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere

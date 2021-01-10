@@ -481,13 +481,13 @@ Item {
         active: enableDragDrop && scriteDocument.screenplay.elementCount === 0
         width: parent.width*0.5
         anchors.centerIn: parent
-        sourceComponent: TextArea {
-            readOnly: true
+        sourceComponent: Text {
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
             // renderType: Text.NativeRendering
             font.pixelSize: 30
             enabled: false
+            color: primaryColors.c800.background
             text: "Drag scenes on the structure canvas from their bottom right corner to this timeline view here."
         }
     }

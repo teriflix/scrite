@@ -19,6 +19,8 @@ import Scrite 1.0
 TextArea {
     id: txtAreaInput
     palette: app.palette
+    selectByKeyboard: true
+    selectByMouse: true
     // renderType: Text.NativeRendering
     Material.primary: primaryColors.key
     Material.accent: accentColors.key

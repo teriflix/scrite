@@ -533,6 +533,7 @@ Item {
                         width: parent.width
                         wrapMode: Text.WordWrap
                         textFormat: TextArea.RichText
+                        readOnly: true
                         background: Item { }
                         text: "<p>Relationship graphs are automatically constructed using the Force Directed Graph algorithm. You can configure attributes of the algorithm using the fields below. The default values work for most cases.</p>" +
                               "<font size=\"-1\"><ul><li><strong>Max Time</strong> is the number of milliseconds the algorithm can take to compute the graph.</li><li><strong>Max Iterations</strong> is the number of times within max-time the graph can go over each character to determine the ideal placement of nodes and edges in the graph.</li></ul></font>"
