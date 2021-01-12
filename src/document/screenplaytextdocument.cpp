@@ -1544,7 +1544,7 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
     // timerEvent(), while handling m_pageBoundaryEvalTimer
     QList< QPair<int,int> > pgBoundaries;
 
-    if(m_formatting != nullptr && m_textDocument != nullptr)
+    if(m_formatting != nullptr && m_textDocument != nullptr && m_screenplay != nullptr)
     {
         m_textDocument->setDefaultFont(m_formatting->defaultFont());
         m_formatting->pageLayout()->configure(m_textDocument);
