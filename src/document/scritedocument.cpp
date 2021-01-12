@@ -408,6 +408,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     }
 #endif
 
+    this->setCreatedOnThisComputer(true);
+
     emit justSaved();
 
     m_progressReport->finish();
