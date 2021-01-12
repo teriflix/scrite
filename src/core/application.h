@@ -244,6 +244,8 @@ public:
 
     QString sanitiseFileName(const QString &fileName) const;
 
+    Q_INVOKABLE void log(const QString &message);
+
     bool event(QEvent *event);
 
 signals:

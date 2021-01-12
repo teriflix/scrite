@@ -815,6 +815,12 @@ QString Application::sanitiseFileName(const QString &fileName) const
     return fileName;
 }
 
+void Application::log(const QString &message)
+{
+    fprintf(stdout, "%s\n", qPrintable(message));
+    fflush(stdout);
+}
+
 bool Application::event(QEvent *event)
 {
 #ifdef Q_OS_MAC
