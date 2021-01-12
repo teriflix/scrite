@@ -834,6 +834,12 @@ Rectangle {
                         ruler.paragraphRightMargin = ruler.rightMargin + pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
                     }
                 }
+
+                function preserveScrollAndReload() {
+                    var cy = contentView.contentY
+                    reload()
+                    contentView.contentY = cy
+                }
             }
 
             ResetOnChange {
@@ -1224,7 +1230,7 @@ Rectangle {
 
                             function replace(cursorPosition, suggestion) {
                                 sceneDocumentBinder.replaceWordAt(cursorPosition, suggestion)
-                                sceneDocumentBinder.reload()
+                                sceneDocumentBinder.preserveScrollAndReload()
                                 if(cursorPosition >= 0)
                                     sceneTextEditor.cursorPosition = cursorPosition
                             }

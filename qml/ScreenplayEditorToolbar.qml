@@ -161,7 +161,7 @@ Row {
         enabled: binder && !showScreenplayPreview ? true : false
         onClicked: {
             var cp = editor.cursorPosition
-            binder.reload()
+            binder.preserveScrollAndReload()
             if(cp >= 0)
                 editor.cursorPosition = cp
         }
