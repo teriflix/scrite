@@ -89,7 +89,10 @@ Item {
                 ToolButton3 {
                     iconSource: "../icons/navigation/zoom_in.png"
                     ToolTip.text: "Increase size of blocks in this view."
-                    onClicked: zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
+                    onClicked: {
+                        zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
+                        screenplayElementList.updateCacheBuffer()
+                    }
                     autoRepeat: true
                     suggestedWidth: 30; suggestedHeight: 30
                 }
@@ -97,7 +100,10 @@ Item {
                 ToolButton3 {
                     iconSource: "../icons/navigation/zoom_out.png"
                     ToolTip.text: "Decrease size of blocks in this view."
-                    onClicked: zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
+                    onClicked: {
+                        zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
+                        screenplayElementList.updateCacheBuffer()
+                    }
                     autoRepeat: true
                     suggestedWidth: 30; suggestedHeight: 30
                 }
@@ -151,11 +157,140 @@ Item {
         }
     }
 
+    Flickable {
+        id: screenplayTracksFlick
+        anchors.left: screenplayElementList.left
+        anchors.top: parent.top
+        anchors.right: screenplayElementList.right
+        height: contentHeight
+        contentWidth: screenplayTracksFlickContent.width
+        contentHeight: screenplayTracksFlickContent.height
+        interactive: false
+        contentX: screenplayElementList.contentX - screenplayElementList.originX
+        clip: true
+
+        EventFilter.events: [31]
+        EventFilter.onFilter: {
+            EventFilter.forwardEventTo(screenplayElementList)
+            result.filter = true
+            result.accepted = true
+        }
+
+        Item {
+            id: screenplayTracksFlickContent
+            width: screenplayElementList.contentWidth
+            height: screenplayTracks.trackCount * (minimumAppFontMetrics.height + 10)
+
+            Repeater {
+                model: screenplayTracks
+
+                Rectangle {
+                    readonly property var trackData: modelData
+                    width: screenplayTracksFlickContent.width
+                    height: minimumAppFontMetrics.height + 8
+                    y: index * (minimumAppFontMetrics.height + 10)
+                    color: app.translucent( border.color, 0.1 )
+                    border.color: Qt.tint(app.pickStandardColor(index), "#80000000")
+                    border.width: 0.5
+
+                    MouseArea {
+                        id: trackMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onMouseXChanged: maybeTooltip()
+                        onMouseYChanged: maybeTooltip()
+                        onContainsMouseChanged: maybeTooltip()
+
+                        function maybeTooltip() {
+                            if(containsMouse) {
+                                toolTipItem.x = mouseX
+                                toolTipItem.y = mouseY
+                                toolTipItem.ToolTip.text = "'" + trackData.category + "' Track"
+                                toolTipItem.ToolTip.visible = true
+                                toolTipItem.source = trackMouseArea
+                            } else if(toolTipItem.source === trackMouseArea) {
+                                toolTipItem.ToolTip.visible = false
+                                toolTipItem.source = null
+                            }
+                        }
+                    }
+
+                    Repeater {
+                        model: trackData.tracks
+
+                        Rectangle {
+                            readonly property var groupData: trackData.tracks[index]
+                            readonly property var groupExtents: screenplayElementList.extents(groupData.startIndex, groupData.endIndex)
+                            color: parent.border.color
+                            border.color: app.translucent(app.textColorFor(color), 0.25)
+                            border.width: 0.5
+                            x: groupExtents.from
+                            width: groupExtents.to - groupExtents.from
+                            height: parent.height-4
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Text {
+                                font: minimumAppFontMetrics.font
+                                text: groupData.group
+                                width: parent.width-10
+                                horizontalAlignment: Text.AlignHCenter
+                                anchors.centerIn: parent
+                                elide: Text.ElideMiddle
+                                color: app.textColorFor(parent.color)
+                            }
+
+                            MouseArea {
+                                id: groupMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onMouseXChanged: maybeTooltip()
+                                onMouseYChanged: maybeTooltip()
+                                onContainsMouseChanged: maybeTooltip()
+
+                                function maybeTooltip() {
+                                    if(containsMouse) {
+                                        toolTipItem.x = mouseX + parent.x
+                                        toolTipItem.y = mouseY
+                                        toolTipItem.ToolTip.text = trackData.category + " > " + groupData.group
+                                        toolTipItem.ToolTip.visible = true
+                                        toolTipItem.source = groupMouseArea
+                                    } else if(toolTipItem.source === groupMouseArea) {
+                                        toolTipItem.ToolTip.visible = false
+                                        toolTipItem.source = null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item {
+                id: toolTipItem
+                property MouseArea source: null
+            }
+        }
+    }
+
+    TrackerPack {
+        TrackProperty {
+            target: screenplayTracks
+            property: "trackCount"
+        }
+
+        TrackProperty {
+            target: scriteDocument.screenplay
+            property: "elementCount"
+        }
+
+        onTracked: screenplayElementList.updateCacheBuffer()
+    }
+
     ListView {
         id: screenplayElementList
         anchors.left: screenplayTools.right
         anchors.right: parent.right
-        anchors.top: parent.top
+        anchors.top: screenplayTracksFlick.bottom
         anchors.bottom: parent.bottom
         anchors.margins: 3
         anchors.bottomMargin: 0
@@ -164,6 +299,7 @@ Item {
         // visible: count > 0 || somethingIsBeingDropped
         model: scriteDocument.loading ? null : scriteDocument.screenplay
         property real minimumDelegateWidth: 100
+        property real breakDelegateWidth: 70
         property real perElementWidth: 2.5
         property bool moveMode: false
         orientation: Qt.Horizontal
@@ -220,8 +356,7 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
-                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
                 color: primaryColors.button.background
                 border.color: primaryColors.borderColor
                 border.width: 1
@@ -265,8 +400,7 @@ Item {
             Item {
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
-                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 10
                 anchors.fill: parent
 
                 BoxShadow {
@@ -280,6 +414,40 @@ Item {
 
         property bool mutiSelectionMode: false
 
+        function updateCacheBuffer() {
+            if(screenplayTracks.trackCount > 0)
+                cacheBuffer = extents(count-1, count-1).to + 20
+            else
+                cacheBuffer = 0
+        }
+
+        function extents(startIndex, endIndex) {
+            var x = 0;
+            var ret = { "from": 0, "to": 0 }
+            if(startIndex < 0 || endIndex < 0)
+                return ret;
+
+            var idx = -1
+            var nrElements = scriteDocument.screenplay.elementCount
+            for(var i=0; i<nrElements; i++) {
+                var element = scriteDocument.screenplay.elementAt(i)
+                if(element.elementType === ScreenplayElement.SceneElementType)
+                    ++idx
+                if(idx === startIndex)
+                    ret.from = x+7.5
+                if(element.elementType === ScreenplayElement.BreakElementType)
+                    x += breakDelegateWidth
+                else {
+                    var sceneElementCount = element.scene ? element.scene.elementCount : 1
+                    x += Math.max(minimumDelegateWidth, sceneElementCount*perElementWidth*zoomLevel)
+                }
+                if(idx === endIndex)
+                    break
+            }
+            ret.to = x-2.5
+            return ret
+        }
+
         delegate: Item {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
@@ -288,7 +456,7 @@ Item {
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
             property string sceneTitle: element.scene ? "[" + element.resolvedSceneNumber + "]: " + (element.scene.title === "" ? (element.scene.heading.enabled ? element.scene.heading.text : "NO SCENE HEADING") : element.scene.title) : element.breakTitle
             property color sceneColor: element.scene ? element.scene.color : "white"
-            width: isBreakElement ? 70 :
+            width: isBreakElement ? screenplayElementList.breakDelegateWidth :
                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
             height: screenplayElementList.height
 
@@ -304,8 +472,7 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                anchors.topMargin: screenplayElementList.scrollBarRequired ? 5 : 10
-                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 10
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 enabled: !dragArea.containsDrag
                 sourceComponent: Rectangle {
@@ -322,8 +489,9 @@ Item {
                         anchors.right: parent.right
                         anchors.top: parent.top
                         anchors.bottom: dragTriggerButton.top
-                        anchors.topMargin: showNotesIcon ? 30 : 10
-                        anchors.margins: 5
+                        anchors.topMargin: notesIconLoader.active ? 30 : 5
+                        anchors.leftMargin: 5
+                        anchors.rightMargin: 5
 
                         Text {
                             lineHeight: 1.25
@@ -385,6 +553,7 @@ Item {
                     }
 
                     Loader {
+                        id: notesIconLoader
                         active: showNotesIcon && (elementItemDelegate.element.scene && elementItemDelegate.element.scene.noteCount >= 1)
                         anchors.left: parent.left
                         anchors.top: parent.top
@@ -495,6 +664,48 @@ Item {
     Menu2 {
         id: elementItemMenu
         property ScreenplayElement element
+
+        onClosed: element = null
+
+        ColorMenu {
+            title: "Color"
+            enabled: elementItemMenu.element !== null
+            onMenuItemClicked: {
+                elementItemMenu.element.scene.color = color
+                elementItemMenu.close()
+            }
+        }
+
+        Menu2 {
+            title: "Mark Scene As"
+
+            Repeater {
+                model: elementItemMenu.element ? app.enumerationModelForType("Scene", "Type") : 0
+
+                MenuItem2 {
+                    text: modelData.key
+                    font.bold: elementItemMenu.element.scene.type === modelData.value
+                    onTriggered: {
+                        elementItemMenu.element.scene.type = modelData.value
+                        elementItemMenu.close()
+                    }
+                }
+            }
+        }
+
+        StructureGroupsMenu {
+            sceneGroup: SceneGroup {
+                structure: scriteDocument.structure
+            }
+            onAboutToShow: {
+                sceneGroup.clearScenes()
+                if(elementItemMenu.element)
+                    sceneGroup.addScene(elementItemMenu.element.scene)
+            }
+            onClosed: sceneGroup.clearScenes()
+        }
+
+        MenuSeparator { }
 
         MenuItem2 {
             text: "Remove"

@@ -440,8 +440,7 @@ public:
 
     void createCopyOfFileAttributes();
 
-signals:
-    void annotationChanged();
+    Q_SIGNAL void annotationChanged();
 
 protected:
     bool event(QEvent *event);
@@ -465,6 +464,7 @@ class Structure : public QObject, public QObjectSerializer::Interface
 public:
     Structure(QObject *parent=nullptr);
     ~Structure();
+    Q_SIGNAL void aboutToDelete(Structure *ptr);
 
     Q_PROPERTY(qreal canvasWidth READ canvasWidth WRITE setCanvasWidth NOTIFY canvasWidthChanged)
     void setCanvasWidth(qreal val);
@@ -623,6 +623,17 @@ public:
     Q_INVOKABLE void clearAnnotations();
     Q_SIGNAL void annotationCountChanged();
 
+    Q_PROPERTY(QString groupsData READ groupsData WRITE setGroupsData NOTIFY groupsDataChanged)
+    void setGroupsData(const QString &val);
+    QString groupsData() const { return m_groupsData; }
+    Q_SIGNAL void groupsDataChanged();
+
+    Q_PROPERTY(QJsonArray groupsModel READ groupsModel NOTIFY groupsModelChanged)
+    QJsonArray groupsModel() const { return m_groupsModel; }
+    Q_SIGNAL void groupsModelChanged();
+
+    Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
+
     Q_INVOKABLE Annotation *createAnnotation(const QString &type);
 
     Q_SIGNAL void structureChanged();
@@ -707,6 +718,9 @@ private:
 
     bool m_forceBeatBoardLayout = false;
     QJsonObject m_characterRelationshipGraph;
+
+    QString m_groupsData;
+    QJsonArray m_groupsModel;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

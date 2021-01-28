@@ -1737,7 +1737,8 @@ Rectangle {
 
             Column {
                 id: sceneHeadingLayout
-                spacing: sceneCharactersListLoader.active ? 5 : 0
+                // spacing: sceneCharactersListLoader.active ? 5 : 0
+                spacing: 5
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: ruler.leftMarginPx
@@ -1827,6 +1828,13 @@ Rectangle {
                                     }
                                 }
 
+                                StructureGroupsMenu {
+                                    sceneGroup: SceneGroup {
+                                        structure: scriteDocument.structure
+                                        scenes: [headingItem.theScene]
+                                    }
+                                }
+
                                 Repeater {
                                     model: additionalSceneMenuItems.length ? 1 : 0
 
@@ -1871,6 +1879,16 @@ Rectangle {
                     property Scene scene: headingItem.theScene
                     active: screenplayEditorSettings.displaySceneCharacters
                     sourceComponent: sceneCharactersList
+                }
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    font.pointSize: app.idealAppFontSize - 2
+                    text: sceneCharactersListLoader.active ? scriteDocument.structure.presentableGroupNames(headingItem.theScene.groups) : ""
+                    visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
+                    topPadding: 5
+                    bottomPadding: 5
                 }
             }
         }

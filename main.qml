@@ -47,6 +47,18 @@ Rectangle {
         readonly property var button: c200
     }
 
+    FontMetrics {
+        id: minimumAppFontMetrics
+        font.family: "Raleway"
+        font.pointSize: Math.min(app.idealFontPointSize-2, 12)
+    }
+
+    FontMetrics {
+        id: idealAppFontMetrics
+        font.family: "Raleway"
+        font.pointSize: app.idealFontPointSize
+    }
+
     Material.primary: primaryColors.key
     Material.accent: accentColors.key
     Material.theme: Material.Light

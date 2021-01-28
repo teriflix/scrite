@@ -848,6 +848,21 @@ Item {
                             })
                         }
                     }
+
+                    StructureGroupsMenu {
+                        sceneGroup: SceneGroup {
+                            structure: scriteDocument.structure
+                        }
+
+                        onAboutToShow: {
+                            sceneGroup.clearScenes()
+                            var items = selection.items
+                            items.forEach( function(item) {
+                                sceneGroup.addScene(item.element.scene)
+                            })
+                        }
+                        onClosed: sceneGroup.clearScenes()
+                    }
                 }
 
                 function layout(type) {
@@ -1035,6 +1050,17 @@ Item {
                             scriteDocument.screenplay.addScene(elementContextMenu.element.scene)
                         elementContextMenu.element = null
                     }
+                }
+
+                StructureGroupsMenu {
+                    sceneGroup: SceneGroup {
+                        structure: scriteDocument.structure
+                    }
+                    onAboutToShow: {
+                        sceneGroup.clearScenes()
+                        sceneGroup.addScene(elementContextMenu.element.scene)
+                    }
+                    onClosed: sceneGroup.clearScenes()
                 }
 
                 MenuSeparator { }
@@ -1667,6 +1693,16 @@ Item {
                     onTextEdited: element.scene.pageTarget = text
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                     Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
+                }
+
+                Text {
+                    font.pointSize: app.idealAppFontSize - 2
+                    width: element.scene.hasCharacters ? characterList.width : parent.width
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
+                    text: scriteDocument.structure.presentableGroupNames(element.scene.groups)
+                    visible: element.scene.groups.length > 0
                 }
 
                 Item {

@@ -25,6 +25,7 @@
 #include <QClipboard>
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QFileSystemWatcher>
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
@@ -1346,8 +1347,8 @@ bool Annotation::event(QEvent *event)
 
 void Annotation::polishAttributes()
 {
-    QJsonArray::const_iterator it = m_metaData.begin();
-    QJsonArray::const_iterator end = m_metaData.end();
+    QJsonArray::const_iterator it = m_metaData.constBegin();
+    QJsonArray::const_iterator end = m_metaData.constEnd();
     while(it != end)
     {
         const QJsonObject meta = (*it).toObject();
@@ -1419,11 +1420,42 @@ Structure::Structure(QObject *parent)
         value = rect;
     });
     connect(&m_annotationsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::annotationsBoundingBoxChanged);
+
+    // Load the default groups.lst file
+    static const QString groupsListFileName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+            + QStringLiteral("/Scrite Structure Groups.list");
+    if( !QFile::exists(groupsListFileName) )
+    {
+        QFile inFile( QStringLiteral(":/misc/structure_groups.lst") );
+        inFile.open(QFile::ReadOnly);
+
+        const QByteArray inFileData = inFile.readAll();
+        this->setGroupsData( QString::fromLatin1(inFileData) );
+
+        QFile outFile( groupsListFileName );
+        if( outFile.open( QFile::WriteOnly ) )
+            outFile.write(inFileData);
+    }
+    else
+    {
+        auto reloadGroupsListFile = [=]() {
+            QFile groupsListFile(groupsListFileName);
+            if(groupsListFile.open(QFile::ReadOnly)) {
+                const QString groupsData = groupsListFile.readAll();
+                this->setGroupsData(groupsData);
+            }
+        };
+        reloadGroupsListFile();
+
+        QFileSystemWatcher *groupsListFileWatcher = new QFileSystemWatcher(this);
+        groupsListFileWatcher->addPath(groupsListFileName);
+        connect(groupsListFileWatcher, &QFileSystemWatcher::fileChanged, reloadGroupsListFile);
+    }
 }
 
 Structure::~Structure()
 {
-
+    emit aboutToDelete(this);
 }
 
 void Structure::setCanvasWidth(qreal val)
@@ -2071,7 +2103,7 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
     }
 
     const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
-    for(QPair<QString, QList<StructureElement*> > beat : beats)
+    for(const QPair<QString, QList<StructureElement*> > &beat : beats)
     {
         const int index = beat.second.indexOf(element);
         if(index < 0)
@@ -2120,13 +2152,13 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
 
     QRectF elementRect(x, y, 0, 0);
 
-    for(QPair<QString, QList<StructureElement*>> beat : beats)
+    for(const QPair<QString, QList<StructureElement*>> &beat : beats)
     {
         if(beat.second.isEmpty())
             continue;
 
         QRectF beatRect;
-        for(StructureElement *element : beat.second)
+        for(StructureElement *element : qAsConst(beat.second))
         {
             elementRect.setWidth(element->width());
             elementRect.setHeight(element->height());
@@ -2149,7 +2181,7 @@ QJsonArray Structure::evaluateBeats(Screenplay *screenplay) const
     QJsonArray ret;
     const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
 
-    for(QPair<QString, QList<StructureElement*>> beat : beats)
+    for(const QPair<QString, QList<StructureElement*>> &beat : beats)
     {
         if(beat.second.isEmpty())
             continue;
@@ -2157,7 +2189,7 @@ QJsonArray Structure::evaluateBeats(Screenplay *screenplay) const
         QJsonArray sceneIds;
 
         QRectF beatBox;
-        for(StructureElement *element : beat.second)
+        for(StructureElement *element : qAsConst(beat.second))
         {
             beatBox |= QRectF(element->x(), element->y(), element->width(), element->height());
             sceneIds.append( element->scene()->id() );
@@ -2392,6 +2424,293 @@ void Structure::clearAnnotations()
 {
     while(m_annotations.size())
         this->removeAnnotation(m_annotations.first());
+}
+
+/**
+Groups Data is a text written in the following format.
+
+[Save The Cat]: description
+Opening Image: description
+Setup
+- Theme Stated
+Catalyst
+Debate
+Break Into Two
+B Story
+Fun And Games
+Midpoint
+Bad Guys Close In
+All Is Lost
+Dark Knight Of The Soul
+Break Into Three
+Finale
+- Gathering The Team
+- Executing The Plan
+- High Tower Surprise
+- Dig Deep Down
+- Execution Of The New Plan
+Final Image
+
+[A Story]
+Beginning
+Middle
+End
+
+[B Story]
+Beginning
+Middle
+End
+
+The text written in square brackets [] creates a category of groups. Everything under that
+will be considered to belong that that category, until another [] is found.
+
+Each line in a category creates a group name. Lines that start with a - create a subgroup.
+Top level group names are used for visually laying out index cards on the canvas. Subgroups
+are only used for annotations.
+
+Anything that comes after : in a line is a description of that group or category.
+
+Groups data can be created separately for each Scrite document. A default one is loaded from
+groups.lst file in the same path as Application.settingsFilePath
+ */
+void Structure::setGroupsData(const QString &val)
+{
+    if(m_groupsData == val)
+        return;
+
+    struct CategoryOrGroup
+    {
+        QString name;
+        QString label;
+        QString desc;
+        int type = -1; // -1 = category, 0 = visual group, 1 = sub-group
+
+        CategoryOrGroup() { }
+        CategoryOrGroup(const QString &name, const QString &desc=QString())  {
+            this->label = name.simplified();
+            this->name = this->label.toUpper();
+            this->desc = desc.simplified();
+        }
+
+        bool isValid() const {
+            return !name.isEmpty();
+        }
+
+        bool operator < (const CategoryOrGroup &other) const {
+            return name < other.name;
+        }
+
+        bool operator == (const CategoryOrGroup &other) const {
+            return name == other.name;
+        }
+
+        QJsonObject toJson(const QString &namePrefix = QString()) const {
+            QJsonObject ret;
+            ret.insert( QStringLiteral("name"), namePrefix.isEmpty() ? this->name : (namePrefix + QStringLiteral("/") + this->name) );
+            ret.insert( QStringLiteral("label"), this->label );
+            ret.insert( QStringLiteral("desc"), this->desc );
+            if(this->type >= 0)
+                ret.insert( QStringLiteral("type"), this->type );
+            return ret;
+        }
+
+        QString toString() const {
+            QString ret;
+            QTextStream ts(&ret, QIODevice::WriteOnly);
+            if(type < 0)
+                ts << QStringLiteral("[") << this->label << QStringLiteral("]");
+            else {
+                if(type > 0)
+                    ts << QStringLiteral("- ") << this->label;
+                else
+                    ts << this->label;
+            }
+            if(!this->desc.isEmpty())
+                ts << QStringLiteral(": ") << this->desc;
+            ts.flush();
+            return ret;
+        }
+    };
+    typedef CategoryOrGroup Category;
+    typedef CategoryOrGroup Group;
+
+    const QString sqbo = QStringLiteral("[");
+    const QString sqbc = QStringLiteral("]");
+    const QString dash = QStringLiteral("- ");
+    const QString colon = QStringLiteral(":");
+    const QString newl = QStringLiteral("\n");
+
+    auto fromCategoryLine = [=](const QString &line) -> Category {
+        Category ret;
+
+        if(line.isEmpty())
+            return ret;
+
+        if(!line.startsWith(sqbo))
+            return ret;
+
+        const int closingBraceIndex = line.indexOf(sqbc);
+        if(closingBraceIndex < 0)
+            return ret;
+
+        const QString name = line.mid(1, closingBraceIndex-1);
+        const QString desc = line.section(colon, 1);
+        ret = CategoryOrGroup(name, desc);
+
+        return ret;
+    };
+
+    auto fromGroupLine = [=](const QString &line) -> Group {
+        Group ret;
+
+        if(line.isEmpty())
+            return ret;
+
+        QString line2 = line;
+        const int type = line.startsWith(dash) ? 1 : 0;
+        if(type == 1)
+            line2 = line.mid(2).trimmed();
+
+        const QString name = line2.section(colon, 0, 0);
+        const QString desc = line2.section(colon, 1);
+        ret = CategoryOrGroup(name, desc);
+        ret.type = type;
+
+        return ret;
+    };
+
+    QMap< Category, QList<Group> > categoryGroupsMap;
+
+    // Parse the text and evaluate groups in it
+    {
+        QString val2 = val;
+        QTextStream ts(&val2, QIODevice::ReadOnly);
+
+        Category activeCategory( QStringLiteral("Default Category") );
+
+        while(!ts.atEnd())
+        {
+            const QString line = ts.readLine().trimmed();
+            if(line.isEmpty())
+                continue;
+
+            if(line.startsWith(sqbo))
+                activeCategory = fromCategoryLine(line);
+            else
+            {
+                const Group group = fromGroupLine(line);
+                categoryGroupsMap[activeCategory].append(group);
+            }
+        }
+    }
+
+    // Polish the text and write properly
+    m_groupsModel = QJsonArray();
+    m_groupsData.clear();
+
+    QTextStream ts(&m_groupsData, QIODevice::WriteOnly);
+
+    QMap< Category, QList<Group> >::iterator it = categoryGroupsMap.begin();
+    QMap< Category, QList<Group> >::iterator end = categoryGroupsMap.end();
+    while(it != end)
+    {
+        const Category category = it.key();
+        const QList<Group> groups = it.value();
+        ts << category.toString() << newl;
+
+        for(const Group &group : groups)
+        {
+            QJsonObject groupJsonItem = group.toJson(category.name);
+            groupJsonItem.insert( QStringLiteral("category"), category.label );
+            m_groupsModel.append(groupJsonItem);
+
+            ts << group.toString() << newl;
+        }
+
+        ts << newl;
+
+        ++it;
+    }
+
+    ts.flush();
+
+    emit groupsDataChanged();
+    emit groupsModelChanged();
+
+#if 0
+    QFile outFile1( QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) +
+                   QStringLiteral("/groups.json") );
+    outFile1.open( QFile::WriteOnly );
+    outFile1.write( QJsonDocument(m_groupsModel).toJson() );
+
+    QFile outFile2( QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) +
+                   QStringLiteral("/groups.lst") );
+    outFile2.open( QFile::WriteOnly );
+    outFile2.write( m_groupsData.toLatin1() );
+#endif
+}
+
+QString Structure::presentableGroupNames(const QStringList &groups) const
+{
+#if 0
+    QMap< QString, QStringList > map;
+    QStringList groups2 = groups;
+
+    const QString nameKey = QStringLiteral("name");
+    const QString labelKey = QStringLiteral("label");
+    const QString categoryKey = QStringLiteral("category");
+
+    for(int i=0; i<m_groupsModel.size(); i++)
+    {
+        if(groups2.isEmpty())
+            break;
+
+        const QJsonObject item = m_groupsModel.at(i).toObject();
+
+        const QString name = item.value(nameKey).toString();
+        if( groups2.contains(name) )
+        {
+            groups2.removeOne(name);
+            map[ item.value(categoryKey).toString() ].append( item.value(labelKey).toString() );
+        }
+    }
+
+    QMap< QString, QStringList >::iterator it = map.begin();
+    QMap< QString, QStringList >::iterator end = map.end();
+    QString ret;
+    while(it != end)
+    {
+        if(!ret.isEmpty())
+            ret += QStringLiteral("<br/>");
+        ret += QStringLiteral("<b>") + it.key() + QStringLiteral("</b>: ") + it.value().join( QStringLiteral(", ") );
+        ++it;
+    }
+
+    return ret;
+#else
+    const QString slash = QStringLiteral("/");
+
+    QMap<QString, QStringList> map;
+    for(const QString &group : groups)
+    {
+        const QString categoryName = group.section(slash, 0, 0);
+        const QString groupName = Application::instance()->camelCased( group.section(slash, 1) );
+        map[ categoryName ].append( groupName );
+    }
+
+    QMap< QString, QStringList >::iterator it = map.begin();
+    QMap< QString, QStringList >::iterator end = map.end();
+    QString ret;
+    while(it != end)
+    {
+        if(!ret.isEmpty())
+            ret += QStringLiteral("<br/>");
+        ret += QStringLiteral("<b>") + Application::instance()->camelCased( it.key() ) + QStringLiteral("</b>: ") + it.value().join( QStringLiteral(", ") );
+        ++it;
+    }
+
+    return ret;
+#endif
 }
 
 Annotation *Structure::createAnnotation(const QString &type)

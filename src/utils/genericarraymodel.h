@@ -56,6 +56,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
+protected:
+    QJsonArray &internalArray() { return m_array; }
+
 private:
     void processArray();
 

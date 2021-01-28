@@ -33,6 +33,7 @@
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "spellcheckservice.h"
+#include "genericarraymodel.h"
 #include "objectlistpropertymodel.h"
 
 class Scene;
@@ -263,6 +264,15 @@ public:
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
     void scanMuteCharacters(const QStringList &characterNames=QStringList());
 
+    Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
+    void setGroups(const QStringList &val);
+    QStringList groups() const { return m_groups; }
+    Q_SIGNAL void groupsChanged();
+
+    Q_INVOKABLE void addToGroup(const QString &group);
+    Q_INVOKABLE void removeFromGroup(const QString &group);
+    Q_INVOKABLE bool isInGroup(const QString &group) const;
+
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements NOTIFY elementCountChanged)
     QQmlListProperty<SceneElement> elements();
     Q_INVOKABLE SceneElement *appendElement(const QString &text, int type=SceneElement::Action);
@@ -346,6 +356,7 @@ private:
     QColor m_color = QColor(Qt::white);
     QString m_title;
     QString m_comments;
+    QStringList m_groups;
     QString m_emotionalChange;
     QString m_charactersInConflict;
     QString m_pageTarget;
@@ -471,6 +482,52 @@ private:
     bool m_hasPendingComputeSize = false;
     QObjectProperty<Scene> m_scene;
     QObjectProperty<ScreenplayFormat> m_format;
+};
+
+// Used only for querying and applying tagging to a bunch of scenes
+class SceneGroup : public GenericArrayModel
+{
+    Q_OBJECT
+
+public:
+    SceneGroup(QObject *parent=nullptr);
+    ~SceneGroup();
+
+    Q_INVOKABLE void toggle(int row);
+
+    // Custom properties
+    Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged)
+    void setStructure(Structure* val);
+    Structure* structure() const { return m_structure; }
+    Q_SIGNAL void structureChanged();
+
+    Q_PROPERTY(QQmlListProperty<Scene> scenes READ scenes NOTIFY sceneCountChanged)
+    QQmlListProperty<Scene> scenes();
+    Q_INVOKABLE void addScene(Scene *ptr);
+    Q_INVOKABLE void removeScene(Scene *ptr);
+    Q_INVOKABLE Scene *sceneAt(int index) const;
+    Q_PROPERTY(int sceneCount READ sceneCount NOTIFY sceneCountChanged)
+    int sceneCount() const { return m_scenes.size(); }
+    Q_INVOKABLE void clearScenes();
+    Q_SIGNAL void sceneCountChanged();
+
+protected:
+    void timerEvent(QTimerEvent *te);
+
+private:
+    void reload();
+    void reeval();
+    void reevalLater();
+
+private:
+    static void staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr);
+    static void staticClearScenes(QQmlListProperty<Scene> *list);
+    static Scene* staticSceneAt(QQmlListProperty<Scene> *list, int index);
+    static int staticSceneCount(QQmlListProperty<Scene> *list);
+    QList<Scene *> m_scenes;
+    QJsonArray &m_groups;
+    QObjectProperty<Structure> m_structure;
+    ExecLaterTimer m_reevalTimer;
 };
 
 #endif // SCENE_H

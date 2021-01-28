@@ -35,6 +35,10 @@ public:
     ~ScreenplayElement();
     Q_SIGNAL void aboutToDelete(ScreenplayElement *element);
 
+    Q_PROPERTY(int elementIndex READ elementIndex NOTIFY elementIndexChanged)
+    int elementIndex() const { return m_elementIndex; }
+    Q_SIGNAL void elementIndexChanged();
+
     enum ElementType
     {
         SceneElementType,
@@ -114,18 +118,21 @@ public:
     Q_SIGNAL void sceneReset(int elementIndex);
     Q_SIGNAL void evaluateSceneNumberRequest();
     Q_SIGNAL void sceneTypeChanged();
+    Q_SIGNAL void sceneGroupsChanged(ScreenplayElement *ptr);
 
 protected:
     bool event(QEvent *event);
     void evaluateSceneNumber(int &number);
     void resetScene();
     void resetScreenplay();
+    void setElementIndex(int val);
 
 private:
     friend class Screenplay;
     bool m_expanded = true;
     int m_breakType = -1;
     bool m_selected = false;
+    int m_elementIndex = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;
     QString m_breakTitle;
@@ -253,6 +260,8 @@ public:
     Q_SIGNAL void elementRemoved(ScreenplayElement *ptr, int index);
     Q_SIGNAL void elementMoved(ScreenplayElement *ptr, int from, int to);
 
+    Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
+
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
     Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
 
@@ -354,6 +363,47 @@ private:
     bool m_hasNonStandardScenes = false;
 
     ExecLaterTimer m_sceneNumberEvaluationTimer;
+};
+
+/**
+ * Looks up scenes in a screenplay and determines tracks that it can overlay on top of scenes
+ * based on the groups to which various scene belong
+ */
+class ScreenplayTracks : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    ScreenplayTracks(QObject *parent=nullptr);
+    ~ScreenplayTracks();
+
+    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    void setScreenplay(Screenplay* val);
+    Screenplay* screenplay() const { return m_screenplay; }
+    Q_SIGNAL void screenplayChanged();
+
+    Q_PROPERTY(int trackCount READ trackCount NOTIFY trackCountChanged)
+    int trackCount() const { return m_data.size(); }
+    Q_SIGNAL void trackCountChanged();
+
+    // QAbstractItemModel interface
+    enum { ModelDataRole = Qt::UserRole };
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int,QByteArray> roleNames() const;
+
+protected:
+    void timerEvent(QTimerEvent *te);
+
+private:
+    void refresh();
+    void refreshLater();
+    void onElementSceneGroupsChanged(ScreenplayElement *) { this->refreshLater(); }
+
+private:
+    QObjectProperty<Screenplay> m_screenplay;
+    QList< QVariantMap > m_data;
+    ExecLaterTimer m_refreshTimer;
 };
 
 #endif // SCREENPLAY_H

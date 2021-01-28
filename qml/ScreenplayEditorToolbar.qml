@@ -61,7 +61,7 @@ Row {
 
             Menu2 {
                 id: sceneCharactersMenu
-                width: 300
+                width: 350
 
                 MenuItem2 {
                     icon.source: "../icons/content/blank.png"
@@ -71,7 +71,7 @@ Row {
                 }
 
                 MenuItem2 {
-                    text: "Display Scene Characters"
+                    text: "Display Scene Characters and Tags"
                     icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
                 }

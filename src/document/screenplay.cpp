@@ -14,6 +14,7 @@
 #include "undoredo.h"
 #include "hourglass.h"
 #include "screenplay.h"
+#include "application.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
@@ -201,6 +202,10 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
     connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
+    connect(m_scene, &Scene::groupsChanged, [=]() {
+        qDebug() << "PA: A scene group was changed.";
+        emit sceneGroupsChanged(this);
+    });
 
     if(m_screenplay)
         connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
@@ -306,6 +311,15 @@ void ScreenplayElement::resetScreenplay()
     emit screenplayChanged();
 
     this->deleteLater();
+}
+
+void ScreenplayElement::setElementIndex(int val)
+{
+    if(m_elementIndex == val)
+        return;
+
+    m_elementIndex = val;
+    emit elementIndexChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -569,12 +583,15 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     else
         m_elements.insert(index, ptr);
 
+    // Keep the following connections in sync with the ones we make in
+    // Screenplay::setPropertyFromObjectList()
     ptr->setParent(this);
     connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
     connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
+    connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
     if(ptr->elementType() == ScreenplayElement::BreakElementType)
         connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
@@ -615,6 +632,7 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
     disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
+    disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
 
     this->endRemoveRows();
 
@@ -1749,12 +1767,15 @@ void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<
 
         for(ScreenplayElement *ptr : list)
         {
+            // Keep the following connections in sync with the ones we make in
+            // Screenplay::insertElementAt()
             ptr->setParent(this);
             connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
             connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
             connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
             connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
             connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
+            connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
             if(ptr->elementType() == ScreenplayElement::BreakElementType)
                 connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
@@ -1860,10 +1881,17 @@ void Screenplay::onSceneReset(int elementIndex)
 void Screenplay::evaluateSceneNumbers()
 {
     int number = 1;
+    int index = 0;
     bool containsNonStandardScenes = false;
     Q_FOREACH(ScreenplayElement *element, m_elements)
     {
+        if(element->elementType() == ScreenplayElement::SceneElementType)
+            element->setElementIndex(index++);
+        else
+            element->setElementIndex(-1);
+
         element->evaluateSceneNumber(number);
+
         if(!containsNonStandardScenes && element->scene() && element->scene()->type() != Scene::Standard)
             containsNonStandardScenes = true;
     }
@@ -1941,3 +1969,193 @@ int Screenplay::staticElementCount(QQmlListProperty<ScreenplayElement> *list)
     return reinterpret_cast< Screenplay* >(list->data)->elementCount();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+ScreenplayTracks::ScreenplayTracks(QObject *parent)
+    : QAbstractListModel(parent),
+      m_screenplay(this, "screenplay")
+{
+    connect(this, &ScreenplayTracks::modelReset, this, &ScreenplayTracks::trackCountChanged);
+    connect(this, &ScreenplayTracks::rowsInserted, this, &ScreenplayTracks::trackCountChanged);
+    connect(this, &ScreenplayTracks::rowsRemoved, this, &ScreenplayTracks::trackCountChanged);
+}
+
+ScreenplayTracks::~ScreenplayTracks()
+{
+
+}
+
+void ScreenplayTracks::setScreenplay(Screenplay *val)
+{
+    if(m_screenplay == val)
+        return;
+
+    if(!m_screenplay.isNull())
+        m_screenplay->disconnect(this);
+
+    m_screenplay = val;
+
+    if(!m_screenplay.isNull())
+    {
+        connect(m_screenplay, &Screenplay::elementsChanged, this, &ScreenplayTracks::refreshLater);
+        connect(m_screenplay, &Screenplay::elementSceneGroupsChanged, this, &ScreenplayTracks::onElementSceneGroupsChanged);
+    }
+
+    this->refreshLater();
+
+    emit screenplayChanged();
+}
+
+int ScreenplayTracks::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_data.size();
+}
+
+QVariant ScreenplayTracks::data(const QModelIndex &index, int role) const
+{
+    if(index.row() < 0 || index.row() >= m_data.size() || role != ModelDataRole)
+        return QVariant();
+
+    return m_data.at( index.row() );
+}
+
+QHash<int, QByteArray> ScreenplayTracks::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[ModelDataRole] = "modelData";
+    return roles;
+}
+
+void ScreenplayTracks::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_refreshTimer.timerId())
+    {
+        m_refreshTimer.stop();
+        this->refresh();
+    }
+    else
+        QAbstractListModel::timerEvent(te);
+}
+
+void ScreenplayTracks::refresh()
+{
+    if(m_screenplay.isNull())
+    {
+        if(m_data.isEmpty())
+            return;
+
+        this->beginResetModel();
+        m_data.clear();
+        this->endResetModel();
+
+        return;
+    }
+
+    const QString slash = QStringLiteral("/");
+
+    QMap< QString, QMap< QString, QList<ScreenplayElement*> > > map;
+    for(int i=0; i<m_screenplay->elementCount(); i++)
+    {
+        ScreenplayElement *element = m_screenplay->elementAt(i);
+        if(element->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
+        const QStringList sceneGroups = element->scene()->groups();
+        if( sceneGroups.isEmpty() )
+            continue;
+
+        for(const QString &sceneGroup : sceneGroups)
+        {
+            const QString categoryName = sceneGroup.section(slash, 0, 0);
+            const QString groupName = sceneGroup.section(slash, 1);
+            map[categoryName][groupName].append(element);
+        }
+    }
+
+    const QString startIndexKey = QStringLiteral("startIndex");
+    const QString endIndexKey = QStringLiteral("endIndex");
+    const QString groupKey = QStringLiteral("group");
+
+    this->beginResetModel();
+
+    m_data.clear();
+
+    QMap< QString, QMap< QString, QList<ScreenplayElement*> > >::iterator it = map.begin();
+    QMap< QString, QMap< QString, QList<ScreenplayElement*> > >::iterator end = map.end();
+    while(it != end)
+    {
+        const QString category = Application::instance()->camelCased( it.key() );
+        const QMap< QString, QList<ScreenplayElement*> > groupElementsMap = it.value();
+
+        QVariantList categoryTrackItems;
+
+        QMap< QString, QList<ScreenplayElement*> >::const_iterator it2 = groupElementsMap.begin();
+        QMap< QString, QList<ScreenplayElement*> >::const_iterator end2 = groupElementsMap.end();
+        while(it2 != end2)
+        {
+            const QString group = Application::instance()->camelCased( it2.key() );
+            QList<ScreenplayElement*> elements = it2.value();
+            std::sort(elements.begin(), elements.end(), [](ScreenplayElement *a, ScreenplayElement *b) {
+                return a->elementIndex() < b->elementIndex();
+            });
+
+            QVariantMap groupTrackItem;
+
+            for(ScreenplayElement *element : qAsConst(elements))
+            {
+                const QVariantMap elementItem = {
+                    { startIndexKey, element->elementIndex() },
+                    { endIndexKey, element->elementIndex() },
+                    { groupKey, group }
+                };
+
+                if(groupTrackItem.isEmpty())
+                    groupTrackItem = elementItem;
+                else
+                {
+                    const int diff = element->elementIndex()-groupTrackItem.value(endIndexKey,-10).toInt();
+                    if(diff == 1)
+                        groupTrackItem.insert(endIndexKey, element->elementIndex());
+                    else
+                    {
+                        categoryTrackItems.append(groupTrackItem);
+                        groupTrackItem = elementItem;
+                    }
+                }
+            }
+
+            if(!groupTrackItem.isEmpty())
+                categoryTrackItems.append(groupTrackItem);
+
+            ++it2;
+        }
+
+        std::sort(categoryTrackItems.begin(), categoryTrackItems.end(),
+                  [startIndexKey,endIndexKey](const QVariant &a, const QVariant &b) {
+            const QVariantMap trackA = a.toMap();
+            const QVariantMap trackB = b.toMap();
+            const int trackASize = trackA.value(endIndexKey).toInt() - trackA.value(startIndexKey).toInt();
+            const int trackBSize = trackB.value(endIndexKey).toInt() - trackB.value(startIndexKey).toInt();
+            return trackASize > trackBSize;
+        });
+
+        QVariantMap row;
+        row.insert( QStringLiteral("category"), category );
+        row.insert( QStringLiteral("tracks"), categoryTrackItems );
+
+        m_data.append(row);
+
+        ++it;
+    }
+
+    this->endResetModel();
+
+    qDebug() << "PA: Finished refreshing.";
+}
+
+void ScreenplayTracks::refreshLater()
+{
+    m_refreshTimer.start(0, this);
+
+    qDebug() << "PA: Scheduling a refresh later";
+}

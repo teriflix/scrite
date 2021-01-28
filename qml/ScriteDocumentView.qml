@@ -111,7 +111,7 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+C"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters" : "Show Scene Characters"
+        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters & Tags" : "Show Scene Characters & Tags"
         ShortcutsModelItem.shortcut: sequence
         onActivated: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
     }
@@ -1430,6 +1430,11 @@ Item {
         }
     }
 
+    ScreenplayTracks {
+        id: screenplayTracks
+        screenplay: scriteDocument.screenplay
+    }
+
     Component {
         id: uiLayoutComponent
 
@@ -1623,7 +1628,7 @@ Item {
             }
 
             Loader {
-                SplitView.preferredHeight: 155
+                SplitView.preferredHeight: 155 + minimumAppFontMetrics.height*screenplayTracks.trackCount
                 SplitView.minimumHeight: SplitView.preferredHeight
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
@@ -1653,7 +1658,7 @@ Item {
             }
 
             Loader {
-                SplitView.preferredHeight: 155
+                SplitView.preferredHeight: 155 + minimumAppFontMetrics.height*screenplayTracks.trackCount
                 SplitView.minimumHeight: SplitView.preferredHeight
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50

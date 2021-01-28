@@ -863,6 +863,47 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
     }
 }
 
+void Scene::setGroups(const QStringList &val)
+{
+    if(m_groups == val)
+        return;
+
+    m_groups = QSet<QString>::fromList(val).toList();
+    emit groupsChanged();
+}
+
+void Scene::addToGroup(const QString &group)
+{
+    if(group.isEmpty() || this->isInGroup(group))
+        return;
+
+    m_groups.append(group);
+    m_groups.sort(Qt::CaseInsensitive);
+    emit groupsChanged();
+}
+
+void Scene::removeFromGroup(const QString &group)
+{
+    int index = -1;
+    for(const QString &item : qAsConst(m_groups))
+    {
+        ++index;
+        if(!item.compare(group, Qt::CaseInsensitive))
+            break;
+    }
+
+    if(index < 0)
+        return;
+
+    m_groups.removeAt(index);
+    emit groupsChanged();
+}
+
+bool Scene::isInGroup(const QString &group) const
+{
+    return m_groups.contains(group, Qt::CaseInsensitive);
+}
+
 QQmlListProperty<SceneElement> Scene::elements()
 {
     return QQmlListProperty<SceneElement>(
@@ -1700,4 +1741,222 @@ void SceneSizeHintItem::setHasPendingComputeSize(bool val)
 
     m_hasPendingComputeSize = val;
     emit hasPendingComputeSizeChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+SceneGroup::SceneGroup(QObject *parent) :
+    GenericArrayModel(parent),
+    m_groups(GenericArrayModel::internalArray()),
+    m_structure(this, "structure")
+{
+    connect(this, &SceneGroup::sceneCountChanged, this, &SceneGroup::reevalLater);
+
+    this->setObjectMembers({"category", "desc", "label", "name", "type", "checked"});
+}
+
+SceneGroup::~SceneGroup()
+{
+
+}
+
+void SceneGroup::toggle(int row)
+{
+    if(row < 0 || row >= m_groups.size() || m_scenes.isEmpty())
+        return;
+
+    const QString nameKey = QStringLiteral("name");
+    const QString checkedKey = QStringLiteral("checked");
+    const QString notCheckedVal = QStringLiteral("no");
+    const QString fullyCheckedVal = QStringLiteral("yes");
+
+    QJsonObject item = m_groups.at(row).toObject();
+    const QString groupName = item.value(nameKey).toString();
+
+    if(item.value(checkedKey) != fullyCheckedVal)
+    {
+        for(Scene *scene : qAsConst(m_scenes))
+        {
+            disconnect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
+            scene->addToGroup(groupName);
+            connect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
+        }
+
+        item.insert(checkedKey, fullyCheckedVal);
+    }
+    else
+    {
+        for(Scene *scene : qAsConst(m_scenes))
+        {
+            disconnect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
+            scene->removeFromGroup(groupName);
+            connect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
+        }
+
+        item.insert(checkedKey, notCheckedVal);
+    }
+
+    m_groups.replace(row, item);
+
+    const QModelIndex index = this->index(row, 0);
+    emit dataChanged(index, index);
+}
+
+void SceneGroup::setStructure(Structure *val)
+{
+    if(m_structure == val)
+        return;
+
+    if(!m_structure.isNull())
+        m_structure->disconnect(this);
+
+    m_structure = val;
+    emit structureChanged();
+
+    this->reload();
+
+    if(!m_structure.isNull())
+        connect(m_structure, &Structure::groupsModelChanged, this, &SceneGroup::reload);
+}
+
+QQmlListProperty<Scene> SceneGroup::scenes()
+{
+    return QQmlListProperty<Scene>(
+                reinterpret_cast<QObject*>(this),
+                static_cast<void*>(this),
+                &SceneGroup::staticAppendScene,
+                &SceneGroup::staticSceneCount,
+                &SceneGroup::staticSceneAt,
+                &SceneGroup::staticClearScenes);
+}
+
+void SceneGroup::addScene(Scene *ptr)
+{
+    if(ptr == nullptr || m_scenes.indexOf(ptr) >= 0)
+        return;
+
+    connect(ptr, &Scene::aboutToDelete, this, &SceneGroup::removeScene);
+    connect(ptr, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
+    m_scenes.append(ptr);
+    emit sceneCountChanged();
+}
+
+void SceneGroup::removeScene(Scene *ptr)
+{
+    if(ptr == nullptr)
+        return;
+
+    const int index = m_scenes.indexOf(ptr);
+    if(index < 0)
+        return ;
+
+    disconnect(ptr, &Scene::aboutToDelete, this, &SceneGroup::removeScene);
+    disconnect(ptr, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
+    m_scenes.removeAt(index);
+    emit sceneCountChanged();
+}
+
+Scene *SceneGroup::sceneAt(int index) const
+{
+    return index < 0 || index >= m_scenes.size() ? nullptr : m_scenes.at(index);
+}
+
+void SceneGroup::clearScenes()
+{
+    while(m_scenes.size())
+        this->removeScene(m_scenes.first());
+}
+
+void SceneGroup::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_reevalTimer.timerId())
+    {
+        m_reevalTimer.stop();
+        this->reeval();
+    }
+    else
+        GenericArrayModel::timerEvent(te);
+}
+
+void SceneGroup::reload()
+{
+    this->beginResetModel();
+
+    m_groups = QJsonArray();
+    if(!m_structure.isNull())
+    {
+        const QJsonArray array = m_structure->groupsModel();
+        for(int i=0; i<array.size(); i++)
+        {
+            QJsonObject item = array.at(i).toObject();
+            item.insert( QStringLiteral("checked"), QStringLiteral("no") );
+            m_groups.append(item);
+        }
+    }
+
+    this->endResetModel();
+
+    this->reeval();
+}
+
+void SceneGroup::reeval()
+{
+    QMap<QString,int> groupCounter;
+    for(Scene *scene : qAsConst(m_scenes))
+    {
+        const QStringList groups = scene->groups();
+        for(const QString &group : groups)
+            groupCounter[group] = groupCounter.value(group, 0) + 1;
+    }
+
+    const QString nameKey = QStringLiteral("name");
+    const QString checkedKey = QStringLiteral("checked");
+    const QString notCheckedVal = QStringLiteral("no");
+    const QString partiallyCheckedVal = QStringLiteral("partial");
+    const QString fullyCheckedVal = QStringLiteral("yes");
+
+    for(int i=0; i<m_groups.size(); i++)
+    {
+        const QModelIndex index = this->index(i, 0);
+
+        QJsonObject item = m_groups.at(i).toObject();
+
+        const QString name = item.value(nameKey).toString();
+        QString checkedVal = notCheckedVal;
+
+        if(groupCounter.contains(name))
+            checkedVal = groupCounter.value(name) == m_scenes.size() ? fullyCheckedVal : partiallyCheckedVal;
+
+        if(item.value(checkedKey) != checkedVal)
+        {
+            item.insert(checkedKey, checkedVal);
+            m_groups.replace(i, item);
+            emit dataChanged(index, index);
+        }
+    }
+}
+
+void SceneGroup::reevalLater()
+{
+    m_reevalTimer.start(0, this);
+}
+
+void SceneGroup::staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr)
+{
+    reinterpret_cast< SceneGroup* >(list->data)->addScene(ptr);
+}
+
+void SceneGroup::staticClearScenes(QQmlListProperty<Scene> *list)
+{
+    reinterpret_cast< SceneGroup* >(list->data)->clearScenes();
+}
+
+Scene *SceneGroup::staticSceneAt(QQmlListProperty<Scene> *list, int index)
+{
+    return reinterpret_cast< SceneGroup* >(list->data)->sceneAt(index);
+}
+
+int SceneGroup::staticSceneCount(QQmlListProperty<Scene> *list)
+{
+    return reinterpret_cast< SceneGroup* >(list->data)->sceneCount();
 }

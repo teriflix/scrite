@@ -843,7 +843,7 @@ QColor Application::pickStandardColor(int counter) const
     if(colors.isEmpty())
         return QColor("white");
 
-    QColor ret = colors.at( counter%colors.size() );
+    QColor ret = colors.at( qMax(counter,0)%colors.size() );
     return ret;
 }
 
@@ -991,7 +991,13 @@ QPointF Application::globalMousePosition() const
 
 QString Application::camelCased(const QString &val) const
 {
-    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
+//    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
+//        return val;
+
+    if(val.isEmpty())
+        return val;
+
+    if(val.at(0).script() != QChar::Script_Latin)
         return val;
 
     QString val2 = val.toLower();

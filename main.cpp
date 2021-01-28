@@ -100,7 +100,7 @@ void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, 
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 5, 8);
+    const QVersionNumber applicationVersion(0, 5, 9);
     Application::setApplicationName("Scrite");
     Application::setOrganizationName("TERIFLIX");
     Application::setOrganizationDomain("teriflix.com");
@@ -151,12 +151,14 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
 
     qmlRegisterType<Scene>("Scrite", 1, 0, "Scene");
+    qmlRegisterType<SceneGroup>("Scrite", 1, 0, "SceneGroup");
     qmlRegisterType<SceneSizeHintItem>("Scrite", 1, 0, "SceneSizeHint");
     qmlRegisterUncreatableType<SceneHeading>("Scrite", 1, 0, "SceneHeading", reason);
     qmlRegisterType<SceneElement>("Scrite", 1, 0, "SceneElement");
 
     qmlRegisterUncreatableType<Screenplay>("Scrite", 1, 0, "Screenplay", reason);
     qmlRegisterType<ScreenplayElement>("Scrite", 1, 0, "ScreenplayElement");
+    qmlRegisterType<ScreenplayTracks>("Scrite", 1, 0, "ScreenplayTracks");
 
     qmlRegisterUncreatableType<Structure>("Scrite", 1, 0, "Structure", reason);
     qmlRegisterType<StructureElement>("Scrite", 1, 0, "StructureElement");
