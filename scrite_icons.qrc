@@ -179,5 +179,7 @@
         <file>icons/editor/format_ital24px.png</file>
         <file>icons/editor/format_underline_inverted.png</file>
         <file>icons/editor/format_underline.png</file>
+        <file>icons/action/layout_grouping.png</file>
+        <file>icons/action/layout_grouping_inverted.png</file>
     </qresource>
 </RCC>

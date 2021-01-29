@@ -233,8 +233,8 @@ Flickable {
         target: null
         onTargetChanged: target = null
 
-        minimumScale: 0.25
-        maximumScale: 4
+        minimumScale: Math.min(parent.scale, 0.25)
+        maximumScale: Math.max(4, parent.scale)
         minimumRotation: 0
         maximumRotation: 0
         minimumPointCount: 2

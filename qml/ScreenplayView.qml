@@ -190,7 +190,7 @@ Item {
                     height: minimumAppFontMetrics.height + 8
                     y: index * (minimumAppFontMetrics.height + 10)
                     color: app.translucent( border.color, 0.1 )
-                    border.color: Qt.tint(app.pickStandardColor(index), "#80000000")
+                    border.color: accentColors.c900.background
                     border.width: 0.5
 
                     MouseArea {
@@ -268,6 +268,7 @@ Item {
             Item {
                 id: toolTipItem
                 property MouseArea source: null
+                ToolTip.delay: 1000
             }
         }
     }

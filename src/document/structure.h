@@ -579,7 +579,7 @@ public:
 
     Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay) const;
     Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay) const;
-    Q_INVOKABLE QJsonArray evaluateBeats(Screenplay *screenplay) const;
+    Q_INVOKABLE QJsonArray evaluateBeats(Screenplay *screenplay, const QString &category) const;
 
     Q_INVOKABLE void scanForMuteCharacters();
 
@@ -632,6 +632,9 @@ public:
     QJsonArray groupsModel() const { return m_groupsModel; }
     Q_SIGNAL void groupsModelChanged();
 
+    Q_PROPERTY(QStringList groupCategories READ groupCategories NOTIFY groupsModelChanged)
+    QStringList groupCategories() const { return m_groupCategories; }
+
     Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
 
     Q_INVOKABLE Annotation *createAnnotation(const QString &type);
@@ -667,7 +670,7 @@ private:
     friend class Screenplay;
     friend class ScriteDocument;
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
-    QList< QPair<QString, QList<StructureElement *> > > evaluateBeatsImpl(Screenplay *screenplay) const;
+    QList< QPair<QString, QList<StructureElement *> > > evaluateBeatsImpl(Screenplay *screenplay, const QString &category=QString()) const;
 
 private:
     qreal m_canvasWidth = 120000;
@@ -721,6 +724,7 @@ private:
 
     QString m_groupsData;
     QJsonArray m_groupsModel;
+    QStringList m_groupCategories;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

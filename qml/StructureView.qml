@@ -179,6 +179,34 @@ Item {
                 }
             }
 
+            ToolButton3 {
+                iconSource: "../icons/action/layout_grouping.png"
+                ToolTip.text: "Grouping Options"
+                onClicked: layoutGroupingMenu.popup()
+                down: layoutGroupingMenu.visible
+
+                Menu2 {
+                    id: layoutGroupingMenu
+                    width: 350
+
+                    MenuItem2 {
+                        text: "Act Wise"
+                        onTriggered: canvas.beatCategory = ""
+                    }
+
+                    MenuSeparator { }
+
+                    Repeater {
+                        model: scriteDocument.structure.groupCategories
+
+                        MenuItem2 {
+                            text: "'" + app.camelCased(modelData) + "' Wise"
+                            onTriggered: canvas.beatCategory = modelData
+                        }
+                    }
+                }
+            }
+
             Rectangle {
                 width: 1
                 height: parent.rowHeight
@@ -639,10 +667,16 @@ Item {
                 }
             }
 
+            property string beatCategory
             property var beats: []
-            Component.onCompleted: app.execLater(canvas, 250, function() {
-                canvas.beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay)
-            })
+            Component.onCompleted: app.execLater(canvas, 250, reevaluateBeats)
+
+            function reevaluateBeats() {
+                var beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay, canvas.beatCategory)
+                canvas.beats = beats
+            }
+
+            onBeatCategoryChanged: app.execLater(canvas, 250, reevaluateBeats)
 
             TrackerPack {
                 delay: 250
@@ -672,10 +706,7 @@ Item {
                     signal: "structureChanged()"
                 }
 
-                onTracked: {
-                    var beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay)
-                    canvas.beats = beats
-                }
+                onTracked: canvas.reevaluateBeats()
             }
 
             Repeater {

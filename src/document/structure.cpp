@@ -2148,7 +2148,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
     const qreal x = 5000;
     const qreal y = 5000;
     const qreal xSpacing = 100;
-    const qreal ySpacing = 150;
+    const qreal ySpacing = 400;
 
     QRectF elementRect(x, y, 0, 0);
 
@@ -2176,10 +2176,10 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
     return newBoundingRect;
 }
 
-QJsonArray Structure::evaluateBeats(Screenplay *screenplay) const
+QJsonArray Structure::evaluateBeats(Screenplay *screenplay, const QString &category) const
 {
     QJsonArray ret;
-    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
+    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay, category);
 
     for(const QPair<QString, QList<StructureElement*>> &beat : beats)
     {
@@ -2213,32 +2213,83 @@ QJsonArray Structure::evaluateBeats(Screenplay *screenplay) const
     return ret;
 }
 
-QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl(Screenplay *screenplay) const
+QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl(Screenplay *screenplay, const QString &category) const
 {
     QList< QPair<QString, QList<StructureElement *> > > ret;
     if(screenplay == nullptr)
         return ret;
 
-    ret.append( qMakePair(QStringLiteral("Opening Act"), QList<StructureElement*>()) );
-
-    for(int i=0; i<screenplay->elementCount(); i++)
+    if(category.isEmpty())
     {
-        ScreenplayElement *element = screenplay->elementAt(i);
-        if(element->elementType() == ScreenplayElement::BreakElementType)
+        ret.append( qMakePair(QStringLiteral("Opening Act"), QList<StructureElement*>()) );
+
+        for(int i=0; i<screenplay->elementCount(); i++)
         {
-            if(i == 0)
-                ret.last().first = element->breakTitle();
+            ScreenplayElement *element = screenplay->elementAt(i);
+            if(element->elementType() == ScreenplayElement::BreakElementType)
+            {
+                if(i == 0)
+                    ret.last().first = element->breakTitle();
+                else
+                    ret.append( qMakePair(element->breakTitle(), QList<StructureElement*>()) );
+            }
             else
-                ret.append( qMakePair(element->breakTitle(), QList<StructureElement*>()) );
+            {
+                Scene *scene = element->scene();
+                int index = this->indexOfScene(scene);
+                StructureElement *selement = this->elementAt(index);
+                if(selement != nullptr)
+                    ret.last().second.append(selement);
+            }
         }
-        else
+    }
+    else
+    {
+        auto filteredGroups = [category](const QStringList &groups) {
+            QStringList ret;
+            const QString slash = QStringLiteral("/");
+            for(const QString &group : groups) {
+                if(group.startsWith(category, Qt::CaseInsensitive)) {
+                    const QString groupName = Application::instance()->camelCased( group.section(slash, 1) );
+                    ret.append(groupName);
+                }
+            }
+            return ret;
+        };
+
+        QMap< QString, QList<StructureElement*> > map;
+
+        for(int i=0; i<screenplay->elementCount(); i++)
         {
+            ScreenplayElement *element = screenplay->elementAt(i);
+            if(element->elementType() == ScreenplayElement::BreakElementType)
+                continue;
+
             Scene *scene = element->scene();
-            int index = this->indexOfScene(scene);
+            const QStringList sceneGroups = filteredGroups(scene->groups());
+            if(sceneGroups.isEmpty())
+                continue;
+
+            const int index = this->indexOfScene(scene);
             StructureElement *selement = this->elementAt(index);
             if(selement != nullptr)
-                ret.last().second.append(selement);
+                for(const QString &group : sceneGroups)
+                    map[group].append(selement);
         }
+
+        QMap< QString, QList<StructureElement*> >::const_iterator it = map.constBegin();
+        QMap< QString, QList<StructureElement*> >::const_iterator end = map.constEnd();
+        while(it != end)
+        {
+            ret.append( qMakePair(it.key(), it.value()) );
+            ++it;
+        }
+
+        std::sort(ret.begin(), ret.end(),
+                  [](const QPair<QString, QList<StructureElement *> > &a,
+                     const QPair<QString, QList<StructureElement *> > &b) {
+            return a.second.size() > b.second.size();
+        });
     }
 
     return ret;
@@ -2633,6 +2684,11 @@ void Structure::setGroupsData(const QString &val)
     }
 
     ts.flush();
+
+    const QList<Category> categories = categoryGroupsMap.keys();
+    m_groupCategories.clear();
+    for(const Category &category : categories)
+        m_groupCategories.append( category.name );
 
     emit groupsDataChanged();
     emit groupsModelChanged();
