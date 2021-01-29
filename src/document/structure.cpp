@@ -1394,6 +1394,7 @@ Structure::Structure(QObject *parent)
 {
     connect(this, &Structure::noteCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::zoomLevelChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::groupsDataChanged, this, &Structure::structureChanged);
     connect(this, &Structure::elementCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::characterCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
@@ -1421,36 +1422,7 @@ Structure::Structure(QObject *parent)
     });
     connect(&m_annotationsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::annotationsBoundingBoxChanged);
 
-    // Load the default groups.lst file
-    static const QString groupsListFileName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-            + QStringLiteral("/Scrite Structure Groups.list");
-    if( !QFile::exists(groupsListFileName) )
-    {
-        QFile inFile( QStringLiteral(":/misc/structure_groups.lst") );
-        inFile.open(QFile::ReadOnly);
-
-        const QByteArray inFileData = inFile.readAll();
-        this->setGroupsData( QString::fromLatin1(inFileData) );
-
-        QFile outFile( groupsListFileName );
-        if( outFile.open( QFile::WriteOnly ) )
-            outFile.write(inFileData);
-    }
-    else
-    {
-        auto reloadGroupsListFile = [=]() {
-            QFile groupsListFile(groupsListFileName);
-            if(groupsListFile.open(QFile::ReadOnly)) {
-                const QString groupsData = groupsListFile.readAll();
-                this->setGroupsData(groupsData);
-            }
-        };
-        reloadGroupsListFile();
-
-        QFileSystemWatcher *groupsListFileWatcher = new QFileSystemWatcher(this);
-        groupsListFileWatcher->addPath(groupsListFileName);
-        connect(groupsListFileWatcher, &QFileSystemWatcher::fileChanged, reloadGroupsListFile);
-    }
+    this->loadDefaultGroupsData();
 }
 
 Structure::~Structure()
@@ -2477,6 +2449,45 @@ void Structure::clearAnnotations()
         this->removeAnnotation(m_annotations.first());
 }
 
+QString Structure::defaultGroupsDataFile() const
+{
+    static const QString ret = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+            + QStringLiteral("/Scrite Structure Groups.list");
+    return ret;
+}
+
+void Structure::loadDefaultGroupsData()
+{
+    static const QString groupsListFileName = this->defaultGroupsDataFile();
+
+    if( !QFile::exists(groupsListFileName) )
+    {
+        QFile inFile( QStringLiteral(":/misc/structure_groups.lst") );
+        inFile.open(QFile::ReadOnly);
+        const QByteArray inFileData = inFile.readAll();
+        QFile outFile( groupsListFileName );
+        if( outFile.open( QFile::WriteOnly ) )
+            outFile.write(inFileData);
+    }
+
+    auto reloadGroupsListFile = [=]() {
+        QFile groupsListFile(groupsListFileName);
+        if(groupsListFile.open(QFile::ReadOnly)) {
+            const QString groupsData = groupsListFile.readAll();
+            this->setGroupsData(groupsData);
+        }
+    };
+    reloadGroupsListFile();
+
+    QFileSystemWatcher *groupsListFileWatcher = this->findChild<QFileSystemWatcher*>();
+    if(groupsListFileWatcher != nullptr)
+        delete groupsListFileWatcher;
+
+    groupsListFileWatcher = new QFileSystemWatcher(this);
+    groupsListFileWatcher->addPath(groupsListFileName);
+    connect(groupsListFileWatcher, &QFileSystemWatcher::fileChanged, reloadGroupsListFile);
+}
+
 /**
 Groups Data is a text written in the following format.
 
@@ -2692,6 +2703,10 @@ void Structure::setGroupsData(const QString &val)
 
     emit groupsDataChanged();
     emit groupsModelChanged();
+
+    QFileSystemWatcher *groupsListFileWatcher = this->findChild<QFileSystemWatcher*>();
+    if(groupsListFileWatcher != nullptr)
+        delete groupsListFileWatcher;
 
 #if 0
     QFile outFile1( QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) +

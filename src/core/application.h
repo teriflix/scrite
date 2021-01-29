@@ -202,6 +202,7 @@ public:
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
 
+    Q_INVOKABLE bool writeToFile(const QString &fileName, const QString &fileContent);
     Q_INVOKABLE QString fileContents(const QString &fileName) const;
     Q_INVOKABLE QString fileName(const QString &path) const;
 

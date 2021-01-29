@@ -39,7 +39,8 @@ Item {
             { "title": "Application", "tooltip": "Settings in this page apply to all documents." },
             { "title": "Page Setup", "tooltip": "Settings in this page apply to all documents." },
             { "title": "Title Page", "tooltip": "Settings in this page applies only to the current document." },
-            { "title": "Formatting Rules", "tooltip": "Settings in this page applies only to the current document." }
+            { "title": "Formatting Rules", "tooltip": "Settings in this page applies only to the current document." },
+            { "title": "Structure", "tooltip": "Edit categories and groups used for tagging scenes." }
         ]
 
         content: {
@@ -48,6 +49,7 @@ Item {
             case 1: return pageSetupComponent
             case 2: return titlePageSettingsComponent
             case 3: return formattingRulesSettingsComponent
+            case 4: return categoriesAndStructureComponent
             }
             return unknownSettingsComponent
         }
@@ -1893,6 +1895,135 @@ Item {
                             displayElementFormat.applyToAll(SceneElementFormat.TextAlignment)
                             printElementFormat.applyToAll(SceneElementFormat.TextAlignment)
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: categoriesAndStructureComponent
+
+        PageView {
+            id: categoriesAndStructurePages
+            pagesArray: [
+                { "title": "This Document" },
+                { "title": "Default Global" }
+            ]
+            pageTitleRole:  "title"
+            currentIndex: 0
+            cornerContent: Item {
+                Text {
+                    width: parent.width-20
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.pointSize: app.idealFontPointSize-2
+                    horizontalAlignment: Text.AlignRight
+                    wrapMode: Text.WordWrap
+                    color: primaryColors.c100.background
+                    text: "Customize categories & groups you use for tagging index cards on the structure canvas. Each document has its own groups, there is a system wide copy as well."
+                }
+            }
+            pageContent: Loader {
+                height: categoriesAndStructurePages.height
+                sourceComponent: {
+                    switch(categoriesAndStructurePages.currentIndex) {
+                    case 0: return currentDocumentGroupsEditor
+                    case 1: return defaultGlobalGroupsEditor
+                    }
+                    return unknownSettingsComponent
+                }
+            }
+        }
+    }
+
+    Component {
+        id: currentDocumentGroupsEditor
+
+        Item {
+            Column {
+                anchors.fill: parent
+                anchors.margins: 10
+                anchors.rightMargin: 20
+                spacing: 20
+
+                ScrollView {
+                    width: parent.width
+                    height: parent.height - parent.spacing - applyButton.height
+                    clip: true
+                    background: Rectangle {
+                        color: primaryColors.c50.background
+                        border.width: 1
+                        border.color: primaryColors.borderColor
+                    }
+
+                    TextArea {
+                        id: groupsDataEdit
+                        text: scriteDocument.structure.groupsData
+                        font.family: "Courier Prime"
+                        font.pointSize: app.idealFontPointSize
+                        background: Item { }
+                        leftPadding: 5
+                        rightPadding: 10
+                        selectByMouse: true
+                        selectByKeyboard: true
+                    }
+                }
+
+                Button2 {
+                    id: applyButton
+                    anchors.right: parent.right
+                    text: "Apply"
+                    onClicked: {
+                        scriteDocument.structure.groupsData = groupsDataEdit.text
+                        modalDialog.close()
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: defaultGlobalGroupsEditor
+
+        Item {
+            Column {
+                anchors.fill: parent
+                anchors.margins: 10
+                anchors.rightMargin: 20
+                spacing: 20
+
+                ScrollView {
+                    width: parent.width
+                    height: parent.height - parent.spacing - applyButton.height
+                    clip: true
+                    background: Rectangle {
+                        color: accentColors.c50.background
+                        border.width: 1
+                        border.color: accentColors.borderColor
+                    }
+
+                    TextArea {
+                        id: groupsDataEdit
+                        text: app.fileContents(scriteDocument.structure.defaultGroupsDataFile)
+                        font.family: "Courier Prime"
+                        font.pointSize: app.idealFontPointSize
+                        background: Item { }
+                        leftPadding: 5
+                        rightPadding: 10
+                        selectByMouse: true
+                        selectByKeyboard: true
+                    }
+                }
+
+                Button2 {
+                    id: applyButton
+                    anchors.right: parent.right
+                    text: "Apply"
+                    onClicked: {
+                        app.writeToFile(scriteDocument.structure.defaultGroupsDataFile, groupsDataEdit.text)
+                        modalDialog.close()
                     }
                 }
             }

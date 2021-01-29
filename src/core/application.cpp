@@ -952,6 +952,18 @@ QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, co
     return around2;
 }
 
+bool Application::writeToFile(const QString &fileName, const QString &fileContent)
+{
+    QFile file(fileName);
+    if( file.open(QFile::WriteOnly) )
+    {
+        file.write(fileContent.toLatin1());
+        return true;
+    }
+
+    return false;
+}
+
 QString Application::fileContents(const QString &fileName) const
 {
     QFile file(fileName);

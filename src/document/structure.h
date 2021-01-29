@@ -623,6 +623,11 @@ public:
     Q_INVOKABLE void clearAnnotations();
     Q_SIGNAL void annotationCountChanged();
 
+    Q_PROPERTY(QString defaultGroupsDataFile READ defaultGroupsDataFile CONSTANT)
+    QString defaultGroupsDataFile() const;
+
+    Q_INVOKABLE void loadDefaultGroupsData();
+
     Q_PROPERTY(QString groupsData READ groupsData WRITE setGroupsData NOTIFY groupsDataChanged)
     void setGroupsData(const QString &val);
     QString groupsData() const { return m_groupsData; }
