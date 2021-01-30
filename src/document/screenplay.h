@@ -128,6 +128,9 @@ protected:
     void setElementIndex(int val);
 
 private:
+    void onSceneGroupsChanged() { emit sceneGroupsChanged(this); }
+
+private:
     friend class Screenplay;
     bool m_expanded = true;
     int m_breakType = -1;

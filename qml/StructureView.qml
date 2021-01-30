@@ -706,6 +706,11 @@ Item {
                     signal: "structureChanged()"
                 }
 
+                TrackSignal {
+                    target: scriteDocument.screenplay
+                    signal: "elementSceneGroupsChanged(ScreenplayElement*)"
+                }
+
                 onTracked: canvas.reevaluateBeats()
             }
 
@@ -884,6 +889,8 @@ Item {
                         sceneGroup: SceneGroup {
                             structure: scriteDocument.structure
                         }
+
+                        onToggled: app.execLater(selection, 250, function() { selection.refit() })
 
                         onAboutToShow: {
                             sceneGroup.clearScenes()
@@ -1087,6 +1094,7 @@ Item {
                     sceneGroup: SceneGroup {
                         structure: scriteDocument.structure
                     }
+                    onToggled: app.execLater(selection, 250, function() { selection.refit() })
                     onAboutToShow: {
                         sceneGroup.clearScenes()
                         sceneGroup.addScene(elementContextMenu.element.scene)

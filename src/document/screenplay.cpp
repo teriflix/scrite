@@ -202,10 +202,7 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
     connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
-    connect(m_scene, &Scene::groupsChanged, [=]() {
-        qDebug() << "PA: A scene group was changed.";
-        emit sceneGroupsChanged(this);
-    });
+    connect(m_scene, &Scene::groupsChanged, this, &ScreenplayElement::onSceneGroupsChanged);
 
     if(m_screenplay)
         connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
@@ -2149,13 +2146,9 @@ void ScreenplayTracks::refresh()
     }
 
     this->endResetModel();
-
-    qDebug() << "PA: Finished refreshing.";
 }
 
 void ScreenplayTracks::refreshLater()
 {
     m_refreshTimer.start(0, this);
-
-    qDebug() << "PA: Scheduling a refresh later";
 }

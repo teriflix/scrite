@@ -494,6 +494,7 @@ public:
     ~SceneGroup();
 
     Q_INVOKABLE void toggle(int row);
+    Q_SIGNAL void toggled(int row);
 
     // Custom properties
     Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged)

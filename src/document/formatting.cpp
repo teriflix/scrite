@@ -934,8 +934,6 @@ void TextFormat::setBold(bool val)
 
     m_bold = val;
     emit boldChanged();
-
-    qDebug() << "PA: " << this << val;
 }
 
 void TextFormat::setItalic(bool val)
@@ -945,8 +943,6 @@ void TextFormat::setItalic(bool val)
 
     m_italic = val;
     emit italicChanged();
-
-    qDebug() << "PA: " << this << val;
 }
 
 void TextFormat::setUnderline(bool val)
@@ -956,8 +952,6 @@ void TextFormat::setUnderline(bool val)
 
     m_underline = val;
     emit underlineChanged();
-
-    qDebug() << "PA: " << this << val;
 }
 
 void TextFormat::setTextColor(const QColor &val)

@@ -1800,6 +1800,8 @@ void SceneGroup::toggle(int row)
 
     const QModelIndex index = this->index(row, 0);
     emit dataChanged(index, index);
+
+    emit toggled(row);
 }
 
 void SceneGroup::setStructure(Structure *val)

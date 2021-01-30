@@ -2229,8 +2229,9 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
             return ret;
         };
 
-        QMap< QString, QList<StructureElement*> > map;
+        QHash<Scene*, int> sceneIndexMap;
 
+        QMap< QString, QList<StructureElement*> > map;
         for(int i=0; i<screenplay->elementCount(); i++)
         {
             ScreenplayElement *element = screenplay->elementAt(i);
@@ -2242,6 +2243,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
             if(sceneGroups.isEmpty())
                 continue;
 
+            sceneIndexMap[scene] = element->elementIndex();
             const int index = this->indexOfScene(scene);
             StructureElement *selement = this->elementAt(index);
             if(selement != nullptr)
@@ -2253,7 +2255,29 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
         QMap< QString, QList<StructureElement*> >::const_iterator end = map.constEnd();
         while(it != end)
         {
-            ret.append( qMakePair(it.key(), it.value()) );
+            QList<StructureElement*> selements = it.value();
+            std::sort(selements.begin(), selements.end(), [sceneIndexMap](StructureElement *a, StructureElement *b) {
+                return sceneIndexMap.value(a->scene()) < sceneIndexMap.value(b->scene());
+            });
+
+            QList<StructureElement*> bunch;
+            for(StructureElement *selement : qAsConst(selements))
+            {
+                if(bunch.isEmpty() ||
+                  sceneIndexMap.value(selement->scene()) - sceneIndexMap.value(bunch.last()->scene()) == 1)
+                {
+                    bunch.append(selement);
+                    continue;
+                }
+
+                ret.append( qMakePair(it.key(), bunch) );
+                bunch.clear();
+                bunch.append(selement);
+            }
+
+            if(!bunch.isEmpty())
+                ret.append( qMakePair(it.key(), bunch) );
+
             ++it;
         }
 

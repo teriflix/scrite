@@ -20,6 +20,7 @@ Menu2 {
     id: structureGroupsMenu
 
     property SceneGroup sceneGroup: null
+    signal toggled(int row, string name)
 
     title: "Tag Groups"
 
@@ -105,7 +106,10 @@ Menu2 {
                             id: groupItemMouseArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            onClicked: sceneGroup.toggle(index)
+                            onClicked: {
+                                sceneGroup.toggle(index)
+                                structureGroupsMenu.toggled(index, arrayItem.name)
+                            }
                         }
                     }
                 }

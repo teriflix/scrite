@@ -29,10 +29,7 @@ Item {
     signal moveItem(Item item, real dx, real dy)
     signal placeItem(Item item)
 
-    function init(givenItems, rectangle) {
-        if(givenItems === undefined || givenItems === null)
-            return
-
+    function createBounds() {
         var bounds = {
             "p1": { x: -1, y: -1 },
             "p2": { x: -1, y: -1 },
@@ -59,6 +56,14 @@ Item {
             }
         }
 
+        return bounds
+    }
+
+    function init(givenItems, rectangle) {
+        if(givenItems === undefined || givenItems === null)
+            return
+
+        var bounds = createBounds()
         var selectedItems = []
         var count = givenItems.count
         for(var i=0; i<count; i++) {
@@ -86,6 +91,26 @@ Item {
             return (i1.x === i2.x) ? i1.y - i2.y : i1.x - i2.x
         })
         items = selectedItems
+    }
+
+    function refit() {
+        var count = items.length
+        if(count === 0)
+            return
+        var bounds = createBounds()
+        for(var i=0; i<count; i++) {
+            var item = items[i]
+            var p1 = Qt.point(item.x, item.y)
+            var p2 = Qt.point(item.x+item.width, item.y+item.height)
+            bounds.unite(p1)
+            bounds.unite(p2)
+        }
+
+        tightRect.x = bounds.p1.x - 10
+        tightRect.y = bounds.p1.y - 10
+        tightRect.width = (bounds.p2.x-bounds.p1.x+20)
+        tightRect.height = (bounds.p2.y-bounds.p1.y+20)
+        tightRect.topLeft = Qt.point(tightRect.x, tightRect.y)
     }
 
     function clear() {
