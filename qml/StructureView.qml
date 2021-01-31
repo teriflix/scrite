@@ -718,6 +718,7 @@ Item {
                 model: canvas.beats
 
                 Rectangle {
+                    id: canvasBeatItem
                     x: modelData.geometry.x - 20
                     y: modelData.geometry.y - 20
                     width: modelData.geometry.width + 40
@@ -742,6 +743,12 @@ Item {
                         border.width: parent.border.width
                         border.color: parent.border.color
                         color: app.translucent(accentColors.windowColor, 0.4)
+
+                        MouseArea {
+                            anchors.fill: parent
+                            drag.target: canvasBeatItem
+                            drag.axis: Drag.XAndYAxis
+                        }
                     }
 
                     Text {
@@ -1654,68 +1661,52 @@ Item {
                     Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
-                TextArea {
-                    id: synopsisField
+                Column {
+                    spacing: 0
                     width: parent.width
-                    background: Item {
-                        Text {
-                            id: labelText
-                            text: "Synopsis"
-                            font.pointSize: app.idealFontPointSize/2
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.top
+
+                    Text {
+                        id: labelText
+                        text: "Synopsis"
+                        font.pointSize: app.idealFontPointSize/2
+                    }
+
+                    Flickable {
+                        id: synopsisFieldFlick
+                        clip: true
+                        width: parent.width
+                        height: 200
+                        contentWidth: synopsisField.width
+                        contentHeight: synopsisField.height
+                        interactive: elementItem.selected
+                        property bool scrollBarVisible: synopsisField.contentHeight > synopsisFieldFlick.height
+                        ScrollBar.vertical: ScrollBar {
+                            policy: synopsisFieldFlick.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         }
-                        Rectangle {
-                            width: parent.width
-                            height: synopsisField.hovered ? 2 : 1
-                            color: synopsisField.hovered ? "black" : primaryColors.borderColor
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: app.idealFontPointSize/2
+                        TextAreaInput {
+                            id: synopsisField
+                            width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
+                            height: Math.max(synopsisFieldFlick.height-1, contentHeight)
+                            background: Item { }
+                            selectByMouse: true
+                            selectByKeyboard: true
+                            placeholderText: "Describe what happens in this scene."
+                            font.pointSize: app.idealFontPointSize
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            TabSequenceItem.manager: indexCardTabSequence
+                            TabSequenceItem.sequence: 1
+                            text: element.scene.title
+                            onTextChanged: element.scene.title = text
+                            onActiveFocusChanged: if(activeFocus) elementItem.select()
+                            Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                         }
                     }
-                    selectByMouse: true
-                    selectByKeyboard: true
-                    placeholderText: "Describe what happens in this scene."
-                    font.pointSize: app.idealFontPointSize
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    TabSequenceItem.manager: indexCardTabSequence
-                    TabSequenceItem.sequence: 1
-                    text: element.scene.title
-                    onTextChanged: element.scene.title = text
-                    onActiveFocusChanged: if(activeFocus) elementItem.select()
-                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
-                }
 
-                TextField2 {
-                    id: emotionChangeField
-                    width: parent.width
-                    label: "Emotional Change"
-                    labelAlwaysVisible: true
-                    placeholderText: "+/- emotional change in this scene..."
-                    font.pointSize: app.idealFontPointSize - 3
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    TabSequenceItem.manager: indexCardTabSequence
-                    TabSequenceItem.sequence: 2
-                    text: element.scene.emotionalChange
-                    onTextEdited: element.scene.emotionalChange = text
-                    onActiveFocusChanged: if(activeFocus) elementItem.select()
-                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
-                }
-
-                TextField2 {
-                    id: conflictCharsField
-                    width: parent.width
-                    label: "Conflicting Characters"
-                    labelAlwaysVisible: true
-                    placeholderText: ">< characters in conflict in this scene..."
-                    font.pointSize: app.idealFontPointSize - 3
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    TabSequenceItem.manager: indexCardTabSequence
-                    TabSequenceItem.sequence: 3
-                    text: element.scene.charactersInConflict
-                    onTextEdited: element.scene.charactersInConflict = text
-                    onActiveFocusChanged: if(activeFocus) elementItem.select()
-                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
+                    Rectangle {
+                        width: parent.width
+                        height: synopsisField.hovered ? 2 : 1
+                        color: synopsisField.hovered ? "black" : primaryColors.borderColor
+                    }
                 }
 
                 TextField2 {

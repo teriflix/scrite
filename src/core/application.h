@@ -221,6 +221,8 @@ public:
 
     Q_INVOKABLE bool resetObjectProperty(QObject *object, const QString &propName);
 
+    Q_INVOKABLE int objectTreeSize(QObject *ptr) const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

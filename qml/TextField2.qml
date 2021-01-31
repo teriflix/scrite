@@ -25,8 +25,8 @@ TextField {
     property bool enableTransliteration: false
     property bool includeEmojiSymbols: true
     property alias showingSymbols: specialSymbolSupport.showingSymbols
-    selectedTextColor: "white"
-    selectionColor: "blue"
+    selectedTextColor: accentColors.c700.text
+    selectionColor: accentColors.c700.background
     selectByMouse: true
 
     signal editingComplete()
@@ -47,6 +47,7 @@ TextField {
     }
 
     Item {
+        id: tooltipItem
         x: parent.cursorRectangle.x
         y: parent.cursorRectangle.y
         width: parent.cursorRectangle.width

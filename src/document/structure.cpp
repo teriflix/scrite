@@ -2158,19 +2158,19 @@ QJsonArray Structure::evaluateBeats(Screenplay *screenplay, const QString &categ
         if(beat.second.isEmpty())
             continue;
 
-        QJsonArray sceneIds;
+        QJsonArray sceneIndexes;
 
         QRectF beatBox;
         for(StructureElement *element : qAsConst(beat.second))
         {
             beatBox |= QRectF(element->x(), element->y(), element->width(), element->height());
-            sceneIds.append( element->scene()->id() );
+            sceneIndexes.append( this->indexOfElement(element) );
         }
 
         QJsonObject beatJson;
         beatJson.insert("name", beat.first);
-        beatJson.insert("sceneIds", sceneIds);
-        beatJson.insert("sceneCount", sceneIds.size());
+        beatJson.insert("sceneIndexes", sceneIndexes);
+        beatJson.insert("sceneCount", sceneIndexes.size());
 
         QJsonObject beatGeo;
         beatGeo.insert("x", beatBox.x());

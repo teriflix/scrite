@@ -1167,6 +1167,11 @@ bool Application::resetObjectProperty(QObject *object, const QString &propName)
     return prop.reset(object);
 }
 
+int Application::objectTreeSize(QObject *ptr) const
+{
+    return ptr->findChildren<QObject*>(QString(), Qt::FindChildrenRecursively).size() + 1;
+}
+
 void Application::initializeStandardColors(QQmlEngine *)
 {
     if(!m_standardColors.isEmpty())
