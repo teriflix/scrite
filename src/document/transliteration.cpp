@@ -529,20 +529,24 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
     if(wordPositions.isEmpty())
         return paragraph;
 
-    if(!includingLastWord)
-    {
-        const QChar lastCharacter = paragraph.at(paragraph.length()-1);
-        const bool endsWithSpaceOrPunctuation = lastCharacter.isSpace() || lastCharacter.isPunct() || lastCharacter.isDigit();
-        if(endsWithSpaceOrPunctuation)
-            includingLastWord = true;
-    }
+    const QChar lastCharacter = paragraph.at(paragraph.length()-1);
+    const bool endsWithSpaceOrPunctuation = lastCharacter.isSpace() || lastCharacter.isPunct() || lastCharacter.isDigit();
+    if(endsWithSpaceOrPunctuation)
+        includingLastWord = true;
 
     QString ret;
     Sonnet::TextBreaks::Position wordPosition;
+    int lastCharIndex = -1;
     for(int i=0; i<wordPositions.size(); i++)
     {
+        ++lastCharIndex;
+
         wordPosition = wordPositions.at(i);
+        if(wordPosition.start > lastCharIndex)
+            ret += paragraph.mid(lastCharIndex, wordPosition.start-lastCharIndex);
+
         const QString word = paragraph.mid(wordPosition.start, wordPosition.length);
+        lastCharIndex = wordPosition.start + wordPosition.length-1;
         QString replacement;
 
         if(i < wordPositions.length()-1 || includingLastWord)
@@ -551,14 +555,9 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
             replacement = word;
 
         ret += replacement;
-        if(paragraph.length() > wordPosition.start+wordPosition.length)
-        {
-            if(i < wordPositions.size()-1)
-                ret += paragraph.at(wordPosition.start+wordPosition.length);
-            else
-                ret += paragraph.mid(wordPosition.start+wordPosition.length);
-        }
     }
+
+    ret += paragraph.mid(lastCharIndex+1);
 
     return ret;
 }

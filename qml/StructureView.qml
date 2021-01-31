@@ -1690,6 +1690,14 @@ Item {
                     TabSequenceItem.sequence: 0
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                     Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
+                    enableTransliteration: true
+                    property var currentLanguage: app.transliterationEngine.language
+                    onCurrentLanguageChanged: {
+                        if(currentLanguage !== TransliterationEngine.English)
+                            font.capitalization = Font.MixedCase
+                        else
+                            font.capitalization = Font.AllUppercase
+                    }
                 }
 
                 Column {

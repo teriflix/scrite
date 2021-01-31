@@ -1694,7 +1694,7 @@ Rectangle {
 
             function edit() {
                 if(theScene.heading.enabled)
-                    sceneHeadingLoader.viewOnly = false
+                    sceneHeadingField.forceActiveFocus()
             }
 
             height: sceneHeadingLayout.height + 24
@@ -1708,10 +1708,11 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: 8
                     spacing: 20
 
                     SceneTypeImage {
-                        width: sceneHeadingLoader.height
+                        width: sceneHeadingField.height * 0.75
                         height: width
                         anchors.verticalCenter: parent.verticalCenter
                         sceneType: headingItem.theScene.type
@@ -1750,27 +1751,29 @@ Rectangle {
                     spacing: 5
                     width: parent.width
 
-                    Loader {
-                        id: sceneHeadingLoader
+                    TextField2 {
+                        id: sceneHeadingField
                         width: parent.width - sceneMenuButton.width - parent.spacing
-                        height: item ? item.contentHeight : headingFontMetrics.lineSpacing
-                        property bool viewOnly: true
-                        property int sceneIndex: headingItem.theElementIndex
-                        property SceneHeading sceneHeading: headingItem.theScene.heading
-                        property TextArea sceneTextEditor: headingItem.sceneTextEditor
-                        sourceComponent: {
-                            if(scriteDocument.readOnly)
-                                return sceneHeading.enabled ? sceneHeadingViewer : sceneHeadingDisabled
-                            if(sceneHeading.enabled)
-                                return viewOnly ? sceneHeadingViewer : sceneHeadingEditor
-                            return sceneHeadingDisabled
+                        text: headingItem.theScene.heading.text
+                        enabled: headingItem.theScene.heading.enabled
+                        label: ""
+                        placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+                        font: headingFontMetrics.font
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        onEditingComplete: headingItem.theScene.heading.parseFrom(text)
+                        onActiveFocusChanged: {
+                            if(activeFocus)
+                                screenplayAdapter.currentIndex = headingItem.theElementIndex
                         }
+                        tabItem: headingItem.sceneTextEditor
 
-                        Connections {
-                            target: sceneHeadingLoader.item
-                            ignoreUnknownSignals: true
-                            onEditRequest: sceneHeadingLoader.viewOnly = false
-                            onEditingFinished: sceneHeadingLoader.viewOnly = true
+                        enableTransliteration: true
+                        property var currentLanguage: app.transliterationEngine.language
+                        onCurrentLanguageChanged: {
+                            if(currentLanguage !== TransliterationEngine.English)
+                                font.capitalization = Font.MixedCase
+                            else
+                                font.capitalization = Font.AllUppercase
                         }
                     }
 
@@ -1904,131 +1907,6 @@ Rectangle {
         id: headingFontMetrics
         readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Heading)
         font: format.font2
-    }
-
-    Component {
-        id: sceneHeadingDisabled
-
-        Item {
-            property real contentHeight: headingFontMetrics.lineSpacing
-
-            Text {
-                text: "no scene heading"
-                anchors.verticalCenter: parent.verticalCenter
-                color: primaryColors.c10.text
-                font: headingFontMetrics.font
-                opacity: 0.25
-            }
-        }
-    }
-
-    Component {
-        id: sceneHeadingEditor
-
-        Item {
-            property real contentHeight: height
-            height: layout.height + 4
-            Component.onCompleted: {
-                locTypeEdit.forceActiveFocus()
-                screenplayAdapter.currentIndex = sceneIndex
-            }
-
-            signal editingFinished()
-
-            property bool hasFocus: locTypeEdit.activeFocus || locTypeEdit.showingSymbols ||
-                                    locEdit.activeFocus || locEdit.showingSymbols ||
-                                    momentEdit.activeFocus || momentEdit.showingSymbols
-            onHasFocusChanged: {
-                if(!hasFocus)
-                    editingFinished()
-            }
-
-            Row {
-                id: layout
-                anchors.left: parent.left
-                anchors.right: parent.right
-
-                TextField2 {
-                    id: locTypeEdit
-                    font: headingFontMetrics.font
-                    width: Math.max(headingFontMetrics.averageCharacterWidth*5, Math.min(contentWidth, 120*zoomLevel))
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: sceneHeading.locationType
-                    completionStrings: scriteDocument.structure.standardLocationTypes()
-                    enableTransliteration: true
-                    onEditingComplete: sceneHeading.locationType = text
-                    tabItem: locEdit
-                    includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
-                    onActiveFocusChanged: screenplayAdapter.currentIndex = sceneIndex
-                }
-
-                Text {
-                    id: sep1Text
-                    font: headingFontMetrics.font
-                    text: ". "
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                TextField2 {
-                    id: locEdit
-                    font: headingFontMetrics.font
-                    width: parent.width - locTypeEdit.width - sep1Text.width - momentEdit.width - sep2Text.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: sceneHeading.location
-                    enableTransliteration: true
-                    completionStrings: scriteDocument.structure.allLocations()
-                    onEditingComplete: sceneHeading.location = text
-                    tabItem: momentEdit
-                    includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
-                    onActiveFocusChanged: screenplayAdapter.currentIndex = sceneIndex
-                }
-
-                Text {
-                    id: sep2Text
-                    font: headingFontMetrics.font
-                    text: "- "
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                TextField2 {
-                    id: momentEdit
-                    font: headingFontMetrics.font
-                    width: Math.max(headingFontMetrics.averageCharacterWidth*5, Math.min(contentWidth, 200*zoomLevel))
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: sceneHeading.moment
-                    enableTransliteration: true
-                    completionStrings: scriteDocument.structure.standardMoments()
-                    onEditingComplete: sceneHeading.moment = text
-                    tabItem: sceneTextEditor
-                    includeEmojiSymbols: app.isWindowsPlatform || app.isLinuxPlatform
-                    onActiveFocusChanged: screenplayAdapter.currentIndex = sceneIndex
-                }
-            }
-        }
-    }
-
-    Component {
-        id: sceneHeadingViewer
-
-        Item {
-            property real contentHeight: sceneHeadingText.contentHeight
-            signal editRequest()
-
-            Text {
-                id: sceneHeadingText
-                width: parent.width
-                font: headingFontMetrics.font
-                text: sceneHeading.text
-                anchors.verticalCenter: parent.verticalCenter
-                wrapMode: Text.WordWrap
-                color: headingFontMetrics.format.textColor
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: parent.editRequest()
-            }
-        }
     }
 
     Component {
