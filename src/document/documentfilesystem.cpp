@@ -18,6 +18,7 @@
 #include <QDateTime>
 #include <QDataStream>
 #include <QTemporaryDir>
+#include <QStandardPaths>
 
 #include "quazip.h"
 #include "quazipfile.h"
@@ -307,8 +308,22 @@ bool DocumentFileSystem::save(const QString &fileName)
     headerFile.write(d->header);
     headerFile.close();
 
-    const QFileInfo fileInfo(fileName);
-    return doZip(fileInfo, *d->folder);
+    const QString tmpFileName = QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+                                 QStringLiteral("/scrite_") + QString::number(QDateTime::currentMSecsSinceEpoch()) +
+                                 QStringLiteral("_temp.scrite");
+
+    const QFileInfo fileInfo(tmpFileName);
+    bool success = doZip(fileInfo, *d->folder);
+
+    if(success && QFile::exists(tmpFileName) && QFileInfo(tmpFileName).size() > 0)
+    {
+        success &= QFile::remove(fileName);
+        if(success)
+            success &= QFile::copy(tmpFileName, fileName);
+        QFile::remove(tmpFileName);
+    }
+
+    return success;
 #endif
 }
 

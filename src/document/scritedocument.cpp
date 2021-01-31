@@ -393,7 +393,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     const QJsonObject json = QObjectSerializer::toJson(this);
     const QByteArray bytes = QJsonDocument(json).toJson();
     m_docFileSystem.setHeader(bytes);
-    m_docFileSystem.save(fileName);
+    if( !m_docFileSystem.save(fileName) )
+        m_errorReport->setErrorMessage( QStringLiteral("Couldn't save document \"") + fileName + QStringLiteral("\"") );
 
     this->setFileName(fileName);
     this->setModified(false);
