@@ -669,9 +669,12 @@ Item {
 
             property string beatCategory
             property var beats: []
+            property bool beatsBeingMoved: false
             Component.onCompleted: app.execLater(canvas, 250, reevaluateBeats)
 
             function reevaluateBeats() {
+                if(beatsBeingMoved)
+                    return
                 var beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay, canvas.beatCategory)
                 canvas.beats = beats
             }
@@ -770,6 +773,7 @@ Item {
                             selection.clear()
                             refX = canvasBeatItem.x
                             refY = canvasBeatItem.y
+                            canvas.beatsBeingMoved = drag.active
                         }
                         onDoubleClicked: canvasBeatItem.selectBeatItems()
                     }
