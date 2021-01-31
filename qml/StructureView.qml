@@ -737,18 +737,49 @@ Item {
                     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
                     BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
+                    onXChanged: if(canvasBeatMouseArea.drag.active) Qt.callLater(moveBeat)
+                    onYChanged: if(canvasBeatMouseArea.drag.active) Qt.callLater(moveBeat)
+
+                    function moveBeat() {
+                        var dx = x - canvasBeatMouseArea.refX
+                        var dy = y - canvasBeatMouseArea.refY
+                        var nrElements = modelData.sceneCount
+                        for(var i=0; i<nrElements; i++) {
+                            var item = elementItems.itemAt(modelData.sceneIndexes[i])
+                            item.x = item.x + dx
+                            item.y = item.y + dy
+                        }
+                        canvasBeatMouseArea.refX = x
+                        canvasBeatMouseArea.refY = y
+                    }
+
+                    function selectBeatItems() {
+                        selection.clear()
+                        selection.init(elementItems, Qt.rect(x,y,width,height))
+                    }
+
+                    MouseArea {
+                        id: canvasBeatMouseArea
+                        anchors.fill: parent
+                        drag.target: canvasBeatItem
+                        drag.axis: Drag.XAndYAxis
+                        cursorShape: Qt.SizeAllCursor
+                        property real refX
+                        property real refY
+                        drag.onActiveChanged: {
+                            selection.clear()
+                            refX = canvasBeatItem.x
+                            refY = canvasBeatItem.y
+                        }
+                        onDoubleClicked: canvasBeatItem.selectBeatItems()
+                    }
+
                     Rectangle {
                         anchors.fill: beatLabel
                         anchors.margins: -parent.radius
                         border.width: parent.border.width
                         border.color: parent.border.color
                         color: app.translucent(accentColors.windowColor, 0.4)
-
-                        MouseArea {
-                            anchors.fill: parent
-                            drag.target: canvasBeatItem
-                            drag.axis: Drag.XAndYAxis
-                        }
                     }
 
                     Text {
@@ -1619,7 +1650,7 @@ Item {
                 wrapAround: true
             }
 
-            property bool focus2: headingField.activeFocus | synopsisField.activeFocus | emotionChangeField.activeFocus | conflictCharsField.activeFocus | pageTargetField.activeFocus
+            property bool focus2: headingField.activeFocus | synopsisField.activeFocus
             onFocus2Changed: {
                 if(focus2)
                     canvasScroll.editItem = elementItem
@@ -1707,22 +1738,6 @@ Item {
                         height: synopsisField.hovered ? 2 : 1
                         color: synopsisField.hovered ? "black" : primaryColors.borderColor
                     }
-                }
-
-                TextField2 {
-                    id: pageTargetField
-                    width: parent.width
-                    label: "Page Target"
-                    labelAlwaysVisible: true
-                    placeholderText: "5, 10-20 etc.."
-                    font.pointSize: app.idealFontPointSize - 3
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    TabSequenceItem.manager: indexCardTabSequence
-                    TabSequenceItem.sequence: 4
-                    text: element.scene.pageTarget
-                    onTextEdited: element.scene.pageTarget = text
-                    onActiveFocusChanged: if(activeFocus) elementItem.select()
-                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                 }
 
                 Text {

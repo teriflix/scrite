@@ -2120,7 +2120,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
     const qreal x = 5000;
     const qreal y = 5000;
     const qreal xSpacing = 100;
-    const qreal ySpacing = 400;
+    const qreal ySpacing = 175;
 
     QRectF elementRect(x, y, 0, 0);
 
