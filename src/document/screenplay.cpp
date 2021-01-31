@@ -2136,11 +2136,45 @@ void ScreenplayTracks::refresh()
             return trackASize > trackBSize;
         });
 
-        QVariantMap row;
-        row.insert( QStringLiteral("category"), category );
-        row.insert( QStringLiteral("tracks"), categoryTrackItems );
+        QList< QVariantList > nonIntersectionTracks;
+        nonIntersectionTracks << QVariantList();
 
-        m_data.append(row);
+        auto includeTrack = [&nonIntersectionTracks,startIndexKey,endIndexKey,groupKey](const QVariantMap &trackB) {
+            for(int i=0; i<nonIntersectionTracks.size(); i++) {
+                QVariantList &list = nonIntersectionTracks[i];
+                bool intersectionFound = false;
+                for(const QVariant &listItem : list) {
+                    const QVariantMap &trackA = listItem.toMap();
+                    const int startA = trackA.value(startIndexKey).toInt();
+                    const int endA = trackA.value(endIndexKey).toInt();
+                    const int startB = trackB.value(startIndexKey).toInt();
+                    const int endB = trackB.value(endIndexKey).toInt();
+                    if( (startA <= startB && startB <= endA) || (startA <= endB && endB <= endA) ) {
+                        intersectionFound = true;
+                        break;
+                    }
+                }
+                if(!intersectionFound) {
+                    list << trackB;
+                    return;
+                }
+            }
+
+            QVariantList newTrack;
+            newTrack << trackB;
+            nonIntersectionTracks << newTrack;
+        };
+
+        for(const QVariant &item : qAsConst(categoryTrackItems))
+            includeTrack(item.toMap());
+
+        for(const QVariantList &tracks : qAsConst(nonIntersectionTracks))
+        {
+            QVariantMap row;
+            row.insert( QStringLiteral("category"), category );
+            row.insert( QStringLiteral("tracks"), tracks );
+            m_data.append(row);
+        }
 
         ++it;
     }
