@@ -1718,14 +1718,14 @@ Item {
                         contentWidth: synopsisField.width
                         contentHeight: synopsisField.height
                         interactive: elementItem.selected
-                        property bool scrollBarVisible: synopsisField.contentHeight > synopsisFieldFlick.height
+                        property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
                         ScrollBar.vertical: ScrollBar {
                             policy: synopsisFieldFlick.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         }
                         TextAreaInput {
                             id: synopsisField
                             width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
-                            height: Math.max(synopsisFieldFlick.height-1, contentHeight)
+                            height: Math.max(synopsisFieldFlick.height-1, contentHeight+50)
                             background: Item { }
                             selectByMouse: true
                             selectByKeyboard: true
