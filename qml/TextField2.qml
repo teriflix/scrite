@@ -18,6 +18,7 @@ import Scrite 1.0
 TextField {
     id: textField
     property alias completionStrings: completer.strings
+    property alias completionPrefix: completer.completionPrefix
     property Item tabItem
     property Item backTabItem
     property bool labelAlwaysVisible: false
@@ -25,6 +26,9 @@ TextField {
     property bool enableTransliteration: false
     property bool includeEmojiSymbols: true
     property alias showingSymbols: specialSymbolSupport.showingSymbols
+    property var includeSuggestion: function(suggestion) {
+        return suggestion
+    }
     selectedTextColor: accentColors.c700.text
     selectionColor: accentColors.c700.background
     selectByMouse: true
@@ -84,7 +88,7 @@ TextField {
 
     function autoCompleteOrFocusNext() {
         if(completer.hasSuggestion && completer.suggestion !== text) {
-            text = completer.suggestion
+            text = includeSuggestion(completer.suggestion)
             editingFinished()
         } else if(tabItem) {
             editingFinished()

@@ -1775,6 +1775,25 @@ Rectangle {
                             else
                                 font.capitalization = Font.AllUppercase
                         }
+
+                        property int dotPosition: text.indexOf(".")
+                        property int dashPosition: text.lastIndexOf("-")
+                        property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
+                        completionStrings: editingLocationPart ? scriteDocument.structure.allLocations() : []
+                        completionPrefix: editingLocationPart ? text.substring(dotPosition+1, dashPosition < 0 ? text.length-1 : dashPosition).trim() : ""
+                        includeSuggestion: function(suggestion) {
+                            if(editingLocationPart) {
+                                var one = text.substring(0, dotPosition).trim() + ". "
+                                var two = suggestion
+                                var three = dashPosition < 0 ? "" : (" - " + text.substring(dashPosition+1).trim())
+                                if(dashPosition >= 0)
+                                    Qt.callLater( function() {
+                                        sceneHeadingField.cursorPosition = dashPosition+1
+                                    })
+                                return one + two + three
+                            }
+                            return suggestion
+                        }
                     }
 
                     ToolButton3 {
