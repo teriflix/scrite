@@ -1067,6 +1067,12 @@ Rectangle {
                         contentItem.theScene.undoRedoEnabled = activeFocus
                     }
 
+                    function reload() {
+                        app.execLater(sceneDocumentBinder, 1000, function() {
+                            sceneDocumentBinder.preserveScrollAndReload()
+                        } )
+                    }
+
                     onCursorRectangleChanged: {
                         if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/)
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
@@ -1296,7 +1302,11 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             enabled: !scriteDocument.readOnly
                             menu: Menu2 {
-                                onAboutToShow: sceneTextEditor.persistentSelection = true
+                                property int sceneTextEditorCursorPosition: -1
+                                onAboutToShow: {
+                                    sceneTextEditorCursorPosition = sceneTextEditor.cursorPosition
+                                    sceneTextEditor.persistentSelection = true
+                                }
                                 onAboutToHide: sceneTextEditor.persistentSelection = false
 
                                 MenuItem2 {
@@ -1327,7 +1337,7 @@ Rectangle {
                                     text: "Split Scene"
                                     enabled: contentItem.canSplitScene
                                     onClicked: {
-                                        contentItem.splitScene()
+                                        sceneTextEditor.splitSceneAt(sceneTextEditorCursorPosition)
                                         editorContextMenu.close()
                                     }
                                 }
@@ -1337,7 +1347,7 @@ Rectangle {
                                     text: "Join Previous Scene"
                                     enabled: contentItem.canJoinToPreviousScene
                                     onClicked: {
-                                        contentItem.mergeWithPreviousScene()
+                                        sceneTextEditor.mergeWithPreviousScene()
                                         editorContextMenu.close()
                                     }
                                 }
@@ -1388,6 +1398,7 @@ Rectangle {
                                                 sceneTextEditor.scene.beginUndoCapture()
                                                 sceneTextEditor.Transliterator.transliterateToLanguage(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd, modelData.value)
                                                 sceneTextEditor.scene.endUndoCapture()
+                                                sceneTextEditor.reload()
                                             }
                                         }
                                     }
@@ -1632,9 +1643,24 @@ Rectangle {
                             sceneTextEditor.cursorPosition = cp
                         }
                     }
+
+                    function splitSceneAt(pos) {
+                        Qt.callLater( function() {
+                            forceActiveFocus()
+                            cursorPosition = pos
+                            contentItem.splitScene()
+                        })
+                    }
+
+                    function mergeWithPreviousScene() {
+                        Qt.callLater( function() {
+                            forceActiveFocus()
+                            cursorPosition = 0
+                            contentItem.mergeWithPreviousScene()
+                        })
+                    }
                 }
             }
-
 
             Rectangle {
                 width: parent.width * 0.01
@@ -1652,8 +1678,10 @@ Rectangle {
             }
 
             function splitScene() {
-                if(!contentItem.canSplitScene)
+                if(!contentItem.canSplitScene) {
+                    app.log("Cannot split scene")
                     return
+                }
                 screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
             }
 
