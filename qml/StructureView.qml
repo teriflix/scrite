@@ -1593,6 +1593,13 @@ Item {
             BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
+            onSelectedChanged: {
+                if(selected && mainUndoStack.structureEditorActive)
+                    synopsisField.forceActiveFocus()
+                else
+                    indexCardTabSequence.releaseFocus()
+            }
+
             x: positionBinder.get.x
             y: positionBinder.get.y
             DelayedPropertyBinder {
@@ -1726,22 +1733,33 @@ Item {
                         ScrollBar.vertical: ScrollBar {
                             policy: synopsisFieldFlick.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         }
-                        TextAreaInput {
+                        TextArea {
                             id: synopsisField
                             width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
                             height: Math.max(synopsisFieldFlick.height-1, contentHeight+50)
                             background: Item { }
                             selectByMouse: true
                             selectByKeyboard: true
+                            Transliterator.textDocument: textDocument
+                            Transliterator.cursorPosition: cursorPosition
+                            Transliterator.hasActiveFocus: activeFocus
                             placeholderText: "Describe what happens in this scene."
                             font.pointSize: app.idealFontPointSize
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             TabSequenceItem.manager: indexCardTabSequence
                             TabSequenceItem.sequence: 1
+                            readOnly: scriteDocument.readOnly
                             text: element.scene.title
                             onTextChanged: element.scene.title = text
                             onActiveFocusChanged: if(activeFocus) elementItem.select()
                             Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
+                            SpecialSymbolsSupport {
+                                anchors.top: parent.bottom
+                                anchors.left: parent.left
+                                textEditor: synopsisField
+                                textEditorHasCursorInterface: true
+                                enabled: !scriteDocument.readOnly
+                            }
                         }
                     }
 

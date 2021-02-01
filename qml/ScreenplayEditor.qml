@@ -80,7 +80,8 @@ Rectangle {
             app.execLater(screenplayAdapter.screenplay, 100, function() {
                 contentView.positionViewAtIndex(screenplayIndex, ListView.Visible)
                 var item = contentView.loadedItemAtIndex(screenplayIndex)
-                item.assumeFocus()
+                if(mainTabBar.currentIndex === 0 || mainUndoStack.screenplayEditorActive)
+                    item.assumeFocus()
             })
         }
         onLoadingChanged: zoomSlider.reset()
@@ -866,7 +867,7 @@ Rectangle {
                 anchors.left: parent.right
 
                 property real parentY: parent.mapToItem(contentView.contentItem, 0, 0).y
-                anchors.topMargin: Math.min( Math.max( contentView.contentY-parentY, 0 ), contentItem.height-height-20 )
+                anchors.topMargin: Math.max(0, Math.min( Math.max( contentView.contentY-parentY, 0 ), contentItem.height-height-20 ))
 
                 // anchors.leftMargin: expanded ? 0 : -minPanelWidth
                 buttonText: expanded ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
