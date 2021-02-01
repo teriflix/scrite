@@ -1728,11 +1728,12 @@ Item {
                         height: 200
                         contentWidth: synopsisField.width
                         contentHeight: synopsisField.height
-                        interactive: elementItem.selected
+                        interactive: elementItem.selected && scrollBarVisible
                         property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
                         ScrollBar.vertical: ScrollBar {
                             policy: synopsisFieldFlick.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         }
+                        flickableDirection: Flickable.VerticalFlick
                         TextArea {
                             id: synopsisField
                             width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
