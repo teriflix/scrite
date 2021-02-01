@@ -67,6 +67,14 @@ TextField {
         completionPrefix: textField.text.toUpperCase()
     }
 
+    UndoHandler {
+        enabled: textField.activeFocus
+        canUndo: textField.canUndo
+        canRedo: textField.canRedo
+        onUndoRequest: textField.undo()
+        onRedoRequest: textField.redo()
+    }
+
     onTextEdited: transliterate(false)
 
     property bool userTypedSomeText: false

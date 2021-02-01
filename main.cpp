@@ -196,6 +196,8 @@ int main(int argc, char **argv)
     qmlRegisterType<ArcToElement>("Scrite", 1, 0, "ArcTo");
     qmlRegisterType<TextShapeItem>("Scrite", 1, 0, "TextShapeItem");
     qmlRegisterType<UndoStack>("Scrite", 1, 0, "UndoStack");
+    qmlRegisterType<UndoHandler>("Scrite", 1, 0, "UndoHandler");
+    qmlRegisterUncreatableType<UndoResult>("Scrite", 1, 0, "UndoResult", "Use the instance provided by UndoHandler.onUndoRequest or UndoHandler.onReduRequest signal.");
 
     qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
     qmlRegisterType<TextDocumentSearch>("Scrite", 1, 0, "TextDocumentSearch");

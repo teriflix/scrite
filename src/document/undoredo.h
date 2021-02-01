@@ -315,4 +315,60 @@ private:
     ObjectListCommand<ParentClass,ChildClass> *m_command = nullptr;
 };
 
+class UndoResult : public QObject
+{
+    Q_OBJECT
+
+public:
+    UndoResult(QObject *parent=nullptr);
+    ~UndoResult();
+
+    Q_PROPERTY(bool success READ isSuccess WRITE setSuccess NOTIFY successChanged)
+    void setSuccess(bool val);
+    bool isSuccess() const { return m_success; }
+    Q_SIGNAL void successChanged();
+
+private:
+    bool m_success = true;
+};
+
+class UndoHandler : public QObject
+{
+    Q_OBJECT
+
+public:
+    static QList<UndoHandler*> all();
+    static bool handleUndo();
+    static bool handleRedo();
+
+    UndoHandler(QObject *parent=nullptr);
+    ~UndoHandler();
+
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
+    Q_PROPERTY(bool canUndo READ canUndo WRITE setCanUndo NOTIFY canUndoChanged)
+    void setCanUndo(bool val);
+    bool canUndo() const { return m_canUndo; }
+    Q_SIGNAL void canUndoChanged();
+
+    Q_PROPERTY(bool canRedo READ canRedo WRITE setCanRedo NOTIFY canRedoChanged)
+    void setCanRedo(bool val);
+    bool canRedo() const { return m_canRedo; }
+    Q_SIGNAL void canRedoChanged();
+
+    bool undo();
+    bool redo();
+
+    Q_SIGNAL void undoRequest(UndoResult *result);
+    Q_SIGNAL void redoRequest(UndoResult *result);
+
+private:
+    bool m_enabled = false;
+    bool m_canUndo = false;
+    bool m_canRedo = false;
+};
+
 #endif // UNDOREDO_H

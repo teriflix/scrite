@@ -261,3 +261,114 @@ PushObjectPropertyUndoCommand::~PushObjectPropertyUndoCommand()
     if(m_command)
         m_command->pushToActiveStack();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+UndoResult::UndoResult(QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+UndoResult::~UndoResult()
+{
+
+}
+
+void UndoResult::setSuccess(bool val)
+{
+    if(m_success == val)
+        return;
+
+    m_success = val;
+    emit successChanged();
+}
+
+Q_GLOBAL_STATIC( QList<UndoHandler*>, AllUndoHandlers );
+
+QList<UndoHandler *> UndoHandler::all()
+{
+    return *AllUndoHandlers;
+}
+
+bool UndoHandler::handleUndo()
+{
+    const QList<UndoHandler *> handlers = UndoHandler::all();
+    for(UndoHandler *handler : qAsConst(handlers))
+    {
+        if(handler->isEnabled() && handler->canUndo())
+        {
+            if(handler->undo())
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool UndoHandler::handleRedo()
+{
+    const QList<UndoHandler *> handlers = UndoHandler::all();
+    for(UndoHandler *handler : qAsConst(handlers))
+    {
+        if(handler->isEnabled() && handler->canRedo())
+        {
+            if(handler->redo())
+                return true;
+        }
+    }
+
+    return false;
+}
+
+UndoHandler::UndoHandler(QObject *parent)
+    : QObject(parent)
+{
+    ::AllUndoHandlers->append(this);
+}
+
+UndoHandler::~UndoHandler()
+{
+    ::AllUndoHandlers->removeOne(this);
+}
+
+void UndoHandler::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}
+
+void UndoHandler::setCanUndo(bool val)
+{
+    if(m_canUndo == val)
+        return;
+
+    m_canUndo = val;
+    emit canUndoChanged();
+}
+
+void UndoHandler::setCanRedo(bool val)
+{
+    if(m_canRedo == val)
+        return;
+
+    m_canRedo = val;
+    emit canRedoChanged();
+}
+
+bool UndoHandler::undo()
+{
+    UndoResult result;
+    emit undoRequest(&result);
+    return result.isSuccess();
+}
+
+bool UndoHandler::redo()
+{
+    UndoResult result;
+    emit redoRequest(&result);
+    return result.isSuccess();
+}

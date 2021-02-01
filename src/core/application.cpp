@@ -656,7 +656,8 @@ bool Application::notify(QObject *object, QEvent *event)
 
         if(ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Z)
         {
-            m_undoGroup->undo();
+            if( !UndoHandler::handleUndo() )
+                m_undoGroup->undo();
             return true;
         }
 
@@ -666,7 +667,8 @@ bool Application::notify(QObject *object, QEvent *event)
 #endif
                 )
         {
-            m_undoGroup->redo();
+            if(! UndoHandler::handleRedo() )
+                m_undoGroup->redo();
             return true;
         }
 
