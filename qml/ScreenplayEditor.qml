@@ -1303,7 +1303,7 @@ Rectangle {
                                     focusPolicy: Qt.NoFocus
                                     text: "Cut\t" + app.polishShortcutTextForDisplay("Ctrl+X")
                                     enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
-                                    onClicked: { sceneTextEditor.cut(); editorContextMenu.close() }
+                                    onClicked: { sceneTextEditor.cut2(); editorContextMenu.close() }
                                 }
 
                                 MenuItem2 {
@@ -1549,6 +1549,10 @@ Rectangle {
                                     contentItem.mergeWithPreviousScene()
                                 }
                                 break
+                            case Qt.Key_X:
+                                event.accepted = true
+                                cut2()
+                                break
                             case Qt.Key_C:
                                 event.accepted = true
                                 copy2()
@@ -1604,6 +1608,13 @@ Rectangle {
                     }
 
                     // Custom Copy & Paste
+                    function cut2() {
+                        if(hasSelection) {
+                            sceneDocumentBinder.copy(selectionStart, selectionEnd)
+                            remove(selectionStart, selectionEnd)
+                        }
+                    }
+
                     function copy2() {
                         if(hasSelection)
                             sceneDocumentBinder.copy(selectionStart, selectionEnd)
@@ -1615,8 +1626,10 @@ Rectangle {
                             // [0.5.2 All] Pasting doesnt replace the selected text #195
                             if(sceneTextEditor.hasSelection)
                                 sceneTextEditor.remove(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd)
+                            var cp = sceneTextEditor.cursorPosition
                             if(!sceneDocumentBinder.paste(sceneTextEditor.cursorPosition))
                                 sceneTextEditor.paste()
+                            sceneTextEditor.cursorPosition = cp
                         }
                     }
                 }
