@@ -864,8 +864,12 @@ Rectangle {
                 borderColor: expanded ? primaryColors.borderColor : Qt.rgba(0,0,0,0)
                 anchors.top: parent.top
                 anchors.left: parent.right
+
+                property real parentY: parent.mapToItem(contentView.contentItem, 0, 0).y
+                anchors.topMargin: Math.min( Math.max( contentView.contentY-parentY, 0 ), contentItem.height-height-20 )
+
                 // anchors.leftMargin: expanded ? 0 : -minPanelWidth
-                buttonText: contentItem.isCurrent && expanded ? ("Scene #" + contentItem.theElement.sceneNumber + " Comments") : ""
+                buttonText: expanded ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
                 height: {
                     if(expanded) {
                         if(contentItem.isCurrent)
@@ -888,7 +892,7 @@ Rectangle {
                     NumberAnimation { duration: 250 }
                 }
                 content: TextArea {
-                    id: synopsisEdit
+                    id: commentsEdit
                     background: Rectangle {
                         color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
                     }
@@ -915,7 +919,7 @@ Rectangle {
                     SpecialSymbolsSupport {
                         anchors.top: parent.bottom
                         anchors.left: parent.left
-                        textEditor: synopsisEdit
+                        textEditor: commentsEdit
                         textEditorHasCursorInterface: true
                         enabled: !scriteDocument.readOnly
                     }
