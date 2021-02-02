@@ -740,20 +740,20 @@ Item {
                     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
                     BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
-                    onXChanged: if(canvasBeatMouseArea.drag.active) Qt.callLater(moveBeat)
-                    onYChanged: if(canvasBeatMouseArea.drag.active) Qt.callLater(moveBeat)
+                    onXChanged: if(canvasBeatMouseArea.drag.active || canvasBeatLabelMouseArea.drag.active) Qt.callLater(moveBeat)
+                    onYChanged: if(canvasBeatMouseArea.drag.active || canvasBeatLabelMouseArea.drag.active) Qt.callLater(moveBeat)
 
                     function moveBeat() {
-                        var dx = x - canvasBeatMouseArea.refX
-                        var dy = y - canvasBeatMouseArea.refY
+                        var dx = x - refX
+                        var dy = y - refY
                         var nrElements = modelData.sceneCount
                         for(var i=0; i<nrElements; i++) {
                             var item = elementItems.itemAt(modelData.sceneIndexes[i])
                             item.x = item.x + dx
                             item.y = item.y + dy
                         }
-                        canvasBeatMouseArea.refX = x
-                        canvasBeatMouseArea.refY = y
+                        refX = x
+                        refY = y
                     }
 
                     function selectBeatItems() {
@@ -761,18 +761,19 @@ Item {
                         selection.init(elementItems, Qt.rect(x,y,width,height))
                     }
 
+                    property real refX: x
+                    property real refY: y
+
                     MouseArea {
                         id: canvasBeatMouseArea
                         anchors.fill: parent
                         drag.target: canvasBeatItem
                         drag.axis: Drag.XAndYAxis
                         cursorShape: Qt.SizeAllCursor
-                        property real refX
-                        property real refY
                         drag.onActiveChanged: {
                             selection.clear()
-                            refX = canvasBeatItem.x
-                            refY = canvasBeatItem.y
+                            canvasBeatItem.refX = canvasBeatItem.x
+                            canvasBeatItem.refY = canvasBeatItem.y
                             canvas.beatsBeingMoved = drag.active
                         }
                         onDoubleClicked: canvasBeatItem.selectBeatItems()
@@ -784,6 +785,21 @@ Item {
                         border.width: parent.border.width
                         border.color: parent.border.color
                         color: app.translucent(accentColors.windowColor, 0.4)
+
+                        MouseArea {
+                            id: canvasBeatLabelMouseArea
+                            anchors.fill: parent
+                            drag.target: canvasBeatItem
+                            drag.axis: Drag.XAndYAxis
+                            cursorShape: Qt.SizeAllCursor
+                            drag.onActiveChanged: {
+                                selection.clear()
+                                canvasBeatItem.refX = canvasBeatItem.x
+                                canvasBeatItem.refY = canvasBeatItem.y
+                                canvas.beatsBeingMoved = drag.active
+                            }
+                            onDoubleClicked: canvasBeatItem.selectBeatItems()
+                        }
                     }
 
                     Text {
