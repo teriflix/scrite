@@ -61,6 +61,5 @@
         <file>qml/ScreenplayPreview.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
-        <file>qml/SmartVerticalListView.qml</file>
     </qresource>
 </RCC>
