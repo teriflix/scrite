@@ -1935,8 +1935,8 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 
     const qreal verticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 50;
     const qreal horizontalLayoutSpacing = verticalLayoutSpacing;
-    const qreal flowVerticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 20;
-    const qreal flowHorizontalLayoutSpacing = flowVerticalLayoutSpacing;
+    const qreal flowVerticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? -125 : 20;
+    const qreal flowHorizontalLayoutSpacing = m_canvasUIMode == IndexCardUI ? -125 : 20;
 
     int direction = 1;
     QRectF elementRect;
@@ -1990,23 +1990,23 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
             break;
         case FlowVerticalLayout:
             if(direction > 0)
-                elementRect.moveTop(elementRect.bottom() + verticalLayoutSpacing);
+                elementRect.moveTop(elementRect.bottom() + flowVerticalLayoutSpacing);
             else
-                elementRect.moveBottom(elementRect.top() - verticalLayoutSpacing);
+                elementRect.moveBottom(elementRect.top() - flowVerticalLayoutSpacing);
             if(i%2)
-                elementRect.moveLeft(elementRect.right() + flowVerticalLayoutSpacing);
+                elementRect.moveLeft(elementRect.right() + horizontalLayoutSpacing/2);
             else
-                elementRect.moveRight(elementRect.left() - flowVerticalLayoutSpacing);
+                elementRect.moveRight(elementRect.left() - horizontalLayoutSpacing/2);
             break;
         case FlowHorizontalLayout:
             if(direction > 0)
-                elementRect.moveLeft( elementRect.center().x() + flowHorizontalLayoutSpacing );
+                elementRect.moveLeft( elementRect.right() + flowHorizontalLayoutSpacing );
             else
-                elementRect.moveRight( elementRect.center().x() - flowHorizontalLayoutSpacing );
+                elementRect.moveRight( elementRect.left() - flowHorizontalLayoutSpacing );
             if(i%2)
-                elementRect.moveTop( elementRect.bottom() + verticalLayoutSpacing );
+                elementRect.moveTop( elementRect.bottom() + verticalLayoutSpacing/2 );
             else
-                elementRect.moveBottom( elementRect.top() - verticalLayoutSpacing );
+                elementRect.moveBottom( elementRect.top() - verticalLayoutSpacing/2 );
             break;
         }
 
