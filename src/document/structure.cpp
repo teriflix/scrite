@@ -2193,6 +2193,8 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
 
     if(category.isEmpty())
     {
+        QList<StructureElement*> unusedElements = m_elements.list();
+
         ret.append( qMakePair(QStringLiteral("Opening Act"), QList<StructureElement*>()) );
 
         for(int i=0; i<screenplay->elementCount(); i++)
@@ -2211,9 +2213,15 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
                 int index = this->indexOfScene(scene);
                 StructureElement *selement = this->elementAt(index);
                 if(selement != nullptr)
+                {
+                    unusedElements.removeOne(selement);
                     ret.last().second.append(selement);
+                }
             }
         }
+
+        if(!unusedElements.isEmpty())
+            ret.append( qMakePair(QStringLiteral("Unused Scenes"), unusedElements) );
     }
     else
     {
