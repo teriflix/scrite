@@ -347,7 +347,7 @@ Rectangle {
                             height = editorHints.height * zoomLevel
                             active = false
                             initialized = true
-                            app.execLater(contentViewDelegateLoader, 2000, load)
+                            app.execLater(contentViewDelegateLoader, 400, load)
                         }
 
                         Component.onDestruction: {
