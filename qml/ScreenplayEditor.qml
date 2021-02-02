@@ -266,7 +266,7 @@ Rectangle {
                         */
 
                         property bool initialized: false
-                        property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex)
+                        property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
                         onIsVisibleToUserChanged: {
                             if(!active && isVisibleToUser)
                                 Qt.callLater(load)
