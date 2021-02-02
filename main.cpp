@@ -32,6 +32,7 @@
 #include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
+#include "smartloader.h"
 #include "timeprofiler.h"
 #include "announcement.h"
 #include "imageprinter.h"
@@ -147,6 +148,8 @@ int main(int argc, char **argv)
 #ifdef ENABLE_TIME_PROFILING
     qmlRegisterUncreatableType<ProfilerItem>("Scrite", 1, 0, "Profiler", apreason);
 #endif
+
+    qmlRegisterType<SmartLoader>("Scrite", 1, 0, "SmartLoader");
 
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
 
