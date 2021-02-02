@@ -1804,7 +1804,14 @@ Rectangle {
                         enabled: headingItem.theScene.heading.enabled
                         label: ""
                         placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
-                        font: headingFontMetrics.font
+                        font.family: headingFontMetrics.font.family
+                        font.pointSize: headingFontMetrics.font.pointSize
+                        font.bold: headingFontMetrics.font.bold
+                        font.underline: headingFontMetrics.font.underline
+                        font.italic: headingFontMetrics.font.italic
+                        font.letterSpacing: headingFontMetrics.font.letterSpacing
+                        font.capitalization: currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase
+                        color: headingFontMetrics.format.textColor
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         onEditingComplete: headingItem.theScene.heading.parseFrom(text)
                         onActiveFocusChanged: {
@@ -1815,12 +1822,6 @@ Rectangle {
 
                         enableTransliteration: true
                         property var currentLanguage: app.transliterationEngine.language
-                        onCurrentLanguageChanged: {
-                            if(currentLanguage !== TransliterationEngine.English)
-                                font.capitalization = Font.MixedCase
-                            else
-                                font.capitalization = Font.AllUppercase
-                        }
 
                         property int dotPosition: text.indexOf(".")
                         property int dashPosition: text.lastIndexOf("-")
