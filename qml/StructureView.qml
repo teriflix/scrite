@@ -757,8 +757,14 @@ Item {
                     }
 
                     function selectBeatItems() {
-                        selection.clear()
-                        selection.init(elementItems, Qt.rect(x,y,width,height))
+                        var items = []
+                        var nrElements = modelData.sceneCount
+                        for(var i=0; i<nrElements; i++) {
+                            var item = elementItems.itemAt(modelData.sceneIndexes[i])
+                            items.push(item)
+                        }
+
+                        selection.set(items)
                     }
 
                     property real refX: x

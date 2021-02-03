@@ -59,15 +59,16 @@ Item {
         return bounds
     }
 
-    function init(givenItems, rectangle) {
-        if(givenItems === undefined || givenItems === null)
+    // For intializing from a repeater and a rectangle
+    function init(repeater, rectangle) {
+        if(repeater === undefined || repeater === null)
             return
 
         var bounds = createBounds()
         var selectedItems = []
-        var count = givenItems.count
+        var count = repeater.count
         for(var i=0; i<count; i++) {
-            var item = givenItems.itemAt(i)
+            var item = repeater.itemAt(i)
             var p1 = Qt.point(item.x, item.y)
             var p2 = Qt.point(item.x+item.width, item.y+item.height)
             var areaContainsPoint = function(p) {
@@ -79,6 +80,36 @@ Item {
                 bounds.unite(p2)
                 selectedItems.push(item)
             }
+        }
+
+        tightRect.x = bounds.p1.x - 10
+        tightRect.y = bounds.p1.y - 10
+        tightRect.width = (bounds.p2.x-bounds.p1.x+20)
+        tightRect.height = (bounds.p2.y-bounds.p1.y+20)
+        tightRect.topLeft = Qt.point(tightRect.x, tightRect.y)
+
+        selectedItems.sort( function(i1, i2) {
+            return (i1.x === i2.x) ? i1.y - i2.y : i1.x - i2.x
+        })
+        items = selectedItems
+    }
+
+    // For initializing from an array of items
+    function set(arrayOfItems) {
+        if(arrayOfItems === null)
+            return
+
+        clear()
+
+        var selectedItems = []
+        var bounds = createBounds()
+        for(var i=0; i<arrayOfItems.length; i++) {
+            var item = arrayOfItems[i]
+            var p1 = Qt.point(item.x, item.y)
+            var p2 = Qt.point(item.x+item.width, item.y+item.height)
+            bounds.unite(p1)
+            bounds.unite(p2)
+            selectedItems.push(item)
         }
 
         tightRect.x = bounds.p1.x - 10
