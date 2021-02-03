@@ -1023,8 +1023,10 @@ QString Application::camelCased(const QString &val) const
         if(capitalize)
         {
             if(ch.isLetterOrNumber() && ch.script() == QChar::Script_Latin)
+            {
                 ch = ch.toUpper();
-            capitalize = false;
+                capitalize = false;
+            }
         }
         else
             capitalize = !ch.isLetterOrNumber();
