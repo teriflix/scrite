@@ -374,7 +374,8 @@ Item {
                         onClicked: libraryGridView.currentIndex = index
                         onDoubleClicked: {
                             libraryGridView.currentIndex = index
-                            openButton.click()
+                            importFromLibraryUi.enabled = false
+                            libraryService.openScreenplayAt(libraryGridView.currentIndex)
                         }
                     }
                 }
@@ -492,7 +493,8 @@ Item {
                         onClicked: templatesGridView.currentIndex = index
                         onDoubleClicked: {
                             templatesGridView.currentIndex = index
-                            openButton.click()
+                            importFromLibraryUi.enabled = false
+                            libraryService.openTemplateAt(templatesGridView.currentIndex)
                         }
                     }
 

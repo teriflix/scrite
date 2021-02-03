@@ -1399,6 +1399,7 @@ Structure::Structure(QObject *parent)
     connect(this, &Structure::characterCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::currentElementIndexChanged, this, &Structure::structureChanged);
+    connect(this, &Structure::preferredGroupCategoryChanged, this, &Structure::structureChanged);
     connect(this, &Structure::characterRelationshipGraphChanged, this, &Structure::structureChanged);
 
     QClipboard *clipboard = qApp->clipboard();
@@ -2751,6 +2752,15 @@ void Structure::setGroupsData(const QString &val)
     outFile2.open( QFile::WriteOnly );
     outFile2.write( m_groupsData.toLatin1() );
 #endif
+}
+
+void Structure::setPreferredGroupCategory(const QStringList &val)
+{
+    if(m_preferredGroupCategory == val)
+        return;
+
+    m_preferredGroupCategory = val;
+    emit preferredGroupCategoryChanged();
 }
 
 QString Structure::presentableGroupNames(const QStringList &groups) const

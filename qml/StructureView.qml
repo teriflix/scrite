@@ -667,7 +667,7 @@ Item {
                 }
             }
 
-            property string beatCategory
+            property string beatCategory: scriteDocument.structure.preferredGroupCategory
             property var beats: []
             property bool beatsBeingMoved: false
             Component.onCompleted: app.execLater(canvas, 250, reevaluateBeats)
@@ -679,7 +679,10 @@ Item {
                 canvas.beats = beats
             }
 
-            onBeatCategoryChanged: app.execLater(canvas, 250, reevaluateBeats)
+            onBeatCategoryChanged: {
+                scriteDocument.structure.preferredGroupCategory = beatCategory
+                app.execLater(canvas, 250, reevaluateBeats)
+            }
 
             TrackerPack {
                 delay: 250
