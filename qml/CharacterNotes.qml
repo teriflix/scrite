@@ -407,7 +407,7 @@ Item {
 
         Rectangle {
             width: Math.max(800, ui.width*0.5)
-            height: Math.min(charactersList.height, 600) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80
+            height: Math.min(ui.height*0.85, Math.min(charactersList.height, 500) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80)
             color: primaryColors.c10.background
 
             readonly property var unrelatedCharacterNames: character.unrelatedCharacterNames()
