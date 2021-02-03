@@ -34,16 +34,28 @@ public:
     LibraryService(QObject *parent=nullptr);
     ~LibraryService();
 
-    Q_PROPERTY(Library* library READ library CONSTANT)
-    Library* library() const;
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
+    bool busy() const;
+    Q_SIGNAL void busyChanged();
 
-    Q_INVOKABLE void openLibraryRecordAt(int index);
+    Q_PROPERTY(Library* screenplays READ screenplays CONSTANT)
+    static Library* screenplays();
+
+    Q_PROPERTY(Library* templates READ templates CONSTANT)
+    static Library *templates();
+
+    Q_INVOKABLE void reload();
+
+    Q_INVOKABLE void openScreenplayAt(int index);
+    Q_INVOKABLE void openTemplateAt(int index);
+    Q_INVOKABLE void openLibraryRecordAt(Library *library, int index);
 
     // AbstractImporter interface
     bool doImport(QIODevice *device);
 
 signals:
     void imported(int index);
+
 
 private:
     bool m_importing = false;
@@ -53,12 +65,18 @@ class Library : public QAbstractListModel
 {
     Q_OBJECT
 
-private:
-    Library(QObject *parent=nullptr);
-
 public:
-    static Library *instance();
     ~Library();
+
+    enum Type
+    {
+        Screenplays,
+        Templates
+    };
+    Q_ENUM(Type)
+
+    Q_PROPERTY(Type type READ type CONSTANT)
+    Type type() const { return m_type; }
 
     Q_PROPERTY(int count READ count NOTIFY countChanged)
     int count() const { return m_records.size(); }
@@ -82,12 +100,16 @@ public:
     Q_INVOKABLE void reload();
 
 private:
+    friend class LibraryService;
+    Library(Type type, QObject *parent=nullptr);
+
     void fetchRecords();
     void loadDatabase(const QByteArray &bytes);
     void setRecords(const QJsonArray &array);
     void setBusy(bool val);
 
 private:
+    Type m_type = Screenplays;
     bool m_busy = false;
     QJsonArray m_records;
     const QUrl m_baseUrl = QUrl( QStringLiteral("http://www.teriflix.in/scrite/library/") );

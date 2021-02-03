@@ -56,7 +56,8 @@ QNetworkAccessManager & LibraryNetworkAccess()
 LibraryService::LibraryService(QObject *parent)
     : AbstractImporter(parent)
 {
-
+    connect(this->screenplays(), &Library::busyChanged, this, &LibraryService::busyChanged);
+    connect(this->templates(), &Library::busyChanged, this, &LibraryService::busyChanged);
 }
 
 LibraryService::~LibraryService()
@@ -64,14 +65,45 @@ LibraryService::~LibraryService()
 
 }
 
-Library *LibraryService::library() const
+bool LibraryService::busy() const
 {
-    return Library::instance();
+    return this->screenplays()->isBusy() || this->templates()->isBusy();
 }
 
-void LibraryService::openLibraryRecordAt(int index)
+Library *LibraryService::screenplays()
 {
-    if(m_importing)
+    static Library *theInstance = new Library(Library::Screenplays, qApp);
+    return theInstance;
+}
+
+Library *LibraryService::templates()
+{
+    static Library *theInstance = new Library(Library::Templates, qApp);
+    return theInstance;
+}
+
+void LibraryService::reload()
+{
+    this->screenplays()->reload();
+    this->templates()->reload();
+}
+
+void LibraryService::openScreenplayAt(int index)
+{
+    this->openLibraryRecordAt(this->screenplays(), index);
+}
+
+void LibraryService::openTemplateAt(int index)
+{
+    this->openLibraryRecordAt(this->templates(), index);
+}
+
+void LibraryService::openLibraryRecordAt(Library *library, int index)
+{
+    if(m_importing || library == nullptr)
+        return;
+
+    if(library != this->templates() && library != this->screenplays())
         return;
 
     this->error()->clear();
@@ -79,18 +111,18 @@ void LibraryService::openLibraryRecordAt(int index)
 
     QNetworkAccessManager &nam = ::LibraryNetworkAccess();
 
-    const QJsonObject record = Library::instance()->recordAt(index);
+    const QJsonObject record = library->recordAt(index);
     const QString name = record.value("name").toString();
 
     QUrl url;
     if(record.value("url_kind").toString() == "relative")
-        url = QUrl( Library::instance()->baseUrl().toString() + "/" + record.value("url").toString() );
+        url = QUrl(library->baseUrl().toString() + "/" + record.value("url").toString());
     else
         url = QUrl(record.value("url").toString());
 
     const QNetworkRequest request(url);
 
-    this->progress()->setProgressText( QStringLiteral("Downloading screenplay of \"") + name + QStringLiteral("\" from library...") );
+    this->progress()->setProgressText( QStringLiteral("Downloading \"") + name + QStringLiteral("\" from library...") );
     qApp->setOverrideCursor(Qt::WaitCursor);
 
     QNetworkReply *reply = nam.get(request);
@@ -126,14 +158,9 @@ bool LibraryService::doImport(QIODevice *device)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Library *Library::instance()
-{
-    static Library *theInstance = new Library(qApp);
-    return theInstance;
-}
-
-Library::Library(QObject *parent)
-        :QAbstractListModel(parent)
+Library::Library(Library::Type type, QObject *parent)
+        :QAbstractListModel(parent),
+          m_type(type)
 {
     this->fetchRecords();
 }
@@ -182,8 +209,10 @@ void Library::fetchRecords()
     if(m_busy)
         return;
 
+    const QString path = m_type == Screenplays ? QStringLiteral("/records.hexdb") : QStringLiteral("/templates.hexdb");
+
     QNetworkAccessManager &nam = ::LibraryNetworkAccess();
-    const QUrl url = QUrl( m_baseUrl.toString() + QStringLiteral("/records.hexdb") );
+    const QUrl url = QUrl( m_baseUrl.toString() + path );
 
     this->setBusy(true);
 

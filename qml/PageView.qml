@@ -24,10 +24,12 @@ Rectangle {
     property alias pageContent: pageContentLoader.sourceComponent
     property alias pageContentItem: pageContentLoader.item
     property int pageContentSpacing: 20
+    property real maxPageListWidth: 220
+    property real pageListWidth: Math.max(width * 0.2, maxPageListWidth)
 
     Rectangle {
         id: pageList
-        width: parent.width * 0.2
+        width: pageListWidth
         color: primaryColors.c700.background
         height: parent.height
         anchors.left: parent.left
