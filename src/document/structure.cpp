@@ -2239,6 +2239,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
         };
 
         QHash<Scene*, int> sceneIndexMap;
+        QHash<Scene*, int> actIndexMap;
 
         QMap< QString, QList<StructureElement*> > map;
         for(int i=0; i<screenplay->elementCount(); i++)
@@ -2253,6 +2254,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
                 continue;
 
             sceneIndexMap[scene] = element->elementIndex();
+            actIndexMap[scene] = element->actIndex();
             const int index = this->indexOfScene(scene);
             StructureElement *selement = this->elementAt(index);
             if(selement != nullptr)
@@ -2273,7 +2275,8 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
             for(StructureElement *selement : qAsConst(selements))
             {
                 if(bunch.isEmpty() ||
-                  sceneIndexMap.value(selement->scene()) - sceneIndexMap.value(bunch.last()->scene()) == 1)
+                  (sceneIndexMap.value(selement->scene()) - sceneIndexMap.value(bunch.last()->scene()) == 1 &&
+                   actIndexMap.value(selement->scene()) == actIndexMap.value(bunch.last()->scene())))
                 {
                     bunch.append(selement);
                     continue;

@@ -39,6 +39,10 @@ public:
     int elementIndex() const { return m_elementIndex; }
     Q_SIGNAL void elementIndexChanged();
 
+    Q_PROPERTY(int actIndex READ actIndex NOTIFY actIndexChanged)
+    int actIndex() const { return m_actIndex; }
+    Q_SIGNAL void actIndexChanged();
+
     enum ElementType
     {
         SceneElementType,
@@ -125,6 +129,7 @@ protected:
     void evaluateSceneNumber(int &number);
     void resetScene();
     void resetScreenplay();
+    void setActIndex(int val);
     void setElementIndex(int val);
 
 private:
@@ -135,6 +140,7 @@ private:
     bool m_expanded = true;
     int m_breakType = -1;
     bool m_selected = false;
+    int m_actIndex = -1;
     int m_elementIndex = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;

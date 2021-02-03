@@ -310,6 +310,15 @@ void ScreenplayElement::resetScreenplay()
     this->deleteLater();
 }
 
+void ScreenplayElement::setActIndex(int val)
+{
+    if(m_actIndex == val)
+        return;
+
+    m_actIndex = val;
+    emit actIndexChanged();
+}
+
 void ScreenplayElement::setElementIndex(int val)
 {
     if(m_elementIndex == val)
@@ -1878,14 +1887,21 @@ void Screenplay::onSceneReset(int elementIndex)
 void Screenplay::evaluateSceneNumbers()
 {
     int number = 1;
-    int index = 0;
+    int actIndex = 0;
+    int elementIndex = 0;
     bool containsNonStandardScenes = false;
     Q_FOREACH(ScreenplayElement *element, m_elements)
     {
         if(element->elementType() == ScreenplayElement::SceneElementType)
-            element->setElementIndex(index++);
+        {
+            element->setElementIndex(elementIndex++);
+            element->setActIndex(actIndex);
+        }
         else
+        {
             element->setElementIndex(-1);
+            ++actIndex;
+        }
 
         element->evaluateSceneNumber(number);
 
