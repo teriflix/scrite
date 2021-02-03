@@ -810,8 +810,7 @@ Item {
 
                     Text {
                         id: beatLabel
-                        text: modelData.name + " (" + modelData.sceneCount + ")"
-                        font.bold: true
+                        text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " scene": " scenes") + "</font>"
                         font.pointSize: app.idealFontPointSize + 3
                         anchors.bottom: parent.top
                         anchors.left: parent.left
@@ -1782,6 +1781,14 @@ Item {
                                 textEditor: synopsisField
                                 textEditorHasCursorInterface: true
                                 enabled: !scriteDocument.readOnly
+                            }
+                            onCursorRectangleChanged: {
+                                var y1 = cursorRectangle.y
+                                var y2 = cursorRectangle.y + cursorRectangle.height
+                                if(y1 < synopsisFieldFlick.contentY)
+                                    synopsisFieldFlick.contentY = Math.max(y1-10, 0)
+                                else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
+                                    synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
                             }
                         }
                     }
