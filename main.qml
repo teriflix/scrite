@@ -77,6 +77,7 @@ Rectangle {
     UI.ScriteDocumentView {
         id: ui
         anchors.fill: parent
+        enabled: !blur.visible
     }
 
     Loader {
