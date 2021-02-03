@@ -17,8 +17,17 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
 Menu {
+    id: thisMenu
     Material.accent: primaryColors.key
     Material.background: primaryColors.c100.background
     Material.foreground: primaryColors.c50.text
     objectName: title
+
+    Connections {
+        target: blur
+        onVisibleChanged: {
+            if(blur.visible)
+                thisMenu.close()
+        }
+    }
 }
