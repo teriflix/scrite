@@ -51,6 +51,12 @@ public:
     Q_INVOKABLE QJsonArray stringListArray(const QStringList &list) const;
     Q_INVOKABLE QJsonArray arrayFromCsv(const QString &text) const;
 
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const { return m_array.size(); }
+    Q_SIGNAL void countChanged();
+
+    Q_INVOKABLE QJsonValue at(int row) const;
+
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent=QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;

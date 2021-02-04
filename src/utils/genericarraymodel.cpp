@@ -19,7 +19,9 @@
 GenericArrayModel::GenericArrayModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-
+    connect(this, &GenericArrayModel::rowsInserted, this, &GenericArrayModel::countChanged);
+    connect(this, &GenericArrayModel::rowsRemoved, this, &GenericArrayModel::countChanged);
+    connect(this, &GenericArrayModel::modelReset, this, &GenericArrayModel::countChanged);
 }
 
 GenericArrayModel::~GenericArrayModel()
@@ -88,6 +90,11 @@ QJsonArray GenericArrayModel::stringListArray(const QStringList &list) const
 QJsonArray GenericArrayModel::arrayFromCsv(const QString &text) const
 {
     return this->stringListArray(text.split(",", QString::SkipEmptyParts));
+}
+
+QJsonValue GenericArrayModel::at(int row) const
+{
+    return row < 0 || row >= m_array.size() ? QJsonValue() : m_array.at(row);
 }
 
 int GenericArrayModel::rowCount(const QModelIndex &parent) const

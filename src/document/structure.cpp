@@ -2581,6 +2581,7 @@ void Structure::setGroupsData(const QString &val)
         QString name;
         QString label;
         QString desc;
+        QString act;
         int type = -1; // -1 = category, 0 = visual group, 1 = sub-group
 
         CategoryOrGroup() { }
@@ -2608,7 +2609,10 @@ void Structure::setGroupsData(const QString &val)
             ret.insert( QStringLiteral("label"), this->label );
             ret.insert( QStringLiteral("desc"), this->desc );
             if(this->type >= 0)
+            {
                 ret.insert( QStringLiteral("type"), this->type );
+                ret.insert("act", this->act);
+            }
             return ret;
         }
 
@@ -2618,6 +2622,8 @@ void Structure::setGroupsData(const QString &val)
             if(type < 0)
                 ts << QStringLiteral("[") << this->label << QStringLiteral("]");
             else {
+                if(!act.isEmpty())
+                    ts << QStringLiteral("<") + this->act << QStringLiteral(">");
                 if(type > 0)
                     ts << QStringLiteral("- ") << this->label;
                 else
@@ -2637,6 +2643,8 @@ void Structure::setGroupsData(const QString &val)
     const QString dash = QStringLiteral("- ");
     const QString colon = QStringLiteral(":");
     const QString newl = QStringLiteral("\n");
+    const QString abo = QStringLiteral("<");
+    const QString abc = QStringLiteral(">");
 
     auto fromCategoryLine = [=](const QString &line) -> Category {
         Category ret;
@@ -2669,10 +2677,13 @@ void Structure::setGroupsData(const QString &val)
         if(type == 1)
             line2 = line.mid(2).trimmed();
 
-        const QString name = line2.section(colon, 0, 0);
+        const QString field1 = line2.section(colon, 0, 0);
+        const QString act = field1.startsWith("<") ? field1.mid(1).section(abc, 0, 0).trimmed() : QString();
+        const QString name = act.isEmpty() ? field1 : field1.section(abc, 1);
         const QString desc = line2.section(colon, 1);
         ret = CategoryOrGroup(name, desc);
         ret.type = type;
+        ret.act = act;
 
         return ret;
     };

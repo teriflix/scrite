@@ -77,7 +77,7 @@ Menu2 {
                     section.criteria: ViewSection.FullString
                     section.delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
-                        height: categoryLabel.height
+                        height: 30
                         color: primaryColors.windowColor
                         Text {
                             id: categoryLabel
@@ -119,13 +119,27 @@ Menu2 {
                             }
 
                             Text {
-                                text: arrayItem.label
+                                text: {
+                                    var ret = arrayItem.label
+                                    if(groupItemMouseArea.containsMouse && arrayItem.act !== "")
+                                        ret += " <font size=\"-2\">(" + arrayItem.act + ")</font>"
+                                    return ret;
+                                }
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.pointSize: app.idealFontPointSize
                                 leftPadding: arrayItem.type > 0 ? 20 : 0
                                 elide: Text.ElideRight
                             }
+                        }
+
+                        Rectangle {
+                            property var nextArrayItem: sceneGroup.at(index+1)
+                            visible: nextArrayItem && nextArrayItem.act !== arrayItem.act
+                            width: parent.width
+                            height: 1
+                            anchors.bottom: parent.bottom
+                            color: primaryColors.borderColor
                         }
 
                         MouseArea {
