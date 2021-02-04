@@ -1897,13 +1897,6 @@ Rectangle {
                                     }
                                 }
 
-                                StructureGroupsMenu {
-                                    sceneGroup: SceneGroup {
-                                        structure: scriteDocument.structure
-                                        scenes: [headingItem.theScene]
-                                    }
-                                }
-
                                 Repeater {
                                     model: additionalSceneMenuItems.length ? 1 : 0
 
