@@ -333,12 +333,13 @@ Rectangle {
                             }
                         }
 
-                        Component.onCompleted: {
+                        Component.onCompleted: {                            
                             var editorHints = componentData.screenplayElement.editorHints
                             if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
                                 !editorHints ||
                                 editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
-                                editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis) {
+                                editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis ||
+                                componentData.scene.elementCount <= 1) {
                                 active = true
                                 initialized = true
                                 return
