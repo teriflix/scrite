@@ -181,5 +181,7 @@
         <file>icons/editor/format_underline.png</file>
         <file>icons/action/layout_grouping.png</file>
         <file>icons/action/layout_grouping_inverted.png</file>
+        <file>icons/action/tag_inverted.png</file>
+        <file>icons/action/tag.png</file>
     </qresource>
 </RCC>

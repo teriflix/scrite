@@ -23,6 +23,7 @@ Menu2 {
     signal toggled(int row, string name)
 
     title: "Tag Groups"
+    property string innerTitle: ""
 
     width: 450
     height: 500
@@ -35,15 +36,40 @@ Menu2 {
         contentItem: Item {
             Rectangle {
                 anchors.fill: parent
-                anchors.bottomMargin: 10
+                anchors.bottomMargin: structureGroupsMenu.bottomPadding
                 border.width: 1
                 border.color: primaryColors.borderColor
                 enabled: sceneGroup.sceneCount > 0
                 opacity: enabled ? 1 : 0.5
 
+                Rectangle {
+                    anchors.fill: innerTitleText
+                    color: primaryColors.c700.background
+                    visible: innerTitleText.visible
+                }
+
+                Text {
+                    id: innerTitleText
+                    width: parent.width - 8
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.margins: 3
+                    wrapMode: Text.WordWrap
+                    text: innerTitle
+                    font.pointSize: app.idealFontPointSize
+                    visible: text !== ""
+                    horizontalAlignment: Text.AlignHCenter
+                    padding: 5
+                    color: primaryColors.c700.text
+                    font.bold: true
+                }
+
                 ListView {
                     id: groupsView
-                    anchors.fill: parent
+                    anchors.left: parent.left
+                    anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
                     anchors.margins: 5
                     clip: true
                     model: sceneGroup

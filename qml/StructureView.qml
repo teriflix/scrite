@@ -190,7 +190,7 @@ Item {
                     width: 350
 
                     MenuItem2 {
-                        text: "Act Wise"
+                        text: "Acts"
                         onTriggered: canvas.beatCategory = ""
                     }
 
@@ -200,9 +200,57 @@ Item {
                         model: scriteDocument.structure.groupCategories
 
                         MenuItem2 {
-                            text: "'" + app.camelCased(modelData) + "' Wise"
+                            text: app.camelCased(modelData)
                             onTriggered: canvas.beatCategory = modelData
                         }
+                    }
+                }
+            }
+
+            ToolButton3 {
+                id: tagMenuOption
+                iconSource: "../icons/action/tag.png"
+                enabled: (selection.hasItems || currentElementItemBinder.get !== null) && scriteDocument.structure.canvasUIMode === Structure.IndexCardUI
+                ToolTip.text: {
+                    if(selection.hasItems)
+                        return "Tag the " + selection.items.length + " selected index card(s)"
+                    else if(currentElementItemBinder.get !== null)
+                        return "Tag the selected index card."
+                    return ""
+                }
+                onClicked: {
+                    tagMenuLoader.popup()
+                }
+                down: tagMenuLoader.active
+
+                MenuLoader {
+                    id: tagMenuLoader
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+
+                    menu: StructureGroupsMenu {
+                        innerTitle: tagMenuOption.ToolTip.text
+                        sceneGroup: SceneGroup {
+                            structure: scriteDocument.structure
+                        }
+
+                        onToggled: {
+                            if(selection.hasItems)
+                                app.execLater(selection, 250, function() { selection.refit() })
+                        }
+
+                        onAboutToShow: {
+                            sceneGroup.clearScenes()
+                            if(selection.hasItems) {
+                                var items = selection.items
+                                items.forEach( function(item) {
+                                    sceneGroup.addScene(item.element.scene)
+                                })
+                            } else {
+                                sceneGroup.addScene(currentElementItemBinder.get.element.scene)
+                            }
+                        }
+                        onClosed: sceneGroup.clearScenes()
                     }
                 }
             }
