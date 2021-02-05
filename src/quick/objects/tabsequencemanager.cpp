@@ -63,6 +63,24 @@ void TabSequenceManager::setBacktabKeyModifiers(int val)
     emit backtabKeyModifiersChanged();
 }
 
+void TabSequenceManager::setReleaseFocusKey(int val)
+{
+    if(m_releaseFocusKey == val)
+        return;
+
+    m_releaseFocusKey = val;
+    emit releaseFocusKeyChanged();
+}
+
+void TabSequenceManager::setReleaseFocusEnabled(bool val)
+{
+    if(m_releaseFocusEnabled == val)
+        return;
+
+    m_releaseFocusEnabled = val;
+    emit releaseFocusEnabledChanged();
+}
+
 void TabSequenceManager::setWrapAround(bool val)
 {
     if(m_wrapAround == val)
@@ -111,6 +129,12 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
     if(event->type() == QEvent::KeyPress)
     {
         QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+        if(m_releaseFocusEnabled && m_releaseFocusKey == ke->key())
+        {
+            this->releaseFocus();
+            return true;
+        }
+
         if(ke->key() == m_tabKey || ke->key() == m_backtabKey)
         {
             int itemIndex = -1;

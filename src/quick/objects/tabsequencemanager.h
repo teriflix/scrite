@@ -50,6 +50,16 @@ public:
     int backtabKeyModifiers() const { return m_backtabKeyModifiers; }
     Q_SIGNAL void backtabKeyModifiersChanged();
 
+    Q_PROPERTY(int releaseFocusKey READ releaseFocusKey WRITE setReleaseFocusKey NOTIFY releaseFocusKeyChanged)
+    void setReleaseFocusKey(int val);
+    int releaseFocusKey() const { return m_releaseFocusKey; }
+    Q_SIGNAL void releaseFocusKeyChanged();
+
+    Q_PROPERTY(bool releaseFocusEnabled READ isReleaseFocusEnabled WRITE setReleaseFocusEnabled NOTIFY releaseFocusEnabledChanged)
+    void setReleaseFocusEnabled(bool val);
+    bool isReleaseFocusEnabled() const { return m_releaseFocusEnabled; }
+    Q_SIGNAL void releaseFocusEnabledChanged();
+
     Q_PROPERTY(bool wrapAround READ isWrapAround WRITE setWrapAround NOTIFY wrapAroundChanged)
     void setWrapAround(bool val);
     bool isWrapAround() const { return m_wrapAround; }
@@ -79,6 +89,8 @@ private:
     int m_tabKeyModifiers = Qt::NoModifier;
     int m_backtabKeyModifiers = Qt::NoModifier;
     QList<TabSequenceItem*> m_tabSequenceItems;
+    int m_releaseFocusKey = Qt::Key_Escape;
+    bool m_releaseFocusEnabled = false;
 };
 
 class TabSequenceItem : public QObject

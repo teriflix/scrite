@@ -29,6 +29,8 @@ Rectangle {
     property alias source: screenplayAdapter.source
     property bool toolBarVisible: toolbar.visible
     property bool commentsPanelAllowed: true
+    property alias enableSceneListPanel: sceneListSidePanel.visible
+    property alias sceneListPanelExpanded: sceneListSidePanel.expanded
     property var additionalCharacterMenuItems: []
     property var additionalSceneMenuItems: []
     signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
@@ -2075,7 +2077,7 @@ Rectangle {
         anchors.bottom: statusBar.top
         anchors.topMargin: 5
         anchors.bottomMargin: 5
-        width: sceneListSidePanel.width // Math.max(sceneListSidePanel.width, notesSidePanel.width)
+        width: sceneListSidePanel.visible ? sceneListSidePanel.width : 0
         property bool expanded: sceneListSidePanel.expanded
         onExpandedChanged: contentView.commentsExpandCounter = 0
 
@@ -2632,125 +2634,31 @@ Rectangle {
         }
     }
 
-    /*
-    DockWidget {
-        id: textFormatDockWindow
-        anchors.fill: parent
-        contentX: Math.min( screenplayEditorSettings.textFormatDockWidgetX, parent.width-contentWidth )
-        contentY: Math.min( screenplayEditorSettings.textFormatDockWidgetY, parent.height-contentHeight )
-        contentWidth: 250
-        contentHeight: 225
-        onContentXChanged: Qt.callLater( updatePositionInSettings )
-        onContentYChanged: Qt.callLater( updatePositionInSettings )
-        function updatePositionInSettings() {
-            screenplayEditorSettings.textFormatDockWidgetX = contentX
-            screenplayEditorSettings.textFormatDockWidgetY = contentY
-        }
+    Connections {
+        target: scriteDocument
+        onAboutToSave: saveLayoutDetails()
+        onJustLoaded: restoreLayoutDetails()
+    }
 
-        title: "Text Formatting"
-        property SceneDocumentBinder binder: globalScreenplayEditorToolbar.binder
-        active: binder !== null
-        visible: active
-        content: Item {
-            implicitWidth: toolBarLayout.width + 10
-            implicitHeight: toolBarLayout.height + 10
+    Component.onCompleted: restoreLayoutDetails()
+    Component.onDestruction: saveLayoutDetails()
 
-            readonly property real buttonSize: 55
-            readonly property TextFormat textFormat: textFormatDockWindow.binder.textFormat
-
-            Column {
-                id: toolBarLayout
-                width: buttonSize * 4
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 5
-                spacing: 5
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    ToolButton3 {
-                        iconSource: "../icons/editor/format_bold.png"
-                        ToolTip.visible: false
-                        checkable: true
-                        checked: textFormat.bold
-                        onToggled: textFormat.bold = checked
-                    }
-
-                    ToolButton3 {
-                        iconSource: "../icons/editor/format_ital24px.png"
-                        ToolTip.visible: false
-                        checkable: true
-                        checked: textFormat.italic
-                        onToggled: textFormat.italic = checked
-                    }
-
-                    ToolButton3 {
-                        iconSource: "../icons/editor/format_underline.png"
-                        ToolTip.visible: false
-                        checkable: true
-                        checked: textFormat.underline
-                        onToggled: textFormat.underline = checked
-                    }
-                }
-
-                Row {
-                    width: parent.width
-
-                    Text {
-                        text: "Text Color: "
-                        width: parent.width - 44
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: app.idealFontPointSize
-                    }
-
-                    Rectangle {
-                        color: textFormat.hasTextColor ? textFormat.textColor : Qt.rgba(0,0,0,0)
-                        width: 42; height: width
-                        border.width: 1
-                        border.color: "black"
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: textColorMenu.popup()
-                        }
-
-                        ColorMenu {
-                            id: textColorMenu
-                            onMenuItemClicked: textFormat.textColor = color
-                        }
-                    }
-                }
-
-                Row {
-                    width: parent.width
-
-                    Text {
-                        text: "Background Color: "
-                        width: parent.width - 44
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: app.idealFontPointSize
-                    }
-
-                    Rectangle {
-                        color: textFormat.hasBackgroundColor ? textFormat.backgroundColor : Qt.rgba(0,0,0,0)
-                        width: 42; height: width
-                        border.width: 1
-                        border.color: "black"
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: backgroundColorMenu.popup()
-                        }
-
-                        ColorMenu {
-                            id: backgroundColorMenu
-                            onMenuItemClicked: textFormat.backgroundColor = color
-                        }
-                    }
-                }
+    function saveLayoutDetails() {
+        if(sceneListSidePanel.visible) {
+            var userData = scriteDocument.userData
+            userData["screenplayEditor"] = {
+                "version": 0,
+                "sceneListSidePanelExpaned": sceneListSidePanel.expanded
             }
+            scriteDocument.userData = userData
         }
     }
-    */
+
+    function restoreLayoutDetails() {
+        if(sceneListSidePanel.visible) {
+            var userData = scriteDocument.userData
+            if(userData.screenplayEditor && userData.screenplayEditor.version === 0)
+                sceneListSidePanel.expanded = userData.screenplayEditor.sceneListSidePanelExpaned
+        }
+    }
 }

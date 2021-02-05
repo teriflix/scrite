@@ -445,6 +445,7 @@ Item {
             TabSequenceManager {
                 id: canvasTabSequence
                 wrapAround: true
+                releaseFocusEnabled: true
             }
 
             function createItem(what, where) {

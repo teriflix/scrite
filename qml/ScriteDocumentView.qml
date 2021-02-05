@@ -1527,6 +1527,8 @@ Item {
                 NumberAnimation { duration: 250 }
             }
 
+            enableSceneListPanel: mainTabBar.currentIndex === 0
+
             source: {
                 if(mainTabBar.currentIndex !== 0 &&
                    scriteDocument.structure.elementCount > 0 &&
@@ -1569,10 +1571,12 @@ Item {
         id: structureEditorComponent
 
         SplitView {
+            id: structureEditorSplitView
             orientation: Qt.Vertical
             Material.background: Qt.darker(primaryColors.windowColor, 1.1)
 
             Rectangle {
+                id: structureEditorRow1
                 SplitView.fillHeight: true
                 color: primaryColors.c10.background
 
@@ -1637,7 +1641,7 @@ Item {
 
                     Loader {
                         id: screenplayEditor2
-                        SplitView.preferredWidth: workspaceSettings.screenplayEditorWidth < 0 ? ui.width * 0.5 : workspaceSettings.screenplayEditorWidth
+                        SplitView.preferredWidth: ui.width * 0.5
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                         readonly property int screenplayZoomLevelModifier: -3
                         active: width >= 50
@@ -1647,6 +1651,7 @@ Item {
             }
 
             Loader {
+                id: structureEditorRow2
                 SplitView.preferredHeight: 155 + minimumAppFontMetrics.height*screenplayTracks.trackCount
                 SplitView.minimumHeight: SplitView.preferredHeight
                 SplitView.maximumHeight: SplitView.preferredHeight
@@ -1660,6 +1665,33 @@ Item {
                         anchors.margins: 5
                         showNotesIcon: workspaceSettings.showNotebookInStructure
                     }
+                }
+            }
+
+            Connections {
+                target: scriteDocument
+                onAboutToSave: structureEditorSplitView.saveLayoutDetails()
+                onJustLoaded: structureEditorSplitView.restoreLayoutDetails()
+            }
+
+            Component.onCompleted: restoreLayoutDetails()
+            Component.onDestruction: saveLayoutDetails()
+
+            function saveLayoutDetails() {
+                var userData = scriteDocument.userData
+                userData["structureTab"] = {
+                    "version": 0,
+                    "screenplayEditorWidth": screenplayEditor2.width/structureEditorRow1.width,
+                    "timelineViewHeight": structureEditorRow2.height
+                }
+                scriteDocument.userData = userData
+            }
+
+            function restoreLayoutDetails() {
+                var userData = scriteDocument.userData
+                if(userData.structureTab && userData.structureTab.version === 0) {
+                    structureEditorRow2.SplitView.preferredHeight = userData.structureTab.timelineViewHeight
+                    screenplayEditor2.SplitView.preferredWidth = structureEditorRow1.width*userData.structureTab.screenplayEditorWidth
                 }
             }
         }
