@@ -41,6 +41,11 @@ public:
     BoundingBoxEvaluator(QObject *parent = nullptr);
     ~BoundingBoxEvaluator();
 
+    Q_PROPERTY(qreal margin READ margin WRITE setMargin NOTIFY marginChanged)
+    void setMargin(qreal val);
+    qreal margin() const { return m_margin; }
+    Q_SIGNAL void marginChanged();
+
     Q_PROPERTY(QRectF boundingBox READ boundingBox NOTIFY boundingBoxChanged)
     QRectF boundingBox() const { return m_boundingBox; }
     Q_SIGNAL void boundingBoxChanged();
@@ -100,6 +105,7 @@ private:
 
 private:
     friend class BoundingBoxItem;
+    qreal m_margin = 0;
     QImage m_preview;
     QRectF m_initialRect;
     QRectF m_boundingBox;

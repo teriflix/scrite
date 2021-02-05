@@ -28,6 +28,17 @@ BoundingBoxEvaluator::~BoundingBoxEvaluator()
 
 }
 
+void BoundingBoxEvaluator::setMargin(qreal val)
+{
+    if( qFuzzyCompare(m_margin, val) )
+        return;
+
+    m_margin = val;
+    emit marginChanged();
+
+    this->evaluateLater();
+}
+
 void BoundingBoxEvaluator::setInitialRect(const QRectF &val)
 {
     if(m_initialRect == val)
@@ -134,11 +145,13 @@ void BoundingBoxEvaluator::evaluateNow()
 {
     QRectF rect = m_initialRect;
 
-    for(BoundingBoxItem *item : m_items)
+    for(BoundingBoxItem *item : qAsConst(m_items))
     {
         if(item->item())
             rect |= item->boundingRect();
     }
+
+    rect.adjust(-m_margin, -m_margin, m_margin, m_margin);
 
     this->setBoundingBox(rect);
 }

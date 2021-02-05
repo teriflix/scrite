@@ -78,14 +78,14 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: { canvasScroll.zoomIn(); canvasScroll.storeZoomLevel() }
+                onClicked: { canvasScroll.zoomIn(); canvasScroll.updateScriteDocumentUserData() }
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom In"
             }
 
             ToolButton3 {
-                onClicked: { canvasScroll.zoomOut(); canvasScroll.storeZoomLevel() }
+                onClicked: { canvasScroll.zoomOut(); canvasScroll.updateScriteDocumentUserData() }
                 iconSource: "../icons/navigation/zoom_out.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Out"
@@ -99,12 +99,12 @@ Item {
                             item = elementItems.itemAt(0)
                         if(item === null) {
                             canvasScroll.zoomOneMiddleArea()
-                            canvasScroll.storeZoomLevel()
+                            canvasScroll.updateScriteDocumentUserData()
                             return
                         }
                     }
                     canvasScroll.zoomOneToItem(item)
-                    canvasScroll.storeZoomLevel()
+                    canvasScroll.updateScriteDocumentUserData()
                 }
                 iconSource: "../icons/navigation/zoom_one.png"
                 autoRepeat: true
@@ -112,7 +112,11 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: { canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox); canvasScroll.storeZoomLevel() }
+                onClicked: {
+                    canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox);
+                    canvasScroll.isZoomFit = true
+                    canvasScroll.updateScriteDocumentUserData()
+                }
                 iconSource: "../icons/navigation/zoom_fit.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Fit"
@@ -342,6 +346,7 @@ Item {
         property Item mouseOverItem
         property Item editItem
         property Item maybeDragItem
+        property bool isZoomFit: false
 
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth / canvas.scale,
                                            visibleArea.yPosition * contentHeight / canvas.scale,
@@ -357,6 +362,7 @@ Item {
         onZoomScaleChangedInteractively: Qt.callLater(updateScriteDocumentUserData)
         onContentXChanged: Qt.callLater(updateScriteDocumentUserData)
         onContentYChanged: Qt.callLater(updateScriteDocumentUserData)
+        onZoomScaleChanged: isZoomFit = false
         property bool updateScriteDocumentUserDataEnabled: false
 
         function updateScriteDocumentUserData() {
@@ -368,7 +374,8 @@ Item {
                 "version": 0,
                 "contentX": canvasScroll.contentX,
                 "contentY": canvasScroll.contentY,
-                "zoomScale": canvasScroll.zoomScale
+                "zoomScale": canvasScroll.zoomScale,
+                "isZoomFit": canvasScroll.isZoomFit
             }
             scriteDocument.userData = userData
         }
@@ -382,9 +389,15 @@ Item {
             var userData = scriteDocument.userData
             var csData = userData["StructureView.canvasScroll"];
             if(csData && csData.version === 0) {
+                app.log(JSON.stringify(csData))
                 canvasScroll.zoomScale = csData.zoomScale
                 canvasScroll.contentX = csData.contentX
                 canvasScroll.contentY = csData.contentY
+                if(csData.isZoomFit) {
+                    var area = canvasItemsBoundingBox.boundingBox
+                    canvasScroll.zoomFit(area)
+                }
+                canvasScroll.isZoomFit = csData.isZoomFit
             } else {
                 if(scriteDocument.structure.elementCount > 0) {
                     var item = currentElementItemBinder.get
@@ -1748,7 +1761,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
-                    onClicked: elementItem.activate()
+                    onPressed: elementItem.select()
 
                     drag.target: scriteDocument.readOnly ? null : elementItem
                     drag.axis: Drag.XAndYAxis
