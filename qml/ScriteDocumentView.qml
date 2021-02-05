@@ -239,6 +239,13 @@ Item {
                 shortcut: "Ctrl+N"
                 shortcutText: "N"
                 onClicked: {
+                    var showNewFileDialog = function() {
+                        scriteDocument.reset()
+                        modalDialog.popupSource = fileNewButton
+                        modalDialog.sourceComponent = newFileDialogComponent
+                        modalDialog.active = true
+                    }
+
                     if(scriteDocument.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
@@ -254,11 +261,11 @@ Item {
                                         return
                                     }
                                 }
-                                resetContentAnimation.start()
+                                app.execLater(fileNewButton, 500, showNewFileDialog)
                             }
                         }, fileNewButton)
                     else
-                        resetContentAnimation.start()
+                        showNewFileDialog()
                 }
 
                 ShortcutsModelItem.group: "File"
@@ -1735,6 +1742,11 @@ Item {
         ScritedView {
 
         }
+    }
+
+    Component {
+        id: newFileDialogComponent
+        NewFileDialog { }
     }
 
     Component {

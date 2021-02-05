@@ -24,6 +24,7 @@ Flickable {
     property alias handlePinchZoom: pinchHandler.enabled
     property bool showScrollBars: true
     property bool zoomOnScroll: app.isWindowsPlatform || app.isLinuxPlatform
+    property bool animatePanAndZoom: true
 
     boundsBehavior: Flickable.StopAtBounds
     clip: true
@@ -88,11 +89,11 @@ Flickable {
     }
 
     Behavior on contentX {
-        enabled: screenplayEditorSettings.enableAnimations
+        enabled: screenplayEditorSettings.enableAnimations && animatePanAndZoom
         NumberAnimation { duration: 250 }
     }
     Behavior on contentY {
-        enabled: screenplayEditorSettings.enableAnimations
+        enabled: screenplayEditorSettings.enableAnimations && animatePanAndZoom
         NumberAnimation { duration: 250 }
     }
 

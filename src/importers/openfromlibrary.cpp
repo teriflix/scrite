@@ -106,8 +106,17 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     if(library != this->templates() && library != this->screenplays())
         return;
 
+
     this->error()->clear();
     this->progress()->start();
+
+    if(library == this->templates() && index == 0)
+    {
+        ScriteDocument::instance()->reset();
+        emit imported(0);
+        this->progress()->finish();
+        return;
+    }
 
     QNetworkAccessManager &nam = ::LibraryNetworkAccess();
 
@@ -235,7 +244,8 @@ void Library::loadDatabase(const QByteArray &bytes)
         return;
 
     const QJsonObject object = doc.object();
-    this->setRecords(object.value("records").toArray());
+    const QJsonArray records = object.value("records").toArray();
+    this->setRecords(records);
 }
 
 void Library::setRecords(const QJsonArray &array)
@@ -249,6 +259,16 @@ void Library::setRecords(const QJsonArray &array)
     }
 #else
     m_records = array;
+    if(m_type == Templates)
+    {
+        QJsonObject defaultTemplate;
+        defaultTemplate.insert( QStringLiteral("name"), "Blank Document" );
+        defaultTemplate.insert( QStringLiteral("authors"), QStringLiteral("Scrite") );
+        defaultTemplate.insert( QStringLiteral("poster"), QStringLiteral("qrc:/images/blank_document.png") );
+        defaultTemplate.insert( QStringLiteral("url_kind"), QStringLiteral("relative") );
+        defaultTemplate.insert( QStringLiteral("description"), QStringLiteral("An empty Scrite document.") );
+        m_records.prepend(defaultTemplate);
+    }
 #endif
     this->endResetModel();
 

@@ -514,7 +514,7 @@ Item {
                             fillMode: Image.PreserveAspectCrop
                             smooth: true
                             anchors.horizontalCenter: parent.horizontalCenter
-                            source: libraryService.templates.baseUrl + "/" + record.poster
+                            source: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
 
                             Rectangle {
                                 anchors.fill: parent
