@@ -29,7 +29,7 @@
     <key>NOTE</key>
     <string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
     <key>NSSupportsAutomaticGraphicsSwitching</key>
-    <true/>
+    <false/>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
