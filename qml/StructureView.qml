@@ -399,6 +399,11 @@ Item {
                 ColorAnimation { duration: 250 }
             }
 
+            TabSequenceManager {
+                id: canvasTabSequence
+                wrapAround: true
+            }
+
             function createItem(what, where) {
                 if(scriteDocument.readOnly)
                     return
@@ -1633,6 +1638,7 @@ Item {
         Item {
             id: elementItem
             property StructureElement element: modelData
+            property int elementIndex: index
             property bool selected: scriteDocument.structure.currentElementIndex === index
             z: selected ? 1 : 0
 
@@ -1666,7 +1672,7 @@ Item {
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
             onSelectedChanged: {
-                if(selected && mainUndoStack.structureEditorActive)
+                if(selected && (mainUndoStack.structureEditorActive || scriteDocument.structure.elementCount === 1))
                     synopsisField.forceActiveFocus()
                 else
                     indexCardTabSequence.releaseFocus()
@@ -1728,11 +1734,6 @@ Item {
                 }
             }
 
-            TabSequenceManager {
-                id: indexCardTabSequence
-                wrapAround: true
-            }
-
             property bool focus2: headingField.activeFocus | synopsisField.activeFocus
             onFocus2Changed: {
                 if(focus2)
@@ -1769,8 +1770,6 @@ Item {
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     onEditingComplete: element.scene.heading.parseFrom(text)
-                    TabSequenceItem.manager: indexCardTabSequence
-                    TabSequenceItem.sequence: 0
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                     Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
                     enableTransliteration: true
@@ -1781,6 +1780,9 @@ Item {
                         else
                             font.capitalization = Font.AllUppercase
                     }
+                    TabSequenceItem.manager: canvasTabSequence
+                    TabSequenceItem.sequence: elementIndex * 2 + 0
+                    TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
                 }
 
                 Column {
@@ -1819,8 +1821,6 @@ Item {
                             placeholderText: "Describe what happens in this scene."
                             font.pointSize: app.idealFontPointSize
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            TabSequenceItem.manager: indexCardTabSequence
-                            TabSequenceItem.sequence: 1
                             readOnly: scriteDocument.readOnly
                             text: element.scene.title
                             onTextChanged: element.scene.title = text
@@ -1841,6 +1841,9 @@ Item {
                                 else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
                                     synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
                             }
+                            TabSequenceItem.manager: canvasTabSequence
+                            TabSequenceItem.sequence: elementIndex * 2 + 1
+                            TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
                         }
                     }
 

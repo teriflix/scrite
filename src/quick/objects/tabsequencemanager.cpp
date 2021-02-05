@@ -27,6 +27,42 @@ TabSequenceManager::~TabSequenceManager()
     qApp->removeEventFilter(this);
 }
 
+void TabSequenceManager::setTabKey(int val)
+{
+    if(m_tabKey == val)
+        return;
+
+    m_tabKey = val;
+    emit tabKeyChanged();
+}
+
+void TabSequenceManager::setBacktabKey(int val)
+{
+    if(m_backtabKey == val)
+        return;
+
+    m_backtabKey = val;
+    emit backtabKeyChanged();
+}
+
+void TabSequenceManager::setTabKeyModifiers(int val)
+{
+    if(m_tabKeyModifiers == val)
+        return;
+
+    m_tabKeyModifiers = val;
+    emit tabKeyModifiersChanged();
+}
+
+void TabSequenceManager::setBacktabKeyModifiers(int val)
+{
+    if(m_backtabKeyModifiers == val)
+        return;
+
+    m_backtabKeyModifiers = val;
+    emit backtabKeyModifiersChanged();
+}
+
 void TabSequenceManager::setWrapAround(bool val)
 {
     if(m_wrapAround == val)
@@ -75,7 +111,7 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
     if(event->type() == QEvent::KeyPress)
     {
         QKeyEvent *ke = static_cast<QKeyEvent*>(event);
-        if(ke->key() == Qt::Key_Tab || ke->key() == Qt::Key_Backtab)
+        if(ke->key() == m_tabKey || ke->key() == m_backtabKey)
         {
             int itemIndex = -1;
             for(int i=0; i<m_tabSequenceItems.size(); i++)
@@ -91,14 +127,22 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
             if(itemIndex < 0)
                 return false;
 
+            const Qt::KeyboardModifiers kemods = ke->modifiers();
+            auto compareModifiers = [kemods](int val) {
+                if(val == Qt::NoModifier)
+                    return true;
+                return int(kemods & Qt::KeyboardModifiers(val)) > 0;
+            };
+
             int nextIndex = -1;
-            if(ke->key() == Qt::Key_Tab)
+            if(ke->key() == m_tabKey && compareModifiers(m_tabKeyModifiers))
             {
                 nextIndex = (itemIndex+1)%m_tabSequenceItems.size();
                 if(nextIndex < itemIndex && !m_wrapAround)
                     return false;
             }
-            else
+
+            if(ke->key() == m_backtabKey && compareModifiers(m_backtabKeyModifiers))
             {
                 nextIndex = itemIndex > 0 ? itemIndex-1 : m_tabSequenceItems.size()-1;
                 if(nextIndex > itemIndex && !m_wrapAround)
@@ -114,7 +158,11 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
 
             QQuickItem *qmlItem = qobject_cast<QQuickItem*>(item->parent());
             if(qmlItem != nullptr)
+            {
+                emit item->aboutToReceiveFocus();
                 qmlItem->setFocus(true);
+                return true;
+            }
         }
     }
 
@@ -160,7 +208,7 @@ void TabSequenceManager::reworkSequence()
 
 void TabSequenceManager::reworkSequenceLater()
 {
-    m_timer.start(100, this);
+    m_timer.start(0, this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
