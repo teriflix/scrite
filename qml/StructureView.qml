@@ -355,16 +355,16 @@ Item {
 
         Connections {
             target: scriteDocument
-            onJustLoaded: Qt.callLater( function() { canvasScroll.updateFromScriteDocumentUserDataLater() } )
+            onJustLoaded: canvasScroll.updateFromScriteDocumentUserDataLater()
         }
-        Component.onCompleted: Qt.callLater( function() { canvasScroll.updateFromScriteDocumentUserDataLater() } )
+        Component.onCompleted: canvasScroll.updateFromScriteDocumentUserDataLater()
         Component.onDestruction: canvasScroll.updateScriteDocumentUserData()
         onZoomScaleChangedInteractively: Qt.callLater(updateScriteDocumentUserData)
         onContentXChanged: Qt.callLater(updateScriteDocumentUserData)
         onContentYChanged: Qt.callLater(updateScriteDocumentUserData)
         onZoomScaleChanged: isZoomFit = false
+        animatePanAndZoom: false
         property bool updateScriteDocumentUserDataEnabled: false
-        animatePanAndZoom: updateScriteDocumentUserDataEnabled
 
         function updateScriteDocumentUserData() {
             if(!updateScriteDocumentUserDataEnabled || scriteDocument.readOnly)
@@ -382,7 +382,7 @@ Item {
         }
 
         function updateFromScriteDocumentUserData() {
-            if(elementItems.count < scriteDocument.structure.elementCount || canvasScroll.moving || canvasScroll.flicking) {
+            if(elementItems.count < scriteDocument.structure.elementCount) {
                 updateFromScriteDocumentUserDataLater()
                 return
             }
@@ -393,11 +393,13 @@ Item {
                 canvasScroll.zoomScale = csData.zoomScale
                 canvasScroll.contentX = csData.contentX
                 canvasScroll.contentY = csData.contentY
-                if(csData.isZoomFit) {
-                    var area = canvasItemsBoundingBox.boundingBox
-                    canvasScroll.zoomFit(area)
+                canvasScroll.isZoomFit = csData.isZoomFit === true
+                if(canvasScroll.isZoomFit) {
+                    app.execLater(canvasScroll, 500, function() {
+                        var area = canvasItemsBoundingBox.boundingBox
+                        canvasScroll.zoomFit(area)
+                    })
                 }
-                canvasScroll.isZoomFit = csData.isZoomFit
             } else {
                 if(scriteDocument.structure.elementCount > 0) {
                     var item = currentElementItemBinder.get
@@ -1663,7 +1665,7 @@ Item {
             }
 
             function activate() {
-                indexCardTabSequence.releaseFocus()
+                canvasTabSequence.releaseFocus()
                 annotationGripLoader.reset()
                 canvas.forceActiveFocus()
                 scriteDocument.structure.currentElementIndex = index
@@ -1673,7 +1675,7 @@ Item {
             function finishEditing() {
                 if(canvasScroll.editItem === elementItem)
                     canvasScroll.editItem = null
-                indexCardTabSequence.releaseFocus()
+                canvasTabSequence.releaseFocus()
             }
 
             Component.onCompleted: element.follow = elementItem
@@ -1691,7 +1693,7 @@ Item {
                 if(selected && (mainUndoStack.structureEditorActive || scriteDocument.structure.elementCount === 1))
                     synopsisField.forceActiveFocus()
                 else
-                    indexCardTabSequence.releaseFocus()
+                    canvasTabSequence.releaseFocus()
             }
 
             x: positionBinder.get.x
@@ -1741,7 +1743,7 @@ Item {
                     anchors.fill: parent
                     acceptedButtons: Qt.RightButton
                     onClicked: {
-                        indexCardTabSequence.releaseFocus()
+                        canvasTabSequence.releaseFocus()
                         canvas.forceActiveFocus()
                         elementItem.select()
                         elementContextMenu.element = elementItem.element
@@ -1787,7 +1789,7 @@ Item {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     onEditingComplete: element.scene.heading.parseFrom(text)
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
-                    Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
+                    Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                     enableTransliteration: true
                     property var currentLanguage: app.transliterationEngine.language
                     onCurrentLanguageChanged: {
@@ -1827,7 +1829,7 @@ Item {
                         TextArea {
                             id: synopsisField
                             width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
-                            height: Math.max(synopsisFieldFlick.height-1, contentHeight+50)
+                            height: Math.max(synopsisFieldFlick.height-1, synopsisField.contentHeight+50)
                             background: Item { }
                             selectByMouse: true
                             selectByKeyboard: true
@@ -1841,7 +1843,7 @@ Item {
                             text: element.scene.title
                             onTextChanged: element.scene.title = text
                             onActiveFocusChanged: if(activeFocus) elementItem.select()
-                            Keys.onEscapePressed: indexCardTabSequence.releaseFocus()
+                            Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                             SpecialSymbolsSupport {
                                 anchors.top: parent.bottom
                                 anchors.left: parent.left
