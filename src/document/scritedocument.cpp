@@ -115,6 +115,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
     this->updateDocumentWindowTitle();
 
     connect(this, &ScriteDocument::spellCheckIgnoreListChanged, this, &ScriteDocument::markAsModified);
+    connect(this, &ScriteDocument::userDataChanged, this, &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::modifiedChanged, this, &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged, this, &ScriteDocument::updateDocumentWindowTitle);
 
@@ -279,6 +280,15 @@ Scene *ScriteDocument::createNewScene()
     return scene;
 }
 
+void ScriteDocument::setUserData(const QJsonObject &val)
+{
+    if(m_userData == val)
+        return;
+
+    m_userData = val;
+    emit userDataChanged();
+}
+
 void ScriteDocument::reset()
 {
     HourGlass hourGlass;
@@ -322,9 +332,10 @@ void ScriteDocument::reset()
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
     this->setSpellCheckIgnoreList(QStringList());
-    this->setModified(false);
     this->setFileName(QString());
+    this->setUserData(QJsonObject());
     this->evaluateStructureElementSequence();
+    this->setModified(false);
 
     connect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
     connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
@@ -333,6 +344,8 @@ void ScriteDocument::reset()
     connect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
     connect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
     connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+
+    emit justLoaded();
 }
 
 void ScriteDocument::open(const QString &fileName)
@@ -396,9 +409,6 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     if( !m_docFileSystem.save(fileName) )
         m_errorReport->setErrorMessage( QStringLiteral("Couldn't save document \"") + fileName + QStringLiteral("\"") );
 
-    this->setFileName(fileName);
-    this->setModified(false);
-
 #ifndef QT_NO_DEBUG
     {
         const QFileInfo fi(fileName);
@@ -409,9 +419,13 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     }
 #endif
 
+    this->setFileName(fileName);
     this->setCreatedOnThisComputer(true);
 
     emit justSaved();
+
+    m_modified = false;
+    emit modifiedChanged();
 
     m_progressReport->finish();
 
@@ -1111,6 +1125,8 @@ bool ScriteDocument::load(const QString &fileName)
         notification->setAutoClose(false);
         notification->setActive(true);
     }
+
+    emit justLoaded();
 
     return ret;
 }

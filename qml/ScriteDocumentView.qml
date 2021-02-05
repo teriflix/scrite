@@ -1251,6 +1251,25 @@ Item {
                 height: parent.height
                 visible: appToolBar.visible
 
+                Connections {
+                    target: scriteDocument
+                    onAboutToSave: {
+                        var userData = scriteDocument.userData
+                        userData["mainTabBar"] = {
+                            "version": 0,
+                            "currentIndex": mainTabBar.currentIndex
+                        }
+                        scriteDocument.userData = userData
+                    }
+                    onJustLoaded: {
+                        var userData = scriteDocument.userData
+                        if(userData.mainTabBar)
+                            mainTabBar.currentIndex = userData.mainTabBar.currentIndex
+                        else
+                            mainTabBar.currentIndex = 0
+                    }
+                }
+
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
                 readonly property var tabs: [

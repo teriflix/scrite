@@ -158,6 +158,11 @@ public:
     bool isLoading() const { return m_loading; }
     Q_SIGNAL void loadingChanged();
 
+    Q_PROPERTY(QJsonObject userData READ userData WRITE setUserData NOTIFY userDataChanged)
+    void setUserData(const QJsonObject &val);
+    QJsonObject userData() const { return m_userData; }
+    Q_SIGNAL void userDataChanged();
+
     Q_PROPERTY(bool isCreatedOnThisComputer READ isCreatedOnThisComputer NOTIFY createdOnThisComputerChanged)
     bool isCreatedOnThisComputer() const { return m_createdOnThisComputer; }
     Q_SIGNAL void createdOnThisComputerChanged();
@@ -171,6 +176,7 @@ public:
 
     Q_SIGNAL void aboutToSave();
     Q_SIGNAL void justSaved();
+    Q_SIGNAL void justLoaded();
 
     Q_PROPERTY(QStringList supportedImportFormats READ supportedImportFormats CONSTANT)
     QStringList supportedImportFormats() const;
@@ -246,6 +252,7 @@ private:
     bool m_autoSave = true;
     bool m_readOnly = false;
     bool m_autoSaveMode = false;
+    QJsonObject m_userData;
     QString m_fileName;
     QString m_busyMessage;
     bool m_inCreateNewScene = false;

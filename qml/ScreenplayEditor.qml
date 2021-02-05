@@ -1679,10 +1679,8 @@ Rectangle {
             }
 
             function splitScene() {
-                if(!contentItem.canSplitScene) {
-                    app.log("Cannot split scene")
+                if(!contentItem.canSplitScene)
                     return
-                }
                 screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
             }
 

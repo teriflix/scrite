@@ -348,15 +348,58 @@ Item {
                                            visibleArea.widthRatio * contentWidth / canvas.scale,
                                            visibleArea.heightRatio * contentHeight / canvas.scale )
 
-        onZoomScaleChangedInteractively: storeZoomLevel()
-
         Connections {
-            target: mainTabBar
-            onCurrentIndexChanged: canvasScroll.storeZoomLevel()
+            target: scriteDocument
+            onJustLoaded: Qt.callLater( function() { canvasScroll.updateFromScriteDocumentUserDataLater() } )
+        }
+        Component.onCompleted: Qt.callLater( function() { canvasScroll.updateFromScriteDocumentUserDataLater() } )
+        Component.onDestruction: canvasScroll.updateScriteDocumentUserData()
+        onZoomScaleChangedInteractively: Qt.callLater(updateScriteDocumentUserData)
+        onContentXChanged: Qt.callLater(updateScriteDocumentUserData)
+        onContentYChanged: Qt.callLater(updateScriteDocumentUserData)
+        property bool updateScriteDocumentUserDataEnabled: false
+
+        function updateScriteDocumentUserData() {
+            if(!updateScriteDocumentUserDataEnabled || scriteDocument.readOnly)
+                return
+
+            var userData = scriteDocument.userData
+            userData["StructureView.canvasScroll"] = {
+                "version": 0,
+                "contentX": canvasScroll.contentX,
+                "contentY": canvasScroll.contentY,
+                "zoomScale": canvasScroll.zoomScale
+            }
+            scriteDocument.userData = userData
         }
 
-        function storeZoomLevel() {
-            scriteDocument.structure.zoomLevel = suggestedScale
+        function updateFromScriteDocumentUserData() {
+            if(elementItems.count < scriteDocument.structure.elementCount) {
+                updateFromScriteDocumentUserDataLater()
+                return
+            }
+
+            var userData = scriteDocument.userData
+            var csData = userData["StructureView.canvasScroll"];
+            if(csData && csData.version === 0) {
+                canvasScroll.zoomScale = csData.zoomScale
+                canvasScroll.contentX = csData.contentX
+                canvasScroll.contentY = csData.contentY
+            } else {
+                if(scriteDocument.structure.elementCount > 0) {
+                    var item = currentElementItemBinder.get
+                    if(item === null)
+                        item = elementItems.itemAt(0)
+                    canvasScroll.ensureItemVisible(item, canvas.scale)
+                } else
+                    canvasScroll.zoomOneMiddleArea()
+            }
+
+            updateScriteDocumentUserDataEnabled = true
+        }
+
+        function updateFromScriteDocumentUserDataLater() {
+            app.execLater(canvasScroll, 500, updateFromScriteDocumentUserData)
         }
 
         function zoomOneMiddleArea() {
@@ -1237,46 +1280,46 @@ Item {
         }
     }
 
-    Timer {
-        id: initializeTimer
-        running: !scriteDocument.loading
-        repeat: false
-        interval: 1000
-        property real storedScale: 1
+//    Timer {
+//        id: initializeTimer
+//        running: !scriteDocument.loading
+//        repeat: false
+//        interval: 1000
+//        property real storedScale: 1
 
-        onTriggered: {
-            if(scriteDocument.structure.elementCount > elementItems.count || scriteDocument.structure.annotationCount > annotationItems.count) {
-                Qt.callLater(start)
-                return
-            }
+//        onTriggered: {
+//            if(scriteDocument.structure.elementCount > elementItems.count || scriteDocument.structure.annotationCount > annotationItems.count) {
+//                Qt.callLater(start)
+//                return
+//            }
 
-            if(scriteDocument.structure.elementCount === 0) {
-                canvasScroll.zoomOneMiddleArea()
-            } else {
-                var item = currentElementItemBinder.get
-                var bbox = canvasItemsBoundingBox.boundingBox
-                if(item === null) {
-                    if(scriteDocument.structure.zoomLevel != canvasScroll.zoomScale) {
-                        var bboxCenterX = bbox.x + bbox.width/2
-                        var bboxCenterY = bbox.y + bbox.height/2
-                        var newWidth = bbox.width / scriteDocument.structure.zoomLevel
-                        var newHeight = bbox.height / scriteDocument.structure.zoomLevel
-                        bbox = Qt.rect(bboxCenterX - newWidth/2,
-                                       bboxCenterY - newHeight/2,
-                                       newWidth,
-                                       newHeight)
-                    }
-                    canvasScroll.zoomFit(bbox)
-                } else {
-                    if(scriteDocument.structure.zoomLevel != canvasScroll.zoomScale) {
-                        canvasScroll.zoomScale = scriteDocument.structure.zoomLevel
-                        app.execLater(canvasScroll, 100, function() { canvasScroll.ensureItemVisible(item, canvas.scale) })
-                    } else
-                        canvasScroll.zoomOneToItem(item)
-                }
-            }
-        }
-    }
+//            if(scriteDocument.structure.elementCount === 0) {
+//                canvasScroll.zoomOneMiddleArea()
+//            } else {
+//                var item = currentElementItemBinder.get
+//                var bbox = canvasItemsBoundingBox.boundingBox
+//                if(item === null) {
+//                    if(scriteDocument.structure.zoomLevel != canvasScroll.zoomScale) {
+//                        var bboxCenterX = bbox.x + bbox.width/2
+//                        var bboxCenterY = bbox.y + bbox.height/2
+//                        var newWidth = bbox.width / scriteDocument.structure.zoomLevel
+//                        var newHeight = bbox.height / scriteDocument.structure.zoomLevel
+//                        bbox = Qt.rect(bboxCenterX - newWidth/2,
+//                                       bboxCenterY - newHeight/2,
+//                                       newWidth,
+//                                       newHeight)
+//                    }
+//                    canvasScroll.zoomFit(bbox)
+//                } else {
+//                    if(scriteDocument.structure.zoomLevel != canvasScroll.zoomScale) {
+//                        canvasScroll.zoomScale = scriteDocument.structure.zoomLevel
+//                        app.execLater(canvasScroll, 100, function() { canvasScroll.ensureItemVisible(item, canvas.scale) })
+//                    } else
+//                        canvasScroll.zoomOneToItem(item)
+//                }
+//            }
+//        }
+//    }
 
     Item {
         id: canvasPreview
