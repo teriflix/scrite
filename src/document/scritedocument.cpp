@@ -362,6 +362,12 @@ void ScriteDocument::reset()
     connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
 
+    QEventLoop eventLoop;
+    QElapsedTimer timer;
+    timer.start();
+    while(timer.elapsed() < 1000)
+        eventLoop.processEvents();
+
     emit justLoaded();
 }
 

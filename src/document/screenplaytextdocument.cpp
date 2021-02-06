@@ -174,6 +174,10 @@ ScreenplayTextDocument::ScreenplayTextDocument(QTextDocument *document, QObject 
 
 ScreenplayTextDocument::~ScreenplayTextDocument()
 {
+    m_sceneResetTimer.stop();
+    m_loadScreenplayTimer.stop();
+    m_pageBoundaryEvalTimer.stop();
+
     if(m_textDocument != nullptr && m_textDocument->parent() == this)
         m_textDocument->setUndoRedoEnabled(true);
 }
