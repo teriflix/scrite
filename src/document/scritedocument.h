@@ -91,6 +91,10 @@ public:
     bool isLocked() const { return m_locked; }
     Q_SIGNAL void lockedChanged();
 
+    Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
+    bool isEmpty() const;
+    Q_SIGNAL void emptyChanged();
+
     Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)
     void setAutoSaveDurationInSeconds(int val);
     int autoSaveDurationInSeconds() const { return m_autoSaveDurationInSeconds; }
@@ -223,7 +227,7 @@ private:
     void setPrintFormat(ScreenplayFormat *val);
     void evaluateStructureElementSequence();
     void evaluateStructureElementSequenceLater();
-    void markAsModified() { this->setModified(true); }
+    void markAsModified();
     void setModified(bool val);
     void setFileName(const QString &val);
     bool load(const QString &fileName);

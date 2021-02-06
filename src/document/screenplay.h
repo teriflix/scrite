@@ -223,6 +223,10 @@ public:
     QString version() const { return m_version; }
     Q_SIGNAL void versionChanged();
 
+    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY emptyChanged)
+    bool isEmpty() const;
+    Q_SIGNAL void emptyChanged();
+
     Q_PROPERTY(QString coverPagePhoto READ coverPagePhoto NOTIFY coverPagePhotoChanged STORED false)
     Q_INVOKABLE void setCoverPagePhoto(const QString &val);
     Q_INVOKABLE void clearCoverPagePhoto();

@@ -243,6 +243,7 @@ Item {
                         scriteDocument.reset()
                         modalDialog.popupSource = fileNewButton
                         modalDialog.sourceComponent = newFileDialogComponent
+                        modalDialog.closeable = false
                         modalDialog.active = true
                     }
 

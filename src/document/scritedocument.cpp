@@ -145,6 +145,16 @@ void ScriteDocument::setLocked(bool val)
     this->markAsModified();
 }
 
+bool ScriteDocument::isEmpty() const
+{
+    const int objectCount = m_structure->elementCount() +
+                            m_structure->annotationCount() +
+                            m_screenplay->elementCount() +
+                            m_structure->noteCount();
+    const bool ret = objectCount == 0 && m_screenplay->isEmpty();
+    return ret;
+}
+
 void ScriteDocument::setAutoSaveDurationInSeconds(int val)
 {
     val = qBound(1, val, 3600);
@@ -336,6 +346,7 @@ void ScriteDocument::reset()
     this->setUserData(QJsonObject());
     this->evaluateStructureElementSequence();
     this->setModified(false);
+    emit emptyChanged();
 
     connect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
     connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
@@ -344,6 +355,12 @@ void ScriteDocument::reset()
     connect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
     connect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
     connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+
+    connect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
+    connect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
+    connect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
+    connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
+    connect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
 
     emit justLoaded();
 }
@@ -975,6 +992,11 @@ void ScriteDocument::evaluateStructureElementSequenceLater()
     m_evaluateStructureElementSequenceTimer.start(0, this);
 }
 
+void ScriteDocument::markAsModified()
+{
+    this->setModified(!this->isEmpty());
+}
+
 void ScriteDocument::setModified(bool val)
 {
     if(m_readOnly)
@@ -986,14 +1008,7 @@ void ScriteDocument::setModified(bool val)
     if(m_structure == nullptr || m_screenplay == nullptr)
         return;
 
-    const int objectCount = m_structure->elementCount() +
-                            m_structure->annotationCount() +
-                            m_screenplay->elementCount() +
-                            m_structure->noteCount();
-    if(objectCount > 0)
-        m_modified = val;
-    else
-        m_modified = false;
+    m_modified = val;
 
     emit modifiedChanged();
 }

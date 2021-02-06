@@ -338,18 +338,19 @@ Screenplay::Screenplay(QObject *parent)
       m_activeScene(this, "activeScene"),
       m_sceneNumberEvaluationTimer("Screenplay.m_sceneNumberEvaluationTimer")
 {
-    connect(this, &Screenplay::titleChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::emailChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::authorChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::loglineChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::websiteChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::basedOnChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::contactChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::versionChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::addressChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::subtitleChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::elementsChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::phoneNumberChanged, this, &Screenplay::screenplayChanged);
+    connect(this, &Screenplay::titleChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::emailChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::authorChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::loglineChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::websiteChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::basedOnChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::contactChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::versionChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::addressChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::subtitleChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::elementsChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::phoneNumberChanged, this, &Screenplay::emptyChanged);
+    connect(this, &Screenplay::emptyChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::coverPagePhotoChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
     connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
@@ -357,7 +358,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::screenplayChanged, [=](){ this->markAsModified(); });
 
     m_author = QSysInfo::machineHostName();
-    m_version = "Initial Draft";
+    m_version = QStringLiteral("Initial Draft");
 }
 
 Screenplay::~Screenplay()
@@ -474,6 +475,17 @@ void Screenplay::setVersion(const QString &val)
     emit versionChanged();
 
     this->evaluateHasTitlePageAttributes();
+}
+
+bool Screenplay::isEmpty() const
+{
+    const bool allEmpty = m_title.isEmpty() && m_elements.isEmpty() &&
+            m_subtitle.isEmpty() && m_logline.isEmpty() &&
+            m_basedOn.isEmpty() && (m_author == QSysInfo::machineHostName()) &&
+            m_contact.isEmpty() && m_address.isEmpty() &&
+            m_phoneNumber.isEmpty() && m_email.isEmpty() &&
+            m_website.isEmpty() && (m_version == QStringLiteral("Initial Draft"));
+    return allEmpty;
 }
 
 void Screenplay::setCoverPagePhoto(const QString &val)

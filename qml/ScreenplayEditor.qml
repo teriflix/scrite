@@ -502,6 +502,18 @@ Rectangle {
                                     scriteDocument.screenplay.addBreakElement(Screenplay.Act)
                                 }
                             }
+
+                            ToolButton2 {
+                                text: "Open Template"
+                                shortcutText: app.polishShortcutTextForDisplay("Ctrl+N")
+                                icon.source: "../icons/action/description.png"
+                                ToolTip.text: "Create new screenplay from a template."
+                                width: implicitWidth * 1.5
+                                height: implicitHeight * 1.5
+                                flat: false
+                                onClicked: fileNewButton.click()
+                                visible: scriteDocument.empty
+                            }
                         }
                     }
 
