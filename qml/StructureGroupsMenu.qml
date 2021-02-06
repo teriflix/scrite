@@ -33,7 +33,7 @@ Menu2 {
         height: structureGroupsMenu.height
 
         background: Item { }
-        contentItem: Item {
+        contentItem: Item {            
             Rectangle {
                 anchors.fill: parent
                 anchors.bottomMargin: structureGroupsMenu.bottomPadding
@@ -93,10 +93,37 @@ Menu2 {
                     ScrollBar.vertical: ScrollBar {
                         policy: groupsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                     }
+
+                    property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
+                    onShowingFilteredItemsChanged: adjustScrollingLater()
+
+                    function adjustScrolling() {
+                        if(!showingFilteredItems) {
+                            positionViewAtBeginning()
+                            return
+                        }
+
+                        var acts = sceneGroup.sceneActs
+                        var index = -1
+                        for(var i=0; i<sceneGroup.count; i++) {
+                            var item = sceneGroup.at(i)
+                            if( acts.indexOf(item.act) >= 0) {
+                                positionViewAtIndex(i, ListView.Beginning)
+                                return
+                            }
+                        }
+                    }
+
+                    function adjustScrollingLater() {
+                        app.execLater(groupsView, 50, adjustScrolling)
+                    }
+
                     delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
                         color: groupItemMouseArea.containsMouse ? primaryColors.button.background : Qt.rgba(0,0,0,0)
+                        opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
+                        property bool filtered: sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
 
                         Row {
                             anchors.fill: parent
@@ -108,7 +135,7 @@ Menu2 {
                                 opacity: {
                                     switch(arrayItem.checked) {
                                     case "no": return 0
-                                    case "partial": return 0.5
+                                    case "partial": return 0.25
                                     case "yes": return 1
                                     }
                                     return 0
@@ -122,12 +149,12 @@ Menu2 {
                                 text: arrayItem.label
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
+                                font.bold: groupsView.showingFilteredItems ? filtered : false
                                 font.pointSize: app.idealFontPointSize
                                 leftPadding: arrayItem.type > 0 ? 20 : 0
                                 elide: Text.ElideRight
                             }
                         }
-
 
                         MouseArea {
                             id: groupItemMouseArea

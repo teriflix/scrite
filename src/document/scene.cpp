@@ -863,6 +863,24 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
     }
 }
 
+void Scene::setAct(const QString &val)
+{
+    if(m_act == val)
+        return;
+
+    m_act = val;
+    emit actChanged();
+}
+
+void Scene::setActIndex(const int &val)
+{
+    if(m_actIndex == val)
+        return;
+
+    m_actIndex = val;
+    emit actIndexChanged();
+}
+
 void Scene::setGroups(const QStringList &val)
 {
     if(m_groups == val)
@@ -1880,9 +1898,29 @@ void SceneGroup::timerEvent(QTimerEvent *te)
         GenericArrayModel::timerEvent(te);
 }
 
+void SceneGroup::setSceneActs(const QStringList &val)
+{
+    if(m_sceneActs == val)
+        return;
+
+    m_sceneActs = val;
+    emit sceneActsChanged();
+}
+
+void SceneGroup::setGroupActs(const QStringList &val)
+{
+    if(m_groupActs == val)
+        return;
+
+    m_groupActs = val;
+    emit groupActsChanged();
+}
+
 void SceneGroup::reload()
 {
     this->beginResetModel();
+
+    QStringList acts;
 
     m_groups = QJsonArray();
     if(!m_structure.isNull())
@@ -1892,11 +1930,18 @@ void SceneGroup::reload()
         {
             QJsonObject item = array.at(i).toObject();
             item.insert( QStringLiteral("checked"), QStringLiteral("no") );
+
+            const QString act = item.value( QStringLiteral("act") ).toString();
+            if( !acts.contains(act) )
+                acts.append(act);
+
             m_groups.append(item);
         }
     }
 
     this->endResetModel();
+
+    this->setGroupActs(acts);
 
     this->reeval();
 }
@@ -1904,11 +1949,17 @@ void SceneGroup::reload()
 void SceneGroup::reeval()
 {
     QMap<QString,int> groupCounter;
+    QStringList acts;
+
     for(Scene *scene : qAsConst(m_scenes))
     {
         const QStringList groups = scene->groups();
         for(const QString &group : groups)
             groupCounter[group] = groupCounter.value(group, 0) + 1;
+
+        const QString sceneAct = scene->act();
+        if( !sceneAct.isEmpty() && m_groupActs.contains(sceneAct) && !acts.contains(sceneAct) )
+            acts.append(sceneAct);
     }
 
     const QString nameKey = QStringLiteral("name");
@@ -1936,6 +1987,8 @@ void SceneGroup::reeval()
             emit dataChanged(index, index);
         }
     }
+
+    this->setSceneActs(acts);
 }
 
 void SceneGroup::reevalLater()

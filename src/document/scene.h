@@ -264,6 +264,16 @@ public:
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
     void scanMuteCharacters(const QStringList &characterNames=QStringList());
 
+    Q_PROPERTY(QString act READ act WRITE setAct NOTIFY actChanged STORED false)
+    void setAct(const QString &val);
+    QString act() const { return m_act; }
+    Q_SIGNAL void actChanged();
+
+    Q_PROPERTY(int actIndex READ actIndex WRITE setActIndex NOTIFY actIndexChanged STORED false)
+    void setActIndex(const int &val);
+    int actIndex() const { return m_actIndex; }
+    Q_SIGNAL void actIndexChanged();
+
     Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
     void setGroups(const QStringList &val);
     QStringList groups() const { return m_groups; }
@@ -352,6 +362,7 @@ private:
     friend class SceneElement;
     friend class SceneDocumentBinder;
 
+    QString m_act;
     Type m_type = Standard;
     QColor m_color = QColor(Qt::white);
     QString m_title;
@@ -360,6 +371,7 @@ private:
     QString m_emotionalChange;
     QString m_charactersInConflict;
     QString m_pageTarget;
+    int m_actIndex = -1;
 
     bool m_enabled = true;
     char m_padding[7];
@@ -496,6 +508,20 @@ public:
     Q_INVOKABLE void toggle(int row);
     Q_SIGNAL void toggled(int row);
 
+    Q_PROPERTY(QStringList groupActs READ groupActs NOTIFY groupActsChanged)
+    QStringList groupActs() const { return m_groupActs; }
+    Q_SIGNAL void groupActsChanged();
+
+    Q_PROPERTY(bool hasGroupActs READ hasGroupActs NOTIFY groupActsChanged)
+    bool hasGroupActs() const { return !m_groupActs.isEmpty(); }
+
+    Q_PROPERTY(QStringList sceneActs READ sceneActs NOTIFY sceneActsChanged)
+    QStringList sceneActs() const { return m_sceneActs; }
+    Q_SIGNAL void sceneActsChanged();
+
+    Q_PROPERTY(bool hasSceneActs READ hasSceneActs NOTIFY sceneActsChanged)
+    bool hasSceneActs() const { return !m_sceneActs.isEmpty(); }
+
     // Custom properties
     Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged)
     void setStructure(Structure* val);
@@ -516,6 +542,8 @@ protected:
     void timerEvent(QTimerEvent *te);
 
 private:
+    void setSceneActs(const QStringList &val);
+    void setGroupActs(const QStringList &val);
     void reload();
     void reeval();
     void reevalLater();
@@ -525,6 +553,8 @@ private:
     static void staticClearScenes(QQmlListProperty<Scene> *list);
     static Scene* staticSceneAt(QQmlListProperty<Scene> *list, int index);
     static int staticSceneCount(QQmlListProperty<Scene> *list);
+    QStringList m_sceneActs;
+    QStringList m_groupActs;
     QList<Scene *> m_scenes;
     QJsonArray &m_groups;
     QObjectProperty<Structure> m_structure;

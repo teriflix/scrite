@@ -2196,7 +2196,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
     {
         QList<StructureElement*> unusedElements = m_elements.list();
 
-        ret.append( qMakePair(QStringLiteral("Opening Act"), QList<StructureElement*>()) );
+        ret.append( qMakePair(QStringLiteral("ACT 1"), QList<StructureElement*>()) );
 
         for(int i=0; i<screenplay->elementCount(); i++)
         {

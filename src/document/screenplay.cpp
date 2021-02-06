@@ -1890,17 +1890,27 @@ void Screenplay::evaluateSceneNumbers()
     int actIndex = 0;
     int elementIndex = 0;
     bool containsNonStandardScenes = false;
-    Q_FOREACH(ScreenplayElement *element, m_elements)
+    QString act = QStringLiteral("ACT 1");
+
+    for(ScreenplayElement *element : qAsConst(m_elements))
     {
         if(element->elementType() == ScreenplayElement::SceneElementType)
         {
             element->setElementIndex(elementIndex++);
             element->setActIndex(actIndex);
+
+            Scene *scene = element->scene();
+            scene->setAct(act);
+            scene->setActIndex(actIndex);
         }
         else
         {
             element->setElementIndex(-1);
-            ++actIndex;
+            if(element->breakType() == Screenplay::Act)
+            {
+                act = element->breakTitle();
+                ++actIndex;
+            }
         }
 
         element->evaluateSceneNumber(number);
