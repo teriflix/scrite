@@ -2683,7 +2683,7 @@ void Structure::setGroupsData(const QString &val)
         const QString desc = line2.section(colon, 1);
         ret = CategoryOrGroup(name, desc);
         ret.type = type;
-        ret.act = act;
+        ret.act = act.toUpper();
 
         return ret;
     };

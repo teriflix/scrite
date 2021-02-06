@@ -85,7 +85,7 @@ Item {
     }
 
     ToolTip.text: toolButtonShortcut.nativeText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(toolButtonShortcut.sequence) + ")")
-    ToolTip.visible: ToolTip.text !== "" && (toolButtonMouseArea.containsMouse ? toolTipVisibility.get : false)
+    ToolTip.visible: ToolTip.text !== "" && (toolButtonMouseArea.containsMouse && !down ? toolTipVisibility.get : false)
 
     DelayedPropertyBinder {
         id: toolTipVisibility

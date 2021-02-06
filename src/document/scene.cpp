@@ -865,10 +865,11 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
 
 void Scene::setAct(const QString &val)
 {
-    if(m_act == val)
+    const QString val2 = val.toUpper();
+    if(m_act == val2)
         return;
 
-    m_act = val;
+    m_act = val2;
     emit actChanged();
 }
 
