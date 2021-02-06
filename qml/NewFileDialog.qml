@@ -18,8 +18,8 @@ import Scrite 1.0
 
 Item {
     id: newFileDialog
-    width: Math.min(ui.width * 0.75, 900)
-    height: Math.min(ui.height * 0.75, 720)
+    width: documentUI.width * 0.75
+    height: documentUI.height * 0.85
 
     EventFilter.target: app
     EventFilter.events: [6] // KeyPress

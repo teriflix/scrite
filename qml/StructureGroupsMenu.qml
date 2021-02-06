@@ -119,12 +119,7 @@ Menu2 {
                             }
 
                             Text {
-                                text: {
-                                    var ret = arrayItem.label
-                                    if(groupItemMouseArea.containsMouse && arrayItem.act !== "")
-                                        ret += " <font size=\"-2\">(" + arrayItem.act + ")</font>"
-                                    return ret;
-                                }
+                                text: arrayItem.label
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.pointSize: app.idealFontPointSize
@@ -133,14 +128,6 @@ Menu2 {
                             }
                         }
 
-                        Rectangle {
-                            property var nextArrayItem: sceneGroup.at(index+1)
-                            visible: nextArrayItem && nextArrayItem.act !== arrayItem.act
-                            width: parent.width
-                            height: 1
-                            anchors.bottom: parent.bottom
-                            color: primaryColors.borderColor
-                        }
 
                         MouseArea {
                             id: groupItemMouseArea
