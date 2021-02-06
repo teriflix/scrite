@@ -61,6 +61,6 @@
         <file>qml/ScreenplayPreview.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
-        <file>qml/NewFileDialog.qml</file>
+        <file>qml/OpenTemplateDialog.qml</file>
     </qresource>
 </RCC>

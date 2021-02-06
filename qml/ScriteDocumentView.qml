@@ -239,14 +239,6 @@ Item {
                 shortcut: "Ctrl+N"
                 shortcutText: "N"
                 onClicked: {
-                    var showNewFileDialog = function() {
-                        scriteDocument.reset()
-                        modalDialog.popupSource = fileNewButton
-                        modalDialog.sourceComponent = newFileDialogComponent
-                        modalDialog.closeable = false
-                        modalDialog.active = true
-                    }
-
                     if(scriteDocument.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
@@ -262,11 +254,11 @@ Item {
                                         return
                                     }
                                 }
-                                app.execLater(fileNewButton, 500, showNewFileDialog)
+                                app.execLater(fileNewButton, 250, newFromTemplate)
                             }
                         }, fileNewButton)
                     else
-                        showNewFileDialog()
+                        newFromTemplate()
                 }
 
                 ShortcutsModelItem.group: "File"
@@ -282,6 +274,7 @@ Item {
                 shortcutText: "O"
                 down: recentFilesMenu.visible
                 onClicked: recentFilesMenu.open()
+
                 function doOpen(filePath) {
                     if(filePath === scriteDocument.fileName)
                         return
@@ -302,12 +295,18 @@ Item {
                                         }
                                     }
                                     recentFilesMenu.close()
-                                    fileDialog.launch("OPEN", filePath)
+                                    if(filePath === "#TEMPLATE")
+                                        app.execLater(fileOpenButton, 250, newFromTemplate)
+                                    else
+                                        fileDialog.launch("OPEN", filePath)
                                 }
                             }, fileOpenButton)
                     else {
                         recentFilesMenu.close()
-                        fileDialog.launch("OPEN", filePath)
+                        if(filePath === "#TEMPLATE")
+                            app.execLater(fileOpenButton, 250, newFromTemplate)
+                        else
+                            fileDialog.launch("OPEN", filePath)
                     }
                 }
 
@@ -364,11 +363,14 @@ Item {
                         onAboutToShow: prepareRecentFilesList()
 
                         MenuItem2 {
-                            text: recentFilesMenu.recentFiles.length > 0 ? "Open Another" : "Open"
+                            text: "Open File"
                             onClicked: fileOpenButton.doOpen()
+                            Rectangle {
+                                width: parent.width; height: 1
+                                anchors.bottom: parent.bottom
+                                color: primaryColors.borderColor
+                            }
                         }
-
-                        MenuSeparator { visible: true }
 
                         FontMetrics {
                             id: recentFilesFontMetrics
@@ -990,6 +992,7 @@ Item {
                                 text: "Open"
                                 onTriggered: fileOpenButton.doOpen()
                             }
+
 
                             Menu2 {
                                 title: "Recent"
@@ -1745,9 +1748,17 @@ Item {
         }
     }
 
+    function newFromTemplate() {
+        scriteDocument.reset()
+        modalDialog.popupSource = fileNewButton
+        modalDialog.sourceComponent = openTemplateDialogComponent
+        modalDialog.closeable = false
+        modalDialog.active = true
+    }
+
     Component {
-        id: newFileDialogComponent
-        NewFileDialog { }
+        id: openTemplateDialogComponent
+        OpenTemplateDialog { }
     }
 
     Component {
