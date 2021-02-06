@@ -417,6 +417,20 @@ Item {
             app.execLater(canvasScroll, 500, updateFromScriteDocumentUserData)
         }
 
+        onUpdateScriteDocumentUserDataEnabledChanged: {
+            if(updateScriteDocumentUserDataEnabled)
+                app.execLater(canvasScroll, 500, zoomSanityCheck)
+        }
+
+        function zoomSanityCheck() {
+            if( !app.doRectanglesIntersect(canvasItemsBoundingBox.boundingBox, canvasScroll.viewportRect) ) {
+                var item = currentElementItemBinder.get
+                if(item === null)
+                    item = elementItems.itemAt(0)
+                canvasScroll.ensureItemVisible(item, canvas.scale)
+            }
+        }
+
         function zoomOneMiddleArea() {
             var middleArea = Qt.rect((canvas.width-canvasScroll.width)/2,
                                      (canvas.height-canvasScroll.height)/2,

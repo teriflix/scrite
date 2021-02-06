@@ -254,6 +254,7 @@ Item {
                                         return
                                     }
                                 }
+                                scriteDocument.reset()
                                 app.execLater(fileNewButton, 250, newFromTemplate)
                             }
                         }, fileNewButton)
