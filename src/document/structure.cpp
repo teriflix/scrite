@@ -2487,8 +2487,8 @@ void Structure::clearAnnotations()
 
 QString Structure::defaultGroupsDataFile() const
 {
-    static const QString ret = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-            + QStringLiteral("/Scrite Structure Groups.list");
+    static const QString ret = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+            + QStringLiteral("/structure_groups.lst");
     return ret;
 }
 

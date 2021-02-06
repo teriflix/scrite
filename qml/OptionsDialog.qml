@@ -1906,6 +1906,14 @@ Item {
 
         PageView {
             id: categoriesAndStructurePages
+            Component.onCompleted: {
+                modalDialog.closeOnEscape = true
+                modalDialog.closeable = false
+            }
+            Component.onDestruction: {
+                closeOnEscape.closeOnEscape = false
+                modalDialog.closeable = true
+            }
             pagesArray: [
                 { "title": "This Document" },
                 { "title": "Default Global" }
@@ -1950,7 +1958,7 @@ Item {
 
                 ScrollView {
                     width: parent.width
-                    height: parent.height - parent.spacing - applyButton.height
+                    height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
                     background: Rectangle {
                         color: primaryColors.c50.background
@@ -1971,13 +1979,22 @@ Item {
                     }
                 }
 
-                Button2 {
-                    id: applyButton
+                Row {
+                    id: buttonsRow
                     anchors.right: parent.right
-                    text: "Apply"
-                    onClicked: {
-                        scriteDocument.structure.groupsData = groupsDataEdit.text
-                        modalDialog.close()
+                    spacing: 20
+
+                    Button2 {
+                        text: "Cancel"
+                        onClicked: modalDialog.close()
+                    }
+
+                    Button2 {
+                        text: "Apply"
+                        onClicked: {
+                            scriteDocument.structure.groupsData = groupsDataEdit.text
+                            modalDialog.close()
+                        }
                     }
                 }
             }
@@ -1996,7 +2013,7 @@ Item {
 
                 ScrollView {
                     width: parent.width
-                    height: parent.height - parent.spacing - applyButton.height
+                    height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
                     background: Rectangle {
                         color: accentColors.c50.background
@@ -2017,13 +2034,22 @@ Item {
                     }
                 }
 
-                Button2 {
-                    id: applyButton
+                Row {
+                    id: buttonsRow
                     anchors.right: parent.right
-                    text: "Apply"
-                    onClicked: {
-                        app.writeToFile(scriteDocument.structure.defaultGroupsDataFile, groupsDataEdit.text)
-                        modalDialog.close()
+                    spacing: 20
+
+                    Button2 {
+                        text: "Cancel"
+                        onClicked: modalDialog.close()
+                    }
+
+                    Button2 {
+                        text: "Apply"
+                        onClicked: {
+                            app.writeToFile(scriteDocument.structure.defaultGroupsDataFile, groupsDataEdit.text)
+                            modalDialog.close()
+                        }
                     }
                 }
             }

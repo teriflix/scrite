@@ -25,6 +25,7 @@ Rectangle {
     property rect defaultPopupSourceArea: Qt.rect( (parent.x+(parent.width-10)/2), (parent.y+(parent.height-10)/2), 10, 10 )
     property bool animationComplete: false
     property alias closeable: closeButton.visible
+    property bool closeOnEscape: closeable || closeUponClickOutsideContentArea
     property bool closeUponClickOutsideContentArea: false
     property bool animationsEnabled: true
     signal closeRequest()
@@ -80,7 +81,7 @@ Rectangle {
     EventFilter.target: app
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {
-        if( (closeable || closeUponClickOutsideContentArea) && event.key === Qt.Key_Escape) {
+        if( closeOnEscape && event.key === Qt.Key_Escape) {
             result.acceptEvent = true
             result.filter = true
             close()
