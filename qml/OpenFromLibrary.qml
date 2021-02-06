@@ -21,15 +21,7 @@ Item {
     width: documentUI.width * 0.75
     height: documentUI.height * 0.85
 
-    EventFilter.target: app
-    EventFilter.events: [6] // KeyPress
-    EventFilter.onFilter: {
-        if( event.key === Qt.Key_Escape) {
-            result.acceptEvent = true
-            result.filter = true
-            modalDialog.close()
-        }
-    }
+    Component.onCompleted: modalDialog.closeOnEscape = true
 
     Rectangle {
         anchors.left: parent.left

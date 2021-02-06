@@ -276,6 +276,7 @@ Rectangle {
             active = false
             closeable = true
             closeUponClickOutsideContentArea = false
+            closeOnEscape = Qt.binding( function() { return closeable || closeUponClickOutsideContentArea } )
         }
         property var arguments
         property var initItemCallback

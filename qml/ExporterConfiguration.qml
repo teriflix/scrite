@@ -26,6 +26,8 @@ Item {
             Math.min(documentUI.height*0.9, contentLoader.item.idealHeight) : 300
 
     Component.onCompleted: {
+        modalDialog.closeOnEscape = false
+
         exporter = scriteDocument.createExporter(modalDialog.arguments)
         if(exporter === null) {
             modalDialog.closeable = true

@@ -28,6 +28,8 @@ Item {
     readonly property color dialogColor: primaryColors.c300.background
 
     Component.onCompleted: {
+        modalDialog.closeOnEscape = false
+
         var reportName = typeof modalDialog.arguments === "string" ? modalDialog.arguments : modalDialog.arguments.reportName
         generator = scriteDocument.createReportGenerator(reportName)
         if(generator === null) {

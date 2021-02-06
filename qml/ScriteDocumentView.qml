@@ -434,11 +434,6 @@ Item {
                 shortcut: "Ctrl+Shift+O"
                 shortcutText: "Shift+O"
                 function go() {
-                    resetContentAnimation.filePath = ""
-                    resetContentAnimation.openFileDialog = false
-                    resetContentAnimation.callback = undefined
-                    resetContentAnimation.start()
-
                     modalDialog.closeable = false
                     modalDialog.popupSource = openFromLibrary
                     modalDialog.sourceComponent = openFromLibraryComponent
@@ -1749,7 +1744,6 @@ Item {
     }
 
     function newFromTemplate() {
-        scriteDocument.reset()
         modalDialog.popupSource = fileNewButton
         modalDialog.sourceComponent = openTemplateDialogComponent
         modalDialog.closeable = false
@@ -1758,6 +1752,7 @@ Item {
 
     Component {
         id: openTemplateDialogComponent
+
         OpenTemplateDialog { }
     }
 
