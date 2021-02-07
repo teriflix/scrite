@@ -1745,10 +1745,15 @@ Item {
     }
 
     function newFromTemplate() {
-        modalDialog.popupSource = fileNewButton
-        modalDialog.sourceComponent = openTemplateDialogComponent
-        modalDialog.closeable = false
-        modalDialog.active = true
+        if(app.internetAvailable) {
+            modalDialog.popupSource = fileNewButton
+            modalDialog.sourceComponent = openTemplateDialogComponent
+            modalDialog.closeable = false
+            modalDialog.active = true
+        } else {
+            if(!scriteDocument.empty)
+                scriteDocument.reset()
+        }
     }
 
     Component {

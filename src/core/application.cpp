@@ -41,6 +41,7 @@
 #include <QFontDatabase>
 #include <QStandardPaths>
 #include <QOperatingSystemVersion>
+#include <QNetworkConfigurationManager>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -119,6 +120,11 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     TransliterationEngine::instance(this);
     SystemTextInputManager::instance();
+
+    m_networkConfiguration = new QNetworkConfigurationManager(this);
+    m_networkConfiguration->allConfigurations(QNetworkConfiguration::Active);
+    connect(m_networkConfiguration, &QNetworkConfigurationManager::onlineStateChanged,
+            this, &Application::internetAvailableChanged);
 }
 
 Application::~Application()
@@ -192,6 +198,11 @@ Application::Platform Application::platform() const
 }
 #endif
 #endif
+
+bool Application::isInternetAvailable() const
+{
+    return m_networkConfiguration != nullptr && m_networkConfiguration->isOnline();
+}
 
 QString Application::controlKey() const
 {

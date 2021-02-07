@@ -1577,6 +1577,8 @@ void Screenplay::updateBreakTitles()
             emit e->breakTitleChanged();
         }
     }
+
+    this->evaluateSceneNumbers();
 }
 
 void Screenplay::setCurrentElementIndex(int val)
@@ -1780,7 +1782,7 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
         emit coverPagePhotoChanged();
     }
 
-    this->evaluateSceneNumbers();
+    this->updateBreakTitles();
 
     if(!m_scriteDocument->isCreatedOnThisComputer())
     {

@@ -35,6 +35,7 @@ typedef QApplication QtApplicationClass;
 class QSettings;
 class QQuickItem;
 class AutoUpdate;
+class QNetworkConfigurationManager;
 
 class Application : public QtApplicationClass
 {
@@ -101,6 +102,10 @@ public:
     bool isLinuxPlatform() const { return false; }
 #endif
 #endif
+
+    Q_PROPERTY(bool internetAvailable READ isInternetAvailable NOTIFY internetAvailableChanged)
+    bool isInternetAvailable() const;
+    Q_SIGNAL void internetAvailableChanged();
 
     Q_PROPERTY(QString controlKey READ controlKey CONSTANT)
     QString controlKey() const;
@@ -270,6 +275,7 @@ private:
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;
     QVariantList m_standardColors;
+    QNetworkConfigurationManager *m_networkConfiguration = nullptr;
 };
 
 #endif // APPLICATION_H

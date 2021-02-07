@@ -171,6 +171,7 @@ Library::Library(Library::Type type, QObject *parent)
         :QAbstractListModel(parent),
           m_type(type)
 {
+    this->setRecords( QJsonArray() );
     this->fetchRecords();
 }
 
