@@ -1118,11 +1118,11 @@ Item {
                     if(scriteDocument.readOnly)
                         return
 
-                    scriteDocument.structure.forceBeatBoardLayout = false
 
                     if(!hasItems) {
                         var rect = scriteDocument.structure.layoutElements(type)
                         canvasScroll.zoomFit(rect)
+                        scriteDocument.structure.forceBeatBoardLayout = false
                         return
                     }
 
@@ -1164,6 +1164,7 @@ Item {
                             oldItems.forEach( function(item) {
                                 item.element.selected = false
                             })
+                            scriteDocument.structure.forceBeatBoardLayout = false
                         }
                     }
 

@@ -64,6 +64,8 @@ Item {
         if(repeater === undefined || repeater === null)
             return
 
+        clear()
+
         var bounds = createBounds()
         var selectedItems = []
         var count = repeater.count
@@ -218,11 +220,10 @@ Item {
             }
         }
 
-        onXChanged: shiftElements()
-        onYChanged: shiftElements()
+        onXChanged: if(selection.items.length > 0) shiftElements()
+        onYChanged: if(selection.items.length > 0) shiftElements()
 
         function shiftElements() {
-            scriteDocument.structure.forceBeatBoardLayout = false
             var elements = selection.items
             var i, item
             var dx = x - topLeft.x
@@ -230,6 +231,7 @@ Item {
             topLeft = Qt.point(x,y)
             for(i=0; i<elements.length; i++)
                 selection.moveItem(elements[i], dx, dy)
+            scriteDocument.structure.forceBeatBoardLayout = false
         }
 
         MenuLoader {
