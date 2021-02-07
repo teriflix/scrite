@@ -155,6 +155,15 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
         ScriteDocument::instance()->openAnonymously(tmpFile.fileName());
         ScriteDocument::instance()->screenplay()->setCurrentElementIndex(-1);
 
+        if(library->type() == Library::Templates)
+        {
+            ScriteDocument::instance()->structure()->setCurrentElementIndex(-1);
+            ScriteDocument::instance()->screenplay()->setCurrentElementIndex(
+                    ScriteDocument::instance()->screenplay()->firstSceneIndex()
+                );
+            ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
+        }
+
         emit imported(index);
     });
 }
