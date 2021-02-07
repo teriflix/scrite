@@ -362,6 +362,9 @@ void ScriteDocument::reset()
     connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
 
+    connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitles);
+    connect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitles);
+
     QEventLoop eventLoop;
     QElapsedTimer timer;
     timer.start();

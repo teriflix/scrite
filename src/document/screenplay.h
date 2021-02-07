@@ -300,6 +300,7 @@ public:
     Q_INVOKABLE void addBreakElementI(int type) { this->addBreakElement(BreakType(type)); }
     Q_INVOKABLE void insertBreakElement(BreakType type, int index);
     Q_INVOKABLE void insertBreakElementI(int type, int index) { this->insertBreakElement(BreakType(type), index); }
+    Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
 
     Q_SIGNAL void screenplayChanged();
