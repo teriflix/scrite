@@ -195,6 +195,7 @@ Item {
 
                     MenuItem2 {
                         text: "Acts"
+                        font.bold: canvas.beatCategory === ""
                         onTriggered: canvas.beatCategory = ""
                     }
 
@@ -205,6 +206,7 @@ Item {
 
                         MenuItem2 {
                             text: app.camelCased(modelData)
+                            font.bold: canvas.beatCategory === modelData
                             onTriggered: canvas.beatCategory = modelData
                         }
                     }
