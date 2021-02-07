@@ -174,12 +174,25 @@ Item {
             }
 
             ToolButton3 {
+                id: beatBoardLayoutToolButton
                 enabled: !scriteDocument.readOnly && scriteDocument.screenplay.elementCount > 0
                 iconSource: "../icons/action/layout_beat_sheet.png"
                 ToolTip.text: "Beat Board Layout"
-                onClicked: {
-                    var rect = scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-                    canvasScroll.zoomFit(rect)
+                checkable: true
+                checked: false
+                onToggled: {
+                    scriteDocument.structure.forceBeatBoardLayout = checked
+                    if(checked) {
+                        var rect = scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+                        canvasScroll.zoomFit(rect)
+                    }
+                }
+
+                Component.onCompleted: checked = scriteDocument.structure.forceBeatBoardLayout
+
+                Connections {
+                    target: scriteDocument.structure
+                    onForceBeatBoardLayoutChanged: beatBoardLayoutToolButton.checked = scriteDocument.structure.forceBeatBoardLayout
                 }
             }
 
@@ -775,21 +788,25 @@ Item {
                         element.x -= dist
                         result.accept = true
                         result.filter = true
+                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Right:
                         element.x += dist
                         result.accept = true
                         result.filter = true
+                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Up:
                         element.y -= dist
                         result.accept = true
                         result.filter = true
+                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Down:
                         element.y += dist
                         result.accept = true
                         result.filter = true
+                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     }
                 }
@@ -1100,6 +1117,8 @@ Item {
                 function layout(type) {
                     if(scriteDocument.readOnly)
                         return
+
+                    scriteDocument.structure.forceBeatBoardLayout = false
 
                     if(!hasItems) {
                         var rect = scriteDocument.structure.layoutElements(type)
@@ -1453,6 +1472,7 @@ Item {
                 heading.location: "SOMEWHERE"
                 heading.moment: "DAY"
             }
+            Component.onCompleted: scriteDocument.structure.forceBeatBoardLayout = false
         }
     }
 
@@ -1577,6 +1597,7 @@ Item {
                     if(drag.active === false) {
                         elementItem.x = scriteDocument.structure.snapToGrid(parent.x)
                         elementItem.y = scriteDocument.structure.snapToGrid(parent.y)
+                        scriteDocument.structure.forceBeatBoardLayout = false
                     }
                 }
             }
@@ -1750,6 +1771,7 @@ Item {
                         if(drag.active === false) {
                             elementItem.x = scriteDocument.structure.snapToGrid(elementItem.x)
                             elementItem.y = scriteDocument.structure.snapToGrid(elementItem.y)
+                            scriteDocument.structure.forceBeatBoardLayout = false
                         }
                     }
                 }

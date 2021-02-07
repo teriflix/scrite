@@ -222,6 +222,7 @@ Item {
         onYChanged: shiftElements()
 
         function shiftElements() {
+            scriteDocument.structure.forceBeatBoardLayout = false
             var elements = selection.items
             var i, item
             var dx = x - topLeft.x
