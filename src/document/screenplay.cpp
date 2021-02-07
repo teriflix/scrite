@@ -752,6 +752,8 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
     emit elementMoved(ptr, fromRow, toRow);
     emit elementsChanged();
 
+    this->updateBreakTitles();
+
     if(UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
         UndoStack::active()->push(new ScreenplayElementMoveCommand(this, ptr, fromRow, toRow));
 }
@@ -954,6 +956,8 @@ void Screenplay::moveSelectedElements(int toRow)
     this->endResetModel();
 
     emit elementsChanged();
+
+    this->updateBreakTitles();
 
     if(UndoStack::active() != nullptr)
         UndoStack::active()->push(cmd);
@@ -1571,6 +1575,9 @@ void Screenplay::updateBreakTitles()
     {
         if(e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Act)
         {
+            if(i < 0 && e != m_elements.first())
+                ++i;
+
             ++i;
             const QString actName = i >= actNames.size() ? QStringLiteral("ACT ") + QString::number(i+1) : actNames.at(i);
             e->m_sceneID = actName;
