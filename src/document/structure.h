@@ -640,9 +640,12 @@ public:
     Q_PROPERTY(QStringList groupCategories READ groupCategories NOTIFY groupsModelChanged)
     QStringList groupCategories() const { return m_groupCategories; }
 
-    Q_PROPERTY(QStringList preferredGroupCategory READ preferredGroupCategory WRITE setPreferredGroupCategory NOTIFY preferredGroupCategoryChanged)
-    void setPreferredGroupCategory(const QStringList &val);
-    QStringList preferredGroupCategory() const { return m_preferredGroupCategory; }
+    Q_PROPERTY(QVariantMap categoryActNames READ categoryActNames NOTIFY groupsModelChanged)
+    QVariantMap categoryActNames() const { return m_categoryActNames; }
+
+    Q_PROPERTY(QString preferredGroupCategory READ preferredGroupCategory WRITE setPreferredGroupCategory NOTIFY preferredGroupCategoryChanged)
+    void setPreferredGroupCategory(const QString &val);
+    QString preferredGroupCategory() const { return m_preferredGroupCategory; }
     Q_SIGNAL void preferredGroupCategoryChanged();
 
     Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
@@ -734,8 +737,9 @@ private:
 
     QString m_groupsData;
     QJsonArray m_groupsModel;
+    QVariantMap m_categoryActNames;
     QStringList m_groupCategories;
-    QStringList m_preferredGroupCategory;
+    QString m_preferredGroupCategory;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

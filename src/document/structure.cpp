@@ -2745,8 +2745,25 @@ void Structure::setGroupsData(const QString &val)
 
     const QList<Category> categories = categoryGroupsMap.keys();
     m_groupCategories.clear();
+    m_categoryActNames.clear();
+
     for(const Category &category : categories)
+    {
         m_groupCategories.append( category.name );
+
+        const QList<Group> &groupList = categoryGroupsMap.value(category);
+        QStringList acts;
+        for(const Group &group : groupList)
+        {
+            if(group.act.isEmpty())
+                continue;
+
+            if(!acts.contains(group.act))
+                acts.append(group.act);
+        }
+
+        m_categoryActNames[category.name] = acts;
+    }
 
     emit groupsDataChanged();
     emit groupsModelChanged();
@@ -2768,7 +2785,7 @@ void Structure::setGroupsData(const QString &val)
 #endif
 }
 
-void Structure::setPreferredGroupCategory(const QStringList &val)
+void Structure::setPreferredGroupCategory(const QString &val)
 {
     if(m_preferredGroupCategory == val)
         return;
@@ -2998,7 +3015,7 @@ void Structure::serializeToJson(QJsonObject &) const
     // Do nothing
 }
 
-void Structure::deserializeFromJson(const QJsonObject &)
+void Structure::deserializeFromJson(const QJsonObject &json)
 {
     Q_FOREACH(Character *character, m_characters.list())
         character->resolveRelationships();
@@ -3033,6 +3050,18 @@ void Structure::deserializeFromJson(const QJsonObject &)
                 }
             }
         }
+    }
+
+    // Unfortunately, I had made the mistake of declaring preferredGroupCategory
+    // as a QStringList property. So files created using the old version would have
+    // stored this property as a QStringList. We will now need to reinterpret it as
+    // QString.
+    const QJsonValue preferredGroupCategoryValue = json.value(QStringLiteral("preferredGroupCategory"));
+    if(preferredGroupCategoryValue.isArray())
+    {
+        const QJsonArray preferredGroupCategoryArray = preferredGroupCategoryValue.toArray();
+        if(preferredGroupCategoryArray.size() >= 1)
+            this->setPreferredGroupCategory( preferredGroupCategoryArray.at(0).toString() );
     }
 }
 

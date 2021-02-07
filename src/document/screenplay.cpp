@@ -1549,9 +1549,41 @@ void Screenplay::addBreakElement(Screenplay::BreakType type)
 
 void Screenplay::insertBreakElement(Screenplay::BreakType type, int index)
 {
+    QString actName;
+    if(this->scriteDocument() != nullptr)
+    {
+        Structure *structure = this->scriteDocument()->structure();
+        const QString category = structure->preferredGroupCategory();
+        const QStringList actNames = structure->categoryActNames().value(category).toStringList();
+
+        if(!actNames.isEmpty())
+        {
+            QList<ScreenplayElement*> actBreakElements;
+            std::copy_if(m_elements.begin(), m_elements.end(), std::back_inserter(actBreakElements), [](ScreenplayElement *e) {
+                return (e->elementType() == ScreenplayElement::BreakElementType &&
+                        e->breakType() == Screenplay::Act);
+            });
+
+            if(actBreakElements.isEmpty())
+            {
+                if(m_elements.isEmpty())
+                    actName = actNames.first();
+                else
+                    actName = actNames.size() >= 2 ? actNames.at(1) : QString();
+            }
+            else
+            {
+                const QString lastActName = actBreakElements.last()->breakTitle().toUpper();
+                const int nextActIndex = actNames.indexOf(lastActName) + 1;
+                actName = nextActIndex < 0 || nextActIndex >= actNames.size() ? QString() : actNames.at(nextActIndex);
+            }
+        }
+    }
+
     ScreenplayElement *element = new ScreenplayElement(this);
     element->setElementType(ScreenplayElement::BreakElementType);
     element->setBreakType(type);
+    element->setBreakTitle(actName);
     this->insertElementAt(element, index);
 }
 
