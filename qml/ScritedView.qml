@@ -68,11 +68,11 @@ Item {
     }
 
     function miniRewind() {
-        mediaPlayer.seek( Math.max(mediaPlayer.position-Math.max(500,mediaPlayer.notifyInterval), 0) )
+        mediaPlayer.seek( Math.max(mediaPlayer.position-Math.max(1000,mediaPlayer.notifyInterval), 0) )
     }
 
     function miniForward() {
-        mediaPlayer.seek( Math.min(mediaPlayer.position+Math.max(500,mediaPlayer.notifyInterval), mediaPlayer.duration) )
+        mediaPlayer.seek( Math.min(mediaPlayer.position+Math.max(1000,mediaPlayer.notifyInterval), mediaPlayer.duration) )
     }
 
     function syncVideoTimeWithScreenplayOffsets(adjustFollowingRows) {

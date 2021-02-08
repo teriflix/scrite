@@ -69,7 +69,7 @@ Item {
 
                 ShortcutsModelItem.priority: -2
                 ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Rewind 0.5s"
+                ShortcutsModelItem.title: "Rewind 1s"
                 ShortcutsModelItem.shortcut: "←"
                 ShortcutsModelItem.enabled: enabled
             }
@@ -82,7 +82,7 @@ Item {
 
                 ShortcutsModelItem.priority: -3
                 ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Forward 0.5s"
+                ShortcutsModelItem.title: "Forward 1s"
                 ShortcutsModelItem.shortcut: "→"
                 ShortcutsModelItem.enabled: enabled
             }
