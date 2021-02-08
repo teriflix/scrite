@@ -572,9 +572,9 @@ void ScreenplayTextDocumentOffsets::saveOffsets()
     const QString versionString = version.toString();
 
     QJsonArray array;
-    for(const _OffsetInfo &offset : m_offsets)
+    for(const _OffsetInfo &offset : qAsConst(m_offsets))
     {
-        const ScreenplayElement *element = m_screenplay->elementAt(offset.sceneIndex);
+        const ScreenplayElement *element = m_screenplay->elementAt(offset.elementIndex);
         QJsonObject item = offset.toJson();
         if(element && element->scene())
             item.insert("sceneId", element->scene()->id());
