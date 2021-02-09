@@ -300,9 +300,9 @@ void ScreenplayTextDocumentOffsets::setTime(int row, int timeInMs, bool adjustFo
             break;
 
         if(i == row)
-            timeDiffInMs = timeInMs - offset.computesSceneTime.msecsSinceStartOfDay();
+            timeDiffInMs = timeInMs - offset.computedSceneTime.msecsSinceStartOfDay();
 
-        offset.sceneTime = offset.computesSceneTime.addMSecs(timeDiffInMs);
+        offset.sceneTime = offset.computedSceneTime.addMSecs(timeDiffInMs);
         tracker.changeRow(i);
         if(!adjustFollowingRows)
             break;
@@ -380,7 +380,7 @@ void ScreenplayTextDocumentOffsets::resetAllTimes()
         if(offset.sceneTimeLocked)
             continue;
 
-        offset.sceneTime = offset.computesSceneTime;
+        offset.sceneTime = offset.computedSceneTime;
         tracker.changeRow(i);
     }
 
@@ -551,9 +551,9 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
         offset.pageNumber = 1+qFloor(offset.pixelOffset / contentHeight);
         offset.sceneHeading = scene->heading()->text();
         offset.sceneNumber = scene->heading()->isEnabled() ? element->resolvedSceneNumber() : noSceneNumber;
-        const int timeMs = qAbs(msPerPixel * offset.pixelOffset);
+        const int timeMs = qRound(msPerPixel * offset.pixelOffset);
         offset.sceneTime = QTime(0,0,0,1).addMSecs(timeMs-1);
-        offset.computesSceneTime = offset.sceneTime;
+        offset.computedSceneTime = offset.sceneTime;
         offsets.append(offset);
     }
 
@@ -574,6 +574,7 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
         offset.sceneNumber = noSceneNumber;
         const int timeMs = qAbs(msPerPixel * offset.pixelOffset);
         offset.sceneTime = QTime(0,0,0,1).addMSecs(timeMs-1);
+        offset.computedSceneTime = offset.sceneTime;
         offsets.append(offset);
     }
 

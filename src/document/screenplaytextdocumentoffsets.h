@@ -115,7 +115,7 @@ private:
         QString sceneHeading;
         int pageNumber = -1;
         QTime sceneTime;
-        QTime computesSceneTime;
+        QTime computedSceneTime;
         bool sceneTimeLocked = false;
         qreal pixelOffset = 0;
         QJsonObject toJson() const;
