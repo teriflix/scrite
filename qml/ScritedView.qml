@@ -211,13 +211,13 @@ Item {
                         id: videoOutput
                         source: mediaPlayer
                         anchors.fill: parent
-                        fillMode: VideoOutput.PreserveAspectFit
+                        fillMode: VideoOutput.PreserveAspectCrop
                     }
 
                     Image {
                         id: logoOverlay
-                        x: videoOutput.contentRect.x + 20
-                        y: videoOutput.contentRect.y + 20
+                        x: 20
+                        y: 20
                         width: Math.min(videoOutput.width, videoOutput.height)*0.15
                         height: width
                         opacity: 0.25
@@ -389,6 +389,20 @@ Item {
                                     suggestedHeight: 36
                                     onClicked: mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
                                     ToolTip.text: "Forward by " + (skipDuration/1000) + " seconds"
+                                    focusPolicy: Qt.NoFocus
+                                }
+
+                                ToolButton2 {
+                                    icon.source: "../icons/navigation/zoom_fit_inverted.png"
+                                    enabled: mediaPlayer.status !== MediaPlayer.NoMedia
+                                    suggestedHeight: 36
+                                    onClicked: {
+                                        if(videoOutput.fillMode === VideoOutput.PreserveAspectCrop)
+                                            videoOutput.fillMode = VideoOutput.PreserveAspectFit
+                                        else
+                                            videoOutput.fillMode = VideoOutput.PreserveAspectCrop
+                                    }
+                                    ToolTip.text: videoOutput.fillMode === VideoOutput.PreserveAspectCrop ? "Fit video" : "Fill video"
                                     focusPolicy: Qt.NoFocus
                                 }
                             }
