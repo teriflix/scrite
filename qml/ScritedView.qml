@@ -180,7 +180,7 @@ Item {
 
                     MediaPlayer {
                         id: mediaPlayer
-                        notifyInterval: 250
+                        notifyInterval: 1000
                         function togglePlayback() {
                             if(status == MediaPlayer.NoMedia)
                                 return
