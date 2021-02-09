@@ -13,13 +13,54 @@
 
 #include "screenplaytextdocumentoffsets.h"
 #include "timeprofiler.h"
+#include "application.h"
 
 #include <QDir>
 #include <QtMath>
 #include <QFileInfo>
 #include <QJsonDocument>
-#include <QAbstractTextDocumentLayout>
 #include <QVersionNumber>
+#include <QAbstractTextDocumentLayout>
+
+class ModelDataChangedTracker
+{
+public:
+    ModelDataChangedTracker(QAbstractItemModel *model)
+        : m_model(model) { }
+    ~ModelDataChangedTracker() {
+        this->notify();
+    }
+
+    void changeRow(int row) {
+        if(m_startRow < 0 || m_endRow < 0) {
+            m_startRow = row;
+            m_endRow = row;
+        } else {
+            if(row-m_endRow > 1) {
+                this->notify();
+                m_startRow = row;
+                m_endRow = row;
+            } else
+                m_endRow = row;
+        }
+    }
+
+private:
+    void notify() {
+        if(m_startRow >= 0 && m_endRow >= 0 && m_endRow >= m_startRow) {
+            const QModelIndex start = m_model->index(m_startRow, 0);
+            const QModelIndex end = m_model->index(m_endRow, 0);
+            emit m_model->dataChanged(start, end);
+        }
+        m_startRow = -1;
+        m_endRow = -1;
+    }
+
+private:
+    QAbstractItemModel *m_model = nullptr;
+    int m_startRow = -1;
+    int m_endRow = -1;
+};
 
 inline QString timeToString(const QTime &t)
 {
@@ -249,24 +290,23 @@ void ScreenplayTextDocumentOffsets::setTime(int row, int timeInMs, bool adjustFo
     if(row < 0 || row >= m_offsets.size())
         return;
 
-    int startRow = row;
+    ModelDataChangedTracker tracker(this);
 
     int timeDiffInMs = 0;
     for(int i=row; i<m_offsets.size(); i++)
     {
         _OffsetInfo &offset = m_offsets[i];
+        if(offset.sceneTimeLocked)
+            break;
+
         if(i == row)
-            timeDiffInMs = timeInMs - offset.sceneTime.msecsSinceStartOfDay();
+            timeDiffInMs = timeInMs - offset.computesSceneTime.msecsSinceStartOfDay();
 
-        offset.sceneTime = offset.sceneTime.addMSecs(timeDiffInMs);
-
+        offset.sceneTime = offset.computesSceneTime.addMSecs(timeDiffInMs);
+        tracker.changeRow(i);
         if(!adjustFollowingRows)
             break;
     }
-
-    const QModelIndex start = this->index(startRow);
-    const QModelIndex end = adjustFollowingRows ? this->index(m_offsets.size()-1) : start;
-    emit dataChanged(start, end);
 
     this->saveOffsets();
 }
@@ -279,25 +319,72 @@ void ScreenplayTextDocumentOffsets::resetTime(int row, bool andFollowingRows)
     const qreal contentHeight = m_format->pageLayout()->contentRect().height();
     const qreal msPerPixel = (m_format->secondsPerPage() * 1000)/contentHeight;
 
+    ModelDataChangedTracker tracker(this);
+
     for(int i=row; i<m_offsets.size(); i++)
     {
         _OffsetInfo &offset = m_offsets[i];
+        if(offset.sceneTimeLocked)
+            break;
+
+        tracker.changeRow(i);
         const int timeMs = qAbs(msPerPixel * offset.pixelOffset);
         offset.sceneTime = QTime(0,0,0,1).addMSecs(timeMs-1);
         if(!andFollowingRows)
             break;
     }
 
-    const QModelIndex start = this->index(row);
-    const QModelIndex end = andFollowingRows ? this->index(m_offsets.size()-1) : start;
-    emit dataChanged(start, end);
+    this->saveOffsets();
+}
+
+void ScreenplayTextDocumentOffsets::toggleSceneTimeLock(int row)
+{
+    if(row < 0 || row >= m_offsets.size())
+        return;
+
+    _OffsetInfo &offset = m_offsets[row];
+    offset.sceneTimeLocked = !offset.sceneTimeLocked;
+
+    const QModelIndex index = this->index(row);
+    emit dataChanged(index, index);
+
+    this->saveOffsets();
+}
+
+void ScreenplayTextDocumentOffsets::unlockAllSceneTimes()
+{
+    if(m_offsets.isEmpty())
+        return;
+
+    ModelDataChangedTracker tracker(this);
+    for(int i=0; i<m_offsets.size(); i++)
+    {
+        _OffsetInfo &offset = m_offsets[i];
+        if(offset.sceneTimeLocked)
+        {
+            offset.sceneTimeLocked = false;
+            tracker.changeRow(i);
+        }
+    }
 
     this->saveOffsets();
 }
 
 void ScreenplayTextDocumentOffsets::resetAllTimes()
 {
-    this->resetTime(0, true);
+    ModelDataChangedTracker tracker(this);
+
+    for(int i=0; i<m_offsets.size(); i++)
+    {
+        _OffsetInfo &offset = m_offsets[i];
+        if(offset.sceneTimeLocked)
+            continue;
+
+        offset.sceneTime = offset.computesSceneTime;
+        tracker.changeRow(i);
+    }
+
+    this->saveOffsets();
 }
 
 QHash<int, QByteArray> ScreenplayTextDocumentOffsets::roleNames() const
@@ -313,6 +400,7 @@ QHash<int, QByteArray> ScreenplayTextDocumentOffsets::roleNames() const
         roles[TimeOffsetRole] = QByteArrayLiteral("timeOffset");
         roles[PixelOffsetRole] = QByteArrayLiteral("pixelOffset");
         roles[OffsetInfoRole] = QByteArrayLiteral("offsetInfo");
+        roles[TimeOffsetLockedRole] = QByteArrayLiteral("timeOffsetLocked");
     }
 
     return roles;
@@ -343,6 +431,8 @@ QVariant ScreenplayTextDocumentOffsets::data(const QModelIndex &index, int role)
         return offset.pixelOffset;
     case OffsetInfoRole:
         return offset.toJson();
+    case TimeOffsetLockedRole:
+        return offset.sceneTimeLocked;
     }
 
     return QVariant();
@@ -360,7 +450,7 @@ Qt::ItemFlags ScreenplayTextDocumentOffsets::flags(const QModelIndex &/*index*/)
 
 bool ScreenplayTextDocumentOffsets::setData(const QModelIndex &index, const QVariant &data, int role)
 {
-    if(role != TimeOffsetRole)
+    if(role != TimeOffsetRole && role != TimeOffsetLockedRole)
         return false;
 
     if(index.row() < 0 || index.row() >= m_offsets.size())
@@ -368,12 +458,17 @@ bool ScreenplayTextDocumentOffsets::setData(const QModelIndex &index, const QVar
 
     _OffsetInfo &offset = m_offsets[index.row()];
 
-    if(data.userType() == QMetaType::QTime)
-        offset.sceneTime = data.toTime();
-    else if(data.userType() == QMetaType::Int)
-        offset.sceneTime = QTime(0,0,0,1).addMSecs(data.toInt()-1);
+    if(role == TimeOffsetRole)
+    {
+        if(data.userType() == QMetaType::QTime)
+            offset.sceneTime = data.toTime();
+        else if(data.userType() == QMetaType::Int)
+            offset.sceneTime = QTime(0,0,0,1).addMSecs(data.toInt()-1);
+        else
+            return false;
+    }
     else
-        return false;
+        offset.sceneTimeLocked = data.toBool();
 
     emit dataChanged(index, index);
     return true;
@@ -458,6 +553,7 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
         offset.sceneNumber = scene->heading()->isEnabled() ? element->resolvedSceneNumber() : noSceneNumber;
         const int timeMs = qAbs(msPerPixel * offset.pixelOffset);
         offset.sceneTime = QTime(0,0,0,1).addMSecs(timeMs-1);
+        offset.computesSceneTime = offset.sceneTime;
         offsets.append(offset);
     }
 
@@ -529,9 +625,9 @@ void ScreenplayTextDocumentOffsets::loadOffsets()
     for(int i=0; i<array.size(); i++)
     {
         const QJsonObject item = array.at(i).toObject();
-        const QString sceneId = item.value("sceneId").toString();
-        const int elementIndex = item.value("elementIndex").toInt();
-        const QString itemVersionString = item.value("version").toString();
+        const QString sceneId = item.value( QStringLiteral("sceneId") ).toString();
+        const int elementIndex = item.value( QStringLiteral("elementIndex") ).toInt();
+        const QString itemVersionString = item.value( QStringLiteral("version") ).toString();
         const QVersionNumber itemVersion = i == 0 ? QVersionNumber::fromString(itemVersionString) : minVersion;
         if(itemVersionString.isEmpty() || itemVersion < minVersion)
         {
@@ -553,7 +649,8 @@ void ScreenplayTextDocumentOffsets::loadOffsets()
             return;
         }
 
-        offset.sceneTime = QTime(0,0,0,1).addMSecs(item.value("timestamp").toInt()-1);
+        offset.sceneTime = QTime(0,0,0,1).addMSecs(item.value( QStringLiteral("timestamp") ).toInt()-1);
+        offset.sceneTimeLocked = item.value( QStringLiteral("sceneTimeLocked") ).toBool();
     }
 
     m_offsets = offsets;
@@ -602,6 +699,7 @@ QJsonObject ScreenplayTextDocumentOffsets::_OffsetInfo::toJson() const
     ret.insert( QStringLiteral("pageNumber"), this->pageNumber );
     ret.insert( QStringLiteral("sceneHeading"), this->sceneHeading );
     ret.insert( QStringLiteral("sceneNumber"), this->sceneNumber );
+    ret.insert( QStringLiteral("sceneTimeLocked"), this->sceneTimeLocked );
 
     QJsonObject timeJs;
     timeJs.insert("hour", this->sceneTime.hour());

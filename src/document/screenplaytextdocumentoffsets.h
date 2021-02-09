@@ -72,6 +72,8 @@ public:
     Q_INVOKABLE QPointF evaluatePointAtTime(int timeInMs, int rowHint=-1) const;
     Q_INVOKABLE void setTime(int row, int timeInMs, bool adjustFollowingRows=false);
     Q_INVOKABLE void resetTime(int row, bool andFollowingRows=false);
+    Q_INVOKABLE void toggleSceneTimeLock(int row);
+    Q_INVOKABLE void unlockAllSceneTimes();
     Q_INVOKABLE void resetAllTimes();
 
     enum Roles
@@ -83,7 +85,8 @@ public:
         PageNumberRole,
         TimeOffsetRole,
         PixelOffsetRole,
-        OffsetInfoRole
+        OffsetInfoRole,
+        TimeOffsetLockedRole
     };
     QHash<int,QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -112,6 +115,8 @@ private:
         QString sceneHeading;
         int pageNumber = -1;
         QTime sceneTime;
+        QTime computesSceneTime;
+        bool sceneTimeLocked = false;
         qreal pixelOffset = 0;
         QJsonObject toJson() const;
     };

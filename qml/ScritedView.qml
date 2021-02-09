@@ -125,6 +125,15 @@ Item {
         screenplayOffsetsView.displayTimeOffset = !screenplayOffsetsView.displayTimeOffset
     }
 
+    property alias currentSceneTimeIsLocked: screenplayOffsetsView.currentSceneTimeIsLocked
+    function toggleCurrentSceneTimeLock() {
+        screenplayOffsetsModel.toggleSceneTimeLock(screenplayOffsetsView.currentIndex)
+    }
+
+    function unlockAllSceneTimes() {
+        screenplayOffsetsModel.unlockAllSceneTimes()
+    }
+
     Settings {
         id: scritedViewSettings
         fileName: app.settingsFilePath
@@ -528,13 +537,14 @@ Item {
 
             Row {
                 id: screenplayOffsesHeading
-                width: screenplayOffsetsView.width-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
+                width: (screenplayOffsetsView.width-x)-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
                 visible: screenplayOffsetsView.count > 0
+                x: 40
 
                 Text {
                     padding: 5
                     width: parent.width * 0.1
-                    text: "Scene #"
+                    text: "#"
                     font.bold: true
                     font.family: "Courier Prime"
                     font.pointSize: 16
@@ -598,6 +608,7 @@ Item {
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
+                property bool currentSceneTimeIsLocked: currentItem ? currentItem.locked : false
 
                 ScrollBar.vertical: ScrollBar {
                     policy: screenplayOffsetsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -623,9 +634,40 @@ Item {
                     // Columns: SceneNr, Heading, PageNumber, Time
                     width: screenplayOffsetsView.width-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
                     height: 40
+                    property bool locked: timeOffsetLocked
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            screenplayOffsetsView.currentIndex = index
+                            if(mediaIsLoaded && mediaIsPaused)
+                                screenplayOffsetsView.adjustTextDocumentAndMedia()
+                        }
+                    }
+
+                    Item {
+                        id: lockIcon
+                        width: parent.height
+                        height: parent.height
+
+                        Image {
+                            source: timeOffsetLocked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
+                            anchors.fill: parent
+                            anchors.margins: 5
+                            opacity: timeOffsetLocked ? 1 : 0.1
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: timeOffsetLocked = !timeOffsetLocked
+                        }
+                    }
 
                     Row {
-                        anchors.fill: parent
+                        anchors.left: lockIcon.right
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
 
                         Text {
                             padding: 5
@@ -666,15 +708,6 @@ Item {
                             horizontalAlignment: Text.AlignRight
                             anchors.verticalCenter: parent.verticalCenter
                             visible: screenplayOffsetsView.displayTimeOffset
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            screenplayOffsetsView.currentIndex = index
-                            if(mediaIsLoaded && mediaIsPaused)
-                                screenplayOffsetsView.adjustTextDocumentAndMedia()
                         }
                     }
                 }
@@ -746,6 +779,12 @@ Item {
         case Qt.Key_Greater:
         case Qt.Key_Period:
             syncVideoTimeWithScreenplayOffsets(event.controlModifier)
+            break
+        case Qt.Key_L:
+            toggleCurrentSceneTimeLock()
+            break
+        case Qt.Key_U:
+            unlockAllSceneTimes()
             break
         }
     }
