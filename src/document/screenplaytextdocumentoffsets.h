@@ -16,13 +16,13 @@
 
 #include <QTime>
 #include <QTextDocument>
-#include <QAbstractListModel>
 
 #include "screenplay.h"
 #include "formatting.h"
 #include "qobjectproperty.h"
+#include "genericarraymodel.h"
 
-class ScreenplayTextDocumentOffsets : public QAbstractListModel
+class ScreenplayTextDocumentOffsets : public GenericArrayModel
 {
     Q_OBJECT
 
@@ -61,11 +61,9 @@ public:
 
     Q_INVOKABLE void clearErrorMessage() { this->setErrorMessage(QString()); }
 
-    Q_PROPERTY(int offsetCount READ offsetCount NOTIFY offsetCountChanged)
-    int offsetCount() const { return m_offsets.size(); }
-    Q_SIGNAL void offsetCountChanged();
+    Q_INVOKABLE QString timestampToString(int timeInMs) const;
 
-    Q_INVOKABLE QJsonObject offsetInfoAt(int row) const;
+    Q_INVOKABLE QJsonObject offsetInfoAt(int row) const { return this->at(row).toObject(); }
     Q_INVOKABLE QJsonObject offsetInfoAtPoint(const QPointF &pos) const;
     Q_INVOKABLE QJsonObject offsetInfoAtTime(int timeInMs, int rowHint=-1) const;
     Q_INVOKABLE int evaluateTimeAtPoint(const QPointF &pos, int rowHint=-1) const;
@@ -76,23 +74,9 @@ public:
     Q_INVOKABLE void unlockAllSceneTimes();
     Q_INVOKABLE void resetAllTimes();
 
-    enum Roles
-    {
-        ScreenplayElementIndexRole = Qt::UserRole,
-        SceneIndexRole,
-        SceneNumberRole,
-        SceneHeadingRole,
-        PageNumberRole,
-        TimeOffsetRole,
-        PixelOffsetRole,
-        OffsetInfoRole,
-        TimeOffsetLockedRole
-    };
-    QHash<int,QByteArray> roleNames() const;
-    QVariant data(const QModelIndex &index, int role) const;
-    int rowCount(const QModelIndex &parent=QModelIndex()) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    bool setData(const QModelIndex &index, const QVariant &data, int role=TimeOffsetRole);
+    Q_INVOKABLE int currentSceneHeadingIndex(int row) const;
+    Q_INVOKABLE int nextSceneHeadingIndex(int row) const;
+    Q_INVOKABLE int previousSceneHeadingIndex(int row) const;
 
 private:
     void reloadDocument();
@@ -105,22 +89,6 @@ private:
     QObjectProperty<Screenplay> m_screenplay;
     QObjectProperty<QTextDocument> m_document;
     QObjectProperty<ScreenplayFormat> m_format;
-
-    struct _OffsetInfo
-    {
-        int row = -1;
-        int elementIndex = -1;
-        int sceneIndex = -1;
-        QString sceneNumber;
-        QString sceneHeading;
-        int pageNumber = -1;
-        QTime sceneTime;
-        QTime computedSceneTime;
-        bool sceneTimeLocked = false;
-        qreal pixelOffset = 0;
-        QJsonObject toJson() const;
-    };
-    QList<_OffsetInfo> m_offsets;
 
     QString m_fileName;
     QString m_errorMessage;

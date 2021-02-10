@@ -64,6 +64,7 @@ public:
 
 protected:
     QJsonArray &internalArray() { return m_array; }
+    const QJsonArray &internalArray() const { return m_array; }
 
 private:
     void processArray();
@@ -93,6 +94,46 @@ private:
 
 private:
     QObjectProperty<GenericArrayModel> m_arrayModel;
+};
+
+class ModelDataChangedTracker
+{
+public:
+    ModelDataChangedTracker(QAbstractItemModel *model)
+        : m_model(model) { }
+    ~ModelDataChangedTracker() {
+        this->notify();
+    }
+
+    void changeRow(int row) {
+        if(m_startRow < 0 || m_endRow < 0) {
+            m_startRow = row;
+            m_endRow = row;
+        } else {
+            if(row-m_endRow > 1) {
+                this->notify();
+                m_startRow = row;
+                m_endRow = row;
+            } else
+                m_endRow = row;
+        }
+    }
+
+private:
+    void notify() {
+        if(m_startRow >= 0 && m_endRow >= 0 && m_endRow >= m_startRow) {
+            const QModelIndex start = m_model->index(m_startRow, 0);
+            const QModelIndex end = m_model->index(m_endRow, 0);
+            emit m_model->dataChanged(start, end);
+        }
+        m_startRow = -1;
+        m_endRow = -1;
+    }
+
+private:
+    QAbstractItemModel *m_model = nullptr;
+    int m_startRow = -1;
+    int m_endRow = -1;
 };
 
 #endif // GENERICARRAYMODEL_H

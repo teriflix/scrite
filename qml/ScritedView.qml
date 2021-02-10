@@ -89,7 +89,7 @@ Item {
     }
 
     function scrollPreviousScene() {
-        screenplayOffsetsView.currentIndex = Math.max(screenplayOffsetsView.currentIndex-1,0)
+        screenplayOffsetsView.currentIndex = screenplayOffsetsModel.previousSceneHeadingIndex(screenplayOffsetsView.currentIndex)
     }
 
     function scrollPreviousScreen() {
@@ -108,7 +108,7 @@ Item {
     }
 
     function scrollNextScene() {
-        screenplayOffsetsView.currentIndex = Math.min(screenplayOffsetsView.currentIndex+1,screenplayOffsetsView.count-1)
+        screenplayOffsetsView.currentIndex = screenplayOffsetsModel.nextSceneHeadingIndex(screenplayOffsetsView.currentIndex)
     }
 
     function scrollNextScreen() {
@@ -547,7 +547,8 @@ Item {
 
         Rectangle {
             SplitView.fillWidth: true
-            color: "white"
+
+            color: primaryColors.c100.background
 
             Row {
                 id: screenplayOffsesHeading
@@ -614,11 +615,11 @@ Item {
 
             ListView {
                 id: screenplayOffsetsView
+                model: screenplayOffsetsModel
                 anchors.top: screenplayOffsesHeading.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                model: screenplayOffsetsModel
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
@@ -641,14 +642,44 @@ Item {
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0
+                preferredHighlightBegin: 150
+                preferredHighlightEnd: height - 1.5*preferredHighlightBegin
+                highlightRangeMode: ListView.ApplyRange
                 highlight: Rectangle {
-                    color: primaryColors.highlight.background
+                    id: highlighter
+
+                    SequentialAnimation {
+                        loops: Animation.Infinite
+                        running: true
+
+                        ColorAnimation {
+                            target: highlighter
+                            property: "color"
+                            from: primaryColors.c200.background
+                            to: accentColors.c200.background
+                            duration: 750
+                        }
+
+                        ColorAnimation {
+                            target: highlighter
+                            property: "color"
+                            to: primaryColors.c200.background
+                            from: accentColors.c200.background
+                            duration: 750
+                        }
+                    }
                 }
-                delegate: Item {
+                delegate: Rectangle {
                     // Columns: SceneNr, Heading, PageNumber, Time
                     width: screenplayOffsetsView.width-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
-                    height: 40
-                    property bool locked: timeOffsetLocked
+                    height: isSceneItem ? 40 : 30
+                    color: {
+                        if(isSceneItem)
+                            return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : primaryColors.c300.background
+                        return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : primaryColors.c100.background
+                    }
+                    property bool isSceneItem: arrayItem.type === SceneElement.Heading
+                    property bool locked: arrayItem.locked
 
                     MouseArea {
                         anchors.fill: parent
@@ -661,19 +692,21 @@ Item {
 
                     Item {
                         id: lockIcon
-                        width: parent.height
+                        width: 40
                         height: parent.height
 
                         Image {
-                            source: timeOffsetLocked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
+                            source: arrayItem.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
                             anchors.fill: parent
                             anchors.margins: 5
-                            opacity: timeOffsetLocked ? 1 : 0.1
+                            opacity: arrayItem.locked ? 1 : 0.1
+                            visible: isSceneItem
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: timeOffsetLocked = !timeOffsetLocked
+                            enabled: isSceneItem
+                            onClicked: arrayItem.locked = !arrayItem.locked
                         }
                     }
 
@@ -686,19 +719,21 @@ Item {
                         Text {
                             padding: 5
                             width: parent.width * 0.1
-                            text: offsetInfo.sceneNumber
+                            text: isSceneItem ? arrayItem.number : ""
                             horizontalAlignment: Text.AlignHCenter
                             font.family: "Courier Prime"
                             font.pointSize: 14
+                            font.bold: isSceneItem
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
                             padding: 5
                             width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
-                            text: offsetInfo.sceneHeading
+                            text: arrayItem.snippet
                             font.family: "Courier Prime"
                             font.pointSize: 14
+                            font.bold: isSceneItem
                             anchors.verticalCenter: parent.verticalCenter
                             elide: Text.ElideMiddle
                         }
@@ -706,9 +741,10 @@ Item {
                         Text {
                             padding: 5
                             width: parent.width * 0.1
-                            text: offsetInfo.pageNumber
+                            text: isSceneItem ? arrayItem.pageNumber : ""
                             font.family: "Courier Prime"
                             font.pointSize: 14
+                            font.bold: isSceneItem
                             horizontalAlignment: Text.AlignHCenter
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -716,9 +752,10 @@ Item {
                         Text {
                             padding: 5
                             width: parent.width * 0.2
-                            text: offsetInfo.sceneTime.text
+                            text: screenplayOffsetsModel.timestampToString(arrayItem.timestamp)
                             font.family: "Courier Prime"
                             font.pointSize: 14
+                            font.bold: isSceneItem
                             horizontalAlignment: Text.AlignRight
                             anchors.verticalCenter: parent.verticalCenter
                             visible: screenplayOffsetsView.displayTimeOffset
@@ -736,7 +773,8 @@ Item {
                     var offsetInfo = screenplayOffsetsModel.offsetInfoAt(screenplayOffsetsView.currentIndex)
                     if(!textDocumentFlickInteraction.value)
                         textDocumentFlick.contentY = offsetInfo.pixelOffset * textDocumentView.documentScale
-                    mediaPlayer.seek(offsetInfo.sceneTime.timestamp)
+                    if(mediaPlayer.status !== MediaPlayer.NoMedia)
+                        mediaPlayer.seek(offsetInfo.timestamp)
                 }
             }
         }
