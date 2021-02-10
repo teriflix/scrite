@@ -162,13 +162,25 @@ Item {
         }
     }
 
+    Settings {
+        id: scritedSettings
+        fileName: app.settingsFilePath
+        category: "Scrited"
+        property real playerAreaRatio: 0.5
+    }
+
     SplitView {
         anchors.fill: parent
         orientation: Qt.Horizontal
         Material.background: Qt.darker(primaryColors.button.background, 1.1)
 
         Item {
-            SplitView.preferredWidth: scritedView.width * 0.50
+            SplitView.preferredWidth: scritedView.width * scritedSettings.playerAreaRatio
+            onWidthChanged: updateScritedSettings()
+
+            function updateScritedSettings() {
+                scritedSettings.playerAreaRatio = width / scritedView.width
+            }
 
             Column {
                 anchors.fill: parent
@@ -439,23 +451,31 @@ Item {
                         clip: true
                         property bool containsMouse: false
 
-                        Item {
+                        Rectangle {
                             id: textDocumentFlickPadding
                             width: parent.width
-                            height: Math.min(4.5 * textDocumentFlick.lineHeight, textDocumentFlick.height*0.35)
+                            height: Math.min(4.5 * textDocumentFlick.lineHeight, textDocumentArea.height*0.35)
 
-                            Rectangle {
-                                anchors.fill: parent
-                                anchors.bottomMargin: parent.height * 0.75
-                                gradient: Gradient {
-                                    GradientStop {
-                                        position: 0
-                                        color: primaryColors.c600.background
-                                    }
-                                    GradientStop {
-                                        position: 1
-                                        color: Qt.rgba(0,0,0,0)
-                                    }
+                            gradient: Gradient {
+                                GradientStop {
+                                    position: 0
+                                    color: primaryColors.c600.background
+                                }
+                                GradientStop {
+                                    position: 0.25
+                                    color: primaryColors.c400.background
+                                }
+                                GradientStop {
+                                    position: 0.5
+                                    color: primaryColors.c100.background
+                                }
+                                GradientStop {
+                                    position: 0.8
+                                    color: primaryColors.c50.background
+                                }
+                                GradientStop {
+                                    position: 1
+                                    color: Qt.rgba(0,0,0,0)
                                 }
                             }
                         }
