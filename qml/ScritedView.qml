@@ -170,12 +170,13 @@ Item {
         Item {
             SplitView.preferredWidth: scritedView.width * 0.50
 
-            SplitView {
+            Column {
                 anchors.fill: parent
-                orientation: Qt.Vertical
 
                 Rectangle {
-                    SplitView.preferredHeight: width / 16 * 9
+                    id: videoArea
+                    width: parent.width
+                    height: width / 16 * 9
                     color: "black"
 
                     MediaPlayer {
@@ -276,7 +277,7 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
                         color: Qt.rgba(0,0,0,0.25)
-                        visible: mediaPlayerMouseArea.containsMouse
+                        visible: !mediaPlayer.keepScreenplayInSyncWithPosition
 
                         MouseArea {
                             anchors.fill: mediaPlayerControlsLayout
@@ -408,15 +409,12 @@ Item {
                             }
                         }
                     }
-
-                    EventFilter.active: scriteDocument.screenplay.elementCount > 0
-                    EventFilter.acceptHoverEvents: true
-                    EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
-                    EventFilter.onFilter: mediaPlayerControls.visible = event.type === 127 || event.type === 129
                 }
 
                 Rectangle {
-                    SplitView.fillHeight: true
+                    width: parent.width
+                    height: parent.height - videoArea.height
+                    color: primaryColors.c100.background
 
                     ScreenplayTextDocumentOffsets {
                         id: screenplayOffsetsModel
@@ -435,80 +433,135 @@ Item {
                         font: screenplayOffsetsModel.format.font
                     }
 
-                    Flickable {
-                        id: textDocumentFlick
+                    Item {
+                        id: textDocumentArea
                         anchors.fill: parent
-                        contentWidth: width
-                        contentHeight: textDocumentView.height + height
-                        boundsBehavior: Flickable.StopAtBounds
                         clip: true
-
-                        property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
-                        property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
                         property bool containsMouse: false
-                        ScrollBar.vertical: ScrollBar {
+
+                        Item {
+                            id: textDocumentFlickPadding
+                            width: parent.width
+                            height: Math.min(4.5 * textDocumentFlick.lineHeight, textDocumentFlick.height*0.35)
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.bottomMargin: parent.height * 0.75
+                                gradient: Gradient {
+                                    GradientStop {
+                                        position: 0
+                                        color: primaryColors.c600.background
+                                    }
+                                    GradientStop {
+                                        position: 1
+                                        color: Qt.rgba(0,0,0,0)
+                                    }
+                                }
+                            }
+                        }
+
+                        Flickable {
+                            id: textDocumentFlick
+                            contentWidth: width
+                            contentHeight: textDocumentView.height + height
+                            boundsBehavior: Flickable.StopAtBounds
+                            width: parent.width
+                            anchors.top: textDocumentFlickPadding.bottom
+                            anchors.bottom: parent.bottom
+
+                            property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
+                            property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
+                            ScrollBar.vertical: textDocumentScrollBar
+
+                            TextDocumentItem {
+                                id: textDocumentView
+                                width: textDocumentFlick.width
+                                document: screenplayOffsetsModel.document
+                                documentScale: (textDocumentFlick.width*0.9) / screenplayOffsetsModel.format.pageLayout.contentWidth
+                                flickable: textDocumentFlick
+                                verticalPadding: textDocumentFlickPadding.height * documentScale
+
+                                Rectangle {
+                                    id: textDocumentTimeCursor
+                                    width: parent.width
+                                    height: 2
+                                    color: primaryColors.c500.background
+                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded
+                                    x: 0
+                                    Behavior on y {
+                                        enabled: mediaIsLoaded && mediaIsPlaying
+                                        NumberAnimation { duration: mediaPlayer.notifyInterval-50 }
+                                    }
+
+                                    TrackerPack {
+                                        enabled: textDocumentTimeCursor.visible
+
+                                        TrackProperty {
+                                            target: mediaPlayer
+                                            property: "position"
+                                        }
+
+                                        TrackSignal {
+                                            target: screenplayOffsetsModel
+                                            signal: "dataChanged(QModelIndex,QModelIndex,QVector<int>)"
+                                        }
+
+                                        onTracked: textDocumentTimeCursor.y = screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.position).y * textDocumentView.documentScale
+                                    }
+                                }
+                            }
+
+                            Behavior on contentY {
+                                enabled: mediaIsLoaded && mediaIsPlaying
+                                NumberAnimation {
+                                    id: contentYAnimation
+                                    duration: mediaPlayer.notifyInterval-50
+                                }
+                            }
+
+                            onContentYChanged: app.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
+                            function updateCurrentIndexOnScreenplayOffsetsView() {
+                                var offsetInfo = screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/textDocumentView.documentScale))
+                                if(offsetInfo.row < 0)
+                                    return
+                                screenplayOffsetsView.currentIndex = offsetInfo.row
+                            }
+
+                            ResetOnChange {
+                                id: textDocumentFlickInteraction
+                                from: true
+                                to: false
+                                trackChangesOn: textDocumentFlick.contentY
+                                delay: mediaPlayer.notifyInterval-50
+                            }
+                        }
+
+                        ScrollBar {
+                            id: textDocumentScrollBar
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
                             policy: textDocumentFlick.contentHeight > textDocumentFlick.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                             minimumSize: 0.1
                             palette {
                                 mid: Qt.rgba(0,0,0,0.25)
                                 dark: Qt.rgba(0,0,0,0.75)
                             }
-                            opacity: textDocumentFlick.containsMouse ? (active ? 1 : 0.2) : 0
+                            opacity: textDocumentArea.containsMouse ? (active ? 1 : 0.2) : 0
                             Behavior on opacity {
                                 enabled: screenplayEditorSettings.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
                         }
 
-                        TextDocumentItem {
-                            id: textDocumentView
-                            width: textDocumentFlick.width
-                            document: screenplayOffsetsModel.document
-                            documentScale: (textDocumentFlick.width*0.9) / screenplayOffsetsModel.format.pageLayout.contentWidth
-                            flickable: textDocumentFlick
-
-                            Image {
-                                width: textDocumentView.width
-                                height: Math.max(textDocumentFlick.contentHeight, textDocumentFlick.height)
-                                fillMode: Image.Tile
-                                source: "../images/notebookpage.jpg"
-                                z: -1
-                                opacity: 0.25
-                            }
-                        }
-
-                        Behavior on contentY {
-                            enabled: mediaIsLoaded && mediaIsPlaying
-                            NumberAnimation {
-                                id: contentYAnimation
-                                duration: mediaPlayer.notifyInterval-50
-                            }
-                        }
-
-                        onContentYChanged: app.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
-                        function updateCurrentIndexOnScreenplayOffsetsView() {
-                            var offsetInfo = screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/textDocumentView.documentScale))
-                            if(offsetInfo.row < 0)
-                                return
-                            screenplayOffsetsView.currentIndex = offsetInfo.row
-                        }
-
-                        ResetOnChange {
-                            id: textDocumentFlickInteraction
-                            from: true
-                            to: false
-                            trackChangesOn: textDocumentFlick.contentY
-                            delay: mediaPlayer.notifyInterval-50
-                        }
-
                         EventFilter.acceptHoverEvents: true
                         EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
-                        EventFilter.onFilter: textDocumentFlick.containsMouse = event.type === 127 || event.type === 129
+                        EventFilter.onFilter: textDocumentArea.containsMouse = event.type === 127 || event.type === 129
                     }
 
                     Item {
-                        x: textDocumentFlick.width * 0.025
-                        anchors.verticalCenter: textDocumentFlick.verticalCenter
+                        x: textDocumentArea.width * 0.025
+                        anchors.verticalCenter: textDocumentArea.verticalCenter
                         rotation: -90
                         transformOrigin: Item.Center
                         opacity: 0.1
@@ -517,7 +570,7 @@ Item {
                         Text {
                             font.family: "Courier Prime"
                             text: "SCRITE"
-                            font.pixelSize: textDocumentFlick.width * 0.05 * 0.65
+                            font.pixelSize: textDocumentArea.width * 0.05 * 0.65
                             font.letterSpacing: 5
                             font.bold: true
                             anchors.centerIn: parent
@@ -525,8 +578,8 @@ Item {
                     }
 
                     Item {
-                        x: textDocumentFlick.width - textDocumentFlick.width * 0.025 - (textDocumentFlick.containsMouse ? 20 : 0)
-                        anchors.verticalCenter: textDocumentFlick.verticalCenter
+                        x: textDocumentArea.width - textDocumentArea.width * 0.025 - (textDocumentArea.containsMouse ? 20 : 0)
+                        anchors.verticalCenter: textDocumentArea.verticalCenter
                         rotation: 90
                         transformOrigin: Item.Center
                         opacity: 0.1
@@ -535,7 +588,7 @@ Item {
                         Text {
                             text: "scrite.io"
                             font.family: "Courier Prime"
-                            font.pixelSize: textDocumentFlick.width * 0.05 * 0.65
+                            font.pixelSize: textDocumentArea.width * 0.05 * 0.65
                             font.letterSpacing: 2
                             font.bold: true
                             anchors.centerIn: parent
@@ -547,7 +600,6 @@ Item {
 
         Rectangle {
             SplitView.fillWidth: true
-
             color: primaryColors.c100.background
 
             Row {
@@ -698,15 +750,14 @@ Item {
                         Image {
                             source: arrayItem.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
                             anchors.fill: parent
+                            fillMode: Image.PreserveAspectFit
                             anchors.margins: 5
                             opacity: arrayItem.locked ? 1 : 0.1
-                            visible: isSceneItem
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            enabled: isSceneItem
-                            onClicked: arrayItem.locked = !arrayItem.locked
+                            onClicked: screenplayOffsetsModel.toggleSceneTimeLock(index)
                         }
                     }
 

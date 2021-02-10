@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QVersionNumber>
+#include <QtConcurrentRun>
 #include <QAbstractTextDocumentLayout>
 
 class OffsetItem
@@ -27,12 +28,13 @@ class OffsetItem
 public:
     OffsetItem() {
         this->setRow(-1);
-        this->setType(SceneElement::Heading);
+        this->setType(-1);
         this->setPageNumber(-1);
         this->setPixelOffset(0);
         this->setTimestamp(0);
         this->setDefaultTimestamp(0);
         this->setLocked(false);
+        this->setTimeManuallySet(false);
     }
     OffsetItem(const QJsonValue &value) : m_object(value.toObject()) { }
     OffsetItem(const QJsonObject &object) : m_object(object) { }
@@ -56,6 +58,7 @@ public:
     int pageNumber() const { return m_object.value(pageNumberAttrib).toInt(); }
     QVersionNumber version() const { return QVersionNumber::fromString(m_object.value(versionAttrib).toString()); }
     bool isLocked() const { return m_object.value(lockedAttrib).toBool(); }
+    bool isTimeManuallySet() const { return m_object.value(timeManuallySet).toBool(); }
 
     void setRow(int val) { m_object.insert(rowAttrib, val); }
     void setType(int val) { m_object.insert(typeAttrib, val); }
@@ -71,6 +74,7 @@ public:
     void setPageNumber(int val) { m_object.insert(pageNumberAttrib, val); }
     void setVersion(const QVersionNumber &val) { m_object.insert(versionAttrib, val.toString()); }
     void setLocked(bool val) { m_object.insert(lockedAttrib, val); }
+    void setTimeManuallySet(bool val) { m_object.insert(timeManuallySet, val); }
 
     bool canMerge(const OffsetItem &other) const {
         return this->id() == other.id() && this->type() == other.type();
@@ -80,8 +84,9 @@ public:
         if(!this->canMerge(other))
             return false;
 
-        if(!this->isLocked())
-            this->setTimestamp( other.timestamp() );
+        this->setTimestamp( other.timestamp() );
+        this->setLocked( other.isLocked() );
+        this->setTimeManuallySet( other.isTimeManuallySet() );
 
         return true;
     }
@@ -105,6 +110,7 @@ private:
     static const QString pageNumberAttrib;
     static const QString versionAttrib;
     static const QString lockedAttrib;
+    static const QString timeManuallySet;
 };
 
 const QString OffsetItem::rowAttrib = QStringLiteral("row");
@@ -119,6 +125,7 @@ const QString OffsetItem::defaultTimestampAttrib = QStringLiteral("defaultTimest
 const QString OffsetItem::pageNumberAttrib = QStringLiteral("pageNumber");
 const QString OffsetItem::versionAttrib = QStringLiteral("version");
 const QString OffsetItem::lockedAttrib = QStringLiteral("locked");
+const QString OffsetItem::timeManuallySet = QStringLiteral("timeManuallySet");
 
 inline QString timeToString(const QTime &t)
 {
@@ -147,7 +154,6 @@ ScreenplayTextDocumentOffsets::ScreenplayTextDocumentOffsets(QObject *parent)
 
 ScreenplayTextDocumentOffsets::~ScreenplayTextDocumentOffsets()
 {
-    this->saveOffsets();
 }
 
 void ScreenplayTextDocumentOffsets::setScreenplay(Screenplay *val)
@@ -232,7 +238,7 @@ QString ScreenplayTextDocumentOffsets::timestampToString(int timeInMs) const
     if(timeInMs <= 0)
         return QStringLiteral("0:00 min");
 
-    return timeToString( QTime(0,0,0,1).fromMSecsSinceStartOfDay(timeInMs-1) );
+    return timeToString( QTime(0,0,0,1).addMSecs(timeInMs-1) );
 }
 
 QJsonObject ScreenplayTextDocumentOffsets::offsetInfoAtPoint(const QPointF &pos) const
@@ -376,6 +382,8 @@ void ScreenplayTextDocumentOffsets::setTime(int row, int timeInMs, bool adjustFo
 
     ModelDataChangedTracker tracker(this);
 
+    OffsetItem rowOffsetItem;
+
     int timeDiffInMs = 0;
     for(int i=row; i<offsets.size(); i++)
     {
@@ -384,14 +392,34 @@ void ScreenplayTextDocumentOffsets::setTime(int row, int timeInMs, bool adjustFo
             break;
 
         if(i == row)
+        {
             timeDiffInMs = timeInMs - item.defaultTimestamp();
+            rowOffsetItem = item;
+        }
 
         item.setTimestamp( item.defaultTimestamp()+timeDiffInMs );
+        if(i == row)
+            item.setTimeManuallySet(true);
+
         offsets[i] = item.json();
         tracker.changeRow(i);
 
         if(!adjustFollowingRows)
             break;
+    }
+
+    if(row > 0 && rowOffsetItem.type() != SceneElement::Heading)
+    {
+        for(int i=row-1; i>=0; i--)
+        {
+            OffsetItem item(offsets[i]);
+            if(item.isTimeManuallySet() || item.type() == SceneElement::Heading || item.isLocked())
+                break;
+
+            item.setTimestamp(timeInMs-qAbs(row-i));
+            offsets[i] = item.json();
+            tracker.changeRow(i);
+        }
     }
 
     this->saveOffsets();
@@ -412,6 +440,8 @@ void ScreenplayTextDocumentOffsets::resetTime(int row, bool andFollowingRows)
             break;
 
         item.setTimestamp( item.defaultTimestamp() );
+        item.setTimeManuallySet(false);
+
         offsets[i] = item.json();
         tracker.changeRow(i);
 
@@ -429,12 +459,6 @@ void ScreenplayTextDocumentOffsets::toggleSceneTimeLock(int row)
         return;
 
     OffsetItem item(offsets[row]);
-    if(item.type() != SceneElement::Heading)
-    {
-        this->toggleSceneTimeLock(this->currentSceneHeadingIndex(row));
-        return;
-    }
-
     item.setLocked( !item.isLocked() );
     offsets[row] = item.json();
 
@@ -478,6 +502,7 @@ void ScreenplayTextDocumentOffsets::resetAllTimes()
         if(!item.isLocked())
         {
             item.setTimestamp(item.defaultTimestamp());
+            item.setTimeManuallySet(false);
             offsets[i] = item.json();
             tracker.changeRow(i);
         }
@@ -707,9 +732,6 @@ void ScreenplayTextDocumentOffsets::loadOffsets()
         }
 
         void merge(const Segment &other) {
-            if( !this->canMerge(other) )
-                return;
-
             this->sceneOffset.mergeFrom( other.sceneOffset );
 
             if( this->paragraphOffsets.size() == other.paragraphOffsets.size() ) {
@@ -763,7 +785,7 @@ void ScreenplayTextDocumentOffsets::loadOffsets()
     for(int i=0; i<fileSegments.size(); i++)
     {
         Segment fileSegment = fileSegments.at(i);
-        Segment modelSegment = modelSegments.at(i);
+        Segment &modelSegment = modelSegments[i];
         if(!modelSegment.canMerge(fileSegment))
         {
             this->setErrorMessage(errMsg);
@@ -789,9 +811,17 @@ void ScreenplayTextDocumentOffsets::saveOffsets()
     if(m_fileName.isEmpty() || m_screenplay.isNull() || this->count() == 0)
         return;
 
-    QFile file(m_fileName);
-    if( !file.open(QFile::WriteOnly) )
-        return;
+    // While we want to save offsets to file in a separate thread, we
+    // dont want multiple threads writing to the file. So, we use a custom
+    // thread-pool with exactly one thread in it.
+    static QThreadPool saveOffsetsThreadPool;
+    if(saveOffsetsThreadPool.maxThreadCount() != 1)
+        saveOffsetsThreadPool.setMaxThreadCount(1);
 
-    file.write( QJsonDocument(this->internalArray()).toJson() );
+    QtConcurrent::run(&saveOffsetsThreadPool, [](const QString &fileName, const QJsonArray &array) {
+        QFile file(fileName);
+        if( !file.open(QFile::WriteOnly) )
+            return;
+        file.write( QJsonDocument(array).toJson() );
+    }, m_fileName, this->internalArray());
 }

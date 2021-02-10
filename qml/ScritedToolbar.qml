@@ -162,7 +162,7 @@ Item {
                 iconSource: "../icons/mediaplayer/sync_with_screenplay.png"
                 ToolTip.text: "Use video time as current scene time offset.\t(> or .)"
                 enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
-                onClicked: scritedView.syncVideoTimeWithScreenplayOffsets()
+                onClicked: scritedView.syncVideoTimeWithScreenplayOffsets(true)
 
                 ShortcutsModelItem.priority: -11
                 ShortcutsModelItem.group: "Scrited"

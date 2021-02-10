@@ -67,9 +67,6 @@ protected:
     const QJsonArray &internalArray() const { return m_array; }
 
 private:
-    void processArray();
-
-private:
     QJsonArray m_array;
     QStringList m_objectMembers;
 };
@@ -121,9 +118,11 @@ public:
 
 private:
     void notify() {
-        if(m_startRow >= 0 && m_endRow >= 0 && m_endRow >= m_startRow) {
-            const QModelIndex start = m_model->index(m_startRow, 0);
-            const QModelIndex end = m_model->index(m_endRow, 0);
+        if(m_startRow >= 0 && m_endRow >= 0) {
+            const int r1 = qMin(m_startRow, m_endRow);
+            const int r2 = qMax(m_startRow, m_endRow);
+            const QModelIndex start = m_model->index(r1, 0);
+            const QModelIndex end = m_model->index(r2, 0);
             emit m_model->dataChanged(start, end);
         }
         m_startRow = -1;

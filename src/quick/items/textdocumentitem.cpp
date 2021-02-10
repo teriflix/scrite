@@ -116,6 +116,15 @@ void TextDocumentItem::setFlickable(QQuickItem *val)
     m_viewportUpdateHandler->start();
 }
 
+void TextDocumentItem::setVerticalPadding(qreal val)
+{
+    if( qFuzzyCompare(m_verticalPadding, val) )
+        return;
+
+    m_verticalPadding = val;
+    emit verticalPaddingChanged();
+}
+
 void TextDocumentItem::updateViewport()
 {
     if(m_document == nullptr)
@@ -126,12 +135,12 @@ void TextDocumentItem::updateViewport()
 
     const qreal maxViewportDim = 4000.0 / m_documentScale;
 
-    const qreal contentY = (m_flickable == nullptr ? 0 : m_flickable->property("contentY").toDouble());
+    const qreal contentY = (m_flickable == nullptr ? 0 : m_flickable->property("contentY").toDouble()) - m_verticalPadding;
 
     const qreal x = 0;
     const qreal y = contentY / m_documentScale;
     const qreal width = qMin(m_document->textWidth(), maxViewportDim);
-    const qreal height = (qMin(m_flickable == nullptr ? this->height() : m_flickable->height(), maxViewportDim)) / m_documentScale;
+    const qreal height = (qMin(m_flickable == nullptr ? this->height() : (m_flickable->height()+m_verticalPadding), maxViewportDim)) / m_documentScale;
     const QRectF rect(x, y, width, height);
     if(rect.isEmpty())
     {

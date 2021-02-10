@@ -41,12 +41,18 @@ public:
     QQuickItem* flickable() const { return m_flickable; }
     Q_SIGNAL void flickableChanged();
 
+    Q_PROPERTY(qreal verticalPadding READ verticalPadding WRITE setVerticalPadding NOTIFY verticalPaddingChanged)
+    void setVerticalPadding(qreal val);
+    qreal verticalPadding() const { return m_verticalPadding; }
+    Q_SIGNAL void verticalPaddingChanged();
+
 private:
     void updateViewport();
     void onDocumentChanged();
 
 private:
     qreal m_documentScale = 1.0;
+    qreal m_verticalPadding = 0;
     QQuickItem* m_flickable = nullptr;
     QTextDocument* m_document = nullptr;
     QTimer *m_viewportUpdateHandler = nullptr;
