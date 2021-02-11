@@ -24,7 +24,7 @@ import Scrite 1.0
 Item {
     id: scritedView
 
-    property int skipDuration: 10*1000
+    property int skipDuration: 10
     property bool mediaIsLoaded: mediaPlayer.status !== MediaPlayer.NoMedia
     property bool mediaIsPlaying: mediaPlayer.playbackState === MediaPlayer.PlayingState
     property bool mediaIsPaused: mediaPlayer.playbackState === MediaPlayer.PausedState
@@ -60,19 +60,19 @@ Item {
     }
 
     function rewind() {
-        mediaPlayer.seek( Math.max(mediaPlayer.position-skipDuration, 0 ) )
+        mediaPlayer.traverse(-skipDuration)
     }
 
     function forward() {
-        mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
+        mediaPlayer.traverse(+skipDuration)
     }
 
     function miniRewind() {
-        mediaPlayer.seek( Math.max(mediaPlayer.position-Math.max(1000,mediaPlayer.notifyInterval), 0) )
+        mediaPlayer.traverse(-1)
     }
 
     function miniForward() {
-        mediaPlayer.seek( Math.min(mediaPlayer.position+Math.max(1000,mediaPlayer.notifyInterval), mediaPlayer.duration) )
+        mediaPlayer.traverse(1)
     }
 
     function syncVideoTimeWithScreenplayOffsets(adjustFollowingRows) {
@@ -204,6 +204,14 @@ Item {
                                 play()
                         }
 
+                        function traverse(secs) {
+                            if(secs === 0)
+                                return
+                            var now = secs > 0 ? Math.ceil(position/1000) : Math.floor(position/1000)
+                            var oldPos = position
+                            seek( Math.min(Math.max((now+secs)*1000,0),duration) )
+                        }
+
                         property bool keepScreenplayInSyncWithPosition: false
                         onPositionChanged: {
                             if(keepScreenplayInSyncWithPosition && playbackState === MediaPlayer.PlayingState) {
@@ -325,7 +333,7 @@ Item {
                                     onXChanged: {
                                         if(positionHandleMouseArea.drag.active) {
                                             var pos = Math.abs(((x + width/2)/parent.width) * mediaPlayer.duration)
-                                            mediaPlayer.seek(pos)
+                                            mediaPlayer.seek( Math.round(pos/1000)*1000 )
                                         }
                                     }
 
@@ -391,8 +399,8 @@ Item {
                                     icon.source: "../icons/mediaplayer/rewind_10_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position > 0
                                     suggestedHeight: 36
-                                    onClicked: mediaPlayer.seek( Math.max(mediaPlayer.position-skipDuration, 0 ) )
-                                    ToolTip.text: "Rewind by " + (skipDuration/1000) + " seconds"
+                                    onClicked: rewind()
+                                    ToolTip.text: "Rewind by " + skipDuration + " seconds"
                                     focusPolicy: Qt.NoFocus
                                 }
 
@@ -400,8 +408,8 @@ Item {
                                     icon.source: "../icons/mediaplayer/forward_10_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position < mediaPlayer.duration
                                     suggestedHeight: 36
-                                    onClicked: mediaPlayer.seek( Math.min(mediaPlayer.position+skipDuration, mediaPlayer.duration) )
-                                    ToolTip.text: "Forward by " + (skipDuration/1000) + " seconds"
+                                    onClicked: forward()
+                                    ToolTip.text: "Forward by " + skipDuration + " seconds"
                                     focusPolicy: Qt.NoFocus
                                 }
 
