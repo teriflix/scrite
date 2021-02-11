@@ -211,6 +211,30 @@ Item {
                 ShortcutsModelItem.shortcut: "+"
                 ShortcutsModelItem.enabled: enabled
             }
+
+            QtObject {
+                ShortcutsModelItem.priority: -14
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Decrease Video Height"
+                ShortcutsModelItem.shortcut: "("
+                ShortcutsModelItem.enabled: true
+            }
+
+            QtObject {
+                ShortcutsModelItem.priority: -14
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Increase Video Height"
+                ShortcutsModelItem.shortcut: ")"
+                ShortcutsModelItem.enabled: true
+            }
+
+            QtObject {
+                ShortcutsModelItem.priority: -15
+                ShortcutsModelItem.group: "Scrited"
+                ShortcutsModelItem.title: "Default Video Height"
+                ShortcutsModelItem.shortcut: "*"
+                ShortcutsModelItem.enabled: true
+            }
         }
     }
 }

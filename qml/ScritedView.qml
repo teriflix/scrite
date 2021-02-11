@@ -857,6 +857,15 @@ Item {
     EventFilter.onFilter: {
         var newY = 0
         switch(event.key) {
+        case Qt.Key_ParenLeft:
+            videoArea.height = videoArea.height-1
+            break
+        case Qt.Key_ParenRight:
+            videoArea.height = videoArea.height+1
+            break
+        case Qt.Key_Asterisk:
+            videoArea.height = videoArea.width / 16 * 9
+            break
         case Qt.Key_Space:
             mediaPlayer.togglePlayback()
             break
