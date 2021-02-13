@@ -624,6 +624,218 @@ Item {
                     }
                 }
             }
+
+            SequentialAnimation {
+                id: startingFrameAnimation
+
+                ScriptAction {
+                    script: {
+                        startingFrameOverlayContent.opacity = 1
+                        startingFrameOverlay.opacity = 1
+                        startingFrameOverlay.visible = true
+                        mediaPlayer.pause()
+                    }
+                }
+
+                PauseAnimation {
+                    duration: 1500
+                }
+
+                ScriptAction {
+                    script: mediaPlayer.play()
+                }
+
+                NumberAnimation {
+                    target: startingFrameOverlayContent
+                    property: "opacity"
+                    from: 1; to: 0
+                    duration: 1500
+                }
+
+                NumberAnimation {
+                    target: startingFrameOverlay
+                    property: "opacity"
+                    from: 1; to: 0
+                    duration: 1500
+                }
+
+                ScriptAction {
+                    script: {
+                        startingFrameOverlay.visible = false
+                        startingFrameOverlayContent.opacity = 1
+                        startingFrameOverlay.opacity = 1
+                    }
+                }
+            }
+
+            Rectangle {
+                id: startingFrameOverlay
+                color: "black"
+                anchors.fill: parent
+                visible: false
+
+                Column {
+                    id: startingFrameOverlayContent
+                    spacing: startingFrameOverlay.height * 0.025
+                    width: parent.width * 0.8
+                    anchors.centerIn: parent
+
+                    Text {
+                        text: "#Scrited"
+                        color: "#f1be41"
+                        font.bold: true
+                        font.pointSize: closingFrameOverlay.height * 0.05
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Image {
+                        source: "file:///" + scriteDocument.screenplay.coverPagePhoto
+                        width: parent.width * 0.75
+                        fillMode: Image.PreserveAspectFit
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Text {
+                        font.pointSize: closingFrameOverlay.height * 0.05
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        color: "white"
+                        text: scriteDocument.screenplay.title
+                    }
+
+                    Text {
+                        font.pointSize: closingFrameOverlay.height * 0.025
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        color: "white"
+                        text: "written by<br/>" + scriteDocument.screenplay.author + "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
+                    }
+                }
+            }
+
+            SequentialAnimation {
+                id: closingFrameAnimation
+                loops: 1
+                running: false
+
+                function rollback() {
+                    closingFrameOverlay.opacity = 0
+                    appLogoOverlay.opacity = 0
+                    callToActionOverlay.opacity = 0
+                    websiteOverlay.opacity = 0
+                    teriflixLogoOverlay.opacity = 0
+                    mediaPlayer.volume = 1
+                }
+
+                ScriptAction {
+                    script: closingFrameAnimation.rollback()
+                }
+
+                ParallelAnimation {
+                    NumberAnimation {
+                        target: mediaPlayer
+                        property: "volume"
+                        from: 1
+                        to: 0.2
+                        duration: 1500
+                    }
+
+                    NumberAnimation {
+                        target: closingFrameOverlay
+                        property: "opacity"
+                        from: 0
+                        to: 1
+                        duration: 1500
+                    }
+                }
+
+                NumberAnimation {
+                    target: appLogoOverlay
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 1000
+                }
+
+                NumberAnimation {
+                    target: callToActionOverlay
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 1000
+                }
+
+                NumberAnimation {
+                    target: websiteOverlay
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 1000
+                }
+
+                NumberAnimation {
+                    target: teriflixLogoOverlay
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 1000
+                }
+
+                PauseAnimation {
+                    duration: 1000
+                }
+
+                ScriptAction {
+                    script: mediaPlayer.pause()
+                }
+            }
+
+            Rectangle {
+                id: closingFrameOverlay
+                color: "black"
+                anchors.fill: parent
+                opacity: 0
+
+                Column {
+                    id: closingFrameOverlayContent
+                    spacing: closingFrameOverlay.height * 0.025
+                    width: parent.width * 0.8
+                    anchors.centerIn: parent
+
+                    Image {
+                        id: appLogoOverlay
+                        source: "../images/appicon.png"
+                        smooth: true
+                        width: parent.width * 0.15
+                        fillMode: Image.PreserveAspectFit
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Item {
+                        width: parent.width
+                        height: 2*parent.spacing
+                    }
+
+                    Text {
+                        id: callToActionOverlay
+                        text: "Screenwrite with <b>Scrite</b>"
+                        color: "#f1be41"
+                        font.pointSize: closingFrameOverlay.height * 0.05
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Text {
+                        id: websiteOverlay
+                        text: "www.scrite.io"
+                        color: "white"
+                        font.pointSize: closingFrameOverlay.height * 0.05
+                        font.family: "Courier Prime"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
         }
 
         Rectangle {
@@ -875,7 +1087,10 @@ Item {
             videoArea.height = videoArea.width / 16 * 9
             break
         case Qt.Key_Space:
-            mediaPlayer.togglePlayback()
+            if(startingFrameOverlay.visible)
+                startingFrameAnimation.start()
+            else
+                mediaPlayer.togglePlayback()
             break
         case Qt.Key_Up:
             if(event.controlModifier)
@@ -925,6 +1140,18 @@ Item {
             break
         case Qt.Key_U:
             unlockAllSceneTimes()
+            break
+        case Qt.Key_S:
+            if(mediaIsLoaded && mediaPlayer.keepScreenplayInSyncWithPosition)
+                startingFrameOverlay.visible = !startingFrameOverlay.visible
+            else
+                startingFrameOverlay.visible = false
+            break
+        case Qt.Key_F:
+            if(closingFrameOverlay.opacity > 0)
+                closingFrameAnimation.rollback()
+            else if(mediaIsLoaded && mediaIsPlaying && mediaPlayer.keepScreenplayInSyncWithPosition)
+                closingFrameAnimation.start()
             break
         }
     }
