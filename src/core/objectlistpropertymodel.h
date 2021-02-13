@@ -46,6 +46,18 @@ public:
         : ObjectListPropertyModelBase(parent) { }
     ~ObjectListPropertyModel() { }
 
+    typedef ObjectListPropertyModel<T> TObjectListModel;
+    typedef std::function<void(TObjectListModel*,T)> SignalHooksFunction;
+    void setSignalHooksFunction(SignalHooksFunction val) {
+        m_signalHooksFunction = val;
+        for(T ptr : m_list) {
+            ptr->disconnect(this);
+            if(m_signalHooksFunction)
+                m_signalHooksFunction(this, ptr);
+        }
+    }
+    SignalHooksFunction signalHooksFunction() const { return m_signalHooksFunction; }
+
     operator QList<T> () { return m_list; }
     QList<T>& list() { return m_list; }
     const QList<T> &list() const { return m_list; }
@@ -59,6 +71,8 @@ public:
 
     void prepend(T ptr) {
         this->beginInsertRows(QModelIndex(), 0, 0);
+        if(m_signalHooksFunction)
+            m_signalHooksFunction(this, ptr);
         m_list.prepend(ptr);
         this->endInsertRows();
     }
@@ -80,6 +94,8 @@ public:
         int iidx = row < 0 || row >= m_list.size() ? m_list.size() : row;
 
         this->beginInsertRows(QModelIndex(), iidx, iidx);
+        if(m_signalHooksFunction)
+            m_signalHooksFunction(this, ptr);
         m_list.insert(iidx, ptr);
         this->endInsertRows();
     }
@@ -101,7 +117,13 @@ public:
 
     void assign(const QList<T> &list) {
         this->beginResetModel();
+        for(T ptr : m_list)
+            ptr->disconnect(this);
         m_list = list;
+        if(m_signalHooksFunction) {
+            for(T ptr : m_list)
+                m_signalHooksFunction(this, ptr);
+        }
         this->endResetModel();
     }
 
@@ -188,6 +210,7 @@ public:
 
 private:
     QList<T> m_list;
+    SignalHooksFunction m_signalHooksFunction;
 };
 
 template <class T>

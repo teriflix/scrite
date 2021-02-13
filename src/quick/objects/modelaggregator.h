@@ -31,6 +31,11 @@ public:
     void setAggregateFunction(AggregateFunction val) { m_aggregateFunction = val; }
     AggregateFunction aggregateFunction() const { return m_aggregateFunction; }
 
+    typedef std::function<void(QVariant &)> FinalizeFunction;
+    void setFinalizeFunction(FinalizeFunction val) { m_finalizeFunction = val; }
+    FinalizeFunction finalizeFunction() const { return m_finalizeFunction; }
+    Q_SIGNAL void finalizeFunctionChanged();
+
     Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel RESET resetModel NOTIFY modelChanged)
     void setModel(QAbstractItemModel* val);
     QAbstractItemModel* model() const { return m_model; }
@@ -50,6 +55,11 @@ public:
     QVariant aggregateValue() const { return m_aggregateValue; }
     Q_SIGNAL void aggregateValueChanged();
 
+    Q_PROPERTY(QVariant initialValue READ initialValue WRITE setInitialValue NOTIFY initialValueChanged)
+    void setInitialValue(const QVariant &val);
+    QVariant initialValue() const { return m_initialValue; }
+    Q_SIGNAL void initialValueChanged();
+
     Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
     void setDelay(int val);
     int delay() const { return m_delay; }
@@ -68,9 +78,11 @@ private:
 private:
     int m_delay = 0;
     int m_column = -1;
+    QVariant m_initialValue;
     QModelIndex m_rootIndex;
     QVariant m_aggregateValue;
     ExecLaterTimer m_evaluateTimer;
+    FinalizeFunction m_finalizeFunction;
     AggregateFunction m_aggregateFunction;
     QObjectProperty<QAbstractItemModel> m_model;
 };

@@ -1086,6 +1086,19 @@ Item {
                         }
                     }
 
+                    /*
+                    MenuItem2 {
+                        text: "Group"
+                        onClicked: {
+                            var items = selection.items
+                            var id = app.createUniqueId()
+                            items.forEach( function(item) {
+                                item.element.groupId = id
+                            })
+                        }
+                    }
+                    */
+
                     MenuItem2 {
                         text: "Add To Timeline"
                         onClicked: {

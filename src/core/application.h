@@ -228,6 +228,8 @@ public:
 
     Q_INVOKABLE int objectTreeSize(QObject *ptr) const;
 
+    Q_INVOKABLE QString createUniqueId() const;
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

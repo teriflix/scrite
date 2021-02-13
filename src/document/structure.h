@@ -105,6 +105,11 @@ public:
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
+    Q_PROPERTY(QString groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
+    void setGroupId(const QString &val);
+    QString groupId() const { return m_groupId; }
+    Q_SIGNAL void groupIdChanged();
+
     Q_SIGNAL void elementChanged();
     Q_SIGNAL void sceneHeadingChanged();
     Q_SIGNAL void sceneLocationChanged();
@@ -121,10 +126,45 @@ private:
     bool m_placed = false;
     qreal m_width = 0;
     qreal m_height = 0;
+    QString m_groupId;
     Scene* m_scene = nullptr;
     bool m_selected = false;
     Structure *m_structure = nullptr;
     QObjectProperty<QQuickItem> m_follow;
+};
+
+class StructureElementList : public ObjectListPropertyModel<StructureElement *>
+{
+    Q_OBJECT
+
+public:
+    StructureElementList(QObject *parent=nullptr);
+    ~StructureElementList();
+};
+
+class StructureElementGroups : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    StructureElementGroups(QObject *parent=nullptr);
+    ~StructureElementGroups();
+
+    typedef QPair<QString, StructureElementList* > Group;
+
+    enum Roles { GroupIdRole = Qt::UserRole, GroupElementsModel };
+
+    // QAbstractItemModel interface
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
+
+private:
+    void setGroups(const QList<Group> &groups);
+
+private:
+    friend class Structure;
+    QList<Group> m_groups;
 };
 
 class Relationship : public QObject, public QObjectSerializer::Interface
@@ -544,6 +584,9 @@ public:
     QRectF elementsBoundingBox() const { return m_elementsBoundingBoxAggregator.aggregateValue().toRectF(); }
     Q_SIGNAL void elementsBoundingBoxChanged();
 
+    Q_PROPERTY(QAbstractListModel* elementGroupsModel READ elementGroupsModel CONSTANT STORED false)
+    QAbstractListModel *elementGroupsModel() const { return &((const_cast<Structure*>(this))->m_elementGroups); }
+
     Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
@@ -711,6 +754,8 @@ private:
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     ObjectListPropertyModel<StructureElement *> m_elements;
     ModelAggregator m_elementsBoundingBoxAggregator;
+    ModelAggregator m_elementGroupsAggregator;
+    StructureElementGroups m_elementGroups;
     int m_currentElementIndex = -1;
     qreal m_zoomLevel = 1.0;
 

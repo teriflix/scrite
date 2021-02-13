@@ -82,6 +82,15 @@ void ModelAggregator::setColumn(int val)
     emit columnChanged();
 }
 
+void ModelAggregator::setInitialValue(const QVariant &val)
+{
+    if(m_initialValue == val)
+        return;
+
+    m_initialValue = val;
+    emit initialValueChanged();
+}
+
 void ModelAggregator::setDelay(int val)
 {
     if(m_delay == val)
@@ -125,7 +134,7 @@ void ModelAggregator::evaluateAggregateValue()
         return;
     }
 
-    QVariant avalue;
+    QVariant avalue = m_initialValue;
 
     const int nrRows = m_model->rowCount(m_rootIndex);
     for(int i=0; i<nrRows; i++)
@@ -133,6 +142,9 @@ void ModelAggregator::evaluateAggregateValue()
         const QModelIndex index = m_model->index(i, m_column, m_rootIndex);
         m_aggregateFunction(index, avalue);
     }
+
+    if(m_finalizeFunction)
+        m_finalizeFunction(avalue);
 
     this->setAggregateValue(avalue);
 }

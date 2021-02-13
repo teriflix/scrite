@@ -40,6 +40,7 @@ StructureElement::StructureElement(QObject *parent)
     connect(this, &StructureElement::yChanged, this, &StructureElement::yfChanged);
     connect(this, &StructureElement::widthChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::heightChanged, this, &StructureElement::elementChanged);
+    connect(this, &StructureElement::groupIdChanged, this, &StructureElement::elementChanged);
 
     connect(this, &StructureElement::xChanged, this, &StructureElement::geometryChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::geometryChanged);
@@ -224,6 +225,15 @@ void StructureElement::setSelected(bool val)
     emit selectedChanged();
 }
 
+void StructureElement::setGroupId(const QString &val)
+{
+    if(m_groupId == val)
+        return;
+
+    m_groupId = val;
+    emit groupIdChanged();
+}
+
 bool StructureElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)
@@ -258,6 +268,80 @@ void StructureElement::syncWithFollowItem()
     this->setY(m_follow->y());
     this->setWidth(m_follow->width());
     this->setHeight(m_follow->height());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StructureElementList::StructureElementList(QObject *parent)
+    : ObjectListPropertyModel<StructureElement *>(parent)
+{
+    static auto hooksFunc = [](ObjectListPropertyModel<StructureElement *> *model, StructureElement *ptr) {
+        QObject::connect(ptr, &StructureElement::geometryChanged, model, &StructureElementList::objectChanged);
+        QObject::connect(ptr, &StructureElement::aboutToDelete, model, &StructureElementList::objectDestroyed);
+    };
+    this->setSignalHooksFunction(hooksFunc);
+}
+
+StructureElementList::~StructureElementList()
+{
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StructureElementGroups::StructureElementGroups(QObject *parent)
+    : QAbstractListModel(parent)
+{
+
+}
+
+StructureElementGroups::~StructureElementGroups()
+{
+
+}
+
+int StructureElementGroups::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_groups.size();
+}
+
+QVariant StructureElementGroups::data(const QModelIndex &index, int role) const
+{
+    if(!index.isValid() || (role != GroupIdRole && role != GroupElementsModel))
+        return QVariant();
+
+    const Group &group = m_groups[index.row()];
+    if(role == GroupIdRole)
+        return group.first;
+
+    return QVariant::fromValue<QObject*>(group.second);
+}
+
+QHash<int, QByteArray> StructureElementGroups::roleNames() const
+{
+    QHash<int,QByteArray> roles;
+    roles[GroupIdRole] = QByteArrayLiteral("groupId");
+    roles[GroupElementsModel] = QByteArrayLiteral("groupId");
+    return roles;
+}
+
+void StructureElementGroups::setGroups(const QList<StructureElementGroups::Group> &groups)
+{
+    this->beginResetModel();
+
+    QList<StructureElementList*> elementsList;
+
+    for(const Group &group : qAsConst(m_groups))
+        elementsList.append(group.second);
+
+    m_groups = groups;
+
+    for(const Group &group : qAsConst(m_groups))
+        elementsList.removeOne(group.second);
+
+    qDeleteAll(elementsList);
+
+    this->endResetModel();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1411,8 +1495,39 @@ Structure::Structure(QObject *parent)
         const StructureElement *element = m_elements.at(index.row());
         rect |= element->geometry();
         value = rect;
-    });
+     });
     connect(&m_elementsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::elementsBoundingBoxChanged);
+
+    m_elementGroupsAggregator.setModel(&m_elements);
+    m_elementGroupsAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
+        StructureElement *element = m_elements.at(index.row());
+        const QString groupId = element->groupId();
+        if(groupId.isEmpty())
+            return;
+
+        QVariantMap map = value.toMap();
+        QVariant listValue = map.value(groupId);
+        StructureElementList *list = listValue.isValid() ? qobject_cast<StructureElementList*>(listValue.value<QObject*>()) : nullptr;
+        if(list == nullptr)
+            list = new StructureElementList(&m_elementGroups);
+        list->append(element);
+        map[groupId] = QVariant::fromValue<QObject*>(list);
+        value = map;
+    });
+    m_elementGroupsAggregator.setFinalizeFunction([=](QVariant &value) {
+         const QVariantMap map = value.toMap();
+         QVariantMap::const_iterator it = map.begin();
+         QVariantMap::const_iterator end = map.end();
+         QList<StructureElementGroups::Group> groups;
+         while(it != end) {
+             StructureElementList *list = qobject_cast<StructureElementList*>(it.value().value<QObject*>());
+             if(list != nullptr)
+                 groups << qMakePair(it.key(), list);
+             ++it;
+         }
+         value = QVariant();
+         m_elementGroups.setGroups(groups);
+    });
 
     m_annotationsBoundingBoxAggregator.setModel(&m_annotations);
     m_annotationsBoundingBoxAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
@@ -3883,4 +3998,5 @@ void StructureCanvasViewportFilterModel::invalidateSelfLater()
     else
         m_invalidateTimer.stop();
 }
+
 
