@@ -334,7 +334,7 @@ void StructureElementStack::initialize()
 
     QList<StructureElement*> &list = this->list();
 
-    for(int i=list.size(); i>=0; i--)
+    for(int i=list.size()-1; i>=0; i--)
     {
         StructureElement *element = list.at(i);
         if(element->stackId() != m_stackId)
@@ -401,6 +401,8 @@ void StructureElementStack::onElementGeometryChanged()
     if(!m_geometry.isValid() || !m_enabled)
         return;
 
+    m_enabled = false;
+
     StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
     const qreal dx = changedElement->x() - m_geometry.x();
     const qreal dy = changedElement->y() - m_geometry.y();
@@ -416,6 +418,8 @@ void StructureElementStack::onElementGeometryChanged()
     m_geometry.setHeight( qMax(m_geometry.height(), changedElement->height()) );
 
     emit geometryChanged();
+
+    m_enabled = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1649,6 +1653,8 @@ Structure::Structure(QObject *parent)
         value = rect;
     });
     connect(&m_annotationsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::annotationsBoundingBoxChanged);
+
+    m_elementStacks.m_structure = this;
 
     this->loadDefaultGroupsData();
 }
