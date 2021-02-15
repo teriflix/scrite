@@ -35,6 +35,8 @@ class Screenplay;
 class SceneHeading;
 class ScriteDocument;
 class StructureLayout;
+class StructureElementStack;
+class StructureElementStacks;
 class StructurePositionCommand;
 
 class StructureElement : public QObject
@@ -105,10 +107,15 @@ public:
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
-    Q_PROPERTY(QString groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
-    void setGroupId(const QString &val);
-    QString groupId() const { return m_groupId; }
-    Q_SIGNAL void groupIdChanged();
+    Q_PROPERTY(QString stackId READ stackId WRITE setStackId NOTIFY stackIdChanged)
+    void setStackId(const QString &val);
+    QString stackId() const { return m_stackId; }
+    Q_SIGNAL void stackIdChanged();
+
+    Q_PROPERTY(bool stackLeader READ isStackLeader WRITE setStackLeader NOTIFY stackLeaderChanged)
+    void setStackLeader(bool val);
+    bool isStackLeader() const { return m_stackLeader; }
+    Q_SIGNAL void stackLeaderChanged();
 
     Q_SIGNAL void elementChanged();
     Q_SIGNAL void sceneHeadingChanged();
@@ -126,33 +133,53 @@ private:
     bool m_placed = false;
     qreal m_width = 0;
     qreal m_height = 0;
-    QString m_groupId;
+    QString m_stackId;
+    bool m_stackLeader = false;
     Scene* m_scene = nullptr;
     bool m_selected = false;
     Structure *m_structure = nullptr;
     QObjectProperty<QQuickItem> m_follow;
 };
 
-class StructureElementList : public ObjectListPropertyModel<StructureElement *>
+class StructureElementStack : public ObjectListPropertyModel<StructureElement *>
 {
     Q_OBJECT
 
 public:
-    StructureElementList(QObject *parent=nullptr);
-    ~StructureElementList();
+    StructureElementStack(QObject *parent=nullptr);
+    ~StructureElementStack();
+
+    Q_PROPERTY(StructureElement *stackLeader READ stackLeader NOTIFY stackLeaderChanged)
+    StructureElement *stackLeader() const;
+    Q_SIGNAL void stackLeaderChanged();
+
+    Q_PROPERTY(QRectF geometry READ geometry NOTIFY geometryChanged)
+    QRectF geometry() const { return m_geometry; }
+    Q_SIGNAL void geometryChanged();
+
+private:
+    void setGeometry(const QRectF &val);
+
+    void initialize();
+    void onStackLeaderChanged();
+    void onElementGeometryChanged();
+
+private:
+    friend class StructureElementStacks;
+    QRectF m_geometry;
 };
 
-class StructureElementGroups : public QAbstractListModel
+class StructureElementStacks : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    StructureElementGroups(QObject *parent=nullptr);
-    ~StructureElementGroups();
+    StructureElementStacks(QObject *parent=nullptr);
+    ~StructureElementStacks();
 
-    typedef QPair<QString, StructureElementList* > Group;
+    typedef QPair<QString, StructureElementStack* > Item;
 
-    enum Roles { GroupIdRole = Qt::UserRole, GroupElementsModel };
+    enum Roles { StackIdRole = Qt::UserRole, StackElementsRole };
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const;
@@ -160,11 +187,11 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    void setGroups(const QList<Group> &groups);
+    void setStacks(const QList<Item> &groups);
 
 private:
     friend class Structure;
-    QList<Group> m_groups;
+    QList<Item> m_stacks;
 };
 
 class Relationship : public QObject, public QObjectSerializer::Interface
@@ -584,8 +611,8 @@ public:
     QRectF elementsBoundingBox() const { return m_elementsBoundingBoxAggregator.aggregateValue().toRectF(); }
     Q_SIGNAL void elementsBoundingBoxChanged();
 
-    Q_PROPERTY(QAbstractListModel* elementGroupsModel READ elementGroupsModel CONSTANT STORED false)
-    QAbstractListModel *elementGroupsModel() const { return &((const_cast<Structure*>(this))->m_elementGroups); }
+    Q_PROPERTY(QAbstractListModel* elementStacks READ elementStacks CONSTANT STORED false)
+    QAbstractListModel *elementStacks() const { return &((const_cast<Structure*>(this))->m_elementStacks); }
 
     Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<StructureElement> elements();
@@ -754,8 +781,8 @@ private:
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     ObjectListPropertyModel<StructureElement *> m_elements;
     ModelAggregator m_elementsBoundingBoxAggregator;
-    ModelAggregator m_elementGroupsAggregator;
-    StructureElementGroups m_elementGroups;
+    ModelAggregator m_elementStacksAggregator;
+    StructureElementStacks m_elementStacks;
     int m_currentElementIndex = -1;
     qreal m_zoomLevel = 1.0;
 

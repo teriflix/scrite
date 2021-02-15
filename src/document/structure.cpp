@@ -40,7 +40,7 @@ StructureElement::StructureElement(QObject *parent)
     connect(this, &StructureElement::yChanged, this, &StructureElement::yfChanged);
     connect(this, &StructureElement::widthChanged, this, &StructureElement::elementChanged);
     connect(this, &StructureElement::heightChanged, this, &StructureElement::elementChanged);
-    connect(this, &StructureElement::groupIdChanged, this, &StructureElement::elementChanged);
+    connect(this, &StructureElement::stackIdChanged, this, &StructureElement::elementChanged);
 
     connect(this, &StructureElement::xChanged, this, &StructureElement::geometryChanged);
     connect(this, &StructureElement::yChanged, this, &StructureElement::geometryChanged);
@@ -225,13 +225,24 @@ void StructureElement::setSelected(bool val)
     emit selectedChanged();
 }
 
-void StructureElement::setGroupId(const QString &val)
+void StructureElement::setStackId(const QString &val)
 {
-    if(m_groupId == val)
+    if(m_stackId == val)
         return;
 
-    m_groupId = val;
-    emit groupIdChanged();
+    m_stackId = val;
+    emit stackIdChanged();
+
+    this->setStackLeader(false);
+}
+
+void StructureElement::setStackLeader(bool val)
+{
+    if(m_stackLeader == val)
+        return;
+
+    m_stackLeader = val;
+    emit stackLeaderChanged();
 }
 
 bool StructureElement::event(QEvent *event)
@@ -272,74 +283,173 @@ void StructureElement::syncWithFollowItem()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StructureElementList::StructureElementList(QObject *parent)
+StructureElementStack::StructureElementStack(QObject *parent)
     : ObjectListPropertyModel<StructureElement *>(parent)
 {
+
+}
+
+StructureElementStack::~StructureElementStack()
+{
+
+}
+
+StructureElement *StructureElementStack::stackLeader() const
+{
+    for(StructureElement *element : qAsConst(this->list()))
+        if(element->isStackLeader())
+            return element;
+
+    return this->first();
+}
+
+void StructureElementStack::setGeometry(const QRectF &val)
+{
+    if(m_geometry == val)
+        return;
+
+    m_geometry = val;
+    emit geometryChanged();
+}
+
+void StructureElementStack::initialize()
+{
+    QRectF geo;
+    StructureElement *leader = nullptr;
+    for(StructureElement *element : qAsConst(this->list()))
+    {
+        if(geo.isValid())
+        {
+            geo.setX( qMin(geo.x(), element->x()) );
+            geo.setY( qMin(geo.y(), element->y()) );
+
+            geo.setWidth( qMax(geo.width(), element->width()) );
+            geo.setHeight( qMax(geo.height(), element->height()) );
+        }
+        else
+            geo = element->geometry();
+
+        if(element->isStackLeader())
+            leader = element;
+    }
+
+    this->setGeometry(geo);
+
+    for(StructureElement *element : qAsConst(this->list()))
+    {
+        element->setX( geo.x() );
+        element->setY( geo.y() );
+    }
+
+    if(leader == nullptr)
+    {
+        leader = this->first();
+        if(leader != nullptr)
+            leader->setStackLeader(true);
+    }
+
     static auto hooksFunc = [](ObjectListPropertyModel<StructureElement *> *model, StructureElement *ptr) {
-        QObject::connect(ptr, &StructureElement::geometryChanged, model, &StructureElementList::objectChanged);
-        QObject::connect(ptr, &StructureElement::aboutToDelete, model, &StructureElementList::objectDestroyed);
+        QObject::connect(ptr, &StructureElement::geometryChanged, model, &StructureElementStack::objectChanged);
+        QObject::connect(ptr, &StructureElement::aboutToDelete, model, &StructureElementStack::objectDestroyed);
+
+        StructureElementStack *stack = qobject_cast<StructureElementStack*>(model);
+        QObject::connect(ptr, &StructureElement::stackLeaderChanged, stack, &StructureElementStack::onStackLeaderChanged);
+        QObject::connect(ptr, &StructureElement::geometryChanged, stack, &StructureElementStack::onElementGeometryChanged);
     };
     this->setSignalHooksFunction(hooksFunc);
 }
 
-StructureElementList::~StructureElementList()
+void StructureElementStack::onStackLeaderChanged()
 {
+    StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
+    if(changedElement->isStackLeader())
+    {
+        for(StructureElement *element : qAsConst(this->list()))
+        {
+            if(element != changedElement)
+                element->setStackLeader(false);
+        }
+    }
+}
 
+void StructureElementStack::onElementGeometryChanged()
+{
+    if(!m_geometry.isValid())
+        return;
+
+    StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
+    const qreal dx = changedElement->x() - m_geometry.x();
+    const qreal dy = changedElement->y() - m_geometry.y();
+    const QPointF dp(dx, dy);
+    for(StructureElement *element : qAsConst(this->list()))
+    {
+        if(element != changedElement)
+            element->setPosition( element->position() + dp );
+    }
+    m_geometry.moveTopLeft( m_geometry.topLeft() + dp );
+
+    m_geometry.setWidth( qMax(m_geometry.width(), changedElement->width()) );
+    m_geometry.setHeight( qMax(m_geometry.height(), changedElement->height()) );
+
+    emit geometryChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StructureElementGroups::StructureElementGroups(QObject *parent)
+StructureElementStacks::StructureElementStacks(QObject *parent)
     : QAbstractListModel(parent)
 {
 
 }
 
-StructureElementGroups::~StructureElementGroups()
+StructureElementStacks::~StructureElementStacks()
 {
 
 }
 
-int StructureElementGroups::rowCount(const QModelIndex &parent) const
+int StructureElementStacks::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_groups.size();
+    return parent.isValid() ? 0 : m_stacks.size();
 }
 
-QVariant StructureElementGroups::data(const QModelIndex &index, int role) const
+QVariant StructureElementStacks::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid() || (role != GroupIdRole && role != GroupElementsModel))
+    if(!index.isValid() || (role != StackIdRole && role != StackElementsRole))
         return QVariant();
 
-    const Group &group = m_groups[index.row()];
-    if(role == GroupIdRole)
-        return group.first;
+    const Item &item = m_stacks[index.row()];
+    if(role == StackIdRole)
+        return item.first;
 
-    return QVariant::fromValue<QObject*>(group.second);
+    return QVariant::fromValue<QObject*>(item.second);
 }
 
-QHash<int, QByteArray> StructureElementGroups::roleNames() const
+QHash<int, QByteArray> StructureElementStacks::roleNames() const
 {
     QHash<int,QByteArray> roles;
-    roles[GroupIdRole] = QByteArrayLiteral("groupId");
-    roles[GroupElementsModel] = QByteArrayLiteral("groupId");
+    roles[StackIdRole] = QByteArrayLiteral("stackId");
+    roles[StackElementsRole] = QByteArrayLiteral("stackElements");
     return roles;
 }
 
-void StructureElementGroups::setGroups(const QList<StructureElementGroups::Group> &groups)
+void StructureElementStacks::setStacks(const QList<StructureElementStacks::Item> &stacks)
 {
     this->beginResetModel();
 
-    QList<StructureElementList*> elementsList;
+    QList<StructureElementStack*> elementsList;
 
-    for(const Group &group : qAsConst(m_groups))
-        elementsList.append(group.second);
+    for(const Item &item : qAsConst(m_stacks))
+        elementsList.append(item.second);
 
-    m_groups = groups;
+    m_stacks = stacks;
 
-    for(const Group &group : qAsConst(m_groups))
-        elementsList.removeOne(group.second);
+    for(const Item &item : qAsConst(m_stacks))
+        elementsList.removeOne(item.second);
 
     qDeleteAll(elementsList);
+
+    for(const Item &item : qAsConst(m_stacks))
+        item.second->initialize();
 
     this->endResetModel();
 }
@@ -1498,35 +1608,35 @@ Structure::Structure(QObject *parent)
      });
     connect(&m_elementsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::elementsBoundingBoxChanged);
 
-    m_elementGroupsAggregator.setModel(&m_elements);
-    m_elementGroupsAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
+    m_elementStacksAggregator.setModel(&m_elements);
+    m_elementStacksAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
         StructureElement *element = m_elements.at(index.row());
-        const QString groupId = element->groupId();
-        if(groupId.isEmpty())
+        const QString stackId = element->stackId();
+        if(stackId.isEmpty())
             return;
 
         QVariantMap map = value.toMap();
-        QVariant listValue = map.value(groupId);
-        StructureElementList *list = listValue.isValid() ? qobject_cast<StructureElementList*>(listValue.value<QObject*>()) : nullptr;
-        if(list == nullptr)
-            list = new StructureElementList(&m_elementGroups);
-        list->append(element);
-        map[groupId] = QVariant::fromValue<QObject*>(list);
+        QVariant listValue = map.value(stackId);
+        StructureElementStack *stack = listValue.isValid() ?
+                    qobject_cast<StructureElementStack*>(listValue.value<QObject*>()) :
+                    new StructureElementStack(&m_elementStacks);
+        stack->append(element);
+        map[stackId] = QVariant::fromValue<QObject*>(stack);
         value = map;
     });
-    m_elementGroupsAggregator.setFinalizeFunction([=](QVariant &value) {
+    m_elementStacksAggregator.setFinalizeFunction([=](QVariant &value) {
          const QVariantMap map = value.toMap();
          QVariantMap::const_iterator it = map.begin();
          QVariantMap::const_iterator end = map.end();
-         QList<StructureElementGroups::Group> groups;
+         QList<StructureElementStacks::Item> groups;
          while(it != end) {
-             StructureElementList *list = qobject_cast<StructureElementList*>(it.value().value<QObject*>());
-             if(list != nullptr)
-                 groups << qMakePair(it.key(), list);
+             StructureElementStack *stack = qobject_cast<StructureElementStack*>(it.value().value<QObject*>());
+             if(stack != nullptr)
+                 groups << qMakePair(it.key(), stack);
              ++it;
          }
          value = QVariant();
-         m_elementGroups.setGroups(groups);
+         m_elementStacks.setStacks(groups);
     });
 
     m_annotationsBoundingBoxAggregator.setModel(&m_annotations);
