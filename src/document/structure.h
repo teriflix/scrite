@@ -148,6 +148,14 @@ class StructureElementStack : public ObjectListPropertyModel<StructureElement *>
 public:
     StructureElementStack(QObject *parent=nullptr);
     ~StructureElementStack();
+    Q_SIGNAL void aboutToDelete(StructureElementStack *ptr);
+
+    void setEnabled(bool val) { m_enabled = val; }
+    bool isEnabled() const { return m_enabled; }
+
+    Q_PROPERTY(QString stackId READ stackId NOTIFY stackIdChanged)
+    QString stackId() const { return m_stackId; }
+    Q_SIGNAL void stackIdChanged();
 
     Q_PROPERTY(StructureElement *stackLeader READ stackLeader NOTIFY stackLeaderChanged)
     StructureElement *stackLeader() const;
@@ -158,6 +166,7 @@ public:
     Q_SIGNAL void geometryChanged();
 
 private:
+    void setStackId(QString val);
     void setGeometry(const QRectF &val);
 
     void initialize();
@@ -167,9 +176,11 @@ private:
 private:
     friend class StructureElementStacks;
     QRectF m_geometry;
+    QString m_stackId;
+    bool m_enabled = false;
 };
 
-class StructureElementStacks : public QAbstractListModel
+class StructureElementStacks : public ObjectListPropertyModel<StructureElementStack *>
 {
     Q_OBJECT
 
@@ -177,21 +188,17 @@ public:
     StructureElementStacks(QObject *parent=nullptr);
     ~StructureElementStacks();
 
-    typedef QPair<QString, StructureElementStack* > Item;
-
-    enum Roles { StackIdRole = Qt::UserRole, StackElementsRole };
-
-    // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+protected:
+    void timerEvent(QTimerEvent *te);
 
 private:
-    void setStacks(const QList<Item> &groups);
+    void evaluateStacks();
+    void evaluateStacksLater();
 
 private:
     friend class Structure;
-    QList<Item> m_stacks;
+    Structure *m_structure = nullptr;
+    ExecLaterTimer m_evaluateTimer;
 };
 
 class Relationship : public QObject, public QObjectSerializer::Interface
@@ -781,7 +788,6 @@ private:
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     ObjectListPropertyModel<StructureElement *> m_elements;
     ModelAggregator m_elementsBoundingBoxAggregator;
-    ModelAggregator m_elementStacksAggregator;
     StructureElementStacks m_elementStacks;
     int m_currentElementIndex = -1;
     qreal m_zoomLevel = 1.0;

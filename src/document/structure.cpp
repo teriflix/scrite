@@ -286,12 +286,18 @@ void StructureElement::syncWithFollowItem()
 StructureElementStack::StructureElementStack(QObject *parent)
     : ObjectListPropertyModel<StructureElement *>(parent)
 {
-
+    static auto hooksFunc = [](ObjectListPropertyModel<StructureElement *> *model, StructureElement *ptr) {
+        QObject::connect(ptr, &StructureElement::aboutToDelete, model, &ObjectListPropertyModel<StructureElement *>::objectDestroyed);
+        StructureElementStack *stack = qobject_cast<StructureElementStack*>(model);
+        QObject::connect(ptr, &StructureElement::stackLeaderChanged, stack, &StructureElementStack::onStackLeaderChanged);
+        QObject::connect(ptr, &StructureElement::geometryChanged, stack, &StructureElementStack::onElementGeometryChanged);
+    };
+    this->setSignalHooksFunction(hooksFunc);
 }
 
 StructureElementStack::~StructureElementStack()
 {
-
+    emit aboutToDelete(this);
 }
 
 StructureElement *StructureElementStack::stackLeader() const
@@ -301,6 +307,15 @@ StructureElement *StructureElementStack::stackLeader() const
             return element;
 
     return this->first();
+}
+
+void StructureElementStack::setStackId(QString val)
+{
+    if(m_stackId == val)
+        return;
+
+    m_stackId = val;
+    emit stackIdChanged();
 }
 
 void StructureElementStack::setGeometry(const QRectF &val)
@@ -316,8 +331,18 @@ void StructureElementStack::initialize()
 {
     QRectF geo;
     StructureElement *leader = nullptr;
-    for(StructureElement *element : qAsConst(this->list()))
+
+    QList<StructureElement*> &list = this->list();
+
+    for(int i=list.size(); i>=0; i--)
     {
+        StructureElement *element = list.at(i);
+        if(element->stackId() != m_stackId)
+        {
+            this->removeAt(i);
+            continue;
+        }
+
         if(geo.isValid())
         {
             geo.setX( qMin(geo.x(), element->x()) );
@@ -331,6 +356,12 @@ void StructureElementStack::initialize()
 
         if(element->isStackLeader())
             leader = element;
+    }
+
+    if(list.isEmpty())
+    {
+        this->deleteLater();
+        return;
     }
 
     this->setGeometry(geo);
@@ -347,20 +378,13 @@ void StructureElementStack::initialize()
         if(leader != nullptr)
             leader->setStackLeader(true);
     }
-
-    static auto hooksFunc = [](ObjectListPropertyModel<StructureElement *> *model, StructureElement *ptr) {
-        QObject::connect(ptr, &StructureElement::geometryChanged, model, &StructureElementStack::objectChanged);
-        QObject::connect(ptr, &StructureElement::aboutToDelete, model, &StructureElementStack::objectDestroyed);
-
-        StructureElementStack *stack = qobject_cast<StructureElementStack*>(model);
-        QObject::connect(ptr, &StructureElement::stackLeaderChanged, stack, &StructureElementStack::onStackLeaderChanged);
-        QObject::connect(ptr, &StructureElement::geometryChanged, stack, &StructureElementStack::onElementGeometryChanged);
-    };
-    this->setSignalHooksFunction(hooksFunc);
 }
 
 void StructureElementStack::onStackLeaderChanged()
 {
+    if(!m_enabled)
+        return;
+
     StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
     if(changedElement->isStackLeader())
     {
@@ -374,7 +398,7 @@ void StructureElementStack::onStackLeaderChanged()
 
 void StructureElementStack::onElementGeometryChanged()
 {
-    if(!m_geometry.isValid())
+    if(!m_geometry.isValid() || !m_enabled)
         return;
 
     StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
@@ -397,9 +421,16 @@ void StructureElementStack::onElementGeometryChanged()
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementStacks::StructureElementStacks(QObject *parent)
-    : QAbstractListModel(parent)
+    : ObjectListPropertyModel<StructureElementStack *>(parent)
 {
+    static auto hooksFunc = [](ObjectListPropertyModel<StructureElementStack *> *model, StructureElementStack *ptr) {
+        QObject::connect(ptr, &StructureElementStack::aboutToDelete, model, &ObjectListPropertyModel<StructureElementStack *>::objectDestroyed);
 
+        StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(model);
+        connect(ptr, &StructureElementStack::stackLeaderChanged, stacks, &StructureElementStacks::objectChanged);
+        connect(ptr, &StructureElementStack::geometryChanged, stacks, &StructureElementStacks::objectChanged);
+    };
+    this->setSignalHooksFunction(hooksFunc);
 }
 
 StructureElementStacks::~StructureElementStacks()
@@ -407,51 +438,53 @@ StructureElementStacks::~StructureElementStacks()
 
 }
 
-int StructureElementStacks::rowCount(const QModelIndex &parent) const
+void StructureElementStacks::timerEvent(QTimerEvent *te)
 {
-    return parent.isValid() ? 0 : m_stacks.size();
+    if(te->timerId() == m_evaluateTimer.timerId())
+    {
+        m_evaluateTimer.stop();
+        this->evaluateStacks();
+    }
+    else
+        QAbstractListModel::timerEvent(te);
 }
 
-QVariant StructureElementStacks::data(const QModelIndex &index, int role) const
+void StructureElementStacks::evaluateStacks()
 {
-    if(!index.isValid() || (role != StackIdRole && role != StackElementsRole))
-        return QVariant();
+    auto findStack = [=](const QString &id) {
+        for(StructureElementStack *stack : qAsConst(this->list()))
+            if(stack->stackId() == id)
+                return stack;
+        StructureElementStack *newStack = new StructureElementStack(this);
+        newStack->setStackId(id);
+        this->append(newStack);
+        return newStack;
+    };
 
-    const Item &item = m_stacks[index.row()];
-    if(role == StackIdRole)
-        return item.first;
+    for(StructureElementStack *stack : qAsConst(this->list()))
+        stack->setEnabled(false);
 
-    return QVariant::fromValue<QObject*>(item.second);
+    for(int i=0; i<m_structure->elementCount(); i++)
+    {
+        StructureElement *element = m_structure->elementAt(i);
+        const QString stackId = element->stackId();
+        if(stackId.isEmpty())
+            continue;
+
+        StructureElementStack *stack = findStack(stackId);
+        stack->append(element);
+    }
+
+    for(StructureElementStack *stack : qAsConst(this->list()))
+    {
+        stack->initialize();
+        stack->setEnabled(true);
+    }
 }
 
-QHash<int, QByteArray> StructureElementStacks::roleNames() const
+void StructureElementStacks::evaluateStacksLater()
 {
-    QHash<int,QByteArray> roles;
-    roles[StackIdRole] = QByteArrayLiteral("stackId");
-    roles[StackElementsRole] = QByteArrayLiteral("stackElements");
-    return roles;
-}
-
-void StructureElementStacks::setStacks(const QList<StructureElementStacks::Item> &stacks)
-{
-    this->beginResetModel();
-
-    QList<StructureElementStack*> elementsList;
-
-    for(const Item &item : qAsConst(m_stacks))
-        elementsList.append(item.second);
-
-    m_stacks = stacks;
-
-    for(const Item &item : qAsConst(m_stacks))
-        elementsList.removeOne(item.second);
-
-    qDeleteAll(elementsList);
-
-    for(const Item &item : qAsConst(m_stacks))
-        item.second->initialize();
-
-    this->endResetModel();
+    m_evaluateTimer.start(0, this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1608,37 +1641,6 @@ Structure::Structure(QObject *parent)
      });
     connect(&m_elementsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::elementsBoundingBoxChanged);
 
-    m_elementStacksAggregator.setModel(&m_elements);
-    m_elementStacksAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
-        StructureElement *element = m_elements.at(index.row());
-        const QString stackId = element->stackId();
-        if(stackId.isEmpty())
-            return;
-
-        QVariantMap map = value.toMap();
-        QVariant listValue = map.value(stackId);
-        StructureElementStack *stack = listValue.isValid() ?
-                    qobject_cast<StructureElementStack*>(listValue.value<QObject*>()) :
-                    new StructureElementStack(&m_elementStacks);
-        stack->append(element);
-        map[stackId] = QVariant::fromValue<QObject*>(stack);
-        value = map;
-    });
-    m_elementStacksAggregator.setFinalizeFunction([=](QVariant &value) {
-         const QVariantMap map = value.toMap();
-         QVariantMap::const_iterator it = map.begin();
-         QVariantMap::const_iterator end = map.end();
-         QList<StructureElementStacks::Item> groups;
-         while(it != end) {
-             StructureElementStack *stack = qobject_cast<StructureElementStack*>(it.value().value<QObject*>());
-             if(stack != nullptr)
-                 groups << qMakePair(it.key(), stack);
-             ++it;
-         }
-         value = QVariant();
-         m_elementStacks.setStacks(groups);
-    });
-
     m_annotationsBoundingBoxAggregator.setModel(&m_annotations);
     m_annotationsBoundingBoxAggregator.setAggregateFunction([=](const QModelIndex &index, QVariant &value) {
         QRectF rect = value.toRectF();
@@ -1993,6 +1995,9 @@ void Structure::removeElement(StructureElement *ptr)
     disconnect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
     disconnect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
     disconnect(ptr, &StructureElement::sceneLocationChanged, this, &Structure::updateLocationHeadingMapLater);
+    disconnect(ptr, &StructureElement::geometryChanged, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectChanged);
+    disconnect(ptr, &StructureElement::aboutToDelete, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectDestroyed);
+    disconnect(ptr, &StructureElement::stackIdChanged, &m_elementStacks, &StructureElementStacks::evaluateStacksLater);
     this->updateLocationHeadingMapLater();
 
     emit elementCountChanged();
@@ -2029,6 +2034,7 @@ void Structure::insertElement(StructureElement *ptr, int index)
     connect(ptr, &StructureElement::sceneLocationChanged, this, &Structure::updateLocationHeadingMapLater);
     connect(ptr, &StructureElement::geometryChanged, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectChanged);
     connect(ptr, &StructureElement::aboutToDelete, &m_elements, &ObjectListPropertyModel<StructureElement*>::objectDestroyed);
+    connect(ptr, &StructureElement::stackIdChanged, &m_elementStacks, &StructureElementStacks::evaluateStacksLater);
     this->updateLocationHeadingMapLater();
 
     this->onStructureElementSceneChanged(ptr);

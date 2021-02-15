@@ -1086,16 +1086,16 @@ Item {
                         }
                     }
 
-//                    MenuItem2 {
-//                        text: "Stack"
-//                        onClicked: {
-//                            var items = selection.items
-//                            var id = app.createUniqueId()
-//                            items.forEach( function(item) {
-//                                item.element.stackId = id
-//                            })
-//                        }
-//                    }
+                    MenuItem2 {
+                        text: "Stack"
+                        onClicked: {
+                            var items = selection.items
+                            var id = app.createUniqueId()
+                            items.forEach( function(item) {
+                                item.element.stackId = id
+                            })
+                        }
+                    }
 
                     MenuItem2 {
                         text: "Add To Timeline"
