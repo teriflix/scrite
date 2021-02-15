@@ -194,6 +194,13 @@ Item {
                     MediaPlayer {
                         id: mediaPlayer
                         notifyInterval: 1000
+
+                        property int sceneStartPosition: -1
+                        property int sceneEndPosition: -1
+                        property bool hasScenePositions: sceneStartPosition >= 0 && sceneEndPosition > 0 && sceneEndPosition > sceneStartPosition
+                        property real sceneStartOffset: sceneStartPosition > 0 ? screenplayOffsetsModel.evaluatePointAtTime(sceneStartPosition, -1).y * textDocumentView.documentScale : 0
+                        property real sceneEndOffset: sceneEndPosition > 0 ? screenplayOffsetsModel.evaluatePointAtTime(sceneEndPosition, -1).y * textDocumentView.documentScale : 0
+
                         function togglePlayback() {
                             if(status == MediaPlayer.NoMedia)
                                 return
@@ -213,8 +220,24 @@ Item {
                         }
 
                         property bool keepScreenplayInSyncWithPosition: false
+
+                        onKeepScreenplayInSyncWithPositionChanged: {
+                            if(keepScreenplayInSyncWithPosition) {
+                                if(hasScenePositions)
+                                    startingFrameAnimation.prepare()
+                            } else {
+                                startingFrameOverlay.visible = false
+                                closingFrameAnimation.rollback()
+                                sceneStartPosition = -1
+                                sceneEndPosition = -1
+                            }
+                        }
+
                         onPositionChanged: {
                             if(keepScreenplayInSyncWithPosition && playbackState === MediaPlayer.PlayingState) {
+                                if(hasScenePositions && position >= sceneEndPosition)
+                                    closingFrameAnimation.start()
+
                                 var offsetInfo = screenplayOffsetsModel.offsetInfoAtTime(position, screenplayOffsetsView.currentIndex)
                                 if(offsetInfo.row < 0)
                                     return
@@ -223,7 +246,8 @@ Item {
                                     screenplayOffsetsView.currentIndex = offsetInfo.row
 
                                 var newY = screenplayOffsetsModel.evaluatePointAtTime(position, offsetInfo.row).y * textDocumentView.documentScale
-                                textDocumentFlick.contentY = newY
+                                var maxNewY = hasScenePositions ? (sceneEndOffset-textDocumentFlick.height*0.75) : textDocumentView.height - textDocumentFlick.height
+                                textDocumentFlick.contentY = Math.min(newY, maxNewY)
                             }
                         }
                     }
@@ -510,6 +534,24 @@ Item {
                                 verticalPadding: textDocumentFlickPadding.height * documentScale
 
                                 Rectangle {
+                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneStartPosition > 0
+                                    width: parent.width
+                                    height: 2
+                                    color: "green"
+                                    x: 0
+                                    y: screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.sceneStartPosition).y * textDocumentView.documentScale - height
+                                }
+
+                                Rectangle {
+                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneEndPosition > 0
+                                    width: parent.width
+                                    height: 2
+                                    color: "red"
+                                    x: 0
+                                    y: screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.sceneEndPosition).y * textDocumentView.documentScale + height
+                                }
+
+                                Rectangle {
                                     id: textDocumentTimeCursor
                                     width: parent.width
                                     height: 2
@@ -628,13 +670,19 @@ Item {
             SequentialAnimation {
                 id: startingFrameAnimation
 
+                function prepare() {
+                    startingFrameOverlayContent.opacity = 1
+                    startingFrameOverlay.opacity = 1
+                    startingFrameOverlay.visible = true
+                    mediaPlayer.pause()
+                    mediaPlayer.seek(mediaPlayer.sceneStartPosition)
+                    var offsetInfo = screenplayOffsetsModel.offsetInfoAtTime(mediaPlayer.sceneStartPosition, screenplayOffsetsView.currentIndex)
+                    screenplayOffsetsView.currentIndex = offsetInfo.row
+                    textDocumentFlick.contentY = screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.sceneStartPosition, offsetInfo.row).y * textDocumentView.documentScale
+                }
+
                 ScriptAction {
-                    script: {
-                        startingFrameOverlayContent.opacity = 1
-                        startingFrameOverlay.opacity = 1
-                        startingFrameOverlay.visible = true
-                        mediaPlayer.pause()
-                    }
+                    script: startingFrameAnimation.prepare()
                 }
 
                 PauseAnimation {
@@ -642,7 +690,10 @@ Item {
                 }
 
                 ScriptAction {
-                    script: mediaPlayer.play()
+                    script: {
+                        mediaPlayer.seek(mediaPlayer.sceneStartPosition-2000)
+                        mediaPlayer.play()
+                    }
                 }
 
                 NumberAnimation {
@@ -676,7 +727,7 @@ Item {
 
                 Column {
                     id: startingFrameOverlayContent
-                    spacing: startingFrameOverlay.height * 0.025
+                    spacing: startingFrameOverlay.height * 0.01
                     width: parent.width * 0.8
                     anchors.centerIn: parent
 
@@ -690,7 +741,7 @@ Item {
 
                     Image {
                         source: "file:///" + scriteDocument.screenplay.coverPagePhoto
-                        width: parent.width * 0.75
+                        width: parent.width
                         fillMode: Image.PreserveAspectFit
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -779,7 +830,7 @@ Item {
                     target: teriflixLogoOverlay
                     property: "opacity"
                     from: 0
-                    to: 1
+                    to: 8
                     duration: 1000
                 }
 
@@ -808,7 +859,7 @@ Item {
                         id: appLogoOverlay
                         source: "../images/appicon.png"
                         smooth: true
-                        width: parent.width * 0.15
+                        width: parent.width * 0.2
                         fillMode: Image.PreserveAspectFit
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -822,7 +873,7 @@ Item {
                         id: callToActionOverlay
                         text: "Screenwrite with <b>Scrite</b>"
                         color: "#f1be41"
-                        font.pointSize: closingFrameOverlay.height * 0.05
+                        font.pointSize: closingFrameOverlay.height * 0.075
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
@@ -830,8 +881,17 @@ Item {
                         id: websiteOverlay
                         text: "www.scrite.io"
                         color: "white"
-                        font.pointSize: closingFrameOverlay.height * 0.05
+                        font.pointSize: closingFrameOverlay.height * 0.075
                         font.family: "Courier Prime"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Image {
+                        id: teriflixLogoOverlay
+                        source: "../images/teriflix_logo_inverted.png"
+                        smooth: true
+                        width: parent.width * 0.2
+                        fillMode: Image.PreserveAspectFit
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
@@ -1087,7 +1147,7 @@ Item {
             videoArea.height = videoArea.width / 16 * 9
             break
         case Qt.Key_Space:
-            if(startingFrameOverlay.visible)
+            if(mediaIsLoaded && mediaIsPaused && mediaPlayer.hasScenePositions)
                 startingFrameAnimation.start()
             else
                 mediaPlayer.togglePlayback()
@@ -1141,17 +1201,23 @@ Item {
         case Qt.Key_U:
             unlockAllSceneTimes()
             break
-        case Qt.Key_S:
-            if(mediaIsLoaded && mediaPlayer.keepScreenplayInSyncWithPosition)
-                startingFrameOverlay.visible = !startingFrameOverlay.visible
-            else
-                startingFrameOverlay.visible = false
+        case Qt.Key_S: // For start
+            if(mediaIsLoaded) {
+                if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
+                    return
+                mediaPlayer.sceneStartPosition = mediaPlayer.position
+            }
             break
-        case Qt.Key_F:
-            if(closingFrameOverlay.opacity > 0)
-                closingFrameAnimation.rollback()
-            else if(mediaIsLoaded && mediaIsPlaying && mediaPlayer.keepScreenplayInSyncWithPosition)
-                closingFrameAnimation.start()
+        case Qt.Key_E: // For end
+            if(mediaIsLoaded) {
+                if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
+                    return
+                mediaPlayer.sceneEndPosition = mediaPlayer.position
+            }
+            break
+        case Qt.Key_A:
+            if(mediaIsLoaded)
+                screenplayOffsetsModel.adjustUnlockedTimes(mediaPlayer.duration)
             break
         }
     }

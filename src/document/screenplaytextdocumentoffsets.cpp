@@ -22,6 +22,7 @@
 #include <QVersionNumber>
 #include <QtConcurrentRun>
 #include <QAbstractTextDocumentLayout>
+#include <QJsonDocument>
 
 class OffsetItem
 {
@@ -464,6 +465,68 @@ void ScreenplayTextDocumentOffsets::toggleSceneTimeLock(int row)
 
     const QModelIndex index = this->index(row);
     emit dataChanged(index, index);
+
+    this->saveOffsets();
+}
+
+void ScreenplayTextDocumentOffsets::adjustUnlockedTimes(int duration)
+{
+    QJsonArray &offsets = this->internalArray();
+    if(offsets.isEmpty() || m_document.isNull())
+        return;
+
+    QJsonArray lockedOffsets;
+    std::copy_if (offsets.begin(), offsets.end(),
+                  std::back_inserter(lockedOffsets), [](const QJsonValue &value) {
+        return OffsetItem(value.toObject()).isLocked();
+    });
+
+    if(lockedOffsets.isEmpty())
+    {
+        this->resetAllTimes();
+        return;
+    }
+
+    auto adjustRange = [&](int fromRow, int toRow, qreal po1, qreal po2, int ts1, int ts2) {
+        if(fromRow >= toRow || po1 >= po2 || ts1 >= ts2)
+            return;
+        ModelDataChangedTracker tracker(this);
+        const qreal msPerPixel = (ts2 - ts1) / (po2 - po1);
+        for(int i=fromRow; i<=toRow; i++) {
+            OffsetItem item(offsets.at(i));
+            if(item.isLocked())
+                continue; // Just to be safe.
+            const int ts = ts1 + (item.pixelOffset()-po1)*msPerPixel;
+            item.setTimestamp(ts);
+            offsets[i] = item.json();
+            tracker.changeRow(i);
+        }
+    };
+
+    const OffsetItem firstLockedOffset( lockedOffsets.first() );
+    if(firstLockedOffset.row() > 0)
+        adjustRange(0, firstLockedOffset.row()-1, 0, firstLockedOffset.pixelOffset(), 0, firstLockedOffset.timestamp());
+
+    for(int i=0; i<lockedOffsets.size()-1; i++)
+    {
+        const OffsetItem l1(lockedOffsets.at(i));
+        const OffsetItem l2(lockedOffsets.at(i+1));
+        if(l2.row() == l1.row()+1)
+            continue;
+
+        adjustRange(l1.row()+1, l2.row()-1, l1.pixelOffset(), l2.pixelOffset(), l1.timestamp(), l2.timestamp());
+    }
+
+    if(duration > 0)
+    {
+        const OffsetItem lastLockedOffset( lockedOffsets.last() );
+        if(lastLockedOffset.row() < offsets.size()-1)
+        {
+            QAbstractTextDocumentLayout *documentLayout = m_document->documentLayout();
+            const qreal contentHeight = documentLayout->documentSize().height();
+            adjustRange(lastLockedOffset.row()+1, offsets.size()-1, lastLockedOffset.pixelOffset(), contentHeight, lastLockedOffset.timestamp(), duration);
+        }
+    }
 
     this->saveOffsets();
 }

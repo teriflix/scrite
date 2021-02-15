@@ -210,6 +210,7 @@ public:
     Q_INVOKABLE bool writeToFile(const QString &fileName, const QString &fileContent);
     Q_INVOKABLE QString fileContents(const QString &fileName) const;
     Q_INVOKABLE QString fileName(const QString &path) const;
+    Q_INVOKABLE QString neighbouringFilePath(const QString &filePath, const QString &nfileName) const;
 
     Q_INVOKABLE QScreen *windowScreen(QObject *window) const;
 

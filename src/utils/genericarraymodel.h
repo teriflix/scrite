@@ -102,6 +102,9 @@ public:
         this->notify();
     }
 
+    int startRowIndex() const { return m_startRow; }
+    int endRowIndex() const { return m_endRow; }
+
     void changeRow(int row) {
         if(m_startRow < 0 || m_endRow < 0) {
             m_startRow = row;

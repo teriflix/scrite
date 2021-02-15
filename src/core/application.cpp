@@ -991,6 +991,12 @@ QString Application::fileName(const QString &path) const
     return QFileInfo(path).baseName();
 }
 
+QString Application::neighbouringFilePath(const QString &filePath, const QString &nfileName) const
+{
+    const QFileInfo fi(filePath);
+    return fi.absoluteDir().absoluteFilePath(nfileName);
+}
+
 QScreen *Application::windowScreen(QObject *window) const
 {
     QWindow *qwindow = qobject_cast<QWindow*>(window);
