@@ -162,6 +162,10 @@ public:
     StructureElement *stackLeader() const;
     Q_SIGNAL void stackLeaderChanged();
 
+    Q_PROPERTY(StructureElement* topmostElement READ topmostElement NOTIFY topmostElementChanged)
+    StructureElement* topmostElement() const;
+    Q_SIGNAL void topmostElementChanged();
+
     Q_PROPERTY(QRectF geometry READ geometry NOTIFY geometryChanged)
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
@@ -174,18 +178,21 @@ protected:
     void itemRemoveEvent(StructureElement *ptr);
 
 private:
+    void setTopmostElement(StructureElement* val);
     void setStackId(const QString &val);
     void setGeometry(const QRectF &val);
 
     void initialize();
     void onStackLeaderChanged();
     void onElementGeometryChanged();
+    void onStructureCurrentElementChanged();
 
 private:
     friend class StructureElementStacks;
     QRectF m_geometry;
     QString m_stackId;
     bool m_enabled = false;
+    StructureElement* m_topmostElement = nullptr;
 };
 
 class StructureElementStacks : public ObjectListPropertyModel<StructureElementStack *>
@@ -196,6 +203,9 @@ public:
     StructureElementStacks(QObject *parent=nullptr);
     ~StructureElementStacks();
 
+    Q_PROPERTY(Structure* structure READ structure CONSTANT)
+    Structure *structure() const { return m_structure; }
+
     Q_INVOKABLE StructureElementStack *findStackById(const QString &stackID) const;
     Q_INVOKABLE StructureElementStack *findStackByElement(StructureElement *element) const;
 
@@ -205,6 +215,7 @@ protected:
     void itemRemoveEvent(StructureElementStack *ptr);
 
 private:
+    void resetAllStacks();
     void evaluateStacks();
     void evaluateStacksLater();
 

@@ -102,6 +102,11 @@ public:
 
     static TabSequenceItem *qmlAttachedProperties(QObject *object);
 
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
     Q_PROPERTY(TabSequenceManager* manager READ manager WRITE setManager NOTIFY managerChanged RESET resetManager)
     void setManager(TabSequenceManager* val);
     TabSequenceManager* manager() const { return m_manager; }
@@ -125,6 +130,7 @@ private:
 
 private:
     friend class TabSequenceManager;
+    bool m_enabled = true;
     int m_sequence = 0;
     int m_insertIndex = -1;
     QObjectProperty<TabSequenceManager> m_manager;

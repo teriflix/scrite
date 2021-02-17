@@ -286,7 +286,10 @@ void StructureElement::syncWithFollowItem()
 StructureElementStack::StructureElementStack(QObject *parent)
     : ObjectListPropertyModel<StructureElement *>(parent)
 {
-
+    StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(parent);
+    if(stacks)
+        connect(stacks->structure(), &Structure::currentElementIndexChanged,
+                this, &StructureElementStack::onStructureCurrentElementChanged);
 }
 
 StructureElementStack::~StructureElementStack()
@@ -301,6 +304,11 @@ StructureElement *StructureElementStack::stackLeader() const
             return element;
 
     return this->first();
+}
+
+StructureElement *StructureElementStack::topmostElement() const
+{
+    return m_topmostElement == nullptr ? this->stackLeader() : m_topmostElement;
 }
 
 void StructureElementStack::moveToStackId(const QString &stackID)
@@ -338,6 +346,15 @@ void StructureElementStack::itemRemoveEvent(StructureElement *ptr)
     disconnect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
 }
 
+void StructureElementStack::setTopmostElement(StructureElement *val)
+{
+    if(m_topmostElement == val)
+        return;
+
+    m_topmostElement = val;
+    emit topmostElementChanged();
+}
+
 void StructureElementStack::setStackId(const QString &val)
 {
     if(m_stackId == val)
@@ -357,7 +374,7 @@ void StructureElementStack::setGeometry(const QRectF &val)
 }
 
 void StructureElementStack::initialize()
-{    
+{
     QRectF geo;
     StructureElement *leader = nullptr;
 
@@ -396,6 +413,13 @@ void StructureElementStack::initialize()
 
     if(list.isEmpty())
     {
+        this->deleteLater();
+        return;
+    }
+
+    if(list.size() == 1)
+    {
+        list.first()->setStackId(QString());
         this->deleteLater();
         return;
     }
@@ -462,6 +486,26 @@ void StructureElementStack::onElementGeometryChanged()
     this->setEnabled(true);
 }
 
+void StructureElementStack::onStructureCurrentElementChanged()
+{
+    StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(this->parent());
+    if(stacks == nullptr)
+        return;
+
+    Structure *structure = stacks->structure();
+    StructureElement *element = structure->elementAt( structure->currentElementIndex() );
+    if(element == nullptr)
+    {
+        this->setTopmostElement(nullptr);
+        return;
+    }
+
+    if(this->list().contains(element))
+        this->setTopmostElement(element);
+    else
+        this->setTopmostElement(nullptr);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementStacks::StructureElementStacks(QObject *parent)
@@ -519,8 +563,23 @@ void StructureElementStacks::itemRemoveEvent(StructureElementStack *ptr)
     disconnect(ptr, &StructureElementStack::geometryChanged, this, &StructureElementStacks::objectChanged);
 }
 
+void StructureElementStacks::resetAllStacks()
+{
+    if(this->isEmpty())
+        return;
+
+    for(StructureElementStack *stack : qAsConst(this->list()))
+        stack->deleteLater();
+}
+
 void StructureElementStacks::evaluateStacks()
 {
+    if(m_structure->canvasUIMode() != Structure::IndexCardUI)
+    {
+        this->resetAllStacks();
+        return;
+    }
+
     auto findOrCreateStack = [=](const QString &id) {
         for(StructureElementStack *stack : qAsConst(this->list()))
             if(stack->stackId() == id)
@@ -2202,6 +2261,9 @@ int Structure::indexOfElement(StructureElement *element) const
 
 StructureElement *Structure::findElementBySceneID(const QString &id) const
 {
+    if(id.isEmpty())
+        return nullptr;
+
     Q_FOREACH(StructureElement *element, m_elements.list())
     {
         if(element->scene()->id() == id)

@@ -158,17 +158,34 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
                 return int(kemods & Qt::KeyboardModifiers(val)) > 0;
             };
 
+            auto fetchNextIndex = [=](int from, int direction) {
+                int idx = from;
+                while(1) {
+                    idx += direction;
+                    if(idx == from)
+                        break;
+                    if(idx >= m_tabSequenceItems.size())
+                        idx = 0;
+                    else if(idx < 0)
+                        idx = m_tabSequenceItems.size()-1;
+                    TabSequenceItem *item = m_tabSequenceItems.at(idx);
+                    if(item->isEnabled())
+                        break;
+                }
+                return idx;
+            };
+
             int nextIndex = -1;
             if(ke->key() == m_tabKey && compareModifiers(m_tabKeyModifiers))
             {
-                nextIndex = (itemIndex+1)%m_tabSequenceItems.size();
+                nextIndex = fetchNextIndex(itemIndex, 1); // (itemIndex+1)%m_tabSequenceItems.size();
                 if(nextIndex < itemIndex && !m_wrapAround)
                     return false;
             }
 
             if(ke->key() == m_backtabKey && compareModifiers(m_backtabKeyModifiers))
             {
-                nextIndex = itemIndex > 0 ? itemIndex-1 : m_tabSequenceItems.size()-1;
+                nextIndex = fetchNextIndex(itemIndex, -1); // itemIndex > 0 ? itemIndex-1 : m_tabSequenceItems.size()-1;
                 if(nextIndex > itemIndex && !m_wrapAround)
                     return false;
             }
@@ -253,6 +270,15 @@ TabSequenceItem::~TabSequenceItem()
 TabSequenceItem *TabSequenceItem::qmlAttachedProperties(QObject *object)
 {
     return new TabSequenceItem(object);
+}
+
+void TabSequenceItem::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
 }
 
 void TabSequenceItem::setManager(TabSequenceManager *val)

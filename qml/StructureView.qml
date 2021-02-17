@@ -1030,8 +1030,11 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
-                        property int objectCount: objectItem.objectCount
-                        onObjectCountChanged: binderClipImageAnimation.start()
+                        Connections {
+                            target: objectItem
+                            onObjectCountChanged: binderClipImageAnimation.start()
+                            onTopmostElementChanged: binderClipImageAnimation.start()
+                        }
 
                         SequentialAnimation {
                             id: binderClipImageAnimation
@@ -1050,42 +1053,6 @@ Item {
                                 property: "scale"
                                 from: 2; to: 1
                                 duration: 250
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: -10
-                        border.width: 2
-                        border.color: app.translucent("black", alpha)
-                        color: app.translucent("#cfd8dc", alpha)
-                        radius: 6
-                        property real alpha: 0
-
-                        DropArea {
-                            anchors.fill: parent
-                            keys: ["scrite/sceneID"]
-                            onEntered: parent.alpha = 0.5
-                            onExited: parent.alpha = 0
-                            onDropped: {
-                                parent.alpha = 0
-
-                                var sceneID = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene.id : drop.source.id
-                                var element = scriteDocument.structure.findElementBySceneID(sceneID)
-                                if(element === null)
-                                    return
-
-                                drop.acceptProposedAction()
-
-                                if(element.stackId === "") {
-                                    element.stackId = objectItem.stackId
-                                    return
-                                }
-
-                                var stack = scriteDocument.structure.elementStacks.findStackById(element.stackId)
-                                if(stack !== null)
-                                    stack.moveToStack(objectItem)
                             }
                         }
                     }
@@ -1808,6 +1775,8 @@ Item {
             property int elementIndex: index
             property bool selected: scriteDocument.structure.currentElementIndex === index
             z: selected ? 1 : 0
+            property StructureElementStack elementStack: scriteDocument.structure.elementStacks.findStackById(element.stackId)
+            visible: elementStack === null || elementStack.topmostElement === element
 
             function select() {
                 scriteDocument.structure.currentElementIndex = index
@@ -1948,6 +1917,7 @@ Item {
                         else
                             font.capitalization = Font.AllUppercase
                     }
+                    TabSequenceItem.enabled: elementItem.visible
                     TabSequenceItem.manager: canvasTabSequence
                     TabSequenceItem.sequence: elementIndex * 2 + 0
                     TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
@@ -2009,6 +1979,7 @@ Item {
                                 else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
                                     synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
                             }
+                            TabSequenceItem.enabled: elementItem.visible
                             TabSequenceItem.manager: canvasTabSequence
                             TabSequenceItem.sequence: elementIndex * 2 + 1
                             TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
@@ -2109,6 +2080,64 @@ Item {
                 Drag.supportedActions: Qt.LinkAction
                 Drag.mimeData: { "scrite/sceneID": element.scene.id }
                 Drag.source: element.scene
+            }
+
+            // Accept drops for stacking items on top of each other.
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -10
+                border.width: 2
+                border.color: app.translucent("black", alpha)
+                color: app.translucent("#cfd8dc", alpha)
+                radius: 6
+                property real alpha: 0
+                enabled: !dragHandleMouseArea.drag.active
+
+                DropArea {
+                    anchors.fill: parent
+                    keys: ["scrite/sceneID"]
+                    onEntered: parent.alpha = 0.5
+                    onExited: parent.alpha = 0
+                    onDropped: {
+                        parent.alpha = 0
+
+                        var otherSceneId = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene.id : drop.source.id
+                        if(otherSceneId === element.scene.id)
+                            return
+
+                        var otherElement = scriteDocument.structure.findElementBySceneID(otherSceneId)
+                        if(otherElement === null)
+                            return
+
+                        var myStackId = element.stackId
+                        var otherStackId = otherElement.stackId
+                        drop.acceptProposedAction()
+
+                        if(myStackId === "") {
+                            if(otherStackId === "") {
+                                var uid = app.createUniqueId()
+                                element.stackId = uid
+                                otherElement.stackId = uid
+                                return
+                            }
+
+                            element.stackId = otherStackId
+                            element.stackLeader = true
+                            otherElement.stackLeader = false
+                            return
+                        }
+
+                        if(otherStackId === "") {
+                            otherElement.stackId = myStackId
+                            otherElement.stackLeader = false
+                            return
+                        }
+
+                        var otherStack = scriteDocument.structure.elementStacks.findStackById(otherStackId)
+                        if(otherStack !== null)
+                            otherStack.moveToStackId(myStackId)
+                    }
+                }
             }
         }
     }
