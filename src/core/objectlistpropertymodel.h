@@ -36,6 +36,15 @@ public:
     Q_SIGNAL void objectCountChanged();
 
     Q_INVOKABLE virtual QObject *objectAt(int row) const = 0;
+
+    // QAbstractListModel implementation
+    enum { ObjectItemRole = Qt::UserRole+1, ModelDataRole };
+    QHash<int, QByteArray> roleNames() const {
+        QHash<int,QByteArray> roles;
+        roles[ObjectItemRole] = QByteArrayLiteral("objectItem");
+        roles[ModelDataRole] = QByteArrayLiteral("modelData");
+        return roles;
+    }
 };
 
 template <class T>
@@ -45,18 +54,6 @@ public:
     ObjectListPropertyModel(QObject *parent=nullptr)
         : ObjectListPropertyModelBase(parent) { }
     ~ObjectListPropertyModel() { }
-
-    typedef ObjectListPropertyModel<T> TObjectListModel;
-    typedef std::function<void(TObjectListModel*,T)> SignalHooksFunction;
-    void setSignalHooksFunction(SignalHooksFunction val) {
-        m_signalHooksFunction = val;
-        for(T ptr : m_list) {
-            ptr->disconnect(this);
-            if(m_signalHooksFunction)
-                m_signalHooksFunction(this, ptr);
-        }
-    }
-    SignalHooksFunction signalHooksFunction() const { return m_signalHooksFunction; }
 
     operator QList<T> () { return m_list; }
     QList<T>& list() { return m_list; }
@@ -70,10 +67,11 @@ public:
     }
 
     void prepend(T ptr) {
+        if(m_list.contains(ptr))
+            return;
         this->beginInsertRows(QModelIndex(), 0, 0);
-        if(m_signalHooksFunction)
-            m_signalHooksFunction(this, ptr);
         m_list.prepend(ptr);
+        this->itemInsertEvent(ptr);
         this->endInsertRows();
     }
 
@@ -82,21 +80,20 @@ public:
     void removeAt(int row) {
         if(row < 0 || row >= m_list.size())
             return;
-
         this->beginRemoveRows(QModelIndex(), row, row);
         T ptr = m_list.at(row);
-        ptr->disconnect(this);
+        this->itemRemoveEvent(ptr);
         m_list.removeAt(row);
         this->endRemoveRows();
     }
 
     void insert(int row, T ptr) {
+        if(m_list.contains(ptr))
+            return;
         int iidx = row < 0 || row >= m_list.size() ? m_list.size() : row;
-
         this->beginInsertRows(QModelIndex(), iidx, iidx);
-        if(m_signalHooksFunction)
-            m_signalHooksFunction(this, ptr);
         m_list.insert(iidx, ptr);
+        this->itemInsertEvent(ptr);
         this->endInsertRows();
     }
 
@@ -118,12 +115,10 @@ public:
     void assign(const QList<T> &list) {
         this->beginResetModel();
         for(T ptr : m_list)
-            ptr->disconnect(this);
+            this->itemRemoveEvent(ptr);
         m_list = list;
-        if(m_signalHooksFunction) {
-            for(T ptr : m_list)
-                m_signalHooksFunction(this, ptr);
-        }
+        for(T ptr : m_list)
+            this->itemInsertEvent(ptr);
         this->endResetModel();
     }
 
@@ -165,7 +160,6 @@ public:
     }
 
     // QAbstractItemModel interface
-    enum { ObjectItemRole = Qt::UserRole+1, ModelDataRole };
     int rowCount(const QModelIndex &parent) const {
         return parent.isValid() ? 0 : m_list.size();
     }
@@ -175,12 +169,6 @@ public:
             return QVariant::fromValue<QObject*>(ptr);
         }
         return QVariant();
-    }
-    QHash<int, QByteArray> roleNames() const {
-        QHash<int,QByteArray> roles;
-        roles[ObjectItemRole] = QByteArrayLiteral("objectItem");
-        roles[ModelDataRole] = QByteArrayLiteral("modelData");
-        return roles;
     }
 
     // ObjectListPropertyModelBase interface
@@ -208,9 +196,12 @@ public:
         this->removeAt(row);
     }
 
+protected:
+    virtual void itemInsertEvent(T ptr) { Q_UNUSED(ptr); }
+    virtual void itemRemoveEvent(T ptr) { Q_UNUSED(ptr); }
+
 private:
     QList<T> m_list;
-    SignalHooksFunction m_signalHooksFunction;
 };
 
 template <class T>

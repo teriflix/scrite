@@ -145,8 +145,9 @@ class StructureElementStack : public ObjectListPropertyModel<StructureElement *>
 {
     Q_OBJECT
 
-public:
     StructureElementStack(QObject *parent=nullptr);
+
+public:
     ~StructureElementStack();
     Q_SIGNAL void aboutToDelete(StructureElementStack *ptr);
 
@@ -165,8 +166,15 @@ public:
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
 
+    Q_INVOKABLE void moveToStackId(const QString &stackID);
+    Q_INVOKABLE void moveToStack(StructureElementStack *other);
+
+protected:
+    void itemInsertEvent(StructureElement *ptr);
+    void itemRemoveEvent(StructureElement *ptr);
+
 private:
-    void setStackId(QString val);
+    void setStackId(const QString &val);
     void setGeometry(const QRectF &val);
 
     void initialize();
@@ -188,8 +196,13 @@ public:
     StructureElementStacks(QObject *parent=nullptr);
     ~StructureElementStacks();
 
+    Q_INVOKABLE StructureElementStack *findStackById(const QString &stackID) const;
+    Q_INVOKABLE StructureElementStack *findStackByElement(StructureElement *element) const;
+
 protected:
     void timerEvent(QTimerEvent *te);
+    void itemInsertEvent(StructureElementStack *ptr);
+    void itemRemoveEvent(StructureElementStack *ptr);
 
 private:
     void evaluateStacks();
@@ -618,8 +631,8 @@ public:
     QRectF elementsBoundingBox() const { return m_elementsBoundingBoxAggregator.aggregateValue().toRectF(); }
     Q_SIGNAL void elementsBoundingBoxChanged();
 
-    Q_PROPERTY(QAbstractListModel* elementStacks READ elementStacks CONSTANT STORED false)
-    QAbstractListModel *elementStacks() const { return &((const_cast<Structure*>(this))->m_elementStacks); }
+    Q_PROPERTY(StructureElementStacks* elementStacks READ elementStacks CONSTANT STORED false)
+    StructureElementStacks *elementStacks() const { return &((const_cast<Structure*>(this))->m_elementStacks); }
 
     Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<StructureElement> elements();

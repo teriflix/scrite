@@ -999,8 +999,102 @@ Item {
                 delegate: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? structureElementIndexCardUIDelegate : structureElementSynopsisEditorUIDelegate
             }
 
+            Repeater {
+                id: stackBinders
+                model: scriteDocument.loading ? null : scriteDocument.structure.elementStacks
+                delegate: Item {
+                    z: 2
+                    x: objectItem.geometry.x
+                    y: objectItem.geometry.y
+                    width: objectItem.geometry.width
+                    height: objectItem.geometry.height
+
+                    Image {
+                        id: binderClipImage
+                        height: 48
+                        source: "../images/paper_clip.png"
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true; mipmap: true
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: -height * 0.55
+
+                        Text {
+                            color: "white"
+                            font.family: "Courier Prime"
+                            font.pixelSize: 10
+                            text: objectItem.objectCount
+                            anchors.top: parent.verticalCenter
+                            anchors.topMargin: parent.height * 0.1
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+
+                        property int objectCount: objectItem.objectCount
+                        onObjectCountChanged: binderClipImageAnimation.start()
+
+                        SequentialAnimation {
+                            id: binderClipImageAnimation
+                            loops: 1
+                            running: false
+
+                            NumberAnimation {
+                                target: binderClipImage
+                                property: "scale"
+                                from: 1; to: 2
+                                duration: 250
+                            }
+
+                            NumberAnimation {
+                                target: binderClipImage
+                                property: "scale"
+                                from: 2; to: 1
+                                duration: 250
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: -10
+                        border.width: 2
+                        border.color: app.translucent("black", alpha)
+                        color: app.translucent("#cfd8dc", alpha)
+                        radius: 6
+                        property real alpha: 0
+
+                        DropArea {
+                            anchors.fill: parent
+                            keys: ["scrite/sceneID"]
+                            onEntered: parent.alpha = 0.5
+                            onExited: parent.alpha = 0
+                            onDropped: {
+                                parent.alpha = 0
+
+                                var sceneID = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene.id : drop.source.id
+                                var element = scriteDocument.structure.findElementBySceneID(sceneID)
+                                if(element === null)
+                                    return
+
+                                drop.acceptProposedAction()
+
+                                if(element.stackId === "") {
+                                    element.stackId = objectItem.stackId
+                                    return
+                                }
+
+                                var stack = scriteDocument.structure.elementStacks.findStackById(element.stackId)
+                                if(stack !== null)
+                                    stack.moveToStack(objectItem)
+                            }
+                        }
+                    }
+                }
+            }
+
             Selection {
                 id: selection
+                z: 3
                 anchors.fill: parent
                 interactive: !scriteDocument.readOnly
                 onMoveItem: {
@@ -1088,11 +1182,17 @@ Item {
 
                     MenuItem2 {
                         text: "Stack"
-                        onClicked: {
+                        enabled: selection.hasItems && selection.items.length >= 2
+                        onTriggered: {
                             var items = selection.items
                             var id = app.createUniqueId()
                             items.forEach( function(item) {
                                 item.element.stackId = id
+                            })
+                            selection.clear()
+                            app.execLater(selection, 250, function() {
+    //                            if(scriteDocument.structure.forceBeatBoardLayout)
+    //                                scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
                             })
                         }
                     }
@@ -2022,7 +2122,7 @@ Item {
             toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
             outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
-            visible: intersects(canvasScroll.viewportRect)
+            visible: intersects(canvasScroll.viewportRect) && (connectorFromElement.stackId === "" || connectorToElement.stackId === "")
 
             Rectangle {
                 id: labelBg
