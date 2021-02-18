@@ -1156,22 +1156,18 @@ Item {
                         }
                     }
 
-                    MenuItem2 {
-                        text: "Stack"
-                        enabled: selection.hasItems && selection.items.length >= 2
-                        onTriggered: {
-                            var items = selection.items
-                            var id = app.createUniqueId()
-                            items.forEach( function(item) {
-                                item.element.stackId = id
-                            })
-                            selection.clear()
-                            app.execLater(selection, 250, function() {
-    //                            if(scriteDocument.structure.forceBeatBoardLayout)
-    //                                scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-                            })
-                        }
-                    }
+//                    MenuItem2 {
+//                        text: "Stack"
+//                        enabled: selection.hasItems && selection.items.length >= 2
+//                        onTriggered: {
+//                            var items = selection.items
+//                            var id = app.createUniqueId()
+//                            items.forEach( function(item) {
+//                                item.element.stackId = id
+//                            })
+//                            selection.clear()
+//                        }
+//                    }
 
                     MenuItem2 {
                         text: "Add To Timeline"
@@ -2141,41 +2137,35 @@ Item {
                         if(element.scene.actIndex !== otherElement.scene.actIndex)
                             return
 
+                        var otherElementIndex = scriteDocument.structure.indexOfElement(otherElement)
+                        Qt.callLater( function() { scriteDocument.structure.currentElementIndex = otherElementIndex } )
+
                         var myStackId = element.stackId
                         var otherStackId = otherElement.stackId
                         drop.acceptProposedAction()
-
-                        if(scriteDocument.structure.forceBeatBoardLayout)
-                            app.execLater(elementItem, 250, function() {
-                                scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-                            })
 
                         if(myStackId === "") {
                             if(otherStackId === "") {
                                 var uid = app.createUniqueId()
                                 element.stackId = uid
                                 otherElement.stackId = uid
+                                Qt.callLater( function() { element.stackLeader = true } )
                                 return
                             }
 
                             element.stackId = otherStackId
-                            element.stackLeader = true
-                            otherElement.stackLeader = false
                             return
                         }
 
                         if(otherStackId === "") {
                             otherElement.stackId = myStackId
-                            otherElement.stackLeader = false
-                            element.stackLeader = this
+                            Qt.callLater( function() { element.stackLeader = true } )
                             return
                         }
 
                         var otherStack = scriteDocument.structure.elementStacks.findStackById(otherStackId)
-                        if(otherStack !== null) {
+                        if(otherStack !== null)
                             otherStack.moveToStackId(myStackId)
-                            element.stackLeader = this
-                        }
                     }
                 }
             }
@@ -2191,7 +2181,7 @@ Item {
             toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
             outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
-            visible: intersects(canvasScroll.viewportRect) && (connectorFromElement.stackId === "" || connectorToElement.stackId === "")
+            visible: intersects(canvasScroll.viewportRect) && (connectorFromElement.stackId === "" || connectorToElement.stackId === "" || connectorFromElement.stackId !== connectorToElement.stackId)
 
             Rectangle {
                 id: labelBg

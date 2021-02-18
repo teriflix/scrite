@@ -231,8 +231,8 @@ void StructureElement::setStackId(const QString &val)
     if(m_stackId == val)
         return;
 
-    this->setStackLeader(false);
     m_stackId = val;
+    this->setStackLeader(false);
 
     emit stackIdChanged();
 }
@@ -638,6 +638,14 @@ void StructureElementStacks::evaluateStacks()
             stack->initialize();
             stack->setEnabled(true);
         }
+    }
+
+    if(m_structure->isForceBeatBoardLayout())
+    {
+        Screenplay *screenplay = m_structure->scriteDocument() ?
+                    m_structure->scriteDocument()->screenplay() :
+                    ScriteDocument::instance()->screenplay();
+        m_structure->placeElementsInBeatBoardLayout(screenplay);
     }
 }
 
@@ -2542,7 +2550,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
         for(StructureElement *element : qAsConst(beat.second))
         {
             const QString stackId = element->stackId();
-            if(stackId.isEmpty() || stackId != lastStackId)
+            if(element != beat.second.first() && (stackId.isEmpty() || stackId != lastStackId))
                 elementRect.moveTopLeft( elementRect.topRight() + QPointF(xSpacing,0) );
 
             elementRect.setWidth(element->width());
