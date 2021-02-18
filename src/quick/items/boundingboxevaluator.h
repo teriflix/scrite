@@ -177,6 +177,11 @@ public:
     QRectF viewportRect() const { return m_viewportRect; }
     Q_SIGNAL void viewportRectChanged();
 
+    Q_PROPERTY(QByteArray visibilityProperty READ visibilityProperty WRITE setVisibilityProperty NOTIFY visibilityPropertyChanged)
+    void setVisibilityProperty(const QByteArray &val);
+    QByteArray visibilityProperty() const { return m_visibilityProperty; }
+    Q_SIGNAL void visibilityPropertyChanged();
+
     Q_INVOKABLE void markPreviewDirty();
 
     QImage preview() const { return m_preview; }
@@ -207,6 +212,7 @@ private:
     QObjectProperty<QQuickItem> m_viewportItem;
     QSharedPointer<QQuickItemGrabResult> m_itemGrabResult;
     QObjectProperty<BoundingBoxEvaluator> m_evaluator;
+    QByteArray m_visibilityProperty;
 };
 
 class BoundingBoxPreview : public QQuickPaintedItem

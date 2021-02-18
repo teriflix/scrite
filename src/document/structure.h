@@ -162,6 +162,10 @@ public:
     StructureElement *stackLeader() const;
     Q_SIGNAL void stackLeaderChanged();
 
+    Q_PROPERTY(int topmostElementIndex READ topmostElementIndex NOTIFY topmostElementChanged)
+    int topmostElementIndex() const;
+    Q_SIGNAL void topmostElementIndexChanged();
+
     Q_PROPERTY(StructureElement* topmostElement READ topmostElement NOTIFY topmostElementChanged)
     StructureElement* topmostElement() const;
     Q_SIGNAL void topmostElementChanged();

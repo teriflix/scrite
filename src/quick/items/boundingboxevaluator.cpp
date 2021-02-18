@@ -297,6 +297,17 @@ void BoundingBoxItem::setViewportRect(const QRectF &val)
     this->determineVisibility();
 }
 
+void BoundingBoxItem::setVisibilityProperty(const QByteArray &val)
+{
+    if(m_visibilityProperty == val)
+        return;
+
+    m_visibilityProperty = val;
+    emit visibilityPropertyChanged();
+
+    this->determineVisibility();
+}
+
 void BoundingBoxItem::markPreviewDirty()
 {
     this->updatePreviewLater();
@@ -407,7 +418,7 @@ void BoundingBoxItem::determineVisibility()
         }
     }
 
-    bool visible = m_item->isVisible();
+    bool visible = true;
 
     switch(m_visibilityMode)
     {
@@ -422,7 +433,10 @@ void BoundingBoxItem::determineVisibility()
         break;
     }
 
-    m_item->setVisible(visible);
+    if(m_visibilityProperty.isEmpty())
+        m_item->setVisible(visible);
+    else
+        m_item->setProperty(m_visibilityProperty, visible);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

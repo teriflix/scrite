@@ -26,6 +26,7 @@
 #include <QJsonDocument>
 #include <QStandardPaths>
 #include <QFileSystemWatcher>
+#include <QScopedValueRollback>
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent),
@@ -306,6 +307,11 @@ StructureElement *StructureElementStack::stackLeader() const
     return this->first();
 }
 
+int StructureElementStack::topmostElementIndex() const
+{
+    return this->indexOf( this->topmostElement() );
+}
+
 StructureElement *StructureElementStack::topmostElement() const
 {
     return m_topmostElement == nullptr ? this->stackLeader() : m_topmostElement;
@@ -375,10 +381,14 @@ void StructureElementStack::setGeometry(const QRectF &val)
 
 void StructureElementStack::initialize()
 {
+    QScopedValueRollback<bool> rollback(m_enabled, false);
+
     QRectF geo;
     StructureElement *leader = nullptr;
 
     QList<StructureElement*> &list = this->list();
+
+    this->setEnabled(false);
 
     qreal x=0, y=0, w=0, h=0;
 
@@ -408,7 +418,12 @@ void StructureElementStack::initialize()
         }
 
         if(element->isStackLeader())
-            leader = element;
+        {
+            if(leader == nullptr)
+                leader = element;
+            else
+                element->setStackLeader(false);
+        }
     }
 
     if(list.isEmpty())
@@ -426,8 +441,6 @@ void StructureElementStack::initialize()
 
     this->setGeometry( QRectF(x,y,w,h) );
 
-    this->setEnabled(false);
-
     for(StructureElement *element : qAsConst(this->list()))
     {
         element->setX( x );
@@ -441,7 +454,7 @@ void StructureElementStack::initialize()
             leader->setStackLeader(true);
     }
 
-    this->setEnabled(true);
+    this->onStructureCurrentElementChanged();
 }
 
 void StructureElementStack::onStackLeaderChanged()
@@ -449,15 +462,31 @@ void StructureElementStack::onStackLeaderChanged()
     if(!m_enabled)
         return;
 
-    StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
-    if(changedElement->isStackLeader())
+    if(!this->isEmpty())
     {
-        for(StructureElement *element : qAsConst(this->list()))
+        StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
+        if(changedElement->isStackLeader())
         {
-            if(element != changedElement)
-                element->setStackLeader(false);
+            for(StructureElement *element : qAsConst(this->list()))
+            {
+                if(element != changedElement)
+                    element->setStackLeader(false);
+            }
+        }
+        else
+        {
+            for(StructureElement *element : qAsConst(this->list()))
+            {
+                if(element->isStackLeader())
+                    return;
+            }
+
+            this->first()->setStackLeader(true);
         }
     }
+
+    if(m_topmostElement == nullptr)
+        emit topmostElementChanged();
 }
 
 void StructureElementStack::onElementGeometryChanged()
@@ -495,12 +524,8 @@ void StructureElementStack::onStructureCurrentElementChanged()
     Structure *structure = stacks->structure();
     StructureElement *element = structure->elementAt( structure->currentElementIndex() );
     if(element == nullptr)
-    {
         this->setTopmostElement(nullptr);
-        return;
-    }
-
-    if(this->list().contains(element))
+    else if(this->list().contains(element))
         this->setTopmostElement(element);
     else
         this->setTopmostElement(nullptr);
@@ -2396,7 +2421,16 @@ void Structure::setForceBeatBoardLayout(bool val)
 
     m_forceBeatBoardLayout = val;
     if(val && ScriteDocument::instance()->structure() == this)
-        this->placeElementsInBeatBoardLayout(ScriteDocument::instance()->screenplay());
+    {
+        QTimer *timer = new QTimer(this);
+        timer->setInterval(250);
+        timer->setSingleShot(true);
+        connect(timer, &QTimer::timeout, [=]() {
+            this->placeElementsInBeatBoardLayout(ScriteDocument::instance()->screenplay());
+            timer->deleteLater();
+        });
+        timer->start();
+    }
 
     emit forceBeatBoardLayoutChanged();
 }
@@ -2494,6 +2528,8 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
     const qreal xSpacing = 100;
     const qreal ySpacing = 175;
 
+    QMap<QString, QPointF> stackPositions;
+
     QRectF elementRect(x, y, 0, 0);
 
     for(const QPair<QString, QList<StructureElement*>> &beat : beats)
@@ -2501,17 +2537,25 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
         if(beat.second.isEmpty())
             continue;
 
+        QString lastStackId;
         QRectF beatRect;
         for(StructureElement *element : qAsConst(beat.second))
         {
+            const QString stackId = element->stackId();
+            if(stackId.isEmpty() || stackId != lastStackId)
+                elementRect.moveTopLeft( elementRect.topRight() + QPointF(xSpacing,0) );
+
             elementRect.setWidth(element->width());
             elementRect.setHeight(element->height());
             beatRect |= elementRect;
             newBoundingRect |= elementRect;
 
-            element->setPosition(elementRect.topLeft());
+            const QPointF elementPos = stackId.isEmpty() || !stackPositions.contains(stackId) ? elementRect.topLeft() : stackPositions.value(stackId);
+            element->setPosition(elementPos);
+            if(!stackId.isEmpty() && !stackPositions.contains(stackId))
+                stackPositions.insert(stackId, elementPos);
 
-            elementRect.moveTopLeft( elementRect.topRight() + QPointF(xSpacing,0) );
+            lastStackId = stackId;
         }
 
         elementRect.moveTopLeft(QPointF(x, beatRect.bottom()+ySpacing));

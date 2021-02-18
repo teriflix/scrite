@@ -1011,7 +1011,7 @@ Item {
 
                     Image {
                         id: binderClipImage
-                        height: 48
+                        height: 64
                         source: "../images/paper_clip.png"
                         anchors.top: parent.top
                         anchors.left: parent.left
@@ -1020,13 +1020,22 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.topMargin: -height * 0.55
 
+                        Rectangle {
+                            anchors.fill: binderClipLabel
+                            color: "black"
+                            opacity: 0.25
+                            radius: 3
+                        }
+
                         Text {
+                            id: binderClipLabel
                             color: "white"
                             font.family: "Courier Prime"
-                            font.pixelSize: 10
-                            text: objectItem.objectCount
-                            anchors.top: parent.verticalCenter
-                            anchors.topMargin: parent.height * 0.1
+                            font.pixelSize: parent.height * 0.21
+                            padding: 2
+                            text: (objectItem.topmostElementIndex+1) + "/" + objectItem.objectCount
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: parent.height * 0.125
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
@@ -1775,8 +1784,6 @@ Item {
             property int elementIndex: index
             property bool selected: scriteDocument.structure.currentElementIndex === index
             z: selected ? 1 : 0
-            property StructureElementStack elementStack: scriteDocument.structure.elementStacks.findStackById(element.stackId)
-            visible: elementStack === null || elementStack.topmostElement === element
 
             function select() {
                 scriteDocument.structure.currentElementIndex = index
@@ -1796,6 +1803,27 @@ Item {
                 canvasTabSequence.releaseFocus()
             }
 
+            property bool visibleInViewport: true
+            property StructureElementStack elementStack
+            visible: visibleInViewport && (elementStack === null || elementStack.topmostElement === element)
+
+            function determineElementStack() {
+                if(element.stackId === "")
+                    elementStack = null
+                else if(elementStack === null || elementStack.stackId !== element.stackId)
+                    elementStack = scriteDocument.structure.elementStacks.findStackById(element.stackId)
+            }
+
+            TrackerPack {
+                delay: 250
+                TrackSignal { target: element; signal: "stackIdChanged()" }
+                TrackSignal { target: scriteDocument.structure.elementStacks; signal: "objectCountChanged()" }
+                TrackSignal { target: elementStack; signal: "objectCountChanged()" }
+                TrackSignal { target: elementStack; signal: "stackLeaderChanged()" }
+                TrackSignal { target: elementStack; signal: "topmostElementChanged()" }
+                onTracked: elementItem.determineElementStack()
+            }
+
             Component.onCompleted: element.follow = elementItem
 
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1806,6 +1834,7 @@ Item {
             BoundingBoxItem.viewportItem: canvas
             BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
+            BoundingBoxItem.visibilityProperty: "visibleInViewport"
 
             onSelectedChanged: {
                 if(selected && (mainUndoStack.structureEditorActive || scriteDocument.structure.elementCount === 1))
@@ -2109,9 +2138,17 @@ Item {
                         if(otherElement === null)
                             return
 
+                        if(element.scene.actIndex !== otherElement.scene.actIndex)
+                            return
+
                         var myStackId = element.stackId
                         var otherStackId = otherElement.stackId
                         drop.acceptProposedAction()
+
+                        if(scriteDocument.structure.forceBeatBoardLayout)
+                            app.execLater(elementItem, 250, function() {
+                                scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+                            })
 
                         if(myStackId === "") {
                             if(otherStackId === "") {
@@ -2130,12 +2167,15 @@ Item {
                         if(otherStackId === "") {
                             otherElement.stackId = myStackId
                             otherElement.stackLeader = false
+                            element.stackLeader = this
                             return
                         }
 
                         var otherStack = scriteDocument.structure.elementStacks.findStackById(otherStackId)
-                        if(otherStack !== null)
+                        if(otherStack !== null) {
                             otherStack.moveToStackId(myStackId)
+                            element.stackLeader = this
+                        }
                     }
                 }
             }
