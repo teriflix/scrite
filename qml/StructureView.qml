@@ -870,10 +870,11 @@ Item {
 
                 Rectangle {
                     id: canvasBeatItem
+                    property real topMarginForStacks: scriteDocument.structure.elementStacks.objectCount > 0 ? 15 : 0
                     x: modelData.geometry.x - 20
-                    y: modelData.geometry.y - 20
+                    y: modelData.geometry.y - 20 - topMarginForStacks
                     width: modelData.geometry.width + 40
-                    height: modelData.geometry.height + 40
+                    height: modelData.geometry.height + 40 + topMarginForStacks
                     radius: 0
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 1
@@ -1003,65 +1004,85 @@ Item {
                 id: stackBinders
                 model: scriteDocument.loading ? null : scriteDocument.structure.elementStacks
                 delegate: Item {
+                    id: stackBinderItem
                     z: 2
                     x: objectItem.geometry.x
                     y: objectItem.geometry.y
                     width: objectItem.geometry.width
                     height: objectItem.geometry.height
 
-                    Image {
-                        id: binderClipImage
-                        height: 64
-                        source: "../images/paper_clip.png"
-                        anchors.top: parent.top
+                    BoundingBoxItem.evaluator: canvasItemsBoundingBox
+                    BoundingBoxItem.stackOrder: 2.5 + (index/scriteDocument.structure.elementStacks.objectCount)
+                    BoundingBoxItem.livePreview: false
+                    BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.viewportItem: canvas
+                    BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
+                    BoundingBoxItem.viewportRect: canvasScroll.viewportRect
+
+                    Flickable {
+                        id: tabBarItemFlick
                         anchors.left: parent.left
-                        fillMode: Image.PreserveAspectFit
-                        smooth: true; mipmap: true
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.topMargin: -height * 0.55
+                        anchors.right: parent.right
+                        anchors.leftMargin: 5
+                        anchors.rightMargin: 5
+                        anchors.bottom: parent.top
+                        anchors.bottomMargin: -tabBarItem.activeTabBorderWidth-0.5
+                        contentWidth: tabBarItem.width
+                        contentHeight: tabBarItem.height
+                        height: contentHeight
+                        interactive: contentWidth > width
+                        clip: interactive
 
-                        Rectangle {
-                            anchors.fill: binderClipLabel
-                            color: "black"
-                            opacity: 0.25
-                            radius: 3
-                        }
+                        SimpleTabBarItem {
+                            id: tabBarItem
+                            tabCount: objectItem.objectCount
+                            activeTabBorderWidth: (objectItem.hasCurrentElement ? 2 : 1)
+                            tabLabelStyle: SimpleTabBarItem.Alphabets
+                            activeTabIndex: objectItem.topmostElementIndex
+                            activeTabColor: Qt.tint(objectItem.topmostElement.scene.color, (objectItem.hasCurrentElement ? "#C0FFFFFF" : "#F0FFFFFF"))
+                            activeTabBorderColor: objectItem.topmostElement.scene.color
+                            activeTabFont.pointSize: app.idealFontPointSize
+                            activeTabFont.bold: true
+                            activeTabTextColor: Qt.rgba(0,0,0,1)
+                            inactiveTabTextColor: Qt.rgba(0,0,0,0.75)
+                            inactiveTabFont.pointSize: app.idealFontPointSize-4
+                            minimumTabWidth: stackBinderItem.width*0.1
+                            onTabClicked: objectItem.bringElementToTop(index)
+                            onActiveTabIndexChanged: Qt.callLater(ensureActiveTabIsVisible)
+                            onTabPathsUpdated: Qt.callLater(ensureActiveTabIsVisible)
 
-                        Text {
-                            id: binderClipLabel
-                            color: "white"
-                            font.family: "Courier Prime"
-                            font.pixelSize: parent.height * 0.21
-                            padding: 2
-                            text: (objectItem.topmostElementIndex+1) + "/" + objectItem.objectCount
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: parent.height * 0.125
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-
-                        Connections {
-                            target: objectItem
-                            onObjectCountChanged: binderClipImageAnimation.start()
-                            onTopmostElementChanged: binderClipImageAnimation.start()
-                        }
-
-                        SequentialAnimation {
-                            id: binderClipImageAnimation
-                            loops: 1
-                            running: false
-
-                            NumberAnimation {
-                                target: binderClipImage
-                                property: "scale"
-                                from: 1; to: 2
-                                duration: 250
+                            Connections {
+                                target: objectItem
+                                onDataChanged: tabBarItem.updateTabAttributes()
                             }
 
-                            NumberAnimation {
-                                target: binderClipImage
-                                property: "scale"
-                                from: 2; to: 1
-                                duration: 250
+                            onAttributeRequest: {
+                                if(index === activeTabIndex)
+                                    return
+                                var element = objectItem.objectAt(index)
+                                switch(attr) {
+                                case SimpleTabBarItem.TabColor:
+                                    requestedAttributeValue = Qt.tint(element.scene.color, "#D0FFFFFF")
+                                    break
+                                case SimpleTabBarItem.TabBorderColor:
+                                    requestedAttributeValue = element.scene.color
+                                    break
+                                default:
+                                    break
+                                }
+                            }
+
+                            function ensureActiveTabIsVisible() {
+                                if(activeTabIndex < 0) {
+                                    tabBarItemFlick.contentX = 0
+                                    return
+                                }
+                                var r = tabRect(activeTabIndex)
+                                if(tabBarItemFlick.contentX > r.x)
+                                    tabBarItemFlick.contentX = r.x
+                                else if(tabBarItemFlick.contentX + tabBarItemFlick.width < r.x + r.width)
+                                    tabBarItemFlick.contentX = r.x + r.width - tabBarItemFlick.width
                             }
                         }
                     }
@@ -1200,7 +1221,6 @@ Item {
                 function layout(type) {
                     if(scriteDocument.readOnly)
                         return
-
 
                     if(!hasItems) {
                         var rect = scriteDocument.structure.layoutElements(type)

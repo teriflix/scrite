@@ -56,6 +56,7 @@ HEADERS += \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
     src/quick/items/boundingboxevaluator.h \
+    src/quick/items/simpletabbaritem.h \
     src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
@@ -156,6 +157,7 @@ SOURCES += \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
     src/quick/items/boundingboxevaluator.cpp \
+    src/quick/items/simpletabbaritem.cpp \
     src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \

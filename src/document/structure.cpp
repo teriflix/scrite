@@ -338,8 +338,27 @@ void StructureElementStack::moveToStack(StructureElementStack *other)
         element->setStackId(other->stackId());
 }
 
+void StructureElementStack::bringElementToTop(int index)
+{
+    if(index < 0 || index >= this->list().size())
+        return;
+
+    StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(this->parent());
+    if(stacks == nullptr)
+        return;
+
+    Structure *structure = stacks->structure();
+    if(structure == nullptr)
+        return;
+
+    StructureElement *element = this->list().at(index);
+    int elementIndex = structure->indexOfElement(element);
+    structure->setCurrentElementIndex(elementIndex);
+}
+
 void StructureElementStack::itemInsertEvent(StructureElement *ptr)
 {
+    connect(ptr, &StructureElement::elementChanged, this, &StructureElementStack::objectChanged);
     connect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     connect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     connect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
@@ -347,9 +366,19 @@ void StructureElementStack::itemInsertEvent(StructureElement *ptr)
 
 void StructureElementStack::itemRemoveEvent(StructureElement *ptr)
 {
+    disconnect(ptr, &StructureElement::elementChanged, this, &StructureElementStack::objectChanged);
     disconnect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     disconnect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     disconnect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
+}
+
+void StructureElementStack::setHasCurrentElement(bool val)
+{
+    if(m_hasCurrentElement == val)
+        return;
+
+    m_hasCurrentElement = val;
+    emit hasCurrentElementChanged();
 }
 
 void StructureElementStack::setTopmostElement(StructureElement *val)
@@ -522,13 +551,17 @@ void StructureElementStack::onStructureCurrentElementChanged()
         return;
 
     Structure *structure = stacks->structure();
+    if(structure == nullptr)
+    {
+        this->setHasCurrentElement(false);
+        this->setTopmostElement(nullptr);
+        return;
+    }
+
     StructureElement *element = structure->elementAt( structure->currentElementIndex() );
-    if(element == nullptr)
-        this->setTopmostElement(nullptr);
-    else if(this->list().contains(element))
+    this->setHasCurrentElement(this->list().contains(element));
+    if(m_hasCurrentElement)
         this->setTopmostElement(element);
-    else
-        this->setTopmostElement(nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

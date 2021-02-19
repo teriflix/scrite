@@ -170,18 +170,24 @@ public:
     StructureElement* topmostElement() const;
     Q_SIGNAL void topmostElementChanged();
 
+    Q_PROPERTY(bool hasCurrentElement READ isHasCurrentElement NOTIFY hasCurrentElementChanged)
+    bool isHasCurrentElement() const { return m_hasCurrentElement; }
+    Q_SIGNAL void hasCurrentElementChanged();
+
     Q_PROPERTY(QRectF geometry READ geometry NOTIFY geometryChanged)
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
 
     Q_INVOKABLE void moveToStackId(const QString &stackID);
     Q_INVOKABLE void moveToStack(StructureElementStack *other);
+    Q_INVOKABLE void bringElementToTop(int index);
 
 protected:
     void itemInsertEvent(StructureElement *ptr);
     void itemRemoveEvent(StructureElement *ptr);
 
 private:
+    void setHasCurrentElement(bool val);
     void setTopmostElement(StructureElement* val);
     void setStackId(const QString &val);
     void setGeometry(const QRectF &val);
@@ -196,6 +202,7 @@ private:
     QRectF m_geometry;
     QString m_stackId;
     bool m_enabled = false;
+    bool m_hasCurrentElement = false;
     StructureElement* m_topmostElement = nullptr;
 };
 

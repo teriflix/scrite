@@ -51,6 +51,7 @@
 #include "abstractexporter.h"
 #include "textdocumentitem.h"
 #include "notebooktabmodel.h"
+#include "simpletabbaritem.h"
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
 #include "spellcheckservice.h"
@@ -250,6 +251,7 @@ int main(int argc, char **argv)
     qmlRegisterType<ScreenplayTextDocumentOffsets>("Scrite", 1, 0, "ScreenplayTextDocumentOffsets");
 
     qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
+    qmlRegisterType<SimpleTabBarItem>("Scrite", 1, 0, "SimpleTabBarItem");
 
     qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
 
