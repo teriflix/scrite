@@ -629,6 +629,8 @@ void StructureElementStack::onStructureCurrentElementChanged()
     this->setHasCurrentElement(this->list().contains(element));
     if(m_hasCurrentElement)
         this->setTopmostElement(element);
+    else if(m_topmostElement != nullptr && !this->list().contains(m_topmostElement))
+        this->setTopmostElement(nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

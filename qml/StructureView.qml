@@ -994,6 +994,20 @@ Item {
                 }
             }
 
+            DropArea {
+                anchors.fill: parent
+                keys: ["scrite/sceneID"]
+                onDropped: {
+                    var sceneId = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene.id : drop.source.id
+                    var element = scriteDocument.structure.findElementBySceneID(sceneId)
+                    if(element === null || element.stackId === "")
+                        return
+                    element.stackId = ""
+                    scriteDocument.structure.currentElementIndex = scriteDocument.structure.indexOfElement(element)
+                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(element.scene)
+                }
+            }
+
             Repeater {
                 id: elementItems
                 model: scriteDocument.loading ? null : scriteDocument.structure.elementsModel
@@ -2184,19 +2198,13 @@ Item {
                         drop.acceptProposedAction()
 
                         if(myStackId === "") {
-                            if(otherStackId === "") {
-                                var uid = app.createUniqueId()
-                                element.stackId = uid
-                                otherElement.stackId = uid
-                                Qt.callLater( function() { element.stackLeader = true } )
-                                return
-                            }
-
-                            element.stackId = otherStackId
-                            return
+                            var uid = app.createUniqueId()
+                            element.stackId = uid
+                            otherElement.stackId = uid
+                        } else {
+                            otherElement.stackId = myStackId
                         }
 
-                        otherElement.stackId = myStackId
                         Qt.callLater( function() { element.stackLeader = true } )
                     }
                 }
