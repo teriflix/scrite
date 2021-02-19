@@ -358,10 +358,19 @@ void StructureElementStack::bringElementToTop(int index)
 
 void StructureElementStack::itemInsertEvent(StructureElement *ptr)
 {
-    connect(ptr, &StructureElement::elementChanged, this, &StructureElementStack::objectChanged);
     connect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     connect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     connect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
+
+
+    Scene *scene = ptr->scene();
+    if(scene != nullptr)
+    {
+        connect(scene, &Scene::colorChanged, this, &StructureElementStack::objectChanged);
+        connect(scene, &Scene::groupsChanged, this, &StructureElementStack::onElementGroupChanged);
+    }
+    else
+        connect(ptr, &StructureElement::elementChanged, this, &StructureElementStack::objectChanged);
 }
 
 void StructureElementStack::itemRemoveEvent(StructureElement *ptr)
@@ -370,6 +379,13 @@ void StructureElementStack::itemRemoveEvent(StructureElement *ptr)
     disconnect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     disconnect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     disconnect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
+
+    Scene *scene = ptr->scene();
+    if(scene != nullptr)
+    {
+        disconnect(scene, &Scene::colorChanged, this, &StructureElementStack::objectChanged);
+        disconnect(scene, &Scene::groupsChanged, this, &StructureElementStack::onElementGroupChanged);
+    }
 }
 
 void StructureElementStack::setHasCurrentElement(bool val)
@@ -417,6 +433,8 @@ void StructureElementStack::initialize()
 
     QList<StructureElement*> &list = this->list();
 
+    QSet<QString> stackGroups;
+
     this->setEnabled(false);
 
     qreal x=0, y=0, w=0, h=0;
@@ -453,6 +471,9 @@ void StructureElementStack::initialize()
             else
                 element->setStackLeader(false);
         }
+
+        const QStringList elementGroups = element->scene()->groups();
+        stackGroups += QSet<QString>::fromList(elementGroups);
     }
 
     if(list.isEmpty())
@@ -470,10 +491,13 @@ void StructureElementStack::initialize()
 
     this->setGeometry( QRectF(x,y,w,h) );
 
+    const QStringList groups = stackGroups.toList();
+
     for(StructureElement *element : qAsConst(this->list()))
     {
         element->setX( x );
         element->setY( y );
+        element->scene()->setGroups(groups);
     }
 
     if(leader == nullptr)
@@ -490,6 +514,8 @@ void StructureElementStack::onStackLeaderChanged()
 {
     if(!m_enabled)
         return;
+
+    QScopedValueRollback<bool> rollback(m_enabled, false);
 
     if(!this->isEmpty())
     {
@@ -518,14 +544,57 @@ void StructureElementStack::onStackLeaderChanged()
         emit topmostElementChanged();
 }
 
+void StructureElementStack::onElementGroupChanged()
+{
+    if(!m_enabled)
+        return;
+
+    QScopedValueRollback<bool> rollback(m_enabled, false);
+
+    StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
+    if(changedElement == nullptr)
+    {
+        Scene *changedScene = qobject_cast<Scene*>(this->sender());
+        if(changedScene == nullptr)
+            return;
+
+        StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(this->parent());
+        if(stacks == nullptr)
+            return;
+
+        Structure *structure = stacks->structure();
+        if(structure == nullptr)
+            return;
+
+        int index = structure->indexOfScene(changedScene);
+        if(index < 0)
+            return;
+
+        changedElement = structure->elementAt(index);
+    }
+
+    if(!this->list().contains(changedElement))
+        return;
+
+    const QStringList changedGroups = changedElement->scene()->groups();
+    for(StructureElement *element : qAsConst(this->list()))
+    {
+        if(element != changedElement)
+            element->scene()->setGroups(changedGroups);
+    }
+}
+
 void StructureElementStack::onElementGeometryChanged()
 {
     if(!m_geometry.isValid() || !m_enabled)
         return;
 
-    this->setEnabled(false);
+    QScopedValueRollback<bool> rollback(m_enabled, false);
 
     StructureElement *changedElement = qobject_cast<StructureElement*>(this->sender());
+    if(changedElement == nullptr || !this->list().contains(changedElement))
+        return;
+
     const qreal dx = changedElement->x() - m_geometry.x();
     const qreal dy = changedElement->y() - m_geometry.y();
     const QPointF dp(dx, dy);
@@ -540,8 +609,6 @@ void StructureElementStack::onElementGeometryChanged()
     m_geometry.setHeight( qMax(m_geometry.height(), changedElement->height()) );
 
     emit geometryChanged();
-
-    this->setEnabled(true);
 }
 
 void StructureElementStack::onStructureCurrentElementChanged()
@@ -672,6 +739,9 @@ void StructureElementStacks::evaluateStacks()
             stack->setEnabled(true);
         }
     }
+
+    if(!this->isEmpty())
+        m_structure->setCanvasUIMode(Structure::IndexCardUI);
 
     if(m_structure->isForceBeatBoardLayout())
     {
@@ -1889,6 +1959,9 @@ void Structure::setCanvasGridSize(qreal val)
 
 void Structure::setCanvasUIMode(Structure::CanvasUIMode val)
 {
+    if(!m_elementStacks.isEmpty())
+        val = IndexCardUI;
+
     if(m_canvasUIMode == val)
         return;
 

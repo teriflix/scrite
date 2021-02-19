@@ -194,6 +194,7 @@ private:
 
     void initialize();
     void onStackLeaderChanged();
+    void onElementGroupChanged();
     void onElementGeometryChanged();
     void onStructureCurrentElementChanged();
 

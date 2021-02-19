@@ -545,6 +545,7 @@ Scene::Scene(QObject *parent)
 
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
+    connect(this, &Scene::groupsChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::characterRelationshipGraphChanged, this, &Scene::sceneChanged);
@@ -1917,6 +1918,15 @@ void SceneGroup::setGroupActs(const QStringList &val)
     emit groupActsChanged();
 }
 
+void SceneGroup::setSceneStackIds(const QStringList &val)
+{
+    if(m_sceneStackIds == val)
+        return;
+
+    m_sceneStackIds = val;
+    emit sceneStackIdsChanged();
+}
+
 void SceneGroup::reload()
 {
     this->beginResetModel();
@@ -1951,6 +1961,7 @@ void SceneGroup::reeval()
 {
     QMap<QString,int> groupCounter;
     QStringList acts;
+    QSet<QString> stackIds;
 
     for(Scene *scene : qAsConst(m_scenes))
     {
@@ -1961,6 +1972,18 @@ void SceneGroup::reeval()
         const QString sceneAct = scene->act();
         if( !sceneAct.isEmpty() && m_groupActs.contains(sceneAct) && !acts.contains(sceneAct) )
             acts.append(sceneAct);
+
+        if(m_structure != nullptr)
+        {
+            const int eindex = m_structure->indexOfScene(scene);
+            const StructureElement *element = m_structure->elementAt(eindex);
+            if(element != nullptr)
+            {
+                const QString stackId = element->stackId();
+                if(!stackId.isEmpty())
+                    stackIds += stackId;
+            }
+        }
     }
 
     const QString nameKey = QStringLiteral("name");
@@ -1990,6 +2013,7 @@ void SceneGroup::reeval()
     }
 
     this->setSceneActs(acts);
+    this->setSceneStackIds(stackIds.toList());
 }
 
 void SceneGroup::reevalLater()

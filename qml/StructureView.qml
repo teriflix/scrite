@@ -1041,11 +1041,11 @@ Item {
                             tabLabelStyle: SimpleTabBarItem.Alphabets
                             activeTabIndex: objectItem.topmostElementIndex
                             activeTabColor: Qt.tint(objectItem.topmostElement.scene.color, (objectItem.hasCurrentElement ? "#C0FFFFFF" : "#F0FFFFFF"))
-                            activeTabBorderColor: objectItem.topmostElement.scene.color
+                            activeTabBorderColor: app.isLightColor(objectItem.topmostElement.scene.color) ? "black" : objectItem.topmostElement.scene.color
                             activeTabFont.pointSize: app.idealFontPointSize
                             activeTabFont.bold: true
-                            activeTabTextColor: Qt.rgba(0,0,0,1)
-                            inactiveTabTextColor: Qt.rgba(0,0,0,0.75)
+                            activeTabTextColor: app.textColorFor(activeTabColor)
+                            inactiveTabTextColor: app.translucent(app.textColorFor(inactiveTabColor), 0.75)
                             inactiveTabFont.pointSize: app.idealFontPointSize-4
                             minimumTabWidth: stackBinderItem.width*0.1
                             onTabClicked: objectItem.bringElementToTop(index)
@@ -1066,7 +1066,7 @@ Item {
                                     requestedAttributeValue = Qt.tint(element.scene.color, "#D0FFFFFF")
                                     break
                                 case SimpleTabBarItem.TabBorderColor:
-                                    requestedAttributeValue = element.scene.color
+                                    requestedAttributeValue = app.isLightColor(element.scene.color) ? "gray" : element.scene.color
                                     break
                                 default:
                                     break
@@ -1177,18 +1177,26 @@ Item {
                         }
                     }
 
-//                    MenuItem2 {
-//                        text: "Stack"
-//                        enabled: selection.hasItems && selection.items.length >= 2
-//                        onTriggered: {
-//                            var items = selection.items
-//                            var id = app.createUniqueId()
-//                            items.forEach( function(item) {
-//                                item.element.stackId = id
-//                            })
-//                            selection.clear()
-//                        }
-//                    }
+                    MenuItem2 {
+                        text: "Stack"
+                        enabled: {
+                            var items = selection.items
+                            for(var i=0; i<items.length; i++) {
+                                var item = items[i]
+                                if(item.element.stackId !== "")
+                                    return false
+                            }
+                            return true
+                        }
+                        onTriggered: {
+                            var items = selection.items
+                            var id = app.createUniqueId()
+                            items.forEach( function(item) {
+                                item.element.stackId = id
+                            })
+                            selection.clear()
+                        }
+                    }
 
                     MenuItem2 {
                         text: "Add To Timeline"
@@ -1879,7 +1887,7 @@ Item {
                 anchors.fill: parent
                 color: Qt.tint(element.scene.color, selected ? "#C0FFFFFF" : "#F0FFFFFF")
                 border.width: elementItem.selected ? 2 : 1
-                border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
+                border.color: app.isLightColor(element.scene.color) ? "black" : element.scene.color
 
                 // Move index-card around
                 MouseArea {
@@ -1934,7 +1942,7 @@ Item {
                     width: parent.width
                     height: 10
                     color: selected ? element.scene.color : Qt.tint(element.scene.color, "#90FFFFFF")
-                    border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
+                    border.color: app.isLightColor(element.scene.color) ? "gray" : element.scene.color
                     border.width: 1
                 }
 
@@ -2154,8 +2162,19 @@ Item {
                         if(otherElement === null)
                             return
 
-                        if(element.scene.actIndex !== otherElement.scene.actIndex)
+                        if(element.scene.actIndex < 0 || otherElement.scene.actIndex < 0) {
+                            showInformation({
+                                "message": "Scenes must be added to the timeline before they can be stacked."
+                            })
                             return
+                        }
+
+                        if(element.scene.actIndex !== otherElement.scene.actIndex) {
+                            showInformation({
+                                "message": "Scenes must belong to the same act for them to be stacked."
+                            })
+                            return
+                        }
 
                         var otherElementIndex = scriteDocument.structure.indexOfElement(otherElement)
                         Qt.callLater( function() { scriteDocument.structure.currentElementIndex = otherElementIndex } )
@@ -2177,15 +2196,8 @@ Item {
                             return
                         }
 
-                        if(otherStackId === "") {
-                            otherElement.stackId = myStackId
-                            Qt.callLater( function() { element.stackLeader = true } )
-                            return
-                        }
-
-                        var otherStack = scriteDocument.structure.elementStacks.findStackById(otherStackId)
-                        if(otherStack !== null)
-                            otherStack.moveToStackId(myStackId)
+                        otherElement.stackId = myStackId
+                        Qt.callLater( function() { element.stackLeader = true } )
                     }
                 }
             }

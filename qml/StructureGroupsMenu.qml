@@ -55,7 +55,15 @@ Menu2 {
                     anchors.top: parent.top
                     anchors.margins: 3
                     wrapMode: Text.WordWrap
-                    text: innerTitle
+                    text: {
+                        var ret = innerTitle
+                        if(sceneGroup.hasSceneStackIds) {
+                            if(ret !== "")
+                                ret += "<br/>"
+                            ret += "<font size=\"-2\"><i>All scenes in the selected stack(s) are going to be tagged.</i></font>"
+                        }
+                        return ret;
+                    }
                     font.pointSize: app.idealFontPointSize
                     visible: text !== ""
                     horizontalAlignment: Text.AlignHCenter

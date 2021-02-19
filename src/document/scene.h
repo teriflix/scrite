@@ -515,6 +515,13 @@ public:
     Q_PROPERTY(bool hasGroupActs READ hasGroupActs NOTIFY groupActsChanged)
     bool hasGroupActs() const { return !m_groupActs.isEmpty(); }
 
+    Q_PROPERTY(QStringList sceneStackIds READ sceneStackIds NOTIFY sceneStackIdsChanged)
+    QStringList sceneStackIds() const { return m_sceneStackIds; }
+    Q_SIGNAL void sceneStackIdsChanged();
+
+    Q_PROPERTY(bool hasSceneStackIds READ hasSceneStackIds NOTIFY sceneStackIdsChanged)
+    bool hasSceneStackIds() const { return !m_sceneStackIds.isEmpty(); }
+
     Q_PROPERTY(QStringList sceneActs READ sceneActs NOTIFY sceneActsChanged)
     QStringList sceneActs() const { return m_sceneActs; }
     Q_SIGNAL void sceneActsChanged();
@@ -544,6 +551,7 @@ protected:
 private:
     void setSceneActs(const QStringList &val);
     void setGroupActs(const QStringList &val);
+    void setSceneStackIds(const QStringList &val);
     void reload();
     void reeval();
     void reevalLater();
@@ -555,6 +563,7 @@ private:
     static int staticSceneCount(QQmlListProperty<Scene> *list);
     QStringList m_sceneActs;
     QStringList m_groupActs;
+    QStringList m_sceneStackIds;
     QList<Scene *> m_scenes;
     QJsonArray &m_groups;
     QObjectProperty<Structure> m_structure;

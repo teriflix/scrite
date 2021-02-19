@@ -860,11 +860,20 @@ QColor Application::pickStandardColor(int counter) const
     return ret;
 }
 
+inline qreal evaluateLuminance(const QColor &color)
+{
+    return ((0.299 * color.redF()) + (0.587 * color.greenF()) + (0.114 * color.blueF()));
+}
+
+bool Application::isLightColor(const QColor &color) const
+{
+    return evaluateLuminance(color) > 0.5;
+}
+
 QColor Application::textColorFor(const QColor &bgColor) const
 {
     // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
-    const qreal luma = ((0.299 * bgColor.redF()) + (0.587 * bgColor.greenF()) + (0.114 * bgColor.blueF()));
-    return luma > 0.5 ? Qt::black : Qt::white;
+    return evaluateLuminance(bgColor) > 0.5 ? Qt::black : Qt::white;
 }
 
 QRectF Application::boundingRect(const QString &text, const QFont &font) const

@@ -415,6 +415,7 @@ Item {
                         CheckBox2 {
                             text: "Use Index Card UI On Canvas"
                             checkable: true
+                            enabled: scriteDocument.structure.elementStacks.objectCount === 0
                             checked: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI
                             onToggled: {
                                 var toggleCanvasUI = function() {
