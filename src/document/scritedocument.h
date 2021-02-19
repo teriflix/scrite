@@ -236,6 +236,7 @@ private:
     void structureElementIndexChanged();
     void screenplayElementIndexChanged();
     void setCreatedOnThisComputer(bool val);
+    void screenplayElementRemoved(ScreenplayElement *ptr, int index);
 
 public:
     // QObjectSerializer::Interface implementation

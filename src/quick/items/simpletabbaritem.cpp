@@ -352,7 +352,7 @@ void SimpleTabBarItem::updateTabInfos()
     QRectF boundingRect;
 
     auto requestAttribute = [=](int index, TabAttribute attr) {
-        m_requestedAttributeValue = QVariant();
+        this->setRequestedAttributeValue(QVariant());
         emit attributeRequest(index, attr);
         return m_requestedAttributeValue;
     };
@@ -374,6 +374,8 @@ void SimpleTabBarItem::updateTabInfos()
             tabInfo.textColor = m_requestedAttributeValue.value<QColor>();
         if( requestAttribute(i, TabFont).isValid() )
             tabInfo.font = m_requestedAttributeValue.value<QFont>();
+        if( requestAttribute(i, TabLabel).isValid() )
+            tabInfo.label = m_requestedAttributeValue.value<QString>();
         this->setRequestedAttributeValue(QVariant());
 
         QFontMetricsF fontMetrics(tabInfo.font);

@@ -14,6 +14,7 @@
 #ifndef EVENTFILTER_H
 #define EVENTFILTER_H
 
+#include <QEvent>
 #include <QObject>
 #include <QQmlEngine>
 #include <QJsonObject>
@@ -82,6 +83,25 @@ public:
     Q_INVOKABLE bool forwardEventTo(QObject *object);
 
     Q_SIGNAL void filter(QObject *object, const QJsonObject &event, EventFilterResult *result);
+
+    enum Event
+    {
+        MouseButtonPress = QEvent::MouseButtonPress,
+        MouseButtonRelease = QEvent::MouseButtonRelease,
+        MouseButtonDblClick = QEvent::MouseButtonDblClick,
+        MouseMove = QEvent::MouseMove,
+        KeyPress = QEvent::KeyPress,
+        KeyRelease = QEvent::KeyRelease,
+        Wheel = QEvent::Wheel,
+        HoverEnter = QEvent::HoverEnter,
+        HoverLeave = QEvent::HoverLeave,
+        HoverMove = QEvent::HoverMove,
+        DragEnter = QEvent::DragEnter,
+        DragMove = QEvent::DragMove,
+        DragLeave = QEvent::DragLeave,
+        Drop = QEvent::Drop
+    };
+    Q_ENUM(Event)
 
 protected:
     void resetTarget();

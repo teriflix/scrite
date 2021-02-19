@@ -994,17 +994,40 @@ Item {
                 }
             }
 
-            DropArea {
-                anchors.fill: parent
-                keys: ["scrite/sceneID"]
-                onDropped: {
-                    var sceneId = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene.id : drop.source.id
-                    var element = scriteDocument.structure.findElementBySceneID(sceneId)
-                    if(element === null || element.stackId === "")
-                        return
+            EventFilter.events: [EventFilter.DragEnter, EventFilter.DragMove, EventFilter.Drop]
+            EventFilter.onFilter: {
+                result.acceptEvent = false
+
+                switch(event.type) {
+                case EventFilter.DragEnter:
+                case EventFilter.DragLeave:
+                case EventFilter.Drop:
+                    break
+                default:
+                    return
+                }
+
+                var sceneId = event.mimeData["scrite/sceneID"]
+                var element = scriteDocument.structure.findElementBySceneID(sceneId)
+                if(element === null)
+                    return
+
+                if(element.stackId === "")
+                    return
+
+                result.acceptEvent = true
+                result.filter = true
+
+                if(event.type === EventFilter.Drop) {
                     element.stackId = ""
-                    scriteDocument.structure.currentElementIndex = scriteDocument.structure.indexOfElement(element)
-                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(element.scene)
+                    app.execLater(element, 250, function() {
+                        if(!scriteDocument.structure.forceBeatBoardLayout) {
+                            element.x = event.pos.x
+                            element.y = event.pos.y
+                        }
+                        scriteDocument.structure.currentElementIndex = scriteDocument.structure.indexOfElement(element)
+                        scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(element.scene)
+                    })
                 }
             }
 

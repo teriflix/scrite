@@ -44,6 +44,7 @@ Rectangle {
         readonly property color windowColor: c300.background
         readonly property color borderColor: c400.background
         readonly property color separatorColor: c400.background
+        readonly property var highlight: c400
         readonly property var button: c200
     }
 

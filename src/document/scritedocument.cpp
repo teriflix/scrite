@@ -309,6 +309,11 @@ void ScriteDocument::reset()
     {
         disconnect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
         disconnect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
+        disconnect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
+        disconnect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
+        disconnect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
+        disconnect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitles);
+        disconnect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitles);
     }
 
     if(m_screenplay != nullptr)
@@ -316,6 +321,9 @@ void ScriteDocument::reset()
         disconnect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
         disconnect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::markAsModified);
         disconnect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::evaluateStructureElementSequenceLater);
+        disconnect(m_screenplay, &Screenplay::elementRemoved, this, &ScriteDocument::screenplayElementRemoved);
+        disconnect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
+        disconnect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
     }
 
     if(m_formatting != nullptr)
@@ -349,21 +357,22 @@ void ScriteDocument::reset()
     emit emptyChanged();
 
     connect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
-    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
-    connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::markAsModified);
-    connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::evaluateStructureElementSequenceLater);
     connect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
-    connect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
-    connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
-
-    connect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
-    connect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
-
     connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitles);
     connect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitles);
+
+    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
+    connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::markAsModified);
+    connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::evaluateStructureElementSequenceLater);
+    connect(m_screenplay, &Screenplay::elementRemoved, this, &ScriteDocument::screenplayElementRemoved);
+    connect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
+    connect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
+
+    connect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+    connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
 
     QEventLoop eventLoop;
     QElapsedTimer timer;
@@ -1224,6 +1233,21 @@ void ScriteDocument::setCreatedOnThisComputer(bool val)
 
     m_createdOnThisComputer = val;
     emit createdOnThisComputerChanged();
+}
+
+void ScriteDocument::screenplayElementRemoved(ScreenplayElement *ptr, int)
+{
+    Scene *scene = ptr->scene();
+    int index = m_screenplay->firstIndexOfScene(scene);
+    if(index < 0)
+    {
+        index = m_structure->indexOfScene(scene);
+        if(index >= 0)
+        {
+            StructureElement *element = m_structure->elementAt(index);
+            element->setStackId(QString());
+        }
+    }
 }
 
 void ScriteDocument::prepareForSerialization()

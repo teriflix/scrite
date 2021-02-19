@@ -111,7 +111,8 @@ public:
         TabColor,
         TabBorderColor,
         TabTextColor,
-        TabFont
+        TabFont,
+        TabLabel
     };
     Q_ENUM(TabAttribute)
     Q_SIGNAL void attributeRequest(int index, TabAttribute attr);

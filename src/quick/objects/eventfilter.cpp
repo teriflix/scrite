@@ -21,6 +21,7 @@
 #include <QMetaObject>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QMimeData>
 
 EventFilterResult::EventFilterResult(QObject *parent)
                   :QObject(parent)
@@ -113,6 +114,29 @@ void EventFilter::setEvents(const QList<int> &val)
 
     m_events = val;
     emit eventsChanged();
+
+    QQuickItem *item = qobject_cast<QQuickItem*>(m_target);
+
+    if(item != nullptr)
+    {
+        for(int event : {QEvent::DragEnter, QEvent::DragLeave, QEvent::DragMove, QEvent::Drop})
+        {
+            if(val.contains(event))
+            {
+                item->setFlag(QQuickItem::ItemAcceptsDrops);
+                break;
+            }
+        }
+
+        for(int event : {QEvent::HoverEnter, QEvent::HoverMove, QEvent::HoverLeave})
+        {
+            if(val.contains(event))
+            {
+                item->setAcceptHoverEvents(true);
+                break;
+            }
+        }
+    }
 }
 
 void EventFilter::setAcceptHoverEvents(bool val)
@@ -235,6 +259,46 @@ inline void packIntoJson(QHoverEvent *event, QJsonObject &object)
     object.insert("oldPos", pointToJson(event->pos()));
 }
 
+inline void packDropEventIntoJson(QDropEvent *event, QJsonObject &object)
+{
+    auto pointToJson = [](const QPointF &pos) {
+        QJsonObject ret;
+        ret.insert("x", pos.x());
+        ret.insert("y", pos.y());
+        return ret;
+    };
+
+    object.insert("pos", pointToJson(event->posF()));
+
+    const QMimeData *mimeData = event->mimeData();
+    const QStringList formats = mimeData->formats();
+    QJsonObject mimeDataJson;
+    for(const QString &format : formats)
+        mimeDataJson.insert(format, QString::fromLatin1(mimeData->data(format)));
+    object.insert("mimeData", mimeDataJson);
+}
+
+inline void packIntoJson(QDragEnterEvent *event, QJsonObject &object)
+{
+    packDropEventIntoJson(event, object);
+}
+
+inline void packIntoJson(QDragMoveEvent *event, QJsonObject &object)
+{
+    packDropEventIntoJson(event, object);
+}
+
+inline void packIntoJson(QDragLeaveEvent *event, QJsonObject &object)
+{
+    Q_UNUSED(event)
+    Q_UNUSED(object)
+}
+
+inline void packIntoJson(QDropEvent *event, QJsonObject &object)
+{
+    packDropEventIntoJson(event, object);
+}
+
 inline bool eventToJson(QEvent *event, QJsonObject &object)
 {
     const QMetaObject *eventMetaObject = &QEvent::staticMetaObject;
@@ -275,6 +339,18 @@ inline bool eventToJson(QEvent *event, QJsonObject &object)
     case QEvent::HoverMove:
         packIntoJson(static_cast<QHoverEvent*>(event), object);
         break;
+    case QEvent::DragEnter:
+        packIntoJson(static_cast<QDragEnterEvent*>(event), object);
+        break;
+    case QEvent::DragMove:
+        packIntoJson(static_cast<QDragMoveEvent*>(event), object);
+        break;
+    case QEvent::DragLeave:
+        packIntoJson(static_cast<QDragLeaveEvent*>(event), object);
+        break;
+    case QEvent::Drop:
+        packIntoJson(static_cast<QDropEvent*>(event), object);
+        break;
     default:
         break;
     }
@@ -299,7 +375,16 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
 
         if(result.filter())
         {
-            event->setAccepted(result.acceptEvent());
+            if( QList<int>({QEvent::DragEnter,QEvent::DragLeave,QEvent::DragMove,QEvent::Drop}).contains(event->type()) )
+            {
+                QDropEvent *dndEvent = static_cast<QDropEvent*>(event);
+                if(result.acceptEvent())
+                    dndEvent->acceptProposedAction();
+                else
+                    dndEvent->ignore();
+            }
+            else
+                event->setAccepted(result.acceptEvent());
             return true;
         }
     }

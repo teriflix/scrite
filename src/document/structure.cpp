@@ -437,6 +437,11 @@ void StructureElementStack::initialize()
 
     this->setEnabled(false);
 
+    Screenplay *screenplay = nullptr;
+    StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(this->parent());
+    if(stacks && stacks->structure() && stacks->structure()->scriteDocument())
+        screenplay = stacks->structure()->scriteDocument()->screenplay();
+
     qreal x=0, y=0, w=0, h=0;
 
     for(int i=list.size()-1; i>=0; i--)
@@ -491,8 +496,20 @@ void StructureElementStack::initialize()
 
     this->setGeometry( QRectF(x,y,w,h) );
 
-    const QStringList groups = stackGroups.toList();
+    if(screenplay != nullptr)
+    {
+        std::sort(list.begin(), list.end(), [screenplay](StructureElement *e1, StructureElement *e2) {
+            const int i1 = screenplay->firstIndexOfScene(e1->scene());
+            const int i2 = screenplay->firstIndexOfScene(e1->scene());
+            e1->setStackLeader(false);
+            e2->setStackLeader(false);
+            return i1 < i2;
+        });
 
+        list.first()->setStackLeader(true);
+    }
+
+    const QStringList groups = stackGroups.toList();
     for(StructureElement *element : qAsConst(this->list()))
     {
         element->setX( x );
