@@ -1469,10 +1469,19 @@ Item {
                     text: "Delete"
                     enabled: elementContextMenu.element !== null
                     onClicked: {
-                        releaseEditor()
-                        scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
-                        scriteDocument.structure.removeElement(elementContextMenu.element)
-                        elementContextMenu.element = null
+                        askQuestion({
+                            "question": "Are you sure you want to delete this scene?",
+                            "okButtonText": "Yes",
+                            "cancelButtonText": "No",
+                            "callback": function(val) {
+                                if(val) {
+                                    releaseEditor()
+                                    scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
+                                    scriteDocument.structure.removeElement(elementContextMenu.element)
+                                    elementContextMenu.element = null
+                                }
+                            }
+                        }, this)
                     }
                 }
             }
