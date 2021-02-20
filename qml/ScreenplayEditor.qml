@@ -775,7 +775,7 @@ Rectangle {
                 opacity: 0.25
             }
 
-            TextField2 {
+            Text {
                 id: breakTitle
                 anchors.top: parent.top
                 anchors.topMargin: 5
@@ -786,8 +786,6 @@ Rectangle {
                 font.family: headingFontMetrics.font.family
                 font.bold: true
                 text: parent.theElement.breakTitle
-                onTextEdited: parent.theElement.breakTitle = text
-                maximumLength: 50
             }
         }
     }
