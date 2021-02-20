@@ -372,15 +372,23 @@ void BoundingBoxItem::updatePreview()
     }
     else
     {
-        m_preview = QImage();
-        emit previewUpdated();
+        if(!m_preview.isNull())
+        {
+            m_preview = QImage();
+            emit previewUpdated();
+        }
     }
 }
 
 void BoundingBoxItem::updatePreviewLater()
 {
     if(m_item != nullptr)
-        m_updatePreviewTimer.start(500, this);
+    {
+        if(!m_livePreview && m_preview.isNull())
+            m_updatePreviewTimer.stop();
+        else
+            m_updatePreviewTimer.start(500, this);
+    }
 }
 
 void BoundingBoxItem::setPreview(const QImage &image)
