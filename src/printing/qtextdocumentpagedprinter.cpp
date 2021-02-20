@@ -151,6 +151,12 @@ void HeaderFooter::paint(QPainter *paint, const QRectF &, int pageNr, int pageCo
         return;
 
     auto updateContent = [pageNr,pageCount](ColumnContent &content, Field field) {
+        // Fixes https://github.com/teriflix/scrite/issues/207
+        if( (field == PageNumber || field == PageNumberOfCount) && pageNr == 1 ) {
+            content.content.clear();
+            return;
+        }
+
         if(field == PageNumber)
             content.content = QString::number(pageNr) + ".";
         else if(field == PageNumberOfCount) {
