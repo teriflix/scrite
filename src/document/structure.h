@@ -234,6 +234,7 @@ private:
     void resetAllStacks();
     void evaluateStacks();
     void evaluateStacksLater();
+    void evaluateStacksMuchLater(int howMuchLater);
 
 private:
     friend class Structure;

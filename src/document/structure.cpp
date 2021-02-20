@@ -232,11 +232,15 @@ void StructureElement::setStackId(const QString &val)
 
     if(!val2.isEmpty())
     {
-        Screenplay *screenplay = m_structure && m_structure->scriteDocument() ? m_structure->scriteDocument()->screenplay() : nullptr;
-        if(screenplay)
+        ScriteDocument *doc = m_structure ? m_structure->scriteDocument() : nullptr;
+        if(doc && !doc->isLoading())
         {
-            if(screenplay->firstIndexOfScene(m_scene) < 0)
-                val2.clear();
+            Screenplay *screenplay = doc ? doc->screenplay() : nullptr;
+            if(screenplay)
+            {
+                if(screenplay->firstIndexOfScene(m_scene) < 0)
+                    val2.clear();
+            }
         }
     }
 
@@ -842,6 +846,11 @@ void StructureElementStacks::evaluateStacks()
 void StructureElementStacks::evaluateStacksLater()
 {
     m_evaluateTimer.start(0, this);
+}
+
+void StructureElementStacks::evaluateStacksMuchLater(int howMuchLater)
+{
+    m_evaluateTimer.start(howMuchLater, this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3728,7 +3737,7 @@ void Structure::setPropertyFromObjectList(const QString &propName, const QList<Q
     if(propName == QStringLiteral("elements"))
     {
         this->setElements(qobject_list_cast<StructureElement*>(objects));
-        m_elementStacks.evaluateStacksLater();
+        m_elementStacks.evaluateStacksMuchLater(500);
         return;
     }
 
