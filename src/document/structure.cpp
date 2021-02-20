@@ -358,10 +358,18 @@ void StructureElementStack::bringElementToTop(int index)
 
 void StructureElementStack::itemInsertEvent(StructureElement *ptr)
 {
+    if(this->list().size() == 1)
+    {
+        m_stackId = ptr->stackId();
+        emit stackIdChanged();
+
+        m_actIndex = ptr->scene()->actIndex();
+        emit actIndexChanged();
+    }
+
     connect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     connect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     connect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
-
 
     Scene *scene = ptr->scene();
     if(scene != nullptr)
@@ -406,15 +414,6 @@ void StructureElementStack::setTopmostElement(StructureElement *val)
     emit topmostElementChanged();
 }
 
-void StructureElementStack::setStackId(const QString &val)
-{
-    if(m_stackId == val)
-        return;
-
-    m_stackId = val;
-    emit stackIdChanged();
-}
-
 void StructureElementStack::setGeometry(const QRectF &val)
 {
     if(m_geometry == val)
@@ -434,8 +433,6 @@ void StructureElementStack::initialize()
     QList<StructureElement*> &list = this->list();
 
     QSet<QString> stackGroups;
-
-    this->setEnabled(false);
 
     Screenplay *screenplay = nullptr;
     StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(this->parent());
@@ -500,15 +497,26 @@ void StructureElementStack::initialize()
 
     if(screenplay != nullptr)
     {
-        std::sort(list.begin(), list.end(), [screenplay](StructureElement *e1, StructureElement *e2) {
+        bool shifted = false;
+        std::sort(list.begin(), list.end(), [screenplay,&shifted](StructureElement *e1, StructureElement *e2) {
             const int i1 = screenplay->firstIndexOfScene(e1->scene());
             const int i2 = screenplay->firstIndexOfScene(e2->scene());
             e1->setStackLeader(false);
             e2->setStackLeader(false);
+            if(i1 > i2)
+                shifted = true;
             return i1 < i2;
         });
 
         list.first()->setStackLeader(true);
+        this->setTopmostElement(nullptr);
+
+        if(shifted)
+        {
+            const QModelIndex start = this->index(0);
+            const QModelIndex end = this->index(list.size()-1);
+            emit dataChanged(start, end);
+        }
     }
 
     const QStringList groups = stackGroups.toList();
@@ -726,12 +734,59 @@ void StructureElementStacks::evaluateStacks()
         return;
     }
 
+    /**
+     * We cannot have a stack that holds elements form multiple acts.
+     * In this loop we make sure that we segregate elements from mutliple acts,
+     * that may have the same stack Id.
+     */
+    QList<StructureElement*> elementsWithStackId;
+    QMap< QString, QMap<int, QList<StructureElement*> > > elementsMap;
+    for(int i=0; i<m_structure->elementCount(); i++)
+    {
+        StructureElement *element = m_structure->elementAt(i);
+        const QString stackId = element->stackId();
+        if(stackId.isEmpty())
+            continue;
+
+        int actIndex = element->scene()->actIndex();
+        elementsMap[ stackId ][ actIndex ].append(element);
+        elementsWithStackId.append(element);
+    }
+
+    /**
+      * Here we sanitize stack-ids by generating unique ids for those elements
+      * that may have the same stack-id but are on different stacks.
+      */
+    QMap< QString, QMap<int, QList<StructureElement*> > >::iterator it = elementsMap.begin();
+    QMap< QString, QMap<int, QList<StructureElement*> > >::iterator end = elementsMap.end();
+    while(it != end)
+    {
+        if( it.value().size() > 1 )
+        {
+            QMap<int, QList<StructureElement*> >::iterator it2 = it.value().begin();
+            QMap<int, QList<StructureElement*> >::iterator end2 = it.value().end();
+            ++it2;
+
+            while(it2 != end2)
+            {
+                const QString id = Application::createUniqueId();
+                for(StructureElement *element : qAsConst(it2.value()))
+                    element->setStackId(id);
+
+                ++it2;
+            }
+        }
+
+        ++it;
+    }
+
+    m_evaluateTimer.stop();
+
     auto findOrCreateStack = [=](const QString &id) {
         for(StructureElementStack *stack : qAsConst(this->list()))
             if(stack->stackId() == id)
                 return stack;
         StructureElementStack *newStack = new StructureElementStack(this);
-        newStack->setStackId(id);
         this->append(newStack);
         return newStack;
     };
@@ -739,9 +794,8 @@ void StructureElementStacks::evaluateStacks()
     for(StructureElementStack *stack : qAsConst(this->list()))
         stack->setEnabled(false);
 
-    for(int i=0; i<m_structure->elementCount(); i++)
+    for(StructureElement *element : qAsConst(elementsWithStackId))
     {
-        StructureElement *element = m_structure->elementAt(i);
         const QString stackId = element->stackId();
         if(stackId.isEmpty())
             continue;
@@ -1942,6 +1996,19 @@ Structure::Structure(QObject *parent)
     connect(&m_annotationsBoundingBoxAggregator, &ModelAggregator::aggregateValueChanged, this, &Structure::annotationsBoundingBoxChanged);
 
     m_elementStacks.m_structure = this;
+
+    if(m_scriteDocument != nullptr)
+    {
+        Screenplay *screenplay = m_scriteDocument->screenplay();
+        if(screenplay != nullptr)
+        {
+            connect(screenplay, &Screenplay::elementMoved, &m_elementStacks, &StructureElementStacks::evaluateStacksLater);
+            connect(screenplay, &Screenplay::elementInserted, [=](ScreenplayElement *ptr, int) {
+                if(ptr->elementType() == ScreenplayElement::BreakElementType)
+                    m_elementStacks.evaluateStacksLater();
+            });
+        }
+    }
 
     this->loadDefaultGroupsData();
 }

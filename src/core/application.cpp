@@ -1202,7 +1202,7 @@ int Application::objectTreeSize(QObject *ptr) const
     return ptr->findChildren<QObject*>(QString(), Qt::FindChildrenRecursively).size() + 1;
 }
 
-QString Application::createUniqueId() const
+QString Application::createUniqueId()
 {
     return QUuid::createUuid().toString();
 }

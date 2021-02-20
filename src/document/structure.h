@@ -158,6 +158,10 @@ public:
     QString stackId() const { return m_stackId; }
     Q_SIGNAL void stackIdChanged();
 
+    Q_PROPERTY(int actIndex READ actIndex NOTIFY actIndexChanged)
+    int actIndex() const { return m_actIndex; }
+    Q_SIGNAL void actIndexChanged();
+
     Q_PROPERTY(StructureElement *stackLeader READ stackLeader NOTIFY stackLeaderChanged)
     StructureElement *stackLeader() const;
     Q_SIGNAL void stackLeaderChanged();
@@ -189,7 +193,6 @@ protected:
 private:
     void setHasCurrentElement(bool val);
     void setTopmostElement(StructureElement* val);
-    void setStackId(const QString &val);
     void setGeometry(const QRectF &val);
 
     void initialize();
@@ -202,6 +205,7 @@ private:
     friend class StructureElementStacks;
     QRectF m_geometry;
     QString m_stackId;
+    int m_actIndex = -1;
     bool m_enabled = false;
     bool m_hasCurrentElement = false;
     StructureElement* m_topmostElement = nullptr;
