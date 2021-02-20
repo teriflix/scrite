@@ -26,7 +26,7 @@ Rectangle {
     id: screenplayEditor
     property ScreenplayFormat screenplayFormat: scriteDocument.displayFormat
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
-    property alias source: screenplayAdapter.source
+    property alias source: sourcePropertyAlias.value
     property bool toolBarVisible: toolbar.visible
     property bool commentsPanelAllowed: true
     property alias enableSceneListPanel: sceneListSidePanel.visible
@@ -43,9 +43,14 @@ Rectangle {
     border.color: primaryColors.borderColor
     clip: true
 
-    ScreenplayAdapter {
-        id: screenplayAdapter
-        source: scriteDocument.loading ? null : scriteDocument.screenplay
+    PropertyAlias {
+        id: sourcePropertyAlias
+        sourceObject: screenplayAdapter
+        sourceProperty: "source"
+    }
+
+    Connections {
+        target: screenplayAdapter
         onCurrentIndexChanged: {
             if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
@@ -59,19 +64,9 @@ Rectangle {
                 contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
         onSourceChanged: {
-            globalScreenplayEditorToolbar.showScreenplayPreview = false
             contentView.commentsExpandCounter = 0
             contentView.commentsExpanded = false
         }
-    }
-
-    ScreenplayTextDocument {
-        id: screenplayTextDocument
-        screenplay: scriteDocument.loading ? null : screenplayAdapter.screenplay
-        formatting: scriteDocument.loading ? null : scriteDocument.printFormat
-        syncEnabled: true
-        secondsPerPage: scriteDocument.printFormat.secondsPerPage
-        Component.onCompleted: globalTimeDisplay.screenplayTextDocument = screenplayTextDocument
     }
 
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus

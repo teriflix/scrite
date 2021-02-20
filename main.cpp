@@ -38,6 +38,7 @@
 #include "focustracker.h"
 #include "notification.h"
 #include "searchengine.h"
+#include "propertyalias.h"
 #include "standardpaths.h"
 #include "urlattributes.h"
 #include "textshapeitem.h"
@@ -242,6 +243,7 @@ int main(int argc, char **argv)
     qmlRegisterType<TrackSignal>("Scrite", 1, 0, "TrackSignal");
     qmlRegisterType<TrackModelRow>("Scrite", 1, 0, "TrackModelRow");
     qmlRegisterType<TrackerPack>("Scrite", 1, 0, "TrackerPack");
+    qmlRegisterType<PropertyAlias>("Scrite", 1, 0, "PropertyAlias");
 
     qmlRegisterType<ScreenplayAdapter>("Scrite", 1, 0, "ScreenplayAdapter");
     qmlRegisterType<ScreenplayTextDocument>("Scrite", 1, 0, "ScreenplayTextDocument");

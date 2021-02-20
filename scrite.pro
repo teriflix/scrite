@@ -61,6 +61,7 @@ HEADERS += \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/modelaggregator.h \
+    src/quick/objects/propertyalias.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
     src/quick/objects/notification.h \
@@ -162,6 +163,7 @@ SOURCES += \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/modelaggregator.cpp \
+    src/quick/objects/propertyalias.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/fileinfo.cpp \
     src/quick/objects/focustracker.cpp \

@@ -206,6 +206,21 @@ Item {
         onActivated: mainTabBar.currentIndex = 3
     }
 
+    ScreenplayAdapter {
+        id: screenplayAdapter
+        source: scriteDocument.loading ? null : scriteDocument.screenplay
+        onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
+    }
+
+    ScreenplayTextDocument {
+        id: screenplayTextDocument
+        screenplay: scriteDocument.loading ? null : screenplayAdapter.screenplay
+        formatting: scriteDocument.loading ? null : scriteDocument.printFormat
+        syncEnabled: true
+        secondsPerPage: scriteDocument.printFormat.secondsPerPage
+        Component.onCompleted: globalTimeDisplay.screenplayTextDocument = screenplayTextDocument
+    }
+
     Rectangle {
         id: appToolBarArea
         anchors.left: parent.left
