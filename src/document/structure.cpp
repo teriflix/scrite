@@ -441,6 +441,8 @@ void StructureElementStack::initialize()
     StructureElementStacks *stacks = qobject_cast<StructureElementStacks*>(this->parent());
     if(stacks && stacks->structure() && stacks->structure()->scriteDocument())
         screenplay = stacks->structure()->scriteDocument()->screenplay();
+    else
+        screenplay = ScriteDocument::instance()->screenplay();
 
     qreal x=0, y=0, w=0, h=0;
 
@@ -500,7 +502,7 @@ void StructureElementStack::initialize()
     {
         std::sort(list.begin(), list.end(), [screenplay](StructureElement *e1, StructureElement *e2) {
             const int i1 = screenplay->firstIndexOfScene(e1->scene());
-            const int i2 = screenplay->firstIndexOfScene(e1->scene());
+            const int i2 = screenplay->firstIndexOfScene(e2->scene());
             e1->setStackLeader(false);
             e2->setStackLeader(false);
             return i1 < i2;

@@ -284,6 +284,22 @@ Scene *ScriteDocument::createNewScene()
     m_structure->setCurrentElementIndex(m_structure->elementCount()-1);
     m_screenplay->setCurrentElementIndex(newScreenplayElementIndex);
 
+    if(structureElement && !structureElement->stackId().isEmpty())
+    {
+        ScreenplayElement *spe_before = m_screenplay->elementAt(newScreenplayElementIndex-1);
+        ScreenplayElement *spe_after = m_screenplay->elementAt(newScreenplayElementIndex+1);
+        if(spe_before && spe_after)
+        {
+            StructureElement *ste_before = m_structure->elementAt(m_structure->indexOfScene(spe_before->scene()));
+            StructureElement *ste_after = m_structure->elementAt(m_structure->indexOfScene(spe_after->scene()));
+            if(ste_before && ste_after)
+            {
+                if(ste_before->stackId() == ste_after->stackId())
+                    newStructureElement->setStackId(ste_before->stackId());
+            }
+        }
+    }
+
     emit newSceneCreated(scene, newScreenplayElementIndex);
 
     scene->setUndoRedoEnabled(true);
