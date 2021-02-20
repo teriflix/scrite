@@ -20,6 +20,12 @@
 TabSequenceManager::TabSequenceManager(QObject *parent) : QObject(parent)
 {
     qApp->installEventFilter(this);
+
+#ifdef Q_OS_MAC
+    m_disabledKeyModifier = Qt::AltModifier;
+#else
+    m_disabledKeyModifier = Qt::ControlModifier;
+#endif
 }
 
 TabSequenceManager::~TabSequenceManager()
@@ -61,6 +67,15 @@ void TabSequenceManager::setBacktabKeyModifiers(int val)
 
     m_backtabKeyModifiers = val;
     emit backtabKeyModifiersChanged();
+}
+
+void TabSequenceManager::setDisabledKeyModifier(int val)
+{
+    if(m_disabledKeyModifier == val)
+        return;
+
+    m_disabledKeyModifier = val;
+    emit disabledKeyModifierChanged();
 }
 
 void TabSequenceManager::setReleaseFocusKey(int val)
@@ -158,7 +173,7 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
                 return int(kemods & Qt::KeyboardModifiers(val)) > 0;
             };
 
-            auto fetchNextIndex = [=](int from, int direction) {
+            auto fetchNextIndex = [=](int from, int direction, bool enabledOnly) {
                 int idx = from;
                 while(1) {
                     idx += direction;
@@ -168,6 +183,8 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
                         idx = 0;
                     else if(idx < 0)
                         idx = m_tabSequenceItems.size()-1;
+                    if(!enabledOnly)
+                        break;
                     TabSequenceItem *item = m_tabSequenceItems.at(idx);
                     if(item->isEnabled())
                         break;
@@ -178,14 +195,14 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
             int nextIndex = -1;
             if(ke->key() == m_tabKey && compareModifiers(m_tabKeyModifiers))
             {
-                nextIndex = fetchNextIndex(itemIndex, 1); // (itemIndex+1)%m_tabSequenceItems.size();
+                nextIndex = fetchNextIndex(itemIndex, 1, !compareModifiers(m_disabledKeyModifier));
                 if(nextIndex < itemIndex && !m_wrapAround)
                     return false;
             }
 
             if(ke->key() == m_backtabKey && compareModifiers(m_backtabKeyModifiers))
             {
-                nextIndex = fetchNextIndex(itemIndex, -1); // itemIndex > 0 ? itemIndex-1 : m_tabSequenceItems.size()-1;
+                nextIndex = fetchNextIndex(itemIndex, -1, !compareModifiers(m_disabledKeyModifier));
                 if(nextIndex > itemIndex && !m_wrapAround)
                     return false;
             }

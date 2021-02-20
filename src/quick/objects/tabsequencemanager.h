@@ -50,6 +50,11 @@ public:
     int backtabKeyModifiers() const { return m_backtabKeyModifiers; }
     Q_SIGNAL void backtabKeyModifiersChanged();
 
+    Q_PROPERTY(int disabledKeyModifier READ disabledKeyModifier WRITE setDisabledKeyModifier NOTIFY disabledKeyModifierChanged)
+    void setDisabledKeyModifier(int val);
+    int disabledKeyModifier() const { return m_disabledKeyModifier; }
+    Q_SIGNAL void disabledKeyModifierChanged();
+
     Q_PROPERTY(int releaseFocusKey READ releaseFocusKey WRITE setReleaseFocusKey NOTIFY releaseFocusKeyChanged)
     void setReleaseFocusKey(int val);
     int releaseFocusKey() const { return m_releaseFocusKey; }
@@ -88,6 +93,7 @@ private:
     int m_backtabKey = Qt::Key_Backtab;
     int m_tabKeyModifiers = Qt::NoModifier;
     int m_backtabKeyModifiers = Qt::NoModifier;
+    int m_disabledKeyModifier = Qt::ControlModifier;
     QList<TabSequenceItem*> m_tabSequenceItems;
     int m_releaseFocusKey = Qt::Key_Escape;
     bool m_releaseFocusEnabled = false;
