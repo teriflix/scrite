@@ -1032,24 +1032,16 @@ Item {
             }
 
             Repeater {
-                id: elementItems
-                model: scriteDocument.loading ? null : scriteDocument.structure.elementsModel
-                delegate: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? structureElementIndexCardUIDelegate : structureElementSynopsisEditorUIDelegate
-            }
-
-            Repeater {
                 id: stackBinders
                 model: scriteDocument.loading ? null : scriteDocument.structure.elementStacks
                 delegate: Item {
                     id: stackBinderItem
-                    z: 2
                     x: objectItem.geometry.x
                     y: objectItem.geometry.y
                     width: objectItem.geometry.width
                     height: objectItem.geometry.height
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
-                    BoundingBoxItem.stackOrder: 2.5 + (index/scriteDocument.structure.elementStacks.objectCount)
                     BoundingBoxItem.livePreview: false
                     BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
                     BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
@@ -1092,6 +1084,7 @@ Item {
                             Connections {
                                 target: objectItem
                                 onDataChanged: tabBarItem.updateTabAttributes()
+                                onStackInitialized: tabBarItem.updateTabAttributes()
                             }
 
                             onAttributeRequest: {
@@ -1124,6 +1117,12 @@ Item {
                         }
                     }
                 }
+            }
+
+            Repeater {
+                id: elementItems
+                model: scriteDocument.loading ? null : scriteDocument.structure.elementsModel
+                delegate: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? structureElementIndexCardUIDelegate : structureElementSynopsisEditorUIDelegate
             }
 
             Selection {
