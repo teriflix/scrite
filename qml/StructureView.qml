@@ -2180,7 +2180,7 @@ Item {
                 color: app.translucent("#cfd8dc", alpha)
                 radius: 6
                 property real alpha: 0
-                enabled: !dragHandleMouseArea.drag.active
+                enabled: !dragHandleMouseArea.drag.active && scriteDocument.screenplay.firstIndexOfScene(element.scene) >= 0
 
                 DropArea {
                     anchors.fill: parent
@@ -2190,18 +2190,32 @@ Item {
                     onDropped: {
                         parent.alpha = 0
 
-                        var otherSceneId = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene.id : drop.source.id
-                        if(otherSceneId === element.scene.id)
+                        var otherScene = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
+                        if(scriteDocument.screenplay.firstIndexOfScene(otherScene) < 0) {
+                            showInformation({
+                                "message": "Scenes must be added to the timeline before they can be stacked."
+                            })
+                            drop.ignore()
                             return
+                        }
+
+                        var otherSceneId = otherScene.id
+                        if(otherSceneId === element.scene.id) {
+                            drop.ignore()
+                            return
+                        }
 
                         var otherElement = scriteDocument.structure.findElementBySceneID(otherSceneId)
-                        if(otherElement === null)
+                        if(otherElement === null) {
+                            drop.ignore()
                             return
+                        }
 
                         if(element.scene.actIndex < 0 || otherElement.scene.actIndex < 0) {
                             showInformation({
                                 "message": "Scenes must be added to the timeline before they can be stacked."
                             })
+                            drop.ignore()
                             return
                         }
 
@@ -2209,6 +2223,7 @@ Item {
                             showInformation({
                                 "message": "Scenes must belong to the same act for them to be stacked."
                             })
+                            drop.ignore()
                             return
                         }
 

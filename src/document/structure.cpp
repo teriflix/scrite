@@ -228,10 +228,22 @@ void StructureElement::setSelected(bool val)
 
 void StructureElement::setStackId(const QString &val)
 {
-    if(m_stackId == val)
+    QString val2 = val;
+
+    if(!val2.isEmpty())
+    {
+        Screenplay *screenplay = m_structure && m_structure->scriteDocument() ? m_structure->scriteDocument()->screenplay() : nullptr;
+        if(screenplay)
+        {
+            if(screenplay->firstIndexOfScene(m_scene) < 0)
+                val2.clear();
+        }
+    }
+
+    if(m_stackId == val2)
         return;
 
-    m_stackId = val;
+    m_stackId = val2;
     this->setStackLeader(false);
 
     emit stackIdChanged();
