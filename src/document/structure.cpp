@@ -2519,6 +2519,19 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     if(screenplay == nullptr)
         return newBoundingRect;
 
+    QStringList stackIds;
+    for(int i=elementsToLayout.size()-1; i>=0; i--)
+    {
+        StructureElement *element = elementsToLayout.at(i);
+        if(element->stackId().isEmpty())
+            continue;
+
+        if(stackIds.contains(element->stackId()))
+            elementsToLayout.removeAt(i);
+        else
+            stackIds.append(element->stackId());
+    }
+
     auto lessThan = [screenplay](StructureElement *e1, StructureElement *e2) -> bool {
           const int pos1 = screenplay->firstIndexOfScene(e1->scene());
           const int pos2 = screenplay->firstIndexOfScene(e2->scene());
