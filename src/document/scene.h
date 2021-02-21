@@ -264,15 +264,20 @@ public:
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
     void scanMuteCharacters(const QStringList &characterNames=QStringList());
 
-    Q_PROPERTY(QString act READ act WRITE setAct NOTIFY actChanged STORED false)
+    Q_PROPERTY(QString act READ act NOTIFY actChanged STORED false)
     void setAct(const QString &val);
     QString act() const { return m_act; }
     Q_SIGNAL void actChanged();
 
-    Q_PROPERTY(int actIndex READ actIndex WRITE setActIndex NOTIFY actIndexChanged STORED false)
+    Q_PROPERTY(int actIndex READ actIndex NOTIFY actIndexChanged STORED false)
     void setActIndex(const int &val);
     int actIndex() const { return m_actIndex; }
     Q_SIGNAL void actIndexChanged();
+
+    Q_PROPERTY(QList<int> screenplayElementIndexList READ screenplayElementIndexList NOTIFY screenplayElementIndexListChanged STORED false)
+    void setScreenplayElementIndexList(const QList<int> &val);
+    QList<int> screenplayElementIndexList() const { return m_screenplayElementIndexList; }
+    Q_SIGNAL void screenplayElementIndexListChanged();
 
     Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
     void setGroups(const QStringList &val);
@@ -384,6 +389,7 @@ private:
     PushSceneUndoCommand *m_pushUndoCommand = nullptr;
     QJsonObject m_characterRelationshipGraph;
     CharacterElementMap m_characterElementMap;
+    QList<int> m_screenplayElementIndexList;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);

@@ -883,6 +883,15 @@ void Scene::setActIndex(const int &val)
     emit actIndexChanged();
 }
 
+void Scene::setScreenplayElementIndexList(const QList<int> &val)
+{
+    if(m_screenplayElementIndexList == val)
+        return;
+
+    m_screenplayElementIndexList = val;
+    emit screenplayElementIndexListChanged();
+}
+
 void Scene::setGroups(const QStringList &val)
 {
     if(m_groups == val)

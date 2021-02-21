@@ -1874,7 +1874,8 @@ Item {
 
             property bool visibleInViewport: true
             property StructureElementStack elementStack
-            visible: visibleInViewport && (elementStack === null || elementStack.topmostElement === element)
+            property bool stackedOnTop: (elementStack === null || elementStack.topmostElement === element)
+            visible: visibleInViewport && stackedOnTop
 
             function determineElementStack() {
                 if(element.stackId === "")
@@ -2015,9 +2016,14 @@ Item {
                         else
                             font.capitalization = Font.AllUppercase
                     }
-                    TabSequenceItem.enabled: elementItem.visible
+                    TabSequenceItem.enabled: elementItem.stackedOnTop
                     TabSequenceItem.manager: canvasTabSequence
-                    TabSequenceItem.sequence: elementIndex * 2 + 0
+                    TabSequenceItem.sequence: {
+                        var indexes = element.scene.screenplayElementIndexList
+                        if(indexes.length === 0)
+                            return elementIndex * 2 + 0
+                        return (indexes[0] + scriteDocument.structure.elementCount) * 2 + 0
+                    }
                     TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
                 }
 
@@ -2077,9 +2083,14 @@ Item {
                                 else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
                                     synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
                             }
-                            TabSequenceItem.enabled: elementItem.visible
+                            TabSequenceItem.enabled: elementItem.stackedOnTop
                             TabSequenceItem.manager: canvasTabSequence
-                            TabSequenceItem.sequence: elementIndex * 2 + 1
+                            TabSequenceItem.sequence: {
+                                var indexes = element.scene.screenplayElementIndexList
+                                if(indexes.length === 0)
+                                    return elementIndex * 2 + 1
+                                return (indexes[0] + scriteDocument.structure.elementCount) * 2 + 1
+                            }
                             TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
                         }
                     }

@@ -1938,7 +1938,14 @@ void Screenplay::evaluateSceneNumbers()
     QString act = QStringLiteral("ACT 1");
 
     for(ScreenplayElement *element : qAsConst(m_elements))
+        if(element->scene())
+            element->scene()->setScreenplayElementIndexList(QList<int>());
+
+    int index=0;
+    for(ScreenplayElement *element : qAsConst(m_elements))
     {
+        ++index;
+
         if(element->elementType() == ScreenplayElement::SceneElementType)
         {
             element->setElementIndex(elementIndex++);
@@ -1947,6 +1954,10 @@ void Screenplay::evaluateSceneNumbers()
             Scene *scene = element->scene();
             scene->setAct(act);
             scene->setActIndex(actIndex);
+
+            QList<int> list = scene->screenplayElementIndexList();
+            list.append(index);
+            scene->setScreenplayElementIndexList(list);
         }
         else
         {

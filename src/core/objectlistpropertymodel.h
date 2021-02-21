@@ -159,6 +159,22 @@ public:
         return ptr;
     }
 
+    void sortList(const std::function<bool(T,T)> &sortFunction) {
+        bool shuffled = false;
+        QList<T> copy = m_list;
+        std::sort(copy.begin(), copy.end(), [sortFunction,&shuffled](T a, T b) {
+            bool ret = sortFunction(a, b);
+            if(ret)
+                shuffled = true;
+            return ret;
+        });
+        if(shuffled) {
+            this->beginResetModel();
+            m_list = copy;
+            this->endResetModel();
+        }
+    }
+
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const {
         return parent.isValid() ? 0 : m_list.size();

@@ -2795,7 +2795,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
         }
 
         elementRect.moveTopLeft(QPointF(x, beatRect.bottom()+ySpacing));
-    }
+    }    
 
     return newBoundingRect;
 }
