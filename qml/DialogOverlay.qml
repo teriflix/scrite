@@ -74,7 +74,7 @@ Rectangle {
         enabled: animationsEnabled
         NumberAnimation {
             id: tAnimation
-            duration: 250
+            duration: 150
             easing.type: Easing.Linear
         }
     }

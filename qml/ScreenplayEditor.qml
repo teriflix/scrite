@@ -52,6 +52,7 @@ Rectangle {
     Connections {
         target: screenplayAdapter
         onCurrentIndexChanged: {
+            var currentIndex = screenplayAdapter.currentIndex
             if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
                 return

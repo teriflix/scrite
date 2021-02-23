@@ -208,8 +208,23 @@ Item {
 
     ScreenplayAdapter {
         id: screenplayAdapter
-        source: scriteDocument.loading ? null : scriteDocument.screenplay
+        // source: scriteDocument.loading ? null : scriteDocument.screenplay
         onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
+        source: {
+            if(scriteDocument.loading)
+                return null
+
+            if(mainTabBar.currentIndex === 0)
+                return scriteDocument.screenplay
+
+            if(scriteDocument.screenplay.currentElementIndex < 0) {
+                var index = scriteDocument.structure.currentElementIndex
+                var element = scriteDocument.structure.elementAt(index)
+                return element.scene
+            }
+
+            return scriteDocument.screenplay
+        }
     }
 
     ScreenplayTextDocument {
@@ -1551,19 +1566,6 @@ Item {
 
             enableSceneListPanel: mainTabBar.currentIndex === 0
 
-            source: {
-                if(mainTabBar.currentIndex !== 0 &&
-                   scriteDocument.structure.elementCount > 0 &&
-                   scriteDocument.screenplay.currentElementIndex < 0) {
-                    var index = scriteDocument.structure.currentElementIndex
-                    var element = scriteDocument.structure.elementAt(index)
-                    if(scriteDocument.screenplay.firstIndexOfScene(element.scene) >= 0)
-                        return scriteDocument.loading ? null : scriteDocument.screenplay
-                    return element ? element.scene : scriteDocument.screenplay
-                }
-                return scriteDocument.loading ? null : scriteDocument.screenplay
-            }
-
             onAdditionalCharacterMenuItemClicked: {
                 if(menuItemName === "Character Notes" && workspaceSettings.showNotebookInStructure) {
                     var ch = scriteDocument.structure.findCharacter(characterName)
@@ -1577,15 +1579,6 @@ Item {
                 if(menuItemName === "Scene Notes")
                     Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", scene)
             }
-        }
-    }
-
-    Component {
-        id: sceneEditorComponent
-
-        ScreenplayEditor {
-            source: scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex).scene
-            zoomLevelModifier: screenplayZoomLevelModifier
         }
     }
 
