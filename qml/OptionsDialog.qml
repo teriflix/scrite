@@ -34,6 +34,10 @@ Item {
         id: tabView
         anchors.fill: parent
         currentIndex: 0
+        onCurrentIndexChanged: {
+            modalDialog.closeOnEscape = true
+            modalDialog.closeable = currentIndex !== 4
+        }
 
         tabsArray: [
             { "title": "Application", "tooltip": "Settings in this page apply to all documents." },
@@ -1907,14 +1911,6 @@ Item {
 
         PageView {
             id: categoriesAndStructurePages
-            Component.onCompleted: {
-                modalDialog.closeOnEscape = true
-                modalDialog.closeable = false
-            }
-            Component.onDestruction: {
-                closeOnEscape.closeOnEscape = false
-                modalDialog.closeable = true
-            }
             pagesArray: [
                 { "title": "This Document" },
                 { "title": "Default Global" }

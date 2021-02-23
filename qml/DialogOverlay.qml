@@ -73,7 +73,8 @@ Rectangle {
     Behavior on t {
         enabled: animationsEnabled
         NumberAnimation {
-            duration: 100
+            id: tAnimation
+            duration: 250
             easing.type: Easing.Linear
         }
     }
@@ -164,7 +165,7 @@ Rectangle {
         source: "../icons/action/dialog_close_button.png"
         smooth: true
         fillMode: Image.PreserveAspectFit
-        opacity: closeButtonMouseArea.containsMouse ? 1 : 0.8
+        opacity: tAnimation.running ? 0 : (closeButtonMouseArea.containsMouse ? 1 : 0.8)
 
         MouseArea {
             id: closeButtonMouseArea
