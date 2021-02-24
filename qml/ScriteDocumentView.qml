@@ -1322,6 +1322,7 @@ Item {
                 onCurrentIndexChanged: {
                     if(currentIndex !== 0)
                         shortcutsDockWidget.hide()
+                    globalTimeDisplay.visible = (currentIndex === 0 || currentIndex === 1)
                 }
 
                 TrackerPack {

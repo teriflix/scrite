@@ -922,9 +922,18 @@ Item {
                     MouseArea {
                         id: canvasBeatMouseArea
                         anchors.fill: parent
-                        drag.target: canvasBeatItem
+                        drag.target: controlPressed ? null : canvasBeatItem
                         drag.axis: Drag.XAndYAxis
                         cursorShape: Qt.SizeAllCursor
+                        property bool controlPressed: false
+                        onPressed: {
+                            controlPressed = mouse.modifiers & Qt.ControlModifier
+                            if(controlPressed) {
+                                mouse.accepted = false
+                                return
+                            }
+                        }
+
                         drag.onActiveChanged: {
                             selection.clear()
                             canvasBeatItem.refX = canvasBeatItem.x
@@ -2635,6 +2644,8 @@ Item {
         id: textAnnotationComponent
 
         AnnotationItem {
+            id: textAnnotationItem
+
             Text {
                 anchors.centerIn: parent
                 horizontalAlignment: {

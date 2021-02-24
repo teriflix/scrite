@@ -1748,12 +1748,12 @@ Rectangle {
                 Row {
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: 8
+                    anchors.top: parent.top
+                    anchors.topMargin: parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
                     spacing: 20
 
                     SceneTypeImage {
-                        width: sceneHeadingField.height * 0.75
+                        width: sceneHeadingField.height * 0.55
                         height: width
                         anchors.verticalCenter: parent.verticalCenter
                         sceneType: headingItem.theScene.type

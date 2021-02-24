@@ -40,6 +40,10 @@ Rectangle {
         anchors.fill: parent
         enabled: annotationGripLoader.annotationItem !== annotationItem
         onClicked: parent.grip()
+        onDoubleClicked: {
+            parent.grip()
+            structureCanvasSettings.displayAnnotationProperties = true
+        }
     }
 
     Component.onCompleted: {

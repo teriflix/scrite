@@ -136,6 +136,15 @@ void EventFilter::setEvents(const QList<int> &val)
                 break;
             }
         }
+
+        for(int event : {QEvent::MouseButtonPress, QEvent::MouseButtonRelease, QEvent::MouseButtonDblClick})
+        {
+            if(val.contains(event))
+            {
+                item->setAcceptedMouseButtons(Qt::AllButtons);
+                break;
+            }
+        }
     }
 }
 
