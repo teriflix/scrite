@@ -39,6 +39,7 @@
 #include <QJsonObject>
 #include <QColorDialog>
 #include <QFontDatabase>
+#include <QJsonDocument>
 #include <QStandardPaths>
 #include <QOperatingSystemVersion>
 #include <QNetworkConfigurationManager>
@@ -519,7 +520,7 @@ AutoUpdate *Application::autoUpdate() const
     return AutoUpdate::instance();
 }
 
-QJsonObject Application::objectConfigurationFormInfo(const QObject *object, const QMetaObject *from=nullptr) const
+QJsonObject Application::objectConfigurationFormInfo(const QObject *object, const QMetaObject *from) const
 {
     QJsonObject ret;
     if(object == nullptr)

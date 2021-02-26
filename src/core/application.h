@@ -183,7 +183,7 @@ public:
     Q_PROPERTY(AutoUpdate* autoUpdate READ autoUpdate CONSTANT)
     AutoUpdate *autoUpdate() const;
 
-    Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object, const QMetaObject *from) const;
+    Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object, const QMetaObject *from=nullptr) const;
 
     Q_PROPERTY(QVariantList standardColors READ standardColorsVariantList NOTIFY standardColorsChanged STORED false)
     QVariantList standardColorsVariantList() const { return m_standardColors; }

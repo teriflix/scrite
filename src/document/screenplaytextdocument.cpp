@@ -649,7 +649,7 @@ void ScreenplayTextDocument::setPageCount(qreal val)
     if(m_totalTime != totalT)
     {
         m_totalTime = totalT;
-        emit currentTimeChanged();
+        emit totalTimeChanged();
     }
 }
 

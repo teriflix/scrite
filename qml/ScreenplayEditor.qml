@@ -2334,6 +2334,7 @@ Rectangle {
         visible: globalScreenplayEditorToolbar.showScreenplayPreview
         active: globalScreenplayEditorToolbar.showScreenplayPreview
         anchors.fill: parent
+        onActiveChanged: globalTimeDisplay.visible = !active
         sourceComponent: ScreenplayPreview {
             purpose: ScreenplayTextDocument.ForPrinting
             screenplay: screenplayTextDocument.screenplay
