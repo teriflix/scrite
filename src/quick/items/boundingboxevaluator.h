@@ -187,6 +187,8 @@ public:
     QImage preview() const { return m_preview; }
     Q_SIGNAL void previewUpdated();
 
+    Q_SIGNAL void itemVisibilityChanged();
+
 protected:
     void timerEvent(QTimerEvent *event);
 

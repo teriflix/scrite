@@ -1892,6 +1892,12 @@ Item {
             property StructureElementStack elementStack
             property bool stackedOnTop: (elementStack === null || elementStack.topmostElement === element)
             visible: visibleInViewport && stackedOnTop
+            onVisibleChanged: {
+                if(!visible) {
+                    if(headingField.activeFocus || synopsisField.activeFocus)
+                        canvasTabSequence.releaseFocus()
+                }
+            }
 
             function determineElementStack() {
                 if(element.stackId === "")
@@ -2061,7 +2067,7 @@ Item {
                         height: 200
                         contentWidth: synopsisField.width
                         contentHeight: synopsisField.height
-                        interactive: elementItem.selected && scrollBarVisible
+                        interactive: synopsisField.activeFocus && scrollBarVisible
                         property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
                         ScrollBar.vertical: ScrollBar {
                             policy: synopsisFieldFlick.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff

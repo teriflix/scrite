@@ -426,6 +426,7 @@ void BoundingBoxItem::determineVisibility()
         }
     }
 
+    const bool wasVisible = m_visibilityProperty.isEmpty() ? m_item->isVisible() : m_item->property(m_visibilityProperty).toBool();
     bool visible = true;
 
     switch(m_visibilityMode)
@@ -441,10 +442,15 @@ void BoundingBoxItem::determineVisibility()
         break;
     }
 
+    if(wasVisible == visible)
+        return;
+
     if(m_visibilityProperty.isEmpty())
         m_item->setVisible(visible);
     else
         m_item->setProperty(m_visibilityProperty, visible);
+
+    emit itemVisibilityChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
