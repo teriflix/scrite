@@ -233,7 +233,6 @@ Item {
         formatting: scriteDocument.loading ? null : scriteDocument.printFormat
         syncEnabled: true
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
-        Component.onCompleted: globalTimeDisplay.screenplayTextDocument = screenplayTextDocument
     }
 
     Rectangle {
@@ -1204,7 +1203,6 @@ Item {
             anchors.right: editTools.visible ? editTools.left : parent.right
             anchors.margins: 10
             height: parent.height
-            property ScreenplayTextDocument screenplayTextDocument
             visible: screenplayTextDocument !== null
             property alias visibleToUser: currentTimeDisplay.visible
             property real contentWidth: currentTimeLabel.visible ? currentTimeLabel.width + 10 : 0
@@ -1222,7 +1220,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
 
-                    ToolTip.text: "Time estimates are approximate, assuming " + globalTimeDisplay.screenplayTextDocument.timePerPageAsString + " per page."
+                    ToolTip.text: "Time estimates are approximate, assuming " + screenplayTextDocument.timePerPageAsString + " per page."
                     ToolTip.delay: 1000
                     ToolTip.visible: containsMouse
                 }
@@ -1241,11 +1239,9 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: primaryColors.c800.text
                     text: {
-                        if(globalTimeDisplay.screenplayTextDocument === null)
-                            return "00:00"
-                        if(globalTimeDisplay.screenplayTextDocument.totalTime.getHours() > 0)
-                            return Qt.formatTime(globalTimeDisplay.screenplayTextDocument.currentTime, "H:mm:ss")
-                        return Qt.formatTime(globalTimeDisplay.screenplayTextDocument.currentTime, "mm:ss")
+                        if(screenplayTextDocument.totalTime.getHours() > 0)
+                            return Qt.formatTime(screenplayTextDocument.currentTime, "H:mm:ss")
+                        return Qt.formatTime(screenplayTextDocument.currentTime, "mm:ss")
                     }
                 }
 

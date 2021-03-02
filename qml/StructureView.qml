@@ -2021,6 +2021,7 @@ Item {
                     font.capitalization: Font.AllUppercase
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    readOnly: scriteDocument.readOnly
                     onEditingComplete: element.scene.heading.parseFrom(text)
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                     Keys.onEscapePressed: canvasTabSequence.releaseFocus()

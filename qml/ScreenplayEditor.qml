@@ -1810,6 +1810,7 @@ Rectangle {
                         font.capitalization: currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase
                         color: headingFontMetrics.format.textColor
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        readOnly: scriteDocument.readOnly
                         onEditingComplete: headingItem.theScene.heading.parseFrom(text)
                         onActiveFocusChanged: {
                             if(activeFocus)
@@ -2001,7 +2002,7 @@ Rectangle {
                     topPadding: 2
                     bottomPadding: 2
                     font.pointSize: 12
-                    closable: scene.isCharacterMute(modelData)
+                    closable: scene.isCharacterMute(modelData) && !scriteDocument.readOnly
                     onClicked: requestCharacterMenu(modelData)
                     onCloseRequest: {
                         if(!scriteDocument.readOnly)
