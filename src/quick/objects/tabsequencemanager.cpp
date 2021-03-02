@@ -120,7 +120,7 @@ void TabSequenceManager::assumeFocusAt(int index)
 
 void TabSequenceManager::releaseFocus()
 {
-    for(TabSequenceItem *item : m_tabSequenceItems)
+    for(TabSequenceItem *item : qAsConst(m_tabSequenceItems))
     {
         QQuickItem *qitem = qobject_cast<QQuickItem*>(item->parent());
         if(qitem)

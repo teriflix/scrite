@@ -491,6 +491,12 @@ Item {
                 ColorAnimation { duration: 250 }
             }
 
+            property bool scaleLessThanHalf: scale < 0.5
+            onScaleLessThanHalfChanged: {
+                if(scaleLessThanHalf)
+                    canvasTabSequence.releaseFocus()
+            }
+
             TabSequenceManager {
                 id: canvasTabSequence
                 wrapAround: true
@@ -2028,7 +2034,7 @@ Item {
                     font.capitalization: Font.AllUppercase
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    readOnly: scriteDocument.readOnly
+                    readOnly: scriteDocument.readOnly || canvas.scale < 0.5
                     onEditingComplete: element.scene.heading.parseFrom(text)
                     onActiveFocusChanged: if(activeFocus) elementItem.select()
                     Keys.onEscapePressed: canvasTabSequence.releaseFocus()
@@ -2087,7 +2093,7 @@ Item {
                             placeholderText: "Describe what happens in this scene."
                             font.pointSize: app.idealFontPointSize
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            readOnly: scriteDocument.readOnly
+                            readOnly: scriteDocument.readOnly || canvas.scale < 0.5
                             text: element.scene.title
                             onTextChanged: element.scene.title = text
                             onActiveFocusChanged: if(activeFocus) elementItem.select()
