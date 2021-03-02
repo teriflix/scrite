@@ -372,6 +372,7 @@ Item {
             target: scriteDocument
             onJustLoaded: canvasScroll.updateFromScriteDocumentUserDataLater()
         }
+
         Component.onCompleted: canvasScroll.updateFromScriteDocumentUserDataLater()
         Component.onDestruction: canvasScroll.updateScriteDocumentUserData()
         onZoomScaleChangedInteractively: Qt.callLater(updateScriteDocumentUserData)
@@ -424,6 +425,9 @@ Item {
                 } else
                     canvasScroll.zoomOneMiddleArea()
             }
+
+            if(scriteDocument.structure.forceBeatBoardLayout)
+                scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
 
             updateScriteDocumentUserDataEnabled = true
         }
