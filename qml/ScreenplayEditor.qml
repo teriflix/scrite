@@ -809,6 +809,12 @@ Rectangle {
             property bool canSplitScene: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition === 0 && screenplayAdapter.isSourceScreenplay
             property bool canJoinToPreviousScene: sceneTextEditor.activeFocus && !scriteDocument.readOnly && sceneTextEditor.cursorPosition === 0 && contentItem.theIndex > 0
 
+            FocusTracker.window: qmlWindow
+            FocusTracker.onHasFocusChanged: {
+                contentItem.theScene.undoRedoEnabled = FocusTracker.hasFocus
+                sceneHeadingAreaLoader.item.sceneHasFocus = FocusTracker.hasFocus
+            }
+
             SceneDocumentBinder {
                 id: sceneDocumentBinder
                 scene: contentItem.theScene
@@ -991,8 +997,6 @@ Rectangle {
                                     contentView.ensureVisible(synopsisEditorField, cursorRectangle)
                                     screenplayAdapter.currentIndex = contentItem.theIndex
                                 }
-                                sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
-                                contentItem.theScene.undoRedoEnabled = activeFocus
                             }
                         }
                     }
@@ -1060,8 +1064,6 @@ Rectangle {
                             justReceivedFocus = true
                         } else if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
                             globalScreenplayEditorToolbar.sceneEditor = null
-                        sceneHeadingAreaLoader.item.sceneHasFocus = activeFocus
-                        contentItem.theScene.undoRedoEnabled = activeFocus
                     }
 
                     function reload() {

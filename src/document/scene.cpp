@@ -168,10 +168,7 @@ PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, bool allowMerging)
        UndoStack::active() != nullptr &&
        UndoStack::active() == allowedStack &&
        scene != nullptr && scene->isUndoRedoEnabled())
-    {
-        if(scene != nullptr)
-            m_command = new SceneUndoCommand(scene, allowMerging);
-    }
+        m_command = new SceneUndoCommand(scene, allowMerging);
 }
 
 PushSceneUndoCommand::~PushSceneUndoCommand()
@@ -272,14 +269,26 @@ void SceneHeading::parseFrom(const QString &text)
     const int field1SepLoc = heading.indexOf('.');
     const int field2SepLoc = heading.lastIndexOf('-');
 
+    auto applyChanges = [=](const QString &_locType, const QString &_loc, const QString &_moment) {
+        PushSceneUndoCommand cmd(m_scene, false);
+
+        m_moment = _moment;
+        m_location = _loc;
+        m_locationType = _locType;
+
+        emit momentChanged();
+        emit locationChanged();
+        emit locationTypeChanged();
+    };
+
     if(field1SepLoc < 0 && field2SepLoc < 0)
     {
         if( structure->standardLocationTypes().contains(heading) )
-            this->setLocationType(heading);
+            applyChanges(heading, m_location, m_moment);
         else if( structure->standardMoments().contains(heading) )
-            this->setMoment(heading);
+            applyChanges(m_locationType, m_location, heading);
         else
-            this->setLocation(heading);
+            applyChanges(m_locationType, heading, m_moment);
         return;
     }
 
@@ -288,8 +297,7 @@ void SceneHeading::parseFrom(const QString &text)
         const QString moment = heading.mid(field2SepLoc+1).trimmed();
         const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
 
-        this->setMoment(moment);
-        this->setLocation(location);
+        applyChanges(m_locationType, location, moment);
         return;
     }
 
@@ -298,8 +306,7 @@ void SceneHeading::parseFrom(const QString &text)
         const QString locationType = heading.left(field1SepLoc).trimmed();
         const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
 
-        this->setLocationType(locationType);
-        this->setLocation(location);
+        applyChanges(locationType, location, m_moment);
         return;
     }
 
@@ -307,9 +314,7 @@ void SceneHeading::parseFrom(const QString &text)
     const QString moment = heading.mid(field2SepLoc+1).trimmed();
     const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
 
-    this->setMoment(moment);
-    this->setLocation(location);
-    this->setLocationType(locationType);
+    applyChanges(locationType, location, moment);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -626,7 +631,7 @@ void Scene::setTitle(const QString &val)
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "title");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if(!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_title = val;
@@ -640,7 +645,7 @@ void Scene::setEmotionalChange(const QString &val)
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "emotionalChange");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if(!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_emotionalChange = val;
@@ -654,7 +659,7 @@ void Scene::setCharactersInConflict(const QString &val)
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "charactersInConflict");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if(!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_charactersInConflict = val;
@@ -668,7 +673,7 @@ void Scene::setColor(const QColor &val)
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "color");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if(!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_color = val;
@@ -682,7 +687,7 @@ void Scene::setPageTarget(const QString &val)
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "pageTarget");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if(!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_pageTarget = val;
@@ -738,7 +743,7 @@ void Scene::setComments(const QString &val)
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "comments");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if(!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_comments = val;
@@ -1268,6 +1273,8 @@ QByteArray Scene::toByteArray() const
 
 bool Scene::resetFromByteArray(const QByteArray &bytes)
 {
+    QScopedValueRollback<bool> ure(m_undoRedoEnabled, false);
+
     QDataStream ds(bytes);
 
     QString sceneID;
@@ -1277,7 +1284,8 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     else if(sceneID != m_id)
         return false;
 
-    this->sceneAboutToReset();
+    emit sceneAboutToReset();
+
     this->clearElements();
 
     QString title;
@@ -1322,7 +1330,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         this->addElement(element);
     }
 
-    this->sceneReset(curPosition);
+    emit sceneReset(curPosition);
 
     return true;
 }

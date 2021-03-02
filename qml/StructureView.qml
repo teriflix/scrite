@@ -1638,7 +1638,10 @@ Item {
                 heading.location: "SOMEWHERE"
                 heading.moment: "DAY"
             }
-            Component.onCompleted: scriteDocument.structure.forceBeatBoardLayout = false
+            Component.onCompleted: {
+                scene.undoRedoEnabled = true
+                scriteDocument.structure.forceBeatBoardLayout = false
+            }
         }
     }
 
