@@ -92,6 +92,8 @@ public:
     Q_INVOKABLE void markPreviewDirty();
     Q_SIGNAL void previewNeedsUpdate();
 
+    Q_INVOKABLE void recomputeBoundingBox() { this->evaluateNow(); }
+
 protected:
     void timerEvent(QTimerEvent *event);
     void setBoundingBox(const QRectF &val);

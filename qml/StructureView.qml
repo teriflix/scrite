@@ -113,6 +113,7 @@ Item {
 
             ToolButton3 {
                 onClicked: {
+                    canvasItemsBoundingBox.recomputeBoundingBox()
                     canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox);
                     canvasScroll.isZoomFit = true
                     canvasScroll.updateScriteDocumentUserData()
