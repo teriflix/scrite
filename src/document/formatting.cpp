@@ -2261,6 +2261,14 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     if(m_textDocument == nullptr || m_scene == nullptr || this->document() == nullptr)
         return;
 
+    m_tabHistory.clear();
+
+    if(charsRemoved > 0)
+    {
+        this->syncSceneFromDocument();
+        return;
+    }
+
     QTextCursor cursor(this->document());
     cursor.setPosition(from);
 
@@ -2272,12 +2280,6 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         return;
     }
 
-    if(userData == nullptr)
-    {
-        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, from);
-        return;
-    }
-
     SceneElement *sceneElement = userData->sceneElement();
     if(sceneElement == nullptr)
     {
@@ -2285,10 +2287,16 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         return;
     }
 
+    const int to = from + charsAdded - 1;
+    if(to > block.position() + block.length())
+    {
+        this->syncSceneFromDocument();
+        return;
+    }
+
     sceneElement->setText(block.text());
     if(m_spellCheckEnabled && m_liveSpellCheckEnabled)
         userData->scheduleSpellCheckUpdate();
-    m_tabHistory.clear();
 }
 
 void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
