@@ -1437,12 +1437,17 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
             this->addElement(item);
         else
             m_elements.append(item);
+
+        if(item->type() == SceneElement::Character)
+            m_characterElementMap.include(item);
     }
 
     while(!oldElements.isEmpty())
     {
         SceneElement *ptr = oldElements.takeFirst();
         emit aboutToRemoveSceneElement(ptr);
+        if(ptr->type() == SceneElement::Character)
+            m_characterElementMap.remove(ptr);
         GarbageCollector::instance()->add(ptr);
     }
 

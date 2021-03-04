@@ -1938,8 +1938,25 @@ Rectangle {
                     width: parent.width
                     readonly property bool editorHasActiveFocus: headingItem.sceneHasFocus
                     property Scene scene: headingItem.theScene
-                    active: screenplayEditorSettings.displaySceneCharacters
+                    property bool allow: true
+                    active: screenplayEditorSettings.displaySceneCharacters && allow
                     sourceComponent: sceneCharactersList
+
+                    function reload() {
+                        sceneCharactersListLoader.allow = false
+                        Qt.callLater( function() {
+                            sceneCharactersListLoader.allow = true
+                        })
+                    }
+
+                    function reloadLater() {
+                        Qt.callLater(reload)
+                    }
+
+                    Connections {
+                        target: headingItem.theScene
+                        onSceneRefreshed: sceneCharactersListLoader.reloadLater()
+                    }
                 }
 
                 Text {
