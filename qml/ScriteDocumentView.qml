@@ -75,6 +75,10 @@ Item {
         property bool includeTitlePageInPreview: true
         property bool enableSpellCheck: false // until we can fix https://github.com/teriflix/scrite/issues/138
         property bool enableAnimations: true
+        property int lastLanguageRefreshNoticeBoxTimestamp: 0
+        property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
+        property bool showLanguageRefreshNoticeBox: true
+        property bool showSpellCheckRefreshNoticeBox: true
         onEnableAnimationsChanged: {
             modalDialog.animationsEnabled = enableAnimations
             statusText.enableAnimations = enableAnimations

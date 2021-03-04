@@ -1830,6 +1830,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         userData->charFormat = format->createCharFormat();
         userData->charFormat.setFontPointSize(format->font().pointSize()+m_screenplayFormat->fontPointSizeDelta());
 
+        cursor.setPosition(block.position());
         cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
         cursor.setCharFormat(userData->charFormat);
         cursor.setBlockFormat(userData->blockFormat);
@@ -1849,6 +1850,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         QTextCharFormat noSpellingErrorFormat;
         noSpellingErrorFormat.setBackground(userData->blockFormat.background());
         noSpellingErrorFormat.setProperty(IsWordMisspelledProperty, false);
+        cursor.setPosition(block.position());
         cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
         cursor.mergeCharFormat(noSpellingErrorFormat);
         cursor.clearSelection();
@@ -1879,11 +1881,17 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 
             spellingErrorFormat.setProperty(WordSuggestionsProperty, fragment.suggestions());
 
-            cursor.setPosition(block.position() + fragment.start());
-            cursor.setPosition(block.position() + fragment.end()+1, QTextCursor::KeepAnchor);
-            cursor.mergeCharFormat(spellingErrorFormat);
+            if(fragment.length() > 0)
+            {
+                cursor.setPosition(block.position() + fragment.start());
+                cursor.setPosition(block.position() + fragment.end()+1, QTextCursor::KeepAnchor);
+                cursor.mergeCharFormat(spellingErrorFormat);
+            }
+
             cursor.clearSelection();
         }
+
+        emit spellingMistakesDetected();
     }
 
     /**

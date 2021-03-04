@@ -562,6 +562,7 @@ public:
     Q_SIGNAL void documentLoadCountChanged();
 
     Q_SIGNAL void documentInitialized();
+    Q_SIGNAL void spellingMistakesDetected();
 
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
     Q_INVOKABLE bool paste(int fromPosition=-1);
