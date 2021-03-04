@@ -1340,6 +1340,8 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     }
 
     emit sceneReset(curPosition);
+    emit sceneChanged();
+    emit sceneRefreshed();
 
     return true;
 }
