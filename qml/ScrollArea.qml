@@ -88,13 +88,20 @@ Flickable {
         ensureVisible(area, s)
     }
 
+    property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
     Behavior on contentX {
         enabled: screenplayEditorSettings.enableAnimations && animatePanAndZoom
-        NumberAnimation { duration: 250 }
+        NumberAnimation { id: contentXAnimation; duration: 250 }
     }
     Behavior on contentY {
         enabled: screenplayEditorSettings.enableAnimations && animatePanAndZoom
-        NumberAnimation { duration: 250 }
+        NumberAnimation { id: contentYAnimation; duration: 250 }
+    }
+    Behavior on zoomScale {
+        id: zoomScaleBehavior
+        property bool allow: true
+        enabled: screenplayEditorSettings.enableAnimations && animatePanAndZoom && allow
+        NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 
     ScrollBar.horizontal: ScrollBar {
@@ -243,8 +250,10 @@ Flickable {
         onScaleChanged: {
             if(flickable === null)
                 return
+            zoomScaleBehavior.allow = false
             zoomScale = activeScale
             zoomScaleChangedInteractively()
+            zoomScaleBehavior.allow = true
         }
     }
 

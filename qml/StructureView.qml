@@ -380,11 +380,12 @@ Item {
         onContentXChanged: Qt.callLater(updateScriteDocumentUserData)
         onContentYChanged: Qt.callLater(updateScriteDocumentUserData)
         onZoomScaleChanged: isZoomFit = false
+        onAnimatePanAndZoomChanged: Qt.callLater(updateScriteDocumentUserData)
         animatePanAndZoom: false
         property bool updateScriteDocumentUserDataEnabled: false
 
         function updateScriteDocumentUserData() {
-            if(!updateScriteDocumentUserDataEnabled || scriteDocument.readOnly)
+            if(!updateScriteDocumentUserDataEnabled || scriteDocument.readOnly || animatingPanOrZoom)
                 return
 
             var userData = scriteDocument.userData
@@ -431,6 +432,7 @@ Item {
                 scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
 
             updateScriteDocumentUserDataEnabled = true
+            animatePanAndZoom = true
         }
 
         function updateFromScriteDocumentUserDataLater() {
@@ -1895,6 +1897,11 @@ Item {
                 canvasTabSequence.releaseFocus()
             }
 
+            function zoomOneForFocus() {
+                if(canvas.scale < 0.65)
+                    canvasScroll.zoomOneToItem(elementItem)
+            }
+
             property bool visibleInViewport: true
             property StructureElementStack elementStack
             property bool stackedOnTop: (elementStack === null || elementStack.topmostElement === element)
@@ -2036,7 +2043,13 @@ Item {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     readOnly: scriteDocument.readOnly || canvas.scale < 0.5
                     onEditingComplete: element.scene.heading.parseFrom(text)
-                    onActiveFocusChanged: if(activeFocus) elementItem.select()
+                    onActiveFocusChanged: {
+                        if(activeFocus) {
+                            elementItem.select()
+                            if(!readOnly)
+                                elementItem.zoomOneForFocus()
+                        }
+                    }
                     Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                     enableTransliteration: true
                     property var currentLanguage: app.transliterationEngine.language
@@ -2096,7 +2109,13 @@ Item {
                             readOnly: scriteDocument.readOnly || canvas.scale < 0.5
                             text: element.scene.title
                             onTextChanged: element.scene.title = text
-                            onActiveFocusChanged: if(activeFocus) elementItem.select()
+                            onActiveFocusChanged: {
+                                if(activeFocus) {
+                                    elementItem.select()
+                                    if(!readOnly)
+                                        elementItem.zoomOneForFocus()
+                                }
+                            }
                             Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                             SpecialSymbolsSupport {
                                 anchors.top: parent.bottom
