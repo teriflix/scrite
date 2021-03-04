@@ -3650,6 +3650,10 @@ void Structure::paste(const QPointF &pos)
         // We copy the newly pasted annotation once more, so that the next paste will
         // happen relative to the newly pasted element
         this->copy(element);
+
+        // Make the newly pasted element as the current item.
+        this->setCurrentElementIndex( this->indexOfElement(element) );
+
         return;
     }
 }
