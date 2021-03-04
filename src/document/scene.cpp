@@ -596,6 +596,15 @@ Scene *Scene::clone(QObject *parent) const
         newScene->addElement(newElement);
     }
 
+    newScene->setGroups(m_groups);
+    newScene->setComments(m_comments);
+    newScene->setPageTarget(m_pageTarget);
+    newScene->setEmotionalChange(m_emotionalChange);
+    newScene->setCharactersInConflict(m_charactersInConflict);
+    newScene->setCharacterRelationshipGraph(m_characterRelationshipGraph);
+
+    newScene->m_characterElementMap = m_characterElementMap;
+
     return newScene;
 }
 
