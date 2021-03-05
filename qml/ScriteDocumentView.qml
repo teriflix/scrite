@@ -1587,7 +1587,7 @@ Item {
         id: structureEditorComponent
 
         SplitView {
-            id: structureEditorSplitView
+            id: structureEditorSplitView1
             orientation: Qt.Vertical
             Material.background: Qt.darker(primaryColors.windowColor, 1.1)
 
@@ -1597,6 +1597,7 @@ Item {
                 color: primaryColors.c10.background
 
                 SplitView {
+                    id: structureEditorSplitView2
                     orientation: Qt.Horizontal
                     Material.background: Qt.darker(primaryColors.windowColor, 1.1)
                     anchors.fill: parent
@@ -1653,6 +1654,130 @@ Item {
                                 }
                             }
                         }
+
+                        /**
+                          Some of our users find it difficult to know that they can pull the splitter handle
+                          to reveal the timeline and/or screenplay editor. So we load an animation letting them
+                          know about that and get rid of it once the animation is done.
+                          */
+                        Loader {
+                            id: splitViewAnimationLoader
+                            anchors.fill: parent
+                            active: false
+                            sourceComponent: Rectangle {
+                                color: app.translucent(primaryColors.button, 0.5)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: splitViewAnimationLoader.active = false
+                                }
+
+                                Timer {
+                                    interval: 5000
+                                    repeat: false
+                                    running: true
+                                    onTriggered: splitViewAnimationLoader.active = false
+                                }
+
+                                Item {
+                                    id: screenplayEditorHandle
+                                    width: 1
+                                    property real marginOnTheRight: 0
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    anchors.rightMargin: marginOnTheRight
+                                    visible: !screenplayEditor2.active
+
+                                    Rectangle {
+                                        height: parent.height * 0.5
+                                        width: 5
+                                        anchors.right: parent.right
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        color: primaryColors.windowColor
+                                        visible: screenplayEditorHandleAnimation.running
+                                    }
+
+                                    Text {
+                                        color: primaryColors.c50.background
+                                        text: "Pull this handle to view the screenplay editor."
+                                        font.pointSize: app.idealFontPointSize + 2
+                                        anchors.right: parent.left
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.rightMargin: 20
+                                    }
+
+                                    SequentialAnimation {
+                                        id: screenplayEditorHandleAnimation
+                                        loops: 2
+                                        running: screenplayEditorHandle.visible
+
+                                        NumberAnimation {
+                                            target: screenplayEditorHandle
+                                            property: "marginOnTheRight"
+                                            duration: 500
+                                            from: 0; to: 50
+                                        }
+
+                                        NumberAnimation {
+                                            target: screenplayEditorHandle
+                                            property: "marginOnTheRight"
+                                            duration: 500
+                                            from: 50; to: 0
+                                        }
+                                    }
+                                }
+
+                                Item {
+                                    id: timelineViewHandle
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: marginOnTheBottom
+                                    height: 1
+                                    visible: !structureEditorRow2.active
+                                    property real marginOnTheBottom: 0
+
+                                    Rectangle {
+                                        width: parent.width * 0.5
+                                        height: 5
+                                        anchors.bottom: parent.bottom
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        color: primaryColors.windowColor
+                                        visible: timelineViewHandleAnimation.running
+                                    }
+
+                                    Text {
+                                        color: primaryColors.c50.background
+                                        text: "Pull this handle to get the timeline view."
+                                        font.pointSize: app.idealFontPointSize
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        anchors.bottom: parent.top
+                                        anchors.bottomMargin: 20
+                                    }
+
+                                    SequentialAnimation {
+                                        id: timelineViewHandleAnimation
+                                        loops: 2
+                                        running: timelineViewHandle.visible
+
+                                        NumberAnimation {
+                                            target: timelineViewHandle
+                                            property: "marginOnTheBottom"
+                                            duration: 500
+                                            from: 0; to: 50
+                                        }
+
+                                        NumberAnimation {
+                                            target: timelineViewHandle
+                                            property: "marginOnTheBottom"
+                                            duration: 500
+                                            from: 50; to: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     Loader {
@@ -1686,8 +1811,8 @@ Item {
 
             Connections {
                 target: scriteDocument
-                onAboutToSave: structureEditorSplitView.saveLayoutDetails()
-                onJustLoaded: structureEditorSplitView.restoreLayoutDetails()
+                onAboutToSave: structureEditorSplitView1.saveLayoutDetails()
+                onJustLoaded: structureEditorSplitView1.restoreLayoutDetails()
             }
 
             Component.onCompleted: restoreLayoutDetails()
@@ -1707,8 +1832,14 @@ Item {
                 var userData = scriteDocument.userData
                 if(userData.structureTab && userData.structureTab.version === 0) {
                     structureEditorRow2.SplitView.preferredHeight = userData.structureTab.timelineViewHeight
+                    structureEditorRow2.height = structureEditorRow2.SplitView.preferredHeight
                     screenplayEditor2.SplitView.preferredWidth = structureEditorRow1.width*userData.structureTab.screenplayEditorWidth
+                    screenplayEditor2.width = screenplayEditor2.SplitView.preferredWidth
                 }
+
+                app.execLater(splitViewAnimationLoader, 250, function() {
+                    splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
+                })
             }
         }
     }
