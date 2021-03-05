@@ -644,6 +644,17 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     this->beginRemoveRows(QModelIndex(), row, row);
     m_elements.removeAt(row);
 
+    Scene *scene = ptr->scene();
+    if(scene != nullptr)
+    {
+        scene->setAct(QString());
+        scene->setActIndex(-1);
+        scene->setScreenplayElementIndexList(QList<int>());
+
+        // If this scene still exists as another element in the screenplay, then
+        // it is going to get the above properties set in evaluateSceneNumbers() shortly.
+    }
+
     disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
@@ -1931,17 +1942,24 @@ void Screenplay::onSceneReset(int elementIndex)
 
 void Screenplay::evaluateSceneNumbers()
 {
+    // Sometimes Screenplay is used by ScreenplayAdapter to house a single
+    // scene. In such cases, we must not evaluate numbers.
+    if(m_scriteDocument == nullptr)
+        return;
+
     int number = 1;
     int actIndex = 0;
     int elementIndex = 0;
     bool containsNonStandardScenes = false;
     QString act = QStringLiteral("ACT 1");
 
+    QHash< Scene*, QList<int> > indexListMap;
+
     for(ScreenplayElement *element : qAsConst(m_elements))
         if(element->scene())
-            element->scene()->setScreenplayElementIndexList(QList<int>());
+            indexListMap[element->scene()] = QList<int>();
 
-    int index=0;
+    int index=-1;
     for(ScreenplayElement *element : qAsConst(m_elements))
     {
         ++index;
@@ -1954,10 +1972,7 @@ void Screenplay::evaluateSceneNumbers()
             Scene *scene = element->scene();
             scene->setAct(act);
             scene->setActIndex(actIndex);
-
-            QList<int> list = scene->screenplayElementIndexList();
-            list.append(index);
-            scene->setScreenplayElementIndexList(list);
+            indexListMap[scene].append(index);
         }
         else
         {
@@ -1973,6 +1988,14 @@ void Screenplay::evaluateSceneNumbers()
 
         if(!containsNonStandardScenes && element->scene() && element->scene()->type() != Scene::Standard)
             containsNonStandardScenes = true;
+    }
+
+    QHash< Scene*, QList<int> >::const_iterator it = indexListMap.constBegin();
+    QHash< Scene*, QList<int> >::const_iterator end = indexListMap.constEnd();
+    while(it != end)
+    {
+        it.key()->setScreenplayElementIndexList(it.value());
+        ++it;
     }
 
     this->setHasNonStandardScenes(containsNonStandardScenes);

@@ -279,6 +279,10 @@ public:
     QList<int> screenplayElementIndexList() const { return m_screenplayElementIndexList; }
     Q_SIGNAL void screenplayElementIndexListChanged();
 
+    Q_PROPERTY(bool addedToScreenplay READ isAddedToScreenplay NOTIFY addedToScreenplayChanged)
+    bool isAddedToScreenplay() const { return !m_screenplayElementIndexList.isEmpty(); }
+    Q_SIGNAL void addedToScreenplayChanged();
+
     Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
     void setGroups(const QStringList &val);
     QStringList groups() const { return m_groups; }

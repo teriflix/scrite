@@ -2249,7 +2249,7 @@ Item {
                 color: app.translucent("#cfd8dc", alpha)
                 radius: 6
                 property real alpha: 0
-                enabled: !dragHandleMouseArea.drag.active && scriteDocument.screenplay.firstIndexOfScene(element.scene) >= 0
+                enabled: !dragHandleMouseArea.drag.active && element.scene.addedToScreenplay
 
                 DropArea {
                     anchors.fill: parent

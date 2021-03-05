@@ -902,8 +902,12 @@ void Scene::setScreenplayElementIndexList(const QList<int> &val)
     if(m_screenplayElementIndexList == val)
         return;
 
+    const bool flag = m_screenplayElementIndexList.isEmpty();
     m_screenplayElementIndexList = val;
     emit screenplayElementIndexListChanged();
+
+    if(flag != m_screenplayElementIndexList.isEmpty())
+        emit addedToScreenplayChanged();
 }
 
 void Scene::setGroups(const QStringList &val)
