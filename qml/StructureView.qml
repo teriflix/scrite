@@ -1238,12 +1238,25 @@ Item {
                     MenuItem2 {
                         text: "Stack"
                         enabled: {
+                            if(scriteDocument.structure.canvasUIMode !== Structure.IndexCardUI)
+                                return false
+
                             var items = selection.items
+                            var actIndex = -1
                             for(var i=0; i<items.length; i++) {
                                 var item = items[i]
                                 if(item.element.stackId !== "")
                                     return false
+
+                                if(i === 0)
+                                    actIndex = item.element.scene.actIndex
+                                else if(actIndex !== item.element.scene.actIndex)
+                                    return false
                             }
+
+                            if(actIndex < 0)
+                                return false
+
                             return true
                         }
                         onTriggered: {
