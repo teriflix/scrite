@@ -1035,18 +1035,17 @@ QString Application::camelCased(const QString &val) const
 //    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
 //        return val;
 
-    if(val.isEmpty())
-        return val;
-
-    if(val.at(0).script() != QChar::Script_Latin)
-        return val;
-
     QString val2 = val.toLower();
+    if(val2.isEmpty())
+        return val;
 
     bool capitalize = true;
     for(int i=0; i<val2.length(); i++)
     {
         QCharRef ch = val2[i];
+        if(ch.isLetterOrNumber() && ch.script() != QChar::Script_Latin)
+            return val;
+
         if(capitalize)
         {
             if(ch.isLetterOrNumber() && ch.script() == QChar::Script_Latin)
