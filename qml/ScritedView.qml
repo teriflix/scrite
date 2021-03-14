@@ -474,7 +474,7 @@ Item {
 
                     FontMetrics {
                         id: screenplayFontMetrics
-                        font: screenplayOffsetsModel.format.font
+                        font: screenplayOffsetsModel.format.defaultFont
                     }
 
                     Item {

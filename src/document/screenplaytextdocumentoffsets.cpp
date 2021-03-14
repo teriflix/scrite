@@ -628,6 +628,22 @@ int ScreenplayTextDocumentOffsets::previousSceneHeadingIndex(int row) const
     return 0;
 }
 
+inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
+{
+    const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
+    Q_FOREACH(TransliterationEngine::Boundary item, items)
+    {
+        if(item.string.isEmpty())
+            continue;
+
+        const QFont font = TransliterationEngine::instance()->languageFont(item.language);
+        QTextCharFormat format;
+        format.setFontFamily(font.family());
+        cursor.mergeCharFormat(format);
+        cursor.insertText(item.string);
+    }
+};
+
 void ScreenplayTextDocumentOffsets::reloadDocument()
 {
     if(m_format.isNull() || m_screenplay.isNull() || m_document.isNull() || m_screenplay->elementCount() == 0)
@@ -642,6 +658,7 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
 
     m_document->clear();
     m_document->setTextWidth(textWidth);
+    m_document->setDefaultFont(m_format->defaultFont());
 
     QTextCursor cursor(m_document);
     auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
@@ -713,12 +730,9 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
         prepareCursor(cursor, SceneElement::Heading);
 
         if(scene->heading()->isEnabled())
-        {
-            cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] "));
-            cursor.insertText(scene->heading()->text());
-        }
+            polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text());
         else
-            cursor.insertText( QStringLiteral("NO SCENE HEADING") );
+            polishFontsAndInsertTextAtCursor(cursor, QStringLiteral("NO SCENE HEADING"));
 
         registerOffsetForTextBlock(cursor.block(), scene->heading()->text(), SceneElement::Heading, scene->id(), element->resolvedSceneNumber());
 
@@ -729,7 +743,7 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
 
             const SceneElement *para = scene->elementAt(p);
             prepareCursor(cursor, para->type());
-            cursor.insertText(para->text());
+            polishFontsAndInsertTextAtCursor(cursor, para->text());
 
             switch(para->type())
             {
@@ -745,7 +759,7 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
 
     if(cursor.position() > 0)
         cursor.insertBlock();
-    cursor.insertText(theEndSceneHeading);
+    polishFontsAndInsertTextAtCursor(cursor, theEndSceneHeading);
     registerOffsetForTextBlock(cursor.block(), theEndSceneHeading, SceneElement::Heading, QString(), noSceneNumber);
 
     this->setArray(offsets);
