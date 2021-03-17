@@ -759,8 +759,11 @@ QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries
             continue;
         }
 
-        const bool isSplChar = ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line;
-        if(isSplChar || ch.script() == script)
+//        const bool isSplChar = ch.isSpace() || ch.isDigit() || ch.isPunct() || ch.category() == QChar::Separator_Line;
+//        if(isSplChar)
+//            script = QChar::Script_Latin;
+
+        if(ch.script() == script)
         {
             item.append(ch, index);
             continue;
