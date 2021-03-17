@@ -761,7 +761,17 @@ Item {
                         width: parent.width
                         wrapMode: Text.WordWrap
                         color: "white"
-                        text: "written by<br/>" + scriteDocument.screenplay.author + "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
+                        text: scriteDocument.screenplay.subtitle
+                        visible: text !== ""
+                    }
+
+                    Text {
+                        font.pointSize: closingFrameOverlay.height * 0.025
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        color: "white"
+                        text: "Written By: " + scriteDocument.screenplay.author + "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
                     }
                 }
             }
