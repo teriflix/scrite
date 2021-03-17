@@ -529,7 +529,7 @@ Item {
                                 id: textDocumentView
                                 width: textDocumentFlick.width
                                 document: screenplayOffsetsModel.document
-                                documentScale: (textDocumentFlick.width*0.9) / screenplayOffsetsModel.format.pageLayout.contentWidth
+                                documentScale: (textDocumentFlick.width*0.85) / screenplayOffsetsModel.format.pageLayout.contentWidth
                                 flickable: textDocumentFlick
                                 verticalPadding: textDocumentFlickPadding.height * documentScale
 
@@ -585,7 +585,7 @@ Item {
                                 enabled: mediaIsLoaded && mediaIsPlaying
                                 NumberAnimation {
                                     id: contentYAnimation
-                                    duration: mediaPlayer.notifyInterval-50
+                                    duration: Math.max(mediaPlayer.notifyInterval-17, 0)
                                 }
                             }
 
