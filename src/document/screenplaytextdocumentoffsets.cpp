@@ -725,14 +725,13 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
             continue;
 
         const Scene *scene = element->scene();
-        if(cursor.position() > 0)
-            cursor.insertBlock();
-        prepareCursor(cursor, SceneElement::Heading);
-
         if(scene->heading()->isEnabled())
+        {
+            if(cursor.position() > 0)
+                cursor.insertBlock();
+            prepareCursor(cursor, SceneElement::Heading);
             polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text());
-        else
-            polishFontsAndInsertTextAtCursor(cursor, QStringLiteral("NO SCENE HEADING"));
+        }
 
         registerOffsetForTextBlock(cursor.block(), scene->heading()->text(), SceneElement::Heading, scene->id(), element->resolvedSceneNumber());
 
