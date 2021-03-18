@@ -502,6 +502,13 @@ Item {
     Component {
         id: editor_MultipleSceneSelector
 
+        /**
+          Once upon a time sceneNumber was the same as element index.
+          It is no longer the case. Scene number can event be user specified.
+          So rather than using ScreenplayElement.sceneNumber we now use ScreenplayElement.elementIndex
+          to let the report generator know which scenes the user has selected.
+          */
+
         Column {
             property var fieldInfo
             spacing: 5
@@ -629,9 +636,9 @@ Item {
                                     return "[" + screenplayElement.resolvedSceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
                                 return "NO SCENE HEADING"
                             }
-                            checked: sceneListView.selectedSceneNumbers.indexOf(screenplayElement.sceneNumber) >= 0
+                            checked: sceneListView.selectedSceneNumbers.indexOf(screenplayElement.elementIndex) >= 0
                             enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
-                            onToggled: sceneListView.select(screenplayElement.sceneNumber, checked)
+                            onToggled: sceneListView.select(screenplayElement.elementIndex, checked)
                         }
                     }
                 }
@@ -648,8 +655,8 @@ Item {
                         for(var i=0; i<count; i++) {
                             var element = scriteDocument.screenplay.elementAt(i)
                             if( sceneListView.filter(element.scene) ) {
-                                if(numbers.indexOf(element.sceneNumber) < 0)
-                                    numbers.push(element.sceneNumber)
+                                if(numbers.indexOf(element.elementIndex) < 0)
+                                    numbers.push(element.elementIndex)
                             }
                         }
                         sceneListView.selectedSceneNumbers = numbers
@@ -665,7 +672,7 @@ Item {
                         for(var i=0; i<count; i++) {
                             var element = scriteDocument.screenplay.elementAt(i)
                             if( sceneListView.filter(element.scene) ) {
-                                var idx = numbers.indexOf(element.sceneNumber)
+                                var idx = numbers.indexOf(element.elementIndex)
                                 if(idx >= 0)
                                     numbers.splice(idx, 1)
                             }

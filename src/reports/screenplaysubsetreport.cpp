@@ -48,7 +48,7 @@ bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *e
     if(element->scene() == nullptr)
         return false;
 
-    return m_sceneNumbers.isEmpty() || m_sceneNumbers.contains(element->sceneNumber());
+    return m_sceneNumbers.isEmpty() || m_sceneNumbers.contains(element->elementIndex());
 }
 
 QString ScreenplaySubsetReport::screenplaySubtitle() const
