@@ -455,10 +455,9 @@ Item {
                     }
                 }
 
-                Rectangle {
+                Item {
                     width: parent.width
                     height: parent.height - videoArea.height
-                    color: primaryColors.c100.background
 
                     ScreenplayTextDocumentOffsets {
                         id: screenplayOffsetsModel
@@ -483,30 +482,47 @@ Item {
                         clip: true
                         property bool containsMouse: false
 
+                        Item {
+                            width: parent.width
+                            height: Math.max(parent.height, textDocumentView.height+parent.height)
+                            x: 0
+                            y: -textDocumentFlick.contentY
+
+                            Image {
+                                anchors.fill: parent
+                                source: "../images/white-paper-texture.jpg"
+                                fillMode: Image.TileVertically
+                            }
+                        }
+
                         Rectangle {
                             id: textDocumentFlickPadding
                             width: parent.width
-                            height: Math.min(4.5 * textDocumentFlick.lineHeight, textDocumentArea.height*0.35)
+                            height: textDocumentArea.height*0.35
 
                             gradient: Gradient {
                                 GradientStop {
                                     position: 0
-                                    color: primaryColors.c600.background
+                                    color: app.translucent(primaryColors.c600.background, 1)
                                 }
                                 GradientStop {
-                                    position: 0.25
-                                    color: primaryColors.c400.background
+                                    position: 0.175
+                                    color: app.translucent(primaryColors.c600.background, 0.5)
                                 }
                                 GradientStop {
-                                    position: 0.5
-                                    color: primaryColors.c100.background
+                                    position: 0.35
+                                    color: app.translucent(primaryColors.c600.background, 0.3)
                                 }
                                 GradientStop {
-                                    position: 0.8
-                                    color: primaryColors.c50.background
+                                    position: 0.56
+                                    color: app.translucent(primaryColors.c600.background, 0.1)
                                 }
                                 GradientStop {
-                                    position: 1
+                                    position: 0.7
+                                    color: Qt.rgba(0,0,0,0)
+                                }
+                                GradientStop {
+                                    position: 0.7
                                     color: Qt.rgba(0,0,0,0)
                                 }
                             }
@@ -585,7 +601,7 @@ Item {
                                 enabled: mediaIsLoaded && mediaIsPlaying
                                 NumberAnimation {
                                     id: contentYAnimation
-                                    duration: Math.max(mediaPlayer.notifyInterval-17, 0)
+                                    duration: Math.max(mediaPlayer.notifyInterval, 0)
                                 }
                             }
 
