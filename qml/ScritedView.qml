@@ -263,26 +263,48 @@ Item {
                         id: logoOverlay
                         x: 20
                         y: 20
-                        width: Math.min(videoOutput.width, videoOutput.height)*0.15
+                        width: Math.min(videoOutput.width, videoOutput.height)*0.10
                         height: width
-                        opacity: 0.25
                         visible: mediaIsLoaded
                         source: "../images/appicon.png"
-                        smooth: true
+                        smooth: true; mipmap: true
                         fillMode: Image.PreserveAspectFit
                     }
 
+                    Image {
+                        id: logoOverlay2
+                        x: parent.width-width-20
+                        y: 20
+                        width: height
+                        height: logoOverlay.height
+                        visible: logoOverlay.visible && imagePath !== ""
+                        property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
+                        source: imagePath === "" ? "" : "file:///" + imagePath
+                        smooth: true; mipmap: true
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    Rectangle {
+                        anchors.fill: urlOverlay
+                        anchors.margins: -urlOverlay.height*0.15
+                        anchors.leftMargin: -20
+                        anchors.rightMargin: -40
+                        radius: height/2
+                        color: "#5d3689"
+                        visible: urlOverlay.visible
+                    }
+
                     Text {
+                        id: urlOverlay
                         text: "scrite.io"
                         font.family: "Courier Prime"
                         font.bold: true
-                        font.pointSize: app.idealFontPointSize * 1.5
+                        font.pixelSize: Math.min(videoOutput.width, videoOutput.height)*0.125 * 0.25
                         horizontalAlignment: Text.AlignRight
                         anchors.bottom: parent.bottom
-                        anchors.right: videoOutput.right
+                        anchors.right: parent.right
                         anchors.rightMargin: 20
-                        anchors.bottomMargin: mediaPlayerControls.visible ? mediaPlayerControls.height + mediaPlayerControls.anchors.bottomMargin + 20 : 20
-                        opacity: logoOverlay.opacity * 1.5
+                        anchors.bottomMargin: mediaPlayerControls.visible ? mediaPlayerControls.height + mediaPlayerControls.anchors.bottomMargin + 20 : (20 + logoOverlay.height/2)
                         color: "white"
                         visible: logoOverlay.visible
                     }
@@ -495,6 +517,18 @@ Item {
                             }
                         }
 
+                        Text {
+                            anchors.centerIn: parent
+                            text: "scrite.io"
+                            font.family: "Courier Prime"
+                            font.bold: true
+                            rotation: -Math.atan( parent.height/parent.width ) * 180 / Math.PI
+                            font.pixelSize: Math.min(parent.width, parent.height) * 0.2
+                            font.letterSpacing: font.pixelSize * 0.1
+                            opacity: 0.025
+                            visible: logoOverlay.visible
+                        }
+
                         Rectangle {
                             id: textDocumentFlickPadding
                             width: parent.width
@@ -545,7 +579,7 @@ Item {
                                 id: textDocumentView
                                 width: textDocumentFlick.width
                                 document: screenplayOffsetsModel.document
-                                documentScale: (textDocumentFlick.width*0.85) / screenplayOffsetsModel.format.pageLayout.contentWidth
+                                documentScale: (textDocumentFlick.width*0.90) / screenplayOffsetsModel.format.pageLayout.contentWidth
                                 flickable: textDocumentFlick
                                 verticalPadding: textDocumentFlickPadding.height * documentScale
 
@@ -644,42 +678,6 @@ Item {
                         EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
                         EventFilter.onFilter: textDocumentArea.containsMouse = event.type === 127 || event.type === 129
                     }
-
-                    Item {
-                        x: textDocumentArea.width * 0.025
-                        anchors.verticalCenter: textDocumentArea.verticalCenter
-                        rotation: -90
-                        transformOrigin: Item.Center
-                        opacity: 0.1
-                        visible: mediaIsLoaded
-
-                        Text {
-                            font.family: "Courier Prime"
-                            text: "SCRITE"
-                            font.pixelSize: textDocumentArea.width * 0.05 * 0.65
-                            font.letterSpacing: 5
-                            font.bold: true
-                            anchors.centerIn: parent
-                        }
-                    }
-
-                    Item {
-                        x: textDocumentArea.width - textDocumentArea.width * 0.025 - (textDocumentArea.containsMouse ? 20 : 0)
-                        anchors.verticalCenter: textDocumentArea.verticalCenter
-                        rotation: 90
-                        transformOrigin: Item.Center
-                        opacity: 0.1
-                        visible: mediaIsLoaded
-
-                        Text {
-                            text: "scrite.io"
-                            font.family: "Courier Prime"
-                            font.pixelSize: textDocumentArea.width * 0.05 * 0.65
-                            font.letterSpacing: 2
-                            font.bold: true
-                            anchors.centerIn: parent
-                        }
-                    }
                 }
             }
 
@@ -743,7 +741,7 @@ Item {
 
                 Column {
                     id: startingFrameOverlayContent
-                    spacing: startingFrameOverlay.height * 0.01
+                    spacing: startingFrameOverlay.height * 0.025
                     width: parent.width * 0.8
                     anchors.centerIn: parent
 
@@ -756,6 +754,7 @@ Item {
                     }
 
                     Image {
+                        id: filmPoster
                         source: "file:///" + scriteDocument.screenplay.coverPagePhoto
                         width: parent.width
                         fillMode: Image.PreserveAspectFit
@@ -772,22 +771,42 @@ Item {
                     }
 
                     Text {
-                        font.pointSize: closingFrameOverlay.height * 0.025
+                        font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
                         width: parent.width
                         wrapMode: Text.WordWrap
                         color: "white"
+                        opacity: 0.8
                         text: scriteDocument.screenplay.subtitle
                         visible: text !== ""
                     }
 
                     Text {
-                        font.pointSize: closingFrameOverlay.height * 0.025
+                        font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
                         width: parent.width
                         wrapMode: Text.WordWrap
                         color: "white"
-                        text: "Written By: " + scriteDocument.screenplay.author + "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
+                        opacity: 0.8
+                        text: {
+                            var ret = "Written By: " + scriteDocument.screenplay.author
+                            if(filmStudioLogo.visible)
+                                return ret
+                            ret += "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
+                            return ret
+                        }
+                    }
+
+                    Image {
+                        id: filmStudioLogo
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: Math.min(filmPoster.width, filmPoster.height)*0.25
+                        height: width
+                        visible: imagePath !== ""
+                        property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
+                        source: imagePath === "" ? "" : "file:///" + imagePath
+                        smooth: true
+                        fillMode: Image.PreserveAspectFit
                     }
                 }
             }
