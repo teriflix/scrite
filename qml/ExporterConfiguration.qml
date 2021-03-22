@@ -182,6 +182,7 @@ Item {
     Notification.text: exporterErrors.errorMessage
     Notification.active: exporterErrors.hasError
     Notification.autoClose: false
+    Notification.onDismissed: modalDialog.close()
 
     function loadFieldEditor(kind) {
         if(kind === "IntegerSpinBox")

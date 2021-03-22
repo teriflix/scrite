@@ -75,9 +75,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
     ExporterFactory.addClass<FountainExporter>();
-    // Until we are able to reliably export structure's appearance in a way
-    // that it can be printed, there is no point in having this exporter.
-    // ExporterFactory.addClass<StructureExporter>();
+    ExporterFactory.addClass<StructureExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
 
     ReportsFactory.addClass<ScreenplaySubsetReport>();

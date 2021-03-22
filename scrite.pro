@@ -52,6 +52,7 @@ HEADERS += \
     src/document/characterrelationshipsgraph.h \
     src/document/notebooktabmodel.h \
     src/document/screenplaytextdocumentoffsets.h \
+    src/exporters/structureexporter_p.h \
     src/importers/openfromlibrary.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
@@ -154,6 +155,7 @@ SOURCES += \
     src/document/characterrelationshipsgraph.cpp \
     src/document/notebooktabmodel.cpp \
     src/document/screenplaytextdocumentoffsets.cpp \
+    src/exporters/structureexporter_p.cpp \
     src/importers/openfromlibrary.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
