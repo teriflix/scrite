@@ -116,7 +116,7 @@ public:
 class StructureTitleCard : public QGraphicsRectItem
 {
 public:
-    StructureTitleCard(const Structure *structure);
+    StructureTitleCard(const Structure *structure, const QString &comment);
     ~StructureTitleCard();
 };
 

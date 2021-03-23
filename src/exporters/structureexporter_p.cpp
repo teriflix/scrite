@@ -128,7 +128,7 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
 
     if(exporter->isInsertTitleCard())
     {
-        StructureTitleCard *titleCard = new StructureTitleCard(structure);
+        StructureTitleCard *titleCard = new StructureTitleCard(structure, exporter->comment());
         QRectF titleCardRect = titleCard->boundingRect();
         titleCardRect.setLeft(indexCardsBox.left()+20);
         titleCardRect.moveBottom(indexCardsBox.top()-20);
@@ -949,7 +949,7 @@ StructureUnknownAnnotation::~StructureUnknownAnnotation()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StructureTitleCard::StructureTitleCard(const Structure *structure)
+StructureTitleCard::StructureTitleCard(const Structure *structure, const QString &comment)
 {
     ScriteDocument *document = structure->scriteDocument();
     if(document == nullptr)
@@ -1081,6 +1081,16 @@ StructureTitleCard::StructureTitleCard(const Structure *structure)
         const QString html = QStringLiteral("<strong>Logline:</strong> ") + screenplay->logline();
         loglineItem->setHtml(html);
         loglineItem->setTextWidth(maxCoverPhotoSize.width());
+    }
+
+    if(!comment.isEmpty())
+    {
+        QGraphicsTextItem *commentItem = new QGraphicsTextItem(this);
+        commentItem->setFont(::applicationFont());
+
+        const QString html = QStringLiteral("<strong>Comment:</strong> ") + comment;
+        commentItem->setHtml(html);
+        commentItem->setTextWidth(maxCoverPhotoSize.width());
     }
 
     QGraphicsSimpleTextItem *groupingInfoItem = new QGraphicsSimpleTextItem(this);

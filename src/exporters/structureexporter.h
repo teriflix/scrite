@@ -50,7 +50,7 @@ public:
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();
 
-    Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer.")
+    Q_CLASSINFO("comment_FieldLabel", "Comment text for use in title card.")
     Q_CLASSINFO("comment_FieldEditor", "TextBox")
     Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
     void setComment(const QString &val);
