@@ -24,7 +24,7 @@ class StructureExporterScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    StructureExporterScene(const Structure *structure, QObject *parent=nullptr);
+    StructureExporterScene(const Structure *structure, bool includeTitleCard, QObject *parent=nullptr);
     ~StructureExporterScene();
 };
 
@@ -108,6 +108,13 @@ class StructureUnknownAnnotation : public QGraphicsRectItem
 public:
     StructureUnknownAnnotation(const Annotation *annotation);
     ~StructureUnknownAnnotation();
+};
+
+class StructureTitleCard : public QGraphicsRectItem
+{
+public:
+    StructureTitleCard(const Structure *structure);
+    ~StructureTitleCard();
 };
 
 #endif // STRUCTUREEXPORTER_P_H

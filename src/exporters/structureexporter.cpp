@@ -34,6 +34,15 @@ StructureExporter::~StructureExporter()
 
 }
 
+void StructureExporter::setInsertTitleCard(bool val)
+{
+    if(m_insertTitleCard == val)
+        return;
+
+    m_insertTitleCard = val;
+    emit insertTitleCardChanged();
+}
+
 bool StructureExporter::doExport(QIODevice *device)
 {
 #ifdef Q_OS_MAC
@@ -52,7 +61,7 @@ bool StructureExporter::doExport(QIODevice *device)
     }
 
     // Construct the graphics scene with content of the structure
-    StructureExporterScene scene(structure);
+    StructureExporterScene scene(structure, m_insertTitleCard);
 
     // How big is the scene?
     QRectF sceneRect = scene.itemsBoundingRect();

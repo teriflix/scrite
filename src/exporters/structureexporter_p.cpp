@@ -25,7 +25,7 @@ inline QFont applicationFont()
     return font;
 }
 
-StructureExporterScene::StructureExporterScene(const Structure *structure, QObject *parent)
+StructureExporterScene::StructureExporterScene(const Structure *structure, bool includeTitleCard, QObject *parent)
     : QGraphicsScene(parent)
 {
     this->setBackgroundBrush(Qt::white);
@@ -90,6 +90,8 @@ StructureExporterScene::StructureExporterScene(const Structure *structure, QObje
         this->addItem(stackItem);
     }
 
+    const QRectF indexCardsBox = this->itemsBoundingRect();
+
     // Add annotations
     for(int i=0; i<structure->annotationCount(); i++)
     {
@@ -115,6 +117,16 @@ StructureExporterScene::StructureExporterScene(const Structure *structure, QObje
 
         annotationItem->setZValue(6);
         this->addItem(annotationItem);
+    }
+
+    if(includeTitleCard)
+    {
+        StructureTitleCard *titleCard = new StructureTitleCard(structure);
+        QRectF titleCardRect = titleCard->boundingRect();
+        titleCardRect.setLeft(indexCardsBox.left()+20);
+        titleCardRect.moveBottom(indexCardsBox.top()-20);
+        titleCard->setPos(titleCardRect.topLeft());
+        this->addItem(titleCard);
     }
 }
 
@@ -871,6 +883,180 @@ StructureUnknownAnnotation::~StructureUnknownAnnotation()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/// Dump screenplay title and other meta data into a box on the top.
+StructureTitleCard::StructureTitleCard(const Structure *structure)
+{
+    ScriteDocument *document = structure->scriteDocument();
+    if(document == nullptr)
+        document = ScriteDocument::instance();
+
+    const Screenplay *screenplay = document->screenplay();
+    const QSize maxCoverPhotoSize(800, 600);
+
+    /**
+      A title card is going to have the following
+
+        Cover Photo
+        Title
+        Subtitle
+        Written By
+        Studio Details & Address
+
+        Logline
+
+        Structure Grouping Category
+      */
+
+    const QString coverPhotoPath = screenplay->coverPagePhoto();
+    if(!coverPhotoPath.isEmpty())
+    {
+        QPixmap coverPhotoPixmap(coverPhotoPath);
+        QSizeF coverPhotoSize = coverPhotoPixmap.size();
+        coverPhotoSize.scale(maxCoverPhotoSize, Qt::KeepAspectRatio);
+        coverPhotoPixmap = coverPhotoPixmap.scaled(coverPhotoSize.toSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        QGraphicsPixmapItem *coverPhotoItem = new QGraphicsPixmapItem(this);
+        coverPhotoItem->setPixmap(coverPhotoPixmap);
+    }
+
+    const QString title = screenplay->title().isEmpty() ? QStringLiteral("Untitled Screenplay") : screenplay->title();
+    QFont titleFont = ::applicationFont();
+    titleFont.setPointSize(titleFont.pointSize()+8);
+    titleFont.setBold(true);
+
+    QGraphicsSimpleTextItem *titleItem = new QGraphicsSimpleTextItem(this);
+    titleItem->setText(title);
+    titleItem->setFont(titleFont);
+
+    if(!screenplay->subtitle().isEmpty())
+    {
+        QGraphicsSimpleTextItem *subtitleItem = new QGraphicsSimpleTextItem(this);
+        subtitleItem->setText(screenplay->subtitle());
+
+        QFont subtitleFont = ::applicationFont();
+        subtitleFont.setPointSize(subtitleFont.pointSize()+5);
+        subtitleItem->setFont(subtitleFont);
+    }
+
+    if(!screenplay->subtitle().isEmpty())
+    {
+        QGraphicsSimpleTextItem *subtitleItem = new QGraphicsSimpleTextItem(this);
+        subtitleItem->setText(screenplay->subtitle());
+
+        QFont subtitleFont = ::applicationFont();
+        subtitleFont.setPointSize(subtitleFont.pointSize()+5);
+        subtitleItem->setFont(subtitleFont);
+    }
+
+    if(!screenplay->version().isEmpty())
+    {
+        QGraphicsSimpleTextItem *versionItem = new QGraphicsSimpleTextItem(this);
+        versionItem->setText(screenplay->version());
+
+        QFont versionFont = ::applicationFont();
+        versionFont.setPointSize(versionFont.pointSize()+2);
+        versionItem->setFont(versionFont);
+    }
+
+    QTextDocument *contactInfoDoc = new QTextDocument;
+    contactInfoDoc->setDefaultFont(::applicationFont());
+
+    QTextCursor cursor(contactInfoDoc);
+    if(!screenplay->contact().isEmpty())
+    {
+        cursor.insertText(screenplay->contact());
+        cursor.insertBlock();
+    }
+
+    if(!screenplay->address().isEmpty())
+    {
+        cursor.insertText(screenplay->address());
+        cursor.insertBlock();
+    }
+
+    if(!screenplay->phoneNumber().isEmpty())
+    {
+        cursor.insertText(screenplay->phoneNumber());
+        cursor.insertBlock();
+    }
+
+    if(!screenplay->email().isEmpty())
+    {
+        cursor.insertText(screenplay->email());
+        cursor.insertBlock();
+    }
+
+    if(!screenplay->website().isEmpty())
+    {
+        cursor.insertText(screenplay->website());
+        cursor.insertBlock();
+    }
+
+    if(contactInfoDoc->isEmpty())
+        delete contactInfoDoc;
+    else
+    {
+        cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+
+        QTextBlockFormat format;
+        format.setAlignment(Qt::AlignHCenter);
+        cursor.mergeBlockFormat(format);
+
+        QGraphicsTextItem *contactInfoItem = new QGraphicsTextItem(this);
+        contactInfoItem->setDocument(contactInfoDoc);
+        contactInfoDoc->setParent(contactInfoItem);
+    }
+
+    if(!screenplay->logline().isEmpty())
+    {
+        QGraphicsTextItem *loglineItem = new QGraphicsTextItem(this);
+        loglineItem->setFont(::applicationFont());
+
+        const QString html = QStringLiteral("<strong>Logline:</strong> ") + screenplay->logline();
+        loglineItem->setHtml(html);
+        loglineItem->setTextWidth(maxCoverPhotoSize.width());
+    }
+
+    QGraphicsSimpleTextItem *groupingInfoItem = new QGraphicsSimpleTextItem(this);
+    groupingInfoItem->setFont(::applicationFont());
+    if(structure->preferredGroupCategory().isEmpty())
+        groupingInfoItem->setText( QStringLiteral("Grouping: Act Wise") );
+    else
+        groupingInfoItem->setText( QStringLiteral("Grouping: ") + structure->preferredGroupCategory() );
+
+    // Now lets layout all the items in a column
+    QRectF boundingRect;
+    const QList<QGraphicsItem*> items = this->childItems();
+    for(QGraphicsItem *item : items)
+    {
+        QRectF itemBoundingRect = item->boundingRect();
+
+        if(!boundingRect.isEmpty())
+            item->setPos(boundingRect.bottomLeft() + QPointF(0, 20));
+
+        itemBoundingRect.moveTopLeft(item->pos());
+        boundingRect |= itemBoundingRect;
+    }
+
+    this->setRect(boundingRect.adjusted(-20, -20, 20, 20));
+    this->setBrush(Qt::white);
+    this->setPen(QPen(Qt::black,2));
+
+    // Now lets layout items horizontally to the center
+    for(QGraphicsItem *item : items)
+    {
+        QRectF itemRect = item->boundingRect();
+        itemRect.moveTopLeft(item->pos());
+        itemRect.moveCenter( QPointF(boundingRect.center().x(), itemRect.center().y()) );
+        item->setPos(itemRect.topLeft());
+    }
+}
+
+StructureTitleCard::~StructureTitleCard()
+{
+
+}
+
+
 
 

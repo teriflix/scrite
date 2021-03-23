@@ -26,9 +26,19 @@ public:
     Q_INVOKABLE StructureExporter(QObject *parent=nullptr);
     ~StructureExporter();
 
+    Q_CLASSINFO("insertTitleCard_FieldLabel", "Include title card in the generated PDF.")
+    Q_CLASSINFO("insertTitleCard_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool insertTitleCard READ isInsertTitleCard WRITE setInsertTitleCard NOTIFY insertTitleCardChanged)
+    void setInsertTitleCard(bool val);
+    bool isInsertTitleCard() const { return m_insertTitleCard; }
+    Q_SIGNAL void insertTitleCardChanged();
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+
+private:
+    bool m_insertTitleCard = true;
 };
 
 #endif // STRUCTUREEXPORTER_H
