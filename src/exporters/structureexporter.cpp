@@ -43,6 +43,33 @@ void StructureExporter::setInsertTitleCard(bool val)
     emit insertTitleCardChanged();
 }
 
+void StructureExporter::setEnableHeaderFooter(bool val)
+{
+    if(m_enableHeaderFooter == val)
+        return;
+
+    m_enableHeaderFooter = val;
+    emit enableHeaderFooterChanged();
+}
+
+void StructureExporter::setWatermark(const QString &val)
+{
+    if(m_watermark == val)
+        return;
+
+    m_watermark = val;
+    emit watermarkChanged();
+}
+
+void StructureExporter::setComment(const QString &val)
+{
+    if(m_comment == val)
+        return;
+
+    m_comment = val;
+    emit commentChanged();
+}
+
 bool StructureExporter::doExport(QIODevice *device)
 {
 #ifdef Q_OS_MAC
@@ -61,7 +88,7 @@ bool StructureExporter::doExport(QIODevice *device)
     }
 
     // Construct the graphics scene with content of the structure
-    StructureExporterScene scene(structure, m_insertTitleCard);
+    StructureExporterScene scene(this);
 
     // How big is the scene?
     QRectF sceneRect = scene.itemsBoundingRect();

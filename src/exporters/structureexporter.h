@@ -26,6 +26,9 @@ public:
     Q_INVOKABLE StructureExporter(QObject *parent=nullptr);
     ~StructureExporter();
 
+    // AbstractExporter interface
+    bool requiresConfiguration() const { return true; }
+
     Q_CLASSINFO("insertTitleCard_FieldLabel", "Include title card in the generated PDF.")
     Q_CLASSINFO("insertTitleCard_FieldEditor", "CheckBox")
     Q_PROPERTY(bool insertTitleCard READ isInsertTitleCard WRITE setInsertTitleCard NOTIFY insertTitleCardChanged)
@@ -33,12 +36,36 @@ public:
     bool isInsertTitleCard() const { return m_insertTitleCard; }
     Q_SIGNAL void insertTitleCardChanged();
 
+//    Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
+//    Q_CLASSINFO("enableHeaderFooter_FieldEditor", "CheckBox")
+//    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY enableHeaderFooterChanged)
+    void setEnableHeaderFooter(bool val);
+    bool isEnableHeaderFooter() const { return m_enableHeaderFooter; }
+    Q_SIGNAL void enableHeaderFooterChanged();
+
+    Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
+    Q_CLASSINFO("watermark_FieldEditor", "TextBox")
+    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    void setWatermark(const QString &val);
+    QString watermark() const { return m_watermark; }
+    Q_SIGNAL void watermarkChanged();
+
+    Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer.")
+    Q_CLASSINFO("comment_FieldEditor", "TextBox")
+    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    void setComment(const QString &val);
+    QString comment() const { return m_comment; }
+    Q_SIGNAL void commentChanged();
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
     bool m_insertTitleCard = true;
+    bool m_enableHeaderFooter = false;
+    QString m_comment;
+    QString m_watermark;
 };
 
 #endif // STRUCTUREEXPORTER_H
