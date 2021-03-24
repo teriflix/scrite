@@ -599,7 +599,7 @@ Item {
                                 ret &= locFilter.items.contains(scene.heading.location)
                             return ret
                         }
-                        return true
+                        return locTypeFilter.items.length === 0 && momentFilter.items.length === 0 && locFilter.items.length === 0
                     }
 
                     function select(sceneNumber, flag) {
