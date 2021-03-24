@@ -984,43 +984,60 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         coverPhotoItem->setPixmap(coverPhotoPixmap);
     }
 
+    auto centerTextInDocument = [](QTextDocument *doc) {
+        QTextCursor cursor(doc);
+        cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+        cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+        QTextBlockFormat format;
+        format.setAlignment(Qt::AlignHCenter);
+        cursor.mergeBlockFormat(format);
+    };
+
     const QString title = screenplay->title().isEmpty() ? QStringLiteral("Untitled Screenplay") : screenplay->title();
     QFont titleFont = ::applicationFont();
     titleFont.setPointSize(titleFont.pointSize()+8);
     titleFont.setBold(true);
 
-    QGraphicsSimpleTextItem *titleItem = new QGraphicsSimpleTextItem(this);
-    titleItem->setText(title);
+    QGraphicsTextItem *titleItem = new QGraphicsTextItem(this);
+    titleItem->setPlainText(title);
     titleItem->setFont(titleFont);
+    titleItem->setTextWidth(maxCoverPhotoSize.width());
+    centerTextInDocument(titleItem->document());
 
     if(!screenplay->subtitle().isEmpty())
     {
-        QGraphicsSimpleTextItem *subtitleItem = new QGraphicsSimpleTextItem(this);
-        subtitleItem->setText(screenplay->subtitle());
+        QGraphicsTextItem *subtitleItem = new QGraphicsTextItem(this);
+        subtitleItem->setPlainText(screenplay->subtitle());
 
         QFont subtitleFont = ::applicationFont();
         subtitleFont.setPointSize(subtitleFont.pointSize()+5);
         subtitleItem->setFont(subtitleFont);
+        subtitleItem->setTextWidth(maxCoverPhotoSize.width());
+        centerTextInDocument(subtitleItem->document());
     }
 
-    if(!screenplay->subtitle().isEmpty())
+    if(!screenplay->author().isEmpty())
     {
-        QGraphicsSimpleTextItem *subtitleItem = new QGraphicsSimpleTextItem(this);
-        subtitleItem->setText(screenplay->subtitle());
+        QGraphicsTextItem *authorItem = new QGraphicsTextItem(this);
+        authorItem->setPlainText(QStringLiteral("Written By: ") + screenplay->author());
 
-        QFont subtitleFont = ::applicationFont();
-        subtitleFont.setPointSize(subtitleFont.pointSize()+5);
-        subtitleItem->setFont(subtitleFont);
+        QFont authorFont = ::applicationFont();
+        authorFont.setPointSize(authorFont.pointSize()+5);
+        authorItem->setFont(authorFont);
+        authorItem->setTextWidth(maxCoverPhotoSize.width());
+        centerTextInDocument(authorItem->document());
     }
 
     if(!screenplay->version().isEmpty())
     {
-        QGraphicsSimpleTextItem *versionItem = new QGraphicsSimpleTextItem(this);
-        versionItem->setText(screenplay->version());
+        QGraphicsTextItem *versionItem = new QGraphicsTextItem(this);
+        versionItem->setPlainText(screenplay->version());
 
         QFont versionFont = ::applicationFont();
         versionFont.setPointSize(versionFont.pointSize()+2);
         versionItem->setFont(versionFont);
+        versionItem->setTextWidth(maxCoverPhotoSize.width());
+        centerTextInDocument(versionItem->document());
     }
 
     QTextDocument *contactInfoDoc = new QTextDocument;
