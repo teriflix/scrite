@@ -124,6 +124,7 @@ bool AbstractReportGenerator::generate()
             if(usePdfWriter)
             {
                 qpdfWriter.reset(new QPdfWriter(&file));
+                qpdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
                 qpdfWriter->setTitle(screenplay->title() + QStringLiteral(" - ") + this->name());
                 qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
                 format->pageLayout()->configure(qpdfWriter.data());
@@ -136,11 +137,12 @@ bool AbstractReportGenerator::generate()
 
                 qprinter.reset(new QPrinter);
                 qprinter->setOutputFormat(QPrinter::PdfFormat);
+                qprinter->setOutputFileName(fileName);
+                qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
                 qprinter->setDocName(screenplay->title() + QStringLiteral(" - ") + this->name());
                 qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
                 format->pageLayout()->configure(qprinter.data());
                 qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
-                qprinter->setOutputFileName(fileName);
                 success = this->directPrintToPdf(qprinter.data());
             }
 
@@ -196,6 +198,7 @@ bool AbstractReportGenerator::generate()
         if(usePdfWriter)
         {
             qpdfWriter.reset(new QPdfWriter(&file));
+            qpdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
             qpdfWriter->setTitle(screenplay->title() + QStringLiteral(" - ") + this->name());
             qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
             format->pageLayout()->configure(qpdfWriter.data());
@@ -210,11 +213,12 @@ bool AbstractReportGenerator::generate()
 
             qprinter.reset(new QPrinter);
             qprinter->setOutputFormat(QPrinter::PdfFormat);
+            qprinter->setOutputFileName(fileName);
+            qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
             qprinter->setDocName(screenplay->title() + QStringLiteral(" - ") + this->name());
             qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
             format->pageLayout()->configure(qprinter.data());
             qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
-            qprinter->setOutputFileName(fileName);
             this->configureWriter(qprinter.data(), &textDocument);
 
             pdfDevice = qprinter.data();

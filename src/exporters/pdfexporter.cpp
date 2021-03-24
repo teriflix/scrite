@@ -110,20 +110,23 @@ bool PdfExporter::doExport(QIODevice *device)
         qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
         format->pageLayout()->configure(qpdfWriter.data());
         qpdfWriter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+        qpdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
 
         pdfDevice = qpdfWriter.data();
     }
     else
     {
+        const QString pdfFileName = QDir::tempPath() + QStringLiteral("/scrite-pdfexporter-") + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".pdf");
+
         qprinter.reset(new QPrinter);
         qprinter->setOutputFormat(QPrinter::PdfFormat);
+        qprinter->setOutputFileName(pdfFileName);
+
+        qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
         qprinter->setDocName(screenplay->title());
         qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
         format->pageLayout()->configure(qprinter.data());
         qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
-
-        const QString pdfFileName = QDir::tempPath() + QStringLiteral("/scrite-pdfexporter-") + QDateTime::currentSecsSinceEpoch() + QStringLiteral(".pdf");
-        qprinter->setOutputFileName(pdfFileName);
 
         pdfDevice = qprinter.data();
     }

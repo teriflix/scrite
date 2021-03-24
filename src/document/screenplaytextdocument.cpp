@@ -450,6 +450,7 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 
         pdfWriter->setTitle(m_screenplay->title());
         pdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+        pdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
     }
     else if(qprinter)
     {
@@ -457,6 +458,8 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 
         qprinter->setDocName(m_screenplay->title());
         qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+        if(qprinter->outputFormat() == QPrinter::PdfFormat)
+            qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
     } else if(imagePrinter)
         printer = imagePrinter;
 

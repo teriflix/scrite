@@ -108,6 +108,7 @@ bool StructureExporter::doExport(QIODevice *device)
 
     // Now, lets create a PDF writer and draw the scene into it.
     QPdfWriter pdfWriter(device);
+    pdfWriter.setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
     pdfWriter.setTitle(screenplay->title() + QStringLiteral(" - Structure"));
     pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
     pdfWriter.setPageSize(pageSize);
