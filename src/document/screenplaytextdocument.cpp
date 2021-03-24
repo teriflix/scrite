@@ -442,6 +442,7 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 
     QPdfWriter *pdfWriter = qobject_cast<QPdfWriter*>(printerObject);
     PrinterObject *qprinter = pdfWriter ? nullptr : qobject_cast<PrinterObject*>(printerObject);
+    ImagePrinter *imagePrinter = pdfWriter || qprinter ? nullptr : qobject_cast<ImagePrinter*>(printerObject);
 
     if(pdfWriter)
     {
@@ -456,10 +457,7 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 
         qprinter->setDocName(m_screenplay->title());
         qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
-    }
-
-    ImagePrinter *imagePrinter = qobject_cast<ImagePrinter*>(printerObject);
-    if(imagePrinter)
+    } else if(imagePrinter)
         printer = imagePrinter;
 
     if(printer)
