@@ -153,7 +153,7 @@ void AbstractScreenplaySubsetReport::configureTextDocumentPrinter(QTextDocumentP
 {
     printer->header()->setVisibleFromPageOne(!m_generateTitlePage);
     printer->footer()->setVisibleFromPageOne(!m_generateTitlePage);
-    printer->watermark()->setVisibleFromPageOne(true);
+    printer->watermark()->setVisibleFromPageOne(!m_generateTitlePage);
 }
 
 void AbstractScreenplaySubsetReport::inject(QTextCursor &, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation)

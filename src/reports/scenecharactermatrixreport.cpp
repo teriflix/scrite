@@ -14,6 +14,7 @@
 #include "scenecharactermatrixreport.h"
 #include "transliteration.h"
 
+#include <QPrinter>
 #include <QPainter>
 #include <QPdfWriter>
 #include <QTextTable>
@@ -265,21 +266,33 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
 
 void SceneCharacterMatrixReport::configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const
 {
+    this->configureWriterImpl(pdfWriter, document);
+}
+
+void SceneCharacterMatrixReport::configureWriter(QPrinter *printer, const QTextDocument *document) const
+{
+    this->configureWriterImpl(printer, document);
+}
+
+Q_DECL_IMPORT int qt_defaultDpi();
+
+void SceneCharacterMatrixReport::configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const
+{
     const QSizeF idealSizeInPixels = document->size();
     if(idealSizeInPixels.width() > idealSizeInPixels.height())
-        pdfWriter->setPageOrientation(QPageLayout::Landscape);
+        ppd->setPageOrientation(QPageLayout::Landscape);
     else
-        pdfWriter->setPageOrientation(QPageLayout::Portrait);
+        ppd->setPageOrientation(QPageLayout::Portrait);
 
-    const QSizeF pdfPageSizeInPixels = pdfWriter->pageLayout().pageSize().sizePixels(72);
+    const QSizeF pdfPageSizeInPixels = ppd->pageLayout().pageSize().sizePixels(qt_defaultDpi());
     const qreal scale = idealSizeInPixels.width() / pdfPageSizeInPixels.width();
 
     if(scale < 1 || qFuzzyCompare(scale, 1.0) )
         return;
 
     const qreal margin = 1.0/2.54;
-    QSizeF requiredPdfPageSize = pdfWriter->pageLayout().pageSize().size(QPageSize::Inch);
+    QSizeF requiredPdfPageSize = ppd->pageLayout().pageSize().size(QPageSize::Inch);
     requiredPdfPageSize *= scale;
     requiredPdfPageSize += QSizeF(margin, margin); // margin
-    pdfWriter->setPageSize( QPageSize(requiredPdfPageSize,QPageSize::Inch,"Custom",QPageSize::FuzzyMatch) );
+    ppd->setPageSize( QPageSize(requiredPdfPageSize,QPageSize::Inch,"Custom",QPageSize::FuzzyMatch) );
 }

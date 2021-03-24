@@ -17,7 +17,9 @@
 #include "qtextdocumentpagedprinter.h"
 
 #include <QDir>
+#include <QPrinter>
 #include <QFileInfo>
+#include <QSettings>
 #include <QPdfWriter>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -107,19 +109,40 @@ bool AbstractReportGenerator::generate()
         return false;
     }
 
+    const bool usePdfWriter = this->usePdfWriter();
+
     if(m_format == AdobePDF)
     {
         if(this->canDirectPrintToPdf())
         {
+            QScopedPointer<QPdfWriter> qpdfWriter;
+            QScopedPointer<QPrinter> qprinter;
+            bool success = false;
+
             this->progress()->start();
 
-            QPdfWriter pdfWriter(&file);
-            pdfWriter.setTitle("Scrite Character Report");
-            pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-            pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
-            pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+            if(usePdfWriter)
+            {
+                qpdfWriter.reset(new QPdfWriter(&file));
+                qpdfWriter->setTitle(screenplay->title() + QStringLiteral(" - ") + this->name());
+                qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+                format->pageLayout()->configure(qpdfWriter.data());
+                qpdfWriter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+                success = this->directPrintToPdf(qpdfWriter.data());
+            }
+            else
+            {
+                file.close();
 
-            const bool success = this->directPrintToPdf(&pdfWriter);
+                qprinter.reset(new QPrinter);
+                qprinter->setOutputFormat(QPrinter::PdfFormat);
+                qprinter->setDocName(screenplay->title() + QStringLiteral(" - ") + this->name());
+                qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
+                format->pageLayout()->configure(qprinter.data());
+                qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+                qprinter->setOutputFileName(fileName);
+                success = this->directPrintToPdf(qprinter.data());
+            }
 
             this->progress()->finish();
 
@@ -166,19 +189,43 @@ bool AbstractReportGenerator::generate()
     }
     else
     {
-        QPdfWriter pdfWriter(&file);
-        pdfWriter.setTitle("Scrite Character Report");
-        pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-        pdfWriter.setPageSize(QPageSize(QPageSize::Letter));
-        pdfWriter.setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
-        this->configureWriter(&pdfWriter, &textDocument);
+        QScopedPointer<QPdfWriter> qpdfWriter;
+        QScopedPointer<QPrinter> qprinter;
+        QPagedPaintDevice *pdfDevice = nullptr;
+
+        if(usePdfWriter)
+        {
+            qpdfWriter.reset(new QPdfWriter(&file));
+            qpdfWriter->setTitle(screenplay->title() + QStringLiteral(" - ") + this->name());
+            qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+            format->pageLayout()->configure(qpdfWriter.data());
+            qpdfWriter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+            this->configureWriter(qpdfWriter.data(), &textDocument);
+
+            pdfDevice = qpdfWriter.data();
+        }
+        else
+        {
+            file.close();
+
+            qprinter.reset(new QPrinter);
+            qprinter->setOutputFormat(QPrinter::PdfFormat);
+            qprinter->setDocName(screenplay->title() + QStringLiteral(" - ") + this->name());
+            qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
+            format->pageLayout()->configure(qprinter.data());
+            qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+            qprinter->setOutputFileName(fileName);
+            this->configureWriter(qprinter.data(), &textDocument);
+
+            pdfDevice = qprinter.data();
+        }
 
         QTextDocumentPagedPrinter printer;
         printer.header()->setVisibleFromPageOne(true);
         printer.footer()->setVisibleFromPageOne(true);
         printer.watermark()->setVisibleFromPageOne(true);
         this->configureTextDocumentPrinter(&printer, &textDocument);
-        printer.print(&textDocument, &pdfWriter);
+        printer.print(&textDocument, pdfDevice);
     }
 
     this->progress()->finish();
@@ -219,4 +266,10 @@ QString AbstractReportGenerator::polishFileName(const QString &fileName) const
     }
 
     return fileName;
+}
+
+bool AbstractReportGenerator::usePdfWriter() const
+{
+    const bool val = Application::instance()->settings()->value(QStringLiteral("PdfExport/usePdfDriver"), true).toBool();
+    return val;
 }

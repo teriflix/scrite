@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia
+QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
@@ -47,6 +47,7 @@ HEADERS += \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
     src/core/objectlistpropertymodel.h \
+    src/core/printerobject.h \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
     src/document/characterrelationshipsgraph.h \

@@ -492,26 +492,68 @@ Item {
                 }
             }
 
-            GroupBox {
-                title: "Window Tabs"
+            Row {
+                spacing: 20
                 width: parent.width - 60
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                Column {
-                    width: parent.width
-                    spacing: 5
+                GroupBox {
+                    title: "Window Tabs"
+                    width: (parent.width - parent.spacing)/2
 
-                    Text {
+                    Column {
                         width: parent.width
-                        font.pointSize: app.idealFontPointSize
-                        text: "By default Scrite shows Screenplay, Structure and Notebook in separate tabs on the main window. If you have a small display, you can move Notebook into a separate tab. Otherwise its productive to see all aspects of your screenplay within the Structure tab itself."
-                        wrapMode: Text.WordWrap
+                        spacing: 5
+
+                        Text {
+                            id: windowTabsExplainerText
+                            width: parent.width
+                            font.pointSize: app.idealFontPointSize-2
+                            text: "By default Scrite shows Screenplay, Structure and Notebook in separate tabs on the main window. If you have a small display, you can move Notebook into a separate tab. Otherwise its productive to see all aspects of your screenplay within the Structure tab itself."
+                            wrapMode: Text.WordWrap
+                        }
+
+                        CheckBox2 {
+                            checked: workspaceSettings.showNotebookInStructure
+                            text: "Move Notebook into the Structure tab"
+                            onToggled: workspaceSettings.showNotebookInStructure = checked
+                        }
+                    }
+                }
+
+                GroupBox {
+                    title: "PDF Export"
+                    width: (parent.width - parent.spacing)/2
+
+                    Settings {
+                        id: pdfExportSettings
+                        fileName: app.settingsFilePath
+                        category: "PdfExport"
+                        property bool usePdfDriver: true
                     }
 
-                    CheckBox2 {
-                        checked: workspaceSettings.showNotebookInStructure
-                        text: "Move Notebook into the Structure tab"
-                        onToggled: workspaceSettings.showNotebookInStructure = checked
+                    Column {
+                        width: parent.width
+                        spacing: 5
+
+                        Text {
+                            width: parent.width
+                            height: windowTabsExplainerText.height
+                            font.pointSize: app.idealFontPointSize-2
+                            text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
+                            wrapMode: Text.WordWrap
+                        }
+
+                        ComboBox2 {
+                            width: parent.width
+                            model: [
+                                { "key": "PDF Driver", "value": true },
+                                { "key": "Printer Driver", "value": false }
+                            ]
+                            textRole: "key"
+                            currentIndex: pdfExportSettings.usePdfDriver ? 0 : 1
+                            onCurrentIndexChanged: pdfExportSettings.usePdfDriver = (currentIndex === 0)
+                        }
                     }
                 }
             }

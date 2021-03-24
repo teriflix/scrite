@@ -16,11 +16,13 @@
 #include "imageprinter.h"
 #include "timeprofiler.h"
 #include "timeprofiler.h"
+#include "printerobject.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "screenplaytextdocument.h"
 
 #include <QDir>
+#include <QUrl>
 #include <QDate>
 #include <QtMath>
 #include <QtDebug>
@@ -32,14 +34,13 @@
 #include <QTextTable>
 #include <QTextCursor>
 #include <QPaintEngine>
+#include <QJsonDocument>
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
+#include <QPropertyAnimation>
 #include <QTextBlockUserData>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
-#include <QJsonDocument>
-#include <QPropertyAnimation>
-#include <QUrl>
 
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
@@ -440,12 +441,21 @@ void ScreenplayTextDocument::print(QObject *printerObject)
     QPagedPaintDevice *printer = nullptr;
 
     QPdfWriter *pdfWriter = qobject_cast<QPdfWriter*>(printerObject);
+    PrinterObject *qprinter = pdfWriter ? nullptr : qobject_cast<PrinterObject*>(printerObject);
+
     if(pdfWriter)
     {
         printer = pdfWriter;
 
         pdfWriter->setTitle(m_screenplay->title());
-        pdfWriter->setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
+        pdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+    }
+    else if(qprinter)
+    {
+        printer = qprinter;
+
+        qprinter->setDocName(m_screenplay->title());
+        qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
     }
 
     ImagePrinter *imagePrinter = qobject_cast<ImagePrinter*>(printerObject);

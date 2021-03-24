@@ -57,9 +57,14 @@ public:
 
 protected:
     // AbstractReportGenerator interface
+    bool usePdfWriter() const { return true; }
     bool supportsFormat(Format) const;
     bool doGenerate(QTextDocument *document);
     void configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const;
+    void configureWriter(QPrinter *printer, const QTextDocument *document) const;
+
+private:
+    void configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const;
 
 private:
     QStringList m_characterNames;
