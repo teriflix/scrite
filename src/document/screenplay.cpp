@@ -19,6 +19,7 @@
 #include "garbagecollector.h"
 
 #include <QScopedValueRollback>
+#include <QSettings>
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent),
@@ -358,6 +359,19 @@ Screenplay::Screenplay(QObject *parent)
 
     m_author = QSysInfo::machineHostName();
     m_version = QStringLiteral("Initial Draft");
+
+    QSettings *settings = Application::instance()->settings();
+    auto fetchSettings = [=](const QString &field, QString &into) {
+        const QString value = settings->value( QStringLiteral("TitlePage/") + field, QString() ).toString();
+        if(!value.isEmpty())
+            into = value;
+    };
+    fetchSettings( QStringLiteral("author"), m_author );
+    fetchSettings( QStringLiteral("contact"), m_contact );
+    fetchSettings( QStringLiteral("address"), m_address );
+    fetchSettings( QStringLiteral("email"), m_email );
+    fetchSettings( QStringLiteral("phone"), m_phoneNumber );
+    fetchSettings( QStringLiteral("website"), m_website );
 }
 
 Screenplay::~Screenplay()

@@ -1026,6 +1026,19 @@ Item {
         Item {
             readonly property real labelWidth: 60
 
+            Settings {
+                id: titlePageSettings
+                fileName: app.settingsFilePath
+                category: "TitlePage"
+
+                property string author
+                property string contact
+                property string address
+                property string email
+                property string phone
+                property string website
+            }
+
             Column {
                 width: parent.width - 80
                 anchors.centerIn: parent
@@ -1286,7 +1299,10 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.author
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.author = text
+                                onTextEdited: {
+                                    scriteDocument.screenplay.author = text
+                                    titlePageSettings.author = text
+                                }
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
@@ -1318,7 +1334,10 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.contact
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.contact = text
+                                onTextEdited: {
+                                    scriteDocument.screenplay.contact = text
+                                    titlePageSettings.contact = text
+                                }
                                 font.pixelSize: 20
                                 placeholderText: "(Optional) Company / Studio name (max 100 letters)"
                                 maximumLength: 100
@@ -1346,7 +1365,10 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.address
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.address = text
+                                onTextEdited: {
+                                    scriteDocument.screenplay.address = text
+                                    titlePageSettings.address = text
+                                }
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Address (max 100 letters)"
@@ -1373,7 +1395,10 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.email
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.email = text
+                                onTextEdited: {
+                                    scriteDocument.screenplay.email = text
+                                    titlePageSettings.email = text
+                                }
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Email (max 100 letters)"
@@ -1400,7 +1425,10 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.phoneNumber
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.phoneNumber = text
+                                onTextEdited: {
+                                    scriteDocument.screenplay.phoneNumber = text
+                                    titlePageSettings.phone = text
+                                }
                                 font.pixelSize: 20
                                 maximumLength: 20
                                 placeholderText: "(Optional) Phone number (max 20 digits/letters)"
@@ -1427,7 +1455,10 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.website
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.website = text
+                                onTextEdited: {
+                                    scriteDocument.screenplay.website = text
+                                    titlePageSettings.website = text
+                                }
                                 font.pixelSize: 20
                                 maximumLength: 150
                                 placeholderText: "(Optional) Website (max 150 letters)"
