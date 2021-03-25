@@ -133,6 +133,25 @@ Row {
         ShortcutsModelItem.shortcut: shortcut
     }
 
+    property int breakInsertIndex: {
+        var idx = scriteDocument.screenplay.currentElementIndex
+        if(idx < 0)
+            return -1
+
+        ++idx
+        while(idx < scriteDocument.screenplay.elementCount) {
+            var e = scriteDocument.screenplay.elementAt(idx)
+            if(e === null)
+                break
+            if(e.elementType === ScreenplayElement.BreakElementType)
+                ++idx
+            else
+                break
+        }
+
+        return idx
+    }
+
     ToolButton3 {
         iconSource: "../icons/content/add_box.png"
         shortcut: "Ctrl+Shift+B"
@@ -141,16 +160,54 @@ Row {
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
         onClicked: {
             requestScreenplayEditor()
-            if(scriteDocument.screenplay.currentElementIndex < 0)
+            if(breakInsertIndex < 0)
                 scriteDocument.screenplay.addBreakElement(Screenplay.Act)
             else
-                scriteDocument.screenplay.insertBreakElement(Screenplay.Act, scriteDocument.screenplay.currentElementIndex+1)
+                scriteDocument.screenplay.insertBreakElement(Screenplay.Act, breakInsertIndex)
         }
 
         ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: "Create New Scene"
-        ShortcutsModelItem.enabled: !scriteDocument.readOnly
+        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Act Break" : "Insert Act Break"
+        ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: shortcut
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+P"
+        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Chapter Break" : "Insert Chapter Break"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: sequence
+
+        onActivated:  {
+            requestScreenplayEditor()
+            if(breakInsertIndex < 0)
+                scriteDocument.screenplay.addBreakElement(Screenplay.Chapter)
+            else
+                scriteDocument.screenplay.insertBreakElement(Screenplay.Chapter, breakInsertIndex)
+        }
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+L"
+        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Interval Break" : "Insert Interval Break"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: sequence
+
+        onActivated:  {
+            requestScreenplayEditor()
+            if(breakInsertIndex < 0)
+                scriteDocument.screenplay.addBreakElement(Screenplay.Interval)
+            else
+                scriteDocument.screenplay.insertBreakElement(Screenplay.Interval, breakInsertIndex)
+        }
     }
 
     ToolButton3 {

@@ -68,54 +68,15 @@ void ScreenplayElement::setBreakType(int val)
         return;
 
     m_breakType = val;
-
-    if(m_sceneID.isEmpty())
-    {
-        QString id;
-        int chapter = 1;
-        for(int i=0; i<m_screenplay->elementCount(); i++)
-        {
-            ScreenplayElement *element = m_screenplay->elementAt(i);
-            if(element->elementType() == BreakElementType)
-            {
-                if(element->breakType() == m_breakType)
-                    ++chapter;
-            }
-        }
-
-        switch(m_breakType)
-        {
-        case Screenplay::Act:
-            id = "Act ";
-            break;
-        case Screenplay::Chapter:
-            id = "Chapter ";
-            break;
-        case Screenplay::Interval:
-            id = "Interval";
-            break;
-        default:
-            id = "Break";
-        }
-
-        if(m_breakType != Screenplay::Interval)
-            id += QString::number(chapter);
-        this->setSceneFromID(id);
-    }
-
     emit breakTypeChanged();
 }
 
 void ScreenplayElement::setBreakTitle(const QString &val)
 {
-    if(m_breakTitle == val)
+    if(m_breakTitle == val || m_elementType != BreakElementType)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "breakTitle");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
-
+    m_breakTitle = val;
     emit breakTitleChanged();
 }
 
@@ -623,8 +584,9 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
     connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-    if(ptr->elementType() == ScreenplayElement::BreakElementType)
-        connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+    connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitles);
+    connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitles);
+    connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
     this->endInsertRows();
 
@@ -675,6 +637,9 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
     disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
+    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitles);
+    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitles);
+    disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
     this->endRemoveRows();
 
@@ -1595,22 +1560,57 @@ void Screenplay::updateBreakTitles()
         actNames = structure->categoryActNames().value(category).toStringList();
     }
 
-    int i = -1;
+    QList<ScreenplayElement*> chapters;
+    QList<ScreenplayElement*> chapterActs;
+    QList<ScreenplayElement*> chapterIntervals;
+
+    int chapterOffset = 0;
+    int actOffset = 0;
+
     for(ScreenplayElement *e : qAsConst(m_elements))
     {
-        if(e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Act)
+        if(e->elementType() != ScreenplayElement::BreakElementType)
         {
-            if(i < 0 && e != m_elements.first())
-                ++i;
+            if(chapterOffset == 0 && chapters.isEmpty())
+                ++chapterOffset;
 
-            ++i;
-            const QString actName = i >= actNames.size() ? QStringLiteral("ACT ") + QString::number(i+1) : actNames.at(i);
-            e->m_sceneID = actName;
-            emit e->breakTitleChanged();
+            if(actOffset == 0 && chapterActs.isEmpty())
+                ++actOffset;
+
+            continue;
+        }
+
+        switch(e->breakType())
+        {
+        case Screenplay::Chapter:
+            chapterActs.clear();
+            chapterIntervals.clear();
+            chapters.append(e);
+            e->setBreakTitle( QStringLiteral("CHAPTER ") + QString::number(chapters.size()+chapterOffset) );
+            break;
+        case Screenplay::Act:
+            chapterActs.append(e);
+            e->setBreakTitle(chapterActs.size() > actNames.size() ?
+                             QStringLiteral("ACT ") + QString::number(chapterActs.size()+actOffset) :
+                             actNames.at(chapterActs.size()+actOffset-1));
+            break;
+        case Screenplay::Interval:
+            chapterIntervals.append(e);
+            e->setBreakTitle(QStringLiteral("INTERVAL ") + QString::number(chapterIntervals.size()));
+            break;
         }
     }
 
     this->evaluateSceneNumbers();
+}
+
+void Screenplay::setChapterCount(int val)
+{
+    if(m_chapterCount == val)
+        return;
+
+    m_chapterCount = val;
+    emit chapterCountChanged();
 }
 
 void Screenplay::setCurrentElementIndex(int val)
@@ -1852,8 +1852,9 @@ void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<
             connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
             connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
             connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-            if(ptr->elementType() == ScreenplayElement::BreakElementType)
-                connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+            connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitles);
+            connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitles);
+            connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
             m_elements.append(ptr);
         }
@@ -1963,9 +1964,13 @@ void Screenplay::evaluateSceneNumbers()
 
     int number = 1;
     int actIndex = 0;
+    int chapterIndex = 0;
     int elementIndex = 0;
     bool containsNonStandardScenes = false;
-    QString act = QStringLiteral("ACT 1");
+
+    ScreenplayElement *lastChapterElement = nullptr;
+    ScreenplayElement *lastActElement = nullptr;
+    ScreenplayElement *lastSceneElement = nullptr;
 
     QHash< Scene*, QList<int> > indexListMap;
 
@@ -1980,12 +1985,16 @@ void Screenplay::evaluateSceneNumbers()
 
         if(element->elementType() == ScreenplayElement::SceneElementType)
         {
+            lastSceneElement = element;
+
             element->setElementIndex(elementIndex++);
             element->setActIndex(actIndex);
 
             Scene *scene = element->scene();
-            scene->setAct(act);
+            scene->setAct(lastActElement ? lastActElement->breakTitle() : QStringLiteral("ACT 1"));
             scene->setActIndex(actIndex);
+            scene->setChapter(lastChapterElement ? lastChapterElement->breakTitle() : QStringLiteral("CHAPTER 1"));
+            scene->setChapterIndex(chapterIndex);
             indexListMap[scene].append(index);
         }
         else
@@ -1993,8 +2002,20 @@ void Screenplay::evaluateSceneNumbers()
             element->setElementIndex(-1);
             if(element->breakType() == Screenplay::Act)
             {
-                act = element->breakTitle();
-                ++actIndex;
+                if(lastSceneElement)
+                    ++actIndex;
+                lastActElement = element;
+                lastSceneElement = nullptr;
+            }
+            else if(element->breakType() == Screenplay::Chapter)
+            {
+                if(lastSceneElement)
+                    ++chapterIndex;
+                actIndex = 0;
+
+                lastActElement = nullptr;
+                lastSceneElement = nullptr;
+                lastChapterElement = element;
             }
         }
 
@@ -2012,6 +2033,7 @@ void Screenplay::evaluateSceneNumbers()
         ++it;
     }
 
+    this->setChapterCount(chapterIndex+1);
     this->setHasNonStandardScenes(containsNonStandardScenes);
 }
 

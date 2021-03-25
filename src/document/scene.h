@@ -274,6 +274,16 @@ public:
     int actIndex() const { return m_actIndex; }
     Q_SIGNAL void actIndexChanged();
 
+    Q_PROPERTY(int chapterIndex READ chapterIndex NOTIFY chapterIndexChanged)
+    void setChapterIndex(const int &val);
+    int chapterIndex() const { return m_chapterIndex; }
+    Q_SIGNAL void chapterIndexChanged();
+
+    Q_PROPERTY(QString chapter READ chapter NOTIFY chapterChanged)
+    void setChapter(const QString &val);
+    QString chapter() const { return m_chapter; }
+    Q_SIGNAL void chapterChanged();
+
     Q_PROPERTY(QList<int> screenplayElementIndexList READ screenplayElementIndexList NOTIFY screenplayElementIndexListChanged STORED false)
     void setScreenplayElementIndexList(const QList<int> &val);
     QList<int> screenplayElementIndexList() const { return m_screenplayElementIndexList; }
@@ -381,6 +391,8 @@ private:
     QString m_charactersInConflict;
     QString m_pageTarget;
     int m_actIndex = -1;
+    int m_chapterIndex = -1;
+    QString m_chapter;
 
     bool m_enabled = true;
     char m_padding[7];

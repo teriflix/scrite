@@ -897,6 +897,24 @@ void Scene::setActIndex(const int &val)
     emit actIndexChanged();
 }
 
+void Scene::setChapterIndex(const int &val)
+{
+    if(m_chapterIndex == val)
+        return;
+
+    m_chapterIndex = val;
+    emit chapterIndexChanged();
+}
+
+void Scene::setChapter(const QString &val)
+{
+    if(m_chapter == val)
+        return;
+
+    m_chapter = val;
+    emit chapterChanged();
+}
+
 void Scene::setScreenplayElementIndexList(const QList<int> &val)
 {
     if(m_screenplayElementIndexList == val)

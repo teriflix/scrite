@@ -59,8 +59,7 @@ public:
     int breakType() const { return m_breakType; }
     Q_SIGNAL void breakTypeChanged();
 
-    Q_PROPERTY(QString breakTitle READ breakTitle WRITE setBreakTitle NOTIFY breakTitleChanged)
-    void setBreakTitle(const QString &val);
+    Q_PROPERTY(QString breakTitle READ breakTitle NOTIFY breakTitleChanged)
     QString breakTitle() const { return m_breakTitle.isEmpty() ? this->sceneID() : m_breakTitle; }
     Q_SIGNAL void breakTitleChanged();
 
@@ -131,6 +130,7 @@ protected:
     void resetScreenplay();
     void setActIndex(int val);
     void setElementIndex(int val);
+    void setBreakTitle(const QString &val);
 
 private:
     void onSceneGroupsChanged() { emit sceneGroupsChanged(this); }
@@ -303,6 +303,10 @@ public:
     Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
 
+    Q_PROPERTY(int chapterCount READ chapterCount NOTIFY chapterCountChanged)
+    int chapterCount() const { return m_chapterCount; }
+    Q_SIGNAL void chapterCountChanged();
+
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY currentElementIndexChanged)
@@ -347,6 +351,7 @@ protected:
     void setHasTitlePageAttributes(bool val);
     void evaluateHasTitlePageAttributes();
     QList<ScreenplayElement*> takeSelectedElements();
+    void setChapterCount(int val);
 
 private:
     QString m_title;
@@ -375,6 +380,7 @@ private:
     int m_currentElementIndex = -1;
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
+    int m_chapterCount = 1;
 
     ExecLaterTimer m_sceneNumberEvaluationTimer;
 };

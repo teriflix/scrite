@@ -2795,7 +2795,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
         }
 
         elementRect.moveTopLeft(QPointF(x, beatRect.bottom()+ySpacing));
-    }    
+    }
 
     return newBoundingRect;
 }
@@ -2843,21 +2843,23 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
     if(screenplay == nullptr)
         return ret;
 
+    bool hasChapterBreaks = false;
+
     if(category.isEmpty())
     {
         QList<StructureElement*> unusedElements = m_elements.list();
 
-        ret.append( qMakePair(QStringLiteral("ACT 1"), QList<StructureElement*>()) );
+        ret.append( qMakePair(QString(), QList<StructureElement*>()) );
 
         for(int i=0; i<screenplay->elementCount(); i++)
         {
             ScreenplayElement *element = screenplay->elementAt(i);
             if(element->elementType() == ScreenplayElement::BreakElementType)
             {
-                if(i == 0)
-                    ret.last().first = element->breakTitle();
-                else
-                    ret.append( qMakePair(element->breakTitle(), QList<StructureElement*>()) );
+                hasChapterBreaks |= Screenplay::Chapter == element->breakType();
+
+                const QString beatName = element->breakType() == Screenplay::Act ? element->breakTitle() : QString();
+                ret.append( qMakePair(beatName, QList<StructureElement*>()) );
             }
             else
             {
@@ -2868,6 +2870,9 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
                 {
                     unusedElements.removeOne(selement);
                     ret.last().second.append(selement);
+
+                    if(ret.last().first.isEmpty())
+                        ret.last().first = QStringLiteral("ACT ") + QString::number(element->actIndex()+1);
                 }
             }
         }
@@ -2897,7 +2902,10 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
         {
             ScreenplayElement *element = screenplay->elementAt(i);
             if(element->elementType() == ScreenplayElement::BreakElementType)
+            {
+                hasChapterBreaks |= Screenplay::Chapter == element->breakType();
                 continue;
+            }
 
             Scene *scene = element->scene();
             const QStringList sceneGroups = filteredGroups(scene->groups());
@@ -2949,6 +2957,22 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
                      const QPair<QString, QList<StructureElement *> > &b) {
             return a.second.size() > b.second.size();
         });
+    }
+
+    for(int i=ret.size()-1; i>=0; i--)
+    {
+        QPair<QString, QList<StructureElement *> > &item = ret[i];
+        if(item.second.isEmpty())
+            ret.removeAt(i);
+        else
+        {
+            if(hasChapterBreaks)
+            {
+                const Scene *scene = item.second.first()->scene();
+                const int chapterNr = scene->chapterIndex()+1;
+                item.first = QStringLiteral("CH %1: %2").arg(chapterNr).arg(item.first);
+            }
+        }
     }
 
     return ret;
