@@ -901,6 +901,10 @@ public:
     QPointF suggestedLabelPosition() const { return m_suggestedLabelPosition; }
     Q_SIGNAL void suggestedLabelPositionChanged();
 
+    Q_PROPERTY(bool canBeVisible READ canBeVisible NOTIFY canBeVisibleChanged)
+    bool canBeVisible() const;
+    Q_SIGNAL void canBeVisibleChanged();
+
     Q_INVOKABLE bool intersects(const QRectF &rect) const;
 
     QPainterPath shape() const;

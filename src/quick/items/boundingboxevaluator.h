@@ -159,7 +159,9 @@ public:
 
     enum VisibilityMode
     {
+        IgnoreVisibility,
         AlwaysVisible,
+        AlwaysInvisible,
         VisibleUponViewportIntersection,
         VisibleUponViewportContains
     };

@@ -402,12 +402,15 @@ void BoundingBoxItem::setPreview(const QImage &image)
 
 void BoundingBoxItem::determineVisibility()
 {
-    if(m_item == nullptr)
+    if(m_item == nullptr || m_visibilityMode == IgnoreVisibility)
         return;
 
-    if(m_visibilityMode == AlwaysVisible)
+    if(m_visibilityMode == AlwaysVisible || m_visibilityMode == AlwaysInvisible)
     {
-        m_item->setVisible(true);
+        if(m_visibilityProperty.isEmpty())
+            m_item->setVisible(m_visibilityMode == AlwaysVisible);
+        else
+            m_item->setProperty(m_visibilityProperty, m_visibilityMode == AlwaysVisible);
         return;
     }
 

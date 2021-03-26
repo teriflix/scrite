@@ -4000,6 +4000,8 @@ StructureElementConnector::StructureElementConnector(QQuickItem *parent)
     this->setOutlineWidth(4);
 
     connect(this, &AbstractShapeItem::contentRectChanged, this, &StructureElementConnector::updateArrowAndLabelPositions);
+    connect(this, &StructureElementConnector::fromElementChanged, this, &StructureElementConnector::canBeVisibleChanged);
+    connect(this, &StructureElementConnector::toElementChanged, this, &StructureElementConnector::canBeVisibleChanged);
 }
 
 StructureElementConnector::~StructureElementConnector()
@@ -4027,6 +4029,7 @@ void StructureElementConnector::setFromElement(StructureElement *val)
         disconnect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_fromElement, &StructureElement::stackIdChanged, this, &StructureElementConnector::canBeVisibleChanged);
 
         Scene *scene = m_fromElement->scene();
         disconnect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -4040,6 +4043,7 @@ void StructureElementConnector::setFromElement(StructureElement *val)
         connect(m_fromElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_fromElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_fromElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_fromElement, &StructureElement::stackIdChanged, this, &StructureElementConnector::canBeVisibleChanged);
 
         Scene *scene = m_fromElement->scene();
         connect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -4063,6 +4067,7 @@ void StructureElementConnector::setToElement(StructureElement *val)
         disconnect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         disconnect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
+        disconnect(m_toElement, &StructureElement::stackIdChanged, this, &StructureElementConnector::canBeVisibleChanged);
 
         Scene *scene = m_toElement->scene();
         disconnect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -4076,6 +4081,7 @@ void StructureElementConnector::setToElement(StructureElement *val)
         connect(m_toElement, &StructureElement::yChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_toElement, &StructureElement::widthChanged, this, &StructureElementConnector::requestUpdateLater);
         connect(m_toElement, &StructureElement::heightChanged, this, &StructureElementConnector::requestUpdateLater);
+        connect(m_toElement, &StructureElement::stackIdChanged, this, &StructureElementConnector::canBeVisibleChanged);
 
         Scene *scene = m_toElement->scene();
         connect(scene, &Scene::colorChanged, this, &StructureElementConnector::pickElementColor);
@@ -4099,11 +4105,18 @@ void StructureElementConnector::setArrowAndLabelSpacing(qreal val)
     this->updateArrowAndLabelPositions();
 }
 
+bool StructureElementConnector::canBeVisible() const
+{
+    return m_fromElement != nullptr && m_toElement != nullptr &&
+           (m_fromElement->stackId().isEmpty() || m_toElement->stackId().isEmpty() ||
+            m_fromElement->stackId() != m_toElement->stackId());
+}
+
 bool StructureElementConnector::intersects(const QRectF &rect) const
 {
     const QPainterPath shape = this->currentShape();
     if(shape.isEmpty())
-        return true;
+        return false;
 
     const QRectF shapeBoundingRect = this->currentShape().boundingRect();
     return rect.isValid() && !rect.isNull() ? rect.intersects( shapeBoundingRect ) : true;

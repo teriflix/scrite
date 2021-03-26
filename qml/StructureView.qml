@@ -1952,7 +1952,7 @@ Item {
             BoundingBoxItem.previewFillColor: background.color
             BoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
             BoundingBoxItem.viewportItem: canvas
-            BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
+            BoundingBoxItem.visibilityMode: stackedOnTop ? BoundingBoxItem.VisibleUponViewportIntersection : BoundingBoxItem.IgnoreVisibility
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
             BoundingBoxItem.visibilityProperty: "visibleInViewport"
 
@@ -2341,7 +2341,11 @@ Item {
             toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
             outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
-            visible: intersects(canvasScroll.viewportRect) && (connectorFromElement.stackId === "" || connectorToElement.stackId === "" || connectorFromElement.stackId !== connectorToElement.stackId)
+            visible: {
+                if(canBeVisible)
+                    return intersects(canvasScroll.viewportRect)
+                return false
+            }
 
             Rectangle {
                 id: labelBg
