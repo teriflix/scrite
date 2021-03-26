@@ -1293,6 +1293,8 @@ bool Scene::mergeInto(Scene *otherScene)
 
     emit sceneReset(0);
     emit otherScene->sceneReset(length);
+
+    return true;
 }
 
 int Scene::rowCount(const QModelIndex &parent) const

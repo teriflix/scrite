@@ -303,6 +303,7 @@ public:
     Q_INVOKABLE void insertBreakElementI(int type, int index) { this->insertBreakElement(BreakType(type), index); }
     Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
+    void updateBreakTitlesLater();
 
     Q_PROPERTY(int episodeCount READ episodeCount NOTIFY episodeCountChanged)
     int episodeCount() const { return m_episodeCount; }
@@ -383,6 +384,7 @@ private:
     bool m_hasNonStandardScenes = false;
     int m_episodeCount = 0;
 
+    ExecLaterTimer m_updateBreakTitlesTimer;
     ExecLaterTimer m_sceneNumberEvaluationTimer;
 };
 

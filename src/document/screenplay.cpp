@@ -584,8 +584,8 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
     connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-    connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitles);
-    connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitles);
+    connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
+    connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
     connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
     this->endInsertRows();
@@ -596,6 +596,9 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
 
     if(ptr->elementType() == ScreenplayElement::SceneElementType && (this->scriteDocument() && !this->scriteDocument()->isLoading()))
         this->setCurrentElementIndex(index);
+
+    if(ptr->elementType() == ScreenplayElement::BreakElementType)
+        this->updateBreakTitlesLater();
 }
 
 void Screenplay::removeElement(ScreenplayElement *ptr)
@@ -637,8 +640,8 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
     disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
     disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitles);
-    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitles);
+    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
+    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
     disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
     this->endRemoveRows();
@@ -742,7 +745,7 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
     emit elementMoved(ptr, fromRow, toRow);
     emit elementsChanged();
 
-    this->updateBreakTitles();
+    this->updateBreakTitlesLater();
 
     if(UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
         UndoStack::active()->push(new ScreenplayElementMoveCommand(this, ptr, fromRow, toRow));
@@ -947,7 +950,7 @@ void Screenplay::moveSelectedElements(int toRow)
 
     emit elementsChanged();
 
-    this->updateBreakTitles();
+    this->updateBreakTitlesLater();
 
     if(UndoStack::active() != nullptr)
         UndoStack::active()->push(cmd);
@@ -1524,8 +1527,6 @@ void Screenplay::insertBreakElement(Screenplay::BreakType type, int index)
     element->setElementType(ScreenplayElement::BreakElementType);
     element->setBreakType(type);
     this->insertElementAt(element, index);
-
-    this->updateBreakTitles();
 }
 
 void Screenplay::updateBreakTitles()
@@ -1793,7 +1794,7 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
         emit coverPagePhotoChanged();
     }
 
-    this->updateBreakTitles();
+    this->updateBreakTitlesLater();
 
     if(!m_scriteDocument->isCreatedOnThisComputer())
     {
@@ -1831,8 +1832,8 @@ void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<
             connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
             connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
             connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-            connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitles);
-            connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitles);
+            connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
+            connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
             connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
             m_elements.append(ptr);
@@ -1912,6 +1913,11 @@ void Screenplay::timerEvent(QTimerEvent *te)
         m_sceneNumberEvaluationTimer.stop();
         this->evaluateSceneNumbers();
     }
+    else if(te->timerId() == m_updateBreakTitlesTimer.timerId())
+    {
+        m_updateBreakTitlesTimer.stop();
+        this->updateBreakTitles();
+    }
 }
 
 void Screenplay::resetActiveScene()
@@ -1932,6 +1938,11 @@ void Screenplay::onSceneReset(int elementIndex)
         return;
 
     emit sceneReset(sceneIndex, elementIndex);
+}
+
+void Screenplay::updateBreakTitlesLater()
+{
+    m_updateBreakTitlesTimer.start(0, this);
 }
 
 void Screenplay::evaluateSceneNumbers()

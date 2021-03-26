@@ -333,8 +333,8 @@ void ScriteDocument::reset()
         disconnect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
         disconnect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
         disconnect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
-        disconnect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitles);
-        disconnect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitles);
+        disconnect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
+        disconnect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
     }
 
     if(m_screenplay != nullptr)
@@ -382,8 +382,8 @@ void ScriteDocument::reset()
     connect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
-    connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitles);
-    connect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitles);
+    connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
+    connect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
 
     connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
     connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::markAsModified);
