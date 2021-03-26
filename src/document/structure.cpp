@@ -2843,7 +2843,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
     if(screenplay == nullptr)
         return ret;
 
-    bool hasChapterBreaks = false;
+    bool hasEpisodeBreaks = false;
 
     if(category.isEmpty())
     {
@@ -2856,7 +2856,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
             ScreenplayElement *element = screenplay->elementAt(i);
             if(element->elementType() == ScreenplayElement::BreakElementType)
             {
-                hasChapterBreaks |= Screenplay::Chapter == element->breakType();
+                hasEpisodeBreaks |= Screenplay::Episode == element->breakType();
 
                 const QString beatName = element->breakType() == Screenplay::Act ? element->breakTitle() : QString();
                 ret.append( qMakePair(beatName, QList<StructureElement*>()) );
@@ -2903,7 +2903,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
             ScreenplayElement *element = screenplay->elementAt(i);
             if(element->elementType() == ScreenplayElement::BreakElementType)
             {
-                hasChapterBreaks |= Screenplay::Chapter == element->breakType();
+                hasEpisodeBreaks |= Screenplay::Episode == element->breakType();
                 continue;
             }
 
@@ -2966,12 +2966,14 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl
             ret.removeAt(i);
         else
         {
-            if(hasChapterBreaks)
+            if(hasEpisodeBreaks)
             {
                 const Scene *scene = item.second.first()->scene();
-                const int chapterNr = scene->chapterIndex()+1;
-                item.first = QStringLiteral("CH %1: %2").arg(chapterNr).arg(item.first);
+                const int episodeNr = scene->episodeIndex()+1;
+                item.first = QStringLiteral("EP %1: %2").arg(episodeNr).arg(item.first);
             }
+
+            item.first = Application::instance()->camelCased(item.first);
         }
     }
 

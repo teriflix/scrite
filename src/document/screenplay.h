@@ -292,7 +292,8 @@ public:
     enum BreakType
     {
         Act,
-        Chapter,
+        Episode,
+        Chapter = Episode,
         Interval
     };
     Q_ENUM(BreakType)
@@ -303,9 +304,9 @@ public:
     Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
 
-    Q_PROPERTY(int chapterCount READ chapterCount NOTIFY chapterCountChanged)
-    int chapterCount() const { return m_chapterCount; }
-    Q_SIGNAL void chapterCountChanged();
+    Q_PROPERTY(int episodeCount READ episodeCount NOTIFY episodeCountChanged)
+    int episodeCount() const { return m_episodeCount; }
+    Q_SIGNAL void episodeCountChanged();
 
     Q_SIGNAL void screenplayChanged();
 
@@ -351,7 +352,7 @@ protected:
     void setHasTitlePageAttributes(bool val);
     void evaluateHasTitlePageAttributes();
     QList<ScreenplayElement*> takeSelectedElements();
-    void setChapterCount(int val);
+    void setEpisodeCount(int val);
 
 private:
     QString m_title;
@@ -380,7 +381,7 @@ private:
     int m_currentElementIndex = -1;
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
-    int m_chapterCount = 1;
+    int m_episodeCount = 1;
 
     ExecLaterTimer m_sceneNumberEvaluationTimer;
 };

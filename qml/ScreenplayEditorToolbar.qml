@@ -178,16 +178,16 @@ Row {
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
 
         ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Chapter Break" : "Insert Chapter Break"
+        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
 
         onActivated:  {
             requestScreenplayEditor()
             if(breakInsertIndex < 0)
-                scriteDocument.screenplay.addBreakElement(Screenplay.Chapter)
+                scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
             else
-                scriteDocument.screenplay.insertBreakElement(Screenplay.Chapter, breakInsertIndex)
+                scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
         }
     }
 

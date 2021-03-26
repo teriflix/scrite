@@ -110,7 +110,7 @@ Item {
 
                 ToolButton3 {
                     iconSource: "../icons/content/add_box.png"
-                    ToolTip.text: "Add a act, chapter or interval break."
+                    ToolTip.text: "Add a act, episode or interval break."
                     autoRepeat: false
                     suggestedWidth: 30; suggestedHeight: 30
                     enabled: !scriteDocument.readOnly &&

@@ -125,7 +125,7 @@ QString ScreenplayElement::sceneID() const
             switch(m_breakType)
             {
             case Screenplay::Act: return "Act";
-            case Screenplay::Chapter: return "Chapter";
+            case Screenplay::Episode: return "Episode";
             case Screenplay::Interval: return "Interval";
             default: break;
             }
@@ -1560,21 +1560,21 @@ void Screenplay::updateBreakTitles()
         actNames = structure->categoryActNames().value(category).toStringList();
     }
 
-    QList<ScreenplayElement*> chapters;
-    QList<ScreenplayElement*> chapterActs;
-    QList<ScreenplayElement*> chapterIntervals;
+    QList<ScreenplayElement*> episodes;
+    QList<ScreenplayElement*> episodeActs;
+    QList<ScreenplayElement*> episodeIntervals;
 
-    int chapterOffset = 0;
+    int episodeOffset = 0;
     int actOffset = 0;
 
     for(ScreenplayElement *e : qAsConst(m_elements))
     {
         if(e->elementType() != ScreenplayElement::BreakElementType)
         {
-            if(chapterOffset == 0 && chapters.isEmpty())
-                ++chapterOffset;
+            if(episodeOffset == 0 && episodes.isEmpty())
+                ++episodeOffset;
 
-            if(actOffset == 0 && chapterActs.isEmpty())
+            if(actOffset == 0 && episodeActs.isEmpty())
                 ++actOffset;
 
             continue;
@@ -1582,21 +1582,22 @@ void Screenplay::updateBreakTitles()
 
         switch(e->breakType())
         {
-        case Screenplay::Chapter:
-            chapterActs.clear();
-            chapterIntervals.clear();
-            chapters.append(e);
-            e->setBreakTitle( QStringLiteral("CHAPTER ") + QString::number(chapters.size()+chapterOffset) );
+        case Screenplay::Episode:
+            episodeActs.clear();
+            episodeIntervals.clear();
+            episodes.append(e);
+            actOffset = 0;
+            e->setBreakTitle( QStringLiteral("EPISODE ") + QString::number(episodes.size()+episodeOffset) );
             break;
         case Screenplay::Act:
-            chapterActs.append(e);
-            e->setBreakTitle(chapterActs.size() > actNames.size() ?
-                             QStringLiteral("ACT ") + QString::number(chapterActs.size()+actOffset) :
-                             actNames.at(chapterActs.size()+actOffset-1));
+            episodeActs.append(e);
+            e->setBreakTitle(episodeActs.size() > actNames.size() ?
+                             QStringLiteral("ACT ") + QString::number(episodeActs.size()+actOffset) :
+                             actNames.at(episodeActs.size()+actOffset-1));
             break;
         case Screenplay::Interval:
-            chapterIntervals.append(e);
-            e->setBreakTitle(QStringLiteral("INTERVAL ") + QString::number(chapterIntervals.size()));
+            episodeIntervals.append(e);
+            e->setBreakTitle(QStringLiteral("INTERVAL ") + QString::number(episodeIntervals.size()));
             break;
         }
     }
@@ -1604,13 +1605,13 @@ void Screenplay::updateBreakTitles()
     this->evaluateSceneNumbers();
 }
 
-void Screenplay::setChapterCount(int val)
+void Screenplay::setEpisodeCount(int val)
 {
-    if(m_chapterCount == val)
+    if(m_episodeCount == val)
         return;
 
-    m_chapterCount = val;
-    emit chapterCountChanged();
+    m_episodeCount = val;
+    emit episodeCountChanged();
 }
 
 void Screenplay::setCurrentElementIndex(int val)
@@ -1964,11 +1965,11 @@ void Screenplay::evaluateSceneNumbers()
 
     int number = 1;
     int actIndex = 0;
-    int chapterIndex = 0;
+    int episodeIndex = 0;
     int elementIndex = 0;
     bool containsNonStandardScenes = false;
 
-    ScreenplayElement *lastChapterElement = nullptr;
+    ScreenplayElement *lastEpisodeElement = nullptr;
     ScreenplayElement *lastActElement = nullptr;
     ScreenplayElement *lastSceneElement = nullptr;
 
@@ -1993,8 +1994,8 @@ void Screenplay::evaluateSceneNumbers()
             Scene *scene = element->scene();
             scene->setAct(lastActElement ? lastActElement->breakTitle() : QStringLiteral("ACT 1"));
             scene->setActIndex(actIndex);
-            scene->setChapter(lastChapterElement ? lastChapterElement->breakTitle() : QStringLiteral("CHAPTER 1"));
-            scene->setChapterIndex(chapterIndex);
+            scene->setEpisode(lastEpisodeElement ? lastEpisodeElement->breakTitle() : QStringLiteral("EPISODE 1"));
+            scene->setEpisodeIndex(episodeIndex);
             indexListMap[scene].append(index);
         }
         else
@@ -2007,15 +2008,15 @@ void Screenplay::evaluateSceneNumbers()
                 lastActElement = element;
                 lastSceneElement = nullptr;
             }
-            else if(element->breakType() == Screenplay::Chapter)
+            else if(element->breakType() == Screenplay::Episode)
             {
                 if(lastSceneElement)
-                    ++chapterIndex;
+                    ++episodeIndex;
                 actIndex = 0;
 
                 lastActElement = nullptr;
                 lastSceneElement = nullptr;
-                lastChapterElement = element;
+                lastEpisodeElement = element;
             }
         }
 
@@ -2033,7 +2034,7 @@ void Screenplay::evaluateSceneNumbers()
         ++it;
     }
 
-    this->setChapterCount(chapterIndex+1);
+    this->setEpisodeCount(episodeIndex+1);
     this->setHasNonStandardScenes(containsNonStandardScenes);
 }
 

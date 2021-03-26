@@ -1043,19 +1043,19 @@ QString Application::camelCased(const QString &val) const
     for(int i=0; i<val2.length(); i++)
     {
         QCharRef ch = val2[i];
-        if(ch.isLetterOrNumber() && ch.script() != QChar::Script_Latin)
+        if(ch.isLetter() && ch.script() != QChar::Script_Latin)
             return val;
 
         if(capitalize)
         {
-            if(ch.isLetterOrNumber() && ch.script() == QChar::Script_Latin)
+            if(ch.isLetter() && ch.script() == QChar::Script_Latin)
             {
                 ch = ch.toUpper();
                 capitalize = false;
             }
         }
         else
-            capitalize = !ch.isLetterOrNumber();
+            capitalize = !ch.isLetter();
     }
 
     return val2;

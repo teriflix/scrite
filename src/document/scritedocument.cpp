@@ -298,6 +298,13 @@ Scene *ScriteDocument::createNewScene()
         }
     }
 
+    if(newScreenplayElementIndex > 0 && newScreenplayElementIndex == m_screenplay->elementCount()-1)
+    {
+        ScreenplayElement *prevElement = m_screenplay->elementAt(newScreenplayElementIndex-1);
+        if(prevElement->elementType() == ScreenplayElement::BreakElementType)
+            scene->setColor(defaultColor);
+    }
+
     emit newSceneCreated(scene, newScreenplayElementIndex);
 
     scene->setUndoRedoEnabled(true);

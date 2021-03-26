@@ -982,6 +982,7 @@ Item {
                     Text {
                         id: beatLabel
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " scene": " scenes") + "</font>"
+                        font.family: "Arial"
                         font.pointSize: app.idealFontPointSize + 3
                         anchors.bottom: parent.top
                         anchors.left: parent.left

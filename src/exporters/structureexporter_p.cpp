@@ -431,10 +431,11 @@ StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCar
     const QPainterPath path = evaluateConnectorPath(r1, r2, &labelPos);
     this->setPath(path);
 
-    const QFont normalFont = ::applicationFont();
+    QFont labelFont = ::applicationFont();
+    labelFont.setFamily(QStringLiteral("Arial"));
 
     QGraphicsSimpleTextItem *labelText = new QGraphicsSimpleTextItem(this);
-    labelText->setFont(normalFont);
+    labelText->setFont(labelFont);
     labelText->setText(label);
     labelText->setPos(labelPos - labelText->boundingRect().center());
     labelText->setZValue(1);
@@ -447,7 +448,7 @@ StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCar
     QGraphicsEllipseItem *labelBackground = new QGraphicsEllipseItem(this);
     labelBackground->setBrush(Qt::white);
     labelBackground->setPen(QPen(Qt::black));
-    labelBackground->setOpacity(0.75);
+    labelBackground->setOpacity(0.9);
     labelBackground->setRect(labelBgRect);
 }
 
@@ -479,7 +480,7 @@ StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const 
     QGraphicsRectItem *bgItem = new QGraphicsRectItem(this);
     bgItem->setRect( geometry.adjusted(1,1,-1,-1) );
     bgItem->setPen(Qt::NoPen);
-    bgItem->setBrush( Qt::gray );
+    bgItem->setBrush( Qt::gray);
     bgItem->setOpacity(0.1);
 
     const QFont normalFont = ::applicationFont();
@@ -488,10 +489,12 @@ StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const 
     const int sceneCount = data.value(QStringLiteral("sceneCount")).toInt();
 
     const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" scene"): QStringLiteral(" scenes")) + QStringLiteral("</font>");
+    QFont titleFont = normalFont;
+    titleFont.setFamily( QStringLiteral("Arial") );
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
     titleText->setDefaultTextColor(Qt::black);
-    titleText->setFont(normalFont);
+    titleText->setFont(titleFont);
     titleText->setHtml(title);
     titleText->setZValue(1);
 
