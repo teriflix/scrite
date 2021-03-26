@@ -1395,30 +1395,8 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
 
     ScreenplayElement *previousSceneElement = screenplay->elementAt(previousElementIndex);
     Scene *previousScene = previousSceneElement->scene();
+    currentScene->mergeInto(previousScene);
 
-    SceneElement *newElement = new SceneElement(previousScene);
-    newElement->setType(SceneElement::Action);
-    newElement->setText(QStringLiteral("--"));
-    previousScene->addElement(newElement);
-
-    int length = 0;
-    for(int i=0; i<previousScene->elementCount(); i++)
-        length += previousScene->elementAt(i)->text().length();
-    length += previousScene->elementCount();
-
-    while(currentScene->elementCount())
-    {
-        SceneElement *element = currentScene->elementAt(0);
-
-        newElement = new SceneElement(previousScene);
-        newElement->setType(element->type());
-        newElement->setText(element->text());
-        previousScene->addElement(newElement);
-
-        currentScene->removeElement(element);
-    }
-
-    previousScene->setCursorPosition(length);
     screenplay->setCurrentElementIndex(previousElementIndex);
     GarbageCollector::instance()->add(element);
     return previousSceneElement;

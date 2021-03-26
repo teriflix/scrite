@@ -233,8 +233,8 @@ Item {
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: scriteDocument.loading ? null : screenplayAdapter.screenplay
-        formatting: scriteDocument.loading ? null : scriteDocument.printFormat
+        screenplay: scriteDocument.loading && enabled ? null : screenplayAdapter.screenplay
+        formatting: scriteDocument.loading && enabled ? null : scriteDocument.printFormat
         syncEnabled: true
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
     }

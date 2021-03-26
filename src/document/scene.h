@@ -346,6 +346,7 @@ public:
     Q_INVOKABLE void endUndoCapture();
 
     Scene *splitScene(SceneElement *element, int textPosition, QObject *parent=nullptr);
+    bool mergeInto(Scene *another);
 
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };

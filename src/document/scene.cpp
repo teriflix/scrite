@@ -1261,6 +1261,40 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     return newScene;
 }
 
+bool Scene::mergeInto(Scene *otherScene)
+{
+    emit otherScene->sceneAboutToReset();
+    emit sceneAboutToReset();
+
+    Scene *thisScene = this;
+    SceneElement *newElement = new SceneElement(otherScene);
+    newElement->setType(SceneElement::Action);
+    newElement->setText(QStringLiteral("--"));
+    otherScene->addElement(newElement);
+
+    int length = 0;
+    for(int i=0; i<otherScene->elementCount(); i++)
+        length += otherScene->elementAt(i)->text().length();
+    length += otherScene->elementCount();
+
+    while(thisScene->elementCount())
+    {
+        SceneElement *element = thisScene->elementAt(0);
+
+        newElement = new SceneElement(otherScene);
+        newElement->setType(element->type());
+        newElement->setText(element->text());
+        otherScene->addElement(newElement);
+
+        thisScene->removeElement(element);
+    }
+
+    otherScene->setCursorPosition(length);
+
+    emit sceneReset(0);
+    emit otherScene->sceneReset(length);
+}
+
 int Scene::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_elements.size();

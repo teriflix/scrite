@@ -1674,13 +1674,17 @@ Rectangle {
             function mergeWithPreviousScene() {
                 if(!contentItem.canJoinToPreviousScene)
                     return
+                screenplayTextDocument.syncEnabled = false
                 screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
+                screenplayTextDocument.syncEnabled = true
             }
 
             function splitScene() {
                 if(!contentItem.canSplitScene)
                     return
+                screenplayTextDocument.syncEnabled = false
                 screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                screenplayTextDocument.syncEnabled = true
             }
 
             function assumeFocus() {
