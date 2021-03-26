@@ -2012,7 +2012,11 @@ void Screenplay::evaluateSceneNumbers()
         ++it;
     }
 
-    this->setEpisodeCount(episodeIndex+1);
+    if(lastEpisodeElement)
+        this->setEpisodeCount(episodeIndex+1);
+    else
+        this->setEpisodeCount(0);
+
     this->setHasNonStandardScenes(containsNonStandardScenes);
 }
 

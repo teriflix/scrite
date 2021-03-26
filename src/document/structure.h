@@ -697,7 +697,7 @@ public:
 
     Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay) const;
     Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay) const;
-    Q_INVOKABLE QJsonArray evaluateBeats(Screenplay *screenplay, const QString &category) const;
+    Q_INVOKABLE QJsonObject evaluateEpisodeAndGroupBoxes(Screenplay *screenplay, const QString &category) const;
 
     Q_INVOKABLE void scanForMuteCharacters();
 
@@ -801,7 +801,7 @@ private:
     friend class Screenplay;
     friend class ScriteDocument;
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
-    QList< QPair<QString, QList<StructureElement *> > > evaluateBeatsImpl(Screenplay *screenplay, const QString &category=QString()) const;
+    QList< QPair<QString, QList<StructureElement *> > > evaluateGroupsImpl(Screenplay *screenplay, const QString &category=QString()) const;
 
 private:
     qreal m_canvasWidth = 120000;

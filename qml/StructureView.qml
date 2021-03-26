@@ -209,8 +209,8 @@ Item {
 
                     MenuItem2 {
                         text: "Acts"
-                        font.bold: canvas.beatCategory === ""
-                        onTriggered: canvas.beatCategory = ""
+                        font.bold: canvas.groupCategory === ""
+                        onTriggered: canvas.groupCategory = ""
                     }
 
                     MenuSeparator { }
@@ -220,8 +220,8 @@ Item {
 
                         MenuItem2 {
                             text: app.camelCased(modelData)
-                            font.bold: canvas.beatCategory === modelData
-                            onTriggered: canvas.beatCategory = modelData
+                            font.bold: canvas.groupCategory === modelData
+                            onTriggered: canvas.groupCategory = modelData
                         }
                     }
                 }
@@ -825,21 +825,23 @@ Item {
                 }
             }
 
-            property string beatCategory: scriteDocument.structure.preferredGroupCategory
-            property var beats: []
-            property bool beatsBeingMoved: false
-            Component.onCompleted: app.execLater(canvas, 250, reevaluateBeats)
+            property string groupCategory: scriteDocument.structure.preferredGroupCategory
+            property var groupBoxes: []
+            property var episodeBoxes: []
+            property bool groupsBeingMoved: false
+            Component.onCompleted: app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
 
-            function reevaluateBeats() {
-                if(beatsBeingMoved)
+            function reevaluateEpisodeAndGroupBoxes() {
+                if(groupsBeingMoved)
                     return
-                var beats = scriteDocument.structure.evaluateBeats(scriteDocument.screenplay, canvas.beatCategory)
-                canvas.beats = beats
+                var egBoxes = scriteDocument.structure.evaluateEpisodeAndGroupBoxes(scriteDocument.screenplay, canvas.groupCategory)
+                canvas.groupBoxes = egBoxes.groupBoxes
+                canvas.episodeBoxes = egBoxes.episodeBoxes
             }
 
-            onBeatCategoryChanged: {
-                scriteDocument.structure.preferredGroupCategory = beatCategory
-                app.execLater(canvas, 250, reevaluateBeats)
+            onGroupCategoryChanged: {
+                scriteDocument.structure.preferredGroupCategory = groupCategory
+                app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
             }
 
             TrackerPack {
@@ -875,14 +877,65 @@ Item {
                     signal: "elementSceneGroupsChanged(ScreenplayElement*)"
                 }
 
-                onTracked: canvas.reevaluateBeats()
+                TrackSignal {
+                    target: scriteDocument.screenplay
+                    signal: "episodeCountChanged()"
+                }
+
+                onTracked: canvas.reevaluateEpisodeAndGroupBoxes()
             }
 
             Repeater {
-                model: canvas.beats
+                model: canvas.episodeBoxes
 
                 Rectangle {
-                    id: canvasBeatItem
+                    id: canvasEpisodeBox
+
+                    x: modelData.geometry.x - 40
+                    y: modelData.geometry.y - 160
+                    width: modelData.geometry.width + 80
+                    height: modelData.geometry.height + 200
+                    color: app.translucent(accentColors.windowColor, 0.1)
+                    border.width: 2
+                    border.color: accentColors.c600.background
+
+                    BoundingBoxItem.evaluator: canvasItemsBoundingBox
+                    BoundingBoxItem.stackOrder: 1.0 + (index/canvas.episodeBoxes.length)
+                    BoundingBoxItem.livePreview: false
+                    BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.viewportItem: canvas
+                    BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
+                    BoundingBoxItem.viewportRect: canvasScroll.viewportRect
+
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: episodeNameText.bottom
+                        anchors.bottomMargin: -8
+                        color: accentColors.c600.background
+                    }
+
+                    Text {
+                        id: episodeNameText
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.margins: 8
+                        font.family: "Arial"
+                        font.pointSize: app.idealFontPointSize + 8
+                        font.bold: true
+                        color: accentColors.c600.text
+                        text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " scene": " scenes") + "</font>"
+                    }
+                }
+            }
+
+            Repeater {
+                model: canvas.groupBoxes
+
+                Rectangle {
+                    id: canvasGroupBoxItem
                     property real topMarginForStacks: scriteDocument.structure.elementStacks.objectCount > 0 ? 15 : 0
                     x: modelData.geometry.x - 20
                     y: modelData.geometry.y - 20 - topMarginForStacks
@@ -894,7 +947,7 @@ Item {
                     border.color: accentColors.borderColor
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
-                    BoundingBoxItem.stackOrder: 2.0 + (index/canvas.beats.length)
+                    BoundingBoxItem.stackOrder: 2.0 + (index/canvas.groupBoxes.length)
                     BoundingBoxItem.livePreview: false
                     BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
                     BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
@@ -935,7 +988,7 @@ Item {
                     MouseArea {
                         id: canvasBeatMouseArea
                         anchors.fill: parent
-                        drag.target: controlPressed ? null : canvasBeatItem
+                        drag.target: controlPressed ? null : canvasGroupBoxItem
                         drag.axis: Drag.XAndYAxis
                         cursorShape: Qt.SizeAllCursor
                         property bool controlPressed: false
@@ -949,11 +1002,11 @@ Item {
 
                         drag.onActiveChanged: {
                             selection.clear()
-                            canvasBeatItem.refX = canvasBeatItem.x
-                            canvasBeatItem.refY = canvasBeatItem.y
-                            canvas.beatsBeingMoved = drag.active
+                            canvasGroupBoxItem.refX = canvasGroupBoxItem.x
+                            canvasGroupBoxItem.refY = canvasGroupBoxItem.y
+                            canvas.groupsBeingMoved = drag.active
                         }
-                        onDoubleClicked: canvasBeatItem.selectBeatItems()
+                        onDoubleClicked: canvasGroupBoxItem.selectBeatItems()
                     }
 
                     Rectangle {
@@ -966,16 +1019,16 @@ Item {
                         MouseArea {
                             id: canvasBeatLabelMouseArea
                             anchors.fill: parent
-                            drag.target: canvasBeatItem
+                            drag.target: canvasGroupBoxItem
                             drag.axis: Drag.XAndYAxis
                             cursorShape: Qt.SizeAllCursor
                             drag.onActiveChanged: {
                                 selection.clear()
-                                canvasBeatItem.refX = canvasBeatItem.x
-                                canvasBeatItem.refY = canvasBeatItem.y
-                                canvas.beatsBeingMoved = drag.active
+                                canvasGroupBoxItem.refX = canvasGroupBoxItem.x
+                                canvasGroupBoxItem.refY = canvasGroupBoxItem.y
+                                canvas.groupsBeingMoved = drag.active
                             }
-                            onDoubleClicked: canvasBeatItem.selectBeatItems()
+                            onDoubleClicked: canvasGroupBoxItem.selectBeatItems()
                         }
                     }
 

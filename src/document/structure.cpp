@@ -2716,7 +2716,7 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
         return;
     }
 
-    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
+    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateGroupsImpl(screenplay);
     for(const QPair<QString, QList<StructureElement*> > &beat : beats)
     {
         const int index = beat.second.indexOf(element);
@@ -2757,7 +2757,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
     if(screenplay == nullptr)
         return newBoundingRect;
 
-    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay);
+    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateGroupsImpl(screenplay);
 
     const qreal x = 5000;
     const qreal y = 5000;
@@ -2766,12 +2766,20 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
 
     QMap<QString, QPointF> stackPositions;
 
+    int episodeIndex = 0;
     QRectF elementRect(x, y, 0, 0);
 
     for(const QPair<QString, QList<StructureElement*>> &beat : beats)
     {
         if(beat.second.isEmpty())
             continue;
+
+        const int beatEpisodeIndex = beat.second.first()->scene()->episodeIndex();
+        if(episodeIndex != beatEpisodeIndex)
+        {
+            elementRect.moveTop( elementRect.top() + ySpacing );
+            episodeIndex = beatEpisodeIndex;
+        }
 
         QString lastStackId;
         QRectF beatRect;
@@ -2800,44 +2808,86 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
     return newBoundingRect;
 }
 
-QJsonArray Structure::evaluateBeats(Screenplay *screenplay, const QString &category) const
+QJsonObject Structure::evaluateEpisodeAndGroupBoxes(Screenplay *screenplay, const QString &category) const
 {
-    QJsonArray ret;
-    const QList< QPair<QString, QList<StructureElement *> > > beats = this->evaluateBeatsImpl(screenplay, category);
+    const QList< QPair<QString, QList<StructureElement *> > > groups = this->evaluateGroupsImpl(screenplay, category);
 
-    for(const QPair<QString, QList<StructureElement*>> &beat : beats)
+    QJsonObject ret;
+    QJsonArray groupBoxes;
+
+    for(const QPair<QString, QList<StructureElement*>> &group : groups)
     {
-        if(beat.second.isEmpty())
+        if(group.second.isEmpty())
             continue;
 
         QJsonArray sceneIndexes;
 
-        QRectF beatBox;
-        for(StructureElement *element : qAsConst(beat.second))
+        QRectF groupBox;
+        for(StructureElement *element : qAsConst(group.second))
         {
-            beatBox |= QRectF(element->x(), element->y(), element->width(), element->height());
+            groupBox |= QRectF(element->x(), element->y(), element->width(), element->height());
             sceneIndexes.append( this->indexOfElement(element) );
         }
 
-        QJsonObject beatJson;
-        beatJson.insert("name", beat.first);
-        beatJson.insert("sceneIndexes", sceneIndexes);
-        beatJson.insert("sceneCount", sceneIndexes.size());
+        QJsonObject groupJson;
+        groupJson.insert(QStringLiteral("name"), group.first);
+        groupJson.insert(QStringLiteral("sceneIndexes"), sceneIndexes);
+        groupJson.insert(QStringLiteral("sceneCount"), sceneIndexes.size());
 
-        QJsonObject beatGeo;
-        beatGeo.insert("x", beatBox.x());
-        beatGeo.insert("y", beatBox.y());
-        beatGeo.insert("width", beatBox.width());
-        beatGeo.insert("height", beatBox.height());
-        beatJson.insert("geometry", beatGeo);
+        QJsonObject geometryJson;
+        geometryJson.insert(QStringLiteral("x"), groupBox.x());
+        geometryJson.insert(QStringLiteral("y"), groupBox.y());
+        geometryJson.insert(QStringLiteral("width"), groupBox.width());
+        geometryJson.insert(QStringLiteral("height"), groupBox.height());
+        groupJson.insert(QStringLiteral("geometry"), geometryJson);
 
-        ret.append(beatJson);
+        groupBoxes.append(groupJson);
     }
+
+    QJsonArray episodeBoxes;
+    if(screenplay->episodeCount() > 0)
+    {
+        QMap<QString, QPair<int,QRectF> > episodeElementsMap;
+        for(StructureElement *element : m_elements.list())
+        {
+            const QString episodeName = element->scene()->episode();
+            if(episodeName.isEmpty())
+                continue;
+
+            episodeElementsMap[episodeName].first++;
+            episodeElementsMap[episodeName].second |= QRectF(element->x(), element->y(), element->width(), element->height());
+        }
+
+        QMap<QString, QPair<int,QRectF> >::const_iterator it = episodeElementsMap.constBegin();
+        QMap<QString, QPair<int,QRectF> >::const_iterator end = episodeElementsMap.constEnd();
+        while(it != end)
+        {
+            QJsonObject episodeJson;
+            episodeJson.insert(QStringLiteral("name"), it.key());
+            episodeJson.insert(QStringLiteral("sceneCount"), it.value().first);
+
+            const QRectF episodeBox = it.value().second;
+
+            QJsonObject geometryJson;
+            geometryJson.insert(QStringLiteral("x"), episodeBox.x());
+            geometryJson.insert(QStringLiteral("y"), episodeBox.y());
+            geometryJson.insert(QStringLiteral("width"), episodeBox.width());
+            geometryJson.insert(QStringLiteral("height"), episodeBox.height());
+            episodeJson.insert(QStringLiteral("geometry"), geometryJson);
+
+            episodeBoxes.append(episodeJson);
+
+            ++it;
+        }
+    }
+
+    ret.insert( QStringLiteral("groupBoxes"), groupBoxes );
+    ret.insert( QStringLiteral("episodeBoxes"), episodeBoxes );
 
     return ret;
 }
 
-QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateBeatsImpl(Screenplay *screenplay, const QString &category) const
+QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) const
 {
     QList< QPair<QString, QList<StructureElement *> > > ret;
     if(screenplay == nullptr)

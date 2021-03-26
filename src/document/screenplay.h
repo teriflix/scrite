@@ -381,7 +381,7 @@ private:
     int m_currentElementIndex = -1;
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
-    int m_episodeCount = 1;
+    int m_episodeCount = 0;
 
     ExecLaterTimer m_sceneNumberEvaluationTimer;
 };

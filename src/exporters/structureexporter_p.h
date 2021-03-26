@@ -45,6 +45,13 @@ public:
     ~StructureIndexCardConnector();
 };
 
+class StructureEpisodeBox : public QGraphicsRectItem
+{
+public:
+    StructureEpisodeBox(const QJsonObject &data, const Structure *structure);
+    ~StructureEpisodeBox();
+};
+
 class StructureIndexCardGroup : public QGraphicsRectItem
 {
 public:

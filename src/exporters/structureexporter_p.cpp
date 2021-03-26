@@ -72,13 +72,26 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
         }
     }
 
-    // Add all groups
-    const QJsonArray beats = structure->evaluateBeats(document->screenplay(), structure->preferredGroupCategory());
-    for(int i=0; i<beats.size(); i++)
-    {
-        const QJsonObject beat = beats.at(i).toObject();
+    const QJsonObject boxes = structure->evaluateEpisodeAndGroupBoxes(document->screenplay(), structure->preferredGroupCategory());
 
-        StructureIndexCardGroup *group = new StructureIndexCardGroup(beat, structure);
+    // Add all chapters
+    const QJsonArray episodeBoxes = boxes.value(QStringLiteral("episodeBoxes")).toArray();
+    for(int i=0; i<episodeBoxes.size(); i++)
+    {
+        const QJsonObject episodeBox = episodeBoxes.at(i).toObject();
+
+        StructureEpisodeBox *episode = new StructureEpisodeBox(episodeBox, structure);
+        episode->setZValue(4);
+        this->addItem(episode);
+    }
+
+    // Add all groups
+    const QJsonArray groupBoxes = boxes.value(QStringLiteral("groupBoxes")).toArray();
+    for(int i=0; i<groupBoxes.size(); i++)
+    {
+        const QJsonObject groupBox = groupBoxes.at(i).toObject();
+
+        StructureIndexCardGroup *group = new StructureIndexCardGroup(groupBox, structure);
         group->setZValue(5);
         this->addItem(group);
     }
@@ -136,7 +149,19 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
         this->addItem(titleCard);
     }
 
-    const QRectF contentsRect = this->itemsBoundingRect();
+    QRectF contentsRect = this->itemsBoundingRect();
+
+    QGraphicsSimpleTextItem *appInfo = new QGraphicsSimpleTextItem;
+    appInfo->setFont( ::applicationFont() );
+    appInfo->setText( QStringLiteral("Created using Scrite (www.scrite.io)") );
+
+    QRectF appInfoRect = appInfo->boundingRect();
+    appInfoRect.moveCenter(contentsRect.center());
+    appInfoRect.moveTop(contentsRect.bottom() + 50);
+    appInfo->setPos(appInfoRect.topLeft());
+    this->addItem(appInfo);
+
+    contentsRect = this->itemsBoundingRect();
 
     QMap<HeaderFooter::Field,QString> fields;
     if(exporter->isEnableHeaderFooter())
@@ -453,6 +478,59 @@ StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCar
 }
 
 StructureIndexCardConnector::~StructureIndexCardConnector()
+{
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structure *structure)
+{
+    Q_UNUSED(structure)
+
+    const QJsonObject geometryJson = data.value( QStringLiteral("geometry") ).toObject();
+          QRectF geometry( 0, 0,
+                           geometryJson.value( QStringLiteral("width") ).toDouble(),
+                           geometryJson.value( QStringLiteral("height") ).toDouble() );
+
+    geometry.adjust(-40, -160, 40, 40);
+
+    this->setRect(geometry);
+    this->setBrush(Qt::NoBrush);
+    this->setPen( QPen(Qt::black,2) );
+    this->setPos( QPointF(geometryJson.value( QStringLiteral("x") ).toDouble(),
+                          geometryJson.value( QStringLiteral("y") ).toDouble()) );
+
+    QGraphicsRectItem *bgItem = new QGraphicsRectItem(this);
+    bgItem->setRect( geometry.adjusted(1,1,-1,-1) );
+    bgItem->setPen(Qt::NoPen);
+    bgItem->setBrush( Qt::gray);
+    bgItem->setOpacity(0.1);
+
+    const QFont normalFont = ::applicationFont();
+
+    const QString name = data.value(QStringLiteral("name")).toString();
+    const int sceneCount = data.value(QStringLiteral("sceneCount")).toInt();
+
+    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" scene"): QStringLiteral(" scenes")) + QStringLiteral("</font>");
+    QFont titleFont = normalFont;
+    titleFont.setFamily( QStringLiteral("Arial") );
+    titleFont.setPointSize( titleFont.pointSize()+8 );
+
+    QGraphicsTextItem *titleItem = new QGraphicsTextItem(this);
+    titleItem->setDefaultTextColor(Qt::white);
+    titleItem->setFont(titleFont);
+    titleItem->setHtml(title);
+    titleItem->setPos(geometry.topLeft() + QPointF(8,8));
+
+    QGraphicsRectItem *titleBar = new QGraphicsRectItem(this);
+    titleBar->setZValue(-1);
+    titleBar->setRect( QRectF(geometry.x(), geometry.y(), geometry.width(), titleItem->boundingRect().height() + 18).adjusted(1,1,-1,0) );
+    titleBar->setBrush(Qt::black);
+    titleBar->setPen(Qt::NoPen);
+}
+
+StructureEpisodeBox::~StructureEpisodeBox()
 {
 
 }
@@ -967,6 +1045,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         Cover Photo
         Title
         Subtitle
+        Based On
         Written By
         Studio Details & Address
 
@@ -1017,6 +1096,18 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         subtitleItem->setFont(subtitleFont);
         subtitleItem->setTextWidth(maxCoverPhotoSize.width());
         centerTextInDocument(subtitleItem->document());
+    }
+
+    if(!screenplay->basedOn().isEmpty())
+    {
+        QGraphicsTextItem *basedOnItem = new QGraphicsTextItem(this);
+        basedOnItem->setPlainText(screenplay->basedOn());
+
+        QFont basedOnFont = ::applicationFont();
+        basedOnFont.setPointSize(basedOnFont.pointSize()+5);
+        basedOnItem->setFont(basedOnFont);
+        basedOnItem->setTextWidth(maxCoverPhotoSize.width());
+        centerTextInDocument(basedOnItem->document());
     }
 
     if(!screenplay->author().isEmpty())
@@ -1219,3 +1310,4 @@ void StructureWatermark::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     m_watermark->paint(painter, m_rect, 1, 1);
 }
+
