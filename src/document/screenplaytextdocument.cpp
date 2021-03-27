@@ -793,9 +793,29 @@ void ScreenplayTextDocument::loadScreenplay()
     if(injection != nullptr)
         injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterTitlePage);
 
+    const bool hasEpisdoes = m_screenplay->episodeCount() > 0;
+
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
+
+        if(!m_printEachSceneOnANewPage)
+        {
+            if(hasEpisdoes && element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode)
+            {
+                QTextBlockFormat episodeBlockFormat;
+                if(i > 0)
+                    episodeBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysBefore);
+                cursor.setBlockFormat(episodeBlockFormat);
+
+                QTextCharFormat episodeCharFormat;
+                episodeCharFormat.setFontPointSize(15);
+                cursor.setCharFormat(episodeCharFormat);
+
+                cursor.insertText(element->breakTitle());
+            }
+        }
+
         if(element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
