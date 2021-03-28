@@ -810,6 +810,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
                 QTextCharFormat episodeCharFormat;
                 episodeCharFormat.setFontPointSize(15);
+                episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
                 cursor.insertText(element->breakTitle());

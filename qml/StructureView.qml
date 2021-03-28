@@ -1999,7 +1999,10 @@ Item {
                 onTracked: elementItem.determineElementStack()
             }
 
-            Component.onCompleted: element.follow = elementItem
+            Component.onCompleted: {
+                element.follow = elementItem
+                elementItem.determineElementStack()
+            }
 
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
             BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)

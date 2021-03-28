@@ -187,6 +187,7 @@ public:
     Q_INVOKABLE void bringElementToTop(int index);
 
 protected:
+    void timerEvent(QTimerEvent *te);
     void itemInsertEvent(StructureElement *ptr);
     void itemRemoveEvent(StructureElement *ptr);
 
@@ -196,6 +197,7 @@ private:
     void setGeometry(const QRectF &val);
 
     void initialize();
+    void onElementFollowSet();
     void onStackLeaderChanged();
     void onElementGroupChanged();
     void onElementGeometryChanged();
@@ -208,6 +210,7 @@ private:
     int m_actIndex = -1;
     bool m_enabled = false;
     bool m_hasCurrentElement = false;
+    ExecLaterTimer m_initializeTimer;
     StructureElement* m_topmostElement = nullptr;
 };
 

@@ -372,6 +372,17 @@ void StructureElementStack::bringElementToTop(int index)
     structure->setCurrentElementIndex(elementIndex);
 }
 
+void StructureElementStack::timerEvent(QTimerEvent *te)
+{
+    if(te->timerId() == m_initializeTimer.timerId())
+    {
+        m_initializeTimer.stop();
+        this->initialize();
+    }
+    else
+        ObjectListPropertyModel<StructureElement *>::timerEvent(te);
+}
+
 void StructureElementStack::itemInsertEvent(StructureElement *ptr)
 {
     if(this->list().size() == 1)
@@ -386,6 +397,7 @@ void StructureElementStack::itemInsertEvent(StructureElement *ptr)
     connect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     connect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     connect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
+    connect(ptr, &StructureElement::followChanged, this, &StructureElementStack::onElementFollowSet);
 
     Scene *scene = ptr->scene();
     if(scene != nullptr)
@@ -403,6 +415,7 @@ void StructureElementStack::itemRemoveEvent(StructureElement *ptr)
     disconnect(ptr, &StructureElement::aboutToDelete, this, &StructureElementStack::objectDestroyed);
     disconnect(ptr, &StructureElement::stackLeaderChanged, this, &StructureElementStack::onStackLeaderChanged);
     disconnect(ptr, &StructureElement::geometryChanged, this, &StructureElementStack::onElementGeometryChanged);
+    disconnect(ptr, &StructureElement::followChanged, this, &StructureElementStack::onElementFollowSet);
 
     Scene *scene = ptr->scene();
     if(scene != nullptr)
@@ -457,7 +470,7 @@ void StructureElementStack::initialize()
     else
         screenplay = ScriteDocument::instance()->screenplay();
 
-    qreal x=0, y=0, w=0, h=0;
+    qreal x=0, y=0, w=350, h=375;
 
     for(int i=list.size()-1; i>=0; i--)
     {
@@ -480,8 +493,8 @@ void StructureElementStack::initialize()
         {
             x = element->x();
             y = element->y();
-            w = element->width();
-            h = element->height();
+            w = qMax(w, element->width());
+            h = qMax(h, element->height());
         }
 
         if(element->isStackLeader())
@@ -551,6 +564,11 @@ void StructureElementStack::initialize()
     }
 
     this->onStructureCurrentElementChanged();
+}
+
+void StructureElementStack::onElementFollowSet()
+{
+    m_initializeTimer.start(0, this);
 }
 
 void StructureElementStack::onStackLeaderChanged()
