@@ -493,7 +493,10 @@ StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structur
                            geometryJson.value( QStringLiteral("width") ).toDouble(),
                            geometryJson.value( QStringLiteral("height") ).toDouble() );
 
-    geometry.adjust(-40, -160, 40, 40);
+    geometry.adjust(-40, -140, 40, 40);
+
+    if(structure != nullptr && structure->elementStacks()->objectCount() > 0)
+        geometry.adjust(0, -15, 0, 0);
 
     this->setRect(geometry);
     this->setBrush(Qt::NoBrush);
@@ -518,7 +521,7 @@ StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structur
     titleFont.setPointSize( titleFont.pointSize()+8 );
 
     QGraphicsTextItem *titleItem = new QGraphicsTextItem(this);
-    titleItem->setDefaultTextColor(Qt::white);
+    titleItem->setDefaultTextColor(Qt::black);
     titleItem->setFont(titleFont);
     titleItem->setHtml(title);
     titleItem->setPos(geometry.topLeft() + QPointF(8,8));
@@ -526,8 +529,9 @@ StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structur
     QGraphicsRectItem *titleBar = new QGraphicsRectItem(this);
     titleBar->setZValue(-1);
     titleBar->setRect( QRectF(geometry.x(), geometry.y(), geometry.width(), titleItem->boundingRect().height() + 18).adjusted(1,1,-1,0) );
-    titleBar->setBrush(Qt::black);
+    titleBar->setBrush(QColor("#546E7A"));
     titleBar->setPen(Qt::NoPen);
+    titleBar->setOpacity(0.3);
 }
 
 StructureEpisodeBox::~StructureEpisodeBox()

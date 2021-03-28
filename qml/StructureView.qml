@@ -891,10 +891,12 @@ Item {
                 Rectangle {
                     id: canvasEpisodeBox
 
+                    property real topMarginForStacks: scriteDocument.structure.elementStacks.objectCount > 0 ? 15 : 0
+
                     x: modelData.geometry.x - 40
-                    y: modelData.geometry.y - 160
+                    y: modelData.geometry.y - 120 - topMarginForStacks
                     width: modelData.geometry.width + 80
-                    height: modelData.geometry.height + 200
+                    height: modelData.geometry.height + 120 + 2*topMarginForStacks + 40
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 2
                     border.color: accentColors.c600.background

@@ -2679,7 +2679,7 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
     const qreal x = 5000;
     const qreal y = 5000;
     const qreal xSpacing = 100;
-    const qreal ySpacing = 150;
+    const qreal ySpacing = 250;
     const qreal elementWidthHint = 350;
     const qreal elementHeightHint = 375;
 
