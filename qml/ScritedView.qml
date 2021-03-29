@@ -175,11 +175,23 @@ Item {
         Material.background: Qt.darker(primaryColors.button.background, 1.1)
 
         Item {
+            id: playerArea
             SplitView.preferredWidth: scritedView.width * scritedSettings.playerAreaRatio
             onWidthChanged: updateScritedSettings()
 
             function updateScritedSettings() {
                 scritedSettings.playerAreaRatio = width / scritedView.width
+            }
+
+            property bool keyFrameGrabMode: false
+            function grabKeyFrame() {
+                keyFrameGrabMode = true
+                app.execLater(playerArea, 250, function() {
+                    playerArea.grabToImage( function(result) {
+                        keyFrameImage.source = result.url
+                        playerArea.keyFrameGrabMode = false
+                    })
+                })
             }
 
             Column {
@@ -343,7 +355,7 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
                         color: Qt.rgba(0,0,0,0.25)
-                        visible: !mediaPlayer.keepScreenplayInSyncWithPosition
+                        visible: !mediaPlayer.keepScreenplayInSyncWithPosition && !playerArea.keyFrameGrabMode
 
                         MouseArea {
                             anchors.fill: mediaPlayerControlsLayout
@@ -584,7 +596,7 @@ Item {
                                 verticalPadding: textDocumentFlickPadding.height * documentScale
 
                                 Rectangle {
-                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneStartPosition > 0
+                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneStartPosition > 0 && !playerArea.keyFrameGrabMode
                                     width: parent.width
                                     height: 2
                                     color: "green"
@@ -593,7 +605,7 @@ Item {
                                 }
 
                                 Rectangle {
-                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneEndPosition > 0
+                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneEndPosition > 0 && !playerArea.keyFrameGrabMode
                                     width: parent.width
                                     height: 2
                                     color: "red"
@@ -606,7 +618,7 @@ Item {
                                     width: parent.width
                                     height: 2
                                     color: primaryColors.c500.background
-                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded
+                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && !playerArea.keyFrameGrabMode
                                     x: 0
                                     Behavior on y {
                                         enabled: mediaIsLoaded && mediaIsPlaying
@@ -700,6 +712,14 @@ Item {
                 }
 
                 PauseAnimation {
+                    duration: 250
+                }
+
+                ScriptAction {
+                    script: keyFrameImage.visible = false
+                }
+
+                PauseAnimation {
                     duration: 1500
                 }
 
@@ -738,6 +758,12 @@ Item {
                 color: "black"
                 anchors.fill: parent
                 visible: false
+
+                onVisibleChanged: {
+                    if(!visible)
+                        keyFrameImage.source = ""
+                    keyFrameImage.visible = true
+                }
 
                 Column {
                     id: startingFrameOverlayContent
@@ -808,6 +834,11 @@ Item {
                         smooth: true
                         fillMode: Image.PreserveAspectFit
                     }
+                }
+
+                Image {
+                    id: keyFrameImage
+                    anchors.fill: parent
                 }
             }
 
@@ -1192,7 +1223,7 @@ Item {
             videoArea.height = videoArea.width / 16 * 9
             break
         case Qt.Key_Space:
-            if(mediaIsLoaded && mediaIsPaused && mediaPlayer.hasScenePositions)
+            if(mediaIsLoaded && mediaIsPaused && mediaPlayer.hasScenePositions && mediaPlayer.keepScreenplayInSyncWithPosition)
                 startingFrameAnimation.start()
             else
                 mediaPlayer.togglePlayback()
@@ -1258,6 +1289,13 @@ Item {
                 if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
                     return
                 mediaPlayer.sceneEndPosition = mediaPlayer.position
+            }
+            break
+        case Qt.Key_K: // Key frame
+            if(mediaIsLoaded) {
+                if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
+                    return
+                playerArea.grabKeyFrame()
             }
             break
         case Qt.Key_A:

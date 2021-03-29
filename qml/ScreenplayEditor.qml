@@ -1015,6 +1015,7 @@ Rectangle {
                     palette: app.palette
                     selectByMouse: true
                     selectByKeyboard: true
+                    // renderType: TextArea.NativeRendering
                     property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
                     property Scene scene: contentItem.theScene
                     readOnly: scriteDocument.readOnly

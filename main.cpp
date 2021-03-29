@@ -368,6 +368,7 @@ int main(int argc, char **argv)
 
     qmlView.rootContext()->setContextProperty(QStringLiteral("fileNameToOpen"), fileNameToOpen);
     qmlView.setResizeMode(QQuickView::SizeRootObjectToView);
+    // qmlView.setTextRenderType(QQuickView::NativeTextRendering);
     Automation::init(&qmlView);
     qmlView.setSource(QUrl("qrc:/main.qml"));
     qmlView.setMinimumSize(QSize(qMin(600,primaryScreenSize.width()), qMin(375,primaryScreenSize.height())));
