@@ -4068,6 +4068,7 @@ StructureElementConnector::StructureElementConnector(QQuickItem *parent)
     this->setOutlineWidth(4);
 
     connect(this, &AbstractShapeItem::contentRectChanged, this, &StructureElementConnector::updateArrowAndLabelPositions);
+    connect(this, &AbstractShapeItem::contentRectChanged, this, &StructureElementConnector::canBeVisibleChanged);
     connect(this, &StructureElementConnector::fromElementChanged, this, &StructureElementConnector::canBeVisibleChanged);
     connect(this, &StructureElementConnector::toElementChanged, this, &StructureElementConnector::canBeVisibleChanged);
 }
