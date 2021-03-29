@@ -2407,6 +2407,12 @@ void Structure::removeElement(StructureElement *ptr)
 
     this->resetCurentElementIndex();
 
+    if(m_forceBeatBoardLayout)
+    {
+        Screenplay *screenplay = m_scriteDocument ? m_scriteDocument->screenplay() : ScriteDocument::instance()->screenplay();
+        this->placeElementsInBeatBoardLayout(screenplay);
+    }
+
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
 }
