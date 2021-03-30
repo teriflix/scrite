@@ -528,19 +528,32 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     return ret;
 }
 
-qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *element) const
+qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *from, ScreenplayElement *to) const
 {
-    QTextFrame *frame = this->findTextFrame(element);
-    if(frame == nullptr)
+    if(from == nullptr)
         return 0;
 
-    QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
-    return layout->frameBoundingRect(frame).height();
+    const int fromIndex = from->elementIndex();
+    const int toIndex   = to ? to->elementIndex() : fromIndex;
+
+    qreal ret = 0;
+    for(int i=fromIndex; i<=toIndex; i++)
+    {
+        ScreenplayElement *element = m_screenplay->elementAt(i);
+        QTextFrame *frame = this->findTextFrame(element);
+        if(frame == nullptr)
+            return 0;
+
+        QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+        ret += layout->frameBoundingRect(frame).height();
+    }
+
+    return ret;
 }
 
-qreal ScreenplayTextDocument::lengthInPages(ScreenplayElement *element) const
+qreal ScreenplayTextDocument::lengthInPages(ScreenplayElement *from, ScreenplayElement *to) const
 {
-    const qreal pxLength = this->lengthInPixels(element);
+    const qreal pxLength = this->lengthInPixels(from, to);
     if( qFuzzyIsNull(pxLength) )
         return 0;
 
