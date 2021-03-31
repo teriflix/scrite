@@ -34,6 +34,10 @@ protected:
     void configureCanvas(int nrBlocks);
     Scene *createScene(const QString &heading);
     SceneElement *addSceneElement(Scene *scene, SceneElement::Type type, const QString &text);
+
+    void setBreakTitle(ScreenplayElement* element, const QString &title) {
+        element->setBreakTitle(title);
+    }
 };
 
 #ifdef QDOM_H
