@@ -15,6 +15,7 @@
 #include "hourglass.h"
 #include "screenplay.h"
 #include "application.h"
+#include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
@@ -1435,16 +1436,15 @@ QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const
     if(scene == nullptr || max == 0)
         return ret;
 
-    for(int i=0; i<m_elements.size(); i++)
-    {
-        ScreenplayElement *element = m_elements.at(i);
-        if(element->scene() == scene)
-        {
-            ret << i;
-            if(max > 0 && ret.size() == max)
-                break;
-        }
-    }
+    ret = scene->screenplayElementIndexList();
+    if(max < 0 || max >= ret.size() || ret.isEmpty())
+        return ret;
+
+    if(max == 1)
+        return QList<int>() << ret.first();
+
+    while(ret.size() > max)
+        ret.removeLast();
 
     return ret;
 }

@@ -1484,6 +1484,9 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
             return;
     }
 
+    if(m_elements == list)
+        return;
+
     const bool sizeChanged = m_elements.size() != list.size();
     QList<SceneElement*> oldElements = m_elements;
 

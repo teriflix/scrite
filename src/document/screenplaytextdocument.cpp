@@ -57,15 +57,28 @@ public:
     const SceneElement *getCharacterElement() const;
     QString getCharacterElementText() const;
 
+    bool isModified() const {
+        if(m_element)
+            return m_element->isModified(&m_elementModificationTime);
+        return true;
+    }
+    void touch() {
+        if(m_element)
+            m_element->isModified(&m_elementModificationTime);
+    }
+
     static ScreenplayParagraphBlockData *get(const QTextBlock &block);
     static ScreenplayParagraphBlockData *get(QTextBlockUserData *userData);
 
 private:
     const SceneElement *m_element = nullptr;
+    mutable int m_elementModificationTime = 0;
 };
 
 ScreenplayParagraphBlockData::ScreenplayParagraphBlockData(const SceneElement *element)
-    : m_element(element) { }
+    : m_element(element)
+{
+}
 
 ScreenplayParagraphBlockData::~ScreenplayParagraphBlockData() { }
 
@@ -623,6 +636,8 @@ void ScreenplayTextDocument::timerEvent(QTimerEvent *event)
         m_sceneResetTimer.stop();
         this->processSceneResetList();
     }
+    else
+        QObject::timerEvent(event);
 }
 
 void ScreenplayTextDocument::init()
@@ -1197,12 +1212,14 @@ void ScreenplayTextDocument::connectToSceneSignals(Scene *scene)
     connect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset, Qt::UniqueConnection);
     connect(scene, &Scene::modelReset, this, &ScreenplayTextDocument::onSceneResetModel, Qt::UniqueConnection);
     connect(scene, &Scene::sceneRefreshed, this, &ScreenplayTextDocument::onSceneRefreshed, Qt::UniqueConnection);
+    connect(scene, &Scene::elementCountChanged, this, &ScreenplayTextDocument::onSceneReset, Qt::UniqueConnection);
     connect(scene, &Scene::sceneAboutToReset, this, &ScreenplayTextDocument::onSceneAboutToReset, Qt::UniqueConnection);
     connect(scene, &Scene::sceneElementChanged, this, &ScreenplayTextDocument::onSceneElementChanged, Qt::UniqueConnection);
     connect(scene, &Scene::modelAboutToBeReset, this, &ScreenplayTextDocument::onSceneAboutToResetModel, Qt::UniqueConnection);
 
     SceneHeading *heading = scene->heading();
     connect(heading, &SceneHeading::textChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged, Qt::UniqueConnection);
+    connect(heading, &SceneHeading::enabledChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged, Qt::UniqueConnection);
 }
 
 void ScreenplayTextDocument::disconnectFromSceneSignals(Scene *scene)
@@ -1213,12 +1230,14 @@ void ScreenplayTextDocument::disconnectFromSceneSignals(Scene *scene)
     disconnect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset);
     disconnect(scene, &Scene::modelReset, this, &ScreenplayTextDocument::onSceneResetModel);
     disconnect(scene, &Scene::sceneRefreshed, this, &ScreenplayTextDocument::onSceneRefreshed);
+    disconnect(scene, &Scene::elementCountChanged, this, &ScreenplayTextDocument::onSceneReset);
     disconnect(scene, &Scene::sceneAboutToReset, this, &ScreenplayTextDocument::onSceneAboutToReset);
     disconnect(scene, &Scene::sceneElementChanged, this, &ScreenplayTextDocument::onSceneElementChanged);
     disconnect(scene, &Scene::modelAboutToBeReset, this, &ScreenplayTextDocument::onSceneAboutToResetModel);
 
     SceneHeading *heading = scene->heading();
     disconnect(heading, &SceneHeading::textChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged);
+    disconnect(heading, &SceneHeading::enabledChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged);
 }
 
 void ScreenplayTextDocument::onScreenplayAboutToReset()
@@ -1336,44 +1355,7 @@ void ScreenplayTextDocument::onSceneAboutToReset()
 
 void ScreenplayTextDocument::onSceneHeadingChanged()
 {
-#if 1
     this->onSceneReset();
-#else
-    SceneHeading *heading = qobject_cast<SceneHeading*>(this->sender());
-    Scene *scene = heading ? heading->scene() : nullptr;
-    if(scene == nullptr)
-        return;
-
-    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating scene heading changed.");
-
-    ScreenplayTextDocumentUpdate update(this);
-
-    QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
-    Q_FOREACH(ScreenplayElement *element, elements)
-    {
-        QTextFrame *frame = this->findTextFrame(element);
-        Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
-
-        QTextCursor cursor = frame->firstCursorPosition();
-        QTextBlock block = cursor.block();
-        ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
-        if(data->elementType() == SceneElement::Heading)
-        {
-            if(heading->isEnabled())
-                this->formatBlock(block, heading->text());
-            else
-            {
-                cursor.select(QTextCursor::BlockUnderCursor);
-                cursor.removeSelectedText();
-            }
-        }
-        else if(heading->isEnabled())
-        {
-            cursor.insertBlock();
-            this->formatBlock(cursor.block(), heading->text());
-        }
-    }
-#endif
 }
 
 void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::SceneElementChangeType type)
@@ -1393,28 +1375,36 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
     ScreenplayTextDocumentUpdate update(this);
 
     QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
-    Q_FOREACH(ScreenplayElement *element, elements)
+    for(ScreenplayElement *element : qAsConst(elements))
     {
         QTextFrame *frame = this->findTextFrame(element);
         Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
 
+        const int nrBlocks = paraIndex + (scene->heading()->isEnabled() ? 1 : 0);
+
         QTextCursor cursor = frame->firstCursorPosition();
+        cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, nrBlocks);
+
         QTextBlock block = cursor.block();
-
-        while(block.isValid())
+        ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
+        if(data && data->contains(para))
         {
-            ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
-            if(data && data->contains(para))
+            if(type == Scene::ElementTypeChange)
+                this->formatBlock(block);
+            else if(type == Scene::ElementTextChange)
             {
-                if(type == Scene::ElementTypeChange)
-                    this->formatBlock(block);
-                else if(type == Scene::ElementTextChange)
+                if(m_purpose == ForDisplay)
+                {
+                    QTextCursor cursor(block);
+                    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+                    cursor.insertText(para->text());
+                }
+                else
                     this->formatBlock(block, para->text());
-                break;
             }
-
-            block = block.next();
         }
+        else
+            this->addToSceneResetList(scene);
     }
 }
 
@@ -1667,6 +1657,136 @@ void ScreenplayTextDocument::formatAllBlocks()
         this->formatBlock(block);
         block = block.next();
     }
+}
+
+bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement *element)
+{
+    QTextFrame *frame = this->findTextFrame(element);
+    if(frame == nullptr)
+        return false;
+
+    Scene *scene = element->scene();
+    if(scene == nullptr)
+        return false;
+
+    int nrParagraphs = scene->elementCount();
+    if(scene->heading()->isEnabled())
+        ++nrParagraphs;
+
+    // Ideally we should have a text-block for each scene element,
+    // ofcourse scene heading should be first if enabled.
+    QList< QPair<SceneElement*,QTextBlock> > paraBlocks;
+    paraBlocks.reserve(nrParagraphs);
+    if(scene->heading()->isEnabled())
+        paraBlocks << qMakePair(nullptr, QTextBlock());
+    for(int i=0; i<scene->elementCount(); i++)
+        paraBlocks << qMakePair(scene->elementAt(i), QTextBlock());
+
+    // Lets go over the whole frame and take stock of what exists
+    // in the frame already. While we are at it, lets make note
+    // of all blocks that we must remove.
+    QTextFrame::iterator it = frame->begin();
+    QTextFrame::iterator end = frame->end();
+    QVector<QTextBlock> blocksToRemove;
+    while(it != end)
+    {
+        QTextBlock block = it.currentBlock();
+        ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
+        if(data)
+        {
+            if(data->element())
+            {
+                SceneElement *para = const_cast<SceneElement*>(data->element());
+                int paraIndex = scene->indexOfElement(para);
+                if(paraIndex < 0)
+                    // This block is no longer backed by an
+                    // actual paragraph in the scene. So we should
+                    // remove the block.
+                    blocksToRemove.append(block);
+                else
+                {
+                    // This block is required. Lets retain it, but
+                    // place it at the appropriate position in the
+                    // frame.
+                    if(scene->heading()->isEnabled())
+                        ++paraIndex;
+
+                    paraBlocks[paraIndex].second = block;
+                }
+            }
+            else if(frame->begin() == it && data->elementType() == SceneElement::Heading)
+            {
+                if(scene->heading()->isEnabled())
+                    paraBlocks.first().second = block;
+                else
+                    blocksToRemove.append(block);
+            }
+            else
+                // We honestly dont know what this block is doing.
+                blocksToRemove.append(block);
+        }
+        else
+            // We honestly dont know what this block is doing.
+            blocksToRemove.append(block);
+
+        ++it;
+    }
+
+    // Remove blocks that are created for paragraphs that no longer exist
+    // in the scene.
+    while(!blocksToRemove.isEmpty())
+    {
+        QTextCursor cursor(blocksToRemove.takeLast());
+        cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+        cursor.removeSelectedText();
+        cursor.deleteChar();
+    }
+
+    // Go over paragraphs and ensure that they exist.
+    int position = frame->firstPosition();
+    for(int i=0; i<paraBlocks.size(); i++)
+    {
+        const QPair<SceneElement*, QTextBlock> item = paraBlocks.at(i);
+
+        QTextBlock block = item.second;
+        SceneElement *para = item.first;
+        bool newBlock = !block.isValid();
+        if(newBlock)
+        {
+            QTextCursor cursor(m_textDocument);
+            cursor.setPosition(position);
+            cursor.insertBlock();
+            block = cursor.block();
+            block.setUserData(new ScreenplayParagraphBlockData(para));
+        }
+
+        const QString paraText = para ? para->text() : scene->heading()->text();
+
+        ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
+
+        QTextCursor cursor(block);
+        if(newBlock)
+        {
+            const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
+            const SceneElementFormat *format = m_formatting->elementFormat(data->elementType());
+            QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+            QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
+            if(i == 0)
+                blockFormat.setTopMargin(0);
+
+            cursor.setCharFormat(charFormat);
+            cursor.setBlockFormat(blockFormat);
+        }
+        else
+            cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+
+        if(data->isModified())
+            cursor.insertText(paraText);
+
+        position = cursor.position();
+    }
+
+    return true;
 }
 
 void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor)
@@ -1985,6 +2105,12 @@ void ScreenplayTextDocument::processSceneResetList()
         {
             QTextFrame *frame = this->findTextFrame(element);
             Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
+
+            if(m_purpose == ForDisplay)
+            {
+                if(this->updateFromScreenplayElement(element))
+                    continue;
+            }
 
             QTextCursor cursor = frame->firstCursorPosition();
             cursor.setPosition(frame->lastPosition(), QTextCursor::KeepAnchor);

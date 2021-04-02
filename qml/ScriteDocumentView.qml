@@ -236,6 +236,12 @@ Item {
         screenplay: scriteDocument.loading && enabled ? null : screenplayAdapter.screenplay
         formatting: scriteDocument.loading && enabled ? null : scriteDocument.printFormat
         syncEnabled: true
+        sceneNumbers: false
+        titlePage: false
+        sceneIcons: false
+        listSceneCharacters: false
+        includeSceneSynopsis: false
+        printEachSceneOnANewPage: false
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
     }
 

@@ -36,7 +36,7 @@ private:
 class ModificationTracker
 {
 public:
-    ModificationTracker(Modifiable *target=nullptr) :
+    ModificationTracker(const Modifiable *target=nullptr) :
         m_target(target) {
         if(m_target)
             m_modificationTime = m_target->modificationTime();
@@ -49,28 +49,35 @@ public:
         return *this;
     }
 
-    bool isTracking(Modifiable *target) const { return m_target == target; }
+    bool isTracking(const Modifiable *target) const { return m_target == target; }
 
-    void track(Modifiable *target) {
+    void track(const Modifiable *target) {
         if(m_target != target) {
             m_target = target;
             if(m_target)
                 m_modificationTime = m_target->modificationTime();
+            else
+                m_modificationTime = 0;
         }
     }
 
-    bool isModified() { return m_target ? m_target->isModified(&m_modificationTime) : false; }
+    bool isModified() const { return m_target ? m_target->isModified(&m_modificationTime) : false; }
 
-    bool isModified(Modifiable *target) {
+    bool isModified(const Modifiable *target) {
         if(this->isTracking(target))
             return this->isModified();
         track(target);
         return true;
     }
 
+    void touch() {
+        if(m_target != nullptr)
+            m_target->isModified(&m_modificationTime);
+    }
+
 private:
-    Modifiable *m_target;
-    int m_modificationTime = 0;
+    const Modifiable *m_target = nullptr;
+    mutable int m_modificationTime = 0;
 };
 
 #endif // MODIFIABLE_H

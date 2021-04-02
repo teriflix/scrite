@@ -187,10 +187,11 @@ Item {
             function grabKeyFrame() {
                 keyFrameGrabMode = true
                 app.execLater(playerArea, 250, function() {
+                    var dpi = scriteDocument.formatting.devicePixelRatio
                     playerArea.grabToImage( function(result) {
                         keyFrameImage.source = result.url
                         playerArea.keyFrameGrabMode = false
-                    })
+                    }, Qt.size(playerArea.width*dpi,playerArea.height*dpi))
                 })
             }
 
@@ -487,6 +488,70 @@ Item {
                             }
                         }
                     }
+
+                    Item {
+                        id: titleCardOverlay
+                        anchors.fill: parent
+                        visible: false
+                        opacity: 0.95
+
+                        Column {
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: mediaPlayerControls.visible ? mediaPlayerControls.height + 20 : 40
+                            anchors.left: parent.left
+                            anchors.leftMargin: 30
+
+                            Rectangle {
+                                color: "#65318f"
+                                width: titleText.width
+                                height: titleText.height
+
+                                Text {
+                                    id: titleText
+                                    padding: 8
+                                    font.family: "Arial"
+                                    font.pointSize: 28
+                                    font.bold: true
+                                    color: "white"
+                                    text: scriteDocument.screenplay.title
+                                }
+                            }
+
+                            Rectangle {
+                                color: "#e665318f"
+                                width: subtitleText.width
+                                height: subtitleText.height
+                                visible: subtitleText.text !== ""
+
+                                Text {
+                                    id: subtitleText
+                                    padding: 6
+                                    font.family: "Arial"
+                                    font.pointSize: 20
+                                    font.bold: true
+                                    color: "white"
+                                    text: scriteDocument.screenplay.subtitle
+                                }
+                            }
+
+                            Rectangle {
+                                color: "black"
+                                width: authorsText.width
+                                height: authorsText.height
+                                visible: authorsText.text !== ""
+
+                                Text {
+                                    id: authorsText
+                                    padding: 6
+                                    font.family: "Arial"
+                                    font.pointSize: 20
+                                    font.bold: true
+                                    color: "white"
+                                    text: "Written By " + scriteDocument.screenplay.author
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Item {
@@ -545,6 +610,8 @@ Item {
                             id: textDocumentFlickPadding
                             width: parent.width
                             height: textDocumentArea.height*0.35
+                            y: -1
+                            color: "black"
 
                             gradient: Gradient {
                                 GradientStop {
@@ -749,7 +816,42 @@ Item {
                         startingFrameOverlay.visible = false
                         startingFrameOverlayContent.opacity = 1
                         startingFrameOverlay.opacity = 1
+                        if(mediaPlayer.sceneEndPosition - mediaPlayer.sceneStartPosition < 30000)
+                            startingFrameAnimation.stop()
                     }
+                }
+
+                PauseAnimation {
+                    duration: 5000
+                }
+
+                ScriptAction {
+                    script: {
+                        titleCardOverlay.opacity = 0
+                        titleCardOverlay.visible = true
+                    }
+                }
+
+                NumberAnimation {
+                    target: titleCardOverlay
+                    property: "opacity"
+                    duration: 1500
+                    from: 0; to: 0.95
+                }
+
+                PauseAnimation {
+                    duration: 5000
+                }
+
+                NumberAnimation {
+                    target: titleCardOverlay
+                    property: "opacity"
+                    duration: 1500
+                    from: 0.95; to: 0
+                }
+
+                ScriptAction {
+                    script: titleCardOverlay.visible = false
                 }
             }
 

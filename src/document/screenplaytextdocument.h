@@ -273,6 +273,7 @@ private:
     void evaluatePageBoundaries();
     void evaluatePageBoundariesLater();
     void formatAllBlocks();
+    bool updateFromScreenplayElement(const ScreenplayElement *element);
     void loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor);
     void formatBlock(const QTextBlock &block, const QString &text=QString());
 
