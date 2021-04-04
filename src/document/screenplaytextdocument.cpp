@@ -735,8 +735,28 @@ inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString 
     }
 };
 
+#ifdef DISPPLAY_DOCUMENT_IN_TEXTEDIT
+#include <QTextEdit>
+#endif // DISPPLAY_DOCUMENT_IN_TEXTEDIT
+
 void ScreenplayTextDocument::loadScreenplay()
 {
+#ifdef DISPPLAY_DOCUMENT_IN_TEXTEDIT
+    static QTextEdit *textEdit = nullptr;
+    if(m_purpose == ForDisplay)
+    {
+        if(textEdit == nullptr)
+        {
+            textEdit = new QTextEdit;
+            textEdit->setDocument(m_textDocument);
+            textEdit->setReadOnly(true);
+            textEdit->setFixedSize(m_formatting->pageLayout()->paperRect().size().toSize());
+        }
+
+        textEdit->show();
+    }
+#endif // DISPPLAY_DOCUMENT_IN_TEXTEDIT
+
     HourGlass hourGlass;
 
     if(m_updating || !m_componentComplete) // so that we avoid recursive updates
@@ -1333,7 +1353,11 @@ void ScreenplayTextDocument::onSceneReset()
 {
     Scene *scene = qobject_cast<Scene*>(this->sender());
     if(scene == nullptr)
-        return;
+    {
+        scene = this->sender() && this->sender()->parent() ? qobject_cast<Scene*>(this->sender()->parent()) : nullptr;
+        if(scene == nullptr)
+            return;
+    }
 
     this->addToSceneResetList(scene);
 }
@@ -1669,16 +1693,13 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
     if(scene == nullptr)
         return false;
 
-    int nrParagraphs = scene->elementCount();
-    if(scene->heading()->isEnabled())
-        ++nrParagraphs;
+    int nrParagraphs = scene->elementCount() + 1;
 
-    // Ideally we should have a text-block for each scene element,
-    // ofcourse scene heading should be first if enabled.
+    // We should have a text-block for each scene element (paragraph),
+    // and one for the scene heading
     QList< QPair<SceneElement*,QTextBlock> > paraBlocks;
     paraBlocks.reserve(nrParagraphs);
-    if(scene->heading()->isEnabled())
-        paraBlocks << qMakePair(nullptr, QTextBlock());
+    paraBlocks << qMakePair(nullptr, QTextBlock());
     for(int i=0; i<scene->elementCount(); i++)
         paraBlocks << qMakePair(scene->elementAt(i), QTextBlock());
 
@@ -1708,19 +1729,12 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
                     // This block is required. Lets retain it, but
                     // place it at the appropriate position in the
                     // frame.
-                    if(scene->heading()->isEnabled())
-                        ++paraIndex;
-
+                    ++paraIndex;
                     paraBlocks[paraIndex].second = block;
                 }
             }
             else if(frame->begin() == it && data->elementType() == SceneElement::Heading)
-            {
-                if(scene->heading()->isEnabled())
-                    paraBlocks.first().second = block;
-                else
-                    blocksToRemove.append(block);
-            }
+                paraBlocks.first().second = block;
             else
                 // We honestly dont know what this block is doing.
                 blocksToRemove.append(block);
@@ -1742,8 +1756,20 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
         cursor.deleteChar();
     }
 
+    auto applyFormattingOnCursor = [=](QTextCursor &cursor, SceneElement::Type paraType, bool firstParagraph) {
+        const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
+        const SceneElementFormat *format = m_formatting->elementFormat(paraType);
+        QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+        QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
+        if(firstParagraph)
+            blockFormat.setTopMargin(0);
+        cursor.setCharFormat(charFormat);
+        cursor.setBlockFormat(blockFormat);
+    };
+
     // Go over paragraphs and ensure that they exist.
     int position = frame->firstPosition();
+    SceneElement::Type lastParaType = SceneElement::Heading;
     for(int i=0; i<paraBlocks.size(); i++)
     {
         const QPair<SceneElement*, QTextBlock> item = paraBlocks.at(i);
@@ -1756,34 +1782,34 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
             QTextCursor cursor(m_textDocument);
             cursor.setPosition(position);
             cursor.insertBlock();
+            applyFormattingOnCursor(cursor, para ? para->type() : SceneElement::Heading, i==0);
             block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
         }
 
-        const QString paraText = para ? para->text() : scene->heading()->text();
+        const QString paraText = para ? para->text() : (scene->heading()->isEnabled() ? scene->heading()->text() : QStringLiteral("NO SCENE HEADING"));
 
         ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
 
         QTextCursor cursor(block);
-        if(newBlock)
-        {
-            const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
-            const SceneElementFormat *format = m_formatting->elementFormat(data->elementType());
-            QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
-            QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
-            if(i == 0)
-                blockFormat.setTopMargin(0);
-
-            cursor.setCharFormat(charFormat);
-            cursor.setBlockFormat(blockFormat);
-        }
-        else
+        if(!newBlock)
             cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
 
         if(data->isModified())
             cursor.insertText(paraText);
 
+        if(lastParaType != data->elementType())
+        {
+            cursor.movePosition(QTextCursor::StartOfBlock);
+            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+            applyFormattingOnCursor(cursor, data->elementType(), i==0);
+        }
+
+        cursor.movePosition(QTextCursor::EndOfBlock);
+
         position = cursor.position();
+
+        lastParaType = data->elementType();
     }
 
     return true;
@@ -1815,7 +1841,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         };
 
         const SceneHeading *heading = scene->heading();
-        if(heading->isEnabled())
+        const bool headingEnabled = heading->isEnabled() || (m_purpose == ForDisplay);
+        if(headingEnabled)
         {
             if(insertBlock)
                 cursor.insertBlock();
@@ -1845,10 +1872,12 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             }
 
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
+
+            const QString headingText = heading->isEnabled() ? heading->text() : QStringLiteral("NO SCENE HEADING");
             if(m_purpose == ForPrinting)
-                polishFontsAndInsertTextAtCursor(cursor, heading->text());
+                polishFontsAndInsertTextAtCursor(cursor, headingText);
             else
-                cursor.insertText(heading->text());
+                cursor.insertText(headingText);
             insertBlock = true;
         }
 
