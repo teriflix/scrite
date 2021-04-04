@@ -11,6 +11,8 @@
 **
 ****************************************************************************/
 
+// #define DISPLAY_DOCUMENT_IN_TEXTEDIT
+
 #include "hourglass.h"
 #include "application.h"
 #include "imageprinter.h"
@@ -735,13 +737,13 @@ inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString 
     }
 };
 
-#ifdef DISPPLAY_DOCUMENT_IN_TEXTEDIT
+#ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
 #include <QTextEdit>
-#endif // DISPPLAY_DOCUMENT_IN_TEXTEDIT
+#endif // DISPLAY_DOCUMENT_IN_TEXTEDIT
 
 void ScreenplayTextDocument::loadScreenplay()
 {
-#ifdef DISPPLAY_DOCUMENT_IN_TEXTEDIT
+#ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
     static QTextEdit *textEdit = nullptr;
     if(m_purpose == ForDisplay)
     {
@@ -755,7 +757,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
         textEdit->show();
     }
-#endif // DISPPLAY_DOCUMENT_IN_TEXTEDIT
+#endif // DISPLAY_DOCUMENT_IN_TEXTEDIT
 
     HourGlass hourGlass;
 
