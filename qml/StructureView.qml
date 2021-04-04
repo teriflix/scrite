@@ -134,7 +134,7 @@ Item {
                 id: selectionModeButton
                 enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
                 iconSource: "../icons/action/selection_drag.png"
-                ToolTip.text: "Selecttion mode"
+                ToolTip.text: "Selection mode"
                 checkable: true
                 onClicked: selection.layout(Structure.HorizontalLayout)
             }
