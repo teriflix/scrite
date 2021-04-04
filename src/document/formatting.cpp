@@ -293,6 +293,33 @@ void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
     m_format->applyToAll(this, properties);
 }
 
+void SceneElementFormat::beginTransaction()
+{
+    if(m_inTransaction)
+        return;
+
+    m_inTransaction = true;
+    emit inTransactionChanged();
+
+    m_nrChangesDuringTransation = 0;
+    connect(this, &SceneElementFormat::elementFormatChanged, this, &SceneElementFormat::countTransactionChange);
+}
+
+void SceneElementFormat::commitTransaction()
+{
+    if(!m_inTransaction)
+        return;
+
+    m_inTransaction = false;
+    emit inTransactionChanged();
+
+    disconnect(this, &SceneElementFormat::elementFormatChanged, this, &SceneElementFormat::countTransactionChange);
+    if(m_nrChangesDuringTransation > 0)
+        emit elementFormatChanged();
+
+    m_nrChangesDuringTransation = 0;
+}
+
 void SceneElementFormat::resetToDefaults()
 {
     this->setFont(m_format->defaultFont());
@@ -785,6 +812,39 @@ void ScreenplayFormat::resetToDefaults()
     m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );
     m_elementFormats[SceneElement::Shot]->setLineSpacingBefore(1);
     m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
+}
+
+void ScreenplayFormat::beginTransaction()
+{
+    if(m_inTransaction)
+        return;
+
+    m_inTransaction = true;
+    emit inTransactionChanged();
+
+    m_nrChangesDuringTransation = 0;
+    connect(this, &ScreenplayFormat::formatChanged, this, &ScreenplayFormat::countTransactionChange);
+
+    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+        m_elementFormats.at(i)->beginTransaction();
+}
+
+void ScreenplayFormat::commitTransaction()
+{
+    if(!m_inTransaction)
+        return;
+
+    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+        m_elementFormats.at(i)->commitTransaction();
+
+    m_inTransaction = false;
+    emit inTransactionChanged();
+
+    disconnect(this, &ScreenplayFormat::formatChanged, this, &ScreenplayFormat::countTransactionChange);
+    if(m_nrChangesDuringTransation > 0)
+        emit formatChanged();
+
+    m_nrChangesDuringTransation = 0;
 }
 
 void ScreenplayFormat::useUserSpecifiedFonts()
@@ -1776,6 +1836,15 @@ bool SceneDocumentBinder::paste(int fromPosition)
     return true;
 }
 
+void SceneDocumentBinder::setApplyFormattingEvenInTransaction(bool val)
+{
+    if(m_applyFormattingEvenInTransaction == val)
+        return;
+
+    m_applyFormattingEvenInTransaction = val;
+    emit applyFormattingEvenInTransactionChanged();
+}
+
 void SceneDocumentBinder::classBegin()
 {
 
@@ -2540,7 +2609,13 @@ void SceneDocumentBinder::onSceneReset(int position)
 
 void SceneDocumentBinder::rehighlightLater()
 {
-    m_rehighlightTimer.start(100, this);
+    if(!m_applyFormattingEvenInTransaction)
+    {
+        if(!m_screenplayFormat.isNull() && m_screenplayFormat->isInTransaction())
+            return;
+    }
+
+    m_rehighlightTimer.start(0, this);
 }
 
 void SceneDocumentBinder::rehighlightBlockLater(const QTextBlock &block)

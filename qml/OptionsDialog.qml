@@ -19,6 +19,7 @@ import QtQuick.Controls.Material 2.12
 import Scrite 1.0
 
 Item {
+    id: optionsDialog
     width: 1050
     height: Math.min(documentUI.height*0.9, 750)
     readonly property color dialogColor: primaryColors.windowColor
@@ -28,6 +29,17 @@ Item {
         tabView.currentIndex = modalDialog.arguments && modalDialog.arguments.activeTabIndex ? modalDialog.arguments.activeTabIndex : 0
         modalDialog.arguments = undefined
         // modalDialog.closeable = false
+
+        scriteDocument.formatting.beginTransaction();
+        scriteDocument.printFormat.beginTransaction();
+    }
+
+    Connections {
+        target: modalDialog
+        onAboutToClose: {
+            scriteDocument.formatting.commitTransaction();
+            scriteDocument.printFormat.commitTransaction();
+        }
     }
 
     TabView2 {
@@ -1596,6 +1608,7 @@ Item {
 
                             SceneDocumentBinder {
                                 screenplayFormat: scriteDocument.formatting
+                                applyFormattingEvenInTransaction: true
                                 scene: Scene {
                                     elements: [
                                         SceneElement {

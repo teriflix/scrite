@@ -29,21 +29,23 @@ Rectangle {
     property bool closeUponClickOutsideContentArea: false
     property bool animationsEnabled: true
     signal closeRequest()
+    signal aboutToClose()
 
     function close() {
         if(!active)
             return
 
+        aboutToClose()
+
         if(contentsLoader.width === 0 || contentsLoader.height === 0)
             closeRequest()
-        else {
+        else
             contentsLoader.grabToImage( function(result) {
                     popupSourceImage.source = result.url
                     closeRequest()
                 },
                 Qt.size( contentsLoader.width, contentsLoader.height )
             )
-        }
     }
 
     onActiveChanged: {

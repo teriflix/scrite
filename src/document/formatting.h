@@ -144,11 +144,19 @@ public:
     Q_ENUM(Properties)
     Q_INVOKABLE void applyToAll(Properties properties);
 
+    Q_INVOKABLE void beginTransaction();
+    Q_INVOKABLE void commitTransaction();
+
+    Q_PROPERTY(bool inTransaction READ isInTransaction NOTIFY inTransactionChanged)
+    bool isInTransaction() const { return m_inTransaction; }
+    Q_SIGNAL void inTransactionChanged();
+
     void resetToDefaults();
 
 private:
     friend class ScreenplayFormat;
     SceneElementFormat(SceneElement::Type type=SceneElement::Action, ScreenplayFormat *parent=nullptr);
+    void countTransactionChange() { ++m_nrChangesDuringTransation; }
 
 private:
     QFont m_font;
@@ -158,6 +166,8 @@ private:
     qreal m_lineSpacingBefore = 0;
     QColor m_textColor = QColor(Qt::black);
     QColor m_backgroundColor = QColor(Qt::transparent);
+    bool m_inTransaction = false;
+    int m_nrChangesDuringTransation = 0;
     ScreenplayFormat *m_format = nullptr;
     Qt::Alignment m_textAlignment = Qt::AlignLeft;
     SceneElement::Type m_elementType = SceneElement::Action;
@@ -351,12 +361,20 @@ public:
 
     Q_INVOKABLE void resetToDefaults();
 
+    Q_INVOKABLE void beginTransaction();
+    Q_INVOKABLE void commitTransaction();
+
+    Q_PROPERTY(bool inTransaction READ isInTransaction NOTIFY inTransactionChanged)
+    bool isInTransaction() const { return m_inTransaction; }
+    Q_SIGNAL void inTransactionChanged();
+
     void useUserSpecifiedFonts();
 
 private:
     void resetScreen();
     void evaluateFontPointSizeDelta();
     void evaluateFontZoomLevels();
+    void countTransactionChange() { ++m_nrChangesDuringTransation; }
 
 private:
     char  m_padding[4];
@@ -365,6 +383,8 @@ private:
     int m_secondsPerPage = 60;
     int   m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
+    bool m_inTransaction = false;
+    int m_nrChangesDuringTransation = 0;
     QList<int> m_fontPointSizes;
     QVariantList m_fontZoomLevels;
     QObjectProperty<QScreen> m_screen;
@@ -567,6 +587,11 @@ public:
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
     Q_INVOKABLE bool paste(int fromPosition=-1);
 
+    Q_PROPERTY(bool applyFormattingEvenInTransaction READ isApplyFormattingEvenInTransaction WRITE setApplyFormattingEvenInTransaction NOTIFY applyFormattingEvenInTransactionChanged)
+    void setApplyFormattingEvenInTransaction(bool val);
+    bool isApplyFormattingEvenInTransaction() const { return m_applyFormattingEvenInTransaction; }
+    Q_SIGNAL void applyFormattingEvenInTransactionChanged();
+
     // QQmlParserStatus interface
     void classBegin();
     void componentComplete();
@@ -629,6 +654,7 @@ private:
     bool m_wordUnderCursorIsMisspelled = false;
     ExecLaterTimer m_initializeDocumentTimer;
     QList<SceneElement::Type> m_tabHistory;
+    bool m_applyFormattingEvenInTransaction = false;
     QList<QTextBlock> m_rehighlightBlockQueue;
     QObjectProperty<SceneElement> m_currentElement;
     QObjectProperty<QQuickTextDocument> m_textDocument;

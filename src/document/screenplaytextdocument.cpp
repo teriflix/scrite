@@ -1123,7 +1123,7 @@ void ScreenplayTextDocument::loadScreenplayLater()
         this->disconnectFromScreenplayFormatSignals();
 
         const bool updateWasScheduled = m_loadScreenplayTimer.isActive();
-        m_loadScreenplayTimer.start(100, this);
+        m_loadScreenplayTimer.start(0, this);
         if(!updateWasScheduled)
             emit updateScheduled();
     }
@@ -1454,32 +1454,14 @@ void ScreenplayTextDocument::onSceneResetModel()
 
 void ScreenplayTextDocument::onElementFormatChanged()
 {
-#if 0
-    if(m_updating)
+    SceneElementFormat *seformat = qobject_cast<SceneElementFormat*>(this->sender());
+    if(seformat && seformat->isInTransaction())
         return;
 
-    ScreenplayTextDocumentUpdate update(this);
-
-    SceneElementFormat *format = qobject_cast<SceneElementFormat*>(this->sender());
-    if(format == nullptr)
-        return;
-
-    QTextCursor cursor(m_textDocument);
-    QTextBlock block = cursor.block();
-    while(block.isValid())
-    {
-        ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-        if(blockData && blockData->elementType() == format->elementType())
-            this->formatBlock(block);
-
-        block = block.next();
-    }
-#else
     // It is less time consuming to reload the whole document than it is
     // to apply formatting. This is mostly because iterating over text blocks
     // in a document is more expensive than just creating them from scratch
     this->loadScreenplayLater();
-#endif
 }
 
 void ScreenplayTextDocument::onDefaultFontChanged()
