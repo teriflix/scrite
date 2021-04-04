@@ -1738,11 +1738,24 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
         cursor.deleteChar();
     }
 
-    auto applyFormattingOnCursor = [=](QTextCursor &cursor, SceneElement::Type paraType, bool firstParagraph) {
-        const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
-        const SceneElementFormat *format = m_formatting->elementFormat(paraType);
-        QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
-        QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
+    QMap<SceneElement::Type, QPair<QTextCharFormat,QTextBlockFormat> > formatMap;
+
+    auto applyFormattingOnCursor = [&](QTextCursor &cursor, SceneElement::Type paraType, bool firstParagraph) {
+        QTextBlockFormat blockFormat;
+        QTextCharFormat charFormat;
+
+        if(!formatMap.contains(paraType)) {
+            const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
+            const SceneElementFormat *format = m_formatting->elementFormat(paraType);
+            blockFormat = format->createBlockFormat(&pageWidth);
+            charFormat = format->createCharFormat(&pageWidth);
+            formatMap[paraType] = qMakePair(charFormat, blockFormat);
+        } else {
+            auto formatPair = formatMap.value(paraType);
+            charFormat = formatPair.first;
+            blockFormat = formatPair.second;
+        }
+
         if(firstParagraph)
             blockFormat.setTopMargin(0);
         cursor.setCharFormat(charFormat);
@@ -1751,7 +1764,9 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
 
     // Go over paragraphs and ensure that they exist.
     int position = frame->firstPosition();
+#if 0
     SceneElement::Type lastParaType = SceneElement::Heading;
+#endif
     for(int i=0; i<paraBlocks.size(); i++)
     {
         const QPair<SceneElement*, QTextBlock> item = paraBlocks.at(i);
@@ -1780,18 +1795,21 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
         if(data->isModified())
             cursor.insertText(paraText);
 
+#if 0
         if(lastParaType != data->elementType())
         {
             cursor.movePosition(QTextCursor::StartOfBlock);
             cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
             applyFormattingOnCursor(cursor, data->elementType(), i==0);
         }
+#endif
 
         cursor.movePosition(QTextCursor::EndOfBlock);
 
         position = cursor.position();
-
+#if 0
         lastParaType = data->elementType();
+#endif
     }
 
     return true;
