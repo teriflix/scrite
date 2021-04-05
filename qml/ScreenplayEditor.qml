@@ -1015,6 +1015,7 @@ Rectangle {
                     palette: app.palette
                     selectByMouse: true
                     selectByKeyboard: true
+                    persistentSelection: true
                     // renderType: TextArea.NativeRendering
                     property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
                     property Scene scene: contentItem.theScene
@@ -1589,11 +1590,14 @@ Rectangle {
                         property var selection: { "start": -1, "end": -1 }
                         property int loadCount: sceneDocumentBinder.documentLoadCount
 
-                        onLoadCountChanged: highlightSearchResultTextSnippet()
-                        onSelectionChanged: highlightSearchResultTextSnippet()
+                        onLoadCountChanged: Qt.callLater(highlightSearchResultTextSnippet)
+                        onSelectionChanged: Qt.callLater(highlightSearchResultTextSnippet)
 
                         function highlightSearchResultTextSnippet() {
                             if(selection.start >= 0 && selection.end >= 0) {
+                                if(sceneTextEditor.selectionStart === selection.start && sceneTextEditor.selectionEnd === selection.end )
+                                    return;
+
                                 var rect = app.uniteRectangles( sceneTextEditor.positionToRectangle(selection.start),
                                                                sceneTextEditor.positionToRectangle(selection.end) )
                                 rect = app.adjustRectangle(rect, -20, -50, 20, 50)
