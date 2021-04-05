@@ -585,7 +585,7 @@ public:
     Q_SIGNAL void spellingMistakesDetected();
 
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
-    Q_INVOKABLE bool paste(int fromPosition=-1);
+    Q_INVOKABLE int paste(int fromPosition=-1);
 
     Q_PROPERTY(bool applyFormattingEvenInTransaction READ isApplyFormattingEvenInTransaction WRITE setApplyFormattingEvenInTransaction NOTIFY applyFormattingEvenInTransactionChanged)
     void setApplyFormattingEvenInTransaction(bool val);

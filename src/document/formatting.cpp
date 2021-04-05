@@ -1790,20 +1790,20 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     clipboard->setMimeData(mimeData);
 }
 
-bool SceneDocumentBinder::paste(int fromPosition)
+int SceneDocumentBinder::paste(int fromPosition)
 {
     if(this->document() == nullptr)
-        return false;
+        return -1;
 
     const QClipboard *clipboard = Application::instance()->clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
     const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/screenplay"));
     if(contentJson.isEmpty())
-        return false;
+        return -1;
 
     const QJsonArray content = QJsonDocument::fromJson(contentJson).array();
     if(content.isEmpty())
-        return false;
+        return -1;
 
     fromPosition = fromPosition >= 0 ? fromPosition : m_cursorPosition;
 
@@ -1833,7 +1833,7 @@ bool SceneDocumentBinder::paste(int fromPosition)
         }
     }
 
-    return true;
+    return cursor.position();
 }
 
 void SceneDocumentBinder::setApplyFormattingEvenInTransaction(bool val)

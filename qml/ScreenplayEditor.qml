@@ -1643,9 +1643,11 @@ Rectangle {
                             if(sceneTextEditor.hasSelection)
                                 sceneTextEditor.remove(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd)
                             var cp = sceneTextEditor.cursorPosition
-                            if(!sceneDocumentBinder.paste(sceneTextEditor.cursorPosition))
+                            var cp2 = sceneDocumentBinder.paste(sceneTextEditor.cursorPosition)
+                            if(cp2 < 0)
                                 sceneTextEditor.paste()
-                            sceneTextEditor.cursorPosition = cp
+                            else
+                                sceneTextEditor.cursorPosition = cp2
                         }
                     }
 
