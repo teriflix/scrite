@@ -120,12 +120,19 @@ void TabSequenceManager::assumeFocusAt(int index)
 
 void TabSequenceManager::releaseFocus()
 {
+    bool hadFocus = false;
     for(TabSequenceItem *item : qAsConst(m_tabSequenceItems))
     {
         QQuickItem *qitem = qobject_cast<QQuickItem*>(item->parent());
         if(qitem)
+        {
+            hadFocus |= qitem->hasFocus();
             qitem->setFocus(false);
+        }
     }
+
+    if(hadFocus)
+        emit focusWasReleased();
 }
 
 void TabSequenceManager::timerEvent(QTimerEvent *te)

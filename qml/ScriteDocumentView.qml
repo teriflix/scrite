@@ -1620,7 +1620,7 @@ Item {
                             id: structureEditorTabs
                             anchors.fill: parent
                             anchors.margins: 1
-                            tabNames: workspaceSettings.showNotebookInStructure ? ["Canvas", "Notebook"] : ["Canvas"]
+                            tabNames: workspaceSettings.showNotebookInStructure ? ["Structure", "Notebook"] : ["Structure"]
                             tabColor: primaryColors.c700.background
                             tabBarVisible: workspaceSettings.showNotebookInStructure
                             currentTabContent: Item {

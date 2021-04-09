@@ -51,12 +51,7 @@ Rectangle {
     onActiveChanged: {
         if(active) {
             if(popupSource) {
-                var pos = Qt.point(0,0)
-                var item = popupSource
-                while(item !== null) {
-                    pos = Qt.point(item.x+pos.x, item.y+pos.y)
-                    item = item.parent
-                }
+                var pos = dialogOverlay.mapFromItem(popupSource, 0, 0)
                 popupSourceArea = Qt.rect(pos.x, pos.y, popupSource.width, popupSource.height)
             } else
                 popupSourceArea = defaultPopupSourceArea
@@ -68,8 +63,10 @@ Rectangle {
     onVisibleChanged: {
         if(visible)
             blur.show()
-        else
+        else {
             blur.hide()
+            popupSourceImage.source = ""
+        }
     }
 
     Behavior on t {

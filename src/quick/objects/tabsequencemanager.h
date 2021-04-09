@@ -74,6 +74,8 @@ public:
     Q_INVOKABLE void assumeFocusAt(int index);
     Q_INVOKABLE void releaseFocus();
 
+    Q_SIGNAL void focusWasReleased();
+
 protected:
     void timerEvent(QTimerEvent *te);
     bool eventFilter(QObject *watched, QEvent *event);

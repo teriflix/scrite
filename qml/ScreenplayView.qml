@@ -468,6 +468,8 @@ Item {
                 color: accentColors.a700.background
             }
 
+            Keys.onDeletePressed: scriteDocument.screenplay.removeElement(element)
+
             Loader {
                 id: elementItemBox
                 anchors.fill: parent

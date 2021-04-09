@@ -471,6 +471,68 @@ Item {
             canvasScroll.zoomFit(visibleArea)
         }
 
+        function deleteCurrentElement(element) {
+            if(element === null)
+                element = scriteDocument.structure.elementAt(criteDocument.structure.currentElementIndex)
+            if(element === null)
+                return
+
+            askQuestion({
+                "question": "Are you sure you want to delete this scene?",
+                "okButtonText": "Yes",
+                "cancelButtonText": "No",
+                "callback": function(val) {
+                    if(val) {
+                        var nextScene = null
+                        var nextElement = null
+                        if(element.scene.addedToScreenplay) {
+                            nextElement = scriteDocument.screenplay.elementAt(element.scene.screenplayElementIndexList[0]+1)
+                            if(nextElement === null)
+                                nextElement = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
+                            if(nextElement !== null)
+                                nextScene = nextElement.scene
+                        } else {
+                            var idx = scriteDocument.structure.indexOfElement(element)
+                            var i = 0;
+                            for(i=idx+1; i<scriteDocument.structure.elementCount; i++) {
+                                nextElement = scriteDocument.structure.elementAt(i)
+                                if(nextElement.scene.addedToScreenplay)
+                                    continue;
+                                nextScene = nextElement.scene
+                                break
+                            }
+
+                            if(nextScene === null) {
+                                for(i=0; i<idx; i++) {
+                                    nextElement = scriteDocument.structure.elementAt(i)
+                                    if(nextElement.scene.addedToScreenplay)
+                                        continue;
+                                    nextScene = nextElement.scene
+                                    break
+                                }
+                            }
+                        }
+
+                        releaseEditor()
+                        scriteDocument.screenplay.removeSceneElements(element.scene)
+                        scriteDocument.structure.removeElement(element)
+
+                        Qt.callLater(function(scene) {
+                            if(scriteDocument.screenplay.elementCount === 0)
+                                return
+                            if(scene === null)
+                                scene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
+                            var idx = scriteDocument.structure.indexOfScene(scene)
+                            if(idx >= 0) {
+                                scriteDocument.structure.currentElementIndex = idx
+                                scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(scene)
+                            }
+                        }, nextScene)
+                    }
+                }
+            }, element.follow)
+        }
+
         GridBackground {
             id: canvas
             antialiasing: false
@@ -503,6 +565,7 @@ Item {
                 id: canvasTabSequence
                 wrapAround: true
                 releaseFocusEnabled: true
+                onFocusWasReleased: canvas.forceActiveFocus()
             }
 
             function createItem(what, where) {
@@ -770,6 +833,7 @@ Item {
             }
 
             BoxShadow {
+                id: currentElementItemShadow
                 anchors.fill: currentElementItem
                 visible: currentElementItem !== null && !annotationGripLoader.active && currentElementItem.visible
                 property Item currentElementItem: currentElementItemBinder.get
@@ -820,6 +884,12 @@ Item {
                         result.accept = true
                         result.filter = true
                         scriteDocument.structure.forceBeatBoardLayout = false
+                        break
+                    case Qt.Key_Delete:
+                    case Qt.Key_Backspace:
+                        result.accept = true
+                        result.filter = true
+                        canvasScroll.deleteCurrentElement(element)
                         break
                     }
                 }
@@ -896,7 +966,7 @@ Item {
                     x: modelData.geometry.x - 40
                     y: modelData.geometry.y - 120 - topMarginForStacks
                     width: modelData.geometry.width + 80
-                    height: modelData.geometry.height + 120 + 2*topMarginForStacks + 40
+                    height: modelData.geometry.height + 120 + topMarginForStacks + 40
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 2
                     border.color: accentColors.c600.background
@@ -1560,19 +1630,8 @@ Item {
                     text: "Delete"
                     enabled: elementContextMenu.element !== null
                     onClicked: {
-                        askQuestion({
-                            "question": "Are you sure you want to delete this scene?",
-                            "okButtonText": "Yes",
-                            "cancelButtonText": "No",
-                            "callback": function(val) {
-                                if(val) {
-                                    releaseEditor()
-                                    scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
-                                    scriteDocument.structure.removeElement(elementContextMenu.element)
-                                    elementContextMenu.element = null
-                                }
-                            }
-                        }, this)
+                        canvasScroll.deleteCurrentElement(elementContextMenu.element, this)
+                        elementContextMenu.element = null
                     }
                 }
             }
@@ -1955,7 +2014,6 @@ Item {
             function activate() {
                 canvasTabSequence.releaseFocus()
                 annotationGripLoader.reset()
-                canvas.forceActiveFocus()
                 scriteDocument.structure.currentElementIndex = index
                 requestEditorLater()
             }
@@ -2047,7 +2105,10 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
-                    onPressed: elementItem.select()
+                    onPressed: {
+                        elementItem.select()
+                        canvas.forceActiveFocus()
+                    }
 
                     drag.target: scriteDocument.readOnly ? null : elementItem
                     drag.axis: Drag.XAndYAxis
