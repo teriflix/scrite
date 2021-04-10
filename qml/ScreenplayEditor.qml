@@ -1560,6 +1560,11 @@ Rectangle {
 
                     // Scrolling up and down
                     Keys.onUpPressed: {
+                        if(sceneTextEditor.hasSelection) {
+                            event.accepted = sceneTextEditor.cursorPosition === 0
+                            return
+                        }
+
                         if(event.modifiers & Qt.ControlModifier) {
                             contentItem.scrollToPreviousScene()
                             event.accepted = true
@@ -1574,6 +1579,11 @@ Rectangle {
                         }
                     }
                     Keys.onDownPressed: {
+                        if(sceneTextEditor.hasSelection) {
+                            event.accepted = sceneTextEditor.cursorPosition >= sceneTextEditor.length -1
+                            return
+                        }
+
                         if(event.modifiers & Qt.ControlModifier) {
                             contentItem.scrollToNextScene()
                             event.accepted = true
