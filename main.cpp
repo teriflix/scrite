@@ -25,7 +25,6 @@
 
 #include "fileinfo.h"
 #include "undoredo.h"
-#include "completer.h"
 #include "ruleritem.h"
 #include "autoupdate.h"
 #include "automation.h"
@@ -46,6 +45,7 @@
 #include "scritedocument.h"
 #include "shortcutsmodel.h"
 #include "materialcolors.h"
+#include "completionmodel.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
 #include "openfromlibrary.h"
@@ -184,7 +184,7 @@ int main(int argc, char **argv)
 
     qmlRegisterType<GridBackgroundItem>("Scrite", 1, 0, "GridBackground");
     qmlRegisterUncreatableType<GridBackgroundItemBorder>("Scrite", 1, 0, "GridBackgroundItemBorder", reason);
-    qmlRegisterType<Completer>("Scrite", 1, 0, "Completer");
+    qmlRegisterType<CompletionModel>("Scrite", 1, 0, "CompletionModel");
 
     qmlRegisterUncreatableType<EventFilterResult>("Scrite", 1, 0, "EventFilterResult", "Use the instance provided by EventFilter.onFilter signal.");
     qmlRegisterUncreatableType<EventFilter>("Scrite", 1, 0, "EventFilter", apreason);

@@ -194,6 +194,7 @@ public:
     Q_INVOKABLE QColor textColorFor(const QColor &bgColor) const;
     const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
 
+    Q_INVOKABLE QRectF largestBoundingRect(const QStringList &text, const QFont &font) const;
     Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
     Q_INVOKABLE QRectF intersectedRectangle(const QRectF &of, const QRectF &with) const;
     Q_INVOKABLE bool   doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const;

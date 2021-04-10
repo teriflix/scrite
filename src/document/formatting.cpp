@@ -2548,7 +2548,17 @@ void SceneDocumentBinder::evaluateAutoCompleteHints()
         break;
     }
 
+    this->setAutoCompleteHintsFor(m_currentElement->type());
     this->setAutoCompleteHints(hints);
+}
+
+void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
+{
+    if(m_autoCompleteHintsFor == val)
+        return;
+
+    m_autoCompleteHintsFor = val;
+    emit autoCompleteHintsForChanged();
 }
 
 void SceneDocumentBinder::setAutoCompleteHints(const QStringList &val)

@@ -41,6 +41,7 @@
 #include <QFontDatabase>
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QtConcurrentMap>
 #include <QOperatingSystemVersion>
 #include <QNetworkConfigurationManager>
 
@@ -875,6 +876,30 @@ QColor Application::textColorFor(const QColor &bgColor) const
 {
     // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
     return evaluateLuminance(bgColor) > 0.5 ? Qt::black : Qt::white;
+}
+
+QRectF Application::largestBoundingRect(const QStringList &strings, const QFont &font) const
+{
+    if(strings.isEmpty())
+        return QRectF();
+
+    const QFontMetricsF fm(font);
+
+    auto evalTextRect = [fm](const QString &item) -> QRectF {
+        return fm.boundingRect(item);
+    };
+
+    auto pickLargestRect = [](QRectF &intermediate, const QRectF &rect) {
+        if(intermediate.isEmpty() || intermediate.width() < rect.width())
+            intermediate = rect;
+    };
+
+    // Turns out that using QtConcurrent takes more time than using a simple for loop
+    QRectF ret;
+    for(const QString &item : strings)
+        pickLargestRect(ret, evalTextRect(item));
+
+    return ret;
 }
 
 QRectF Application::boundingRect(const QString &text, const QFont &font) const

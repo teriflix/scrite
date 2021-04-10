@@ -569,6 +569,10 @@ public:
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }
     Q_SIGNAL void autoCompleteHintsChanged();
 
+    Q_PROPERTY(SceneElement::Type autoCompleteHintsFor READ autoCompleteHintsFor NOTIFY autoCompleteHintsForChanged)
+    SceneElement::Type autoCompleteHintsFor() const { return m_autoCompleteHintsFor; }
+    Q_SIGNAL void autoCompleteHintsForChanged();
+
     Q_PROPERTY(QString completionPrefix READ completionPrefix NOTIFY completionPrefixChanged)
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
@@ -620,6 +624,7 @@ private:
     bool eventFilter(QObject *object, QEvent *event);
 
     void evaluateAutoCompleteHints();
+    void setAutoCompleteHintsFor(SceneElement::Type val);
     void setAutoCompleteHints(const QStringList &val);
     void setCompletionPrefix(const QString &val);
     void setSpellingSuggestions(const QStringList &val);
@@ -659,6 +664,7 @@ private:
     QObjectProperty<SceneElement> m_currentElement;
     QObjectProperty<QQuickTextDocument> m_textDocument;
     QObjectProperty<ScreenplayFormat> m_screenplayFormat;
+    SceneElement::Type m_autoCompleteHintsFor = SceneElement::Action;
 };
 
 #endif // FORMATTING_H

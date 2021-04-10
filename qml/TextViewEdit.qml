@@ -96,7 +96,7 @@ Loader {
             wrapMode: textViewEdit.wrapMode
             horizontalAlignment: textViewEdit.horizontalAlignment
             verticalAlignment: textViewEdit.verticalAlignment
-            onTextChanged: textViewEdit.textEdited(text)
+            onTextChanged: { textViewEdit.textEdited(text); completionModel.allowEnable = true }
             selectByMouse: true
             selectByKeyboard: true
             background: Rectangle {
@@ -129,21 +129,55 @@ Loader {
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
 
-            Completer {
-                id: completer
+            onFocusChanged: completionModel.allowEnable = true
+
+            CompletionModel {
+                id: completionModel
+                property bool allowEnable: true
+                property string suggestion: currentCompletion
+                property bool hasSuggestion: count > 0
+                enabled: allowEnable && textArea.activeFocus
+                sortStrings: false
                 strings: completionStrings
-                suggestionMode: Completer.CompleteSuggestion
                 completionPrefix: textArea.text
+                filterKeyStrokes: textArea.activeFocus
+                onRequestCompletion: {
+                    textArea.text = currentCompletion
+                    textArea.cursorPosition = textArea.length
+                    allowEnable = false
+                }
+                property bool hasItems: count > 0
+                onHasItemsChanged: {
+                    if(hasItems)
+                        completionViewPopup.open()
+                    else
+                        completionViewPopup.close()
+                }
             }
 
-            Item {
-                x: parent.cursorRectangle.x
-                y: parent.cursorRectangle.y
-                width: parent.cursorRectangle.width
-                height: parent.cursorRectangle.height
-                ToolTip.visible: completer.hasSuggestion && parent.cursorVisible
-                ToolTip.text: completer.suggestion
-                visible: parent.cursorVisible
+            Popup {
+                id: completionViewPopup
+                x: parent.cursorRectangle.x - app.boundingRect(completionModel.completionPrefix, parent.font).width
+                y: parent.cursorRectangle.y + parent.cursorRectangle.height
+                width: app.largestBoundingRect(completionModel.strings, textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
+                height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+                focus: false
+                closePolicy: Popup.NoAutoClose
+                contentItem: ListView {
+                    id: completionView
+                    model: completionModel
+                    delegate: Text {
+                        width: completionView.width-1
+                        text: string
+                        padding: 5
+                        font: textArea.font
+                    }
+                    highlight: Rectangle {
+                        color: "lightsteelblue"
+                    }
+                    currentIndex: completionModel.currentRow
+                    height: contentHeight
+                }
             }
 
             Keys.onEscapePressed: {
@@ -151,9 +185,10 @@ Loader {
             }
 
             Keys.onReturnPressed: {
-                if(completer.hasSuggestion) {
-                    textArea.text = completer.suggestion
+                if(completionModel.hasSuggestion) {
+                    textArea.text = completionModel.suggestion
                     textArea.cursorPosition = textArea.length
+                    completionModel.allowEnable = false
                 } else if(event.modifiers !== Qt.NoModifier)
                     textArea.append("\n")
                 else

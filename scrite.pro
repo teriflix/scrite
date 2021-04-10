@@ -62,6 +62,7 @@ HEADERS += \
     src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
+    src/quick/objects/completionmodel.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
     src/quick/objects/tabsequencemanager.h \
@@ -69,7 +70,6 @@ HEADERS += \
     src/quick/objects/notification.h \
     src/quick/objects/fileinfo.h \
     src/quick/objects/searchengine.h \
-    src/quick/objects/completer.h \
     src/quick/objects/eventfilter.h \
     src/quick/objects/polygontesselator.h \
     src/quick/objects/shortcutsmodel.h \
@@ -165,6 +165,7 @@ SOURCES += \
     src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \
+    src/quick/objects/completionmodel.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \
     src/quick/objects/tabsequencemanager.cpp \
@@ -174,7 +175,6 @@ SOURCES += \
     src/quick/objects/notificationmanager.cpp \
     src/quick/objects/notification.cpp \
     src/quick/objects/resetonchange.cpp \
-    src/quick/objects/completer.cpp \
     src/quick/objects/eventfilter.cpp \
     src/quick/objects/aggregation.cpp \
     src/quick/objects/shortcutsmodel.cpp \

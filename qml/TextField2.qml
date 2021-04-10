@@ -17,8 +17,11 @@ import Scrite 1.0
 
 TextField {
     id: textField
-    property alias completionStrings: completer.strings
-    property alias completionPrefix: completer.completionPrefix
+    property alias completionStrings: completionModel.strings
+    property alias completionPrefix: completionModel.completionPrefix
+    property int minimumCompletionPrefixLength: 1
+    signal requestCompletion(string string)
+
     property Item tabItem
     property Item backTabItem
     property bool labelAlwaysVisible: false
@@ -38,8 +41,10 @@ TextField {
 
     onEditingFinished: {
         transliterate(true)
+        completionModel.allowEnable = false
         editingComplete()
     }
+
     Component.onDestruction: {
         transliterate(true)
         editingComplete()
@@ -50,21 +55,23 @@ TextField {
             selectAll()
     }
 
-    Item {
-        id: tooltipItem
-        x: parent.cursorRectangle.x
-        y: parent.cursorRectangle.y
-        width: parent.cursorRectangle.width
-        height: parent.cursorRectangle.height
-
-        ToolTip.visible: parent.activeFocus && completer.hasSuggestion && completer.suggestion !== parent.text
-        ToolTip.text: completer.suggestion
-    }
-
-    Completer {
-        id: completer
-        suggestionMode: Completer.CompleteSuggestion
-        completionPrefix: textField.text.toUpperCase()
+    CompletionModel {
+        id: completionModel
+        property bool allowEnable: true
+        property string suggestion: currentCompletion
+        property bool hasSuggestion: count > 0
+        enabled: allowEnable && textField.activeFocus
+        sortStrings: false
+        completionPrefix: textField.length >= textField.minimumCompletionPrefixLength ? textField.text : ""
+        filterKeyStrokes: textField.activeFocus
+        onRequestCompletion: autoCompleteOrFocusNext()
+        property bool hasItems: count > 0
+        onHasItemsChanged: {
+            if(hasItems)
+                completionViewPopup.open()
+            else
+                completionViewPopup.close()
+        }
     }
 
     UndoHandler {
@@ -75,7 +82,12 @@ TextField {
         onRedoRequest: textField.redo()
     }
 
-    onTextEdited: transliterate(false)
+    onTextEdited: {
+        transliterate(false)
+        completionModel.allowEnable = true
+    }
+
+    onFocusChanged: completionModel.allowEnable = true
 
     property bool userTypedSomeText: false
     Keys.onPressed: {
@@ -95,8 +107,8 @@ TextField {
     Keys.onTabPressed: autoCompleteOrFocusNext()
 
     function autoCompleteOrFocusNext() {
-        if(completer.hasSuggestion && completer.suggestion !== text) {
-            text = includeSuggestion(completer.suggestion)
+        if(completionModel.hasSuggestion && completionModel.suggestion !== text) {
+            text = includeSuggestion(completionModel.suggestion)
             editingFinished()
         } else if(tabItem) {
             editingFinished()
@@ -136,5 +148,30 @@ TextField {
         anchors.left: parent.left
         anchors.verticalCenter: parent.top
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
+    }
+
+    Popup {
+        id: completionViewPopup
+        x: 0
+        y: parent.height
+        width: parent.width
+        height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+        focus: false
+        closePolicy: Popup.NoAutoClose
+        contentItem: ListView {
+            id: completionView
+            model: completionModel
+            delegate: Text {
+                width: completionView.width-1
+                text: string
+                font: textField.font
+                padding: 5
+            }
+            highlight: Rectangle {
+                color: "lightsteelblue"
+            }
+            currentIndex: completionModel.currentRow
+            height: contentHeight
+        }
     }
 }

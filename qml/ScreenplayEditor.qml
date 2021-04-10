@@ -1061,6 +1061,7 @@ Rectangle {
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
                     onActiveFocusChanged: {
                         if(activeFocus) {
+                            completionModel.allowEnable = true
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
@@ -1173,17 +1174,18 @@ Rectangle {
                     // Support for transliteration.
                     property bool userIsTyping: false
                     EventFilter.active: sceneTextEditor.activeFocus
-                    EventFilter.events: [51,6] // Wheel, ShortcutOverride
+                    EventFilter.events: [EventFilter.Wheel, EventFilter.KeyPress] // Wheel, ShortcutOverride
                     EventFilter.onFilter: {
-                        if(event.type === 51) {
+                        if(event.type === EventFilter.Wheel) {
                             // We want to avoid TextArea from processing Ctrl+Z
                             // and other such shortcuts.
                             result.acceptEvent = false
                             result.filter = (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
-                        } else if(event.type === 6) {
+                        } else if(event.type === EventFilter.KeyPress) {
                             // Enter, Tab and other keys must not trigger
                             // Transliteration. Only space should.
                             sceneTextEditor.userIsTyping = event.hasText
+                            completionModel.allowEnable = event.hasText
                         }
                     }
                     Transliterator.enabled: contentItem.theScene && !contentItem.theScene.isBeingReset && userIsTyping
@@ -1209,8 +1211,6 @@ Rectangle {
                         width: parent.cursorRectangle.width
                         height: parent.cursorRectangle.height
                         visible: parent.cursorVisible
-                        ToolTip.text: '<font name="' + sceneDocumentBinder.currentFont.family + '"><font color="lightgray">' + sceneDocumentBinder.completionPrefix.toUpperCase() + '</font>' + completer.suggestion.toUpperCase() + '</font>';
-                        ToolTip.visible: completer.hasSuggestion
 
                         SpecialSymbolsSupport {
                             anchors.top: parent.bottom
@@ -1228,10 +1228,54 @@ Rectangle {
                             enabled: !scriteDocument.readOnly
                         }
 
-                        Completer {
-                            id: completer
+                        CompletionModel {
+                            id: completionModel
+                            property bool allowEnable: true
+                            property string suggestion: currentCompletion
+                            property bool hasSuggestion: count > 0
+                            enabled: allowEnable && sceneTextEditor.activeFocus
                             strings: sceneDocumentBinder.autoCompleteHints
+                            sortStrings: false
                             completionPrefix: sceneDocumentBinder.completionPrefix
+                            filterKeyStrokes: sceneTextEditor.activeFocus
+                            onRequestCompletion: sceneTextEditor.acceptCompletionSuggestion()
+                            minimumCompletionPrefixLength: 1
+                            property bool hasItems: count > 0
+                            onHasItemsChanged: {
+                                if(hasItems)
+                                    completionViewPopup.open()
+                                else
+                                    completionViewPopup.close()
+                            }
+
+                            property int autoCompleteStartingCursorPosition: 0
+                            property int achType: sceneDocumentBinder.autoCompleteHintsFor
+                            onAchTypeChanged: autoCompleteStartingCursorPosition = sceneTextEditor.cursorPosition
+                        }
+
+                        Popup {
+                            id: completionViewPopup
+                            x: -app.boundingRect(completionModel.completionPrefix, defaultFontMetrics.font).width
+                            y: parent.height
+                            width: app.largestBoundingRect(completionModel.strings, defaultFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
+                            height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+                            focus: false
+                            closePolicy: Popup.NoAutoClose
+                            contentItem: ListView {
+                                id: completionView
+                                model: completionModel
+                                delegate: Text {
+                                    width: completionView.width-1
+                                    text: string
+                                    padding: 5
+                                    font: defaultFontMetrics.font
+                                }
+                                highlight: Rectangle {
+                                    color: "lightsteelblue"
+                                }
+                                currentIndex: completionModel.currentRow
+                                height: contentHeight
+                            }
                         }
 
                         // Context menus must ideally show up directly below the cursor
@@ -1414,7 +1458,7 @@ Rectangle {
                         ShortcutsModelItem.enabled: sceneTextEditor.activeFocus && !scriteDocument.readOnly
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
                         ShortcutsModelItem.group: "Formatting"
-                        ShortcutsModelItem.title: completer.hasSuggestion ? "Auto-complete" : sceneDocumentBinder.nextTabFormatAsString
+                        ShortcutsModelItem.title: completionModel.hasSuggestion ? "Auto-complete" : sceneDocumentBinder.nextTabFormatAsString
                         ShortcutsModelItem.shortcut: "Tab"
                     }
 
@@ -1445,14 +1489,23 @@ Rectangle {
                         ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Ctrl+Delete" : "Ctrl+Backspace"
                     }
 
+                    function acceptCompletionSuggestion() {
+                        if(completionModel.suggestion !== "") {
+                            var suggestion = completionModel.suggestion
+                            userIsTyping = false
+                            remove(completionModel.autoCompleteStartingCursorPosition, cursorPosition)
+                            insert(cursorPosition, suggestion)
+                            userIsTyping = true
+                            Transliterator.enableFromNextWord()
+                            completionModel.allowEnable = false
+                            return true
+                        }
+                        return false
+                    }
+
                     Keys.onTabPressed: {
                         if(!scriteDocument.readOnly) {
-                            if(completer.suggestion !== "") {
-                                userIsTyping = false
-                                insert(cursorPosition, completer.suggestion)
-                                userIsTyping = true
-                                Transliterator.enableFromNextWord()
-                            } else
+                            if(!acceptCompletionSuggestion())
                                 sceneDocumentBinder.tab()
                             event.accepted = true
                         }
@@ -1837,7 +1890,7 @@ Rectangle {
                         property int dashPosition: text.lastIndexOf("-")
                         property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
                         completionStrings: editingLocationPart ? scriteDocument.structure.allLocations() : []
-                        completionPrefix: editingLocationPart ? text.substring(dotPosition+1, dashPosition < 0 ? text.length-1 : dashPosition).trim() : ""
+                        completionPrefix: editingLocationPart ? text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim() : ""
                         includeSuggestion: function(suggestion) {
                             if(editingLocationPart) {
                                 var one = text.substring(0, dotPosition).trim() + ". "
