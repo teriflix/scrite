@@ -67,7 +67,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
     auto addTextToParagraph = [&doc,this](QDomElement &element, const QString &text) {
         if(m_markLanguagesExplicitly) {
-            QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
+            QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text, true);
             Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
                 QDomElement textE = doc.createElement(QStringLiteral("Text"));
                 element.appendChild(textE);

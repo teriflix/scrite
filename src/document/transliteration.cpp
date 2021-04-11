@@ -723,7 +723,7 @@ bool TransliterationEngine::Boundary::isEmpty() const
     return end < 0 || start < 0 || start == end;
 }
 
-QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries(const QString &text) const
+QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries(const QString &text, bool bundleCommonScriptChars) const
 {
     QList<Boundary> ret;
     if(text.isEmpty())
@@ -763,7 +763,7 @@ QList<TransliterationEngine::Boundary> TransliterationEngine::evaluateBoundaries
 //        if(isSplChar)
 //            script = QChar::Script_Latin;
 
-        if(ch.script() == script)
+        if(ch.script() == script || (bundleCommonScriptChars && ch.script() == QChar::Script_Common))
         {
             item.append(ch, index);
             continue;

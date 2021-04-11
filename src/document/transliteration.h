@@ -130,7 +130,7 @@ public:
         void append(const QChar &ch, int pos);
         bool isEmpty() const;
     };
-    QList<Boundary> evaluateBoundaries(const QString &text) const;
+    QList<Boundary> evaluateBoundaries(const QString &text, bool bundleCommonScriptChars=false) const;
     void evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const;
 
     Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
