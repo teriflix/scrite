@@ -164,11 +164,12 @@ TextField {
             delegate: Text {
                 width: completionView.width-1
                 text: string
-                font: textField.font
                 padding: 5
+                font: textField.font
+                color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
             }
             highlight: Rectangle {
-                color: "lightsteelblue"
+                color: primaryColors.highlight.background
             }
             currentIndex: completionModel.currentRow
             height: contentHeight

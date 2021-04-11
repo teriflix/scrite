@@ -1247,10 +1247,6 @@ Rectangle {
                                 else
                                     completionViewPopup.close()
                             }
-
-                            property int autoCompleteStartingCursorPosition: 0
-                            property int achType: sceneDocumentBinder.autoCompleteHintsFor
-                            onAchTypeChanged: autoCompleteStartingCursorPosition = sceneTextEditor.cursorPosition
                         }
 
                         Popup {
@@ -1269,9 +1265,10 @@ Rectangle {
                                     text: string
                                     padding: 5
                                     font: defaultFontMetrics.font
+                                    color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
                                 }
                                 highlight: Rectangle {
-                                    color: "lightsteelblue"
+                                    color: primaryColors.highlight.background
                                 }
                                 currentIndex: completionModel.currentRow
                                 height: contentHeight
@@ -1493,7 +1490,7 @@ Rectangle {
                         if(completionModel.suggestion !== "") {
                             var suggestion = completionModel.suggestion
                             userIsTyping = false
-                            remove(completionModel.autoCompleteStartingCursorPosition, cursorPosition)
+                            remove(sceneDocumentBinder.currentBlockPosition(), cursorPosition)
                             insert(cursorPosition, suggestion)
                             userIsTyping = true
                             Transliterator.enableFromNextWord()

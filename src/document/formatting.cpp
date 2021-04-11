@@ -1730,6 +1730,13 @@ int SceneDocumentBinder::cursorPositionAtBlock(int blockNumber) const
     return -1;
 }
 
+int SceneDocumentBinder::currentBlockPosition() const
+{
+    QTextCursor cursor(this->document());
+    cursor.setPosition(m_cursorPosition);
+    return cursor.block().position();
+}
+
 QFont SceneDocumentBinder::currentFont() const
 {
     if(this->document() == nullptr)

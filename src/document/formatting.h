@@ -539,6 +539,7 @@ public:
 
     Q_INVOKABLE int lastCursorPosition() const;
     Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;
+    Q_INVOKABLE int currentBlockPosition() const;
 
     Q_PROPERTY(QStringList spellingSuggestions READ spellingSuggestions NOTIFY spellingSuggestionsChanged)
     QStringList spellingSuggestions() const {return m_spellingSuggestions; }

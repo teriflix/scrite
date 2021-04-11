@@ -171,9 +171,10 @@ Loader {
                         text: string
                         padding: 5
                         font: textArea.font
+                        color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
                     }
                     highlight: Rectangle {
-                        color: "lightsteelblue"
+                        color: primaryColors.highlight.background
                     }
                     currentIndex: completionModel.currentRow
                     height: contentHeight
