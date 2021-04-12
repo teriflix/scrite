@@ -312,7 +312,7 @@ Item {
                         text: "scrite.io"
                         font.family: "Courier Prime"
                         font.bold: true
-                        font.pixelSize: Math.min(videoOutput.width, videoOutput.height)*0.125 * 0.25
+                        font.pixelSize: Math.max(24, Math.min(videoOutput.width, videoOutput.height)*0.125 * 0.25)
                         horizontalAlignment: Text.AlignRight
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right

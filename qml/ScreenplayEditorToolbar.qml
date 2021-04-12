@@ -236,6 +236,13 @@ Row {
         opacity: 0.5
     }
 
+    QtObject {
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Current Scene Heading"
+        ShortcutsModelItem.shortcut: "Ctrl+0"
+        ShortcutsModelItem.enabled: enabled
+    }
+
     Repeater {
         model: screenplayEditorToolbar.tools
 
