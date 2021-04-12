@@ -243,6 +243,7 @@ Item {
         includeSceneSynopsis: false
         printEachSceneOnANewPage: false
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
+        property Item editor
     }
 
     Rectangle {
@@ -1213,7 +1214,7 @@ Item {
             anchors.right: editTools.visible ? editTools.left : parent.right
             anchors.margins: 10
             height: parent.height
-            visible: screenplayTextDocument !== null
+            visible: screenplayTextDocument.editor !== null
             property alias visibleToUser: currentTimeDisplay.visible
             property real contentWidth: currentTimeLabel.visible ? currentTimeLabel.width + 10 : 0
 
@@ -1328,7 +1329,6 @@ Item {
                 onCurrentIndexChanged: {
                     if(currentIndex !== 0)
                         shortcutsDockWidget.hide()
-                    globalTimeDisplay.visible = (currentIndex === 0 || currentIndex === 1)
                 }
 
                 TrackerPack {

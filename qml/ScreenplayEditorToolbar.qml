@@ -44,6 +44,7 @@ Row {
         ToolTip.text: "Preview the screenplay in print format."
         checkable: true
         checked: false
+        enabled: screenplayTextDocument.editor !== null
     }
 
     ToolButton3 {
@@ -52,7 +53,7 @@ Row {
         ToolTip.delay: 1000
         down: sceneCharactersMenu.visible
         onClicked: sceneCharactersMenu.visible = true
-        enabled: !showScreenplayPreview
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
 
         Item {
             width: parent.width
@@ -102,7 +103,7 @@ Row {
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
-        enabled: !showScreenplayPreview
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find"

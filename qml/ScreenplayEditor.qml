@@ -2426,7 +2426,6 @@ Rectangle {
         visible: globalScreenplayEditorToolbar.showScreenplayPreview
         active: globalScreenplayEditorToolbar.showScreenplayPreview
         anchors.fill: parent
-        onActiveChanged: globalTimeDisplay.visible = !active
         sourceComponent: ScreenplayPreview {
             purpose: ScreenplayTextDocument.ForPrinting
             screenplay: screenplayTextDocument.screenplay
@@ -2727,8 +2726,14 @@ Rectangle {
         onJustLoaded: restoreLayoutDetails()
     }
 
-    Component.onCompleted: restoreLayoutDetails()
-    Component.onDestruction: saveLayoutDetails()
+    Component.onCompleted: {
+        restoreLayoutDetails()
+        screenplayTextDocument.editor = screenplayEditor
+    }
+    Component.onDestruction: {
+        saveLayoutDetails()
+        screenplayTextDocument.editor = null
+    }
 
     function saveLayoutDetails() {
         if(sceneListSidePanel.visible) {
