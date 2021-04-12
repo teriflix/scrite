@@ -102,11 +102,11 @@ void ScreenplaySubsetReport::inject(QTextCursor &cursor, AbstractScreenplayTextD
 
     blockFormat.setIndent(2);
 
-    const Screenplay *screenplay = this->document()->screenplay();
+    const Screenplay *screenplay = this->screenplaySubset();
     for(int i=0; i<screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if( !this->includeScreenplayElement(element) )
+        if(element->scene() == nullptr || !element->scene()->heading()->isEnabled())
             continue;
 
         cursor.insertBlock(blockFormat, charFormat);

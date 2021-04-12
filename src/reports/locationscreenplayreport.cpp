@@ -124,8 +124,8 @@ void LocationScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTex
         cursor.insertBlock(blockFormat, charFormat);
         cursor.insertText("SUMMARY:");
 
-        QMap< QString, QList<const ScreenplayElement *> >::const_iterator it = m_locationSceneNumberList.begin();
-        QMap< QString, QList<const ScreenplayElement *> >::const_iterator end = m_locationSceneNumberList.end();
+        QMap< QString, QList<const ScreenplayElement *> >::const_iterator it = m_locationSceneNumberList.constBegin();
+        QMap< QString, QList<const ScreenplayElement *> >::const_iterator end = m_locationSceneNumberList.constEnd();
         while(it != end)
         {
             blockFormat = defaultBlockFormat;

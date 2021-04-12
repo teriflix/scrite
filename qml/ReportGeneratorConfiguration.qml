@@ -318,6 +318,8 @@ Item {
             return editor_MultipleLocationSelector
         if(kind === "MultipleSceneSelector")
             return editor_MultipleSceneSelector
+        if(kind === "MultipleEpisodeSelector")
+            return editor_MultipleEpisodeSelector
         if(kind === "CheckBox")
             return editor_CheckBox
         if(kind === "EnumSelector")
@@ -587,9 +589,18 @@ Item {
                     model: scriteDocument.screenplay
                     clip: true
                     property var selectedSceneNumbers: []
+                    property var selectedEpisodeNumbers: generator.episodeNumbers
 
                     function filter(scene) {
-                        if(scene && scene.heading.enabled) {
+                        if(selectedEpisodeNumbers && selectedEpisodeNumbers.length > 0) {
+                            if(scene && selectedEpisodeNumbers.indexOf(scene.episodeIndex+1) < 0)
+                                return false
+                        }
+
+                        if(scene) {
+                            if(!scene.heading.enabled)
+                                return false
+
                             var ret = true
                             if(ret && locTypeFilter.items.length > 0)
                                 ret &= locTypeFilter.items.contains(scene.heading.locationType)
@@ -597,8 +608,10 @@ Item {
                                 ret &= momentFilter.items.contains(scene.heading.moment)
                             if(ret && locFilter.items.length > 0)
                                 ret &= locFilter.items.contains(scene.heading.location)
+
                             return ret
                         }
+
                         return locTypeFilter.items.length === 0 && momentFilter.items.length === 0 && locFilter.items.length === 0
                     }
 
@@ -629,7 +642,7 @@ Item {
                             width: parent.width-1
                             font.pointSize: app.idealFontPointSize
                             font.family: scriteDocument.formatting.defaultFont.family
-                            visible: sceneListView.filter(screenplayElement.scene)
+                            visible: sceneListView.filter(screenplayElement.scene) && screenplayElement.scene && screenplayElement.scene.heading.enabled
                             text: {
                                 var scene = screenplayElement.scene
                                 if(scene && scene.heading.enabled)
@@ -687,6 +700,88 @@ Item {
                     text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
                     anchors.verticalCenter: parent.verticalCenter
                     padding: 5
+                }
+            }
+        }
+    }
+
+    Component {
+        id: editor_MultipleEpisodeSelector
+
+        Column {
+            property var fieldInfo
+            spacing: 5
+
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                text: fieldInfo.label
+            }
+
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                text: fieldInfo.note
+                font.pixelSize: 10
+                font.italic: true
+            }
+
+            Item {
+                width: parent.width
+                height: parent.spacing
+            }
+
+            ScrollView {
+                width: parent.width-20
+                height: 320
+                background: Rectangle {
+                    color: primaryColors.c50.background
+                    border.width: 1
+                    border.color: primaryColors.c50.text
+                }
+                ListView {
+                    id: episodeListView
+                    model: scriteDocument.screenplay.episodeCount + 1
+                    property var episodeNumbers: generator.getConfigurationValue(fieldInfo.name)
+
+                    function select(episodeNumber, flag) {
+                        var numbers = generator.getConfigurationValue(fieldInfo.name)
+                        var idx = numbers.indexOf(episodeNumber)
+                        if(flag) {
+                            if(idx < 0)
+                                numbers.push(episodeNumber)
+                            else
+                                return
+                        } else {
+                            if(idx >= 0)
+                                numbers.splice(idx, 1)
+                            else
+                                return
+                        }
+                        episodeNumbers = numbers
+                        generator.setConfigurationValue(fieldInfo.name, numbers)
+                    }
+
+                    delegate: Item {
+                        width: episodeListView.width-1
+                        height: index > 0 ? 40 : (scriteDocument.screenplay.episodeCount === 0 ? 40 : 0)
+
+                        Text {
+                            text: "No espisodes in this screenplay"
+                            visible: scriteDocument.screenplay.episodeCount === 0
+                            anchors.centerIn: parent
+                        }
+
+                        CheckBox2 {
+                            text: "EPISODE " + index
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: index > 0
+                            font.pointSize: app.idealFontPointSize
+                            font.family: scriteDocument.formatting.defaultFont.family
+                            checked: episodeListView.episodeNumbers.indexOf(index) >= 0
+                            onToggled: episodeListView.select(index, checked)
+                        }
+                    }
                 }
             }
         }

@@ -841,9 +841,24 @@ void ScreenplayTextDocument::loadScreenplay()
 
     AbstractScreenplayTextDocumentInjectionInterface *injection = qobject_cast<AbstractScreenplayTextDocumentInjectionInterface*>(m_injection);
     if(injection != nullptr)
+    {
         injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterTitlePage);
+        cursor.insertBlock();
+    }
 
-    const bool hasEpisdoes = m_screenplay->episodeCount() > 0;
+    bool hasEpisdoes = m_screenplay->episodeCount() > 0;
+    if(m_screenplay->scriteDocument() == nullptr)
+    {
+        const QList<ScreenplayElement*> allElements = m_screenplay->getElements();
+
+        QList<ScreenplayElement*> episodeElements;
+        std::copy_if(allElements.begin(), allElements.end(),
+                     std::back_inserter(episodeElements), [](ScreenplayElement *e) {
+            return e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Episode;
+        });
+
+        hasEpisdoes = !episodeElements.isEmpty();
+    }
 
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {

@@ -84,11 +84,22 @@ public:
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
+    Q_CLASSINFO("episodeNumbers_FieldGroup", "Episodes")
+    Q_CLASSINFO("episodeNumbers_FieldLabel", "Episodes to include in the report")
+    Q_CLASSINFO("episodeNumbers_FieldEditor", "MultipleEpisodeSelector")
+    Q_CLASSINFO("episodeNumbers_FieldNote", "If no episodes are selected, then the report is generted for all episodes in the screenplay.")
+    Q_PROPERTY(QList<int> episodeNumbers READ episodeNumbers WRITE setEpisodeNumbers NOTIFY episodeNumbersChanged)
+    void setEpisodeNumbers(const QList<int> &val);
+    QList<int> episodeNumbers() const { return m_episodeNumbers; }
+    Q_SIGNAL void episodeNumbersChanged();
+
     virtual QString screenplaySubtitle() const { return QStringLiteral("Screenplay Subset"); }
     virtual bool includeScreenplayElement(const ScreenplayElement *) const { return true; }
 
 protected:
     AbstractScreenplaySubsetReport(QObject *parent=nullptr);
+
+    Screenplay *screenplaySubset() const { return m_screenplaySubset; }
 
     // AbstractReportGenerator interface
     bool doGenerate(QTextDocument *);
@@ -110,6 +121,7 @@ private:
     bool m_listSceneCharacters = false;
     bool m_includeSceneContents = true;
     bool m_includeSceneSynopsis = false;
+    QList<int> m_episodeNumbers;
     Screenplay *m_screenplaySubset = nullptr;
     bool m_printEachSceneOnANewPage = false;
 };

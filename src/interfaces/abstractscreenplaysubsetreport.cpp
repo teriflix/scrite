@@ -91,6 +91,15 @@ void AbstractScreenplaySubsetReport::setPrintEachSceneOnANewPage(bool val)
     emit printEachSceneOnANewPageChanged();
 }
 
+void AbstractScreenplaySubsetReport::setEpisodeNumbers(const QList<int> &val)
+{
+    if(m_episodeNumbers == val)
+        return;
+
+    m_episodeNumbers = val;
+    emit episodeNumbersChanged();
+}
+
 bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 {
     ScriteDocument *document = this->document();
@@ -98,6 +107,30 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 
     if(m_screenplaySubset)
         delete m_screenplaySubset;
+
+    const bool hasEpisodes = screenplay->episodeCount() > 0;
+
+    QString subtitle = this->screenplaySubtitle();
+    if(hasEpisodes)
+    {
+        if(m_episodeNumbers.isEmpty())
+        {
+            if(screenplay->episodeCount() > 1)
+                subtitle += QStringLiteral(" [All %1 Episodes]").arg(screenplay->episodeCount());
+            else
+                subtitle += QStringLiteral(" [Episode 1]");
+        }
+        else if(m_episodeNumbers.size() == 1)
+            subtitle += QStringLiteral(" [Episode ") + QString::number(m_episodeNumbers.first()) + QStringLiteral("]");
+        else
+        {
+            QStringList epNrs;
+            epNrs.reserve(m_episodeNumbers.size());
+            for(int nr : qAsConst(m_episodeNumbers))
+                epNrs << QString::number(nr);
+            subtitle += QStringLiteral(" [Episode ") + epNrs.join(", ") + QStringLiteral("]");
+        }
+    }
 
     m_screenplaySubset = new Screenplay(this);
     m_screenplaySubset->setEmail(screenplay->email());
@@ -107,22 +140,41 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     m_screenplaySubset->setBasedOn(screenplay->basedOn());
     m_screenplaySubset->setContact(screenplay->contact());
     m_screenplaySubset->setVersion(screenplay->version());
-    m_screenplaySubset->setSubtitle(this->screenplaySubtitle());
+    m_screenplaySubset->setSubtitle(subtitle);
     m_screenplaySubset->setPhoneNumber(screenplay->phoneNumber());
     m_screenplaySubset->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
 
+    int episodeNr = 0; // Episode number is 1+episodeIndex
     for(int i=0; i<screenplay->elementCount(); i++)
     {
         ScreenplayElement *element = screenplay->elementAt(i);
-        if(this->includeScreenplayElement(element))
+        if(hasEpisodes && !m_episodeNumbers.isEmpty())
+        {
+            if(element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode)
+                ++episodeNr;
+            else if(i==0)
+                ++episodeNr;
+
+            if(!m_episodeNumbers.contains(episodeNr))
+                continue;
+        }
+
+        if(element->elementType() == ScreenplayElement::BreakElementType || this->includeScreenplayElement(element))
         {
             ScreenplayElement *element2 = new ScreenplayElement(m_screenplaySubset);
             element2->setElementType(element->elementType());
             if(element->elementType() == ScreenplayElement::BreakElementType)
+            {
                 element2->setBreakType(element->breakType());
-            element2->setScene(element->scene());
-            element2->setProperty("#sceneNumber", element->sceneNumber());
-            element2->setUserSceneNumber(element->userSceneNumber());
+                element2->setBreakTitle(element->breakTitle());
+            }
+            else
+            {
+                element2->setScene(element->scene());
+                element2->setProperty("#sceneNumber", element->sceneNumber());
+                element2->setUserSceneNumber(element->userSceneNumber());
+            }
+
             m_screenplaySubset->addElement(element2);
         }
     }

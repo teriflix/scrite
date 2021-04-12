@@ -26,6 +26,7 @@
 class Screenplay;
 class ScriteDocument;
 class AbstractImporter;
+class AbstractScreenplaySubsetReport;
 
 class ScreenplayElement : public QObject, public Modifiable
 {
@@ -139,6 +140,8 @@ private:
 private:
     friend class Screenplay;
     friend class AbstractImporter;
+    friend class AbstractScreenplaySubsetReport;
+
     bool m_expanded = true;
     int m_breakType = -1;
     bool m_selected = false;
