@@ -1622,6 +1622,10 @@ Rectangle {
                                     contentItem.mergeWithPreviousScene()
                                 }
                                 break
+                            case Qt.Key_0:
+                                event.accepted = true
+                                sceneHeadingAreaLoader.edit()
+                                break
                             case Qt.Key_X:
                                 event.accepted = true
                                 cut2()
@@ -1808,8 +1812,10 @@ Rectangle {
             property TextArea sceneTextEditor
 
             function edit() {
-                if(theScene.heading.enabled)
+                if(theScene.heading.enabled) {
                     sceneHeadingField.forceActiveFocus()
+                    contentView.ensureVisible(sceneHeadingField, sceneHeadingField.cursorRectangle)
+                }
             }
 
             height: sceneHeadingLayout.height + 24
