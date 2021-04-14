@@ -841,10 +841,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
     AbstractScreenplayTextDocumentInjectionInterface *injection = qobject_cast<AbstractScreenplayTextDocumentInjectionInterface*>(m_injection);
     if(injection != nullptr)
-    {
         injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterTitlePage);
-        cursor.insertBlock();
-    }
 
     bool hasEpisdoes = m_screenplay->episodeCount() > 0;
     if(m_screenplay->scriteDocument() == nullptr)
@@ -871,6 +868,8 @@ void ScreenplayTextDocument::loadScreenplay()
                 QTextBlockFormat episodeBlockFormat;
                 if(i > 0)
                     episodeBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysBefore);
+
+                cursor.insertBlock();
                 cursor.setBlockFormat(episodeBlockFormat);
 
                 QTextCharFormat episodeCharFormat;

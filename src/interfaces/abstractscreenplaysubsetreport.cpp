@@ -159,7 +159,8 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
                 continue;
         }
 
-        if(element->elementType() == ScreenplayElement::BreakElementType || this->includeScreenplayElement(element))
+        if( (element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode) ||
+            (element->scene() != nullptr && this->includeScreenplayElement(element)) )
         {
             ScreenplayElement *element2 = new ScreenplayElement(m_screenplaySubset);
             element2->setElementType(element->elementType());
@@ -167,6 +168,12 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
             {
                 element2->setBreakType(element->breakType());
                 element2->setBreakTitle(element->breakTitle());
+
+                ScreenplayElement* lastElement = m_screenplaySubset->elementAt(m_screenplaySubset->elementCount()-1);
+                if(lastElement &&
+                   lastElement->elementType() == ScreenplayElement::BreakElementType &&
+                   lastElement->breakType() == Screenplay::Episode)
+                    m_screenplaySubset->removeElement(lastElement);
             }
             else
             {
@@ -178,6 +185,12 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
             m_screenplaySubset->addElement(element2);
         }
     }
+
+    ScreenplayElement* lastElement = m_screenplaySubset->elementAt(m_screenplaySubset->elementCount()-1);
+    if(lastElement &&
+       lastElement->elementType() == ScreenplayElement::BreakElementType &&
+       lastElement->breakType() == Screenplay::Episode)
+        m_screenplaySubset->removeElement(lastElement);
 
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(this->format() == AdobePDF ? m_generateTitlePage : false);
