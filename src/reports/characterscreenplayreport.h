@@ -62,7 +62,7 @@ protected:
 private:
     QString m_comment;
     QString m_watermark;
-    bool m_includeNotes;
+    bool m_includeNotes = false;
     QStringList m_characterNames;
     bool m_includeSceneIcons = true;
     bool m_highlightDialogues = true;
