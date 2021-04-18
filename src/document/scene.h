@@ -154,6 +154,7 @@ public:
     bool isEmpty() const { return m_forwardMap.isEmpty() && m_reverseMap.isEmpty(); }
 
     QStringList characterNames() const;
+    bool containsCharacter(const QString &name) const;
     QList<SceneElement*> characterElements() const;
     QList<SceneElement*> characterElements(const QString &name) const;
 
@@ -258,6 +259,10 @@ public:
     Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
     QStringList characterNames() const { return m_characterElementMap.characterNames(); }
     Q_SIGNAL void characterNamesChanged();
+
+    Q_INVOKABLE bool hasCharacter(const QString &characterName) const {
+        return m_characterElementMap.containsCharacter(characterName);
+    }
 
     Q_INVOKABLE void addMuteCharacter(const QString &characterName);
     Q_INVOKABLE void removeMuteCharacter(const QString &characterName);

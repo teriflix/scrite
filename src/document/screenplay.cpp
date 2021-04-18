@@ -1490,7 +1490,7 @@ int Screenplay::lastSceneIndex() const
 
 bool Screenplay::setElements(const QList<ScreenplayElement *> &list)
 {
-    // Works only if the elements in the list supplied as parameters already
+    // Works only if the elements in the list supplied as parameters
     // is just a reordered list of elements already in the screenplay.
     if(list == m_elements)
         return true;

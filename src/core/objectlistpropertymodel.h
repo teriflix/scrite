@@ -67,7 +67,7 @@ public:
     }
 
     void prepend(T ptr) {
-        if(m_list.contains(ptr))
+        if(m_list.contains(ptr) || ptr == nullptr)
             return;
         this->beginInsertRows(QModelIndex(), 0, 0);
         m_list.prepend(ptr);
@@ -88,7 +88,7 @@ public:
     }
 
     void insert(int row, T ptr) {
-        if(m_list.contains(ptr))
+        if(m_list.contains(ptr) || ptr == nullptr)
             return;
         int iidx = row < 0 || row >= m_list.size() ? m_list.size() : row;
         this->beginInsertRows(QModelIndex(), iidx, iidx);

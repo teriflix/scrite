@@ -524,6 +524,11 @@ QStringList CharacterElementMap::characterNames() const
     return m_reverseMap.keys();
 }
 
+bool CharacterElementMap::containsCharacter(const QString &name) const
+{
+    return m_reverseMap.contains(name);
+}
+
 QList<SceneElement *> CharacterElementMap::characterElements() const
 {
     return m_forwardMap.keys();
