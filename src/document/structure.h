@@ -125,6 +125,7 @@ protected:
     bool event(QEvent *event);
     void resetFollow();
     void syncWithFollowItem();
+    void groupVerificationRequired();
 
 private:
     friend class StructurePositionCommand;

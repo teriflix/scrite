@@ -52,6 +52,7 @@ StructureElement::StructureElement(QObject *parent)
     {
         connect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
         connect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
+        connect(m_structure, &Structure::groupsModelChanged, this, &StructureElement::groupVerificationRequired);
     }
 }
 
@@ -278,6 +279,7 @@ bool StructureElement::event(QEvent *event)
         {
             connect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
             connect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
+            connect(m_structure, &Structure::groupsModelChanged, this, &StructureElement::groupVerificationRequired);
         }
 
         emit xfChanged();
@@ -296,6 +298,12 @@ void StructureElement::syncWithFollowItem()
     this->setY(m_follow->y());
     this->setWidth(m_follow->width());
     this->setHeight(m_follow->height());
+}
+
+void StructureElement::groupVerificationRequired()
+{
+    if(m_scene && m_structure)
+        m_scene->verifyGroups(m_structure->groupsModel());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

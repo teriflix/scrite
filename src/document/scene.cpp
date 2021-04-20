@@ -975,6 +975,46 @@ bool Scene::isInGroup(const QString &group) const
     return m_groups.contains(group, Qt::CaseInsensitive);
 }
 
+void Scene::verifyGroups(const QJsonArray &groupsModel)
+{
+    if(m_groups.isEmpty())
+        return;
+
+    if(groupsModel.isEmpty() && !m_groups.isEmpty())
+    {
+        m_groups.clear();
+        emit groupsChanged();
+        return;
+    }
+
+    auto verifyGroupsImpl = [](const QJsonArray &model, const QStringList &groups) {
+        QStringList ret;
+        std::copy_if(groups.begin(), groups.end(), std::back_inserter(ret),
+                     [model](const QString &group) {
+            for(const QJsonValue &item : model) {
+                const QJsonObject obj = item.toObject();
+                if(obj.value(QStringLiteral("name")).toString() == group)
+                    return true;
+            }
+            return false;
+        });
+        ret.sort(Qt::CaseInsensitive);
+        return ret;
+    };
+
+    QFuture<QStringList> verifiedGroupsFuture = QtConcurrent::run(verifyGroupsImpl, groupsModel, m_groups);
+    QFutureWatcher<QStringList> *verifiedGroupsFutureWatcher = new QFutureWatcher<QStringList>(this);
+    connect(verifiedGroupsFutureWatcher, &QFutureWatcher<QStringList>::finished, [=]() {
+         const QStringList filteredList = verifiedGroupsFutureWatcher->result();
+         if(filteredList != m_groups) {
+             m_groups = filteredList;
+             emit groupsChanged();
+         }
+         verifiedGroupsFutureWatcher->deleteLater();
+    });
+    verifiedGroupsFutureWatcher->setFuture(verifiedGroupsFuture);
+}
+
 QQmlListProperty<SceneElement> Scene::elements()
 {
     return QQmlListProperty<SceneElement>(

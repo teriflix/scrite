@@ -306,6 +306,7 @@ public:
     Q_INVOKABLE void addToGroup(const QString &group);
     Q_INVOKABLE void removeFromGroup(const QString &group);
     Q_INVOKABLE bool isInGroup(const QString &group) const;
+    void verifyGroups(const QJsonArray &groupsModel);
 
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements NOTIFY elementCountChanged)
     QQmlListProperty<SceneElement> elements();
