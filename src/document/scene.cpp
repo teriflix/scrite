@@ -1002,8 +1002,14 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
         return ret;
     };
 
+#if 0
+    const QString watcherName = QStringLiteral("verifiedGroupsFutureWatcher");
+    if( this->findChild<QFutureWatcherBase*>(watcherName, Qt::FindDirectChildrenOnly) != nullptr )
+        return;
+
     QFuture<QStringList> verifiedGroupsFuture = QtConcurrent::run(verifyGroupsImpl, groupsModel, m_groups);
     QFutureWatcher<QStringList> *verifiedGroupsFutureWatcher = new QFutureWatcher<QStringList>(this);
+    verifiedGroupsFutureWatcher->setObjectName(watcherName);
     connect(verifiedGroupsFutureWatcher, &QFutureWatcher<QStringList>::finished, [=]() {
          const QStringList filteredList = verifiedGroupsFutureWatcher->result();
          if(filteredList != m_groups) {
@@ -1013,6 +1019,13 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
          verifiedGroupsFutureWatcher->deleteLater();
     });
     verifiedGroupsFutureWatcher->setFuture(verifiedGroupsFuture);
+#else
+    const QStringList filteredList = verifyGroupsImpl(groupsModel, m_groups);
+    if(filteredList != m_groups) {
+        m_groups = filteredList;
+        emit groupsChanged();
+    }
+#endif
 }
 
 QQmlListProperty<SceneElement> Scene::elements()
