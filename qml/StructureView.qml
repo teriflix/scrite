@@ -852,7 +852,7 @@ Item {
                 }
 
                 EventFilter.target: app
-                EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1
+                EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1 && !modalDialog.active
                 EventFilter.events: [6]
                 EventFilter.onFilter: {
                     var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
@@ -2531,7 +2531,7 @@ Item {
             }
 
             EventFilter.target: app
-            EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus
+            EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus && !modalDialog.active
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
