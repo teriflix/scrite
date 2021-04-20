@@ -455,7 +455,24 @@ Item {
             property bool isBreakElement: element.elementType === ScreenplayElement.BreakElementType
             property bool active: element.scene ? scriteDocument.screenplay.activeScene === element.scene : false
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
-            property string sceneTitle: element.scene ? "[" + element.resolvedSceneNumber + "]: " + (element.scene.title === "" ? (element.scene.heading.enabled ? element.scene.heading.text : "NO SCENE HEADING") : element.scene.title) : element.breakTitle
+            property string sceneTitle: {
+                var ret = ""
+                if(element.scene) {
+                    if(element.scene.heading.enabled)
+                        ret += "[" + element.resolvedSceneNumber + "]: "
+                    if(element.scene.title !== "")
+                        ret += element.scene.title
+                    else {
+                        if(element.scene.heading.enabled)
+                            ret += element.scene.heading.text
+                        else
+                            ret += "NO SCENE HEADING"
+                    }
+                } else
+                    ret = element.breakTitle
+
+                return ret;
+            }
             property color sceneColor: element.scene ? element.scene.color : "white"
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
