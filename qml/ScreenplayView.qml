@@ -274,14 +274,34 @@ Item {
     }
 
     TrackerPack {
-        TrackProperty {
+        TrackSignal {
             target: screenplayTracks
-            property: "trackCount"
+            signal: "trackCountChanged()"
         }
 
         TrackProperty {
             target: scriteDocument.screenplay
-            property: "elementCount"
+            property: "currentElementIndex"
+        }
+
+        TrackSignal {
+            target: scriteDocument.screenplay
+            signal: "elementsChanged()"
+        }
+
+        TrackSignal {
+            target: scriteDocument.screenplay
+            signal: "elementInserted(ScreenplayElement*,int)"
+        }
+
+        TrackSignal {
+            target: scriteDocument.screenplay
+            signal: "elementRemoved(ScreenplayElement*,int)"
+        }
+
+        TrackSignal {
+            target: scriteDocument.screenplay
+            signal: "elementMoved(ScreenplayElement*,int,int)"
         }
 
         onTracked: screenplayElementList.updateCacheBuffer()
@@ -417,7 +437,7 @@ Item {
 
         function updateCacheBuffer() {
             if(screenplayTracks.trackCount > 0)
-                cacheBuffer = extents(count-1, count-1).to + 20
+                cacheBuffer = Math.max(extents(count-1, count-1).to + 20, contentWidth)
             else
                 cacheBuffer = 0
         }
