@@ -37,12 +37,7 @@ Menu2 {
             columns: Math.floor(width / minCellSize)
 
             Repeater {
-                model: app.standardColors
-                delegate: colorItemDelegate
-            }
-
-            Repeater {
-                model: workspaceSettings.customColors
+                model: app.standardColors.concat(workspaceSettings.customColors)
                 delegate: colorItemDelegate
             }
 
