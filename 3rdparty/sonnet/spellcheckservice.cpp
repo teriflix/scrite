@@ -250,6 +250,9 @@ void SpellCheckService::setAsynchronous(bool val)
 
 void SpellCheckService::scheduleUpdate()
 {
+    if( this->findChild<QFutureWatcherBase*>(QString(), Qt::FindDirectChildrenOnly) != nullptr )
+        return;
+
     m_textModifiable.markAsModified();
     m_updateTimer.start(500, this);
 }
@@ -340,7 +343,7 @@ void SpellCheckService::doUpdate()
     if(m_method == Automatic)
     {
         if(m_asynchronous)
-            m_updateTimer.start(500, this);
+            this->scheduleUpdate();
         else
             this->update();
     }
