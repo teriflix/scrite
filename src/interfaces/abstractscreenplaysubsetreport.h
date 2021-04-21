@@ -93,6 +93,15 @@ public:
     QList<int> episodeNumbers() const { return m_episodeNumbers; }
     Q_SIGNAL void episodeNumbersChanged();
 
+    Q_CLASSINFO("tags_FieldGroup", "Tags")
+    Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
+    Q_CLASSINFO("tags_FieldEditor", "MultipleGroupSelector")
+    Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    void setTags(const QStringList &val);
+    QStringList tags() const { return m_tags; }
+    Q_SIGNAL void tagsChanged();
+
     virtual QString screenplaySubtitle() const { return QStringLiteral("Screenplay Subset"); }
     virtual bool includeScreenplayElement(const ScreenplayElement *) const { return true; }
 
@@ -114,6 +123,7 @@ protected:
     virtual void configureScreenplayTextDocument(ScreenplayTextDocument &) { }
 
 private:
+    QStringList m_tags;
     bool m_generateTitlePage = true;
     bool m_printSceneContent = true;
     bool m_includeSceneIcons = true;

@@ -100,6 +100,15 @@ void AbstractScreenplaySubsetReport::setEpisodeNumbers(const QList<int> &val)
     emit episodeNumbersChanged();
 }
 
+void AbstractScreenplaySubsetReport::setTags(const QStringList &val)
+{
+    if(m_tags == val)
+        return;
+
+    m_tags = val;
+    emit tagsChanged();
+}
+
 bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 {
     ScriteDocument *document = this->document();
@@ -159,6 +168,24 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
                 continue;
         }
 
+        if(!m_tags.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType && element->scene() != nullptr)
+        {
+            Scene *scene = element->scene();
+
+            const QStringList sceneTags = scene->groups();
+            if(sceneTags.isEmpty())
+                continue;
+
+            QStringList tags;
+            std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
+                         [=](const QString &sceneTag) {
+                return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
+            });
+
+            if(tags.isEmpty())
+                continue;
+        }
+
         if( (element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode) ||
             (element->scene() != nullptr && this->includeScreenplayElement(element)) )
         {
@@ -176,7 +203,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
                     m_screenplaySubset->removeElement(lastElement);
             }
             else
-            {
+            {                
                 element2->setScene(element->scene());
                 element2->setProperty("#sceneNumber", element->sceneNumber());
                 element2->setUserSceneNumber(element->userSceneNumber());
