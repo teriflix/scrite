@@ -88,6 +88,23 @@ private:
     QString m_locationType = "EXT";
 };
 
+class SceneElementContentChange
+{
+public:
+    SceneElementContentChange() { }
+    SceneElementContentChange(int pos, int added, int rem, const QString &str=QString())
+        : position(pos), charsAdded(added), charsRemoved(rem), content(str) { }
+
+    int position = -1;
+    int charsAdded = -1;
+    int charsRemoved = -1;
+    QString content;
+
+    bool isValid() const {
+        return position >= 0 && (charsAdded > 0 || charsRemoved > 0);
+    }
+};
+
 class SceneElement : public QObject, public Modifiable
 {
     Q_OBJECT
@@ -124,6 +141,9 @@ public:
     int cursorPosition() const;
     Q_SIGNAL void cursorPositionChanged();
 
+    void setLastContentChange(const SceneElementContentChange &val) { m_lastContentChange = val; }
+    SceneElementContentChange lastContentChange() const;
+
     QString formattedText() const;
 
     Q_SIGNAL void elementChanged();
@@ -138,6 +158,7 @@ private:
     QString m_text;
     Scene* m_scene = nullptr;
     mutable SpellCheckService *m_spellCheck = nullptr;
+    mutable SceneElementContentChange m_lastContentChange;
 };
 
 class CharacterElementMap

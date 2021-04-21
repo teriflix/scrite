@@ -1414,6 +1414,8 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
 
     ScreenplayTextDocumentUpdate update(this);
 
+    const SceneElementContentChange lastParaChange = para->lastContentChange();
+
     QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
     for(ScreenplayElement *element : qAsConst(elements))
     {
@@ -1433,11 +1435,25 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
                 this->formatBlock(block);
             else if(type == Scene::ElementTextChange)
             {
-                if(m_purpose == ForDisplay)
+                if(m_purpose == ForDisplay && !block.text().isEmpty())
                 {
                     QTextCursor cursor(block);
-                    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-                    cursor.insertText(para->text());
+                    if(lastParaChange.isValid())
+                    {
+                        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, lastParaChange.position);
+                        if(lastParaChange.charsAdded > 0)
+                            cursor.insertText(lastParaChange.content);
+                        else
+                        {
+                            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, lastParaChange.charsRemoved);
+                            cursor.removeSelectedText();
+                        }
+                    }
+                    else
+                    {
+                        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+                        cursor.insertText(para->text());
+                    }
                 }
                 else
                     this->formatBlock(block, para->text());
@@ -1802,15 +1818,18 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
 
         const QString paraText = para ? para->text() : (scene->heading()->isEnabled() ? scene->heading()->text() : QStringLiteral("NO SCENE HEADING"));
 
+        if(para)
+            para->lastContentChange();
+
         ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
 
         QTextCursor cursor(block);
         if(!newBlock)
             cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
 
+
         if(data->isModified())
             cursor.insertText(paraText);
-
 #if 0
         if(lastParaType != data->elementType())
         {
@@ -2040,6 +2059,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             if(highlightParagraph)
                 cursor.mergeCharFormat(highlightCharFormat);
 
+            para->lastContentChange();
             const QString text = para->text();
             if(m_purpose == ForPrinting)
                 polishFontsAndInsertTextAtCursor(cursor, text);

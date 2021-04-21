@@ -2339,19 +2339,10 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     if(m_initializingDocument || m_sceneIsBeingReset)
         return;
 
-    Q_UNUSED(charsRemoved)
-    Q_UNUSED(charsAdded)
-
     if(m_textDocument == nullptr || m_scene == nullptr || this->document() == nullptr)
         return;
 
     m_tabHistory.clear();
-
-    if(charsRemoved > 0)
-    {
-        this->syncSceneFromDocument();
-        return;
-    }
 
     QTextCursor cursor(this->document());
     cursor.setPosition(from);
@@ -2371,15 +2362,25 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         return;
     }
 
-    const int to = from + charsAdded - 1;
-    if(to > block.position() + block.length())
+    sceneElement->setLastContentChange(SceneElementContentChange());
+
+    /**
+      If the number of paragraphs in the document is differnet from the number of
+      paragraphs in our internal Scene data structure, then we better sync it once.
+      This can happen when user pastes more than 1 paragraphs at once or if the user
+      deletes more than 1 paragraphs at once.
+      */
+    if(this->document()->blockCount() != sceneElement->scene()->elementCount())
     {
         this->syncSceneFromDocument();
         return;
     }
 
+    const int blockPosition = from - block.position();
+    const QString changedText = charsAdded > 0 ? block.text().mid(blockPosition, charsAdded) : QString();
+    sceneElement->setLastContentChange( SceneElementContentChange(blockPosition, charsAdded, charsRemoved, changedText) );
     sceneElement->setText(block.text());
-    if(m_spellCheckEnabled && m_liveSpellCheckEnabled)
+    if(m_spellCheckEnabled && m_liveSpellCheckEnabled && (charsAdded > 0 || charsRemoved >0))
         userData->scheduleSpellCheckUpdate();
 }
 
