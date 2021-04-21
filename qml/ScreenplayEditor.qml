@@ -1239,7 +1239,7 @@ Rectangle {
                             completionPrefix: sceneDocumentBinder.completionPrefix
                             filterKeyStrokes: sceneTextEditor.activeFocus
                             onRequestCompletion: sceneTextEditor.acceptCompletionSuggestion()
-                            minimumCompletionPrefixLength: 1
+                            minimumCompletionPrefixLength: 0
                             property bool hasItems: count > 0
                             onHasItemsChanged: {
                                 if(hasItems)
