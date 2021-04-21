@@ -195,6 +195,11 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
                 return true;
             }
             break;
+        case Qt::Key_Escape:
+            this->beginResetModel();
+            m_filteredStrings.clear();
+            this->endResetModel();
+            return true;
         case Qt::Key_Enter:
         case Qt::Key_Return: {
                 const QString cc = this->currentCompletion();
