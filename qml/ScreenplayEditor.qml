@@ -2738,7 +2738,6 @@ Rectangle {
     }
     Component.onDestruction: {
         saveLayoutDetails()
-        screenplayTextDocument.editor = null
     }
 
     function saveLayoutDetails() {
