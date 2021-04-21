@@ -2380,7 +2380,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     const QString changedText = charsAdded > 0 ? block.text().mid(blockPosition, charsAdded) : QString();
     sceneElement->setLastContentChange( SceneElementContentChange(blockPosition, charsAdded, charsRemoved, changedText) );
     sceneElement->setText(block.text());
-    if(m_spellCheckEnabled && m_liveSpellCheckEnabled && (charsAdded > 0 || charsRemoved >0))
+    if(m_spellCheckEnabled && m_liveSpellCheckEnabled && (charsAdded > 0 || charsRemoved > 0))
         userData->scheduleSpellCheckUpdate();
 }
 

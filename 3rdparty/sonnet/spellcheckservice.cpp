@@ -256,6 +256,8 @@ void SpellCheckService::scheduleUpdate()
 
 void SpellCheckService::update()
 {
+    m_updateTimer.stop();
+
     if(!m_textTracker.isModified())
         return;
 
@@ -347,10 +349,7 @@ void SpellCheckService::doUpdate()
 void SpellCheckService::timerEvent(QTimerEvent *event)
 {
     if(event->timerId() == m_updateTimer.timerId())
-    {
-        m_updateTimer.stop();
         this->update();
-    }
 }
 
 void SpellCheckService::spellCheckComplete()
