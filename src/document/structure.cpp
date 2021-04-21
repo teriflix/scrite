@@ -3182,6 +3182,18 @@ Annotation *Structure::annotationAt(int index) const
     return index < 0 || index >= m_annotations.size() ? nullptr : m_annotations.at(index);
 }
 
+bool Structure::canBringToFront(Annotation *ptr) const
+{
+    const int idx = ptr ? m_annotations.indexOf(ptr) : -1;
+    return idx >= 0 && idx < m_annotations.size()-1;
+}
+
+bool Structure::canSendToBack(Annotation *ptr) const
+{
+    const int idx = ptr ? m_annotations.indexOf(ptr) : -1;
+    return idx >= 1;
+}
+
 void Structure::bringToFront(Annotation *ptr)
 {
     if(ptr == nullptr || m_annotations.empty())

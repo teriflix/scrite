@@ -325,18 +325,6 @@ Item {
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
             }
-
-            ToolButton3 {
-                enabled: annotationGripLoader.active
-                iconSource: "../icons/navigation/property_editor.png"
-                ToolTip.text: "Display properties of selected annotation"
-                down: floatingDockWidget.visible
-                onClicked: structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
-                Connections {
-                    target: floatingDockWidget
-                    onCloseRequest: structureCanvasSettings.displayAnnotationProperties = false
-                }
-            }
         }
     }
 
@@ -2511,6 +2499,71 @@ Item {
 
             property real gripSize: 10 * onePxSize
             property real onePxSize: Math.max(1, 1/canvas.scale)
+
+            BoxShadow {
+                anchors.fill: annotationToolBar
+                opacity: 0.5
+            }
+
+            Rectangle {
+                id: annotationToolBar
+                anchors.left: parent.left
+                anchors.bottom: parent.top
+                anchors.bottomMargin: parent.gripSize
+                color: primaryColors.c100.background
+                height: annotationToolBarLayout.height+5
+                width: annotationToolBarLayout.width+5
+                border.width: 1
+                border.color: primaryColors.borderColor
+
+                Row {
+                    id: annotationToolBarLayout
+                    anchors.centerIn: parent
+
+                    ToolButton3 {
+                        iconSource: "../icons/action/edit.png"
+                        ToolTip.text: "Edit properties of this annotation"
+                        down: floatingDockWidget.visible
+                        onClicked: structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
+                        Connections {
+                            target: floatingDockWidget
+                            onCloseRequest: structureCanvasSettings.displayAnnotationProperties = false
+                        }
+                    }
+
+                    ToolButton3 {
+                        iconSource: "../icons/action/keyboard_arrow_up.png"
+                        ToolTip.text: "Bring this annotation to front"
+                        enabled: scriteDocument.structure.canBringToFront(annotationGripLoader.annotation)
+                        onClicked: {
+                            var a = annotationGripLoader.annotation
+                            annotationGripLoader.reset()
+                            scriteDocument.structure.bringToFront(a)
+                        }
+                    }
+
+                    ToolButton3 {
+                        iconSource: "../icons/action/keyboard_arrow_down.png"
+                        ToolTip.text: "Send this annotation to back"
+                        enabled: scriteDocument.structure.canSendToBack(annotationGripLoader.annotation)
+                        onClicked: {
+                            var a = annotationGripLoader.annotation
+                            annotationGripLoader.reset()
+                            scriteDocument.structure.sendToBack(a)
+                        }
+                    }
+
+                    ToolButton3 {
+                        iconSource: "../icons/action/delete.png"
+                        ToolTip.text: "Delete this annotation"
+                        onClicked: {
+                            var a = annotationGripLoader.annotation
+                            annotationGripLoader.reset()
+                            scriteDocument.structure.removeAnnotation(a)
+                        }
+                    }
+                }
+            }
 
             PainterPathItem {
                 id: focusIndicator

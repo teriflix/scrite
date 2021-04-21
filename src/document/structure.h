@@ -737,6 +737,8 @@ public:
     Q_INVOKABLE void addAnnotation(Annotation *ptr);
     Q_INVOKABLE void removeAnnotation(Annotation *ptr);
     Q_INVOKABLE Annotation *annotationAt(int index) const;
+    Q_INVOKABLE bool canBringToFront(Annotation *ptr) const;
+    Q_INVOKABLE bool canSendToBack(Annotation *ptr) const;
     Q_INVOKABLE void bringToFront(Annotation *ptr);
     Q_INVOKABLE void sendToBack(Annotation *ptr);
     void setAnnotations(const QList<Annotation*> &list);
