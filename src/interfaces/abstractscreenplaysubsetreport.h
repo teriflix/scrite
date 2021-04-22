@@ -95,7 +95,7 @@ public:
 
     Q_CLASSINFO("tags_FieldGroup", "Tags")
     Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
-    Q_CLASSINFO("tags_FieldEditor", "MultipleGroupSelector")
+    Q_CLASSINFO("tags_FieldEditor", "MultipleTagGroupSelector")
     Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
     Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
     void setTags(const QStringList &val);

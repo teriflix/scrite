@@ -320,6 +320,8 @@ Item {
             return editor_MultipleSceneSelector
         if(kind === "MultipleEpisodeSelector")
             return editor_MultipleEpisodeSelector
+        if(kind === "MultipleTagGroupSelector")
+            return editor_MultipleTagGroupSelector;
         if(kind === "CheckBox")
             return editor_CheckBox
         if(kind === "EnumSelector")
@@ -742,6 +744,7 @@ Item {
                 ListView {
                     id: episodeListView
                     model: scriteDocument.screenplay.episodeCount + 1
+                    clip: true
                     property var episodeNumbers: generator.getConfigurationValue(fieldInfo.name)
 
                     function select(episodeNumber, flag) {
@@ -780,6 +783,82 @@ Item {
                             font.family: scriteDocument.formatting.defaultFont.family
                             checked: episodeListView.episodeNumbers.indexOf(index) >= 0
                             onToggled: episodeListView.select(index, checked)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: editor_MultipleTagGroupSelector
+
+        Column {
+            spacing: 5
+            property var fieldInfo
+
+            Text {
+                id: labelText
+                width: parent.width-20
+                wrapMode: Text.WordWrap
+                text: fieldInfo.label
+            }
+
+            Text {
+                id: noteText
+                width: parent.width-20
+                wrapMode: Text.WordWrap
+                text: fieldInfo.note
+                font.pixelSize: 10
+                font.italic: true
+            }
+
+            ScrollView {
+                height: 350
+                width: parent.width-20
+                background: Rectangle {
+                    color: primaryColors.c50.background
+                    border.width: 1
+                    border.color: primaryColors.c50.text
+                }
+                ListView {
+                    id: groupsView
+                    clip: true
+                    model: GenericArrayModel {
+                        array: scriteDocument.structure.groupsModel
+                        objectMembers: ["category", "label", "name"]
+                    }
+                    section.property: "category"
+                    section.criteria: ViewSection.FullString
+                    section.delegate: Item {
+                        width: groupsView.width
+                        height: 40
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: 3
+                            color: primaryColors.windowColor
+                            Text {
+                                text: section
+                                topPadding: 5
+                                bottomPadding: 5
+                                anchors.centerIn: parent
+                                color: primaryColors.button.text
+                                font.pointSize: app.idealFontPointSize
+                            }
+                        }
+                    }
+                    property var checkedTags: generator.getConfigurationValue(fieldInfo.name)
+                    delegate: CheckBox2 {
+                        text: label
+                        checked: groupsView.checkedTags.indexOf(name) >= 0
+                        onToggled: {
+                            var tags = groupsView.checkedTags
+                            if(checked)
+                                tags.push(name)
+                            else
+                                tags.splice(tags.indexOf(name), 1)
+                            groupsView.checkedTags = tags
+                            generator.setConfigurationValue(fieldInfo.name, tags)
                         }
                     }
                 }
