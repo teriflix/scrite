@@ -97,6 +97,11 @@ public:
     QPointF position() const { return QPointF(m_x,m_y); }
     Q_SIGNAL void positionChanged();
 
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    void setTitle(const QString &val);
+    QString title() const;
+    Q_SIGNAL void titleChanged();
+
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
     void setScene(Scene* val);
     Scene* scene() const { return m_scene; }
@@ -136,6 +141,7 @@ private:
     qreal m_height = 0;
     QString m_stackId;
     bool m_stackLeader = false;
+    QString m_title;
     Scene* m_scene = nullptr;
     bool m_selected = false;
     Structure *m_structure = nullptr;

@@ -1879,6 +1879,7 @@ Rectangle {
                         enabled: headingItem.theScene.heading.enabled
                         label: ""
                         placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+                        maximumLength: 140
                         font.family: headingFontMetrics.font.family
                         font.pointSize: headingFontMetrics.font.pointSize
                         font.bold: headingFontMetrics.font.bold

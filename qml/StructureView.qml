@@ -2152,18 +2152,19 @@ Item {
                 TextField2 {
                     id: headingField
                     width: parent.width
-                    text: element.scene.heading.text
-                    enabled: element.scene.heading.enabled
+                    text: element.title
+                    enabled: true
                     label: "Scene Heading"
                     labelAlwaysVisible: true
-                    placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+                    placeholderText: "Index Card Title"
+                    maximumLength: 140
                     font.family: scriteDocument.formatting.defaultFont.family
                     font.bold: true
                     font.capitalization: Font.AllUppercase
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     readOnly: scriteDocument.readOnly || canvas.scale < 0.5
-                    onEditingComplete: element.scene.heading.parseFrom(text)
+                    onEditingComplete: element.title = text
                     onActiveFocusChanged: {
                         if(activeFocus) {
                             elementItem.select()

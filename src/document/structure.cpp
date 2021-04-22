@@ -54,6 +54,11 @@ StructureElement::StructureElement(QObject *parent)
         connect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
         connect(m_structure, &Structure::groupsModelChanged, this, &StructureElement::groupVerificationRequired);
     }
+
+    connect(this, &StructureElement::sceneHeadingChanged, [=]() {
+        if(m_title.isEmpty())
+            emit titleChanged();
+    });
 }
 
 StructureElement::~StructureElement()
@@ -197,6 +202,35 @@ void StructureElement::setPosition(const QPointF &pos)
 
     this->setX(pos.x());
     this->setY(pos.y());
+}
+
+void StructureElement::setTitle(const QString &val)
+{
+    if(m_title == val)
+        return;
+
+    m_title = val;
+    emit titleChanged();
+
+    SceneHeading *heading = m_scene->heading();
+    if(heading->isEnabled())
+    {
+        QString _locationType, _location, _moment;
+        if( SceneHeading::parse(val, _locationType, _location, _moment) )
+        {
+            heading->setLocationType(_locationType);
+            heading->setLocation(_location);
+            heading->setMoment(_moment);
+        }
+    }
+}
+
+QString StructureElement::title() const
+{
+    if(!m_title.isEmpty())
+        return m_title;
+
+    return m_scene->heading()->isEnabled() ? m_scene->heading()->text() : QString();
 }
 
 void StructureElement::setScene(Scene *val)

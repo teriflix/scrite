@@ -259,62 +259,58 @@ QString SceneHeading::text() const
     return QString();
 }
 
-void SceneHeading::parseFrom(const QString &text)
+bool SceneHeading::parse(const QString &text, QString &locationType, QString &location, QString &moment)
 {
-    if(!m_enabled || this->text() == text)
-        return;
-
     const Structure *structure = ScriteDocument::instance()->structure();
     const QString heading = text.toUpper().trimmed();
     const int field1SepLoc = heading.indexOf('.');
     const int field2SepLoc = heading.lastIndexOf('-');
 
-    auto applyChanges = [=](const QString &_locType, const QString &_loc, const QString &_moment) {
-        PushSceneUndoCommand cmd(m_scene, false);
-
-        m_moment = _moment;
-        m_location = _loc;
-        m_locationType = _locType;
-
-        emit momentChanged();
-        emit locationChanged();
-        emit locationTypeChanged();
-    };
-
     if(field1SepLoc < 0 && field2SepLoc < 0)
     {
         if( structure->standardLocationTypes().contains(heading) )
-            applyChanges(heading, m_location, m_moment);
+            locationType = heading;
         else if( structure->standardMoments().contains(heading) )
-            applyChanges(m_locationType, m_location, heading);
+            moment = heading;
         else
-            applyChanges(m_locationType, heading, m_moment);
-        return;
+            location = heading;
+        return false;
     }
 
     if(field1SepLoc < 0)
     {
-        const QString moment = heading.mid(field2SepLoc+1).trimmed();
-        const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
-
-        applyChanges(m_locationType, location, moment);
-        return;
+        moment = heading.mid(field2SepLoc+1).trimmed();
+        location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+        return false;
     }
 
     if(field2SepLoc < 0)
     {
-        const QString locationType = heading.left(field1SepLoc).trimmed();
-        const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
-
-        applyChanges(locationType, location, m_moment);
-        return;
+        locationType = heading.left(field1SepLoc).trimmed();
+        location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+        return false;
     }
 
-    const QString locationType = heading.left(field1SepLoc).trimmed();
-    const QString moment = heading.mid(field2SepLoc+1).trimmed();
-    const QString location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+    locationType = heading.left(field1SepLoc).trimmed();
+    moment = heading.mid(field2SepLoc+1).trimmed();
+    location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+    return true;
+}
 
-    applyChanges(locationType, location, moment);
+void SceneHeading::parseFrom(const QString &text)
+{
+    if(!m_enabled || this->text() == text)
+        return;
+
+    QString _locationType, _location, _moment;
+    parse(text, _locationType, _location, _moment);
+
+    if(!_locationType.isEmpty())
+        this->setLocationType(_locationType);
+    if(!_location.isEmpty())
+        this->setLocation(_location);
+    if(!_moment.isEmpty())
+        this->setMoment(_moment);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
