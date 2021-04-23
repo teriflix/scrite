@@ -17,7 +17,6 @@
 #include "application.h"
 #include "imageprinter.h"
 #include "timeprofiler.h"
-#include "timeprofiler.h"
 #include "printerobject.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"

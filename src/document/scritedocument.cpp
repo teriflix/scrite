@@ -183,14 +183,6 @@ void ScriteDocument::setBusy(bool val)
 
     m_busy = val;
     emit busyChanged();
-
-    if(val)
-    {
-        QElapsedTimer timer;
-        timer.start();
-        while(timer.elapsed() < 100)
-            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-    }
 }
 
 void ScriteDocument::setBusyMessage(const QString &val)
