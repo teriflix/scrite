@@ -2388,7 +2388,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
       This can happen when user pastes more than 1 paragraphs at once or if the user
       deletes more than 1 paragraphs at once.
       */
-    if(this->document()->blockCount() != sceneElement->scene()->elementCount())
+    if(sceneElement->scene() == nullptr || this->document()->blockCount() != sceneElement->scene()->elementCount())
     {
         this->syncSceneFromDocument();
         return;
