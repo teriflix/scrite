@@ -172,6 +172,11 @@ private:
     Qt::Alignment m_textAlignment = Qt::AlignLeft;
     SceneElement::Type m_elementType = SceneElement::Action;
     DefaultLanguage m_defaultLanguage = Default;
+
+    mutable qreal m_lastCreatedBlockFormatPageWidth = 0;
+    mutable QTextBlockFormat m_lastCreatedBlockFormat;
+    mutable qreal m_lastCreatedCharFormatPageWidth = 0;
+    mutable QTextCharFormat m_lastCreatedCharFormat;
 };
 
 class ScreenplayPageLayout : public QObject

@@ -42,6 +42,8 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
 {
     QObject::connect(this, &SceneElementFormat::elementFormatChanged, [this]() {
         this->markAsModified();
+        m_lastCreatedBlockFormatPageWidth = -1;
+        m_lastCreatedCharFormatPageWidth = -1;
     });
     QObject::connect(this, &SceneElementFormat::fontChanged, this, &SceneElementFormat::font2Changed);
     QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &SceneElementFormat::font2Changed);
@@ -233,6 +235,9 @@ void SceneElementFormat::activateDefaultLanguage()
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContentWidth) const
 {
+    if(m_lastCreatedBlockFormatPageWidth > 0 && givenContentWidth && *givenContentWidth == m_lastCreatedBlockFormatPageWidth)
+        return m_lastCreatedBlockFormat;
+
     const qreal dpr = m_format->devicePixelRatio();
     const QFontMetrics fm = m_format->screen() ? m_format->defaultFont2Metrics() : m_format->defaultFontMetrics();
     const qreal contentWidth = givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
@@ -250,12 +255,19 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContent
     if( !qFuzzyIsNull(m_backgroundColor.alphaF()) )
         format.setBackground(QBrush(m_backgroundColor));
 
+    if(givenContentWidth)
+    {
+        m_lastCreatedBlockFormatPageWidth = *givenContentWidth;
+        m_lastCreatedBlockFormat = format;
+    }
+
     return format;
 }
 
 QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth) const
 {
-    Q_UNUSED(givenPageWidth)
+    if(m_lastCreatedCharFormatPageWidth > 0 && givenPageWidth && *givenPageWidth == m_lastCreatedCharFormatPageWidth)
+        return m_lastCreatedCharFormat;
 
     QTextCharFormat format;
 
@@ -284,6 +296,12 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     format.setFontLetterSpacingType(font.letterSpacingType());
 
     format.setForeground(QBrush(m_textColor));
+
+    if(givenPageWidth)
+    {
+        m_lastCreatedCharFormatPageWidth = *givenPageWidth;
+        m_lastCreatedCharFormat = format;
+    }
 
     return format;
 }
