@@ -1631,8 +1631,7 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
         QRectF paperRect = pageLayout->paperRect();
         QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
 
-        QTextCursor endCursor(m_textDocument);
-        endCursor.movePosition(QTextCursor::End);
+        const int endCursorPosition = m_textDocument->characterCount()-1;
 
         qreal fpageCount = 0.1;
 
@@ -1643,8 +1642,8 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
             paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
             const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
             const int firstPosition = pgBoundaries.isEmpty() ? layout->hitTest(contentsRect.topLeft(), Qt::FuzzyHit) : pgBoundaries.last().second+1;
-            const int lastPosition = pageIndex == pageCount-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
-            pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : endCursor.position());
+            const int lastPosition = pageIndex == pageCount-1 ? endCursorPosition : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
+            pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : endCursorPosition);
 
             ++pageIndex;
 
@@ -1657,11 +1656,11 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
                 {
                     QTextFrame *lastFrame = this->findTextFrame(lastElement);
                     if(lastFrame == nullptr)
-                        fpageCount = m_textDocument->pageCount();
+                        fpageCount = pageCount;
                     else
                     {
-                        const QRectF lastFrameRect = m_textDocument->documentLayout()->frameBoundingRect(lastFrame);
-                        fpageCount = m_textDocument->pageCount()-1;
+                        const QRectF lastFrameRect = layout->frameBoundingRect(lastFrame);
+                        fpageCount = pageCount-1;
                         fpageCount += (lastFrameRect.bottom() - contentsRect.top())/contentsRect.height();
                     }
                 }
