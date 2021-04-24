@@ -25,6 +25,7 @@ Item {
     property string filePathPrefix: "File will be saved as: "
     property alias nameFilters: folderPathDialog.nameFilters
     property url folder
+    property TabSequenceManager tabSequenceManager
 
     width: 400
     height: layout.height
@@ -65,7 +66,8 @@ Item {
             wrapMode: Text.WordWrap
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
-            text: "<font size=\"+1\">" + label + ":</font><br/>(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)"
+            text: label + ":<br/><font size=\"-2\">(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
+            font.pointSize: app.idealFontPointSize
 
             MouseArea {
                 anchors.fill: parent
@@ -79,10 +81,12 @@ Item {
         }
 
         TextField2 {
-            placeholderText: "file name"
+            placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
+            font.pointSize: app.idealFontPointSize
             onTextChanged: fileInfo.baseName = text
+            TabSequenceItem.manager: tabSequenceManager
         }
 
         Row {

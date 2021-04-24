@@ -48,6 +48,10 @@ Item {
         horizontalAlignment: Text.AlignHCenter
     }
 
+    TabSequenceManager {
+        id: tabSequence
+    }
+
     Loader {
         id: contentLoader
         anchors.fill: parent
@@ -88,6 +92,7 @@ Item {
                         nameFilters: exporter.nameFilters
                         folder: workspaceSettings.lastOpenExportFolderUrl
                         onFolderChanged: workspaceSettings.lastOpenExportFolderUrl = folder
+                        tabSequenceManager: tabSequence
                     }
 
                     Loader {
@@ -97,6 +102,7 @@ Item {
                             width: parent.width
                             label: Text {
                                 text: "Export fonts for the following languages"
+                                font.pointSize: app.idealFontPointSize
                             }
                             height: languageBundleView.height+45
 
@@ -115,6 +121,8 @@ Item {
                                         checked: exporter.isFontForLanguageBundled(modelData.value)
                                         text: modelData.key
                                         onToggled: exporter.bundleFontForLanguage(modelData.value,checked)
+                                        TabSequenceItem.manager: tabSequence
+                                        font.pointSize: app.idealFontPointSize
                                     }
                                 }
                             }
@@ -220,6 +228,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
+                font.pointSize: app.idealFontPointSize
             }
 
             SpinBox {
@@ -230,6 +239,7 @@ Item {
                     if(exporter)
                         exporter.setConfigurationValue(fieldInfo.name, value)
                 }
+                TabSequenceItem.manager: tabSequence
             }
         }
     }
@@ -243,6 +253,8 @@ Item {
             checkable: true
             checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
             onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
+            font.pointSize: app.idealFontPointSize
+            TabSequenceItem.manager: tabSequence
         }
     }
 
@@ -256,12 +268,14 @@ Item {
             Text {
                 text: fieldInfo.name
                 font.capitalization: Font.Capitalize
+                font.pointSize: app.idealFontPointSize
             }
 
             TextField2 {
                 width: parent.width-30
-                placeholderText: fieldInfo.label
+                placeholderText: text === "" ? fieldInfo.label : ""
                 onTextChanged: exporter.setConfigurationValue(fieldInfo.name, text)
+                TabSequenceItem.manager: tabSequence
             }
         }
     }
