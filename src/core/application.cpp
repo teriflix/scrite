@@ -44,6 +44,7 @@
 #include <QtConcurrentMap>
 #include <QOperatingSystemVersion>
 #include <QNetworkConfigurationManager>
+#include <QElapsedTimer>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -1230,6 +1231,24 @@ int Application::objectTreeSize(QObject *ptr) const
 QString Application::createUniqueId()
 {
     return QUuid::createUuid().toString();
+}
+
+void Application::sleep(int ms)
+{
+    ms = qBound(0, ms, 2000);
+
+    QEventLoop eventLoop;
+    if(ms == 0)
+    {
+        eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents);
+        return;
+    }
+
+    QElapsedTimer timer;
+    timer.start();
+
+    while(timer.elapsed() < ms)
+        eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 void Application::initializeStandardColors(QQmlEngine *)

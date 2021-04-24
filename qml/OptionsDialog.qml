@@ -37,6 +37,11 @@ Item {
     Connections {
         target: modalDialog
         onAboutToClose: {
+            if(scriteDocument.formatting.hasChangesToCommit()) {
+                busyOverlay.visible = true
+                app.sleep(100)
+            }
+
             scriteDocument.formatting.commitTransaction();
             scriteDocument.printFormat.commitTransaction();
         }
@@ -69,6 +74,12 @@ Item {
             }
             return unknownSettingsComponent
         }
+    }
+
+    BusyOverlay {
+        id: busyOverlay
+        anchors.fill: parent
+        busyMessage: "Applying changes..."
     }
 
     Component {

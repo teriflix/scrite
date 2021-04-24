@@ -145,6 +145,7 @@ public:
     Q_INVOKABLE void applyToAll(Properties properties);
 
     Q_INVOKABLE void beginTransaction();
+    Q_INVOKABLE bool hasChangesToCommit() { return m_nrChangesDuringTransation > 0; }
     Q_INVOKABLE void commitTransaction();
 
     Q_PROPERTY(bool inTransaction READ isInTransaction NOTIFY inTransactionChanged)
@@ -367,6 +368,7 @@ public:
     Q_INVOKABLE void resetToDefaults();
 
     Q_INVOKABLE void beginTransaction();
+    Q_INVOKABLE bool hasChangesToCommit() { return m_nrChangesDuringTransation > 0; }
     Q_INVOKABLE void commitTransaction();
 
     Q_PROPERTY(bool inTransaction READ isInTransaction NOTIFY inTransactionChanged)

@@ -233,6 +233,8 @@ public:
 
     Q_INVOKABLE static QString createUniqueId();
 
+    Q_INVOKABLE void sleep(int ms);
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 
