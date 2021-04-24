@@ -39,9 +39,10 @@ class StructureElementStack;
 class StructureElementStacks;
 class StructurePositionCommand;
 
-class StructureElement : public QObject
+class StructureElement : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Q_INVOKABLE StructureElement(QObject *parent=nullptr);
@@ -97,15 +98,15 @@ public:
     QPointF position() const { return QPointF(m_x,m_y); }
     Q_SIGNAL void positionChanged();
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    void setTitle(const QString &val);
-    QString title() const;
-    Q_SIGNAL void titleChanged();
-
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
     void setScene(Scene* val);
     Scene* scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
+
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    void setTitle(const QString &val);
+    QString title() const;
+    Q_SIGNAL void titleChanged();
 
     Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
     void setSelected(bool val);
@@ -125,6 +126,9 @@ public:
     Q_SIGNAL void elementChanged();
     Q_SIGNAL void sceneHeadingChanged();
     Q_SIGNAL void sceneLocationChanged();
+
+    // QObjectSerializer::Interface implementation
+    void serializeToJson(QJsonObject &) const;
 
 protected:
     bool event(QEvent *event);

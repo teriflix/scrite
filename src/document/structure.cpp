@@ -209,20 +209,28 @@ void StructureElement::setTitle(const QString &val)
     if(m_title == val)
         return;
 
-    m_title = val;
-    emit titleChanged();
-
-    SceneHeading *heading = m_scene->heading();
-    if(heading->isEnabled())
+    if(m_scene != nullptr)
     {
-        QString _locationType, _location, _moment;
-        if( SceneHeading::parse(val, _locationType, _location, _moment) )
+        SceneHeading *heading = m_scene->heading();
+        if(heading != nullptr && heading->isEnabled())
         {
-            heading->setLocationType(_locationType);
-            heading->setLocation(_location);
-            heading->setMoment(_moment);
+            QString _locationType, _location, _moment;
+            if( SceneHeading::parse(val, _locationType, _location, _moment) )
+            {
+                heading->setLocationType(_locationType);
+                heading->setLocation(_location);
+                heading->setMoment(_moment);
+            }
         }
     }
+
+    m_title = val.toUpper().trimmed();
+
+    if(m_scene != nullptr && m_scene->heading() != nullptr &&
+       m_scene->heading()->isEnabled() && m_scene->heading()->text() == m_title)
+        m_title.clear();
+
+    emit titleChanged();
 }
 
 QString StructureElement::title() const
@@ -295,6 +303,13 @@ void StructureElement::setStackLeader(bool val)
 
     m_stackLeader = val;
     emit stackLeaderChanged();
+}
+
+void StructureElement::serializeToJson(QJsonObject &json) const
+{
+    if(m_scene != nullptr && m_scene->heading() != nullptr &&
+       m_scene->heading()->isEnabled() && m_scene->heading()->text() == this->title())
+        json.remove( QStringLiteral("title") );
 }
 
 bool StructureElement::event(QEvent *event)
