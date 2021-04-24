@@ -157,17 +157,6 @@ Rectangle {
             }
         }
 
-        /*
-          // There are many graphics card drivers out there that are simply unable to fund
-          // this blur effect. We have to aim for the lowest common denominator unfortunately.
-
-        FastBlur {
-            anchors.fill: parent
-            source: ui
-            radius: parent.radius
-        }
-        */
-
         Rectangle {
             anchors.fill: parent
             color: parent.color

@@ -62,5 +62,6 @@
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
         <file>qml/OpenTemplateDialog.qml</file>
+        <file>qml/BusyOverlay.qml</file>
     </qresource>
 </RCC>

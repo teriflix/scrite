@@ -292,12 +292,24 @@ Item {
                     text: "Generate"
                     Material.background: primaryColors.c100.background
                     Material.foreground: primaryColors.c100.text
+                    onClicked: busyOverlay.visible = true
+                }
+            }
 
-                    onClicked: {
-                        if(generator.generate()) {
-                            app.revealFileOnDesktop(generator.fileName)
-                            modalDialog.close()
-                        }
+            BusyOverlay {
+                id: busyOverlay
+                anchors.fill: parent
+                busyMessage: "Generating \"" + generator.fileName + "\" ..."
+
+                onVisibleChanged: {
+                    if(visible) {
+                        app.execLater(busyOverlay, 100, function() {
+                            if(generator.generate()) {
+                                app.revealFileOnDesktop(generator.fileName)
+                                modalDialog.close()
+                            } else
+                                busyOverlay.visible = false
+                        })
                     }
                 }
             }

@@ -166,11 +166,24 @@ Item {
                 Button2 {
                     enabled: fileSelector.absoluteFilePath !== ""
                     text: "Export"
-                    onClicked: {
-                        if(exporter.write()) {
-                            app.revealFileOnDesktop(exporter.fileName)
-                            modalDialog.close()
-                        }
+                    onClicked: busyOverlay.visible = true
+                }
+            }
+
+            BusyOverlay {
+                id: busyOverlay
+                anchors.fill: parent
+                busyMessage: "Exporting to \"" + exporter.fileName + "\" ..."
+
+                onVisibleChanged: {
+                    if(visible) {
+                        app.execLater(busyOverlay, 100, function() {
+                            if(exporter.write()) {
+                                app.revealFileOnDesktop(exporter.fileName)
+                                modalDialog.close()
+                            } else
+                                busyOverlay.visible = false
+                        })
                     }
                 }
             }
