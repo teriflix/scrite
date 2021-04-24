@@ -2257,25 +2257,28 @@ void ScreenplayElementPageBreaks::resetScreenplayElement()
 
 void ScreenplayElementPageBreaks::updatePageBreaks()
 {
-    QVariantList breaks;
+    QJsonArray breaks;
 
     if(m_screenplayDocument != nullptr && m_screenplayElement != nullptr)
     {
+        const QString positionKey = QStringLiteral("position");
+        const QString pageNumberKey = QStringLiteral("pageNumber");
+
         const QList< QPair<int,int> > ibreaks = m_screenplayDocument->pageBreaksFor(m_screenplayElement);
         QPair<int,int> ibreak;
         Q_FOREACH(ibreak, ibreaks)
         {
-            QVariantMap item;
-            item["position"] = ibreak.first;
-            item["pageNumber"] = ibreak.second;
-            breaks << item;
+            QJsonObject item;
+            item.insert(positionKey, ibreak.first);
+            item.insert(pageNumberKey, ibreak.second);
+            breaks.append(item);
         }
     }
 
     this->setPageBreaks(breaks);
 }
 
-void ScreenplayElementPageBreaks::setPageBreaks(const QVariantList &val)
+void ScreenplayElementPageBreaks::setPageBreaks(const QJsonArray &val)
 {
     if(m_pageBreaks == val)
         return;

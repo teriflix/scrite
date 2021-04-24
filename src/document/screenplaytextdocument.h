@@ -347,18 +347,18 @@ public:
     ScreenplayElement* screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
 
-    Q_PROPERTY(QVariantList pageBreaks READ pageBreaks NOTIFY pageBreaksChanged)
-    QVariantList pageBreaks() const { return m_pageBreaks; }
+    Q_PROPERTY(QJsonArray pageBreaks READ pageBreaks NOTIFY pageBreaksChanged)
+    QJsonArray pageBreaks() const { return m_pageBreaks; }
     Q_SIGNAL void pageBreaksChanged();
 
 private:
     void resetScreenplayDocument();
     void resetScreenplayElement();
     void updatePageBreaks();
-    void setPageBreaks(const QVariantList &val);
+    void setPageBreaks(const QJsonArray &val);
 
 private:
-    QVariantList m_pageBreaks;
+    QJsonArray m_pageBreaks;
     QObjectProperty<ScreenplayElement> m_screenplayElement;
     QObjectProperty<ScreenplayTextDocument> m_screenplayDocument;
 };
