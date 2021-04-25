@@ -478,13 +478,17 @@ Item {
             property string sceneTitle: {
                 var ret = ""
                 if(element.scene) {
-                    if(element.scene.heading.enabled)
+                    var sheading = element.scene.heading
+                    if(sheading.enabled)
                         ret += "[" + element.resolvedSceneNumber + "]: "
-                    if(element.scene.title !== "")
-                        ret += element.scene.title
-                    else {
-                        if(element.scene.heading.enabled)
-                            ret += element.scene.heading.text
+
+                    var selement = element.scene.structureElement
+                    var ntitle = selement.nativeTitle
+                    if(ntitle !== "")
+                        ret += ntitle
+                    else if(selement.stackId === "" || selement.stackLeader) {
+                        if(sheading.enabled)
+                            ret += sheading.text
                         else
                             ret += "NO SCENE HEADING"
                     }

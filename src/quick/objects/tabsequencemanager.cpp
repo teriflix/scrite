@@ -135,6 +135,60 @@ void TabSequenceManager::releaseFocus()
         emit focusWasReleased();
 }
 
+bool TabSequenceManager::switchFocus(int by)
+{
+    for(int i=0; i<m_tabSequenceItems.size(); i++)
+    {
+        TabSequenceItem *item = m_tabSequenceItems.at(i);
+        if(item->hasFocus())
+            return this->switchFocusFrom(i, by);
+    }
+
+    return false;
+}
+
+bool TabSequenceManager::switchFocusFrom(int fromItemIndex, int by)
+{
+    if(fromItemIndex < 0 || fromItemIndex >= m_tabSequenceItems.size())
+        return false;
+
+    const int nextIndex = this->fetchItemIndex(fromItemIndex, by);
+    if(by > 0 && nextIndex < fromItemIndex && !m_wrapAround)
+        return false;
+
+    if(by < 0 && nextIndex > fromItemIndex && !m_wrapAround)
+        return false;
+
+    if(nextIndex < 0 || nextIndex >= m_tabSequenceItems.size())
+        return false;
+
+    TabSequenceItem *item = m_tabSequenceItems.at(nextIndex);
+    if(item == nullptr)
+        return false;
+
+    return item->assumeFocus();
+}
+
+int TabSequenceManager::fetchItemIndex(int from, int direction, bool enabledOnly) const
+{
+    int idx = from;
+    while(1) {
+        idx += direction;
+        if(idx == from)
+            break;
+        if(idx >= m_tabSequenceItems.size())
+            idx = 0;
+        else if(idx < 0)
+            idx = m_tabSequenceItems.size()-1;
+        if(!enabledOnly)
+            break;
+        TabSequenceItem *item = m_tabSequenceItems.at(idx);
+        if(item->isEnabled())
+            break;
+    }
+    return idx;
+}
+
 void TabSequenceManager::timerEvent(QTimerEvent *te)
 {
     if(m_timer.timerId() == te->timerId())
@@ -180,36 +234,17 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
                 return int(kemods & Qt::KeyboardModifiers(val)) > 0;
             };
 
-            auto fetchNextIndex = [=](int from, int direction, bool enabledOnly) {
-                int idx = from;
-                while(1) {
-                    idx += direction;
-                    if(idx == from)
-                        break;
-                    if(idx >= m_tabSequenceItems.size())
-                        idx = 0;
-                    else if(idx < 0)
-                        idx = m_tabSequenceItems.size()-1;
-                    if(!enabledOnly)
-                        break;
-                    TabSequenceItem *item = m_tabSequenceItems.at(idx);
-                    if(item->isEnabled())
-                        break;
-                }
-                return idx;
-            };
-
             int nextIndex = -1;
             if(ke->key() == m_tabKey && compareModifiers(m_tabKeyModifiers))
             {
-                nextIndex = fetchNextIndex(itemIndex, 1, !compareModifiers(m_disabledKeyModifier));
+                nextIndex = fetchItemIndex(itemIndex, 1, !compareModifiers(m_disabledKeyModifier));
                 if(nextIndex < itemIndex && !m_wrapAround)
                     return false;
             }
 
             if(ke->key() == m_backtabKey && compareModifiers(m_backtabKeyModifiers))
             {
-                nextIndex = fetchNextIndex(itemIndex, -1, !compareModifiers(m_disabledKeyModifier));
+                nextIndex = fetchItemIndex(itemIndex, -1, !compareModifiers(m_disabledKeyModifier));
                 if(nextIndex > itemIndex && !m_wrapAround)
                     return false;
             }
@@ -221,13 +256,8 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
             if(item == nullptr)
                 return false;
 
-            QQuickItem *qmlItem = qobject_cast<QQuickItem*>(item->parent());
-            if(qmlItem != nullptr)
-            {
-                emit item->aboutToReceiveFocus();
-                qmlItem->setFocus(true);
+            if(item->assumeFocus())
                 return true;
-            }
         }
     }
 
@@ -282,7 +312,9 @@ TabSequenceItem::TabSequenceItem(QObject *parent)
     : QObject(parent),
       m_manager(this, "manager")
 {
-
+    QQuickItem *qmlItem = qobject_cast<QQuickItem*>(parent);
+    if(qmlItem != nullptr)
+        connect(qmlItem, &QQuickItem::focusChanged, this, &TabSequenceItem::hasFocusChanged);
 }
 
 TabSequenceItem::~TabSequenceItem()
@@ -331,6 +363,56 @@ void TabSequenceItem::setSequence(int val)
 
     if(!m_manager.isNull())
         m_manager->reworkSequenceLater();
+}
+
+bool TabSequenceItem::hasFocus() const
+{
+    QQuickItem *qmlItem = qobject_cast<QQuickItem*>(this->parent());
+    if(qmlItem != nullptr)
+        return qmlItem->hasFocus();
+
+    return false;
+}
+
+bool TabSequenceItem::focusNext()
+{
+    if(m_manager != nullptr)
+    {
+        int index = m_manager->indexOf(this);
+        if(index < 0)
+            return false;
+
+        return m_manager->switchFocusFrom(index, 1);
+    }
+
+    return false;
+}
+
+bool TabSequenceItem::focusPrevious()
+{
+    if(m_manager != nullptr)
+    {
+        int index = m_manager->indexOf(this);
+        if(index < 0)
+            return false;
+
+        return m_manager->switchFocusFrom(index, -1);
+    }
+
+    return false;
+}
+
+bool TabSequenceItem::assumeFocus()
+{
+    QQuickItem *qmlItem = qobject_cast<QQuickItem*>(this->parent());
+    if(qmlItem != nullptr)
+    {
+        emit aboutToReceiveFocus();
+        qmlItem->setFocus(true);
+        return true;
+    }
+
+    return false;
 }
 
 void TabSequenceItem::resetManager()

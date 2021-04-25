@@ -555,6 +555,7 @@ Scene::Scene(QObject *parent)
     : QAbstractListModel(parent)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
+    m_structureElement = qobject_cast<StructureElement*>(parent);
 
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
@@ -1534,6 +1535,17 @@ void Scene::setPropertyFromObjectList(const QString &propName, const QList<QObje
         this->setElements(qobject_list_cast<SceneElement*>(objects));
         return;
     }
+}
+
+bool Scene::event(QEvent *event)
+{
+    if(m_structureElement == nullptr && event->type() == QEvent::ParentChange)
+    {
+        m_structureElement = qobject_cast<StructureElement*>(this->parent());
+        emit structureElementChanged();
+    }
+
+    return QObject::event(event);
 }
 
 void Scene::setElementsList(const QList<SceneElement *> &list)

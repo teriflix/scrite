@@ -39,6 +39,7 @@
 class Scene;
 class SceneHeading;
 class SceneElement;
+class StructureElement;
 class SceneDocumentBinder;
 class PushSceneUndoCommand;
 
@@ -199,6 +200,10 @@ public:
     Q_SIGNAL void aboutToDelete(Scene *scene);
 
     Scene *clone(QObject *parent) const;
+
+    Q_PROPERTY(StructureElement* structureElement READ structureElement NOTIFY structureElementChanged STORED false)
+    StructureElement *structureElement() const { return m_structureElement; }
+    Q_SIGNAL void structureElementChanged();
 
     /*
      * The 'id' is a special property. It can be set only once. If it is not
@@ -400,6 +405,9 @@ public:
     void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
 private:
+    bool event(QEvent *event);
+
+private:
     QList<SceneElement *> elementsList() const { return m_elements; }
     void setElementsList(const QList<SceneElement*> &list);
     void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
@@ -423,6 +431,7 @@ private:
     int m_actIndex = -1;
     int m_episodeIndex = -1;
     QString m_episode;
+    StructureElement *m_structureElement = nullptr;
 
     bool m_enabled = true;
     char m_padding[7];

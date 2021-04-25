@@ -74,13 +74,23 @@ public:
     Q_INVOKABLE void assumeFocusAt(int index);
     Q_INVOKABLE void releaseFocus();
 
+    Q_INVOKABLE bool focusPrevious() { return this->switchFocus(-1); }
+    Q_INVOKABLE bool focusNext() { return this->switchFocus(1); }
+
     Q_SIGNAL void focusWasReleased();
+
+private:
+    bool switchFocus(int by=1);
+    bool switchFocusFrom(int fromItemIndex, int by=1);
+    int  fetchItemIndex(int from, int direction, bool enabledOnly=true) const;
 
 protected:
     void timerEvent(QTimerEvent *te);
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
+    int indexOf(TabSequenceItem *ptr) const { return m_tabSequenceItems.indexOf(ptr); }
+    int count() const { return m_tabSequenceItems.size(); }
     void add(TabSequenceItem *ptr);
     void remove(TabSequenceItem *ptr);
     void reworkSequence();
@@ -124,6 +134,14 @@ public:
     void setSequence(int val);
     int sequence() const { return m_sequence; }
     Q_SIGNAL void sequenceChanged();
+
+    Q_PROPERTY(bool hasFocus READ hasFocus NOTIFY hasFocusChanged)
+    bool hasFocus() const;
+    Q_SIGNAL void hasFocusChanged();
+
+    Q_INVOKABLE bool focusNext();
+    Q_INVOKABLE bool focusPrevious();
+    Q_INVOKABLE bool assumeFocus();
 
     Q_SIGNAL void aboutToReceiveFocus();
 

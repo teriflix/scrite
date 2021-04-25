@@ -2164,7 +2164,7 @@ Item {
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     readOnly: scriteDocument.readOnly || canvas.scale < 0.5
-                    onEditingComplete: element.title = text
+                    onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
                     onActiveFocusChanged: {
                         if(activeFocus) {
                             elementItem.select()

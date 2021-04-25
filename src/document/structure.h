@@ -108,6 +108,9 @@ public:
     QString title() const;
     Q_SIGNAL void titleChanged();
 
+    Q_PROPERTY(QString nativeTitle READ nativeTitle NOTIFY titleChanged)
+    QString nativeTitle() const { return m_title; }
+
     Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
     void setSelected(bool val);
     bool isSelected() const { return m_selected; }
