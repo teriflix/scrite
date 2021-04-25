@@ -55,6 +55,24 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_CLASSINFO("episodeNumbers_FieldGroup", "Episodes")
+    Q_CLASSINFO("episodeNumbers_FieldLabel", "Episodes to include in the report")
+    Q_CLASSINFO("episodeNumbers_FieldEditor", "MultipleEpisodeSelector")
+    Q_CLASSINFO("episodeNumbers_FieldNote", "If no episodes are selected, then the report is generted for all episodes in the screenplay.")
+    Q_PROPERTY(QList<int> episodeNumbers READ episodeNumbers WRITE setEpisodeNumbers NOTIFY episodeNumbersChanged)
+    void setEpisodeNumbers(const QList<int> &val);
+    QList<int> episodeNumbers() const { return m_episodeNumbers; }
+    Q_SIGNAL void episodeNumbersChanged();
+
+    Q_CLASSINFO("tags_FieldGroup", "Tags")
+    Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
+    Q_CLASSINFO("tags_FieldEditor", "MultipleTagGroupSelector")
+    Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    void setTags(const QStringList &val);
+    QStringList tags() const { return m_tags; }
+    Q_SIGNAL void tagsChanged();
+
 protected:
     // AbstractReportGenerator interface
     bool usePdfWriter() const { return true; }
@@ -67,8 +85,10 @@ private:
     void configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const;
 
 private:
+    QStringList m_tags;
     QStringList m_characterNames;
     int m_type = SceneVsCharacter;
+    QList<int> m_episodeNumbers;
 };
 
 #endif // SCENECHARACTERMATRIXREPORT_H

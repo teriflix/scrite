@@ -54,6 +54,24 @@ void SceneCharacterMatrixReport::setCharacterNames(const QStringList &val)
     emit characterNamesChanged();
 }
 
+void SceneCharacterMatrixReport::setEpisodeNumbers(const QList<int> &val)
+{
+    if(m_episodeNumbers == val)
+        return;
+
+    m_episodeNumbers = val;
+    emit episodeNumbersChanged();
+}
+
+void SceneCharacterMatrixReport::setTags(const QStringList &val)
+{
+    if(m_tags == val)
+        return;
+
+    m_tags = val;
+    emit tagsChanged();
+}
+
 bool SceneCharacterMatrixReport::supportsFormat(AbstractReportGenerator::Format format) const
 {
     return format == AdobePDF;
@@ -98,6 +116,47 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
     const Structure *structure = this->document()->structure();
     const QStringList availableCharacters = structure->characterNames();
 
+    const bool hasEpisodes = screenplay->episodeCount() > 0;
+    int episodeNr = 0; // Episode number is 1+episodeIndex
+    QList<ScreenplayElement*> screenplayElements;
+    for(int i=0; i<screenplay->elementCount(); i++)
+    {
+        ScreenplayElement *element = screenplay->elementAt(i);
+        if(hasEpisodes && !m_episodeNumbers.isEmpty())
+        {
+            if(element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode)
+                ++episodeNr;
+            else if(i==0)
+                ++episodeNr;
+
+            if(!m_episodeNumbers.contains(episodeNr))
+                continue;
+        }
+
+        if(!m_tags.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType && element->scene() != nullptr)
+        {
+            Scene *scene = element->scene();
+
+            const QStringList sceneTags = scene->groups();
+            if(sceneTags.isEmpty())
+                continue;
+
+            QStringList tags;
+            std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
+                         [=](const QString &sceneTag) {
+                return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
+            });
+
+            if(tags.isEmpty())
+                continue;
+        }
+
+        if(element->scene() == nullptr)
+            continue;
+
+        screenplayElements.append(element);
+    }
+
     // Validate the given set of character names. Ensure that they
     // exist in the screenplay.
     if(m_characterNames.isEmpty())
@@ -117,10 +176,9 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
     }
 
     // Lets compile a list of scene names.
-    auto compileSceneTitles = [screenplay]() {
+    auto compileSceneTitles = [screenplayElements]() {
         QStringList ret;
-        for(int i=0; i<screenplay->elementCount(); i++) {
-            const ScreenplayElement *element = screenplay->elementAt(i);
+        for(const ScreenplayElement *element : qAsConst(screenplayElements)) {
             const Scene *scene = element->scene();
             if(scene) {
                 QString title = QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("]: ")
@@ -180,6 +238,24 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         cursor.insertBlock(blockFormat, charFormat);
         cursor.insertText(reportType);
 
+        if(!m_episodeNumbers.isEmpty() || !m_tags.isEmpty())
+            cursor.insertBlock();
+
+        if(!m_episodeNumbers.isEmpty())
+        {
+            QStringList epNos;
+            epNos.reserve(m_episodeNumbers.size());
+            for(int epno : qAsConst(m_episodeNumbers))
+                epNos << QString::number(epno);
+
+            cursor.insertText( QStringLiteral("Episode(s): ") + epNos.join( QStringLiteral(", " ) ) );
+            if(!m_tags.isEmpty())
+                cursor.insertText( QStringLiteral(", ") );
+        }
+
+        if(!m_tags.isEmpty())
+            cursor.insertText( QStringLiteral("Tag(s): ") + m_tags.join( QStringLiteral(", ") ) );
+
         blockFormat = defaultBlockFormat;
         blockFormat.setAlignment(Qt::AlignHCenter);
         blockFormat.setBottomMargin(20);
@@ -237,9 +313,8 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
 
     // Mark cells
     int sceneNumber = 0;
-    for(int i=0; i<screenplay->elementCount(); i++)
+    for(const ScreenplayElement *element : qAsConst(screenplayElements))
     {
-        const ScreenplayElement *element = screenplay->elementAt(i);
         const Scene *scene = element->scene();
         if(scene)
         {
