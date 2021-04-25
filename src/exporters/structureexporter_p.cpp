@@ -270,8 +270,8 @@ StructureIndexCard::StructureIndexCard(const StructureElement *element)
     // Draw scene heading at the top
     QGraphicsTextItem *headingTextItem = new QGraphicsTextItem(this);
     headingTextItem->setTextWidth(contentRect.width());
-    if(element->scene()->heading()->isEnabled())
-        headingTextItem->setPlainText(element->scene()->heading()->text());
+    if(!element->title().isEmpty())
+        headingTextItem->setPlainText(element->title());
     else
         headingTextItem->setPlainText(QStringLiteral("NO SCENE HEADING"));
     headingTextItem->setFont(boldFont(fixedWidthFont));
