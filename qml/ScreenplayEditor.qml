@@ -762,13 +762,14 @@ Rectangle {
         id: breakComponent
 
         Item {
+            id: breakItem
             property int theIndex: componentData.rowNumber
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
-            height: breakTitle.height+20
+            height: breakTitle.height+breakSubtitleLoader.height+10
 
             Rectangle {
-                anchors.fill: breakTitle
+                anchors.fill: parent
                 anchors.margins: -4
                 color: accentColors.windowColor
                 border.width: 1
@@ -781,12 +782,57 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width-8
-                horizontalAlignment: Text.AlignHCenter
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: ruler.leftMarginPx
+                anchors.rightMargin: ruler.rightMarginPx
+                horizontalAlignment: theElement.breakType === Screenplay.Episode ? Text.AlignLeft : Text.AlignHCenter
                 font.pointSize: headingFontMetrics.font.pointSize + 2
                 font.family: headingFontMetrics.font.family
                 font.bold: true
                 text: parent.theElement.breakTitle
+            }
+
+            Loader {
+                id: breakSubtitleLoader
+                anchors.top: breakTitle.bottom
+                anchors.topMargin: 5
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: ruler.leftMarginPx
+                anchors.rightMargin: ruler.rightMarginPx
+                active: theElement.breakType === Screenplay.Episode
+                sourceComponent: TextField2 {
+                    label: ""
+                    placeholderText: "Optional episode name"
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    maximumLength: 256
+                    font.pointSize: headingFontMetrics.font.pointSize + 2
+                    font.family: headingFontMetrics.font.family
+                    font.bold: length > 0
+                    text: breakItem.theElement.breakSubtitle
+                    onTextChanged: breakItem.theElement.breakSubtitle = text
+                    enableTransliteration: true
+                    onReturnPressed: focusOnNextScene()
+                    Keys.onTabPressed: focusOnNextScene()
+
+                    function focusOnNextScene() {
+                        var idx = breakItem.theIndex
+                        var element = null
+                        while(idx < contentView.count-1) {
+                            ++idx
+                            element = screenplayAdapter.screenplay.elementAt(idx)
+                            if(element === null)
+                                return
+                            if(element.scene !== null)
+                                break
+                        }
+
+                        contentView.scrollIntoView(idx)
+                        var item = contentView.loadedItemAtIndex(idx)
+                        item.assumeFocusAt(0)
+                    }
+                }
             }
         }
     }

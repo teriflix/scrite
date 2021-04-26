@@ -877,6 +877,9 @@ void ScreenplayTextDocument::loadScreenplay()
                 cursor.setCharFormat(episodeCharFormat);
 
                 cursor.insertText(element->breakTitle());
+
+                if(!element->breakSubtitle().isEmpty())
+                    cursor.insertText( QStringLiteral(": ") + element->breakSubtitle() );
             }
         }
 

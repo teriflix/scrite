@@ -677,6 +677,8 @@ Item {
                 EventFilter.onFilter: {
                     if(event.key === Qt.Key_Escape)
                         createItemMouseHandler.enabled = false
+                    result.accept = false
+                    result.filter = false
                 }
 
                 onClicked: {

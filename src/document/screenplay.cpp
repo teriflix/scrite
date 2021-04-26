@@ -33,6 +33,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::breakTitleChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::breakSubtitleChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::editorHintsChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::elementChanged, [=](){
         this->markAsModified();
@@ -70,6 +71,15 @@ void ScreenplayElement::setBreakType(int val)
 
     m_breakType = val;
     emit breakTypeChanged();
+}
+
+void ScreenplayElement::setBreakSubtitle(const QString &val)
+{
+    if(m_breakSubtitle == val)
+        return;
+
+    m_breakSubtitle = val;
+    emit breakSubtitleChanged();
 }
 
 void ScreenplayElement::setBreakTitle(const QString &val)

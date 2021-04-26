@@ -40,14 +40,15 @@ Rectangle {
 
     Component.onCompleted: {
         app.execLater(screenplayTextDocument, 250, function() {
-            screenplay.currentElementIndex = 0
+            previewItem.screenplay.currentElementIndex = 0
+            screenplayTextDocument.screenplay = previewItem.screenplay
             screenplayTextDocument.print(screenplayImagePrinter)
+            noticeText.visible = false
         })
     }
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: previewItem.screenplay
         formatting: previewItem.screenplayFormat
         sceneNumbers: true
         purpose: ScreenplayTextDocument.ForPrinting
@@ -70,7 +71,7 @@ Rectangle {
         font.pixelSize: 30
         anchors.centerIn: parent
         text: "Generating preview ..."
-        visible: screenplayImagePrinter.printing || (screenplayImagePrinter.pageCount === 0 && screenplayTextDocument.pageCount > 0)
+        visible: true
     }
 
     Flickable {
