@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport
+QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport svg
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
