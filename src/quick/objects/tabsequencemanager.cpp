@@ -217,7 +217,7 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
             for(int i=0; i<m_tabSequenceItems.size(); i++)
             {
                 TabSequenceItem *item = m_tabSequenceItems.at(i);
-                if(item->parent() == watched)
+                if(item->hasFocus() && item->parent() == watched)
                 {
                     itemIndex = i;
                     break;
@@ -409,6 +409,7 @@ bool TabSequenceItem::assumeFocus()
     {
         emit aboutToReceiveFocus();
         qmlItem->setFocus(true);
+        qmlItem->forceActiveFocus();
         return true;
     }
 

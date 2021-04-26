@@ -50,6 +50,7 @@ Item {
 
     TabSequenceManager {
         id: tabSequence
+        wrapAround: true
     }
 
     Loader {
