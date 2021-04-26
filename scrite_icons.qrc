@@ -183,5 +183,6 @@
         <file>icons/action/layout_grouping_inverted.png</file>
         <file>icons/action/tag_inverted.png</file>
         <file>icons/action/tag.png</file>
+        <file>icons/navigation/center_focus.svg</file>
     </qresource>
 </RCC>

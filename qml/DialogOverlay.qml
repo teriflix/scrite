@@ -80,9 +80,9 @@ Rectangle {
 
     EventFilter.target: app
     EventFilter.events: [6] // KeyPress
-    EventFilter.active: closeOnEscape
+    EventFilter.active: closeOnEscape && visible
     EventFilter.onFilter: {
-        if( event.key === Qt.Key_Escape) {
+        if(event.key === Qt.Key_Escape) {
             result.acceptEvent = true
             result.filter = true
             close()

@@ -650,12 +650,33 @@ Item {
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton
                 enabled: false
-                cursorShape: Qt.CrossCursor
+                hoverEnabled: true
+                z: 10000
 
                 property string what
                 function handle(_what) {
                     what = _what
                     enabled = true
+                }
+
+                Image {
+                    width: 30/canvas.scale
+                    height: width
+                    sourceSize.width: width
+                    sourceSize.height: height
+                    source: "../icons/navigation/center_focus.svg"
+                    property real halfSize: width/2
+                    x: parent.mouseX - halfSize
+                    y: parent.mouseY - halfSize
+                    visible: parent.enabled
+                }
+
+                EventFilter.target: app
+                EventFilter.events: [EventFilter.KeyPress]
+                EventFilter.active: createItemMouseHandler.enabled
+                EventFilter.onFilter: {
+                    if(event.key === Qt.Key_Escape)
+                        createItemMouseHandler.enabled = false
                 }
 
                 onClicked: {
@@ -840,7 +861,7 @@ Item {
                 }
 
                 EventFilter.target: app
-                EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1 && !modalDialog.active
+                EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1 && !modalDialog.active && !createItemMouseHandler.enabled
                 EventFilter.events: [6]
                 EventFilter.onFilter: {
                     var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
@@ -958,6 +979,7 @@ Item {
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 2
                     border.color: accentColors.c600.background
+                    enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
                     BoundingBoxItem.stackOrder: 1.0 + (index/canvas.episodeBoxes.length)
@@ -1005,6 +1027,7 @@ Item {
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 1
                     border.color: accentColors.borderColor
+                    enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
                     BoundingBoxItem.stackOrder: 2.0 + (index/canvas.groupBoxes.length)
@@ -2585,7 +2608,7 @@ Item {
             }
 
             EventFilter.target: app
-            EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus && !modalDialog.active
+            EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus && !modalDialog.active && !createItemMouseHandler.enabled
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
