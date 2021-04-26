@@ -247,7 +247,7 @@ void StructureElement::setScene(Scene *val)
         return;
 
     m_scene = val;
-    m_scene->setParent(this);
+    m_scene->setStructureElement(this);
     connect(m_scene, &Scene::sceneChanged, this, &StructureElement::elementChanged);
     connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
 

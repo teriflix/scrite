@@ -404,10 +404,11 @@ public:
     bool canSetPropertyFromObjectList(const QString &propName) const;
     void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
-private:
+protected:
     bool event(QEvent *event);
 
 private:
+    void setStructureElement(StructureElement *ptr);
     QList<SceneElement *> elementsList() const { return m_elements; }
     void setElementsList(const QList<SceneElement*> &list);
     void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
@@ -416,6 +417,7 @@ private:
 
 private:
     friend class Structure;
+    friend class StructureElement;
     friend class SceneElement;
     friend class SceneDocumentBinder;
 

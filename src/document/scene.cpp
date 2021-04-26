@@ -1548,6 +1548,16 @@ bool Scene::event(QEvent *event)
     return QObject::event(event);
 }
 
+void Scene::setStructureElement(StructureElement *ptr)
+{
+    if(m_structureElement == ptr)
+        return;
+
+    m_structureElement = ptr;
+    this->setParent(m_structureElement);
+    emit structureElementChanged();
+}
+
 void Scene::setElementsList(const QList<SceneElement *> &list)
 {
     QScopedValueRollback<bool> isel(m_inSetElementsList, true);
