@@ -17,6 +17,7 @@
 #include <QDir>
 #include <QBuffer>
 #include <QtDebug>
+#include <QPicture>
 #include <QDateTime>
 #include <QQmlEngine>
 #include <QPainterPath>
@@ -47,8 +48,8 @@ public:
     ImagePrinterEngine();
     ~ImagePrinterEngine();
 
-    QImage currentPageImage() const { return m_pageImage; }
-    QImage printedPageImage() const { return m_printedPageImage; }
+    QPicture currentPagePicture() const { return m_pagePicture; }
+    QPicture printedPagePicture() const { return m_printedPagePicture; }
 
     // Creates a brand new page image. All painting
     // will happen on this page from now on.
@@ -63,7 +64,7 @@ public:
     // We redirect everything related to "actual painting" to the
     // underlying page images paint-image.
     QPaintEngine *pageImageEngine() const {
-        return m_pagePainter ? m_pagePainter->paintEngine() : m_pageImage.paintEngine();
+        return m_pagePainter ? m_pagePainter->paintEngine() : m_pagePicture.paintEngine();
     }
     void updateState(const QPaintEngineState &pestate);
     void drawRects(const QRect *rects, int rectCount);
@@ -93,8 +94,8 @@ private:
     int m_pageNumber = 0;
     char m_padding1[4];
     qreal m_pageScale = 1.0;
-    QImage m_pageImage = QImage(30, 30, QImage::Format_ARGB32);
-    QImage m_printedPageImage;
+    QPicture m_pagePicture;
+    QPicture m_printedPagePicture;
     QColor m_pageColor = Qt::white;
     QString m_directory;
     QTransform m_pageTransform;
@@ -173,8 +174,17 @@ QImage ImagePrinter::pageImageAt(int index)
 
     const QByteArray bytes = m_pageImagesData.at(index);
 
-    QImage image;
-    image.loadFromData(bytes, "JPG");
+    QPicture picture;
+    picture.setData(bytes.data(), bytes.size());
+
+    QImage image(m_pageSize*m_scale, QImage::Format_ARGB32);
+    image.setDevicePixelRatio(m_scale);
+    image.fill(Qt::white);
+
+    QPainter paint(&image);
+    picture.play(&paint);
+    paint.end();
+
     return image;
 }
 
@@ -366,12 +376,6 @@ void ImagePrinter::end()
     emit pagesChanged();
 
     this->setPrinting(false);
-
-    qint64 totalBytes = 0;
-    for(const QByteArray &bytes : qAsConst(m_pageImagesData))
-        totalBytes += bytes.size();
-
-    Application::log( QStringLiteral("Total memory: ") + QString::number(totalBytes) );
 }
 
 void ImagePrinter::capturePrintedPageImage()
@@ -381,14 +385,8 @@ void ImagePrinter::capturePrintedPageImage()
 
     QWriteLocker lock(&m_pageImagesDataLock);
 
-    const QImage printedPageImage = m_engine->printedPageImage();
-
-    QByteArray imageBytes;
-    QBuffer imageWriter(&imageBytes);
-    imageWriter.open(QIODevice::WriteOnly);
-    printedPageImage.save(&imageWriter, "JPG");
-    imageWriter.close();
-    m_pageImagesData << imageBytes;
+    const QPicture printedPagePicture = m_engine->printedPagePicture();
+    m_pageImagesData << QByteArray(printedPagePicture.data(), printedPagePicture.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -501,14 +499,14 @@ void ImagePrinterEngine::newPage()
     }
 
     const QSize pageImageSize = m_pageSize*m_pageScale;
-    m_pageImage = QImage(pageImageSize, m_imageFormat);
-    m_pageImage.setDevicePixelRatio(m_pageScale);
-    m_pageImage.fill(m_pageColor);
+    m_pagePicture = QPicture();
+    m_pagePicture.setBoundingRect( QRect(0, 0, pageImageSize.width(), pageImageSize.height()) );
+
     ++m_pageNumber;
 
     if(m_currentDevice)
     {
-        m_pagePainter = new QPainter(&m_pageImage);
+        m_pagePainter = new QPainter(&m_pagePicture);
 
         m_pageTransform = QTransform();
         m_pageTransform.translate(0, -m_pageSize.height()*(m_pageNumber-1));
@@ -550,11 +548,10 @@ bool ImagePrinterEngine::begin(QPaintDevice *pdev)
     }
 
     const QSize pageImageSize = m_pageSize*m_pageScale;
-    m_pageImage = QImage(pageImageSize, m_imageFormat);
-    m_pageImage.setDevicePixelRatio(m_pageScale);
-    m_pageImage.fill(m_pageColor);
+    m_pagePicture = QPicture();
+    m_pagePicture.setBoundingRect( QRect(0, 0, pageImageSize.width(), pageImageSize.height()) );
 
-    m_pagePainter = new QPainter(&m_pageImage);
+    m_pagePainter = new QPainter(&m_pagePicture);
     m_pageTransform = QTransform();
 
     return true;
@@ -575,15 +572,18 @@ bool ImagePrinterEngine::end()
     m_currentDevice = nullptr;
 
     m_directory.clear();
-    m_pageSize = QSize(10, 10); // US Letter Page Size @ 96dpi
+    m_pageSize = QSize(10, 10);
     m_pageColor = Qt::white;
     m_imageFormat = QImage::Format_ARGB32;
     m_pageNumber = 1;
     m_baseFileName.clear();
     m_fileFormat.clear();
-    m_pageImage = QImage(m_pageSize, m_imageFormat);
-    m_pageImage.fill(m_pageColor);
-    m_printedPageImage = QImage();
+
+    const QSize pageImageSize = m_pageSize*m_pageScale;
+    m_pagePicture = QPicture();
+    m_pagePicture.setBoundingRect( QRect(0, 0, pageImageSize.width(), pageImageSize.height()) );
+
+    m_printedPagePicture = QPicture();
 
     return true;
 }
@@ -862,7 +862,7 @@ void ImagePrinterEngine::paintHeaderFooterWatermark()
         m_pagePainter->setClipping(false);
     }
 
-    m_printedPageImage = m_pageImage;
+    m_printedPagePicture = m_pagePicture;
 }
 
 void ImagePrinterEngine::savePageImage()
@@ -871,5 +871,5 @@ void ImagePrinterEngine::savePageImage()
         return;
 
     const QString filePath = QDir(m_directory).absoluteFilePath(m_baseFileName + QString::number(m_pageNumber) + "." + m_fileFormat);
-    m_pageImage.save(filePath, m_fileFormat);
+    m_pagePicture.save(filePath, m_fileFormat);
 }
