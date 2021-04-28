@@ -12,8 +12,10 @@
 ****************************************************************************/
 
 #include "imageprinter.h"
+#include "application.h"
 
 #include <QDir>
+#include <QBuffer>
 #include <QtDebug>
 #include <QDateTime>
 #include <QQmlEngine>
@@ -127,7 +129,7 @@ ImagePrinter::~ImagePrinter()
 {
     emit aboutToDelete(this);
 
-    m_pageImages.clear();
+    m_pageImagesData.clear();
     emit pagesChanged();
 
     if(m_engine)
@@ -164,11 +166,16 @@ void ImagePrinter::setScale(qreal val)
 
 QImage ImagePrinter::pageImageAt(int index)
 {
-    if(index < 0 || index >= m_pageImages.size())
+    if(index < 0 || index >= m_pageImagesData.size())
         return QImage();
 
-    QReadLocker lock(&m_pageImagesLock);
-    return m_pageImages.at(index);
+    QReadLocker lock(&m_pageImagesDataLock);
+
+    const QByteArray bytes = m_pageImagesData.at(index);
+
+    QImage image;
+    image.loadFromData(bytes, "JPG");
+    return image;
 }
 
 QString ImagePrinter::pageUrl(int index) const
@@ -185,7 +192,7 @@ void ImagePrinter::clear()
         return;
 
     this->beginResetModel();
-    m_pageImages.clear();
+    m_pageImagesData.clear();
     this->endResetModel();
 }
 
@@ -203,12 +210,12 @@ void ImagePrinter::setPrinting(bool val)
 
 int ImagePrinter::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_pageImages.size();
+    return parent.isValid() ? 0 : m_pageImagesData.size();
 }
 
 QVariant ImagePrinter::data(const QModelIndex &index, int role) const
 {
-    if(index.row() < 0 || index.row() >= m_pageImages.size())
+    if(index.row() < 0 || index.row() >= m_pageImagesData.size())
         return QVariant();
 
     switch(role)
@@ -346,7 +353,7 @@ void ImagePrinter::begin()
     m_pageSize = this->pageLayout().pageSize().sizePixels(resolution);
 
     m_templatePageImage = QImage(m_pageSize.width(), m_pageSize.height(), QImage::Format_ARGB32);
-    m_pageImages.clear();
+    m_pageImagesData.clear();
 }
 
 void ImagePrinter::end()
@@ -359,6 +366,12 @@ void ImagePrinter::end()
     emit pagesChanged();
 
     this->setPrinting(false);
+
+    qint64 totalBytes = 0;
+    for(const QByteArray &bytes : qAsConst(m_pageImagesData))
+        totalBytes += bytes.size();
+
+    Application::log( QStringLiteral("Total memory: ") + QString::number(totalBytes) );
 }
 
 void ImagePrinter::capturePrintedPageImage()
@@ -366,8 +379,16 @@ void ImagePrinter::capturePrintedPageImage()
     if(m_engine == nullptr)
         return;
 
-    QWriteLocker lock(&m_pageImagesLock);
-    m_pageImages << m_engine->printedPageImage();
+    QWriteLocker lock(&m_pageImagesDataLock);
+
+    const QImage printedPageImage = m_engine->printedPageImage();
+
+    QByteArray imageBytes;
+    QBuffer imageWriter(&imageBytes);
+    imageWriter.open(QIODevice::WriteOnly);
+    printedPageImage.save(&imageWriter, "JPG");
+    imageWriter.close();
+    m_pageImagesData << imageBytes;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

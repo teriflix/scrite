@@ -55,7 +55,7 @@ public:
     Q_SIGNAL void scaleChanged();
 
     Q_PROPERTY(int pageCount READ pageCount NOTIFY pagesChanged)
-    int pageCount() const { return m_pageImages.size(); }
+    int pageCount() const { return m_pageImagesData.size(); }
     Q_SIGNAL void pagesChanged();
 
     Q_PROPERTY(qreal pageWidth READ pageWidth NOTIFY pagesChanged)
@@ -115,8 +115,8 @@ private:
     QSize m_pageSize;
     QString m_directory;
     ImageFormat m_imageFormat = PNG;
-    QList<QImage> m_pageImages;
-    QReadWriteLock m_pageImagesLock;
+    QList<QByteArray> m_pageImagesData;
+    QReadWriteLock m_pageImagesDataLock;
     mutable QImage m_templatePageImage;
     mutable ImagePrinterEngine *m_engine = nullptr;
 };
