@@ -1219,19 +1219,23 @@ Rectangle {
 
                     // Support for transliteration.
                     property bool userIsTyping: false
+                    EventFilter.target: app
                     EventFilter.active: sceneTextEditor.activeFocus
-                    EventFilter.events: [EventFilter.Wheel, EventFilter.KeyPress] // Wheel, ShortcutOverride
+                    EventFilter.events: [EventFilter.KeyPress] // Wheel, ShortcutOverride
                     EventFilter.onFilter: {
-                        if(event.type === EventFilter.Wheel) {
-                            // We want to avoid TextArea from processing Ctrl+Z
-                            // and other such shortcuts.
-                            result.acceptEvent = false
-                            result.filter = (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
-                        } else if(event.type === EventFilter.KeyPress) {
+                        if(object === sceneTextEditor) {
                             // Enter, Tab and other keys must not trigger
                             // Transliteration. Only space should.
                             sceneTextEditor.userIsTyping = event.hasText
                             completionModel.allowEnable = event.hasText
+                            result.filter = event.controlModifier && (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
+                        } else if(event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown) {
+                            if(event.key === Qt.Key_PageUp)
+                                contentItem.scrollToPreviousScene()
+                            else
+                                contentItem.scrollToNextScene()
+                            result.filter = true
+                            result.acceptEvent = true
                         }
                     }
                     Transliterator.enabled: contentItem.theScene && !contentItem.theScene.isBeingReset && userIsTyping
@@ -1643,17 +1647,6 @@ Rectangle {
                     Keys.onPressed: {
                         event.accepted = false
 
-                        switch(event.key) {
-                        case Qt.Key_PageUp:
-                            event.accepted = true
-                            contentItem.scrollToPreviousScene()
-                            break
-                        case Qt.Key_PageDown:
-                            event.accepted = true
-                            contentItem.scrollToNextScene()
-                            break
-                        }
-
                         if(event.modifiers === Qt.ControlModifier) {
                             switch(event.key) {
                             case Qt.Key_Delete:
@@ -1827,8 +1820,11 @@ Rectangle {
                 }
 
                 contentView.scrollIntoView(idx)
-                var item = contentView.loadedItemAtIndex(idx)
-                item.assumeFocusAt(-1)
+                Qt.callLater( function(iidx) {
+                    contentView.positionViewAtIndex(iidx, ListView.Contain)
+                    var item = contentView.loadedItemAtIndex(iidx)
+                    item.assumeFocusAt(-1)
+                }, idx)
             }
 
             function scrollToNextScene() {
@@ -1840,8 +1836,11 @@ Rectangle {
                 }
 
                 contentView.scrollIntoView(idx)
-                var item = contentView.loadedItemAtIndex(idx)
-                item.assumeFocusAt(0)
+                Qt.callLater( function(iidx) {
+                    contentView.positionViewAtIndex(iidx, ListView.Contain)
+                    var item = contentView.loadedItemAtIndex(iidx)
+                    item.assumeFocusAt(0)
+                }, idx)
             }
         }
     }
