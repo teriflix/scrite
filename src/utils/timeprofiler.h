@@ -145,10 +145,13 @@ public:
     QString context() const { return m_context; }
     TimeProfile profile(bool aggregate=false) const;
 
+    void capture();
+
 private:
+    bool m_captured = false;
     QString m_context;
     QElapsedTimer m_timer;
-    bool m_printInDestructor = false;
+    bool m_printDuringCapture = false;
 };
 
 class ProfilerItem : public QObject

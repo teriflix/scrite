@@ -203,7 +203,7 @@ inline QString evaluateContextPrefix()
 }
 
 TimeProfiler::TimeProfiler(const QString &context, bool print)
-    : m_context(context + evaluateContextPrefix()), m_printInDestructor(print)
+    : m_context(context + evaluateContextPrefix()), m_printDuringCapture(print)
 {
     addPostRoutine();
     ::TimeProfilerStack()->localData().push(this);
@@ -212,15 +212,7 @@ TimeProfiler::TimeProfiler(const QString &context, bool print)
 
 TimeProfiler::~TimeProfiler()
 {
-    TimeProfile p = this->profile();
-    TimeProfile::put(p);
-
-    int indent = 0;
-    Q_ASSERT( ::TimeProfilerStack()->localData().pop() == this );
-    indent = ::TimeProfilerStack()->localData().size();
-
-    if( m_printInDestructor )
-        p.printSelf(indent);
+    this->capture();
 }
 
 TimeProfile TimeProfiler::profile(bool aggregate) const
@@ -229,6 +221,24 @@ TimeProfile TimeProfiler::profile(bool aggregate) const
     if( aggregate )
         p += TimeProfile::get(m_context);
     return p;
+}
+
+void TimeProfiler::capture()
+{
+    if(m_captured)
+        return;
+
+    TimeProfile p = this->profile();
+    TimeProfile::put(p);
+
+    int indent = 0;
+    Q_ASSERT( ::TimeProfilerStack()->localData().pop() == this );
+    indent = ::TimeProfilerStack()->localData().size();
+
+    if( m_printDuringCapture )
+        p.printSelf(indent);
+
+    m_captured = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

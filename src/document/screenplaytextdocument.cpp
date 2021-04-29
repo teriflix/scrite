@@ -645,6 +645,12 @@ void ScreenplayTextDocument::init()
 {
     if(m_textDocument == nullptr)
         m_textDocument = new QTextDocument(this);
+
+#ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
+    m_sceneFrameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+    m_sceneFrameFormat.setBorderBrush(QBrush(Qt::black));
+    m_sceneFrameFormat.setBackground(QBrush(QColor(255,0,255,64)));
+#endif
 }
 
 void ScreenplayTextDocument::setUpdating(bool val)
@@ -856,6 +862,7 @@ void ScreenplayTextDocument::loadScreenplay()
         hasEpisdoes = !episodeElements.isEmpty();
     }
 
+    const int fsi = m_screenplay->firstSceneIndex();
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
@@ -888,7 +895,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
         QTextFrameFormat frameFormat = m_sceneFrameFormat;
         const Scene *scene = element->scene();
-        if(scene != nullptr && i > 0)
+        if(scene != nullptr && i > fsi)
         {
             SceneElement::Type firstParaType = SceneElement::Heading;
             if(!scene->heading()->isEnabled() && scene->elementCount())
@@ -1322,6 +1329,9 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
         m_sceneResetTimer.start(100, this);
 
     this->disconnectFromSceneSignals(scene);
+
+    if(m_syncEnabled)
+        this->evaluatePageBoundariesLater();
 }
 
 void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int index)
@@ -1333,14 +1343,16 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
         return;
 
     ScreenplayTextDocumentUpdate update(this);
+    QTextFrame *rootFrame = m_textDocument->rootFrame();
 
     QTextCursor cursor(m_textDocument);
     if(index == m_screenplay->elementCount()-1)
-        cursor = m_textDocument->rootFrame()->lastCursorPosition();
+        cursor = rootFrame->lastCursorPosition();
     else if(index > 0)
     {
+        const int sindex = index;
         ScreenplayElement *before = nullptr;
-        while(before == nullptr)
+        while(before == nullptr && index >= 0)
         {
             before = m_screenplay->elementAt(--index);
             if(before == nullptr || before->scene() == nullptr)
@@ -1349,6 +1361,7 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
                 continue;
             }
         }
+        index = sindex;
 
         if(before != nullptr)
         {
@@ -1359,12 +1372,32 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
         }
     }
 
-    QTextFrame *frame = cursor.insertFrame(m_sceneFrameFormat);
+    QTextFrameFormat frameFormat = m_sceneFrameFormat;
+    const int fsi = m_screenplay->firstSceneIndex();
+    if(index > fsi)
+    {
+        SceneElement::Type firstParaType = SceneElement::Heading;
+        if(!scene->heading()->isEnabled() && scene->elementCount())
+        {
+            SceneElement *firstPara = scene->elementAt(0);
+            firstParaType = firstPara->type();
+        }
+
+        const SceneElementFormat *firstParaFormat = m_formatting->elementFormat(firstParaType);
+        const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
+        const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
+        frameFormat.setTopMargin(blockFormat.topMargin());
+    }
+
+    QTextFrame *frame = cursor.insertFrame(frameFormat);
     this->registerTextFrame(element, frame);
     this->loadScreenplayElement(element, cursor);
 
     if(m_syncEnabled)
+    {
         this->connectToSceneSignals(scene);
+        this->evaluatePageBoundariesLater();
+    }
 }
 
 void ScreenplayTextDocument::onSceneReset()
