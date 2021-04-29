@@ -274,7 +274,8 @@ Item {
 
             TextField2 {
                 width: parent.width-30
-                placeholderText: text === "" ? fieldInfo.label : ""
+                label: ""
+                placeholderText: fieldInfo.label
                 onTextChanged: exporter.setConfigurationValue(fieldInfo.name, text)
                 TabSequenceItem.manager: tabSequence
             }

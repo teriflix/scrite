@@ -567,7 +567,8 @@ Item {
 
                 TextField2 {
                     id: locTypeFilter
-                    width: (parent.width - parent.spacing*2)/3
+                    width: (parent.width - parent.spacing*2)*0.25
+                    label: ""
                     placeholderText: "INT, EXT ..."
                     property var items: parent.split(text)
                     font.capitalization: Font.AllUppercase
@@ -575,7 +576,8 @@ Item {
 
                 TextField2 {
                     id: locFilter
-                    width: (parent.width - parent.spacing*2)/3
+                    width: parent.width - locTypeFilter.width - locTypeFilter.width
+                    label: ""
                     placeholderText: scriteDocument.structure.allLocations()[0] + " ..."
                     property var items: parent.split(text)
                     font.capitalization: Font.AllUppercase
@@ -583,7 +585,8 @@ Item {
 
                 TextField2 {
                     id: momentFilter
-                    width: (parent.width - parent.spacing*2)/3
+                    width: locTypeFilter.width
+                    label: ""
                     placeholderText: "DAY, NIGHT ..."
                     property var items: parent.split(text)
                     font.capitalization: Font.AllUppercase
@@ -928,6 +931,7 @@ Item {
 
             TextField2 {
                 width: parent.width - 30
+                label: ""
                 placeholderText: fieldInfo.label
                 onTextChanged: {
                     if(generator)
