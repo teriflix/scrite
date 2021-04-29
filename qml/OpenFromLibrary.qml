@@ -236,7 +236,7 @@ Item {
                     width: libraryGridView.cellWidth
                     height: libraryGridView.cellHeight
                     property color textColor: libraryGridView.currentIndex === index ? primaryColors.highlight.text : "black"
-                    z: mouseArea.containsMouse ? 2 : 1
+                    z: mouseArea.containsMouse || libraryGridView.currentIndex === index ? 2 : 1
 
                     Rectangle {
                         visible: toolTipVisibility.get
@@ -424,7 +424,7 @@ Item {
                     width: templatesGridView.cellWidth
                     height: templatesGridView.cellHeight
                     property color textColor: templatesGridView.currentIndex === index ? primaryColors.highlight.text : "black"
-                    z: mouseArea.containsMouse ? 2 : 1
+                    z: mouseArea.containsMouse || templatesGridView.currentIndex === index ? 2 : 1
 
                     Rectangle {
                         visible: toolTipVisibility.get
