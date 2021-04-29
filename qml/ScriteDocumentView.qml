@@ -374,6 +374,7 @@ Item {
                         id: recentFilesMenu
                         width: recentFiles.length > 1 ? 400 : 200
 
+                        property int nrRecentFiles: recentFiles.length
                         property var recentFiles: []
                         function add(filePath) {
                             var r = recentFiles
@@ -421,8 +422,9 @@ Item {
                             model: recentFilesMenu.recentFiles
 
                             MenuItem2 {
-                                property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
-                                text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.nrRecentFiles-index-1]
+                                property var fileInfo: app.fileInfo(filePath)
+                                text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + fileInfo.baseName, Qt.ElideMiddle, recentFilesMenu.width)
                                 ToolTip.text: filePath
                                 ToolTip.visible: hovered
                                 onClicked: fileOpenButton.doOpen(filePath)
