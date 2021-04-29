@@ -13,6 +13,7 @@
 
 #include "hourglass.h"
 #include "application.h"
+#include "timeprofiler.h"
 #include "transliteration.h"
 #include "systemtextinputmanager.h"
 #include "3rdparty/sonnet/sonnet/src/core/textbreaks_p.h"
@@ -60,6 +61,12 @@ static QStringList getCustomFontFilePaths()
          QStringLiteral(":/font/Bengali/HindSiliguri-Regular.ttf") <<
          QStringLiteral(":/font/Bengali/HindSiliguri-Bold.ttf");
     return customFonts;
+}
+
+static QFontDatabase &GlobalFontDatabase()
+{
+    static QFontDatabase theGlobalFontDatabase;
+    return theGlobalFontDatabase;
 }
 
 TransliterationEngine *TransliterationEngine::instance(QCoreApplication *app)
@@ -129,6 +136,11 @@ TransliterationEngine::TransliterationEngine(QObject *parent)
         lang = Language(val);
     }
     this->setLanguage(lang);
+
+    // The first call to QFontDatabase::families() is quite slow.
+    // We are better off sucking up that time here than elsewhere during UI
+    // refresh
+    ::GlobalFontDatabase().families();
 }
 
 TransliterationEngine::~TransliterationEngine()
@@ -543,7 +555,7 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
 
         wordPosition = wordPositions.at(i);
         if(wordPosition.start > lastCharIndex)
-            ret += paragraph.mid(lastCharIndex, wordPosition.start-lastCharIndex);
+            ret += paragraph.midRef(lastCharIndex, wordPosition.start-lastCharIndex);
 
         const QString word = paragraph.mid(wordPosition.start, wordPosition.length);
         lastCharIndex = wordPosition.start + wordPosition.length-1;
@@ -557,20 +569,22 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
         ret += replacement;
     }
 
-    ret += paragraph.mid(lastCharIndex+1);
+    ret += paragraph.midRef(lastCharIndex+1);
 
     return ret;
 }
 
 QFont TransliterationEngine::languageFont(TransliterationEngine::Language language, bool preferAppFonts) const
 {
-    const QFontDatabase fontDb;
+    const QFontDatabase &fontDb = ::GlobalFontDatabase();
     const QString preferredFontFamily = m_languageFontFamily.value(language);
-    const QStringList languageFontFamilies = fontDb.families(writingSystemForLanguage(language));
 
-    QString fontFamily = preferAppFonts ? preferredFontFamily : languageFontFamilies.first();
+    QString fontFamily = preferAppFonts ? preferredFontFamily : QString();
     if(fontFamily.isEmpty())
+    {
+        const QStringList languageFontFamilies = fontDb.families(writingSystemForLanguage(language));
         fontFamily = languageFontFamilies.first();
+    }
 
     return fontFamily.isEmpty() ? Application::instance()->font() : QFont(fontFamily);
 }
@@ -591,7 +605,7 @@ QJsonObject TransliterationEngine::availableLanguageFontFamilies(Transliteration
     {
         HourGlass hourGlass;
 
-        const QFontDatabase fontDb;
+        const QFontDatabase &fontDb = ::GlobalFontDatabase();
         const QStringList languageFontFamilies = fontDb.families(writingSystemForLanguage(language));
         std::copy_if (languageFontFamilies.begin(), languageFontFamilies.end(),
                       std::back_inserter(filteredLanguageFontFamilies), [fontDb,language](const QString &family) {
@@ -631,7 +645,7 @@ void TransliterationEngine::setPreferredFontFamilyForLanguage(TransliterationEng
         m_languageFontFamily[language] = builtInFontFamily;
     else
     {
-        const QFontDatabase fontDb;
+        const QFontDatabase &fontDb = ::GlobalFontDatabase();
         const QList<QFontDatabase::WritingSystem> writingSystems = fontDb.writingSystems(fontFamily);
         if( writingSystems.contains(writingSystemForLanguage(language)) )
             m_languageFontFamily[language] = fontFamily;
