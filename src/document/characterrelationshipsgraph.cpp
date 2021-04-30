@@ -190,7 +190,7 @@ void CharacterRelationshipsGraphEdge::evaluatePath()
 
     QPainterPath path;
 
-    if(!m_fromNode.isNull() && !m_toNode.isNull())
+    if(!m_fromNode.isNull() && !m_toNode.isNull() && !m_relationship.isNull())
     {
 #if 0
         path.moveTo( m_fromNode->rect().center() );
