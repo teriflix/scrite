@@ -296,6 +296,7 @@ Item {
                                     }
                                 }
                                 scriteDocument.reset()
+                                contentLoader.reset()
                                 app.execLater(fileNewButton, 250, newFromTemplate)
                             }
                         }, fileNewButton)
@@ -1452,7 +1453,7 @@ Item {
 
     Loader {
         id: contentLoader
-        active: !scriteDocument.loading
+        active: enabled && !scriteDocument.loading
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
@@ -1460,6 +1461,11 @@ Item {
         anchors.bottom: parent.bottom
         onActiveChanged: {
             globalScreenplayEditorToolbar.sceneEditor = null
+        }
+
+        function reset() {
+            enabled = false
+            Qt.callLater( function() { contentLoader.enabled = true } )
         }
     }
 
@@ -1894,8 +1900,10 @@ Item {
     }
 
     function newFromTemplate() {
-        if(!scriteDocument.empty)
+        if(!scriteDocument.empty) {
+            contentLoader.reset()
             scriteDocument.reset()
+        }
         if(app.internetAvailable) {
             modalDialog.popupSource = fileNewButton
             modalDialog.sourceComponent = openTemplateDialogComponent
@@ -1948,6 +1956,7 @@ Item {
                     "nameFilters": ["Scrite Projects (*.scrite)"],
                     "selectExisting": true,
                     "callback": function(path) {
+                        contentLoader.reset()
                         scriteDocument.open(path)
                         recentFilesMenu.add(path)
                     },
@@ -1971,6 +1980,7 @@ Item {
                     "nameFilters": scriteDocument.importFormatFileSuffix(format),
                     "selectExisting": true,
                     "callback": function(path) {
+                        contentLoader.reset()
                         scriteDocument.importFile(path, format)
                     },
                     "reset": true,
