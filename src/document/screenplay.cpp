@@ -19,6 +19,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QJsonDocument>
 #include <QScopedValueRollback>
 #include <QSettings>
 
@@ -1370,6 +1371,8 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
         }
 
         this->setCurrentElementIndex(this->indexOfElement(ret));
+
+        ptr->setEditorHints(QJsonValue());
     }
 
     if(ret != nullptr && UndoStack::active() != nullptr)
@@ -1411,6 +1414,7 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
     Scene *previousScene = previousSceneElement->scene();
     currentScene->mergeInto(previousScene);
 
+    previousSceneElement->setEditorHints(QJsonValue());
     screenplay->setCurrentElementIndex(previousElementIndex);
     GarbageCollector::instance()->add(element);
     return previousSceneElement;
@@ -1808,7 +1812,7 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
 
     if(!m_scriteDocument->isCreatedOnThisComputer())
     {
-        for(ScreenplayElement *element : m_elements)
+        for(ScreenplayElement *element : qAsConst(m_elements))
             element->setEditorHints(QJsonValue());
     }
 }

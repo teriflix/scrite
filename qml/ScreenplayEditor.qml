@@ -350,7 +350,7 @@ Rectangle {
                         }
 
                         Component.onDestruction: {
-                            if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType )
+                            if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType)
                                 return
                             var editorHints = {
                                 "height": height / zoomLevel,
