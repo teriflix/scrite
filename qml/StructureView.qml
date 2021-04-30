@@ -1698,6 +1698,11 @@ Item {
             opacity: 0.55 * previewArea.opacity
         }
 
+        onVisibleChanged: {
+            if(visible)
+                canvasItemsBoundingBox.markPreviewDirty()
+        }
+
         BoundingBoxPreview {
             id: previewArea
             anchors.fill: parent
