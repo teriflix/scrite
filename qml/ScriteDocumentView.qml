@@ -67,6 +67,7 @@ Item {
         id: screenplayEditorSettings
         fileName: app.settingsFilePath
         category: "Screenplay Editor"
+        property bool displayRuler: true
         property bool displaySceneCharacters: true
         property bool displaySceneSynopsis: true
         property bool displaySceneComments: false

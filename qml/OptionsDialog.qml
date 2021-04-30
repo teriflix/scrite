@@ -179,10 +179,20 @@ Item {
                         text: "Screenplay Editor"
                     }
 
-                    CheckBox2 {
-                        checked: screenplayEditorSettings.enableSpellCheck
-                        text: "Enable spell check"
-                        onToggled: screenplayEditorSettings.enableSpellCheck = checked
+                    Column {
+                        width: parent.width
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.enableSpellCheck
+                            text: "Enable spell check"
+                            onToggled: screenplayEditorSettings.enableSpellCheck = checked
+                        }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.displayRuler
+                            text: "Display Ruler"
+                            onToggled: screenplayEditorSettings.displayRuler = checked
+                        }
                     }
                 }
             }

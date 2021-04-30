@@ -207,7 +207,7 @@ Rectangle {
 
             Rectangle {
                 id: contentArea
-                anchors.top: ruler.bottom
+                anchors.top: ruler.visible ? ruler.bottom : parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
@@ -586,6 +586,7 @@ Rectangle {
                 rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
                 zoomLevel: screenplayEditor.zoomLevel
                 resolution: scriteDocument.displayFormat.pageLayout.resolution
+                visible: screenplayEditorSettings.displayRuler
 
                 property real leftMarginPx: leftMargin * zoomLevel
                 property real rightMarginPx: rightMargin * zoomLevel
