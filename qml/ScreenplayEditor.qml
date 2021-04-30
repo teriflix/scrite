@@ -2080,6 +2080,11 @@ Rectangle {
                         target: headingItem.theScene
                         onSceneRefreshed: sceneCharactersListLoader.reloadLater()
                     }
+
+                    Connections {
+                        target: sceneCharactersListLoader.item
+                        onNewCharacterAdded: headingItem.sceneTextEditor.forceActiveFocus()
+                    }
                 }
 
                 Text {
@@ -2111,8 +2116,11 @@ Rectangle {
         id: sceneCharactersList
 
         Flow {
+            id: sceneCharacterListItem
             spacing: 5
             flow: Flow.LeftToRight
+
+            signal newCharacterAdded(string characterName)
 
             Text {
                 id: sceneCharactersListHeading
@@ -2172,6 +2180,7 @@ Rectangle {
                         completionStrings: scriteDocument.structure.characterNames
                         onEditingFinished: {
                             scene.addMuteCharacter(text)
+                            sceneCharacterListItem.newCharacterAdded(text)
                             newCharacterInput.active = false
                         }
 
