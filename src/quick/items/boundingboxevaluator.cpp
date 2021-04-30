@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "application.h"
 #include "boundingboxevaluator.h"
 #include "boundingboxevaluator.h"
 
@@ -61,6 +62,9 @@ void BoundingBoxEvaluator::setPreviewScale(qreal val)
 
 void BoundingBoxEvaluator::updatePreview()
 {
+#ifndef QT_NO_DEBUG
+    qDebug("BoundingBoxEvaluator is updating preview picture");
+#endif
     if(!m_preview.isNull())
         return;
 
@@ -74,8 +78,8 @@ void BoundingBoxEvaluator::updatePreview()
     };
     std::sort(m_items.begin(), m_items.end(), lessThan);
 
-    m_preview = QImage(boxSize.toSize(), QImage::Format_ARGB32);
-    m_preview.fill(Qt::transparent);
+    m_preview = QPicture();
+    m_preview.setBoundingRect( QRectF( QPointF(0,0), boxSize ).toRect() );
 
     QTransform tx;
     tx.translate(-m_boundingBox.left(), -m_boundingBox.top());
@@ -86,8 +90,10 @@ void BoundingBoxEvaluator::updatePreview()
     paint.setRenderHint(QPainter::SmoothPixmapTransform);
     paint.setTransform(tx);
 
+    int itemIndex = 0;
     Q_FOREACH(BoundingBoxItem *item, m_items)
     {
+        ++itemIndex;
         if(item->item() == nullptr)
             continue;
 
@@ -96,9 +102,13 @@ void BoundingBoxEvaluator::updatePreview()
 
         if(item->isLivePreview() && !itemPreview.isNull())
             paint.drawImage(itemRect, itemPreview);
-        else if(item->previewBorderColor().alpha() > 0 && item->previewFillColor().alpha() > 0)
+        else if(item->previewBorderColor().alpha() > 0 || item->previewFillColor().alpha() > 0)
         {
-            paint.setPen( QPen(item->previewBorderColor()) );
+            QPen pen(item->previewBorderColor());
+            pen.setCosmetic(true);
+            pen.setWidthF(item->previewBorderWidth());
+
+            paint.setPen(pen);
             paint.setBrush( QBrush(item->previewFillColor()) );
             paint.drawRect(itemRect);
         }
@@ -154,11 +164,12 @@ void BoundingBoxEvaluator::evaluateNow()
     rect.adjust(-m_margin, -m_margin, m_margin, m_margin);
 
     this->setBoundingBox(rect);
+    this->markPreviewDirty();
 }
 
 void BoundingBoxEvaluator::markPreviewDirty()
 {
-    m_preview = QImage();
+    m_preview = QPicture();
     emit previewNeedsUpdate();
 }
 
@@ -249,6 +260,17 @@ void BoundingBoxItem::setPreviewBorderColor(const QColor &val)
 
     m_previewBorderColor = val;
     emit previewBorderColorChanged();
+
+    this->updatePreviewLater();
+}
+
+void BoundingBoxItem::setPreviewBorderWidth(qreal val)
+{
+    if( qFuzzyCompare(m_previewBorderWidth, val) )
+        return;
+
+    m_previewBorderWidth = val;
+    emit previewBorderWidthChanged();
 
     this->updatePreviewLater();
 }
@@ -373,10 +395,9 @@ void BoundingBoxItem::updatePreview()
     else
     {
         if(!m_preview.isNull())
-        {
             m_preview = QImage();
-            emit previewUpdated();
-        }
+
+        emit previewUpdated();
     }
 }
 
@@ -385,7 +406,10 @@ void BoundingBoxItem::updatePreviewLater()
     if(m_item != nullptr)
     {
         if(!m_livePreview && m_preview.isNull())
+        {
             m_updatePreviewTimer.stop();
+            emit previewUpdated();
+        }
         else
             m_updatePreviewTimer.start(500, this);
     }
@@ -509,7 +533,7 @@ void BoundingBoxPreview::setEvaluator(BoundingBoxEvaluator *val)
 void BoundingBoxPreview::paint(QPainter *painter)
 {
 #ifndef QT_NO_DEBUG
-    qDebug("TightBoundingBoxPreview is painting");
+    qDebug("BoundingBoxPreview is painting");
 #endif
 
     if(!this->isVisible())
@@ -524,18 +548,25 @@ void BoundingBoxPreview::paint(QPainter *painter)
     {
         m_evaluator->updatePreview();
 
-        const QImage preview = m_evaluator->preview();
+        QPicture preview = m_evaluator->preview();
         if(preview.isNull())
             return;
 
-        QSizeF previewSize = preview.size();
+        QSizeF previewSize = preview.boundingRect().size();
         previewSize.scale(itemRect.size(), Qt::KeepAspectRatio);
 
         QRectF previewRect( QPointF(0,0), previewSize );
         // previewRect.moveCenter(itemRect.center());
 
-        painter->setRenderHint(QPainter::SmoothPixmapTransform);
-        painter->drawImage(previewRect, preview );
+        painter->translate(previewRect.topLeft());
+
+        const qreal sx = previewSize.width() / preview.boundingRect().width();
+        const qreal sy = previewSize.height() / preview.boundingRect().height();
+        painter->scale(sx, sy);
+
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        preview.play(painter);
     }
 }
 

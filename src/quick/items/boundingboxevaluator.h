@@ -19,6 +19,7 @@
 #include <QRectF>
 #include <QImage>
 #include <QObject>
+#include <QPicture>
 #include <QPointer>
 #include <QQmlEngine>
 #include <QQuickItem>
@@ -88,7 +89,7 @@ public:
     Q_SIGNAL void previewScaleChanged();
 
     void updatePreview();
-    QImage preview() const { return m_preview; }
+    QPicture preview() const { return m_preview; }
     Q_INVOKABLE void markPreviewDirty();
     Q_SIGNAL void previewNeedsUpdate();
 
@@ -108,10 +109,10 @@ private:
 private:
     friend class BoundingBoxItem;
     qreal m_margin = 0;
-    QImage m_preview;
     QRectF m_initialRect;
     QRectF m_boundingBox;
     qreal m_previewScale = 1.0;
+    QPicture m_preview;
     ExecLaterTimer m_evaluationTimer;
     QList<BoundingBoxItem*> m_items;
 };
@@ -151,6 +152,11 @@ public:
     void setPreviewBorderColor(const QColor &val);
     QColor previewBorderColor() const { return m_previewBorderColor; }
     Q_SIGNAL void previewBorderColorChanged();
+
+    Q_PROPERTY(qreal previewBorderWidth READ previewBorderWidth WRITE setPreviewBorderWidth NOTIFY previewBorderWidthChanged)
+    void setPreviewBorderWidth(qreal val);
+    qreal previewBorderWidth() const { return m_previewBorderWidth; }
+    Q_SIGNAL void previewBorderWidthChanged();
 
     Q_PROPERTY(bool livePreview READ isLivePreview WRITE setLivePreview NOTIFY livePreviewChanged)
     void setLivePreview(bool val);
@@ -211,6 +217,7 @@ private:
     bool m_livePreview = true;
     QRectF m_viewportRect;
     QPointer<QQuickItem> m_item;
+    qreal m_previewBorderWidth = 1;
     QColor m_previewFillColor = Qt::white;
     QColor m_previewBorderColor = Qt::black;
     VisibilityMode m_visibilityMode = AlwaysVisible;

@@ -78,6 +78,7 @@ Item {
             }
 
             ToolButton3 {
+                id: cmdZoomIn
                 onClicked: { canvasScroll.zoomIn(); canvasScroll.updateScriteDocumentUserData() }
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
@@ -85,6 +86,7 @@ Item {
             }
 
             ToolButton3 {
+                id: cmdZoomOut
                 onClicked: { canvasScroll.zoomOut(); canvasScroll.updateScriteDocumentUserData() }
                 iconSource: "../icons/navigation/zoom_out.png"
                 autoRepeat: true
@@ -92,7 +94,12 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: {
+                id: cmdZoomOne
+                onClicked: click()
+                iconSource: "../icons/navigation/zoom_one.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom One"
+                function click() {
                     var item = currentElementItemBinder.get
                     if(item === null) {
                         if(elementItems.count > 0)
@@ -106,12 +113,10 @@ Item {
                     canvasScroll.zoomOneToItem(item)
                     canvasScroll.updateScriteDocumentUserData()
                 }
-                iconSource: "../icons/navigation/zoom_one.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom One"
             }
 
             ToolButton3 {
+                id: cmdZoomFit
                 onClicked: {
                     canvasItemsBoundingBox.recomputeBoundingBox()
                     canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox);
@@ -185,7 +190,7 @@ Item {
                     scriteDocument.structure.forceBeatBoardLayout = checked
                     if(checked) {
                         var rect = scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-                        canvasScroll.zoomFit(rect)
+                        cmdZoomOne.click()
                     }
                 }
 
@@ -1657,6 +1662,7 @@ Item {
         anchors.right: canvasScroll.right
         anchors.bottom: canvasScroll.bottom
         anchors.margins: 30
+        property alias interacting: panMouseArea.pressed
 
         readonly property real maxSize: 150
         property size previewSize: {
@@ -1697,8 +1703,8 @@ Item {
             anchors.fill: parent
             anchors.margins: 5
             evaluator: canvasItemsBoundingBox
-            backgroundColor: primaryColors.c50.background
-            backgroundOpacity: 0.25
+            backgroundColor: primaryColors.c100.background
+            backgroundOpacity: 0.9
 
             Rectangle {
                 id: viewportIndicator
@@ -1761,6 +1767,7 @@ Item {
                     enabled: parent.width > 0 && parent.height > 0
                     hoverEnabled: drag.active
                     cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+                    drag.onActiveChanged: canvasScroll.animatePanAndZoom = !drag.active
                 }
             }
         }
@@ -1812,8 +1819,9 @@ Item {
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
             BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
             BoundingBoxItem.livePreview: false
-            BoundingBoxItem.previewFillColor: app.translucent(background.color, 0.5)
-            BoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
+            BoundingBoxItem.previewFillColor: selected ? Qt.darker(element.scene.color) : element.scene.color
+            BoundingBoxItem.previewBorderColor: app.isLightColor(element.scene.color) ? "black" : background.color
+            BoundingBoxItem.previewBorderWidth: selected ? 3 : 1.5
             BoundingBoxItem.viewportItem: canvas
             BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
@@ -2078,8 +2086,9 @@ Item {
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
             BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
             BoundingBoxItem.livePreview: false
-            BoundingBoxItem.previewFillColor: background.color
-            BoundingBoxItem.previewBorderColor: selected ? "black" : background.border.color
+            BoundingBoxItem.previewFillColor: app.translucent(element.scene.color, selected ? 0.75 : 0.1)
+            BoundingBoxItem.previewBorderColor: app.isLightColor(element.scene.color) ? "black" : element.scene.color
+            BoundingBoxItem.previewBorderWidth: selected ? 3 : 1.5
             BoundingBoxItem.viewportItem: canvas
             BoundingBoxItem.visibilityMode: stackedOnTop ? BoundingBoxItem.VisibleUponViewportIntersection : BoundingBoxItem.IgnoreVisibility
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
@@ -2832,9 +2841,7 @@ Item {
         id: rectangleAnnotationComponent
 
         AnnotationItem {
-            BoundingBoxItem.previewFillColor: app.translucent(color, opacity)
-            BoundingBoxItem.previewBorderColor: app.translucent(border.color, opacity)
-            BoundingBoxItem.livePreview: false
+
         }
     }
 
@@ -3191,6 +3198,6 @@ Item {
     }
 
     function requestEditorLater() {
-        app.execLater(screenplayView, 100, function() { requestEditor() })
+        app.execLater(structureView, 100, function() { requestEditor() })
     }
 }

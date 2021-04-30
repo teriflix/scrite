@@ -30,6 +30,9 @@ Rectangle {
     }
     opacity: annotation.attributes.opacity / 100
 
+    BoundingBoxItem.evaluator: canvasItemsBoundingBox
+    BoundingBoxItem.livePreview: true
+
     function grip() {
         annotationGripLoader.reset()
         annotationGripLoader.annotationItem = annotationItem
