@@ -218,7 +218,7 @@ Rectangle {
                     id: trackerPack
                     property int counter: 0
                     TrackProperty { target: screenplayEditorSettings; property: "displaySceneCharacters" }
-                    // TrackProperty { target: screenplayAdapter; property: "elementCount" }
+                    TrackProperty { target: screenplayAdapter; property: "elementCount" }
                     TrackProperty { target: screenplayAdapter; property: "source" }
                     onTracked: counter = counter+1
                 }
