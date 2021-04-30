@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "announcement.h"
+#include "application.h"
 
 Q_GLOBAL_STATIC(QList<Announcement*>, Announcements);
 
@@ -33,7 +34,7 @@ Announcement *Announcement::qmlAttachedProperties(QObject *object)
 
 void Announcement::shout(const QString &type, const QJsonValue &data)
 {
-    for(Announcement *a : *::Announcements)
+    for(Announcement *a : qAsConst(*::Announcements))
     {
         if(a == this)
             continue;

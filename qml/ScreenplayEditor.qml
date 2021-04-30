@@ -1289,7 +1289,10 @@ Rectangle {
                             sortStrings: false
                             completionPrefix: sceneDocumentBinder.completionPrefix
                             filterKeyStrokes: sceneTextEditor.activeFocus
-                            onRequestCompletion: sceneTextEditor.acceptCompletionSuggestion()
+                            onRequestCompletion: {
+                                sceneTextEditor.acceptCompletionSuggestion()
+                                Announcement.shout("E69D2EA0-D26D-4C60-B551-FD3B45C5BE60", contentItem.theScene.id)
+                            }
                             minimumCompletionPrefixLength: 0
                             property bool hasItems: count > 0
                             onHasItemsChanged: {
@@ -2065,6 +2068,15 @@ Rectangle {
                     property bool allow: true
                     active: screenplayEditorSettings.displaySceneCharacters && allow
                     sourceComponent: sceneCharactersList
+
+                    Announcement.onIncoming: {
+                        if(type === "E69D2EA0-D26D-4C60-B551-FD3B45C5BE60" && data === headingItem.theScene.id) {
+                            sceneCharactersListLoader.allow = false
+                            Qt.callLater( function() {
+                                sceneCharactersListLoader.allow = true
+                            })
+                        }
+                    }
 
                     function reload() {
                         sceneCharactersListLoader.allow = false
