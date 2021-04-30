@@ -1034,7 +1034,7 @@ Item {
                     color: app.translucent(accentColors.windowColor, 0.1)
                     border.width: 1
                     border.color: accentColors.borderColor
-                    enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
+                    enabled: !createItemMouseHandler.enabled && !annotationGripLoader.active
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
                     BoundingBoxItem.stackOrder: 2.0 + (index/canvas.groupBoxes.length)
