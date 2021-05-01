@@ -991,8 +991,8 @@ Item {
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
                     BoundingBoxItem.stackOrder: 1.0 + (index/canvas.episodeBoxes.length)
                     BoundingBoxItem.livePreview: false
-                    BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
-                    BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
+                    BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0.05)
+                    BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0.5)
                     BoundingBoxItem.viewportItem: canvas
                     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
                     BoundingBoxItem.viewportRect: canvasScroll.viewportRect
@@ -1713,8 +1713,9 @@ Item {
 
             Rectangle {
                 id: viewportIndicator
-                color: primaryColors.highlight.background
-                opacity: 0.5
+                color: app.translucent(accentColors.highlight.background, 0.25)
+                border.width: 2
+                border.color: accentColors.borderColor
 
                 DelayedPropertyBinder {
                     id: geometryBinder
