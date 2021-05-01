@@ -1658,9 +1658,12 @@ Rectangle {
                         if(event.modifiers === Qt.ControlModifier) {
                             switch(event.key) {
                             case Qt.Key_Delete:
-                                if(app.isMacOSPlatform && sceneTextEditor.cursorPosition === 0) {
+                                if(app.isMacOSPlatform) {
                                     event.accepted = true
-                                    contentItem.mergeWithPreviousScene()
+                                    if(sceneTextEditor.cursorPosition === 0)
+                                        contentItem.mergeWithPreviousScene()
+                                    else
+                                        contentItem.showCantMergeSceneMessage()
                                 }
                                 break
                             case Qt.Key_Backspace:
@@ -1668,6 +1671,8 @@ Rectangle {
                                     event.accepted = true
                                     contentItem.mergeWithPreviousScene()
                                 }
+                                else
+                                    contentItem.showCantMergeSceneMessage()
                                 break
                             case Qt.Key_0:
                                 event.accepted = true
@@ -1790,32 +1795,55 @@ Rectangle {
             }
 
             function mergeWithPreviousScene() {
-                if(!contentItem.canJoinToPreviousScene)
+                if(!contentItem.canJoinToPreviousScene) {
+                    showCantMergeSceneMessage()
                     return
+                }
                 scriteDocument.setBusyMessage("Merging scene...")
                 app.execLater(contentItem, 100, mergeWithPreviousSceneImpl)
             }
 
             function mergeWithPreviousSceneImpl() {
                 screenplayTextDocument.syncEnabled = false
-                screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
+                var ret = screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
                 screenplayTextDocument.syncEnabled = true
-                contentView.scrollIntoView(screenplayAdapter.currentIndex)
                 scriteDocument.clearBusyMessage()
+                if(ret === null)
+                    showCantMergeSceneMessage()
+                contentView.scrollIntoView(screenplayAdapter.currentIndex)
+            }
+
+            function showCantMergeSceneMessage() {
+                showInformation({
+                    "message": "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene.",
+                    "closeOnEscape": true
+                })
             }
 
             function splitScene() {
-                if(!contentItem.canSplitScene)
+                if(!contentItem.canSplitScene) {
+                    showCantSplitSceneMessage()
                     return
+                }
                 scriteDocument.setBusyMessage("Splitting scene...")
                 app.execLater(contentItem, 100, splitSceneImpl)
             }
 
             function splitSceneImpl() {
                 screenplayTextDocument.syncEnabled = false
-                screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                var ret = screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
                 screenplayTextDocument.syncEnabled = true
                 scriteDocument.clearBusyMessage()
+                if(ret === null)
+                    showCantSplitSceneMessage()
+                contentView.scrollIntoView(screenplayAdapter.currentIndex)
+            }
+
+            function showCantSplitSceneMessage() {
+                showInformation({
+                    "message": "Scene can be split only when cursor is placed at the start of a paragraph.",
+                    "closeOnEscape": true
+                })
             }
 
             function assumeFocus() {

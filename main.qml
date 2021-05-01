@@ -205,6 +205,8 @@ Rectangle {
         if(popupSource)
             modalDialog.popupSource = popupSource
         modalDialog.closeable = false
+        if(params.closeOnEscape !== undefined)
+            modalDialog.closeOnEscape = params.closeOnEscape
         modalDialog.active = true
     }
 
