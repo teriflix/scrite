@@ -218,7 +218,6 @@ QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
         roles[BreakTypeRole] = "breakType";
         roles[SceneRole] = "scene";
         roles[ModelDataRole] = "modelData";
-        roles[RowNumberRole] = "rowNumber";
     }
 
     return roles;
@@ -301,8 +300,6 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene*>(element->scene());
-    case RowNumberRole:
-        return row;
     case ModelDataRole: {
             QVariantMap ret;
             const QHash<int, QByteArray> roles = this->roleNames();
@@ -336,6 +333,11 @@ void ScreenplayAdapter::updateCurrentIndexAndCount()
         this->setCurrentIndexInternal(-1);
 
     emit elementCountChanged();
+
+    // Lets approximate for now that row number changes for everybody
+    const QModelIndex start = this->index(0, 0);
+    const QModelIndex end = this->index( this->rowCount()-1, 0 );
+    emit dataChanged(start, end);
 }
 
 void ScreenplayAdapter::resetSource()

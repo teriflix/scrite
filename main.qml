@@ -165,20 +165,6 @@ Rectangle {
         }
     }
 
-    Item {
-        anchors.fill: blur
-        visible: scriteDocument.busy
-        opacity: 0.9
-        onVisibleChanged: {
-            if(visible) {
-                blur.radius = blur.maxRadius
-                blur.show()
-            } else {
-                blur.hide()
-            }
-        }
-    }
-
     Settings {
         id: scrollAreaSettings
         fileName: app.settingsFilePath
@@ -380,6 +366,14 @@ Rectangle {
 
     Loader {
         active: scriteDocument.busy
+        onActiveChanged: {
+            if(active) {
+                blur.radius = blur.maxRadius
+                blur.show()
+            } else {
+                blur.hide()
+            }
+        }
         anchors.fill: parent
         sourceComponent: Item {
             Rectangle {

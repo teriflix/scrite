@@ -72,7 +72,7 @@ public:
     Q_INVOKABLE QVariant at(int row) const;
     Q_INVOKABLE void refresh();
 
-    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, ModelDataRole, RowNumberRole };
+    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, ModelDataRole };
     Q_ENUMS(Roles)
     QHash<int,QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;

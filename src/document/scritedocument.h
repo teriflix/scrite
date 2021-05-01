@@ -111,11 +111,11 @@ public:
     Q_SIGNAL void busyChanged();
 
     Q_PROPERTY(QString busyMessage READ busyMessage NOTIFY busyMessageChanged STORED false)
-    void setBusyMessage(const QString &val);
+    Q_INVOKABLE void setBusyMessage(const QString &val);
     QString busyMessage() const { return m_busyMessage; }
     Q_SIGNAL void busyMessageChanged();
 
-    void clearBusyMessage() { this->setBusyMessage(QString()); }
+    Q_INVOKABLE void clearBusyMessage() { this->setBusyMessage(QString()); }
 
     Q_PROPERTY(QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
     QString documentWindowTitle() const { return m_documentWindowTitle; }

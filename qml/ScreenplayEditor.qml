@@ -218,7 +218,10 @@ Rectangle {
                     id: trackerPack
                     property int counter: 0
                     TrackProperty { target: screenplayEditorSettings; property: "displaySceneCharacters" }
-                    TrackProperty { target: screenplayAdapter; property: "elementCount" }
+                    // We shouldnt be tracking changes in elementCount as a reason to reset
+                    // the model used by contentView. This causes too many delegate creation/deletions.
+                    // Just not effective.
+                    // TrackProperty { target: screenplayAdapter; property: "elementCount" }
                     TrackProperty { target: screenplayAdapter; property: "source" }
                     onTracked: counter = counter+1
                 }
@@ -247,6 +250,7 @@ Rectangle {
                     delegate: Loader {
                         id: contentViewDelegateLoader
                         property var componentData: modelData
+                        property int componentIndex: index
 
                         z: contentViewModel.value.currentIndex === index ? 2 : 1
                         width: contentView.width
@@ -331,7 +335,7 @@ Rectangle {
                             }
                         }
 
-                        Component.onCompleted: {                            
+                        Component.onCompleted: {
                             var editorHints = componentData.screenplayElement.editorHints
                             if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
                                 !editorHints ||
@@ -764,7 +768,7 @@ Rectangle {
 
         Item {
             id: breakItem
-            property int theIndex: componentData.rowNumber
+            property int theIndex: componentIndex
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             height: breakTitle.height+breakSubtitleLoader.height+10
@@ -843,7 +847,7 @@ Rectangle {
 
         Rectangle {
             id: contentItem
-            property int theIndex: componentData.rowNumber
+            property int theIndex: componentIndex
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             property bool isCurrent: theElement === screenplayAdapter.currentElement
@@ -1788,17 +1792,30 @@ Rectangle {
             function mergeWithPreviousScene() {
                 if(!contentItem.canJoinToPreviousScene)
                     return
+                scriteDocument.setBusyMessage("Merging scene...")
+                app.execLater(contentItem, 100, mergeWithPreviousSceneImpl)
+            }
+
+            function mergeWithPreviousSceneImpl() {
                 screenplayTextDocument.syncEnabled = false
                 screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
                 screenplayTextDocument.syncEnabled = true
+                contentView.scrollIntoView(screenplayAdapter.currentIndex)
+                scriteDocument.clearBusyMessage()
             }
 
             function splitScene() {
                 if(!contentItem.canSplitScene)
                     return
+                scriteDocument.setBusyMessage("Splitting scene...")
+                app.execLater(contentItem, 100, splitSceneImpl)
+            }
+
+            function splitSceneImpl() {
                 screenplayTextDocument.syncEnabled = false
                 screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
                 screenplayTextDocument.syncEnabled = true
+                scriteDocument.clearBusyMessage()
             }
 
             function assumeFocus() {

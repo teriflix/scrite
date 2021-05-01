@@ -347,7 +347,7 @@ public:
     void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
     // QAbstractItemModel interface
-    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, RowNumberRole };
+    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int,QByteArray> roleNames() const;

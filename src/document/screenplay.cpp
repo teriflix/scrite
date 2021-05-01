@@ -1887,8 +1887,6 @@ QVariant Screenplay::data(const QModelIndex &index, int role) const
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene*>(element->scene());
-    case RowNumberRole:
-        return index.row();
     default:
         break;
     }
@@ -1906,7 +1904,6 @@ QHash<int, QByteArray> Screenplay::roleNames() const
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
         roles[BreakTypeRole] = "breakType";
         roles[SceneRole] = "scene";
-        roles[RowNumberRole] = "rowNumber";
     }
 
     return roles;
