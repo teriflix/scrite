@@ -183,6 +183,11 @@ void ScriteDocument::setBusy(bool val)
 
     m_busy = val;
     emit busyChanged();
+
+    if(val)
+        qApp->setOverrideCursor(Qt::WaitCursor);
+    else
+        qApp->restoreOverrideCursor();
 }
 
 void ScriteDocument::setBusyMessage(const QString &val)

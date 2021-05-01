@@ -175,7 +175,7 @@ Item {
         ShortcutsModelItem.title: "Screenplay"
         ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 0
         ShortcutsModelItem.shortcut: sequence
-        onActivated: mainTabBar.currentIndex = 0
+        onActivated: mainTabBar.activateTab(0)
     }
 
     Shortcut {
@@ -185,7 +185,7 @@ Item {
         ShortcutsModelItem.title: "Structure"
         ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 1
         ShortcutsModelItem.shortcut: sequence
-        onActivated: mainTabBar.currentIndex = 1
+        onActivated: mainTabBar.activateTab(1)
     }
 
     Shortcut {
@@ -197,7 +197,7 @@ Item {
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.visible: enabled
         enabled: !workspaceSettings.showNotebookInStructure
-        onActivated: mainTabBar.currentIndex = 2
+        onActivated: mainTabBar.activateTab(2)
     }
 
     Shortcut {
@@ -262,7 +262,7 @@ Item {
             visible: appToolBarArea.width >= 1366
             onVisibleChanged: {
                 if(!visible)
-                    mainTabBar.currentIndex = 0
+                    mainTabBar.activateTab(0)
             }
 
             function saveQuestionText() {
@@ -1171,19 +1171,19 @@ Item {
 
                             MenuItem2 {
                                 text: "Screenplay (" + app.polishShortcutTextForDisplay("Alt+1") + ")"
-                                onTriggered: mainTabBar.currentIndex = 0
+                                onTriggered: mainTabBar.activateTab(0)
                                 font.bold: mainTabBar.currentIndex === 0
                             }
 
                             MenuItem2 {
                                 text: "Structure (" + app.polishShortcutTextForDisplay("Alt+2") + ")"
-                                onTriggered: mainTabBar.currentIndex = 1
+                                onTriggered: mainTabBar.activateTab(1)
                                 font.bold: mainTabBar.currentIndex === 1
                             }
 
                             MenuItem2 {
                                 text: "Notebook (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
-                                onTriggered: mainTabBar.currentIndex = 2
+                                onTriggered: mainTabBar.activateTab(2)
                                 font.bold: mainTabBar.currentIndex === 2
                                 enabled: !workspaceSettings.showNotebookInStructure
                             }
@@ -1312,10 +1312,21 @@ Item {
                     onJustLoaded: {
                         var userData = scriteDocument.userData
                         if(userData.mainTabBar)
-                            mainTabBar.currentIndex = userData.mainTabBar.currentIndex
+                            mainTabBar.activateTab(userData.mainTabBar.currentIndex)
                         else
-                            mainTabBar.currentIndex = 0
+                            mainTabBar.activateTab(0)
                     }
+                }
+
+                function activateTab(index) {
+                    if(index < 0 || index >= tabs.length)
+                        return
+                    var message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
+                    scriteDocument.setBusyMessage(message)
+                    app.execLater(mainTabBar, 100, function() {
+                        mainTabBar.currentIndex = index
+                        scriteDocument.clearBusyMessage()
+                    })
                 }
 
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
@@ -1413,7 +1424,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
-                            onClicked: mainTabBar.currentIndex = index
+                            onClicked: mainTabBar.activateTab(index)
                             ToolTip.text: modelData.name + "\t" + app.polishShortcutTextForDisplay("Alt+"+(index+1))
                             ToolTip.delay: 1000
                             ToolTip.visible: containsMouse
