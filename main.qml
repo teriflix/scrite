@@ -497,7 +497,7 @@ Rectangle {
             var timestamp = (new Date()).getTime()
             if(timestamp - lastSnapshotTimestamp > 500) {
                 lastSnapshotTimestamp = timestamp
-                windowCapture.start()
+                windowCapture.capture()
             }
         }
     }
@@ -508,7 +508,7 @@ Rectangle {
         format: WindowCapture.JPGFormat
         forceCounterInFileName: true
         window: qmlWindow
-        maxImageSize: Qt.size(1920, 1080)
+        captureMode: WindowCapture.FileAndClipboard
     }
 
     Component.onCompleted: qmlWindow.raise()

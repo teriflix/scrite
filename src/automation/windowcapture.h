@@ -74,6 +74,17 @@ public:
     bool isReplaceExistingFile() const { return m_replaceExistingFile; }
     Q_SIGNAL void replaceExistingFileChanged();
 
+    enum CaptureMode
+    {
+        FileOnly,
+        FileAndClipboard
+    };
+    Q_ENUM(CaptureMode)
+    Q_PROPERTY(CaptureMode captureMode READ captureMode WRITE setCaptureMode NOTIFY captureModeChanged)
+    void setCaptureMode(CaptureMode val);
+    CaptureMode captureMode() const { return m_captureMode; }
+    Q_SIGNAL void captureModeChanged();
+
     Q_INVOKABLE QString capture();
 
 protected:
@@ -90,6 +101,7 @@ private:
     QSizeF m_maxImageSize;
     Format m_format = JPGFormat;
     bool m_replaceExistingFile = false;
+    CaptureMode m_captureMode = FileOnly;
     QObjectProperty<QWindow> m_window;
     bool m_forceCounterInFileName = false;
 };

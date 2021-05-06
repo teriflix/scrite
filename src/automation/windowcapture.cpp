@@ -16,6 +16,7 @@
 
 #include <QDir>
 #include <QScreen>
+#include <QClipboard>
 #include <QQuickWindow>
 #include <QStandardPaths>
 
@@ -112,6 +113,15 @@ void WindowCapture::setReplaceExistingFile(bool val)
     emit replaceExistingFileChanged();
 }
 
+void WindowCapture::setCaptureMode(WindowCapture::CaptureMode val)
+{
+    if(m_captureMode == val)
+        return;
+
+    m_captureMode = val;
+    emit captureModeChanged();
+}
+
 QString WindowCapture::capture()
 {
     this->clearErrorMessage();
@@ -201,6 +211,7 @@ QString WindowCapture::capture()
         return QString();
     }
 
+    pixmap.setDevicePixelRatio(screen->devicePixelRatio());
     if(m_maxImageSize.isValid() && (pixmap.width() > m_maxImageSize.width() || pixmap.height() > m_maxImageSize.height()))
         pixmap = pixmap.scaled(m_maxImageSize.toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
@@ -211,6 +222,9 @@ QString WindowCapture::capture()
         this->setErrorMessage(QStringLiteral("Error while saving pixmap"));
         return QString();
     }
+
+    if(m_captureMode == FileAndClipboard)
+        qApp->clipboard()->setPixmap(pixmap);
 
     return absoluteFilePath;
 }
