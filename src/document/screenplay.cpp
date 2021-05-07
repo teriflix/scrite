@@ -1467,8 +1467,21 @@ QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) cons
 {
     const QList<int> indexes = this->sceneElementIndexes(scene, max);
     QList<ScreenplayElement*> elements;
-    Q_FOREACH(int idx, indexes)
-        elements << m_elements.at(idx);
+
+    if(indexes.isEmpty())
+    {
+        for(ScreenplayElement *element : qAsConst(m_elements))
+        {
+            if(element->scene() == scene)
+                elements << element;
+        }
+    }
+    else
+    {
+        for(int idx : indexes)
+            elements << m_elements.at(idx);
+    }
+
     return elements;
 }
 
