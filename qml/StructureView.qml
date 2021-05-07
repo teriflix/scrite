@@ -2258,7 +2258,7 @@ Item {
                         TextArea {
                             id: synopsisField
                             width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
-                            height: Math.max(synopsisFieldFlick.height-1, synopsisField.contentHeight+50)
+                            height: Math.max(synopsisFieldFlick.height-1, synopsisField.contentHeight+idealAppFontMetrics.lineSpacing*Math.max(canvas.scale,1))
                             background: Item { }
                             selectByMouse: true
                             selectByKeyboard: true
@@ -2276,7 +2276,8 @@ Item {
                                     elementItem.select()
                                     if(!readOnly)
                                         elementItem.zoomOneForFocus()
-                                }
+                                } else
+                                    element.scene.trimTitle()
                             }
                             Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                             SpecialSymbolsSupport {

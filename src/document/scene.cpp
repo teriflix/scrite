@@ -657,6 +657,16 @@ void Scene::setTitle(const QString &val)
     emit titleChanged();
 }
 
+void Scene::trimTitle()
+{
+    const QString val = m_title.trimmed();
+    if(m_title != val)
+    {
+        m_title = val;
+        emit titleChanged();
+    }
+}
+
 void Scene::setEmotionalChange(const QString &val)
 {
     if(m_emotionalChange == val)

@@ -223,6 +223,8 @@ public:
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
+    Q_INVOKABLE void trimTitle();
+
     Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY emotionalChangeChanged)
     void setEmotionalChange(const QString &val);
     QString emotionalChange() const { return m_emotionalChange; }
