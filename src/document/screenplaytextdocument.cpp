@@ -1455,7 +1455,11 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
     for(ScreenplayElement *element : qAsConst(elements))
     {
         QTextFrame *frame = this->findTextFrame(element);
-        Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
+        if(frame == nullptr)
+        {
+            this->addToSceneResetList(para->scene());
+            return;
+        }
 
         const int nrBlocks = paraIndex + (scene->heading()->isEnabled() ? 1 : 0);
 
