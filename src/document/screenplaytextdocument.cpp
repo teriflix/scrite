@@ -1314,10 +1314,15 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
     if(scene == nullptr)
         return;
 
-    ScreenplayTextDocumentUpdate update(this);
-
     QTextFrame *frame = this->findTextFrame(element);
+#ifdef QT_NO_DEBUG
+    if(frame == nullptr)
+        return;
+#else
     Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to remove a scene before it was included in the text document.");
+#endif
+
+    ScreenplayTextDocumentUpdate update(this);
 
     QTextCursor cursor = frame->firstCursorPosition();
     cursor.movePosition(QTextCursor::Up);
@@ -1366,7 +1371,24 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
         if(before != nullptr)
         {
             QTextFrame *beforeFrame = this->findTextFrame(before);
+#ifdef QT_NO_DEBUG
+            // This cannot be fixed in the next update cycle. The document will
+            // be completely out of sync with the scenes. So we should take some
+            // time now and deal with it.
+            if(beforeFrame == nullptr)
+            {
+                this->loadScreenplay();
+
+                beforeFrame = this->findTextFrame(before);
+
+                // Okay, if this is happening again - then something is seriously wrong.
+                // We better let the user move on for now and not block the UI.
+                if(beforeFrame == nullptr)
+                    return;
+            }
+#else
             Q_ASSERT_X(beforeFrame != nullptr, "ScreenplayTextDocument", "Attempting to insert scene before screenplay is loaded.");
+#endif
             cursor = beforeFrame->lastCursorPosition();
             cursor.movePosition(QTextCursor::Down);
         }
@@ -1455,12 +1477,15 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
     for(ScreenplayElement *element : qAsConst(elements))
     {
         QTextFrame *frame = this->findTextFrame(element);
+#ifdef QT_NO_DEBUG
+        // This will probably get updated in the next cycle. Trying to fix
+        // this here & right now will likely lead to slow UI updates, which
+        // is much worse than having to live with dirty text document.
         if(frame == nullptr)
-        {
-            this->addToSceneResetList(para->scene());
-            return;
-        }
-
+            continue;
+#else
+        Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
+#endif
         const int nrBlocks = paraIndex + (scene->heading()->isEnabled() ? 1 : 0);
 
         QTextCursor cursor = frame->firstCursorPosition();
@@ -1480,13 +1505,14 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
                     if(lastParaChange.isValid())
                     {
                         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, lastParaChange.position);
-                        if(lastParaChange.charsAdded > 0)
-                            cursor.insertText(lastParaChange.content);
-                        else
+                        if(lastParaChange.charsRemoved > 0)
                         {
                             cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, lastParaChange.charsRemoved);
                             cursor.removeSelectedText();
                         }
+
+                        if(lastParaChange.charsAdded > 0)
+                            cursor.insertText(lastParaChange.content);
                     }
                     else
                     {
@@ -2142,7 +2168,7 @@ void ScreenplayTextDocument::removeTextFrame(const ScreenplayElement *element)
 void ScreenplayTextDocument::registerTextFrame(const ScreenplayElement *element, QTextFrame *frame)
 {
     QTextFrame *existingFrame = m_elementFrameMap.value(element, nullptr);
-    if(existingFrame && existingFrame != frame)
+    if(existingFrame != nullptr && existingFrame != frame)
     {
         m_elementFrameMap.remove(element);
         m_frameElementMap.remove(existingFrame);
@@ -2159,17 +2185,24 @@ void ScreenplayTextDocument::registerTextFrame(const ScreenplayElement *element,
 
 QTextFrame *ScreenplayTextDocument::findTextFrame(const ScreenplayElement *element) const
 {
-    return m_elementFrameMap.value(element, nullptr);
+    QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
+    if(frame != nullptr)
+    {
+        const ScreenplayElement *frameElement = m_frameElementMap.value(frame, nullptr);
+        if(frameElement == element)
+            return frame;
+    }
+
+    return nullptr;
 }
 
 void ScreenplayTextDocument::onTextFrameDestroyed(QObject *object)
 {
     const ScreenplayElement *element = m_frameElementMap.value(object, nullptr);
     if(element != nullptr)
-    {
         m_frameElementMap.remove(object);
-        m_elementFrameMap.remove(element);
-    }
+
+    m_elementFrameMap.remove(element);
 }
 
 void ScreenplayTextDocument::clearTextFrames()
@@ -2207,8 +2240,15 @@ void ScreenplayTextDocument::processSceneResetList()
         Q_FOREACH(ScreenplayElement *element, elements)
         {
             QTextFrame *frame = this->findTextFrame(element);
+#ifdef QT_NO_DEBUG
+            // This will probably get updated in the next cycle. Trying to fix
+            // this here & right now will likely lead to slow UI updates, which
+            // is much worse than having to live with dirty text document.
+            if(frame == nullptr)
+                continue;
+#else
             Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
-
+#endif
             if(m_purpose == ForDisplay)
             {
                 if(this->updateFromScreenplayElement(element))
