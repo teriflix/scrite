@@ -1066,7 +1066,7 @@ bool ScriteDocument::load(const QString &fileName)
 
     if( QFile(fileName).isReadable() )
     {
-        m_errorReport->setErrorMessage( QString("Cannot open %1 for reading.").arg(fileName));
+        m_errorReport->setErrorMessage( QStringLiteral("Cannot open %1 for reading.").arg(fileName));
         return false;
     }
 
@@ -1077,7 +1077,7 @@ bool ScriteDocument::load(const QString &fileName)
 
     if(!loaded)
     {
-        m_errorReport->setErrorMessage( QString("%1 is not a Scrite document.").arg(fileName) );
+        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName) );
         return false;
     }
 
@@ -1124,22 +1124,22 @@ bool ScriteDocument::load(const QString &fileName)
     const QJsonObject json = jsonDoc.object();
     if(json.isEmpty())
     {
-        m_errorReport->setErrorMessage( QString("%1 is not a Scrite document.").arg(fileName) );
+        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName) );
         return false;
     }
 
     const QJsonObject metaInfo = json.value("meta").toObject();
     if(metaInfo.value("appName").toString().toLower() != qApp->applicationName().toLower())
     {
-        m_errorReport->setErrorMessage(QString("Scrite document '%1' was created using an unrecognised app.").arg(fileName));
+        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an unrecognised app.").arg(fileName));
         return false;
     }
 
-    const QVersionNumber docVersion = QVersionNumber::fromString( metaInfo.value("appVersion").toString() );
+    const QVersionNumber docVersion = QVersionNumber::fromString( metaInfo.value(QStringLiteral("appVersion")).toString() );
     const QVersionNumber appVersion = Application::instance()->versionNumber();
     if(appVersion < docVersion)
     {
-        m_errorReport->setErrorMessage(QString("Scrite document '%1' was created using an updated version.").arg(fileName));
+        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an updated version.").arg(fileName));
         return false;
     }
 
@@ -1288,38 +1288,50 @@ bool ScriteDocument::canSerialize(const QMetaObject *, const QMetaProperty &) co
 void ScriteDocument::serializeToJson(QJsonObject &json) const
 {
     QJsonObject metaInfo;
-    metaInfo.insert("appName", qApp->applicationName());
-    metaInfo.insert("orgName", qApp->organizationName());
-    metaInfo.insert("orgDomain", qApp->organizationDomain());
-    metaInfo.insert("appVersion", Application::instance()->versionNumber().toString());
+    metaInfo.insert( QStringLiteral("appName"), qApp->applicationName());
+    metaInfo.insert( QStringLiteral("orgName"), qApp->organizationName());
+    metaInfo.insert( QStringLiteral("orgDomain"), qApp->organizationDomain());
+
+    /**
+     * Nightly builds are x.y.z, where z is odd for nightly builds and even
+     * for public builds. Users using nightly builds must be able to create a file
+     * using it and open it using the public builds. Just in case the nightly
+     * build crashes, they shouldnt be constrained from opening the file using a
+     * previous public build.
+     */
+    QVersionNumber appVersion = QVersionNumber::fromString(Application::instance()->versionNumber().toString());
+    if(appVersion.microVersion() % 2)
+        appVersion = QVersionNumber(appVersion.majorVersion(), appVersion.minorVersion(), appVersion.microVersion()-1);
+
+    metaInfo.insert( QStringLiteral("appVersion"), appVersion.toString());
 
     QJsonObject systemInfo;
-    systemInfo.insert("machineHostName", QSysInfo::machineHostName());
-    systemInfo.insert("machineUniqueId", QString::fromLatin1(QSysInfo::machineUniqueId()));
-    systemInfo.insert("prettyProductName", QSysInfo::prettyProductName());
-    systemInfo.insert("productType", QSysInfo::productType());
-    systemInfo.insert("productVersion", QSysInfo::productVersion());
-    metaInfo.insert("system", systemInfo);
+    systemInfo.insert( QStringLiteral("machineHostName"), QSysInfo::machineHostName());
+    systemInfo.insert( QStringLiteral("machineUniqueId"), QString::fromLatin1(QSysInfo::machineUniqueId()));
+    systemInfo.insert( QStringLiteral("prettyProductName"), QSysInfo::prettyProductName());
+    systemInfo.insert( QStringLiteral("productType"), QSysInfo::productType());
+    systemInfo.insert( QStringLiteral("productVersion"), QSysInfo::productVersion());
+    metaInfo.insert( QStringLiteral("system"), systemInfo);
 
     QJsonObject installationInfo;
-    installationInfo.insert("id", Application::instance()->installationId());
-    installationInfo.insert("since", Application::instance()->installationTimestamp().toMSecsSinceEpoch());
-    installationInfo.insert("launchCount", Application::instance()->launchCounter());
-    metaInfo.insert("installation", installationInfo);
+    installationInfo.insert( QStringLiteral("id"), Application::instance()->installationId());
+    installationInfo.insert( QStringLiteral("since"), Application::instance()->installationTimestamp().toMSecsSinceEpoch());
+    installationInfo.insert( QStringLiteral("launchCount"), Application::instance()->launchCounter());
+    metaInfo.insert( QStringLiteral("installation"), installationInfo);
 
-    json.insert("meta", metaInfo);
+    json.insert( QStringLiteral("meta"), metaInfo);
 }
 
 void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonObject metaInfo = json.value("meta").toObject();
-    const QJsonObject systemInfo = metaInfo.value("system").toObject();
+    const QJsonObject metaInfo = json.value( QStringLiteral("meta") ).toObject();
+    const QJsonObject systemInfo = metaInfo.value( QStringLiteral("system") ).toObject();
 
     const QString thisMachineId = QString::fromLatin1(QSysInfo::machineUniqueId());
-    const QString jsonMachineId = systemInfo.value("machineUniqueId").toString() ;
+    const QString jsonMachineId = systemInfo.value( QStringLiteral("machineUniqueId") ).toString() ;
     this->setCreatedOnThisComputer(jsonMachineId == thisMachineId);
 
-    const QString appVersion = metaInfo.value("appVersion").toString();
+    const QString appVersion = metaInfo.value( QStringLiteral("appVersion") ).toString();
     const QVersionNumber version = QVersionNumber::fromString(appVersion);
     if( version <= QVersionNumber(0,1,9) )
     {
@@ -1347,11 +1359,11 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 
             SceneHeading *heading = scene->heading();
             QString val = heading->locationType();
-            if(val == "INTERIOR")
-                val = "INT";
-            if(val == "EXTERIOR")
-                val = "EXT";
-            if(val == "BOTH")
+            if(val ==  QStringLiteral("INTERIOR") )
+                val =  QStringLiteral("INT") ;
+            if(val ==  QStringLiteral("EXTERIOR") )
+                val =  QStringLiteral("EXT") ;
+            if(val ==  QStringLiteral("BOTH") )
                 val = "I/E";
             heading->setLocationType(val);
         }
@@ -1428,8 +1440,8 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // such that it is editable only the system in which it was created.
     if(m_locked && !m_readOnly)
     {
-        const QJsonObject installationInfo = metaInfo.value("installation").toObject();
-        const QString docClientId = installationInfo.value("id").toString();
+        const QJsonObject installationInfo = metaInfo.value( QStringLiteral("installation") ).toObject();
+        const QString docClientId = installationInfo.value( QStringLiteral("id") ).toString();
         const QString myClientId = Application::instance()->installationId();
         if(!myClientId.isEmpty() && !docClientId.isEmpty() )
         {
@@ -1494,9 +1506,9 @@ QString ScriteDocument::polishFileName(const QString &givenFileName) const
     {
         QFileInfo fi(fileName);
         if(fi.isDir())
-            fileName = fi.absolutePath() + "/Screenplay-" + QString::number(QDateTime::currentSecsSinceEpoch()) + ".scrite";
-        else if(fi.suffix() != "scrite")
-            fileName += ".scrite";
+            fileName = fi.absolutePath() + QStringLiteral("/Screenplay-") + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".scrite");
+        else if(fi.suffix() != QStringLiteral("scrite"))
+            fileName += QStringLiteral(".scrite");
     }
 
     return fileName;
