@@ -139,17 +139,19 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
         this->addItem(annotationItem);
     }
 
+    QRectF contentsRect = this->itemsBoundingRect();
+
     if(exporter->isInsertTitleCard())
     {
         StructureTitleCard *titleCard = new StructureTitleCard(structure, exporter->comment());
         QRectF titleCardRect = titleCard->boundingRect();
         titleCardRect.setLeft(indexCardsBox.left()+20);
         titleCardRect.moveBottom(indexCardsBox.top()-20);
+        if( !this->items(titleCardRect).isEmpty() )
+            titleCardRect.moveBottom(contentsRect.top()-20);
         titleCard->setPos(titleCardRect.topLeft());
         this->addItem(titleCard);
     }
-
-    QRectF contentsRect = this->itemsBoundingRect();
 
     QGraphicsSimpleTextItem *appInfo = new QGraphicsSimpleTextItem;
     appInfo->setFont( ::applicationFont() );
