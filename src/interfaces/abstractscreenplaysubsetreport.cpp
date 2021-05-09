@@ -221,7 +221,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(this->format() == AdobePDF ? m_generateTitlePage : false);
-    stDoc.setSceneNumbers(this->format() == AdobePDF ? m_includeSceneNumbers : false);
+    stDoc.setSceneNumbers(m_includeSceneNumbers);
     stDoc.setSceneIcons(this->format() == AdobePDF ? m_includeSceneIcons : false);
     stDoc.setListSceneCharacters(m_listSceneCharacters);
     stDoc.setPrintEachSceneOnANewPage(this->format() == AdobePDF ? m_printEachSceneOnANewPage : false);

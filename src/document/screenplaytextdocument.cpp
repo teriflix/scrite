@@ -1976,7 +1976,11 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             if(m_purpose == ForPrinting)
                 polishFontsAndInsertTextAtCursor(cursor, headingText);
             else
+            {
+                if(m_sceneNumbers)
+                    cursor.insertText( element->resolvedSceneNumber() + QStringLiteral(". ") );
                 cursor.insertText(headingText);
+            }
             insertBlock = true;
         }
 
@@ -2081,8 +2085,11 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             QTextCharFormat charFormat;
             charFormat.setFont(Application::instance()->font());
 
+            QString synopsis = scene->title();
+            synopsis.replace( QRegularExpression("\n+"), QStringLiteral("\n") );
+
             cursor.insertBlock(blockFormat, charFormat);
-            cursor.insertText(scene->title());
+            cursor.insertText(synopsis);
 
             insertBlock = true;
         }

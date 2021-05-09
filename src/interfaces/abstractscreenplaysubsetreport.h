@@ -28,7 +28,7 @@ public:
 
     bool requiresConfiguration() const { return true; }
 
-    Q_CLASSINFO("listSceneCharacters_FieldGroup", "Basic")
+    Q_CLASSINFO("listSceneCharacters_FieldGroup", "Options")
     Q_CLASSINFO("listSceneCharacters_FieldLabel", "List characters for each scene.")
     Q_CLASSINFO("listSceneCharacters_FieldEditor", "CheckBox")
     Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters NOTIFY listSceneCharactersChanged)
@@ -36,7 +36,7 @@ public:
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
-    Q_CLASSINFO("includeSceneSynopsis_FieldGroup", "Basic")
+    Q_CLASSINFO("includeSceneSynopsis_FieldGroup", "Options")
     Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include synopsis of each scene.")
     Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
@@ -44,7 +44,7 @@ public:
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();
 
-    Q_CLASSINFO("includeSceneContents_FieldGroup", "Basic")
+    Q_CLASSINFO("includeSceneContents_FieldGroup", "Options")
     Q_CLASSINFO("includeSceneContents_FieldLabel", "Include scene content.")
     Q_CLASSINFO("includeSceneContents_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneContents READ isIncludeSceneContents WRITE setIncludeSceneContents NOTIFY includeSceneContentsChanged)
@@ -52,15 +52,7 @@ public:
     bool isIncludeSceneContents() const { return m_includeSceneContents; }
     Q_SIGNAL void includeSceneContentsChanged();
 
-    Q_CLASSINFO("generateTitlePage_FieldGroup", "PDF Options")
-    Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
-    Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY generateTitlePageChanged)
-    void setGenerateTitlePage(bool val);
-    bool isGenerateTitlePage() const { return m_generateTitlePage; }
-    Q_SIGNAL void generateTitlePageChanged();
-
-    Q_CLASSINFO("includeSceneNumbers_FieldGroup", "PDF Options")
+    Q_CLASSINFO("includeSceneNumbers_FieldGroup", "Options")
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
@@ -68,16 +60,24 @@ public:
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
-    Q_CLASSINFO("includeSceneIcons_FieldGroup", "PDF Options")
-    Q_CLASSINFO("includeSceneIcons_FieldLabel", "Include scene icons in the generated PDF.")
+    Q_CLASSINFO("generateTitlePage_FieldGroup", "Options")
+    Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page. (PDF Only)")
+    Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY generateTitlePageChanged)
+    void setGenerateTitlePage(bool val);
+    bool isGenerateTitlePage() const { return m_generateTitlePage; }
+    Q_SIGNAL void generateTitlePageChanged();
+
+    Q_CLASSINFO("includeSceneIcons_FieldGroup", "Options")
+    Q_CLASSINFO("includeSceneIcons_FieldLabel", "Include scene icons in the generated PDF. (PDF Only)")
     Q_CLASSINFO("includeSceneIcons_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneIcons READ isIncludeSceneIcons WRITE setIncludeSceneIcons NOTIFY includeSceneIconsChanged)
     void setIncludeSceneIcons(bool val);
     bool isIncludeSceneIcons() const { return m_includeSceneIcons; }
     Q_SIGNAL void includeSceneIconsChanged();
 
-    Q_CLASSINFO("printEachSceneOnANewPage_FieldGroup", "PDF Options")
-    Q_CLASSINFO("printEachSceneOnANewPage_FieldLabel", "Print each scene on a new page.")
+    Q_CLASSINFO("printEachSceneOnANewPage_FieldGroup", "Options")
+    Q_CLASSINFO("printEachSceneOnANewPage_FieldLabel", "Print each scene on a new page. (PDF Only)")
     Q_CLASSINFO("printEachSceneOnANewPage_FieldEditor", "CheckBox")
     Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
     void setPrintEachSceneOnANewPage(bool val);
