@@ -53,7 +53,7 @@ public:
     Q_SIGNAL void includeSceneContentsChanged();
 
     Q_CLASSINFO("includeSceneNumbers_FieldGroup", "Options")
-    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
+    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
     void setIncludeSceneNumbers(bool val);
