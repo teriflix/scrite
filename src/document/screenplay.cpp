@@ -465,12 +465,22 @@ void Screenplay::setVersion(const QString &val)
 
 bool Screenplay::isEmpty() const
 {
+    const QSettings *settings = Application::instance()->settings();
+    const QString titlePageGroup = QStringLiteral("TitlePage");
+    auto configuredValue = [=](const QString &key) {
+        return settings->value(titlePageGroup + QStringLiteral("/") + key).toString();
+    };
+
     const bool allEmpty = m_title.isEmpty() && m_elements.isEmpty() &&
             m_subtitle.isEmpty() && m_logline.isEmpty() &&
-            m_basedOn.isEmpty() && (m_author == QSysInfo::machineHostName()) &&
-            m_contact.isEmpty() && m_address.isEmpty() &&
-            m_phoneNumber.isEmpty() && m_email.isEmpty() &&
-            m_website.isEmpty() && (m_version == QStringLiteral("Initial Draft"));
+            m_basedOn.isEmpty() &&
+            (m_author == QSysInfo::machineHostName() || m_author == configuredValue( QStringLiteral("author")) ) &&
+            (m_contact.isEmpty() || m_contact == configuredValue( QStringLiteral("contact") )) &&
+            (m_address.isEmpty() || m_address == configuredValue( QStringLiteral("address") )) &&
+            (m_phoneNumber.isEmpty() || m_phoneNumber == configuredValue( QStringLiteral("phone") )) &&
+            (m_email.isEmpty() || m_email == configuredValue( QStringLiteral("email") )) &&
+            (m_website.isEmpty() || m_website == configuredValue( QStringLiteral("website")) ) &&
+            (m_version == QStringLiteral("Initial Draft"));
     return allEmpty;
 }
 

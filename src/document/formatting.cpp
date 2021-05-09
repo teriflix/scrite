@@ -897,7 +897,7 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
 {
     Q_ASSERT_X(m_fontPointSizes.size() == m_fontZoomLevels.size(), "ScreenplayFormat", "Font sizes and zoom levels are out of sync.");
 
-    int fontPointSize = m_defaultFont.pointSize();
+    int fontPointSize = 0;
     if(m_fontZoomLevelIndex < 0)
     {
         const int index = qBound(0, m_fontZoomLevels.indexOf( QVariant(1.0) ), m_fontZoomLevels.size()-1);
