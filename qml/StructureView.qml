@@ -2300,18 +2300,27 @@ Item {
                             font.pointSize: app.idealFontPointSize/2
                         }
 
-                        Item {
+                        Rectangle {
                             clip: true
                             width: parent.width
                             height: 200
+                            border.width: synopsisTextDisplay.truncated ? 1 : 0
+                            border.color: primaryColors.borderColor
+                            color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
 
                             Text {
+                                id: synopsisTextDisplay
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 width: parent.width
                                 topPadding: 8
+                                leftPadding: 4
+                                rightPadding: 4
+                                bottomPadding: 4
                                 text: element.scene.hasTitle ? element.scene.title : "Describe what happens in this scene."
                                 font.pointSize: app.idealFontPointSize
                                 color: element.scene.hasTitle ? "black" : "gray"
+                                maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
+                                elide: Text.ElideRight
                             }
                         }
 
@@ -2349,7 +2358,7 @@ Item {
                             TextArea {
                                 id: synopsisField
                                 width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
-                                height: Math.max(synopsisFieldFlick.height-1, synopsisField.contentHeight+idealAppFontMetrics.lineSpacing*Math.max(canvas.scale,1))
+                                height: synopsisField.contentHeight+synopsisFieldFlick.height*0.5
                                 background: Item { }
                                 selectByMouse: true
                                 selectByKeyboard: true
