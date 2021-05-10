@@ -38,13 +38,14 @@
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QColorDialog>
+#include <QQuickWindow>
+#include <QElapsedTimer>
 #include <QFontDatabase>
 #include <QJsonDocument>
 #include <QStandardPaths>
 #include <QtConcurrentMap>
 #include <QOperatingSystemVersion>
 #include <QNetworkConfigurationManager>
-#include <QElapsedTimer>
 
 #define ENABLE_SCRIPT_HOTKEY
 
@@ -1204,6 +1205,26 @@ void Application::toggleFullscreen(QWindow *window)
         window->setProperty(propName, window->windowStates().testFlag(Qt::WindowMaximized));
         window->showFullScreen();
     }
+}
+
+bool Application::hasActiveFocus(QQuickWindow *window, QQuickItem *item)
+{
+    if(window == nullptr || item == nullptr)
+        return false;
+
+    QQuickItem *focusItem = window->activeFocusItem();
+    if(focusItem == nullptr)
+        return false;
+
+    QQuickItem *i = focusItem;
+    while(i != nullptr)
+    {
+        if(i == item)
+            return true;
+        i = i->parentItem();
+    }
+
+    return false;
 }
 
 bool Application::resetObjectProperty(QObject *object, const QString &propName)

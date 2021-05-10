@@ -226,6 +226,7 @@ public:
     Q_INVOKABLE bool restoreWindowGeometry(QWindow *window, const QString &group);
     Q_INVOKABLE void launchNewInstance(QWindow *window);
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
+    Q_INVOKABLE bool hasActiveFocus(QQuickWindow *window, QQuickItem *item);
 
     Q_INVOKABLE bool resetObjectProperty(QObject *object, const QString &propName);
 

@@ -223,6 +223,9 @@ public:
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
+    Q_PROPERTY(bool hasTitle READ hasTitle NOTIFY titleChanged)
+    bool hasTitle() const { return !m_title.isEmpty(); }
+
     Q_INVOKABLE void trimTitle();
 
     Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY emotionalChangeChanged)

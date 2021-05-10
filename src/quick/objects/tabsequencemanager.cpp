@@ -211,13 +211,24 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
             return true;
         }
 
+        auto isWatched = [watched](TabSequenceItem *item) {
+            QObject *itemParent = item->parent();
+            QObject *o = watched;
+            while(o != nullptr) {
+                if(o == itemParent)
+                    return true;
+                o = o->parent();
+            }
+            return false;
+        };
+
         if(ke->key() == m_tabKey || ke->key() == m_backtabKey)
         {
             int itemIndex = -1;
             for(int i=0; i<m_tabSequenceItems.size(); i++)
             {
                 TabSequenceItem *item = m_tabSequenceItems.at(i);
-                if(item->hasFocus() && item->parent() == watched)
+                if(item->hasFocus() && isWatched(item))
                 {
                     itemIndex = i;
                     break;
@@ -369,7 +380,10 @@ bool TabSequenceItem::hasFocus() const
 {
     QQuickItem *qmlItem = qobject_cast<QQuickItem*>(this->parent());
     if(qmlItem != nullptr)
-        return qmlItem->hasFocus();
+    {
+        QQuickWindow *qmlWindow = qmlItem->window();
+        return Application::instance()->hasActiveFocus(qmlWindow, qmlItem);
+    }
 
     return false;
 }

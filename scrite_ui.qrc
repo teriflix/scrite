@@ -63,5 +63,6 @@
         <file>qml/StructureGroupsMenu.qml</file>
         <file>qml/OpenTemplateDialog.qml</file>
         <file>qml/BusyOverlay.qml</file>
+        <file>qml/LodLoader.qml</file>
     </qresource>
 </RCC>
