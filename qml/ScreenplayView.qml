@@ -435,6 +435,7 @@ Item {
 
         property bool mutiSelectionMode: false
 
+        onCountChanged: updateCacheBuffer()
         function updateCacheBuffer() {
             if(screenplayTracks.trackCount > 0)
                 cacheBuffer = Math.max(extents(count-1, count-1).to + 20, contentWidth)
