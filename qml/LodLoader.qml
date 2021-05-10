@@ -27,8 +27,6 @@ Loader {
     property bool resetWidthBeforeLodChange: false
     property bool resetHeightBeforeLodChange: true
 
-    property bool hasFocus: FocusTracker.hasFocus || focus
-
     Component {
         id: defaultDetailComponent
 

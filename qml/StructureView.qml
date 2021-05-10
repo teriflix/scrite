@@ -2085,8 +2085,8 @@ Item {
             }
 
             Component.onCompleted: {
-                element.follow = elementItem
                 elementItem.determineElementStack()
+                element.follow = elementItem
             }
 
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -2120,7 +2120,7 @@ Item {
             }
 
             width: 350
-            height: headingFieldLoader.active && synopsisFieldLoader.active ? indexCardLayout.height+20 : 340
+            height: Math.max(indexCardLayout.height+20, 350)
 
             Rectangle {
                 id: background
@@ -2205,6 +2205,8 @@ Item {
                     }
                     TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
 
+                    property bool hasFocus: false
+
                     lowDetailComponent: Text {
                         id: basicHeadingField
                         text: element.hasTitle ? element.title : "Index Card Title"
@@ -2223,6 +2225,8 @@ Item {
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.top
                         }
+
+                        Component.onCompleted: headingFieldLoader.hasFocus = false
                     }
 
                     highDetailComponent: TextField2 {
@@ -2247,6 +2251,7 @@ Item {
                                 if(!readOnly)
                                     elementItem.zoomOneForFocus()
                             }
+                            headingFieldLoader.hasFocus = activeFocus
                         }
                         Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                         enableTransliteration: true
@@ -2285,6 +2290,8 @@ Item {
                     }
                     TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
 
+                    property bool hasFocus: false
+
                     lowDetailComponent: Column {
                         spacing: 0
 
@@ -2307,6 +2314,8 @@ Item {
                                 color: element.scene.hasTitle ? "black" : "gray"
                             }
                         }
+
+                        Component.onCompleted: synopsisFieldLoader.hasFocus = false
                     }
 
                     highDetailComponent: Column {
@@ -2360,6 +2369,7 @@ Item {
                                             elementItem.zoomOneForFocus()
                                     } else
                                         element.scene.trimTitle()
+                                    synopsisFieldLoader.hasFocus = activeFocus
                                 }
                                 Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                                 SpecialSymbolsSupport {
