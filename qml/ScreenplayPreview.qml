@@ -176,7 +176,11 @@ Rectangle {
 
         EventFilter.acceptHoverEvents: true
         EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
-        EventFilter.onFilter: pageView.containsMouse = event.type === 127 || event.type === 129
+        EventFilter.onFilter: {
+            result.acceptEvent = false
+            result.filter = false
+            pageView.containsMouse = event.type === 127 || event.type === 129
+        }
     }
 
     Rectangle {

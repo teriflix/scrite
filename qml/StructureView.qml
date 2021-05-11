@@ -20,6 +20,8 @@ Item {
     signal requestEditor()
     signal releaseEditor()
 
+    readonly property size maxDragImageSize: Qt.size(75, 75)
+
     Rectangle {
         id: toolbar
         anchors.left: parent.left
@@ -1947,6 +1949,7 @@ Item {
                 drag.onActiveChanged: {
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
+                    elementItem.element.syncWithFollow = true
                     if(drag.active === false) {
                         elementItem.x = scriteDocument.structure.snapToGrid(parent.x)
                         elementItem.y = scriteDocument.structure.snapToGrid(parent.y)
@@ -1977,12 +1980,17 @@ Item {
                 }
             }
 
+            property size dragImageSize: {
+                var s = elementItem.width > elementItem.height ? maxDragImageSize.width / elementItem.width : maxDragImageSize.height / elementItem.height
+                return Qt.size( elementItem.width*s, elementItem.height*s )
+            }
+
             // Drag to timeline support
             Drag.active: dragMouseArea.drag.active
             Drag.dragType: Drag.Automatic
             Drag.supportedActions: Qt.LinkAction
-            Drag.hotSpot.x: elementItem.width/2 // dragHandle.x + dragHandle.width/2
-            Drag.hotSpot.y: elementItem.height/2 // dragHandle.y + dragHandle.height/2
+            Drag.hotSpot.x: dragImageSize.width/2 // dragHandle.x + dragHandle.width/2
+            Drag.hotSpot.y: dragImageSize.height/2 // dragHandle.y + dragHandle.height/2
             Drag.mimeData: {
                 "scrite/sceneID": element.scene.id
             }
@@ -2008,8 +2016,8 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 1
                 anchors.rightMargin: 3
-                opacity: dragMouseArea.containsMouse ? 1 : 0.1
-                scale: dragMouseArea.containsMouse ? 2 : 1
+                opacity: elementItem.selected ? 1 : 0.1
+                scale: dragMouseArea.pressed ? 2 : 1
                 Behavior on scale {
                     enabled: screenplayEditorSettings.enableAnimations
                     NumberAnimation { duration: 250 }
@@ -2017,21 +2025,25 @@ Item {
 
                 MouseArea {
                     id: dragMouseArea
-                    hoverEnabled: !canvasScroll.flicking && !canvasScroll.moving && elementItem.selected
                     anchors.fill: parent
                     drag.target: parent
                     cursorShape: Qt.SizeAllCursor
-                    onContainsMouseChanged: {
-                        if(containsMouse)
-                            canvasScroll.maybeDragItem = elementItem
+                    drag.onActiveChanged: {
+                        if(drag.active)
+                            canvas.forceActiveFocus()
                         else if(canvasScroll.maybeDragItem === elementItem)
                             canvasScroll.maybeDragItem = null
                     }
                     onPressed: {
                         canvas.forceActiveFocus()
+                        canvasScroll.maybeDragItem = elementItem
                         elementItem.grabToImage(function(result) {
                             elementItem.Drag.imageSource = result.url
-                        })
+                        }, elementItem.dragImageSize)
+                    }
+                    onReleased: {
+                        if(canvasScroll.maybeDragItem === elementItem)
+                            canvasScroll.maybeDragItem = null
                     }
                 }
             }
@@ -2161,6 +2173,7 @@ Item {
                     drag.onActiveChanged: {
                         canvas.forceActiveFocus()
                         scriteDocument.structure.currentElementIndex = index
+                        elementItem.element.syncWithFollow = true
                         if(drag.active === false) {
                             elementItem.x = scriteDocument.structure.snapToGrid(elementItem.x)
                             elementItem.y = scriteDocument.structure.snapToGrid(elementItem.y)
@@ -2479,8 +2492,8 @@ Item {
                         width: 24; height: 24
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        scale: dragHandleMouseArea.containsMouse ? 2 : 1
-                        opacity: dragHandleMouseArea.containsMouse ? 1 : 0.1
+                        scale: dragHandleMouseArea.pressed ? 2 : 1
+                        opacity: elementItem.selected ? 1 : 0.1
                         Behavior on scale {
                             enabled: screenplayEditorSettings.enableAnimations
                             NumberAnimation { duration: 250 }
@@ -2495,30 +2508,38 @@ Item {
                             drag.onActiveChanged: {
                                 if(drag.active)
                                     canvas.forceActiveFocus()
-                            }
-                            onContainsMouseChanged: {
-                                if(containsMouse)
-                                    canvasScroll.maybeDragItem = elementItem
                                 else if(canvasScroll.maybeDragItem === elementItem)
                                     canvasScroll.maybeDragItem = null
                             }
                             onPressed: {
                                 canvas.forceActiveFocus()
+                                canvasScroll.maybeDragItem = elementItem
                                 elementItem.grabToImage(function(result) {
                                     elementItem.Drag.imageSource = result.url
-                                })
+                                }, elementItem.dragImageSize)
+                            }
+                            onReleased: {
+                                if(canvasScroll.maybeDragItem === elementItem)
+                                    canvasScroll.maybeDragItem = null
                             }
                         }
                     }
                 }
-
-                // Drag to timeline support
-                Drag.active: dragHandleMouseArea.drag.active
-                Drag.dragType: Drag.Automatic
-                Drag.supportedActions: Qt.LinkAction
-                Drag.mimeData: { "scrite/sceneID": element.scene.id }
-                Drag.source: element.scene
             }
+
+            // Drag to timeline support
+            property size dragImageSize: {
+                var s = elementItem.width > elementItem.height ? maxDragImageSize.width / elementItem.width : maxDragImageSize.height / elementItem.height
+                return Qt.size( elementItem.width*s, elementItem.height*s )
+            }
+
+            Drag.active: dragHandleMouseArea.drag.active
+            Drag.dragType: Drag.Automatic
+            Drag.supportedActions: Qt.LinkAction
+            Drag.hotSpot.x: dragImageSize.width/2 // dragHandle.x + dragHandle.width/2
+            Drag.hotSpot.y: dragImageSize.height/2 // dragHandle.y + dragHandle.height/2
+            Drag.mimeData: { "scrite/sceneID": element.scene.id }
+            Drag.source: element.scene
 
             // Accept drops for stacking items on top of each other.
             Rectangle {

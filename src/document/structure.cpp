@@ -151,7 +151,8 @@ void StructureElement::setFollow(QQuickItem *val)
 
     if(m_follow)
     {
-        this->syncWithFollowItem();
+        this->setWidth(m_follow->width());
+        this->setHeight(m_follow->height());
         connect(m_follow, &QQuickItem::xChanged, this, &StructureElement::syncWithFollowItem);
         connect(m_follow, &QQuickItem::yChanged, this, &StructureElement::syncWithFollowItem);
         connect(m_follow, &QQuickItem::widthChanged, this, &StructureElement::syncWithFollowItem);
@@ -159,6 +160,15 @@ void StructureElement::setFollow(QQuickItem *val)
     }
 
     emit followChanged();
+}
+
+void StructureElement::setSyncWithFollow(bool val)
+{
+    if(m_syncWithFollow == val)
+        return;
+
+    m_syncWithFollow = val;
+    emit syncWithFollowChanged();
 }
 
 void StructureElement::resetFollow()
@@ -340,7 +350,7 @@ bool StructureElement::event(QEvent *event)
 
 void StructureElement::syncWithFollowItem()
 {
-    if(m_follow.isNull())
+    if(m_follow.isNull() || !m_syncWithFollow)
         return;
 
     this->setX(m_follow->x());

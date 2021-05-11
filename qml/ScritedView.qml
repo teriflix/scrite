@@ -755,7 +755,11 @@ Item {
 
                         EventFilter.acceptHoverEvents: true
                         EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
-                        EventFilter.onFilter: textDocumentArea.containsMouse = event.type === 127 || event.type === 129
+                        EventFilter.onFilter: {
+                            result.acceptEvent = false
+                            result.filter = false
+                            textDocumentArea.containsMouse = event.type === 127 || event.type === 129
+                        }
                     }
                 }
             }

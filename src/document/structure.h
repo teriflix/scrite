@@ -83,6 +83,11 @@ public:
     QQuickItem* follow() const { return m_follow; }
     Q_SIGNAL void followChanged();
 
+    Q_PROPERTY(bool syncWithFollow READ isSyncWithFollow WRITE setSyncWithFollow NOTIFY syncWithFollowChanged STORED false)
+    void setSyncWithFollow(bool val);
+    bool isSyncWithFollow() const { return m_syncWithFollow; }
+    Q_SIGNAL void syncWithFollowChanged();
+
     Q_PROPERTY(qreal xf READ xf WRITE setXf NOTIFY xfChanged)
     void setXf(qreal val);
     qreal xf() const;
@@ -154,6 +159,7 @@ private:
     QString m_title;
     Scene* m_scene = nullptr;
     bool m_selected = false;
+    bool m_syncWithFollow = false;
     Structure *m_structure = nullptr;
     QObjectProperty<QQuickItem> m_follow;
 };
