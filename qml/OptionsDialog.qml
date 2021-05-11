@@ -196,6 +196,41 @@ Item {
                     }
                 }
             }
+
+            Row {
+                spacing: 20
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text { text: "Timeline" }
+
+                    Column {
+                        spacing: 20
+                        width: parent.width
+
+                        Text {
+                            width: parent.width
+                            text: "What text do you want to display on cards in the timeline?"
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
+
+                        ComboBox2 {
+                            width: parent.width
+                            model: [
+                                { "label": "Scene Heading Or Title", "value": "HeadingOrTitle" },
+                                { "label": "Scene Synopsis", "value": "Synopsis" }
+                            ]
+                            textRole: "label"
+                            currentIndex: timelineViewSettings.textMode === "HeadingOrTitle" ? 0 : 1
+                            onActivated: timelineViewSettings.textMode = model[currentIndex].value
+                        }
+                    }
+                }
+
+            }
+
         }
     }
 

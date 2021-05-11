@@ -478,21 +478,25 @@ Item {
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
             property string sceneTitle: {
                 var ret = ""
-                if(element.scene) {
-                    var sheading = element.scene.heading
+                var escene = element.scene
+                if(escene) {
+                    var sheading = escene.heading
                     if(sheading.enabled)
                         ret += "[" + element.resolvedSceneNumber + "]: "
 
-                    var selement = element.scene.structureElement
-                    var ntitle = selement.nativeTitle
-                    if(ntitle !== "")
-                        ret += ntitle
-                    else if(selement.stackId === "" || selement.stackLeader) {
-                        if(sheading.enabled)
-                            ret += sheading.text
-                        else
-                            ret += "NO SCENE HEADING"
-                    }
+                    if(timelineViewSettings.textMode === "HeadingOrTitle") {
+                        var selement = escene.structureElement
+                        var ntitle = selement.nativeTitle
+                        if(ntitle !== "")
+                            ret += ntitle
+                        else if(selement.stackId === "" || selement.stackLeader) {
+                            if(sheading.enabled)
+                                ret += sheading.text
+                            else
+                                ret += "NO SCENE HEADING"
+                        }
+                    } else
+                        ret += escene.title
                 } else
                     ret = element.breakTitle
 
