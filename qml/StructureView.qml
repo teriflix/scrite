@@ -154,6 +154,13 @@ Item {
             }
 
             ToolButton3 {
+                enabled: !scriteDocument.readOnly && scriteDocument.structure.elementCount >= 2
+                iconSource: "../icons/content/select_all.png"
+                ToolTip.text: "Select All"
+                onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox)
+            }
+
+            ToolButton3 {
                 enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
                 iconSource: "../icons/action/layout_options.png"
                 ToolTip.text: "Layout Options"
@@ -167,12 +174,7 @@ Item {
 
                     Menu2 {
                         id: layoutOptionsMenu
-
-                        MenuItem2 {
-                            icon.source: "../icons/content/select_all.png"
-                            text: "Select All"
-                            onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox)
-                        }
+                        width: 250
 
                         MenuItem2 {
                             icon.source: "../icons/action/layout_horizontally.png"
@@ -1949,12 +1951,12 @@ Item {
                 drag.onActiveChanged: {
                     canvas.forceActiveFocus()
                     scriteDocument.structure.currentElementIndex = index
-                    elementItem.element.syncWithFollow = true
                     if(drag.active === false) {
                         elementItem.x = scriteDocument.structure.snapToGrid(parent.x)
                         elementItem.y = scriteDocument.structure.snapToGrid(parent.y)
                         scriteDocument.structure.forceBeatBoardLayout = false
-                    }
+                    } else
+                        elementItem.element.syncWithFollow = true
                 }
             }
 
@@ -2173,12 +2175,12 @@ Item {
                     drag.onActiveChanged: {
                         canvas.forceActiveFocus()
                         scriteDocument.structure.currentElementIndex = index
-                        elementItem.element.syncWithFollow = true
                         if(drag.active === false) {
                             elementItem.x = scriteDocument.structure.snapToGrid(elementItem.x)
                             elementItem.y = scriteDocument.structure.snapToGrid(elementItem.y)
                             scriteDocument.structure.forceBeatBoardLayout = false
-                        }
+                        } else
+                            elementItem.element.syncWithFollow = true
                     }
                 }
 
