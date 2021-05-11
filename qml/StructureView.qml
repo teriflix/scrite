@@ -1699,8 +1699,8 @@ Item {
             w *= scale
             h *= scale
 
-            if(w > parent.width-60)
-                scale = (parent.width-60)/w
+            if(w > parent.width-toolbar.width-60)
+                scale = (parent.width-toolbar.width-60)/w
             else if(h >= parent.height-60)
                 scale = (parent.height-60)/h
             else
