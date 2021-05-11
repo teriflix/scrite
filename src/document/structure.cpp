@@ -168,6 +168,7 @@ void StructureElement::setFollow(QQuickItem *val)
         this->setSyncWithFollow(true);
         timer->deleteLater();
     });
+    timer->start();
 }
 
 void StructureElement::setSyncWithFollow(bool val)

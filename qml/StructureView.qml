@@ -21,7 +21,7 @@ Item {
     signal requestEditor()
     signal releaseEditor()
 
-    readonly property size maxDragImageSize: Qt.size(75, 75)
+    readonly property size maxDragImageSize: Qt.size(36, 36)
 
     Rectangle {
         id: toolbar
@@ -1069,10 +1069,16 @@ Item {
                         var dx = x - refX
                         var dy = y - refY
                         var nrElements = modelData.sceneCount
+                        var idxList = modelData.sceneIndexes
+                        var movedIdxList = []
                         for(var i=0; i<nrElements; i++) {
-                            var item = elementItems.itemAt(modelData.sceneIndexes[i])
-                            item.x = item.x + dx
-                            item.y = item.y + dy
+                            var idx = idxList[i]
+                            if(movedIdxList.indexOf(idx) < 0) {
+                                var item = elementItems.itemAt(idxList[i])
+                                item.x = item.x + dx
+                                item.y = item.y + dy
+                                movedIdxList.push(idx)
+                            }
                         }
                         refX = x
                         refY = y
@@ -1081,9 +1087,15 @@ Item {
                     function selectBeatItems() {
                         var items = []
                         var nrElements = modelData.sceneCount
+                        var idxList = modelData.sceneIndexes
+                        var selIdxList = []
                         for(var i=0; i<nrElements; i++) {
-                            var item = elementItems.itemAt(modelData.sceneIndexes[i])
-                            items.push(item)
+                            var idx = idxList[i]
+                            if(selIdxList.indexOf(idx) < 0) {
+                                var item = elementItems.itemAt(idxList[i])
+                                items.push(item)
+                                selIdxList.push(idx)
+                            }
                         }
 
                         selection.set(items)
