@@ -24,9 +24,9 @@ Item {
         id: toolbar
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.right: parent.right
+        anchors.bottom: parent.bottom
         color: primaryColors.c100.background
-        height: toolbarLayout.height+4
+        width: toolbarLayout.width+4
         border.width: 1
         border.color: primaryColors.borderColor
         radius: 6
@@ -34,10 +34,10 @@ Item {
         Flow {
             id: toolbarLayout
             spacing: 3
-            width: parent.width-4
-            anchors.verticalCenter: parent.verticalCenter
-            layoutDirection: Flow.LeftToRight
-            property real rowHeight: newSceneButton.height
+            height: parent.height-4
+            anchors.horizontalCenter: parent.horizontalCenter
+            flow: Flow.TopToBottom
+            property real columnWidth: newSceneButton.width
 
             ToolButton3 {
                 id: newSceneButton
@@ -45,11 +45,18 @@ Item {
                 enabled: !scriteDocument.readOnly
                 onClicked: {
                     canvasMenu.isContextMenu = false
-                    canvasMenu.popup()
+                    canvasMenu.popup(newSceneButtonPopupArea)
                 }
                 iconSource: "../icons/content/add_box.png"
                 ToolTip.text: "Add Scene"
+                hasMenu: true
                 property color activeColor: "white"
+
+                Item {
+                    id: newSceneButtonPopupArea
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                }
             }
 
             ToolButton3 {
@@ -62,8 +69,8 @@ Item {
             }
 
             Rectangle {
-                width: 1
-                height: parent.rowHeight
+                width: parent.columnWidth
+                height: 1
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
@@ -129,8 +136,8 @@ Item {
             }
 
             Rectangle {
-                width: 1
-                height: parent.rowHeight
+                width: parent.columnWidth
+                height: 1
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
@@ -145,38 +152,51 @@ Item {
             }
 
             ToolButton3 {
-                enabled: !scriteDocument.readOnly && scriteDocument.structure.elementCount >= 2
-                iconSource: "../icons/content/select_all.png"
-                ToolTip.text: "Select All"
-                onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox)
-            }
-
-            ToolButton3 {
                 enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
-                iconSource: "../icons/action/layout_horizontally.png"
-                ToolTip.text: "Layout Horizontally"
-                onClicked: selection.layout(Structure.HorizontalLayout)
-            }
+                iconSource: "../icons/action/layout_options.png"
+                ToolTip.text: "Layout Options"
+                down: layoutOptionsMenu.visible
+                onClicked: layoutOptionsMenu.visible = true
+                hasMenu: true
 
-            ToolButton3 {
-                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
-                iconSource: "../icons/action/layout_vertically.png"
-                ToolTip.text: "Layout Vertically"
-                onClicked: selection.layout(Structure.VerticalLayout)
-            }
+                Item {
+                    anchors.top: parent.top
+                    anchors.right: parent.right
 
-            ToolButton3 {
-                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
-                iconSource: "../icons/action/layout_flow_horizontally.png"
-                ToolTip.text: "Flow Horizontally"
-                onClicked: selection.layout(Structure.FlowHorizontalLayout)
-            }
+                    Menu2 {
+                        id: layoutOptionsMenu
 
-            ToolButton3 {
-                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
-                iconSource: "../icons/action/layout_flow_vertically.png"
-                ToolTip.text: "Flow Vertically"
-                onClicked: selection.layout(Structure.FlowVerticalLayout)
+                        MenuItem2 {
+                            icon.source: "../icons/content/select_all.png"
+                            text: "Select All"
+                            onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox)
+                        }
+
+                        MenuItem2 {
+                            icon.source: "../icons/action/layout_horizontally.png"
+                            text: "Layout Horizontally"
+                            onClicked: selection.layout(Structure.HorizontalLayout)
+                        }
+
+                        MenuItem2 {
+                            icon.source: "../icons/action/layout_vertically.png"
+                            text: "Layout Vertically"
+                            onClicked: selection.layout(Structure.VerticalLayout)
+                        }
+
+                        MenuItem2 {
+                            icon.source: "../icons/action/layout_flow_horizontally.png"
+                            text: "Flow Horizontally"
+                            onClicked: selection.layout(Structure.FlowHorizontalLayout)
+                        }
+
+                        MenuItem2 {
+                            icon.source: "../icons/action/layout_flow_vertically.png"
+                            text: "Flow Vertically"
+                            onClicked: selection.layout(Structure.FlowVerticalLayout)
+                        }
+                    }
+                }
             }
 
             ToolButton3 {
@@ -281,8 +301,8 @@ Item {
             }
 
             Rectangle {
-                width: 1
-                height: parent.rowHeight
+                width: parent.columnWidth
+                height: 1
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
@@ -340,8 +360,8 @@ Item {
 
     ScrollArea {
         id: canvasScroll
-        anchors.left: parent.left
-        anchors.top: toolbar.bottom
+        anchors.left: toolbar.right
+        anchors.top: parent.top
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         contentWidth: canvas.width * canvas.scale

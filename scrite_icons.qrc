@@ -184,5 +184,7 @@
         <file>icons/action/tag_inverted.png</file>
         <file>icons/action/tag.png</file>
         <file>icons/navigation/center_focus.svg</file>
+        <file>icons/action/layout_options_inverted.png</file>
+        <file>icons/action/layout_options.png</file>
     </qresource>
 </RCC>

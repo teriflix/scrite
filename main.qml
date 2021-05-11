@@ -185,6 +185,14 @@ Rectangle {
         property real connectorLineWidth: 2
     }
 
+    Settings {
+        id: timelineViewSettings
+        fileName: app.settingsFilePath
+        category: "Timeline View"
+
+        property string textMode: "HeadingOrTitle"
+    }
+
     function showInformation(params, popupSource) {
         var okCallback = function() {
             if(params.callback)

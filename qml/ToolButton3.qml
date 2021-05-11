@@ -40,6 +40,7 @@ Item {
     property string text
     property bool autoRepeat: false
     property alias toolButtonImage: iconImage
+    property bool hasMenu: false
 
     signal toggled()
     signal clicked()
@@ -75,6 +76,19 @@ Item {
                 duration: 250
             }
         }
+    }
+
+
+    Image {
+        visible: hasMenu
+        width: parent.width/2.5
+        height: parent.height/2.5
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: -parent.width/10
+        fillMode: Image.PreserveAspectFit
+        opacity: iconImage.opacity
+        source: "../icons/navigation/arrow_right.png"
     }
 
     Shortcut {
