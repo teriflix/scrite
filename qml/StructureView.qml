@@ -484,66 +484,55 @@ Item {
             canvasScroll.zoomFit(visibleArea)
         }
 
-        function deleteCurrentElement(element) {
-            if(element === null)
-                element = scriteDocument.structure.elementAt(criteDocument.structure.currentElementIndex)
+        function deleteElement(element) {
             if(element === null)
                 return
 
-            askQuestion({
-                "question": "Are you sure you want to delete this scene?",
-                "okButtonText": "Yes",
-                "cancelButtonText": "No",
-                "callback": function(val) {
-                    if(val) {
-                        var nextScene = null
-                        var nextElement = null
-                        if(element.scene.addedToScreenplay) {
-                            nextElement = scriteDocument.screenplay.elementAt(element.scene.screenplayElementIndexList[0]+1)
-                            if(nextElement === null)
-                                nextElement = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
-                            if(nextElement !== null)
-                                nextScene = nextElement.scene
-                        } else {
-                            var idx = scriteDocument.structure.indexOfElement(element)
-                            var i = 0;
-                            for(i=idx+1; i<scriteDocument.structure.elementCount; i++) {
-                                nextElement = scriteDocument.structure.elementAt(i)
-                                if(nextElement.scene.addedToScreenplay)
-                                    continue;
-                                nextScene = nextElement.scene
-                                break
-                            }
+            var nextScene = null
+            var nextElement = null
+            if(element.scene.addedToScreenplay) {
+                nextElement = scriteDocument.screenplay.elementAt(element.scene.screenplayElementIndexList[0]+1)
+                if(nextElement === null)
+                    nextElement = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
+                if(nextElement !== null)
+                    nextScene = nextElement.scene
+            } else {
+                var idx = scriteDocument.structure.indexOfElement(element)
+                var i = 0;
+                for(i=idx+1; i<scriteDocument.structure.elementCount; i++) {
+                    nextElement = scriteDocument.structure.elementAt(i)
+                    if(nextElement.scene.addedToScreenplay)
+                        continue;
+                    nextScene = nextElement.scene
+                    break
+                }
 
-                            if(nextScene === null) {
-                                for(i=0; i<idx; i++) {
-                                    nextElement = scriteDocument.structure.elementAt(i)
-                                    if(nextElement.scene.addedToScreenplay)
-                                        continue;
-                                    nextScene = nextElement.scene
-                                    break
-                                }
-                            }
-                        }
-
-                        releaseEditor()
-                        scriteDocument.screenplay.removeSceneElements(element.scene)
-                        scriteDocument.structure.removeElement(element)
-
-                        Qt.callLater(function(scene) {
-                            if(scriteDocument.screenplay.elementCount === 0)
-                                return
-                            if(scene === null)
-                                scene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
-                            var idx = scriteDocument.structure.indexOfScene(scene)
-                            if(idx >= 0) {
-                                scriteDocument.structure.currentElementIndex = idx
-                                scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(scene)
-                            }
-                        }, nextScene)
+                if(nextScene === null) {
+                    for(i=0; i<idx; i++) {
+                        nextElement = scriteDocument.structure.elementAt(i)
+                        if(nextElement.scene.addedToScreenplay)
+                            continue;
+                        nextScene = nextElement.scene
+                        break
                     }
                 }
-            }, element.follow)
+            }
+
+            releaseEditor()
+            scriteDocument.screenplay.removeSceneElements(element.scene)
+            scriteDocument.structure.removeElement(element)
+
+            Qt.callLater(function(scene) {
+                if(scriteDocument.screenplay.elementCount === 0)
+                    return
+                if(scene === null)
+                    scene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
+                var idx = scriteDocument.structure.indexOfScene(scene)
+                if(idx >= 0) {
+                    scriteDocument.structure.currentElementIndex = idx
+                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(scene)
+                }
+            }, nextScene)
         }
 
         GridBackground {
@@ -925,7 +914,10 @@ Item {
                     case Qt.Key_Backspace:
                         result.accept = true
                         result.filter = true
-                        canvasScroll.deleteCurrentElement(element)
+                        if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
+                            element.follow.confirmAndDeleteSelf()
+                        else
+                            canvasScroll.deleteElement(element)
                         break
                     }
                 }
@@ -1668,8 +1660,12 @@ Item {
                     text: "Delete"
                     enabled: elementContextMenu.element !== null
                     onClicked: {
-                        canvasScroll.deleteCurrentElement(elementContextMenu.element, this)
+                        var element = elementContextMenu.element
                         elementContextMenu.element = null
+                        if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
+                            element.follow.confirmAndDeleteSelf()
+                        else
+                            canvasScroll.deleteElement(element)
                     }
                 }
             }
@@ -2596,6 +2592,73 @@ Item {
                         }
 
                         Qt.callLater( function() { element.stackLeader = true } )
+                    }
+                }
+            }
+
+            function confirmAndDeleteSelf() {
+                deleteConfirmationBox.active = true
+            }
+
+            Loader {
+                id: deleteConfirmationBox
+                active: false
+                anchors.fill: parent
+                sourceComponent: Rectangle {
+                    Component.onCompleted: {
+                        if(canvas.scale < 1)
+                            canvasScroll.zoomOneToItem(elementItem)
+                        forceActiveFocus()
+                    }
+
+                    color: app.translucent(primaryColors.c600.background,0.85)
+
+                    property bool visibleInViewport: elementItem.visibleInViewport
+                    onVisibleInViewportChanged: {
+                        if(!visibleInViewport)
+                            deleteConfirmationBox.active = false
+                    }
+
+                    onActiveFocusChanged: {
+                        if(!activeFocus)
+                            deleteConfirmationBox.active = false
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                    }
+
+                    Column {
+                        width: parent.width-20
+                        anchors.centerIn: parent
+                        spacing: 40
+
+                        Text {
+                            text: "Are you sure you want to delete this index card?"
+                            font.bold: true
+                            font.pointSize: app.idealFontPointSize
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WordWrap
+                            color: primaryColors.c600.text
+                        }
+
+                        Row {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+
+                            Button2 {
+                                text: "Yes"
+                                focusPolicy: Qt.NoFocus
+                                onClicked: canvasScroll.deleteElement(elementItem.element)
+                            }
+
+                            Button2 {
+                                text: "No"
+                                focusPolicy: Qt.NoFocus
+                                onClicked: deleteConfirmationBox.active = false
+                            }
+                        }
                     }
                 }
             }

@@ -645,15 +645,15 @@ Rectangle {
                     question = "By locking this document, you will be able to edit it only on this computer. Do you want to lock?"
 
                 askQuestion({
-                                "question": question,
-                                "okButtonText": "Yes",
-                                "cancelButtonText": "No",
-                                "callback": function(val) {
-                                    if(val) {
-                                        scriteDocument.locked = !scriteDocument.locked
-                                    }
-                                }
-                            }, this)
+                    "question": question,
+                    "okButtonText": "Yes",
+                    "cancelButtonText": "No",
+                    "callback": function(val) {
+                        if(val) {
+                            scriteDocument.locked = !scriteDocument.locked
+                        }
+                    }
+                }, this)
             }
         }
 
