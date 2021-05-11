@@ -1658,7 +1658,7 @@ Item {
 
     Item {
         id: canvasPreview
-        visible: structureCanvasSettings.showPreview
+        visible: structureCanvasSettings.showPreview && parent.width > 400
         anchors.right: canvasScroll.right
         anchors.bottom: canvasScroll.bottom
         anchors.margins: 30
@@ -1782,7 +1782,7 @@ Item {
     Loader {
         width: parent.width*0.7
         anchors.centerIn: parent
-        active: scriteDocument.structure.elementCount === 0 && scriteDocument.structure.annotationCount === 0
+        active: scriteDocument.structure.elementCount === 0 && scriteDocument.structure.annotationCount === 0 && parent.width > 400
         sourceComponent: Text {
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter

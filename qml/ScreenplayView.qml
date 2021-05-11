@@ -692,7 +692,7 @@ Item {
     }
 
     Loader {
-        active: enableDragDrop && scriteDocument.screenplay.elementCount === 0
+        active: enableDragDrop && scriteDocument.screenplay.elementCount === 0 && parent.height > 80
         width: parent.width*0.5
         anchors.centerIn: parent
         sourceComponent: Text {
