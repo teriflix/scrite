@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
+import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
@@ -2389,7 +2390,7 @@ Item {
                             TextArea {
                                 id: synopsisField
                                 width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
-                                height: synopsisField.contentHeight+synopsisFieldFlick.height*0.5
+                                height: synopsisField.contentHeight+100
                                 background: Item { }
                                 selectByMouse: true
                                 selectByKeyboard: true
@@ -2407,6 +2408,7 @@ Item {
                                         elementItem.select()
                                         if(!readOnly)
                                             elementItem.zoomOneForFocus()
+                                        cursorFocusAnimation.active = true
                                     } else
                                         element.scene.trimTitle()
                                     synopsisFieldLoader.hasFocus = activeFocus
@@ -2426,6 +2428,40 @@ Item {
                                         synopsisFieldFlick.contentY = Math.max(y1-10, 0)
                                     else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
                                         synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
+                                }
+
+                                Loader {
+                                    id: cursorFocusAnimation
+                                    active: false
+                                    x: synopsisField.cursorRectangle.x
+                                    y: synopsisField.cursorRectangle.y
+                                    width: synopsisField.cursorRectangle.width
+                                    height: synopsisField.cursorRectangle.height
+                                    sourceComponent: Item {
+                                        Rectangle {
+                                            id: cursorFocusRect
+                                            width: t*parent.width
+                                            height: Math.max(t*parent.height*0.5, parent.height)
+                                            anchors.centerIn: parent
+                                            opacity: 1.0 - (t/10)*0.8
+                                            visible: false
+                                            color: "black"
+                                            property real t: 10
+                                            property bool scaledDown: t <= 1
+                                            onScaledDownChanged: {
+                                                if(scaledDown)
+                                                    cursorFocusAnimation.active = false
+                                            }
+                                            Behavior on t {
+                                                NumberAnimation { duration: 500 }
+                                            }
+                                        }
+
+                                        Component.onCompleted: app.execLater(cursorFocusRect, 250, function() {
+                                            cursorFocusRect.visible = true
+                                            cursorFocusRect.t = 1
+                                        })
+                                    }
                                 }
                             }
                         }
