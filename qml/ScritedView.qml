@@ -42,10 +42,8 @@ Item {
             app.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
-                    "callback": function() {
-                        scritedViewSettings.experimentalFeatureNoticeDisplayed = true
-                    }
                 })
+                scritedViewSettings.experimentalFeatureNoticeDisplayed = true
             })
         }
     }

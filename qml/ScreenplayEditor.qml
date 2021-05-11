@@ -636,24 +636,18 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             enabled: !scriteDocument.readOnly
             iconSource: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
-            ToolTip.text: "Lock to allow editing of this document only on this computer."
+            ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
             onClicked: {
-                var question = ""
-                if(scriteDocument.locked)
-                    question = "By unlocking this document, you will be able to edit it on this and any other computer. Do you want to unlock?"
-                else
-                    question = "By locking this document, you will be able to edit it only on this computer. Do you want to lock?"
+                var locked = !scriteDocument.locked
+                scriteDocument.locked = locked
 
-                askQuestion({
-                    "question": question,
-                    "okButtonText": "Yes",
-                    "cancelButtonText": "No",
-                    "callback": function(val) {
-                        if(val) {
-                            scriteDocument.locked = !scriteDocument.locked
-                        }
-                    }
-                }, this)
+                var message = ""
+                if(locked)
+                    message = "Document LOCKED. You will be able to edit it only on this computer."
+                else
+                    message = "Document unlocked. You will be able to edit it on this and any other computer."
+
+                showInformation({"message": message}, this)
             }
         }
 
