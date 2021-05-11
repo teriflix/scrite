@@ -47,7 +47,7 @@ Item {
                 enabled: !scriteDocument.readOnly
                 onClicked: {
                     canvasMenu.isContextMenu = false
-                    canvasMenu.popup(newSceneButtonPopupArea)
+                    canvasMenu.popup()
                 }
                 iconSource: "../icons/content/add_box.png"
                 ToolTip.text: "Add Scene"
@@ -2628,22 +2628,28 @@ Item {
                 active: false
                 anchors.fill: parent
                 sourceComponent: Rectangle {
+                    id: deleteConfirmationItem
+                    property bool allowDeactivate: false
+
                     Component.onCompleted: {
                         if(canvas.scale < 1)
                             canvasScroll.zoomOneToItem(elementItem)
                         forceActiveFocus()
+                        app.execLater(deleteConfirmationItem, 500, function() {
+                            deleteConfirmationItem.allowDeactivate = true
+                        })
                     }
 
                     color: app.translucent(primaryColors.c600.background,0.85)
 
                     property bool visibleInViewport: elementItem.visibleInViewport
                     onVisibleInViewportChanged: {
-                        if(!visibleInViewport)
+                        if(!visibleInViewport && allowDeactivate)
                             deleteConfirmationBox.active = false
                     }
 
                     onActiveFocusChanged: {
-                        if(!activeFocus)
+                        if(!activeFocus && allowDeactivate)
                             deleteConfirmationBox.active = false
                     }
 

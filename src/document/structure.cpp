@@ -160,6 +160,14 @@ void StructureElement::setFollow(QQuickItem *val)
     }
 
     emit followChanged();
+
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(250);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, [=]() {
+        this->setSyncWithFollow(true);
+        timer->deleteLater();
+    });
 }
 
 void StructureElement::setSyncWithFollow(bool val)
