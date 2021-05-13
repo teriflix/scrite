@@ -14,6 +14,8 @@
 #include "notebooktabmodel.h"
 #include "application.h"
 
+#include <QSettings>
+
 NotebookTabModel::NotebookTabModel(QObject *parent)
     : QAbstractListModel(parent),
       m_activeScene(this, "activeScene"),
@@ -55,10 +57,34 @@ void NotebookTabModel::setActiveScene(Scene *val)
     if(m_activeScene == val)
         return;
 
+    if(!m_activeScene.isNull())
+    {
+        disconnect(m_activeScene, &Scene::titleChanged, this, &NotebookTabModel::updateActiveScene);
+
+        SceneHeading *sceneHeading = m_activeScene->heading();
+        disconnect(sceneHeading, &SceneHeading::enabledChanged, this, &NotebookTabModel::updateActiveScene);
+        disconnect(sceneHeading, &SceneHeading::textChanged, this, &NotebookTabModel::updateActiveScene);
+
+        StructureElement *element = m_activeScene->structureElement();
+        disconnect(element, &StructureElement::titleChanged, this, &NotebookTabModel::updateActiveScene);
+    }
+
     m_activeScene = val;
     emit activeSceneChanged();
 
     this->updateModel();
+
+    if(!m_activeScene.isNull())
+    {
+        connect(m_activeScene, &Scene::titleChanged, this, &NotebookTabModel::updateActiveScene);
+
+        SceneHeading *sceneHeading = m_activeScene->heading();
+        connect(sceneHeading, &SceneHeading::enabledChanged, this, &NotebookTabModel::updateActiveScene);
+        connect(sceneHeading, &SceneHeading::textChanged, this, &NotebookTabModel::updateActiveScene);
+
+        StructureElement *element = m_activeScene->structureElement();
+        connect(element, &StructureElement::titleChanged, this, &NotebookTabModel::updateActiveScene);
+    }
 }
 
 QObject *NotebookTabModel::sourceAt(int row) const
@@ -258,6 +284,40 @@ void NotebookTabModel::resetModel()
     this->beginResetModel();
     m_items = this->gatherItems();
     this->endResetModel();
+}
+
+void NotebookTabModel::updateActiveScene()
+{
+    this->updateModel();
+}
+
+QString NotebookTabModel::sceneLabel(const Scene *scene)
+{
+    if(scene == nullptr)
+        return QStringLiteral("No Scene");
+
+    const QSettings *settings = Application::instance()->settings();
+    const bool headingOrTitle = settings->value( QStringLiteral("Timeline View/textMode") ).toString() == QStringLiteral("HeadingOrTitle");
+
+    if(headingOrTitle)
+    {
+        const StructureElement *element = scene->structureElement();
+        const QString ntitle = element ? element->nativeTitle() : QString();
+        if(!ntitle.isEmpty() && ntitle.length() > 5)
+            return ntitle;
+
+        const QString heading = scene->heading()->isEnabled() ? scene->heading()->text() : QString();
+        if(!heading.isEmpty())
+            return heading;
+    }
+    else
+    {
+        const QString title = scene->title();
+        if(!title.isEmpty() && title.length() > 5)
+            return title;
+    }
+
+    return QStringLiteral("Current Scene");
 }
 
 QList<NotebookTabModel::Item> NotebookTabModel::gatherItems(bool charactersOnly) const

@@ -62,6 +62,9 @@ private:
     void resetActiveScene();
     void updateModel();
     void resetModel();
+    void updateActiveScene();
+
+    static QString sceneLabel(const Scene *scene);
 
 private:
     QObjectProperty<Scene> m_activeScene;
@@ -73,7 +76,7 @@ private:
         Item(Structure *structure) :
             source(structure), label(QStringLiteral("Story")), color(QStringLiteral("purple")) { }
         Item(Scene *scene) :
-            source(scene), label(scene->title()), color(scene->color()) { }
+            source(scene), label(NotebookTabModel::sceneLabel(scene)), color(scene->color()) { }
         Item(Character *character, const QColor &_color=Qt::blue) :
             source(character), label(character->name()), color(_color) { }
 
