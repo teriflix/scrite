@@ -915,15 +915,21 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.right
 
-                property real parentY: parent.mapToItem(contentView.contentItem, 0, 0).y
-                anchors.topMargin: Math.max(0, Math.min( Math.max( contentView.contentY-parentY, 0 ), contentItem.height-height-20 ))
+                property real screenY: screenplayEditor.mapFromItem(parent, 0, 0).y
+                property real maxTopMargin: contentItem.height-height-20
+                anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : 0
+
+                Connections {
+                    target: contentView
+                    onContentYChanged: commentsSidePanel.screenY = screenplayEditor.mapFromItem(commentsSidePanel.parent, 0, 0).y
+                }
 
                 // anchors.leftMargin: expanded ? 0 : -minPanelWidth
-                buttonText: expanded ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
+                label: expanded ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
                 height: {
                     if(expanded) {
                         if(contentItem.isCurrent)
-                            return contentInstance ? Math.max(contentInstance.contentHeight+40, 350) : 300
+                            return contentInstance ? Math.min(contentItem.height, Math.max(contentInstance.contentHeight+60, 350)) : 300
                         return Math.min(300, parent.height)
                     }
                     return sceneHeadingAreaLoader.height
@@ -972,6 +978,16 @@ Rectangle {
                         textEditor: commentsEdit
                         textEditorHasCursorInterface: true
                         enabled: !scriteDocument.readOnly
+                    }
+
+                    Item {
+                        x: parent.cursorRectangle.x
+                        y: parent.cursorRectangle.y
+                        width: parent.cursorRectangle.width
+                        height: parent.cursorRectangle.height
+
+                        ToolTip.visible: parent.height < parent.contentHeight
+                        ToolTip.text: "Please consider capturing long comments as scene notes in the notebook tab."
                     }
                 }
             }
@@ -2284,7 +2300,7 @@ Rectangle {
             id: sceneListSidePanel
             height: parent.height
             buttonY: 20
-            buttonText: ""
+            label: ""
             z: expanded ? 1 : 0
 
             content: Item {

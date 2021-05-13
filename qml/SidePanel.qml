@@ -19,7 +19,7 @@ Item {
     id: sidePanel
 
     property real buttonY: 0
-    property string buttonText: ""
+    property string label: ""
     property alias buttonColor: expandCollapseButton.color
     property alias backgroundColor: panelBackground.color
     property color borderColor: primaryColors.borderColor
@@ -27,14 +27,11 @@ Item {
     property bool expanded: false
     property alias content: contentLoader.sourceComponent
     property alias contentInstance: contentLoader.item
+    property real contentAreaSize: Qt.size(contentLoaderArea.width,contentLoaderArea.height)
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
-    property real buttonSize: {
-        if(textLabel.text !== "")
-            Math.min((textLabel.contentWidth + iconImage.width + 20) * 1.25, height)
-        return Math.min(100, height)
-    }
+    property real buttonSize: Math.min(100, height)
     readonly property real minPanelWidth: 25
     property real maxPanelWidth: 450
     Behavior on width {
@@ -72,9 +69,35 @@ Item {
         anchors.leftMargin: 0
         clip: true
 
+        Rectangle {
+            id: textLabelBackground
+            anchors.fill: textLabel
+            color: Qt.darker(expandCollapseButton.color)
+            visible: textLabel.visible
+            opacity: textLabel.opacity
+        }
+
+        Text {
+            id: textLabel
+            anchors.top: parent.top
+            text: sidePanel.label
+            leftPadding: 5; rightPadding: 5
+            topPadding: 8; bottomPadding: 8
+            font.bold: true
+            font.pixelSize: expandCollapseButton.width * 0.45
+            font.capitalization: Font.AllUppercase
+            horizontalAlignment: Text.AlignHCenter
+            width: parent.width
+            elide: Text.ElideRight
+            opacity: contentLoader.opacity
+            visible: contentLoader.visible && text !== ""
+            color: app.isLightColor(textLabelBackground.color) ? "black" : "white"
+        }
+
         Loader {
             id: contentLoader
-            height: parent.height
+            anchors.top: textLabel.visible ? textLabel.bottom : parent.top
+            anchors.bottom: parent.bottom
             width: sidePanel.maxPanelWidth - expandCollapseButton.width
             visible: opacity > 0
             opacity: sidePanel.expanded ? 1 : 0
@@ -108,21 +131,11 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.horizontalCenterOffset: sidePanel.expanded ? 0 : parent.radius/2
 
-            Text {
-                id: textLabel
-                text: sidePanel.buttonText
-                rotation: -90
-                font.pixelSize: parent.width * 0.45
-                transformOrigin: Item.Center
-                anchors.centerIn: parent
-            }
-
             Image {
                 id: iconImage
                 width: parent.width
                 height: width
                 anchors.centerIn: parent
-                anchors.verticalCenterOffset: textLabel.text === "" ? 0 : (textLabel.contentWidth/2 + 10)
                 source: sidePanel.expanded ? "../icons/navigation/arrow_left.png" : "../icons/navigation/arrow_right.png"
                 fillMode: Image.PreserveAspectFit
             }
