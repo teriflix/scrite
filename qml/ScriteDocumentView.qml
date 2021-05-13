@@ -25,6 +25,8 @@ Item {
     width: 1350
     height: 700
 
+    readonly property url helpUrl: "https://www.scrite.io/index.php/help/"
+
     enabled: !scriteDocument.loading
 
     FontMetrics {
@@ -114,14 +116,26 @@ Item {
 
     Shortcut {
         context: Qt.ApplicationShortcut
+        sequence: "F1"
+
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Help"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: Qt.openUrlExternally(helpUrl)
+    }
+
+    Shortcut {
+        id: sceneCharactersToggleShortcut
+        context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+C"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters & Tags" : "Show Scene Characters & Tags"
+        ShortcutsModelItem.title: screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters, Tags" : "Show Scene Characters, Tags"
         ShortcutsModelItem.shortcut: sequence
         onActivated: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
     }
 
     Shortcut {
+        id: synopsisToggleShortcut
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+S"
         ShortcutsModelItem.group: "Settings"
@@ -131,6 +145,7 @@ Item {
     }
 
     Shortcut {
+        id: commentsToggleShortcut
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+M"
         ShortcutsModelItem.group: "Settings"
@@ -140,6 +155,7 @@ Item {
     }
 
     Shortcut {
+        id: spellCheckToggleShortcut
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+L"
         ShortcutsModelItem.group: "Settings"
@@ -743,6 +759,12 @@ Item {
                         width: 300
 
                         MenuItem2 {
+                            icon.source: "../icons/action/help.png"
+                            text: "Help\tF1"
+                            onClicked: Qt.openUrlExternally(helpUrl)
+                        }
+
+                        MenuItem2 {
                             id: settingsMenuItem
                             text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "../icons/action/settings_applications.png"
@@ -809,20 +831,45 @@ Item {
                                 onActivated: app.execLater(app, 100, function() { app.toggleFullscreen(qmlWindow) })
                             }
                         }
+
+                        MenuSeparator {
+
+                        }
+
+                        Menu2 {
+                            id: sceneCharactersMenu
+                            width: 400
+                            title: "Screenplay Options"
+
+                            MenuItem2 {
+                                icon.source: "../icons/content/blank.png"
+                                text: "Scan For Mute Characters"
+                                onClicked: scriteDocument.structure.scanForMuteCharacters()
+                                enabled: !scriteDocument.readOnly && screenplayEditorSettings.displaySceneCharacters
+                            }
+
+                            MenuItem2 {
+                                text: "Scene Characters and Tags\t" + app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
+                                icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
+                            }
+
+                            MenuSeparator {  }
+
+                            MenuItem2 {
+                                text: "Scene Synopsis\t" + app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
+                                icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
+                            }
+
+                            MenuItem2 {
+                                text: "Scene Comments\t" + app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
+                                icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
+                            }
+                        }
                     }
                 }
-            }
-
-            ToolButton3 {
-                id: helpButton
-                iconSource: "../icons/action/help.png"
-                text: "Help"
-                shortcut: "F1"
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
-
-                ShortcutsModelItem.group: "Application"
-                ShortcutsModelItem.title: "Help"
-                ShortcutsModelItem.shortcut: "F1"
             }
 
             Rectangle {

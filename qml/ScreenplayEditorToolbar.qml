@@ -48,55 +48,6 @@ Row {
     }
 
     ToolButton3 {
-        iconSource: "../icons/action/flag.png"
-        ToolTip.text: "Toggle display of character names & synopsis under scene headings and scan for hidden characters in each scene."
-        ToolTip.delay: 1000
-        down: sceneCharactersMenu.visible
-        onClicked: sceneCharactersMenu.visible = true
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
-
-        Item {
-            width: parent.width
-            height: 1
-            anchors.top: parent.bottom
-
-            Menu2 {
-                id: sceneCharactersMenu
-                width: 350
-
-                MenuItem2 {
-                    icon.source: "../icons/content/blank.png"
-                    text: "Scan For Mute Characters"
-                    onClicked: scriteDocument.structure.scanForMuteCharacters()
-                    enabled: !scriteDocument.readOnly && screenplayEditorSettings.displaySceneCharacters
-                }
-
-                MenuItem2 {
-                    text: "Display Scene Characters and Tags"
-                    icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
-                }
-
-                MenuSeparator {
-
-                }
-
-                MenuItem2 {
-                    text: "Display Scene Synopsis"
-                    icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
-                }
-
-                MenuItem2 {
-                    text: "Display Scene Comments"
-                    icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
-                }
-            }
-        }
-    }
-
-    ToolButton3 {
         id: findAndReplaceButton
         iconSource: "../icons/action/search.png"
         shortcut: "Ctrl+F"
