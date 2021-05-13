@@ -18,13 +18,6 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 Item {
-    Image {
-        anchors.fill: parent
-        source: "../images/notebookpage.jpg"
-        fillMode: Image.Stretch
-        smooth: true
-    }
-
     NotebookTabModel {
         id: noteSources
         structure: scriteDocument.loading ? null : scriteDocument.structure
