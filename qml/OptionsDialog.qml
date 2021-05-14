@@ -2066,7 +2066,7 @@ Item {
                     anchors.bottomMargin: 20
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pointSize: app.idealFontPointSize-2
-                    horizontalAlignment: Text.AlignRight
+                    horizontalAlignment: Text.AlignLeft
                     wrapMode: Text.WordWrap
                     color: primaryColors.c100.background
                     text: "Customize categories & groups you use for tagging index cards on the structure canvas. Each document has its own groups, there is a system wide copy as well."
