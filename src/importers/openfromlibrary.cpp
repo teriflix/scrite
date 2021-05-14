@@ -58,6 +58,8 @@ LibraryService::LibraryService(QObject *parent)
 {
     connect(this->screenplays(), &Library::busyChanged, this, &LibraryService::busyChanged);
     connect(this->templates(), &Library::busyChanged, this, &LibraryService::busyChanged);
+    connect(this, &LibraryService::importStarted, this, &LibraryService::busyChanged);
+    connect(this, &LibraryService::importFinished, this, &LibraryService::busyChanged);
 }
 
 LibraryService::~LibraryService()
@@ -67,7 +69,7 @@ LibraryService::~LibraryService()
 
 bool LibraryService::busy() const
 {
-    return this->screenplays()->isBusy() || this->templates()->isBusy();
+    return m_importing || this->screenplays()->isBusy() || this->templates()->isBusy();
 }
 
 Library *LibraryService::screenplays()
@@ -106,15 +108,19 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     if(library != this->templates() && library != this->screenplays())
         return;
 
-
     this->error()->clear();
     this->progress()->start();
+
+    m_importing = true;
+    emit importStarted(index);
 
     if(library == this->templates() && index == 0)
     {
         ScriteDocument::instance()->reset();
-        emit imported(0);
         this->progress()->finish();
+
+        m_importing = false;
+        emit importFinished(0);
         return;
     }
 
@@ -138,10 +144,10 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     connect(reply, &QNetworkReply::finished, [=]() {
         const QByteArray bytes = reply->readAll();
         reply->deleteLater();
-        this->progress()->finish();
-        qApp->restoreOverrideCursor();
 
         if(bytes.isEmpty()) {
+            this->progress()->finish();
+            qApp->restoreOverrideCursor();
             this->error()->setErrorMessage( QStringLiteral("Error downloading ") + name + QStringLiteral(". Please try again later.") );
             return;
         }
@@ -164,7 +170,11 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
             ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
         }
 
-        emit imported(index);
+        this->progress()->finish();
+        qApp->restoreOverrideCursor();
+
+        m_importing = false;
+        emit importFinished(index);
     });
 }
 

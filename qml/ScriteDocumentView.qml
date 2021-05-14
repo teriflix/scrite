@@ -311,8 +311,9 @@ Item {
                                         return
                                     }
                                 }
+                                contentLoader.allowContent = false
                                 scriteDocument.reset()
-                                contentLoader.reset()
+                                contentLoader.allowContent = true
                                 app.execLater(fileNewButton, 250, newFromTemplate)
                             }
                         }, fileNewButton)
@@ -1522,11 +1523,6 @@ Item {
         }
 
         property bool allowContent: true
-        function reset() {
-            allowContent = false
-            Qt.callLater( function() { contentLoader.allowContent = true } )
-        }
-
         property string sessionId
     }
 
@@ -1966,8 +1962,9 @@ Item {
 
     function newFromTemplate() {
         if(!scriteDocument.empty) {
-            contentLoader.reset()
+            contentLoader.allowContent = false
             scriteDocument.reset()
+            contentLoader.allowContent = true
         }
         if(app.internetAvailable) {
             modalDialog.popupSource = fileNewButton
@@ -1980,16 +1977,21 @@ Item {
     Component {
         id: openTemplateDialogComponent
 
-        OpenTemplateDialog { }
+        OpenTemplateDialog {
+            onImportStarted: contentLoader.allowContent = false
+            onImportFinished: contentLoader.allowContent = true
+        }
     }
 
     Component {
         id: aboutBoxComponent
+
         AboutBox { }
     }
 
     Component {
         id: optionsDialogComponent
+
         OptionsDialog { }
     }
 
@@ -2021,8 +2023,9 @@ Item {
                     "nameFilters": ["Scrite Projects (*.scrite)"],
                     "selectExisting": true,
                     "callback": function(path) {
-                        contentLoader.reset()
+                        contentLoader.allowContent = false
                         scriteDocument.open(path)
+                        contentLoader.allowContent = true
                         recentFilesMenu.add(path)
                     },
                     "reset": true,
@@ -2045,8 +2048,9 @@ Item {
                     "nameFilters": scriteDocument.importFormatFileSuffix(format),
                     "selectExisting": true,
                     "callback": function(path) {
-                        contentLoader.reset()
+                        contentLoader.allowContent = false
                         scriteDocument.importFile(path, format)
+                        contentLoader.allowContent = true
                     },
                     "reset": true,
                     "notificationTitle": "Creating Scrite project from " + format
@@ -2111,7 +2115,10 @@ Item {
     Component {
         id: openFromLibraryComponent
 
-        OpenFromLibrary { }
+        OpenFromLibrary {
+            onImportStarted: contentLoader.allowContent = false
+            onImportFinished: contentLoader.allowContent = true
+        }
     }
 
     Item {

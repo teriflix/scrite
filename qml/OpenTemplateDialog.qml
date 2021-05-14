@@ -21,11 +21,20 @@ Item {
     width: documentUI.width * 0.75
     height: documentUI.height * 0.85
 
+    signal importStarted()
+    signal importFinished()
+
     Component.onCompleted: modalDialog.closeOnEscape = true
 
     LibraryService {
         id: libraryService
-        onImported: {
+        onImportStarted: {
+            busyOverlay.busyMessage = "Loading template \"" + libraryService.templates.recordAt(index).name + "\" ..."
+            busyOverlay.visible = true
+            newFileDialog.importStarted()
+        }
+        onImportFinished: {
+            newFileDialog.importFinished()
             app.execLater(libraryService, 250, function() {
                 modalDialog.close()
             })
@@ -289,14 +298,10 @@ Item {
 
     enabled: !libraryService.busy
 
-    Rectangle {
+    BusyOverlay {
+        id: busyOverlay
         anchors.fill: parent
-        opacity: 0.5
+        busyMessage: "Loading templates..."
         visible: libraryService.busy
-
-        BusyIndicator {
-            anchors.centerIn: parent
-            running: libraryService.busy
-        }
     }
 }

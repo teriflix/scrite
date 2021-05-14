@@ -54,8 +54,8 @@ public:
     bool doImport(QIODevice *device);
 
 signals:
-    void imported(int index);
-
+    void importStarted(int index);
+    void importFinished(int index);
 
 private:
     bool m_importing = false;
