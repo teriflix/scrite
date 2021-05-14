@@ -77,8 +77,6 @@
         <file>icons/content/add_box_inverted.png</file>
         <file>icons/content/add_circle_outline.png</file>
         <file>icons/content/add_circle_outline_inverted.png</file>
-        <file>icons/content/archive.png</file>
-        <file>icons/content/archive_inverted.png</file>
         <file>icons/content/blank.png</file>
         <file>icons/content/bookmark.png</file>
         <file>icons/content/bookmark_outline.png</file>
@@ -106,6 +104,8 @@
         <file>icons/content/redo.png</file>
         <file>icons/content/redo_inverted.png</file>
         <file>icons/content/save.png</file>
+        <file>icons/content/save_as.png</file>
+        <file>icons/content/save_as_inverted.png</file>
         <file>icons/content/save_inverted.png</file>
         <file>icons/content/select_all.png</file>
         <file>icons/content/select_all_inverted.png</file>

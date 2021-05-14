@@ -477,7 +477,7 @@ Item {
                 text: "Save As"
                 shortcut: "Ctrl+Shift+S"
                 shortcutText: "Shift+S"
-                iconSource: "../icons/content/archive.png"
+                iconSource: "../icons/content/save_as.png"
                 onClicked: fileDialog.launch("SAVE")
                 enabled: scriteDocument.structure.elementCount > 0 ||
                          scriteDocument.structure.noteCount > 0 ||
