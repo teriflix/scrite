@@ -67,7 +67,7 @@ Item {
                 checked: canvasPreview.visible
                 checkable: true
                 onToggled: structureCanvasSettings.showPreview = checked
-                iconSource: "../icons/action/preview.png"
+                iconSource: "../icons/action/thumbnail.png"
                 ToolTip.text: "Preview"
             }
 

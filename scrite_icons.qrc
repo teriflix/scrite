@@ -19,8 +19,8 @@
         <file>icons/action/done_all_inverted.png</file>
         <file>icons/action/edit.png</file>
         <file>icons/action/edit_inverted.png</file>
-        <file>icons/action/edit_title_page_inverted.png</file>
         <file>icons/action/edit_title_page.png</file>
+        <file>icons/action/edit_title_page_inverted.png</file>
         <file>icons/action/find_replace.png</file>
         <file>icons/action/find_replace_inverted.png</file>
         <file>icons/action/flag.png</file>
@@ -67,6 +67,8 @@
         <file>icons/action/settings_applications_inverted.png</file>
         <file>icons/action/tag.png</file>
         <file>icons/action/tag_inverted.png</file>
+        <file>icons/action/thumbnail.png</file>
+        <file>icons/action/thumbnail_inverted.png</file>
         <file>icons/action/view_array.png</file>
         <file>icons/action/view_array_inverted.png</file>
         <file>icons/content/add_box.png</file>
