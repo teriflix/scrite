@@ -211,7 +211,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.topMargin: 5
+                anchors.topMargin: ruler.visible ? 5 : 1
                 color: "white"
 
                 TrackerPack {
