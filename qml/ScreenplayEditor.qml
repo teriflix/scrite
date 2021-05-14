@@ -392,7 +392,7 @@ Rectangle {
                                 anchors.top: parent.top
                                 anchors.right: parent.right
                                 anchors.rightMargin: ruler.rightMarginPx
-                                iconSource: "../icons/action/edit.png"
+                                iconSource: "../icons/action/edit_title_page.png"
                                 onClicked: editTitlePage(this)
                                 visible: parent.active && enabled
                                 enabled: !scriteDocument.readOnly
@@ -402,7 +402,7 @@ Rectangle {
                         ToolButton2 {
                             id: editTitlePageButton
                             text: "Edit Title Page"
-                            icon.source: "../icons/action/edit.png"
+                            icon.source: "../icons/action/edit_title_page.png"
                             flat: false
                             width: implicitWidth * 1.5
                             height: implicitHeight * 1.25
