@@ -654,32 +654,52 @@ Rectangle {
             }
         }
 
-        Text {
-            id: pageNumberDisplay
+        Row {
+            id: metricsDisplay
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: toggleLockButton.right
             anchors.leftMargin: 20
-            font.family: headingFontMetrics.font.family
-            font.pixelSize: parent.height * 0.5
-            text: {
-                var ret = "Page " + screenplayTextDocument.currentPage + "/" + screenplayTextDocument.pageCount + " | "
-                if(screenplayTextDocument.pageCount > 1) {
-                    if(globalTimeDisplay.visibleToUser) {
-                        ret += "Time Est: ~" + screenplayTextDocument.totalTimeAsString
-                    } else {
-                        ret += "Time: ~" + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
-                    }
-                } else
-                    ret += "Time Est: < ~" + screenplayTextDocument.timePerPageAsString
-                return ret
+            spacing: 10
+
+            Text {
+                font.family: headingFontMetrics.font.family
+                font.pixelSize: statusBar.height * 0.5
+                text: "Page " + screenplayTextDocument.currentPage + "/" + screenplayTextDocument.pageCount
             }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.borderColor
+            }
+
+            Text {
+                font.family: headingFontMetrics.font.family
+                font.pixelSize: statusBar.height * 0.5
+                text: {
+                    var ret = ""
+                    if(screenplayTextDocument.pageCount > 1) {
+                        if(globalTimeDisplay.visibleToUser) {
+                            ret += "Time Est: ~" + screenplayTextDocument.totalTimeAsString
+                        } else {
+                            ret += "Time: ~" + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
+                        }
+                    } else
+                        ret += "Time Est: < ~" + screenplayTextDocument.timePerPageAsString
+                    return ret
+                }
+            }
+        }
+
+        Item {
+            anchors.fill: metricsDisplay
 
             ToolTip.text: "Page count and time estimates are approximate, assuming " + screenplayTextDocument.timePerPageAsString + " per page."
             ToolTip.delay: 1000
-            ToolTip.visible: pageNumberDisplayMouseArea.containsMouse
+            ToolTip.visible: metricsDisplayOverlayMouseArea.containsMouse
 
             MouseArea {
-                id: pageNumberDisplayMouseArea
+                id: metricsDisplayOverlayMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
             }
@@ -689,7 +709,7 @@ Rectangle {
             width: pageRulerArea.width
             height: parent.height
             anchors.centerIn: parent
-            visible: parent.width - pageNumberDisplay.width - zoomSlider.width > width
+            visible: parent.width - metricsDisplay.width - zoomSlider.width > width
 
             Text {
                 anchors.left: parent.left
