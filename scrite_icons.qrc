@@ -1,5 +1,15 @@
 <RCC>
     <qresource prefix="/">
+        <file>icons/action/add_act.png</file>
+        <file>icons/action/add_act_inverted.png</file>
+        <file>icons/action/add_all.png</file>
+        <file>icons/action/add_all_inverted.png</file>
+        <file>icons/action/add_episide_inverted.png</file>
+        <file>icons/action/add_episode.png</file>
+        <file>icons/action/add_one.png</file>
+        <file>icons/action/add_one_inverted.png</file>
+        <file>icons/action/add_scene.png</file>
+        <file>icons/action/add_scene_inverted.png</file>
         <file>icons/action/delete.png</file>
         <file>icons/action/delete_inverted.png</file>
         <file>icons/action/description.png</file>
@@ -7,35 +17,101 @@
         <file>icons/action/dialog_close_button.png</file>
         <file>icons/action/done_all.png</file>
         <file>icons/action/done_all_inverted.png</file>
+        <file>icons/action/edit.png</file>
+        <file>icons/action/edit_inverted.png</file>
+        <file>icons/action/find_replace.png</file>
+        <file>icons/action/find_replace_inverted.png</file>
+        <file>icons/action/flag.png</file>
+        <file>icons/action/flag_inverted.png</file>
+        <file>icons/action/help.png</file>
+        <file>icons/action/help_inverted.png</file>
         <file>icons/action/keyboard_arrow_down.png</file>
         <file>icons/action/keyboard_arrow_down_inverted.png</file>
         <file>icons/action/keyboard_arrow_up.png</file>
         <file>icons/action/keyboard_arrow_up_inverted.png</file>
+        <file>icons/action/layout_beat_sheet.png</file>
+        <file>icons/action/layout_beat_sheet_inverted.png</file>
+        <file>icons/action/layout_flow_horizontally.png</file>
+        <file>icons/action/layout_flow_horizontally_inverted.png</file>
+        <file>icons/action/layout_flow_vertically.png</file>
+        <file>icons/action/layout_flow_vertically_inverted.png</file>
+        <file>icons/action/layout_grouping.png</file>
+        <file>icons/action/layout_grouping_inverted.png</file>
+        <file>icons/action/layout_horizontally.png</file>
+        <file>icons/action/layout_horizontally_inverted.png</file>
+        <file>icons/action/layout_options.png</file>
+        <file>icons/action/layout_options_inverted.png</file>
+        <file>icons/action/layout_vertically.png</file>
+        <file>icons/action/layout_vertically_inverted.png</file>
+        <file>icons/action/library.png</file>
+        <file>icons/action/library_inverted.png</file>
+        <file>icons/action/lock_open.png</file>
+        <file>icons/action/lock_open_inverted.png</file>
+        <file>icons/action/lock_outline.png</file>
+        <file>icons/action/lock_outline_inverted.png</file>
         <file>icons/action/note_add.png</file>
         <file>icons/action/note_add_inverted.png</file>
+        <file>icons/action/preview.png</file>
+        <file>icons/action/preview_inverted.png</file>
+        <file>icons/action/remove_all.png</file>
+        <file>icons/action/remove_all_inverted.png</file>
+        <file>icons/action/remove_one.png</file>
+        <file>icons/action/remove_one_inverted.png</file>
         <file>icons/action/search.png</file>
         <file>icons/action/search_inverted.png</file>
+        <file>icons/action/selection_drag.png</file>
+        <file>icons/action/selection_drag_inverted.png</file>
         <file>icons/action/settings_applications.png</file>
         <file>icons/action/settings_applications_inverted.png</file>
+        <file>icons/action/tag.png</file>
+        <file>icons/action/tag_inverted.png</file>
         <file>icons/action/view_array.png</file>
         <file>icons/action/view_array_inverted.png</file>
         <file>icons/content/add_box.png</file>
         <file>icons/content/add_box_inverted.png</file>
+        <file>icons/content/add_circle_outline.png</file>
+        <file>icons/content/add_circle_outline_inverted.png</file>
+        <file>icons/content/archive.png</file>
+        <file>icons/content/archive_inverted.png</file>
+        <file>icons/content/blank.png</file>
+        <file>icons/content/bookmark.png</file>
+        <file>icons/content/bookmark_outline.png</file>
+        <file>icons/content/camera_alt.png</file>
+        <file>icons/content/camera_alt_inverted.png</file>
+        <file>icons/content/character_icon.png</file>
         <file>icons/content/clear_all.png</file>
         <file>icons/content/clear_all_inverted.png</file>
+        <file>icons/content/content_copy.png</file>
+        <file>icons/content/content_copy_inverted.png</file>
+        <file>icons/content/content_paste.png</file>
+        <file>icons/content/content_paste_inverted.png</file>
         <file>icons/content/create.png</file>
         <file>icons/content/create_inverted.png</file>
+        <file>icons/content/fight_scene.png</file>
+        <file>icons/content/fight_scene_inverted.png</file>
         <file>icons/content/language.png</file>
         <file>icons/content/language_inverted.png</file>
         <file>icons/content/person_add.png</file>
         <file>icons/content/person_add_inverted.png</file>
+        <file>icons/content/person_outline.png</file>
+        <file>icons/content/person_outline_inverted.png</file>
+        <file>icons/content/queue_mus24px.png</file>
+        <file>icons/content/queue_mus24px_inverted.png</file>
         <file>icons/content/redo.png</file>
         <file>icons/content/redo_inverted.png</file>
         <file>icons/content/save.png</file>
         <file>icons/content/save_inverted.png</file>
+        <file>icons/content/select_all.png</file>
+        <file>icons/content/select_all_inverted.png</file>
         <file>icons/content/shadow.png</file>
         <file>icons/content/undo.png</file>
         <file>icons/content/undo_inverted.png</file>
+        <file>icons/editor/format_bold.png</file>
+        <file>icons/editor/format_bold_inverted.png</file>
+        <file>icons/editor/format_ital24px.png</file>
+        <file>icons/editor/format_ital24px_inverted.png</file>
+        <file>icons/editor/format_underline.png</file>
+        <file>icons/editor/format_underline_inverted.png</file>
         <file>icons/file/file_download.png</file>
         <file>icons/file/file_download_inverted.png</file>
         <file>icons/file/file_pdf.png</file>
@@ -49,17 +125,66 @@
         <file>icons/hardware/keyboard_hide.png</file>
         <file>icons/hardware/keyboard_hide_inverted.png</file>
         <file>icons/hardware/keyboard_inverted.png</file>
+        <file>icons/hardware/mouse.png</file>
+        <file>icons/hardware/mouse_inverted.png</file>
+        <file>icons/mediaplayer/fast_forward.png</file>
+        <file>icons/mediaplayer/fast_forward_inverted.png</file>
+        <file>icons/mediaplayer/fast_rewind.png</file>
+        <file>icons/mediaplayer/fast_rewind_inverted.png</file>
+        <file>icons/mediaplayer/forward_10.png</file>
+        <file>icons/mediaplayer/forward_10_inverted.png</file>
+        <file>icons/mediaplayer/movie.png</file>
+        <file>icons/mediaplayer/movie_inverted.png</file>
+        <file>icons/mediaplayer/pause.png</file>
+        <file>icons/mediaplayer/pause_inverted.png</file>
+        <file>icons/mediaplayer/play_arrow.png</file>
+        <file>icons/mediaplayer/play_arrow_inverted.png</file>
+        <file>icons/mediaplayer/reset_screenplay_offsets.png</file>
+        <file>icons/mediaplayer/reset_screenplay_offsets_inverted.png</file>
+        <file>icons/mediaplayer/rewind_10.png</file>
+        <file>icons/mediaplayer/rewind_10_inverted.png</file>
+        <file>icons/mediaplayer/sync_with_screenplay.png</file>
+        <file>icons/mediaplayer/sync_with_screenplay_inverted.png</file>
+        <file>icons/mediaplayer/time_column.png</file>
+        <file>icons/mediaplayer/time_column_inverted.png</file>
+        <file>icons/navigation/arrow_left.png</file>
+        <file>icons/navigation/arrow_left_inverted.png</file>
+        <file>icons/navigation/arrow_right.png</file>
+        <file>icons/navigation/arrow_right_inverted.png</file>
+        <file>icons/navigation/center_focus.svg</file>
+        <file>icons/navigation/check.png</file>
+        <file>icons/navigation/check_inverted.png</file>
         <file>icons/navigation/close.png</file>
         <file>icons/navigation/close_inverted.png</file>
         <file>icons/navigation/fullscreen.png</file>
         <file>icons/navigation/fullscreen_exit.png</file>
         <file>icons/navigation/fullscreen_exit_inverted.png</file>
         <file>icons/navigation/fullscreen_inverted.png</file>
+        <file>icons/navigation/keyboard_arrow_down.png</file>
+        <file>icons/navigation/keyboard_arrow_down_inverted.png</file>
+        <file>icons/navigation/keyboard_arrow_up.png</file>
+        <file>icons/navigation/keyboard_arrow_up_inverted.png</file>
         <file>icons/navigation/menu.png</file>
         <file>icons/navigation/menu_inverted.png</file>
+        <file>icons/navigation/notebook_tab.png</file>
+        <file>icons/navigation/notebook_tab_inverted.png</file>
+        <file>icons/navigation/property_editor.png</file>
+        <file>icons/navigation/property_editor_inverted.png</file>
         <file>icons/navigation/refresh.png</file>
         <file>icons/navigation/refresh_inverted.png</file>
+        <file>icons/navigation/screenplay_tab.png</file>
+        <file>icons/navigation/screenplay_tab_inverted.png</file>
+        <file>icons/navigation/scrited_tab.png</file>
+        <file>icons/navigation/scrited_tab_inverted.png</file>
+        <file>icons/navigation/shortcuts_linux.png</file>
+        <file>icons/navigation/shortcuts_macos.png</file>
+        <file>icons/navigation/shortcuts_windows.png</file>
+        <file>icons/navigation/structure_tab.png</file>
+        <file>icons/navigation/structure_tab_inverted.png</file>
+        <file>icons/navigation/zoom_fit.png</file>
+        <file>icons/navigation/zoom_fit_inverted.png</file>
         <file>icons/navigation/zoom_in.png</file>
+        <file>icons/navigation/zoom_one.png</file>
         <file>icons/navigation/zoom_out.png</file>
         <file>icons/screenplay/action.png</file>
         <file>icons/screenplay/character.png</file>
@@ -67,124 +192,5 @@
         <file>icons/screenplay/paranthetical.png</file>
         <file>icons/screenplay/shot.png</file>
         <file>icons/screenplay/transition.png</file>
-        <file>icons/action/find_replace.png</file>
-        <file>icons/action/find_replace_inverted.png</file>
-        <file>icons/content/select_all_inverted.png</file>
-        <file>icons/content/select_all.png</file>
-        <file>icons/action/preview.png</file>
-        <file>icons/action/preview_inverted.png</file>
-        <file>icons/navigation/arrow_left_inverted.png</file>
-        <file>icons/navigation/arrow_left.png</file>
-        <file>icons/navigation/arrow_right_inverted.png</file>
-        <file>icons/navigation/arrow_right.png</file>
-        <file>icons/content/add_circle_outline.png</file>
-        <file>icons/content/add_circle_outline_inverted.png</file>
-        <file>icons/content/archive.png</file>
-        <file>icons/content/archive_inverted.png</file>
-        <file>icons/content/queue_mus24px.png</file>
-        <file>icons/content/queue_mus24px_inverted.png</file>
-        <file>icons/content/fight_scene_inverted.png</file>
-        <file>icons/content/fight_scene.png</file>
-        <file>icons/action/edit.png</file>
-        <file>icons/action/edit_inverted.png</file>
-        <file>icons/action/lock_open.png</file>
-        <file>icons/action/lock_open_inverted.png</file>
-        <file>icons/action/lock_outline_inverted.png</file>
-        <file>icons/action/lock_outline.png</file>
-        <file>icons/action/layout_horizontally.png</file>
-        <file>icons/action/layout_horizontally_inverted.png</file>
-        <file>icons/action/layout_vertically_inverted.png</file>
-        <file>icons/action/layout_vertically.png</file>
-        <file>icons/action/layout_flow_vertically.png</file>
-        <file>icons/action/layout_flow_vertically_inverted.png</file>
-        <file>icons/action/layout_flow_horizontally.png</file>
-        <file>icons/action/layout_flow_horizontally_inverted.png</file>
-        <file>icons/navigation/check_inverted.png</file>
-        <file>icons/navigation/check.png</file>
-        <file>icons/action/selection_drag.png</file>
-        <file>icons/action/selection_drag_inverted.png</file>
-        <file>icons/action/add_one.png</file>
-        <file>icons/action/add_one_inverted.png</file>
-        <file>icons/action/add_all.png</file>
-        <file>icons/action/add_all_inverted.png</file>
-        <file>icons/action/remove_one.png</file>
-        <file>icons/action/remove_one_inverted.png</file>
-        <file>icons/action/remove_all.png</file>
-        <file>icons/action/remove_all_inverted.png</file>
-        <file>icons/content/blank.png</file>
-        <file>icons/navigation/shortcuts_linux.png</file>
-        <file>icons/navigation/shortcuts_macos.png</file>
-        <file>icons/navigation/shortcuts_windows.png</file>
-        <file>icons/action/library.png</file>
-        <file>icons/action/library_inverted.png</file>
-        <file>icons/action/help.png</file>
-        <file>icons/action/help_inverted.png</file>
-        <file>icons/content/content_copy.png</file>
-        <file>icons/content/content_copy_inverted.png</file>
-        <file>icons/content/content_paste_inverted.png</file>
-        <file>icons/content/content_paste.png</file>
-        <file>icons/navigation/property_editor.png</file>
-        <file>icons/navigation/property_editor_inverted.png</file>
-        <file>icons/navigation/zoom_fit_inverted.png</file>
-        <file>icons/navigation/zoom_fit.png</file>
-        <file>icons/content/bookmark.png</file>
-        <file>icons/content/bookmark_outline.png</file>
-        <file>icons/navigation/zoom_one.png</file>
-        <file>icons/content/person_outline.png</file>
-        <file>icons/content/person_outline_inverted.png</file>
-        <file>icons/content/character_icon.png</file>
-        <file>icons/navigation/keyboard_arrow_up.png</file>
-        <file>icons/navigation/keyboard_arrow_up_inverted.png</file>
-        <file>icons/navigation/keyboard_arrow_down.png</file>
-        <file>icons/navigation/keyboard_arrow_down_inverted.png</file>
-        <file>icons/hardware/mouse_inverted.png</file>
-        <file>icons/hardware/mouse.png</file>
-        <file>icons/content/camera_alt.png</file>
-        <file>icons/content/camera_alt_inverted.png</file>
-        <file>icons/action/layout_beat_sheet.png</file>
-        <file>icons/action/layout_beat_sheet_inverted.png</file>
-        <file>icons/action/flag.png</file>
-        <file>icons/action/flag_inverted.png</file>
-        <file>icons/navigation/structure_tab_inverted.png</file>
-        <file>icons/navigation/structure_tab.png</file>
-        <file>icons/navigation/notebook_tab.png</file>
-        <file>icons/navigation/notebook_tab_inverted.png</file>
-        <file>icons/navigation/screenplay_tab.png</file>
-        <file>icons/navigation/screenplay_tab_inverted.png</file>
-        <file>icons/navigation/scrited_tab.png</file>
-        <file>icons/navigation/scrited_tab_inverted.png</file>
-        <file>icons/mediaplayer/forward_10.png</file>
-        <file>icons/mediaplayer/forward_10_inverted.png</file>
-        <file>icons/mediaplayer/pause.png</file>
-        <file>icons/mediaplayer/pause_inverted.png</file>
-        <file>icons/mediaplayer/play_arrow.png</file>
-        <file>icons/mediaplayer/play_arrow_inverted.png</file>
-        <file>icons/mediaplayer/rewind_10.png</file>
-        <file>icons/mediaplayer/rewind_10_inverted.png</file>
-        <file>icons/mediaplayer/movie.png</file>
-        <file>icons/mediaplayer/movie_inverted.png</file>
-        <file>icons/mediaplayer/fast_rewind.png</file>
-        <file>icons/mediaplayer/fast_rewind_inverted.png</file>
-        <file>icons/mediaplayer/fast_forward.png</file>
-        <file>icons/mediaplayer/fast_forward_inverted.png</file>
-        <file>icons/mediaplayer/sync_with_screenplay.png</file>
-        <file>icons/mediaplayer/sync_with_screenplay_inverted.png</file>
-        <file>icons/mediaplayer/time_column.png</file>
-        <file>icons/mediaplayer/time_column_inverted.png</file>
-        <file>icons/mediaplayer/reset_screenplay_offsets_inverted.png</file>
-        <file>icons/mediaplayer/reset_screenplay_offsets.png</file>
-        <file>icons/editor/format_bold_inverted.png</file>
-        <file>icons/editor/format_bold.png</file>
-        <file>icons/editor/format_ital24px_inverted.png</file>
-        <file>icons/editor/format_ital24px.png</file>
-        <file>icons/editor/format_underline_inverted.png</file>
-        <file>icons/editor/format_underline.png</file>
-        <file>icons/action/layout_grouping.png</file>
-        <file>icons/action/layout_grouping_inverted.png</file>
-        <file>icons/action/tag_inverted.png</file>
-        <file>icons/action/tag.png</file>
-        <file>icons/navigation/center_focus.svg</file>
-        <file>icons/action/layout_options_inverted.png</file>
-        <file>icons/action/layout_options.png</file>
     </qresource>
 </RCC>

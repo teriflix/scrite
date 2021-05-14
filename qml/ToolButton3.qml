@@ -53,7 +53,6 @@ Item {
         anchors.fill: parent
         color: Qt.rgba(0,0,0,0.15)
         visible: parent.checkable && parent.checked || parent.down
-        radius: 6
     }
 
     Image {
@@ -98,14 +97,15 @@ Item {
         onActivated: toolButton.click()
     }
 
-    ToolTip.text: toolButtonShortcut.nativeText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(toolButtonShortcut.sequence) + ")")
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(shortcutText) + ")")
     ToolTip.visible: ToolTip.text !== "" && (toolButtonMouseArea.containsMouse && !down ? toolTipVisibility.get : false)
+    ToolTip.delay: 500
 
     DelayedPropertyBinder {
         id: toolTipVisibility
         initial: false
         set: toolButtonMouseArea.containsMouse
-        delay: 1000
+        delay: toolButton.ToolTip.delay
     }
 
     MouseArea {

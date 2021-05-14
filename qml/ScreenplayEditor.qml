@@ -465,7 +465,7 @@ Rectangle {
                     }
                     footer: Item {
                         width: contentView.width
-                        height: ruler.bottomMarginPx
+                        height: Math.max(ruler.bottomMarginPx, addEpisodeButton.height+20)
 
                         Row {
                             anchors.centerIn: parent
@@ -473,15 +473,13 @@ Rectangle {
                             enabled: !scriteDocument.readOnly
                             spacing: 20
 
-                            ToolButton2 {
+                            ToolButton3 {
                                 id: addSceneButton
+                                iconSource: "../icons/action/add_scene.png"
+                                shortcutText: "Ctrl+Shift+N"
+                                ToolTip.delay: 0
                                 text: "Add Scene"
-                                shortcutText: app.polishShortcutTextForDisplay("Ctrl+Shift+N")
-                                icon.source: "../icons/content/add_circle_outline.png"
-                                ToolTip.text: "Adds a new scene at the end of the screenplay."
-                                width: implicitWidth * 1.5
-                                height: implicitHeight * 1.5
-                                flat: false
+                                width: Math.max(60 * zoomLevel, 45); height: width
                                 onClicked: {
                                     scriteDocument.screenplay.currentElementIndex = -1
                                     if(!scriteDocument.readOnly)
@@ -489,18 +487,24 @@ Rectangle {
                                 }
                             }
 
-                            ToolButton2 {
-                                id: addBreakButton
-                                text: "Add Break"
-                                shortcutText: app.polishShortcutTextForDisplay("Ctrl+Shift+B")
-                                icon.source: "../icons/content/add_box.png"
-                                ToolTip.text: "Adds an act break at the end of the screenplay."
-                                width: implicitWidth * 1.5
-                                height: implicitHeight * 1.5
-                                flat: false
-                                onClicked: {
-                                    scriteDocument.screenplay.addBreakElement(Screenplay.Act)
-                                }
+                            ToolButton3 {
+                                id: addActBreakButton
+                                iconSource: "../icons/action/add_act.png"
+                                shortcutText: "Ctrl+Shift+B"
+                                ToolTip.delay: 0
+                                text: "Add Act Break"
+                                width: Math.max(60 * zoomLevel, 45); height: width
+                                onClicked: scriteDocument.screenplay.addBreakElement(Screenplay.Act)
+                            }
+
+                            ToolButton3 {
+                                id: addEpisodeButton
+                                iconSource: "../icons/action/add_episode.png"
+                                shortcutText: "Ctrl+Shift+P"
+                                ToolTip.delay: 0
+                                text: "Add Episode Break"
+                                width: Math.max(60 * zoomLevel, 45); height: width
+                                onClicked: scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
                             }
                         }
                     }

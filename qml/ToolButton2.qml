@@ -41,7 +41,6 @@ ToolButton {
         color: primaryColors.c10.background
         border.width: toolButton.flat ? 0 : 1
         border.color: primaryColors.borderColor
-        radius: 8
 
         Row {
             anchors.centerIn: parent
