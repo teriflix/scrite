@@ -39,6 +39,8 @@
 #include "scenecharactermatrixreport.h"
 
 #include <QDir>
+#include <QUuid>
+#include <QPainter>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QSettings>
@@ -48,7 +50,6 @@
 #include <QStandardPaths>
 #include <QRandomGenerator>
 #include <QScopedValueRollback>
-#include <QPainter>
 
 class DeviceIOFactories
 {
@@ -352,6 +353,8 @@ void ScriteDocument::reset()
 
     UndoStack::clearAllStacks();
     m_docFileSystem.reset();
+
+    this->setSessionId( QUuid::createUuid().toString() );
     this->setReadOnly(false);
     this->setLocked(false);
 
@@ -1512,6 +1515,15 @@ QString ScriteDocument::polishFileName(const QString &givenFileName) const
     }
 
     return fileName;
+}
+
+void ScriteDocument::setSessionId(QString val)
+{
+    if(m_sessionId == val)
+        return;
+
+    m_sessionId = val;
+    emit sessionIdChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

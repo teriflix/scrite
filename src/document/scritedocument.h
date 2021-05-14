@@ -95,6 +95,10 @@ public:
     bool isEmpty() const;
     Q_SIGNAL void emptyChanged();
 
+    Q_PROPERTY(QString sessionId READ sessionId NOTIFY sessionIdChanged)
+    QString sessionId() const { return m_sessionId; }
+    Q_SIGNAL void sessionIdChanged();
+
     Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)
     void setAutoSaveDurationInSeconds(int val);
     int autoSaveDurationInSeconds() const { return m_autoSaveDurationInSeconds; }
@@ -248,6 +252,7 @@ public:
 
 private:
     QString polishFileName(const QString &fileName) const;
+    void setSessionId(QString val);
 
 private:
     bool m_busy = false;
@@ -257,6 +262,7 @@ private:
     bool m_autoSave = true;
     bool m_readOnly = false;
     bool m_autoSaveMode = false;
+    QString m_sessionId;
     QJsonObject m_userData;
     QString m_fileName;
     QString m_busyMessage;

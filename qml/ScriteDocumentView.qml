@@ -1525,6 +1525,8 @@ Item {
             enabled = false
             Qt.callLater( function() { contentLoader.enabled = true } )
         }
+
+        property string sessionId
     }
 
     SequentialAnimation {
@@ -1737,6 +1739,7 @@ Item {
                             id: splitViewAnimationLoader
                             anchors.fill: parent
                             active: false
+                            property string sessionId
                             sourceComponent: Rectangle {
                                 color: app.translucent(primaryColors.button, 0.5)
 
@@ -1910,9 +1913,12 @@ Item {
                     screenplayEditor2.width = screenplayEditor2.SplitView.preferredWidth
                 }
 
-                app.execLater(splitViewAnimationLoader, 250, function() {
-                    splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
-                })
+                if(contentLoader.sessionId !== scriteDocument.sessionId) {
+                    app.execLater(splitViewAnimationLoader, 250, function() {
+                        splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
+                    })
+                    contentLoader.sessionId = scriteDocument.sessionId
+                }
             }
         }
     }
