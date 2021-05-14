@@ -928,7 +928,7 @@ Rectangle {
                 }
 
                 // anchors.leftMargin: expanded ? 0 : -minPanelWidth
-                label: expanded ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
+                label: expanded && anchors.topMargin > 0 ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
                 height: {
                     if(expanded) {
                         if(contentItem.isCurrent)
@@ -991,6 +991,7 @@ Rectangle {
 
                         ToolTip.visible: parent.height < parent.contentHeight
                         ToolTip.text: "Please consider capturing long comments as scene notes in the notebook tab."
+                        ToolTip.delay: 1000
                     }
                 }
             }
