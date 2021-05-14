@@ -178,6 +178,9 @@ void StructureElement::setSyncWithFollow(bool val)
 
     m_syncWithFollow = val;
     emit syncWithFollowChanged();
+
+    if(m_syncWithFollow)
+        this->syncWithFollowItem();
 }
 
 void StructureElement::resetFollow()
