@@ -426,7 +426,7 @@ Rectangle {
                             anchors.topMargin: Math.max(ruler.topMarginPx * 0.1, 10)
                             anchors.bottomMargin: Math.max(ruler.topMarginPx * 0.1, 10)
                             property real contentHeight: visible ? logLineEditorLayout.height + anchors.topMargin + anchors.bottomMargin : 0
-                            visible: screenplayAdapter.isSourceScreenplay
+                            visible: screenplayAdapter.isSourceScreenplay && (scriteDocument.readOnly ? logLineField.text !== "" : true)
 
                             Column {
                                 id: logLineEditorLayout

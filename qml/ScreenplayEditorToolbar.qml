@@ -61,6 +61,24 @@ Row {
         ShortcutsModelItem.shortcut: shortcut
     }
 
+    ToolButton3 {
+        iconSource: "../icons/navigation/refresh.png"
+        shortcut: "F5"
+        shortcutText: ""
+        ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: binder && !showScreenplayPreview ? true : false
+        onClicked: {
+            var cp = editor.cursorPosition
+            binder.preserveScrollAndReload()
+            if(cp >= 0)
+                editor.cursorPosition = cp
+        }
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Refresh"
+        ShortcutsModelItem.shortcut: shortcut
+    }
+
     Rectangle {
         width: 1
         height: parent.height
@@ -69,7 +87,7 @@ Row {
     }
 
     ToolButton3 {
-        iconSource: "../icons/content/add_circle_outline.png"
+        iconSource: "../icons/action/add_scene.png"
         shortcut: "Ctrl+Shift+N"
         shortcutText: ""
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
@@ -105,7 +123,7 @@ Row {
     }
 
     ToolButton3 {
-        iconSource: "../icons/content/add_box.png"
+        iconSource: "../icons/action/add_act.png"
         shortcut: "Ctrl+Shift+B"
         shortcutText: ""
         ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
@@ -124,23 +142,24 @@ Row {
         ShortcutsModelItem.shortcut: shortcut
     }
 
-    Shortcut {
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+P"
+    ToolButton3 {
+        iconSource: "../icons/action/add_episode.png"
+        shortcut: "Ctrl+Shift+P"
+        shortcutText: ""
+        ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
-
-        ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.shortcut: sequence
-
-        onActivated:  {
+        onClicked: {
             requestScreenplayEditor()
             if(breakInsertIndex < 0)
                 scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
             else
                 scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
         }
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: sequence
     }
 
     Shortcut {
@@ -160,24 +179,6 @@ Row {
             else
                 scriteDocument.screenplay.insertBreakElement(Screenplay.Interval, breakInsertIndex)
         }
-    }
-
-    ToolButton3 {
-        iconSource: "../icons/navigation/refresh.png"
-        shortcut: "F5"
-        shortcutText: ""
-        ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: binder && !showScreenplayPreview ? true : false
-        onClicked: {
-            var cp = editor.cursorPosition
-            binder.preserveScrollAndReload()
-            if(cp >= 0)
-                editor.cursorPosition = cp
-        }
-
-        ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: "Refresh"
-        ShortcutsModelItem.shortcut: shortcut
     }
 
     Rectangle {
