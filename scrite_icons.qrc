@@ -188,8 +188,11 @@
         <file>icons/navigation/zoom_fit.png</file>
         <file>icons/navigation/zoom_fit_inverted.png</file>
         <file>icons/navigation/zoom_in.png</file>
+        <file>icons/navigation/zoom_in_inverted.png</file>
         <file>icons/navigation/zoom_one.png</file>
+        <file>icons/navigation/zoom_one_inverted.png</file>
         <file>icons/navigation/zoom_out.png</file>
+        <file>icons/navigation/zoom_out_inverted.png</file>
         <file>icons/screenplay/action.png</file>
         <file>icons/screenplay/character.png</file>
         <file>icons/screenplay/dialogue.png</file>
