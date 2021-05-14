@@ -16,20 +16,21 @@ import QtQuick.Controls 2.13
 import Scrite 1.0
 
 PainterPathItem {
-    property int pageNumber: -1
+    property string pageNumber: "-1"
     readonly property var colors: primaryColors.c600
 
     Text {
         id: sceneNumberText
         anchors.centerIn: parent
-        font.family: scriteDocument.formatting.defaultFont.family
-        font.pointSize: app.idealFontPointSize
-        text: "" + parent.pageNumber
+        font: defaultFontMetrics.font
+        text: parent.pageNumber
         color: colors.text
+        leftPadding: 4; rightPadding: 4
+        topPadding: 3; bottomPadding: 1
     }
 
     width: Math.max(sceneNumberText.contentWidth * 1.5, 30)
-    height: sceneNumberText.contentHeight + 1.1
+    height: sceneNumberText.height
 
     renderType: PainterPathItem.OutlineAndFill
     fillColor: colors.background
