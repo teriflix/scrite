@@ -446,7 +446,6 @@ Rectangle {
                                 TextArea {
                                     id: logLineField
                                     width: parent.width
-                                    height: Math.max(contentHeight+defaultFontMetrics.height, 2*logLineFieldHeading.height)
                                     font: screenplayFormat.defaultFont2
                                     readOnly: scriteDocument.readOnly
                                     palette: app.palette
