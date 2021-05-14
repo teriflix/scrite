@@ -1511,7 +1511,7 @@ Item {
 
     Loader {
         id: contentLoader
-        active: enabled && !scriteDocument.loading
+        active: allowContent && !scriteDocument.loading
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
@@ -1521,9 +1521,10 @@ Item {
             globalScreenplayEditorToolbar.sceneEditor = null
         }
 
+        property bool allowContent: true
         function reset() {
-            enabled = false
-            Qt.callLater( function() { contentLoader.enabled = true } )
+            allowContent = false
+            Qt.callLater( function() { contentLoader.allowContent = true } )
         }
 
         property string sessionId

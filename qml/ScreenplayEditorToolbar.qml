@@ -159,7 +159,7 @@ Row {
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
         ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.shortcut: shortcut
     }
 
     Shortcut {
