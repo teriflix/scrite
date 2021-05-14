@@ -44,21 +44,75 @@ Item {
 
             ToolButton3 {
                 id: newSceneButton
-                down: canvasMenu.visible
+                down: newSceneMenu.visible
                 enabled: !scriteDocument.readOnly
-                onClicked: {
-                    canvasMenu.isContextMenu = false
-                    canvasMenu.popup()
-                }
-                iconSource: "../icons/content/add_box.png"
+                onClicked: newSceneMenu.open()
+                iconSource: "../icons/action/add_scene.png"
                 ToolTip.text: "Add Scene"
                 hasMenu: true
                 property color activeColor: "white"
 
                 Item {
-                    id: newSceneButtonPopupArea
                     anchors.top: parent.top
                     anchors.right: parent.right
+
+                    Menu2 {
+                        id: newSceneMenu
+
+                        MenuItem2 {
+                            text: "New Scene"
+                            enabled: !scriteDocument.readOnly
+                            onClicked: {
+                                Qt.callLater( function() { newSceneMenu.close() } )
+                                createItemMouseHandler.handle("element")
+                            }
+                        }
+
+                        ColorMenu {
+                            title: "Colored Scene"
+                            selectedColor: newSceneButton.activeColor
+                            enabled: !scriteDocument.readOnly
+                            onMenuItemClicked: {
+                                Qt.callLater( function() { newSceneMenu.close() } )
+                                newSceneButton.activeColor = color
+                                createItemMouseHandler.handle("element")
+                            }
+                        }
+                    }
+                }
+            }
+
+            ToolButton3 {
+                id: newAnnotationButton
+                down: newAnnotationMenu.down
+                enabled: !scriteDocument.readOnly
+                onClicked: newAnnotationMenu.open()
+                iconSource: "../icons/action/add_annotation.png"
+                ToolTip.text: "Add Annotation"
+                hasMenu: true
+
+                Item {
+                    id: newAnnotationMenuArea
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+
+                    Menu2 {
+                        id: newAnnotationMenu
+
+                        Repeater {
+                            model: canvas.annotationsList
+
+                            MenuItem2 {
+                                property var annotationInfo: canvas.annotationsList[index]
+                                text: annotationInfo.title
+                                enabled: !scriteDocument.readOnly && annotationInfo.what !== ""
+                                onClicked: {
+                                    Qt.callLater( function() { newAnnotationMenu.close() } )
+                                    createItemMouseHandler.handle(annotationInfo.what)
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -683,7 +737,7 @@ Item {
                     height: width
                     sourceSize.width: width
                     sourceSize.height: height
-                    source: "../icons/navigation/center_focus.svg"
+                    source: parent.what === "element" ? "../icons/action/add_scene.png" : "../icons/action/add_annotation.png"
                     property real halfSize: width/2
                     x: parent.mouseX - halfSize
                     y: parent.mouseY - halfSize
@@ -828,9 +882,9 @@ Item {
                     }
 
                     Connections {
-                        target: canvasMenu
+                        target: canvasContextMenu
                         onVisibleChanged: {
-                            if(canvasMenu.visible)
+                            if(canvasContextMenu.visible)
                                 annotationGripLoader.reset()
                         }
                     }
@@ -1183,10 +1237,7 @@ Item {
                 anchors.fill: parent
                 enabled: canvasScroll.editItem === null && !selection.active
                 acceptedButtons: Qt.RightButton
-                onPressed: {
-                    canvasMenu.isContextMenu = true
-                    canvasMenu.popup()
-                }
+                onPressed: canvasContextMenu.popup()
             }
 
             EventFilter.events: [EventFilter.DragEnter, EventFilter.DragMove, EventFilter.Drop]
@@ -1543,7 +1594,7 @@ Item {
             }
 
             Menu2 {
-                id: canvasMenu
+                id: canvasContextMenu
 
                 property bool isContextMenu: false
 
@@ -1551,10 +1602,8 @@ Item {
                     text: "New Scene"
                     enabled: !scriteDocument.readOnly
                     onClicked: {
-                        if(canvasMenu.isContextMenu)
-                            canvas.createItem("element", Qt.point(canvasMenu.x-130,canvasMenu.y-22), newSceneButton.activeColor)
-                        else
-                            createItemMouseHandler.handle("element")
+                        Qt.callLater( function() { canvasContextMenu.close() } )
+                        canvas.createItem("element", Qt.point(canvasContextMenu.x-130,canvasContextMenu.y-22), newSceneButton.activeColor)
                     }
                 }
 
@@ -1563,12 +1612,9 @@ Item {
                     selectedColor: newSceneButton.activeColor
                     enabled: !scriteDocument.readOnly
                     onMenuItemClicked: {
-                        Qt.callLater( function() { canvasMenu.close() } )
+                        Qt.callLater( function() { canvasContextMenu.close() } )
                         newSceneButton.activeColor = color
-                        if(canvasMenu.isContextMenu)
-                            canvas.createItem("element", Qt.point(canvasMenu.x-130,canvasMenu.y-22), newSceneButton.activeColor)
-                        else
-                            createItemMouseHandler.handle("element")
+                        canvas.createItem("element", Qt.point(canvasContextMenu.x-130,canvasContextMenu.y-22), newSceneButton.activeColor)
                     }
                 }
 
@@ -1585,11 +1631,8 @@ Item {
                             text: annotationInfo.title
                             enabled: !scriteDocument.readOnly && annotationInfo.what !== ""
                             onClicked: {
-                                Qt.callLater( function() { canvasMenu.close() } )
-                                if(canvasMenu.isContextMenu)
-                                    canvas.createItem(annotationInfo.what, Qt.point(canvasMenu.x, canvasMenu.y))
-                                else
-                                    createItemMouseHandler.handle(annotationInfo.what)
+                                Qt.callLater( function() { canvasContextMenu.close() } )
+                                canvas.createItem(annotationInfo.what, Qt.point(canvasContextMenu.x, canvasContextMenu.y))
                             }
                         }
                     }

@@ -4,6 +4,8 @@
         <file>icons/action/add_act_inverted.png</file>
         <file>icons/action/add_all.png</file>
         <file>icons/action/add_all_inverted.png</file>
+        <file>icons/action/add_annotation.png</file>
+        <file>icons/action/add_annotation_inverted.png</file>
         <file>icons/action/add_episide_inverted.png</file>
         <file>icons/action/add_episode.png</file>
         <file>icons/action/add_one.png</file>
@@ -155,7 +157,6 @@
         <file>icons/navigation/arrow_left_inverted.png</file>
         <file>icons/navigation/arrow_right.png</file>
         <file>icons/navigation/arrow_right_inverted.png</file>
-        <file>icons/navigation/center_focus.svg</file>
         <file>icons/navigation/check.png</file>
         <file>icons/navigation/check_inverted.png</file>
         <file>icons/navigation/close.png</file>
