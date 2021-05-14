@@ -1167,92 +1167,86 @@ Rectangle {
                     }
 
                     property bool justReceivedFocus: false
-                    cursorDelegate: Item {
+
+                    Loader {
+                        id: cursorHighlight
                         x: sceneTextEditor.cursorRectangle.x
                         y: sceneTextEditor.cursorRectangle.y
                         width: sceneTextEditor.cursorRectangle.width
                         height: sceneTextEditor.cursorRectangle.height
-                        visible: sceneTextEditor.activeFocus
+                        active: sceneTextEditor.justReceivedFocus
 
-                        Rectangle {
-                            id: cursorRectangle
-                            width: parent.width*Screen.devicePixelRatio
-                            height: parent.height
-                            anchors.centerIn: parent
-                            color: scriteDocument.readOnly ? primaryColors.borderColor : "black"
-                        }
+                        sourceComponent: Item {
 
-                        SequentialAnimation {
-                            running: sceneTextEditor.justReceivedFocus /*&& screenplayEditorSettings.enableAnimations*/
-
-                            ParallelAnimation {
-                                NumberAnimation {
-                                    target: cursorRectangle
-                                    property: "width"
-                                    duration: 250
-                                    from: sceneTextEditor.cursorRectangle.width*Screen.devicePixelRatio
-                                    to: sceneTextEditor.cursorRectangle.width*10
-                                }
-
-                                NumberAnimation {
-                                    target: cursorRectangle
-                                    property: "height"
-                                    duration: 250
-                                    from: sceneTextEditor.cursorRectangle.height
-                                    to: sceneTextEditor.cursorRectangle.height*2
-                                }
-
-                                NumberAnimation {
-                                    target: cursorRectangle
-                                    property: "opacity"
-                                    duration: 250
-                                    from: 1
-                                    to: 0.1
-                                }
+                            Rectangle {
+                                id: cursorRectangle
+                                width: parent.width*Screen.devicePixelRatio
+                                height: parent.height
+                                anchors.centerIn: parent
+                                color: scriteDocument.readOnly ? primaryColors.borderColor : "black"
                             }
 
-                            ParallelAnimation {
-                                NumberAnimation {
-                                    target: cursorRectangle
-                                    property: "width"
-                                    duration: 250
-                                    from: sceneTextEditor.cursorRectangle.width*10
-                                    to: sceneTextEditor.cursorRectangle.width*1.5
+                            SequentialAnimation {
+                                running: true
+
+                                ParallelAnimation {
+                                    NumberAnimation {
+                                        target: cursorRectangle
+                                        property: "width"
+                                        duration: 250
+                                        from: sceneTextEditor.cursorRectangle.width*Screen.devicePixelRatio
+                                        to: sceneTextEditor.cursorRectangle.width*10
+                                    }
+
+                                    NumberAnimation {
+                                        target: cursorRectangle
+                                        property: "height"
+                                        duration: 250
+                                        from: sceneTextEditor.cursorRectangle.height
+                                        to: sceneTextEditor.cursorRectangle.height*2
+                                    }
+
+                                    NumberAnimation {
+                                        target: cursorRectangle
+                                        property: "opacity"
+                                        duration: 250
+                                        from: 1
+                                        to: 0.1
+                                    }
                                 }
 
-                                NumberAnimation {
-                                    target: cursorRectangle
-                                    property: "height"
-                                    duration: 250
-                                    from: sceneTextEditor.cursorRectangle.height*2
-                                    to: sceneTextEditor.cursorRectangle.height
+                                ParallelAnimation {
+                                    NumberAnimation {
+                                        target: cursorRectangle
+                                        property: "width"
+                                        duration: 250
+                                        from: sceneTextEditor.cursorRectangle.width*10
+                                        to: sceneTextEditor.cursorRectangle.width*1.5
+                                    }
+
+                                    NumberAnimation {
+                                        target: cursorRectangle
+                                        property: "height"
+                                        duration: 250
+                                        from: sceneTextEditor.cursorRectangle.height*2
+                                        to: sceneTextEditor.cursorRectangle.height
+                                    }
+
+                                    NumberAnimation {
+                                        target: cursorRectangle
+                                        property: "opacity"
+                                        duration: 250
+                                        from: 0.1
+                                        to: 1
+                                    }
                                 }
 
-                                NumberAnimation {
-                                    target: cursorRectangle
-                                    property: "opacity"
-                                    duration: 250
-                                    from: 0.1
-                                    to: 1
+                                ScriptAction {
+                                    script: {
+                                        sceneTextEditor.justReceivedFocus = false
+                                    }
                                 }
                             }
-
-                            ScriptAction {
-                                script: {
-                                    sceneTextEditor.justReceivedFocus = false
-                                    cursorRectangle.width = sceneTextEditor.cursorRectangle.width*1.5
-                                    cursorRectangle.height = sceneTextEditor.cursorRectangle.height
-                                }
-                            }
-                        }
-
-                        SequentialAnimation {
-                            running: !sceneTextEditor.justReceivedFocus && sceneTextEditor.activeFocus
-                            loops: Animation.Infinite
-                            ScriptAction { script: cursorRectangle.opacity = 0.1 }
-                            PauseAnimation { duration: 500 }
-                            ScriptAction { script: cursorRectangle.opacity = 1 }
-                            PauseAnimation { duration: 500 }
                         }
                     }
 
