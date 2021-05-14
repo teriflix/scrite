@@ -194,10 +194,16 @@
         <file>icons/navigation/zoom_out.png</file>
         <file>icons/navigation/zoom_out_inverted.png</file>
         <file>icons/screenplay/action.png</file>
+        <file>icons/screenplay/action_inverted.png</file>
         <file>icons/screenplay/character.png</file>
+        <file>icons/screenplay/character_inverted.png</file>
         <file>icons/screenplay/dialogue.png</file>
-        <file>icons/screenplay/paranthetical.png</file>
+        <file>icons/screenplay/dialogue_inverted.png</file>
+        <file>icons/screenplay/parenthetical.png</file>
+        <file>icons/screenplay/parenthetical_inverted.png</file>
         <file>icons/screenplay/shot.png</file>
+        <file>icons/screenplay/shot_inverted.png</file>
         <file>icons/screenplay/transition.png</file>
+        <file>icons/screenplay/transition_inverted.png</file>
     </qresource>
 </RCC>

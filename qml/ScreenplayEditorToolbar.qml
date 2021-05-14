@@ -32,7 +32,7 @@ Row {
         { "value": SceneElement.Action, "display": "Action", "icon": "../icons/screenplay/action.png" },
         { "value": SceneElement.Character, "display": "Character", "icon": "../icons/screenplay/character.png" },
         { "value": SceneElement.Dialogue, "display": "Dialogue", "icon": "../icons/screenplay/dialogue.png" },
-        { "value": SceneElement.Parenthetical, "display": "Parenthetical", "icon": "../icons/screenplay/paranthetical.png" },
+        { "value": SceneElement.Parenthetical, "display": "Parenthetical", "icon": "../icons/screenplay/parenthetical.png" },
         { "value": SceneElement.Shot, "display": "Shot", "icon": "../icons/screenplay/shot.png" },
         { "value": SceneElement.Transition, "display": "Transition", "icon": "../icons/screenplay/transition.png" }
     ]
