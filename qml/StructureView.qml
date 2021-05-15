@@ -2215,6 +2215,14 @@ Item {
                 border.width: elementItem.selected ? 2 : 1
                 border.color: app.isLightColor(element.scene.color) ? "black" : element.scene.color
 
+                Rectangle {
+                    y: parent.border.width
+                    color: elementItem.selected ? parent.border.color : Qt.tint(element.scene.color, "#C0FFFFFF")
+                    width: parent.width-2*parent.border.width
+                    height: 2*parent.border.width
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
                 // Move index-card around
                 MouseArea {
                     anchors.fill: parent
@@ -2268,15 +2276,6 @@ Item {
                 anchors.centerIn: parent
                 spacing: 10
 
-                Rectangle {
-                    width: parent.width
-                    height: 10
-                    color: selected ? element.scene.color : Qt.tint(element.scene.color, "#90FFFFFF")
-                    border.color: app.isLightColor(element.scene.color) ? "gray" : element.scene.color
-                    border.width: 1
-                }
-
-                // TODO, use LodLoader to optimise loading of delegates.
                 LodLoader {
                     id: headingFieldLoader
                     width: parent.width
@@ -2305,14 +2304,6 @@ Item {
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         topPadding: 8
                         bottomPadding: 16
-
-                        Text {
-                            text: "Scene Heading / Name"
-                            font.pointSize: app.idealFontPointSize/2
-                            anchors.left: parent.left
-                            anchors.verticalCenter: parent.top
-                        }
-
                         Component.onCompleted: headingFieldLoader.hasFocus = false
                     }
 
@@ -2321,9 +2312,9 @@ Item {
                         width: parent.width
                         text: element.title
                         enabled: true
-                        label: "Scene Heading / Name"
+                        label: ""
                         labelAlwaysVisible: true
-                        placeholderText: "Index Card Title"
+                        placeholderText: "Scene Heading / Name"
                         maximumLength: 140
                         font.family: scriteDocument.formatting.defaultFont.family
                         font.bold: true
@@ -2379,36 +2370,26 @@ Item {
 
                     property bool hasFocus: false
 
-                    lowDetailComponent: Column {
-                        spacing: 0
+                    lowDetailComponent: Rectangle {
+                        clip: true
+                        height: 200
+                        border.width: synopsisTextDisplay.truncated ? 1 : 0
+                        border.color: primaryColors.borderColor
+                        color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
 
                         Text {
-                            text: "Synopsis"
-                            font.pointSize: app.idealFontPointSize/2
-                        }
-
-                        Rectangle {
-                            clip: true
+                            id: synopsisTextDisplay
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             width: parent.width
-                            height: 200
-                            border.width: synopsisTextDisplay.truncated ? 1 : 0
-                            border.color: primaryColors.borderColor
-                            color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
-
-                            Text {
-                                id: synopsisTextDisplay
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                width: parent.width
-                                topPadding: 8
-                                leftPadding: 4
-                                rightPadding: 4
-                                bottomPadding: 4
-                                text: element.scene.hasTitle ? element.scene.title : "Describe what happens in this scene."
-                                font.pointSize: app.idealFontPointSize
-                                color: element.scene.hasTitle ? "black" : "gray"
-                                maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
-                                elide: Text.ElideRight
-                            }
+                            topPadding: 8
+                            leftPadding: 4
+                            rightPadding: 4
+                            bottomPadding: 4
+                            text: element.scene.hasTitle ? element.scene.title : "Describe what happens in this scene."
+                            font.pointSize: app.idealFontPointSize
+                            color: element.scene.hasTitle ? "black" : "gray"
+                            maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
+                            elide: Text.ElideRight
                         }
 
                         Component.onCompleted: synopsisFieldLoader.hasFocus = false
@@ -2421,12 +2402,6 @@ Item {
                         function assumeFocus() {
                             synopsisField.forceActiveFocus()
                             synopsisField.cursorPosition = synopsisField.length
-                        }
-
-                        Text {
-                            id: labelText
-                            text: "Synopsis"
-                            font.pointSize: app.idealFontPointSize/2
                         }
 
                         Flickable {
@@ -2523,8 +2498,8 @@ Item {
 
                         Rectangle {
                             width: parent.width
-                            height: synopsisField.hovered ? 2 : 1
-                            color: synopsisField.hovered ? "black" : primaryColors.borderColor
+                            height: synopsisField.hovered || synopsisField.activeFocus ? 2 : 1
+                            color: primaryColors.c500.background
                         }
                     }
 
@@ -2538,13 +2513,13 @@ Item {
                 }
 
                 Text {
-                    font.pointSize: app.idealAppFontSize - 2
-                    width: element.scene.hasCharacters ? characterList.width : parent.width
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
+                    x: characterList.x
                     text: scriteDocument.structure.presentableGroupNames(element.scene.groups)
+                    width: element.scene.hasCharacters ? characterList.width : parent.width
                     visible: element.scene.groups.length > 0
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    font.pointSize: app.idealAppFontSize - 2
+                    horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
                 }
 
                 Item {
@@ -2565,9 +2540,9 @@ Item {
                     Text {
                         id: characterList
                         font.pointSize: app.idealAppFontSize - 2
-                        anchors.left: sceneTypeImage.right
+                        anchors.left: sceneTypeImage.visible ? sceneTypeImage.right : parent.left
                         anchors.right: dragHandle.left
-                        anchors.margins: 5
+                        anchors.margins: sceneTypeImage.visible ? 5 : 0
                         anchors.verticalCenter: parent.verticalCenter
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
