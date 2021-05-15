@@ -2213,11 +2213,13 @@ Item {
                 anchors.fill: parent
                 color: Qt.tint(element.scene.color, selected ? "#C0FFFFFF" : "#F0FFFFFF")
                 border.width: elementItem.selected ? 2 : 1
-                border.color: app.isLightColor(element.scene.color) ? "black" : element.scene.color
+
+                property color borderColor: app.isLightColor(element.scene.color) ? "gray" : element.scene.color
+                border.color: elementItem.selected ? borderColor : Qt.lighter(borderColor)
 
                 Rectangle {
                     y: parent.border.width
-                    color: elementItem.selected ? parent.border.color : Qt.tint(element.scene.color, "#C0FFFFFF")
+                    color: parent.border.color
                     width: parent.width-2*parent.border.width
                     height: 2*parent.border.width
                     anchors.horizontalCenter: parent.horizontalCenter
