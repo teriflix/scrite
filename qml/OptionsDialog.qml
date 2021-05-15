@@ -193,6 +193,12 @@ Item {
                             text: "Display Ruler"
                             onToggled: screenplayEditorSettings.displayRuler = checked
                         }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.showLoglineEditor
+                            text: "Show Logline Editor"
+                            onToggled: screenplayEditorSettings.showLoglineEditor = checked
+                        }
                     }
                 }
             }

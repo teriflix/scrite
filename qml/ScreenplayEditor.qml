@@ -371,7 +371,7 @@ Rectangle {
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
                         width: contentView.width
-                        height: logLineEditor.contentHeight + (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
+                        height: (logLineEditor.visible ? logLineEditor.contentHeight : 0) + (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
                         property real padding: width * 0.1
 
                         function editTitlePage(source) {
@@ -426,7 +426,8 @@ Rectangle {
                             anchors.topMargin: Math.max(ruler.topMarginPx * 0.1, 10)
                             anchors.bottomMargin: Math.max(ruler.topMarginPx * 0.1, 10)
                             property real contentHeight: visible ? logLineEditorLayout.height + anchors.topMargin + anchors.bottomMargin : 0
-                            visible: screenplayAdapter.isSourceScreenplay && (scriteDocument.readOnly ? logLineField.text !== "" : true)
+                            height: logLineEditorLayout.height
+                            visible: screenplayEditorSettings.showLoglineEditor && screenplayAdapter.isSourceScreenplay && (scriteDocument.readOnly ? logLineField.text !== "" : true)
 
                             Column {
                                 id: logLineEditorLayout

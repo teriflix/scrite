@@ -82,6 +82,7 @@ Item {
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
         property bool showLanguageRefreshNoticeBox: true
         property bool showSpellCheckRefreshNoticeBox: true
+        property bool showLoglineEditor: false
         onEnableAnimationsChanged: {
             modalDialog.animationsEnabled = enableAnimations
             statusText.enableAnimations = enableAnimations
@@ -849,13 +850,19 @@ Item {
                                 enabled: !scriteDocument.readOnly && screenplayEditorSettings.displaySceneCharacters
                             }
 
+                            MenuSeparator {  }
+
+                            MenuItem2 {
+                                text: "Logline Editor"
+                                icon.source: screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.showLoglineEditor = !screenplayEditorSettings.showLoglineEditor
+                            }
+
                             MenuItem2 {
                                 text: "Scene Characters and Tags\t" + app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
                             }
-
-                            MenuSeparator {  }
 
                             MenuItem2 {
                                 text: "Scene Synopsis\t" + app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
