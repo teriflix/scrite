@@ -679,9 +679,7 @@ Rectangle {
             }
 
             Text {
-                font.family: headingFontMetrics.font.family
                 font.pixelSize: statusBar.height * 0.5
-                anchors.verticalCenterOffset: 1
                 text: screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -699,9 +697,7 @@ Rectangle {
             }
 
             Text {
-                font.family: headingFontMetrics.font.family
                 font.pixelSize: statusBar.height * 0.5
-                anchors.verticalCenterOffset: 1
                 text: screenplayTextDocument.currentTimeAsString + " of " + (screenplayTextDocument.pageCount > 1 ? screenplayTextDocument.totalTimeAsString : screenplayTextDocument.timePerPageAsString)
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -2448,7 +2444,7 @@ Rectangle {
                             font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType
                             font.pixelSize: screenplayElementType === ScreenplayElement.BreakElementType ? 16 : 14
                             font.letterSpacing: screenplayElementType === ScreenplayElement.BreakElementType ? 3 : 0
-                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignRight : (scene && scene.heading.enabled ? Qt.AlignLeft : Qt.AlignRight)
+                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignHCenter : (scene && scene.heading.enabled ? Qt.AlignLeft : Qt.AlignRight)
                             color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
                             font.capitalization: Font.AllUppercase
                             text: {
