@@ -458,8 +458,7 @@ StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCar
     const QPainterPath path = evaluateConnectorPath(r1, r2, &labelPos);
     this->setPath(path);
 
-    QFont labelFont = ::applicationFont();
-    labelFont.setFamily(QStringLiteral("Arial"));
+    const QFont labelFont = ::applicationFont();
 
     QGraphicsSimpleTextItem *labelText = new QGraphicsSimpleTextItem(this);
     labelText->setFont(labelFont);
@@ -517,9 +516,8 @@ StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structur
     const QString name = data.value(QStringLiteral("name")).toString();
     const int sceneCount = data.value(QStringLiteral("sceneCount")).toInt();
 
-    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" scene"): QStringLiteral(" scenes")) + QStringLiteral("</font>");
+    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" Scene"): QStringLiteral(" Scenes")) + QStringLiteral("</font>");
     QFont titleFont = normalFont;
-    titleFont.setFamily( QStringLiteral("Arial") );
     titleFont.setPointSize( titleFont.pointSize()+8 );
 
     QGraphicsTextItem *titleItem = new QGraphicsTextItem(this);
@@ -572,9 +570,8 @@ StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const 
     const QString name = data.value(QStringLiteral("name")).toString();
     const int sceneCount = data.value(QStringLiteral("sceneCount")).toInt();
 
-    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" scene"): QStringLiteral(" scenes")) + QStringLiteral("</font>");
-    QFont titleFont = normalFont;
-    titleFont.setFamily( QStringLiteral("Arial") );
+    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" Scene"): QStringLiteral(" Scenes")) + QStringLiteral("</font>");
+    const QFont titleFont = normalFont;
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
     titleText->setDefaultTextColor(Qt::black);
