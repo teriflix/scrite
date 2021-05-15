@@ -86,23 +86,6 @@ Row {
         opacity: 0.5
     }
 
-    ToolButton3 {
-        iconSource: "../icons/action/add_scene.png"
-        shortcut: "Ctrl+Shift+N"
-        shortcutText: ""
-        ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !scriteDocument.readOnly
-        onClicked: {
-            requestScreenplayEditor()
-            scriteDocument.createNewScene()
-        }
-
-        ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: "Create New Scene"
-        ShortcutsModelItem.enabled: !scriteDocument.readOnly
-        ShortcutsModelItem.shortcut: shortcut
-    }
-
     property int breakInsertIndex: {
         var idx = scriteDocument.screenplay.currentElementIndex
         if(idx < 0)
@@ -120,6 +103,26 @@ Row {
         }
 
         return idx
+    }
+
+    ToolButton3 {
+        iconSource: "../icons/action/add_episode.png"
+        shortcut: "Ctrl+Shift+P"
+        shortcutText: ""
+        ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+        onClicked: {
+            requestScreenplayEditor()
+            if(breakInsertIndex < 0)
+                scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
+            else
+                scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
+        }
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: shortcut
     }
 
     ToolButton3 {
@@ -143,22 +146,19 @@ Row {
     }
 
     ToolButton3 {
-        iconSource: "../icons/action/add_episode.png"
-        shortcut: "Ctrl+Shift+P"
+        iconSource: "../icons/action/add_scene.png"
+        shortcut: "Ctrl+Shift+N"
         shortcutText: ""
-        ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
         onClicked: {
             requestScreenplayEditor()
-            if(breakInsertIndex < 0)
-                scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
-            else
-                scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
+            scriteDocument.createNewScene()
         }
 
         ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
-        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.title: "Create New Scene"
+        ShortcutsModelItem.enabled: !scriteDocument.readOnly
         ShortcutsModelItem.shortcut: shortcut
     }
 

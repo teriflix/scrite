@@ -2297,10 +2297,9 @@ Item {
                         id: basicHeadingField
                         text: element.hasTitle ? element.title : "Index Card Title"
                         color: element.hasTitle ? "black" : "gray"
-                        font.family: scriteDocument.formatting.defaultFont.family
                         font.bold: true
-                        font.capitalization: Font.AllUppercase
                         font.pointSize: app.idealFontPointSize
+                        font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         topPadding: 8
                         bottomPadding: 16
@@ -2316,10 +2315,9 @@ Item {
                         labelAlwaysVisible: true
                         placeholderText: "Scene Heading / Name"
                         maximumLength: 140
-                        font.family: scriteDocument.formatting.defaultFont.family
                         font.bold: true
-                        font.capitalization: Font.AllUppercase
                         font.pointSize: app.idealFontPointSize
+                        font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         readOnly: scriteDocument.readOnly || canvas.scale < 0.5
                         onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
