@@ -23,6 +23,7 @@ Item {
 
     signal importStarted()
     signal importFinished()
+    signal importCancelled()
 
     Component.onCompleted: modalDialog.closeOnEscape = true
 
@@ -282,7 +283,10 @@ Item {
 
                 Button2 {
                     text: "Cancel"
-                    onClicked: modalDialog.close()
+                    onClicked: {
+                        newFileDialog.importCancelled()
+                        modalDialog.close()
+                    }
                 }
 
                 Button2 {
