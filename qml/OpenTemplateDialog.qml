@@ -30,7 +30,7 @@ Item {
     LibraryService {
         id: libraryService
         onImportStarted: {
-            busyOverlay.busyMessage = "Loading template \"" + libraryService.templates.recordAt(index).name + "\" ..."
+            busyOverlay.busyMessage = "Loading \"" + libraryService.templates.recordAt(index).name + "\" Template ..."
             busyOverlay.visible = true
             newFileDialog.importStarted()
         }

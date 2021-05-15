@@ -425,7 +425,7 @@ Item {
                         onAboutToShow: prepareRecentFilesList()
 
                         MenuItem2 {
-                            text: "Open.."
+                            text: "Open..."
                             onClicked: fileOpenButton.doOpen()
                             Rectangle {
                                 width: parent.width; height: 1

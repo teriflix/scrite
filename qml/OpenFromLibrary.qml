@@ -83,7 +83,7 @@ Item {
         id: libraryService
         onImportStarted: {
             var library = pageView.currentIndex === 0 ? libraryService.screenplays : libraryService.templates
-            busyOverlay.busyMessage = "Loading " + pageView.pagesArray[pageView.currentIndex].kind + " \"" + library.recordAt(index).name + "\" ..."
+            busyOverlay.busyMessage = "Loading " + " \"" + library.recordAt(index).name + "\" " + pageView.pagesArray[pageView.currentIndex].kind + " ..."
             busyOverlay.visible = true
             importFromLibraryUi.importStarted()
         }
@@ -105,8 +105,8 @@ Item {
         pageListWidth: 180
 
         pagesArray: [
-            { "kind": "screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>." },
-            { "kind": "template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com." }
+            { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>." },
+            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com." }
         ]
 
         pageTitleRole: "title"
