@@ -2226,7 +2226,7 @@ Item {
             }
 
             width: 350
-            height: Math.max(indexCardLayout.height+20, 350)
+            height: Math.max(indexCardLayout.height+6, 350)
 
             Rectangle {
                 id: background
@@ -2323,8 +2323,6 @@ Item {
                         font.pointSize: app.idealFontPointSize
                         font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        topPadding: 8
-                        bottomPadding: 16
                         Component.onCompleted: headingFieldLoader.hasFocus = false
                     }
 
