@@ -630,41 +630,39 @@ Rectangle {
         border.color: primaryColors.borderColor
         clip: true
 
-        ToolButton3 {
-            id: toggleLockButton
-            width: parent.height - 10
-            height: width
-            anchors.left: parent.left
-            anchors.leftMargin: 20
-            anchors.verticalCenter: parent.verticalCenter
-            enabled: !scriteDocument.readOnly
-            iconSource: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
-            ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
-            onClicked: {
-                var locked = !scriteDocument.locked
-                scriteDocument.locked = locked
-
-                var message = ""
-                if(locked)
-                    message = "Document LOCKED. You will be able to edit it only on this computer."
-                else
-                    message = "Document unlocked. You will be able to edit it on this and any other computer."
-
-                showInformation({"message": message}, this)
-            }
-        }
-
         Row {
             id: metricsDisplay
             anchors.verticalCenter: parent.verticalCenter
-            anchors.left: toggleLockButton.right
+            anchors.left: parent.left
             anchors.leftMargin: 20
             spacing: 10
 
-            Text {
-                font.family: headingFontMetrics.font.family
-                font.pixelSize: statusBar.height * 0.5
-                text: "Page " + screenplayTextDocument.currentPage + "/" + screenplayTextDocument.pageCount
+            Image {
+                id: toggleLockButton
+                height: parent.height; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+                enabled: !scriteDocument.readOnly
+                source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
+                    ToolTip.visible: containsMouse
+
+                    onClicked: {
+                        var locked = !scriteDocument.locked
+                        scriteDocument.locked = locked
+
+                        var message = ""
+                        if(locked)
+                            message = "Document LOCKED. You will be able to edit it only on this computer."
+                        else
+                            message = "Document unlocked. You will be able to edit it on this and any other computer."
+
+                        showInformation({"message": message}, this)
+                    }
+                }
             }
 
             Rectangle {
@@ -673,21 +671,38 @@ Rectangle {
                 color: primaryColors.borderColor
             }
 
+            Image {
+                source: "../icons/content/page_count.png"
+                height: parent.height; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
             Text {
                 font.family: headingFontMetrics.font.family
                 font.pixelSize: statusBar.height * 0.5
-                text: {
-                    var ret = ""
-                    if(screenplayTextDocument.pageCount > 1) {
-                        if(globalTimeDisplay.visibleToUser) {
-                            ret += "Time Est: ~" + screenplayTextDocument.totalTimeAsString
-                        } else {
-                            ret += "Time: ~" + screenplayTextDocument.currentTimeAsString + "/" + screenplayTextDocument.totalTimeAsString
-                        }
-                    } else
-                        ret += "Time Est: < ~" + screenplayTextDocument.timePerPageAsString
-                    return ret
-                }
+                anchors.verticalCenterOffset: 1
+                text: screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.borderColor
+            }
+
+            Image {
+                source: "../icons/content/time.png"
+                height: parent.height; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                font.family: headingFontMetrics.font.family
+                font.pixelSize: statusBar.height * 0.5
+                anchors.verticalCenterOffset: 1
+                text: screenplayTextDocument.currentTimeAsString + " of " + (screenplayTextDocument.pageCount > 1 ? screenplayTextDocument.totalTimeAsString : screenplayTextDocument.timePerPageAsString)
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
 

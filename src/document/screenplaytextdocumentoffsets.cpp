@@ -131,12 +131,12 @@ const QString OffsetItem::timeManuallySet = QStringLiteral("timeManuallySet");
 inline QString timeToString(const QTime &t)
 {
     if(t == QTime(0,0,0))
-        return QStringLiteral("0:00 min");
+        return QStringLiteral("0:00");
 
     if(t.hour() > 0)
-        return t.toString(QStringLiteral("H:mm:ss")) + QStringLiteral(" hrs");
+        return t.toString(QStringLiteral("H:mm:ss"));
 
-    return t.toString(QStringLiteral("m:ss")) + QStringLiteral(" min");
+    return t.toString(QStringLiteral("m:ss"));
 }
 
 ScreenplayTextDocumentOffsets::ScreenplayTextDocumentOffsets(QObject *parent)

@@ -419,12 +419,12 @@ void ScreenplayTextDocument::setTimePerPage(const QTime &val)
 inline QString timeToString(const QTime &t)
 {
     if(t == QTime(0,0,0))
-        return QStringLiteral("00:00 min");
+        return QStringLiteral("00:00");
 
     if(t.hour() > 0)
-        return t.toString(QStringLiteral("H:mm:ss")) + QStringLiteral(" hrs");
+        return t.toString(QStringLiteral("H:mm:ss"));
 
-    return t.toString(QStringLiteral("m:ss")) + QStringLiteral(" min");
+    return t.toString(QStringLiteral("m:ss"));
 }
 
 QString ScreenplayTextDocument::timePerPageAsString() const

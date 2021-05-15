@@ -275,7 +275,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            visible: appToolBarArea.width >= 1366
+            visible: appToolBarArea.width >= 1200
             onVisibleChanged: {
                 if(!visible)
                     mainTabBar.activateTab(0)
@@ -424,7 +424,7 @@ Item {
                         onAboutToShow: prepareRecentFilesList()
 
                         MenuItem2 {
-                            text: "Open File"
+                            text: "Open.."
                             onClicked: fileOpenButton.doOpen()
                             Rectangle {
                                 width: parent.width; height: 1
@@ -1260,63 +1260,6 @@ Item {
             }
         }
 
-        Item {
-            id: globalTimeDisplay
-            anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
-            anchors.right: editTools.visible ? editTools.left : parent.right
-            anchors.margins: 10
-            height: parent.height
-            visible: screenplayTextDocument.editor !== null
-            property alias visibleToUser: currentTimeDisplay.visible
-            property real contentWidth: currentTimeLabel.visible ? currentTimeLabel.width + 10 : 0
-
-            Rectangle {
-                visible: currentTimeDisplay.visible
-                anchors.fill: currentTimeDisplay
-                anchors.margins: -5
-                color: primaryColors.c800.background
-                border.color: primaryColors.c300.background
-                border.width: 1
-                radius: 3
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    ToolTip.text: "Time estimates are approximate, assuming " + screenplayTextDocument.timePerPageAsString + " per page."
-                    ToolTip.delay: 1000
-                    ToolTip.visible: containsMouse
-                }
-            }
-
-            Column {
-                id: currentTimeDisplay
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                visible: width <= parent.width
-
-                Text {
-                    id: currentTimeLabel
-                    font.pixelSize: globalTimeDisplay.height*0.45
-                    font.family: scriteDocument.formatting.defaultFont.family
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: primaryColors.c800.text
-                    text: {
-                        if(screenplayTextDocument.totalTime.getHours() > 0)
-                            return Qt.formatTime(screenplayTextDocument.currentTime, "H:mm:ss")
-                        return Qt.formatTime(screenplayTextDocument.currentTime, "mm:ss")
-                    }
-                }
-
-                Text {
-                    font.pixelSize: globalTimeDisplay.height*0.15
-                    color: primaryColors.c800.text
-                    text: "( Current Time )"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-            }
-        }
-
         ScritedToolbar {
             id: scritedToolbar
             anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
@@ -1328,7 +1271,7 @@ Item {
 
         Row {
             id: editTools
-            x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2 + (globalTimeDisplay.visible ? globalTimeDisplay.contentWidth/2 : 0))
+            x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
             height: parent.height
             spacing: 20
 
@@ -1980,6 +1923,11 @@ Item {
         OpenTemplateDialog {
             onImportStarted: contentLoader.allowContent = false
             onImportFinished: contentLoader.allowContent = true
+            onImportCancelled: {
+                contentLoader.allowContent = false
+                scriteDocument.reset()
+                contentLoader.allowContent = true
+            }
         }
     }
 

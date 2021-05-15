@@ -95,6 +95,8 @@
         <file>icons/content/fight_scene_inverted.png</file>
         <file>icons/content/language.png</file>
         <file>icons/content/language_inverted.png</file>
+        <file>icons/content/page_count.png</file>
+        <file>icons/content/page_count_inverted.png</file>
         <file>icons/content/person_add.png</file>
         <file>icons/content/person_add_inverted.png</file>
         <file>icons/content/person_outline.png</file>
@@ -110,6 +112,8 @@
         <file>icons/content/select_all.png</file>
         <file>icons/content/select_all_inverted.png</file>
         <file>icons/content/shadow.png</file>
+        <file>icons/content/time.png</file>
+        <file>icons/content/time_inverted.png</file>
         <file>icons/content/undo.png</file>
         <file>icons/content/undo_inverted.png</file>
         <file>icons/editor/format_bold.png</file>
