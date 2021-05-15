@@ -520,7 +520,7 @@ Item {
                             transformOrigin: Item.Center
                             verticalAlignment: Text.AlignTop
                             rotation: isBreakElement ? -90 : 0
-                            horizontalAlignment: Text.AlignHCenter
+                            horizontalAlignment: isBreakElement ? Text.AlignHCenter : Text.AlignLeft
                             maximumLineCount: isBreakElement ? 1 : 4
                             font.pointSize: isBreakElement ? (minFontSize*1.25) : minFontSize
                             visible: isBreakElement ? true : width >= 80
