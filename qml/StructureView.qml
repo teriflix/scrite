@@ -35,10 +35,11 @@ Item {
 
         Flow {
             id: toolbarLayout
-            spacing: 3
-            height: parent.height-4
+            spacing: 1
+            height: parent.height-5
             anchors.horizontalCenter: parent.horizontalCenter
             flow: Flow.TopToBottom
+            layoutDirection: Qt.RightToLeft
             property real columnWidth: newSceneButton.width
 
             ToolButton3 {

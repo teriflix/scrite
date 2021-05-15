@@ -44,94 +44,63 @@ Item {
         }
     }
 
-    Item {
+    Rectangle {
         id: screenplayTools
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.margins: 1
-        width: 60
         z: 1
+        color: accentColors.c100.background
+        width: screenplayToolsLayout.width+4
+        border.color: accentColors.borderColor
+        border.width: 1
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
 
-        ScrollView {
-            anchors.top: parent.top
-            anchors.topMargin: 10
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 10
+        Flow {
+            id: screenplayToolsLayout
+            spacing: 1
+            height: parent.height-5
             anchors.horizontalCenter: parent.horizontalCenter
-            width: screenplayToolsLayout.width
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOff
+            flow: Flow.TopToBottom
+            layoutDirection: Qt.RightToLeft
+            property real columnWidth: newSceneButton.width
 
-            Column {
-                id: screenplayToolsLayout
-                width: 40
-
-                ToolButton3 {
-                    iconSource: "../icons/content/clear_all.png"
-                    ToolTip.text: "Clear the screenplay, while retaining the scenes."
-                    enabled: !scriteDocument.readOnly
-                    suggestedWidth: 30; suggestedHeight: 30
-                    onClicked: {
-                        askQuestion({
-                            "question": "Are you sure you want to clear the screenplay?",
-                            "okButtonText": "Yes",
-                            "cancelButtonText": "No",
-                            "callback": function(val) {
-                                if(val) {
-                                    screenplayElementList.forceActiveFocus()
-                                    scriteDocument.screenplay.clearElements()
-                                }
-                            }
-                        }, this)
-                    }
-                }
-
-                ToolButton3 {
-                    iconSource: "../icons/navigation/zoom_in.png"
-                    ToolTip.text: "Increase size of blocks in this view."
-                    onClicked: {
-                        zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
-                        screenplayElementList.updateCacheBuffer()
-                    }
-                    autoRepeat: true
-                    suggestedWidth: 30; suggestedHeight: 30
-                }
-
-                ToolButton3 {
-                    iconSource: "../icons/navigation/zoom_out.png"
-                    ToolTip.text: "Decrease size of blocks in this view."
-                    onClicked: {
-                        zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
-                        screenplayElementList.updateCacheBuffer()
-                    }
-                    autoRepeat: true
-                    suggestedWidth: 30; suggestedHeight: 30
-                }
-
-                ToolButton3 {
-                    iconSource: "../icons/content/add_box.png"
-                    ToolTip.text: "Add a act, episode or interval break."
-                    autoRepeat: false
-                    suggestedWidth: 30; suggestedHeight: 30
-                    enabled: !scriteDocument.readOnly &&
-                             (scriteDocument.screenplay.elementCount === 0 ||
-                             scriteDocument.screenplay.currentElementIndex >= 0)
-                    onClicked: breakElementMenu.popup(width,height/2)
-                    down: breakElementMenu.visible
-
-                    Menu2 {
-                        id: breakElementMenu
-
-                        Repeater {
-                            model: app.enumerationModel(scriteDocument.screenplay, "BreakType")
-
-                            MenuItem2 {
-                                text: modelData.key
-                                onClicked: scriteDocument.screenplay.insertBreakElement(modelData.value, scriteDocument.screenplay.currentElementIndex+1)
+            ToolButton3 {
+                iconSource: "../icons/content/clear_all.png"
+                ToolTip.text: "Clear the screenplay, while retaining the scenes."
+                enabled: !scriteDocument.readOnly
+                onClicked: {
+                    askQuestion({
+                        "question": "Are you sure you want to clear the screenplay?",
+                        "okButtonText": "Yes",
+                        "cancelButtonText": "No",
+                        "callback": function(val) {
+                            if(val) {
+                                screenplayElementList.forceActiveFocus()
+                                scriteDocument.screenplay.clearElements()
                             }
                         }
-                    }
+                    }, this)
                 }
+            }
+
+            ToolButton3 {
+                iconSource: "../icons/navigation/zoom_in.png"
+                ToolTip.text: "Increase size of blocks in this view."
+                onClicked: {
+                    zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
+                    screenplayElementList.updateCacheBuffer()
+                }
+                autoRepeat: true
+            }
+
+            ToolButton3 {
+                iconSource: "../icons/navigation/zoom_out.png"
+                ToolTip.text: "Decrease size of blocks in this view."
+                onClicked: {
+                    zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
+                    screenplayElementList.updateCacheBuffer()
+                }
+                autoRepeat: true
             }
         }
     }

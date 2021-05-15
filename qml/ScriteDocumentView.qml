@@ -1876,7 +1876,7 @@ Item {
 
                     ScreenplayView {
                         anchors.fill: parent
-                        anchors.margins: 5
+                        anchors.margins: 3
                         showNotesIcon: workspaceSettings.showNotebookInStructure
                     }
                 }
@@ -1943,7 +1943,7 @@ Item {
 
                     ScreenplayView {
                         anchors.fill: parent
-                        anchors.margins: 5
+                        anchors.margins: 3
                         showNotesIcon: true
                         enableDragDrop: false
                     }
