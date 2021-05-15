@@ -15,7 +15,7 @@ Rectangle {
         anchors.fill: busyOverlayNotice
         anchors.margins: -30
         radius: 4
-        color: primaryColors.c600.background
+        color: primaryColors.c700.background
     }
 
     Column {
@@ -27,7 +27,7 @@ Rectangle {
         BusyIndicator {
             running: busyOverlay.visible
             anchors.horizontalCenter: parent.horizontalCenter
-            Material.accent: primaryColors.c600.text
+            Material.accent: primaryColors.c700.text
         }
 
         Text {
@@ -36,7 +36,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             text: busyMessage
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            color: primaryColors.c600.text
+            color: primaryColors.c700.text
         }
     }
 

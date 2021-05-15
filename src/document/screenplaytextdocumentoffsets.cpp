@@ -628,6 +628,15 @@ int ScreenplayTextDocumentOffsets::previousSceneHeadingIndex(int row) const
     return 0;
 }
 
+void ScreenplayTextDocumentOffsets::setBusy(bool val)
+{
+    if(m_busy == val)
+        return;
+
+    m_busy = val;
+    emit busyChanged();
+}
+
 inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
 {
     const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
@@ -648,10 +657,32 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
 {
     if(m_format.isNull() || m_screenplay.isNull() || m_document.isNull() || m_screenplay->elementCount() == 0)
     {
+        this->setBusy(false);
         this->setArray( QJsonArray() );
         return;
     }
 
+    if(m_busy)
+        return;
+
+    this->setBusy(true);
+
+    /**
+     * We are doing this because we want to allow some time for the UI to update itself
+     * and show the busy message, before we get into a long operation.
+     */
+    QTimer *reloadNowTimer = new QTimer(this);
+    reloadNowTimer->setInterval(100);
+    connect(reloadNowTimer, &QTimer::timeout, [=]() {
+        this->reloadDocumentNow();
+        reloadNowTimer->deleteLater();
+        this->setBusy(false);
+    });
+    reloadNowTimer->start();
+}
+
+void ScreenplayTextDocumentOffsets::reloadDocumentNow()
+{
     const qreal textWidth = m_format->pageLayout()->contentWidth();
     const qreal contentHeight = m_format->pageLayout()->contentRect().height();
     const qreal msPerPixel = (m_format->secondsPerPage() * 1000)/contentHeight;

@@ -556,9 +556,16 @@ Item {
                     width: parent.width
                     height: parent.height - videoArea.height
 
+                    Component.onCompleted: {
+                        app.execLater(screenplayOffsetsModel, 100, function() {
+                            screenplayOffsetsModel.allowScreenplay = true
+                        })
+                    }
+
                     ScreenplayTextDocumentOffsets {
                         id: screenplayOffsetsModel
-                        screenplay: scriteDocument.loading ? null : scriteDocument.screenplay
+                        property bool allowScreenplay : false
+                        screenplay: allowScreenplay ? (scriteDocument.loading ? null : scriteDocument.screenplay) : null
                         format: scriteDocument.loading ? null : scriteDocument.printFormat
 
                         Notification.title: "Time Offsets Error"
@@ -1423,5 +1430,11 @@ Item {
                 Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
             scritedViewSettings.codecsNoticeDisplayed = true
         }
+    }
+
+    BusyOverlay {
+        anchors.fill: parent
+        visible: screenplayOffsetsModel.busy
+        busyMessage: "Computing offsets & preparing screenplay for continuous scroll ..."
     }
 }

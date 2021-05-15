@@ -50,6 +50,10 @@ public:
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
+    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    bool isBusy() const { return m_busy; }
+    Q_SIGNAL void busyChanged();
+
     Q_INVOKABLE QString fileNameFrom(const QString &mediaFileNameOrUrl) const;
 
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
@@ -80,12 +84,15 @@ public:
     Q_INVOKABLE int previousSceneHeadingIndex(int row) const;
 
 private:
+    void setBusy(bool val);
     void reloadDocument();
+    void reloadDocumentNow();
     void setErrorMessage(const QString &val);
     void loadOffsets();
     void saveOffsets();
 
 private:
+    bool m_busy = false;
     QTimer *m_reloadTimer = nullptr;
     QObjectProperty<Screenplay> m_screenplay;
     QObjectProperty<QTextDocument> m_document;
