@@ -30,9 +30,8 @@ Item {
         anchors.bottom: parent.bottom
         color: primaryColors.c100.background
         width: toolbarLayout.width+4
-        border.width: 1
         border.color: primaryColors.borderColor
-        radius: 6
+        border.width: 1
 
         Flow {
             id: toolbarLayout
@@ -84,7 +83,7 @@ Item {
 
             ToolButton3 {
                 id: newAnnotationButton
-                down: newAnnotationMenu.down
+                down: newAnnotationMenu.visible
                 enabled: !scriteDocument.readOnly
                 onClicked: newAnnotationMenu.open()
                 iconSource: "../icons/action/add_annotation.png"
@@ -116,29 +115,11 @@ Item {
                 }
             }
 
-            ToolButton3 {
-                down: canvasPreview.visible
-                checked: canvasPreview.visible
-                checkable: true
-                onToggled: structureCanvasSettings.showPreview = checked
-                iconSource: "../icons/action/thumbnail.png"
-                ToolTip.text: "Preview"
-            }
-
             Rectangle {
                 width: parent.columnWidth
                 height: 1
                 color: primaryColors.separatorColor
                 opacity: 0.5
-            }
-
-            ToolButton3 {
-                iconSource: "../icons/hardware/mouse.png"
-                autoRepeat: false
-                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
-                checkable: true
-                checked: workspaceSettings.mouseWheelZoomsInStructureCanvas
-                onCheckedChanged: workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
             }
 
             ToolButton3 {
@@ -408,6 +389,31 @@ Item {
                 ShortcutsModelItem.title: "Paste"
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
+            }
+
+            Rectangle {
+                width: parent.columnWidth
+                height: 1
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
+
+            ToolButton3 {
+                iconSource: "../icons/hardware/mouse.png"
+                autoRepeat: false
+                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
+                checkable: true
+                checked: workspaceSettings.mouseWheelZoomsInStructureCanvas
+                onCheckedChanged: workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
+            }
+
+            ToolButton3 {
+                down: canvasPreview.visible
+                checked: canvasPreview.visible
+                checkable: true
+                onToggled: structureCanvasSettings.showPreview = checked
+                iconSource: "../icons/action/thumbnail.png"
+                ToolTip.text: "Preview"
             }
         }
     }
