@@ -1089,7 +1089,7 @@ Item {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.margins: 8
-                        font.family: "Arial"
+                        // font.family: "Arial"
                         font.pointSize: app.idealFontPointSize + 8
                         font.bold: true
                         color: accentColors.c600.text
@@ -1215,7 +1215,7 @@ Item {
                     Text {
                         id: beatLabel
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
-                        font.family: "Arial"
+                        // font.family: "Arial"
                         font.pointSize: app.idealFontPointSize + 3
                         anchors.bottom: parent.top
                         anchors.left: parent.left

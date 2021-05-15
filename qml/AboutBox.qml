@@ -45,7 +45,6 @@ Item {
                 id: versionText
                 x: 60 * iscale
                 y: 125 * iscale
-                font.family: "Raleway"
                 font.pixelSize: 18
                 color: "white"
                 text: app.applicationVersion

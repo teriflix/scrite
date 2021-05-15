@@ -49,7 +49,6 @@ Flickable {
                         width: parent.width
                         text: notification.title
                         wrapMode: Text.WordWrap
-                        font.family: "Raleway"
                         font.pixelSize: 20
                         font.bold: true
                         visible: text !== ""

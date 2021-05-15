@@ -247,7 +247,7 @@ RESOURCES += \
     scrite_sanskrit_font.qrc \
     scrite_tamil_font.qrc \
     scrite_telugu_font.qrc \
-    scrite_raleway_font.qrc \
+    scrite_rubik_font.qrc \
     scrite_icons.qrc \
     scrite_images.qrc \
     scrite_ui.qrc

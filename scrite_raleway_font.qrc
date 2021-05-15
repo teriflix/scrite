@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>font/Raleway/Raleway-BoldItalic.ttf</file>
-        <file>font/Raleway/Raleway-Regular.ttf</file>
-        <file>font/Raleway/Raleway-Italic.ttf</file>
-        <file>font/Raleway/Raleway-Bold.ttf</file>
-    </qresource>
-</RCC>

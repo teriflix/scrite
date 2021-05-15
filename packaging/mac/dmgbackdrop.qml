@@ -18,7 +18,7 @@ Item {
         text: "https://www.scrite.io"
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        font.family: "Raleway"
+        font.family: "Rubik"
         font.pixelSize: parent.height * 0.03
         anchors.margins: 15
         color: "#65318f"
@@ -30,15 +30,15 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.verticalCenter
         anchors.topMargin: 128
-        font.family: "Raleway"
-        font.pixelSize: parent.height * 0.035
+        font.family: "Rubik"
+        font.pixelSize: parent.height * 0.0325
         color: "gray"
     }
 
     Text {
         text: "{{VERSION}}"
         font.pixelSize: 18
-        font.family: "Raleway"
+        font.family: "Rubik"
         color: "white"
         x: parent.width * 0.045
         y: parent.height * 0.145

@@ -444,7 +444,7 @@ Item {
                             MenuItem2 {
                                 property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.nrRecentFiles-index-1]
                                 property var fileInfo: app.fileInfo(filePath)
-                                text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + fileInfo.baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                text: recentFilesFontMetrics.elidedText(fileInfo.baseName, Qt.ElideMiddle, recentFilesMenu.width)
                                 ToolTip.text: filePath
                                 ToolTip.visible: hovered
                                 onClicked: fileOpenButton.doOpen(filePath)
@@ -761,12 +761,6 @@ Item {
                         width: 300
 
                         MenuItem2 {
-                            icon.source: "../icons/action/help.png"
-                            text: "Help\tF1"
-                            onClicked: Qt.openUrlExternally(helpUrl)
-                        }
-
-                        MenuItem2 {
                             id: settingsMenuItem
                             text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "../icons/action/settings_applications.png"
@@ -818,6 +812,12 @@ Item {
                                 sequence: "Ctrl+E"
                                 onActivated: shortcutsMenuItem.activate()
                             }
+                        }
+
+                        MenuItem2 {
+                            icon.source: "../icons/action/help.png"
+                            text: "Help\tF1"
+                            onClicked: Qt.openUrlExternally(helpUrl)
                         }
 
                         MenuItem2 {

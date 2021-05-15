@@ -60,11 +60,11 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv),
       m_versionNumber(version)
 {
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-BoldItalic.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-Regular.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-Italic.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Raleway/Raleway-Bold.ttf"));
-    this->setFont( QFont("Raleway") );
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-BoldItalic.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Regular.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Italic.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Bold.ttf"));
+    this->setFont( QFont( QStringLiteral("Rubik") ) );
 
     connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
     connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);

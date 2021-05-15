@@ -50,13 +50,11 @@ Rectangle {
 
     FontMetrics {
         id: minimumAppFontMetrics
-        font.family: "Raleway"
         font.pointSize: Math.min(app.idealFontPointSize-2, 12)
     }
 
     FontMetrics {
         id: idealAppFontMetrics
-        font.family: "Raleway"
         font.pointSize: app.idealFontPointSize
     }
 
