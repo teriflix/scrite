@@ -88,6 +88,10 @@ public:
     qreal previewScale() const { return m_previewScale; }
     Q_SIGNAL void previewScaleChanged();
 
+    Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
+    int itemCount() const { return m_items.size(); }
+    Q_SIGNAL void itemCountChanged();
+
     void updatePreview();
     QPicture preview() const { return m_preview; }
     Q_INVOKABLE void markPreviewDirty();

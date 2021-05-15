@@ -705,6 +705,7 @@ Item {
             BoundingBoxEvaluator {
                 id: canvasItemsBoundingBox
                 initialRect: scriteDocument.structure.annotationsBoundingBox
+                margin: 50
             }
 
             DelayedPropertyBinder {
@@ -1791,6 +1792,20 @@ Item {
             evaluator: canvasItemsBoundingBox
             backgroundColor: primaryColors.c100.background
             backgroundOpacity: 0.9
+
+            MouseArea {
+                id: jumpToMouseArea
+                anchors.fill: parent
+                enabled: canvasItemsBoundingBox.itemCount > 0
+                onClicked: {
+                    var scale = canvasItemsBoundingBox.width / previewArea.width
+                    var x = canvasItemsBoundingBox.x + mouse.x * scale - canvasScroll.width/2
+                    var y = canvasItemsBoundingBox.y + mouse.y * scale - canvasScroll.height/2
+                    var area = Qt.rect(x,y,canvasScroll.width,canvasScroll.height)
+                    canvasScroll.zoomOne()
+                    canvasScroll.ensureVisible(area)
+                }
+            }
 
             Rectangle {
                 id: viewportIndicator

@@ -141,6 +141,8 @@ void BoundingBoxEvaluator::addItem(BoundingBoxItem *item)
     connect(item, &BoundingBoxItem::previewUpdated, this, &BoundingBoxEvaluator::markPreviewDirty);
     m_items.append(item);
     this->evaluateLater();
+
+    emit itemCountChanged();
 }
 
 void BoundingBoxEvaluator::removeItem(BoundingBoxItem *item)
@@ -149,6 +151,8 @@ void BoundingBoxEvaluator::removeItem(BoundingBoxItem *item)
     disconnect(item, &BoundingBoxItem::previewUpdated, this, &BoundingBoxEvaluator::markPreviewDirty);
     m_items.removeOne(item);
     this->evaluateLater();
+
+    emit itemCountChanged();
 }
 
 void BoundingBoxEvaluator::evaluateNow()
