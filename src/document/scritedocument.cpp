@@ -941,14 +941,14 @@ void ScriteDocument::prepareAutoSave()
 
 void ScriteDocument::updateDocumentWindowTitle()
 {
-    QString title = "[";
-    if(m_fileName.isEmpty())
-        title += "noname";
-    else
-        title += m_fileName;
+    QString title;
     if(m_modified)
-        title += " *";
-    title += "] " + qApp->property("baseWindowTitle").toString();
+        title += QStringLiteral("* ");
+    if(m_fileName.isEmpty())
+        title += QStringLiteral("[noname]");
+    else
+        title += QFileInfo(m_fileName).baseName();
+    title += QStringLiteral(" - ") + qApp->property("baseWindowTitle").toString();
     this->setDocumentWindowTitle(title);
 }
 
