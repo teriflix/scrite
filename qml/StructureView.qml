@@ -1093,7 +1093,7 @@ Item {
                         font.pointSize: app.idealFontPointSize + 8
                         font.bold: true
                         color: accentColors.c600.text
-                        text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " scene": " scenes") + "</font>"
+                        text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
                     }
                 }
             }
@@ -1214,7 +1214,7 @@ Item {
 
                     Text {
                         id: beatLabel
-                        text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " scene": " scenes") + "</font>"
+                        text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
                         font.family: "Arial"
                         font.pointSize: app.idealFontPointSize + 3
                         anchors.bottom: parent.top
