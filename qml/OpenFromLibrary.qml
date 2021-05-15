@@ -83,7 +83,7 @@ Item {
         id: libraryService
         onImportStarted: {
             var library = pageView.currentIndex === 0 ? libraryService.screenplays : libraryService.templates
-            busyOverlay.busyMessage = "Loading " + " \"" + library.recordAt(index).name + "\" " + pageView.pagesArray[pageView.currentIndex].kind + " ..."
+            busyOverlay.busyMessage = "Loading \"" + library.recordAt(index).name + "\" " + pageView.pagesArray[pageView.currentIndex].kind + " ..."
             busyOverlay.visible = true
             importFromLibraryUi.importStarted()
         }

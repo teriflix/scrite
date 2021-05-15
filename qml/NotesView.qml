@@ -101,16 +101,12 @@ Item {
 
                     Column {
                         id: noteItemContent
-                        spacing: 10
+                        spacing: 4
                         width: noteItemScroll.width - (noteItemScroll.contentHeight > noteItemScroll.height ? 20 : 0)
 
-                        Rectangle {
-                            color: notesList.currentIndex === index ? Qt.tint(note.color, "#c0ffffff") : app.translucent(note.color, 0.25)
+                        Item {
                             width: parent.width
                             height: colorNoteButton.height + 4
-                            border.width: notesList.currentIndex === index ? 1 : 0
-                            border.color: app.textColorFor(note.color)
-                            radius: 6
 
                             Row {
                                 width: parent.width - 10
@@ -119,6 +115,7 @@ Item {
 
                                 Text {
                                     id: noteTitleText
+                                    font.bold: notesList.currentIndex === index
                                     font.pointSize: app.idealFontPointSize
                                     font.letterSpacing: 1
                                     text: "Note #" + (index+1)
@@ -162,21 +159,16 @@ Item {
                             }
                         }
 
-                        Item {
-                            width: parent.width
-                            height: 5
-                        }
-
                         TextField2 {
                             id: headingField
                             width: parent.width
                             height: Math.max(colorNoteButton.height, contentHeight+app.idealFontPointSize+8)
                             anchors.margins: 10
-                            label: "Heading"
+                            label: ""
                             placeholderText: "Heading"
                             font.pointSize: app.idealFontPointSize + 2
                             maximumLength: 256
-                            font.bold: true
+                            font.bold: notesList.currentIndex === index
                             text: note.heading
                             onTextChanged: note.heading = text
                             wrapMode: Text.WordWrap

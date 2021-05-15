@@ -73,8 +73,8 @@ private:
     struct Item
     {
         Item() { }
-        Item(Structure *structure) :
-            source(structure), label(QStringLiteral("Story")), color(QStringLiteral("purple")) { }
+        Item(Structure *structure) : // color is hard-coded, but it should be accentColors.c300.background
+            source(structure), label(QStringLiteral("Story")), color(QStringLiteral("#90A4AE")) { }
         Item(Scene *scene) :
             source(scene), label(NotebookTabModel::sceneLabel(scene)), color(scene->color()) { }
         Item(Character *character, const QColor &_color=Qt::blue) :
