@@ -2130,6 +2130,7 @@ Item {
 
     // This is the new style structure element delegate, where we are showing index cards like UI
     // on the structure canvas.
+    readonly property real minIndexCardHeight: 350
     Component {
         id: structureElementIndexCardUIDelegate
 
@@ -2226,7 +2227,7 @@ Item {
             }
 
             width: 350
-            height: Math.max(indexCardLayout.height+6, 350)
+            height: Math.max(indexCardLayout.height+6, minIndexCardHeight)
 
             Rectangle {
                 id: background
@@ -2319,6 +2320,8 @@ Item {
                         id: basicHeadingField
                         text: element.hasTitle ? element.title : "Index Card Title"
                         color: element.hasTitle ? "black" : "gray"
+                        topPadding: 8
+                        bottomPadding: 16
                         font.bold: true
                         font.pointSize: app.idealFontPointSize
                         font.capitalization: Font.AllUppercase
@@ -2365,6 +2368,8 @@ Item {
 
                     function maybeAssumeFocus() {
                         if(focus && lod === eHIGH && item) {
+                            if(canvas.scale < 0.5)
+                                canvasScroll.zoomOneToItem(elementItem)
                             item.selectAll()
                             item.forceActiveFocus()
                         }
@@ -2386,11 +2391,13 @@ Item {
                     }
                     TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
 
+                    property real idealHeight: Math.max(minIndexCardHeight-headingFieldLoader.height-groupsRow.height-charactersRow.height-3*parent.spacing, 200)
+
                     property bool hasFocus: false
 
                     lowDetailComponent: Rectangle {
                         clip: true
-                        height: 200
+                        height: synopsisFieldLoader.idealHeight
                         border.width: synopsisTextDisplay.truncated ? 1 : 0
                         border.color: primaryColors.borderColor
                         color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
@@ -2413,9 +2420,9 @@ Item {
                         Component.onCompleted: synopsisFieldLoader.hasFocus = false
                     }
 
-                    highDetailComponent: Column {
-                        spacing: 0
+                    highDetailComponent: Item {
                         width: parent.width
+                        height: synopsisFieldLoader.idealHeight
 
                         function assumeFocus() {
                             synopsisField.forceActiveFocus()
@@ -2426,7 +2433,7 @@ Item {
                             id: synopsisFieldFlick
                             clip: true
                             width: parent.width
-                            height: 200
+                            height: parent.height-5
                             contentWidth: synopsisField.width
                             contentHeight: synopsisField.height
                             interactive: synopsisField.activeFocus && scrollBarVisible
@@ -2515,6 +2522,7 @@ Item {
                         }
 
                         Rectangle {
+                            anchors.bottom: parent.bottom
                             width: parent.width
                             height: synopsisField.hovered || synopsisField.activeFocus ? 2 : 1
                             color: primaryColors.c500.background
@@ -2525,12 +2533,16 @@ Item {
                     onItemChanged: Qt.callLater(maybeAssumeFocus)
 
                     function maybeAssumeFocus() {
-                        if(focus && lod === eHIGH && item)
+                        if(focus && lod === eHIGH && item) {
+                            if(canvas.scale < 0.5)
+                                canvasScroll.zoomOneToItem(elementItem)
                             item.assumeFocus()
+                        }
                     }
                 }
 
                 Text {
+                    id: groupsRow
                     x: characterList.x
                     text: scriteDocument.structure.presentableGroupNames(element.scene.groups)
                     width: element.scene.hasCharacters ? characterList.width : parent.width
@@ -2541,6 +2553,7 @@ Item {
                 }
 
                 Item {
+                    id: charactersRow
                     width: parent.width
                     height: Math.max(characterList.height, dragHandle.height)
 
