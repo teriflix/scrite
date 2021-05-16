@@ -274,7 +274,7 @@ Item {
                         id: logoOverlay
                         x: 20
                         y: 20
-                        width: Math.min(videoOutput.width, videoOutput.height)*0.10
+                        width: Math.max(Math.min(videoOutput.width, videoOutput.height)*0.10, 80)
                         height: width
                         visible: mediaIsLoaded
                         source: "../images/appicon.png"
@@ -545,7 +545,7 @@ Item {
                                     font.pointSize: 20
                                     font.bold: true
                                     color: "white"
-                                    text: "Written By " + scriteDocument.screenplay.author
+                                    text: "Written by " + scriteDocument.screenplay.author
                                 }
                             }
                         }
@@ -885,7 +885,6 @@ Item {
                     Text {
                         text: "#Scrited"
                         color: "#f1be41"
-                        font.bold: true
                         font.pointSize: closingFrameOverlay.height * 0.05
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -900,6 +899,7 @@ Item {
 
                     Text {
                         font.pointSize: closingFrameOverlay.height * 0.05
+                        font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         width: parent.width
                         wrapMode: Text.WordWrap
@@ -926,7 +926,7 @@ Item {
                         color: "white"
                         opacity: 0.8
                         text: {
-                            var ret = "Written By: " + scriteDocument.screenplay.author
+                            var ret = "Written by " + scriteDocument.screenplay.author
                             if(filmStudioLogo.visible)
                                 return ret
                             ret += "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
@@ -942,7 +942,7 @@ Item {
                         visible: imagePath !== ""
                         property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
                         source: imagePath === "" ? "" : "file:///" + imagePath
-                        smooth: true
+                        mipmap: true
                         fillMode: Image.PreserveAspectFit
                     }
                 }
@@ -959,74 +959,43 @@ Item {
                 running: false
 
                 function rollback() {
-                    closingFrameOverlay.opacity = 0
-                    appLogoOverlay.opacity = 0
-                    callToActionOverlay.opacity = 0
-                    websiteOverlay.opacity = 0
-                    teriflixLogoOverlay.opacity = 0
+                    closingFrameOverlay.visible = false
+                    closingMediaPlayer.stop()
                     mediaPlayer.volume = 1
                 }
 
                 ScriptAction {
-                    script: closingFrameAnimation.rollback()
-                }
-
-                ParallelAnimation {
-                    NumberAnimation {
-                        target: mediaPlayer
-                        property: "volume"
-                        from: 1
-                        to: 0.2
-                        duration: 1500
-                    }
-
-                    NumberAnimation {
-                        target: closingFrameOverlay
-                        property: "opacity"
-                        from: 0
-                        to: 1
-                        duration: 1500
+                    script: {
+                        closingMediaPlayer.stop()
+                        closingMediaPlayer.play()
+                        closingFrameOverlay.visible = true
+                        closingFrameVideo.visible = true
+                        closingFrameImage.visible = false
                     }
                 }
 
                 NumberAnimation {
-                    target: appLogoOverlay
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    duration: 1000
-                }
-
-                NumberAnimation {
-                    target: callToActionOverlay
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    duration: 1000
-                }
-
-                NumberAnimation {
-                    target: websiteOverlay
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    duration: 1000
-                }
-
-                NumberAnimation {
-                    target: teriflixLogoOverlay
-                    property: "opacity"
-                    from: 0
-                    to: 8
-                    duration: 1000
+                    target: mediaPlayer
+                    property: "volume"
+                    from: 1
+                    to: 0.2
+                    duration: 3500
                 }
 
                 PauseAnimation {
-                    duration: 1000
+                    duration: 1500
                 }
 
                 ScriptAction {
-                    script: mediaPlayer.pause()
+                    script: {
+                        mediaPlayer.pause()
+                        closingFrameVideo.visible = false
+                        closingFrameImage.visible = true
+                    }
+                }
+
+                PauseAnimation {
+                    duration: 2000
                 }
             }
 
@@ -1034,53 +1003,31 @@ Item {
                 id: closingFrameOverlay
                 color: "black"
                 anchors.fill: parent
-                opacity: 0
+                visible: false
 
-                Column {
-                    id: closingFrameOverlayContent
-                    spacing: closingFrameOverlay.height * 0.025
-                    width: parent.width * 0.8
+                MediaPlayer {
+                    id: closingMediaPlayer
+                    autoPlay: false
+                    source: "qrc:/misc/scrited_closing_frame_video.mp4"
+                }
+
+                VideoOutput {
+                    id: closingFrameVideo
+                    width: Math.min(parent.width, parent.height)
+                    height: width
                     anchors.centerIn: parent
+                    source: closingMediaPlayer
+                    flushMode: VideoOutput.LastFrame
+                    fillMode: VideoOutput.Stretch
+                }
 
-                    Image {
-                        id: appLogoOverlay
-                        source: "../images/appicon.png"
-                        smooth: true
-                        width: parent.width * 0.2
-                        fillMode: Image.PreserveAspectFit
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: 2*parent.spacing
-                    }
-
-                    Text {
-                        id: callToActionOverlay
-                        text: "Screenwrite with <b>Scrite</b>"
-                        color: "#f1be41"
-                        font.pointSize: closingFrameOverlay.height * 0.075
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Text {
-                        id: websiteOverlay
-                        text: "www.scrite.io"
-                        color: "white"
-                        font.pointSize: closingFrameOverlay.height * 0.075
-                        font.family: "Courier Prime"
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Image {
-                        id: teriflixLogoOverlay
-                        source: "../images/teriflix_logo_inverted.png"
-                        smooth: true
-                        width: parent.width * 0.2
-                        fillMode: Image.PreserveAspectFit
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                Image {
+                    id: closingFrameImage
+                    width: Math.min(parent.width, parent.height)
+                    height: width
+                    anchors.centerIn: parent
+                    mipmap: true
+                    source: "../images/scrited_closing_frame.jpeg"
                 }
             }
         }

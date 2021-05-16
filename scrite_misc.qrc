@@ -4,5 +4,6 @@
         <file>misc/annotations_metadata.json</file>
         <file>misc/fetchogattribs.js</file>
         <file>misc/structure_groups.lst</file>
+        <file>misc/scrited_closing_frame_video.mp4</file>
     </qresource>
 </RCC>

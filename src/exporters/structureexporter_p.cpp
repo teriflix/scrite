@@ -1116,7 +1116,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
     if(!screenplay->author().isEmpty())
     {
         QGraphicsTextItem *authorItem = new QGraphicsTextItem(this);
-        authorItem->setPlainText(QStringLiteral("Written By: ") + screenplay->author());
+        authorItem->setPlainText(QStringLiteral("Written by ") + screenplay->author());
 
         QFont authorFont = ::applicationFont();
         authorFont.setPointSize(authorFont.pointSize()+5);
