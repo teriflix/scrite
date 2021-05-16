@@ -1860,7 +1860,7 @@ Item {
                     screenplayEditor2.width = screenplayEditor2.SplitView.preferredWidth
                 }
 
-                if(contentLoader.sessionId !== scriteDocument.sessionId) {
+                if(structureCanvasSettings.showPullHandleAnimation && contentLoader.sessionId !== scriteDocument.sessionId) {
                     app.execLater(splitViewAnimationLoader, 250, function() {
                         splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
                     })

@@ -180,6 +180,7 @@ Rectangle {
         property color canvasColor: accentColors.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true
+        property bool showPullHandleAnimation: true
         property real connectorLineWidth: 2
     }
 

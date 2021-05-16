@@ -235,6 +235,16 @@ Item {
                     }
                 }
 
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text { text: "Structure" }
+
+                    CheckBox2 {
+                        checked: structureCanvasSettings.showPullHandleAnimation
+                        text: "Show Pull Handle Animation"
+                        onToggled: structureCanvasSettings.showPullHandleAnimation = checked
+                    }
+                }
             }
 
         }
