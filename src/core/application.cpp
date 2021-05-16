@@ -285,8 +285,16 @@ QJsonObject Application::systemFontInfo()
     QFontDatabase &fontdb = Application::fontDatabase();
 
     static QJsonObject ret;
+
+    static QMutex retLock;
+    QMutexLocker locker(&retLock);
+
     if(ret.isEmpty())
     {
+
+        // Load all fonts, we will need it at some point anyway
+        fontdb.families();
+
         const QStringList allFamilies = fontdb.families( QFontDatabase::Latin );
         QStringList families;
         std::copy_if (allFamilies.begin(), allFamilies.end(),

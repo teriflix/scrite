@@ -27,6 +27,7 @@
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QFontDatabase>
+#include <QtConcurrentRun>
 #include <QQuickTextDocument>
 #include <QAbstractTextDocumentLayout>
 
@@ -130,11 +131,6 @@ TransliterationEngine::TransliterationEngine(QObject *parent)
         lang = Language(val);
     }
     this->setLanguage(lang);
-
-    // The first call to QFontDatabase::families() is quite slow.
-    // We are better off sucking up that time here than elsewhere during UI
-    // refresh
-    ::Application::fontDatabase().families();
 }
 
 TransliterationEngine::~TransliterationEngine()
