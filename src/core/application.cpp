@@ -1082,7 +1082,10 @@ QString Application::camelCased(const QString &val) const
             }
         }
         else
-            capitalize = !ch.isLetter();
+        {
+            const QList<QChar> exclude = QList<QChar>() << QChar('\'');
+            capitalize = !ch.isLetter() && !exclude.contains(ch);
+        }
     }
 
     return val2;
