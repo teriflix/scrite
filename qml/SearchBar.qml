@@ -21,45 +21,20 @@ Item {
     width: 300
     height: searchBarLayout.height
     property real borderWidth: 0
-    property bool hasFocus: txtSearch.activeFocus
+    property bool hasFocus: txtSearch.activeFocus || txtReplace.activeFocus
     property bool allowReplace: false
-    property bool focusOnShortcut: false
+    property bool showReplace: false
     clip: true
-
-    Shortcut {
-        sequence: "Ctrl+F"
-        enabled: searchBar.focusOnShortcut
-        context: Qt.WindowShortcut
-        onActivated: searchBar.forceSearchFocus()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+Shift+F"
-        enabled: searchBar.focusOnShortcut && allowReplace
-        context: Qt.WindowShortcut
-        onActivated: {
-            replaceUiRect.visible = true
-            if(txtSearch.text === "")
-                searchBar.forceSearchFocus()
-            else
-                searchBar.forceReplaceFocus()
-        }
-    }
-
-    function forceSearchFocus() {
-        txtSearch.forceActiveFocus()
-    }
-
-    function forceReplaceFocus() {
-        if(txtReplace.visible)
-            txtReplace.forceActiveFocus()
-        else
-            txtSearch.forceActiveFocus()
-    }
 
     Behavior on height {
         enabled: screenplayEditorSettings.enableAnimations
         NumberAnimation { duration: 100 }
+    }
+
+    signal showReplaceRequest(bool flag)
+
+    function assumeFocus() {
+        txtSearch.forceActiveFocus()
     }
 
     property SearchEngine searchEngine: SearchEngine { }
@@ -187,18 +162,18 @@ Item {
                     down: checked
                     checked: replaceUiRect.visible
                     checkable: true
-                    onToggled: replaceUiRect.visible = checked
+                    onToggled: showReplaceRequest(!showReplace)
                     suggestedHeight: 40
                     hoverEnabled: true
                     visible: allowReplace
-                    ToolTip.text: checked ? "Hide replace field." : "Show replace field."
+                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + app.polishShortcutTextForDisplay("Ctrl+Shift+F") + ")"
                 }
             }
         }
 
         Rectangle {
             id: replaceUiRect
-            visible: false
+            visible: showReplace
             width: parent.width
             height: Math.max(txtReplace.height, replaceButtonsRow.height)
             color: primaryColors.c10.background

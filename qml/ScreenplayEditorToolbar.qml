@@ -21,7 +21,8 @@ Row {
     property SceneDocumentBinder binder
     property TextArea editor
     property alias showScreenplayPreview: screenplayPreviewButton.checked
-    property alias showFindAndReplace: findAndReplaceButton.checked
+    property alias showFind: findButton.checked
+    property bool showReplace: false
 
     signal requestScreenplayEditor()
 
@@ -48,17 +49,39 @@ Row {
     }
 
     ToolButton3 {
-        id: findAndReplaceButton
+        id: findButton
         iconSource: "../icons/action/search.png"
         shortcut: "Ctrl+F"
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
         enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
+        onToggled: {
+            if(!checked)
+                showReplace = false
+        }
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find"
         ShortcutsModelItem.shortcut: shortcut
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+F"
+        onActivated: {
+            if(showReplace)
+                showReplace = false
+            else {
+                findButton.checked = true
+                showReplace = !showReplace
+            }
+        }
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Find & Replace"
+        ShortcutsModelItem.shortcut: sequence
     }
 
     ToolButton3 {

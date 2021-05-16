@@ -98,10 +98,15 @@ Rectangle {
         border.width: 1
         border.color: primaryColors.borderColor
         visible: opacity > 0
-        opacity: globalScreenplayEditorToolbar.showFindAndReplace ? 1 : 0
+        opacity: globalScreenplayEditorToolbar.showFind ? 1 : 0
         Behavior on opacity {
             enabled: screenplayEditorSettings.enableAnimations
             NumberAnimation { duration: 100 }
+        }
+
+        onVisibleChanged: {
+            if(visible)
+                screenplaySearchBar.assumeFocus()
         }
 
         SearchBar {
@@ -109,8 +114,10 @@ Rectangle {
             searchEngine.objectName: "Screenplay Search Engine"
             anchors.horizontalCenter: parent.horizontalCenter
             allowReplace: !scriteDocument.readOnly
+            showReplace: globalScreenplayEditorToolbar.showReplace
             width: toolbar.width * 0.6
             enabled: !screenplayPreview.active
+            onShowReplaceRequest: globalScreenplayEditorToolbar.showReplace = flag
 
             Repeater {
                 id: searchAgents

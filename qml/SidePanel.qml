@@ -27,7 +27,6 @@ Item {
     property bool expanded: false
     property alias content: contentLoader.sourceComponent
     property alias contentInstance: contentLoader.item
-    property real contentAreaSize: Qt.size(contentLoaderArea.width,contentLoaderArea.height)
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
