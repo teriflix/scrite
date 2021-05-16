@@ -725,36 +725,62 @@ Rectangle {
         }
 
         Item {
-            width: pageRulerArea.width
+            anchors.right: metricsDisplay.right
+            anchors.left: zoomSlider.left
+            anchors.margins: 5
+            clip: true
             height: parent.height
-            anchors.centerIn: parent
-            visible: parent.width - metricsDisplay.width - zoomSlider.width > width
 
-            Text {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: ruler.rightMarginPx
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: height*0.1
-                font.family: headingFontMetrics.font.family
-                font.pixelSize: parent.height * 0.6
-                elide: Text.ElideRight
-                text: {
+            Item {
+                property real pageIndentation: pageRulerArea.x
+                onPageIndentationChanged: Qt.callLater(placeSelf)
+
+                function placeSelf() {
+                    x = parent.mapFromItem(contentView, 0, 0).x
+                }
+
+                Component.onCompleted: placeSelf()
+                width: contentView.width
+                height: parent.height
+
+                property ScreenplayElement currentSceneElement: {
                     if(screenplayAdapter.isSourceScene || screenplayAdapter.elementCount === 0)
-                        return ""
+                        return null
 
-                    var scene = null
                     var element = null
                     if(contentView.isVisible(screenplayAdapter.currentIndex)) {
-                        scene = screenplayAdapter.currentScene
                         element = screenplayAdapter.currentElement
                     } else {
                         var data = screenplayAdapter.at(contentView.firstItemIndex)
-                        scene = data ? data.scene : null
                         element = data ? data.screenplayElement : null
                     }
-                    return scene && scene.heading.enabled ? "[" + element.resolvedSceneNumber + "] " + scene.heading.text : ''
+
+                    return element
+                }
+                property Scene currentScene: currentSceneElement ? currentSceneElement.scene : null
+                property SceneHeading currentSceneHeading: currentScene && currentScene.heading.enabled ? currentScene.heading : null
+
+                Text {
+                    id: currentSceneNumber
+                    anchors.verticalCenter: currentSceneHeadingText.verticalCenter
+                    anchors.left: currentSceneHeadingText.left
+                    anchors.leftMargin: Math.min(-88 * zoomLevel, -contentWidth)
+                    font: currentSceneHeadingText.font
+                    text: parent.currentSceneHeading ? parent.currentSceneElement.resolvedSceneNumber + ". " : ''
+                }
+
+                Text {
+                    id: currentSceneHeadingText
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: ruler.leftMarginPx
+                    anchors.rightMargin: ruler.rightMarginPx
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: height*0.1
+                    font.family: headingFontMetrics.font.family
+                    font.pixelSize: parent.height * 0.6
+                    elide: Text.ElideRight
+                    text: parent.currentSceneHeading ? parent.currentSceneHeading.text : ''
                 }
             }
         }
