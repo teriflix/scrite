@@ -725,8 +725,8 @@ Rectangle {
         }
 
         Item {
-            anchors.right: metricsDisplay.right
-            anchors.left: zoomSlider.left
+            anchors.left: metricsDisplay.right
+            anchors.right: zoomSlider.left
             anchors.margins: 5
             clip: true
             height: parent.height
@@ -742,6 +742,7 @@ Rectangle {
                 Component.onCompleted: placeSelf()
                 width: contentView.width
                 height: parent.height
+                visible: x > 0
 
                 property ScreenplayElement currentSceneElement: {
                     if(screenplayAdapter.isSourceScene || screenplayAdapter.elementCount === 0)

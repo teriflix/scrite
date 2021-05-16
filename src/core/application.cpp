@@ -291,7 +291,6 @@ QJsonObject Application::systemFontInfo()
 
     if(ret.isEmpty())
     {
-
         // Load all fonts, we will need it at some point anyway
         fontdb.families();
 
