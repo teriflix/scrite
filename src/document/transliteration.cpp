@@ -63,12 +63,6 @@ static QStringList getCustomFontFilePaths()
     return customFonts;
 }
 
-static QFontDatabase &GlobalFontDatabase()
-{
-    static QFontDatabase theGlobalFontDatabase;
-    return theGlobalFontDatabase;
-}
-
 TransliterationEngine *TransliterationEngine::instance(QCoreApplication *app)
 {
     static TransliterationEngine *newInstance = new TransliterationEngine(app ? app : qApp);
@@ -140,7 +134,7 @@ TransliterationEngine::TransliterationEngine(QObject *parent)
     // The first call to QFontDatabase::families() is quite slow.
     // We are better off sucking up that time here than elsewhere during UI
     // refresh
-    ::GlobalFontDatabase().families();
+    ::Application::fontDatabase().families();
 }
 
 TransliterationEngine::~TransliterationEngine()
@@ -576,7 +570,7 @@ QString TransliterationEngine::transliteratedParagraph(const QString &paragraph,
 
 QFont TransliterationEngine::languageFont(TransliterationEngine::Language language, bool preferAppFonts) const
 {
-    const QFontDatabase &fontDb = ::GlobalFontDatabase();
+    const QFontDatabase &fontDb = ::Application::fontDatabase();
     const QString preferredFontFamily = m_languageFontFamily.value(language);
 
     QString fontFamily = preferAppFonts ? preferredFontFamily : QString();
@@ -605,7 +599,7 @@ QJsonObject TransliterationEngine::availableLanguageFontFamilies(Transliteration
     {
         HourGlass hourGlass;
 
-        const QFontDatabase &fontDb = ::GlobalFontDatabase();
+        const QFontDatabase &fontDb = ::Application::fontDatabase();
         const QStringList languageFontFamilies = fontDb.families(writingSystemForLanguage(language));
         std::copy_if (languageFontFamilies.begin(), languageFontFamilies.end(),
                       std::back_inserter(filteredLanguageFontFamilies), [fontDb,language](const QString &family) {
@@ -645,7 +639,7 @@ void TransliterationEngine::setPreferredFontFamilyForLanguage(TransliterationEng
         m_languageFontFamily[language] = builtInFontFamily;
     else
     {
-        const QFontDatabase &fontDb = ::GlobalFontDatabase();
+        const QFontDatabase &fontDb = ::Application::fontDatabase();
         const QList<QFontDatabase::WritingSystem> writingSystems = fontDb.writingSystems(fontFamily);
         if( writingSystems.contains(writingSystemForLanguage(language)) )
             m_languageFontFamily[language] = fontFamily;

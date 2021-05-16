@@ -151,7 +151,9 @@ public:
     QString redoText() const { return m_undoGroup->redoText(); }
     Q_SIGNAL void redoTextChanged();
 
-    Q_INVOKABLE QJsonObject systemFontInfo() const;
+    static QFontDatabase &fontDatabase();
+
+    Q_INVOKABLE static QJsonObject systemFontInfo();
     Q_INVOKABLE QColor pickColor(const QColor &initial) const;
     Q_INVOKABLE QString colorName(const QColor &color) const { return color.name(); }
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;

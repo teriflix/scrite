@@ -15,6 +15,7 @@
 #include "hourglass.h"
 #include "autoupdate.h"
 #include "application.h"
+#include "timeprofiler.h"
 #include "execlatertimer.h"
 #include "scritedocument.h"
 
@@ -44,6 +45,7 @@
 #include <QJsonDocument>
 #include <QStandardPaths>
 #include <QtConcurrentMap>
+#include <QtConcurrentRun>
 #include <QOperatingSystemVersion>
 #include <QNetworkConfigurationManager>
 
@@ -129,6 +131,8 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     m_networkConfiguration->allConfigurations(QNetworkConfiguration::Active);
     connect(m_networkConfiguration, &QNetworkConfigurationManager::onlineStateChanged,
             this, &Application::internetAvailableChanged);
+
+    QtConcurrent::run(&Application::systemFontInfo);
 }
 
 Application::~Application()
@@ -268,11 +272,17 @@ UndoStack *Application::findUndoStack(const QString &objectName) const
     return nullptr;
 }
 
-QJsonObject Application::systemFontInfo() const
+QFontDatabase &Application::fontDatabase()
+{
+    static QFontDatabase theGlobalFontDatabase;
+    return theGlobalFontDatabase;
+}
+
+QJsonObject Application::systemFontInfo()
 {
     HourGlass hourGlass;
 
-    QFontDatabase fontdb;
+    QFontDatabase &fontdb = Application::fontDatabase();
 
     static QJsonObject ret;
     if(ret.isEmpty())

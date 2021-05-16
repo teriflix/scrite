@@ -145,6 +145,7 @@ Item {
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
                     label: Text { text: "Auto Save" }
+                    height: screenplayEditorSettingsGroupBox.height
 
                     Column {
                         width: parent.width
@@ -174,6 +175,7 @@ Item {
                 }
 
                 GroupBox {
+                    id: screenplayEditorSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
                     label: Text {
                         text: "Screenplay Editor"
@@ -209,6 +211,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 GroupBox {
+                    id: timelineSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
                     label: Text { text: "Timeline" }
 
@@ -239,10 +242,21 @@ Item {
                     width: (parent.width - parent.spacing)/2
                     label: Text { text: "Structure" }
 
-                    CheckBox2 {
-                        checked: structureCanvasSettings.showPullHandleAnimation
-                        text: "Show Pull Handle Animation"
-                        onToggled: structureCanvasSettings.showPullHandleAnimation = checked
+                    Column {
+                        spacing: 20
+                        width: parent.width
+
+                        Text {
+                            width: parent.width
+                            text: "Turn on/off pull handle animations on the structure canvas."
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        }
+
+                        CheckBox2 {
+                            checked: structureCanvasSettings.showPullHandleAnimation
+                            text: "Show Pull Handle Animation"
+                            onToggled: structureCanvasSettings.showPullHandleAnimation = checked
+                        }
                     }
                 }
             }
