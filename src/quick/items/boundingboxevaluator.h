@@ -23,6 +23,7 @@
 #include <QPointer>
 #include <QQmlEngine>
 #include <QQuickItem>
+#include <QThreadPool>
 #include <QQuickPaintedItem>
 
 #include "qobjectproperty.h"
@@ -92,10 +93,9 @@ public:
     int itemCount() const { return m_items.size(); }
     Q_SIGNAL void itemCountChanged();
 
-    void updatePreview();
-    QPicture preview() const { return m_preview; }
+    QPicture preview() const;
     Q_INVOKABLE void markPreviewDirty();
-    Q_SIGNAL void previewNeedsUpdate();
+    Q_SIGNAL void previewUpdated();
 
     Q_INVOKABLE void recomputeBoundingBox() { this->evaluateNow(); }
 
@@ -105,6 +105,9 @@ protected:
     void evaluateLater() { m_evaluationTimer.start(100, this); }
     void evaluateNow();
 
+    void updatePreview();
+    QPicture createPreviewPicture() const;
+
 private:
     void addItem(BoundingBoxItem *item);
     void removeItem(BoundingBoxItem* item);
@@ -112,12 +115,17 @@ private:
 
 private:
     friend class BoundingBoxItem;
+    friend class BoundingBoxPreview;
+
     qreal m_margin = 0;
+    QPicture m_preview;
+    qreal m_previewScale = 1.0;
     QRectF m_initialRect;
     QRectF m_boundingBox;
-    qreal m_previewScale = 1.0;
-    QPicture m_preview;
+    QThreadPool m_threadPool;
+    mutable QMutex m_previewLock;
     ExecLaterTimer m_evaluationTimer;
+    ExecLaterTimer m_updatePreviewTimer;
     QList<BoundingBoxItem*> m_items;
 };
 
@@ -259,10 +267,11 @@ public:
     void paint(QPainter *painter);
 
 private:
-    void redraw() { this->update(); }
+    void updatePreviewImage();
     void resetEvaluator();
 
 private:
+    QImage m_previewImage;
     QColor m_backgroundColor = Qt::white;
     qreal m_backgroundOpacity = 1.0;
     QObjectProperty<BoundingBoxEvaluator> m_evaluator;

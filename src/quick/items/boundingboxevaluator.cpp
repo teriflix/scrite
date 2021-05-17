@@ -12,16 +12,26 @@
 ****************************************************************************/
 
 #include "application.h"
+#include "timeprofiler.h"
 #include "boundingboxevaluator.h"
 #include "boundingboxevaluator.h"
 
 #include <QPainter>
+#include <QFutureWatcher>
+#include <QtConcurrentRun>
 #include <QQuickItemGrabResult>
 
 BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent)
     : QObject(parent)
 {
-
+    /**
+      Preview updates are time consumping operations and hence are done
+      on a background thread. Since we need such operations to run on
+      a background thread, but sequentially, we need to dump them all
+      into one single thread. That's why we are going to configure
+      the thread pool to contain exactly one thread.
+      */
+    m_threadPool.setMaxThreadCount(1);
 }
 
 BoundingBoxEvaluator::~BoundingBoxEvaluator()
@@ -60,61 +70,10 @@ void BoundingBoxEvaluator::setPreviewScale(qreal val)
     emit previewScaleChanged();
 }
 
-void BoundingBoxEvaluator::updatePreview()
+QPicture BoundingBoxEvaluator::preview() const
 {
-#ifndef QT_NO_DEBUG
-    qDebug("BoundingBoxEvaluator is updating preview picture");
-#endif
-    if(!m_preview.isNull())
-        return;
-
-    QSizeF boxSize = m_boundingBox.size();
-    boxSize *= m_previewScale;
-    if(boxSize.isEmpty())
-        return;
-
-    auto lessThan = [](BoundingBoxItem *e1, BoundingBoxItem *e2) -> bool {
-        return e1->stackOrder() < e2->stackOrder();
-    };
-    std::sort(m_items.begin(), m_items.end(), lessThan);
-
-    m_preview = QPicture();
-    m_preview.setBoundingRect( QRectF( QPointF(0,0), boxSize ).toRect() );
-
-    QTransform tx;
-    tx.translate(-m_boundingBox.left(), -m_boundingBox.top());
-    tx.scale(m_previewScale, m_previewScale);
-
-    QPainter paint(&m_preview);
-    paint.setRenderHint(QPainter::Antialiasing);
-    paint.setRenderHint(QPainter::SmoothPixmapTransform);
-    paint.setTransform(tx);
-
-    int itemIndex = 0;
-    Q_FOREACH(BoundingBoxItem *item, m_items)
-    {
-        ++itemIndex;
-        if(item->item() == nullptr)
-            continue;
-
-        const QRectF itemRect = item->boundingRect();
-        const QImage itemPreview = item->preview();
-
-        if(item->isLivePreview() && !itemPreview.isNull())
-            paint.drawImage(itemRect, itemPreview);
-        else if(item->previewBorderColor().alpha() > 0 || item->previewFillColor().alpha() > 0)
-        {
-            QPen pen(item->previewBorderColor());
-            pen.setCosmetic(true);
-            pen.setWidthF(item->previewBorderWidth());
-
-            paint.setPen(pen);
-            paint.setBrush( QBrush(item->previewFillColor()) );
-            paint.drawRect(itemRect);
-        }
-    }
-
-    paint.end();
+    QMutexLocker locker(&m_previewLock);
+    return m_preview;
 }
 
 void BoundingBoxEvaluator::timerEvent(QTimerEvent *event)
@@ -123,6 +82,11 @@ void BoundingBoxEvaluator::timerEvent(QTimerEvent *event)
     {
         m_evaluationTimer.stop();
         this->evaluateNow();
+    }
+    else if(event->timerId() == m_updatePreviewTimer.timerId())
+    {
+        m_updatePreviewTimer.stop();
+        this->updatePreview();
     }
 }
 
@@ -171,10 +135,94 @@ void BoundingBoxEvaluator::evaluateNow()
     this->markPreviewDirty();
 }
 
+void BoundingBoxEvaluator::updatePreview()
+{
+#ifndef QT_NO_DEBUG
+    qDebug("BoundingBoxEvaluator is updating preview picture");
+#endif
+    if(!m_preview.isNull())
+        return;
+
+    const QString futureWatcherName = QStringLiteral("CreatePreviewPictureFuture");
+    if( this->findChild<QFutureWatcherBase*>(futureWatcherName) != nullptr )
+        return;
+
+    QFuture<QPicture> future = QtConcurrent::run(&m_threadPool, [=]() -> QPicture {
+        return this->createPreviewPicture();
+    });
+    QFutureWatcher<QPicture> *futureWatcher = new QFutureWatcher<QPicture>(this);
+    futureWatcher->setObjectName(futureWatcherName);
+    connect(futureWatcher, &QFutureWatcher<QPicture>::finished, [=]() {
+        m_preview = future.result();
+        futureWatcher->deleteLater();
+        emit previewUpdated();
+    });
+    futureWatcher->setFuture(future);
+}
+
+QPicture BoundingBoxEvaluator::createPreviewPicture() const
+{
+    const QRectF bboxCopy = m_boundingBox;
+    const qreal scaleCopy = m_previewScale;
+    QList<BoundingBoxItem*> itemsCopy = m_items;
+
+    QMutexLocker locker(&m_previewLock);
+
+    QSizeF boxSize = bboxCopy.size();
+    boxSize *= scaleCopy;
+    if(boxSize.isEmpty())
+        return QPicture();
+
+    auto lessThan = [](BoundingBoxItem *e1, BoundingBoxItem *e2) -> bool {
+        return e1->stackOrder() < e2->stackOrder();
+    };
+    std::sort(itemsCopy.begin(), itemsCopy.end(), lessThan);
+
+    QPicture picture;
+    picture.setBoundingRect( QRectF( QPointF(0,0), boxSize ).toRect() );
+
+    QTransform tx;
+    tx.translate(-bboxCopy.left(), -bboxCopy.top());
+    tx.scale(scaleCopy, scaleCopy);
+
+    QPainter paint(&picture);
+    paint.setRenderHint(QPainter::Antialiasing);
+    paint.setRenderHint(QPainter::SmoothPixmapTransform);
+    paint.setTransform(tx);
+
+    int itemIndex = 0;
+    Q_FOREACH(BoundingBoxItem *item, itemsCopy)
+    {
+        ++itemIndex;
+        if(item->item() == nullptr)
+            continue;
+
+        const QRectF itemRect = item->boundingRect();
+        const QImage itemPreview = item->preview();
+
+        if(item->isLivePreview() && !itemPreview.isNull())
+            paint.drawImage(itemRect, itemPreview);
+        else if(item->previewBorderColor().alpha() > 0 || item->previewFillColor().alpha() > 0)
+        {
+            QPen pen(item->previewBorderColor());
+            pen.setCosmetic(true);
+            pen.setWidthF(item->previewBorderWidth());
+
+            paint.setPen(pen);
+            paint.setBrush( QBrush(item->previewFillColor()) );
+            paint.drawRect(itemRect);
+        }
+    }
+
+    paint.end();
+
+    return picture;
+}
+
 void BoundingBoxEvaluator::markPreviewDirty()
 {
     m_preview = QPicture();
-    emit previewNeedsUpdate();
+    m_updatePreviewTimer.start(100, this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -462,8 +510,14 @@ void BoundingBoxItem::determineVisibility()
 
     switch(m_visibilityMode)
     {
+    case IgnoreVisibility:
+        visible = wasVisible;
+        break;
     case AlwaysVisible:
         visible = true;
+        break;
+    case AlwaysInvisible:
+        visible = false;
         break;
     case VisibleUponViewportIntersection:
         visible = m_viewportRect.isValid() && itemRect.isValid() ? m_viewportRect.intersects(itemRect) : true;
@@ -522,12 +576,12 @@ void BoundingBoxPreview::setEvaluator(BoundingBoxEvaluator *val)
         return;
 
     if(m_evaluator != nullptr)
-        disconnect(m_evaluator, &BoundingBoxEvaluator::previewNeedsUpdate, this, &BoundingBoxPreview::redraw);
+        disconnect(m_evaluator, &BoundingBoxEvaluator::previewUpdated, this, &BoundingBoxPreview::updatePreviewImage);
 
     m_evaluator = val;
 
     if(m_evaluator != nullptr)
-        connect(m_evaluator, &BoundingBoxEvaluator::previewNeedsUpdate, this, &BoundingBoxPreview::redraw);
+        connect(m_evaluator, &BoundingBoxEvaluator::previewUpdated, this, &BoundingBoxPreview::updatePreviewImage);
 
     emit evaluatorChanged();
 
@@ -540,38 +594,80 @@ void BoundingBoxPreview::paint(QPainter *painter)
     qDebug("BoundingBoxPreview is painting");
 #endif
 
-    if(!this->isVisible())
+    if(m_evaluator == nullptr || !this->isVisible() || qFuzzyIsNull(this->opacity()))
         return;
 
-    const QRectF itemRect(0, 0, this->width(), this->height());
-    painter->setOpacity(m_backgroundOpacity);
-    painter->fillRect(itemRect, m_backgroundColor);
-    painter->setOpacity(1.0);
+    painter->drawImage(0, 0, m_previewImage);
+}
 
-    if(m_evaluator != nullptr)
-    {
-        m_evaluator->updatePreview();
+void BoundingBoxPreview::updatePreviewImage()
+{
+    if(m_evaluator == nullptr)
+        return;
+
+    auto capturePreviewAsPicture = [=]() -> QImage {
+        const QRectF pictureRect(0, 0, this->width(), this->height());
+
+        /**
+         * Why capture the preview in a QImage now? Why not QPicture?
+         * ----------------------------------------------------------
+         *
+         * Painting a QPicture on screen takes more time than painting a
+         * QImage. When measured on a MacBook Pro, I noticed that painting
+         * a QPicture takes 19ms per paint, whereas painting QImage
+         * takes only 328us. So painting a QImage is ~60 times faster than
+         * painting an image.
+         *
+         * If we take 19ms to paint a QPicture in BoundingBoxPreview::paint()
+         * we are using that time along with drawing of other times on the
+         * screen. Bad idea right?
+         */
+
+        QImage image( (pictureRect.size()*2.0).toSize(), QImage::Format_ARGB32 );
+        image.setDevicePixelRatio(2.0);
+        image.fill(Qt::transparent);
 
         QPicture preview = m_evaluator->preview();
         if(preview.isNull())
-            return;
+            return image;
+
+        QPainter painter(&image);
+        painter.setOpacity(m_backgroundOpacity);
+        painter.fillRect(pictureRect, m_backgroundColor);
+        painter.setOpacity(1.0);
 
         QSizeF previewSize = preview.boundingRect().size();
-        previewSize.scale(itemRect.size(), Qt::KeepAspectRatio);
+        previewSize.scale(pictureRect.size(), Qt::KeepAspectRatio);
 
         QRectF previewRect( QPointF(0,0), previewSize );
         // previewRect.moveCenter(itemRect.center());
 
-        painter->translate(previewRect.topLeft());
+        painter.translate(previewRect.topLeft());
 
         const qreal sx = previewSize.width() / preview.boundingRect().width();
         const qreal sy = previewSize.height() / preview.boundingRect().height();
-        painter->scale(sx, sy);
+        painter.scale(sx, sy);
 
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-        preview.play(painter);
-    }
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        preview.play(&painter);
+
+        return image;
+    };
+
+    const QString futureWatcherName = QStringLiteral("RedrawFutureWatcher");
+    if( this->findChild<QFutureWatcherBase*>(futureWatcherName) != nullptr )
+        return;
+
+    QFuture<QImage> future = QtConcurrent::run(&m_evaluator->m_threadPool, capturePreviewAsPicture);
+    QFutureWatcher<QImage> *futureWatcher = new QFutureWatcher<QImage>(this);
+    futureWatcher->setObjectName(futureWatcherName);
+    connect(futureWatcher, &QFutureWatcher<QImage>::finished, [=]() {
+        m_previewImage = future.result();
+        futureWatcher->deleteLater();
+        this->update();
+    });
+    futureWatcher->setFuture(future);
 }
 
 void BoundingBoxPreview::resetEvaluator()
