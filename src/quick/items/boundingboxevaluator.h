@@ -18,6 +18,7 @@
 
 #include <QRectF>
 #include <QImage>
+#include <QMutex>
 #include <QObject>
 #include <QPicture>
 #include <QPointer>
