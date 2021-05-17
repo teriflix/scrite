@@ -2446,7 +2446,11 @@ Rectangle {
                         id: delegateItem
                         width: sceneListView.width-1
                         height: 40
-                        color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF")) : Qt.rgba(0,0,0,0)
+                        color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF"))
+                                     : Qt.rgba(0,0,0,0.01)
+
+                        property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
+                        property bool elementIsEpisodeBreak: screenplayElementType === ScreenplayElement.BreakElementType && breakType === Screenplay.Episode
 
                         SceneTypeImage {
                             id: sceneTypeImage
@@ -2475,16 +2479,16 @@ Rectangle {
                             anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 5) + 5
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
-                            font.bold: screenplayAdapter.currentIndex === index || screenplayElementType === ScreenplayElement.BreakElementType
-                            font.pixelSize: screenplayElementType === ScreenplayElement.BreakElementType ? 16 : 14
-                            font.letterSpacing: screenplayElementType === ScreenplayElement.BreakElementType ? 3 : 0
-                            horizontalAlignment: screenplayElementType === ScreenplayElement.BreakElementType ? Qt.AlignHCenter : (scene && scene.heading.enabled ? Qt.AlignLeft : Qt.AlignRight)
-                            color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                            font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
+                            font.pixelSize: parent.elementIsBreak ? 16 : 14
+                            font.letterSpacing: parent.elementIsEpisodeBreak ? 3 : 0
+                            horizontalAlignment: parent.elementIsBreak ? Qt.AlignHCenter : Qt.AlignLeft
+                            color: primaryColors.c10.text
                             font.capitalization: Font.AllUppercase
                             text: {
                                 if(scene && scene.heading.enabled)
                                     return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
-                                if(screenplayElementType === ScreenplayElement.BreakElementType)
+                                if(parent.elementIsBreak)
                                     return screenplayElement.breakTitle
                                 return "NO SCENE HEADING"
                             }
@@ -2558,6 +2562,15 @@ Rectangle {
                             height: 2
                             color: primaryColors.borderColor
                             visible: false
+                        }
+
+                        Rectangle {
+                            anchors.top: dropIndicator.visible ? dropIndicator.bottom : parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            height: 1
+                            color: parent.elementIsEpisodeBreak ? accentColors.c200.background : accentColors.c100.background
+                            visible: parent.elementIsBreak
                         }
                     }
 
