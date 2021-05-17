@@ -933,10 +933,21 @@ void StructureElementStacks::evaluateStacks()
 
     if(m_structure->isForceBeatBoardLayout())
     {
-        Screenplay *screenplay = m_structure->scriteDocument() ?
-                    m_structure->scriteDocument()->screenplay() :
-                    ScriteDocument::instance()->screenplay();
-        m_structure->placeElementsInBeatBoardLayout(screenplay);
+        /**
+         * By instantaneously layouting the elements in the beat-board,
+         * we do not allow for follow to be set for sync by the newly created
+         * structure element on the UI. This will result in invalid layouting
+         */
+        QTimer *layoutTimer = new QTimer(this);
+        layoutTimer->setInterval(100);
+        connect(layoutTimer, &QTimer::timeout, [=]() {
+            Screenplay *screenplay = m_structure->scriteDocument() ?
+                        m_structure->scriteDocument()->screenplay() :
+                        ScriteDocument::instance()->screenplay();
+            m_structure->placeElementsInBeatBoardLayout(screenplay);
+            layoutTimer->deleteLater();
+        });
+        layoutTimer->start();
     }
 }
 
