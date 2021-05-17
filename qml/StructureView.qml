@@ -443,6 +443,15 @@ Item {
         property Item maybeDragItem
         property bool isZoomFit: false
 
+        onEditItemChanged: {
+            if(editItem) {
+                app.execLater(canvasScroll, 500, function() {
+                    if(canvasScroll.editItem !== null && canvas.scale < 0.5)
+                        canvasScroll.zoomOneToItem(canvasScroll.editItem)
+                })
+            }
+        }
+
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth / canvas.scale,
                                            visibleArea.yPosition * contentHeight / canvas.scale,
                                            visibleArea.widthRatio * contentWidth / canvas.scale,
@@ -2368,8 +2377,6 @@ Item {
 
                     function maybeAssumeFocus() {
                         if(focus && lod === eHIGH && item) {
-                            if(canvas.scale < 0.5)
-                                canvasScroll.zoomOneToItem(elementItem)
                             item.selectAll()
                             item.forceActiveFocus()
                         }
@@ -2533,11 +2540,8 @@ Item {
                     onItemChanged: Qt.callLater(maybeAssumeFocus)
 
                     function maybeAssumeFocus() {
-                        if(focus && lod === eHIGH && item) {
-                            if(canvas.scale < 0.5)
-                                canvasScroll.zoomOneToItem(elementItem)
+                        if(focus && lod === eHIGH && item)
                             item.assumeFocus()
-                        }
                     }
                 }
 
