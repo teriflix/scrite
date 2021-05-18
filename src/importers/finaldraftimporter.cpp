@@ -47,7 +47,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     }
 
     const int fdxVersion = rootE.attribute("Version").toInt();
-    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 1 || fdxVersion > 4)
+    if(rootE.attribute("DocumentType") != "Script" || fdxVersion < 1 || fdxVersion > 5)
     {
         this->error()->setErrorMessage("Unrecognised Final Draft file version.");
         return false;
@@ -83,8 +83,6 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         QDomElement textE = paragraphE.firstChildElement("Text");
         while(!textE.isNull())
         {
-            if(!text.isEmpty())
-                text += QStringLiteral(" ");
             text += textE.text();
             textE = textE.nextSiblingElement("Text");
         }
