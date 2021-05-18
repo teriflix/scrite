@@ -1335,8 +1335,9 @@ Item {
                     onJustLoaded: {
                         var userData = scriteDocument.userData
                         if(userData.mainTabBar) {
-                            if(userData.mainTabBar >= 0 && userData.mainTabBar <= 2)
-                                mainTabBar.activateTab(userData.mainTabBar)
+                            var ci = userData.mainTabBar.currentIndex
+                            if(ci >= 0 && ci <= 2)
+                                mainTabBar.activateTab(ci)
                             else
                                 mainTabBar.activateTab(0)
                         } else
