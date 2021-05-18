@@ -228,12 +228,36 @@ Item {
         onActivated: mainTabBar.currentIndex = 3
     }
 
+    Connections {
+        target: scriteDocument
+        onJustReset: {
+            editorBusyOveray.visible = true
+            screenplayAdapter.initialLoadTreshold = 25
+            app.execLater(screenplayAdapter, 250, function() {
+                screenplayAdapter.sessionId = scriteDocument.sessionId
+                editorBusyOveray.visible = false
+            })
+        }
+        onJustLoaded: {
+            var firstElement = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.firstSceneIndex())
+            if(firstElement) {
+                var editorHints = firstElement.editorHints
+                if(editorHints) {
+                    screenplayAdapter.initialLoadTreshold = -1
+                    screenplayEditorSettings.displaySceneCharacters = editorHints.displaySceneCharacters
+                    screenplayEditorSettings.displaySceneSynopsis = editorHints.displaySceneSynopsis
+                    return
+                }
+            }
+        }
+    }
+
     ScreenplayAdapter {
         id: screenplayAdapter
-        // source: scriteDocument.loading ? null : scriteDocument.screenplay
         onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
+        property string sessionId
         source: {
-            if(scriteDocument.loading)
+            if(scriteDocument.sessionId !== sessionId)
                 return null
 
             if(mainTabBar.currentIndex === 0)
@@ -1299,6 +1323,7 @@ Item {
 
                 Connections {
                     target: scriteDocument
+                    onJustReset: mainTabBar.activateTab(0)
                     onAboutToSave: {
                         var userData = scriteDocument.userData
                         userData["mainTabBar"] = {
@@ -1309,9 +1334,12 @@ Item {
                     }
                     onJustLoaded: {
                         var userData = scriteDocument.userData
-                        if(userData.mainTabBar)
-                            mainTabBar.activateTab(userData.mainTabBar.currentIndex)
-                        else
+                        if(userData.mainTabBar) {
+                            if(userData.mainTabBar >= 0 && userData.mainTabBar <= 2)
+                                mainTabBar.activateTab(userData.mainTabBar)
+                            else
+                                mainTabBar.activateTab(0)
+                        } else
                             mainTabBar.activateTab(0)
                     }
                 }
@@ -1319,6 +1347,9 @@ Item {
                 function activateTab(index) {
                     if(index < 0 || index >= tabs.length)
                         return
+                    var tab = tabs[index]
+                    if(!tab.visible)
+                        index = 0
                     var message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
                     scriteDocument.setBusyMessage(message)
                     app.execLater(mainTabBar, 100, function() {
@@ -2195,5 +2226,12 @@ Item {
     Component.onCompleted: {
         if(!app.restoreWindowGeometry(qmlWindow, "Workspace"))
             workspaceSettings.screenplayEditorWidth = -1
+        screenplayAdapter.sessionId = scriteDocument.sessionId
+    }
+
+    BusyOverlay {
+        id: editorBusyOveray
+        anchors.fill: parent
+        busyMessage: "Loading screenplay ..."
     }
 }

@@ -403,7 +403,7 @@ void ScriteDocument::reset()
         eventLoop.processEvents();
 #endif
 
-    emit justLoaded();
+    emit justReset();
 }
 
 void ScriteDocument::open(const QString &fileName)

@@ -12,9 +12,10 @@
 ****************************************************************************/
 
 #include "screenplay.h"
+#include "application.h"
+#include "scritedocument.h"
 #include "garbagecollector.h"
 #include "screenplayadapter.h"
-#include "scritedocument.h"
 
 ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
     : QIdentityProxyModel(parent),
@@ -60,17 +61,26 @@ void ScreenplayAdapter::setSource(QObject *val)
     this->setCurrentIndex(-1);
 
     m_source = val;
+    m_maxRows = MAX_ELEMENT_COUNT;
 
     if(m_source != nullptr)
     {
         Screenplay *screenplay = qobject_cast<Screenplay*>(m_source);
         if(screenplay != nullptr)
         {
-            this->setSourceModel(screenplay);
+            if(m_initialLoadTreshold < 0 || screenplay->elementCount() <= m_initialLoadTreshold)
+                m_maxRows = MAX_ELEMENT_COUNT;
+            else
+            {
+                m_maxRows = 0;
+                screenplay->setCurrentElementIndex(-1);
+            }
 
             connect(this, &ScreenplayAdapter::currentIndexChanged, screenplay, &Screenplay::setCurrentElementIndex);
             connect(screenplay, &Screenplay::currentElementIndexChanged, this, &ScreenplayAdapter::setCurrentIndex);
             connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this, &ScreenplayAdapter::hasNonStandardScenesChanged);
+
+            this->setSourceModel(screenplay);
         }
         else
         {
@@ -158,6 +168,15 @@ bool ScreenplayAdapter::hasNonStandardScenes() const
     return false;
 }
 
+void ScreenplayAdapter::setInitialLoadTreshold(int val)
+{
+    if(m_initialLoadTreshold == val)
+        return;
+
+    m_initialLoadTreshold = val;
+    emit initialLoadTresholdChanged();
+}
+
 ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition)
 {
     Screenplay *screenplay = qobject_cast<Screenplay*>(m_source);
@@ -243,7 +262,48 @@ int ScreenplayAdapter::rowCount(const QModelIndex &parent) const
         return 0;
 
     const Screenplay *screenplay = this->screenplay();
-    return m_source.isNull() || screenplay == nullptr ? 0 : screenplay->elementCount();
+    return m_source.isNull() || screenplay == nullptr ? 0 : qMin(screenplay->elementCount(), m_maxRows);
+}
+
+void ScreenplayAdapter::fetchMore(const QModelIndex &parent)
+{
+    if(parent.isValid())
+        return;
+
+    if(this->isSourceScreenplay())
+    {
+        const Screenplay *screenplay = this->screenplay();
+        const int delta = m_initialLoadTreshold < 0 ? MAX_ELEMENT_COUNT : m_initialLoadTreshold;
+        const int is = qMax(0, qMin(m_maxRows-1, screenplay->elementCount()-1));
+        const int ie = qMin(screenplay->elementCount()-1, is+delta);
+        if(ie > is)
+            this->beginInsertRows(QModelIndex(), is, ie);
+        m_maxRows = ie >= screenplay->elementCount()-1 ? MAX_ELEMENT_COUNT : ie+1;
+        if(ie > is)
+        {
+            this->endInsertRows();
+
+            if(m_maxRows < INT_MAX && m_fetchMoreTimer.isNull())
+            {
+                m_fetchMoreTimer = new QTimer(this);
+                connect(m_fetchMoreTimer, &QTimer::timeout, this, &ScreenplayAdapter::continueFetchingMore);
+                m_fetchMoreTimer->setInterval(500);
+                m_fetchMoreTimer->setSingleShot(false);
+                m_fetchMoreTimer->start();
+            }
+        }
+    }
+}
+
+bool ScreenplayAdapter::canFetchMore(const QModelIndex &parent) const
+{
+    if(parent.isValid())
+        return false;
+
+    if(this->isSourceScreenplay())
+        return m_maxRows < INT_MAX;
+
+    return false;
 }
 
 void ScreenplayAdapter::setCurrentIndexInternal(int val)
@@ -324,6 +384,21 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
 void ScreenplayAdapter::clearCurrentIndex()
 {
     this->setCurrentIndexInternal(-1);
+}
+
+void ScreenplayAdapter::continueFetchingMore()
+{
+    if(this->canFetchMore(QModelIndex()))
+    {
+        this->fetchMore(QModelIndex());
+        if(m_fetchMoreTimer)
+            m_fetchMoreTimer->setInterval(10);
+    }
+    else if(m_fetchMoreTimer)
+    {
+        m_fetchMoreTimer->stop();
+        m_fetchMoreTimer->deleteLater();
+    }
 }
 
 void ScreenplayAdapter::updateCurrentIndexAndCount()

@@ -1837,6 +1837,8 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
     {
         for(ScreenplayElement *element : qAsConst(m_elements))
             element->setEditorHints(QJsonValue());
+
+        this->setCurrentElementIndex(-1);
     }
 }
 

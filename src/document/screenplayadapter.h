@@ -14,6 +14,8 @@
 #ifndef SCREENPLAYADAPTER_H
 #define SCREENPLAYADAPTER_H
 
+#include <QTimer>
+#include <QPointer>
 #include <QIdentityProxyModel>
 
 #include "qobjectproperty.h"
@@ -22,6 +24,8 @@ class Scene;
 class Screenplay;
 class SceneElement;
 class ScreenplayElement;
+
+#define MAX_ELEMENT_COUNT 16777216 // 2^24
 
 class ScreenplayAdapter : public QIdentityProxyModel
 {
@@ -65,6 +69,11 @@ public:
     bool hasNonStandardScenes() const;
     Q_SIGNAL void hasNonStandardScenesChanged();
 
+    Q_PROPERTY(int initialLoadTreshold READ initialLoadTreshold WRITE setInitialLoadTreshold NOTIFY initialLoadTresholdChanged)
+    void setInitialLoadTreshold(int val);
+    int initialLoadTreshold() const { return m_initialLoadTreshold; }
+    Q_SIGNAL void initialLoadTresholdChanged();
+
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
     Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
     Q_INVOKABLE int previousSceneElementIndex();
@@ -77,18 +86,24 @@ public:
     QHash<int,QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    void fetchMore(const QModelIndex &parent);
+    bool canFetchMore(const QModelIndex &parent) const;
 
 private:
     void setCurrentIndexInternal(int val);
     void setCurrentElement(ScreenplayElement* val);
     QVariant data(ScreenplayElement *element, int row, int role) const;
 
-    void clearCurrentIndex();
-    void updateCurrentIndexAndCount();
     void resetSource();
+    void clearCurrentIndex();
+    void continueFetchingMore();
+    void updateCurrentIndexAndCount();
 
 private:
+    int m_maxRows = MAX_ELEMENT_COUNT;
     int m_currentIndex = -1;
+    int m_initialLoadTreshold = -1;
+    QPointer<QTimer> m_fetchMoreTimer;
     QObjectProperty<QObject> m_source;
     QObjectProperty<ScreenplayElement> m_currentElement;
 };

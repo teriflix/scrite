@@ -183,6 +183,7 @@ public:
     Q_INVOKABLE void save();
 
     Q_SIGNAL void aboutToSave();
+    Q_SIGNAL void justReset();
     Q_SIGNAL void justSaved();
     Q_SIGNAL void justLoaded();
 
