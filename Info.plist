@@ -19,9 +19,9 @@
     <key>CFBundleIdentifier</key>
     <string>com.teriflix.scrite</string>
     <key>CFBundleVersion</key>
-    <string>0.6.7</string>
+    <string>0.4.13</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.6.7</string>
+    <string>0.4.13</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.productivity</string>
     <key>Vendor</key>
@@ -29,7 +29,7 @@
     <key>NOTE</key>
     <string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
     <key>NSSupportsAutomaticGraphicsSwitching</key>
-    <true/>
+    <false/>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
