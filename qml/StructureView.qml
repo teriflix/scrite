@@ -446,7 +446,7 @@ Item {
         onEditItemChanged: {
             if(editItem) {
                 app.execLater(canvasScroll, 500, function() {
-                    if(canvasScroll.editItem !== null && canvas.scale < 0.5)
+                    if(canvasScroll.editItem !== null && canvas.scaleIsLessForEdit)
                         canvasScroll.zoomOneToItem(canvasScroll.editItem)
                 })
             }
@@ -632,9 +632,9 @@ Item {
                 ColorAnimation { duration: 250 }
             }
 
-            property bool scaleLessThanHalf: scale < 0.5
-            onScaleLessThanHalfChanged: {
-                if(scaleLessThanHalf)
+            property bool scaleIsLessForEdit: (350*canvas.scale < canvasScroll.height*0.25)
+            onScaleIsLessForEditChanged: {
+                if(scaleIsLessForEdit)
                     canvasTabSequence.releaseFocus()
             }
 
@@ -2168,7 +2168,7 @@ Item {
             }
 
             function zoomOneForFocus() {
-                if(canvas.scale < 0.65)
+                if(canvas.scaleIsLessForEdit)
                     canvasScroll.zoomOneToItem(elementItem)
             }
 
@@ -2311,7 +2311,7 @@ Item {
                 LodLoader {
                     id: headingFieldLoader
                     width: parent.width
-                    lod: elementItem.selected ? eHIGH : eLOW
+                    lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
 
                     TabSequenceItem.enabled: elementItem.stackedOnTop
                     TabSequenceItem.manager: canvasTabSequence
@@ -2351,14 +2351,11 @@ Item {
                         font.pointSize: app.idealFontPointSize
                         font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        readOnly: scriteDocument.readOnly || canvas.scale < 0.5
+                        readOnly: scriteDocument.readOnly
                         onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
                         onActiveFocusChanged: {
-                            if(activeFocus) {
+                            if(activeFocus)
                                 elementItem.select()
-                                if(!readOnly)
-                                    elementItem.zoomOneForFocus()
-                            }
                             headingFieldLoader.hasFocus = activeFocus
                         }
                         Keys.onEscapePressed: canvasTabSequence.releaseFocus()
@@ -2386,7 +2383,7 @@ Item {
                 LodLoader {
                     id: synopsisFieldLoader
                     width: parent.width
-                    lod: elementItem.selected ? eHIGH : eLOW
+                    lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
 
                     TabSequenceItem.enabled: elementItem.stackedOnTop
                     TabSequenceItem.manager: canvasTabSequence
@@ -2462,14 +2459,12 @@ Item {
                                 placeholderText: "Describe what happens in this scene."
                                 font.pointSize: app.idealFontPointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                readOnly: scriteDocument.readOnly || canvas.scale < 0.5
+                                readOnly: scriteDocument.readOnly
                                 text: element.scene.title
                                 onTextChanged: element.scene.title = text
                                 onActiveFocusChanged: {
                                     if(activeFocus) {
                                         elementItem.select()
-                                        if(!readOnly)
-                                            elementItem.zoomOneForFocus()
                                         cursorFocusAnimation.active = true
                                     } else
                                         element.scene.trimTitle()
@@ -2733,8 +2728,7 @@ Item {
                     property bool allowDeactivate: false
 
                     Component.onCompleted: {
-                        if(canvas.scale < 1)
-                            canvasScroll.zoomOneToItem(elementItem)
+                        elementItem.zoomOneForFocus()
                         forceActiveFocus()
                         app.execLater(deleteConfirmationItem, 500, function() {
                             deleteConfirmationItem.allowDeactivate = true
