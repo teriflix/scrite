@@ -16,6 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
+import QtQuick.Controls.Material 2.12
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -263,7 +264,7 @@ Rectangle {
                         width: contentView.width
 
                         active: false
-                        sourceComponent: modelData.scene ? contentComponent : breakComponent
+                        sourceComponent: modelData.scene ? contentComponent : (modelData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)
 
                         /*
                         Profiler.context: "ScreenplayEditorContentDelegate"
@@ -827,83 +828,88 @@ Rectangle {
     }
 
     Component {
-        id: breakComponent
+        id: episodeBreakComponent
 
-        Item {
-            id: breakItem
+        Rectangle {
+            id: episodeBreakItem
             property int theIndex: componentIndex
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
-            height: breakTitle.height+breakSubtitleLoader.height+10
+            height: episodeBreakSubtitle.height + headingFontMetrics.lineSpacing*0.1
+            color: primaryColors.c10.background
 
-            Rectangle {
-                anchors.fill: parent
-                color: accentColors.windowColor
-                border.width: 1
-                border.color: accentColors.borderColor
-                opacity: 0.25
+            TextField {
+                id: episodeBreakTitle
+                maximumLength: 5
+                width: headingFontMetrics.averageCharacterWidth*maximumLength
+                anchors.right: episodeBreakSubtitle.left
+                anchors.rightMargin: ruler.leftMarginPx * 0.075
+                anchors.bottom: parent.bottom
+                text: "Ep " + (theElement.episodeIndex+1)
+                readOnly: true
+                visible: episodeBreakSubtitle.length > 0
+                font: episodeBreakSubtitle.font
+                background: Item { }
+            }
+
+            TextField2 {
+                id: episodeBreakSubtitle
+                label: ""
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: ruler.leftMarginPx
+                anchors.rightMargin: ruler.rightMarginPx
+                anchors.bottom: parent.bottom
+                placeholderText: theElement.breakTitle
+                font.family: headingFontMetrics.font.family
+                font.bold: headingFontMetrics.font.bold
+                font.italic: headingFontMetrics.font.italic
+                font.underline: headingFontMetrics.font.underline
+                font.pointSize: headingFontMetrics.font.pointSize+2
+                font.capitalization: headingFontMetrics.font.capitalization
+                text: theElement.breakSubtitle
+                enableTransliteration: true
+                onTextEdited: theElement.breakSubtitle = text
+                onEditingComplete: theElement.breakSubtitle = text
+            }
+        }
+    }
+
+    Component {
+        id: actBreakComponent
+
+        Rectangle {
+            id: actBreakItem
+            property int theIndex: componentIndex
+            property Scene theScene: componentData.scene
+            property ScreenplayElement theElement: componentData.screenplayElement
+            height: actBreakTitle.height
+            color: primaryColors.c10.background
+
+            Text {
+                id: actBreakPrefix
+                font: actBreakTitle.font
+                anchors.right: actBreakTitle.left
+                anchors.rightMargin: ruler.leftMarginPx * 0.075
+                anchors.verticalCenter: actBreakTitle.verticalCenter
+                width: headingFontMetrics.averageCharacterWidth*maximumLength
+                visible: parent.theElement.breakType === Screenplay.Act && screenplayAdapter.isSourceScreenplay && screenplayAdapter.screenplay.episodeCount > 0
+                text: "Ep " + (parent.theElement.episodeIndex+1)
+                color: actBreakTitle.color
+                readonly property int maximumLength: 5
             }
 
             Text {
-                id: breakTitle
-                anchors.top: parent.top
-                anchors.topMargin: 5
-                anchors.horizontalCenter: parent.horizontalCenter
+                id: actBreakTitle
+                font: headingFontMetrics.font
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
-                horizontalAlignment: theElement.breakType === Screenplay.Episode ? Text.AlignLeft : Text.AlignHCenter
-                font.pointSize: headingFontMetrics.font.pointSize + 2
-                font.family: headingFontMetrics.font.family
-                font.bold: true
-                text: {
-                    if(parent.theElement.breakType === Screenplay.Act && screenplayAdapter.isSourceScreenplay && screenplayAdapter.screenplay.episodeCount > 0)
-                        return "Ep " + (parent.theElement.episodeIndex+1) + ": " +  parent.theElement.breakTitle
-                    return parent.theElement.breakTitle
-                }
-            }
-
-            Loader {
-                id: breakSubtitleLoader
-                anchors.top: breakTitle.bottom
-                anchors.topMargin: 5
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: ruler.rightMarginPx
-                active: theElement.breakType === Screenplay.Episode
-                sourceComponent: TextField2 {
-                    label: ""
-                    placeholderText: "Optional Episode Name"
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    maximumLength: 256
-                    font.pointSize: headingFontMetrics.font.pointSize + 2
-                    font.family: headingFontMetrics.font.family
-                    font.bold: length > 0
-                    text: breakItem.theElement.breakSubtitle
-                    onTextChanged: breakItem.theElement.breakSubtitle = text
-                    enableTransliteration: true
-                    onReturnPressed: focusOnNextScene()
-                    Keys.onTabPressed: focusOnNextScene()
-
-                    function focusOnNextScene() {
-                        var idx = breakItem.theIndex
-                        var element = null
-                        while(idx < contentView.count-1) {
-                            ++idx
-                            element = screenplayAdapter.screenplay.elementAt(idx)
-                            if(element === null)
-                                return
-                            if(element.scene !== null)
-                                break
-                        }
-
-                        contentView.scrollIntoView(idx)
-                        var item = contentView.loadedItemAtIndex(idx)
-                        item.assumeFocusAt(0)
-                    }
-                }
+                topPadding: headingFontMetrics.lineSpacing*0.15
+                bottomPadding: topPadding
+                color:  primaryColors.c10.text
+                text: parent.theElement.breakTitle
             }
         }
     }
@@ -2011,8 +2017,8 @@ Rectangle {
                     }
 
                     TextField2 {
-                        label: "Scene No."
-                        labelAlwaysVisible: true
+                        label: cursorVisible ? "Scene No." : ""
+                        labelAlwaysVisible: false
                         width: headingFontMetrics.averageCharacterWidth*maximumLength
                         text: headingItem.theElement.userSceneNumber
                         anchors.bottom: parent.bottom
@@ -2229,7 +2235,7 @@ Rectangle {
                     text: sceneCharactersListLoader.active ? scriteDocument.structure.presentableGroupNames(headingItem.theScene.groups) : ""
                     visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
                     topPadding: 5
-                    bottomPadding: 5
+                    bottomPadding: screenplayEditorSettings.displaySceneSynopsis ? 5 : 15
                 }
             }
         }
@@ -2485,7 +2491,6 @@ Rectangle {
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
                             font.pixelSize: parent.elementIsBreak ? 16 : 14
-                            font.letterSpacing: parent.elementIsEpisodeBreak ? 3 : 0
                             horizontalAlignment: parent.elementIsBreak & !sceneListView.hasEpisodes ? Qt.AlignHCenter : Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: Font.AllUppercase

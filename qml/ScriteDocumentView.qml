@@ -2233,6 +2233,6 @@ Item {
     BusyOverlay {
         id: editorBusyOveray
         anchors.fill: parent
-        busyMessage: "Loading screenplay ..."
+        busyMessage: "Loading Screenplay ..."
     }
 }

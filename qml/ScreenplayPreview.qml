@@ -70,7 +70,7 @@ Rectangle {
         id: noticeText
         font.pixelSize: 30
         anchors.centerIn: parent
-        text: "Generating preview ..."
+        text: "Generating Preview ..."
         visible: true
     }
 
@@ -198,7 +198,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 20
-            text: noticeText.visible ? "Generating preview ..." : ("Page " + (Math.max(pageView.currentIndex,0)+1) + " of " + pageRepeater.count)
+            text: noticeText.visible ? "Generating Preview ..." : ("Page " + (Math.max(pageView.currentIndex,0)+1) + " of " + pageRepeater.count)
         }
 
         ZoomSlider {
