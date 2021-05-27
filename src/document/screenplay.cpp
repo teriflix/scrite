@@ -292,6 +292,15 @@ void ScreenplayElement::setActIndex(int val)
     emit actIndexChanged();
 }
 
+void ScreenplayElement::setEpisodeIndex(int val)
+{
+    if(m_episodeIndex == val)
+        return;
+
+    m_episodeIndex = val;
+    emit episodeIndexChanged();
+}
+
 void ScreenplayElement::setElementIndex(int val)
 {
     if(m_elementIndex == val)
@@ -2015,6 +2024,7 @@ void Screenplay::evaluateSceneNumbers()
 
             element->setElementIndex(elementIndex++);
             element->setActIndex(actIndex);
+            element->setEpisodeIndex(episodeIndex);
 
             Scene *scene = element->scene();
             scene->setAct(lastActElement ? lastActElement->breakTitle() : QStringLiteral("ACT 1"));
@@ -2030,6 +2040,7 @@ void Screenplay::evaluateSceneNumbers()
             {
                 if(lastSceneElement)
                     ++actIndex;
+
                 lastActElement = element;
                 lastSceneElement = nullptr;
             }
@@ -2037,12 +2048,16 @@ void Screenplay::evaluateSceneNumbers()
             {
                 if(lastSceneElement)
                     ++episodeIndex;
+
                 actIndex = 0;
 
                 lastActElement = nullptr;
                 lastSceneElement = nullptr;
                 lastEpisodeElement = element;
             }
+
+            element->setActIndex(actIndex);
+            element->setEpisodeIndex(episodeIndex);
         }
 
         element->evaluateSceneNumber(number);

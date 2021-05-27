@@ -45,6 +45,10 @@ public:
     int actIndex() const { return m_actIndex; }
     Q_SIGNAL void actIndexChanged();
 
+    Q_PROPERTY(int episodeIndex READ episodeIndex NOTIFY episodeIndexChanged)
+    int episodeIndex() const { return m_episodeIndex; }
+    Q_SIGNAL void episodeIndexChanged();
+
     enum ElementType
     {
         SceneElementType,
@@ -136,6 +140,7 @@ protected:
     void resetScene();
     void resetScreenplay();
     void setActIndex(int val);
+    void setEpisodeIndex(int val);
     void setElementIndex(int val);
     void setBreakTitle(const QString &val);
 
@@ -152,6 +157,7 @@ private:
     bool m_selected = false;
     int m_actIndex = -1;
     int m_elementIndex = -1;
+    int m_episodeIndex = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;
     QString m_breakTitle;

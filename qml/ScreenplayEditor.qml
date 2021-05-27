@@ -292,7 +292,7 @@ Rectangle {
                             anchors.fill: parent
                             visible: !parent.active
                             border.width: 1
-                            border.color: scene.color
+                            border.color: modelData.screenplayElement.scene ? modelData.screenplayElement.scene.color : primaryColors.c400.background
                             color: modelData.screenplayElement.scene ? Qt.tint(modelData.screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
 
                             Text {
@@ -838,7 +838,6 @@ Rectangle {
 
             Rectangle {
                 anchors.fill: parent
-                anchors.margins: -4
                 color: accentColors.windowColor
                 border.width: 1
                 border.color: accentColors.borderColor
@@ -858,7 +857,11 @@ Rectangle {
                 font.pointSize: headingFontMetrics.font.pointSize + 2
                 font.family: headingFontMetrics.font.family
                 font.bold: true
-                text: parent.theElement.breakTitle
+                text: {
+                    if(parent.theElement.breakType === Screenplay.Act && screenplayAdapter.isSourceScreenplay && screenplayAdapter.screenplay.episodeCount > 0)
+                        return "Ep " + (parent.theElement.episodeIndex+1) + ": " +  parent.theElement.breakTitle
+                    return parent.theElement.breakTitle
+                }
             }
 
             Loader {
@@ -872,7 +875,7 @@ Rectangle {
                 active: theElement.breakType === Screenplay.Episode
                 sourceComponent: TextField2 {
                     label: ""
-                    placeholderText: "Optional episode name"
+                    placeholderText: "Optional Episode Name"
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     maximumLength: 256
                     font.pointSize: headingFontMetrics.font.pointSize + 2
@@ -2409,6 +2412,7 @@ Rectangle {
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
+                    property bool hasEpisodes: screenplayAdapter.isSourceScreenplay ? screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     header: Rectangle {
                         width: sceneListView.width-1
@@ -2447,7 +2451,7 @@ Rectangle {
                         width: sceneListView.width-1
                         height: 40
                         color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF"))
-                                     : Qt.rgba(0,0,0,0.01)
+                                     : screenplayAdapter.currentIndex === index ? app.translucent(accentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
                         property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
                         property bool elementIsEpisodeBreak: screenplayElementType === ScreenplayElement.BreakElementType && breakType === Screenplay.Episode
@@ -2482,14 +2486,19 @@ Rectangle {
                             font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
                             font.pixelSize: parent.elementIsBreak ? 16 : 14
                             font.letterSpacing: parent.elementIsEpisodeBreak ? 3 : 0
-                            horizontalAlignment: parent.elementIsBreak ? Qt.AlignHCenter : Qt.AlignLeft
+                            horizontalAlignment: parent.elementIsBreak & !sceneListView.hasEpisodes ? Qt.AlignHCenter : Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: Font.AllUppercase
                             text: {
                                 if(scene && scene.heading.enabled)
                                     return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
-                                if(parent.elementIsBreak)
+                                if(parent.elementIsBreak) {
+                                    if(parent.elementIsEpisodeBreak)
+                                        return screenplayElement.breakTitle + ": " + screenplayElement.breakSubtitle
+                                    if(sceneListView.hasEpisodes)
+                                        return "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
                                     return screenplayElement.breakTitle
+                                }
                                 return "NO SCENE HEADING"
                             }
                             elide: Text.ElideMiddle
@@ -2498,8 +2507,7 @@ Rectangle {
                         MouseArea {
                             id: delegateMouseArea
                             anchors.fill: parent
-                            enabled: screenplayElementType === ScreenplayElement.SceneElementType
-                            onClicked: navigateToScene()
+                            onClicked: navigateToScreenplayElement()
                             drag.target: screenplayAdapter.isSourceScreenplay && !scriteDocument.readOnly ? parent : null
                             drag.axis: Drag.YAxis
                             onPressed: {
@@ -2509,11 +2517,11 @@ Rectangle {
                                 })
                             }
                             onDoubleClicked: {
-                                navigateToScene()
+                                navigateToScreenplayElement()
                                 sceneListSidePanel.expanded = false
                             }
 
-                            function navigateToScene() {
+                            function navigateToScreenplayElement() {
                                 contentView.positionViewAtIndex(index, ListView.Beginning)
                                 screenplayAdapter.currentIndex = index
                             }
