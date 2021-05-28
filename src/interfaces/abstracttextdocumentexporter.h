@@ -52,6 +52,8 @@ public:
     virtual bool isIncludeSceneNumbers() const { return false; }
     virtual bool isIncludeSceneIcons() const { return false; }
     virtual bool isPrintEachSceneOnANewPage() const { return false; }
+    virtual bool isPrintEachActOnANewPage() const { return false; }
+    virtual bool isIncludeActBreaks() const { return false; }
 
     bool requiresConfiguration() const { return true; }
 

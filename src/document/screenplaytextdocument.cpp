@@ -381,6 +381,26 @@ void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setPrintEachActOnANewPage(bool val)
+{
+    if(m_printEachActOnANewPage == val)
+        return;
+
+    m_printEachActOnANewPage = val;
+    emit printEachActOnANewPageChanged();
+
+    this->loadScreenplayLater();
+}
+
+void ScreenplayTextDocument::setIncludeActBreaks(bool val)
+{
+    if(m_includeActBreaks == val)
+        return;
+
+    m_includeActBreaks = val;
+    emit includeActBreaksChanged();
+}
+
 void ScreenplayTextDocument::setTitlePageIsCentered(bool val)
 {
     if(m_titlePageIsCentered == val)
@@ -862,6 +882,32 @@ void ScreenplayTextDocument::loadScreenplay()
         hasEpisdoes = !episodeElements.isEmpty();
     }
 
+    const ScreenplayElement *lastPrintedElement = nullptr;
+
+    auto printActBreak = [=](QTextCursor &cursor, const ScreenplayElement *element, bool addPageBreak) {
+        QTextBlockFormat actBlockFormat;
+        if(addPageBreak)
+            actBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysBefore);
+        else {
+            const SceneElementFormat *firstParaFormat = m_formatting->elementFormat(SceneElement::Heading);
+            const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
+            const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
+            actBlockFormat.setTopMargin(blockFormat.topMargin());
+        }
+
+        cursor.insertBlock();
+        cursor.setBlockFormat(actBlockFormat);
+
+        QTextCharFormat actCharFormat;
+        actCharFormat.setFontPointSize(m_textDocument->defaultFont().pointSize());
+        actCharFormat.setFontWeight(QFont::ExtraBold);
+        cursor.setCharFormat(actCharFormat);
+
+        if(hasEpisdoes && (!lastPrintedElement || lastPrintedElement->elementType() != ScreenplayElement::BreakElementType))
+            cursor.insertText(QStringLiteral("Episode ") + QString::number(element->episodeIndex()+1) + QStringLiteral(": "));
+        cursor.insertText(element->breakTitle());
+    };
+
     const int fsi = m_screenplay->firstSceneIndex();
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
@@ -879,7 +925,7 @@ void ScreenplayTextDocument::loadScreenplay()
                 cursor.setBlockFormat(episodeBlockFormat);
 
                 QTextCharFormat episodeCharFormat;
-                episodeCharFormat.setFontPointSize(15);
+                episodeCharFormat.setFontPointSize(m_textDocument->defaultFont().pointSize()+2);
                 episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
@@ -887,7 +933,24 @@ void ScreenplayTextDocument::loadScreenplay()
 
                 if(!element->breakSubtitle().isEmpty())
                     cursor.insertText( QStringLiteral(": ") + element->breakSubtitle() );
+
+                lastPrintedElement = element;
+                continue;
             }
+
+            if(m_printEachActOnANewPage && element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Act)
+            {
+                printActBreak(cursor, element, i>0);
+                lastPrintedElement = element;
+                continue;
+            }
+        }
+
+        if(m_includeActBreaks && element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Act && lastPrintedElement != element)
+        {
+            printActBreak(cursor, element, false);
+            lastPrintedElement = element;
+            continue;
         }
 
         if(element->elementType() != ScreenplayElement::SceneElementType)
@@ -895,7 +958,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
         QTextFrameFormat frameFormat = m_sceneFrameFormat;
         const Scene *scene = element->scene();
-        if(scene != nullptr && i > fsi)
+        if(scene != nullptr && (i > fsi || element != lastPrintedElement))
         {
             SceneElement::Type firstParaType = SceneElement::Heading;
             if(!scene->heading()->isEnabled() && scene->elementCount())
@@ -911,7 +974,7 @@ void ScreenplayTextDocument::loadScreenplay()
         }
 
         if(i > 0 && m_printEachSceneOnANewPage)
-            frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);
+            frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);            
 
         // Each screenplay element (or scene) has its own frame. That makes
         // moving them in one bunch easy.
@@ -923,6 +986,8 @@ void ScreenplayTextDocument::loadScreenplay()
         // https://doc.qt.io/qt-5/richtext-cursor.html#frames
         cursor = m_textDocument->rootFrame()->lastCursorPosition();
         cursor.setBlockFormat(frameBoundaryBlockFormat);
+
+        lastPrintedElement = element;
     }
 
     if(injection != nullptr)

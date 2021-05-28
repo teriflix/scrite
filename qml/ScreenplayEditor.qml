@@ -279,7 +279,7 @@ Rectangle {
                         property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
                         onIsVisibleToUserChanged: {
                             if(!active && isVisibleToUser)
-                                Qt.callLater(load)
+                                app.execLater(contentViewDelegateLoader, 100, load)
                         }
 
                         function load() {
@@ -2516,7 +2516,7 @@ Rectangle {
                             drag.target: screenplayAdapter.isSourceScreenplay && !scriteDocument.readOnly ? parent : null
                             drag.axis: Drag.YAxis
                             onPressed: {
-                                dragHotspotItem.text = scene.heading.text
+                                dragHotspotItem.text = delegateText.text
                                 dragHotspotItem.grabToImage(function(result) {
                                     delegateItem.Drag.imageSource = result.url
                                 })

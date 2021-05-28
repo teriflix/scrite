@@ -138,6 +138,16 @@ public:
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
+    Q_PROPERTY(bool printEachActOnANewPage READ isPrintEachActOnANewPage WRITE setPrintEachActOnANewPage NOTIFY printEachActOnANewPageChanged)
+    void setPrintEachActOnANewPage(bool val);
+    bool isPrintEachActOnANewPage() const { return m_printEachActOnANewPage; }
+    Q_SIGNAL void printEachActOnANewPageChanged();
+
+    Q_PROPERTY(bool includeActBreaks READ isIncludeActBreaks WRITE setIncludeActBreaks NOTIFY includeActBreaksChanged)
+    void setIncludeActBreaks(bool val);
+    bool isIncludeActBreaks() const { return m_includeActBreaks; }
+    Q_SIGNAL void includeActBreaksChanged();
+
     Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered NOTIFY titlePageIsCenteredChanged)
     void setTitlePageIsCentered(bool val);
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
@@ -310,6 +320,8 @@ private:
     QList<Scene*> m_sceneResetList;
     ExecLaterTimer m_sceneResetTimer;
     bool m_printEachSceneOnANewPage = false;
+    bool m_printEachActOnANewPage = false;
+    bool m_includeActBreaks = false;
     ExecLaterTimer m_loadScreenplayTimer;
     QStringList m_highlightDialoguesOf;
     ExecLaterTimer m_pageBoundaryEvalTimer;

@@ -63,6 +63,30 @@ void PdfExporter::setPrintEachSceneOnANewPage(bool val)
 
     m_printEachSceneOnANewPage = val;
     emit printEachSceneOnANewPageChanged();
+
+    if(val)
+        this->setPrintEachActOnANewPage(false);
+}
+
+void PdfExporter::setPrintEachActOnANewPage(bool val)
+{
+    if(m_printEachActOnANewPage == val)
+        return;
+
+    m_printEachActOnANewPage = val;
+    emit printEachActOnANewPageChanged();
+
+    if(val)
+        this->setPrintEachSceneOnANewPage(false);
+}
+
+void PdfExporter::setIncludeActBreaks(bool val)
+{
+    if(m_includeActBreaks == val)
+        return;
+
+    m_includeActBreaks = val;
+    emit includeActBreaksChanged();
 }
 
 void PdfExporter::setUsePageBreaks(bool val)

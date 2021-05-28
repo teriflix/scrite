@@ -49,10 +49,26 @@ public:
 
     Q_CLASSINFO("printEachSceneOnANewPage_FieldLabel", "Print each scene on a new page.")
     Q_CLASSINFO("printEachSceneOnANewPage_FieldEditor", "CheckBox")
+    Q_CLASSINFO("printEachSceneOnANewPage_FieldNote", "Automatically turned off if acts are included or printed on a new page.")
     Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
     void setPrintEachSceneOnANewPage(bool val);
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
+
+    Q_CLASSINFO("printEachActOnANewPage_FieldLabel", "Print each act on a new page.")
+    Q_CLASSINFO("printEachActOnANewPage_FieldEditor", "CheckBox")
+    Q_CLASSINFO("printEachActOnANewPage_FieldNote", "Automatically includes act breaks in the generated PDF.")
+    Q_PROPERTY(bool printEachActOnANewPage READ isPrintEachActOnANewPage WRITE setPrintEachActOnANewPage NOTIFY printEachActOnANewPageChanged)
+    void setPrintEachActOnANewPage(bool val);
+    bool isPrintEachActOnANewPage() const { return m_printEachActOnANewPage; }
+    Q_SIGNAL void printEachActOnANewPageChanged();
+
+    Q_CLASSINFO("includeActBreaks_FieldLabel", "Include act breaks.")
+    Q_CLASSINFO("includeActBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeActBreaks READ isIncludeActBreaks WRITE setIncludeActBreaks NOTIFY includeActBreaksChanged)
+    void setIncludeActBreaks(bool val);
+    bool isIncludeActBreaks() const { return m_includeActBreaks; }
+    Q_SIGNAL void includeActBreaksChanged();
 
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
@@ -81,6 +97,8 @@ private:
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
     bool m_printEachSceneOnANewPage = false;
+    bool m_printEachActOnANewPage = false;
+    bool m_includeActBreaks = false;
 };
 
 #endif // PDFEXPORTER_H

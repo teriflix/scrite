@@ -248,14 +248,29 @@ Item {
     Component {
         id: editor_CheckBox
 
-        CheckBox2 {
+        Column {
             property var fieldInfo
-            text: fieldInfo.label
-            checkable: true
-            checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
-            onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
-            font.pointSize: app.idealFontPointSize
-            TabSequenceItem.manager: tabSequence
+
+            CheckBox2 {
+                id: checkBox
+                width: parent.width
+                text: fieldInfo.label
+                checkable: true
+                checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
+                onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
+                font.pointSize: app.idealFontPointSize
+                TabSequenceItem.manager: tabSequence
+            }
+
+            Text {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
+                text: fieldInfo.note
+                font.pointSize: app.idealFontPointSize-2
+                color: primaryColors.c600.background
+                visible: fieldInfo.note !== ""
+            }
         }
     }
 
