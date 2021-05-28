@@ -13,6 +13,7 @@
 
 #include "abstractshapeitem.h"
 #include "polygontesselator.h"
+#include "application.h"
 
 #include <QtQuick/QSGFlatColorMaterial>
 #include <QtQuick/QSGGeometryNode>
@@ -144,7 +145,7 @@ QSGNode *AbstractShapeItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Update
 
     const bool pathUpdated = this->updateShape();
     static const bool isSoftwareContext = qgetenv("QMLSCENE_DEVICE") == QByteArray("softwarecontext");
-    if( isSoftwareContext || m_renderingMechanism == UseQPainter )
+    if( isSoftwareContext || m_renderingMechanism == UseQPainter || m_renderingMechanism == UseAntialiasedQPainter )
         return QQuickPaintedItem::updatePaintNode(oldNode, nodeData);
 
     QQuickWindow *qmlWindow = this->window();
@@ -321,6 +322,6 @@ void AbstractShapeItem::paint(QPainter *paint)
     else
         paint->setPen(Qt::NoPen);
 
-    paint->setRenderHint(QPainter::Antialiasing, this->antialiasing());
+    paint->setRenderHint(QPainter::Antialiasing, m_renderingMechanism == UseAntialiasedQPainter);
     paint->drawPath(m_path);
 }

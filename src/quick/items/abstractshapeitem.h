@@ -44,7 +44,8 @@ public:
     enum RenderingMechanism
     {
         UseOpenGL,
-        UseQPainter
+        UseQPainter,
+        UseAntialiasedQPainter
     };
     Q_ENUM(RenderingMechanism)
     Q_PROPERTY(RenderingMechanism renderingMechanism READ renderingMechanism WRITE setRenderingMechanism NOTIFY renderingMechanismChanged)

@@ -51,8 +51,7 @@ Item {
         fillColor: active ? primaryColors.windowColor : primaryColors.c200.background
         outlineColor: primaryColors.borderColor
         outlineWidth: 2
-        renderingMechanism: PainterPathItem.UseQPainter
-        antialiasing: true
+        renderingMechanism: PainterPathItem.UseAntialiasedQPainter
         painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
 
         Text {
