@@ -2137,18 +2137,9 @@ Rectangle {
                                     }
                                 }
 
-                                Menu2 {
+                                MarkSceneAsMenu {
                                     title: "Mark Scene As"
-
-                                    Repeater {
-                                        model: app.enumerationModel(headingItem.theScene, "Type")
-
-                                        MenuItem2 {
-                                            text: modelData.key
-                                            font.bold: headingItem.theScene.type === modelData.value
-                                            onTriggered: headingItem.theScene.type = modelData.value
-                                        }
-                                    }
+                                    scene: headingItem.theScene
                                 }
 
                                 Repeater {

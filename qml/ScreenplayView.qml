@@ -548,8 +548,13 @@ Item {
                             }
 
                             if(mouse.button === Qt.RightButton) {
-                                elementItemMenu.element = element
-                                elementItemMenu.popup(this)
+                                if(element.elementType === ScreenplayElement.BreakElementType) {
+                                    breakItemMenu.element = element
+                                    breakItemMenu.popup(this)
+                                } else {
+                                    elementItemMenu.element = element
+                                    elementItemMenu.popup(this)
+                                }
                             }
                         }
                     }
@@ -680,6 +685,21 @@ Item {
     }
 
     Menu2 {
+        id: breakItemMenu
+        property ScreenplayElement element
+        onClosed: element = null
+
+        MenuItem2 {
+            text: "Remove"
+            enabled: !scriteDocument.readOnly
+            onClicked: {
+                scriteDocument.screenplay.removeElement(breakItemMenu.element)
+                breakItemMenu.close()
+            }
+        }
+    }
+
+    Menu2 {
         id: elementItemMenu
         property ScreenplayElement element
 
@@ -694,21 +714,10 @@ Item {
             }
         }
 
-        Menu2 {
+        MarkSceneAsMenu {
             title: "Mark Scene As"
-
-            Repeater {
-                model: elementItemMenu.element ? app.enumerationModelForType("Scene", "Type") : 0
-
-                MenuItem2 {
-                    text: modelData.key
-                    font.bold: elementItemMenu.element.scene.type === modelData.value
-                    onTriggered: {
-                        elementItemMenu.element.scene.type = modelData.value
-                        elementItemMenu.close()
-                    }
-                }
-            }
+            scene: elementItemMenu.element.scene
+            onTriggered: elementItemMenu.close()
         }
 
         StructureGroupsMenu {

@@ -64,5 +64,6 @@
         <file>qml/OpenTemplateDialog.qml</file>
         <file>qml/BusyOverlay.qml</file>
         <file>qml/LodLoader.qml</file>
+        <file>qml/MarkSceneAsMenu.qml</file>
     </qresource>
 </RCC>

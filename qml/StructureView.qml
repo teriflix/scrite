@@ -1686,21 +1686,10 @@ Item {
                     }
                 }
 
-                Menu2 {
+                MarkSceneAsMenu {
                     title: "Mark Scene As"
-
-                    Repeater {
-                        model: elementContextMenu.element ? app.enumerationModelForType("Scene", "Type") : 0
-
-                        MenuItem2 {
-                            text: modelData.key
-                            font.bold: elementContextMenu.element.scene.type === modelData.value
-                            onTriggered: {
-                                elementContextMenu.element.scene.type = modelData.value
-                                elementContextMenu.element = null
-                            }
-                        }
-                    }
+                    scene: elementContextMenu.element.scene
+                    onTriggered: elementContextMenu.element = null
                 }
 
                 MenuItem2 {

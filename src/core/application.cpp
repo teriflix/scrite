@@ -392,11 +392,25 @@ QJsonArray enumerationModel(const QMetaObject *metaObject, const QString &enumNa
     if( !enumInfo.isValid() )
         return ret;
 
+    auto queryEnumIcon = [=](const char *key) {
+        const QByteArray cikey = QByteArrayLiteral("enum_") + QByteArray(key) + QByteArrayLiteral("_icon");
+        const int ciIndex = metaObject->indexOfClassInfo(cikey.constData());
+        if(ciIndex < 0)
+            return QString();
+
+        const QMetaClassInfo ci = metaObject->classInfo(ciIndex);
+        return QString::fromLatin1(ci.value());
+    };
+
     for(int i=0; i<enumInfo.keyCount(); i++)
     {
         QJsonObject item;
-        item.insert("key", QString::fromLatin1(enumInfo.key(i)));
-        item.insert("value", enumInfo.value(i));
+        item.insert(QStringLiteral("key"), QString::fromLatin1(enumInfo.key(i)));
+        item.insert(QStringLiteral("value"), enumInfo.value(i));
+
+        const QString icon = queryEnumIcon(enumInfo.key(i));
+        if(!icon.isEmpty())
+            item.insert(QStringLiteral("icon"), icon);
         ret.append(item);
     }
 

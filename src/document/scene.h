@@ -257,6 +257,12 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
+    // Keep this updated and synced with SceneTypeImage.qml
+    Q_CLASSINFO("enum_Standard_icon", "../icons/content/blank.png")
+    Q_CLASSINFO("enum_Song_icon", "../icons/content/queue_mus24px.png")
+    Q_CLASSINFO("enum_Action_icon", "../icons/content/fight_scene.png")
+    Q_CLASSINFO("enum_Montage_icon", "../icons/content/camera_alt.png")
+
     enum Type { Standard=0, Song, Action, Montage };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
