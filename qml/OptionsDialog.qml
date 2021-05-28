@@ -1180,6 +1180,7 @@ Item {
             }
 
             Column {
+                id: titlePageSettingsLayout
                 width: parent.width - 80
                 anchors.centerIn: parent
                 spacing: 20
@@ -1439,10 +1440,7 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.author
                                 selectByMouse: true
-                                onTextEdited: {
-                                    scriteDocument.screenplay.author = text
-                                    titlePageSettings.author = text
-                                }
+                                onTextEdited: scriteDocument.screenplay.author = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
@@ -1474,10 +1472,7 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.contact
                                 selectByMouse: true
-                                onTextEdited: {
-                                    scriteDocument.screenplay.contact = text
-                                    titlePageSettings.contact = text
-                                }
+                                onTextEdited: scriteDocument.screenplay.contact = text
                                 font.pixelSize: 20
                                 placeholderText: "(Optional) Company / Studio name (max 100 letters)"
                                 maximumLength: 100
@@ -1505,10 +1500,7 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.address
                                 selectByMouse: true
-                                onTextEdited: {
-                                    scriteDocument.screenplay.address = text
-                                    titlePageSettings.address = text
-                                }
+                                onTextEdited: scriteDocument.screenplay.address = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Address (max 100 letters)"
@@ -1535,10 +1527,7 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.email
                                 selectByMouse: true
-                                onTextEdited: {
-                                    scriteDocument.screenplay.email = text
-                                    titlePageSettings.email = text
-                                }
+                                onTextEdited: scriteDocument.screenplay.email = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Email (max 100 letters)"
@@ -1565,10 +1554,7 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.phoneNumber
                                 selectByMouse: true
-                                onTextEdited: {
-                                    scriteDocument.screenplay.phoneNumber = text
-                                    titlePageSettings.phone = text
-                                }
+                                onTextEdited: scriteDocument.screenplay.phoneNumber = text
                                 font.pixelSize: 20
                                 maximumLength: 20
                                 placeholderText: "(Optional) Phone number (max 20 digits/letters)"
@@ -1595,10 +1581,7 @@ Item {
                                 width: parent.width-parent.spacing-labelWidth
                                 text: scriteDocument.screenplay.website
                                 selectByMouse: true
-                                onTextEdited: {
-                                    scriteDocument.screenplay.website = text
-                                    titlePageSettings.website = text
-                                }
+                                onTextEdited: scriteDocument.screenplay.website = text
                                 font.pixelSize: 20
                                 maximumLength: 150
                                 placeholderText: "(Optional) Website (max 150 letters)"
@@ -1624,6 +1607,37 @@ Item {
                         checked: scriteDocument.screenplay.titlePageIsCentered
                         onToggled: scriteDocument.screenplay.titlePageIsCentered = checked
                     }
+                }
+
+                Button2 {
+                    text: "Use As Defaults"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    hoverEnabled: true
+                    ToolTip.visible: hovered && defaultsSavedNotice.opacity === 0
+                    ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
+                    ToolTip.delay: 1000
+                    onClicked: {
+                        titlePageSettings.author = scriteDocument.screenplay.author
+                        titlePageSettings.contact = scriteDocument.screenplay.contact
+                        titlePageSettings.address = scriteDocument.screenplay.address
+                        titlePageSettings.email = scriteDocument.screenplay.email
+                        titlePageSettings.phone = scriteDocument.screenplay.phoneNumber
+                        titlePageSettings.website = scriteDocument.screenplay.website
+                        defaultsSavedNotice.opacity = true
+                    }
+                }
+            }
+
+            Text {
+                id: defaultsSavedNotice
+                anchors.top: titlePageSettingsLayout.bottom
+                anchors.topMargin: 10
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Address, Author, Contact, Email, Phone and Website field values saved as default."
+                opacity: 0
+                onOpacityChanged: {
+                    if(opacity > 0)
+                        app.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
                 }
             }
         }
