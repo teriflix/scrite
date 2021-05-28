@@ -2503,7 +2503,10 @@ Rectangle {
                         MouseArea {
                             id: delegateMouseArea
                             anchors.fill: parent
-                            onClicked: navigateToScreenplayElement()
+                            onClicked: {
+                                navigateToScreenplayElement()
+                                app.execLater(delegateMouseArea, 500, navigateToScreenplayElement)
+                            }
                             drag.target: screenplayAdapter.isSourceScreenplay && !scriteDocument.readOnly ? parent : null
                             drag.axis: Drag.YAxis
                             onPressed: {
@@ -2514,7 +2517,10 @@ Rectangle {
                             }
                             onDoubleClicked: {
                                 navigateToScreenplayElement()
-                                sceneListSidePanel.expanded = false
+                                app.execLater(delegateMouseArea, 500, function() {
+                                    delegateMouseArea.navigateToScreenplayElement()
+                                    sceneListSidePanel.expanded = false
+                                })
                             }
 
                             function navigateToScreenplayElement() {
