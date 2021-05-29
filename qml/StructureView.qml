@@ -914,6 +914,24 @@ Item {
                         }
                         onAnnotationCountChanged: annotationGripLoader.reset()
                     }
+
+                    Connections {
+                        target: scriteDocument.screenplay
+                        onCurrentElementIndexChanged: {
+                            var element = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.currentElementIndex)
+                            var info = scriteDocument.structure.queryBreakElements(element)
+                            if(info.indexes && info.indexes.length > 0) {
+                                var fi = info.indexes[0]
+                                var fe = scriteDocument.structure.elementAt(fi)
+                                if(fe === null)
+                                    return
+                                var febox = fe.geometry
+                                var topPadding = element.breakType === Screenplay.Episode ? 150 : 90
+                                febox = Qt.rect(febox.x-50, febox.y-topPadding, febox.width, febox.height)
+                                canvasScroll.ensureVisible(febox, 1, 0)
+                            }
+                        }
+                    }
                 }
             }
 

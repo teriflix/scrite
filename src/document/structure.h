@@ -35,6 +35,7 @@ class Screenplay;
 class SceneHeading;
 class ScriteDocument;
 class StructureLayout;
+class ScreenplayElement;
 class StructureElementStack;
 class StructureElementStacks;
 class StructurePositionCommand;
@@ -724,6 +725,8 @@ public:
     Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay) const;
     Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay) const;
     Q_INVOKABLE QJsonObject evaluateEpisodeAndGroupBoxes(Screenplay *screenplay, const QString &category) const;
+
+    Q_INVOKABLE QJsonObject queryBreakElements(ScreenplayElement *breakElement) const;
 
     Q_INVOKABLE void scanForMuteCharacters();
 

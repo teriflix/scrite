@@ -62,7 +62,6 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             flow: Flow.TopToBottom
             layoutDirection: Qt.RightToLeft
-            property real columnWidth: newSceneButton.width
 
             ToolButton3 {
                 iconSource: "../icons/content/clear_all.png"
@@ -534,18 +533,16 @@ Item {
 
                     MouseArea {
                         anchors.fill: parent
-                        acceptedButtons: isBreakElement ? Qt.RightButton : Qt.LeftButton|Qt.RightButton
+                        acceptedButtons: Qt.LeftButton|Qt.RightButton
                         onClicked: {
-                            if(!isBreakElement) {
-                                parent.forceActiveFocus()
-                                screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
-                                if(screenplayElementList.mutiSelectionMode)
-                                    elementItemDelegate.element.toggleSelection()
-                                else
-                                    scriteDocument.screenplay.clearSelection()
-                                scriteDocument.screenplay.currentElementIndex = index
-                                requestEditorLater()
-                            }
+                            parent.forceActiveFocus()
+                            screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
+                            if(screenplayElementList.mutiSelectionMode)
+                                elementItemDelegate.element.toggleSelection()
+                            else
+                                scriteDocument.screenplay.clearSelection()
+                            scriteDocument.screenplay.currentElementIndex = index
+                            requestEditorLater()
 
                             if(mouse.button === Qt.RightButton) {
                                 if(element.elementType === ScreenplayElement.BreakElementType) {

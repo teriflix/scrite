@@ -3001,6 +3001,69 @@ QJsonObject Structure::evaluateEpisodeAndGroupBoxes(Screenplay *screenplay, cons
     return ret;
 }
 
+QJsonObject Structure::queryBreakElements(ScreenplayElement *breakElement) const
+{
+    QJsonObject ret;
+    if(breakElement == nullptr || breakElement->screenplay() == nullptr || breakElement->elementType() != ScreenplayElement::BreakElementType)
+        return ret;
+
+    /**
+     * This function queries information about elements in the given breakElement.
+     * In case of episode break, it includes all Structure elements included in that episode.
+     * In case of act break, it only includes all Structure elements in that act.
+     */
+
+    const Screenplay *screenplay = breakElement->screenplay();
+    const QList<ScreenplayElement*> allSpElements = screenplay->getElements();
+    const int breakIndex = allSpElements.indexOf(breakElement);
+    if(breakIndex < 0)
+        return ret;
+
+    const QList<int> breakTypes =
+            breakElement->breakType() == Screenplay::Episode ?
+            (QList<int>() << Screenplay::Episode) :
+            (QList<int>() << Screenplay::Act << Screenplay::Interval);
+
+    QRectF boundingRect;
+    QJsonArray elementIndexes;
+    QList<const StructureElement*> elementsInBreak;
+    for(int i=breakIndex+1; i<allSpElements.size(); i++)
+    {
+        const ScreenplayElement *selement = allSpElements.at(i);
+        if(selement->elementType() == ScreenplayElement::BreakElementType)
+        {
+            if(breakTypes.contains(selement->breakType()))
+                break;
+
+            continue;
+        }
+
+        const Scene *scene = selement->scene();
+        if(scene == nullptr)
+            continue; // ?????
+
+        StructureElement *structureElement = scene->structureElement();
+        if(structureElement == nullptr)
+            continue; // ????
+
+        elementsInBreak << structureElement;
+        elementIndexes.append( m_elements.indexOf(structureElement) );
+
+        boundingRect |= structureElement->geometry();
+    }
+
+    ret.insert( QStringLiteral("indexes"), elementIndexes );
+
+    QJsonObject boundingBoxJson;
+    boundingBoxJson.insert(QStringLiteral("x"), boundingRect.x());
+    boundingBoxJson.insert(QStringLiteral("y"), boundingRect.y());
+    boundingBoxJson.insert(QStringLiteral("width"), boundingRect.width());
+    boundingBoxJson.insert(QStringLiteral("height"), boundingRect.height());
+    ret.insert(QStringLiteral("boundingBox"), boundingBoxJson);
+
+    return ret;
+}
+
 QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) const
 {
     QList< QPair<QString, QList<StructureElement *> > > ret;
