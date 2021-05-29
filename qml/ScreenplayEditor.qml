@@ -52,7 +52,8 @@ Rectangle {
 
     Connections {
         target: screenplayAdapter
-        onCurrentIndexChanged: {
+
+        function swithToCurrentIndex() {
             var currentIndex = screenplayAdapter.currentIndex
             if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
@@ -65,6 +66,12 @@ Rectangle {
             else
                 contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
+
+        onCurrentIndexChanged: {
+            swithToCurrentIndex()
+            app.execLater(screenplayEditor, 500, swithToCurrentIndex)
+        }
+
         onSourceChanged: {
             contentView.commentsExpandCounter = 0
             contentView.commentsExpanded = false
