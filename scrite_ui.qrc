@@ -65,5 +65,6 @@
         <file>qml/BusyOverlay.qml</file>
         <file>qml/LodLoader.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
+        <file>qml/BackupsDialogBox.qml</file>
     </qresource>
 </RCC>

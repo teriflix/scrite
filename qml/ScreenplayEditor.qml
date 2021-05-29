@@ -831,6 +831,13 @@ Rectangle {
                     value = screenplayFormat.fontZoomLevelIndex + zoomLevelModifier
                 screenplayFormat.fontZoomLevelIndex = value
             }
+
+            Connections {
+                target: screenplayFormat
+                onFontZoomLevelIndexChanged: {
+                    zoomSlider.value = screenplayFormat.fontZoomLevelIndex
+                }
+            }
         }
     }
 

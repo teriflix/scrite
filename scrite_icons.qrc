@@ -122,6 +122,8 @@
         <file>icons/editor/format_ital24px_inverted.png</file>
         <file>icons/editor/format_underline.png</file>
         <file>icons/editor/format_underline_inverted.png</file>
+        <file>icons/file/backup_open.png</file>
+        <file>icons/file/backup_open_inverted.png</file>
         <file>icons/file/file_download.png</file>
         <file>icons/file/file_download_inverted.png</file>
         <file>icons/file/file_pdf.png</file>

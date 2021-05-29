@@ -40,6 +40,7 @@
 
 #include <QDir>
 #include <QUuid>
+#include <QFuture>
 #include <QPainter>
 #include <QDateTime>
 #include <QFileInfo>
@@ -47,9 +48,306 @@
 #include <QDateTime>
 #include <QElapsedTimer>
 #include <QJsonDocument>
+#include <QFutureWatcher>
 #include <QStandardPaths>
+#include <QtConcurrentRun>
 #include <QRandomGenerator>
+#include <QFileSystemWatcher>
 #include <QScopedValueRollback>
+
+ScriteDocumentBackups::ScriteDocumentBackups(QObject *parent)
+    : QAbstractListModel(parent)
+{
+    m_reloadTimer.setSingleShot(true);
+    m_reloadTimer.setInterval(50);
+    connect(&m_reloadTimer, &QTimer::timeout, this, &ScriteDocumentBackups::reloadBackupFileInformation);
+}
+
+ScriteDocumentBackups::~ScriteDocumentBackups()
+{
+
+}
+
+QJsonObject ScriteDocumentBackups::at(int index) const
+{
+    QJsonObject ret;
+
+    if(index < 0 || index >= m_backupFiles.size())
+        return ret;
+
+    const QModelIndex idx = this->index(index, 0, QModelIndex());
+
+    const QHash<int,QByteArray> roles = this->roleNames();
+    auto it = roles.begin();
+    auto end = roles.end();
+    while(it != end)
+    {
+        ret.insert( QString::fromLatin1(it.value()), QJsonValue::fromVariant(this->data(idx, it.key())) );
+        ++it;
+    }
+
+    return ret;
+}
+
+int ScriteDocumentBackups::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_backupFiles.size();
+}
+
+QVariant ScriteDocumentBackups::data(const QModelIndex &index, int role) const
+{
+    if(!index.isValid() || index.row() < 0 || index.row() >= m_backupFiles.size())
+        return QVariant();
+
+    const QFileInfo fi = m_backupFiles.at(index.row());
+    switch(role)
+    {
+    case TimestampRole:
+        return fi.birthTime().toMSecsSinceEpoch();
+    case TimestampAsStringRole:
+        return fi.birthTime().toString();
+    case Qt::DisplayRole:
+    case FileNameRole:
+        return fi.baseName();
+    case FilePathRole:
+        return fi.absoluteFilePath();
+    case RelativeTimeRole:
+        return relativeTime(fi.birthTime());
+    case FileSizeRole:
+        return fi.size();
+    case MetaDataRole:
+        if(!m_metaDataList.at(index.row()).loaded)
+            (const_cast<ScriteDocumentBackups*>(this))->loadMetaData(index.row());
+        return m_metaDataList.at(index.row()).toJson();
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> ScriteDocumentBackups::roleNames() const
+{
+    static QHash<int, QByteArray> roles =
+        {
+            { TimestampRole, QByteArrayLiteral("timestamp") },
+            { TimestampAsStringRole, QByteArrayLiteral("timestampAsString") },
+            { RelativeTimeRole, QByteArrayLiteral("relativeTime")},
+            { FileNameRole, QByteArrayLiteral("fileName") },
+            { FilePathRole, QByteArrayLiteral("filePath") },
+            { FileSizeRole, QByteArrayLiteral("fileSize") },
+            { MetaDataRole,QByteArrayLiteral("metaData") }
+        };
+    return roles;
+}
+
+QString ScriteDocumentBackups::relativeTime(const QDateTime &dt)
+{
+    if(!dt.isValid())
+        return QStringLiteral("Unknown Time");
+
+    const QDateTime now = QDateTime::currentDateTime();
+    if(now.date() == dt.date())
+    {
+        const int secsInMin = 60;
+        const int secsInHour = secsInMin * 60;
+
+        // Just say how many minutes or hours ago.
+        const int nrSecs = dt.time().secsTo(now.time());
+        const int nrHours = nrSecs > secsInHour ? qFloor( qreal(nrSecs)/qreal(secsInHour) ) : 0;
+        const int nrSecsRemaining = nrSecs-nrHours*secsInHour;
+        const int nrMins = nrSecs > secsInMin ? qCeil( qreal(nrSecsRemaining)/qreal(secsInMin) ) : 0;
+
+        if(nrMins == 0)
+            return QStringLiteral("Less than a minute ago");
+        if(nrHours == 0)
+            return QString::number( qCeil(qreal(nrSecs)/qreal(secsInMin)) ) + QStringLiteral("m ago");
+
+        return QString::number(nrHours) + QStringLiteral("h ") + QString::number(nrMins) + QStringLiteral("m ago");
+    }
+
+    const int nrDays = dt.date().daysTo(now.date());
+    const QString time = dt.time().toString(QStringLiteral("h:mm A"));
+    switch(nrDays)
+    {
+    case 1:
+        return QStringLiteral("Yesterday @ ") + time;
+    case 2:
+        return QStringLiteral("Day before yesterday @ ") + time;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        return QString::number(nrDays) + QStringLiteral(" days ago @ ") + time;
+    default:
+        break;
+    }
+
+    if(nrDays >= 7 && nrDays < 14)
+        return QStringLiteral("Last week ") + QLocale::system().standaloneDayName(dt.date().dayOfWeek()) + " @ " + time;
+
+    if(nrDays >= 14 && nrDays < 21)
+        return QStringLiteral("Two weeks ago");
+
+    if(nrDays >= 21 && nrDays < 28)
+        return QStringLiteral("Three weeks ago");
+
+    if(nrDays >= 28 & nrDays < 60)
+        return QStringLiteral("Little more than a month ago");
+
+    return QStringLiteral("More than two months ago");
+}
+
+void ScriteDocumentBackups::setDocumentFilePath(const QString &val)
+{
+    if(m_documentFilePath == val)
+        return;
+
+    m_documentFilePath = val;
+    emit documentFilePathChanged();
+
+    this->loadBackupFileInformation();
+}
+
+void ScriteDocumentBackups::loadBackupFileInformation()
+{
+    if(m_documentFilePath.isEmpty())
+    {
+        this->clear();
+        return;
+    }
+
+    const QFileInfo fi(m_documentFilePath);
+    if(!fi.exists() || fi.suffix() != QStringLiteral("scrite"))
+    {
+        this->clear();
+        return;
+    }
+
+    const QString backupDirPath(fi.absolutePath() + QStringLiteral("/") + fi.baseName() + QStringLiteral(" Backups"));
+    QDir backupDir(backupDirPath);
+    if(!backupDir.exists())
+    {
+        this->clear();
+        return;
+    }
+
+    if(m_fsWatcher == nullptr)
+    {
+        m_fsWatcher = new QFileSystemWatcher(this);
+        connect(m_fsWatcher, SIGNAL(directoryChanged(QString)), &m_reloadTimer, SLOT(start()));
+        m_fsWatcher->addPath(backupDirPath);
+    }
+
+    m_backupFilesDir = backupDir;
+    this->reloadBackupFileInformation();
+}
+
+void ScriteDocumentBackups::reloadBackupFileInformation()
+{
+    const QString futureWatcherName = QStringLiteral("ReloadFutureWatcher");
+    if(this->findChild<QFutureWatcherBase*>(futureWatcherName,Qt::FindDirectChildrenOnly))
+    {
+        m_reloadTimer.start();
+        return;
+    }
+
+    /**
+     * Why all this circus?
+     *
+     * Depending on the kind of OS and hard-disk used, querying directory information may take
+     * a few milliseconds or maybe even up to a few seconds. We shouldn't however freeze the
+     * UI or even the business logic layer during that time. Updating the model is not a critical
+     * activity, so it can take its own sweet time.
+     *
+     * We push directory query to a separate thread and update the model whenever its job is
+     * done.
+     */
+    QFuture<QFileInfoList> future = QtConcurrent::run([=]() -> QFileInfoList {
+        return m_backupFilesDir.entryInfoList({QStringLiteral("*.scrite")}, QDir::Files, QDir::Time);
+    });
+    QFutureWatcher<QFileInfoList> *futureWatcher = new QFutureWatcher<QFileInfoList>(this);
+    futureWatcher->setObjectName(futureWatcherName);
+    connect(futureWatcher, &QFutureWatcher<QFileInfoList>::finished, [=]() {
+        futureWatcher->deleteLater();
+
+        this->beginResetModel();
+        m_backupFiles = future.result();
+        m_metaDataList.resize(m_backupFiles.size());
+        this->endResetModel();
+
+        emit countChanged();
+    });
+    futureWatcher->setFuture(future);
+}
+
+void ScriteDocumentBackups::loadMetaData(int row)
+{
+    if(row < 0 || row >= m_backupFiles.size())
+        return;
+
+    const QString futureWatcherName = QStringLiteral("loadMetaDataFuture");
+
+    const QFileInfo fi = m_backupFiles.at(row);
+    const QString fileName = fi.absoluteFilePath();
+
+    QFuture<MetaData> future = QtConcurrent::run([](const QString &fileName) -> MetaData {
+        MetaData ret;
+
+        DocumentFileSystem dfs;
+        if( !dfs.load(fileName) ) {
+            ret.loaded = true;
+            return ret;
+        }
+
+        const QJsonDocument jsonDoc = QJsonDocument::fromJson(dfs.header());
+        const QJsonObject docObj = jsonDoc.object();
+
+        const QJsonObject structure = docObj.value(QStringLiteral("structure")).toObject();
+        ret.structureElementCount = structure.value(QStringLiteral("elements")).toArray().size();
+
+        const QJsonObject screenplay = docObj.value(QStringLiteral("screenplay")).toObject();
+        ret.screenplayElementCount = screenplay.value(QStringLiteral("elements")).toArray().size();
+
+        ret.loaded = true;
+
+        return ret;
+    }, fileName);
+
+    QFutureWatcher<MetaData> *futureWatcher = new QFutureWatcher<MetaData>(this);
+    futureWatcher->setObjectName(futureWatcherName);
+    connect(futureWatcher, &QFutureWatcher<MetaData>::finished, [=]() {
+        if(row < 0 || row >= m_metaDataList.size())
+            return;
+
+        m_metaDataList.replace(row, future.result());
+
+        const QModelIndex index = this->index(row, 0);
+        emit dataChanged(index, index);
+    });
+    futureWatcher->setFuture(future);
+
+    connect(this, &ScriteDocumentBackups::modelAboutToBeReset, futureWatcher, &QObject::deleteLater);
+}
+
+void ScriteDocumentBackups::clear()
+{
+    delete m_fsWatcher;
+    m_fsWatcher = nullptr;
+
+    m_backupFilesDir = QDir();
+
+    if(m_backupFiles.isEmpty())
+        return;
+
+    this->beginResetModel();
+    m_backupFiles.clear();
+    m_metaDataList.clear();
+    m_metaDataList.squeeze();
+    this->endResetModel();
+
+    emit countChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 class DeviceIOFactories
 {
@@ -117,6 +415,9 @@ ScriteDocument::ScriteDocument(QObject *parent)
     connect(this, &ScriteDocument::userDataChanged, this, &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::modifiedChanged, this, &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged, this, &ScriteDocument::updateDocumentWindowTitle);
+    connect(this, &ScriteDocument::fileNameChanged, [=]() {
+        m_documentBackupsModel.setDocumentFilePath( m_fileName );
+    });
 
     const QVariant ase = Application::instance()->settings()->value("AutoSave/autoSaveEnabled");
     this->setAutoSave( ase.isValid() ? ase.toBool() : m_autoSave );
@@ -1706,4 +2007,14 @@ void StructureElementConnectors::reload()
             this->endRemoveRows();
         }
     }
+}
+
+QJsonObject ScriteDocumentBackups::MetaData::toJson() const
+{
+    QJsonObject ret;
+    ret.insert(QStringLiteral("loaded"), this->loaded);
+    ret.insert(QStringLiteral("structureElementCount"), this->structureElementCount);
+    ret.insert(QStringLiteral("screenplayElementCount"), this->screenplayElementCount);
+    ret.insert(QStringLiteral("sceneCount"), qMax(this->structureElementCount,this->screenplayElementCount));
+    return ret;
 }

@@ -14,6 +14,7 @@
 #ifndef SCRITEDOCUMENT_H
 #define SCRITEDOCUMENT_H
 
+#include <QDir>
 #include <QObject>
 #include <QJsonArray>
 
@@ -26,7 +27,9 @@
 #include "qobjectserializer.h"
 #include "documentfilesystem.h"
 
+class ScriteDocument;
 class AbstractExporter;
+class QFileSystemWatcher;
 class AbstractReportGenerator;
 
 class StructureElementConnectors : public QAbstractListModel
@@ -69,6 +72,68 @@ private:
         }
     };
     QList<Item> m_items;
+};
+
+class ScriteDocumentBackups : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    ~ScriteDocumentBackups();
+
+    Q_PROPERTY(QString documentFilePath READ documentFilePath NOTIFY documentFilePathChanged)
+    QString documentFilePath() const { return m_documentFilePath; }
+    Q_SIGNAL void documentFilePathChanged();
+
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const { return m_backupFiles.size(); }
+    Q_SIGNAL void countChanged();
+
+    Q_INVOKABLE QJsonObject at(int index) const;
+    Q_INVOKABLE QJsonObject latestBackup() const { return this->at(0); }
+    Q_INVOKABLE QJsonObject oldestBackup() const { return this->at(m_backupFiles.size()-1); }
+
+    // QAbstractItemModel interface
+    enum Roles
+    {
+        TimestampRole=Qt::UserRole,
+        TimestampAsStringRole,
+        RelativeTimeRole,
+        FileNameRole,
+        FilePathRole,
+        FileSizeRole,
+        MetaDataRole
+    };
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
+
+    static QString relativeTime(const QDateTime &dt);
+
+private:
+    friend class ScriteDocument;
+    ScriteDocumentBackups(QObject *parent=nullptr);
+    void setDocumentFilePath(const QString &val);
+    void loadBackupFileInformation();
+    void reloadBackupFileInformation();
+    void loadMetaData(int row);
+    void clear();
+
+private:
+    struct MetaData
+    {
+        bool loaded = false;
+        int structureElementCount = 0;
+        int screenplayElementCount = 0;
+        QJsonObject toJson() const;
+    };
+
+    QTimer m_reloadTimer;
+    QDir m_backupFilesDir;
+    QString m_documentFilePath;
+    QFileInfoList m_backupFiles;
+    QVector<MetaData> m_metaDataList;
+    QFileSystemWatcher *m_fsWatcher = nullptr;
 };
 
 class ScriteDocument : public QObject, public QObjectSerializer::Interface
@@ -187,6 +252,9 @@ public:
     Q_SIGNAL void justSaved();
     Q_SIGNAL void justLoaded();
 
+    Q_PROPERTY(QAbstractListModel* backupFilesModel READ backupFilesModel CONSTANT STORED false)
+    ScriteDocumentBackups *backupFilesModel() const { return &((const_cast<ScriteDocument*>(this))->m_documentBackupsModel); }
+
     Q_PROPERTY(QStringList supportedImportFormats READ supportedImportFormats CONSTANT)
     QStringList supportedImportFormats() const;
     Q_INVOKABLE QString importFormatFileSuffix(const QString &format) const;
@@ -279,6 +347,7 @@ private:
     QObjectProperty<Structure> m_structure;
     StructureElementConnectors m_connectors;
     QObjectProperty<Screenplay> m_screenplay;
+    ScriteDocumentBackups m_documentBackupsModel;
     QObjectProperty<ScreenplayFormat> m_formatting;
     QObjectProperty<ScreenplayFormat> m_printFormat;
     ExecLaterTimer m_evaluateStructureElementSequenceTimer;

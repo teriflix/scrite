@@ -30,7 +30,7 @@ Menu2 {
             text: modelData.key
             icon.source: modelData.icon
             enabled: scene !== null
-            font.bold: scene.type === modelData.value
+            font.bold: enabled ? scene.type === modelData.value : false
             onTriggered: {
                 scene.type = modelData.value
                 msaMenu.triggered(modelData.value)

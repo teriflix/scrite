@@ -451,6 +451,7 @@ Item {
                         MenuItem2 {
                             text: "Open..."
                             onClicked: fileOpenButton.doOpen()
+
                             Rectangle {
                                 width: parent.width; height: 1
                                 anchors.bottom: parent.bottom
@@ -475,6 +476,33 @@ Item {
                             }
                         }
                     }
+                }
+            }
+
+            ToolButton3 {
+                id: backupOpenButton
+                iconSource: "../icons/file/backup_open.png"
+                text: "Open Backup"
+                visible: scriteDocument.backupFilesModel.count > 0
+                onClicked: {
+                    modalDialog.closeable = false
+                    modalDialog.closeOnEscape = true
+                    modalDialog.popupSource = backupOpenButton
+                    modalDialog.sourceComponent = backupsDialogBoxComponent
+                    modalDialog.active = true
+                }
+
+                ToolTip.text: "Open any of the " + scriteDocument.backupFilesModel.count + " backup(s) available for this file."
+
+                Text {
+                    id: backupCountHint
+                    font.pixelSize: parent.height * 0.2
+                    font.bold: true
+                    text: scriteDocument.backupFilesModel.count
+                    padding: 2
+                    color: primaryColors.highlight.text
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
                 }
             }
 
@@ -2108,6 +2136,27 @@ Item {
         }
     }
 
+    Component {
+        id: backupsDialogBoxComponent
+
+        BackupsDialogBox {
+            onOpenInThisWindow: {
+                contentLoader.allowContent = false
+                scriteDocument.openAnonymously(filePath)
+                modalDialog.close()
+                app.execLater(contentLoader, 300, function() {
+                    contentLoader.allowContent = true
+                })
+            }
+            onOpenInNewWindow: {
+                app.launchNewInstanceAndOpenAnonymously(qmlWindow, filePath)
+                app.execLater(modalDialog, 4000, function() {
+                    modalDialog.close()
+                })
+            }
+        }
+    }
+
     Item {
         id: closeEventHandler
         width: 100
@@ -2227,6 +2276,8 @@ Item {
     Component.onCompleted: {
         if(!app.restoreWindowGeometry(qmlWindow, "Workspace"))
             workspaceSettings.screenplayEditorWidth = -1
+        if(app.maybeOpenAnonymously())
+            splashLoader.active = false
         screenplayAdapter.sessionId = scriteDocument.sessionId
     }
 

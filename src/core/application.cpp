@@ -1211,16 +1211,43 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
 
 void Application::launchNewInstance(QWindow *window)
 {
+    this->launchNewInstanceAndOpenAnonymously(window, QString());
+}
+
+void Application::launchNewInstanceAndOpenAnonymously(QWindow *window, const QString &filePath)
+{
     const QString appPath = this->applicationFilePath();
+
+    QStringList args;
+    if(!filePath.isEmpty() && QFile::exists(filePath))
+        args = QStringList({ QStringLiteral("--openAnonymously"), filePath });
+
     if(window != nullptr)
     {
         const QRect geometry = window->geometry();
-        QProcess::startDetached(appPath, QStringList() << QStringLiteral("--windowGeometry") <<
-                                QString::number(geometry.x()+30) << QString::number(geometry.y()+30) <<
-                                QString::number(geometry.width()) << QString::number(geometry.height()));
+        args += { QStringLiteral("--windowGeometry"),
+                  QString::number(geometry.x()+30), QString::number(geometry.y()+30),
+                  QString::number(geometry.width()), QString::number(geometry.height()) };
     }
     else
-        QProcess::startDetached(appPath, QStringList() << QStringLiteral("--geodelta") << QStringLiteral("30"));
+        args += { QStringLiteral("--geodelta"), QStringLiteral("30") };
+
+    QProcess::startDetached(appPath, args);
+}
+
+bool Application::maybeOpenAnonymously()
+{
+    const QStringList args = this->arguments();
+    const int oaIndex = args.indexOf( QStringLiteral("--openAnonymously") );
+    if(oaIndex < 0 || oaIndex >= args.size()-1)
+        return false;
+
+    const QString filePath = args.at(oaIndex+1);
+    if(filePath.isEmpty() || !QFile::exists(filePath))
+        return false;
+
+    ScriteDocument::instance()->openAnonymously(filePath);
+    return true;
 }
 
 void Application::toggleFullscreen(QWindow *window)
