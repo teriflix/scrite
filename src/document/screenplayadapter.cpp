@@ -410,11 +410,6 @@ void ScreenplayAdapter::updateCurrentIndexAndCount()
         this->setCurrentIndexInternal(-1);
 
     emit elementCountChanged();
-
-    // Lets approximate for now that row number changes for everybody
-    const QModelIndex start = this->index(0, 0);
-    const QModelIndex end = this->index( this->rowCount()-1, 0 );
-    emit dataChanged(start, end);
 }
 
 void ScreenplayAdapter::resetSource()
