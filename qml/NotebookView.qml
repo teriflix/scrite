@@ -52,7 +52,7 @@ Item {
         notebookTabsView.currentIndex = 0
     }
 
-    function switchToSceneTab(scene) {
+    function switchToSceneTab() {
         // if(noteSources.activeScene === scene)
         notebookTabsView.currentIndex = 1
     }

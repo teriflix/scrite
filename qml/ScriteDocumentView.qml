@@ -83,6 +83,7 @@ Item {
         property bool showLanguageRefreshNoticeBox: true
         property bool showSpellCheckRefreshNoticeBox: true
         property bool showLoglineEditor: false
+        property bool allowTaggingOfScenes: false
         onEnableAnimationsChanged: {
             modalDialog.animationsEnabled = enableAnimations
             statusText.enableAnimations = enableAnimations
@@ -927,6 +928,12 @@ Item {
                                 icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
                             }
+
+                            MenuItem2 {
+                                text: "Allow Tagging Of Scenes"
+                                icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
+                            }
                         }
                     }
                 }
@@ -1660,7 +1667,7 @@ Item {
 
             onAdditionalSceneMenuItemClicked: {
                 if(menuItemName === "Scene Notes")
-                    Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", scene)
+                    Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", undefined)
             }
         }
     }

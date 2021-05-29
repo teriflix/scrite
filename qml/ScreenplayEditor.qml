@@ -2065,7 +2065,7 @@ Rectangle {
 
                     TextField2 {
                         id: sceneHeadingField
-                        width: parent.width - sceneMenuButton.width - parent.spacing
+                        width: parent.width - sceneMenuButton.width - parent.spacing - (sceneTaggingButton.visible ? (sceneTaggingButton.width+parent.spacing) : 0)
                         text: headingItem.theScene.heading.text
                         enabled: headingItem.theScene.heading.enabled
                         label: ""
@@ -2108,6 +2108,34 @@ Rectangle {
                                 return one + two + three
                             }
                             return suggestion
+                        }
+                    }
+
+                    ToolButton3 {
+                        id: sceneTaggingButton
+                        iconSource: "../icons/action/tag.png"
+                        visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
+                        down: sceneTagMenuLoader.active
+                        onClicked: sceneTagMenuLoader.popup()
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: headingFontMetrics.lineSpacing
+                        height: headingFontMetrics.lineSpacing
+
+                        MenuLoader {
+                            id: sceneTagMenuLoader
+                            anchors.left: parent.left
+                            anchors.bottom: parent.bottom
+
+                            menu: StructureGroupsMenu {
+                                sceneGroup: SceneGroup {
+                                    structure: scriteDocument.structure
+                                }
+                                onAboutToShow: {
+                                    sceneGroup.clearScenes()
+                                    sceneGroup.addScene(headingItem.theScene)
+                                }
+                                onClosed: sceneGroup.clearScenes()
+                            }
                         }
                     }
 
