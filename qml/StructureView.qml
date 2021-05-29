@@ -928,7 +928,7 @@ Item {
                                 var febox = fe.geometry
                                 var topPadding = element.breakType === Screenplay.Episode ? 150 : 90
                                 febox = Qt.rect(febox.x-50, febox.y-topPadding, febox.width, febox.height)
-                                canvasScroll.ensureVisible(febox, 1, 0)
+                                canvasScroll.ensureVisible(febox, canvas.scale, 0)
                             }
                         }
                     }
