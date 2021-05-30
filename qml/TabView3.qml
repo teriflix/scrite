@@ -56,7 +56,6 @@ Item {
         color: Qt.rgba(1,1,1,0.25)
         border.width: tabBar.visible ? 1 : 0
         border.color: tabColor
-        radius: 6
 
         Loader {
             id: tabContentLoader

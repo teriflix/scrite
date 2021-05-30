@@ -187,7 +187,6 @@ Item {
         anchors.bottomMargin: 3
         anchors.rightMargin: -1
         color: app.translucent(border.color, 0.04)
-        radius: 4
         border.width: 2
         border.color: currentTabNoteColor
 

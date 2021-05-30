@@ -24,24 +24,24 @@ Row {
     property alias stepSize: zoomSlider.stepSize
     property alias zoomLevel: zoomSlider.zoomLevel
 
-    Rectangle {
+    signal zoomOutRequest()
+    signal zoomInRequest()
+    signal sliderMoved()
+
+    ToolButton3 {
         id: decrZoom
-        width: 20; height: 20
+        suggestedWidth: parent.height
+        suggestedHeight: parent.height
+        iconSource: "../icons/navigation/zoom_out.png"
+        autoRepeat: true
+        ToolTip.text: "Zoom Out"
         anchors.verticalCenter: parent.verticalCenter
-        color: decrZoomMouseArea.containsMouse ? primaryColors.button.background : primaryColors.c10.background
         enabled: zoomSlider.value > zoomSlider.from
-
-        Text {
-            text: "-"
-            anchors.centerIn: parent
-            color: primaryColors.button.text
-        }
-
-        MouseArea {
-            id: decrZoomMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: zoomSlider.value = zoomSlider.value-zoomSlider.stepSize
+        onClicked: {
+            if(zoomSlider.stepSize > 0)
+                zoomSlider.value = zoomSlider.value-zoomSlider.stepSize
+            else
+                zoomOutRequest()
         }
     }
 
@@ -52,26 +52,23 @@ Row {
         stepSize: 0.1
         property real zoomLevel: value
         anchors.verticalCenter: parent.verticalCenter
+        onMoved: sliderMoved()
     }
 
-    Rectangle {
+    ToolButton3 {
         id: incrZoom
-        width: 20; height: 20
+        suggestedWidth: parent.height
+        suggestedHeight: parent.height
+        iconSource: "../icons/navigation/zoom_in.png"
+        autoRepeat: true
+        ToolTip.text: "Zoom In"
         anchors.verticalCenter: parent.verticalCenter
-        color: incrZoomMouseArea.containsMouse ? primaryColors.button.background : primaryColors.c10.background
         enabled: zoomSlider.value < zoomSlider.to
-
-        Text {
-            text: "+"
-            anchors.centerIn: parent
-            color: primaryColors.button.text
-        }
-
-        MouseArea {
-            id: incrZoomMouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: zoomSlider.value = zoomSlider.value+zoomSlider.stepSize
+        onClicked: {
+            if(zoomSlider.stepSize > 0)
+                zoomSlider.value = zoomSlider.value+zoomSlider.stepSize
+            else
+                zoomInRequest()
         }
     }
 

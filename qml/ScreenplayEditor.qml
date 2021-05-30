@@ -801,6 +801,7 @@ Rectangle {
             property var zoomLevels: screenplayFormat.fontZoomLevels
             zoomLevel: zoomLevels[value]
             from: 0; to: zoomLevels.length-1
+            height: parent.height-6
             stepSize: 1
             function reset() {
                 var zls = zoomLevels

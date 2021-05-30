@@ -25,6 +25,8 @@ Flickable {
     property bool showScrollBars: true
     property bool zoomOnScroll: app.isWindowsPlatform || app.isLinuxPlatform
     property bool animatePanAndZoom: true
+    property alias minimumScale: pinchHandler.minimumScale
+    property alias maximumScale: pinchHandler.maximumScale
 
     boundsBehavior: Flickable.StopAtBounds
     clip: true
@@ -69,6 +71,10 @@ Flickable {
 
     function zoomOne() {
         zoomScale = 1
+    }
+
+    function zoomTo(val) {
+        zoomScale = val
     }
 
     function zoomFit(area) {

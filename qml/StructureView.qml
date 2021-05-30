@@ -27,7 +27,7 @@ Item {
         id: toolbar
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         color: primaryColors.c100.background
         width: toolbarLayout.width+4
         border.color: primaryColors.borderColor
@@ -114,64 +114,6 @@ Item {
                         }
                     }
                 }
-            }
-
-            Rectangle {
-                width: parent.columnWidth
-                height: 1
-                color: primaryColors.separatorColor
-                opacity: 0.5
-            }
-
-            ToolButton3 {
-                id: cmdZoomIn
-                onClicked: { canvasScroll.zoomIn(); canvasScroll.updateScriteDocumentUserData() }
-                iconSource: "../icons/navigation/zoom_in.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom In"
-            }
-
-            ToolButton3 {
-                id: cmdZoomOut
-                onClicked: { canvasScroll.zoomOut(); canvasScroll.updateScriteDocumentUserData() }
-                iconSource: "../icons/navigation/zoom_out.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom Out"
-            }
-
-            ToolButton3 {
-                id: cmdZoomOne
-                onClicked: click()
-                iconSource: "../icons/navigation/zoom_one.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom One"
-                function click() {
-                    var item = currentElementItemBinder.get
-                    if(item === null) {
-                        if(elementItems.count > 0)
-                            item = elementItems.itemAt(0)
-                        if(item === null) {
-                            canvasScroll.zoomOneMiddleArea()
-                            canvasScroll.updateScriteDocumentUserData()
-                            return
-                        }
-                    }
-                    canvasScroll.zoomOneToItem(item)
-                    canvasScroll.updateScriteDocumentUserData()
-                }
-            }
-
-            ToolButton3 {
-                id: cmdZoomFit
-                onClicked: {
-                    canvasItemsBoundingBox.recomputeBoundingBox()
-                    canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox);
-                    canvasScroll.isZoomFit = true
-                    canvasScroll.updateScriteDocumentUserData()
-                }
-                iconSource: "../icons/navigation/zoom_fit.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom Fit"
             }
 
             Rectangle {
@@ -398,24 +340,6 @@ Item {
                 color: primaryColors.separatorColor
                 opacity: 0.5
             }
-
-            ToolButton3 {
-                iconSource: "../icons/hardware/mouse.png"
-                autoRepeat: false
-                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
-                checkable: true
-                checked: workspaceSettings.mouseWheelZoomsInStructureCanvas
-                onCheckedChanged: workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
-            }
-
-            ToolButton3 {
-                down: canvasPreview.visible
-                checked: canvasPreview.visible
-                checkable: true
-                onToggled: structureCanvasSettings.showPreview = checked
-                iconSource: "../icons/action/thumbnail.png"
-                ToolTip.text: "Preview"
-            }
         }
     }
 
@@ -429,7 +353,7 @@ Item {
         anchors.left: toolbar.right
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         contentWidth: canvas.width * canvas.scale
         contentHeight: canvas.height * canvas.scale
         initialContentWidth: canvas.width
@@ -438,6 +362,7 @@ Item {
         showScrollBars: scriteDocument.structure.elementCount >= 1
         zoomOnScroll: workspaceSettings.mouseWheelZoomsInStructureCanvas
         interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null && maybeDragItem === null
+        minimumScale: canvasItemsBoundingBox.itemCount > 0 ? Math.min(0.25, width/canvasItemsBoundingBox.width, height/canvasItemsBoundingBox.height) : 0.25
         property Item mouseOverItem
         property Item editItem
         property Item maybeDragItem
@@ -1886,6 +1811,111 @@ Item {
                     hoverEnabled: drag.active
                     cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
                     drag.onActiveChanged: canvasScroll.animatePanAndZoom = !drag.active
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        id: statusBar
+        height: 30
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: primaryColors.windowColor
+        border.width: 1
+        border.color: primaryColors.borderColor
+        clip: true
+
+        Row {
+            height: parent.height-6
+            spacing: 10
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+
+            ToolButton3 {
+                iconSource: "../icons/hardware/mouse.png"
+                autoRepeat: false
+                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
+                checkable: true
+                checked: workspaceSettings.mouseWheelZoomsInStructureCanvas
+                onCheckedChanged: workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+            }
+
+            ToolButton3 {
+                down: canvasPreview.visible
+                checked: canvasPreview.visible
+                checkable: true
+                onToggled: structureCanvasSettings.showPreview = checked
+                iconSource: "../icons/action/thumbnail.png"
+                ToolTip.text: "Preview"
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+            }
+
+            Rectangle {
+                height: parent.height
+                width: 1
+                color: primaryColors.borderColor
+            }
+
+            ToolButton3 {
+                id: cmdZoomOne
+                onClicked: click()
+                iconSource: "../icons/navigation/zoom_one.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom One"
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+                function click() {
+                    var item = currentElementItemBinder.get
+                    if(item === null) {
+                        if(elementItems.count > 0)
+                            item = elementItems.itemAt(0)
+                        if(item === null) {
+                            canvasScroll.zoomOneMiddleArea()
+                            canvasScroll.updateScriteDocumentUserData()
+                            return
+                        }
+                    }
+                    canvasScroll.zoomOneToItem(item)
+                    canvasScroll.updateScriteDocumentUserData()
+                }
+            }
+
+            ToolButton3 {
+                id: cmdZoomFit
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+                onClicked: {
+                    canvasItemsBoundingBox.recomputeBoundingBox()
+                    canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox);
+                    canvasScroll.isZoomFit = true
+                    canvasScroll.updateScriteDocumentUserData()
+                }
+                iconSource: "../icons/navigation/zoom_fit.png"
+                autoRepeat: true
+                ToolTip.text: "Zoom Fit"
+            }
+
+            ZoomSlider {
+                id: zoomSlider
+                from: canvasScroll.minimumScale
+                to: canvasScroll.maximumScale
+                stepSize: 0.0
+                anchors.verticalCenter: parent.verticalCenter
+                value: canvas.scale
+                onSliderMoved: Qt.callLater(applyZoom)
+                onZoomInRequest: canvasScroll.zoomIn()
+                onZoomOutRequest: canvasScroll.zoomOut()
+                height: parent.height
+                function applyZoom() {
+                    canvasScroll.animatePanAndZoom = false
+                    canvasScroll.zoomTo(zoomLevel)
+                    canvasScroll.animatePanAndZoom = true
                 }
             }
         }
