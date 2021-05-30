@@ -184,14 +184,14 @@ Item {
 
             ToolButton3 {
                 id: beatBoardLayoutToolButton
-                enabled: !scriteDocument.readOnly && scriteDocument.screenplay.elementCount > 0
+                enabled: !scriteDocument.readOnly
                 iconSource: "../icons/action/layout_beat_sheet.png"
                 ToolTip.text: "Beat Board Layout"
                 checkable: true
                 checked: false
                 onToggled: {
                     scriteDocument.structure.forceBeatBoardLayout = checked
-                    if(checked) {
+                    if(checked && scriteDocument.structure.elementCount > 0) {
                         var rect = scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
                         cmdZoomOne.click()
                     }
@@ -1828,7 +1828,34 @@ Item {
         border.color: primaryColors.borderColor
         clip: true
 
+        Text {
+            anchors.left: parent.left
+            anchors.right: statusBarControls.left
+            anchors.margins: 10
+            elide: Text.ElideRight
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: statusBar.height * 0.5
+            text: {
+                var ret = scriteDocument.structure.elementCount + " Scenes";
+                if(canvas.episodeBoxes.length > 0)
+                    ret += ", " + canvas.episodeBoxes.length + " Episodes";
+                if(scriteDocument.structure.forceBeatBoardLayout)
+                    ret += ", Scenes Not Movable"
+                ret += "."
+                return ret;
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: parent.truncated
+                hoverEnabled: true
+                ToolTip.text: parent.text
+                ToolTip.visible: containsMouse
+            }
+        }
+
         Row {
+            id: statusBarControls
             height: parent.height-6
             spacing: 10
             anchors.verticalCenter: parent.verticalCenter
