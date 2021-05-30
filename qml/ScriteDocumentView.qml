@@ -1615,7 +1615,7 @@ Item {
 
             Loader {
                 anchors.fill: parent
-                anchors.margins: 0
+                anchors.topMargin: 1
                 clip: true
                 readonly property int screenplayZoomLevelModifier: 0
                 sourceComponent: {

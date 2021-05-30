@@ -182,10 +182,6 @@ Item {
         anchors.right: notebookTabsView.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.leftMargin: 3
-        anchors.topMargin: 3
-        anchors.bottomMargin: 3
-        anchors.rightMargin: -1
         color: app.translucent(border.color, 0.04)
         border.width: 2
         border.color: currentTabNoteColor
