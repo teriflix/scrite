@@ -1631,7 +1631,7 @@ Item {
 
                 MarkSceneAsMenu {
                     title: "Mark Scene As"
-                    scene: elementContextMenu.element.scene
+                    scene: elementContextMenu.elemen ? elementContextMenu.element.scene : null
                     onTriggered: elementContextMenu.element = null
                 }
 
@@ -1870,6 +1870,7 @@ Item {
                 ToolTip.text: "Zoom One"
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
+                enabled: canvasItemsBoundingBox.itemCount > 0
                 function click() {
                     var item = currentElementItemBinder.get
                     if(item === null) {
@@ -1890,6 +1891,7 @@ Item {
                 id: cmdZoomFit
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
+                enabled: canvasItemsBoundingBox.itemCount > 0
                 onClicked: {
                     canvasItemsBoundingBox.recomputeBoundingBox()
                     canvasScroll.zoomFit(canvasItemsBoundingBox.boundingBox);

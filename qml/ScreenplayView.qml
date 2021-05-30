@@ -713,7 +713,7 @@ Item {
 
         MarkSceneAsMenu {
             title: "Mark Scene As"
-            scene: elementItemMenu.element.scene
+            scene: elementItemMenu.element ? elementItemMenu.element.scene : null
             onTriggered: elementItemMenu.close()
         }
 
