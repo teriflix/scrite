@@ -214,9 +214,6 @@ Item {
             drag.minimumY: 0
             enabled: parent.visible
             onClicked: {
-                if(!selection.interactive)
-                    return
-
                 if(selectionMenu.menu && mouse.button === Qt.RightButton)
                     selectionMenu.popup()
             }

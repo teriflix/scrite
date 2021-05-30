@@ -140,7 +140,7 @@ Item {
             }
 
             ToolButton3 {
-                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
                 iconSource: "../icons/action/layout_options.png"
                 ToolTip.text: "Layout Options"
                 down: layoutOptionsMenu.visible
@@ -904,30 +904,32 @@ Item {
                     if(element === null)
                         return
 
+                    var fbbl = scriteDocument.structure.forceBeatBoardLayout
+
                     switch(event.key) {
                     case Qt.Key_Left:
+                        if(fbbl) return
                         element.x -= dist
                         result.accept = true
                         result.filter = true
-                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Right:
+                        if(fbbl) return
                         element.x += dist
                         result.accept = true
                         result.filter = true
-                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Up:
+                        if(fbbl) return
                         element.y -= dist
                         result.accept = true
                         result.filter = true
-                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Down:
+                        if(fbbl) return
                         element.y += dist
                         result.accept = true
                         result.filter = true
-                        scriteDocument.structure.forceBeatBoardLayout = false
                         break
                     case Qt.Key_Delete:
                     case Qt.Key_Backspace:
@@ -1120,7 +1122,7 @@ Item {
                     MouseArea {
                         id: canvasBeatMouseArea
                         anchors.fill: parent
-                        drag.target: controlPressed ? null : canvasGroupBoxItem
+                        drag.target: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
                         drag.axis: Drag.XAndYAxis
                         cursorShape: Qt.SizeAllCursor
                         property bool controlPressed: false
@@ -1333,7 +1335,7 @@ Item {
                 id: selection
                 z: 3
                 anchors.fill: parent
-                interactive: !scriteDocument.readOnly
+                interactive: !scriteDocument.readOnly && !scriteDocument.structure.forceBeatBoardLayout
                 onMoveItem: {
                     item.x = item.x + dx
                     item.y = item.y + dy
@@ -1381,28 +1383,28 @@ Item {
                         title: "Layout"
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_horizontally.png"
                             text: "Layout Horizontally"
                             onClicked: selection.layout(Structure.HorizontalLayout)
                         }
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_vertically.png"
                             text: "Layout Vertically"
                             onClicked: selection.layout(Structure.VerticalLayout)
                         }
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_flow_horizontally.png"
                             text: "Flow Horizontally"
                             onClicked: selection.layout(Structure.FlowHorizontalLayout)
                         }
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
                             onClicked: selection.layout(Structure.FlowVerticalLayout)
@@ -1480,13 +1482,12 @@ Item {
                 }
 
                 function layout(type) {
-                    if(scriteDocument.readOnly)
+                    if(scriteDocument.readOnly || scriteDocument.structure.forceBeatBoardLayout)
                         return
 
                     if(!hasItems) {
                         var rect = scriteDocument.structure.layoutElements(type)
                         canvasScroll.zoomFit(rect)
-                        scriteDocument.structure.forceBeatBoardLayout = false
                         return
                     }
 
@@ -1631,7 +1632,7 @@ Item {
 
                 MarkSceneAsMenu {
                     title: "Mark Scene As"
-                    scene: elementContextMenu.elemen ? elementContextMenu.element.scene : null
+                    scene: elementContextMenu.element ? elementContextMenu.element.scene : null
                     onTriggered: elementContextMenu.element = null
                 }
 
@@ -2068,7 +2069,7 @@ Item {
                     requestEditorLater()
                 }
 
-                drag.target: scriteDocument.readOnly ? null : elementItem
+                drag.target: scriteDocument.readOnly || scriteDocument.structure.forceBeatBoardLayout ? null : elementItem
                 drag.axis: Drag.XAndYAxis
                 drag.minimumX: 0
                 drag.minimumY: 0
@@ -2078,7 +2079,6 @@ Item {
                     if(drag.active === false) {
                         elementItem.x = scriteDocument.structure.snapToGrid(parent.x)
                         elementItem.y = scriteDocument.structure.snapToGrid(parent.y)
-                        scriteDocument.structure.forceBeatBoardLayout = false
                     } else
                         elementItem.element.syncWithFollow = true
                 }
@@ -2303,7 +2303,7 @@ Item {
                         canvas.forceActiveFocus()
                     }
 
-                    drag.target: scriteDocument.readOnly ? null : elementItem
+                    drag.target: scriteDocument.readOnly || scriteDocument.structure.forceBeatBoardLayout ? null : elementItem
                     drag.axis: Drag.XAndYAxis
                     drag.minimumX: 0
                     drag.minimumY: 0
@@ -2313,7 +2313,6 @@ Item {
                         if(drag.active === false) {
                             elementItem.x = scriteDocument.structure.snapToGrid(elementItem.x)
                             elementItem.y = scriteDocument.structure.snapToGrid(elementItem.y)
-                            scriteDocument.structure.forceBeatBoardLayout = false
                         } else
                             elementItem.element.syncWithFollow = true
                     }

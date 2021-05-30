@@ -27,7 +27,7 @@ Menu2 {
         model: app.enumerationModelForType("Scene", "Type")
 
         MenuItem2 {
-            text: modelData.key
+            text: modelData.key + (font.bold ? " ✔" : "")
             icon.source: modelData.icon
             enabled: scene !== null
             font.bold: enabled ? scene.type === modelData.value : false
