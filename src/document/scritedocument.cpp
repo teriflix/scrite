@@ -818,6 +818,7 @@ void ScriteDocument::save()
 
         const QDir backupDir(backupDirPath);
         QFileInfoList backupEntries = backupDir.entryInfoList(QStringList() << QStringLiteral("*.scrite"), QDir::Files, QDir::Name);
+        const bool firstBackup = backupEntries.isEmpty();
         if(!backupEntries.isEmpty())
         {
             static const int maxBackups = 20;
@@ -836,7 +837,10 @@ void ScriteDocument::save()
         }
 
         const QString backupFileName = backupDirPath + "/" + fi.baseName() + " [" + QString::number(now) + "].scrite";
-        QFile::copy(m_fileName, backupFileName);
+        const bool backupSuccessful = QFile::copy(m_fileName, backupFileName);
+
+        if(firstBackup && backupSuccessful)
+            m_documentBackupsModel.loadBackupFileInformation();
     }
 
     this->saveAs(m_fileName);
