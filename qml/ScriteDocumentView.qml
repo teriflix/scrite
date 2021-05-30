@@ -1615,7 +1615,7 @@ Item {
 
             Loader {
                 anchors.fill: parent
-                anchors.margins: 5
+                anchors.margins: 0
                 clip: true
                 readonly property int screenplayZoomLevelModifier: 0
                 sourceComponent: {
@@ -1888,12 +1888,16 @@ Item {
                 active: height >= 50
                 sourceComponent: Rectangle {
                     color: accentColors.c200.background
-                    border { width: 1; color: accentColors.borderColor }
 
                     ScreenplayView {
                         anchors.fill: parent
-                        anchors.margins: 3
                         showNotesIcon: workspaceSettings.showNotebookInStructure
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Qt.rgba(0,0,0,0)
+                        border { width: 1; color: accentColors.borderColor }
                     }
                 }
             }
@@ -1955,13 +1959,17 @@ Item {
 
                 sourceComponent: Rectangle {
                     color: accentColors.c200.background
-                    border { width: 1; color: accentColors.borderColor }
 
                     ScreenplayView {
                         anchors.fill: parent
-                        anchors.margins: 3
                         showNotesIcon: true
                         enableDragDrop: false
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Qt.rgba(0,0,0,0)
+                        border { width: 1; color: accentColors.borderColor }
                     }
                 }
             }

@@ -281,7 +281,6 @@ Item {
         anchors.right: parent.right
         anchors.top: screenplayTracksFlick.bottom
         anchors.bottom: parent.bottom
-        anchors.margins: 3
         anchors.bottomMargin: 0
         clip: true
         property bool somethingIsBeingDropped: false

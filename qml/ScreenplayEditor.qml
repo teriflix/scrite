@@ -40,8 +40,6 @@ Rectangle {
     property alias zoomLevel: zoomSlider.zoomLevel
     property int zoomLevelModifier: 0
     color: primaryColors.windowColor
-    border.width: 1
-    border.color: primaryColors.borderColor
     clip: true
 
     PropertyAlias {
@@ -3153,5 +3151,12 @@ Rectangle {
                 }
             }
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        color: Qt.rgba(0,0,0,0)
+        border.width: 1
+        border.color: primaryColors.borderColor
     }
 }
