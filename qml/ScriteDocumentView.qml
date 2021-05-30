@@ -1702,7 +1702,6 @@ Item {
                         TabView3 {
                             id: structureEditorTabs
                             anchors.fill: parent
-                            anchors.margins: 1
                             tabNames: workspaceSettings.showNotebookInStructure ? ["Structure", "Notebook"] : ["Structure"]
                             tabColor: primaryColors.c700.background
                             tabBarVisible: workspaceSettings.showNotebookInStructure

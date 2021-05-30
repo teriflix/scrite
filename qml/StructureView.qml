@@ -1860,7 +1860,6 @@ Item {
             spacing: 10
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.rightMargin: 10
 
             ToolButton3 {
                 iconSource: "../icons/hardware/mouse.png"

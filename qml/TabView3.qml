@@ -54,13 +54,18 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         color: Qt.rgba(1,1,1,0.25)
-        border.width: tabBar.visible ? 1 : 0
-        border.color: tabColor
+        border.width: 0
 
         Loader {
             id: tabContentLoader
             anchors.fill: parent
-            anchors.margins: 2
+        }
+
+        Rectangle {
+            anchors.fill: tabContentLoader
+            border.width: 1
+            border.color: tabBar.visible ? tabColor : primaryColors.borderColor
+            color: Qt.rgba(0,0,0,0)
         }
     }
 }
