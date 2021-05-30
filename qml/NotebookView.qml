@@ -68,11 +68,10 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: tabScrollButtons.top
-        anchors.rightMargin: 3
         anchors.topMargin: 8
         anchors.bottomMargin: 8
         clip: true
-        width: 45
+        width: 41
         model: noteSources
         spacing: -width*0.4
         currentIndex: 0
@@ -97,7 +96,7 @@ Item {
         }
 
         delegate: TabBarTab {
-            width: active ? 40 : 35
+            width: active ? 40 : 38
             height: implicitTabSize
             alignment: Qt.AlignRight
 
