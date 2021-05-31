@@ -129,6 +129,7 @@ Item {
         id: screenplayTracksFlick
         anchors.left: screenplayElementList.left
         anchors.top: parent.top
+        anchors.topMargin: screenplayTracks.trackCount > 0 ? 2 : 0
         anchors.right: screenplayElementList.right
         height: contentHeight
         contentWidth: screenplayTracksFlickContent.width
@@ -282,6 +283,7 @@ Item {
         anchors.top: screenplayTracksFlick.bottom
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
+        anchors.topMargin: screenplayTracks.trackCount > 0 ? 0 : 3
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
@@ -488,7 +490,7 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 0
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 enabled: !dragArea.containsDrag
                 sourceComponent: Rectangle {
