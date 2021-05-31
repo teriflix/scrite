@@ -36,7 +36,6 @@ bool FountainImporter::doImport(QIODevice *device)
     Screenplay *screenplay = doc->screenplay();
 
     int sceneCounter = 0;
-    Scene *previousScene = nullptr;
     Scene *currentScene = nullptr;
     Character *character = nullptr;
     static const QStringList headerhints = QStringList() <<
