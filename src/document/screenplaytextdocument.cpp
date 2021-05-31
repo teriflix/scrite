@@ -929,10 +929,10 @@ void ScreenplayTextDocument::loadScreenplay()
                 episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
-                cursor.insertText(element->breakTitle());
+                cursor.insertText(element->breakTitle().toUpper());
 
                 if(!element->breakSubtitle().isEmpty())
-                    cursor.insertText( QStringLiteral(": ") + element->breakSubtitle() );
+                    cursor.insertText( QStringLiteral(": ") + element->breakSubtitle().toUpper() );
 
                 lastPrintedElement = element;
                 continue;

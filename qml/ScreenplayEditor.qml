@@ -875,11 +875,9 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 placeholderText: theElement.breakTitle
                 font.family: headingFontMetrics.font.family
-                font.bold: headingFontMetrics.font.bold
-                font.italic: headingFontMetrics.font.italic
-                font.underline: headingFontMetrics.font.underline
+                font.bold: true
+                font.capitalization: Font.AllUppercase
                 font.pointSize: headingFontMetrics.font.pointSize+2
-                font.capitalization: headingFontMetrics.font.capitalization
                 text: theElement.breakSubtitle
                 enableTransliteration: true
                 onTextEdited: theElement.breakSubtitle = text
@@ -914,7 +912,10 @@ Rectangle {
 
             Text {
                 id: actBreakTitle
-                font: headingFontMetrics.font
+                font.family: headingFontMetrics.font.family
+                font.bold: true
+                font.capitalization: Font.AllUppercase
+                font.pointSize: headingFontMetrics.font.pointSize
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: ruler.leftMarginPx
