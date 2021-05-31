@@ -172,7 +172,7 @@ Item {
     }
 
     EventFilter.target: app
-    EventFilter.active: hasItems && !modalDialog.active && !floatingDockWidget.contentHasFocus
+    EventFilter.active: hasItems && !modalDialog.active && !floatingDockWidget.contentHasFocus && interactive
     EventFilter.events: [6]
     EventFilter.onFilter: {
         var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
