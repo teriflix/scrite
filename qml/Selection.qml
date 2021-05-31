@@ -60,9 +60,12 @@ Item {
     }
 
     // For intializing from a repeater and a rectangle
-    function init(repeater, rectangle) {
+    function init(repeater, rectangle, includeInvisibleItems) {
         if(repeater === undefined || repeater === null)
             return
+
+        if(includeInvisibleItems === undefined)
+            includeInvisibleItems = false
 
         clear()
 
@@ -71,7 +74,7 @@ Item {
         var count = repeater.count
         for(var i=0; i<count; i++) {
             var item = repeater.itemAt(i)
-            if(!item.visible)
+            if(!item.visible && !includeInvisibleItems)
                 continue
             var p1 = Qt.point(item.x, item.y)
             var p2 = Qt.point(item.x+item.width, item.y+item.height)
