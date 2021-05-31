@@ -934,6 +934,34 @@ Item {
                                 icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
                             }
+
+                            MenuSeparator { }
+
+                            Menu2 {
+                                id: layoutGroupingMenu
+                                width: 350
+                                title: "Active Structure Category"
+
+                                MenuItem2 {
+                                    text: "None"
+                                    icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                    font.bold: scriteDocument.structure.preferredGroupCategory === ""
+                                    onTriggered: scriteDocument.structure.preferredGroupCategory = ""
+                                }
+
+                                MenuSeparator { }
+
+                                Repeater {
+                                    model: scriteDocument.structure.groupCategories
+
+                                    MenuItem2 {
+                                        text: app.camelCased(modelData)
+                                        icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                        font.bold: scriteDocument.structure.preferredGroupCategory === modelData
+                                        onTriggered: scriteDocument.structure.preferredGroupCategory = modelData
+                                    }
+                                }
+                            }
                         }
                     }
                 }

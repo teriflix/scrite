@@ -2116,7 +2116,7 @@ Rectangle {
                         iconSource: "../icons/action/tag.png"
                         visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
                         down: sceneTagMenuLoader.active
-                        onClicked: sceneTagMenuLoader.popup()
+                        onClicked: sceneTagMenuLoader.show()
                         anchors.verticalCenter: parent.verticalCenter
                         width: headingFontMetrics.lineSpacing
                         height: headingFontMetrics.lineSpacing
@@ -2127,6 +2127,7 @@ Rectangle {
                             anchors.bottom: parent.bottom
 
                             menu: StructureGroupsMenu {
+                                height: 300
                                 sceneGroup: SceneGroup {
                                     structure: scriteDocument.structure
                                 }
