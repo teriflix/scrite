@@ -886,11 +886,10 @@ void ScreenplayFormat::useUserSpecifiedFonts()
 void ScreenplayFormat::resetScreen()
 {
     m_screen = nullptr;
+    emit screenChanged();
 
     this->evaluateFontZoomLevels();
     this->evaluateFontPointSizeDelta();
-
-    emit screenChanged();
 }
 
 void ScreenplayFormat::evaluateFontPointSizeDelta()

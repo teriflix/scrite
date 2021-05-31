@@ -522,13 +522,12 @@ Item {
                             rotation: isBreakElement ? -90 : 0
                             horizontalAlignment: isBreakElement ? Text.AlignHCenter : Text.AlignLeft
                             maximumLineCount: isBreakElement ? 1 : 4
-                            font.pointSize: isBreakElement ? (minFontSize*1.25) : minFontSize
+                            font.pointSize: isBreakElement ? 15 : 12
                             visible: isBreakElement ? true : width >= 80
                             wrapMode: isBreakElement ? Text.NoWrap : Text.Wrap
                             font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
                             width: elementItemDelegate.isBreakElement ? parent.height : parent.width
                             height: elementItemDelegate.isBreakElement ? contentHeight : parent.height
-                            readonly property real minFontSize: scriteDocument.formatting.screen.devicePixelRatio > 1 ? 13 : 10
                         }
                     }
 
