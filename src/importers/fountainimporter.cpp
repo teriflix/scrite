@@ -38,13 +38,16 @@ bool FountainImporter::doImport(QIODevice *device)
     int sceneCounter = 0;
     Scene *currentScene = nullptr;
     Character *character = nullptr;
-    static const QStringList headerhints = QStringList() <<
-            "INT" << "EXT" << "EST" << "INT./EXT" << "INT/EXT" << "I/E";
+    static const QStringList headerhints = {
+            QStringLiteral("INT"), QStringLiteral("EXT"),
+            QStringLiteral("EST"), QStringLiteral("INT./EXT"),
+            QStringLiteral("INT/EXT"), QStringLiteral("I/E")
+        };
     bool inCharacter = false;
     bool hasParaBreak = false;
     bool mergeWithLastPara = false;
     auto maybeCharacter = [](QString &text) {
-        if(text.startsWith("@")) {
+        if(text.startsWith(QStringLiteral("@"))) {
             text = text.remove(0, 1);
             return true;
         }
