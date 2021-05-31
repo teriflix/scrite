@@ -66,8 +66,19 @@ bool FountainImporter::doImport(QIODevice *device)
 
     const QChar space(' ');
     const QByteArray bytes = device->readAll();
-    const QRegExp multipleSpaces("\\s+");
-    const QString singleSpace(" ");
+    const QRegExp multipleSpaces(QStringLiteral("\\s+"));
+    const QString singleSpace = QStringLiteral(" ");
+    const QString pound = QStringLiteral("#");
+    const QString sqbo = QStringLiteral("[");
+    const QString sqbc = QStringLiteral("]");
+    const QString dot = QStringLiteral(".");
+    const QString dash = QStringLiteral("-");
+    const QString colon = QStringLiteral(":");
+    const QString rbo = QStringLiteral("(");
+    const QString rbc = QStringLiteral(")");
+    const QString at = QStringLiteral("@");
+    const QString gt = QStringLiteral(">");
+    const QString lt = QStringLiteral("<");
 
     QTextStream ts(bytes);
     ts.setCodec("utf-8");
@@ -88,10 +99,10 @@ bool FountainImporter::doImport(QIODevice *device)
             continue;
         }
 
-        if(line.startsWith("#"))
+        if(line.startsWith(pound))
         {
-            line = line.remove("#").trimmed();
-            line = line.split(" ", QString::SkipEmptyParts).first();
+            line = line.remove(pound).trimmed();
+            line = line.split(space, QString::SkipEmptyParts).first();
 
             ScreenplayElement *element = new ScreenplayElement(screenplay);
             element->setElementType(ScreenplayElement::BreakElementType);
@@ -101,18 +112,18 @@ bool FountainImporter::doImport(QIODevice *device)
         }
 
         QString pruned;
-        if(line.startsWith('['))
+        if(line.startsWith(sqbo))
         {
             // Hack to be able to import fountain files with [nnn]
-            const int bcIndex = line.indexOf(']');
+            const int bcIndex = line.indexOf(sqbc);
             pruned = line.left(bcIndex+1);
             line = line.mid(bcIndex+1).trimmed();
         }
 
         // We do not support other formatting features from the fountain syntax
-        line = line.remove("_");
-        line = line.remove("*");
-        line = line.remove("^");
+        line = line.remove(QStringLiteral("_"));
+        line = line.remove(QStringLiteral("*"));
+        line = line.remove(QStringLiteral("^"));
 
         // detect if ths line contains a header.
         bool isHeader = false;
@@ -120,7 +131,7 @@ bool FountainImporter::doImport(QIODevice *device)
         {
             if(line.length() >= 2)
             {
-                if(line.at(0) == '.' && line.at(1) != ".")
+                if(line.at(0) == dot[0] && line.at(1) != dot[0])
                     isHeader = true;
             }
 
@@ -128,7 +139,7 @@ bool FountainImporter::doImport(QIODevice *device)
             {
                 Q_FOREACH(QString hint, headerhints)
                 {
-                    if(line.startsWith(hint))
+                    if(line.startsWith(hint) && line.length() > hint.length() && !line.at(hint.length()).isLetterOrNumber())
                     {
                         isHeader = true;
                         break;
@@ -141,44 +152,18 @@ bool FountainImporter::doImport(QIODevice *device)
         {
             ++sceneCounter;
             screenplay->setCurrentElementIndex(-1);
-            previousScene = currentScene;
             currentScene = this->createScene(QString());
 
             SceneHeading *heading = currentScene->heading();
-            if(line.at(0) == QChar('.'))
-            {
+            if(line.at(0) == dot[0])
                 line = line.remove(0, 1);
-                const int dotIndex = line.indexOf('.');
-                const int dashIndex = line.indexOf('-');
-
-                if(dashIndex >= 0)
-                {
-                    const QString moment = line.mid(dashIndex+1).trimmed();
-                    heading->setMoment(moment);
-                    line = line.left(dashIndex);
-                }
-                else
-                    heading->setMoment( previousScene ? previousScene->heading()->moment() : "DAY" );
-
-                if(dotIndex >= 0)
-                {
-                    const QString locType = line.left(dotIndex).trimmed();
-                    heading->setLocationType(locType);
-                    line = line.remove(0, dotIndex+1);
-                }
-                else
-                    heading->setLocationType( previousScene ? previousScene->heading()->locationType() : "I/E" );
-
-                heading->setLocation(line.trimmed());
-            }
-            else
-                heading->parseFrom(line);
+            heading->parseFrom(line);
 
             QString locationForTitle = heading->location();
             if(locationForTitle.length() > 25)
                 locationForTitle = locationForTitle.left(22) + "...";
 
-            currentScene->setTitle( QString("Scene number #%1 at %2").arg(sceneCounter+1).arg(locationForTitle) );
+            currentScene->setTitle( QStringLiteral("Scene number #%1 at %2").arg(sceneCounter+1).arg(locationForTitle) );
             continue;
         }
 
@@ -187,11 +172,11 @@ bool FountainImporter::doImport(QIODevice *device)
 
         if(currentScene == nullptr)
         {
-            if(line.startsWith("Title:", Qt::CaseInsensitive))
+            if(line.startsWith( QStringLiteral("Title:"), Qt::CaseInsensitive))
             {
-                const QString title = line.section(':',1);
-                const int boIndex = title.indexOf('(');
-                const int bcIndex = title.lastIndexOf(')');
+                const QString title = line.section(colon,1);
+                const int boIndex = title.indexOf(rbo);
+                const int bcIndex = title.lastIndexOf(rbc);
                 if(boIndex >= 0 && bcIndex >= 0)
                 {
                     screenplay->setSubtitle(title.mid(boIndex+1, bcIndex-boIndex-1));
@@ -200,15 +185,15 @@ bool FountainImporter::doImport(QIODevice *device)
                 else
                     screenplay->setTitle(title);
             }
-            else if(line.startsWith("Credit:", Qt::CaseInsensitive))
+            else if(line.startsWith(QStringLiteral("Credit:"), Qt::CaseInsensitive))
                 continue;
-            else if(line.startsWith("Author:", Qt::CaseInsensitive))
+            else if(line.startsWith(QStringLiteral("Author:"), Qt::CaseInsensitive))
                 screenplay->setAuthor(line.section(':',1));
-            else if(line.startsWith("Version:", Qt::CaseInsensitive))
+            else if(line.startsWith(QStringLiteral("Version:"), Qt::CaseInsensitive))
                 screenplay->setVersion(line.section(':',1));
-            else if(line.startsWith("Contact:", Qt::CaseInsensitive))
+            else if(line.startsWith(QStringLiteral("Contact:"), Qt::CaseInsensitive))
                 screenplay->setContact(line.section(':',1));
-            else if(line.at(0) == QChar('@'))
+            else if(line.at(0) == at[0])
             {
                 line = line.remove(0, 1).trimmed();
 
@@ -220,7 +205,7 @@ bool FountainImporter::doImport(QIODevice *device)
             }
             else if(character != nullptr)
             {
-                if(line.startsWith('(') && line.endsWith(')'))
+                if(line.startsWith(rbo) && line.endsWith(rbc))
                 {
                     line.remove(0, 1);
                     line.remove(line.length()-1, 1);
@@ -235,7 +220,7 @@ bool FountainImporter::doImport(QIODevice *device)
                     if(note == nullptr)
                     {
                         note = new Note(character);
-                        note->setHeading("Note");
+                        note->setHeading(QStringLiteral("Note"));
                         character->addNote(note);
                     }
 
@@ -260,17 +245,19 @@ bool FountainImporter::doImport(QIODevice *device)
         SceneElement *para = new SceneElement;
         para->setText(line);
 
-        if(line.endsWith("TO:", Qt::CaseInsensitive))
+        // I turns out not many writers end their transition with TO:
+        // but they all by-and-large end with :
+        if(line.endsWith(colon, Qt::CaseInsensitive))
         {
             para->setType(SceneElement::Transition);
             currentScene->addElement(para);
             continue;
         }
 
-        if(line.startsWith(">"))
+        if(line.startsWith(gt))
         {
             line = line.remove(0, 1);
-            if(line.endsWith("<"))
+            if(line.endsWith(lt))
                 line = line.remove(line.length()-1,1);
             para->setText(line);
             para->setType(SceneElement::Shot);
@@ -278,11 +265,18 @@ bool FountainImporter::doImport(QIODevice *device)
             continue;
         }
 
-        if(line.startsWith('(') && line.endsWith(')'))
+        if(line.startsWith(rbo) && line.endsWith(rbc))
         {
             if(inCharacter)
             {
                 para->setType(SceneElement::Parenthetical);
+
+                while(!line.isEmpty() && line.at(0) == rbo[0])
+                    line = line.mid(1);
+                while(!line.isEmpty() && line.at(line.length()-1) == rbc[0])
+                    line = line.left(line.length()-1);
+                para->setText(rbo + line + rbc);
+
                 currentScene->addElement(para);
                 continue;
             }
@@ -293,7 +287,7 @@ bool FountainImporter::doImport(QIODevice *device)
             line = line.remove(0, 1);
             line = line.remove(line.length()-1, 1);
             Note *note = new Note(currentScene);
-            note->setHeading("Note #" + QString::number(currentScene->noteCount()+1));
+            note->setHeading(QStringLiteral("Note #") + QString::number(currentScene->noteCount()+1));
             note->setContent(line);
             note->setColor( Application::instance()->pickStandardColor(currentScene->noteCount()) );
             currentScene->addNote(note);

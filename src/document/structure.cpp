@@ -231,6 +231,8 @@ void StructureElement::setTitle(const QString &val)
     if(m_title == val)
         return;
 
+    m_title = val.toUpper().trimmed();
+
     if(m_scene != nullptr)
     {
         SceneHeading *heading = m_scene->heading();
@@ -242,15 +244,11 @@ void StructureElement::setTitle(const QString &val)
                 heading->setLocationType(_locationType);
                 heading->setLocation(_location);
                 heading->setMoment(_moment);
+
+                m_title.clear();
             }
         }
     }
-
-    m_title = val.toUpper().trimmed();
-
-    if(m_scene != nullptr && m_scene->heading() != nullptr &&
-       m_scene->heading()->isEnabled() && m_scene->heading()->text() == m_title)
-        m_title.clear();
 
     emit titleChanged();
 }

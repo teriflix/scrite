@@ -263,8 +263,9 @@ bool SceneHeading::parse(const QString &text, QString &locationType, QString &lo
 {
     const Structure *structure = ScriteDocument::instance()->structure();
     const QString heading = text.toUpper().trimmed();
-    const int field1SepLoc = heading.indexOf('.');
-    const int field2SepLoc = heading.lastIndexOf('-');
+    const QRegularExpression fieldSep( QStringLiteral("[\\.-]") );
+    const int field1SepLoc = heading.indexOf(fieldSep);
+    const int field2SepLoc = heading.lastIndexOf(fieldSep);
 
     if(field1SepLoc < 0 && field2SepLoc < 0)
     {
