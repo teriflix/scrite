@@ -443,6 +443,7 @@ Item {
             id: elementItemDelegate
             property ScreenplayElement element: screenplayElement
             property bool isBreakElement: element.elementType === ScreenplayElement.BreakElementType
+            property bool isEpisodeBreak: isBreakElement && element.breakType === Screenplay.Episode
             property bool active: element.scene ? scriteDocument.screenplay.activeScene === element.scene : false
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
             property string sceneTitle: {
@@ -466,7 +467,9 @@ Item {
                         }
                     } else
                         ret += escene.title
-                } else
+                } else if(isEpisodeBreak)
+                    ret = "EP " + (element.episodeIndex+1)
+                else
                     ret = element.breakTitle
 
                 return ret;
@@ -502,32 +505,41 @@ Item {
                         NumberAnimation { duration: 400 }
                     }
 
+                    Image {
+                        id: breakTypeIcon
+                        anchors.top: parent.top
+                        anchors.margins: 10
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: isBreakElement
+                        source: isEpisodeBreak ? "../icons/content/episode.png" : "../icons/content/act.png"
+                        width: 24; height: 24
+                    }
+
                     Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.top: parent.top
-                        anchors.bottom: dragTriggerButton.top
-                        anchors.topMargin: notesIconLoader.active ? 30 : 5
+                        anchors.bottom: breakTypeIcon.visible ? parent.bottom : dragTriggerButton.top
+                        anchors.topMargin: breakTypeIcon.visible ? 0 : (notesIconLoader.active ? 30 : 5)
                         anchors.leftMargin: 5
                         anchors.rightMargin: 5
 
                         Text {
+                            width: parent.width
+                            height: parent.height
                             lineHeight: 1.25
                             text: sceneTitle
                             elide: Text.ElideRight
                             anchors.centerIn: parent
                             font.bold: isBreakElement
                             transformOrigin: Item.Center
-                            verticalAlignment: Text.AlignTop
-                            rotation: isBreakElement ? -90 : 0
+                            verticalAlignment: isBreakElement ? Text.AlignVCenter : Text.AlignTop
                             horizontalAlignment: isBreakElement ? Text.AlignHCenter : Text.AlignLeft
-                            maximumLineCount: isBreakElement ? 1 : 4
-                            font.pointSize: isBreakElement ? 15 : 12
+                            maximumLineCount: isBreakElement ? 2 : 5
+                            font.pointSize: 12
                             visible: isBreakElement ? true : width >= 80
-                            wrapMode: isBreakElement ? Text.NoWrap : Text.Wrap
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
-                            width: elementItemDelegate.isBreakElement ? parent.height : parent.width
-                            height: elementItemDelegate.isBreakElement ? contentHeight : parent.height
                         }
                     }
 

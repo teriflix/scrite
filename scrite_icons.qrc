@@ -73,6 +73,8 @@
         <file>icons/action/thumbnail_inverted.png</file>
         <file>icons/action/view_array.png</file>
         <file>icons/action/view_array_inverted.png</file>
+        <file>icons/content/act.png</file>
+        <file>icons/content/act_inverted.png</file>
         <file>icons/content/add_box.png</file>
         <file>icons/content/add_box_inverted.png</file>
         <file>icons/content/add_circle_outline.png</file>
@@ -91,6 +93,8 @@
         <file>icons/content/content_paste_inverted.png</file>
         <file>icons/content/create.png</file>
         <file>icons/content/create_inverted.png</file>
+        <file>icons/content/episode.png</file>
+        <file>icons/content/episode_inverted.png</file>
         <file>icons/content/fight_scene.png</file>
         <file>icons/content/fight_scene_inverted.png</file>
         <file>icons/content/language.png</file>

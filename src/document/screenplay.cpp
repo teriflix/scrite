@@ -1616,7 +1616,7 @@ void Screenplay::updateBreakTitles()
             break;
         case Screenplay::Act:
             episodeActs.append(e);
-            e->setBreakTitle(episodeActs.size() > actNames.size() ?
+            e->setBreakTitle(episodeActs.size()+actOffset > actNames.size() ?
                              QStringLiteral("ACT ") + QString::number(episodeActs.size()+actOffset) :
                              actNames.at(episodeActs.size()+actOffset-1));
             break;
