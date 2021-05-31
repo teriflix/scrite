@@ -31,10 +31,11 @@
 #include <QUndoCommand>
 #include <QTextDocument>
 #include <QJsonDocument>
+#include <QFutureWatcher>
 #include <QtConcurrentRun>
+#include <QTextBoundaryFinder>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
-#include <QFutureWatcher>
 
 class PushSceneUndoCommand;
 class SceneUndoCommand : public QUndoCommand
@@ -656,6 +657,83 @@ void Scene::setTitle(const QString &val)
 
     m_title = val;
     emit titleChanged();
+}
+
+void Scene::inferTitleFromContent()
+{
+    /**
+     * This function is called from importers to let Scenes infer their synopsis (title) from
+     * scene contents.
+     *
+     * Here we look for the first action paragraph and extract its first sentence as synopsis.
+     * If the scene doesnt have any action paragraph, we extract the first dialogue and infer from it.
+     * If that is not present either, we try to use scene heading as title.
+     * In scene heading is disabled, then we leave the title empty.
+     */
+
+    auto setTitleInternal = [=](const QString &val) {
+        m_title = val;
+        emit titleChanged();
+    };
+    setTitleInternal( QStringLiteral("Empty Scene") );
+
+    // First lets look for an action paragraph.
+    if(m_elements.isEmpty())
+    {
+        if(m_heading->isEnabled())
+        {
+            setTitleInternal(m_heading->text());
+            return;
+        }
+
+        return;
+    }
+
+    auto findParagraph = [=](SceneElement::Type type, SceneElement *fromElement = nullptr) {
+        bool checkElement = fromElement == nullptr;
+        for(SceneElement *element : qAsConst(m_elements)) {
+            if(!checkElement && fromElement != nullptr && element == fromElement) {
+                checkElement = true;
+                continue;
+            }
+            if(element->type() == type && !element->text().isEmpty())
+                return element;
+        }
+        return (SceneElement*)nullptr;
+    };
+
+    auto firstSentence = [](const QString &text) {
+        QTextBoundaryFinder sentenceFinder(QTextBoundaryFinder::Sentence, text);
+        const int from = sentenceFinder.position();
+        const int to = sentenceFinder.toNextBoundary();
+        if(from < 0 || to < 0)
+            return text;
+        return text.mid(from, (to-from)).trimmed();
+    };
+
+    SceneElement *firstActionPara = findParagraph(SceneElement::Action);
+    if(firstActionPara != nullptr)
+    {
+        setTitleInternal( firstSentence(firstActionPara->text()) );
+        return;
+    }
+
+    SceneElement *firstCharacterPara = findParagraph(SceneElement::Character);
+    if(firstCharacterPara != nullptr)
+    {
+        const QString name = firstCharacterPara->formattedText();
+
+        SceneElement *firstDialoguePara = findParagraph(SceneElement::Dialogue, firstCharacterPara);
+        if(firstDialoguePara != nullptr)
+        {
+            const QString dialogue = firstSentence(firstDialoguePara->text());
+            setTitleInternal( name + QStringLiteral(": ") + dialogue );
+            return;
+        }
+
+        setTitleInternal( name + QStringLiteral(" says something.") );
+        return;
+    }
 }
 
 void Scene::trimTitle()

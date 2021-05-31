@@ -68,6 +68,16 @@ bool AbstractImporter::read()
     this->progress()->start();
     UndoStack::ignoreUndoCommands = true;
     const bool ret = this->doImport(&file);
+    if(ret)
+    {
+        Structure *structure = doc->structure();
+        for(int i=0; i<structure->elementCount(); i++)
+        {
+            StructureElement *element = structure->elementAt(i);
+            if(element != nullptr && element->scene() != nullptr)
+                element->scene()->inferTitleFromContent();
+        }
+    }
     screenplay->setCurrentElementIndex(0);
     UndoStack::ignoreUndoCommands = false;
     UndoStack::clearAllStacks();

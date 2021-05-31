@@ -223,6 +223,8 @@ public:
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
+    void inferTitleFromContent();
+
     Q_PROPERTY(bool hasTitle READ hasTitle NOTIFY titleChanged)
     bool hasTitle() const { return !m_title.isEmpty(); }
 
