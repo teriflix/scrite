@@ -1379,14 +1379,19 @@ QVector<QColor> Application::standardColors(const QVersionNumber &version)
 
 bool Application::loadScript()
 {
-    QMessageBox::StandardButton answer = QMessageBox::question(nullptr, "Warning", "Executing scripts on a scrite project is an experimental feature. Are you sure you want to use it?", QMessageBox::Yes|QMessageBox::No);
+    QMessageBox::StandardButton answer = QMessageBox::question(nullptr,
+       QStringLiteral("Warning"),
+       QStringLiteral("Executing scripts on a scrite project is an experimental feature. Are you sure you want to use it?"),
+       QMessageBox::Yes|QMessageBox::No);
     if(answer == QMessageBox::No)
         return true;
 
     ScriteDocument *document = ScriteDocument::instance();
     if(document->isReadOnly())
     {
-        QMessageBox::information(nullptr, "Warning", "Cannot execute script on a readonly document.");
+        QMessageBox::information(nullptr,
+             QStringLiteral("Warning"),
+             QStringLiteral("Cannot execute script on a readonly document."));
         return false;
     }
 
@@ -1397,8 +1402,8 @@ bool Application::loadScript()
         scriptPath = fi.absolutePath();
     }
 
-    const QString caption("Select a JavaScript file to load");
-    const QString filter("JavaScript File (*.js)");
+    const QString caption = QStringLiteral("Select a JavaScript file to load");
+    const QString filter = QStringLiteral("JavaScript File (*.js)");
     const QString scriptFile = QFileDialog::getOpenFileName(nullptr, caption, scriptPath, filter);
     if(scriptFile.isEmpty())
         return true;
@@ -1412,14 +1417,17 @@ bool Application::loadScript()
     const QString program = loadProgram(scriptFile);
     if(program.isEmpty())
     {
-        QMessageBox::information(nullptr, "Script", "No code was found in the selected file.");
+        QMessageBox::information(nullptr,
+             QStringLiteral("Script"),
+             QStringLiteral("No code was found in the selected file."));
         return true;
     }
 
     QJSEngine jsEngine;
     QJSValue globalObject = jsEngine.globalObject();
+    globalObject.setProperty(QStringLiteral("app"), jsEngine.newQObject(this));
     if(!document->isReadOnly())
-        globalObject.setProperty("document", jsEngine.newQObject(document));
+        globalObject.setProperty(QStringLiteral("document"), jsEngine.newQObject(document));
 
     qApp->setOverrideCursor(Qt::WaitCursor);
     const QJSValue result = jsEngine.evaluate(program, scriptFile);
@@ -1427,10 +1435,10 @@ bool Application::loadScript()
 
     if(result.isError())
     {
-        const QString msg = "Uncaught exception at line " +
+        const QString msg = QStringLiteral("Uncaught exception at line ") +
                 result.property("lineNumber").toString() + ": " +
                 result.toString();
-        QMessageBox::warning(nullptr, "Script", msg);
+        QMessageBox::warning(nullptr, QStringLiteral("Script"), msg);
     }
 
     return true;
