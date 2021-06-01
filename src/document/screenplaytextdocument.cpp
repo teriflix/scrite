@@ -625,9 +625,295 @@ void ScreenplayTextDocument::syncNow()
     this->loadScreenplay();
 }
 
+/*
+This function is experiemental, which is the reason why we dont make it accessible via a button
+or menu option on the GUI. This function can be invoked only from the scripting interface, which
+is also an experimental feature.
+
+If you ran the following script, then you would be able to get a fairly good super-imposition of
+the save the cat structure on an existing screenplay.
+
+var structure = {
+    "name": "Save The Cat",
+    "pageCount": 110,
+    "elements": [
+        {"name": "Opening Image", "page": 1, "act": "ACT 1" },
+        {"name": "Setup", "page": "1-10", "act": "ACT 1" },
+        {"name": "Theme Stated", "page": 5, "act": "ACT 1", "allowMultiple": true },
+        {"name": "Catalyst", "page": 12, "act": "ACT 1" },
+        {"name": "Debate", "page": "12-25", "act": "ACT 1"},
+        {"name": "Break Into Two", "page": "25-30", "act": "ACT 1" },
+        {"name": "B Story", "page": 30, "act": "ACT 2A" },
+        {"name": "Fun And Games", "page": "30-55", "act": "ACT 2A" },
+        {"name": "Midpoint", "page": 55, "act": "ACT 2A" },
+        {"name": "Bad Guys Close In", "page": "55-75", "act": "ACT 2B" },
+        {"name": "All Is Lost", "page": 75, "act": "ACT 2B" },
+        {"name": "Dark Night Of The Soul", "page": "75-85", "act": "ACT 2B" },
+        {"name": "Break Into Three", "page": 85, "act": "ACT 2B"},
+        {"name": "Finale", "page": "85-110", "act": "ACT 3" },
+        {"name": "Final Image", "page": 110, "act": "ACT 3" }
+    ]
+}
+
+screenplayTextDocument.superImposeStructure(structure)
+*/
 void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 {
-    Application::log( QStringLiteral("ScreenplayTextDocument::superImposeStructure()") );
+    if(m_screenplay == nullptr || m_screenplay->scriteDocument() == nullptr || m_textDocument == nullptr)
+        return;
+
+    if(m_purpose == ForPrinting)
+        return;
+
+    ScriteDocument *document = m_screenplay->scriteDocument();
+    Structure *structure = document->structure();
+    const int nrPages = model.value(QStringLiteral("pageCount")).toInt();
+    if(nrPages <= 0)
+        return;
+
+    const QString tagGroup = model.value( QStringLiteral("name") ).toString();
+    struct TagInfo
+    {
+        QString name;
+        QString act;
+        QString id;
+        int fromPageNr = 0;
+        int toPageNr = 0;
+        bool allowMultiple = false;
+    };
+    QVector<TagInfo> tags;
+
+    /**
+     * First lets parse model and set groups data on structure.
+     */
+    {
+        QString groupsData;
+        QTextStream ts(&groupsData, QIODevice::WriteOnly);
+
+        ts << "[" << tagGroup << "]\n";
+
+        const QJsonArray elements = model.value(QStringLiteral("elements")).toArray();
+        tags.reserve( elements.size() );
+
+        for(const QJsonValue &item : elements)
+        {
+            const QJsonObject element = item.toObject();
+
+            TagInfo tag;
+            tag.name = element.value( QStringLiteral("name") ).toString();
+            tag.act = element.value( QStringLiteral("act") ).toString();
+            tag.allowMultiple = element.value( QStringLiteral("allowMultiple") ).toBool(tag.allowMultiple);
+
+            const QJsonValue pageValue = element.value( QStringLiteral("page") );
+            const QString page = pageValue.toVariant().toString();
+            if(page.contains(QStringLiteral("-")))
+            {
+                const QStringList fields = page.split(QStringLiteral("-"), QString::SkipEmptyParts);
+                const int a = fields.size() >= 2 ? fields.first().toInt() : 0;
+                const int b = fields.size() >= 2 ? fields.last().toInt() : 0;
+                if(a == 0 || b == 0)
+                    return;
+
+                tag.fromPageNr = qMin(a, b);
+                tag.toPageNr = qMax(a, b);
+            }
+            else
+            {
+                tag.fromPageNr = page.toInt();
+                if(tag.fromPageNr == 0)
+                    return;
+
+                tag.toPageNr = tag.fromPageNr;
+            }
+
+            tag.id = tagGroup + QStringLiteral("/") + tag.name + QStringLiteral(" (") + page + QStringLiteral(")");
+            tag.id = tag.id.toUpper();
+
+            ts << "<" << tag.act << ">" << tag.name << " (" << page << ")\n";
+            tags.append(tag);
+        }
+
+        ts.flush();
+
+        if(tags.isEmpty())
+            return;
+
+        structure->setGroupsData(groupsData);
+    }
+
+    // Lets sync the document if it has not already been done
+    if(m_loadScreenplayTimer.isActive())
+        this->syncNow();
+
+    // What we have in the screenplay is (potentially) a bunch of episodes.
+    // Each episode made up of scenes with their corresponding text frames
+    struct _SceneFrame
+    {
+        StructureElement *element = nullptr;
+        QTextFrame *textFrame = nullptr;
+        qreal startPage = 0;
+        qreal endPage = 0;
+        qreal pageCount = 0;
+    };
+
+    struct _Episode
+    {
+        QList<_SceneFrame> sceneFrames;
+        qreal pageCount = 0;
+    };
+
+    QList<_Episode> episodes;
+
+    // First lets gather all episodes from the screenplay. There will always be atleast one episode.
+    QList<ScreenplayElement*> actBreaksToRemove;
+    const int nrElements = m_screenplay->elementCount();
+    for(int i=0; i<nrElements; i++)
+    {
+        ScreenplayElement *element = m_screenplay->elementAt(i);
+        if(element->elementType() != ScreenplayElement::SceneElementType)
+        {
+            if(element->breakType() == Screenplay::Episode)
+                episodes.append( _Episode() );
+            else
+                actBreaksToRemove.append(element);
+            continue;
+        }
+
+        Scene *scene = element->scene();
+        if(scene == nullptr)
+            continue;
+
+        StructureElement *selement = scene->structureElement();
+        if(selement == nullptr)
+            continue;
+
+        QTextFrame *frame = this->findTextFrame(element);
+        if(frame == nullptr)
+            return;
+
+        if(episodes.isEmpty())
+            episodes.append( _Episode() );
+
+        _SceneFrame sceneFrame;
+        sceneFrame.element = selement;
+        sceneFrame.textFrame = frame;
+        episodes.last().sceneFrames.append(sceneFrame);
+    }
+
+    auto findTags = [tags](int pageNr) -> QVector<TagInfo> {
+        QVector<TagInfo> ret;
+        for(const TagInfo &tag : qAsConst(tags)) {
+            if(pageNr >= tag.fromPageNr && pageNr <= tag.toPageNr)
+                ret.append(tag);
+        }
+        return ret;
+    };
+
+    // Compute height in pixels of each page.
+    const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
+    const qreal topMargin = rootFrameFormat.topMargin();
+    const qreal bottomMargin = rootFrameFormat.bottomMargin();
+    const qreal pageLength = m_textDocument->pageSize().height() - topMargin - bottomMargin;
+
+    // Now lets compute page extents of each episode and each scene in those episodes.
+    QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
+    for(_Episode &episode : episodes)
+    {
+        if(episode.sceneFrames.isEmpty())
+            episode.pageCount = 0;
+        else
+        {
+            qreal episodeY = -1;
+            for(_SceneFrame &sceneFrame : episode.sceneFrames)
+            {
+                const QRectF rect = layout->frameBoundingRect(sceneFrame.textFrame);
+                if(episodeY < 0)
+                    episodeY = rect.top();
+
+                sceneFrame.startPage = (rect.top() - episodeY)/pageLength;
+                sceneFrame.endPage = (rect.bottom() - episodeY)/pageLength;
+                sceneFrame.pageCount = sceneFrame.endPage - sceneFrame.startPage;
+            }
+
+            episode.pageCount = episode.sceneFrames.last().endPage - episode.sceneFrames.first().startPage;
+        }
+    }
+
+    // Now we go ahead and apply tags to each scene.
+    for(const _Episode &episode : qAsConst(episodes))
+    {
+        if(episode.pageCount == 0)
+            continue;
+
+        const qreal pageScale = qreal(nrPages) / episode.pageCount;
+        for(const _SceneFrame &sceneFrame : qAsConst(episode.sceneFrames))
+        {
+            const int pageNr = 1 + floor(sceneFrame.startPage * pageScale);
+            const QVector<TagInfo> sceneTags = findTags(pageNr);
+            if(sceneTags.isEmpty())
+                continue;
+
+            QStringList tagGroups;
+            if(sceneTags.size() == 0)
+                tagGroups << sceneTags.first().id;
+            else
+            {
+                for(const TagInfo &sceneTag : sceneTags)
+                {
+                    if(sceneTag.fromPageNr == sceneTag.toPageNr)
+                        tagGroups.clear();
+                    tagGroups << sceneTag.id;
+                    if(sceneTag.fromPageNr == sceneTag.toPageNr)
+                        break;
+                }
+            }
+
+            sceneFrame.element->scene()->setGroups(tagGroups);
+        }
+    }
+
+    // Insert act breaks
+    QString actName = tags.first().act;
+    int startingElementIndex = 0;
+    while(!tags.isEmpty())
+    {
+        if(tags.first().act == actName)
+        {
+            tags.takeFirst();
+            continue;
+        }
+
+        for(int i=startingElementIndex; i<m_screenplay->elementCount(); i++)
+        {
+            ScreenplayElement *element = m_screenplay->elementAt(i);
+            if(element->scene() == nullptr)
+                continue;
+
+            if(element->scene()->groups().contains(tags.first().id))
+            {
+                ScreenplayElement *actBreak = new ScreenplayElement(m_screenplay);
+                actBreak->setElementType(ScreenplayElement::BreakElementType);
+                actBreak->setBreakType(Screenplay::Act);
+                m_screenplay->insertElementAt(actBreak, i);
+                startingElementIndex = i+1;
+                break;
+            }
+        }
+
+        actName = tags.first().act;
+        tags.takeFirst();
+    }
+
+    // Remove all act breaks that existed before.
+    while(!actBreaksToRemove.isEmpty())
+        m_screenplay->removeElement(actBreaksToRemove.takeLast());
+
+    // Set the preferred grouping to the newly loaded tag group.
+    structure->setPreferredGroupCategory(tagGroup);
+
+    // Place index cards in beat board layout
+    structure->placeElementsInBeatBoardLayout(m_screenplay);
+    structure->setForceBeatBoardLayout(true);
 }
 
 void ScreenplayTextDocument::classBegin()

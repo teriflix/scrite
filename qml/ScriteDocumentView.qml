@@ -297,6 +297,7 @@ Item {
         printEachSceneOnANewPage: false
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
         property Item editor
+        Component.onCompleted: app.registerObject(screenplayTextDocument, "screenplayTextDocument")
     }
 
     Rectangle {

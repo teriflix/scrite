@@ -894,6 +894,51 @@ bool Application::event(QEvent *event)
     return QtApplicationClass::event(event);
 }
 
+/**
+ * I dont expect the object registry to have too many objects at this point.
+ * So, I dont want to overly optimise the code here for being super fast.
+ */
+QString Application::registerObject(QObject *object, const QString &name)
+{
+    if(object == nullptr)
+        return QString();
+
+    QString objName = name;
+    if(objName.isEmpty())
+        objName = object->objectName();
+    if(objName.isEmpty())
+        objName = QString::fromLatin1(object->metaObject()->className());
+
+    int index = 0;
+    QString finalObjName = objName;
+    while( this->findRegisteredObject(finalObjName) )
+        finalObjName = objName + QString::number(index++);
+
+    // We are not using setObjectName on purpose!!
+    object->setProperty("#objectName", finalObjName);
+    m_objectRegistry.append(object);
+
+    return finalObjName;
+}
+
+void Application::unregisterObject(QObject *object)
+{
+    m_objectRegistry.removeAt( m_objectRegistry.indexOf(object) );
+}
+
+QObject *Application::findRegisteredObject(const QString &name) const
+{
+    const QList<QObject*> & objects = m_objectRegistry.list();
+    for(QObject *object : objects)
+    {
+        const QString objName = object->property("#objectName").toString();
+        if(objName == name)
+            return object;
+    }
+
+    return nullptr;
+}
+
 QColor Application::pickStandardColor(int counter) const
 {
     const QVector<QColor> colors = this->standardColors();
@@ -1424,10 +1469,17 @@ bool Application::loadScript()
     }
 
     QJSEngine jsEngine;
+
     QJSValue globalObject = jsEngine.globalObject();
-    globalObject.setProperty(QStringLiteral("app"), jsEngine.newQObject(this));
     if(!document->isReadOnly())
         globalObject.setProperty(QStringLiteral("document"), jsEngine.newQObject(document));
+
+    const QList<QObject*> objects = m_objectRegistry.list();
+    for(QObject *object : qAsConst(objects))
+    {
+        const QString objName = object->property("#objectName").toString();
+        globalObject.setProperty(objName, jsEngine.newQObject(object));
+    }
 
     qApp->setOverrideCursor(Qt::WaitCursor);
     const QJSValue result = jsEngine.evaluate(program, scriptFile);

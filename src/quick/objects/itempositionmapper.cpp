@@ -121,9 +121,11 @@ void ItemPositionMapper::trackMovement(QQuickItem *item, QList<QObject*> &list)
         connect(ptr, SIGNAL(destroyed(QObject*)), this, SLOT(trackedObjectDestroyed(QObject*)));
         connect(ptr, SIGNAL(xChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(yChanged()), &m_recomputePositionTimer, SLOT(start()));
+        connect(ptr, SIGNAL(widthChanged()), &m_recomputePositionTimer, SLOT(start()));
+        connect(ptr, SIGNAL(heightChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(rotationChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(scale()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(transformOriginChanged()), &m_recomputePositionTimer, SLOT(start()));
+        connect(ptr, SIGNAL(scaleChanged()), &m_recomputePositionTimer, SLOT(start()));
+        connect(ptr, SIGNAL(transformOriginChanged(TransformOrigin)), &m_recomputePositionTimer, SLOT(start()));
         ptr = ptr->parentItem();
     }
 

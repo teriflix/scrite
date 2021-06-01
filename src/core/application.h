@@ -30,6 +30,7 @@
 #include "errorreport.h"
 #include "transliteration.h"
 #include "systemtextinputmanager.h"
+#include "objectlistpropertymodel.h"
 
 typedef QApplication QtApplicationClass;
 class QSettings;
@@ -272,6 +273,16 @@ public:
 signals:
     void minimizeWindowRequest();
 
+public:
+    Q_PROPERTY(QAbstractListModel* objectReigstry READ objectRegistry CONSTANT STORED false)
+    ObjectListPropertyModel<QObject*>* objectRegistry() const {
+        return &(const_cast<Application*>(this)->m_objectRegistry);
+    }
+
+    Q_INVOKABLE QString registerObject(QObject *object, const QString &name);
+    Q_INVOKABLE void unregisterObject(QObject *object);
+    Q_INVOKABLE QObject *findRegisteredObject(const QString &name) const;
+
 private:
     bool loadScript();
     bool registerFileTypes();
@@ -288,6 +299,7 @@ private:
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;
     QVariantList m_standardColors;
+    ObjectListPropertyModel<QObject*> m_objectRegistry;
     QNetworkConfigurationManager *m_networkConfiguration = nullptr;
 };
 
