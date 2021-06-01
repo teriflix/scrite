@@ -242,11 +242,11 @@ Item {
     Connections {
         target: scriteDocument
         onJustReset: {
-            editorBusyOveray.visible = true
+            appBusyOverlay.refCount = appBusyOverlay.refCount+1
             screenplayAdapter.initialLoadTreshold = 25
             app.execLater(screenplayAdapter, 250, function() {
                 screenplayAdapter.sessionId = scriteDocument.sessionId
-                editorBusyOveray.visible = false
+                appBusyOverlay.refCount = Math.max(appBusyOverlay.refCount-1,0)
             })
         }
         onJustLoaded: {
@@ -297,6 +297,8 @@ Item {
         printEachSceneOnANewPage: false
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
         property Item editor
+        onUpdateScheduled: appBusyOverlay.refCount = appBusyOverlay.refCount+1
+        onUpdateFinished: appBusyOverlay.refCount = Math.max(appBusyOverlay.refCount-1,0)
         Component.onCompleted: app.registerObject(screenplayTextDocument, "screenplayTextDocument")
     }
 
@@ -2307,8 +2309,10 @@ Item {
     }
 
     BusyOverlay {
-        id: editorBusyOveray
+        id: appBusyOverlay
         anchors.fill: parent
         busyMessage: "Loading Screenplay ..."
+        visible: refCount > 0
+        property int refCount: 0
     }
 }

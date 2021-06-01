@@ -1504,7 +1504,7 @@ void ScreenplayTextDocument::loadScreenplayLater()
         this->disconnectFromScreenplayFormatSignals();
 
         const bool updateWasScheduled = m_loadScreenplayTimer.isActive();
-        m_loadScreenplayTimer.start(0, this);
+        m_loadScreenplayTimer.start(50, this);
         if(!updateWasScheduled)
             emit updateScheduled();
     }
