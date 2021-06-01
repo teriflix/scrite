@@ -1181,6 +1181,8 @@ Rectangle {
                 }
             }
 
+            property real totalSceneHeadingHeight: sceneHeadingAreaLoader.height + (synopsisEditorArea.visible ? synopsisEditorArea.height : 0)
+
             Column {
                 id: contentItemLayout
                 width: parent.width
@@ -1205,6 +1207,7 @@ Rectangle {
                 }
 
                 Rectangle {
+                    id: synopsisEditorArea
                     width: parent.width
                     height: synopsisEditorLayout.height + 10
                     color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
@@ -1295,7 +1298,7 @@ Rectangle {
                                 id: pageBreakLine
                                 property rect cursorRect: modelData.position >= 0 ? sceneTextEditor.positionToRectangle(modelData.position) : Qt.rect(0,0,0,0)
                                 x: 0
-                                y: (modelData.position >= 0 ? cursorRect.y : -sceneHeadingAreaLoader.height) - height/2
+                                y: (modelData.position >= 0 ? cursorRect.y : -contentItem.totalSceneHeadingHeight) - height/2
                                 width: sceneTextEditorBackground.width
                                 height: 1
                                 // color: primaryColors.c400.background
@@ -2368,6 +2371,12 @@ Rectangle {
                     visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
                     topPadding: 5
                     bottomPadding: screenplayEditorSettings.displaySceneSynopsis ? 5 : 15
+                }
+
+                Item {
+                    width: parent.width
+                    height: 10
+                    visible: !screenplayEditorSettings.displaySceneSynopsis
                 }
             }
         }
