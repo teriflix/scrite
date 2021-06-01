@@ -190,11 +190,15 @@ Item {
                 checkable: true
                 checked: false
                 onToggled: {
+                    canvasPreview.allowed = false
                     scriteDocument.structure.forceBeatBoardLayout = checked
                     if(checked && scriteDocument.structure.elementCount > 0) {
-                        var rect = scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-                        cmdZoomOne.click()
+                        scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
                     }
+                    app.execLater(canvasPreview, 1000, function() {
+                        cmdZoomOne.click()
+                        canvasPreview.allowed = true
+                    })
                 }
 
                 Component.onCompleted: checked = scriteDocument.structure.forceBeatBoardLayout
@@ -1486,8 +1490,12 @@ Item {
                         return
 
                     if(!hasItems) {
+                        canvasPreview.allowed = false
                         var rect = scriteDocument.structure.layoutElements(type)
-                        canvasScroll.zoomFit(rect)
+                        app.execLater(selection, 1000, function() {
+                            cmdZoomOne.click()
+                            canvasPreview.allowed = true
+                        })
                         return
                     }
 
@@ -1501,13 +1509,14 @@ Item {
                 SequentialAnimation {
                     id: layoutAnimation
 
-                    property var layoutType: -1
+                    property int layoutType: -1
                     property var layoutItems: []
                     property var layoutItemBounds
                     running: false
 
                     ScriptAction {
                         script: {
+                            canvasPreview.allowed = false
                             layoutAnimation.layoutItems = selection.items
                             selection.clear()
                         }
@@ -1547,6 +1556,7 @@ Item {
                             };
                             layoutAnimation.layoutItemBounds = undefined
                             selection.init(elementItems, rect)
+                            canvasPreview.allowed = true
                         }
                     }
                 }
@@ -1682,11 +1692,12 @@ Item {
 
     Item {
         id: canvasPreview
-        visible: structureCanvasSettings.showPreview && parent.width > 400
+        visible: allowed && structureCanvasSettings.showPreview && parent.width > 400
         anchors.right: canvasScroll.right
         anchors.bottom: canvasScroll.bottom
         anchors.margins: 30
         property alias interacting: panMouseArea.pressed
+        property bool allowed: true
 
         readonly property real maxSize: 150
         property size previewSize: {
@@ -1702,10 +1713,10 @@ Item {
             w *= scale
             h *= scale
 
-            if(w > parent.width-toolbar.width-60)
-                scale = (parent.width-toolbar.width-60)/w
-            else if(h >= parent.height-60)
-                scale = (parent.height-60)/h
+            if(w > canvasScroll.width-60)
+                scale = (canvasScroll.width-60)/w
+            else if(h >= canvasScroll.height-60)
+                scale = (canvasScroll.height-60)/h
             else
                 scale = 1
 
