@@ -57,6 +57,7 @@
 #include "screenplayadapter.h"
 #include "spellcheckservice.h"
 #include "colorimageprovider.h"
+#include "itempositionmapper.h"
 #include "tabsequencemanager.h"
 #include "gridbackgrounditem.h"
 #include "notificationmanager.h"
@@ -278,6 +279,8 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", apreason);
 
     qmlRegisterType<NotebookTabModel>("Scrite", 1, 0, "NotebookTabModel");
+
+    qmlRegisterType<ItemPositionMapper>("Scrite", 1, 0, "ItemPositionMapper");
 
     NotificationManager notificationManager;
 

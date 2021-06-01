@@ -770,21 +770,22 @@ Rectangle {
         }
 
         Item {
+            id: headingTextAreaOnStatusBar
             anchors.left: metricsDisplay.right
             anchors.right: zoomSlider.left
             anchors.margins: 5
             clip: true
             height: parent.height
 
+            ItemPositionMapper {
+                id: contentViewPositionMapper
+                from: contentView
+                position: Qt.point(0,0)
+                to: headingTextAreaOnStatusBar
+            }
+
             Item {
-                property real pageIndentation: pageRulerArea.x
-                onPageIndentationChanged: Qt.callLater(placeSelf)
-
-                function placeSelf() {
-                    x = parent.mapFromItem(contentView, 0, 0).x
-                }
-
-                Component.onCompleted: placeSelf()
+                x: contentViewPositionMapper.mappedPosition.x
                 width: contentView.width
                 height: parent.height
                 visible: x > 0
@@ -810,9 +811,10 @@ Rectangle {
                     id: currentSceneNumber
                     anchors.verticalCenter: currentSceneHeadingText.verticalCenter
                     anchors.left: currentSceneHeadingText.left
-                    anchors.leftMargin: Math.min(-88 * zoomLevel, -contentWidth)
+                    anchors.leftMargin: Math.min(-recommendedMargin, -contentWidth)
                     font: currentSceneHeadingText.font
                     text: parent.currentSceneHeading ? parent.currentSceneElement.resolvedSceneNumber + ". " : ''
+                    property real recommendedMargin: headingFontMetrics.averageCharacterWidth*5 + ruler.leftMarginPx*0.075
                 }
 
                 Text {
