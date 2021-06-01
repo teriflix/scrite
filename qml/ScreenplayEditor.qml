@@ -1221,7 +1221,8 @@ Rectangle {
 
                         Text {
                             id: synopsisEditorHeading
-                            text: "<b>Synopsis:</b> " + (scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? "(The text you type below will be synced with this scene's index card on the Structure Canvas.)" : "")
+                            text: "Synopsis:"
+                            font.bold: true
                             font.pointSize: 12
                             visible: synopsisEditorField.length > 0
                             width: parent.width

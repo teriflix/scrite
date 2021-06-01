@@ -3742,7 +3742,7 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     {
         if(!ret.isEmpty())
             ret += QStringLiteral("<br/>");
-        ret += QStringLiteral("<b>") + it.key() + QStringLiteral("</b>: ") + it.value().join( QStringLiteral(", ") );
+        ret += QStringLiteral("<b>") + it.key() + QStringLiteral(":</b> ") + it.value().join( QStringLiteral(", ") );
         ++it;
     }
 
@@ -3765,7 +3765,7 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     {
         if(!ret.isEmpty())
             ret += QStringLiteral("<br/>");
-        ret += QStringLiteral("<b>") + Application::instance()->camelCased( it.key() ) + QStringLiteral("</b>: ") + it.value().join( QStringLiteral(", ") );
+        ret += QStringLiteral("<b>") + Application::instance()->camelCased( it.key() ) + QStringLiteral(":</b> ") + it.value().join( QStringLiteral(", ") );
         ++it;
     }
 
