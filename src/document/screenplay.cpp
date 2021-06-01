@@ -497,36 +497,13 @@ void Screenplay::setCoverPagePhoto(const QString &val)
 {
     HourGlass hourGlass;
 
-#if 0
-    QImage image = val.isEmpty() ? QImage() : QImage(val);
-    if( image.isNull() )
-    {
-        m_scriteDocument->fileSystem()->remove(coverPagePhotoPath);
-        m_coverPagePhoto.clear();
-    }
-    else
-    {
-        if(m_scriteDocument->fileSystem()->contains(val))
-            m_coverPagePhoto = val;
-        else
-        {
-            const QSize imageSize = image.size().scaled(1920, 1080, Qt::KeepAspectRatio);
-            if(image.width() > imageSize.width() || image.height() > imageSize.height())
-                image = image.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-            const QString photoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath, true);
-            if(image.save(photoPath, "JPG"))
-                m_coverPagePhoto = photoPath;
-            else
-                m_coverPagePhoto.clear();
-        }
-    }
-#else
     const QSize fullHdSize(1920, 1080);
     const QString val2 = m_scriteDocument->fileSystem()->addImage(val, coverPagePhotoPath, fullHdSize);
-    m_coverPagePhoto = val2.isEmpty() ? val2 : m_scriteDocument->fileSystem()->absolutePath(val2);
-#endif
 
+    m_coverPagePhoto.clear();
+    emit coverPagePhotoChanged();
+
+    m_coverPagePhoto = val2.isEmpty() ? val2 : m_scriteDocument->fileSystem()->absolutePath(val2);
     emit coverPagePhotoChanged();
 }
 
