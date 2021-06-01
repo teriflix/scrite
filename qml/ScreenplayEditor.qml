@@ -772,7 +772,7 @@ Rectangle {
         Item {
             id: headingTextAreaOnStatusBar
             anchors.left: metricsDisplay.right
-            anchors.right: zoomSlider.left
+            anchors.right: taggingOptions.visible ? taggingOptions.left : zoomSlider.left
             anchors.margins: 5
             clip: true
             height: parent.height
@@ -830,6 +830,61 @@ Rectangle {
                     elide: Text.ElideRight
                     text: parent.currentSceneHeading ? parent.currentSceneHeading.text : ''
                 }
+            }
+        }
+
+        Row {
+            id: taggingOptions
+            spacing: 10
+            visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: zoomSlider.left
+            anchors.rightMargin: spacing
+            height: zoomSlider.height
+
+            ToolButton3 {
+                iconSource: "../icons/action/layout_grouping.png"
+                height: parent.height; width: height;
+                anchors.verticalCenter: parent.verticalCenter
+                down: taggingMenu.active
+                onClicked: taggingMenu.show()
+                ToolTip.text: "Grouping Options"
+
+                MenuLoader {
+                    id: taggingMenu
+                    anchors.left: parent.left
+                    anchors.bottom: parent.top
+                    menu: Menu2 {
+                        id: layoutGroupingMenu
+                        width: 350
+
+                        MenuItem2 {
+                            text: "None"
+                            icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            font.bold: scriteDocument.structure.preferredGroupCategory === ""
+                            onTriggered: scriteDocument.structure.preferredGroupCategory = ""
+                        }
+
+                        MenuSeparator { }
+
+                        Repeater {
+                            model: scriteDocument.structure.groupCategories
+
+                            MenuItem2 {
+                                text: app.camelCased(modelData)
+                                icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                font.bold: scriteDocument.structure.preferredGroupCategory === modelData
+                                onTriggered: scriteDocument.structure.preferredGroupCategory = modelData
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.borderColor
             }
         }
 
@@ -2161,6 +2216,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         width: headingFontMetrics.lineSpacing
                         height: headingFontMetrics.lineSpacing
+                        ToolTip.text: "Tag Scene"
 
                         MenuLoader {
                             id: sceneTagMenuLoader

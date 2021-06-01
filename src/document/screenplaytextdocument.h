@@ -212,6 +212,8 @@ public:
 
     void syncNow();
 
+    Q_INVOKABLE void superImposeStructure(const QJsonObject &model);
+
 signals:
     void updateScheduled();
     void updateStarted();

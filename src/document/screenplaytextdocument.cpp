@@ -625,6 +625,11 @@ void ScreenplayTextDocument::syncNow()
     this->loadScreenplay();
 }
 
+void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
+{
+    Application::log( QStringLiteral("ScreenplayTextDocument::superImposeStructure()") );
+}
+
 void ScreenplayTextDocument::classBegin()
 {
     m_updating = true;
