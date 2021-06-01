@@ -78,7 +78,7 @@ public:
     QString text() const;
     Q_SIGNAL void textChanged();
 
-    static bool parse(const QString &text, QString &locationType, QString &location, QString &moment);
+    static bool parse(const QString &text, QString &locationType, QString &location, QString &moment, bool strict=false);
 
     Q_INVOKABLE void parseFrom(const QString &text);
 

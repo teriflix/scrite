@@ -260,13 +260,19 @@ QString SceneHeading::text() const
     return QString();
 }
 
-bool SceneHeading::parse(const QString &text, QString &locationType, QString &location, QString &moment)
+bool SceneHeading::parse(const QString &text, QString &locationType, QString &location, QString &moment, bool strict)
 {
     const Structure *structure = ScriteDocument::instance()->structure();
     const QString heading = text.toUpper().trimmed();
     const QRegularExpression fieldSep( QStringLiteral("[\\.-]") );
+
     const int field1SepLoc = heading.indexOf(fieldSep);
-    const int field2SepLoc = heading.lastIndexOf(fieldSep);
+    int field2SepLoc = heading.lastIndexOf(fieldSep);
+    if(field2SepLoc == field1SepLoc)
+        field2SepLoc = -1;
+
+    if(strict && (field1SepLoc < 0 || field2SepLoc < 0))
+        return false;
 
     if(field1SepLoc < 0 && field2SepLoc < 0)
     {

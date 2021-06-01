@@ -239,7 +239,7 @@ void StructureElement::setTitle(const QString &val)
         if(heading != nullptr && heading->isEnabled())
         {
             QString _locationType, _location, _moment;
-            if( SceneHeading::parse(val, _locationType, _location, _moment) )
+            if( SceneHeading::parse(val, _locationType, _location, _moment, true) )
             {
                 heading->setLocationType(_locationType);
                 heading->setLocation(_location);
