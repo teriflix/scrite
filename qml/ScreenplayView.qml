@@ -493,7 +493,7 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
-                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 0
+                anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 3
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 enabled: !dragArea.containsDrag
                 sourceComponent: Rectangle {
