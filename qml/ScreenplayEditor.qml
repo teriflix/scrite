@@ -57,7 +57,14 @@ Rectangle {
                 contentView.scrollToFirstScene()
                 return
             }
-            if(mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive)
+
+            var originIsContentView = mainTabBar.currentIndex === 0 || app.hasActiveFocus(qmlWindow,contentView)
+            if(!originIsContentView) {
+                var gp = app.cursorPosition()
+                var pos = app.mapGlobalPositionToItem(contentView,gp)
+                originIsContentView = pos.x >= 0 && pos.x < contentView.width && pos.y >= 0 && pos.y < contentView.height
+            }
+            if(originIsContentView)
                 app.execLater(contentView, 100, function() {
                     contentView.scrollIntoView(currentIndex)
                 })
@@ -535,10 +542,42 @@ Rectangle {
 
                     onContentYChanged: Qt.callLater(evaluateFirstAndLastPoint)
                     onOriginYChanged: Qt.callLater(evaluateFirstAndLastPoint)
+                    onFirstItemIndexChanged: makeAVisibleItemCurrentTimer.start()
+                    onLastItemIndexChanged: makeAVisibleItemCurrentTimer.start()
+                    onMovingChanged: makeAVisibleItemCurrentTimer.start()
 
                     function evaluateFirstAndLastPoint() {
                         firstPoint = mapToItem(contentItem, width/2, 1)
                         lastPoint = mapToItem(contentItem, width/2, height-2)
+                    }
+
+                    Timer {
+                        id: makeAVisibleItemCurrentTimer
+                        interval: 600
+                        repeat: false
+                        running: false
+                        onTriggered: {
+                            if(contentView.moving) {
+                                start()
+                                return
+                            }
+                            contentView.makeAVisibleItemCurrent()
+                        }
+                    }
+
+                    function makeAVisibleItemCurrent() {
+                        var ci = screenplayAdapter.currentIndex
+                        if(ci >= firstItemIndex && ci <= lastItemIndex)
+                            return
+
+                        var gp = app.cursorPosition()
+                        var pos = app.mapGlobalPositionToItem(contentView,gp)
+                        if(pos.x >= 0 && pos.x < contentView.width && pos.y >= 0 && pos.y < contentView.height) {
+                            pos = mapToItem(contentItem, pos.x, pos.y)
+                            ci = indexAt(pos.x, pos.y)
+                        } else
+                            ci = indexAt(firstPoint.x, firstPoint.y+height*0.33)
+                        screenplayAdapter.currentIndex = ci
                     }
 
                     function validOrLastIndex(val) { return val < 0 ? screenplayAdapter.elementCount-1 : val }

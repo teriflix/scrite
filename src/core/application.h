@@ -175,6 +175,7 @@ public:
 
     Q_INVOKABLE QPointF cursorPosition() const;
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
+    Q_INVOKABLE bool isMouseOverItem(QQuickItem *item) const;
 
     Q_INVOKABLE void execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
 

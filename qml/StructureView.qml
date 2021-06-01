@@ -897,7 +897,7 @@ Item {
 
                 EventFilter.target: app
                 EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1 && !modalDialog.active && !createItemMouseHandler.enabled
-                EventFilter.events: [6]
+                EventFilter.events: [EventFilter.KeyPress]
                 EventFilter.onFilter: {
                     var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
                     var element = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)

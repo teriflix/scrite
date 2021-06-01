@@ -494,6 +494,15 @@ QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &po
     return item->mapFromGlobal(pos);
 }
 
+bool Application::isMouseOverItem(QQuickItem *item) const
+{
+    if(item == nullptr)
+        return false;
+
+    const QPointF pos = this->mapGlobalPositionToItem(item, QCursor::pos());
+    return item->boundingRect().contains(pos);
+}
+
 class ExecLater : public QObject
 {
 public:
