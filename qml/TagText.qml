@@ -27,30 +27,24 @@ Rectangle {
     property alias font: textItem.font
     property alias textColor: textItem.color
     property real padding: 0
-    property real topPadding: 0
-    property real leftPadding: 0
-    property real rightPadding: 0
-    property real bottomPadding: 0
+    property real topPadding: padding
+    property real leftPadding: padding
+    property real rightPadding: padding
+    property real bottomPadding: padding
     property alias closable: closeButton.active
     property alias hoverEnabled: tagMouseArea.hoverEnabled
     property alias containsMouse: tagMouseArea.containsMouse
 
     width: textItemContainer.width + (closeButton.active ? (height+2-rightPadding) : 0)
     height: textItemContainer.height
-    onPaddingChanged: {
-        leftPadding = padding
-        rightPadding = padding
-        topPadding = padding
-        bottomPadding = padding
-    }
 
     signal closeRequest()
     signal clicked()
 
     Item {
         id: textItemContainer
-        width: textItem.contentWidth + parent.leftPadding + parent.rightPadding
-        height: textItem.contentHeight + parent.topPadding + parent.bottomPadding
+        width: textItem.width + parent.leftPadding + parent.rightPadding
+        height: textItem.height + parent.topPadding + parent.bottomPadding
 
         TransliteratedText {
             id: textItem

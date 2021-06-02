@@ -1192,6 +1192,7 @@ Rectangle {
                     width: parent.width
                     active: contentItem.theScene !== null
                     sourceComponent: sceneHeadingArea
+                    z: 1
                     onItemChanged: {
                         if(item) {
                             item.theElementIndex = contentItem.theIndex
@@ -1209,7 +1210,7 @@ Rectangle {
                 Rectangle {
                     id: synopsisEditorArea
                     width: parent.width
-                    height: synopsisEditorLayout.height + 10
+                    height: synopsisEditorLayout.height + 10*Math.min(zoomLevel,1)
                     color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
                     visible: screenplayEditorSettings.displaySceneSynopsis
 
@@ -1226,7 +1227,7 @@ Rectangle {
                             id: synopsisEditorHeading
                             text: "Synopsis:"
                             font.bold: true
-                            font.pointSize: 12
+                            font.pointSize: headingFontMetrics.font.pointSize-2
                             visible: synopsisEditorField.length > 0
                             width: parent.width
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1235,7 +1236,7 @@ Rectangle {
                         TextArea {
                             id: synopsisEditorField
                             width: parent.width
-                            font.pointSize: screenplayFormat.defaultFont2.pointSize-2
+                            font.pointSize: headingFontMetrics.font.pointSize-2
                             readOnly: scriteDocument.readOnly
                             palette: app.palette
                             selectByMouse: true
@@ -2109,7 +2110,7 @@ Rectangle {
                 }
             }
 
-            height: sceneHeadingLayout.height + 24
+            height: sceneHeadingLayout.height + 12*Math.min(zoomLevel,1)
             color: Qt.tint(theScene.color, "#E7FFFFFF")
 
             Item {
@@ -2366,16 +2367,16 @@ Rectangle {
                 Text {
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    font.pointSize: app.idealAppFontSize - 2
+                    font.pointSize: headingFontMetrics.font.pointSize-2
                     text: sceneCharactersListLoader.active ? scriteDocument.structure.presentableGroupNames(headingItem.theScene.groups) : ""
                     visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
                     topPadding: 5
-                    bottomPadding: screenplayEditorSettings.displaySceneSynopsis ? 5 : 15
+                    bottomPadding: (screenplayEditorSettings.displaySceneSynopsis ? 5 : 15) * Math.min(zoomLevel,1)
                 }
 
                 Item {
                     width: parent.width
-                    height: 10
+                    height: 10 * Math.min(zoomLevel,1)
                     visible: !screenplayEditorSettings.displaySceneSynopsis
                 }
             }
@@ -2410,7 +2411,7 @@ Rectangle {
                 font.bold: true
                 topPadding: 5
                 bottomPadding: 5
-                font.pointSize: 12
+                font.pointSize: headingFontMetrics.font.pointSize-2
             }
 
             Repeater {
@@ -2423,16 +2424,16 @@ Rectangle {
                             return accentColors.c900
                         return editorHasActiveFocus ? accentColors.c600 : accentColors.c10
                     }
-                    border.width: editorHasActiveFocus ? 0 : 1
+                    border.width: editorHasActiveFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
                     border.color: colors.text
                     color: colors.background
                     textColor: colors.text
                     text: modelData
-                    leftPadding: 10
-                    rightPadding: 10
-                    topPadding: 2
-                    bottomPadding: 2
-                    font.pointSize: 12
+                    topPadding: Math.max(5, 5 * zoomLevel); bottomPadding: topPadding
+                    leftPadding: Math.max(10, 10 * zoomLevel); rightPadding: leftPadding
+                    font.family: headingFontMetrics.font.family
+                    font.capitalization: headingFontMetrics.font.capitalization
+                    font.pointSize: headingFontMetrics.font.pointSize-2
                     closable: scene.isCharacterMute(modelData) && !scriteDocument.readOnly
                     onClicked: requestCharacterMenu(modelData)
                     onCloseRequest: {
@@ -2455,8 +2456,9 @@ Rectangle {
                         width: parent.width
                         y: fontDescent
                         readOnly: false
-                        font.capitalization: Font.AllUppercase
-                        font.pointSize: 12
+                        font.family: headingFontMetrics.font.family
+                        font.capitalization: headingFontMetrics.font.capitalization
+                        font.pointSize: headingFontMetrics.font.pointSize-2
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.NoWrap
                         completionStrings: scriteDocument.structure.characterNames
@@ -2481,7 +2483,7 @@ Rectangle {
             Image {
                 source: "../icons/content/add_box.png"
                 width: sceneCharactersListHeading.height
-                height: sceneCharactersListHeading.height
+                height: width
                 opacity: 0.5
                 visible: enabled
                 enabled: !scriteDocument.readOnly

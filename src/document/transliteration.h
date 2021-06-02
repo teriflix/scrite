@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QJsonArray>
 #include <QQmlEngine>
+#include <QStaticText>
 #include <QJsonObject>
 #include <QFontDatabase>
 #include <QQuickPaintedItem>
@@ -283,8 +284,8 @@ public:
 
 private:
     void timerEvent(QTimerEvent *te);
-    void updateTextDocument();
-    void updateTextDocumentLater();
+    void updateStaticText();
+    void updateStaticTextLater();
 
     void setContentWidth(qreal val);
     void setContentHeight(qreal val);
@@ -295,8 +296,8 @@ private:
     QString m_text;
     qreal m_contentWidth = 0;
     qreal m_contentHeight = 0;
+    QStaticText m_staticText;
     ExecLaterTimer m_updateTimer;
-    QTextDocument *m_textDocument = nullptr;
 };
 
 

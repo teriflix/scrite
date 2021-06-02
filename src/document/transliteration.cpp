@@ -25,6 +25,7 @@
 #include <QMetaObject>
 #include <QJsonObject>
 #include <QTextCursor>
+#include <QQuickWindow>
 #include <QTextDocument>
 #include <QFontDatabase>
 #include <QtConcurrentRun>
@@ -1134,7 +1135,7 @@ void TransliteratedText::setText(const QString &val)
     m_text = val;
     emit textChanged();
 
-    this->updateTextDocumentLater();
+    this->updateStaticTextLater();
 }
 
 void TransliteratedText::setFont(const QFont &val)
@@ -1145,7 +1146,7 @@ void TransliteratedText::setFont(const QFont &val)
     m_font = val;
     emit fontChanged();
 
-    this->updateTextDocumentLater();
+    this->updateStaticTextLater();
 }
 
 void TransliteratedText::setColor(const QColor &val)
@@ -1156,7 +1157,7 @@ void TransliteratedText::setColor(const QColor &val)
     m_color = val;
     emit colorChanged();
 
-    this->updateTextDocumentLater();
+    this->updateStaticTextLater();
 }
 
 void TransliteratedText::paint(QPainter *painter)
@@ -1165,12 +1166,9 @@ void TransliteratedText::paint(QPainter *painter)
     qDebug("TransliteratedText is painting %s", qPrintable(m_text));
 #endif
 
-    m_textDocument->setTextWidth(this->width());
-
-    QAbstractTextDocumentLayout::PaintContext context;
-
-    QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
-    layout->draw(painter, context);
+    painter->setPen(m_color);
+    painter->setFont(m_font);
+    painter->drawStaticText(0, 0, m_staticText);
 }
 
 void TransliteratedText::timerEvent(QTimerEvent *te)
@@ -1178,42 +1176,23 @@ void TransliteratedText::timerEvent(QTimerEvent *te)
     if(te->timerId() == m_updateTimer.timerId())
     {
         m_updateTimer.stop();
-        this->updateTextDocument();
+        this->updateStaticText();
     }
 }
 
-void TransliteratedText::updateTextDocument()
+void TransliteratedText::updateStaticText()
 {
-    if(m_textDocument == nullptr)
-        m_textDocument = new QTextDocument(this);
+    m_staticText.setText(m_text);
+    m_staticText.prepare(QTransform(), m_font);
 
-    m_textDocument->clear();
-    m_textDocument->setDefaultFont(m_font);
-
-    QTextCursor cursor(m_textDocument);
-
-    QTextCharFormat charFormat;
-    charFormat.setFont(m_font);
-    charFormat.setForeground(m_color);
-    cursor.setCharFormat(charFormat);
-
-    QTextBlockFormat blockFormat;
-    blockFormat.setLeftMargin(0);
-    blockFormat.setTopMargin(0);
-    blockFormat.setRightMargin(0);
-    blockFormat.setBottomMargin(0);
-    cursor.setBlockFormat(blockFormat);
-
-    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, m_text);
-
-    const QSizeF size = m_textDocument->size();
+    const QSizeF size = m_staticText.size();
     this->setContentWidth(size.width());
     this->setContentHeight(size.height());
 
     this->update();
 }
 
-void TransliteratedText::updateTextDocumentLater()
+void TransliteratedText::updateStaticTextLater()
 {
     m_updateTimer.start(0, this);
 }
