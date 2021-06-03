@@ -1227,7 +1227,7 @@ Rectangle {
                             id: synopsisEditorHeading
                             text: "Synopsis:"
                             font.bold: true
-                            font.pointSize: headingFontMetrics.font.pointSize-2
+                            font.pointSize: sceneHeadingFieldsFontPointSize
                             visible: synopsisEditorField.length > 0
                             width: parent.width
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1236,7 +1236,7 @@ Rectangle {
                         TextArea {
                             id: synopsisEditorField
                             width: parent.width
-                            font.pointSize: headingFontMetrics.font.pointSize-2
+                            font.pointSize: sceneHeadingFieldsFontPointSize
                             readOnly: scriteDocument.readOnly
                             palette: app.palette
                             selectByMouse: true
@@ -2367,7 +2367,7 @@ Rectangle {
                 Text {
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    font.pointSize: headingFontMetrics.font.pointSize-2
+                    font.pointSize: sceneHeadingFieldsFontPointSize
                     text: sceneCharactersListLoader.active ? scriteDocument.structure.presentableGroupNames(headingItem.theScene.groups) : ""
                     visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
                     topPadding: 5
@@ -2411,7 +2411,7 @@ Rectangle {
                 font.bold: true
                 topPadding: 5
                 bottomPadding: 5
-                font.pointSize: headingFontMetrics.font.pointSize-2
+                font.pointSize: sceneHeadingFieldsFontPointSize
             }
 
             Repeater {
@@ -2433,7 +2433,7 @@ Rectangle {
                     leftPadding: Math.max(10, 10 * zoomLevel); rightPadding: leftPadding
                     font.family: headingFontMetrics.font.family
                     font.capitalization: headingFontMetrics.font.capitalization
-                    font.pointSize: headingFontMetrics.font.pointSize-2
+                    font.pointSize: sceneHeadingFieldsFontPointSize
                     closable: scene.isCharacterMute(modelData) && !scriteDocument.readOnly
                     onClicked: requestCharacterMenu(modelData)
                     onCloseRequest: {
@@ -2458,7 +2458,7 @@ Rectangle {
                         readOnly: false
                         font.family: headingFontMetrics.font.family
                         font.capitalization: headingFontMetrics.font.capitalization
-                        font.pointSize: headingFontMetrics.font.pointSize-2
+                        font.pointSize: sceneHeadingFieldsFontPointSize
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.NoWrap
                         completionStrings: scriteDocument.structure.characterNames
@@ -3263,6 +3263,8 @@ Rectangle {
             }
         }
     }
+
+    property real sceneHeadingFieldsFontPointSize: Math.max(headingFontMetrics.font.pointSize*0.7, 6)
 
     Rectangle {
         anchors.fill: parent
