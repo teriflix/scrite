@@ -33,129 +33,150 @@ Item {
             return null
         }
 
-        property int currentIndex: notebookTabsView.currentIndex
+        property int currentIndex: notebookTabsPanel.currentIndex
         onCurrentIndexChanged: fetchCurrents()
         onRefreshed: fetchCurrents()
 
         function fetchCurrents() {
-            currentSource = sourceAt(currentIndex)
-            currentColor = colorAt(currentIndex)
-            currentLabel = labelAt(currentIndex)
+            currentTabSource = tabSourceAt(currentIndex)
+            currentTabColor = tabColorAt(currentIndex)
+            currentTabLabel = tabLabelAt(currentIndex)
+            currentTabGroup = tabGroupAt(currentIndex)
         }
 
-        property var currentSource
-        property color currentColor: "white"
-        property string currentLabel: "none"
+        property var currentTabSource
+        property color currentTabColor: "white"
+        property string currentTabLabel: "none"
+        property string currentTabGroup: "none"
     }
 
     function switchToStoryTab() {
-        notebookTabsView.currentIndex = 0
+        notebookTabsPanel.currentIndex = 0
     }
 
     function switchToSceneTab() {
         // if(noteSources.activeScene === scene)
-        notebookTabsView.currentIndex = 1
+        notebookTabsPanel.currentIndex = 1
     }
 
     function switchToCharacterTab(name) {
         var idx = noteSources.indexOfLabel(name);
         if(idx >= 0)
-            notebookTabsView.currentIndex = idx
+            notebookTabsPanel.currentIndex = idx
     }
 
-    ListView {
-        id: notebookTabsView
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: tabScrollButtons.top
-        anchors.topMargin: 8
-        anchors.bottomMargin: 8
-        clip: true
-        width: 41
-        model: noteSources
-        spacing: -width*0.4
-        currentIndex: 0
-        highlightMoveDuration: 0
-        footer: Item {
-            width: notebookTabsView.width
-            height: width * 1.5
+    SidePanel {
+        id: notebookTabsPanel
+        height: parent.height
+        buttonY: 5
+        label: ""
+        z: 1
+        property int currentIndex: 0
+        maxPanelWidth: Math.max(parent.width*0.2, 300)
+        expanded: true
 
-            RoundButton {
-                anchors.centerIn: parent
-                hoverEnabled: true
-                icon.source: "../icons/content/person_add.png"
-                enabled: !scriteDocument.readOnly
-                onClicked: {
-                    modalDialog.popupSource = this
-                    modalDialog.sourceComponent = newCharactersDialogUi
-                    modalDialog.active = true
+        content: ListView {
+            id: notebookTabsListView
+            clip: true
+            model: noteSources
+            ScrollBar.vertical: ScrollBar {
+                policy: notebookTabsListView.contentHeight > notebookTabsListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                minimumSize: 0.1
+                palette {
+                    mid: Qt.rgba(0,0,0,0.25)
+                    dark: Qt.rgba(0,0,0,0.75)
                 }
-                ToolTip.text: "Click this button to detect characters in your screenplay and create sections for a subset of them in this notebook."
-                ToolTip.visible: hovered
+                opacity: active ? 1 : 0.2
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
             }
-        }
+            footer: Item {
+                width: notebookTabsListView.width-1
+                height: 50
 
-        delegate: TabBarTab {
-            width: active ? 40 : 38
-            height: implicitTabSize
-            alignment: Qt.AlignRight
-
-            tabIndex: index
-            tabCount: notebookTabsView.count
-            currentTabIndex: notebookTabsView.currentIndex
-
-            tabFillColor: active ? modelData.color : Qt.tint(modelData.color, "#C0FFFFFF")
-            tabBorderColor: modelData.color
-
-            text: modelData.label.length > 20 ? (modelData.label.substr(0,17)+"...") : modelData.label
-            font.pixelSize: active ? 20 : 16
-            font.bold: active
-            textColor: active ? app.textColorFor(modelData.color) : "black"
-
-            property bool allowRemove: app.typeName(modelData.source) === "Character"
-            acceptedMouseButtons: allowRemove ? (Qt.LeftButton|Qt.RightButton) : Qt.LeftButton
-
-            hoverEnabled: true
-            ToolTip.visible: hoverEnabled && containsMouse
-            ToolTip.text: modelData.label
-            ToolTip.delay: 3000
-
-            onRequestActivation: notebookTabsView.currentIndex = index
-            onRequestContextMenu: {
-                notebookTabsView.currentIndex = index
-                characterItemMenu.character = modelData.source
-                characterItemMenu.popup(this)
+                ToolButton3 {
+                    enabled: !scriteDocument.readOnly
+                    iconSource: "../icons/content/person_add.png"
+                    anchors.centerIn: parent
+                    ToolTip.text: "Create notebook page for a character."
+                    onClicked: {
+                        modalDialog.popupSource = this
+                        modalDialog.sourceComponent = newCharactersDialogUi
+                        modalDialog.active = true
+                    }
+                }
             }
-        }
-    }
+            delegate: Rectangle {
+                color: Qt.tint(tabColor, (notebookTabsListView.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF"))
+                width: notebookTabsListView.width-1
+                height: tabLabelText.height
 
-    Column {
-        id: tabScrollButtons
-        width: notebookTabsView.width
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        spacing: -10
+                Text {
+                    id: tabLabelText
+                    width: parent.width
+                    padding: 10
+                    text: tabLabel
+                    elide: Text.ElideRight
+                    color: app.isLightColor(parent.color) ? "black" : "white"
+                    font.pointSize: app.idealFontPointSize
+                    font.bold: notebookTabsListView.currentIndex === index
 
-        ToolButton {
-            icon.source: "../icons/navigation/keyboard_arrow_up.png"
-            width: parent.width
-            enabled: notebookTabsView.currentIndex > 0
-            onClicked: notebookTabsView.currentIndex = Math.max(0, notebookTabsView.currentIndex-1)
-            ToolTip.text: "Click to switch to the previous tab"
-            ToolTip.visible: hovered
-            ToolTip.delay: 1000
-            hoverEnabled: true
-        }
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: scriteDocument.readOnly ? Qt.LeftButton : (Qt.LeftButton | Qt.RightButton)
+                        onClicked: {
+                            if(mouse.button === Qt.LeftButton)
+                                notebookTabsListView.currentIndex = index
+                            else if(mouse.button === Qt.RightButton) {
+                                if(tabGroup === "Character") {
+                                    characterItemMenu.character = tabSource
+                                    characterItemMenu.popup()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            section.property: "tabGroup"
+            section.criteria: ViewSection.FullString
+            section.delegate: Rectangle {
+                color: primaryColors.c400.background
+                width: notebookTabsListView.width-1
+                height: groupText.height
 
-        ToolButton {
-            icon.source: "../icons/navigation/keyboard_arrow_down.png"
-            width: parent.width
-            enabled: notebookTabsView.currentIndex < notebookTabsView.count-1
-            onClicked: notebookTabsView.currentIndex = Math.min(notebookTabsView.count-1, notebookTabsView.currentIndex+1)
-            ToolTip.text: "Click to switch to the next tab"
-            ToolTip.visible: hovered
-            ToolTip.delay: 1000
-            hoverEnabled: true
+                Text {
+                    id: groupText
+                    text: section
+                    color: primaryColors.c400.text
+                    elide: Text.ElideMiddle
+                    padding: 10
+                    font.bold: true
+                    font.capitalization: Font.AllUppercase
+                    font.pointSize: app.idealFontPointSize-2
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                ToolButton3 {
+                    visible: !scriteDocument.readOnly && section === "Character"
+                    iconSource: "../icons/content/person_add.png"
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: groupText.right
+                    anchors.leftMargin: 10
+                    height: groupText.height
+                    ToolTip.text: "Create notebook page for a character."
+                    onClicked: {
+                        modalDialog.popupSource = this
+                        modalDialog.sourceComponent = newCharactersDialogUi
+                        modalDialog.active = true
+                    }
+                }
+            }
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
+            currentIndex: notebookTabsPanel.currentIndex
+            onCurrentIndexChanged: notebookTabsPanel.currentIndex = currentIndex
         }
     }
 
@@ -164,21 +185,22 @@ Item {
         property Character character
 
         MenuItem2 {
-            text: "Remove Section"
+            text: "Delete"
+            enabled: !scriteDocument.readOnly
             onClicked: {
-                notebookTabsView.currentIndex = 0
+                notebookTabsPanel.currentIndex = 0
                 scriteDocument.structure.removeCharacter(characterItemMenu.character)
                 characterItemMenu.close()
             }
         }
     }
 
-    property color currentTabNoteColor: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources.currentColor : "black"
-    property var currentTabNotesSource: !scriteDocument.loading && notebookTabsView.currentIndex >= 0 ? noteSources.currentSource : scriteDocument.structure
+    property color currentTabNoteColor: !scriteDocument.loading && notebookTabsPanel.currentIndex >= 0 ? noteSources.currentTabColor : "black"
+    property var currentTabNotesSource: !scriteDocument.loading && notebookTabsPanel.currentIndex >= 0 ? noteSources.currentTabSource : scriteDocument.structure
 
     Rectangle {
-        anchors.left: parent.left
-        anchors.right: notebookTabsView.left
+        anchors.left: notebookTabsPanel.width == notebookTabsPanel.minPanelWidth ? parent.left : notebookTabsPanel.right
+        anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         color: app.translucent(border.color, 0.04)
@@ -215,7 +237,6 @@ Item {
             TabView3 {
                 id: notesTabView
                 anchors.fill: parent
-                anchors.margins: 2
                 tabNames: ["Relationships", "(" + currentTabNotesSource.noteCount + ") Notes"]
                 currentTabIndex: notebookSettings.activeTab
                 onCurrentTabIndexChanged: notebookSettings.activeTab = currentTabIndex
@@ -243,7 +264,7 @@ Item {
                         }
                         onRemoveNoteRequest: currentTabNotesSource.removeNote(currentTabNotesSource.noteAt(index))
                         title: {
-                            if(notebookTabsView.currentTabIndex > 0)
+                            if(notebookTabsPanel.currentTabIndex > 0)
                                 return "You can capture your thoughts, ideas and research related to '<b>" + currentTabNotesSource.name + "</b>' here.";
                             return "You can capture your thoughts, ideas and research about your screenplay here.";
                         }

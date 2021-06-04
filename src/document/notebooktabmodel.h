@@ -42,17 +42,18 @@ public:
     Scene* activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
 
-    Q_INVOKABLE QObject *sourceAt(int row) const;
-    Q_INVOKABLE QString labelAt(int row) const;
-    Q_INVOKABLE QColor colorAt(int row) const;
-    Q_INVOKABLE QVariantMap at(int row) const;
-    Q_INVOKABLE int indexOfSource(QObject *source) const;
-    Q_INVOKABLE int indexOfLabel(const QString &name) const;
+    Q_INVOKABLE QObject *tabSourceAt(int row) const;
+    Q_INVOKABLE QString tabLabelAt(int row) const;
+    Q_INVOKABLE QColor tabColorAt(int row) const;
+    Q_INVOKABLE QString tabGroupAt(int row) const;
+    Q_INVOKABLE QVariantMap tabDataAt(int row) const;
+    Q_INVOKABLE int indexOfTabSource(QObject *source) const;
+    Q_INVOKABLE int indexOfTabLabel(const QString &name) const;
 
     Q_SIGNAL void refreshed();
 
     // QAbstractItemModel interface
-    enum Roles { SourceRole = Qt::UserRole+1, LabelRole, ColorRole, ModelDataRole };
+    enum Roles { TabSourceRole = Qt::UserRole+1, TabLabelRole, TabColorRole, TabGroupRole, TabModelDataRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
@@ -74,13 +75,16 @@ private:
     {
         Item() { }
         Item(Structure *structure) : // color is hard-coded, but it should be accentColors.c300.background
-            source(structure), label(QStringLiteral("Story")), color(QStringLiteral("#90A4AE")) { }
+            source(structure), label(QStringLiteral("Story")), color(QStringLiteral("#90A4AE")) {
+            group = label;
+        }
         Item(Scene *scene) :
-            source(scene), label(NotebookTabModel::sceneLabel(scene)), color(scene->color()) { }
+            source(scene), group(QStringLiteral("Current Scene")), label(NotebookTabModel::sceneLabel(scene)), color(scene->color()) { }
         Item(Character *character, const QColor &_color=Qt::blue) :
-            source(character), label(character->name()), color(_color) { }
+            source(character), group(QStringLiteral("Character")), label(character->name()), color(_color) { }
 
         QPointer<QObject> source;
+        QString group;
         QString label;
         QColor color;
 
