@@ -87,7 +87,7 @@ void NotebookTabModel::setActiveScene(Scene *val)
     }
 }
 
-QObject *NotebookTabModel::sourceAt(int row) const
+QObject *NotebookTabModel::tabSourceAt(int row) const
 {
     if(row < 0 || row >= m_items.size())
         return nullptr;
@@ -95,7 +95,7 @@ QObject *NotebookTabModel::sourceAt(int row) const
     return m_items.at(row).source;
 }
 
-QString NotebookTabModel::labelAt(int row) const
+QString NotebookTabModel::tabLabelAt(int row) const
 {
     if(row < 0 || row >= m_items.size())
         return QString();
@@ -103,7 +103,7 @@ QString NotebookTabModel::labelAt(int row) const
     return m_items.at(row).label;
 }
 
-QColor NotebookTabModel::colorAt(int row) const
+QColor NotebookTabModel::tabColorAt(int row) const
 {
     if(row < 0 || row >= m_items.size())
         return QColor();
@@ -111,26 +111,40 @@ QColor NotebookTabModel::colorAt(int row) const
     return m_items.at(row).color;
 }
 
-QVariantMap NotebookTabModel::at(int row) const
+QString NotebookTabModel::tabGroupAt(int row) const
 {
-    const Item item = (row < 0 || row >= m_items.size()) ? Item() : m_items.at(row);
+    if(row < 0 || row >= m_items.size())
+        return QString();
+
+    return m_items.at(row).group;
+}
+
+QVariantMap NotebookTabModel::tabDataAt(int row) const
+{
+    const QModelIndex index = this->index(row);
 
     QVariantMap ret;
-    ret["source"] = QVariant::fromValue<QObject*>(item.source);
-    ret["label"] = item.label;
-    ret["color"] = item.color;
+
+    const QHash<int,QByteArray> roles = this->roleNames();
+    auto it = roles.begin();
+    auto end = roles.end();
+    while(it != end)
+    {
+        ret[ QString::fromLatin1(it.value()) ] = this->data(index, it.key());
+        ++it;
+    }
 
     return ret;
 }
 
-int NotebookTabModel::indexOfSource(QObject *source) const
+int NotebookTabModel::indexOfTabSource(QObject *source) const
 {
     Item item;
     item.source = source;
     return m_items.indexOf( item );
 }
 
-int NotebookTabModel::indexOfLabel(const QString &name) const
+int NotebookTabModel::indexOfTabLabel(const QString &name) const
 {
     for(int i=m_items.size()-1; i>=0; i--)
     {
@@ -155,14 +169,16 @@ QVariant NotebookTabModel::data(const QModelIndex &index, int role) const
 
     switch(role)
     {
-    case SourceRole:
+    case TabSourceRole:
         return QVariant::fromValue<QObject*>(item.source);
-    case LabelRole:
+    case TabLabelRole:
         return item.label;
-    case ColorRole:
+    case TabColorRole:
         return item.color;
-    case ModelDataRole:
-        return this->at(index.row());
+    case TabGroupRole:
+        return item.group;
+    case TabModelDataRole:
+        return this->tabDataAt(index.row());
     default:
         break;
     }
@@ -172,12 +188,14 @@ QVariant NotebookTabModel::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> NotebookTabModel::roleNames() const
 {
-    QHash<int,QByteArray> roles;
-    roles[SourceRole] = "source";
-    roles[LabelRole] = "label";
-    roles[ColorRole] = "color";
-    roles[ModelDataRole] = "modelData";
-    return roles;
+    return
+    {
+        { TabSourceRole, QByteArrayLiteral("tabSource") },
+        { TabLabelRole, QByteArrayLiteral("tabLabel") },
+        { TabColorRole, QByteArrayLiteral("tabColor") },
+        { TabGroupRole, QByteArrayLiteral("tabGroup") },
+        { TabModelDataRole, QByteArrayLiteral("tabModelData") },
+    };
 }
 
 void NotebookTabModel::resetStructure()
