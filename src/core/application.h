@@ -60,9 +60,14 @@ public:
     QFont applicationFont() const { return this->font(); }
     Q_SIGNAL void applicationFontChanged();
 
-    Q_PROPERTY(int idealFontPointSize READ idealFontPointSize CONSTANT)
+    Q_PROPERTY(int idealFontPointSize READ idealFontPointSize NOTIFY idealFontPointSizeChanged)
     int idealFontPointSize() const { return m_idealFontPointSize; }
     Q_SIGNAL void idealFontPointSizeChanged();
+
+    Q_PROPERTY(int customFontPointSize READ customFontPointSize WRITE setCustomFontPointSize NOTIFY customFontPointSizeChanged)
+    void setCustomFontPointSize(int val);
+    int customFontPointSize() const { return m_customFontPointSize; }
+    Q_SIGNAL void customFontPointSizeChanged();
 
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) const { return url.toLocalFile(); }
     Q_INVOKABLE QUrl toHttpUrl(const QUrl &url) const;
@@ -295,6 +300,7 @@ private:
     QSettings *m_settings = nullptr;
     QUndoGroup *m_undoGroup = new QUndoGroup(this);
     int m_idealFontPointSize = 12;
+    int m_customFontPointSize = 0;
     QString m_baseWindowTitle;
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;

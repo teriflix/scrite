@@ -105,10 +105,10 @@ Item {
         id: coreSettingsComponent
 
         Column {
-            spacing: 20
+            spacing: 16
 
             Item {
-                height: 30
+                height: 1
                 width: parent.width - 60
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -261,6 +261,46 @@ Item {
                 }
             }
 
+            GroupBox {
+                spacing: 10
+                width: timelineSettingsGroupBox.width
+                x: 30
+                label: Text {
+                    text: "Normal Font Size"
+                }
+
+                Row {
+                    spacing: 10
+
+                    TextField {
+                        id: appFontSizeField
+                        text: app.customFontPointSize === 0 ? app.idealFontPointSize : app.customFontPointSize
+                        width: idealAppFontMetrics.averageCharacterWidth*5
+                        selectByMouse: true
+                        onActiveFocusChanged: {
+                            if(activeFocus)
+                                selectAll()
+                        }
+                        validator: IntValidator {
+                            bottom: 0; top: 100
+                        }
+                        anchors.verticalCenter: parent.verticalCenter
+                        Component.onDestruction: applyCustomFontSize()
+
+                        function applyCustomFontSize() {
+                            if(length > 0)
+                                app.customFontPointSize = parseInt(text)
+                            else
+                                app.customFontPointSize = 0
+                        }
+                    }
+
+                    Text {
+                        text: "pt"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
         }
     }
 

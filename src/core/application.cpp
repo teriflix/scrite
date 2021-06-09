@@ -173,6 +173,17 @@ int Application::launchCounter() const
     return m_settings->value("Installation/launchCount", 0).toInt();
 }
 
+void Application::setCustomFontPointSize(int val)
+{
+    if(m_customFontPointSize == val || val < 0 || val >= 100)
+        return;
+
+    m_customFontPointSize = val;
+    emit customFontPointSizeChanged();
+
+    this->computeIdealFontPointSize();
+}
+
 QUrl Application::toHttpUrl(const QUrl &url) const
 {
     if(url.scheme() != QStringLiteral("https"))
@@ -815,15 +826,28 @@ Q_DECL_IMPORT int qt_defaultDpi();
 
 void Application::computeIdealFontPointSize()
 {
+    int fontPointSize = 0;
+
+    if(m_customFontPointSize > 0)
+        fontPointSize = m_customFontPointSize;
+    else
+    {
 #ifndef Q_OS_MAC
-    m_idealFontPointSize = 12;
+        fontPointSize = 12;
 #else
-    const qreal minInch = 0.12; // Font should occupy atleast 0.12 inches on the screen
-    const qreal nrPointsPerInch = qt_defaultDpi(); // These many dots make up one inch on the screen
-    const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
-    const qreal dpr = this->primaryScreen()->devicePixelRatio();
-    m_idealFontPointSize = qCeil(minInch * nrPointsPerInch * qMax(dpr,scale));
+        const qreal minInch = 0.12; // Font should occupy atleast 0.12 inches on the screen
+        const qreal nrPointsPerInch = qt_defaultDpi(); // These many dots make up one inch on the screen
+        const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
+        const qreal dpr = this->primaryScreen()->devicePixelRatio();
+        fontPointSize = qCeil(minInch * nrPointsPerInch * qMax(dpr,scale));
 #endif
+    }
+
+    if(m_idealFontPointSize != fontPointSize)
+    {
+        m_idealFontPointSize = fontPointSize;
+        emit idealFontPointSizeChanged();
+    }
 }
 
 QString Application::painterPathToString(const QPainterPath &val) const
