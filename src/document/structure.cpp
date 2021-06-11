@@ -971,7 +971,7 @@ Relationship::Relationship(QObject *parent)
     connect(this, &Relationship::nameChanged, this, &Relationship::relationshipChanged);
     connect(this, &Relationship::withChanged, this, &Relationship::relationshipChanged);
     connect(this, &Relationship::directionChanged, this, &Relationship::relationshipChanged);
-    connect(this, &Relationship::noteCountChanged, this, &Relationship::relationshipChanged);
+    connect(m_notes, &Notes::notesModified, this, &Relationship::relationshipChanged);
 }
 
 Relationship::~Relationship()
@@ -1019,79 +1019,8 @@ void Relationship::setWith(Character *val)
     emit withChanged();
 }
 
-QQmlListProperty<Note> Relationship::notes()
-{
-    return QQmlListProperty<Note>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Relationship::staticAppendNote,
-                &Relationship::staticNoteCount,
-                &Relationship::staticNoteAt,
-                &Relationship::staticClearNotes);
-}
-
-void Relationship::addNote(Note *ptr)
-{
-    if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
-        return;
-
-    ptr->setParent(this);
-    connect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
-    connect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
-
-    m_notes.append(ptr);
-    emit noteCountChanged();
-}
-
-void Relationship::removeNote(Note *ptr)
-{
-    if(ptr == nullptr)
-        return;
-
-    const int index = m_notes.indexOf(ptr);
-    if(index < 0)
-        return;
-
-    m_notes.removeAt(index);
-    if(ptr->parent() == this)
-        GarbageCollector::instance()->add(ptr);
-
-    disconnect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
-    disconnect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
-
-    emit noteCountChanged();
-}
-
-Note *Relationship::noteAt(int index) const
-{
-    return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
-}
-
-void Relationship::setNotes(const QList<Note *> &list)
-{
-    if(!m_notes.isEmpty() || list.isEmpty())
-        return;
-
-    for(Note *ptr : list)
-    {
-        ptr->setParent(this);
-        connect(ptr, &Note::aboutToDelete, this, &Relationship::removeNote);
-        connect(ptr, &Note::noteChanged, this, &Relationship::relationshipChanged);
-    }
-
-    m_notes.assign(list);
-    emit noteCountChanged();
-}
-
-void Relationship::clearNotes()
-{
-    while(m_notes.size())
-        this->removeNote(m_notes.first());
-}
-
 void Relationship::serializeToJson(QJsonObject &json) const
 {
-
     if(m_with != nullptr)
         json.insert("with", m_with->name());
 }
@@ -1099,23 +1028,14 @@ void Relationship::serializeToJson(QJsonObject &json) const
 void Relationship::deserializeFromJson(const QJsonObject &json)
 {
     m_withName = json.value("with").toString();
-}
 
-bool Relationship::canSetPropertyFromObjectList(const QString &propName) const
-{
-    if(propName == QStringLiteral("notes"))
-        return m_notes.isEmpty();
-
-    return false;
-}
-
-void Relationship::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
-{
-    if(propName == QStringLiteral("notes"))
-    {
-        this->setNotes(qobject_list_cast<Note*>(objects));
-        return;
-    }
+    // Previously notes was an array, because the notes property used to be
+    // a list property. Now notes is an object, because it represents Notes class.
+    // So, if we are loading a notes from a file created using older versions of Scrite,
+    // we have to upgrade the notes to the newer format based on the Notes class.
+    const QJsonValue notes = json.value(QStringLiteral("notes"));
+    if(notes.isArray())
+        m_notes->loadOldNotes(notes.toArray());
 }
 
 void Relationship::resolveRelationship()
@@ -1136,26 +1056,6 @@ void Relationship::resolveRelationship()
         else
             this->deleteLater();
     }
-}
-
-void Relationship::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
-{
-    reinterpret_cast< Relationship* >(list->data)->addNote(ptr);
-}
-
-void Relationship::staticClearNotes(QQmlListProperty<Note> *list)
-{
-    reinterpret_cast< Relationship* >(list->data)->clearNotes();
-}
-
-Note *Relationship::staticNoteAt(QQmlListProperty<Note> *list, int index)
-{
-    return reinterpret_cast< Relationship* >(list->data)->noteAt(index);
-}
-
-int Relationship::staticNoteCount(QQmlListProperty<Note> *list)
-{
-    return reinterpret_cast< Relationship* >(list->data)->noteCount();
 }
 
 bool Relationship::event(QEvent *event)
@@ -1204,7 +1104,7 @@ Character::Character(QObject *parent)
     connect(this, &Character::genderChanged, this, &Character::characterChanged);
     connect(this, &Character::aliasesChanged, this, &Character::characterChanged);
     connect(this, &Character::bodyTypeChanged, this, &Character::characterChanged);
-    connect(this, &Character::noteCountChanged, this, &Character::characterChanged);
+    connect(m_notes, &Notes::notesModified, this, &Character::characterChanged);
     connect(this, &Character::designationChanged, this, &Character::characterChanged);
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
     connect(this, &Character::characterRelationshipGraphChanged, this, &Character::characterChanged);
@@ -1231,76 +1131,6 @@ void Character::setVisibleOnNotebook(bool val)
 
     m_visibleOnNotebook = val;
     emit visibleOnNotebookChanged();
-}
-
-QQmlListProperty<Note> Character::notes()
-{
-    return QQmlListProperty<Note>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Character::staticAppendNote,
-                &Character::staticNoteCount,
-                &Character::staticNoteAt,
-                &Character::staticClearNotes);
-}
-
-void Character::addNote(Note *ptr)
-{
-    if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
-        return;
-
-    connect(ptr, &Note::aboutToDelete, this, &Character::removeNote);
-    connect(ptr, &Note::noteChanged, this, &Character::characterChanged);
-
-    ptr->setParent(this);
-    m_notes.append(ptr);
-    emit noteCountChanged();
-}
-
-void Character::removeNote(Note *ptr)
-{
-    if(ptr == nullptr)
-        return;
-
-    const int index = m_notes.indexOf(ptr);
-    if(index < 0)
-        return;
-
-    m_notes.removeAt(index);
-    if(ptr->parent() == this)
-        GarbageCollector::instance()->add(ptr);
-
-    disconnect(ptr, &Note::aboutToDelete, this, &Character::removeNote);
-    disconnect(ptr, &Note::noteChanged, this, &Character::characterChanged);
-
-    emit noteCountChanged();
-}
-
-Note *Character::noteAt(int index) const
-{
-    return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
-}
-
-void Character::setNotes(const QList<Note *> &list)
-{
-    if(!m_notes.isEmpty() || list.isEmpty())
-        return;
-
-    for(Note *ptr : list)
-    {
-        ptr->setParent(this);
-        connect(ptr, &Note::aboutToDelete, this, &Character::removeNote);
-        connect(ptr, &Note::noteChanged, this, &Character::characterChanged);
-    }
-
-    m_notes.assign(list);
-    emit noteCountChanged();
-}
-
-void Character::clearNotes()
-{
-    while(m_notes.size())
-        this->removeNote(m_notes.first());
 }
 
 void Character::setPhotos(const QStringList &val)
@@ -1436,6 +1266,15 @@ void Character::setAliases(const QStringList &val)
         m_aliases << item.trimmed();
 
     emit aliasesChanged();
+}
+
+void Character::setColor(const QColor &val)
+{
+    if(m_color == val)
+        return;
+
+    m_color = val;
+    emit colorChanged();
 }
 
 QQmlListProperty<Relationship> Character::relationships()
@@ -1659,13 +1498,18 @@ void Character::deserializeFromJson(const QJsonObject &json)
         m_photos = photoPaths;
         emit photosChanged();
     }
+
+    // Previously notes was an array, because the notes property used to be
+    // a list property. Now notes is an object, because it represents Notes class.
+    // So, if we are loading a notes from a file created using older versions of Scrite,
+    // we have to upgrade the notes to the newer format based on the Notes class.
+    const QJsonValue notes = json.value(QStringLiteral("notes"));
+    if(notes.isArray())
+        m_notes->loadOldNotes(notes.toArray());
 }
 
 bool Character::canSetPropertyFromObjectList(const QString &propName) const
 {
-    if(propName == QStringLiteral("notes"))
-        return m_notes.isEmpty();
-
     if(propName == QStringLiteral("relationships"))
         return m_relationships.isEmpty();
 
@@ -1674,12 +1518,6 @@ bool Character::canSetPropertyFromObjectList(const QString &propName) const
 
 void Character::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
 {
-    if(propName == QStringLiteral("notes"))
-    {
-        this->setNotes(qobject_list_cast<Note*>(objects));
-        return;
-    }
-
     if(propName == QStringLiteral("relationships"))
     {
         this->setRelationships(qobject_list_cast<Relationship*>(objects));
@@ -1728,26 +1566,6 @@ bool Character::isRelatedToImpl(Character *with, QStack<Character *> &stack) con
     }
 
     return false;
-}
-
-void Character::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
-{
-    reinterpret_cast< Character* >(list->data)->addNote(ptr);
-}
-
-void Character::staticClearNotes(QQmlListProperty<Note> *list)
-{
-    reinterpret_cast< Character* >(list->data)->clearNotes();
-}
-
-Note *Character::staticNoteAt(QQmlListProperty<Note> *list, int index)
-{
-    return reinterpret_cast< Character* >(list->data)->noteAt(index);
-}
-
-int Character::staticNoteCount(QQmlListProperty<Note> *list)
-{
-    return reinterpret_cast< Character* >(list->data)->noteCount();
 }
 
 void Character::staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr)
@@ -2091,7 +1909,7 @@ Structure::Structure(QObject *parent)
       m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
       m_locationHeadingsMapTimer("Structure.m_locationHeadingsMapTimer")
 {
-    connect(this, &Structure::noteCountChanged, this, &Structure::structureChanged);
+    connect(m_notes, &Notes::notesModified, this, &Structure::structureChanged);
     connect(this, &Structure::zoomLevelChanged, this, &Structure::structureChanged);
     connect(this, &Structure::groupsDataChanged, this, &Structure::structureChanged);
     connect(this, &Structure::elementCountChanged, this, &Structure::structureChanged);
@@ -2363,82 +2181,6 @@ QList<Character *> Structure::findCharacters(const QStringList &names, bool retu
     }
 
     return ret;
-}
-
-QQmlListProperty<Note> Structure::notes()
-{
-    return QQmlListProperty<Note>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Structure::staticAppendNote,
-                &Structure::staticNoteCount,
-                &Structure::staticNoteAt,
-                &Structure::staticClearNotes);
-}
-
-void Structure::addNote(Note *ptr)
-{
-    if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
-        return;
-
-    ptr->setParent(this);
-
-    connect(ptr, &Note::aboutToDelete, this, &Structure::removeNote);
-    connect(ptr, &Note::noteChanged, this, &Structure::structureChanged);
-
-    m_notes.append(ptr);
-    emit noteCountChanged();
-}
-
-void Structure::removeNote(Note *ptr)
-{
-    if(ptr == nullptr)
-        return;
-
-    const int index = m_notes.indexOf(ptr);
-    if(index < 0)
-        return ;
-
-    m_notes.removeAt(index);
-
-    disconnect(ptr, &Note::aboutToDelete, this, &Structure::removeNote);
-    disconnect(ptr, &Note::noteChanged, this, &Structure::structureChanged);
-
-    emit noteCountChanged();
-
-    if(ptr->parent() == this)
-        GarbageCollector::instance()->add(ptr);
-}
-
-Note *Structure::noteAt(int index) const
-{
-    return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
-}
-
-void Structure::setNotes(const QList<Note *> &list)
-{
-    if(!m_notes.isEmpty() || list.isEmpty())
-        return;
-
-    // We dont have to capture this as an undoable action, because this method
-    // is only called as a part of loading the Structure. What's the point in
-    // undoing a Structure loaded from file.
-
-    for(Note *ptr : list)
-    {
-        ptr->setParent(this);
-        connect(ptr, &Note::aboutToDelete, this, &Structure::removeNote);
-        connect(ptr, &Note::noteChanged, this, &Structure::structureChanged);
-    }
-
-    m_notes.assign(list);
-    emit noteCountChanged();
-}
-
-void Structure::clearNotes()
-{
-    while(m_notes.size())
-        this->removeNote(m_notes.first());
 }
 
 QQmlListProperty<StructureElement> Structure::elements()
@@ -3983,6 +3725,14 @@ void Structure::deserializeFromJson(const QJsonObject &json)
         if(preferredGroupCategoryArray.size() >= 1)
             this->setPreferredGroupCategory( preferredGroupCategoryArray.at(0).toString() );
     }
+
+    // Previously notes was an array, because the notes property used to be
+    // a list property. Now notes is an object, because it represents Notes class.
+    // So, if we are loading a notes from a file created using older versions of Scrite,
+    // we have to upgrade the notes to the newer format based on the Notes class.
+    const QJsonValue notes = json.value(QStringLiteral("notes"));
+    if(notes.isArray())
+        m_notes->loadOldNotes(notes.toArray());
 }
 
 bool Structure::canSetPropertyFromObjectList(const QString &propName) const
@@ -3992,9 +3742,6 @@ bool Structure::canSetPropertyFromObjectList(const QString &propName) const
 
     if(propName == QStringLiteral("characters"))
         return m_characters.isEmpty();
-
-    if(propName == QStringLiteral("notes"))
-        return m_notes.isEmpty();
 
     return false;
 }
@@ -4011,12 +3758,6 @@ void Structure::setPropertyFromObjectList(const QString &propName, const QList<Q
     if(propName == QStringLiteral("characters"))
     {
         this->setCharacters(qobject_list_cast<Character*>(objects));
-        return;
-    }
-
-    if(propName == QStringLiteral("notes"))
-    {
-        this->setNotes(qobject_list_cast<Note*>(objects));
         return;
     }
 }
@@ -4111,26 +3852,6 @@ Character *Structure::staticCharacterAt(QQmlListProperty<Character> *list, int i
 int Structure::staticCharacterCount(QQmlListProperty<Character> *list)
 {
     return reinterpret_cast< Structure* >(list->data)->characterCount();
-}
-
-void Structure::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
-{
-    reinterpret_cast< Structure* >(list->data)->addNote(ptr);
-}
-
-void Structure::staticClearNotes(QQmlListProperty<Note> *list)
-{
-    reinterpret_cast< Structure* >(list->data)->clearNotes();
-}
-
-Note *Structure::staticNoteAt(QQmlListProperty<Note> *list, int index)
-{
-    return reinterpret_cast< Structure* >(list->data)->noteAt(index);
-}
-
-int Structure::staticNoteCount(QQmlListProperty<Note> *list)
-{
-    return reinterpret_cast< Structure* >(list->data)->noteCount();
 }
 
 void Structure::staticAppendElement(QQmlListProperty<StructureElement> *list, StructureElement *ptr)

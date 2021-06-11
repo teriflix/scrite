@@ -212,18 +212,16 @@ bool FountainImporter::doImport(QIODevice *device)
                     line.remove(0, 1);
                     line.remove(line.length()-1, 1);
 
-                    Note *note = new Note(character);
-                    note->setHeading(line);
-                    character->addNote(note);
+                    Note *note = character->notes()->addTextNote();
+                    note->setTitle(line);
                 }
                 else
                 {
-                    Note *note = character->noteAt(character->noteCount()-1);
+                    Note *note = character->notes()->lastNote();
                     if(note == nullptr)
                     {
-                        note = new Note(character);
-                        note->setHeading(QStringLiteral("Note"));
-                        character->addNote(note);
+                        note = character->notes()->addTextNote();
+                        note->setTitle(QStringLiteral("Note"));
                     }
 
                     note->setContent(line);
@@ -288,11 +286,10 @@ bool FountainImporter::doImport(QIODevice *device)
             // it as Scene notes.
             line = line.remove(0, 1);
             line = line.remove(line.length()-1, 1);
-            Note *note = new Note(currentScene);
-            note->setHeading(QStringLiteral("Note #") + QString::number(currentScene->noteCount()+1));
+            Note *note = currentScene->notes()->addTextNote();
+            note->setTitle(QStringLiteral("Note #") + QString::number(currentScene->notes()->noteCount()+1));
             note->setContent(line);
-            note->setColor( Application::instance()->pickStandardColor(currentScene->noteCount()) );
-            currentScene->addNote(note);
+            note->setColor( Application::instance()->pickStandardColor(currentScene->notes()->noteCount()) );
 
             delete para;
             continue;

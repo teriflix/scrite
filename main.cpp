@@ -23,6 +23,7 @@
 #include <QFontDatabase>
 #include <QOperatingSystemVersion>
 
+#include "notes.h"
 #include "fileinfo.h"
 #include "undoredo.h"
 #include "ruleritem.h"
@@ -42,6 +43,7 @@
 #include "urlattributes.h"
 #include "textshapeitem.h"
 #include "resetonchange.h"
+#include "notebookmodel.h"
 #include "scritedocument.h"
 #include "shortcutsmodel.h"
 #include "materialcolors.h"
@@ -51,7 +53,6 @@
 #include "openfromlibrary.h"
 #include "abstractexporter.h"
 #include "textdocumentitem.h"
-#include "notebooktabmodel.h"
 #include "simpletabbaritem.h"
 #include "genericarraymodel.h"
 #include "screenplayadapter.h"
@@ -170,10 +171,15 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<StructureElementStack>("Scrite", 1, 0, "StructureElementStack", reason);
     qmlRegisterUncreatableType<StructureElementStacks>("Scrite", 1, 0, "StructureElementStacks", reason);
 
+    qmlRegisterType<Attachment>("Scrite", 1, 0, "Attachment");
     qmlRegisterType<Note>("Scrite", 1, 0, "Note");
+    qmlRegisterType<Notes>("Scrite", 1, 0, "Notes");
     qmlRegisterType<Relationship>("Scrite", 1, 0, "Relationship");
     qmlRegisterUncreatableType<Character>("Scrite", 1, 0, "Character", reason);
     qmlRegisterType<CharacterRelationshipsGraph>("Scrite", 1, 0, "CharacterRelationshipsGraph");
+
+    qmlRegisterType<NotebookModel>("Scrite", 1, 0, "NotebookModel");
+    qmlRegisterType<NotebookFilterModel>("Scrite", 1, 0, "NotebookFilterModel");
 
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
     qmlRegisterUncreatableType<ScreenplayFormat>("Scrite", 1, 0, "ScreenplayFormat", reason);
@@ -277,8 +283,6 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", apreason);
 
     qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", apreason);
-
-    qmlRegisterType<NotebookTabModel>("Scrite", 1, 0, "NotebookTabModel");
 
     qmlRegisterType<ItemPositionMapper>("Scrite", 1, 0, "ItemPositionMapper");
 

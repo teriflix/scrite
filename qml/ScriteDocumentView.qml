@@ -1956,36 +1956,8 @@ Item {
     Component {
         id: notebookEditorComponent
 
-        SplitView {
-            orientation: Qt.Vertical
-            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+        NotebookView {
 
-            NotebookView {
-                SplitView.fillHeight: true
-            }
-
-            Loader {
-                SplitView.preferredHeight: 155 + minimumAppFontMetrics.height*screenplayTracks.trackCount
-                SplitView.minimumHeight: SplitView.preferredHeight
-                SplitView.maximumHeight: SplitView.preferredHeight
-                active: height >= 50
-
-                sourceComponent: Rectangle {
-                    color: accentColors.c200.background
-
-                    ScreenplayView {
-                        anchors.fill: parent
-                        showNotesIcon: true
-                        enableDragDrop: false
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: Qt.rgba(0,0,0,0)
-                        border { width: 1; color: accentColors.borderColor }
-                    }
-                }
-            }
         }
     }
 

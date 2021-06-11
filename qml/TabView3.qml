@@ -40,7 +40,7 @@ Item {
                 tabIndex: index
                 tabCount: 2
                 textColor: active ? app.textColorFor(tabColor) : "black"
-                font.pixelSize: active ? 20 : 16
+                font.pointSize: app.idealFontPointSize
                 font.bold: active
                 currentTabIndex: tabBar.currentIndex
                 onRequestActivation: tabBar.currentIndex = index

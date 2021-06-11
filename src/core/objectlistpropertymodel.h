@@ -14,6 +14,7 @@
 #ifndef OBJECTLISTPROPERTYMODEL_H
 #define OBJECTLISTPROPERTYMODEL_H
 
+#include <QSet>
 #include <QList>
 #include <QMetaMethod>
 #include <QAbstractListModel>
@@ -116,7 +117,7 @@ public:
         this->beginResetModel();
         for(T ptr : m_list)
             this->itemRemoveEvent(ptr);
-        m_list = list;
+        m_list = list.toSet().toList(); // so that the list does not have duplicates
         for(T ptr : m_list)
             this->itemInsertEvent(ptr);
         this->endResetModel();

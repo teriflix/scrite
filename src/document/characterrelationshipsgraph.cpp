@@ -852,7 +852,7 @@ void CharacterRelationshipsGraph::load()
 
 void CharacterRelationshipsGraph::loadLater()
 {
-    m_loadTimer.start(100, this);
+    m_loadTimer.start(0, this);
 }
 
 void CharacterRelationshipsGraph::setDirty(bool val)

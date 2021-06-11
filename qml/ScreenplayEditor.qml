@@ -561,23 +561,28 @@ Rectangle {
                                 start()
                                 return
                             }
-                            contentView.makeAVisibleItemCurrent()
+                            contentView.makeItemUnderCursorCurrent()
                         }
                     }
 
-                    function makeAVisibleItemCurrent() {
+                    function makeItemUnderCursorCurrent() {
+                        // If the current item is already visible, then lets not
+                        // second guess user's intent. We will leave the current
+                        // item as is.
                         var ci = screenplayAdapter.currentIndex
                         if(ci >= firstItemIndex && ci <= lastItemIndex)
                             return
 
+                        // Lets first confirm that the mouse pointer is within
+                        // the contentView area.
                         var gp = app.cursorPosition()
                         var pos = app.mapGlobalPositionToItem(contentView,gp)
                         if(pos.x >= 0 && pos.x < contentView.width && pos.y >= 0 && pos.y < contentView.height) {
+                            // Find out the item under mouse and make it current.
                             pos = mapToItem(contentItem, pos.x, pos.y)
                             ci = indexAt(pos.x, pos.y)
-                        } else
-                            ci = indexAt(firstPoint.x, firstPoint.y+height*0.33)
-                        screenplayAdapter.currentIndex = ci
+                            screenplayAdapter.currentIndex = ci
+                        }
                     }
 
                     function validOrLastIndex(val) { return val < 0 ? screenplayAdapter.elementCount-1 : val }
@@ -2633,7 +2638,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
-                            font.pixelSize: parent.elementIsBreak ? 16 : 14
+                            font.pixelSize: Math.ceil(app.idealFontPointSize*(parent.elementIsBreak ? 1 : 0.75))
                             horizontalAlignment: parent.elementIsBreak & !sceneListView.hasEpisodes ? Qt.AlignHCenter : Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: Font.AllUppercase

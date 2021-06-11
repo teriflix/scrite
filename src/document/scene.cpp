@@ -568,7 +568,7 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::groupsChanged, this, &Scene::sceneChanged);
-    connect(this, &Scene::noteCountChanged, this, &Scene::sceneChanged);
+    connect(m_notes, &Notes::notesModified, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::characterRelationshipGraphChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::sceneChanged);
@@ -1282,79 +1282,6 @@ void Scene::removeLastElementIfEmpty()
     }
 }
 
-QQmlListProperty<Note> Scene::notes()
-{
-    return QQmlListProperty<Note>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Scene::staticAppendNote,
-                &Scene::staticNoteCount,
-                &Scene::staticNoteAt,
-                &Scene::staticClearNotes);
-}
-
-void Scene::addNote(Note *ptr)
-{
-    if(ptr == nullptr || m_notes.indexOf(ptr) >= 0)
-        return;
-
-    ptr->setParent(this);
-
-    connect(ptr, &Note::aboutToDelete, this, &Scene::removeNote);
-    connect(ptr, &Note::noteChanged, this, &Scene::sceneChanged);
-
-    m_notes.append(ptr);
-    emit noteCountChanged();
-}
-
-void Scene::removeNote(Note *ptr)
-{
-    if(ptr == nullptr)
-        return;
-
-    const int index = m_notes.indexOf(ptr);
-    if(index < 0)
-        return ;
-
-    m_notes.removeAt(index);
-
-    disconnect(ptr, &Note::aboutToDelete, this, &Scene::removeNote);
-    disconnect(ptr, &Note::noteChanged, this, &Scene::sceneChanged);
-
-    emit noteCountChanged();
-
-    if(ptr->parent() == this)
-        GarbageCollector::instance()->add(ptr);
-}
-
-Note *Scene::noteAt(int index) const
-{
-    return index < 0 || index >= m_notes.size() ? nullptr : m_notes.at(index);
-}
-
-void Scene::setNotes(const QList<Note *> &list)
-{
-    if(!m_notes.isEmpty() || list.isEmpty())
-        return;
-
-    for(Note *ptr : list)
-    {
-        ptr->setParent(this);
-
-        connect(ptr, &Note::aboutToDelete, this, &Scene::removeNote);
-        connect(ptr, &Note::noteChanged, this, &Scene::sceneChanged);
-    }
-
-    m_notes.assign(list);
-    emit noteCountChanged();
-}
-
-void Scene::clearNotes()
-{
-    while(m_notes.size())
-        this->removeNote(m_notes.first());
-}
-
 void Scene::beginUndoCapture(bool allowMerging)
 {
     if(m_pushUndoCommand != nullptr)
@@ -1602,17 +1529,25 @@ void Scene::serializeToJson(QJsonObject &json) const
     }
 
     if(!invisibleCharacters.isEmpty())
-        json.insert("#invisibleCharacters", invisibleCharacters);
+        json.insert(QStringLiteral("#invisibleCharacters"), invisibleCharacters);
 }
 
 void Scene::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonArray invisibleCharacters = json.value("#invisibleCharacters").toArray();
-    if(invisibleCharacters.isEmpty())
-        return;
+    const QJsonArray invisibleCharacters = json.value(QStringLiteral("#invisibleCharacters")).toArray();
+    if(!invisibleCharacters.isEmpty())
+    {
+        for(int i=0; i<invisibleCharacters.size(); i++)
+            this->addMuteCharacter(invisibleCharacters.at(i).toString());
+    }
 
-    for(int i=0; i<invisibleCharacters.size(); i++)
-        this->addMuteCharacter(invisibleCharacters.at(i).toString());
+    // Previously notes was an array, because the notes property used to be
+    // a list property. Now notes is an object, because it represents Notes class.
+    // So, if we are loading a notes from a file created using older versions of Scrite,
+    // we have to upgrade the notes to the newer format based on the Notes class.
+    const QJsonValue notes = json.value(QStringLiteral("notes"));
+    if(notes.isArray())
+        m_notes->loadOldNotes(notes.toArray());
 }
 
 bool Scene::canSetPropertyFromObjectList(const QString &propName) const
@@ -1732,26 +1667,6 @@ SceneElement *Scene::staticElementAt(QQmlListProperty<SceneElement> *list, int i
 int Scene::staticElementCount(QQmlListProperty<SceneElement> *list)
 {
     return reinterpret_cast< Scene* >(list->data)->elementCount();
-}
-
-void Scene::staticAppendNote(QQmlListProperty<Note> *list, Note *ptr)
-{
-    reinterpret_cast< Scene* >(list->data)->addNote(ptr);
-}
-
-void Scene::staticClearNotes(QQmlListProperty<Note> *list)
-{
-    reinterpret_cast< Scene* >(list->data)->clearNotes();
-}
-
-Note *Scene::staticNoteAt(QQmlListProperty<Note> *list, int index)
-{
-    return reinterpret_cast< Scene* >(list->data)->noteAt(index);
-}
-
-int Scene::staticNoteCount(QQmlListProperty<Note> *list)
-{
-    return reinterpret_cast< Scene* >(list->data)->noteCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

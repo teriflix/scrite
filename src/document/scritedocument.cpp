@@ -450,7 +450,7 @@ bool ScriteDocument::isEmpty() const
     const int objectCount = m_structure->elementCount() +
                             m_structure->annotationCount() +
                             m_screenplay->elementCount() +
-                            m_structure->noteCount();
+                            m_structure->notes()->noteCount();
     const bool ret = objectCount == 0 && m_screenplay->isEmpty();
     return ret;
 }
@@ -631,7 +631,7 @@ void ScriteDocument::reset()
         disconnect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
         disconnect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
         disconnect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
-        disconnect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
+        disconnect(m_structure->notes(), &Notes::notesModified, this, &ScriteDocument::emptyChanged);
         disconnect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
         disconnect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
     }
@@ -682,7 +682,7 @@ void ScriteDocument::reset()
     connect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
     connect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
-    connect(m_structure, &Structure::noteCountChanged, this, &ScriteDocument::emptyChanged);
+    connect(m_structure->notes(), &Notes::notesModified, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
     connect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
 
@@ -1705,18 +1705,18 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 
             scene->setColor( evalNewColor(scene->color()) );
 
-            const int nrNotes = scene->noteCount();
+            const int nrNotes = scene->notes()->noteCount();
             for(int n=0; n<nrNotes; n++)
             {
-                Note *note = scene->noteAt(n);
+                Note *note = scene->notes()->noteAt(n);
                 note->setColor( evalNewColor(note->color()) );
             }
         }
 
-        const int nrNotes = m_structure->noteCount();
+        const int nrNotes = m_structure->notes()->noteCount();
         for(int n=0; n<nrNotes; n++)
         {
-            Note *note = m_structure->noteAt(n);
+            Note *note = m_structure->notes()->noteAt(n);
             note->setColor( evalNewColor(note->color()) );
         }
 
@@ -1725,10 +1725,10 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
         {
             Character *character = m_structure->characterAt(c);
 
-            const int nrNotes = character->noteCount();
+            const int nrNotes = character->notes()->noteCount();
             for(int n=0; n<nrNotes; n++)
             {
-                Note *note = character->noteAt(n);
+                Note *note = character->notes()->noteAt(n);
                 note->setColor( evalNewColor(note->color()) );
             }
         }

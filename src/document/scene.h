@@ -27,7 +27,7 @@
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
 
-#include "note.h"
+#include "notes.h"
 #include "modifiable.h"
 #include "execlatertimer.h"
 #include "qobjectproperty.h"
@@ -375,19 +375,8 @@ public:
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
 
-    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT STORED false)
-    QAbstractListModel *notesModel() const { return &((const_cast<Scene*>(this))->m_notes); }
-
-    Q_PROPERTY(QQmlListProperty<Note> notes READ notes)
-    QQmlListProperty<Note> notes();
-    Q_INVOKABLE void addNote(Note *ptr);
-    Q_INVOKABLE void removeNote(Note *ptr);
-    Q_INVOKABLE Note *noteAt(int index) const;
-    void setNotes(const QList<Note*> &list);
-    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
-    int noteCount() const { return m_notes.size(); }
-    Q_INVOKABLE void clearNotes();
-    Q_SIGNAL void noteCountChanged();
+    Q_PROPERTY(Notes* notes READ notes CONSTANT)
+    Notes *notes() const { return m_notes; }
 
     Q_INVOKABLE void beginUndoCapture(bool allowMerging=true);
     Q_INVOKABLE void endUndoCapture();
@@ -467,11 +456,7 @@ private:
     static int staticElementCount(QQmlListProperty<SceneElement> *list);
     QList<SceneElement *> m_elements;
 
-    static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
-    static void staticClearNotes(QQmlListProperty<Note> *list);
-    static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
-    static int staticNoteCount(QQmlListProperty<Note> *list);
-    ObjectListPropertyModel<Note *> m_notes;
+    Notes *m_notes = new Notes(this);
 };
 
 class ScreenplayFormat;

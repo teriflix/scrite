@@ -33,7 +33,9 @@ Item {
         leftMargin: 1000
         topMargin: 1000
         onUpdated: app.execLater(crgraph, 250, function() {
+            canvasScroll.animatePanAndZoom = false
             canvas.zoomFit()
+            canvasScroll.animatePanAndZoom = true
             canvas.selectedNodeItem = canvas.mainCharacterNodeItem
         })
     }
@@ -47,7 +49,7 @@ Item {
     }
 
     ScrollArea {
-        id: scrollArea
+        id: canvasScroll
         clip: true
         anchors.fill: parent
         contentWidth: canvas.width * canvas.scale
@@ -58,12 +60,33 @@ Item {
         handlePinchZoom: true
         zoomOnScroll: workspaceSettings.mouseWheelZoomsInCharacterGraph
 
+        function zoomOneMiddleArea() {
+            nodeItemsBoxEvaluator.recomputeBoundingBox()
+            var bboxCenter = nodeItemsBoxEvaluator.center
+            var middleArea = Qt.rect(bboxCenter.x - canvasScroll.width/2,
+                                     bboxCenter.y - canvasScroll.height/2,
+                                     canvasScroll.width,
+                                     canvasScroll.height)
+            canvasScroll.zoomOne()
+            canvasScroll.ensureVisible(middleArea)
+        }
+
+        function zoomOneToItem(item) {
+            if(item === null)
+                return
+            var bbox = nodeItemsBoxEvaluator.boundingBox
+            var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
+            var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
+            var visibleArea = app.querySubRectangle(bbox, itemRect, atBest)
+            canvasScroll.zoomFit(visibleArea)
+        }
+
         Item {
             id: canvas
             width: 120000
             height: 120000
             transformOrigin: Item.TopLeft
-            scale: scrollArea.suggestedScale
+            scale: canvasScroll.suggestedScale
 
             MouseArea {
                 anchors.fill: parent
@@ -79,7 +102,7 @@ Item {
                 id: nodeItemsBox
                 x: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.x - 50) : 0
                 y: crgraph.nodes.objectCount > 0 ? nodeItemsBoxEvaluator.boundingBox.y - 50 : 0
-                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.width + 100) : Math.floor(Math.min(scrollArea.width,scrollArea.height)/100)*100
+                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.width + 100) : Math.floor(Math.min(canvasScroll.width,canvasScroll.height)/100)*100
                 height: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.height + 100) : width
                 color: Qt.rgba(0,0,0,0)
                 border.width: crgraph.nodes.objectCount > 0 ? 1 : 0
@@ -97,16 +120,16 @@ Item {
             }
 
             function zoomFit() {
-                if(nodeItemsBox.width > scrollArea.width || nodeItemsBox.height > scrollArea.height)
-                    scrollArea.zoomFit(Qt.rect(nodeItemsBox.x,nodeItemsBox.y,nodeItemsBox.width,nodeItemsBox.height))
+                if(nodeItemsBox.width > canvasScroll.width || nodeItemsBox.height > canvasScroll.height)
+                    canvasScroll.zoomFit(Qt.rect(nodeItemsBox.x,nodeItemsBox.y,nodeItemsBox.width,nodeItemsBox.height))
                 else {
                     var centerX = nodeItemsBox.x + nodeItemsBox.width/2
                     var centerY = nodeItemsBox.y + nodeItemsBox.height/2
-                    var w = scrollArea.width
-                    var h = scrollArea.height
+                    var w = canvasScroll.width
+                    var h = canvasScroll.height
                     var x = centerX - w/2
                     var y = centerY - h/2
-                    scrollArea.zoomFit(Qt.rect(x,y,w,h))
+                    canvasScroll.zoomFit(Qt.rect(x,y,w,h))
                 }
             }
 
@@ -266,11 +289,11 @@ Item {
                             drag.axis: Drag.XAndYAxis
                             hoverEnabled: true
                             onPressed: {
-                                scrollArea.interactive = false
+                                canvasScroll.interactive = false
                                 canvas.selectedNodeItem = parent
                                 canvas.reloadIfDirty()
                             }
-                            onReleased: scrollArea.interactive = true
+                            onReleased: canvasScroll.interactive = true
                             onDoubleClicked: characterDoubleClicked(character.name)
                             ToolTip.text: "Double click to switch to " + character.name + " tab"
                             ToolTip.delay: 1500
@@ -286,8 +309,8 @@ Item {
         id: floatingToolbar
         width: floatingToolbarLayout.width + 10
         height: floatingToolbarLayout.height + 10
-        anchors.top: scrollArea.top
-        anchors.left: scrollArea.left
+        anchors.top: canvasScroll.top
+        anchors.left: canvasScroll.left
         anchors.margins: 20
         color: crgraph.dirty ? primaryColors.c200.background : primaryColors.c100.background
         border.color: primaryColors.c100.text
@@ -309,14 +332,14 @@ Item {
             }
 
             ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); scrollArea.zoomIn() }
+                onClicked: { canvas.reloadIfDirty(); canvasScroll.zoomIn() }
                 iconSource: "../icons/navigation/zoom_in.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom In"
             }
 
             ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); scrollArea.zoomOut() }
+                onClicked: { canvas.reloadIfDirty(); canvasScroll.zoomOut() }
                 iconSource: "../icons/navigation/zoom_out.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Out"
@@ -326,10 +349,10 @@ Item {
                 onClicked: {
                     canvas.reloadIfDirty()
                     var item = canvas.selectedNodeItem
-                    if(item === null)
-                        canvasScroll.zoomOneMiddleArea()
-                    else
+                    if(item)
                         canvasScroll.zoomOneToItem(item)
+                    else
+                        canvasScroll.zoomOneMiddleArea()
                 }
                 iconSource: "../icons/navigation/zoom_one.png"
                 autoRepeat: true

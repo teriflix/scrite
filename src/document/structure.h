@@ -14,7 +14,7 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
-#include "note.h"
+#include "notes.h"
 #include "scene.h"
 #include "execlatertimer.h"
 #include "modelaggregator.h"
@@ -308,27 +308,14 @@ public:
     Character* of() const { return m_of; }
     Q_SIGNAL void ofChanged();
 
-    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT STORED false)
-    QAbstractListModel *notesModel() const { return &((const_cast<Relationship*>(this))->m_notes); }
-
-    Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
-    QQmlListProperty<Note> notes();
-    Q_INVOKABLE void addNote(Note *ptr);
-    Q_INVOKABLE void removeNote(Note *ptr);
-    Q_INVOKABLE Note *noteAt(int index) const;
-    void setNotes(const QList<Note*> &list);
-    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
-    int noteCount() const { return m_notes.size(); }
-    Q_INVOKABLE void clearNotes();
-    Q_SIGNAL void noteCountChanged();
+    Q_PROPERTY(Notes* notes READ notes CONSTANT)
+    Notes *notes() const { return m_notes; }
 
     Q_SIGNAL void relationshipChanged();
 
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
-    bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
     void resolveRelationship();
 
@@ -339,18 +326,13 @@ private:
     void setOf(Character* val);
     void resetWith();
 
-    static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
-    static void staticClearNotes(QQmlListProperty<Note> *list);
-    static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
-    static int staticNoteCount(QQmlListProperty<Note> *list);
-
 private:
     QString m_name = QStringLiteral("Friend");
     Character *m_of;
     QString m_withName; // for delayed resolution during load
     Direction m_direction = OfWith;
     QObjectProperty<Character> m_with;
-    ObjectListPropertyModel<Note *> m_notes;
+    Notes *m_notes = new Notes(this);
 };
 
 class Character : public QObject, public QObjectSerializer::Interface
@@ -379,19 +361,8 @@ public:
     bool isVisibleOnNotebook() const { return m_visibleOnNotebook; }
     Q_SIGNAL void visibleOnNotebookChanged();
 
-    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT STORED false)
-    QAbstractListModel *notesModel() const { return &((const_cast<Character*>(this))->m_notes); }
-
-    Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
-    QQmlListProperty<Note> notes();
-    Q_INVOKABLE void addNote(Note *ptr);
-    Q_INVOKABLE void removeNote(Note *ptr);
-    Q_INVOKABLE Note *noteAt(int index) const;
-    void setNotes(const QList<Note*> &list);
-    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
-    int noteCount() const { return m_notes.size(); }
-    Q_INVOKABLE void clearNotes();
-    Q_SIGNAL void noteCountChanged();
+    Q_PROPERTY(Notes* notes READ notes CONSTANT)
+    Notes *notes() const { return m_notes; }
 
     Q_PROPERTY(QStringList photos READ photos WRITE setPhotos NOTIFY photosChanged STORED false)
     void setPhotos(const QStringList &val);
@@ -442,6 +413,11 @@ public:
     QStringList aliases() const { return m_aliases; }
     Q_SIGNAL void aliasesChanged();
 
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    void setColor(const QColor &val);
+    QColor color() const { return m_color; }
+    Q_SIGNAL void colorChanged();
+
     Q_PROPERTY(QAbstractListModel* relationshipsModel READ relationshipsModel CONSTANT STORED false)
     QAbstractListModel *relationshipsModel() const { return &((const_cast<Character*>(this))->m_relationships); }
 
@@ -491,11 +467,6 @@ protected:
 private:
     bool isRelatedToImpl(Character *with, QStack<Character*> &stack) const;
 
-    static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
-    static void staticClearNotes(QQmlListProperty<Note> *list);
-    static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
-    static int staticNoteCount(QQmlListProperty<Note> *list);
-
     static void staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr);
     static void staticClearRelationships(QQmlListProperty<Relationship> *list);
     static Relationship* staticRelationshipAt(QQmlListProperty<Relationship> *list, int index);
@@ -504,6 +475,7 @@ private:
 private:
     QString m_age;
     QString m_name;
+    QColor m_color = Qt::white;
     QString m_type = QStringLiteral("Human");
     QString m_weight;
     QString m_height;
@@ -514,7 +486,7 @@ private:
     QStringList m_aliases;
     bool m_visibleOnNotebook = true;
     Structure* m_structure = nullptr;
-    ObjectListPropertyModel<Note *> m_notes;
+    Notes* m_notes = new Notes(this);
     QJsonObject m_characterRelationshipGraph;
     ObjectListPropertyModel<Relationship *> m_relationships;
 };
@@ -644,7 +616,7 @@ public:
     ScriteDocument* scriteDocument() const { return m_scriteDocument; }
 
     Q_PROPERTY(QAbstractListModel* charactersModel READ charactersModel CONSTANT STORED false)
-    QAbstractListModel *charactersModel() const { return &((const_cast<Structure*>(this))->m_characters); }
+    ObjectListPropertyModel<Character *> *charactersModel() const { return &((const_cast<Structure*>(this))->m_characters); }
 
     Q_PROPERTY(QQmlListProperty<Character> characters READ characters NOTIFY characterCountChanged)
     QQmlListProperty<Character> characters();
@@ -665,22 +637,11 @@ public:
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
     QList<Character*> findCharacters(const QStringList &names, bool returnAssociativeList=false) const;
 
-    Q_PROPERTY(QAbstractListModel* notesModel READ notesModel CONSTANT STORED false)
-    QAbstractListModel *notesModel() const { return &((const_cast<Structure*>(this))->m_notes); }
-
-    Q_PROPERTY(QQmlListProperty<Note> notes READ notes NOTIFY noteCountChanged)
-    QQmlListProperty<Note> notes();
-    Q_INVOKABLE void addNote(Note *ptr);
-    Q_INVOKABLE void removeNote(Note *ptr);
-    Q_INVOKABLE Note *noteAt(int index) const;
-    void setNotes(const QList<Note*> &list);
-    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
-    int noteCount() const { return m_notes.size(); }
-    Q_INVOKABLE void clearNotes();
-    Q_SIGNAL void noteCountChanged();
+    Q_PROPERTY(Notes* notes READ notes CONSTANT)
+    Notes *notes() const { return m_notes; }
 
     Q_PROPERTY(QAbstractListModel* elementsModel READ elementsModel CONSTANT STORED false)
-    QAbstractListModel *elementsModel() const { return &((const_cast<Structure*>(this))->m_elements); }
+    ObjectListPropertyModel<StructureElement *> *elementsModel() const { return &((const_cast<Structure*>(this))->m_elements); }
 
     Q_PROPERTY(QRectF elementsBoundingBox READ elementsBoundingBox NOTIFY elementsBoundingBoxChanged)
     QRectF elementsBoundingBox() const { return m_elementsBoundingBoxAggregator.aggregateValue().toRectF(); }
@@ -847,11 +808,7 @@ private:
     static int staticCharacterCount(QQmlListProperty<Character> *list);
     ObjectListPropertyModel<Character *> m_characters;
 
-    static void staticAppendNote(QQmlListProperty<Note> *list, Note *ptr);
-    static void staticClearNotes(QQmlListProperty<Note> *list);
-    static Note* staticNoteAt(QQmlListProperty<Note> *list, int index);
-    static int staticNoteCount(QQmlListProperty<Note> *list);
-    ObjectListPropertyModel<Note *> m_notes;
+    Notes *m_notes = new Notes(this);
 
     friend class StructureLayout;
     static void staticAppendElement(QQmlListProperty<StructureElement> *list, StructureElement *ptr);

@@ -1961,21 +1961,6 @@ Item {
         }
     }
 
-    Loader {
-        width: parent.width*0.7
-        anchors.centerIn: parent
-        active: scriteDocument.structure.elementCount === 0 && scriteDocument.structure.annotationCount === 0 && parent.width > 400
-        sourceComponent: Text {
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 30
-            enabled: false
-            color: primaryColors.c600.background
-            // renderType: Text.NativeRendering
-            text: "Create scenes by clicking on the 'Add Scene' button OR right click to see options."
-        }
-    }
-
     Component {
         id: newStructureElementComponent
 

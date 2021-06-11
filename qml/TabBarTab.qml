@@ -58,7 +58,7 @@ Item {
             id: tabText
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0
-            font.pixelSize: tabBarTab.active ? 16 : 14
+            font.pointSize: app.idealFontPointSize
             font.bold: tabBarTab.active
             rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
             Behavior on font.pixelSize {

@@ -51,7 +51,8 @@ HEADERS += \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
     src/document/characterrelationshipsgraph.h \
-    src/document/notebooktabmodel.h \
+    src/document/notebookmodel.h \
+    src/document/notes.h \
     src/document/screenplaytextdocumentoffsets.h \
     src/exporters/structureexporter_p.h \
     src/importers/openfromlibrary.h \
@@ -107,7 +108,6 @@ HEADERS += \
     src/document/screenplaytextdocument.h \
     src/document/undoredo.h \
     src/document/screenplayadapter.h \
-    src/document/note.h \
     src/document/screenplay.h \
     src/document/scene.h \
     src/core/application.h \
@@ -155,7 +155,8 @@ SOURCES += \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/characterrelationshipsgraph.cpp \
-    src/document/notebooktabmodel.cpp \
+    src/document/notebookmodel.cpp \
+    src/document/notes.cpp \
     src/document/screenplaytextdocumentoffsets.cpp \
     src/exporters/structureexporter_p.cpp \
     src/importers/openfromlibrary.cpp \
@@ -209,7 +210,6 @@ SOURCES += \
     src/document/undoredo.cpp \
     src/document/transliteration.cpp \
     src/document/screenplayadapter.cpp \
-    src/document/note.cpp \
     src/document/formatting.cpp \
     src/core/autoupdate.cpp \
     src/core/application.cpp \

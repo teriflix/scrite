@@ -171,18 +171,22 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             cursor.setCharFormat(charFormat);
 
             const Character *character = structure->findCharacter(characterName);
-            if(character == nullptr || character->noteCount() == 0)
+            const Notes *characterNotes = character ? character->notes() : nullptr;
+            if(characterNotes == nullptr || characterNotes->noteCount() == 0)
             {
                 cursor.insertText(": no notes available.");
                 continue;
             }
 
-            cursor.insertText(": " + QString::number(character->noteCount()) + " note(s) available.");
+            cursor.insertText(": " + QString::number(characterNotes->noteCount()) + " note(s) available.");
 
-            for(int i=0; i<character->noteCount(); i++)
+            for(int i=0; i<characterNotes->noteCount(); i++)
             {
-                const Note *note = character->noteAt(i);
-                QString heading = note->heading().trimmed();
+                const Note *note = characterNotes->noteAt(i);
+                if(note->type() != Note::TextNoteType)
+                    continue;
+
+                QString heading = note->title().trimmed();
                 if(heading.isEmpty())
                     heading = "Note #" + QString::number(i+1);
 
@@ -197,13 +201,13 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 cursor.insertText(heading);
 
                 blockFormat.setTopMargin(0);
-                if(i == character->noteCount()-1 || characterName != m_characterNames.last())
+                if(i == characterNotes->noteCount()-1 || characterName != m_characterNames.last())
                     blockFormat.setBottomMargin(10);
                 blockFormat.setAlignment(Qt::AlignJustify);
 
                 charFormat.setFontWeight(QFont::Normal);
                 cursor.insertBlock(blockFormat, charFormat);
-                cursor.insertText(note->content());
+                cursor.insertText(note->content().toString());
             }
         }
     }
