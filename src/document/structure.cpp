@@ -1108,6 +1108,7 @@ Character::Character(QObject *parent)
     connect(this, &Character::designationChanged, this, &Character::characterChanged);
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
     connect(this, &Character::characterRelationshipGraphChanged, this, &Character::characterChanged);
+    connect(m_attachments, &Attachments::attachmentsModified, this, &Character::characterChanged);
 }
 
 Character::~Character()
@@ -1917,6 +1918,7 @@ Structure::Structure(QObject *parent)
     connect(this, &Structure::annotationCountChanged, this, &Structure::structureChanged);
     connect(this, &Structure::currentElementIndexChanged, this, &Structure::structureChanged);
     connect(this, &Structure::preferredGroupCategoryChanged, this, &Structure::structureChanged);
+    connect(m_attachments, &Attachments::attachmentsModified, this, &Structure::structureChanged);
     connect(this, &Structure::characterRelationshipGraphChanged, this, &Structure::structureChanged);
 
     QClipboard *clipboard = qApp->clipboard();

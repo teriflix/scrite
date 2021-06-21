@@ -171,9 +171,11 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<StructureElementStack>("Scrite", 1, 0, "StructureElementStack", reason);
     qmlRegisterUncreatableType<StructureElementStacks>("Scrite", 1, 0, "StructureElementStacks", reason);
 
-    qmlRegisterType<Attachment>("Scrite", 1, 0, "Attachment");
-    qmlRegisterType<Note>("Scrite", 1, 0, "Note");
-    qmlRegisterType<Notes>("Scrite", 1, 0, "Notes");
+    qmlRegisterUncreatableType<Note>("Scrite", 1, 0, "Note", reason);
+    qmlRegisterUncreatableType<Notes>("Scrite", 1, 0, "Notes", reason);
+    qmlRegisterUncreatableType<Attachment>("Scrite", 1, 0, "Attachment", reason);
+    qmlRegisterUncreatableType<Attachments>("Scrite", 1, 0, "Attachments", reason);
+    qmlRegisterType<AttachmentsDropArea>("Scrite", 1, 0, "AttachmentsDropArea");
     qmlRegisterType<Relationship>("Scrite", 1, 0, "Relationship");
     qmlRegisterUncreatableType<Character>("Scrite", 1, 0, "Character", reason);
     qmlRegisterType<CharacterRelationshipsGraph>("Scrite", 1, 0, "CharacterRelationshipsGraph");

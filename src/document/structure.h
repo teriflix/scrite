@@ -16,6 +16,7 @@
 
 #include "notes.h"
 #include "scene.h"
+#include "attachments.h"
 #include "execlatertimer.h"
 #include "modelaggregator.h"
 #include "qobjectproperty.h"
@@ -451,6 +452,9 @@ public:
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
+    Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
+    Attachments *attachments() const { return m_attachments; }
+
     Q_SIGNAL void characterChanged();
 
     // QObjectSerializer::Interface interface
@@ -488,6 +492,7 @@ private:
     Structure* m_structure = nullptr;
     Notes* m_notes = new Notes(this);
     QJsonObject m_characterRelationshipGraph;
+    Attachments *m_attachments = new Attachments(this);
     ObjectListPropertyModel<Relationship *> m_relationships;
 };
 
@@ -776,6 +781,9 @@ public:
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
+    Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
+    Attachments *attachments() const { return m_attachments; }
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
@@ -841,6 +849,7 @@ private:
 
     bool m_forceBeatBoardLayout = false;
     QJsonObject m_characterRelationshipGraph;
+    Attachments *m_attachments = new Attachments(this);
 
     QString m_groupsData;
     QJsonArray m_groupsModel;

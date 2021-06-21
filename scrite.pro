@@ -50,6 +50,7 @@ HEADERS += \
     src/core/printerobject.h \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
+    src/document/attachments.h \
     src/document/characterrelationshipsgraph.h \
     src/document/notebookmodel.h \
     src/document/notes.h \
@@ -154,6 +155,7 @@ SOURCES += \
     src/core/application_build_timestamp.cpp \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
+    src/document/attachments.cpp \
     src/document/characterrelationshipsgraph.cpp \
     src/document/notebookmodel.cpp \
     src/document/notes.cpp \

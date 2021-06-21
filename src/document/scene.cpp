@@ -588,6 +588,8 @@ Scene::Scene(QObject *parent)
         m_isBeingReset = false;
         emit resetStateChanged();
     });
+
+    connect(m_attachments, &Attachments::attachmentsModified, this, &Scene::sceneChanged);
 }
 
 Scene::~Scene()

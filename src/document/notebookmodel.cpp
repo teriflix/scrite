@@ -20,7 +20,22 @@
 #include "timeprofiler.h"
 #include "scritedocument.h"
 
-class ObjectItem : public QStandardItem
+static int nextItemId()
+{
+    static int id = 1;
+    return id++;
+}
+
+class StandardItemWithId : public QStandardItem
+{
+public:
+    StandardItemWithId() : QStandardItem() {
+        this->setData(::nextItemId(), NotebookModel::IdRole);
+    }
+    ~StandardItemWithId() { }
+};
+
+class ObjectItem : public StandardItemWithId
 {
 public:
     ObjectItem(QObject *object);
@@ -150,6 +165,7 @@ QVariant NotebookModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> NotebookModel::staticRoleNames()
 {
     static QHash<int,QByteArray> roles = {
+        { IdRole, QByteArrayLiteral("notebookItemId") },
         { TitleRole, QByteArrayLiteral("notebookItemTitle") },
         { TypeRole, QByteArrayLiteral("notebookItemType") },
         { CategoryRole, QByteArrayLiteral("notebookItemCategory") },
@@ -194,7 +210,7 @@ void NotebookModel::loadStory()
 
 void NotebookModel::loadScenes()
 {
-    QStandardItem *scenesItem = new QStandardItem;
+    QStandardItem *scenesItem = new StandardItemWithId;
     scenesItem->setText( QStringLiteral("Scenes") );
     scenesItem->setData(CategoryType, TypeRole);
     scenesItem->setData(ScenesCategory, CategoryRole);
@@ -220,7 +236,7 @@ void NotebookModel::loadScenes()
 
 void NotebookModel::loadCharacters()
 {
-    QStandardItem *charactersItem = new QStandardItem;
+    QStandardItem *charactersItem = new StandardItemWithId;
     charactersItem->setText( QStringLiteral("Characters") );
     charactersItem->setData(CategoryType, TypeRole);
     charactersItem->setData(CharactersCategory, CategoryRole);
@@ -246,7 +262,7 @@ void NotebookModel::loadCharacters()
 void NotebookModel::loadLocations()
 {
 #if 0
-    QStandardItem *locationsGroupItem = new QStandardItem;
+    QStandardItem *locationsGroupItem = new StandardItemWithId;
     locationsGroupItem->setText( QStringLiteral("Locations") );
     locationsGroupItem->setData(CategoryType, TypeRole);
     locationsGroupItem->setData(LocationsCategory, CategoryRole);
@@ -258,7 +274,7 @@ void NotebookModel::loadLocations()
 void NotebookModel::loadProps()
 {
 #if 0
-    QStandardItem *propsGroupItem = new QStandardItem;
+    QStandardItem *propsGroupItem = new StandardItemWithId;
     propsGroupItem->setText( QStringLiteral("Props") );
     propsGroupItem->setData(CategoryType, TypeRole);
     propsGroupItem->setData(LocationsCategory, CategoryRole);
@@ -270,7 +286,7 @@ void NotebookModel::loadProps()
 void NotebookModel::loadOthers()
 {
 #if 0
-    QStandardItem *otherCategoryGroupItem = new QStandardItem;
+    QStandardItem *otherCategoryGroupItem = new StandardItemWithId;
     otherCategoryGroupItem->setText( QStringLiteral("Others") );
     otherCategoryGroupItem->setData(CategoryType, TypeRole);
     otherCategoryGroupItem->setData(LocationsCategory, CategoryRole);
@@ -353,7 +369,7 @@ void NotebookModel::syncCharacters()
 ///////////////////////////////////////////////////////////////////////////////
 
 ObjectItem::ObjectItem(QObject *object)
-    : QStandardItem(), m_object(object)
+    : StandardItemWithId(), m_object(object)
 {
     m_destroyedConnection = QObject::connect(m_object, &QObject::destroyed, m_object, [=](QObject *ptr) {
         this->objectDestroyed(ptr);

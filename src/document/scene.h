@@ -29,6 +29,7 @@
 
 #include "notes.h"
 #include "modifiable.h"
+#include "attachments.h"
 #include "execlatertimer.h"
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
@@ -400,6 +401,9 @@ public:
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
+    Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
+    Attachments *attachments() const { return m_attachments; }
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &json) const;
     void deserializeFromJson(const QJsonObject &json);
@@ -457,6 +461,7 @@ private:
     QList<SceneElement *> m_elements;
 
     Notes *m_notes = new Notes(this);
+    Attachments *m_attachments = new Attachments(this);
 };
 
 class ScreenplayFormat;

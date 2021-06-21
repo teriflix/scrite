@@ -18,8 +18,7 @@
 #include <QAbstractListModel>
 #include <QQmlListProperty>
 
-#include "qobjectserializer.h"
-#include "objectlistpropertymodel.h"
+#include "attachments.h"
 
 class Prop;
 class Notes;
@@ -27,61 +26,9 @@ class Scene;
 class Location;
 class Character;
 class Structure;
+class Attachments;
 class Relationship;
 
-class Attachment : public QObject, public QObjectSerializer::Interface
-{
-    Q_OBJECT
-    Q_INTERFACES(QObjectSerializer::Interface)
-
-public:
-    Attachment(QObject *parent=nullptr);
-    ~Attachment();
-    Q_SIGNAL void aboutToDelete(Attachment *ptr);
-
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    void setName(const QString &val);
-    QString name() const { return m_name; }
-    Q_SIGNAL void nameChanged();
-
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    void setTitle(const QString &val);
-    QString title() const { return m_title; }
-    Q_SIGNAL void titleChanged();
-
-    Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
-    QString filePath() const { return m_filePath; }
-    Q_SIGNAL void filePathChanged();
-
-    Q_PROPERTY(QString type READ type NOTIFY mimeTypeChanged)
-    QString type() const { return m_type; }
-
-    Q_PROPERTY(QUrl typeIcon READ typeIcon NOTIFY mimeTypeChanged)
-    QUrl typeIcon() const { return m_typeIcon; }
-
-    Q_PROPERTY(QString mimeType READ mimeType NOTIFY mimeTypeChanged)
-    QString mimeType() const { return m_mimeType; }
-    Q_SIGNAL void mimeTypeChanged();
-
-    Q_SIGNAL void attachmentModified();
-
-    // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
-
-private:
-    friend class Note;
-    void setFilePath(const QString &val);
-    void setMimeType(const QString &val);
-
-private:
-    QString m_name;
-    QString m_type;
-    QString m_title;
-    QUrl    m_typeIcon;
-    QString m_filePath;
-    QString m_mimeType;
-};
 
 class Note : public QObject, public QObjectSerializer::Interface
 {
@@ -128,36 +75,17 @@ public:
     QJsonObject metaData() const { return m_metaData; }
     Q_SIGNAL void metaDataChanged();
 
-    Q_PROPERTY(QAbstractItemModel* attachmentsModel READ attachmentsModel STORED false CONSTANT)
-    ObjectListPropertyModel<Attachment *> *attachmentsModel() const;
-
-    Q_PROPERTY(QQmlListProperty<Attachment> attachments READ attachments NOTIFY attachmentCountChanged)
-    QQmlListProperty<Attachment> attachments();
-    Q_INVOKABLE Attachment *addAttachment(const QString &filePath);
-    Q_INVOKABLE void removeAttachment(Attachment *ptr);
-    Q_INVOKABLE Attachment *attachmentAt(int index) const;
-    Q_PROPERTY(int attachmentCount READ attachmentCount NOTIFY attachmentCountChanged)
-    int attachmentCount() const { return m_attachments.size(); }
-    Q_INVOKABLE void clearAttachments();
-    Q_SIGNAL void attachmentCountChanged();
+    Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
+    Attachments *attachments() const { return m_attachments; }
 
     Q_SIGNAL void noteModified();
 
     // QObjectSerializer::Interface interface
     bool canSerialize(const QMetaObject *metaObject, const QMetaProperty &metaProperty) const;
-    bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
 
 private:
     void setType(Type val);
     void addAttachment(Attachment *ptr);
-    void setAttachments(const QList<Attachment*> &list);
-
-    static void staticAppendAttachment(QQmlListProperty<Attachment> *list, Attachment *ptr);
-    static void staticClearAttachments(QQmlListProperty<Attachment> *list);
-    static Attachment* staticAttachmentAt(QQmlListProperty<Attachment> *list, int index);
-    static int staticAttachmentCount(QQmlListProperty<Attachment> *list);
-    ObjectListPropertyModel<Attachment *> m_attachments;
 
 private:
     friend class Notes;
@@ -167,6 +95,7 @@ private:
     QJsonObject m_metaData;
     QColor m_color = Qt::white;
     Type m_type = TextNoteType;
+    Attachments *m_attachments = new Attachments(this);
 };
 
 class Notes : public ObjectListPropertyModel<Note *>, public QObjectSerializer::Interface

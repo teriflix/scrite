@@ -15,83 +15,9 @@
 #include "scene.h"
 #include "structure.h"
 #include "timeprofiler.h"
-#include "scritedocument.h"
 
-#include <QFileInfo>
-#include <QMimeType>
-#include <QMimeDatabase>
-#include <QTextBoundaryFinder>
 #include <QSet>
-
-Attachment::Attachment(QObject *parent)
-    : QObject(parent)
-{
-    connect(this, &Attachment::nameChanged, this, &Attachment::attachmentModified);
-    connect(this, &Attachment::titleChanged, this, &Attachment::attachmentModified);
-    connect(this, &Attachment::filePathChanged, this, &Attachment::attachmentModified);
-    connect(this, &Attachment::mimeTypeChanged, this, &Attachment::attachmentModified);
-}
-
-Attachment::~Attachment()
-{
-    emit aboutToDelete(this);
-}
-
-void Attachment::setName(const QString &val)
-{
-    if(m_name == val)
-        return;
-
-    m_name = val;
-    emit nameChanged();
-}
-
-void Attachment::setTitle(const QString &val)
-{
-    if(m_title == val)
-        return;
-
-    m_title = val;
-    emit titleChanged();
-}
-
-void Attachment::setFilePath(const QString &val)
-{
-    if(m_filePath == val || !m_filePath.isEmpty())
-        return;
-
-    QFileInfo fi(val);
-    if(!fi.exists() || !fi.isReadable())
-        return;
-
-    m_filePath = val;
-    emit filePathChanged();
-}
-
-void Attachment::setMimeType(const QString &val)
-{
-    if(m_mimeType == val || !m_mimeType.isEmpty())
-        return;
-
-    m_mimeType = val;
-    // m_type = ...
-    // m_typeIcon = ...
-    emit mimeTypeChanged();
-}
-
-void Attachment::serializeToJson(QJsonObject &json) const
-{
-    json.insert( QStringLiteral("#filePath"), m_filePath );
-    json.insert( QStringLiteral("#mimeType"), m_mimeType );
-}
-
-void Attachment::deserializeFromJson(const QJsonObject &json)
-{
-    this->setFilePath( json.value( QStringLiteral("#filePath") ).toString() );
-    this->setMimeType( json.value( QStringLiteral("#mimeType") ).toString() );
-}
-
-///////////////////////////////////////////////////////////////////////////////
+#include <QTextBoundaryFinder>
 
 Note::Note(QObject *parent)
     : QObject(parent)
@@ -101,7 +27,7 @@ Note::Note(QObject *parent)
     connect(this, &Note::summaryChanged, this, &Note::noteModified);
     connect(this, &Note::contentChanged, this, &Note::noteModified);
     connect(this, &Note::metaDataChanged, this, &Note::noteModified);
-    connect(this, &Note::attachmentCountChanged, this, &Note::noteModified);
+    connect(m_attachments, &Attachments::attachmentsModified, this, &Note::noteModified);
 }
 
 Note::~Note()
@@ -163,108 +89,6 @@ void Note::setMetaData(const QJsonObject &val)
     emit metaDataChanged();
 }
 
-ObjectListPropertyModel<Attachment *> *Note::attachmentsModel() const
-{
-    return &(const_cast<Note*>(this)->m_attachments);
-}
-
-QQmlListProperty<Attachment> Note::attachments()
-{
-    return QQmlListProperty<Attachment>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Note::staticAttachmentCount,
-                &Note::staticAttachmentAt);
-}
-
-Attachment *Note::addAttachment(const QString &filePath)
-{
-    QFileInfo fi(filePath);
-    if( !fi.exists() || !fi.isReadable() )
-        return nullptr;
-
-    static QMimeDatabase mimeDb;
-    const QMimeType mimeType = mimeDb.mimeTypeForFile(fi);
-    if(!mimeType.isValid())
-        return nullptr;
-
-    Notes *notes = qobject_cast<Notes*>(this->parent());
-    if(notes == nullptr)
-        return nullptr;
-
-    ScriteDocument *doc = ScriteDocument::instance()->instance();
-    DocumentFileSystem *dfs = doc->fileSystem();
-    const QString attachedFilePath = dfs->add(filePath);
-
-    Attachment *ptr = new Attachment(this);
-    ptr->setFilePath(attachedFilePath);
-    ptr->setMimeType(mimeType.name());
-    ptr->setFilePath(fi.fileName());
-    ptr->setTitle(fi.baseName());
-    this->addAttachment(ptr);
-
-    return ptr;
-}
-
-void Note::addAttachment(Attachment *ptr)
-{
-    if(ptr == nullptr || m_attachments.indexOf(ptr) >= 0)
-        return;
-
-    ptr->setParent(this);
-
-    connect(ptr, &Attachment::aboutToDelete, this, &Note::removeAttachment);
-    connect(ptr, &Attachment::attachmentModified, this, &Note::noteModified);
-
-    m_attachments.append(ptr);
-    emit attachmentCountChanged();
-}
-
-void Note::setAttachments(const QList<Attachment *> &list)
-{
-    if(!m_attachments.isEmpty())
-        return;
-
-    for(Attachment *ptr : list)
-    {
-        ptr->setParent(this);
-        connect(ptr, &Attachment::aboutToDelete, this, &Note::removeAttachment);
-        connect(ptr, &Attachment::attachmentModified, this, &Note::noteModified);
-    }
-
-    m_attachments.assign(list);
-    emit attachmentCountChanged();
-}
-
-void Note::removeAttachment(Attachment *ptr)
-{
-    if(ptr == nullptr)
-        return;
-
-    const int index = m_attachments.indexOf(ptr);
-    if(index < 0)
-        return;
-
-    disconnect(ptr, &Attachment::aboutToDelete, this, &Note::removeAttachment);
-    disconnect(ptr, &Attachment::attachmentModified, this, &Note::noteModified);
-
-    m_attachments.removeAt(index);
-    emit attachmentCountChanged();
-
-    ptr->deleteLater();
-}
-
-Attachment *Note::attachmentAt(int index) const
-{
-    return index < 0 || index >= m_attachments.size() ? nullptr : m_attachments.at(index);
-}
-
-void Note::clearAttachments()
-{
-    while(m_attachments.size())
-        this->removeAttachment(m_attachments.first());
-}
-
 bool Note::canSerialize(const QMetaObject *metaObject, const QMetaProperty &metaProperty) const
 {
     if(!this->metaObject()->inherits(metaObject))
@@ -275,40 +99,6 @@ bool Note::canSerialize(const QMetaObject *metaObject, const QMetaProperty &meta
         return m_type == FormNoteType;
 
     return true;
-}
-
-bool Note::canSetPropertyFromObjectList(const QString &propName) const
-{
-    if(propName == QStringLiteral("attachments"))
-        return m_attachments.isEmpty();
-
-    return false;
-}
-
-void Note::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
-{
-    if(propName == QStringLiteral("attachments"))
-        this->setAttachments( qobject_list_cast<Attachment*>(objects) );
-}
-
-void Note::staticAppendAttachment(QQmlListProperty<Attachment> *list, Attachment *ptr)
-{
-    reinterpret_cast< Note* >(list->data)->addAttachment(ptr);
-}
-
-void Note::staticClearAttachments(QQmlListProperty<Attachment> *list)
-{
-    reinterpret_cast< Note* >(list->data)->clearAttachments();
-}
-
-Attachment *Note::staticAttachmentAt(QQmlListProperty<Attachment> *list, int index)
-{
-    return reinterpret_cast< Note* >(list->data)->attachmentAt(index);
-}
-
-int Note::staticAttachmentCount(QQmlListProperty<Attachment> *list)
-{
-    return reinterpret_cast< Note* >(list->data)->attachmentCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -437,6 +227,9 @@ void Notes::setNotes(const QList<Note *> &list)
         ptr->setParent(this);
         connect(ptr, &Note::aboutToDelete, this, &Notes::removeNote);
         connect(ptr, &Note::noteModified, this, &Notes::notesModified);
+
+        if(ptr->type() == Note::TextNoteType && ptr->summary().isEmpty())
+            ptr->setSummary( ptr->content().toString() );
     }
 
     this->assign(list);
@@ -461,7 +254,7 @@ void Notes::removeNote(Note *ptr)
 
 Note *Notes::noteAt(int index) const
 {
-    return index < 0 || index >= this->size() ? nullptr : this->at(index);
+    return this->at(index);
 }
 
 void Notes::clearNotes()
@@ -493,36 +286,23 @@ void Notes::deserializeFromJson(const QJsonObject &json)
     if(jsNotes.isEmpty())
         return;
 
+    // Remove duplicate notes.
     QList<Note*> notes;
-    if(jsNotes.size() == 1)
-    {
-        const QJsonObject &jsNote = jsNotes.first().toObject();
+    QSet<QJsonObject> uniqueJsNotes;
+    for(const QJsonValue &jsNotesItem : jsNotes)
+        uniqueJsNotes |= jsNotesItem.toObject();
 
+    notes.reserve(jsNotes.size());
+    for(const QJsonObject &jsNote : qAsConst(uniqueJsNotes))
+    {
         Note *note = new Note(this);
         if( QObjectSerializer::fromJson(jsNote, note) )
-            this->append(note);
+            notes.prepend(note);
         else
             delete note;
     }
-    else
-    {
-        // Remove duplicate notes.
-        QSet<QJsonObject> uniqueJsNotes;
-        for(const QJsonValue &jsNotesItem : jsNotes)
-            uniqueJsNotes |= jsNotesItem.toObject();
 
-        notes.reserve(jsNotes.size());
-        for(const QJsonObject &jsNote : qAsConst(uniqueJsNotes))
-        {
-            Note *note = new Note(this);
-            if( QObjectSerializer::fromJson(jsNote, note) )
-                notes.prepend(note);
-            else
-                delete note;
-        }
-
-        this->setNotes(notes);
-    }
+    this->setNotes(notes);
 }
 
 void Notes::loadOldNotes(const QJsonArray &jsNotes)
@@ -554,4 +334,5 @@ void Notes::loadOldNotes(const QJsonArray &jsNotes)
 
     this->setNotes(notes);
 }
+
 

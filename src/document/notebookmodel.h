@@ -62,7 +62,8 @@ public:
     enum ItemRoles
     {
         TitleRole = Qt::DisplayRole,
-        TypeRole = Qt::UserRole,
+        IdRole = Qt::UserRole,
+        TypeRole,
         CategoryRole,
         ObjectRole,
         ModelDataRole

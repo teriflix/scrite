@@ -20,7 +20,7 @@ import QtQuick.Controls 1.4 as OldControls
 
 import Scrite 1.0
 
-Item {
+Rectangle {
 
     function switchToStoryTab() {
         notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(structure.notes) )
@@ -203,11 +203,13 @@ Item {
 
         Loader {
             id: notebookContentLoader
-            active: activeProperty.value
+            active: notebookContentActiveProperty.value
+
+            property int currentNotebookItemId: notebookTree.currentData ? notebookTree.currentData.notebookItemId : -1
 
             ResetOnChange {
-                id: activeProperty
-                trackChangesOn: notebookTree.currentData
+                id: notebookContentActiveProperty
+                trackChangesOn: notebookContentLoader.currentNotebookItemId
                 from: false
                 to: true
             }
@@ -223,10 +225,7 @@ Item {
                     case NotebookModel.CharactersCategory:
                         return charactersComponent
                     }
-                    return unknownComponent
-                }
-
-                if(notebookTree.currentData.notebookItemType === NotebookModel.NotesType) {
+                } else if(notebookTree.currentData.notebookItemType === NotebookModel.NotesType) {
                     switch(notebookTree.currentData.notebookItemObject.ownerType) {
                     case Notes.CharacterOwner:
                         return characterNotesComponent
@@ -235,12 +234,28 @@ Item {
                     }
 
                     return notesComponent
+                } else if(notebookTree.currentData.notebookItemType === NotebookModel.NoteType) {
+                    switch(notebookTree.currentData.notebookItemObject.type) {
+                    case Note.TextNoteType:
+                        return textNoteComponent
+                    case Note.FormNoteType:
+                        return formNoteComponent
+                    }
                 }
 
-                return noteComponent
+                return unknownComponent
             }
-            onLoaded: {
-                item.componentData = notebookTree.currentData
+            onLoaded: item.componentData = notebookTree.currentData
+
+            Rectangle {
+                anchors.fill: parent
+                color: Qt.rgba(0,0,0,0.05)
+                visible: notebookContentActiveProperty.value === false
+
+                BusyIndicator {
+                    running: notebookContentActiveProperty.value === false
+                    anchors.centerIn: parent
+                }
             }
         }
     }
@@ -263,25 +278,162 @@ Item {
         id: notesComponent
 
         Item {
+            id: notesSummary
             property var componentData
+            property Notes notes: componentData.notebookItemObject
+            readonly property real minimumNoteSize: 175
+            property real noteSize: notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize)
 
-            Text {
-                anchors.centerIn: parent
-                text: "Notes"
-                font.pointSize: app.idealFontPointSize
+            Flickable {
+                id: notesFlick
+                anchors.fill: parent
+                anchors.margins: 20
+
+                Flow {
+                    width: notesFlick.width
+                    Repeater {
+                        model: notes
+
+                        Item {
+                            width: noteSize; height: noteSize
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                color: Qt.tint(objectItem.color, "#E7FFFFFF")
+                                border.width: 1
+                                border.color: app.isLightColor(color) ? "black" : objectItem.color
+
+                                Column {
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    spacing: 5
+
+                                    Text {
+                                        id: headingText
+                                        font.pointSize: app.idealFontPointSize
+                                        font.bold: true
+                                        maximumLineCount: 1
+                                        width: parent.width
+                                        elide: Text.ElideRight
+                                        text: objectItem.title
+                                        color: primaryColors.c900.background
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        height: parent.height - headingText.height - parent.spacing
+                                        wrapMode: Text.WordWrap
+                                        elide: Text.ElideRight
+                                        font.pointSize: app.idealFontPointSize-2
+                                        text: objectItem.summary
+                                        color: primaryColors.c600.background
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Item {
+                        width: noteSize; height: noteSize
+
+                        Image {
+                            anchors.centerIn: parent
+                            width: Math.min(parent.width*0.4, 48)
+                            height: width
+                            source: "../icons/action/note_add.png"
+                            smooth: true; mipmap: true
+                            fillMode: Image.PreserveAspectFit
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            // onClicked: TODO
+                        }
+                    }
+                }
+
+                ScrollBar.vertical: notesFlickScrollBar
+            }
+
+            ScrollBar {
+                id: notesFlickScrollBar
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                policy: notesFlick.height < notesFlick.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                minimumSize: 0.1
+                palette {
+                    mid: Qt.rgba(0,0,0,0.25)
+                    dark: Qt.rgba(0,0,0,0.75)
+                }
+                opacity: active ? 1 : 0.2
+                Behavior on opacity {
+                    enabled: screenplayEditorSettings.enableAnimations
+                    NumberAnimation { duration: 250 }
+                }
             }
         }
     }
 
     Component {
-        id: noteComponent
+        id: textNoteComponent
+
+        Item {
+            property var componentData
+            property Note note: componentData.notebookItemObject
+
+            AttachmentsDropArea {
+                anchors.fill: parent
+                target: note.attachments
+            }
+
+            TextField2 {
+                id: noteHeadingField
+                font.pointSize: app.idealFontPointSize + 5
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.margins: 10
+                text: note.title
+                onTextChanged: note.title = text
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                maximumLength: 256
+            }
+
+            ScrollView {
+                id: noteContentFieldArea
+                anchors.top: noteHeadingField.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: attachmentsArea.top
+                anchors.margins: 10
+
+                TextAreaInput {
+                    id: noteContentField
+                    width: noteContentFieldArea.width
+                    font.pointSize: app.idealFontPointSize
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: note.content
+                    onTextChanged: note.content = text
+                }
+            }
+
+            Loader {
+                sourceComponent: attachmentsComponent
+            }
+        }
+    }
+
+    Component {
+        id: formNoteComponent
 
         Item {
             property var componentData
 
             Text {
                 anchors.centerIn: parent
-                text: "Note"
+                text: "Scenes"
                 font.pointSize: app.idealFontPointSize
             }
         }
@@ -340,11 +492,12 @@ Item {
                     font.family: idealAppFontMetrics.font.family
                     font.capitalization: Font.AllUppercase
                     font.bold: true
-                    text: character.name
+                    text: character.name + ": "
+                    rightPadding: 10
                 }
 
                 Repeater {
-                    model: ["Information", "Relationships"]
+                    model: ["Information", "Relationships", "Notes"]
 
                     Text {
                         font: idealAppFontMetrics.font
@@ -383,6 +536,13 @@ Item {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
 
+                    EventFilter.events: [31]
+                    EventFilter.onFilter: {
+                        EventFilter.forwardEventTo(characterQuickInfoView)
+                        result.filter = true
+                        result.accepted = true
+                    }
+
                     Item {
                         width: Math.min(400, parent.width)
                         height: parent.height
@@ -419,7 +579,9 @@ Item {
 
                         Flickable {
                             id: characterQuickInfoView
-                            anchors.fill: parent
+                            width: parent.width
+                            height: Math.min(parent.height, contentHeight)
+                            anchors.centerIn: parent
                             contentWidth: characterQuickInfoViewContent.width
                             contentHeight: characterQuickInfoViewContent.height
                             clip: true
@@ -431,11 +593,12 @@ Item {
                                 spacing: 10
 
                                 Rectangle {
-                                    width: parent.width
-                                    height: parent.width
+                                    width: Math.min(parent.width, 300)
+                                    height: width
                                     color: photoSlides.currentIndex === photoSlides.count-1 ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0.75)
                                     border.width: 1
                                     border.color: primaryColors.borderColor
+                                    anchors.horizontalCenter: parent.horizontalCenter
 
                                     SwipeView {
                                         id: photoSlides
@@ -648,7 +811,7 @@ Item {
                         anchors.right: parent.right
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        policy: characterQuickInfoView.height > characterQuickInfoView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        policy: characterQuickInfoView.height < characterQuickInfoView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         minimumSize: 0.1
                         palette {
                             mid: Qt.rgba(0,0,0,0.25)
@@ -679,6 +842,14 @@ Item {
                         var relationship = character.findRelationship(otherCharacter)
                         character.removeRelationship(relationship)
                     }
+                }
+
+                Loader {
+                    width: characterTabContentArea.width
+                    height: characterTabContentArea.height
+                    sourceComponent: notesComponent
+                    active: characterNotes.character
+                    onLoaded: item.componentData = characterNotes.componentData
                 }
             }
         }
@@ -866,6 +1037,22 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    Component {
+        id: attachmentsComponent
+
+        Item {
+            id: attachmentsArea
+            property var componentData
+            property Attachments attachments: componentData.notebookItemObject.attachments
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 10
+            height: 60
         }
     }
 }
