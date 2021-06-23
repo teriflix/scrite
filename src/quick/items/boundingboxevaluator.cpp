@@ -629,7 +629,6 @@ void BoundingBoxItem::determineVisibility()
 
 void BoundingBoxItem::updateJson()
 {
-    PROFILE_THIS_FUNCTION;
     m_json = this->toJson();
 }
 
