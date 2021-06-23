@@ -25,6 +25,7 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QThreadPool>
+#include <QJsonObject>
 #include <QQuickPaintedItem>
 
 #include "qobjectproperty.h"
@@ -107,7 +108,7 @@ protected:
     void evaluateNow();
 
     void updatePreview();
-    QPicture createPreviewPicture() const;
+    static QPicture createPreviewPicture(const QList<QJsonObject> &items, const QRectF &bbox, const qreal scale);
 
 private:
     void addItem(BoundingBoxItem *item);
@@ -146,7 +147,7 @@ public:
 
     QRectF boundingRect() const;
 
-    Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
+    Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator STORED false)
     void setEvaluator(BoundingBoxEvaluator* val);
     BoundingBoxEvaluator* evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
@@ -190,7 +191,7 @@ public:
     VisibilityMode visibilityMode() const { return m_visibilityMode; }
     Q_SIGNAL void visibilityModeChanged();
 
-    Q_PROPERTY(QQuickItem* viewportItem READ viewportItem WRITE setViewportItem NOTIFY viewportItemChanged RESET resetViewportItem)
+    Q_PROPERTY(QQuickItem* viewportItem READ viewportItem WRITE setViewportItem NOTIFY viewportItemChanged RESET resetViewportItem STORED false)
     void setViewportItem(QQuickItem* val);
     QQuickItem* viewportItem() const { return m_viewportItem; }
     Q_SIGNAL void viewportItemChanged();
@@ -212,6 +213,8 @@ public:
 
     Q_SIGNAL void itemVisibilityChanged();
 
+    QJsonObject asJson() const { return m_json; }
+
 protected:
     void timerEvent(QTimerEvent *event);
 
@@ -223,22 +226,26 @@ private:
     void updatePreviewLater();
     void setPreview(const QImage &image);
     void determineVisibility();
+    void updateJson();
+    QJsonObject toJson() const;
 
 private:
     QImage m_preview;
     qreal m_stackOrder = 0;
     bool m_livePreview = true;
     QRectF m_viewportRect;
+    QJsonObject m_json;
+    QTimer m_jsonUpdateTimer;
     QPointer<QQuickItem> m_item;
     qreal m_previewBorderWidth = 1;
     QColor m_previewFillColor = Qt::white;
     QColor m_previewBorderColor = Qt::black;
     VisibilityMode m_visibilityMode = AlwaysVisible;
+    QByteArray m_visibilityProperty;
     ExecLaterTimer m_updatePreviewTimer;
     QObjectProperty<QQuickItem> m_viewportItem;
     QSharedPointer<QQuickItemGrabResult> m_itemGrabResult;
     QObjectProperty<BoundingBoxEvaluator> m_evaluator;
-    QByteArray m_visibilityProperty;
 };
 
 class BoundingBoxPreview : public QQuickPaintedItem
