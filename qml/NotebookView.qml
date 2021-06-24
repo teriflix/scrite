@@ -291,6 +291,7 @@ Rectangle {
 
                 Flow {
                     width: notesFlick.width
+
                     Repeater {
                         model: notes
 
@@ -336,6 +337,7 @@ Rectangle {
 
                     Item {
                         width: noteSize; height: noteSize
+                        visible: !scriteDocument.readOnly
 
                         Image {
                             anchors.centerIn: parent
@@ -383,11 +385,6 @@ Rectangle {
             property var componentData
             property Note note: componentData.notebookItemObject
 
-            AttachmentsDropArea {
-                anchors.fill: parent
-                target: note.attachments
-            }
-
             TextField2 {
                 id: noteHeadingField
                 font.pointSize: app.idealFontPointSize + 5
@@ -396,31 +393,87 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.margins: 10
                 text: note.title
+                readOnly: scriteDocument.readOnly
                 onTextChanged: note.title = text
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 maximumLength: 256
+                placeholderText: "Note Heading"
+                label: ""
             }
 
-            ScrollView {
+            Flickable {
                 id: noteContentFieldArea
                 anchors.top: noteHeadingField.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: attachmentsArea.top
                 anchors.margins: 10
+                property bool scrollBarVisible: noteContentField.height > height
+                ScrollBar.vertical: ScrollBar {
+                    policy: noteContentFieldArea.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                }
+                clip: true
+                contentWidth: noteContentField.width
+                contentHeight: noteContentField.height
 
-                TextAreaInput {
+                TextArea {
                     id: noteContentField
-                    width: noteContentFieldArea.width
+                    width: noteContentFieldArea.width - (noteContentFieldArea.scrollBarVisible ? 20 : 0)
+                    height: contentHeight+50
                     font.pointSize: app.idealFontPointSize
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: note.content
                     onTextChanged: note.content = text
+                    selectByMouse: true
+                    selectByKeyboard: true
+                    Transliterator.textDocument: textDocument
+                    Transliterator.cursorPosition: cursorPosition
+                    Transliterator.hasActiveFocus: activeFocus
+                    readOnly: scriteDocument.readOnly
+                    background: Item { }
+                    placeholderText: "Note Content"
+                    SpecialSymbolsSupport {
+                        anchors.top: parent.bottom
+                        anchors.left: parent.left
+                        textEditor: noteContentField
+                        textEditorHasCursorInterface: true
+                        enabled: !scriteDocument.readOnly
+                    }
                 }
             }
 
-            Loader {
-                sourceComponent: attachmentsComponent
+            AttachmentsView {
+                id: attachmentsArea
+                attachments: note.attachments
+                orientation: ListView.Horizontal
+                height: 80
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 10
+            }
+
+            AttachmentsDropArea {
+                id: attachmentsDropArea
+                anchors.fill: parent
+                target: note.attachments
+                enabled: !scriteDocument.readOnly
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: attachmentsDropArea.active
+                    color: Qt.tint(primaryColors.c500.background, "#E7FFFFFF")
+
+                    Text {
+                        anchors.centerIn: parent
+                        width: parent.width * 0.5
+                        wrapMode: Text.WordWrap
+                        text: "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here."
+                        horizontalAlignment: Text.AlignHCenter
+                        color: primaryColors.c10.text
+                        font.pointSize: app.idealFontPointSize
+                    }
+                }
             }
         }
     }

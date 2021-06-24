@@ -371,6 +371,7 @@ protected:
     void evaluateHasTitlePageAttributes();
     QList<ScreenplayElement*> takeSelectedElements();
     void setEpisodeCount(int val);
+    void onDfsAuction(const QString &filePath, int *claims);
 
 private:
     QString m_title;

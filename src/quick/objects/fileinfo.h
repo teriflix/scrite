@@ -16,6 +16,7 @@
 
 #include <QObject>
 #include <QFileInfo>
+#include <QQuickImageProvider>
 
 class FileInfo : public QObject
 {
@@ -53,6 +54,16 @@ private:
 
 private:
     QFileInfo m_fileInfo;
+};
+
+class FileIconProvider : public QQuickImageProvider
+{
+public:
+    FileIconProvider();
+    ~FileIconProvider();
+
+    // QQuickImageProvider interface
+    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
 #endif // FILEINFO_H

@@ -26,6 +26,8 @@ class DocumentFile;
 struct DocumentFileSystemData;
 class DocumentFileSystem : public QObject
 {
+    Q_OBJECT
+
 public:
     static void setMarker(const QByteArray &marker);
 
@@ -61,6 +63,10 @@ public:
     QString addFile(const QString &srcFile, const QString &dstPath, bool replaceIfExists=true);
     QString addImage(const QString &srcFile, const QString &dstPath, const QSize &scaleTo=QSize(), bool replaceIfExists=true);
     QString addImage(const QImage &srcImage, const QString &dstPath, const QSize &scaleTo=QSize(), bool replaceIfExists=true);
+
+    // API to cleanup unreferenced files that may be lying around.
+    void cleanup();
+    Q_SIGNAL void auction(const QString &path, int *claims);
 
 private:
     bool pack(QDataStream &ds);

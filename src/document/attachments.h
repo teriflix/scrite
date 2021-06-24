@@ -19,6 +19,7 @@
 #include "objectlistpropertymodel.h"
 
 #include <QFileInfo>
+#include <QMimeType>
 #include <QQuickItem>
 
 class Attachment : public QObject, public QObjectSerializer::Interface
@@ -43,17 +44,12 @@ public:
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    void setName(const QString &val);
-    QString name() const { return m_name; }
-    Q_SIGNAL void nameChanged();
-
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString originalFileName WRITE setOriginalFileName NOTIFY originalFileNameChanged)
+    Q_PROPERTY(QString originalFileName READ originalFileName NOTIFY originalFileNameChanged)
     QString originalFileName() const { return m_originalFileName; }
     Q_SIGNAL void originalFileNameChanged();
 
@@ -65,10 +61,12 @@ public:
     QString mimeType() const { return m_mimeType; }
     Q_SIGNAL void mimeTypeChanged();
 
-    Q_PROPERTY(QUrl typeIcon READ typeIcon NOTIFY mimeTypeChanged)
-    QUrl typeIcon() const { return m_typeIcon; }
-
+    Q_INVOKABLE void openAttachmentAnonymously();
     Q_SIGNAL void attachmentModified();
+
+    bool isValid() const;
+
+    bool isRemoveFileOnDelete() const { return m_removeFileOnDelete; }
 
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
@@ -84,20 +82,24 @@ private:
     void setMimeType(const QString &val);
     void setOriginalFileName(const QString &val);
     bool removeAttachedFile();
+    void onDfsAuction(const QString &filePath, int *claims);
+    void setRemoveFileOnDelete(bool val) { m_removeFileOnDelete = val; }
 
 private:
     QString m_name;
     QString m_title;
-    QUrl    m_typeIcon;
     QString m_filePath;
     QString m_mimeType;
     QString m_originalFileName;
     Type m_type = Document;
+    QString m_anonFilePath;
+    bool m_removeFileOnDelete = false;
 };
 
 class Attachments : public ObjectListPropertyModel<Attachment *>, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Attachments(QObject *parent=nullptr);
@@ -113,13 +115,23 @@ public:
         DocumentsOfAnyType = 15
     };
     Q_ENUM(AllowedType)
-    Q_PROPERTY(AllowedType allowedType READ allowedType NOTIFY allowedTypeChanged)
+    Q_PROPERTY(AllowedType allowedType READ allowedType NOTIFY allowedTypeChanged STORED false)
     void setAllowedType(AllowedType val); // Can only be called from C++ classes.
     AllowedType allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
 
     static bool canAllow(const QFileInfo &fi, AllowedType allowed);
+    static QMimeType mimeTypeFor(const QFileInfo &fi);
 
+    Q_PROPERTY(QStringList nameFilters READ nameFilters NOTIFY allowedTypeChanged STORED false)
+    QStringList nameFilters() const { return m_nameFilters; }
+    Q_SIGNAL void nameFiltersChanged();
+
+    Q_INVOKABLE Attachment *includeAttachmentFromFileUrl(const QUrl &fileUrl) {
+        if(fileUrl.isLocalFile())
+            return this->includeAttachment(fileUrl.toLocalFile());
+        return nullptr;
+    }
     Q_INVOKABLE Attachment *includeAttachment(const QString &filePath);
     Q_INVOKABLE void removeAttachment(Attachment *ptr);
     Q_INVOKABLE Attachment *attachmentAt(int index) const;
@@ -144,6 +156,7 @@ private:
 
 private:
     AllowedType m_allowedType = DocumentsOfAnyType;
+    QStringList m_nameFilters;
 };
 
 class AttachmentsDropArea : public QQuickItem

@@ -14,6 +14,7 @@
 #include "fileinfo.h"
 
 #include <QtDebug>
+#include <QFileIconProvider>
 
 FileInfo::FileInfo(QObject *parent)
     : QObject(parent)
@@ -81,4 +82,35 @@ void FileInfo::setFileInfo(const QFileInfo &val)
 {
     m_fileInfo = val;
     emit fileInfoChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+FileIconProvider::FileIconProvider()
+    : QQuickImageProvider(QQuickImageProvider::Pixmap)
+{
+
+}
+
+FileIconProvider::~FileIconProvider()
+{
+
+}
+
+QPixmap FileIconProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    const QFileInfo fi(id);
+    const QFileIconProvider iconProvider;
+    const QIcon icon = iconProvider.icon(fi);
+
+    QSize iconSize(96, 96);
+    if(requestedSize.isValid())
+        iconSize = requestedSize;
+
+    const QPixmap pixmap = icon.pixmap(iconSize);
+
+    if(size)
+        *size = pixmap.size();
+
+    return pixmap;
 }

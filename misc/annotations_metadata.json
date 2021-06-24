@@ -1,5 +1,5 @@
 {
-   "#revision": 1,
+   "#revision":2,
    "oval":[
       {
          "name":"fillBackground",
@@ -7,21 +7,21 @@
          "text":"Fill with 'Color'",
          "type":"boolean",
          "default":true,
-         "cache": true
+         "cache":true
       },
       {
          "name":"color",
          "title":"Color",
          "type":"color",
          "default":"white",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderColor",
          "title":"Border Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderWidth",
@@ -31,7 +31,7 @@
          "step":1,
          "min":0,
          "max":5,
-         "cache": true
+         "cache":true
       },
       {
          "name":"opacity",
@@ -41,7 +41,7 @@
          "step":10,
          "min":0,
          "max":100,
-         "cache": true
+         "cache":true
       }
    ],
    "rectangle":[
@@ -51,21 +51,21 @@
          "text":"Fill with 'Color'",
          "type":"boolean",
          "default":true,
-         "cache": true
+         "cache":true
       },
       {
          "name":"color",
          "title":"Color",
          "type":"color",
          "default":"white",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderColor",
          "title":"Border Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderWidth",
@@ -75,7 +75,7 @@
          "step":1,
          "min":0,
          "max":5,
-         "cache": true
+         "cache":true
       },
       {
          "name":"opacity",
@@ -85,7 +85,7 @@
          "step":10,
          "min":0,
          "max":100,
-         "cache": true
+         "cache":true
       }
    ],
    "text":[
@@ -94,21 +94,21 @@
          "title":"Text",
          "type":"text",
          "default":"Text",
-         "cache": false
+         "cache":false
       },
       {
          "name":"textColor",
          "title":"Text Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"fontFamily",
          "title":"Font Family",
          "type":"fontFamily",
          "default":"Impact",
-         "cache": true
+         "cache":true
       },
       {
          "name":"fontSize",
@@ -118,7 +118,7 @@
          "min":9,
          "max":72,
          "step":1,
-         "cache": true
+         "cache":true
       },
       {
          "name":"fontStyle",
@@ -127,21 +127,21 @@
          "default":[
 
          ],
-         "cache": true
+         "cache":true
       },
       {
          "name":"hAlign",
          "title":"Horizontal Alignment",
          "type":"hAlign",
          "default":"center",
-         "cache": true
+         "cache":true
       },
       {
          "name":"vAlign",
          "title":"Vertical Alignment",
          "type":"vAlign",
          "default":"center",
-         "cache": true
+         "cache":true
       },
       {
          "name":"fillBackground",
@@ -149,21 +149,21 @@
          "text":"Fill with 'Background Color'",
          "type":"boolean",
          "default":false,
-         "cache": true
+         "cache":true
       },
       {
          "name":"backgroundColor",
          "title":"Background Color",
          "type":"color",
          "default":"white",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderColor",
          "title":"Border Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderWidth",
@@ -173,7 +173,7 @@
          "step":1,
          "min":0,
          "max":5,
-         "cache": true
+         "cache":true
       },
       {
          "name":"opacity",
@@ -183,16 +183,25 @@
          "step":10,
          "min":0,
          "max":100,
-         "cache": true
+         "cache":true
       }
    ],
    "url":[
+      {
+         "name":"imageName",
+         "title":"Image",
+         "type":"image",
+         "default":"",
+         "isFile":true,
+         "cache":false,
+         "visible":false
+      },
       {
          "name":"url",
          "title":"Website Address",
          "type":"url",
          "default":"",
-         "cache": false
+         "cache":false
       },
       {
          "name":"title",
@@ -200,7 +209,7 @@
          "type":"text",
          "default":"",
          "placeHolderText":"Set website title",
-         "cache": false
+         "cache":false
       },
       {
          "name":"description",
@@ -208,7 +217,7 @@
          "type":"text",
          "default":"",
          "placeHolderText":"Set website description",
-         "cache": false
+         "cache":false
       },
       {
          "name":"imageUrl",
@@ -216,7 +225,7 @@
          "type":"url",
          "default":"",
          "placeHolderText":"Set preview image URL",
-         "cache": false
+         "cache":false
       }
    ],
    "image":[
@@ -226,28 +235,28 @@
          "type":"image",
          "default":"",
          "isFile":true,
-         "cache": false
+         "cache":false
       },
       {
          "name":"caption",
          "title":"Caption",
          "type":"text",
          "default":"",
-         "cache": false
+         "cache":false
       },
       {
          "name":"captionColor",
          "title":"Caption Text Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"captionAlignment",
          "title":"Caption Alignment",
          "type":"hAlign",
          "default":"center",
-         "cache": true
+         "cache":true
       },
       {
          "name":"fillBackground",
@@ -255,21 +264,21 @@
          "text":"Fill with 'Background Color'",
          "type":"boolean",
          "default":false,
-         "cache": true
+         "cache":true
       },
       {
          "name":"backgroundColor",
          "title":"Background Color",
          "type":"color",
          "default":"white",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderColor",
          "title":"Border Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"borderWidth",
@@ -279,7 +288,7 @@
          "step":1,
          "min":0,
          "max":5,
-         "cache": true
+         "cache":true
       },
       {
          "name":"opacity",
@@ -289,7 +298,7 @@
          "step":10,
          "min":0,
          "max":100,
-         "cache": true
+         "cache":true
       }
    ],
    "line":[
@@ -303,14 +312,14 @@
          ],
          "default":"Horizontal",
          "visible":false,
-         "cache": false
+         "cache":false
       },
       {
          "name":"lineColor",
          "title":"Line Color",
          "type":"color",
          "default":"black",
-         "cache": true
+         "cache":true
       },
       {
          "name":"lineWidth",
@@ -320,7 +329,7 @@
          "step":1,
          "min":1,
          "max":20,
-         "cache": true
+         "cache":true
       },
       {
          "name":"opacity",
@@ -330,7 +339,7 @@
          "step":10,
          "min":0,
          "max":100,
-         "cache": true
+         "cache":true
       }
    ]
 }

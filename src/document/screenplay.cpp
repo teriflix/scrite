@@ -354,6 +354,9 @@ Screenplay::Screenplay(QObject *parent)
     fetchSettings( QStringLiteral("email"), m_email );
     fetchSettings( QStringLiteral("phone"), m_phoneNumber );
     fetchSettings( QStringLiteral("website"), m_website );
+
+    DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
+    connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
 }
 
 Screenplay::~Screenplay()
@@ -497,8 +500,11 @@ void Screenplay::setCoverPagePhoto(const QString &val)
 {
     HourGlass hourGlass;
 
+    DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
+    connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
+
     const QSize fullHdSize(1920, 1080);
-    const QString val2 = m_scriteDocument->fileSystem()->addImage(val, coverPagePhotoPath, fullHdSize);
+    const QString val2 =dfs->addImage(val, coverPagePhotoPath, fullHdSize);
 
     m_coverPagePhoto.clear();
     emit coverPagePhotoChanged();
@@ -1614,6 +1620,12 @@ void Screenplay::setEpisodeCount(int val)
 
     m_episodeCount = val;
     emit episodeCountChanged();
+}
+
+void Screenplay::onDfsAuction(const QString &filePath, int *claims)
+{
+    if(filePath == coverPagePhotoPath)
+        *claims = *claims + 1;
 }
 
 void Screenplay::setCurrentElementIndex(int val)
