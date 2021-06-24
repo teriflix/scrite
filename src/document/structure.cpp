@@ -1109,6 +1109,9 @@ Character::Character(QObject *parent)
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
     connect(this, &Character::characterRelationshipGraphChanged, this, &Character::characterChanged);
     connect(m_attachments, &Attachments::attachmentsModified, this, &Character::characterChanged);
+
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    connect(dfs, &DocumentFileSystem::auction, this, &Character::onDfsAuction);
 }
 
 Character::~Character()
@@ -1569,6 +1572,16 @@ bool Character::isRelatedToImpl(Character *with, QStack<Character *> &stack) con
     return false;
 }
 
+void Character::onDfsAuction(const QString &filePath, int *claims)
+{
+    if(m_photos.isEmpty() || !filePath.startsWith(QStringLiteral("characters/")))
+        return;
+
+    const QString absPath = ScriteDocument::instance()->fileSystem()->absolutePath(filePath);
+    if(m_photos.contains(absPath))
+        *claims = *claims + 1;
+}
+
 void Character::staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr)
 {
     reinterpret_cast< Character* >(list->data)->addRelationship(ptr);
@@ -1691,6 +1704,9 @@ Annotation::Annotation(QObject *parent)
     connect(this, &Annotation::typeChanged, this, &Annotation::annotationChanged);
     connect(this, &Annotation::geometryChanged, this, &Annotation::annotationChanged);
     connect(this, &Annotation::attributesChanged, this, &Annotation::annotationChanged);
+
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    connect(dfs, &DocumentFileSystem::auction, this, &Annotation::onDfsAuction);
 }
 
 Annotation::~Annotation()
@@ -1783,14 +1799,23 @@ void Annotation::setMetaData(const QJsonArray &val)
         return;
 
     m_metaData = val;
+    m_fileAttributes.clear();
+
     for(int i=0; i<m_metaData.count(); i++)
     {
+        const QString visibleAttr = QStringLiteral("visible");
+        const QString isFileAttr = QStringLiteral("isFile");
+        const QString nameAttr = QStringLiteral("name");
+
         QJsonObject obj = m_metaData.at(i).toObject();
-        if( !obj.contains("visible") )
+        if( !obj.contains(visibleAttr) )
         {
-            obj.insert("visible", true);
+            obj.insert(visibleAttr, true);
             m_metaData.replace(i, obj);
         }
+
+        if(obj.contains(isFileAttr) && obj.value(isFileAttr).isBool())
+            m_fileAttributes.append( obj.value(nameAttr).toString() );
     }
 
     this->polishAttributes();
@@ -1900,6 +1925,19 @@ void Annotation::polishAttributes()
         }
 
         ++it;
+    }
+}
+
+void Annotation::onDfsAuction(const QString &filePath, int *claims)
+{
+    if(m_fileAttributes.isEmpty() || !filePath.startsWith(QStringLiteral("annotation/")))
+        return;
+
+    for(const QString &fileAttr : qAsConst(m_fileAttributes))
+    {
+        const QString attrFilePath = m_attributes.value(fileAttr).toString();
+        if(attrFilePath == filePath)
+            *claims = *claims + 1;
     }
 }
 

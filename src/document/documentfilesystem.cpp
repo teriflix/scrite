@@ -30,6 +30,15 @@ struct DocumentFileSystemData
     QScopedPointer<QTemporaryDir> folder;
 
     void pack(QDataStream &ds, const QString &path);
+
+    QStringList filePaths() const {
+        QStringList ret;
+        this->filePaths(ret, folder->path());
+        return ret;
+    }
+
+private:
+    void filePaths(QStringList &paths, const QString &dirPath) const;
 };
 
 void DocumentFileSystemData::pack(QDataStream &ds, const QString &path)
@@ -75,6 +84,21 @@ void DocumentFileSystemData::pack(QDataStream &ds, const QString &path)
         else
             ds << qint64(0);
     }
+}
+
+void DocumentFileSystemData::filePaths(QStringList &paths, const QString &dirPath) const
+{
+    QDir fsDir(this->folder->path());
+
+    QFileInfo fi(dirPath);
+    if(fi.isDir())
+    {
+        const QFileInfoList fiList = QDir(dirPath).entryInfoList(QDir::Dirs|QDir::Files|QDir::NoDotAndDotDot, QDir::Name|QDir::DirsLast);
+        Q_FOREACH(QFileInfo fi2, fiList)
+            this->filePaths(paths, fi2.absoluteFilePath());
+    }
+    else
+        paths.append( fsDir.relativeFilePath(fi.absoluteFilePath()) );
 }
 
 Q_GLOBAL_STATIC(QByteArray, DocumentFileSystemMaker)
@@ -280,6 +304,9 @@ bool DocumentFileSystem::save(const QString &fileName)
 {
     if(fileName.isEmpty())
         return false;
+
+    // Ensure that unwanted files are no longer in the DFS folder
+    this->cleanup();
 
 #if 0
     QFile file(fileName);
@@ -599,6 +626,18 @@ QString DocumentFileSystem::addImage(const QImage &srcImage, const QString &dstP
     const QString suffix = QFileInfo(absDstPath).suffix().toUpper();
     const bool ret = imageToSave.save(absDstPath, qPrintable(suffix));
     return ret ? this->relativePath(absDstPath) : QString();
+}
+
+void DocumentFileSystem::cleanup()
+{
+    const QStringList filePaths = d->filePaths();
+    for(const QString &filePath : filePaths)
+    {
+        int claims = 0;
+        emit auction(filePath, &claims);
+        if(claims == 0)
+            this->remove(filePath);
+    }
 }
 
 bool DocumentFileSystem::pack(QDataStream &ds)

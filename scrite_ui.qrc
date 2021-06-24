@@ -65,5 +65,6 @@
         <file>qml/LodLoader.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
         <file>qml/BackupsDialogBox.qml</file>
+        <file>qml/AttachmentsView.qml</file>
     </qresource>
 </RCC>

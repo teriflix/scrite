@@ -383,11 +383,6 @@ Rectangle {
             property var componentData
             property Note note: componentData.notebookItemObject
 
-            AttachmentsDropArea {
-                anchors.fill: parent
-                target: note.attachments
-            }
-
             TextField2 {
                 id: noteHeadingField
                 font.pointSize: app.idealFontPointSize + 5
@@ -419,8 +414,37 @@ Rectangle {
                 }
             }
 
-            Loader {
-                sourceComponent: attachmentsComponent
+            AttachmentsView {
+                id: attachmentsArea
+                attachments: note.attachments
+                orientation: ListView.Horizontal
+                height: 80
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 10
+            }
+
+            AttachmentsDropArea {
+                id: attachmentsDropArea
+                anchors.fill: parent
+                target: note.attachments
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: attachmentsDropArea.active
+                    color: Qt.tint(primaryColors.c500.background, "#E7FFFFFF")
+
+                    Text {
+                        anchors.centerIn: parent
+                        width: parent.width * 0.5
+                        wrapMode: Text.WordWrap
+                        text: "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here."
+                        horizontalAlignment: Text.AlignHCenter
+                        color: primaryColors.c10.text
+                        font.pointSize: app.idealFontPointSize
+                    }
+                }
             }
         }
     }

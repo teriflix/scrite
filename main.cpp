@@ -337,6 +337,7 @@ int main(int argc, char **argv)
     qmlView.setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
     qmlView.engine()->addImageProvider(QStringLiteral("color"), new ColorImageProvider);
+    qmlView.engine()->addImageProvider(QStringLiteral("fileIcon"), new FileIconProvider);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
     qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);

@@ -470,6 +470,7 @@ protected:
 
 private:
     bool isRelatedToImpl(Character *with, QStack<Character*> &stack) const;
+    void onDfsAuction(const QString &filePath, int *claims);
 
     static void staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr);
     static void staticClearRelationships(QQmlListProperty<Relationship> *list);
@@ -564,6 +565,7 @@ public:
 protected:
     bool event(QEvent *event);
     void polishAttributes();
+    void onDfsAuction(const QString &filePath, int *claims);
 
 private:
     QRectF m_geometry;
@@ -572,6 +574,7 @@ private:
     bool m_resizable = true;
     Structure *m_structure = nullptr;
     QJsonArray m_metaData;
+    QStringList m_fileAttributes;
     QJsonObject m_attributes;
 };
 
