@@ -49,6 +49,19 @@ private:
     QMetaObject::Connection m_destroyedConnection;
 };
 
+class NoteItem : public ObjectItem
+{
+public:
+    NoteItem(Note *note);
+    ~NoteItem();
+
+private:
+    void updateText();
+
+private:
+    Note *m_note = nullptr;
+};
+
 class NotesItem : public ObjectItem
 {
 public:
@@ -61,6 +74,27 @@ public:
 private:
     Notes *m_notes = nullptr;
     QTimer m_syncTimer;
+    QList<QMetaObject::Connection> m_connections;
+};
+
+struct StoryNode
+{
+    ~StoryNode();
+
+    Screenplay *screenplay = nullptr;
+    ScreenplayElement *episode = nullptr;
+    ScreenplayElement *act = nullptr;
+    ScreenplayElement *scene = nullptr;
+
+    Structure *structure = nullptr;
+    StructureElement *unusedScene = nullptr;
+
+    QList<StoryNode*> childNodes;
+
+    static StoryNode *create(ScriteDocument *document=nullptr);
+
+private:
+    StoryNode();
 };
 
 NotebookModel::NotebookModel(QObject *parent)
@@ -75,6 +109,7 @@ NotebookModel::NotebookModel(QObject *parent)
 
     connect(&m_syncScenesTimer, &QTimer::timeout, this, &NotebookModel::syncScenes);
     connect(&m_syncCharactersTimer, &QTimer::timeout, this, &NotebookModel::syncCharacters);
+    connect(this, &NotebookModel::dataChanged, this, &NotebookModel::onDataChanged);
 }
 
 NotebookModel::~NotebookModel()
@@ -208,30 +243,70 @@ void NotebookModel::loadStory()
     this->appendRow(storyNotesItem);
 }
 
-void NotebookModel::loadScenes()
+QStandardItem *createItemForNode(StoryNode *node)
 {
-    QStandardItem *scenesItem = new StandardItemWithId;
-    scenesItem->setText( QStringLiteral("Scenes") );
-    scenesItem->setData(CategoryType, TypeRole);
-    scenesItem->setData(ScenesCategory, CategoryRole);
+    QStandardItem *nodeItem = nullptr;
+    if(node->scene == nullptr && node->unusedScene == nullptr)
+        nodeItem = new StandardItemWithId;
+    else if(node->scene != nullptr)
+        nodeItem = new NotesItem(node->scene->scene()->notes());
+    else if(node->unusedScene != nullptr)
+        nodeItem = new NotesItem(node->unusedScene->scene()->notes());
 
-    Structure *structure = m_document->structure();
-    ObjectListPropertyModel<StructureElement *> *elements = structure->elementsModel();
+    Notes *nodeNotes = nullptr;
 
-    const int nrElements = elements->objectCount();
-    for(int i=0; i<nrElements; i++)
+    if(node->screenplay != nullptr)
     {
-        StructureElement *element = elements->at(i);
-        Scene *scene = element->scene();
-        Notes *sceneNotes = scene->notes();
+        nodeItem->setText( QStringLiteral("Used Scenes") );
+        nodeItem->setData(NotebookModel::CategoryType, NotebookModel::TypeRole);
+        nodeItem->setData(NotebookModel::ScenesCategory, NotebookModel::CategoryRole);
+    }
+    else if(node->structure != nullptr)
+    {
+        nodeItem->setText( QStringLiteral("Unused Scenes") );
+        nodeItem->setData(NotebookModel::CategoryType, NotebookModel::TypeRole);
+        nodeItem->setData(NotebookModel::ScenesCategory, NotebookModel::CategoryRole);
+    }
+    else if(node->episode != nullptr)
+    {
+        if(node->episode->breakSubtitle().isEmpty())
+            nodeItem->setText( node->episode->breakTitle() );
+        else
+            nodeItem->setText( node->episode->breakTitle() + QStringLiteral(": ") + node->episode->breakSubtitle() );
+        nodeNotes = node->episode->breakNotes();
+    }
+    else if(node->act != nullptr)
+    {
+        nodeItem->setText( node->act->breakTitle() );
+        nodeNotes = node->act->breakNotes();
+    }
+    else if(node->scene == nullptr && node->unusedScene == nullptr)
+        nodeItem->setText( QStringLiteral("Story") );
 
-        NotesItem *sceneNotesItem = new NotesItem(sceneNotes);
-        scenesItem->appendRow(sceneNotesItem);
+    if(nodeNotes != nullptr)
+    {
+        NotesItem *nodeNotesItem = new NotesItem(nodeNotes);
+        nodeItem->appendRow(nodeNotesItem);
     }
 
-    this->appendRow(scenesItem);
+    for(StoryNode *childNode : qAsConst(node->childNodes))
+    {
+        QStandardItem *childNodeItem = createItemForNode(childNode);
+        nodeItem->appendRow(childNodeItem);
+    }
+
+    return nodeItem;
+}
+
+void NotebookModel::loadScenes()
+{
+    Structure *structure = m_document->structure();
+    Screenplay *screenplay = m_document->screenplay();
 
     connect(structure, &Structure::elementCountChanged, &m_syncScenesTimer, QOverload<>::of(&QTimer::start), Qt::UniqueConnection);
+    connect(screenplay, &Screenplay::elementsChanged, &m_syncScenesTimer, QOverload<>::of(&QTimer::start), Qt::UniqueConnection);
+
+    this->syncScenes();
 }
 
 void NotebookModel::loadCharacters()
@@ -297,38 +372,47 @@ void NotebookModel::loadOthers()
 
 void NotebookModel::syncScenes()
 {
-    Structure *structure = m_document->structure();
-    ObjectListPropertyModel<StructureElement *> *elements = structure->elementsModel();
-
-    QList<QStandardItem *> plausibleItems = this->findItems(QStringLiteral("Scenes"), Qt::MatchExactly, 0);
-    if(plausibleItems.size() != 1)
+    QScopedPointer<StoryNode> storyNodes( StoryNode::create(m_document) );
+    if(storyNodes.isNull())
         return;
 
-    QStandardItem *scenesItem = plausibleItems.first();
-    if(scenesItem->rowCount() > elements->objectCount())
+    StoryNode *structureNode = nullptr, *screenplayNode = nullptr;
+    for(StoryNode *storyNode : qAsConst(storyNodes->childNodes))
     {
-        m_syncScenesTimer.start();
-        return;
+        if(storyNode->structure != nullptr)
+            structureNode = storyNode;
+        else if(storyNode->screenplay != nullptr)
+            screenplayNode = storyNode;
     }
 
-    const int count = elements->objectCount();
-    for(int i=0; i<count; i++)
-    {
-        StructureElement *element = elements->at(i);
-        Scene *scene = element->scene();
-        Notes *sceneNotes = scene->notes();
-
-        QStandardItem *sceneNotesItem = scenesItem->child(i);
-        Notes *assignedNotes = sceneNotesItem ?
-                    qobject_cast<Notes*>(sceneNotesItem->data(NotebookModel::ObjectRole).value<QObject*>()) :
-                    nullptr;
-
-        if(sceneNotes != assignedNotes)
-        {
-            sceneNotesItem = new NotesItem(sceneNotes);
-            this->insertRow(i, sceneNotesItem);
+    auto removeTopLevelItems = [=](QList<QStandardItem*> &items) {
+        QList<int> rows;
+        while(!items.isEmpty()) {
+            QStandardItem *item = items.takeLast();
+            rows << item->row();
         }
-    }
+        std::sort(rows.begin(), rows.end());
+        while(!rows.isEmpty())
+            this->removeRow(rows.takeLast());
+    };
+
+    QList<QStandardItem *> unusedScenesItem = this->findItems(QStringLiteral("Unused Scenes"), Qt::MatchExactly, 0);
+    QList<QStandardItem *> screenplayScenesItem = this->findItems(QStringLiteral("Used Scenes"), Qt::MatchExactly, 0);
+    bool hasScenes = unusedScenesItem.size() + screenplayScenesItem.size() > 0;
+
+    if(hasScenes)
+        emit aboutToReloadScenes();
+
+    removeTopLevelItems(unusedScenesItem);
+    if(structureNode != nullptr)
+        this->insertRow(1, createItemForNode(structureNode));
+
+    removeTopLevelItems(screenplayScenesItem);
+    if(screenplayNode != nullptr)
+        this->insertRow(1, createItemForNode(screenplayNode));
+
+    if(hasScenes)
+        emit justReloadedScenes();
 }
 
 void NotebookModel::syncCharacters()
@@ -366,6 +450,15 @@ void NotebookModel::syncCharacters()
     }
 }
 
+void NotebookModel::onDataChanged(const QModelIndex &start, const QModelIndex &end, const QVector<int> &roles)
+{
+    /** ModelDataRole is a combination of all roles provided by the model. Anytime any role changes,
+        ModelDataRole should also be announced as changed. Otherwise, views connected to this model
+        which depends on ModelDataRole wont update themselves. */
+    if(!roles.isEmpty() && !roles.contains(ModelDataRole))
+        emit dataChanged(start, end, {ModelDataRole});
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ObjectItem::ObjectItem(QObject *object)
@@ -401,6 +494,29 @@ void ObjectItem::objectDestroyed(QObject *ptr)
     }
 }
 
+NoteItem::NoteItem(Note *note)
+         :ObjectItem(note),
+           m_note(note)
+{
+    this->updateText();
+    this->setData(NotebookModel::NoteType, NotebookModel::TypeRole);
+
+    QObject::connect(m_note, &Note::titleChanged, m_note, [=](){
+        this->updateText();
+    });
+}
+
+NoteItem::~NoteItem()
+{
+
+}
+
+void NoteItem::updateText()
+{
+    const QString title = m_note->title();
+    this->setText( title.isEmpty() ? QStringLiteral("New Note") : title );
+}
+
 NotesItem::NotesItem(Notes *notes)
           :ObjectItem(notes), m_notes(notes)
 {
@@ -411,10 +527,10 @@ NotesItem::NotesItem(Notes *notes)
             StructureElement *element = m_notes->scene()->structureElement();
             auto updateTextSlot = [=]() { this->updateText(); };
             if(element)
-                QObject::connect(element, &StructureElement::titleChanged, m_notes, updateTextSlot);
+                m_connections << QObject::connect(element, &StructureElement::titleChanged, m_notes, updateTextSlot);
             else
-                QObject::connect(m_notes->scene(), &Scene::titleChanged, m_notes, updateTextSlot);
-            QObject::connect(m_notes->scene(), &Scene::screenplayElementIndexListChanged, m_notes, updateTextSlot);
+                m_connections << QObject::connect(m_notes->scene(), &Scene::titleChanged, m_notes, updateTextSlot);
+            m_connections << QObject::connect(m_notes->scene(), &Scene::screenplayElementIndexListChanged, m_notes, updateTextSlot);
         } break;
     default:
         break;
@@ -434,10 +550,7 @@ NotesItem::NotesItem(Notes *notes)
                     QStringLiteral("Note: ") + QString::number(i) :
                     note->title();
 
-        ObjectItem *noteItem = new ObjectItem(note);
-        noteItem->setText( noteTitle );
-        noteItem->setData(NotebookModel::NoteType, NotebookModel::TypeRole);
-
+        NoteItem *noteItem = new NoteItem(note);
         noteItems.append(noteItem);
     }
 
@@ -447,14 +560,15 @@ NotesItem::NotesItem(Notes *notes)
     // Because noteCountChanged() is emitted before objectDestroyed()
     m_syncTimer.setInterval(0);
     m_syncTimer.setSingleShot(true);
-    QObject::connect(&m_syncTimer, &QTimer::timeout, m_notes, [=]() { this->sync(); });
-    QObject::connect(m_notes, &Notes::noteCountChanged, &m_syncTimer, QOverload<>::of(&QTimer::start));
-
+    m_connections << QObject::connect(&m_syncTimer, &QTimer::timeout, m_notes, [=]() { this->sync(); });
+    m_connections << QObject::connect(m_notes, &Notes::noteCountChanged, &m_syncTimer, QOverload<>::of(&QTimer::start));
 }
 
 NotesItem::~NotesItem()
 {
     m_syncTimer.stop();
+    while(!m_connections.isEmpty())
+        QObject::disconnect(m_connections.takeFirst());
 }
 
 void NotesItem::sync()
@@ -476,9 +590,7 @@ void NotesItem::sync()
 
         if(actualNote != assignedNote)
         {
-            noteItem = new ObjectItem(actualNote);
-            noteItem->setText( QStringLiteral("Note") );
-            noteItem->setData(NotebookModel::NoteType, NotebookModel::TypeRole);
+            noteItem = new NoteItem(actualNote);
             this->insertRow(i, noteItem);
         }
     }
@@ -491,6 +603,15 @@ void NotesItem::updateText()
     case Notes::StructureOwner:
         this->setText(QStringLiteral("Story"));
         return;
+    case Notes::BreakOwner: {
+        ScreenplayElement *spelement = qobject_cast<ScreenplayElement*>(m_notes->parent());
+        if(spelement->breakType() < 0)
+            this->setText(QStringLiteral("Break Notes"));
+        if(spelement->breakType() == Screenplay::Episode)
+            this->setText(QStringLiteral("Episode Notes"));
+        else
+            this->setText(QStringLiteral("Act Notes"));
+        } return;
     case Notes::CharacterOwner:
         this->setText(m_notes->character()->name());
         return;
@@ -532,153 +653,91 @@ void NotesItem::updateText()
     this->setText(QStringLiteral("Notes"));
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-NotebookFilterModel::NotebookFilterModel(QObject *parent)
-    :QSortFilterProxyModel(parent)
-{
-    this->setDynamicSortFilter(true);
-    this->setSortRole(NotebookModel::ModelDataRole);
-}
-
-NotebookFilterModel::~NotebookFilterModel()
+StoryNode::StoryNode()
 {
 
 }
 
-void NotebookFilterModel::setNotebookModel(NotebookModel *val)
+StoryNode::~StoryNode()
 {
-    if(m_notebookModel == val)
-        return;
-
-    this->dropHookstoScreenplaySignals();
-
-    m_notebookModel = val;
-    this->setSourceModel(val);
-
-    this->hookToScreenplaySignals();
-
-    emit notebookModelChanged();
+    qDeleteAll(childNodes);
+    childNodes.clear();
 }
 
-QModelIndex NotebookFilterModel::findModelIndexFor(QObject *owner) const
+StoryNode *StoryNode::create(ScriteDocument *document)
 {
-    if(m_notebookModel == nullptr)
-        return QModelIndex();
+    if(document == nullptr)
+        document = ScriteDocument::instance();
 
-    const QModelIndex source_index = m_notebookModel->findModelIndexFor(owner);
-    if(source_index.isValid())
-        return this->mapFromSource(source_index);
+    Structure *structure = document->structure();
+    Screenplay *screenplay = document->screenplay();
 
-    return QModelIndex();
-}
+    QList<StructureElement*> structureElements = structure->elementsModel()->list();
 
-QHash<int, QByteArray> NotebookFilterModel::roleNames() const
-{
-    return NotebookModel::staticRoleNames();
-}
+    StoryNode *rootNode = new StoryNode;
 
-bool NotebookFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
-    NotebookModel *nbm = qobject_cast<NotebookModel*>(this->sourceModel());
-    if(nbm == nullptr || nbm != m_notebookModel)
-        return true;
+    // Dump all scenes into screenplay nodes first.
+    StoryNode *screenplayNode = new StoryNode;
+    screenplayNode->screenplay = screenplay;
+    rootNode->childNodes.append(screenplayNode);
 
-    QStandardItem *parentItem = nbm->itemFromIndex(source_parent);
-    if(parentItem == nullptr)
-        return true;
+    StoryNode *actNode = nullptr;
+    StoryNode *episodeNode = nullptr;
 
-    QStandardItem *item = parentItem->child(source_row);
-    if(item == nullptr)
-        return true;
-
-    if( item->data(NotebookModel::TypeRole).toInt() == NotebookModel::NotesType )
+    const int nrElements = screenplay->elementCount();
+    for(int i=0; i<nrElements; i++)
     {
-        Notes *notes = qobject_cast<Notes*>(item->data(NotebookModel::ObjectRole).value<QObject*>());
-        if(notes == nullptr || notes->ownerType() != Notes::SceneOwner)
-            return true;
+        ScreenplayElement *element = screenplay->elementAt(i);
 
-        return notes->noteCount() > 0;
-    }
-
-    return true;
-}
-
-bool NotebookFilterModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
-{
-    NotebookModel *nbm = qobject_cast<NotebookModel*>(this->sourceModel());
-    if(nbm == nullptr || nbm != m_notebookModel)
-        return false;
-
-    QStandardItem *leftItem = nbm->itemFromIndex(source_left);
-    QStandardItem *rightItem = nbm->itemFromIndex(source_right);
-    if(leftItem == nullptr || rightItem == nullptr || leftItem == rightItem ||
-       leftItem->parent() != rightItem->parent() ||
-       leftItem->parent() == nullptr || rightItem->parent() == nullptr)
-        return false;
-
-    Notes *leftNotes = qobject_cast<Notes*>( leftItem->data(NotebookModel::ObjectRole).value<QObject*>() );
-    Notes *rightNotes = qobject_cast<Notes*>( rightItem->data(NotebookModel::ObjectRole).value<QObject*>() );
-    if(leftNotes == nullptr || rightNotes == nullptr)
-        return false;
-
-    if(leftNotes->ownerType() == Notes::SceneOwner && rightNotes->ownerType() == Notes::SceneOwner)
-    {
-        Scene *leftScene = leftNotes->scene();
-        Scene *rightScene = rightNotes->scene();
-        if(leftScene == nullptr || rightScene == nullptr)
-            return false;
-
-        QList<int> leftIndexes = leftScene->screenplayElementIndexList();
-        QList<int> rightIndexes = rightScene->screenplayElementIndexList();
-        if(leftIndexes.isEmpty() && rightIndexes.isEmpty())
-            return false;
-
-        if(!leftIndexes.isEmpty() && rightIndexes.isEmpty())
-            return true;
-
-        if(leftIndexes.isEmpty() && !rightIndexes.isEmpty())
-            return false;
-
-        return leftIndexes.first() < rightIndexes.first();
-    }
-
-    if(leftNotes->ownerType() == Notes::CharacterOwner && rightNotes->ownerType() == Notes::CharacterOwner)
-        return leftNotes->character()->name().compare( rightNotes->character()->name(), Qt::CaseInsensitive ) < 0;
-
-    return false;
-}
-
-void NotebookFilterModel::hookToScreenplaySignals()
-{
-    if(m_notebookModel != nullptr)
-    {
-        ScriteDocument *document = m_notebookModel->document();
-        if(document == nullptr)
+        if(element->elementType() == ScreenplayElement::BreakElementType)
         {
-            connect(m_notebookModel, &NotebookModel::documentChanged, this, &NotebookFilterModel::hookToScreenplaySignals, Qt::UniqueConnection);
-            return;
+            if(element->breakType() == Screenplay::Episode)
+            {
+                episodeNode = new StoryNode;
+                episodeNode->episode = element;
+                screenplayNode->childNodes.append(episodeNode);
+            }
+            else if(element->breakType() == Screenplay::Act)
+            {
+                actNode = new StoryNode;
+                actNode->act = element;
+                if(episodeNode == nullptr)
+                    screenplayNode->childNodes.append(actNode);
+                else
+                    episodeNode->childNodes.append(actNode);
+            }
         }
+        else
+        {
+            StoryNode *sceneNode = new StoryNode;
+            sceneNode->scene = element;
+            if(actNode != nullptr)
+                actNode->childNodes.append(sceneNode);
+            else if(episodeNode != nullptr)
+                episodeNode->childNodes.append(sceneNode);
+            else
+                screenplayNode->childNodes.append(sceneNode);
 
-        disconnect(m_notebookModel, &NotebookModel::documentChanged, this, &NotebookFilterModel::hookToScreenplaySignals);
-
-        Screenplay *screenplay = document->screenplay();
-        connect(screenplay, &Screenplay::rowsMoved, this, &NotebookFilterModel::invalidate, Qt::UniqueConnection);
-
-        this->sort(0);
+            structureElements.removeOne(element->scene()->structureElement());
+        }
     }
-}
 
-void NotebookFilterModel::dropHookstoScreenplaySignals()
-{
-    if(m_notebookModel != nullptr)
+    // Dump remaining structure scenes
+    if(!structureElements.isEmpty())
     {
-        disconnect(m_notebookModel, &NotebookModel::documentChanged, this, &NotebookFilterModel::hookToScreenplaySignals);
-        ScriteDocument *document = m_notebookModel->document();
-        if(document == nullptr)
-            return;
+        StoryNode *structureNode = new StoryNode;
+        structureNode->structure = structure;
+        rootNode->childNodes.append(structureNode);
 
-        Screenplay *screenplay = document->screenplay();
-        disconnect(screenplay, &Screenplay::rowsMoved, this, &NotebookFilterModel::invalidate);
+        for(StructureElement *element : qAsConst(structureElements))
+        {
+            StoryNode *unusedSceneNode = new StoryNode;
+            unusedSceneNode->unusedScene = element;
+            structureNode->childNodes.append(unusedSceneNode);
+        }
     }
+
+    return rootNode;
 }
+
+

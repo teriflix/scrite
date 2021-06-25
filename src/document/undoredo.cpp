@@ -63,10 +63,44 @@ QUndoStack *UndoStack::active()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef QList<ObjectPropertyInfo*> ObjectPropertyInfoList;
-Q_GLOBAL_STATIC(ObjectPropertyInfoList, GlobalObjectPropertyInfoList);
-
 int ObjectPropertyInfo::counter = 1000;
+static QByteArray objectUndoRedoLockProperty()
+{
+    static QByteArray ret = QByteArrayLiteral("#lockUndoRedo");
+    return ret;
+}
+
+class ObjectPropertyInfoList : public QObject, public QList<ObjectPropertyInfo*>
+{
+public:
+    ObjectPropertyInfoList() : QObject() {
+        qApp->installEventFilter(this);
+    }
+    ~ObjectPropertyInfoList() {
+        qDeleteAll(*this);
+        this->clear();
+    }
+
+    bool eventFilter(QObject *object, QEvent *event) {
+        if(event->type() != QEvent::DynamicPropertyChange)
+            return false;
+
+        QDynamicPropertyChangeEvent *dpe = static_cast<QDynamicPropertyChangeEvent*>(event);
+        if(dpe->propertyName() != objectUndoRedoLockProperty())
+            return false;
+
+        const bool locked = object->property(objectUndoRedoLockProperty()).toBool();
+
+        for(int i=0; i<this->size(); i++) {
+            ObjectPropertyInfo *pinfo = this->at(i);
+            if(pinfo->object == object)
+                pinfo->m_objectIsLocked = locked;
+        }
+
+        return false;
+    }
+};
+Q_GLOBAL_STATIC(ObjectPropertyInfoList, GlobalObjectPropertyInfoList);
 
 static inline QList<QByteArray> queryPropertyBundle(QObject *object, const QByteArray &property)
 {
@@ -93,9 +127,11 @@ ObjectPropertyInfo::ObjectPropertyInfo(QObject *o, const QMetaObject *mo, const 
     : id(++ObjectPropertyInfo::counter), object(o), property(prop),
       metaObject(mo), propertyBundle(queryPropertyBundle(o,prop))
 {
-    m_connection = QObject::connect(o, &QObject::destroyed, [this]() {
+    m_objectIsLocked = o->property(objectUndoRedoLockProperty()).toBool();
+    m_connection = QObject::connect(o, &QObject::destroyed, o,  [this]() {
         this->deleteSelf();
     });
+
     ::GlobalObjectPropertyInfoList->append(this);
 }
 
@@ -152,13 +188,26 @@ ObjectPropertyInfo *ObjectPropertyInfo::get(QObject *object, const QByteArray &p
         return nullptr; // dont know why this would happen. Just being paranoid
 
     ObjectPropertyInfoList &list = *::GlobalObjectPropertyInfoList();
-    Q_FOREACH(ObjectPropertyInfo *info, list)
+    for(int i=0; i<list.size(); i++)
     {
+        ObjectPropertyInfo *info = list.at(i);
         if(info->object == object && info->metaObject == metaObject && info->property == property)
             return info;
     }
 
     return new ObjectPropertyInfo(object, metaObject, property);
+}
+
+void ObjectPropertyInfo::lockUndoRedoFor(QObject *object)
+{
+    if(object)
+        object->setProperty(objectUndoRedoLockProperty(), true);
+}
+
+void ObjectPropertyInfo::unlockUndoRedoFor(QObject *object)
+{
+    if(object)
+        object->setProperty(objectUndoRedoLockProperty(), false);
 }
 
 int ObjectPropertyInfo::querySetCounter(QObject *object, const QByteArray &property)
@@ -196,7 +245,7 @@ ObjectPropertyUndoCommand::ObjectPropertyUndoCommand(QObject *object, const QByt
             {
                 m_oldValue = m_propertyInfo->read();
                 this->setText( QString("%1.%2").arg(object->metaObject()->className()).arg(QString::fromLatin1(property)) );
-                m_connection = QObject::connect(object, &QObject::destroyed, [this]() {
+                m_connection = QObject::connect(object, &QObject::destroyed, object, [this]() {
                     m_propertyInfo = nullptr;
                     this->setObsolete(true);
                 });

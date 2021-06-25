@@ -29,7 +29,6 @@ class Structure;
 class Attachments;
 class Relationship;
 
-
 class Note : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
@@ -39,6 +38,9 @@ public:
     Note(QObject *parent=nullptr);
     ~Note();
     Q_SIGNAL void aboutToDelete(Note *ptr);
+
+    Q_PROPERTY(Notes* notes READ notes CONSTANT STORED false)
+    Notes *notes() const;
 
     enum Type
     {
@@ -98,6 +100,7 @@ private:
     Attachments *m_attachments = new Attachments(this);
 };
 
+class RemoveNoteUndoCommand;
 class Notes : public ObjectListPropertyModel<Note *>, public QObjectSerializer::Interface
 {
     Q_OBJECT
@@ -106,11 +109,13 @@ class Notes : public ObjectListPropertyModel<Note *>, public QObjectSerializer::
 public:
     Notes(QObject *parent = nullptr);
     ~Notes();
+    Q_SIGNAL void aboutToDelete(Notes *ptr);
 
     enum OwnerType
     {
         StructureOwner,
         SceneOwner,
+        BreakOwner, // Act, Episode etc..
         CharacterOwner,
         RelationshipOwner,
         LocationOwner,
@@ -174,6 +179,7 @@ private:
     void setNotes(const QList<Note*> &list);
 
 private:
+    friend class RemoveNoteUndoCommand;
     QColor m_color = Qt::white;
     OwnerType m_ownerType = OtherOwner;
 };

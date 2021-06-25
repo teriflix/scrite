@@ -21,31 +21,44 @@ import QtQuick.Controls 1.4 as OldControls
 import Scrite 1.0
 
 Rectangle {
+    id: notebookView
 
     function switchToStoryTab() {
-        notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(structure.notes) )
+        switchTo(scriteDocument.structure.notes)
     }
 
     function switchToSceneTab() {
         var currentScene = scriteDocument.screenplay.activeScene
         if(currentScene)
-            notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(currentScene.notes) )
+            switchTo(currentScene.notes)
     }
 
     function switchToCharacterTab(name) {
         var character = scriteDocument.structure.findCharacter(name)
         if(character)
-            notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(character.notes) )
+            switchTo(character.notes)
+    }
+
+    function switchTo(object) {
+        notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(object) )
     }
 
     NotebookModel {
         id: notebookModel
         document: scriteDocument.loading ? null : scriteDocument
-    }
 
-    NotebookFilterModel {
-        id: notebookFilterModel
-        sourceNotebookModel: notebookModel
+        onAboutToReloadScenes: noteCurrentObject()
+        onJustReloadedScenes: restoreCurrentObject()
+
+        property var currentObject
+        function noteCurrentObject() {
+            currentObject = notebookTree.currentData.notebookItemObject
+        }
+
+        function restoreCurrentObject() {
+            switchTo(currentObject)
+            currentObject = null
+        }
     }
 
     FontMetrics {
@@ -64,7 +77,7 @@ Rectangle {
             SplitView.minimumWidth: 150
             clip: true
             headerVisible: false
-            model: notebookFilterModel
+            model: notebookModel
             alternatingRowColors: false
             horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
             rowDelegate: Rectangle {
@@ -72,7 +85,8 @@ Rectangle {
                 height: fontMetrics.height + 20
                 color: styleData.selected ? primaryColors.highlight.background : primaryColors.c10.background
             }
-            property var currentData: notebookFilterModel.modelIndexData(currentIndex)
+            property var currentData: model.modelIndexData(currentIndex)
+
             itemDelegate: Item {
                 width: notebookTree.width
 
@@ -162,7 +176,17 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
+                }
 
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.RightButton
+                    onClicked: {
+                        if(styleData.value.notebookItemType === NotebookModel.NoteType) {
+                            noteContextMenu.note = styleData.value.notebookItemObject
+                            noteContextMenu.popup()
+                        }
+                    }
                 }
             }
             OldControls.TableViewColumn {
@@ -283,13 +307,18 @@ Rectangle {
             property Notes notes: componentData.notebookItemObject
             readonly property real minimumNoteSize: 175
             property real noteSize: notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize)
+            clip: true
 
             Flickable {
                 id: notesFlick
                 anchors.fill: parent
                 anchors.margins: 20
+                property int currentIndex: 0
+                contentWidth: width
+                contentHeight: noteItemsFlow.height
 
                 Flow {
+                    id: noteItemsFlow
                     width: notesFlick.width
 
                     Repeater {
@@ -298,12 +327,23 @@ Rectangle {
                         Item {
                             width: noteSize; height: noteSize
 
+                            BoxShadow {
+                                anchors.fill: noteVisual
+                                visible: notesFlick.currentIndex === index
+                            }
+
                             Rectangle {
+                                id: noteVisual
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: Qt.tint(objectItem.color, "#E7FFFFFF")
+                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#E0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
                                 border.width: 1
                                 border.color: app.isLightColor(color) ? "black" : objectItem.color
+
+                                Behavior on color {
+                                    enabled: screenplayEditorSettings.enableAnimations
+                                    ColorAnimation { duration: 250 }
+                                }
 
                                 Column {
                                     anchors.fill: parent
@@ -318,7 +358,7 @@ Rectangle {
                                         width: parent.width
                                         elide: Text.ElideRight
                                         text: objectItem.title
-                                        color: primaryColors.c900.background
+                                        color: app.isLightColor(parent.parent.color) ? "black" : "white"
                                     }
 
                                     Text {
@@ -327,9 +367,26 @@ Rectangle {
                                         wrapMode: Text.WordWrap
                                         elide: Text.ElideRight
                                         font.pointSize: app.idealFontPointSize-2
-                                        text: objectItem.summary
-                                        color: primaryColors.c600.background
+                                        text: objectItem.type === Note.TextNoteType ? objectItem.content : objectItem.summary
+                                        color: app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                     }
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: {
+                                    parent.forceActiveFocus()
+                                    notesFlick.currentIndex = index
+                                    if(mouse.button === Qt.RightButton) {
+                                        noteContextMenu.note = objectItem
+                                        noteContextMenu.popup()
+                                    }
+                                }
+                                onDoubleClicked: {
+                                    parent.forceActiveFocus()
+                                    switchTo(objectItem)
                                 }
                             }
                         }
@@ -339,18 +396,40 @@ Rectangle {
                         width: noteSize; height: noteSize
                         visible: !scriteDocument.readOnly
 
-                        Image {
+                        ToolButton3 {
                             anchors.centerIn: parent
-                            width: Math.min(parent.width*0.4, 48)
-                            height: width
-                            source: "../icons/action/note_add.png"
-                            smooth: true; mipmap: true
-                            fillMode: Image.PreserveAspectFit
-                        }
+                            ToolTip.text: "Add a new text or form note."
+                            iconSource: "../icons/action/note_add.png"
+                            onClicked: newNoteMenu.open()
+                            down: newNoteMenu.visible
 
-                        MouseArea {
-                            anchors.fill: parent
-                            // onClicked: TODO
+                            Item {
+                                anchors.left: parent.left
+                                anchors.top: parent.bottom
+
+                                Menu2 {
+                                    id: newNoteMenu
+
+                                    ColorMenu {
+                                        title: "Text Note"
+                                        onMenuItemClicked: {
+                                            var note = notes.addTextNote()
+                                            if(note) {
+                                                note.color = color
+                                                note.objectName = "_newNote"
+                                                app.execLater(note, 10, function() {
+                                                    switchTo(note);
+                                                })
+                                            }
+                                        }
+                                    }
+
+                                    MenuItem2 {
+                                        text: "Form Note"
+                                        enabled: false
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -381,9 +460,18 @@ Rectangle {
     Component {
         id: textNoteComponent
 
-        Item {
+        Rectangle {
             property var componentData
             property Note note: componentData.notebookItemObject
+            color: Qt.tint(note.color, "#E7FFFFFF")
+
+            onNoteChanged: {
+                if(note.objectName == "_newNote")
+                    noteHeadingField.forceActiveFocus()
+                else
+                    noteContentField.forceActiveFocus()
+                note.objectName = ""
+            }
 
             TextField2 {
                 id: noteHeadingField
@@ -399,6 +487,8 @@ Rectangle {
                 maximumLength: 256
                 placeholderText: "Note Heading"
                 label: ""
+                tabItem: noteContentField
+                onReturnPressed: noteContentField.forceActiveFocus()
             }
 
             Flickable {
@@ -429,7 +519,9 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
+                    Transliterator.textDocumentUndoRedoUnabled: true
                     readOnly: scriteDocument.readOnly
+                    KeyNavigation.backtab: noteHeadingField
                     background: Item { }
                     placeholderText: "Note Content"
                     SpecialSymbolsSupport {
@@ -438,6 +530,13 @@ Rectangle {
                         textEditor: noteContentField
                         textEditorHasCursorInterface: true
                         enabled: !scriteDocument.readOnly
+                    }
+                    UndoHandler {
+                        enabled: !noteContentField.readOnly && noteContentField.activeFocus
+                        canUndo: noteContentField.canUndo
+                        canRedo: noteContentField.canRedo
+                        onUndoRequest: noteContentField.undo()
+                        onRedoRequest: noteContentField.redo()
                     }
                 }
             }
@@ -462,13 +561,13 @@ Rectangle {
                 Rectangle {
                     anchors.fill: parent
                     visible: attachmentsDropArea.active
-                    color: Qt.tint(primaryColors.c500.background, "#E7FFFFFF")
+                    color: app.translucent(primaryColors.c500.background, 0.5)
 
                     Text {
                         anchors.centerIn: parent
                         width: parent.width * 0.5
                         wrapMode: Text.WordWrap
-                        text: "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here."
+                        text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here." : ""
                         horizontalAlignment: Text.AlignHCenter
                         color: primaryColors.c10.text
                         font.pointSize: app.idealFontPointSize
@@ -1108,4 +1207,35 @@ Rectangle {
             height: 60
         }
     }
+
+    Menu2 {
+        id: noteContextMenu
+        property Note note
+        enabled: note
+
+        onAboutToHide: note = null
+
+        ColorMenu {
+            title: "Note Color"
+            onMenuItemClicked: {
+                noteContextMenu.note.color = color
+                noteContextMenu.close()
+            }
+        }
+
+        MenuSeparator { }
+
+        MenuItem2 {
+            text: "Delete Note"
+            onClicked: {
+                var notes = noteContextMenu.note.notes
+                notes.removeNote(noteContextMenu.note)
+                switchTo(notes)
+                noteContextMenu.close()
+            }
+        }
+    }
+
+    FocusTracker.window: qmlWindow
+    FocusTracker.onHasFocusChanged: mainUndoStack.notebookActive = FocusTracker.hasFocus
 }

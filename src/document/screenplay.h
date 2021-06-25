@@ -124,6 +124,10 @@ public:
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
+    Q_PROPERTY(Notes* breakNotes READ breakNotes NOTIFY breakNotesChanged)
+    Notes* breakNotes() const { return m_breakNotes; }
+    Q_SIGNAL void breakNotesChanged();
+
     Q_INVOKABLE void toggleSelection() { this->setSelected(!m_selected); }
 
     Q_SIGNAL void elementChanged();
@@ -146,6 +150,7 @@ protected:
 
 private:
     void onSceneGroupsChanged() { emit sceneGroupsChanged(this); }
+    void setBreakNotes(Notes *val);
 
 private:
     friend class Screenplay;
@@ -160,6 +165,7 @@ private:
     int m_episodeIndex = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;
+    Notes* m_breakNotes = nullptr;
     QString m_breakTitle;
     QJsonValue m_userData;
     QString m_breakSubtitle;

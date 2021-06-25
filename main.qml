@@ -70,7 +70,8 @@ Rectangle {
         property bool timelineEditorActive: false
         property bool structureEditorActive: false
         property bool sceneEditorActive: false
-        active: screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive
+        property bool notebookActive: false
+        active: screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
     }
 
     UI.ScriteDocumentView {

@@ -63,6 +63,11 @@ void ScreenplayElement::setElementType(ScreenplayElement::ElementType val)
 
     m_elementType = val;
     emit elementTypeChanged();
+
+    if(m_elementType == SceneElementType)
+        this->setBreakNotes(nullptr);
+    else
+        this->setBreakNotes(new Notes(this));
 }
 
 void ScreenplayElement::setBreakType(int val)
@@ -90,6 +95,18 @@ void ScreenplayElement::setBreakTitle(const QString &val)
 
     m_breakTitle = val;
     emit breakTitleChanged();
+}
+
+void ScreenplayElement::setBreakNotes(Notes *val)
+{
+    if(m_breakNotes == val)
+        return;
+
+    if(m_breakNotes != nullptr)
+        m_breakNotes->deleteLater();
+
+    m_breakNotes = val;
+    emit breakNotesChanged();
 }
 
 void ScreenplayElement::setScreenplay(Screenplay *val)
@@ -355,8 +372,11 @@ Screenplay::Screenplay(QObject *parent)
     fetchSettings( QStringLiteral("phone"), m_phoneNumber );
     fetchSettings( QStringLiteral("website"), m_website );
 
-    DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
-    connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
+    if(m_scriteDocument != nullptr)
+    {
+        DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
+        connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
+    }
 }
 
 Screenplay::~Screenplay()

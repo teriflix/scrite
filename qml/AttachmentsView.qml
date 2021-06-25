@@ -65,8 +65,13 @@ ListView {
         MouseArea {
             id: itemMouseArea
             anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             hoverEnabled: true
-            onClicked: attachmentsView.currentIndex = index
+            onClicked: {
+                attachmentsView.currentIndex = index
+                if(mouse.button === Qt.RightButton)
+                    attachmentContextMenu.popup()
+            }
             onDoubleClicked: objectItem.openAttachmentAnonymously()
         }
     }
@@ -94,6 +99,16 @@ ListView {
                 return
             if(fileUrl !== "")
                 attachments.includeAttachmentFromFileUrl(fileUrl)
+        }
+    }
+
+    Menu2 {
+        id: attachmentContextMenu
+
+        MenuItem2 {
+            text: "Remove"
+            enabled: attachmentsView.currentIndex >= 0
+            onClicked: attachments.removeAttachment( attachments.attachmentAt(attachmentsView.currentIndex) )
         }
     }
 }

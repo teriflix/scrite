@@ -44,6 +44,7 @@ public:
     static QUndoStack *active();
 };
 
+class ObjectPropertyInfoList;
 struct ObjectPropertyInfo
 {
     ~ObjectPropertyInfo();
@@ -62,15 +63,19 @@ struct ObjectPropertyInfo
     bool write(const QVariant &val);
 
     static ObjectPropertyInfo *get(QObject *object, const QByteArray &property);
+    static void lockUndoRedoFor(QObject *object);
+    static void unlockUndoRedoFor(QObject *object);
 
     static int querySetCounter(QObject *object, const QByteArray &property);
 
 private:
+    friend class ObjectPropertyInfoList;
     ObjectPropertyInfo(QObject *o, const QMetaObject *mo, const QByteArray &prop);
     void deleteSelf();
 
     static int counter;
     bool m_locked = false;
+    bool m_objectIsLocked = false;
     QMetaObject::Connection m_connection;
 };
 

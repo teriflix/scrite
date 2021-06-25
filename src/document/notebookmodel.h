@@ -50,7 +50,6 @@ public:
 
     enum ItemCategory
     {
-        ObjectCategory,
         ScenesCategory,
         CharactersCategory,
         LocationsCategory,
@@ -80,6 +79,10 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     static QHash<int, QByteArray> staticRoleNames();
 
+signals:
+    void aboutToReloadScenes();
+    void justReloadedScenes();
+
 private:
     void resetDocument();
     void reload();
@@ -94,45 +97,12 @@ private:
     void syncScenes();
     void syncCharacters();
 
+    void onDataChanged(const QModelIndex &start, const QModelIndex &end, const QVector<int> &roles);
+
 private:
     QObjectProperty<ScriteDocument> m_document;
     QTimer m_syncScenesTimer;
     QTimer m_syncCharactersTimer;
-};
-
-class NotebookFilterModel : public QSortFilterProxyModel
-{
-    Q_OBJECT
-
-public:
-    NotebookFilterModel(QObject *parent=nullptr);
-    ~NotebookFilterModel();
-
-    Q_PROPERTY(NotebookModel* sourceNotebookModel READ notebookModel WRITE setNotebookModel NOTIFY notebookModelChanged)
-    void setNotebookModel(NotebookModel* val);
-    NotebookModel* notebookModel() const { return m_notebookModel; }
-    Q_SIGNAL void notebookModelChanged();
-
-    Q_INVOKABLE QVariant modelIndexData(const QModelIndex &index) const {
-        return this->data(index, NotebookModel::ModelDataRole);
-    }
-
-    Q_INVOKABLE QModelIndex findModelIndexFor(QObject *owner) const;
-
-    // QAbstractItemModel interface
-    QHash<int, QByteArray> roleNames() const;
-
-protected:
-    // QSortFilterProxyModel interface
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
-    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
-
-private:
-    void hookToScreenplaySignals();
-    void dropHookstoScreenplaySignals();
-
-private:
-    NotebookModel* m_notebookModel = nullptr;
 };
 
 #endif // NOTEBOOKMODEL_H

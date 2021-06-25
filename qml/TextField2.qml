@@ -75,7 +75,7 @@ TextField {
     }
 
     UndoHandler {
-        enabled: textField.activeFocus
+        enabled: !textField.readOnly && textField.activeFocus
         canUndo: textField.canUndo
         canRedo: textField.canRedo
         onUndoRequest: textField.undo()

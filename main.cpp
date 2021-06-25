@@ -181,7 +181,6 @@ int main(int argc, char **argv)
     qmlRegisterType<CharacterRelationshipsGraph>("Scrite", 1, 0, "CharacterRelationshipsGraph");
 
     qmlRegisterType<NotebookModel>("Scrite", 1, 0, "NotebookModel");
-    qmlRegisterType<NotebookFilterModel>("Scrite", 1, 0, "NotebookFilterModel");
 
     qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
     qmlRegisterUncreatableType<ScreenplayFormat>("Scrite", 1, 0, "ScreenplayFormat", reason);

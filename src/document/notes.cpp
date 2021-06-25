@@ -13,11 +13,12 @@
 
 #include "notes.h"
 #include "scene.h"
+#include "undoredo.h"
 #include "structure.h"
+#include "screenplay.h"
 #include "timeprofiler.h"
 
 #include <QSet>
-#include <QTextBoundaryFinder>
 
 Note::Note(QObject *parent)
     : QObject(parent)
@@ -33,6 +34,11 @@ Note::Note(QObject *parent)
 Note::~Note()
 {
     emit aboutToDelete(this);
+}
+
+Notes *Note::notes() const
+{
+    return qobject_cast<Notes*>(this->parent());
 }
 
 void Note::setType(Type val)
@@ -76,6 +82,11 @@ void Note::setColor(const QColor &val)
     if(m_color == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "color");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if(!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_color = val;
     emit colorChanged();
 }
@@ -103,6 +114,64 @@ bool Note::canSerialize(const QMetaObject *metaObject, const QMetaProperty &meta
 
 ///////////////////////////////////////////////////////////////////////////////
 
+class RemoveNoteUndoCommand : public QUndoCommand
+{
+public:
+    RemoveNoteUndoCommand(Notes *notes, Note *note)
+        : QUndoCommand(), m_note(note), m_notes(notes) {
+        m_connection1 = QObject::connect(m_notes, &Notes::aboutToDelete, m_notes, [=]() {
+            m_notes = nullptr;
+            this->setObsolete(true);
+        });
+        m_connection2 = QObject::connect(m_note, &Note::aboutToDelete, m_note, [=]() {
+            m_note = nullptr;
+        });
+    }
+    ~RemoveNoteUndoCommand() {
+        QObject::disconnect(m_connection1);
+        QObject::disconnect(m_connection2);
+    }
+
+    static QPointer<Note> noteCurrentlyBeingRemoved;
+
+    void redo() {
+        if(m_note == nullptr || m_notes == nullptr) {
+            this->setObsolete(true);
+            return;
+        }
+
+        m_noteData = QObjectSerializer::toJson(m_note);
+        noteCurrentlyBeingRemoved = m_note;
+        QObject::disconnect(m_connection2);
+        m_connection2 = QMetaObject::Connection();
+        m_notes->removeNote(m_note);
+        noteCurrentlyBeingRemoved = nullptr;
+    }
+    void undo() {
+        if(m_notes == nullptr) {
+            this->setObsolete(true);
+            return;
+        }
+
+        m_note = new Note(m_notes);
+        m_connection2 = QObject::connect(m_note, &Note::aboutToDelete, m_note, [=]() {
+            m_note = nullptr;
+            m_connection2 = QMetaObject::Connection();
+        });
+        QObjectSerializer::fromJson(m_noteData, m_note);
+        m_notes->addNote(m_note);
+    }
+
+private:
+    Note *m_note = nullptr;
+    Notes *m_notes = nullptr;
+    QJsonObject m_noteData;
+    QMetaObject::Connection m_connection1;
+    QMetaObject::Connection m_connection2;
+};
+
+QPointer<Note> RemoveNoteUndoCommand::noteCurrentlyBeingRemoved;
+
 Notes::Notes(QObject *parent)
       :ObjectListPropertyModel<Note *>(parent)
 {
@@ -114,6 +183,8 @@ Notes::Notes(QObject *parent)
         const QMetaObject *pmo = parent->metaObject();
         if(pmo->inherits(&Structure::staticMetaObject))
             m_ownerType = StructureOwner;
+        else if(pmo->inherits(&ScreenplayElement::staticMetaObject))
+            m_ownerType = BreakOwner;
         else if(pmo->inherits(&Scene::staticMetaObject))
         {
             m_ownerType = SceneOwner;
@@ -147,7 +218,7 @@ Notes::Notes(QObject *parent)
 
 Notes::~Notes()
 {
-
+    emit aboutToDelete(this);
 }
 
 Notes::OwnerType Notes::ownerType() const
@@ -227,9 +298,6 @@ void Notes::setNotes(const QList<Note *> &list)
         ptr->setParent(this);
         connect(ptr, &Note::aboutToDelete, this, &Notes::removeNote);
         connect(ptr, &Note::noteModified, this, &Notes::notesModified);
-
-        if(ptr->type() == Note::TextNoteType && ptr->summary().isEmpty())
-            ptr->setSummary( ptr->content().toString() );
     }
 
     this->assign(list);
@@ -248,6 +316,9 @@ void Notes::removeNote(Note *ptr)
     disconnect(ptr, &Note::noteModified, this, &Notes::notesModified);
 
     this->removeAt(index);
+
+    if(UndoStack::active() && RemoveNoteUndoCommand::noteCurrentlyBeingRemoved.isNull())
+        UndoStack::active()->push(new RemoveNoteUndoCommand(this, ptr));
 
     ptr->deleteLater();
 }
@@ -316,19 +387,10 @@ void Notes::loadOldNotes(const QJsonArray &jsNotes)
     {
         const QJsonObject jsNote = jsNotesItem.toObject();
         Note *note = new Note(this);
+        note->setType(Note::TextNoteType);
         note->setColor( QColor(jsNote.value(QStringLiteral("color")).toString()) );
         note->setTitle( jsNote.value(QStringLiteral("heading")).toString() );
         note->setContent( jsNote.value(QStringLiteral("content")) );
-
-        const QString noteContent = note->content().toString();
-        QTextBoundaryFinder sentenceFinder(QTextBoundaryFinder::Sentence, noteContent);
-        const int from = sentenceFinder.position();
-        const int to = sentenceFinder.toNextBoundary();
-        if(from < 0 || to < 0)
-            note->setSummary(noteContent);
-        else
-            note->setSummary(noteContent.mid(from, (to-from)).trimmed());
-
         notes.append(note);
     }
 
