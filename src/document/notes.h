@@ -28,6 +28,7 @@ class Character;
 class Structure;
 class Attachments;
 class Relationship;
+class ScreenplayElement;
 
 class Note : public QObject, public QObjectSerializer::Interface
 {
@@ -131,6 +132,9 @@ public:
 
     Q_PROPERTY(Structure* structure READ structure STORED false CONSTANT)
     Structure *structure() const;
+
+    Q_PROPERTY(ScreenplayElement *breakElement READ breakElement STORED false CONSTANT)
+    ScreenplayElement *breakElement() const;
 
     Q_PROPERTY(Scene* scene READ scene STORED false CONSTANT)
     Scene *scene() const;

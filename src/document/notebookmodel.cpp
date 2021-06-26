@@ -86,6 +86,9 @@ struct StoryNode
     ScreenplayElement *act = nullptr;
     ScreenplayElement *scene = nullptr;
 
+    QString actName;
+    QString episodeName;
+
     Structure *structure = nullptr;
     StructureElement *unusedScene = nullptr;
 
@@ -191,6 +194,8 @@ QVariant NotebookModel::data(const QModelIndex &index, int role) const
             ++it;
         }
 
+        ret[ QStringLiteral("modelIndex") ] = index;
+
         return ret;
     }
 
@@ -257,15 +262,15 @@ QStandardItem *createItemForNode(StoryNode *node)
 
     if(node->screenplay != nullptr)
     {
-        nodeItem->setText( QStringLiteral("Used Scenes") );
+        nodeItem->setText( QStringLiteral("Screenplay") );
         nodeItem->setData(NotebookModel::CategoryType, NotebookModel::TypeRole);
-        nodeItem->setData(NotebookModel::ScenesCategory, NotebookModel::CategoryRole);
+        nodeItem->setData(NotebookModel::ScreenplayCategory, NotebookModel::CategoryRole);
     }
     else if(node->structure != nullptr)
     {
         nodeItem->setText( QStringLiteral("Unused Scenes") );
         nodeItem->setData(NotebookModel::CategoryType, NotebookModel::TypeRole);
-        nodeItem->setData(NotebookModel::ScenesCategory, NotebookModel::CategoryRole);
+        nodeItem->setData(NotebookModel::UnusedScenesCategory, NotebookModel::CategoryRole);
     }
     else if(node->episode != nullptr)
     {
@@ -273,12 +278,29 @@ QStandardItem *createItemForNode(StoryNode *node)
             nodeItem->setText( node->episode->breakTitle() );
         else
             nodeItem->setText( node->episode->breakTitle() + QStringLiteral(": ") + node->episode->breakSubtitle() );
-        nodeNotes = node->episode->breakNotes();
+
+        nodeItem->setData(NotebookModel::EpisodeBreakType, NotebookModel::TypeRole);
+        nodeItem->setData(QVariant::fromValue<QObject*>(node->episode), NotebookModel::ObjectRole);
+
+        nodeNotes = node->episode->notes();
     }
     else if(node->act != nullptr)
     {
         nodeItem->setText( node->act->breakTitle() );
-        nodeNotes = node->act->breakNotes();
+        nodeItem->setData(NotebookModel::ActBreakType, NotebookModel::TypeRole);
+        nodeItem->setData(QVariant::fromValue<QObject*>(node->act), NotebookModel::ObjectRole);
+
+        nodeNotes = node->act->notes();
+    }
+    else if(!node->episodeName.isEmpty())
+    {
+        nodeItem->setData(NotebookModel::EpisodeBreakType, NotebookModel::TypeRole);
+        nodeItem->setText( node->episodeName );
+    }
+    else if(!node->actName.isEmpty())
+    {
+        nodeItem->setText( node->actName );
+        nodeItem->setData(NotebookModel::ActBreakType, NotebookModel::TypeRole);
     }
     else if(node->scene == nullptr && node->unusedScene == nullptr)
         nodeItem->setText( QStringLiteral("Story") );
@@ -397,7 +419,7 @@ void NotebookModel::syncScenes()
     };
 
     QList<QStandardItem *> unusedScenesItem = this->findItems(QStringLiteral("Unused Scenes"), Qt::MatchExactly, 0);
-    QList<QStandardItem *> screenplayScenesItem = this->findItems(QStringLiteral("Used Scenes"), Qt::MatchExactly, 0);
+    QList<QStandardItem *> screenplayScenesItem = this->findItems(QStringLiteral("Screenplay"), Qt::MatchExactly, 0);
     bool hasScenes = unusedScenesItem.size() + screenplayScenesItem.size() > 0;
 
     if(hasScenes)
@@ -546,10 +568,6 @@ NotesItem::NotesItem(Notes *notes)
     for(int i=0; i<nrNotes; i++)
     {
         Note *note = m_notes->noteAt(i);
-        const QString noteTitle = note->title().isEmpty() ?
-                    QStringLiteral("Note: ") + QString::number(i) :
-                    note->title();
-
         NoteItem *noteItem = new NoteItem(note);
         noteItems.append(noteItem);
     }
@@ -693,12 +711,34 @@ StoryNode *StoryNode::create(ScriteDocument *document)
         {
             if(element->breakType() == Screenplay::Episode)
             {
+                if(episodeNode == nullptr && element->episodeIndex() > 0)
+                {
+                    // User has not created an Episode 1, so we are going to create Episode 1
+                    // node just for the sake of the notebook model.
+                    episodeNode = new StoryNode;
+                    episodeNode->episodeName = QStringLiteral("EPISODE 1");
+                    episodeNode->childNodes = screenplayNode->childNodes;
+                    screenplayNode->childNodes.clear();
+                    screenplayNode->childNodes.append(episodeNode);
+                }
+
                 episodeNode = new StoryNode;
                 episodeNode->episode = element;
                 screenplayNode->childNodes.append(episodeNode);
             }
             else if(element->breakType() == Screenplay::Act)
             {
+                StoryNode *parentNode = episodeNode ? episodeNode : screenplayNode;
+
+                if(actNode == nullptr && element->actIndex() > 0)
+                {
+                    actNode = new StoryNode;
+                    actNode->actName = QStringLiteral("ACT 1");
+                    actNode->childNodes = parentNode->childNodes;
+                    parentNode->childNodes.clear();
+                    parentNode->childNodes.append(actNode);
+                }
+
                 actNode = new StoryNode;
                 actNode->act = element;
                 if(episodeNode == nullptr)

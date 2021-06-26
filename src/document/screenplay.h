@@ -28,9 +28,10 @@ class ScriteDocument;
 class AbstractImporter;
 class AbstractScreenplaySubsetReport;
 
-class ScreenplayElement : public QObject, public Modifiable
+class ScreenplayElement : public QObject, public Modifiable, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Q_INVOKABLE ScreenplayElement(QObject *parent=nullptr);
@@ -124,9 +125,18 @@ public:
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
-    Q_PROPERTY(Notes* breakNotes READ breakNotes NOTIFY breakNotesChanged)
-    Notes* breakNotes() const { return m_breakNotes; }
-    Q_SIGNAL void breakNotesChanged();
+    Q_PROPERTY(QString breakSummary READ breakSummary WRITE setBreakSummary NOTIFY breakSummaryChanged)
+    void setBreakSummary(const QString &val);
+    QString breakSummary() const { return m_breakSummary; }
+    Q_SIGNAL void breakSummaryChanged();
+
+    Q_PROPERTY(Notes* notes READ notes NOTIFY notesChanged)
+    Notes* notes() const { return m_notes ? m_notes : (m_scene ? m_scene->notes() : nullptr); }
+    Q_SIGNAL void notesChanged();
+
+    Q_PROPERTY(Attachments* attachments READ attachments NOTIFY attachmentsChanged)
+    Attachments *attachments() const { return m_attachments ? m_attachments : (m_scene ? m_scene->attachments() : nullptr); }
+    Q_SIGNAL void attachmentsChanged();
 
     Q_INVOKABLE void toggleSelection() { this->setSelected(!m_selected); }
 
@@ -137,6 +147,9 @@ public:
     Q_SIGNAL void evaluateSceneNumberRequest();
     Q_SIGNAL void sceneTypeChanged();
     Q_SIGNAL void sceneGroupsChanged(ScreenplayElement *ptr);
+
+    // QObjectSerializer::Interface interface
+    bool canSerialize(const QMetaObject *, const QMetaProperty &) const;
 
 protected:
     bool event(QEvent *event);
@@ -150,7 +163,8 @@ protected:
 
 private:
     void onSceneGroupsChanged() { emit sceneGroupsChanged(this); }
-    void setBreakNotes(Notes *val);
+    void setNotes(Notes *val);
+    void setAttachments(Attachments *val);
 
 private:
     friend class Screenplay;
@@ -165,9 +179,11 @@ private:
     int m_episodeIndex = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;
-    Notes* m_breakNotes = nullptr;
+    Notes* m_notes = nullptr;
+    Attachments *m_attachments = nullptr;
     QString m_breakTitle;
     QJsonValue m_userData;
+    QString m_breakSummary;
     QString m_breakSubtitle;
     int m_customSceneNumber = -1;
     bool m_elementTypeIsSet = false;

@@ -169,10 +169,10 @@ public:
     QQuickTextDocument* textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(bool textDocumentUndoRedoUnabled READ isTextDocumentUndoRedoUnabled WRITE setTextDocumentUndoRedoUnabled NOTIFY textDocumentUndoRedoUnabledChanged)
-    void setTextDocumentUndoRedoUnabled(bool val);
-    bool isTextDocumentUndoRedoUnabled() const { return m_textDocumentUndoRedoUnabled; }
-    Q_SIGNAL void textDocumentUndoRedoUnabledChanged();
+    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
+    void setTextDocumentUndoRedoEnabled(bool val);
+    bool isTextDocumentUndoRedoEnabled() const { return m_textDocumentUndoRedoEnabled; }
+    Q_SIGNAL void textDocumentUndoRedoEnabledChanged();
 
     Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
     void setCursorPosition(int val);
@@ -225,7 +225,7 @@ private:
     int m_cursorPosition = -1;
     bool m_hasActiveFocus = false;
     bool m_transliterateCurrentWordOnly = true;
-    bool m_textDocumentUndoRedoUnabled = false;
+    bool m_textDocumentUndoRedoEnabled = false;
     QObjectProperty<QQuickTextDocument> m_textDocument;
 };
 Q_DECLARE_METATYPE(Transliterator*)

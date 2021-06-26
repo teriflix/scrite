@@ -901,7 +901,7 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
 
         if(doc != nullptr)
         {
-            doc->setUndoRedoEnabled(m_textDocumentUndoRedoUnabled);
+            doc->setUndoRedoEnabled(m_textDocumentUndoRedoEnabled);
             connect( doc, &QTextDocument::contentsChange, this, &Transliterator::processTransliteration);
         }
     }
@@ -909,12 +909,12 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
     emit textDocumentChanged();
 }
 
-void Transliterator::setTextDocumentUndoRedoUnabled(bool val)
+void Transliterator::setTextDocumentUndoRedoEnabled(bool val)
 {
-    if(m_textDocumentUndoRedoUnabled == val)
+    if(m_textDocumentUndoRedoEnabled == val)
         return;
 
-    m_textDocumentUndoRedoUnabled = val;
+    m_textDocumentUndoRedoEnabled = val;
 
     if(m_textDocument != nullptr)
     {
@@ -923,7 +923,7 @@ void Transliterator::setTextDocumentUndoRedoUnabled(bool val)
             doc->setUndoRedoEnabled(val);
     }
 
-    emit textDocumentUndoRedoUnabledChanged();
+    emit textDocumentUndoRedoEnabledChanged();
 }
 
 void Transliterator::setCursorPosition(int val)

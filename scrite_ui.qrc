@@ -66,5 +66,7 @@
         <file>qml/MarkSceneAsMenu.qml</file>
         <file>qml/BackupsDialogBox.qml</file>
         <file>qml/AttachmentsView.qml</file>
+        <file>qml/FlickableTextArea.qml</file>
+        <file>qml/AttachmentsDropArea2.qml</file>
     </qresource>
 </RCC>

@@ -231,6 +231,11 @@ Structure *Notes::structure() const
     return qobject_cast<Structure*>(this->owner());
 }
 
+ScreenplayElement *Notes::breakElement() const
+{
+    return qobject_cast<ScreenplayElement*>(this->owner());
+}
+
 Scene *Notes::scene() const
 {
     return qobject_cast<Scene*>(this->owner());

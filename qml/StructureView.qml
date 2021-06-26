@@ -1293,6 +1293,7 @@ Item {
 
                             Connections {
                                 target: objectItem
+                                ignoreUnknownSignals: true
                                 onDataChanged: tabBarItem.updateTabAttributes()
                                 onStackInitialized: tabBarItem.updateTabAttributes()
                             }

@@ -43,6 +43,8 @@ public:
     enum ItemType
     {
         CategoryType, // Just heading text, no "live" object
+        EpisodeBreakType,
+        ActBreakType,
         NotesType,   // Represents a Notes instance
         NoteType     // Represents a Note instance
     };
@@ -50,7 +52,8 @@ public:
 
     enum ItemCategory
     {
-        ScenesCategory,
+        ScreenplayCategory,
+        UnusedScenesCategory,
         CharactersCategory,
         LocationsCategory,
         PropsCategory,

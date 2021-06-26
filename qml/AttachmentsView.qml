@@ -27,6 +27,24 @@ ListView {
         color: primaryColors.highlight.background
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: app.translucent(primaryColors.windowColor, 0.5)
+        border.width: 1
+        border.color: primaryColors.borderColor
+        z: -1
+
+        Text {
+            anchors.fill: parent
+            anchors.margins: 10
+            anchors.leftMargin: attachmentsView.delegateSize
+            verticalAlignment: Text.AlignVCenter
+            font.pointSize: app.idealFontPointSize
+            opacity: 0.5
+            text: "Attachments"
+        }
+    }
+
     delegate: Item {
         property bool isSelected: attachmentsView.currentIndex === index
         width: attachmentsView.delegateSize

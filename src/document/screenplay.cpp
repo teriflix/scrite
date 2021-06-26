@@ -65,9 +65,15 @@ void ScreenplayElement::setElementType(ScreenplayElement::ElementType val)
     emit elementTypeChanged();
 
     if(m_elementType == SceneElementType)
-        this->setBreakNotes(nullptr);
+    {
+        this->setNotes(nullptr);
+        this->setAttachments(nullptr);
+    }
     else
-        this->setBreakNotes(new Notes(this));
+    {
+        this->setNotes(new Notes(this));
+        this->setAttachments(new Attachments(this));
+    }
 }
 
 void ScreenplayElement::setBreakType(int val)
@@ -97,16 +103,28 @@ void ScreenplayElement::setBreakTitle(const QString &val)
     emit breakTitleChanged();
 }
 
-void ScreenplayElement::setBreakNotes(Notes *val)
+void ScreenplayElement::setNotes(Notes *val)
 {
-    if(m_breakNotes == val)
+    if(m_notes == val)
         return;
 
-    if(m_breakNotes != nullptr)
-        m_breakNotes->deleteLater();
+    if(m_notes != nullptr)
+        m_notes->deleteLater();
 
-    m_breakNotes = val;
-    emit breakNotesChanged();
+    m_notes = val;
+    emit notesChanged();
+}
+
+void ScreenplayElement::setAttachments(Attachments *val)
+{
+    if(m_attachments == val)
+        return;
+
+    if(m_attachments != nullptr)
+        m_attachments->deleteLater();
+
+    m_attachments = val;
+    emit attachmentsChanged();
 }
 
 void ScreenplayElement::setScreenplay(Screenplay *val)
@@ -234,6 +252,35 @@ void ScreenplayElement::setSelected(bool val)
 
     m_selected = val;
     emit selectedChanged();
+}
+
+void ScreenplayElement::setBreakSummary(const QString &val)
+{
+    if(m_breakSummary == val)
+        return;
+
+    m_breakSummary = val;
+    emit breakSummaryChanged();
+}
+
+bool ScreenplayElement::canSerialize(const QMetaObject *mo, const QMetaProperty &prop) const
+{
+    if(mo != &ScreenplayElement::staticMetaObject)
+        return false;
+
+    static const int breakSummaryPropIndex = ScreenplayElement::staticMetaObject.indexOfProperty("breakSummary");
+    if(prop.propertyIndex() == breakSummaryPropIndex)
+        return (m_elementType == BreakElementType) && (m_breakType == Screenplay::Act || m_breakType == Screenplay::Episode);
+
+    static const int notesPropIndex = ScreenplayElement::staticMetaObject.indexOfProperty("notes");
+    if(prop.propertyIndex() == notesPropIndex)
+        return m_notes != nullptr;
+
+    static const int attachmentsPropIndex = ScreenplayElement::staticMetaObject.indexOfProperty("attachments");
+    if(prop.propertyIndex() == attachmentsPropIndex)
+        return m_attachments != nullptr;
+
+    return true;
 }
 
 bool ScreenplayElement::event(QEvent *event)

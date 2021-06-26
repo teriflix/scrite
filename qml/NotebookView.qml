@@ -73,7 +73,7 @@ Rectangle {
 
         OldControls.TreeView {
             id: notebookTree
-            SplitView.preferredWidth: 350
+            SplitView.preferredWidth: Math.min(350, notebookView.width*0.25)
             SplitView.minimumWidth: 150
             clip: true
             headerVisible: false
@@ -136,18 +136,24 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: source != ""
                             source: {
-                                if(styleData.value.notebookItemType === NotebookModel.NotesType) {
+                                switch(styleData.value.notebookItemType) {
+                                case NotebookModel.EpisodeBreakType:
+                                    return "../icons/content/episode.png"
+                                case NotebookModel.ActBreakType:
+                                    return "../icons/content/act.png"
+                                case NotebookModel.NotesType:
                                     switch(styleData.value.notebookItemObject.ownerType) {
                                     case Notes.SceneOwner:
                                         return "../icons/content/scene.png"
                                     case Notes.CharacterOwner:
                                         return "../icons/content/person_outline.png"
-                                    case Notes.StructureOwner:
+                                    case Notes.BreakOwner:
                                         return "../icons/content/story.png"
                                     default:
                                         break
                                     }
-                                } else if(styleData.value.notebookItemType === NotebookModel.NoteType) {
+                                    break;
+                                case NotebookModel.NoteType:
                                     switch(styleData.value.notebookItemObject.type) {
                                     case Note.TextNoteType:
                                         return "../icons/content/note.png"
@@ -156,6 +162,7 @@ Rectangle {
                                     default:
                                         break
                                     }
+                                    break;
                                 }
 
                                 return ""
@@ -168,7 +175,9 @@ Rectangle {
                             font.family: fontMetrics.font.family
                             font.pointSize: fontMetrics.font.pointSize
                             font.capitalization: fontMetrics.font.capitalization
-                            font.bold: styleData.value.notebookItemType === NotebookModel.CategoryType
+                            font.bold: styleData.value.notebookItemType === NotebookModel.CategoryType ||
+                                       (styleData.value.notebookItemType === NotebookModel.NotesType &&
+                                        styleData.value.notebookItemObject.ownerType === Notes.StructureOwner)
                             text: styleData.value.notebookItemTitle ? styleData.value.notebookItemTitle : ""
                             color: app.isLightColor(parent.parent.color) ? "black" : "white"
                             elide: Text.ElideRight
@@ -242,29 +251,35 @@ Rectangle {
                 if(!notebookTree.currentData)
                     return unknownComponent
 
-                if(notebookTree.currentData.notebookItemType === NotebookModel.CategoryType) {
+                switch(notebookTree.currentData.notebookItemType) {
+                case NotebookModel.CategoryType:
                     switch(notebookTree.currentData.notebookItemCategory) {
-                    case NotebookModel.ScenesCategory:
-                        return scenesComponent
+                    case NotebookModel.ScreenplayCategory:
+                        return screenplayComponent
+                    case NotebookModel.UnusedScenesCategory:
+                        return unusedScenesComponent
                     case NotebookModel.CharactersCategory:
                         return charactersComponent
                     }
-                } else if(notebookTree.currentData.notebookItemType === NotebookModel.NotesType) {
+                    break
+                case NotebookModel.NotesType:
                     switch(notebookTree.currentData.notebookItemObject.ownerType) {
                     case Notes.CharacterOwner:
                         return characterNotesComponent
                     default:
-                        break
+                        return notesComponent
                     }
-
-                    return notesComponent
-                } else if(notebookTree.currentData.notebookItemType === NotebookModel.NoteType) {
+                case NotebookModel.NoteType:
                     switch(notebookTree.currentData.notebookItemObject.type) {
                     case Note.TextNoteType:
                         return textNoteComponent
                     case Note.FormNoteType:
                         return formNoteComponent
                     }
+                    break
+                case NotebookModel.EpisodeBreakType:
+                case NotebookModel.ActBreakType:
+                    return episodeOrActBreakComponent
                 }
 
                 return unknownComponent
@@ -469,7 +484,7 @@ Rectangle {
                 if(note.objectName == "_newNote")
                     noteHeadingField.forceActiveFocus()
                 else
-                    noteContentField.forceActiveFocus()
+                    noteContentFieldArea.textArea.forceActiveFocus()
                 note.objectName = ""
             }
 
@@ -487,58 +502,28 @@ Rectangle {
                 maximumLength: 256
                 placeholderText: "Note Heading"
                 label: ""
-                tabItem: noteContentField
-                onReturnPressed: noteContentField.forceActiveFocus()
+                tabItem: noteContentFieldArea.textArea
+                onReturnPressed: noteContentFieldArea.textArea.forceActiveFocus()
             }
 
-            Flickable {
+            Rectangle {
+                anchors.fill: noteContentFieldArea
+                color: app.translucent(primaryColors.c100.background, 0.5)
+                border.width: 1
+                border.color: primaryColors.borderColor
+            }
+
+            FlickableTextArea {
                 id: noteContentFieldArea
                 anchors.top: noteHeadingField.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: attachmentsArea.top
                 anchors.margins: 10
-                property bool scrollBarVisible: noteContentField.height > height
-                ScrollBar.vertical: ScrollBar {
-                    policy: noteContentFieldArea.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                }
-                clip: true
-                contentWidth: noteContentField.width
-                contentHeight: noteContentField.height
-
-                TextArea {
-                    id: noteContentField
-                    width: noteContentFieldArea.width - (noteContentFieldArea.scrollBarVisible ? 20 : 0)
-                    height: contentHeight+50
-                    font.pointSize: app.idealFontPointSize
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: note.content
-                    onTextChanged: note.content = text
-                    selectByMouse: true
-                    selectByKeyboard: true
-                    Transliterator.textDocument: textDocument
-                    Transliterator.cursorPosition: cursorPosition
-                    Transliterator.hasActiveFocus: activeFocus
-                    Transliterator.textDocumentUndoRedoUnabled: true
-                    readOnly: scriteDocument.readOnly
-                    KeyNavigation.backtab: noteHeadingField
-                    background: Item { }
-                    placeholderText: "Note Content"
-                    SpecialSymbolsSupport {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-                        textEditor: noteContentField
-                        textEditorHasCursorInterface: true
-                        enabled: !scriteDocument.readOnly
-                    }
-                    UndoHandler {
-                        enabled: !noteContentField.readOnly && noteContentField.activeFocus
-                        canUndo: noteContentField.canUndo
-                        canRedo: noteContentField.canRedo
-                        onUndoRequest: noteContentField.undo()
-                        onRedoRequest: noteContentField.redo()
-                    }
-                }
+                text: note.content
+                onTextChanged: note.content = text
+                backtab: noteHeadingField
+                placeholderText: "Note content ..."
             }
 
             AttachmentsView {
@@ -552,27 +537,10 @@ Rectangle {
                 anchors.margins: 10
             }
 
-            AttachmentsDropArea {
+            AttachmentsDropArea2 {
                 id: attachmentsDropArea
                 anchors.fill: parent
                 target: note.attachments
-                enabled: !scriteDocument.readOnly
-
-                Rectangle {
-                    anchors.fill: parent
-                    visible: attachmentsDropArea.active
-                    color: app.translucent(primaryColors.c500.background, 0.5)
-
-                    Text {
-                        anchors.centerIn: parent
-                        width: parent.width * 0.5
-                        wrapMode: Text.WordWrap
-                        text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here." : ""
-                        horizontalAlignment: Text.AlignHCenter
-                        color: primaryColors.c10.text
-                        font.pointSize: app.idealFontPointSize
-                    }
-                }
             }
         }
     }
@@ -592,15 +560,438 @@ Rectangle {
     }
 
     Component {
-        id: scenesComponent
+        id: episodeOrActBreakComponent
+
+        Item {
+            property var componentData
+            property ScreenplayElement breakElement: componentData.notebookItemObject
+            property string breakKind: componentData.notebookItemType === NotebookModel.EpisodeBreakType ? "Episode" : "Act"
+
+            Loader {
+                active: breakElement !== null
+                anchors.fill: parent
+                anchors.margins: 10
+                sourceComponent: Item {
+                    Row {
+                        id: breakElementHeadingRow
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        spacing: 10
+
+                        Text {
+                            id: headingLabel
+                            text: breakElement.breakTitle + ": "
+                            font.pointSize: app.idealFontPointSize + 3
+                            anchors.baseline: breakElementHeadingField.baseline
+                        }
+
+                        TextField2 {
+                            id: breakElementHeadingField
+                            text: breakElement.breakSubtitle
+                            width: parent.width - headingLabel.width - parent.spacing
+                            label: ""
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            font.pointSize: app.idealFontPointSize + 5
+                            placeholderText: breakKind + " Name"
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: breakElementSummaryField
+                        color: app.translucent(primaryColors.c100.background, 0.5)
+                        border.width: 1
+                        border.color: primaryColors.borderColor
+                    }
+
+                    FlickableTextArea {
+                        id: breakElementSummaryField
+                        placeholderText: breakKind + " summary ..."
+                        text: breakElement.breakSummary
+                        onTextChanged: breakElement.breakSummary = text
+                        anchors.top: breakElementHeadingRow.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: breakElementAttachmentsView.top
+                        anchors.topMargin: 10
+                        anchors.bottomMargin: 10
+                    }
+
+                    AttachmentsView {
+                        id: breakElementAttachmentsView
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        height: 80
+                        attachments: breakElement.attachments
+                    }
+                }
+            }
+
+            AttachmentsDropArea2 {
+                id: attachmentsDropArea
+                anchors.fill: parent
+                target: breakElement.attachments
+            }
+
+            Text {
+                width: parent.width * 0.6
+                anchors.centerIn: parent
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: app.idealFontPointSize
+                text: "Create " + breakKind.toLowerCase() + " break in the screenplay to capture a summary for it."
+                wrapMode: Text.WordWrap
+                visible: breakElement === null
+            }
+        }
+    }
+
+    property int screenplayNotesTabIndex: 0
+    Component {
+        id: screenplayComponent
+
+        Rectangle {
+            property var componentData
+            property Screenplay screenplay: scriteDocument.screenplay
+
+            FontMetrics {
+                id: screenplayFontMetrics
+                font.family: scriteDocument.formatting.defaultFont.family
+                font.pointSize: app.idealFontPointSize
+            }
+
+            Row {
+                id: screenplayTabBar
+                spacing: 10
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 8
+                property int tabIndex: screenplayNotesTabIndex
+                onTabIndexChanged: screenplayNotesTabIndex = tabIndex
+
+                Text {
+                    font.pointSize: idealAppFontMetrics.font.pointSize
+                    font.family: idealAppFontMetrics.font.family
+                    font.bold: true
+                    text: "Screenplay: "
+                    rightPadding: 10
+                }
+
+                Repeater {
+                    model: ["Title Page", "Logline", "Notes"]
+
+                    Text {
+                        font: idealAppFontMetrics.font
+                        color: screenplayTabBar.tabIndex === index ? accentColors.c900.background : primaryColors.c900.background
+                        text: modelData
+
+                        Rectangle {
+                            height: 1
+                            color: accentColors.c900.background
+                            width: parent.width
+                            anchors.top: parent.bottom
+                            visible: screenplayTabBar.tabIndex === index
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: screenplayTabBar.tabIndex = index
+                        }
+                    }
+                }
+            }
+
+            Item {
+                id: screenplayTabContentArea
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: screenplayTabBar.bottom
+                anchors.bottom: parent.bottom
+                anchors.topMargin: 10
+                clip: true
+
+                Item {
+                    width: screenplayTabContentArea.width
+                    height: screenplayTabContentArea.height
+                    visible: screenplayTabBar.tabIndex === 0
+
+                    Flickable {
+                        id: titlePageFlickable
+                        width: Math.min(contentWidth, parent.width)
+                        height: Math.min(contentHeight, parent.height)
+                        contentWidth: titlePageLayout.width
+                        contentHeight: titlePageLayout.height
+                        anchors.centerIn: parent
+                        property bool vscrollBarRequired: contentHeight > height
+                        property bool hscrollBarRequired: contentWidth > width
+                        ScrollBar.vertical: titlePageVScrollBar
+                        ScrollBar.horizontal: titlePageHScrollBar
+
+                        Column {
+                            id: titlePageLayout
+                            width: Math.max(550, screenplayTabContentArea.width)
+                            spacing: 10
+                            property real maxWidth: Math.min(550, width)
+
+                            Image {
+                                width: {
+                                    switch(scriteDocument.screenplay.coverPagePhotoSize) {
+                                    case Screenplay.SmallCoverPhoto:
+                                        return parent.maxWidth / 4
+                                    case Screenplay.MediumCoverPhoto:
+                                        return parent.maxWidth / 2
+                                    }
+                                    return parent.maxWidth
+                                }
+                                source: visible ? "file:///" + scriteDocument.screenplay.coverPagePhoto : ""
+                                visible: scriteDocument.screenplay.coverPagePhoto !== ""
+                                smooth: true; mipmap: true
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                font.family: screenplayFontMetrics.font.family
+                                font.pointSize: screenplayFontMetrics.font.pointSize + 2
+                                font.bold: true
+                                width: parent.width
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: Text.AlignHCenter
+                                text: scriteDocument.screenplay.title === "" ? "<untitled>" : scriteDocument.screenplay.title
+                            }
+
+                            Text {
+                                font.family: screenplayFontMetrics.font.family
+                                font.pointSize: screenplayFontMetrics.font.pointSize
+                                font.bold: true
+                                width: parent.width
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: Text.AlignHCenter
+                                text: scriteDocument.screenplay.subtitle
+                                visible: scriteDocument.screenplay.subtitle !== ""
+                            }
+
+                            Column {
+                                width: parent.width
+                                spacing: 0
+
+                                Text {
+                                    font: screenplayFontMetrics.font
+                                    width: parent.width
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: "Written By"
+                                }
+
+                                Text {
+                                    font: screenplayFontMetrics.font
+                                    width: parent.width
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: (scriteDocument.screenplay.author === "" ? "<unknown author>" : scriteDocument.screenplay.author)
+                                }
+                            }
+
+                            Text {
+                                font: screenplayFontMetrics.font
+                                width: parent.width
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: Text.AlignHCenter
+                                text: scriteDocument.screenplay.version === "" ? "Initial Version" : scriteDocument.screenplay.version
+                            }
+
+                            Text {
+                                font: screenplayFontMetrics.font
+                                width: parent.width
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: Text.AlignHCenter
+                                text: scriteDocument.screenplay.basedOn
+                                visible: scriteDocument.screenplay.basedOn !== ""
+                            }
+
+                            Item { width: parent.width; height: parent.spacing/2 }
+
+                            Column {
+                                spacing: parent.spacing/2
+                                width: parent.width * 0.5
+                                anchors.right: parent.horizontalCenter
+                                anchors.rightMargin: -width*0.25
+
+                                Text {
+                                    font.family: screenplayFontMetrics.font.family
+                                    font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    width: parent.width
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    text: scriteDocument.screenplay.contact
+                                    visible: text !== ""
+                                }
+
+                                Text {
+                                    font.family: screenplayFontMetrics.font.family
+                                    font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    width: parent.width
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    text: scriteDocument.screenplay.address
+                                    visible: text !== ""
+                                }
+
+                                Text {
+                                    font.family: screenplayFontMetrics.font.family
+                                    font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    width: parent.width
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    text: scriteDocument.screenplay.phoneNumber
+                                    visible: text !== ""
+                                }
+
+                                Text {
+                                    font.family: screenplayFontMetrics.font.family
+                                    font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    font.underline: true
+                                    color: "blue"
+                                    width: parent.width
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    text: scriteDocument.screenplay.email
+                                    visible: text !== ""
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: Qt.openUrlExternally("mailto:" + parent.text)
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+
+                                Text {
+                                    font.family: screenplayFontMetrics.font.family
+                                    font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    font.underline: true
+                                    color: "blue"
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                    text: scriteDocument.screenplay.website
+                                    visible: text !== ""
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: Qt.openUrlExternally(parent.text)
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    ToolButton3 {
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.rightMargin: titlePageFlickable.vscrollBarRequired ? 20 : 0
+                        iconSource: "../icons/action/edit_title_page.png"
+                        onClicked: {
+                            modalDialog.arguments = {"activeTabIndex": 2}
+                            modalDialog.popupSource = this
+                            modalDialog.sourceComponent = optionsDialogComponent
+                            modalDialog.active = true
+                        }
+                        enabled: !scriteDocument.readOnly
+                    }
+
+                    ScrollBar {
+                        id: titlePageVScrollBar
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        policy: titlePageFlickable.vscrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        minimumSize: 0.1
+                        palette {
+                            mid: Qt.rgba(0,0,0,0.25)
+                            dark: Qt.rgba(0,0,0,0.75)
+                        }
+                        opacity: active ? 1 : 0.2
+                        Behavior on opacity {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
+                    }
+
+                    ScrollBar {
+                        id: titlePageHScrollBar
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        orientation: Qt.Horizontal
+                        policy: titlePageFlickable.hscrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        minimumSize: 0.1
+                        palette {
+                            mid: Qt.rgba(0,0,0,0.25)
+                            dark: Qt.rgba(0,0,0,0.75)
+                        }
+                        opacity: active ? 1 : 0.2
+                        Behavior on opacity {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
+                    }
+                }
+
+                Item {
+                    width: screenplayTabContentArea.width
+                    height: screenplayTabContentArea.height
+                    visible: screenplayTabBar.tabIndex === 1
+
+                    Rectangle {
+                        anchors.fill: loglineFieldArea
+                        color: app.translucent(primaryColors.c100.background, 0.5)
+                        border.width: 1
+                        border.color: primaryColors.borderColor
+                    }
+
+                    Text {
+                        anchors.fill: loglineFieldArea
+                        anchors.margins: 20
+                        text: "<font size=\"+2\"><b>Logline</b></font><br/><br/>A logline is a one-sentence summary or description of a movie. Loglines distill the important elements of your screenplay—main character, setup, central conflict, antagonist—into a clear, concise teaser. The goal is to write a logline so enticing that it hooks the listener into reading the entire script."
+                        opacity: loglineFieldArea.textArea.cursorVisible ? 0.2 : 0.55
+                        visible: loglineFieldArea.textArea.length === 0
+                        font.pointSize: app.idealFontPointSize
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        Behavior on opacity {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
+                    }
+
+                    FlickableTextArea {
+                        id: loglineFieldArea
+                        width: Math.max(200, parent.width * 0.75)
+                        height: parent.height * 0.75
+                        anchors.centerIn: parent
+                        text: scriteDocument.screenplay.logline
+                        onTextChanged: scriteDocument.screenplay.logline = text
+                    }
+                }
+
+                Loader {
+                    width: screenplayTabContentArea.width
+                    height: screenplayTabContentArea.height
+                    sourceComponent: notesComponent
+                    onLoaded: item.notes = scriteDocument.structure.notes
+                    visible: screenplayTabBar.tabIndex === 2
+                }
+            }
+        }
+    }
+
+    Component {
+        id: unusedScenesComponent
 
         Item {
             property var componentData
 
             Text {
-                anchors.centerIn: parent
-                text: "Scenes"
+                anchors.fill: parent
+                anchors.margins: 20
                 font.pointSize: app.idealFontPointSize
+                text: "<b><font size=\"+2\">Unused Scenes</font></b><br/><br/>Unused scenes are those that are placed on structure but are not yet dragged into the screenplay (or timeline). Click on any of the unused scenes in the tree to the left to view their notes."
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
         }
     }
@@ -611,10 +1002,13 @@ Rectangle {
         Item {
             property var componentData
 
-            Text {
-                anchors.centerIn: parent
-                text: "Characters"
-                font.pointSize: app.idealFontPointSize
+            CharacterRelationshipsGraphView {
+                anchors.fill: parent
+                onCharacterDoubleClicked: {
+                    var ch = scriteDocument.structure.findCharacter(characterName)
+                    if(ch)
+                        switchTo(ch.notes)
+                }
             }
         }
     }
@@ -672,21 +1066,19 @@ Rectangle {
                 }
             }
 
-            SwipeView {
+            Item {
                 id: characterTabContentArea
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: characterTabBar.bottom
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 10
-                interactive: false
-                currentIndex: characterTabBar.tabIndex
-                orientation: Qt.Horizontal
                 clip: true
 
                 Item {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
+                    visible: characterTabBar.tabIndex === 0
 
                     EventFilter.events: [31]
                     EventFilter.onFilter: {
@@ -980,6 +1372,7 @@ Rectangle {
                 CharacterRelationshipsGraphView {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
+                    visible: characterTabBar.tabIndex === 1
                     character: characterNotes.character
                     editRelationshipsEnabled: !scriteDocument.readOnly
                     onCharacterDoubleClicked: characterNotes.characterDoubleClicked(characterName)
@@ -1002,6 +1395,7 @@ Rectangle {
                     sourceComponent: notesComponent
                     active: characterNotes.character
                     onLoaded: item.componentData = characterNotes.componentData
+                    visible: characterTabBar.tabIndex === 2
                 }
             }
         }
