@@ -557,7 +557,7 @@ void CharacterRelationshipsGraph::load()
 
     QList<CharacterRelationshipsGraphEdge*> edges = m_edges.list();
     m_edges.clear();
-    for(CharacterRelationshipsGraphEdge *edge : edges)
+    for(CharacterRelationshipsGraphEdge *edge : qAsConst(edges))
     {
         disconnect(edge->relationship(), &Relationship::aboutToDelete,
                    this, &CharacterRelationshipsGraph::loadLater);
@@ -567,7 +567,7 @@ void CharacterRelationshipsGraph::load()
 
     QList<CharacterRelationshipsGraphNode*> nodes = m_nodes.list();
     m_nodes.clear();
-    for(CharacterRelationshipsGraphNode *node : nodes)
+    for(CharacterRelationshipsGraphNode *node : qAsConst(nodes))
     {
         disconnect(node->character(), &Character::aboutToDelete,
                    this, &CharacterRelationshipsGraph::loadLater);
@@ -595,7 +595,7 @@ void CharacterRelationshipsGraph::load()
     // Lets fetch information about the graph as previously placed by the user.
     const QJsonObject previousGraphJson = this->graphJsonObject()->property("characterRelationshipGraph").value<QJsonObject>();
 
-    QMap<Character*,CharacterRelationshipsGraphNode*> nodeMap;
+    QHash<Character*,CharacterRelationshipsGraphNode*> nodeMap;
 
     // Lets begin by create graph groups. Each group consists of nodes and edges
     // of characters related to each other.
@@ -605,10 +605,9 @@ void CharacterRelationshipsGraph::load()
     // dont have any relationship with anybody else in the screenplay.
     graphs.append( GraphLayout::Graph() );
 
-    for(int i=0; i<m_structure->characterCount(); i++)
+    const QList<Character*> characters = m_structure->charactersModel()->list();
+    for(Character *character : characters)
     {
-        Character *character = m_structure->characterAt(i);
-
         // If the graph is being requested for a specific scene, then we will have
         // to consider this character, only and only if it shows up in the scene
         // or is related to one of the characters in the scene.
@@ -656,11 +655,9 @@ void CharacterRelationshipsGraph::load()
 
         // This is a character which has a relationship. We group it into a graph/group
         // in which this character has relationships. Otherwise, we create a new group.
-        for(int j=1; j<graphs.size(); j++)
+        for(GraphLayout::Graph &graph : graphs)
         {
-            GraphLayout::Graph &graph = graphs[j];
-
-            for(GraphLayout::AbstractNode *agnode : graph.nodes)
+            for(GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes))
             {
                 CharacterRelationshipsGraphNode *gnode =
                         qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
@@ -693,7 +690,7 @@ void CharacterRelationshipsGraph::load()
 
         int col = 0;
         QPointF pos;
-        for(GraphLayout::AbstractNode *agnode : graph.nodes) {
+        for(GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
             CharacterRelationshipsGraphNode *node =
                     qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
             node->move(pos);
@@ -711,19 +708,17 @@ void CharacterRelationshipsGraph::load()
 
     // Lets now loop over all nodes within each graph (except for the first one, which only
     // constains lone character nodes) and bundle relationships.
-    for(int i=1; i<graphs.size(); i++)
+    for(GraphLayout::Graph &graph : graphs)
     {
-        GraphLayout::Graph &graph = graphs[i];
-
-        for(GraphLayout::AbstractNode *agnode : graph.nodes)
+        for(GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes))
         {
             CharacterRelationshipsGraphNode *node1 =
                     qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
             Character *character = node1->character();
 
-            for(int j=0; j<character->relationshipCount(); j++)
+            const QList<Relationship*> relationships = character->relationshipsModel()->list();
+            for(Relationship *relationship : relationships)
             {
-                Relationship *relationship = character->relationshipAt(j);
                 if(relationship->direction() != Relationship::OfWith)
                     continue;
 
@@ -749,20 +744,20 @@ void CharacterRelationshipsGraph::load()
         return s1.length() > s2.length() ? s1 : s2;
     };
     QRectF boundingRect(m_leftMargin,m_topMargin,0,0);
-    for(int i=0; i<graphs.size(); i++)
+    int graphIndex = 0;
+    for(const GraphLayout::Graph &graph : graphs)
     {
-        const GraphLayout::Graph &graph = graphs[i];
+        const int i = graphIndex++;
         if(graph.nodes.isEmpty())
             continue;
 
         if(i >= 1)
         {
             QString longestRelationshipName;
-            for(GraphLayout::AbstractEdge *agedge : graph.edges)
+            for(GraphLayout::AbstractEdge *agedge : qAsConst(graph.edges))
             {
                 CharacterRelationshipsGraphEdge *gedge =
                         qobject_cast<CharacterRelationshipsGraphEdge*>(agedge->containerObject());
-                const QString relationshipName = gedge->relationship()->name();
                 longestRelationshipName = longerText(gedge->forwardLabel(), longestRelationshipName);
                 longestRelationshipName = longerText(gedge->reverseLabel(), longestRelationshipName);
             }
@@ -778,7 +773,7 @@ void CharacterRelationshipsGraph::load()
 
         // Compute bounding rect of the nodes.
         QRectF graphRect;
-        for(GraphLayout::AbstractNode *agnode : graph.nodes)
+        for(GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes))
         {
             CharacterRelationshipsGraphNode *gnode =
                     qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
@@ -805,7 +800,7 @@ void CharacterRelationshipsGraph::load()
 
         // Move the nodes such that they are layed out in a row.
         const QPointF dp = -graphRect.topLeft() + boundingRect.topRight();
-        for(GraphLayout::AbstractNode *agnode : graph.nodes)
+        for(GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes))
         {
             CharacterRelationshipsGraphNode *gnode =
                     qobject_cast<CharacterRelationshipsGraphNode*>(agnode->containerObject());
@@ -823,12 +818,12 @@ void CharacterRelationshipsGraph::load()
             boundingRect.setRight( boundingRect.right() + 100 );
     }
 
-    for(CharacterRelationshipsGraphNode *node : nodes)
+    for(CharacterRelationshipsGraphNode *node : qAsConst(nodes))
         connect(node->character(), &Character::aboutToDelete,
                 this, &CharacterRelationshipsGraph::loadLater,
                 Qt::UniqueConnection);
 
-    for(CharacterRelationshipsGraphEdge *edge : edges)
+    for(CharacterRelationshipsGraphEdge *edge : qAsConst(edges))
     {
         connect(edge->relationship(), &Relationship::aboutToDelete,
                 this, &CharacterRelationshipsGraph::loadLater,

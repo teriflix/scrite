@@ -1,6 +1,21 @@
+/****************************************************************************
+**
+** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
 #include "graphlayout.h"
+#include "timeprofiler.h"
 
 #include <QMap>
+#include <QHash>
 #include <QtMath>
 #include <QLineF>
 #include <QTransform>
@@ -28,8 +43,8 @@ bool ForceDirectedLayout::layout(const Graph &graph)
 
     // If the graph contains nodes that are not part of edges within it,
     // then we must not even bother laying it out.
-    QMap<AbstractNode *,int> refCountMap;
-    for(AbstractEdge *edge : graph.edges)
+    QHash<AbstractNode *,int> refCountMap;
+    for(AbstractEdge *edge : qAsConst(graph.edges))
     {
         const int i1 = graph.nodes.indexOf(edge->node1());
         const int i2 = graph.nodes.indexOf(edge->node2());
@@ -39,7 +54,7 @@ bool ForceDirectedLayout::layout(const Graph &graph)
         refCountMap[edge->node2()]++;
     }
 
-    for(AbstractNode *node : graph.nodes)
+    for(AbstractNode *node : qAsConst(graph.nodes))
     {
         if(refCountMap.value(node,0) == 0)
             return false;
@@ -53,7 +68,7 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     const qreal angleStep = 2*M_PI / qreal(graph.nodes.size());
     QSizeF maxSize(0,0);
     qreal angle = 0;
-    for(AbstractNode *node : graph.nodes)
+    for(AbstractNode *node : qAsConst(graph.nodes))
     {
         if(node->canBeMoved())
             node->setPosition( QPointF(qCos(angle), qSin(angle)) );
@@ -92,9 +107,9 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     // Now, lets find out the least space between any two nodes in the layed out
     // graph.
     qreal minNodeSpacing = 240000.0;
-    for(AbstractNode *n1 : graph.nodes)
+    for(AbstractNode *n1 : qAsConst(graph.nodes))
     {
-        for(AbstractNode *n2 : graph.nodes)
+        for(AbstractNode *n2 : qAsConst(graph.nodes))
         {
             if(n1 == n2)
                 continue;
@@ -107,11 +122,11 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     const qreal scale = minNodeSpacingPx / minNodeSpacing;
 
     // Apply the scaling
-    for(AbstractNode *node : graph.nodes)
+    for(AbstractNode *node : qAsConst(graph.nodes))
         node->setPosition( node->position() * scale );
 
     // Get the edges to compute their paths
-    for(AbstractEdge *edge : graph.edges)
+    for(AbstractEdge *edge : qAsConst(graph.edges))
         edge->evaluateEdge();
 
     return true;

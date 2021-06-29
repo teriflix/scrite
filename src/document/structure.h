@@ -420,7 +420,7 @@ public:
     Q_SIGNAL void colorChanged();
 
     Q_PROPERTY(QAbstractListModel* relationshipsModel READ relationshipsModel CONSTANT STORED false)
-    QAbstractListModel *relationshipsModel() const { return &((const_cast<Character*>(this))->m_relationships); }
+    ObjectListPropertyModel<Relationship *> *relationshipsModel() const { return &((const_cast<Character*>(this))->m_relationships); }
 
     Q_PROPERTY(QQmlListProperty<Relationship> relationships READ relationships NOTIFY relationshipCountChanged)
     QQmlListProperty<Relationship> relationships();
