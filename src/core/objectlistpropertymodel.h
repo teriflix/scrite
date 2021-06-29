@@ -18,18 +18,14 @@
 #include <QList>
 #include <QMetaMethod>
 #include <QAbstractListModel>
+#include <QSortFilterProxyModel>
 
 class ObjectListPropertyModelBase : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    ObjectListPropertyModelBase(QObject *parent=nullptr) :
-        QAbstractListModel(parent) {
-        connect(this, &QAbstractListModel::rowsInserted, this, &ObjectListPropertyModelBase::objectCountChanged);
-        connect(this, &QAbstractListModel::rowsRemoved, this, &ObjectListPropertyModelBase::objectCountChanged);
-        connect(this, &QAbstractListModel::modelReset, this, &ObjectListPropertyModelBase::objectCountChanged);
-    }
+    ObjectListPropertyModelBase(QObject *parent=nullptr);
     ~ObjectListPropertyModelBase() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
@@ -40,12 +36,7 @@ public:
 
     // QAbstractListModel implementation
     enum { ObjectItemRole = Qt::UserRole+1, ModelDataRole };
-    QHash<int, QByteArray> roleNames() const {
-        QHash<int,QByteArray> roles;
-        roles[ObjectItemRole] = QByteArrayLiteral("objectItem");
-        roles[ModelDataRole] = QByteArrayLiteral("modelData");
-        return roles;
-    }
+    QHash<int, QByteArray> roleNames() const;
 };
 
 template <class T>
@@ -219,6 +210,33 @@ protected:
 
 private:
     QList<T> m_list;
+};
+
+class SortedObjectListPropertyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+
+public:
+    SortedObjectListPropertyModel(QObject *parent=nullptr);
+    ~SortedObjectListPropertyModel() { }
+
+    Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
+    int objectCount() const { return this->rowCount(QModelIndex()); }
+    Q_SIGNAL void objectCountChanged();
+
+    Q_PROPERTY(QByteArray sortByProperty READ sortByProperty WRITE setSortByProperty NOTIFY sortByPropertyChanged)
+    void setSortByProperty(const QByteArray &val);
+    QByteArray sortByProperty() const { return m_sortByProperty; }
+    Q_SIGNAL void sortByPropertyChanged();
+
+    QHash<int, QByteArray> roleNames() const;
+
+protected:
+    // QSortFilterProxyModel interface
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+
+private:
+    QByteArray m_sortByProperty;
 };
 
 template <class T>

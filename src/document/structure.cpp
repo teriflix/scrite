@@ -4477,11 +4477,14 @@ void StructureCanvasViewportFilterModel::setSourceModel(QAbstractItemModel *mode
             this->QSortFilterProxyModel::setSourceModel(nullptr);
     }
 
-    connect(model, &QAbstractItemModel::rowsInserted, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
-    connect(model, &QAbstractItemModel::rowsRemoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
-    connect(model, &QAbstractItemModel::rowsMoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
-    connect(model, &QAbstractItemModel::dataChanged, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
-    connect(model, &QAbstractItemModel::modelReset, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    if(model != nullptr)
+    {
+        connect(model, &QAbstractItemModel::rowsInserted, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(model, &QAbstractItemModel::rowsRemoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(model, &QAbstractItemModel::rowsMoved, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(model, &QAbstractItemModel::dataChanged, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+        connect(model, &QAbstractItemModel::modelReset, this, &StructureCanvasViewportFilterModel::invalidateSelfLater);
+    }
 }
 
 bool StructureCanvasViewportFilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const

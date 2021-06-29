@@ -339,12 +339,15 @@ void NotebookModel::loadCharacters()
     charactersItem->setData(CharactersCategory, CategoryRole);
 
     Structure *structure = m_document->structure();
-    ObjectListPropertyModel<Character *> *characters = structure->charactersModel();
+    ObjectListPropertyModel<Character *> *charactersModel = structure->charactersModel();
 
-    const int nrCharacters = characters->objectCount();
-    for(int i=0; i<nrCharacters; i++)
+    QList<Character*> characters = charactersModel->list();
+    std::sort(characters.begin(), characters.end(), [](Character *a, Character *b) {
+        return a->name() < b->name();
+    });
+
+    for(Character *character : qAsConst(characters))
     {
-        Character *character = characters->at(i);
         Notes *characterNotes = character->notes();
 
         NotesItem *notesItem = new NotesItem(characterNotes);

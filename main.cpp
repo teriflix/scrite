@@ -66,6 +66,7 @@
 #include "delayedpropertybinder.h"
 #include "screenplaytextdocument.h"
 #include "abstractreportgenerator.h"
+#include "objectlistpropertymodel.h"
 #include "qtextdocumentpagedprinter.h"
 #include "characterrelationshipsgraph.h"
 #include "screenplaytextdocumentoffsets.h"
@@ -286,6 +287,8 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", apreason);
 
     qmlRegisterType<ItemPositionMapper>("Scrite", 1, 0, "ItemPositionMapper");
+
+    qmlRegisterType<SortedObjectListPropertyModel>("Scrite", 1, 0, "SortedObjectListPropertyModel");
 
     NotificationManager notificationManager;
 

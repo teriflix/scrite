@@ -153,6 +153,7 @@ SOURCES += \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
     src/core/application_build_timestamp.cpp \
+    src/core/objectlistpropertymodel.cpp \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \

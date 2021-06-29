@@ -18,7 +18,9 @@ import Scrite 1.0
 Item {
     property alias scene: crgraph.scene
     property alias character: crgraph.character
+    property alias structure: crgraph.structure
     property bool editRelationshipsEnabled: false
+    property bool showBusyIndicator: false
 
     signal characterDoubleClicked(string characterName)
     signal addNewRelationshipRequest(Item sourceItem)
@@ -428,10 +430,11 @@ Item {
             anchors.fill: parent
             enabled: crgraph.busy
         }
+    }
 
-        BusyIndicator {
-            running: crgraph.busy
-        }
+    BusyIndicator {
+        running: crgraph.busy || showBusyIndicator
+        anchors.centerIn: parent
     }
 
     Component {

@@ -135,6 +135,15 @@ Rectangle {
                             mipmap: true
                             anchors.verticalCenter: parent.verticalCenter
                             visible: source != ""
+                            opacity: {
+                                switch(styleData.value.notebookItemType) {
+                                case NotebookModel.EpisodeBreakType:
+                                case NotebookModel.ActBreakType:
+                                    return styleData.value.notebookItemObject ? 1 : 0.5
+                                }
+                                return 1
+                            }
+
                             source: {
                                 switch(styleData.value.notebookItemType) {
                                 case NotebookModel.EpisodeBreakType:
@@ -996,20 +1005,223 @@ Rectangle {
         }
     }
 
+    property int charactersNotesTabIndex: 0
     Component {
         id: charactersComponent
 
         Item {
             property var componentData
 
-            CharacterRelationshipsGraphView {
-                anchors.fill: parent
-                onCharacterDoubleClicked: {
-                    var ch = scriteDocument.structure.findCharacter(characterName)
-                    if(ch)
-                        switchTo(ch.notes)
+            Row {
+                id: charactersTabBar
+                spacing: 10
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 8
+                property int tabIndex: charactersNotesTabIndex
+                onTabIndexChanged: charactersNotesTabIndex = tabIndex
+
+                Text {
+                    font.pointSize: idealAppFontMetrics.font.pointSize
+                    font.family: idealAppFontMetrics.font.family
+                    font.capitalization: Font.AllUppercase
+                    font.bold: true
+                    text: "Characters: "
+                    rightPadding: 10
+                }
+
+                Repeater {
+                    model: ["List", "Relationships"]
+
+                    Text {
+                        font: idealAppFontMetrics.font
+                        color: charactersTabBar.tabIndex === index ? accentColors.c900.background : primaryColors.c900.background
+                        text: modelData
+
+                        Rectangle {
+                            height: 1
+                            color: accentColors.c900.background
+                            width: parent.width
+                            anchors.top: parent.bottom
+                            visible: charactersTabBar.tabIndex === index
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: charactersTabBar.tabIndex = index
+                        }
+                    }
                 }
             }
+
+            Item {
+                id: charactersTabContentArea
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: charactersTabBar.bottom
+                anchors.bottom: parent.bottom
+                anchors.topMargin: 10
+                clip: true
+
+                Item {
+                    width: charactersTabContentArea.width
+                    height: charactersTabContentArea.height
+                    visible: charactersTabBar.tabIndex === 0
+
+                    SortedObjectListPropertyModel {
+                        id: sortedCharactersModel
+                        sourceModel: scriteDocument.structure.charactersModel
+                        sortByProperty: "name"
+                    }
+
+                    GridView {
+                        id: charactersView
+                        anchors.fill: parent
+                        anchors.rightMargin: contentHeight > height ? 17 : 0
+                        clip: true
+                        model: sortedCharactersModel
+                        property real idealCellWidth: Math.min(250,width)
+                        property int nrColumns: Math.floor(width/idealCellWidth)
+                        cellWidth: width/nrColumns
+                        cellHeight: 120
+                        ScrollBar.vertical: charactersListViewScrollBar
+                        delegate: Item {
+                            width: charactersView.cellWidth
+                            height: charactersView.cellHeight
+                            property Character character: objectItem
+
+                            function polishStr(val,defval) {
+                                return val === "" ? defval : val
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                color: charactersView.currentIndex === index ? primaryColors.highlight.background : primaryColors.c10.background
+                                border { width: 1; color: primaryColors.borderColor }
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    spacing: 10
+
+                                    Image {
+                                        width: parent.height
+                                        height: parent.height
+                                        source: {
+                                            if(character.photos.length > 0)
+                                                return "file:///" + character.photos[0]
+                                            return "../icons/content/character_icon.png"
+                                        }
+                                        fillMode: Image.PreserveAspectCrop
+                                        mipmap: true; smooth: true
+                                    }
+
+                                    Column {
+                                        width: parent.width - parent.height - parent.spacing
+                                        spacing: parent.spacing/2
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        Text {
+                                            font.pointSize: app.idealFontPointSize
+                                            font.bold: true
+                                            text: character.name
+                                            width: parent.width
+                                            elide: Text.ElideRight
+                                        }
+
+                                        Text {
+                                            font.pointSize: app.idealFontPointSize - 2
+                                            text: [character.type, character.designation].join(", ")
+                                            width: parent.width
+                                            elide: Text.ElideRight
+                                        }
+
+                                        Text {
+                                            font.pointSize: app.idealFontPointSize - 2
+                                            text: ["Age: " + polishStr(character.age,"?"), "Gender: " + polishStr(character.gender,"?")].join(", ")
+                                            width: parent.width
+                                            elide: Text.ElideRight
+                                        }
+                                    }
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: charactersView.currentIndex = index
+                                onDoubleClicked: switchTo(character.notes)
+                            }
+                        }
+
+                        property int nrVisibleItems: Math.ceil(height/120)
+                        header: model.objectCount < nrVisibleItems ? null : addNewCharacter
+                        footer: addNewCharacter
+                    }
+
+                    Component {
+                        id: addNewCharacter
+
+                        Item {
+                            width: charactersView.width
+                            height: 60
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                color: primaryColors.windowColor
+                                border { width: 1; color: primaryColors.borderColor }
+
+                                ToolButton3 {
+                                    iconSource: "../icons/content/person_add.png"
+                                    anchors.centerIn: parent
+                                    ToolTip.text: "Add Character"
+                                }
+                            }
+                        }
+                    }
+
+                    ScrollBar {
+                        id: charactersListViewScrollBar
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        policy: charactersView.height < charactersView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                        minimumSize: 0.1
+                        palette {
+                            mid: Qt.rgba(0,0,0,0.25)
+                            dark: Qt.rgba(0,0,0,0.75)
+                        }
+                        opacity: active ? 1 : 0.2
+                        Behavior on opacity {
+                            enabled: screenplayEditorSettings.enableAnimations
+                            NumberAnimation { duration: 250 }
+                        }
+                    }
+                }
+
+                CharacterRelationshipsGraphView {
+                    structure: null
+                    showBusyIndicator: true
+                    width: charactersTabContentArea.width
+                    height: charactersTabContentArea.height
+                    visible: charactersTabBar.tabIndex === 1
+                    onCharacterDoubleClicked: {
+                        var ch = scriteDocument.structure.findCharacter(characterName)
+                        if(ch)
+                            switchTo(ch.notes)
+                    }
+                    function prepare() {
+                        if(visible) {
+                            structure = scriteDocument.structure
+                            showBusyIndicator = false
+                        }
+                    }
+                    Component.onCompleted: app.execLater(charactersTabContentArea, 100, prepare)
+                    onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
+                }
+            }
+
         }
     }
 
@@ -1373,7 +1585,9 @@ Rectangle {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
                     visible: characterTabBar.tabIndex === 1
-                    character: characterNotes.character
+                    character: null
+                    structure: null
+                    showBusyIndicator: true
                     editRelationshipsEnabled: !scriteDocument.readOnly
                     onCharacterDoubleClicked: characterNotes.characterDoubleClicked(characterName)
                     onAddNewRelationshipRequest: {
@@ -1387,6 +1601,16 @@ Rectangle {
                         var relationship = character.findRelationship(otherCharacter)
                         character.removeRelationship(relationship)
                     }
+
+                    function prepare() {
+                        if(visible) {
+                            structure = scriteDocument.structure
+                            character = characterNotes.character
+                            showBusyIndicator = false
+                        }
+                    }
+                    Component.onCompleted: app.execLater(characterTabContentArea, 100, prepare)
+                    onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
                 }
 
                 Loader {
