@@ -107,8 +107,11 @@ NotebookModel::NotebookModel(QObject *parent)
     m_syncScenesTimer.setSingleShot(true);
     m_syncCharactersTimer.setSingleShot(true);
 
-    m_syncScenesTimer.setInterval(0);
-    m_syncCharactersTimer.setInterval(0);
+    // The timeout interval for these has to be > 0, because we have to let
+    // ExecLater timers in Structure and Screenplay to do their thing before
+    // we sync.
+    m_syncScenesTimer.setInterval(50);
+    m_syncCharactersTimer.setInterval(50);
 
     connect(&m_syncScenesTimer, &QTimer::timeout, this, &NotebookModel::syncScenes);
     connect(&m_syncCharactersTimer, &QTimer::timeout, this, &NotebookModel::syncCharacters);
@@ -303,7 +306,7 @@ QStandardItem *createItemForNode(StoryNode *node)
         nodeItem->setData(NotebookModel::ActBreakType, NotebookModel::TypeRole);
     }
     else if(node->scene == nullptr && node->unusedScene == nullptr)
-        nodeItem->setText( QStringLiteral("Story") );
+        nodeItem->setText( QStringLiteral("Story Notes") );
 
     if(nodeNotes != nullptr)
     {
@@ -622,7 +625,7 @@ void NotesItem::updateText()
     switch(m_notes->ownerType())
     {
     case Notes::StructureOwner:
-        this->setText(QStringLiteral("Story"));
+        this->setText(QStringLiteral("Story Notes"));
         return;
     case Notes::BreakOwner: {
         ScreenplayElement *spelement = qobject_cast<ScreenplayElement*>(m_notes->parent());
@@ -714,7 +717,7 @@ StoryNode *StoryNode::create(ScriteDocument *document)
         {
             if(element->breakType() == Screenplay::Episode)
             {
-                if(episodeNode == nullptr && element->episodeIndex() > 0)
+                if(episodeNode == nullptr && !screenplayNode->childNodes.isEmpty())
                 {
                     // User has not created an Episode 1, so we are going to create Episode 1
                     // node just for the sake of the notebook model.
@@ -728,12 +731,14 @@ StoryNode *StoryNode::create(ScriteDocument *document)
                 episodeNode = new StoryNode;
                 episodeNode->episode = element;
                 screenplayNode->childNodes.append(episodeNode);
+
+                actNode = nullptr;
             }
             else if(element->breakType() == Screenplay::Act)
             {
                 StoryNode *parentNode = episodeNode ? episodeNode : screenplayNode;
 
-                if(actNode == nullptr && element->actIndex() > 0)
+                if(actNode == nullptr && !parentNode->childNodes.isEmpty())
                 {
                     actNode = new StoryNode;
                     actNode->actName = QStringLiteral("ACT 1");

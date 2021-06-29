@@ -2054,9 +2054,9 @@ void Screenplay::evaluateSceneNumbers()
         return;
 
     int number = 1;
-    int actIndex = 0;
-    int episodeIndex = 0;
-    int elementIndex = 0;
+    int actIndex = -1;
+    int episodeIndex = -1;
+    int elementIndex = -1;
     bool containsNonStandardScenes = false;
 
     ScreenplayElement *lastEpisodeElement = nullptr;
@@ -2076,9 +2076,12 @@ void Screenplay::evaluateSceneNumbers()
 
         if(element->elementType() == ScreenplayElement::SceneElementType)
         {
-            lastSceneElement = element;
+            if(actIndex < 0)
+                ++actIndex;
+            if(episodeIndex < 0)
+                ++episodeIndex;
 
-            element->setElementIndex(elementIndex++);
+            element->setElementIndex(++elementIndex);
             element->setActIndex(actIndex);
             element->setEpisodeIndex(episodeIndex);
 
@@ -2094,21 +2097,18 @@ void Screenplay::evaluateSceneNumbers()
             element->setElementIndex(-1);
             if(element->breakType() == Screenplay::Act)
             {
-                if(lastSceneElement)
-                    ++actIndex;
+                ++actIndex;
 
                 lastActElement = element;
                 lastSceneElement = nullptr;
             }
             else if(element->breakType() == Screenplay::Episode)
             {
-                if(lastSceneElement)
-                    ++episodeIndex;
+                ++episodeIndex;
 
                 actIndex = 0;
 
                 lastActElement = nullptr;
-                lastSceneElement = nullptr;
                 lastEpisodeElement = element;
             }
 
