@@ -23,10 +23,11 @@ Flickable {
     property bool undoRedoEnabled: true
     property alias text: __textArea.text
     property alias font: __textArea.font
-    property Item tab
-    property Item backtab
+    property Item tabItem
+    property Item backTabItem
     property alias readonly: __textArea.readOnly
     property alias placeholderText: __textArea.placeholderText
+    property alias readOnly: __textArea.readOnly
 
     id: flickable
     clip: true
@@ -61,8 +62,8 @@ Flickable {
         Transliterator.hasActiveFocus: activeFocus
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
         readOnly: scriteDocument.readOnly
-        KeyNavigation.tab: flickable.tab
-        KeyNavigation.backtab: flickable.backtab
+        KeyNavigation.tab: flickable.tabItem
+        KeyNavigation.backtab: flickable.backTabItem
         KeyNavigation.priority: KeyNavigation.AfterItem
         background: Item { }
         SpecialSymbolsSupport {

@@ -226,5 +226,13 @@
         <file>icons/screenplay/transition_inverted.png</file>
         <file>icons/action/attach_file.png</file>
         <file>icons/action/attach_file_inverted.png</file>
+        <file>icons/filetype/audio.png</file>
+        <file>icons/filetype/audio_inverted.png</file>
+        <file>icons/filetype/document.png</file>
+        <file>icons/filetype/document_inverted.png</file>
+        <file>icons/filetype/photo.png</file>
+        <file>icons/filetype/photo_inverted.png</file>
+        <file>icons/filetype/video.png</file>
+        <file>icons/filetype/video_inverted.png</file>
     </qresource>
 </RCC>

@@ -15,7 +15,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import Scrite 1.0
 
-Item {
+Rectangle {
     property alias scene: crgraph.scene
     property alias character: crgraph.character
     property alias structure: crgraph.structure
@@ -25,6 +25,10 @@ Item {
     signal characterDoubleClicked(string characterName)
     signal addNewRelationshipRequest(Item sourceItem)
     signal removeRelationshipWithRequest(Character otherCharacter, Item sourceItem)
+
+    color: app.translucent(primaryColors.c100.background, 0.5)
+    border.width: 1
+    border.color: primaryColors.borderColor
 
     CharacterRelationshipsGraph {
         id: crgraph
@@ -53,7 +57,10 @@ Item {
     ScrollArea {
         id: canvasScroll
         clip: true
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: statusBar.top
         contentWidth: canvas.width * canvas.scale
         contentHeight: canvas.height * canvas.scale
         initialContentWidth: canvas.width
@@ -61,6 +68,7 @@ Item {
         showScrollBars: true
         handlePinchZoom: true
         zoomOnScroll: workspaceSettings.mouseWheelZoomsInCharacterGraph
+        minimumScale: nodeItemsBoxEvaluator.itemCount > 0 ? Math.min(0.25, width/nodeItemsBoxEvaluator.width, height/nodeItemsBoxEvaluator.height) : 0.25
 
         function zoomOneMiddleArea() {
             nodeItemsBoxEvaluator.recomputeBoundingBox()
@@ -308,21 +316,61 @@ Item {
     }
 
     Rectangle {
-        id: floatingToolbar
-        width: floatingToolbarLayout.width + 10
-        height: floatingToolbarLayout.height + 10
-        anchors.top: canvasScroll.top
-        anchors.left: canvasScroll.left
-        anchors.margins: 20
-        color: crgraph.dirty ? primaryColors.c200.background : primaryColors.c100.background
-        border.color: primaryColors.c100.text
+        id: statusBar
+        height: 30
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: primaryColors.windowColor
         border.width: 1
-        radius: 6
+        border.color: primaryColors.borderColor
+        clip: true
 
         Row {
-            id: floatingToolbarLayout
-            anchors.centerIn: parent
-            spacing: 5
+            id: statusBarControls
+            height: parent.height-6
+            spacing: 10
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+
+            ToolButton3 {
+                onClicked: crgraph.reset()
+                iconSource: "../icons/navigation/refresh.png"
+                autoRepeat: true
+                ToolTip.text: "Refresh"
+                visible: !scriteDocument.readOnly
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+            }
+
+            ToolButton3 {
+                onClicked: { canvas.reloadIfDirty(); addNewRelationshipRequest(this) }
+                iconSource: "../icons/content/add_circle_outline.png"
+                autoRepeat: false
+                ToolTip.text: "Add A New Relationship"
+                enabled: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
+                visible: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+            }
+
+            ToolButton3 {
+                onClicked: { canvas.reloadIfDirty(); removeRelationshipWithRequest(canvas.activeCharacter, this) }
+                iconSource: "../icons/action/delete.png"
+                autoRepeat: false
+                ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
+                enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
+                visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.separatorColor
+                opacity: 0.5
+            }
 
             ToolButton3 {
                 iconSource: "../icons/hardware/mouse.png"
@@ -331,20 +379,8 @@ Item {
                 checkable: true
                 checked: workspaceSettings.mouseWheelZoomsInCharacterGraph
                 onCheckedChanged: workspaceSettings.mouseWheelZoomsInCharacterGraph = checked
-            }
-
-            ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); canvasScroll.zoomIn() }
-                iconSource: "../icons/navigation/zoom_in.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom In"
-            }
-
-            ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); canvasScroll.zoomOut() }
-                iconSource: "../icons/navigation/zoom_out.png"
-                autoRepeat: true
-                ToolTip.text: "Zoom Out"
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
             }
 
             ToolButton3 {
@@ -359,6 +395,8 @@ Item {
                 iconSource: "../icons/navigation/zoom_one.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom One"
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
             }
 
             ToolButton3 {
@@ -366,47 +404,26 @@ Item {
                 iconSource: "../icons/navigation/zoom_fit.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Fit"
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
             }
 
-            Rectangle {
-                width: 1
+            ZoomSlider {
+                id: zoomSlider
+                from: canvasScroll.minimumScale
+                to: canvasScroll.maximumScale
+                stepSize: 0.0
+                anchors.verticalCenter: parent.verticalCenter
+                value: canvas.scale
+                onSliderMoved: Qt.callLater(applyZoom)
+                onZoomInRequest: canvasScroll.zoomIn()
+                onZoomOutRequest: canvasScroll.zoomOut()
                 height: parent.height
-                color: primaryColors.separatorColor
-                opacity: 0.5
-            }
-
-            ToolButton3 {
-                onClicked: crgraph.reset()
-                iconSource: "../icons/navigation/refresh.png"
-                autoRepeat: true
-                ToolTip.text: "Refresh"
-                visible: !scriteDocument.readOnly
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.separatorColor
-                opacity: 0.5
-                visible: editRelationshipsEnabled && !scriteDocument.readOnly
-            }
-
-            ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); addNewRelationshipRequest(this) }
-                iconSource: "../icons/content/add_circle_outline.png"
-                autoRepeat: false
-                ToolTip.text: "Add A New Relationship"
-                enabled: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
-                visible: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
-            }
-
-            ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); removeRelationshipWithRequest(canvas.activeCharacter, this) }
-                iconSource: "../icons/action/delete.png"
-                autoRepeat: false
-                ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
-                enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
-                visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
+                function applyZoom() {
+                    canvasScroll.animatePanAndZoom = false
+                    canvasScroll.zoomTo(zoomLevel)
+                    canvasScroll.animatePanAndZoom = true
+                }
             }
         }
     }

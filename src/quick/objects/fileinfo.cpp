@@ -12,8 +12,10 @@
 ****************************************************************************/
 
 #include "fileinfo.h"
+#include "application.h"
+#include "attachments.h"
 
-#include <QtDebug>
+#include <QPainter>
 #include <QFileIconProvider>
 
 FileInfo::FileInfo(QObject *parent)
@@ -87,7 +89,7 @@ void FileInfo::setFileInfo(const QFileInfo &val)
 ///////////////////////////////////////////////////////////////////////////////
 
 FileIconProvider::FileIconProvider()
-    : QQuickImageProvider(QQuickImageProvider::Pixmap)
+    : QQuickImageProvider(QQuickImageProvider::Image)
 {
 
 }
@@ -97,8 +99,12 @@ FileIconProvider::~FileIconProvider()
 
 }
 
-QPixmap FileIconProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+QImage FileIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
+#if 0
+    // This just doesnt work. QFileIconProvider does not provide icons
+    // appropriate to the file type.
+
     const QFileInfo fi(id);
     const QFileIconProvider iconProvider;
     const QIcon icon = iconProvider.icon(fi);
@@ -112,5 +118,89 @@ QPixmap FileIconProvider::requestPixmap(const QString &id, QSize *size, const QS
     if(size)
         *size = pixmap.size();
 
-    return pixmap;
+    return pixmap.toImage();
+#else
+    QImage icon = this->requestImage( QFileInfo(id) );
+
+    QSize iconSize(96, 96);
+    if(requestedSize.isValid())
+        iconSize = requestedSize;
+
+    icon = icon.scaled(iconSize, Qt::KeepAspectRatio);
+
+    if(size)
+        *size = icon.size();
+
+    return icon;
+#endif
+}
+
+QImage FileIconProvider::requestImage(const QFileInfo &fi)
+{
+    const QString suffix = fi.suffix().toUpper();
+
+    if(m_suffixImageMap.contains(suffix))
+        return m_suffixImageMap.value(suffix);
+
+    Attachment::Type type = Attachment::determineType(fi);
+    static const QMap<Attachment::Type, QString> typeIconBase
+            = {
+                    { Attachment::Photo, QStringLiteral("photo") },
+                    { Attachment::Video, QStringLiteral("video") },
+                    { Attachment::Audio, QStringLiteral("audio") },
+                    { Attachment::Document, QStringLiteral("document") },
+              };
+    const QString baseIconFile = QStringLiteral(":/icons/filetype/") + typeIconBase.value(type) + QStringLiteral(".png");
+
+    QImage icon(baseIconFile);
+    if(suffix.isEmpty())
+    {
+        m_suffixImageMap[suffix] = icon;
+        return icon;
+    }
+
+    QPainter paint;
+    paint.begin(&icon);
+
+    QFont font = paint.font();
+    font.setPointSize( Application::instance()->idealFontPointSize() );
+    paint.setFont(font);
+
+    const qreal maxTextWidth = icon.width() * 0.8;
+    const QFontMetricsF fm = paint.fontMetrics();
+    const QRectF sourceRect = fm.boundingRect(suffix);
+    QRectF targetRect = sourceRect;
+    qreal targetScale = 1.0;
+    if(targetRect.width() > maxTextWidth)
+    {
+        targetScale = maxTextWidth / targetRect.width();
+        targetRect.setWidth( targetRect.width()*targetScale );
+        targetRect.setHeight( targetRect.height()*targetScale );
+    }
+
+    targetRect.moveCenter(icon.rect().center());
+    if(type == Attachment::Photo)
+        targetRect.moveTop(icon.rect().top() + icon.height()*0.25);
+    else if(type == Attachment::Video)
+    {
+        targetRect.moveTop(targetRect.top() + icon.height()*0.1);
+        targetRect.moveLeft(targetRect.left() + 1);
+    }
+    else if(type == Attachment::Document)
+        targetRect.moveTop(targetRect.top() + icon.height()*0.1);
+
+    paint.setBrush(Qt::white);
+    paint.setPen(Qt::black);
+    paint.setOpacity(0.5);
+    paint.drawRect(targetRect.adjusted(-2,-2,2,2));
+
+    paint.translate(targetRect.left(), targetRect.top());
+    paint.scale(targetScale, targetScale);
+    paint.setOpacity(1);
+    paint.drawText(QRectF(0,0,targetRect.width(),targetRect.height()), Qt::AlignCenter, suffix);
+
+    paint.end();
+
+    m_suffixImageMap[suffix] = icon;
+    return icon;
 }

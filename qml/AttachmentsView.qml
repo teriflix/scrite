@@ -21,11 +21,16 @@ ListView {
     id: attachmentsView
     property Attachments attachments
     property real delegateSize: orientation === ListView.Horizontal ? height : width
+    property bool readonly: scriteDocument.readOnly
     orientation: ListView.Horizontal
     model: attachments
+    onAttachmentsChanged: currentIndex = -1
     highlight: Rectangle {
         color: primaryColors.highlight.background
     }
+    clip: true
+    highlightMoveDuration: 0
+    highlightResizeDuration: 0
 
     Rectangle {
         anchors.fill: parent
@@ -42,6 +47,7 @@ ListView {
             font.pointSize: app.idealFontPointSize
             opacity: 0.5
             text: "Attachments"
+            visible: attachments && attachments.attachmentCount === 0
         }
     }
 
@@ -87,7 +93,7 @@ ListView {
             hoverEnabled: true
             onClicked: {
                 attachmentsView.currentIndex = index
-                if(mouse.button === Qt.RightButton)
+                if(mouse.button === Qt.RightButton && !readonly)
                     attachmentContextMenu.popup()
             }
             onDoubleClicked: objectItem.openAttachmentAnonymously()
@@ -101,7 +107,8 @@ ListView {
         ToolButton3 {
             iconSource: "../icons/action/attach_file.png"
             anchors.centerIn: parent
-            onClicked: fileDialog.open()
+            onClicked: if(!readonly) fileDialog.open()
+            visible: !readonly
         }
     }
 

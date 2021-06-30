@@ -63,7 +63,13 @@ public:
     ~FileIconProvider();
 
     // QQuickImageProvider interface
-    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+
+private:
+    QImage requestImage(const QFileInfo &fi);
+
+private:
+    QMap<QString,QImage> m_suffixImageMap;
 };
 
 #endif // FILEINFO_H

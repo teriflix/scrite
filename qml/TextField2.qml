@@ -28,6 +28,7 @@ TextField {
     property alias label: labelText.text
     property bool enableTransliteration: false
     property bool includeEmojiSymbols: true
+    property bool undoRedoEnabled: false
     property alias showingSymbols: specialSymbolSupport.showingSymbols
     property var includeSuggestion: function(suggestion) {
         return suggestion
@@ -35,6 +36,7 @@ TextField {
     selectedTextColor: accentColors.c700.text
     selectionColor: accentColors.c700.background
     selectByMouse: true
+    font.pointSize: app.idealFontPointSize
 
     signal editingComplete()
     signal returnPressed()
@@ -174,5 +176,13 @@ TextField {
             currentIndex: completionModel.currentRow
             height: contentHeight
         }
+    }
+
+    UndoHandler {
+        enabled: undoRedoEnabled && parent.activeFocus && !parent.readOnly
+        canUndo: parent.canUndo
+        canRedo: parent.canRedo
+        onUndoRequest: parent.undo()
+        onRedoRequest: parent.redo()
     }
 }

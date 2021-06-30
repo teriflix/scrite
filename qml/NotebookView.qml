@@ -275,6 +275,8 @@ Rectangle {
                     switch(notebookTree.currentData.notebookItemObject.ownerType) {
                     case Notes.CharacterOwner:
                         return characterNotesComponent
+                    case Notes.SceneOwner:
+                        return sceneNotesComponent
                     default:
                         return notesComponent
                     }
@@ -322,16 +324,155 @@ Rectangle {
         }
     }
 
+    property int sceneNotesTabIndex: 0
+    Component {
+        id: sceneNotesComponent
+
+        Item {
+            id: sceneNotesItem
+            property var componentData
+            property Notes notes: componentData.notebookItemObject
+            property Scene scene: notes.scene
+
+            TextTabBar {
+                id: sceneTabBar
+                tabIndex: sceneNotesTabIndex
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 8
+                onTabIndexChanged: sceneNotesTabIndex = tabIndex
+                name: componentData ? "Scene " + componentData.notebookItemTitle.substr(0, componentData.notebookItemTitle.indexOf(']')+1) : "Scene"
+                tabs: ["Synopsis", "Relationships", "Notes"]
+            }
+
+            Item {
+                id: sceneTabContentArea
+                anchors.top: sceneTabBar.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.topMargin: 10
+                clip: true
+
+                Item {
+                    visible: sceneTabBar.tabIndex === 0
+                    width: sceneTabContentArea.width
+                    height: sceneTabContentArea.height
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 10
+
+                        TextField2 {
+                            id: sceneHeadingField
+                            text: scene.heading.text
+                            label: ""
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            placeholderText: "Scene Heading"
+                            readOnly: scriteDocument.readOnly
+                            enabled: scene.heading.enabled
+                            onTextChanged: scene.heading.parseFrom(text)
+                            tabItem: sceneTitleField
+                            font.family: scriteDocument.formatting.elementFormat(SceneElement.Heading).font.family
+                            font.pointSize: app.idealFontPointSize+2
+                        }
+
+                        TextField2 {
+                            id: sceneTitleField
+                            text: scene.structureElement.nativeTitle
+                            label: ""
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            placeholderText: "Scene Title"
+                            readOnly: scriteDocument.readOnly
+                            onTextChanged: scene.structureElement.title = text
+                            tabItem: sceneSynopsisField.textArea
+                            backTabItem: sceneHeadingField
+                        }
+
+                        Rectangle {
+                            width: parent.width
+                            height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneAttachments.height - parent.spacing*3
+                            color: app.translucent(primaryColors.c100.background, 0.5)
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+
+                            FlickableTextArea {
+                                id: sceneSynopsisField
+                                anchors.fill: parent
+                                text: scene.title
+                                placeholderText: "Scene Synopsis"
+                                readOnly: scriteDocument.readOnly
+                                onTextChanged: scene.title = title
+                                undoRedoEnabled: true
+                                backTabItem: sceneTitleField
+                            }
+                        }
+
+                        AttachmentsView {
+                            id: sceneAttachments
+                            width: parent.width
+                            height: 80
+                            attachments: scene.attachments
+                        }
+                    }
+
+                    AttachmentsDropArea2 {
+                        anchors.fill: parent
+                        target: scene.attachments
+                    }
+                }
+
+                CharacterRelationshipsGraphView {
+                    visible: sceneTabBar.tabIndex === 1
+                    width: sceneTabContentArea.width
+                    height: sceneTabContentArea.height
+                    scene: null
+                    structure: null
+                    showBusyIndicator: true
+                    onCharacterDoubleClicked: {
+                        var ch = scriteDocument.structure.findCharacter(characterName)
+                        if(ch)
+                            switchTo(ch.notes)
+                    }
+                    function prepare() {
+                        if(visible) {
+                            scene = sceneNotesItem.scene
+                            structure = scriteDocument.structure
+                            showBusyIndicator = false
+                        }
+                    }
+                    Component.onCompleted: app.execLater(sceneTabContentArea, 100, prepare)
+                    onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
+                }
+
+                Loader {
+                    visible: sceneTabBar.tabIndex === 2
+                    width: sceneTabContentArea.width
+                    height: sceneTabContentArea.height
+                    sourceComponent: notesComponent
+                    active: componentData
+                    onLoaded: item.componentData = sceneNotesItem.componentData
+                }
+            }
+        }
+    }
+
     Component {
         id: notesComponent
 
-        Item {
+        Rectangle {
             id: notesSummary
             property var componentData
             property Notes notes: componentData.notebookItemObject
             readonly property real minimumNoteSize: 175
             property real noteSize: notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize)
             clip: true
+            color: app.translucent(primaryColors.c100.background, 0.5)
+            border.width: 1
+            border.color: primaryColors.borderColor
 
             Flickable {
                 id: notesFlick
@@ -416,9 +557,12 @@ Rectangle {
                         }
                     }
 
-                    Item {
+                    Rectangle {
                         width: noteSize; height: noteSize
                         visible: !scriteDocument.readOnly
+                        color: app.translucent(primaryColors.c100.background, 0.5)
+                        border.width: 1
+                        border.color: primaryColors.borderColor
 
                         ToolButton3 {
                             anchors.centerIn: parent
@@ -531,7 +675,7 @@ Rectangle {
                 anchors.margins: 10
                 text: note.content
                 onTextChanged: note.content = text
-                backtab: noteHeadingField
+                backTabItem: noteHeadingField
                 placeholderText: "Note content ..."
             }
 
@@ -669,45 +813,15 @@ Rectangle {
                 font.pointSize: app.idealFontPointSize
             }
 
-            Row {
+            TextTabBar {
                 id: screenplayTabBar
-                spacing: 10
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                property int tabIndex: screenplayNotesTabIndex
+                tabIndex: screenplayNotesTabIndex
                 onTabIndexChanged: screenplayNotesTabIndex = tabIndex
-
-                Text {
-                    font.pointSize: idealAppFontMetrics.font.pointSize
-                    font.family: idealAppFontMetrics.font.family
-                    font.bold: true
-                    text: "Screenplay: "
-                    rightPadding: 10
-                }
-
-                Repeater {
-                    model: ["Title Page", "Logline", "Notes"]
-
-                    Text {
-                        font: idealAppFontMetrics.font
-                        color: screenplayTabBar.tabIndex === index ? accentColors.c900.background : primaryColors.c900.background
-                        text: modelData
-
-                        Rectangle {
-                            height: 1
-                            color: accentColors.c900.background
-                            width: parent.width
-                            anchors.top: parent.bottom
-                            visible: screenplayTabBar.tabIndex === index
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: screenplayTabBar.tabIndex = index
-                        }
-                    }
-                }
+                name: "Screenplay"
+                tabs: ["Title Page", "Logline", "Notes"]
             }
 
             Item {
@@ -1012,46 +1126,15 @@ Rectangle {
         Item {
             property var componentData
 
-            Row {
+            TextTabBar {
                 id: charactersTabBar
-                spacing: 10
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                property int tabIndex: charactersNotesTabIndex
+                tabIndex: charactersNotesTabIndex
                 onTabIndexChanged: charactersNotesTabIndex = tabIndex
-
-                Text {
-                    font.pointSize: idealAppFontMetrics.font.pointSize
-                    font.family: idealAppFontMetrics.font.family
-                    font.capitalization: Font.AllUppercase
-                    font.bold: true
-                    text: "Characters: "
-                    rightPadding: 10
-                }
-
-                Repeater {
-                    model: ["List", "Relationships"]
-
-                    Text {
-                        font: idealAppFontMetrics.font
-                        color: charactersTabBar.tabIndex === index ? accentColors.c900.background : primaryColors.c900.background
-                        text: modelData
-
-                        Rectangle {
-                            height: 1
-                            color: accentColors.c900.background
-                            width: parent.width
-                            anchors.top: parent.bottom
-                            visible: charactersTabBar.tabIndex === index
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: charactersTabBar.tabIndex = index
-                        }
-                    }
-                }
+                name: "Characters"
+                tabs: ["List", "Relationships"]
             }
 
             Item {
@@ -1221,7 +1304,6 @@ Rectangle {
                     onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
                 }
             }
-
         }
     }
 
@@ -1236,46 +1318,15 @@ Rectangle {
 
             signal characterDoubleClicked(string characterName)
 
-            Row {
+            TextTabBar {
                 id: characterTabBar
-                spacing: 10
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                property int tabIndex: characterNotesTabIndex
-                onTabIndexChanged: characterNotesTabIndex = tabIndex
-
-                Text {
-                    font.pointSize: idealAppFontMetrics.font.pointSize
-                    font.family: idealAppFontMetrics.font.family
-                    font.capitalization: Font.AllUppercase
-                    font.bold: true
-                    text: character.name + ": "
-                    rightPadding: 10
-                }
-
-                Repeater {
-                    model: ["Information", "Relationships", "Notes"]
-
-                    Text {
-                        font: idealAppFontMetrics.font
-                        color: characterTabBar.tabIndex === index ? accentColors.c900.background : primaryColors.c900.background
-                        text: modelData
-
-                        Rectangle {
-                            height: 1
-                            color: accentColors.c900.background
-                            width: parent.width
-                            anchors.top: parent.bottom
-                            visible: characterTabBar.tabIndex === index
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: characterTabBar.tabIndex = index
-                        }
-                    }
-                }
+                tabIndex: charactersNotesTabIndex
+                onTabIndexChanged: charactersNotesTabIndex = tabIndex
+                name: character.name
+                tabs: ["Information", "Relationships", "Notes"]
             }
 
             Item {
@@ -1604,8 +1655,8 @@ Rectangle {
 
                     function prepare() {
                         if(visible) {
-                            structure = scriteDocument.structure
                             character = characterNotes.character
+                            structure = scriteDocument.structure
                             showBusyIndicator = false
                         }
                     }
