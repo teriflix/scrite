@@ -503,7 +503,7 @@ Rectangle {
                                 onClicked: {
                                     scriteDocument.screenplay.currentElementIndex = -1
                                     if(!scriteDocument.readOnly)
-                                        scriteDocument.createNewScene()
+                                        scriteDocument.createNewScene(true)
                                 }
                             }
 

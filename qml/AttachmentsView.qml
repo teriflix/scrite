@@ -20,7 +20,7 @@ import Scrite 1.0
 ListView {
     id: attachmentsView
     property Attachments attachments
-    property real delegateSize: orientation === ListView.Horizontal ? height : width
+    readonly property real delegateSize: 83
     property bool readonly: scriteDocument.readOnly
     orientation: ListView.Horizontal
     model: attachments
@@ -31,6 +31,7 @@ ListView {
     clip: true
     highlightMoveDuration: 0
     highlightResizeDuration: 0
+    height: scrollBarVisible ? 100 : 83
 
     Rectangle {
         anchors.fill: parent
@@ -85,6 +86,7 @@ ListView {
 
         ToolTip.text: objectItem.originalFileName
         ToolTip.visible: itemMouseArea.containsMouse
+        ToolTip.delay: 1000
 
         MouseArea {
             id: itemMouseArea
@@ -109,6 +111,21 @@ ListView {
             anchors.centerIn: parent
             onClicked: if(!readonly) fileDialog.open()
             visible: !readonly
+        }
+    }
+
+    property bool scrollBarVisible: contentWidth > width
+    ScrollBar.horizontal: ScrollBar {
+        policy: attachmentsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+        minimumSize: 0.1
+        palette {
+            mid: Qt.rgba(0,0,0,0.25)
+            dark: Qt.rgba(0,0,0,0.75)
+        }
+        opacity: active ? 1 : 0.2
+        Behavior on opacity {
+            enabled: screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 250 }
         }
     }
 

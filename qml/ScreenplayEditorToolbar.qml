@@ -115,14 +115,17 @@ Row {
             return -1
 
         ++idx
-        while(idx < scriteDocument.screenplay.elementCount) {
-            var e = scriteDocument.screenplay.elementAt(idx)
-            if(e === null)
-                break
-            if(e.elementType === ScreenplayElement.BreakElementType)
-                ++idx
-            else
-                break
+
+        if(mainTabBar.currentIndex == 0 || mainUndoStack.screenplayEditorActive) {
+            while(idx < scriteDocument.screenplay.elementCount) {
+                var e = scriteDocument.screenplay.elementAt(idx)
+                if(e === null)
+                    break
+                if(e.elementType === ScreenplayElement.BreakElementType)
+                    ++idx
+                else
+                    break
+            }
         }
 
         return idx
@@ -176,7 +179,8 @@ Row {
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
         onClicked: {
             requestScreenplayEditor()
-            scriteDocument.createNewScene()
+            if(!scriteDocument.readOnly)
+                scriteDocument.createNewScene(mainTabBar.currentIndex > 0 ? mainUndoStack.screenplayEditorActive : false)
         }
 
         ShortcutsModelItem.group: "Edit"

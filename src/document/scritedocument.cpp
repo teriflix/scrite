@@ -450,7 +450,9 @@ bool ScriteDocument::isEmpty() const
     const int objectCount = m_structure->elementCount() +
                             m_structure->annotationCount() +
                             m_screenplay->elementCount() +
-                            m_structure->notes()->noteCount();
+                            m_structure->notes()->noteCount() +
+                            m_structure->characterCount() +
+                            m_structure->attachments()->attachmentCount();
     const bool ret = objectCount == 0 && m_screenplay->isEmpty();
     return ret;
 }
@@ -524,7 +526,13 @@ void ScriteDocument::addToSpellCheckIgnoreList(const QString &word)
     emit spellCheckIgnoreListChanged();
 }
 
-Scene *ScriteDocument::createNewScene()
+/**
+When createNewScene() is called as a because of Ctrl+Shift+N shortcut key then
+a new scene must be created after all act-breaks. (fuzzyScreenplayInsert = true)
+
+Otherwise it must add a new scene after the current scene in screenplay.
+*/
+Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
 {
     QScopedValueRollback<bool> createNewSceneRollback(m_inCreateNewScene, true);
 
@@ -558,7 +566,7 @@ Scene *ScriteDocument::createNewScene()
     m_structure->addElement(newStructureElement);
 
     const bool asLastScene = m_screenplay->currentElementIndex() < 0 ||
-                            (m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
+                            (fuzzyScreenplayInsert && m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
 
     ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
     newScreenplayElement->setScene(scene);

@@ -216,7 +216,7 @@ public:
 
     // This function adds a new scene to both structure and screenplay
     // and inserts it right after the current element in both.
-    Q_INVOKABLE Scene *createNewScene();
+    Q_INVOKABLE Scene *createNewScene(bool fuzzyScreenplayInsert=true);
     Q_SIGNAL void newSceneCreated(Scene *scene, int screenplayIndex);
 
     Q_PROPERTY(bool modified READ isModified NOTIFY modifiedChanged)

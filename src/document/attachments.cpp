@@ -60,7 +60,8 @@ Attachment::Attachment(QObject *parent)
 
 Attachment::~Attachment()
 {
-    QFile::remove(m_anonFilePath);
+    if(!m_anonFilePath.isEmpty() && QFile::exists(m_anonFilePath))
+        QFile::remove(m_anonFilePath);
     m_anonFilePath = QString();
 
     if(m_removeFileOnDelete)
@@ -237,6 +238,7 @@ Attachments::Attachments(QObject *parent)
 {
     connect(this, &Attachments::rowsMoved, this, &Attachments::attachmentsModified);
     connect(this, &Attachments::dataChanged, this, &Attachments::attachmentsModified);
+    connect(this, &Attachments::objectCountChanged, this, &Attachments::attachmentsModified);
     connect(this, &Attachments::objectCountChanged, this, &Attachments::attachmentCountChanged);
 }
 

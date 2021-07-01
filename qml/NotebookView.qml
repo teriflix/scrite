@@ -39,25 +39,36 @@ Rectangle {
             switchTo(character.notes)
     }
 
-    function switchTo(object) {
-        notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(object) )
+    function switchTo(item) {
+        if(typeof item === "string")
+            notebookTree.setCurrentIndex( notebookTree.model.findModelIndexForTopLevelItem(item) )
+        else
+            notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(item) )
     }
 
     NotebookModel {
         id: notebookModel
         document: scriteDocument.loading ? null : scriteDocument
 
-        onAboutToReloadScenes: noteCurrentObject()
-        onJustReloadedScenes: restoreCurrentObject()
+        onAboutToReloadScenes: noteCurrentItem()
+        onJustReloadedScenes: restoreCurrentItem()
+        onAboutToReloadCharacters: noteCurrentItem()
+        onJustReloadedCharacters: restoreCurrentItem()
 
-        property var currentObject
-        function noteCurrentObject() {
-            currentObject = notebookTree.currentData.notebookItemObject
+        property var preferredItem
+        property var currentItem
+
+        function noteCurrentItem() {
+            currentItem = notebookTree.currentData.notebookItemObject
         }
 
-        function restoreCurrentObject() {
-            switchTo(currentObject)
-            currentObject = null
+        function restoreCurrentItem() {
+            if(preferredItem)
+                switchTo(preferredItem)
+            else
+                switchTo(currentItem)
+            currentItem = null
+            preferredItem = null
         }
     }
 
@@ -203,6 +214,10 @@ Rectangle {
                         if(styleData.value.notebookItemType === NotebookModel.NoteType) {
                             noteContextMenu.note = styleData.value.notebookItemObject
                             noteContextMenu.popup()
+                        } else if(styleData.value.notebookItemType === NotebookModel.NotesType &&
+                                  styleData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
+                            characterContextMenu.character = styleData.value.notebookItemObject.character
+                            characterContextMenu.popup()
                         }
                     }
                 }
@@ -215,6 +230,31 @@ Rectangle {
                 resizable: false
             }
             onDoubleClicked: {
+                var makeSceneCurrent = function(notes) {
+                    if(notes.ownerType === Notes.SceneOwner) {
+                        var scene = notes.owner
+                        var idxes = scene.screenplayElementIndexList
+                        if(idxes.length > 0)
+                            scriteDocument.screenplay.currentElementIndex = idxes[0]
+                    }
+                }
+
+                var indexData = notebookModel.modelIndexData(index)
+                switch(indexData.notebookItemType) {
+                case NotebookModel.EpisodeBreakType:
+                case NotebookModel.ActBreakType:
+                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.indexOfElement(indexData.notebookItemObject)
+                    break
+                case NotebookModel.NotesType:
+                    makeSceneCurrent(indexData.notebookItemObject)
+                    break
+                case NotebookModel.NoteType:
+                    makeSceneCurrent(indexData.notebookItemObject.notes)
+                    break
+                default:
+                    break
+                }
+
                 if(isExpanded(index))
                     collapse(index)
                 else
@@ -315,12 +355,6 @@ Rectangle {
 
         Item {
             property var componentData
-
-            Text {
-                anchors.centerIn: parent
-                text: "Unknown"
-                font.pointSize: app.idealFontPointSize
-            }
         }
     }
 
@@ -414,7 +448,6 @@ Rectangle {
                         AttachmentsView {
                             id: sceneAttachments
                             width: parent.width
-                            height: 80
                             attachments: scene.attachments
                         }
                     }
@@ -449,12 +482,12 @@ Rectangle {
                 }
 
                 Loader {
-                    visible: sceneTabBar.tabIndex === 2
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
                     sourceComponent: notesComponent
-                    active: componentData
-                    onLoaded: item.componentData = sceneNotesItem.componentData
+                    active: sceneNotesItem.notes
+                    onLoaded: item.notes = sceneNotesItem.notes
+                    visible: sceneTabBar.tabIndex === 2
                 }
             }
         }
@@ -501,7 +534,7 @@ Rectangle {
                                 id: noteVisual
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#E0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
+                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
                                 border.width: 1
                                 border.color: app.isLightColor(color) ? "black" : objectItem.color
 
@@ -683,7 +716,6 @@ Rectangle {
                 id: attachmentsArea
                 attachments: note.attachments
                 orientation: ListView.Horizontal
-                height: 80
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
@@ -747,6 +779,7 @@ Rectangle {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             font.pointSize: app.idealFontPointSize + 5
                             placeholderText: breakKind + " Name"
+                            onTextChanged: breakElement.breakSubtitle = text
                         }
                     }
 
@@ -775,7 +808,6 @@ Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        height: 80
                         attachments: breakElement.attachments
                     }
                 }
@@ -1180,8 +1212,9 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: charactersView.currentIndex === index ? primaryColors.highlight.background : primaryColors.c10.background
-                                border { width: 1; color: primaryColors.borderColor }
+                                color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : "#E7FFFFFF")
+                                border.width: charactersView.currentIndex === index ? 3 : 1
+                                border.color: app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "black" : primaryColors.borderColor) : character.color
 
                                 Row {
                                     anchors.fill: parent
@@ -1232,14 +1265,22 @@ Rectangle {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: charactersView.currentIndex = index
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: {
+                                    charactersView.currentIndex = index
+                                    if(mouse.button === Qt.RightButton) {
+                                        characterContextMenu.character = character
+                                        characterContextMenu.popup()
+                                    }
+                                }
                                 onDoubleClicked: switchTo(character.notes)
                             }
                         }
 
-                        property int nrVisibleItems: Math.ceil(height/120)
-                        header: model.objectCount < nrVisibleItems ? null : addNewCharacter
-                        footer: addNewCharacter
+                        property int nrVisibleRows: Math.ceil((height-60)/cellHeight)
+                        property int nrRows: Math.ceil(model.objectCount/nrColumns)
+                        footer: nrRows > nrVisibleRows ? addNewCharacter : null
+                        header: addNewCharacter
                     }
 
                     Component {
@@ -1252,13 +1293,34 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: primaryColors.windowColor
+                                color: app.translucent(primaryColors.windowColor, 0.5)
                                 border { width: 1; color: primaryColors.borderColor }
 
-                                ToolButton3 {
-                                    iconSource: "../icons/content/person_add.png"
+                                Row {
+                                    spacing: 10
+                                    width: parent.width-20
                                     anchors.centerIn: parent
-                                    ToolTip.text: "Add Character"
+
+                                    TextField2 {
+                                        id: characterNameField
+                                        completionStrings: scriteDocument.structure.characterNames
+                                        width: parent.width - characterAddButton.width - parent.spacing
+                                        placeholderText: "Enter character name to search/add."
+                                        label: ""
+                                        onReturnPressed: characterAddButton.click()
+                                    }
+
+                                    ToolButton3 {
+                                        id: characterAddButton
+                                        iconSource: "../icons/content/person_add.png"
+                                        ToolTip.text: "Add Character"
+                                        onClicked: {
+                                            var chName = characterNameField.text
+                                            var ch = scriteDocument.structure.addCharacter(chName)
+                                            if(ch)
+                                                notebookModel.preferredItem = ch.notes
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1315,6 +1377,7 @@ Rectangle {
             id: characterNotes
             property var componentData
             property Character character: componentData.notebookItemObject.character
+            color: Qt.tint(character.color, "#e7ffffff")
 
             signal characterDoubleClicked(string characterName)
 
@@ -1352,7 +1415,8 @@ Rectangle {
 
                     Item {
                         width: Math.min(400, parent.width)
-                        height: parent.height
+                        anchors.top: parent.top
+                        anchors.bottom: attachmentsView.top
                         anchors.horizontalCenter: parent.horizontalCenter
 
                         Connections {
@@ -1617,7 +1681,7 @@ Rectangle {
                         id: characterQuickInfoViewScrollBar
                         anchors.right: parent.right
                         anchors.top: parent.top
-                        anchors.bottom: parent.bottom
+                        anchors.bottom: attachmentsView.top
                         policy: characterQuickInfoView.height < characterQuickInfoView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
                         minimumSize: 0.1
                         palette {
@@ -1629,6 +1693,19 @@ Rectangle {
                             enabled: screenplayEditorSettings.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
+                    }
+
+                    AttachmentsView {
+                        id: attachmentsView
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        attachments: character.attachments
+                    }
+
+                    AttachmentsDropArea2 {
+                        anchors.fill: parent
+                        target: character.attachments
                     }
                 }
 
@@ -1901,6 +1978,33 @@ Rectangle {
                 notes.removeNote(noteContextMenu.note)
                 switchTo(notes)
                 noteContextMenu.close()
+            }
+        }
+    }
+
+    Menu2 {
+        id: characterContextMenu
+        property Character character
+        enabled: character
+
+        onAboutToHide: character = null
+
+        ColorMenu {
+            title: "Character Color"
+            onMenuItemClicked: {
+                characterContextMenu.character.color = color
+                characterContextMenu.close()
+            }
+        }
+
+        MenuSeparator { }
+
+        MenuItem2 {
+            text: "Delete Character"
+            onClicked: {
+                notebookModel.preferredItem = "Characters"
+                scriteDocument.structure.removeCharacter(characterContextMenu.character)
+                characterContextMenu.close()
             }
         }
     }

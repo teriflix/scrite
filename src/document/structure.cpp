@@ -1098,6 +1098,7 @@ Character::Character(QObject *parent)
     connect(this, &Character::ageChanged, this, &Character::characterChanged);
     connect(this, &Character::nameChanged, this, &Character::characterChanged);
     connect(this, &Character::typeChanged, this, &Character::characterChanged);
+    connect(this, &Character::colorChanged, this, &Character::characterChanged);
     connect(this, &Character::weightChanged, this, &Character::characterChanged);
     connect(this, &Character::photosChanged, this, &Character::characterChanged);
     connect(this, &Character::heightChanged, this, &Character::characterChanged);
@@ -2093,6 +2094,8 @@ void Structure::addCharacter(Character *ptr)
 
     m_characters.append(ptr);
     emit characterCountChanged();
+
+    this->updateCharacterNamesLater();
 }
 
 void Structure::removeCharacter(Character *ptr)
@@ -2110,6 +2113,8 @@ void Structure::removeCharacter(Character *ptr)
     disconnect(ptr, &Character::characterChanged, this, &Structure::structureChanged);
 
     emit characterCountChanged();
+
+    this->updateCharacterNamesLater();
 
     if(ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
@@ -2148,6 +2153,8 @@ void Structure::setCharacters(const QList<Character *> &list)
 
     m_characters.assign(list2);
     emit characterCountChanged();
+
+    this->updateCharacterNamesLater();
 }
 
 void Structure::clearCharacters()
@@ -2368,6 +2375,8 @@ void Structure::setElements(const QList<StructureElement *> &list)
     this->setCurrentElementIndex(0);
     emit elementCountChanged();
     emit elementsChanged();
+
+    this->updateCharacterNamesLater();
 }
 
 StructureElement *Structure::elementAt(int index) const
@@ -3773,6 +3782,8 @@ void Structure::deserializeFromJson(const QJsonObject &json)
     const QJsonValue notes = json.value(QStringLiteral("notes"));
     if(notes.isArray())
         m_notes->loadOldNotes(notes.toArray());
+
+    this->updateCharacterNamesLater();
 }
 
 bool Structure::canSetPropertyFromObjectList(const QString &propName) const
@@ -3816,6 +3827,13 @@ void Structure::timerEvent(QTimerEvent *event)
     {
         m_locationHeadingsMapTimer.stop();
         this->updateLocationHeadingMap();
+        return;
+    }
+
+    if(m_updateCharacterNamesTimer.timerId() == event->timerId())
+    {
+        m_updateCharacterNamesTimer.stop();
+        this->updateCharacterNames();
         return;
     }
 
@@ -3956,13 +3974,41 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
 {
     if( m_characterElementMap.include(element) )
-        emit characterNamesChanged();
+        updateCharacterNamesLater();
 }
 
 void Structure::onAboutToRemoveSceneElement(SceneElement *element)
 {
     if( m_characterElementMap.remove(element) )
-        emit characterNamesChanged();
+        updateCharacterNamesLater();
+}
+
+void Structure::updateCharacterNames()
+{
+    QStringList names = m_characterElementMap.characterNames();
+
+    bool requiresSort = false;
+    const QList<Character*> characters = m_characters.list();
+    for(Character *character : characters)
+    {
+        const QString name = character->name();
+        if(!names.contains(name))
+        {
+            names.append(name);
+            requiresSort = true;
+        }
+    }
+
+    if(requiresSort)
+        std::sort(names.begin(), names.end());
+
+    m_characterNames = names;
+    emit characterNamesChanged();
+}
+
+void Structure::updateCharacterNamesLater()
+{
+    m_updateCharacterNamesTimer.start(0, this);
 }
 
 void Structure::staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr)

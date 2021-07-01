@@ -675,7 +675,8 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     emit elementCountChanged();
     emit elementsChanged();
 
-    if(ptr->elementType() == ScreenplayElement::SceneElementType && (this->scriteDocument() && !this->scriteDocument()->isLoading()))
+    if(/*ptr->elementType() == ScreenplayElement::SceneElementType && */
+       (this->scriteDocument() && !this->scriteDocument()->isLoading()) )
         this->setCurrentElementIndex(index);
 
     if(ptr->elementType() == ScreenplayElement::BreakElementType)

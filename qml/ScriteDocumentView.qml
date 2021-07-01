@@ -1361,7 +1361,11 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
-                visible: mainTabBar.currentIndex === 1 || mainTabBar.currentIndex === 0
+                visible: {
+                    var min = 0
+                    var max = workspaceSettings.showNotebookInStructure ? 1 : 2
+                    return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
+                }
             }
 
             Row {

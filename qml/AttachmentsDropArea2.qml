@@ -24,13 +24,21 @@ AttachmentsDropArea {
         visible: attachmentsDropArea.active
         color: app.translucent(primaryColors.c500.background, 0.5)
 
+        Rectangle {
+            anchors.fill: attachmentNotice
+            anchors.margins: -30
+            radius: 4
+            color: primaryColors.c700.background
+        }
+
         Text {
+            id: attachmentNotice
             anchors.centerIn: parent
             width: parent.width * 0.5
             wrapMode: Text.WordWrap
+            color: primaryColors.c700.text
             text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here." : ""
             horizontalAlignment: Text.AlignHCenter
-            color: primaryColors.c10.text
             font.pointSize: app.idealFontPointSize
         }
     }

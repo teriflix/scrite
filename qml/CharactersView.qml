@@ -66,6 +66,7 @@ Rectangle {
                     checkable: true
                     checked: selectedCharacters.indexOf(text) >= 0 || (charactersModel.arrayHasObjects ? arrayItem.added : false)
                     enabled: charactersModel.arrayHasObjects ? (arrayItem.added === false) : true
+                    opacity: enabled ? 1 : 0.5
                     text: charactersModel.arrayHasObjects ? arrayItem.name : arrayItem
                     onToggled: {
                         var chs = selectedCharacters
