@@ -31,6 +31,41 @@
 #include <QMimeData>
 #include <QJsonDocument>
 
+struct ParagraphMetrics
+{
+    // The following metrics are picked up from FinalDraft 12
+    const qreal leftMargin = 1.5; // inches
+    const qreal rightMargin = 7.69; // inches
+    const qreal topMargin = 0.80; // inches
+    const qreal bottomMargin = 0.80; // inches
+    const qreal contentWidth = rightMargin-leftMargin;
+    const QList<QVariantList> paragraphMetrics = {
+        { 1.50, 7.69, 1, QFont::MixedCase,    Qt::AlignLeft },  // SceneElement::Action,
+        { 3.56, 7.41, 1, QFont::AllUppercase, Qt::AlignLeft },  // SceneElement::Character,
+        { 2.56, 6.13, 0, QFont::MixedCase,    Qt::AlignLeft },  // SceneElement::Dialogue,
+        { 3.06, 5.63, 0, QFont::MixedCase,    Qt::AlignLeft },  // SceneElement::Parenthetical,
+        { 1.50, 7.69, 1, QFont::AllUppercase, Qt::AlignLeft },  // SceneElement::Shot,
+        { 5.63, 7.25, 1, QFont::AllUppercase, Qt::AlignRight }, // SceneElement::Transition,
+        { 1.50, 7.69, 1, QFont::AllUppercase, Qt::AlignLeft }   // SceneElement::Heading,
+    };
+
+    qreal leftMarginOf(int type) const {
+        return paragraphMetrics[type][0].toDouble();
+    }
+    qreal rightMarginOf(int type) const {
+        return paragraphMetrics[type][1].toDouble();
+    }
+    int linesBefore(int type) const {
+        return paragraphMetrics[type][2].toInt();
+    }
+    QFont::Capitalization fontCappingOf(int type) const {
+        return QFont::Capitalization(paragraphMetrics[type][3].toInt());
+    }
+    Qt::Alignment textAlignOf(int type) const {
+        return Qt::Alignment(paragraphMetrics[type][4].toInt());
+    }
+};
+
 static const int IsWordMisspelledProperty = QTextCharFormat::UserProperty+100;
 static const int WordSuggestionsProperty = IsWordMisspelledProperty+1;
 
@@ -495,10 +530,11 @@ void ScreenplayPageLayout::evaluateRects()
         this->setResolution(qt_defaultDpi());
 
     // Page margins
-    static const qreal leftMargin = 1.5; // inches
-    static const qreal topMargin = 1.0; // inches
-    static const qreal bottomMargin = 1.0; // inches
-    static const qreal contentWidth = 6.55; // inches
+    const ParagraphMetrics paraMetrics;
+    const qreal leftMargin = paraMetrics.leftMargin; // inches
+    const qreal topMargin = paraMetrics.topMargin; // inches
+    const qreal bottomMargin = paraMetrics.bottomMargin; // inches
+    const qreal contentWidth = paraMetrics.contentWidth; // inches
 
     const QPageSize pageSize(m_paperSize == A4 ? QPageSize::A4 : QPageSize::Letter);
     const QRectF paperRectIn = pageSize.rect(QPageSize::Inch);
@@ -567,7 +603,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
     });
 
     connect(TransliterationEngine::instance(),
-            &TransliterationEngine::preferredFontFamilyForLanguageChanged, [=] {
+            &TransliterationEngine::preferredFontFamilyForLanguageChanged, this, [=] {
         this->useUserSpecifiedFonts();
         emit formatChanged();
     });
@@ -756,22 +792,6 @@ void ScreenplayFormat::resetToDefaults()
 
     this->setSecondsPerPage(60);
 
-    /**
-      Here is how Final Draft formats its screenplays.
-
-      !!!!!! ALL PARAGRAPHS ARE LEFT ALIGNED !!!!!!
-
-      Paragraph Type | Starts From | Extends Upto | Spacing Before
-      ---------------|-------------|--------------|----------------
-      Scene Heading  | 1.50"       | 8.05"        | 2 Lines
-      Action         | 1.50"       | 8.05"        | 1 Line
-      Character      | 3.70"       | 7.36"        | 1 Line
-      Parenthetical  | 3.10"       | 5.63"        | 0 Lines
-      Dialogue       | 2.50"       | 6.55"        | 0 Lines
-      Transition     | 4.78"       | 8.05"        | 1 Lines
-      Shot           | 1.50"       | 7.6"         | 1 Lines
-      */
-
     const QString fontFamily = TransliterationEngine::instance()->preferredFontFamilyForLanguage(TransliterationEngine::English);
     this->setDefaultFont(QFont(fontFamily, 12));
     if(m_screen != nullptr)
@@ -794,42 +814,22 @@ void ScreenplayFormat::resetToDefaults()
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
         m_elementFormats.at(i)->resetToDefaults();
 
-    const qreal contentWidth = 6.55;
-    const qreal left = 1.50;
-    const qreal right = 8.05;
+    const ParagraphMetrics paraMetrics;
+    const qreal lm = paraMetrics.leftMargin;
+    const qreal rm = paraMetrics.rightMargin;
+    const qreal cw = paraMetrics.contentWidth;
 
-    m_elementFormats[SceneElement::Heading]->setLeftMargin( (1.5-left)/contentWidth );
-    m_elementFormats[SceneElement::Heading]->setRightMargin( (right-8.05)/contentWidth );
-    m_elementFormats[SceneElement::Heading]->setLineSpacingBefore(1);
-    m_elementFormats[SceneElement::Heading]->setFontCapitalization(QFont::AllUppercase);
+    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
+    {
+        const qreal plm = paraMetrics.leftMarginOf(i);
+        const qreal prm = paraMetrics.rightMarginOf(i);
 
-    m_elementFormats[SceneElement::Action]->setLeftMargin( (1.5-left)/contentWidth );
-    m_elementFormats[SceneElement::Action]->setRightMargin( (right-8.05)/contentWidth );
-    m_elementFormats[SceneElement::Action]->setLineSpacingBefore(1);
-
-    m_elementFormats[SceneElement::Character]->setLeftMargin( (3.7-left)/contentWidth );
-    m_elementFormats[SceneElement::Character]->setRightMargin( (right-7.36)/contentWidth );
-    m_elementFormats[SceneElement::Character]->setLineSpacingBefore(1);
-    m_elementFormats[SceneElement::Character]->setFontCapitalization(QFont::AllUppercase);
-
-    m_elementFormats[SceneElement::Parenthetical]->setLeftMargin( (3.1-left)/contentWidth );
-    m_elementFormats[SceneElement::Parenthetical]->setRightMargin( (right-5.63)/contentWidth );
-    m_elementFormats[SceneElement::Parenthetical]->setLineSpacingBefore(0);
-
-    m_elementFormats[SceneElement::Dialogue]->setLeftMargin( (2.5-left)/contentWidth );
-    m_elementFormats[SceneElement::Dialogue]->setRightMargin( (right-6.55)/contentWidth );
-    m_elementFormats[SceneElement::Dialogue]->setLineSpacingBefore(0);
-
-    m_elementFormats[SceneElement::Transition]->setLeftMargin( (4.78-left)/contentWidth );
-    m_elementFormats[SceneElement::Transition]->setRightMargin( (right-8.05)/contentWidth );
-    m_elementFormats[SceneElement::Transition]->setLineSpacingBefore(1);
-    m_elementFormats[SceneElement::Transition]->setFontCapitalization(QFont::AllUppercase);
-    m_elementFormats[SceneElement::Transition]->setTextAlignment(Qt::AlignRight);
-
-    m_elementFormats[SceneElement::Shot]->setLeftMargin( (1.5-left)/contentWidth );
-    m_elementFormats[SceneElement::Shot]->setRightMargin( (right-7.6)/contentWidth );
-    m_elementFormats[SceneElement::Shot]->setLineSpacingBefore(1);
-    m_elementFormats[SceneElement::Shot]->setFontCapitalization(QFont::AllUppercase);
+        m_elementFormats[i]->setLeftMargin( (plm-lm)/cw );
+        m_elementFormats[i]->setRightMargin( (rm-prm)/cw );
+        m_elementFormats[i]->setLineSpacingBefore( paraMetrics.linesBefore(i) );
+        m_elementFormats[i]->setFontCapitalization( paraMetrics.fontCappingOf(i) );
+        m_elementFormats[i]->setTextAlignment( paraMetrics.textAlignOf(i) );
+    }
 }
 
 void ScreenplayFormat::beginTransaction()
