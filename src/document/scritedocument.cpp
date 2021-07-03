@@ -190,7 +190,7 @@ QString ScriteDocumentBackups::relativeTime(const QDateTime &dt)
     if(nrDays >= 21 && nrDays < 28)
         return QStringLiteral("Three weeks ago");
 
-    if(nrDays >= 28 & nrDays < 60)
+    if(nrDays >= 28 && nrDays < 60)
         return QStringLiteral("Little more than a month ago");
 
     return QStringLiteral("More than two months ago");
