@@ -72,6 +72,12 @@ Rectangle {
         }
     }
 
+    Connections {
+        target: scriteDocument.screenplay
+        onElementInserted: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+        onElementMoved: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+    }
+
     FontMetrics {
         id: fontMetrics
         font.pointSize: Math.ceil(app.idealFontPointSize*0.75)
@@ -229,7 +235,8 @@ Rectangle {
                 movable: false
                 resizable: false
             }
-            onDoubleClicked: {
+
+            function activateScreenplayElement(_modelData) {
                 var makeSceneCurrent = function(notes) {
                     if(notes.ownerType === Notes.SceneOwner) {
                         var scene = notes.owner
@@ -239,22 +246,29 @@ Rectangle {
                     }
                 }
 
-                var indexData = notebookModel.modelIndexData(index)
-                switch(indexData.notebookItemType) {
+                switch(_modelData.notebookItemType) {
                 case NotebookModel.EpisodeBreakType:
                 case NotebookModel.ActBreakType:
-                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.indexOfElement(indexData.notebookItemObject)
+                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.indexOfElement(_modelData.notebookItemObject)
                     break
                 case NotebookModel.NotesType:
-                    makeSceneCurrent(indexData.notebookItemObject)
+                    makeSceneCurrent(_modelData.notebookItemObject)
                     break
                 case NotebookModel.NoteType:
-                    makeSceneCurrent(indexData.notebookItemObject.notes)
+                    makeSceneCurrent(_modelData.notebookItemObject.notes)
                     break
                 default:
                     break
                 }
+            }
 
+            onClicked: {
+                if(mainTabBar.currentIndex != 1)
+                    activateScreenplayElement( notebookModel.modelIndexData(index) )
+            }
+
+            onDoubleClicked: {
+                activateScreenplayElement( notebookModel.modelIndexData(index) )
                 if(isExpanded(index))
                     collapse(index)
                 else

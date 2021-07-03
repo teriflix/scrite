@@ -308,9 +308,9 @@ public:
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
     Q_SIGNAL void elementsChanged();
-    Q_SIGNAL void elementInserted(ScreenplayElement *ptr, int index);
-    Q_SIGNAL void elementRemoved(ScreenplayElement *ptr, int index);
-    Q_SIGNAL void elementMoved(ScreenplayElement *ptr, int from, int to);
+    Q_SIGNAL void elementInserted(ScreenplayElement *element, int index);
+    Q_SIGNAL void elementRemoved(ScreenplayElement *element, int index);
+    Q_SIGNAL void elementMoved(ScreenplayElement *element, int from, int to);
 
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
 
