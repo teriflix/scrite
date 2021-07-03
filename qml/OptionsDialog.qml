@@ -647,12 +647,13 @@ Item {
                             id: windowTabsExplainerText
                             width: parent.width
                             font.pointSize: app.idealFontPointSize-2
-                            text: "By default Scrite shows Screenplay, Structure and Notebook in separate tabs on the main window. If you have a small display, you can move Notebook into a separate tab. Otherwise its productive to see all aspects of your screenplay within the Structure tab itself."
+                            text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. (Note: This works when Scrite window size is atleast 1600 px wide.)"
                             wrapMode: Text.WordWrap
                         }
 
                         CheckBox2 {
-                            checked: workspaceSettings.showNotebookInStructure
+                            checked: ui.showNotebookInStructure
+                            enabled: ui.canShowNotebookInStructure
                             text: "Move Notebook into the Structure tab"
                             onToggled: workspaceSettings.showNotebookInStructure = checked
                         }

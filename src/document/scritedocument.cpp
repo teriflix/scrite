@@ -704,14 +704,6 @@ void ScriteDocument::reset()
     connect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
     connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
 
-#if 0
-    QEventLoop eventLoop;
-    QElapsedTimer timer;
-    timer.start();
-    while(timer.elapsed() < 1000)
-        eventLoop.processEvents();
-#endif
-
     emit justReset();
 }
 

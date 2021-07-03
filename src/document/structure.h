@@ -419,6 +419,11 @@ public:
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
+    Q_PROPERTY(QString summary READ summary WRITE setSummary NOTIFY summaryChanged)
+    void setSummary(const QString &val);
+    QString summary() const { return m_summary; }
+    Q_SIGNAL void summaryChanged();
+
     Q_PROPERTY(QAbstractListModel* relationshipsModel READ relationshipsModel CONSTANT STORED false)
     ObjectListPropertyModel<Relationship *> *relationshipsModel() const { return &((const_cast<Character*>(this))->m_relationships); }
 
@@ -485,6 +490,7 @@ private:
     QString m_weight;
     QString m_height;
     QString m_gender;
+    QString m_summary;
     QString m_bodyType;
     QStringList m_photos;
     QString m_designation;

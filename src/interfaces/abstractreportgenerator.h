@@ -17,7 +17,6 @@
 #include "abstractdeviceio.h"
 #include "garbagecollector.h"
 
-#include <QEventLoop>
 #include <QTextDocument>
 
 class QPrinter;
@@ -96,7 +95,6 @@ private:
     Format m_format = AdobePDF;
     QString m_comment;
     QString m_watermark;
-    QEventLoop m_eventLoop;
 };
 
 #endif // ABSTRACTREPORTGENERATOR_H

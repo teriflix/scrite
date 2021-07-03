@@ -40,6 +40,14 @@ Item {
         font: format ? format.font2 : scriteDocument.formatting.defaultFont2
     }
 
+    property bool canShowNotebookInStructure: width > 1600
+    property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
+    onShowNotebookInStructureChanged: {
+        app.execLater(workspaceSettings, 100, function() {
+            mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
+        })
+    }
+
     Settings {
         id: workspaceSettings
         fileName: app.settingsFilePath
@@ -57,12 +65,6 @@ Item {
         property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
         property var customColors: []
-
-        onShowNotebookInStructureChanged: {
-            app.execLater(workspaceSettings, 100, function() {
-                mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
-            })
-        }
     }
 
     Settings {
@@ -224,7 +226,7 @@ Item {
         ShortcutsModelItem.enabled: enabled && mainTabBar.currentIndex !== 2
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.visible: enabled
-        enabled: !workspaceSettings.showNotebookInStructure
+        enabled: !ui.showNotebookInStructure
         onActivated: mainTabBar.activateTab(2)
     }
 
@@ -1312,7 +1314,7 @@ Item {
                                 text: "Notebook (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.activateTab(2)
                                 font.bold: mainTabBar.currentIndex === 2
-                                enabled: !workspaceSettings.showNotebookInStructure
+                                enabled: !ui.showNotebookInStructure
                             }
 
                             MenuItem2 {
@@ -1363,7 +1365,7 @@ Item {
                 editor: sceneEditor ? sceneEditor.editor : null
                 visible: {
                     var min = 0
-                    var max = workspaceSettings.showNotebookInStructure ? 1 : 2
+                    var max = ui.showNotebookInStructure ? 1 : 2
                     return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
                 }
             }
@@ -1416,7 +1418,7 @@ Item {
                 readonly property var tabs: [
                     { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true },
                     { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true },
-                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !workspaceSettings.showNotebookInStructure },
+                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !ui.showNotebookInStructure },
                     { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": true }
                 ]
                 property var currentTabP1: currentTabExtents.value.p1
@@ -1654,14 +1656,14 @@ Item {
             zoomLevelModifier: screenplayZoomLevelModifier
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
-                    if(workspaceSettings.showNotebookInStructure)
+                    if(ui.showNotebookInStructure)
                         return [{"name": "Character Notes", "description": "Create/switch to notes for the character in notebook"}]
                 }
                 return []
             }
             additionalSceneMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
-                    if(workspaceSettings.showNotebookInStructure)
+                    if(ui.showNotebookInStructure)
                         return ["Scene Notes"]
                 }
                 return []
@@ -1674,7 +1676,7 @@ Item {
             enableSceneListPanel: mainTabBar.currentIndex === 0
 
             onAdditionalCharacterMenuItemClicked: {
-                if(menuItemName === "Character Notes" && workspaceSettings.showNotebookInStructure) {
+                if(menuItemName === "Character Notes" && ui.showNotebookInStructure) {
                     var ch = scriteDocument.structure.findCharacter(characterName)
                     if(ch === null)
                         scriteDocument.structure.addCharacter(characterName)
@@ -1712,19 +1714,19 @@ Item {
                         SplitView.fillWidth: true
                         color: primaryColors.c10.background
                         border {
-                            width: workspaceSettings.showNotebookInStructure ? 0 : 1
+                            width: ui.showNotebookInStructure ? 0 : 1
                             color: primaryColors.borderColor
                         }
 
                         TabView3 {
                             id: structureEditorTabs
                             anchors.fill: parent
-                            tabNames: workspaceSettings.showNotebookInStructure ? ["Structure", "Notebook"] : ["Structure"]
+                            tabNames: ui.showNotebookInStructure ? ["Structure", "Notebook"] : ["Structure"]
                             tabColor: primaryColors.c700.background
-                            tabBarVisible: workspaceSettings.showNotebookInStructure
+                            tabBarVisible: ui.showNotebookInStructure
                             currentTabContent: Item {
                                 Announcement.onIncoming: {
-                                    if(workspaceSettings.showNotebookInStructure) {
+                                    if(ui.showNotebookInStructure) {
                                         if(structureEditorTabs.currentTabIndex === 0)
                                             structureEditorTabs.currentTabIndex = 1
 
@@ -1742,7 +1744,7 @@ Item {
                                 Loader {
                                     id: structureViewLoader
                                     anchors.fill: parent
-                                    visible: !workspaceSettings.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+                                    visible: !ui.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                     sourceComponent: StructureView { }
                                 }
 
@@ -1750,7 +1752,7 @@ Item {
                                     id: notebookViewLoader
                                     anchors.fill: parent
                                     active: false
-                                    visible: workspaceSettings.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                    visible: ui.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
                                     onVisibleChanged: {
                                         if(visible && !active)
                                             active = true
@@ -1908,7 +1910,7 @@ Item {
 
                     ScreenplayView {
                         anchors.fill: parent
-                        showNotesIcon: workspaceSettings.showNotebookInStructure
+                        showNotesIcon: ui.showNotebookInStructure
                     }
 
                     Rectangle {

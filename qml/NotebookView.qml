@@ -421,9 +421,10 @@ Rectangle {
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Title"
                             readOnly: scriteDocument.readOnly
-                            onTextChanged: scene.structureElement.title = text
+                            onEditingComplete: scene.structureElement.title = text
                             tabItem: sceneSynopsisField.textArea
                             backTabItem: sceneHeadingField
+                            font.capitalization: Font.AllUppercase
                         }
 
                         Rectangle {
@@ -439,7 +440,7 @@ Rectangle {
                                 text: scene.title
                                 placeholderText: "Scene Synopsis"
                                 readOnly: scriteDocument.readOnly
-                                onTextChanged: scene.title = title
+                                onTextChanged: scene.title = text
                                 undoRedoEnabled: true
                                 backTabItem: sceneTitleField
                             }
@@ -1413,294 +1414,349 @@ Rectangle {
                         result.accepted = true
                     }
 
-                    Item {
-                        width: Math.min(400, parent.width)
-                        anchors.top: parent.top
-                        anchors.bottom: attachmentsView.top
-                        anchors.horizontalCenter: parent.horizontalCenter
+                    Flickable {
+                        id: quickInfoFlickable
+                        clip: true
+                        anchors.fill: parent
+                        contentWidth: quickInfoFlickableContent.width
+                        contentHeight: quickInfoFlickableContent.height
 
-                        Connections {
-                            target: characterNotes
-                            onCharacterChanged: app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
-                        }
-                        Component.onCompleted: app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                        property bool scrollBarVisible: contentWidth > width
 
-                        FileDialog {
-                            id: fileDialog
-                            nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
-                            selectFolder: false
-                            selectMultiple: false
-                            sidebarVisible: true
-                            selectExisting: true
-                            folder: workspaceSettings.lastOpenPhotosFolderUrl
-                            onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
+                        Row {
+                            id: quickInfoFlickableContent
+                            width: Math.max(550, quickInfoFlickable.width)
+                            height: quickInfoFlickable.scrollBarVisible ? quickInfoFlickable.height-17 : quickInfoFlickable.height
 
-                            onAccepted: {
-                                if(fileUrl != "") {
-                                    character.addPhoto(app.urlToLocalFile(fileUrl))
-                                    photoSlides.currentIndex = character.photos.length - 1
+                            Item {
+                                id: characterQuickInfoArea
+                                width: 300
+                                height: parent.height
+
+                                Connections {
+                                    target: characterNotes
+                                    onCharacterChanged: app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                                }
+                                Component.onCompleted: app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+
+                                FileDialog {
+                                    id: fileDialog
+                                    nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
+                                    selectFolder: false
+                                    selectMultiple: false
+                                    sidebarVisible: true
+                                    selectExisting: true
+                                    folder: workspaceSettings.lastOpenPhotosFolderUrl
+                                    onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
+
+                                    onAccepted: {
+                                        if(fileUrl != "") {
+                                            character.addPhoto(app.urlToLocalFile(fileUrl))
+                                            photoSlides.currentIndex = character.photos.length - 1
+                                        }
+                                    }
+                                }
+
+                                TabSequenceManager {
+                                    id: characterInfoTabSequence
+                                    wrapAround: true
+                                }
+
+                                Flickable {
+                                    id: characterQuickInfoView
+                                    width: parent.width-20
+                                    height: Math.min(parent.height, contentHeight)
+                                    anchors.top: parent.top
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    contentWidth: characterQuickInfoViewContent.width
+                                    contentHeight: characterQuickInfoViewContent.height
+                                    clip: true
+                                    ScrollBar.vertical: characterQuickInfoViewScrollBar
+
+                                    Column {
+                                        id: characterQuickInfoViewContent
+                                        width: characterQuickInfoView.width
+                                        spacing: 10
+
+                                        Rectangle {
+                                            width: Math.min(parent.width, 300)
+                                            height: width
+                                            color: photoSlides.currentIndex === photoSlides.count-1 ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0.75)
+                                            border.width: 1
+                                            border.color: primaryColors.borderColor
+                                            anchors.horizontalCenter: parent.horizontalCenter
+
+                                            SwipeView {
+                                                id: photoSlides
+                                                anchors.fill: parent
+                                                anchors.margins: 2
+                                                clip: true
+                                                currentIndex: 0
+
+                                                Repeater {
+                                                    model: character.photos
+
+                                                    Image {
+                                                        width: photoSlides.width
+                                                        height: photoSlides.height
+                                                        fillMode: Image.PreserveAspectFit
+                                                        source: "file:///" + modelData
+                                                    }
+                                                }
+
+                                                Item {
+                                                    width: photoSlides.width
+                                                    height: photoSlides.height
+
+                                                    Button2 {
+                                                        anchors.centerIn: parent
+                                                        text: "Add Photo"
+                                                        onClicked: fileDialog.open()
+                                                        enabled: !scriteDocument.readOnly && photoSlides.count <= 6
+                                                    }
+                                                }
+                                            }
+
+                                            ToolButton3 {
+                                                anchors.verticalCenter: photoSlides.verticalCenter
+                                                anchors.left: parent.left
+                                                iconSource: "../icons/navigation/arrow_left_inverted.png"
+                                                enabled: photoSlides.currentIndex > 0
+                                                onClicked: photoSlides.currentIndex = Math.max(photoSlides.currentIndex-1, 0)
+                                            }
+
+                                            ToolButton3 {
+                                                anchors.verticalCenter: photoSlides.verticalCenter
+                                                anchors.right: parent.right
+                                                iconSource: "../icons/navigation/arrow_right_inverted.png"
+                                                enabled: photoSlides.currentIndex < photoSlides.count-1
+                                                onClicked: photoSlides.currentIndex = Math.min(photoSlides.currentIndex+1, photoSlides.count-1)
+                                            }
+
+                                            ToolButton3 {
+                                                anchors.top: parent.top
+                                                anchors.right: parent.right
+                                                iconSource: "../icons/action/delete_inverted.png"
+                                                visible: photoSlides.currentIndex < photoSlides.count-1
+                                                onClicked: {
+                                                    var ci = photoSlides.currentIndex
+                                                    character.removePhoto(photoSlides.currentIndex)
+                                                    Qt.callLater( function() { photoSlides.currentIndex = Math.min(ci,photoSlides.count-1) } )
+                                                }
+                                            }
+                                        }
+
+                                        PageIndicator {
+                                            count: photoSlides.count
+                                            currentIndex: photoSlides.currentIndex
+                                            onCurrentIndexChanged: photoSlides.currentIndex = currentIndex
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            interactive: true
+                                        }
+
+                                        TextField2 {
+                                            id: designationField
+                                            label: "Role / Designation:"
+                                            width: parent.width
+                                            labelAlwaysVisible: true
+                                            placeholderText: "Hero/Heroine/Villian/Other <max 50 letters>"
+                                            maximumLength: 50
+                                            text: character.designation
+                                            TabSequenceItem.sequence: 0
+                                            TabSequenceItem.manager: characterInfoTabSequence
+                                            onTextEdited: character.designation = text
+                                            enableTransliteration: true
+                                            readOnly: scriteDocument.readOnly
+                                        }
+
+                                        TextField2 {
+                                            id: aliasesField
+                                            label: "Aliases:"
+                                            width: parent.width
+                                            labelAlwaysVisible: true
+                                            placeholderText: "<max 100 letters>"
+                                            maximumLength: 50
+                                            text: character.aliases.join(", ")
+                                            TabSequenceItem.sequence: 1
+                                            TabSequenceItem.manager: characterInfoTabSequence
+                                            onEditingComplete: character.aliases = text.split(",")
+                                            enableTransliteration: true
+                                            readOnly: scriteDocument.readOnly
+                                        }
+
+                                        Row {
+                                            spacing: 10
+                                            width: parent.width
+
+                                            TextField2 {
+                                                id: typeField
+                                                label: "Type:"
+                                                width: (parent.width - parent.spacing)/2
+                                                labelAlwaysVisible: true
+                                                placeholderText: "Human/Animal/Robot <max 25 letters>"
+                                                maximumLength: 25
+                                                text: character.type
+                                                TabSequenceItem.sequence: 2
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onTextEdited: character.type = text
+                                                enableTransliteration: true
+                                                readOnly: scriteDocument.readOnly
+                                            }
+
+                                            TextField2 {
+                                                id: genderField
+                                                label: "Gender:"
+                                                width: (parent.width - parent.spacing)/2
+                                                labelAlwaysVisible: true
+                                                placeholderText: "<max 20 letters>"
+                                                maximumLength: 20
+                                                text: character.gender
+                                                TabSequenceItem.sequence: 3
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onTextEdited: character.gender = text
+                                                enableTransliteration: true
+                                                readOnly: scriteDocument.readOnly
+                                            }
+                                        }
+
+                                        Row {
+                                            spacing: 10
+                                            width: parent.width
+
+                                            TextField2 {
+                                                id: ageField
+                                                label: "Age:"
+                                                width: (parent.width - parent.spacing)/2
+                                                labelAlwaysVisible: true
+                                                placeholderText: "<max 20 letters>"
+                                                maximumLength: 20
+                                                text: character.age
+                                                TabSequenceItem.sequence: 4
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onTextEdited: character.age = text
+                                                enableTransliteration: true
+                                                readOnly: scriteDocument.readOnly
+                                            }
+
+                                            TextField2 {
+                                                id: bodyTypeField
+                                                label: "Body Type:"
+                                                width: (parent.width - parent.spacing)/2
+                                                labelAlwaysVisible: true
+                                                placeholderText: "<max 20 letters>"
+                                                maximumLength: 20
+                                                text: character.bodyType
+                                                TabSequenceItem.sequence: 5
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onTextEdited: character.bodyType = text
+                                                enableTransliteration: true
+                                                readOnly: scriteDocument.readOnly
+                                            }
+                                        }
+
+                                        Row {
+                                            spacing: 10
+                                            width: parent.width
+
+                                            TextField2 {
+                                                id: heightField
+                                                label: "Height:"
+                                                width: (parent.width - parent.spacing)/2
+                                                labelAlwaysVisible: true
+                                                placeholderText: "<max 20 letters>"
+                                                maximumLength: 20
+                                                text: character.height
+                                                TabSequenceItem.sequence: 6
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onTextEdited: character.height = text
+                                                enableTransliteration: true
+                                                readOnly: scriteDocument.readOnly
+                                            }
+
+                                            TextField2 {
+                                                id: weightField
+                                                label: "Weight:"
+                                                width: (parent.width - parent.spacing)/2
+                                                labelAlwaysVisible: true
+                                                placeholderText: "<max 20 letters>"
+                                                maximumLength: 20
+                                                text: character.weight
+                                                TabSequenceItem.sequence: 7
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onTextEdited: character.weight = text
+                                                enableTransliteration: true
+                                                readOnly: scriteDocument.readOnly
+                                            }
+                                        }
+                                    }
+                                }
+
+                                ScrollBar {
+                                    id: characterQuickInfoViewScrollBar
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    policy: characterQuickInfoView.height < characterQuickInfoView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                                    minimumSize: 0.1
+                                    palette {
+                                        mid: Qt.rgba(0,0,0,0.25)
+                                        dark: Qt.rgba(0,0,0,0.75)
+                                    }
+                                    opacity: active ? 1 : 0.2
+                                    Behavior on opacity {
+                                        enabled: screenplayEditorSettings.enableAnimations
+                                        NumberAnimation { duration: 250 }
+                                    }
                                 }
                             }
-                        }
 
-                        TabSequenceManager {
-                            id: characterInfoTabSequence
-                            wrapAround: true
-                        }
-
-                        Flickable {
-                            id: characterQuickInfoView
-                            width: parent.width
-                            height: Math.min(parent.height, contentHeight)
-                            anchors.centerIn: parent
-                            contentWidth: characterQuickInfoViewContent.width
-                            contentHeight: characterQuickInfoViewContent.height
-                            clip: true
-                            ScrollBar.vertical: characterQuickInfoViewScrollBar
-
-                            Column {
-                                id: characterQuickInfoViewContent
-                                width: characterQuickInfoView.width
-                                spacing: 10
+                            Item {
+                                width: parent.width - characterQuickInfoArea.width
+                                height: parent.height
 
                                 Rectangle {
-                                    width: Math.min(parent.width, 300)
-                                    height: width
-                                    color: photoSlides.currentIndex === photoSlides.count-1 ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0.75)
-                                    border.width: 1
-                                    border.color: primaryColors.borderColor
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    SwipeView {
-                                        id: photoSlides
-                                        anchors.fill: parent
-                                        anchors.margins: 2
-                                        clip: true
-                                        currentIndex: 0
-
-                                        Repeater {
-                                            model: character.photos
-
-                                            Image {
-                                                width: photoSlides.width
-                                                height: photoSlides.height
-                                                fillMode: Image.PreserveAspectFit
-                                                source: "file:///" + modelData
-                                            }
-                                        }
-
-                                        Item {
-                                            width: photoSlides.width
-                                            height: photoSlides.height
-
-                                            Button2 {
-                                                anchors.centerIn: parent
-                                                text: "Add Photo"
-                                                onClicked: fileDialog.open()
-                                                enabled: !scriteDocument.readOnly && photoSlides.count <= 6
-                                            }
-                                        }
-                                    }
-
-                                    ToolButton3 {
-                                        anchors.verticalCenter: photoSlides.verticalCenter
-                                        anchors.left: parent.left
-                                        iconSource: "../icons/navigation/arrow_left_inverted.png"
-                                        enabled: photoSlides.currentIndex > 0
-                                        onClicked: photoSlides.currentIndex = Math.max(photoSlides.currentIndex-1, 0)
-                                    }
-
-                                    ToolButton3 {
-                                        anchors.verticalCenter: photoSlides.verticalCenter
-                                        anchors.right: parent.right
-                                        iconSource: "../icons/navigation/arrow_right_inverted.png"
-                                        enabled: photoSlides.currentIndex < photoSlides.count-1
-                                        onClicked: photoSlides.currentIndex = Math.min(photoSlides.currentIndex+1, photoSlides.count-1)
-                                    }
-
-                                    ToolButton3 {
-                                        anchors.top: parent.top
-                                        anchors.right: parent.right
-                                        iconSource: "../icons/action/delete_inverted.png"
-                                        visible: photoSlides.currentIndex < photoSlides.count-1
-                                        onClicked: {
-                                            var ci = photoSlides.currentIndex
-                                            character.removePhoto(photoSlides.currentIndex)
-                                            Qt.callLater( function() { photoSlides.currentIndex = Math.min(ci,photoSlides.count-1) } )
-                                        }
-                                    }
+                                    anchors.fill: characterSummaryField
+                                    color: app.translucent(primaryColors.windowColor, 0.5)
+                                    border { width: 1; color: primaryColors.borderColor }
                                 }
 
-                                PageIndicator {
-                                    count: photoSlides.count
-                                    currentIndex: photoSlides.currentIndex
-                                    onCurrentIndexChanged: photoSlides.currentIndex = currentIndex
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    interactive: true
+                                FlickableTextArea {
+                                    id: characterSummaryField
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: attachmentsView.top
+                                    anchors.margins: 10
+                                    anchors.topMargin: 0
+                                    text: character.summary
+                                    onTextChanged: character.summary = text
+                                    placeholderText: "Character Summary"
                                 }
 
-                                TextField2 {
-                                    id: designationField
-                                    label: "Role / Designation:"
-                                    width: parent.width
-                                    labelAlwaysVisible: true
-                                    placeholderText: "Hero/Heroine/Villian/Other <max 50 letters>"
-                                    maximumLength: 50
-                                    text: character.designation
-                                    TabSequenceItem.sequence: 0
-                                    TabSequenceItem.manager: characterInfoTabSequence
-                                    onTextEdited: character.designation = text
-                                    enableTransliteration: true
-                                    readOnly: scriteDocument.readOnly
-                                }
-
-                                TextField2 {
-                                    id: aliasesField
-                                    label: "Aliases:"
-                                    width: parent.width
-                                    labelAlwaysVisible: true
-                                    placeholderText: "<max 100 letters>"
-                                    maximumLength: 50
-                                    text: character.aliases.join(", ")
-                                    TabSequenceItem.sequence: 1
-                                    TabSequenceItem.manager: characterInfoTabSequence
-                                    onEditingComplete: character.aliases = text.split(",")
-                                    enableTransliteration: true
-                                    readOnly: scriteDocument.readOnly
-                                }
-
-                                Row {
-                                    spacing: 10
-                                    width: parent.width
-
-                                    TextField2 {
-                                        id: typeField
-                                        label: "Type:"
-                                        width: (parent.width - parent.spacing)/2
-                                        labelAlwaysVisible: true
-                                        placeholderText: "Human/Animal/Robot <max 25 letters>"
-                                        maximumLength: 25
-                                        text: character.type
-                                        TabSequenceItem.sequence: 2
-                                        TabSequenceItem.manager: characterInfoTabSequence
-                                        onTextEdited: character.type = text
-                                        enableTransliteration: true
-                                        readOnly: scriteDocument.readOnly
-                                    }
-
-                                    TextField2 {
-                                        id: genderField
-                                        label: "Gender:"
-                                        width: (parent.width - parent.spacing)/2
-                                        labelAlwaysVisible: true
-                                        placeholderText: "<max 20 letters>"
-                                        maximumLength: 20
-                                        text: character.gender
-                                        TabSequenceItem.sequence: 3
-                                        TabSequenceItem.manager: characterInfoTabSequence
-                                        onTextEdited: character.gender = text
-                                        enableTransliteration: true
-                                        readOnly: scriteDocument.readOnly
-                                    }
-                                }
-
-                                Row {
-                                    spacing: 10
-                                    width: parent.width
-
-                                    TextField2 {
-                                        id: ageField
-                                        label: "Age:"
-                                        width: (parent.width - parent.spacing)/2
-                                        labelAlwaysVisible: true
-                                        placeholderText: "<max 20 letters>"
-                                        maximumLength: 20
-                                        text: character.age
-                                        TabSequenceItem.sequence: 4
-                                        TabSequenceItem.manager: characterInfoTabSequence
-                                        onTextEdited: character.age = text
-                                        enableTransliteration: true
-                                        readOnly: scriteDocument.readOnly
-                                    }
-
-                                    TextField2 {
-                                        id: bodyTypeField
-                                        label: "Body Type:"
-                                        width: (parent.width - parent.spacing)/2
-                                        labelAlwaysVisible: true
-                                        placeholderText: "<max 20 letters>"
-                                        maximumLength: 20
-                                        text: character.bodyType
-                                        TabSequenceItem.sequence: 5
-                                        TabSequenceItem.manager: characterInfoTabSequence
-                                        onTextEdited: character.bodyType = text
-                                        enableTransliteration: true
-                                        readOnly: scriteDocument.readOnly
-                                    }
-                                }
-
-                                Row {
-                                    spacing: 10
-                                    width: parent.width
-
-                                    TextField2 {
-                                        id: heightField
-                                        label: "Height:"
-                                        width: (parent.width - parent.spacing)/2
-                                        labelAlwaysVisible: true
-                                        placeholderText: "<max 20 letters>"
-                                        maximumLength: 20
-                                        text: character.height
-                                        TabSequenceItem.sequence: 6
-                                        TabSequenceItem.manager: characterInfoTabSequence
-                                        onTextEdited: character.height = text
-                                        enableTransliteration: true
-                                        readOnly: scriteDocument.readOnly
-                                    }
-
-                                    TextField2 {
-                                        id: weightField
-                                        label: "Weight:"
-                                        width: (parent.width - parent.spacing)/2
-                                        labelAlwaysVisible: true
-                                        placeholderText: "<max 20 letters>"
-                                        maximumLength: 20
-                                        text: character.weight
-                                        TabSequenceItem.sequence: 7
-                                        TabSequenceItem.manager: characterInfoTabSequence
-                                        onTextEdited: character.weight = text
-                                        enableTransliteration: true
-                                        readOnly: scriteDocument.readOnly
-                                    }
+                                AttachmentsView {
+                                    id: attachmentsView
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    anchors.margins: 10
+                                    attachments: character.attachments
                                 }
                             }
                         }
-                    }
 
-                    ScrollBar {
-                        id: characterQuickInfoViewScrollBar
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: attachmentsView.top
-                        policy: characterQuickInfoView.height < characterQuickInfoView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
+                        ScrollBar.horizontal: ScrollBar {
+                            policy: quickInfoFlickable.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+                            minimumSize: 0.1
+                            palette {
+                                mid: Qt.rgba(0,0,0,0.25)
+                                dark: Qt.rgba(0,0,0,0.75)
+                            }
+                            opacity: active ? 1 : 0.2
+                            Behavior on opacity {
+                                enabled: screenplayEditorSettings.enableAnimations
+                                NumberAnimation { duration: 250 }
+                            }
                         }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-                    }
-
-                    AttachmentsView {
-                        id: attachmentsView
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        attachments: character.attachments
                     }
 
                     AttachmentsDropArea2 {

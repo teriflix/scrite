@@ -1282,6 +1282,15 @@ void Character::setColor(const QColor &val)
     emit colorChanged();
 }
 
+void Character::setSummary(const QString &val)
+{
+    if(m_summary == val)
+        return;
+
+    m_summary = val;
+    emit summaryChanged();
+}
+
 QQmlListProperty<Relationship> Character::relationships()
 {
     return QQmlListProperty<Relationship>(

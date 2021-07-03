@@ -15,7 +15,6 @@
 #include "searchengine.h"
 
 #include <QSet>
-#include <QEventLoop>
 #include <QJsonObject>
 #include <QTextCursor>
 #include <QTimerEvent>
