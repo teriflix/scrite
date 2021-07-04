@@ -77,7 +77,7 @@ TextField {
     }
 
     UndoHandler {
-        enabled: !textField.readOnly && textField.activeFocus
+        enabled: undoRedoEnabled && !textField.readOnly && textField.activeFocus
         canUndo: textField.canUndo
         canRedo: textField.canRedo
         onUndoRequest: textField.undo()
@@ -176,13 +176,5 @@ TextField {
             currentIndex: completionModel.currentRow
             height: contentHeight
         }
-    }
-
-    UndoHandler {
-        enabled: undoRedoEnabled && parent.activeFocus && !parent.readOnly
-        canUndo: parent.canUndo
-        canRedo: parent.canRedo
-        onUndoRequest: parent.undo()
-        onRedoRequest: parent.redo()
     }
 }
