@@ -77,16 +77,17 @@ Rectangle {
         onElementInserted: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         onElementMoved: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         onCurrentElementIndexChanged: {
-            if(workspaceSettings.syncCurrentSceneOnNotebook) {
-                var spobj = scriteDocument.screenplay
-                var element = spobj.elementAt(spobj.currentElementIndex)
-                if(element.elementType === ScreenplayElement.BreakElementType)
-                    switchTo(element)
-                else
-                    switchTo(element.scene.notes)
-            }
+            if(workspaceSettings.syncCurrentSceneOnNotebook)
+                notebookTree.activateFromCurrentScreenplayElement()
         }
     }
+
+    Connections {
+        target: scriteDocument
+        onLoadingComplete: notebookTree.activateFromCurrentScreenplayElement()
+    }
+
+    Component.onCompleted: notebookTree.activateFromCurrentScreenplayElement()
 
     FontMetrics {
         id: fontMetrics
@@ -244,6 +245,15 @@ Rectangle {
                 width: 300
                 movable: false
                 resizable: false
+            }
+
+            function activateFromCurrentScreenplayElement() {
+                var spobj = scriteDocument.screenplay
+                var element = spobj.elementAt(spobj.currentElementIndex)
+                if(element.elementType === ScreenplayElement.BreakElementType)
+                    switchTo(element)
+                else
+                    switchTo(element.scene.notes)
             }
 
             function activateScreenplayElement(_modelData) {
@@ -1273,7 +1283,7 @@ Rectangle {
 
                                         Text {
                                             font.pointSize: app.idealFontPointSize - 2
-                                            text: [character.type, character.designation].join(", ")
+                                            text: [character.designation, character.type].join(", ")
                                             width: parent.width
                                             elide: Text.ElideRight
                                         }

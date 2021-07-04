@@ -53,17 +53,10 @@ Item {
         }
     }
 
-    ItemPositionMapper {
-        id: lastTabItemMapper
-        from: tabRepeater.count > 0 ? tabRepeater.itemAt( tabRepeater.count-1 ) : null
-        to: tabView
-    }
-
     Loader {
         id: cornerLoader
-        x: lastTabItemMapper.from ? lastTabItemMapper.mappedPosition.x + lastTabItemMapper.from.width : 0
-        y: 0
-        width: tabBar.width - x
+        anchors.left: tabBar.right
+        anchors.right: parent.right
         height: tabBar.height
         active: tabBar.visible
         visible: active

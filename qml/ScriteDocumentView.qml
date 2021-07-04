@@ -1770,6 +1770,7 @@ Item {
                                     ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
                                     checked: workspaceSettings.syncCurrentSceneOnNotebook
                                     onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
+                                    anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
