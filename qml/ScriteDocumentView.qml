@@ -56,6 +56,7 @@ Item {
         property real screenplayEditorWidth: -1
         property bool scriptalayIntroduced: false
         property bool showNotebookInStructure: true
+        property bool syncCurrentSceneOnNotebook: true
         property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
         property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
         property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
@@ -1758,6 +1759,18 @@ Item {
                                             active = true
                                     }
                                     sourceComponent: NotebookView { }
+                                }
+                            }
+
+                            cornerItem: Item {
+                                visible: structureEditorTabs.currentTabIndex === 1
+
+                                CheckBox2 {
+                                    text: "Sync Episode, Act & Scene"
+                                    ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
+                                    checked: workspaceSettings.syncCurrentSceneOnNotebook
+                                    onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
+                                    anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
                         }

@@ -73,9 +73,19 @@ Rectangle {
     }
 
     Connections {
-        target: scriteDocument.screenplay
+        target: screenplayAdapter.isSourceScreenplay ? scriteDocument.screenplay : null
         onElementInserted: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         onElementMoved: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+        onCurrentElementIndexChanged: {
+            if(workspaceSettings.syncCurrentSceneOnNotebook) {
+                var spobj = scriteDocument.screenplay
+                var element = spobj.elementAt(spobj.currentElementIndex)
+                if(element.elementType === ScreenplayElement.BreakElementType)
+                    switchTo(element)
+                else
+                    switchTo(element.scene.notes)
+            }
+        }
     }
 
     FontMetrics {
@@ -263,7 +273,7 @@ Rectangle {
             }
 
             onClicked: {
-                if(mainTabBar.currentIndex != 1)
+                if(mainTabBar.currentIndex != 1 || workspaceSettings.syncCurrentSceneOnNotebook)
                     activateScreenplayElement( notebookModel.modelIndexData(index) )
             }
 
@@ -308,7 +318,6 @@ Rectangle {
                 trackChangesOn: notebookContentLoader.currentNotebookItemId
                 from: false
                 to: true
-                delay: 10
             }
 
             sourceComponent: {

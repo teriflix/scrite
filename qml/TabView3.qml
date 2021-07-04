@@ -15,12 +15,16 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
+import Scrite 1.0
+
 Item {
+    id: tabView
     property var tabNames: ["Default"]
     property var tabColor: primaryColors.windowColor
     property alias currentTabIndex: tabBar.currentIndex
     property alias currentTabContent: tabContentLoader.sourceComponent
     property alias tabBarVisible: tabBar.visible
+    property alias cornerItem: cornerLoader.sourceComponent
 
     Row {
         id: tabBar
@@ -30,6 +34,7 @@ Item {
         property int currentIndex: 0
 
         Repeater {
+            id: tabRepeater
             model: tabNames
 
             TabBarTab {
@@ -46,6 +51,22 @@ Item {
                 onRequestActivation: tabBar.currentIndex = index
             }
         }
+    }
+
+    ItemPositionMapper {
+        id: lastTabItemMapper
+        from: tabRepeater.count > 0 ? tabRepeater.itemAt( tabRepeater.count-1 ) : null
+        to: tabView
+    }
+
+    Loader {
+        id: cornerLoader
+        x: lastTabItemMapper.from ? lastTabItemMapper.mappedPosition.x + lastTabItemMapper.from.width : 0
+        y: 0
+        width: tabBar.width - x
+        height: tabBar.height
+        active: tabBar.visible
+        visible: active
     }
 
     Rectangle {
