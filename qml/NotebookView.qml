@@ -1760,8 +1760,10 @@ Rectangle {
                                     anchors.left: parent.left
                                     anchors.right: parent.right
                                     anchors.bottom: attachmentsView.top
-                                    anchors.margins: 10
                                     anchors.topMargin: 0
+                                    anchors.leftMargin: 0
+                                    anchors.rightMargin: 10
+                                    anchors.bottomMargin: 10
                                     text: character.summary
                                     onTextChanged: character.summary = text
                                     placeholderText: "Character Summary"
@@ -1769,10 +1771,10 @@ Rectangle {
 
                                 AttachmentsView {
                                     id: attachmentsView
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
+                                    anchors.left: characterSummaryField.left
+                                    anchors.right: characterSummaryField.right
                                     anchors.bottom: parent.bottom
-                                    anchors.margins: 10
+                                    anchors.bottomMargin: 10
                                     attachments: character.attachments
                                 }
                             }
