@@ -401,6 +401,9 @@ Item {
         highlightFollowsCurrentItem: true
         highlightMoveDuration: 0
         highlightResizeDuration: 0
+        highlightRangeMode: FocusTracker.hasFocus ? ListView.NoHighlightRange : ListView.ApplyRange
+        preferredHighlightEnd: width*0.6
+        preferredHighlightBegin: width*0.2
 
         property bool mutiSelectionMode: false
 
@@ -474,7 +477,18 @@ Item {
 
                 return ret;
             }
-            property color sceneColor: element.scene ? element.scene.color : "white"
+            property color sceneColor: colorPalette.background
+            property var colorPalette: {
+                if(element.scene) {
+                    if(app.isLightColor(element.scene.color))
+                        return { "background": element.scene.color, "text": "black" }
+                    return { "background": element.scene.color, "text": "white" }
+                }
+                if(element.breakType === Screenplay.Episode)
+                    return accentColors.c700
+                return accentColors.c500
+            }
+
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
                    Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
             height: screenplayElementList.height
@@ -497,7 +511,7 @@ Item {
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 enabled: !dragArea.containsDrag
                 sourceComponent: Rectangle {
-                    color: Qt.tint(sceneColor, "#C0FFFFFF")
+                    color: element.scene ? Qt.tint(sceneColor, "#C0FFFFFF") : sceneColor
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
@@ -511,7 +525,7 @@ Item {
                         anchors.margins: 10
                         anchors.horizontalCenter: parent.horizontalCenter
                         visible: isBreakElement
-                        source: isEpisodeBreak ? "../icons/content/episode.png" : "../icons/content/act.png"
+                        source: isEpisodeBreak ? "../icons/content/episode_inverted.png" : "../icons/content/act_inverted.png"
                         width: 24; height: 24
                     }
 
@@ -525,20 +539,21 @@ Item {
                         anchors.rightMargin: 5
 
                         Text {
+                            text: sceneTitle
+                            color: element.scene ? "black" : colorPalette.text
+                            elide: Text.ElideRight
                             width: parent.width
                             height: parent.height
-                            lineHeight: 1.25
-                            text: sceneTitle
-                            elide: Text.ElideRight
-                            anchors.centerIn: parent
-                            font.bold: isBreakElement
-                            transformOrigin: Item.Center
-                            verticalAlignment: isBreakElement ? Text.AlignVCenter : Text.AlignTop
-                            horizontalAlignment: isBreakElement ? Text.AlignHCenter : Text.AlignLeft
-                            maximumLineCount: isBreakElement ? 2 : 5
-                            font.pointSize: 12
                             visible: isBreakElement ? true : width >= 80
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            font.bold: isBreakElement
+                            lineHeight: 1.25
+                            font.pointSize: 12
+                            transformOrigin: Item.Center
+                            anchors.centerIn: parent
+                            maximumLineCount: isBreakElement ? 2 : 5
+                            verticalAlignment: isBreakElement ? Text.AlignVCenter : Text.AlignTop
+                            horizontalAlignment: isBreakElement ? Text.AlignHCenter : Text.AlignLeft
                             font.capitalization: isBreakElement ? Font.AllUppercase : Font.MixedCase
                         }
                     }
@@ -677,6 +692,81 @@ Item {
             }
         }
     }
+
+    Loader {
+        anchors.fill: screenplayElementList
+        active: screenplayEditorSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
+        sourceComponent: Item {
+            id: highlightedItemOverlay
+
+            Image {
+                id: highlightBackdrop
+                opacity: 0.75*Math.max(scale-1.0,0)
+                transformOrigin: Item.Bottom
+            }
+
+            ResetOnChange {
+                trackChangesOn: screenplayElementList.currentIndex
+                from: false
+                to: true
+                onValueChanged: {
+                    if(value) {
+                        var ci = screenplayElementList.currentItem
+                        ci.grabToImage( function(result) {
+                            highlightBackdrop.source = result.url
+                            highlightAnimation.running = true
+                        }, Qt.size(ci.width*2,ci.height*2))
+                    } else
+                        highlightAnimation.running = false
+                }
+            }
+
+            SequentialAnimation {
+                id: highlightAnimation
+                running: false
+                loops: 1
+
+                ScriptAction {
+                    script: {
+                        screenplayView.clip = false
+
+                        var ci = screenplayElementList.currentItem
+                        var cipos = highlightedItemOverlay.mapFromItem(ci,0,0)
+                        highlightBackdrop.scale = 1
+                        highlightBackdrop.x = cipos.x
+                        highlightBackdrop.y = cipos.y
+                        highlightBackdrop.width = ci.width
+                        highlightBackdrop.height = ci.height
+                    }
+                }
+
+                NumberAnimation {
+                    target: highlightBackdrop
+                    property: "scale"
+                    from: 1; to: 2
+                    duration: 250
+                    easing.type: Easing.InBack
+                }
+
+                PauseAnimation {
+                    duration: 50
+                }
+
+                NumberAnimation {
+                    target: highlightBackdrop
+                    property: "scale"
+                    from: 2; to: 1
+                    duration: 250
+                    easing.type: Easing.InBack
+                }
+
+                ScriptAction {
+                    script: screenplayView.clip = true
+                }
+            }
+        }
+    }
+
 
     Menu2 {
         id: breakItemMenu

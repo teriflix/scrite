@@ -1767,7 +1767,10 @@ Item {
 
                                 CheckBox2 {
                                     text: "Sync Episode, Act & Scene"
+                                    hoverEnabled: true
                                     ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
+                                    ToolTip.delay: 1000
+                                    ToolTip.visible: hovered
                                     checked: workspaceSettings.syncCurrentSceneOnNotebook
                                     onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
                                     anchors.right: parent.right
