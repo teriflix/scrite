@@ -1829,6 +1829,15 @@ Item {
         }
     }
 
+    AttachmentsDropArea2 {
+        allowedType: Attachments.PhotosOnly
+        anchors.fill: canvasScroll
+        onDropped: {
+            var pos = canvas.mapFromItem(canvasScroll, mouse.x, mouse.y)
+            createNewImageAnnotation(pos.x, pos.y, attachment.filePath)
+        }
+    }
+
     Rectangle {
         id: statusBar
         height: 30
@@ -3461,7 +3470,7 @@ Item {
         }
     }
 
-    function createNewImageAnnotation(x, y) {
+    function createNewImageAnnotation(x, y, filePath) {
         if(scriteDocument.readOnly)
             return
 
@@ -3471,6 +3480,13 @@ Item {
         var annot = annotationObject.createObject(canvas)
         annot.type = "image"
         annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
+
+        if(filePath && typeof filePath === "string") {
+            var attrs = annot.attributes
+            attrs["image"] = annot.addImage(filePath)
+            annot.attributes = attrs
+        }
+
         scriteDocument.structure.addAnnotation(annot)
     }
 

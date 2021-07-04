@@ -1781,8 +1781,9 @@ void Annotation::setAttributes(const QJsonObject &val)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_attributes = val;
-    this->polishAttributes();
     emit attributesChanged();
+
+    this->polishAttributes();
 }
 
 void Annotation::setAttribute(const QString &key, const QJsonValue &value)
@@ -1900,6 +1901,7 @@ bool Annotation::event(QEvent *event)
 
 void Annotation::polishAttributes()
 {
+    bool attribsChanged = false;
     QJsonArray::const_iterator it = m_metaData.constBegin();
     QJsonArray::const_iterator end = m_metaData.constEnd();
     while(it != end)
@@ -1920,7 +1922,10 @@ void Annotation::polishAttributes()
 
         QJsonValue attrVal = m_attributes.value(key);
         if(attrVal.isUndefined())
+        {
             m_attributes.insert(key, meta.value(QStringLiteral("default")));
+            attribsChanged = true;
+        }
         else
         {
             const bool isNumber = meta.value(QStringLiteral("type")).toString() == QStringLiteral("number");
@@ -1930,12 +1935,18 @@ void Annotation::polishAttributes()
                 const qreal max = meta.value(QStringLiteral("max")).toDouble();
                 const qreal val = qBound(min, attrVal.toDouble(), max);
                 if(val != attrVal.toDouble())
+                {
                     m_attributes.insert(key, val);
+                    attribsChanged = true;
+                }
             }
         }
 
         ++it;
     }
+
+    if(attribsChanged)
+        emit attributesChanged();
 }
 
 void Annotation::onDfsAuction(const QString &filePath, int *claims)

@@ -545,6 +545,7 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
 {
     if(m_attachment != nullptr)
     {
+        this->setMouse(de->posF());
         m_allowDrop = true;
 
         emit dropped();
