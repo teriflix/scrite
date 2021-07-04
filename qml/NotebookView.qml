@@ -308,6 +308,7 @@ Rectangle {
                 trackChangesOn: notebookContentLoader.currentNotebookItemId
                 from: false
                 to: true
+                delay: 10
             }
 
             sourceComponent: {
@@ -1401,8 +1402,8 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                tabIndex: charactersNotesTabIndex
-                onTabIndexChanged: charactersNotesTabIndex = tabIndex
+                tabIndex: characterNotesTabIndex
+                onTabIndexChanged: characterNotesTabIndex = tabIndex
                 name: character.name
                 tabs: ["Information", "Relationships", "Notes"]
             }

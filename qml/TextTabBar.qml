@@ -59,6 +59,7 @@ Item {
         id: currentTabItemPositionMapper
         from: tabsRepeater.count > 0 ? tabsRepeater.itemAt(textTabBar.tabIndex) : null
         to: textTabBar
+        onMappedPositionChanged: Qt.callLater( function() { currentTabUnderline.placedOnce = true } )
     }
 
     Rectangle {
@@ -69,6 +70,15 @@ Item {
         width: currentTabItemPositionMapper.from.width
         anchors.top: tabsRow.bottom
         anchors.topMargin: idealAppFontMetrics.descent
+        property bool placedOnce: false
+        Behavior on x {
+            enabled: currentTabUnderline.placedOnce && screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 100 }
+        }
+        Behavior on width {
+            enabled: currentTabUnderline.placedOnce && screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 100 }
+        }
     }
 }
 
