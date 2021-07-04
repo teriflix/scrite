@@ -1808,20 +1808,27 @@ Rectangle {
                     showBusyIndicator: true
                     editRelationshipsEnabled: !scriteDocument.readOnly
                     onCharacterDoubleClicked:  {
+                        if(characterNotes.character.name === characterName) {
+                            doAddNewRelationship(chNodeItem)
+                            return
+                        }
+
                         var ch = scriteDocument.structure.findCharacter(characterName)
                         if(ch)
                             switchTo(ch.notes)
                     }
-                    onAddNewRelationshipRequest: {
-                        modalDialog.closeable = false
-                        modalDialog.popupSource = sourceItem
-                        modalDialog.arguments = character
-                        modalDialog.sourceComponent = addRelationshipDialogComponent
-                        modalDialog.active = true
-                    }
+                    onAddNewRelationshipRequest: doAddNewRelationship(sourceItem)
                     onRemoveRelationshipWithRequest: {
                         var relationship = character.findRelationship(otherCharacter)
                         character.removeRelationship(relationship)
+                    }
+
+                    function doAddNewRelationship(psitem) {
+                        modalDialog.closeable = false
+                        modalDialog.popupSource = psitem
+                        modalDialog.arguments = character
+                        modalDialog.sourceComponent = addRelationshipDialogComponent
+                        modalDialog.active = true
                     }
 
                     function prepare() {

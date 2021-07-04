@@ -22,7 +22,7 @@ Rectangle {
     property bool editRelationshipsEnabled: false
     property bool showBusyIndicator: false
 
-    signal characterDoubleClicked(string characterName)
+    signal characterDoubleClicked(string characterName, Item chNodeItem)
     signal addNewRelationshipRequest(Item sourceItem)
     signal removeRelationshipWithRequest(Character otherCharacter, Item sourceItem)
 
@@ -304,8 +304,10 @@ Rectangle {
                                 canvas.reloadIfDirty()
                             }
                             onReleased: canvasScroll.interactive = true
-                            onDoubleClicked: characterDoubleClicked(character.name)
-                            ToolTip.text: "Double click to switch to " + character.name + " tab"
+                            onDoubleClicked: characterDoubleClicked(character.name, parent)
+                            ToolTip.text: (crgraph.character && character.name === crgraph.character.name) ?
+                                          "Double click to add a relationship to this character." :
+                                          "Double click to switch to " + character.name + "'s notes."
                             ToolTip.delay: 1500
                             ToolTip.visible: containsMouse
                         }
