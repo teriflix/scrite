@@ -1807,7 +1807,11 @@ Rectangle {
                     structure: null
                     showBusyIndicator: true
                     editRelationshipsEnabled: !scriteDocument.readOnly
-                    onCharacterDoubleClicked: characterNotes.characterDoubleClicked(characterName)
+                    onCharacterDoubleClicked:  {
+                        var ch = scriteDocument.structure.findCharacter(characterName)
+                        if(ch)
+                            switchTo(ch.notes)
+                    }
                     onAddNewRelationshipRequest: {
                         modalDialog.closeable = false
                         modalDialog.popupSource = sourceItem
