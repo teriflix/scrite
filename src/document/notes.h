@@ -15,11 +15,13 @@
 #define NOTES_H
 
 #include <QJsonValue>
-#include <QAbstractListModel>
 #include <QQmlListProperty>
+#include <QAbstractListModel>
 
 #include "attachments.h"
+#include "qobjectproperty.h"
 
+class Form;
 class Prop;
 class Notes;
 class Scene;
@@ -73,10 +75,21 @@ public:
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(QJsonObject metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged)
-    void setMetaData(const QJsonObject &val);
-    QJsonObject metaData() const { return m_metaData; }
-    Q_SIGNAL void metaDataChanged();
+    Q_PROPERTY(QString formId READ formId NOTIFY formIdChanged)
+    QString formId() const { return m_formId; }
+    Q_SIGNAL void formIdChanged();
+
+    Q_PROPERTY(Form* form READ form RESET resetForm NOTIFY formChanged)
+    Form* form() const { return m_form; }
+    Q_SIGNAL void formChanged();
+
+    Q_PROPERTY(QJsonObject formData READ formData WRITE setFormData NOTIFY formDataChanged)
+    void setFormData(const QJsonObject &val);
+    QJsonObject formData() const { return m_formData; }
+    Q_SIGNAL void formDataChanged();
+
+    Q_INVOKABLE void setFormData(const QString &key, const QJsonValue &value);
+    Q_INVOKABLE QJsonValue formData(const QString &key) const;
 
     Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
     Attachments *attachments() const { return m_attachments; }
@@ -84,20 +97,26 @@ public:
     Q_SIGNAL void noteModified();
 
     // QObjectSerializer::Interface interface
+    void prepareForSerialization();
     bool canSerialize(const QMetaObject *metaObject, const QMetaProperty &metaProperty) const;
 
 private:
     void setType(Type val);
+    void setFormId(const QString &val);
+    void setForm(Form* val);
+    void resetForm();
     void addAttachment(Attachment *ptr);
 
 private:
     friend class Notes;
     QString m_title;
+    QString m_formId;
     QString m_summary;
     QJsonValue m_content;
-    QJsonObject m_metaData;
+    QJsonObject m_formData;
     QColor m_color = Qt::white;
     Type m_type = TextNoteType;
+    QObjectProperty<Form> m_form;
     Attachments *m_attachments = new Attachments(this);
 };
 
@@ -159,6 +178,7 @@ public:
     Q_SIGNAL void colorChanged();
 
     Q_INVOKABLE Note *addTextNote();
+    Q_INVOKABLE Note *addFormNote(const QString &id);
     Q_INVOKABLE void removeNote(Note *ptr);
     Q_INVOKABLE Note *noteAt(int index) const;
     Q_INVOKABLE Note *firstNote() const { return this->noteAt(0); }

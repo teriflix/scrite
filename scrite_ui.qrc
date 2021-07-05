@@ -69,5 +69,7 @@
         <file>qml/FlickableTextArea.qml</file>
         <file>qml/AttachmentsDropArea2.qml</file>
         <file>qml/TextTabBar.qml</file>
+        <file>qml/FormField.qml</file>
+        <file>qml/Form.qml</file>
     </qresource>
 </RCC>

@@ -13,6 +13,7 @@
 
 #include "scritedocument.h"
 
+#include "form.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "aggregation.h"
@@ -406,6 +407,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
                   m_screenplay(this, "screenplay"),
                   m_formatting(this, "formatting"),
                   m_printFormat(this, "printFormat"),
+                  m_forms(this, "forms"),
                   m_evaluateStructureElementSequenceTimer("ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
     this->reset();
@@ -524,6 +526,45 @@ void ScriteDocument::addToSpellCheckIgnoreList(const QString &word)
     m_spellCheckIgnoreList.append(word);
     std::sort(m_spellCheckIgnoreList.begin(), m_spellCheckIgnoreList.end());
     emit spellCheckIgnoreListChanged();
+}
+
+Forms *ScriteDocument::globalForms() const
+{
+    return Forms::global();
+}
+
+Form *ScriteDocument::requestForm(const QString &id)
+{
+    Form *ret = m_forms->findForm(id);
+    if(ret)
+    {
+        ret->ref();
+        return ret;
+    }
+
+    ret = Forms::global()->findForm(id);
+    if(ret)
+    {
+        const QJsonObject fjs = QObjectSerializer::toJson(ret);
+        ret = m_forms->addForm(fjs);
+        ret->ref();
+        m_forms->append(ret);
+    }
+
+    return ret;
+}
+
+void ScriteDocument::releaseForm(Form *form)
+{
+    const int index = form == nullptr ? -1 : m_forms->indexOf(form);
+    if(index < 0)
+        return;
+
+    if(form->deref() <= 0)
+    {
+        m_forms->removeAt(index);
+        form->deleteLater();
+    }
 }
 
 /**
@@ -679,6 +720,7 @@ void ScriteDocument::reset()
 
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
+    this->setForms(new Forms(this));
     this->setSpellCheckIgnoreList(QStringList());
     this->setFileName(QString());
     this->setUserData(QJsonObject());
@@ -1326,6 +1368,15 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
         m_printFormat->setParent(this);
 
     emit printFormatChanged();
+}
+
+void ScriteDocument::setForms(Forms *val)
+{
+    if(m_forms == val)
+        return;
+
+    m_forms = val;
+    emit formsChanged();
 }
 
 void ScriteDocument::evaluateStructureElementSequence()

@@ -11,23 +11,26 @@
 **
 ****************************************************************************/
 
+#include "form.h"
 #include "notes.h"
 #include "scene.h"
 #include "undoredo.h"
 #include "structure.h"
 #include "screenplay.h"
 #include "timeprofiler.h"
+#include "scritedocument.h"
 
 #include <QSet>
 
 Note::Note(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_form(this, "form")
 {
     connect(this, &Note::typeChanged, this, &Note::noteModified);
     connect(this, &Note::titleChanged, this, &Note::noteModified);
     connect(this, &Note::summaryChanged, this, &Note::noteModified);
     connect(this, &Note::contentChanged, this, &Note::noteModified);
-    connect(this, &Note::metaDataChanged, this, &Note::noteModified);
+    connect(this, &Note::formDataChanged, this, &Note::noteModified);
     connect(m_attachments, &Attachments::attachmentsModified, this, &Note::noteModified);
 }
 
@@ -48,6 +51,39 @@ void Note::setType(Type val)
 
     m_type = val;
     emit typeChanged();
+}
+
+void Note::setForm(Form *val)
+{
+    if(m_form == val)
+        return;
+
+    if(!m_form.isNull())
+        ScriteDocument::instance()->releaseForm(m_form);
+
+    m_form = val;
+
+    if(!m_form.isNull())
+    {
+        this->setTitle(m_form->title());
+        this->setSummary(m_form->subtitle());
+
+        m_formData = m_form->formDataTemplate();
+        emit formDataChanged();
+    }
+    else
+    {
+        m_formData = QJsonObject();
+        emit formDataChanged();
+    }
+
+    emit formChanged();
+}
+
+void Note::resetForm()
+{
+    m_form = nullptr;
+    emit formChanged();
 }
 
 void Note::setTitle(const QString &val)
@@ -91,13 +127,49 @@ void Note::setColor(const QColor &val)
     emit colorChanged();
 }
 
-void Note::setMetaData(const QJsonObject &val)
+void Note::setFormId(const QString &val)
 {
-    if(m_metaData == val)
+    QString val2 = val;
+    Form *form = ScriteDocument::instance()->requestForm(val2);
+    if(form == nullptr)
+        val2.clear();
+
+    if(m_formId == val2)
         return;
 
-    m_metaData = val;
-    emit metaDataChanged();
+    m_formId = val2;
+    emit formIdChanged();
+
+    this->setForm(form);
+}
+
+void Note::setFormData(const QJsonObject &val)
+{
+    if(m_formData == val)
+        return;
+
+    m_formData = val;
+    emit formDataChanged();
+}
+
+void Note::setFormData(const QString &key, const QJsonValue &value)
+{
+    if(m_formData.value(key) == value)
+        return;
+
+    m_formData.insert(key, value);
+    emit formDataChanged();
+}
+
+QJsonValue Note::formData(const QString &key) const
+{
+    return m_formData.value(key);
+}
+
+void Note::prepareForSerialization()
+{
+    if(!m_form.isNull())
+        m_form->validateFormData(m_formData);
 }
 
 bool Note::canSerialize(const QMetaObject *metaObject, const QMetaProperty &metaProperty) const
@@ -105,7 +177,7 @@ bool Note::canSerialize(const QMetaObject *metaObject, const QMetaProperty &meta
     if(!this->metaObject()->inherits(metaObject))
         return false;
 
-    static const int propIndex = this->metaObject()->indexOfProperty("metaData");
+    static const int propIndex = this->metaObject()->indexOfProperty("formData");
     if(propIndex >= 0 && metaProperty.propertyIndex() == propIndex)
         return m_type == FormNoteType;
 
@@ -276,6 +348,21 @@ Note *Notes::addTextNote()
 {
     Note *ptr = new Note(this);
     ptr->setType(Note::TextNoteType);
+    this->addNote(ptr);
+    return ptr;
+}
+
+Note *Notes::addFormNote(const QString &id)
+{
+    Note *ptr = new Note(this);
+    ptr->setType(Note::FormNoteType);
+    ptr->setFormId(id);
+    if(ptr->form() == nullptr)
+    {
+        delete ptr;
+        return nullptr;
+    }
+
     this->addNote(ptr);
     return ptr;
 }

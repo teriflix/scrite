@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "form.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "autoupdate.h"
@@ -1409,6 +1410,11 @@ void Application::sleep(int ms)
 
     while(timer.elapsed() < ms)
         eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents);
+}
+
+Forms *Application::forms() const
+{
+    return Forms::global();
 }
 
 void Application::initializeStandardColors(QQmlEngine *)

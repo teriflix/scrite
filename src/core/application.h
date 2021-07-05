@@ -33,6 +33,8 @@
 #include "objectlistpropertymodel.h"
 
 typedef QApplication QtApplicationClass;
+
+class Forms;
 class QSettings;
 class QQuickItem;
 class AutoUpdate;
@@ -246,6 +248,9 @@ public:
     Q_INVOKABLE static QString createUniqueId();
 
     Q_INVOKABLE void sleep(int ms);
+
+    Q_PROPERTY(Forms* forms READ forms CONSTANT)
+    Forms *forms() const;
 
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);

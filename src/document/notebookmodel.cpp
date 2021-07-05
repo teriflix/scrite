@@ -13,6 +13,7 @@
 
 #include "notebookmodel.h"
 
+#include "form.h"
 #include "notes.h"
 #include "scene.h"
 #include "structure.h"
@@ -142,6 +143,10 @@ NotebookModel::NotebookModel(QObject *parent)
     connect(&m_syncScenesTimer, &QTimer::timeout, this, &NotebookModel::syncScenes);
     connect(&m_syncCharactersTimer, &QTimer::timeout, this, &NotebookModel::syncCharacters);
     connect(this, &NotebookModel::dataChanged, this, &NotebookModel::onDataChanged);
+
+    // Ensure that we query the global forms object right away, so that the NotebookView.qml
+    // is capable of showing forms against characters.
+    Forms::global();
 }
 
 NotebookModel::~NotebookModel()

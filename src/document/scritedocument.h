@@ -27,6 +27,7 @@
 #include "qobjectserializer.h"
 #include "documentfilesystem.h"
 
+class Forms;
 class ScriteDocument;
 class AbstractExporter;
 class QFileSystemWatcher;
@@ -214,6 +215,16 @@ public:
 
     Q_INVOKABLE void addToSpellCheckIgnoreList(const QString &word);
 
+    Q_PROPERTY(Forms* forms READ forms NOTIFY formsChanged)
+    Forms* forms() const { return m_forms; }
+    Q_SIGNAL void formsChanged();
+
+    Q_PROPERTY(Forms *globalForms READ globalForms CONSTANT STORED false)
+    Forms *globalForms() const;
+
+    Form *requestForm(const QString &id);
+    void releaseForm(Form *form);
+
     // This function adds a new scene to both structure and screenplay
     // and inserts it right after the current element in both.
     Q_INVOKABLE Scene *createNewScene(bool fuzzyScreenplayInsert=true);
@@ -298,6 +309,7 @@ private:
     void setScreenplay(Screenplay* val);
     void setFormatting(ScreenplayFormat* val);
     void setPrintFormat(ScreenplayFormat *val);
+    void setForms(Forms* val);
     void evaluateStructureElementSequence();
     void evaluateStructureElementSequenceLater();
     void markAsModified();
@@ -350,6 +362,7 @@ private:
     ScriteDocumentBackups m_documentBackupsModel;
     QObjectProperty<ScreenplayFormat> m_formatting;
     QObjectProperty<ScreenplayFormat> m_printFormat;
+    QObjectProperty<Forms> m_forms;
     ExecLaterTimer m_evaluateStructureElementSequenceTimer;
     bool m_syncingStructureScreenplayCurrentIndex = false;
 

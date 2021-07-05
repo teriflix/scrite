@@ -31,17 +31,17 @@ QHash<int, QByteArray> ObjectListPropertyModelBase::roleNames() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SortedObjectListPropertyModel::SortedObjectListPropertyModel(QObject *parent)
+SortFilterObjectListModel::SortFilterObjectListModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
-    connect(this, &QSortFilterProxyModel::rowsInserted, this, &SortedObjectListPropertyModel::objectCountChanged);
-    connect(this, &QSortFilterProxyModel::rowsRemoved, this, &SortedObjectListPropertyModel::objectCountChanged);
-    connect(this, &QSortFilterProxyModel::modelReset, this, &SortedObjectListPropertyModel::objectCountChanged);
+    connect(this, &QSortFilterProxyModel::rowsInserted, this, &SortFilterObjectListModel::objectCountChanged);
+    connect(this, &QSortFilterProxyModel::rowsRemoved, this, &SortFilterObjectListModel::objectCountChanged);
+    connect(this, &QSortFilterProxyModel::modelReset, this, &SortFilterObjectListModel::objectCountChanged);
 
     this->setDynamicSortFilter(true);
 }
 
-void SortedObjectListPropertyModel::setSortByProperty(const QByteArray &val)
+void SortFilterObjectListModel::setSortByProperty(const QByteArray &val)
 {
     if(m_sortByProperty == val)
         return;
@@ -52,7 +52,40 @@ void SortedObjectListPropertyModel::setSortByProperty(const QByteArray &val)
     this->sort(0);
 }
 
-QHash<int, QByteArray> SortedObjectListPropertyModel::roleNames() const
+void SortFilterObjectListModel::setFilterByProperty(const QByteArray &val)
+{
+    if(m_filterByProperty == val)
+        return;
+
+    m_filterByProperty = val;
+    emit filterByPropertyChanged();
+
+    this->invalidateFilter();
+}
+
+void SortFilterObjectListModel::setFilterValues(const QVariantList &val)
+{
+    if(m_filterValues == val)
+        return;
+
+    m_filterValues = val;
+    emit filterValuesChanged();
+
+    this->invalidateFilter();
+}
+
+void SortFilterObjectListModel::setFilterMode(FilterMode val)
+{
+    if(m_filterMode == val)
+        return;
+
+    m_filterMode = val;
+    emit filterModeChanged();
+
+    this->invalidateFilter();
+}
+
+QHash<int, QByteArray> SortFilterObjectListModel::roleNames() const
 {
     return {
         { ObjectListPropertyModelBase::ObjectItemRole, QByteArrayLiteral("objectItem") },
@@ -60,7 +93,7 @@ QHash<int, QByteArray> SortedObjectListPropertyModel::roleNames() const
     };
 }
 
-bool SortedObjectListPropertyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
+bool SortFilterObjectListModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
 {
     if(m_sortByProperty.isEmpty())
         return false;
@@ -77,4 +110,30 @@ bool SortedObjectListPropertyModel::lessThan(const QModelIndex &source_left, con
     const QVariant left = left_object->property(m_sortByProperty);
     const QVariant right = right_object->property(m_sortByProperty);
     return left < right;
+}
+
+bool SortFilterObjectListModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    if(m_filterByProperty.isEmpty() || m_filterValues.isEmpty())
+        return true;
+
+    const QMetaObject *mo = this->sourceModel()->metaObject();
+    if(!mo->inherits(&ObjectListPropertyModelBase::staticMetaObject))
+        return true;
+
+    const QModelIndex source_index = this->sourceModel()->index(source_row, 0, source_parent);
+    if(!source_index.isValid())
+        return true;
+
+    QObject *source_object = source_index.data(ObjectListPropertyModelBase::ObjectItemRole).value<QObject*>();
+    if(source_object == nullptr)
+        return true;
+
+    const QVariant value = source_object->property(m_filterByProperty);
+    const bool flag = m_filterValues.contains(value);
+
+    if(m_filterMode == IncludeFilterValues)
+        return flag;
+
+    return !flag;
 }

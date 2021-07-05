@@ -14,83 +14,12 @@
 #include "autoupdate.h"
 #include "application.h"
 #include "garbagecollector.h"
+#include "networkaccessmanager.h"
 
 #include <QSettings>
 #include <QUrlQuery>
 #include <QJsonDocument>
 #include <QNetworkReply>
-#include <QNetworkAccessManager>
-
-class NetworkAccessManager : public QNetworkAccessManager
-{
-public:
-    static NetworkAccessManager *instance();
-    ~NetworkAccessManager();
-
-protected:
-    // QNetworkAccessManager interface
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData);
-
-private:
-    static NetworkAccessManager *INSTANCE;
-    NetworkAccessManager(QObject *parent=nullptr);
-    void onReplyFinished(QNetworkReply *reply);
-    void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
-
-private:
-    QList<QNetworkReply*> m_replies;
-};
-
-NetworkAccessManager *NetworkAccessManager::INSTANCE = nullptr;
-
-NetworkAccessManager *NetworkAccessManager::instance()
-{
-    if(NetworkAccessManager::INSTANCE)
-        return NetworkAccessManager::INSTANCE;
-
-    return new NetworkAccessManager(qApp);
-}
-
-NetworkAccessManager::NetworkAccessManager(QObject *parent)
-    : QNetworkAccessManager(parent)
-{
-    NetworkAccessManager::INSTANCE = this;
-    connect(this, &QNetworkAccessManager::finished, this, &NetworkAccessManager::onReplyFinished);
-    connect(this, &QNetworkAccessManager::sslErrors, this, &NetworkAccessManager::onSslErrors);
-}
-
-NetworkAccessManager::~NetworkAccessManager()
-{
-    NetworkAccessManager::INSTANCE = nullptr;
-}
-
-QNetworkReply *NetworkAccessManager::createRequest(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
-{
-    QNetworkReply *reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
-    if(reply)
-        m_replies.append(reply);
-
-    return reply;
-}
-
-void NetworkAccessManager::onReplyFinished(QNetworkReply *reply)
-{
-    if( reply != nullptr && m_replies.removeOne(reply) )
-    {
-        GarbageCollector::instance()->add(reply);
-
-        if(m_replies.isEmpty())
-        {
-            NetworkAccessManager::INSTANCE = nullptr;
-            GarbageCollector::instance()->add(this);
-        }
-    }
-}
-
-void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
-{
-    reply->ignoreSslErrors(errors);
-}
 
 AutoUpdate *AutoUpdate::instance()
 {

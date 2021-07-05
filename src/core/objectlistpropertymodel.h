@@ -69,12 +69,18 @@ public:
 
     int indexOf(T ptr) const { return m_list.indexOf(ptr); }
 
+    void remove(T ptr) {
+        const int index = this->indexOf(ptr);
+        this->removeAt(index);
+    }
+
     void removeAt(int row) {
         if(row < 0 || row >= m_list.size())
             return;
         this->beginRemoveRows(QModelIndex(), row, row);
         T ptr = m_list.at(row);
         this->itemRemoveEvent(ptr);
+        ptr->disconnect(this);
         m_list.removeAt(row);
         this->endRemoveRows();
     }
@@ -106,19 +112,31 @@ public:
 
     void assign(const QList<T> &list) {
         this->beginResetModel();
-        for(T ptr : m_list)
+        while(!m_list.isEmpty()) {
+            T ptr = m_list.first();
             this->itemRemoveEvent(ptr);
-        m_list = list.toSet().toList(); // so that the list does not have duplicates
-        for(T ptr : m_list)
-            this->itemInsertEvent(ptr);
+            ptr->disconnect(this);
+            m_list.takeFirst();
+        }
+        if(!list.isEmpty()) {
+            for(T ptr : list) {
+                if(m_list.contains(ptr))
+                    continue;
+                this->itemInsertEvent(ptr);
+                m_list.append(ptr);
+            }
+        }
         this->endResetModel();
     }
 
     void clear() {
         this->beginResetModel();
-        for(T ptr : m_list)
+        while(!m_list.isEmpty()) {
+            T ptr = m_list.first();
+            this->itemRemoveEvent(ptr);
             ptr->disconnect(this);
-        m_list.clear();
+            m_list.takeFirst();
+        }
         this->endResetModel();
     }
 
@@ -212,13 +230,13 @@ private:
     QList<T> m_list;
 };
 
-class SortedObjectListPropertyModel : public QSortFilterProxyModel
+class SortFilterObjectListModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 
 public:
-    SortedObjectListPropertyModel(QObject *parent=nullptr);
-    ~SortedObjectListPropertyModel() { }
+    SortFilterObjectListModel(QObject *parent=nullptr);
+    ~SortFilterObjectListModel() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
     int objectCount() const { return this->rowCount(QModelIndex()); }
@@ -229,14 +247,39 @@ public:
     QByteArray sortByProperty() const { return m_sortByProperty; }
     Q_SIGNAL void sortByPropertyChanged();
 
+    Q_PROPERTY(QByteArray filterByProperty READ filterByProperty WRITE setFilterByProperty NOTIFY filterByPropertyChanged)
+    void setFilterByProperty(const QByteArray &val);
+    QByteArray filterByProperty() const { return m_filterByProperty; }
+    Q_SIGNAL void filterByPropertyChanged();
+
+    Q_PROPERTY(QVariantList filterValues READ filterValues WRITE setFilterValues NOTIFY filterValuesChanged)
+    void setFilterValues(const QVariantList &val);
+    QVariantList filterValues() const { return m_filterValues; }
+    Q_SIGNAL void filterValuesChanged();
+
+    enum FilterMode
+    {
+        IncludeFilterValues,
+        ExcludeFilterValues
+    };
+    Q_ENUM(FilterMode)
+    Q_PROPERTY(FilterMode filterMode READ filterMode WRITE setFilterMode NOTIFY filterModeChanged)
+    void setFilterMode(FilterMode val);
+    FilterMode filterMode() const { return m_filterMode; }
+    Q_SIGNAL void filterModeChanged();
+
     QHash<int, QByteArray> roleNames() const;
 
 protected:
     // QSortFilterProxyModel interface
     bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 private:
+    QVariantList m_filterValues;
     QByteArray m_sortByProperty;
+    QByteArray m_filterByProperty;
+    FilterMode m_filterMode = IncludeFilterValues;
 };
 
 template <class T>

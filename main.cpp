@@ -23,6 +23,7 @@
 #include <QFontDatabase>
 #include <QOperatingSystemVersion>
 
+#include "form.h"
 #include "notes.h"
 #include "fileinfo.h"
 #include "undoredo.h"
@@ -172,6 +173,10 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<StructureElementStack>("Scrite", 1, 0, "StructureElementStack", reason);
     qmlRegisterUncreatableType<StructureElementStacks>("Scrite", 1, 0, "StructureElementStacks", reason);
 
+    qmlRegisterUncreatableType<Form>("Scrite", 1, 0, "Form", reason);
+    qmlRegisterUncreatableType<Forms>("Scrite", 1, 0, "Forms", reason);
+    qmlRegisterUncreatableType<FormQuestion>("Scrite", 1, 0, "FormQuestion", reason);
+
     qmlRegisterUncreatableType<Note>("Scrite", 1, 0, "Note", reason);
     qmlRegisterUncreatableType<Notes>("Scrite", 1, 0, "Notes", reason);
     qmlRegisterUncreatableType<Attachment>("Scrite", 1, 0, "Attachment", reason);
@@ -288,7 +293,7 @@ int main(int argc, char **argv)
 
     qmlRegisterType<ItemPositionMapper>("Scrite", 1, 0, "ItemPositionMapper");
 
-    qmlRegisterType<SortedObjectListPropertyModel>("Scrite", 1, 0, "SortedObjectListPropertyModel");
+    qmlRegisterType<SortFilterObjectListModel>("Scrite", 1, 0, "SortFilterObjectListModel");
 
     NotificationManager notificationManager;
 

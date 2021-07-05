@@ -46,12 +46,14 @@ HEADERS += \
     src/automation/pausestep.h \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
+    src/core/networkaccessmanager.h \
     src/core/objectlistpropertymodel.h \
     src/core/printerobject.h \
     src/core/qobjectproperty.h \
     src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipsgraph.h \
+    src/document/form.h \
     src/document/notebookmodel.h \
     src/document/notes.h \
     src/document/screenplaytextdocumentoffsets.h \
@@ -153,11 +155,13 @@ SOURCES += \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
     src/core/application_build_timestamp.cpp \
+    src/core/networkaccessmanager.cpp \
     src/core/objectlistpropertymodel.cpp \
     src/core/qobjectproperty.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipsgraph.cpp \
+    src/document/form.cpp \
     src/document/notebookmodel.cpp \
     src/document/notes.cpp \
     src/document/screenplaytextdocumentoffsets.cpp \

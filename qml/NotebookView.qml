@@ -1218,7 +1218,7 @@ Rectangle {
                     height: charactersTabContentArea.height
                     visible: charactersTabBar.tabIndex === 0
 
-                    SortedObjectListPropertyModel {
+                    SortFilterObjectListModel {
                         id: sortedCharactersModel
                         sourceModel: scriteDocument.structure.charactersModel
                         sortByProperty: "name"
@@ -2088,6 +2088,13 @@ Rectangle {
     Menu2 {
         id: characterContextMenu
         property Character character
+        readonly property SortFilterObjectListModel characterForms: SortFilterObjectListModel {
+            sourceModel: scriteDocument.globalForms
+            sortByProperty: "title"
+            filterByProperty: "type"
+            filterValues: [Form.CharacterForm]
+        }
+
         enabled: character
 
         onAboutToHide: character = null
@@ -2097,6 +2104,18 @@ Rectangle {
             onMenuItemClicked: {
                 characterContextMenu.character.color = color
                 characterContextMenu.close()
+            }
+        }
+
+        Menu2 {
+            title: "Forms"
+
+            Repeater {
+                model: characterContextMenu.characterForms
+
+                MenuItem2 {
+                    text: objectItem.title
+                }
             }
         }
 

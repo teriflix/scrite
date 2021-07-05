@@ -12,13 +12,13 @@
 ****************************************************************************/
 
 #include "openfromlibrary.h"
+#include "networkaccessmanager.h"
 
 #include <QApplication>
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QTemporaryFile>
 #include <QNetworkRequest>
-#include <QNetworkAccessManager>
 
 /*
 We will host a JSON file at http://www.teriflix.in/scrite/library.json.
@@ -49,8 +49,7 @@ anyway.
 
 QNetworkAccessManager & LibraryNetworkAccess()
 {
-    static QNetworkAccessManager nam;
-    return nam;
+    return *NetworkAccessManager::instance();
 }
 
 LibraryService::LibraryService(QObject *parent)
@@ -141,7 +140,7 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     qApp->setOverrideCursor(Qt::WaitCursor);
 
     QNetworkReply *reply = nam.get(request);
-    connect(reply, &QNetworkReply::finished, [=]() {
+    connect(reply, &QNetworkReply::finished, this, [=]() {
         const QByteArray bytes = reply->readAll();
         reply->deleteLater();
 
@@ -247,7 +246,7 @@ void Library::fetchRecords()
 
     const QNetworkRequest request(url);
     QNetworkReply *reply = nam.get(request);
-    connect(reply, &QNetworkReply::finished, [=]() {
+    connect(reply, &QNetworkReply::finished, this, [=]() {
         const QByteArray bytes = reply->readAll();
         reply->deleteLater();
         this->loadDatabase(bytes);
@@ -287,7 +286,7 @@ void Library::setRecords(const QJsonArray &array)
         defaultTemplate.insert( QStringLiteral("poster"), QStringLiteral("qrc:/images/blank_document.png") );
         defaultTemplate.insert( QStringLiteral("url_kind"), QStringLiteral("local") );
         defaultTemplate.insert( QStringLiteral("description"), QStringLiteral("An empty Scrite document.") );
-        defaultTemplate.insert( QStringLiteral("more_info"), QStringLiteral("") );
+        defaultTemplate.insert( QStringLiteral("more_info"), QLatin1String() );
         m_records.prepend(defaultTemplate);
     }
 #endif
