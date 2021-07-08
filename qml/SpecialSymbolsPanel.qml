@@ -84,19 +84,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.leftMargin: 5
         clip: true
-        ScrollBar.vertical: ScrollBar {
-            policy: ScrollBar.AlwaysOn
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: active ? 1 : 0.2
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
+        ScrollBar.vertical: ScrollBar2 { flickable: symbolsGridView }
         rightMargin: 14
 
         cellWidth: symbolsPanel.currentIndexIsEmoji ? 50 : 40

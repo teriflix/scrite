@@ -98,10 +98,7 @@ Menu2 {
                         }
                     }
                     property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
-                    ScrollBar.vertical: ScrollBar {
-                        policy: groupsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                    }
-
+                    ScrollBar.vertical: ScrollBar2 { flickable: groupsView }
                     property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
                     onShowingFilteredItemsChanged: adjustScrollingLater()
 

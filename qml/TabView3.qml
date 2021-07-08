@@ -20,11 +20,12 @@ import Scrite 1.0
 Item {
     id: tabView
     property var tabNames: ["Default"]
-    property var tabColor: primaryColors.windowColor
+    property color tabColor: primaryColors.windowColor
     property alias currentTabIndex: tabBar.currentIndex
     property alias currentTabContent: tabContentLoader.sourceComponent
     property alias tabBarVisible: tabBar.visible
     property alias cornerItem: cornerLoader.sourceComponent
+    property real cornerItemSpace: cornerLoader.width
 
     Row {
         id: tabBar

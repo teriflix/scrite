@@ -298,15 +298,7 @@ Item {
         Keys.onLeftPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex-1
 
         property bool scrollBarRequired: screenplayElementList.width < screenplayElementList.contentWidth
-        ScrollBar.horizontal: ScrollBar {
-            policy: screenplayElementList.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            minimumSize: 0.1
-            opacity: active ? 1 : 0.5
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
+        ScrollBar.horizontal: ScrollBar2 { flickable: screenplayElementList }
 
         FocusTracker.window: qmlWindow
         FocusTracker.indicator.target: mainUndoStack

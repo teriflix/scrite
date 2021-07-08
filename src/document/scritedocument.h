@@ -191,6 +191,10 @@ public:
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
 
+    Q_PROPERTY(Forms* forms READ forms NOTIFY formsChanged)
+    Forms* forms() const { return m_forms; }
+    Q_SIGNAL void formsChanged();
+
     Q_PROPERTY(Structure* structure READ structure NOTIFY structureChanged)
     Structure* structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
@@ -214,10 +218,6 @@ public:
     Q_SIGNAL void spellCheckIgnoreListChanged();
 
     Q_INVOKABLE void addToSpellCheckIgnoreList(const QString &word);
-
-    Q_PROPERTY(Forms* forms READ forms NOTIFY formsChanged)
-    Forms* forms() const { return m_forms; }
-    Q_SIGNAL void formsChanged();
 
     Q_PROPERTY(Forms *globalForms READ globalForms CONSTANT STORED false)
     Forms *globalForms() const;

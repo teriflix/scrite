@@ -68,13 +68,31 @@ void Note::setForm(Form *val)
         this->setTitle(m_form->title());
         this->setSummary(m_form->subtitle());
 
-        m_formData = m_form->formDataTemplate();
-        emit formDataChanged();
+        if(m_formData.isEmpty())
+        {
+            m_formData = m_form->formDataTemplate();
+            emit formDataChanged();
+        }
+
+        if(m_summary.isEmpty())
+        {
+            QStringList questions;
+            const QList<FormQuestion*> formQuestions = m_form->questionsModel()->list();
+            for(const FormQuestion *formQuestion : formQuestions)
+                questions << formQuestion->questionText();
+
+            m_summary = QStringLiteral("Form with ") + QString::number(questions.size()) + QStringLiteral(" question(s). ");
+            m_summary += questions.join( QStringLiteral(", ") );
+            emit summaryChanged();
+        }
     }
     else
     {
-        m_formData = QJsonObject();
-        emit formDataChanged();
+        if(!m_formData.isEmpty())
+        {
+            m_formData = QJsonObject();
+            emit formDataChanged();
+        }
     }
 
     emit formChanged();
@@ -154,14 +172,11 @@ void Note::setFormData(const QJsonObject &val)
 
 void Note::setFormData(const QString &key, const QJsonValue &value)
 {
-    if(m_formData.value(key) == value)
-        return;
-
     m_formData.insert(key, value);
     emit formDataChanged();
 }
 
-QJsonValue Note::formData(const QString &key) const
+QJsonValue Note::getFormData(const QString &key) const
 {
     return m_formData.value(key);
 }
@@ -172,16 +187,27 @@ void Note::prepareForSerialization()
         m_form->validateFormData(m_formData);
 }
 
-bool Note::canSerialize(const QMetaObject *metaObject, const QMetaProperty &metaProperty) const
+void Note::serializeToJson(QJsonObject &json) const
 {
-    if(!this->metaObject()->inherits(metaObject))
-        return false;
+    if(m_type == TextNoteType)
+        json.insert( QStringLiteral("type"), QStringLiteral("Text") );
+    else if(m_type == FormNoteType)
+    {
+        json.insert( QStringLiteral("type"), QStringLiteral("Form") );
+        json.insert( QStringLiteral("formId"), m_formId );
+    }
+}
 
-    static const int propIndex = this->metaObject()->indexOfProperty("formData");
-    if(propIndex >= 0 && metaProperty.propertyIndex() == propIndex)
-        return m_type == FormNoteType;
-
-    return true;
+void Note::deserializeFromJson(const QJsonObject &json)
+{
+    const QString type = json.value( QStringLiteral("type") ).toString();
+    if(type == QStringLiteral("Text"))
+        this->setType(TextNoteType);
+    else if(type == QStringLiteral("Form"))
+    {
+        this->setType(FormNoteType);
+        this->setFormId( json.value(QStringLiteral("formId")).toString() );
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -250,16 +276,25 @@ Notes::Notes(QObject *parent)
     connect(this, &Notes::objectCountChanged, this, &Notes::noteCountChanged);
     connect(this, &Notes::noteCountChanged, this, &Notes::notesModified);
 
+    m_compatibleFormType = Form::GeneralForm;
+
     if(parent != nullptr)
     {
         const QMetaObject *pmo = parent->metaObject();
         if(pmo->inherits(&Structure::staticMetaObject))
+        {
             m_ownerType = StructureOwner;
+            m_compatibleFormType = Form::StoryForm;
+        }
         else if(pmo->inherits(&ScreenplayElement::staticMetaObject))
+        {
             m_ownerType = BreakOwner;
+            m_compatibleFormType = Form::SceneForm;
+        }
         else if(pmo->inherits(&Scene::staticMetaObject))
         {
             m_ownerType = SceneOwner;
+            m_compatibleFormType = Form::SceneForm;
 
             Scene *scene = (qobject_cast<Scene*>(parent));
             m_color = scene->color();
@@ -270,6 +305,7 @@ Notes::Notes(QObject *parent)
         else if(pmo->inherits(&Character::staticMetaObject))
         {
             m_ownerType = CharacterOwner;
+            m_compatibleFormType = Form::CharacterForm;
 
             Character *character = (qobject_cast<Character*>(parent));
             m_color = character->color();
@@ -278,13 +314,19 @@ Notes::Notes(QObject *parent)
             });
         }
         else if(pmo->inherits(&Relationship::staticMetaObject))
+        {
             m_ownerType = RelationshipOwner;
+            m_compatibleFormType = Form::RelationshipForm;
+        }
         /*else if(pmo->inherits(&Character::staticMetaObject))
             m_ownerType = CharacterOwner;
         else if(pmo->inherits(&Prop::staticMetaObject))
             m_ownerType = PropOwner;*/
         else
+        {
             m_ownerType = LocationOwner;
+            m_compatibleFormType = Form::LocationForm;
+        }
     }
 }
 

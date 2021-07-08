@@ -97,20 +97,7 @@ Rectangle {
         contentWidth: pageContentLoader.width
         contentHeight: pageContentLoader.height
 
-        ScrollBar.vertical: ScrollBar {
-            policy: pageContentArea.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: active ? 1 : 0.2
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
-
+        ScrollBar.vertical: ScrollBar2 { flickable: pageContentArea }
         Loader {
             id: pageContentLoader
             width: pageContentArea.showScrollBars ? pageContentArea.width-17 : pageContentArea.width

@@ -70,6 +70,8 @@
         <file>qml/AttachmentsDropArea2.qml</file>
         <file>qml/TextTabBar.qml</file>
         <file>qml/FormField.qml</file>
-        <file>qml/Form.qml</file>
+        <file>qml/FormView.qml</file>
+        <file>qml/ScrollBar2.qml</file>
+        <file>qml/FormMenu.qml</file>
     </qresource>
 </RCC>

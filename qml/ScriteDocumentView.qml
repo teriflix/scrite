@@ -1763,9 +1763,10 @@ Item {
                             }
 
                             cornerItem: Item {
-                                visible: structureEditorTabs.currentTabIndex === 1
+                                visible: structureEditorTabs.currentTabIndex === 1 && structureEditorTabs.cornerItemSpace > syncEpisodeActSceneCheckBox.width
 
                                 CheckBox2 {
+                                    id: syncEpisodeActSceneCheckBox
                                     text: "Sync Episode, Act & Scene"
                                     hoverEnabled: true
                                     ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"

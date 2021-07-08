@@ -718,9 +718,9 @@ void ScriteDocument::reset()
     else
         m_printFormat->resetToDefaults();
 
+    this->setForms(new Forms(this));
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
-    this->setForms(new Forms(this));
     this->setSpellCheckIgnoreList(QStringList());
     this->setFileName(QString());
     this->setUserData(QJsonObject());
@@ -1375,7 +1375,14 @@ void ScriteDocument::setForms(Forms *val)
     if(m_forms == val)
         return;
 
+    if(m_forms != nullptr)
+        GarbageCollector::instance()->add(m_forms);
+
     m_forms = val;
+
+    if(m_forms != nullptr)
+        m_forms->setParent(this);
+
     emit formsChanged();
 }
 

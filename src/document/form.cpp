@@ -42,7 +42,7 @@ void FormQuestion::setId(const QString &val)
 
 void FormQuestion::setNumber(int val)
 {
-    if(m_number == val || val >= 0)
+    if(m_number == val || m_number >= 0)
         return;
 
     m_number = val;
@@ -194,9 +194,14 @@ void Form::deserializeFromJson(const QJsonObject &json)
         else
             question->setId( QUuid::createUuid().toString() );
 
+        const QString ques = qjs.value(QStringLiteral("question")).toString();
+        const QString ansHint = qjs.value(QStringLiteral("answerHint")).toString();
+        const QString defAnsHint = QStringLiteral("Your answer for '%1' ...").arg(ques);
+
+        question->setQuestionText( ques );
+        question->setAnswerHint( ansHint.isEmpty() ? defAnsHint : ansHint );
         question->setNumber( list.size()+1 );
-        question->setQuestionText( qjs.value(QStringLiteral("question")).toString() );
-        question->setAnswerHint( qjs.value(QStringLiteral("answerHint")).toString() );
+
         list.append(question);
     }
 

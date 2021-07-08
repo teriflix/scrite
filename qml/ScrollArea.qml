@@ -16,7 +16,7 @@ import QtQuick.Controls 2.12
 import Scrite 1.0
 
 Flickable {
-    id: flickable
+    id: scrollAreaFlickable
     property rect visibleRect: Qt.rect(contentX, contentY, width, height)
     property real initialContentWidth: 100
     property real initialContentHeight: 100
@@ -36,27 +36,27 @@ Flickable {
         delay: 250
 
         TrackProperty {
-            target: flickable
+            target: scrollAreaFlickable
             property: "contentX"
-            onTracked: flickable.changing = true
+            onTracked: scrollAreaFlickable.changing = true
         }
         TrackProperty {
-            target: flickable
+            target: scrollAreaFlickable
             property: "contentY"
-            onTracked: flickable.changing = true
+            onTracked: scrollAreaFlickable.changing = true
         }
         TrackProperty {
-            target: flickable
+            target: scrollAreaFlickable
             property: "moving"
-            onTracked: flickable.changing = true
+            onTracked: scrollAreaFlickable.changing = true
         }
         TrackProperty {
-            target: flickable
+            target: scrollAreaFlickable
             property: "flicking"
-            onTracked: flickable.changing = true
+            onTracked: scrollAreaFlickable.changing = true
         }
 
-        onTracked: flickable.changing = false
+        onTracked: scrollAreaFlickable.changing = false
     }
 
     signal zoomScaleChangedInteractively()
@@ -110,32 +110,8 @@ Flickable {
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 
-    ScrollBar.horizontal: ScrollBar {
-        policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-        minimumSize: 0.1
-        palette {
-            mid: Qt.rgba(0,0,0,0.25)
-            dark: Qt.rgba(0,0,0,0.75)
-        }
-        opacity: active ? 1 : 0.2
-        Behavior on opacity {
-            enabled: screenplayEditorSettings.enableAnimations
-            NumberAnimation { duration: 250 }
-        }
-    }
-    ScrollBar.vertical: ScrollBar {
-        policy: flickable.showScrollBars ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-        minimumSize: 0.1
-        palette {
-            mid: Qt.rgba(0,0,0,0.25)
-            dark: Qt.rgba(0,0,0,0.75)
-        }
-        opacity: active ? 1 : 0.2
-        Behavior on opacity {
-            enabled: screenplayEditorSettings.enableAnimations
-            NumberAnimation { duration: 250 }
-        }
-    }
+    ScrollBar.horizontal: ScrollBar2 { flickable: scrollAreaFlickable }
+    ScrollBar.vertical: ScrollBar2 { flickable: scrollAreaFlickable }
 
     function ensureItemVisible(item, scaling, leaveMargin) {
         if(item === null)
@@ -159,7 +135,7 @@ Flickable {
             ensureVisibleParams = {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }
-            app.execLater(flickable, 500, function() {
+            app.execLater(scrollAreaFlickable, 500, function() {
                 var params = ensureVisibleParams
                 ensureVisibleParams = undefined
                 ensureVisible(params.area, params.scaling, params.leaveMargin)
@@ -230,7 +206,7 @@ Flickable {
 
     onZoomScaleChanged: {
         var cursorPos = app.cursorPosition()
-        var fCursorPos = app.mapGlobalPositionToItem(flickable, cursorPos)
+        var fCursorPos = app.mapGlobalPositionToItem(scrollAreaFlickable, cursorPos)
         var fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
         var visibleArea = Qt.rect(contentX, contentY, width, height)
         var mousePoint = fContainsCursor ?
@@ -254,7 +230,7 @@ Flickable {
         minimumPointCount: 2
 
         onScaleChanged: {
-            if(flickable === null)
+            if(scrollAreaFlickable === null)
                 return
             zoomScaleBehavior.allow = false
             zoomScale = activeScale

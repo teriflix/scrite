@@ -64,9 +64,7 @@ Item {
                 anchors.margins: 1
                 model: scriteDocument.backupFilesModel
                 currentIndex: -1
-                ScrollBar.vertical: ScrollBar {
-                    policy: ScrollBar.AsNeeded
-                }
+                ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
                 highlight: Rectangle {
                     color: primaryColors.highlight.background
                 }

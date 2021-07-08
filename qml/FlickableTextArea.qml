@@ -29,28 +29,16 @@ Flickable {
     property alias placeholderText: __textArea.placeholderText
     property alias readOnly: __textArea.readOnly
 
-    id: flickable
+    id: textAreaFlickable
     clip: true
     contentWidth: __textArea.width
     contentHeight: __textArea.height
-    ScrollBar.vertical: ScrollBar {
-        policy: flickable.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-        minimumSize: 0.1
-        palette {
-            mid: Qt.rgba(0,0,0,0.25)
-            dark: Qt.rgba(0,0,0,0.75)
-        }
-        opacity: active ? 1 : 0.2
-        Behavior on opacity {
-            enabled: screenplayEditorSettings.enableAnimations
-            NumberAnimation { duration: 250 }
-        }
-    }
+    ScrollBar.vertical: ScrollBar2 { flickable: textAreaFlickable }
 
     TextArea {
         id: __textArea
-        width: flickable.width - (flickable.scrollBarRequired ? 20 : 0)
-        height: Math.max(flickable.height-topPadding-bottomPadding, contentHeight+50)
+        width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired ? 20 : 0)
+        height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
         font.pointSize: app.idealFontPointSize
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         selectByMouse: true
@@ -62,8 +50,8 @@ Flickable {
         Transliterator.hasActiveFocus: activeFocus
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
         readOnly: scriteDocument.readOnly
-        KeyNavigation.tab: flickable.tabItem
-        KeyNavigation.backtab: flickable.backTabItem
+        KeyNavigation.tab: textAreaFlickable.tabItem
+        KeyNavigation.backtab: textAreaFlickable.backTabItem
         KeyNavigation.priority: KeyNavigation.AfterItem
         background: Item { }
         SpecialSymbolsSupport {
@@ -74,7 +62,7 @@ Flickable {
             enabled: !scriteDocument.readOnly
         }
         UndoHandler {
-            enabled: !__textArea.readOnly && __textArea.activeFocus && flickable.undoRedoEnabled
+            enabled: !__textArea.readOnly && __textArea.activeFocus && textAreaFlickable.undoRedoEnabled
             canUndo: __textArea.canUndo
             canRedo: __textArea.canRedo
             onUndoRequest: __textArea.undo()
@@ -84,15 +72,15 @@ Flickable {
             var cr = cursorRectangle
             cr = Qt.rect(cr.x, cr.y-4, cr.width, cr.height+8)
 
-            var cy = flickable.contentY
-            var ch = flickable.height
-            if(cr.y < flickable.contentY)
+            var cy = textAreaFlickable.contentY
+            var ch = textAreaFlickable.height
+            if(cr.y < cy)
                 cy = Math.max(cr.y, 0)
             else if(cr.y + cr.height > cy + ch)
                 cy = Math.min(cr.y + cr.height - ch, height-ch)
             else
                 return
-            flickable.contentY = cy
+            textAreaFlickable.contentY = cy
         }
     }
 }

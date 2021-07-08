@@ -38,19 +38,7 @@ Item {
         highlightMoveDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
         highlightResizeDuration: screenplayEditorSettings.enableAnimations ? 250 : 50
         clip: true
-        ScrollBar.horizontal: ScrollBar {
-            policy: ScrollBar.AlwaysOn
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: active ? 1 : 0.2
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
+        ScrollBar.horizontal: ScrollBar2 { flickable: notesList }
         header: Item {
             width: listHeader ? notesList.itemWidth : 0
             height: notesList.itemHeight
@@ -85,19 +73,7 @@ Item {
                     contentWidth: noteItemContent.width
                     clip: true
 
-                    ScrollBar.vertical: ScrollBar {
-                        policy: noteItemScroll.contentHeight > noteItemScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-                    }
+                    ScrollBar.vertical: ScrollBar2 { flickable: noteItemScroll }
 
                     Column {
                         id: noteItemContent

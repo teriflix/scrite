@@ -461,23 +461,16 @@ Rectangle {
                             font.capitalization: Font.AllUppercase
                         }
 
-                        Rectangle {
+                        FlickableTextArea {
+                            id: sceneSynopsisField
                             width: parent.width
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneAttachments.height - parent.spacing*3
-                            color: app.translucent(primaryColors.c100.background, 0.5)
-                            border.width: 1
-                            border.color: primaryColors.borderColor
-
-                            FlickableTextArea {
-                                id: sceneSynopsisField
-                                anchors.fill: parent
-                                text: scene.title
-                                placeholderText: "Scene Synopsis"
-                                readOnly: scriteDocument.readOnly
-                                onTextChanged: scene.title = text
-                                undoRedoEnabled: true
-                                backTabItem: sceneTitleField
-                            }
+                            text: scene.title
+                            placeholderText: "Scene Synopsis"
+                            readOnly: scriteDocument.readOnly
+                            onTextChanged: scene.title = text
+                            undoRedoEnabled: true
+                            backTabItem: sceneTitleField
                         }
 
                         AttachmentsView {
@@ -535,8 +528,8 @@ Rectangle {
             id: notesSummary
             property var componentData
             property Notes notes: componentData.notebookItemObject
-            readonly property real minimumNoteSize: 175
-            property real noteSize: notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize)
+            readonly property real minimumNoteSize: 200
+            property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
             color: app.translucent(primaryColors.c100.background, 0.5)
             border.width: 1
@@ -563,15 +556,14 @@ Rectangle {
                             BoxShadow {
                                 anchors.fill: noteVisual
                                 visible: notesFlick.currentIndex === index
+                                opacity: 0.5
                             }
 
                             Rectangle {
                                 id: noteVisual
                                 anchors.fill: parent
-                                anchors.margins: 5
+                                anchors.margins: 10
                                 color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
-                                border.width: 1
-                                border.color: app.isLightColor(color) ? "black" : objectItem.color
 
                                 Behavior on color {
                                     enabled: screenplayEditorSettings.enableAnimations
@@ -625,12 +617,17 @@ Rectangle {
                         }
                     }
 
-                    Rectangle {
+                    Item {
                         width: noteSize; height: noteSize
                         visible: !scriteDocument.readOnly
-                        color: app.translucent(primaryColors.c100.background, 0.5)
-                        border.width: 1
-                        border.color: primaryColors.borderColor
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            color: app.translucent(primaryColors.c100.background, 0.5)
+                            border.width: 1
+                            border.color: primaryColors.borderColor
+                        }
 
                         ToolButton3 {
                             anchors.centerIn: parent
@@ -660,9 +657,14 @@ Rectangle {
                                         }
                                     }
 
-                                    MenuItem2 {
-                                        text: "Form Note"
-                                        enabled: false
+                                    FormMenu {
+                                        title: "Form Note"
+                                        notes: notesSummary.notes
+                                        onNoteAdded: {
+                                            app.execLater(note, 10, function() {
+                                                switchTo(note);
+                                            })
+                                        }
                                     }
                                 }
                             }
@@ -673,22 +675,13 @@ Rectangle {
                 ScrollBar.vertical: notesFlickScrollBar
             }
 
-            ScrollBar {
+            ScrollBar2 {
                 id: notesFlickScrollBar
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                policy: notesFlick.height < notesFlick.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                minimumSize: 0.1
-                palette {
-                    mid: Qt.rgba(0,0,0,0.25)
-                    dark: Qt.rgba(0,0,0,0.75)
-                }
-                opacity: active ? 1 : 0.2
-                Behavior on opacity {
-                    enabled: screenplayEditorSettings.enableAnimations
-                    NumberAnimation { duration: 250 }
-                }
+                orientation: Qt.Vertical
+                flickable: notesFlick
             }
         }
     }
@@ -702,7 +695,7 @@ Rectangle {
             color: Qt.tint(note.color, "#E7FFFFFF")
 
             onNoteChanged: {
-                if(note.objectName == "_newNote")
+                if(note.objectName === "_newNote")
                     noteHeadingField.forceActiveFocus()
                 else
                     noteContentFieldArea.textArea.forceActiveFocus()
@@ -727,13 +720,6 @@ Rectangle {
                 onReturnPressed: noteContentFieldArea.textArea.forceActiveFocus()
             }
 
-            Rectangle {
-                anchors.fill: noteContentFieldArea
-                color: app.translucent(primaryColors.c100.background, 0.5)
-                border.width: 1
-                border.color: primaryColors.borderColor
-            }
-
             FlickableTextArea {
                 id: noteContentFieldArea
                 anchors.top: noteHeadingField.bottom
@@ -744,7 +730,7 @@ Rectangle {
                 text: note.content
                 onTextChanged: note.content = text
                 backTabItem: noteHeadingField
-                placeholderText: "Note content ..."
+                placeholderText: "Note Content ..."
             }
 
             AttachmentsView {
@@ -768,13 +754,15 @@ Rectangle {
     Component {
         id: formNoteComponent
 
-        Item {
+        Rectangle {
+            id: formNoteItem
             property var componentData
+            property Note note: componentData.notebookItemObject
+            color: Qt.tint(note.color, "#E7FFFFFF")
 
-            Text {
-                anchors.centerIn: parent
-                text: "Scenes"
-                font.pointSize: app.idealFontPointSize
+            FormView {
+                anchors.fill: parent
+                note: parent.note
             }
         }
     }
@@ -818,16 +806,9 @@ Rectangle {
                         }
                     }
 
-                    Rectangle {
-                        anchors.fill: breakElementSummaryField
-                        color: app.translucent(primaryColors.c100.background, 0.5)
-                        border.width: 1
-                        border.color: primaryColors.borderColor
-                    }
-
                     FlickableTextArea {
                         id: breakElementSummaryField
-                        placeholderText: breakKind + " summary ..."
+                        placeholderText: breakKind + " Summary ..."
                         text: breakElement.breakSummary
                         onTextChanged: breakElement.breakSummary = text
                         anchors.top: breakElementHeadingRow.bottom
@@ -1085,41 +1066,22 @@ Rectangle {
                         enabled: !scriteDocument.readOnly
                     }
 
-                    ScrollBar {
+                    ScrollBar2 {
                         id: titlePageVScrollBar
                         anchors.right: parent.right
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        policy: titlePageFlickable.vscrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
+                        orientation: Qt.Vertical
+                        flickable: titlePageFlickable
                     }
 
-                    ScrollBar {
+                    ScrollBar2 {
                         id: titlePageHScrollBar
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         orientation: Qt.Horizontal
-                        policy: titlePageFlickable.hscrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
+                        flickable: titlePageFlickable
                     }
                 }
 
@@ -1351,9 +1313,13 @@ Rectangle {
                                         ToolTip.text: "Add Character"
                                         onClicked: {
                                             var chName = characterNameField.text
-                                            var ch = scriteDocument.structure.addCharacter(chName)
+                                            var ch = scriteDocument.structure.findCharacter(chName)
                                             if(ch)
+                                                switchTo(ch.notes)
+                                            else {
+                                                ch = scriteDocument.structure.addCharacter(chName)
                                                 notebookModel.preferredItem = ch.notes
+                                            }
                                         }
                                     }
                                 }
@@ -1361,22 +1327,13 @@ Rectangle {
                         }
                     }
 
-                    ScrollBar {
+                    ScrollBar2 {
                         id: charactersListViewScrollBar
-                        anchors.right: parent.right
                         anchors.top: parent.top
+                        anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        policy: charactersView.height < charactersView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
+                        orientation: Qt.Vertical
+                        flickable: charactersView
                     }
                 }
 
@@ -1725,22 +1682,13 @@ Rectangle {
                                     }
                                 }
 
-                                ScrollBar {
+                                ScrollBar2 {
                                     id: characterQuickInfoViewScrollBar
                                     anchors.top: parent.top
                                     anchors.right: parent.right
                                     anchors.bottom: parent.bottom
-                                    policy: characterQuickInfoView.height < characterQuickInfoView.contentHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                                    minimumSize: 0.1
-                                    palette {
-                                        mid: Qt.rgba(0,0,0,0.25)
-                                        dark: Qt.rgba(0,0,0,0.75)
-                                    }
-                                    opacity: active ? 1 : 0.2
-                                    Behavior on opacity {
-                                        enabled: screenplayEditorSettings.enableAnimations
-                                        NumberAnimation { duration: 250 }
-                                    }
+                                    orientation: Qt.Vertical
+                                    flickable: characterQuickInfoView
                                 }
                             }
 
@@ -1780,19 +1728,7 @@ Rectangle {
                             }
                         }
 
-                        ScrollBar.horizontal: ScrollBar {
-                            policy: quickInfoFlickable.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                            minimumSize: 0.1
-                            palette {
-                                mid: Qt.rgba(0,0,0,0.25)
-                                dark: Qt.rgba(0,0,0,0.75)
-                            }
-                            opacity: active ? 1 : 0.2
-                            Behavior on opacity {
-                                enabled: screenplayEditorSettings.enableAnimations
-                                NumberAnimation { duration: 250 }
-                            }
-                        }
+                        ScrollBar.horizontal: ScrollBar2 { flickable: quickInfoFlickable }
                     }
 
                     AttachmentsDropArea2 {
@@ -2088,13 +2024,6 @@ Rectangle {
     Menu2 {
         id: characterContextMenu
         property Character character
-        readonly property SortFilterObjectListModel characterForms: SortFilterObjectListModel {
-            sourceModel: scriteDocument.globalForms
-            sortByProperty: "title"
-            filterByProperty: "type"
-            filterValues: [Form.CharacterForm]
-        }
-
         enabled: character
 
         onAboutToHide: character = null
@@ -2104,18 +2033,6 @@ Rectangle {
             onMenuItemClicked: {
                 characterContextMenu.character.color = color
                 characterContextMenu.close()
-            }
-        }
-
-        Menu2 {
-            title: "Forms"
-
-            Repeater {
-                model: characterContextMenu.characterForms
-
-                MenuItem2 {
-                    text: objectItem.title
-                }
             }
         }
 

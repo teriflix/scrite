@@ -79,7 +79,7 @@ public:
     QString formId() const { return m_formId; }
     Q_SIGNAL void formIdChanged();
 
-    Q_PROPERTY(Form* form READ form RESET resetForm NOTIFY formChanged)
+    Q_PROPERTY(Form* form READ form RESET resetForm NOTIFY formChanged STORED false)
     Form* form() const { return m_form; }
     Q_SIGNAL void formChanged();
 
@@ -89,7 +89,7 @@ public:
     Q_SIGNAL void formDataChanged();
 
     Q_INVOKABLE void setFormData(const QString &key, const QJsonValue &value);
-    Q_INVOKABLE QJsonValue formData(const QString &key) const;
+    Q_INVOKABLE QJsonValue getFormData(const QString &key) const;
 
     Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
     Attachments *attachments() const { return m_attachments; }
@@ -98,7 +98,8 @@ public:
 
     // QObjectSerializer::Interface interface
     void prepareForSerialization();
-    bool canSerialize(const QMetaObject *metaObject, const QMetaProperty &metaProperty) const;
+    void serializeToJson(QJsonObject &json) const;
+    void deserializeFromJson(const QJsonObject &);
 
 private:
     void setType(Type val);
@@ -189,6 +190,9 @@ public:
     int noteCount() const { return this->objectCount(); }
     Q_SIGNAL void noteCountChanged();
 
+    Q_PROPERTY(int compatibleFormType READ compatibleFormType CONSTANT)
+    int compatibleFormType() const { return m_compatibleFormType; }
+
     Q_SIGNAL void notesModified();
 
     // QObjectSerializer::Interface interface
@@ -204,6 +208,7 @@ private:
 
 private:
     friend class RemoveNoteUndoCommand;
+    int m_compatibleFormType = -1;
     QColor m_color = Qt::white;
     OwnerType m_ownerType = OtherOwner;
 };

@@ -2512,9 +2512,7 @@ Item {
                             contentHeight: synopsisField.height
                             interactive: synopsisField.activeFocus && scrollBarVisible
                             property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
-                            ScrollBar.vertical: ScrollBar {
-                                policy: synopsisFieldFlick.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                            }
+                            ScrollBar.vertical: ScrollBar2 { flickable: synopsisFieldFlick }
                             flickableDirection: Flickable.VerticalFlick
                             TextArea {
                                 id: synopsisField

@@ -2550,19 +2550,7 @@ Rectangle {
                     clip: true
                     model: screenplayAdapter
                     currentIndex: screenplayAdapter.currentIndex
-                    ScrollBar.vertical: ScrollBar {
-                        policy: sceneListView.contentHeight > sceneListView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-                    }
+                    ScrollBar.vertical: ScrollBar2 { flickable: sceneListView }
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0

@@ -83,33 +83,8 @@ Rectangle {
         clip: true
 
         property bool containsMouse: false
-        ScrollBar.horizontal: ScrollBar {
-            policy: pageLayout.width > pageView.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: pageView.containsMouse ? (active ? 1 : 0.2) : 0
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
-
-        ScrollBar.vertical: ScrollBar {
-            policy: pageLayout.height > pageView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: pageView.containsMouse ? (active ? 1 : 0.2) : 0
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
+        ScrollBar.horizontal: ScrollBar2 { flickable: pageView }
+        ScrollBar.vertical: ScrollBar2 { flickable: pageView }
 
         property real cellWidth: screenplayImagePrinter.pageWidth*previewZoomSlider.value + pageSpacing
         property real cellHeight: screenplayImagePrinter.pageHeight*previewZoomSlider.value + pageSpacing

@@ -17,6 +17,20 @@ import QtQuick.Controls.Material 2.12
 
 import Scrite 1.0
 
-Item {
-
+ScrollBar {
+    property Flickable flickable
+    property int contentSize: flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0
+    property int actualSize: flickable ? (orientation === Qt.Vertical ? flickable.height : flickable.width) : 0
+    property bool required: contentSize > actualSize
+    policy: shown ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+    minimumSize: 0.1
+    palette {
+        mid: Qt.rgba(0,0,0,0.25)
+        dark: Qt.rgba(0,0,0,0.75)
+    }
+    opacity: active ? 1 : 0.2
+    Behavior on opacity {
+        enabled: screenplayEditorSettings.enableAnimations
+        NumberAnimation { duration: 250 }
+    }
 }

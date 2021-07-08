@@ -740,22 +740,13 @@ Item {
                             }
                         }
 
-                        ScrollBar {
+                        ScrollBar2 {
                             id: textDocumentScrollBar
                             anchors.top: parent.top
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            policy: textDocumentFlick.contentHeight > textDocumentFlick.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                            minimumSize: 0.1
-                            palette {
-                                mid: Qt.rgba(0,0,0,0.25)
-                                dark: Qt.rgba(0,0,0,0.75)
-                            }
-                            opacity: textDocumentArea.containsMouse ? (active ? 1 : 0.2) : 0
-                            Behavior on opacity {
-                                enabled: screenplayEditorSettings.enableAnimations
-                                NumberAnimation { duration: 250 }
-                            }
+                            orientation: Qt.Vertical
+                            flickable: textDocumentFlick
                         }
 
                         EventFilter.acceptHoverEvents: true
@@ -1111,19 +1102,7 @@ Item {
                 property bool scrollBarVisible: contentHeight > height
                 property bool currentSceneTimeIsLocked: currentItem ? currentItem.locked : false
 
-                ScrollBar.vertical: ScrollBar {
-                    policy: screenplayOffsetsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                    minimumSize: 0.1
-                    palette {
-                        mid: Qt.rgba(0,0,0,0.25)
-                        dark: Qt.rgba(0,0,0,0.75)
-                    }
-                    opacity: active ? 1 : 0.2
-                    Behavior on opacity {
-                        enabled: screenplayEditorSettings.enableAnimations
-                        NumberAnimation { duration: 250 }
-                    }
-                }
+                ScrollBar.vertical: ScrollBar2 { flickable: screenplayOffsetsView }
 
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 0

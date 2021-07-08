@@ -81,6 +81,7 @@ public:
         GeneralForm,
         LocationForm,
         CharacterForm,
+        RelationshipForm
     };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type NOTIFY typeChanged)
@@ -159,6 +160,7 @@ private:
 class Forms : public ObjectListPropertyModel<Form*>, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     static Forms *global();

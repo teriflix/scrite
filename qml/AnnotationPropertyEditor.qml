@@ -31,19 +31,7 @@ Item {
         contentHeight: propertyEditorItems.height
 
         property bool scrollBarVisible: contentHeight > height
-        ScrollBar.vertical: ScrollBar {
-            policy: propertyEditorView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: active ? 1 : 0.2
-            Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-        }
+        ScrollBar.vertical: ScrollBar2 { flickable: propertyEditorView }
 
         Column {
             id: propertyEditorItems
@@ -418,19 +406,7 @@ Item {
                         }
                         padding: 4
                     }
-                    ScrollBar.vertical: ScrollBar {
-                        policy: propertyEditorView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                        minimumSize: 0.1
-                        palette {
-                            mid: Qt.rgba(0,0,0,0.25)
-                            dark: Qt.rgba(0,0,0,0.75)
-                        }
-                        opacity: active ? 1 : 0.2
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-                    }
+                    ScrollBar.vertical: ScrollBar2 { flickable: propertyEditorView }
                     currentIndex: systemFontInfo ? systemFontInfo.families.indexOf(propertyValue) : -1
                 }
             }

@@ -220,20 +220,7 @@ Item {
                 rightMargin: contentHeight > height ? 15 : 0
                 highlightMoveDuration: 0
                 clip: true
-                ScrollBar.vertical: ScrollBar {
-                    policy: (libraryGridView.contentHeight > libraryGridView.height) ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                    minimumSize: 0.1
-                    palette {
-                        mid: Qt.rgba(0,0,0,0.25)
-                        dark: Qt.rgba(0,0,0,0.75)
-                    }
-                    opacity: active ? 1 : 0.2
-                    Behavior on opacity {
-                        enabled: screenplayEditorSettings.enableAnimations
-                        NumberAnimation { duration: 250 }
-                    }
-                }
-
+                ScrollBar.vertical: ScrollBar2 { flickable: libraryGridView }
                 property real availableWidth: width-rightMargin
                 readonly property real posterWidth: 80 * 1.75
                 readonly property real posterHeight: 120 * 1.5
@@ -408,19 +395,7 @@ Item {
                 rightMargin: contentHeight > height ? 15 : 0
                 highlightMoveDuration: 0
                 clip: true
-                ScrollBar.vertical: ScrollBar {
-                    policy: (templatesGridView.contentHeight > templatesGridView.height) ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                    minimumSize: 0.1
-                    palette {
-                        mid: Qt.rgba(0,0,0,0.25)
-                        dark: Qt.rgba(0,0,0,0.75)
-                    }
-                    opacity: active ? 1 : 0.2
-                    Behavior on opacity {
-                        enabled: screenplayEditorSettings.enableAnimations
-                        NumberAnimation { duration: 250 }
-                    }
-                }
+                ScrollBar.vertical: ScrollBar2 { flickable: templatesGridView  }
 
                 property real availableWidth: width-rightMargin
                 readonly property real posterWidth: 80 * 1.75

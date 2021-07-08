@@ -115,19 +115,7 @@ ListView {
     }
 
     property bool scrollBarVisible: contentWidth > width
-    ScrollBar.horizontal: ScrollBar {
-        policy: attachmentsView.scrollBarVisible ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-        minimumSize: 0.1
-        palette {
-            mid: Qt.rgba(0,0,0,0.25)
-            dark: Qt.rgba(0,0,0,0.75)
-        }
-        opacity: active ? 1 : 0.2
-        Behavior on opacity {
-            enabled: screenplayEditorSettings.enableAnimations
-            NumberAnimation { duration: 250 }
-        }
-    }
+    ScrollBar.horizontal: ScrollBar2 { flickable: attachmentsView }
 
     FileDialog {
         id: fileDialog

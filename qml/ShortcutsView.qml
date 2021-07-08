@@ -37,15 +37,7 @@ Item {
         model: shortcutsModel
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        ScrollBar.vertical: ScrollBar {
-            policy: shortcutsView.contentHeight > shortcutsView.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            minimumSize: 0.1
-            palette {
-                mid: Qt.rgba(0,0,0,0.25)
-                dark: Qt.rgba(0,0,0,0.75)
-            }
-            opacity: active ? 1 : 0.2
-        }
+        ScrollBar.vertical: ScrollBar2 { flickable: shortcutsView }
         section.property: "itemGroup"
         section.criteria: ViewSection.FullString
         section.delegate: Item {
