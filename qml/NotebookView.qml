@@ -627,6 +627,11 @@ Rectangle {
                             color: app.translucent(primaryColors.c100.background, 0.5)
                             border.width: 1
                             border.color: primaryColors.borderColor
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: newNoteMenu.open()
+                            }
                         }
 
                         ToolButton3 {
