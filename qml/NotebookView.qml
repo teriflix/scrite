@@ -572,8 +572,8 @@ Rectangle {
 
                                 Column {
                                     anchors.fill: parent
-                                    anchors.margins: 5
-                                    spacing: 5
+                                    anchors.margins: 16
+                                    spacing: 8
 
                                     Text {
                                         id: headingText
@@ -583,7 +583,7 @@ Rectangle {
                                         width: parent.width
                                         elide: Text.ElideRight
                                         text: objectItem.title
-                                        color: app.isLightColor(parent.parent.color) ? "black" : "white"
+                                        color: app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                     }
 
                                     Text {
@@ -593,7 +593,7 @@ Rectangle {
                                         elide: Text.ElideRight
                                         font.pointSize: app.idealFontPointSize-2
                                         text: objectItem.type === Note.TextNoteType ? objectItem.content : objectItem.summary
-                                        color: app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
+                                        color: headingText.color
                                     }
                                 }
                             }
