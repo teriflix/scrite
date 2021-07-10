@@ -528,7 +528,7 @@ Rectangle {
             id: notesSummary
             property var componentData
             property Notes notes: componentData.notebookItemObject
-            readonly property real minimumNoteSize: 200
+            property real minimumNoteSize: Math.max(200, ui.width*0.15)
             property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
             color: app.translucent(primaryColors.c100.background, 0.5)
