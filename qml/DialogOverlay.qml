@@ -62,9 +62,9 @@ Rectangle {
     visible: t > 0
     onVisibleChanged: {
         if(visible)
-            blur.show()
+            dialogUnderlay.show()
         else {
-            blur.hide()
+            dialogUnderlay.hide()
             popupSourceImage.source = ""
         }
     }
@@ -89,7 +89,7 @@ Rectangle {
         }
     }
 
-    onTChanged: blur.radius = blur.maxRadius * t
+    onTChanged: dialogUnderlay.radius = dialogUnderlay.maxRadius * t
 
     MouseArea {
         anchors.fill: parent

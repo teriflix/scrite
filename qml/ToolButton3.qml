@@ -32,7 +32,7 @@ Item {
     property real suggestedWidth: 42
     property real suggestedHeight: suggestedWidth
     property alias shortcut: toolButtonShortcut.sequence
-    property string shortcutText: "" + shortcut
+    property string shortcutText: toolButtonShortcut.portableText
     property bool down: toolButtonMouseArea.pressed
     property bool checkable: false
     property bool checked: false
@@ -98,15 +98,8 @@ Item {
     }
 
     ToolTip.text: shortcutText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(shortcutText) + ")")
-    ToolTip.visible: ToolTip.text !== "" && (toolButtonMouseArea.containsMouse && !down ? toolTipVisibility.get : false)
+    ToolTip.visible: ToolTip.text === "" ? false : (toolButtonMouseArea.containsMouse && !down)
     ToolTip.delay: 500
-
-    DelayedPropertyBinder {
-        id: toolTipVisibility
-        initial: false
-        set: toolButtonMouseArea.containsMouse
-        delay: toolButton.ToolTip.delay
-    }
 
     MouseArea {
         id: toolButtonMouseArea

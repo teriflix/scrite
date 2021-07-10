@@ -77,7 +77,7 @@ Rectangle {
     UI.ScriteDocumentView {
         id: ui
         anchors.fill: parent
-        enabled: !blur.visible
+        enabled: !dialogUnderlay.visible
     }
 
     Loader {
@@ -130,7 +130,7 @@ Rectangle {
     }
 
     Item {
-        id: blur
+        id: dialogUnderlay
         anchors.fill: ui
         property color color: primaryColors.windowColor
 
@@ -159,7 +159,6 @@ Rectangle {
         Rectangle {
             anchors.fill: parent
             color: parent.color
-            // opacity: 0.6 * (parent.radius/parent.maxRadius)
             opacity: 0.9 * (parent.radius/parent.maxRadius)
         }
     }
@@ -378,10 +377,10 @@ Rectangle {
         active: scriteDocument.busy
         onActiveChanged: {
             if(active) {
-                blur.radius = blur.maxRadius
-                blur.show()
+                dialogUnderlay.radius = dialogUnderlay.maxRadius
+                dialogUnderlay.show()
             } else {
-                blur.hide()
+                dialogUnderlay.hide()
             }
         }
         anchors.fill: parent
@@ -466,9 +465,9 @@ Rectangle {
         width: parent.width * 0.7
         onVisibleChanged: {
             if(visible)
-                blur.show()
+                dialogUnderlay.show()
             else
-                blur.hide()
+                dialogUnderlay.hide()
         }
     }
 
@@ -482,8 +481,8 @@ Rectangle {
         id: splashLoader
         anchors.fill: parent
         sourceComponent: UI.SplashScreen {
-            Component.onCompleted: blur.show()
-            Component.onDestruction: blur.hide()
+            Component.onCompleted: dialogUnderlay.show()
+            Component.onDestruction: dialogUnderlay.hide()
             onDone: {
                 splashLoader.active = false
                 if(app.isWindowsPlatform && app.isNotWindows10)
@@ -496,7 +495,7 @@ Rectangle {
         }
     }
 
-    property var lastSnapshotTimestamp: 0
+    property int lastSnapshotTimestamp: 0
     EventFilter.active: app.getEnvironmentVariable("SCRITE_SNAPSHOT_CAPTURE") === "YES"
     EventFilter.target: app
     EventFilter.events: [6]

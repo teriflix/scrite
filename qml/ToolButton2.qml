@@ -85,6 +85,6 @@ ToolButton {
         shortcut: toolButton.shortcut
     }
 
-    ToolTip.text: app.polishShortcutTextForDisplay(text + "\t" + shortcut)
-    ToolTip.visible: hovered
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(shortcutText) + ")")
+    ToolTip.visible: ToolTip.text === "" ? false : hovered
 }

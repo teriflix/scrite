@@ -24,9 +24,9 @@ Menu {
     objectName: title
 
     Connections {
-        target: blur
+        target: dialogUnderlay
         onVisibleChanged: {
-            if(blur.visible)
+            if(dialogUnderlay.visible)
                 thisMenu.close()
         }
     }
