@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.13
@@ -1719,63 +1720,48 @@ Item {
                             color: primaryColors.borderColor
                         }
 
-                        TabView3 {
+                        Item {
                             id: structureEditorTabs
                             anchors.fill: parent
-                            tabNames: ui.showNotebookInStructure ? ["Structure", "Notebook"] : ["Structure"]
-                            tabColor: primaryColors.c700.background
-                            tabBarVisible: ui.showNotebookInStructure
-                            currentTabContent: Item {
-                                Announcement.onIncoming: {
-                                    if(ui.showNotebookInStructure) {
-                                        if(structureEditorTabs.currentTabIndex === 0)
-                                            structureEditorTabs.currentTabIndex = 1
+                            property int currentTabIndex: 0
 
-                                        if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8")
-                                            app.execLater(notebookViewLoader, 100, function() {
-                                                notebookViewLoader.item.switchToCharacterTab(data)
-                                            })
-                                        else if(type === "41EE5E06-FF97-4DB6-B32D-F938418C9529")
-                                            app.execLater(notebookViewLoader, 100, function() {
-                                                notebookViewLoader.item.switchToSceneTab(data)
-                                            })
+                            Announcement.onIncoming: {
+                                if(ui.showNotebookInStructure) {
+                                    if(type === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
+                                        structureEditorTabs.currentTabIndex = (structureEditorTabs.currentTabIndex+1)%2
+                                    } else if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
+                                        structureEditorTabs.currentTabIndex = 1
+                                        app.execLater(notebookViewLoader, 100, function() {
+                                            notebookViewLoader.item.switchToCharacterTab(data)
+                                        })
                                     }
-                                }
-
-                                Loader {
-                                    id: structureViewLoader
-                                    anchors.fill: parent
-                                    visible: !ui.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
-                                    sourceComponent: StructureView { }
-                                }
-
-                                Loader {
-                                    id: notebookViewLoader
-                                    anchors.fill: parent
-                                    active: false
-                                    visible: ui.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
-                                    onVisibleChanged: {
-                                        if(visible && !active)
-                                            active = true
+                                    else if(type === "41EE5E06-FF97-4DB6-B32D-F938418C9529") {
+                                        structureEditorTabs.currentTabIndex = 1
+                                        app.execLater(notebookViewLoader, 100, function() {
+                                            notebookViewLoader.item.switchToSceneTab(data)
+                                        })
                                     }
-                                    sourceComponent: NotebookView { }
                                 }
                             }
 
-                            cornerItem: Item {
-                                visible: structureEditorTabs.currentTabIndex === 1 && structureEditorTabs.cornerItemSpace > syncEpisodeActSceneCheckBox.width
+                            Loader {
+                                id: structureViewLoader
+                                anchors.fill: parent
+                                visible: !ui.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+                                sourceComponent: StructureView { }
+                            }
 
-                                CheckBox2 {
-                                    id: syncEpisodeActSceneCheckBox
-                                    text: "Sync Episode, Act & Scene"
-                                    hoverEnabled: true
-                                    ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
-                                    ToolTip.delay: 1000
-                                    ToolTip.visible: hovered
-                                    checked: workspaceSettings.syncCurrentSceneOnNotebook
-                                    onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
+                            Loader {
+                                id: notebookViewLoader
+                                anchors.fill: parent
+                                active: false
+                                visible: ui.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                onVisibleChanged: {
+                                    if(visible && !active)
+                                        active = true
+                                }
+                                sourceComponent: NotebookView {
+                                    toolbarSize: structureViewLoader.item.toolbarSize
                                 }
                             }
                         }

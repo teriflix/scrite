@@ -35,7 +35,7 @@ Item {
 
         Column {
             id: formContentLayout
-            width: formVScrollBar.required ? formFlickable.width - 17 : formFlickable.width
+            width: formVScrollBar.needed ? formFlickable.width - 17 : formFlickable.width
             spacing: 20
 
             Item {

@@ -41,6 +41,7 @@ Item {
     property bool autoRepeat: false
     property alias toolButtonImage: iconImage
     property bool hasMenu: false
+    property int menuArrow: Qt.RightArrow
 
     signal toggled()
     signal clicked()
@@ -77,17 +78,22 @@ Item {
         }
     }
 
-
     Image {
         visible: hasMenu
         width: parent.width/2.5
         height: parent.height/2.5
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: -parent.width/10
+
+        anchors.verticalCenter: menuArrow === Qt.RightArrow ? parent.verticalCenter : undefined
+        anchors.right: menuArrow === Qt.RightArrow ? parent.right : undefined
+        anchors.rightMargin: menuArrow === Qt.RightArrow ? -parent.width/10 : 0
+
+        anchors.horizontalCenter: menuArrow === Qt.DownArrow ? parent.horizontalCenter : undefined
+        anchors.bottom: menuArrow === Qt.DownArrow ? parent.bottom : undefined
+        anchors.bottomMargin:  menuArrow === Qt.DownArrow ? -parent.height/10 : 0
+
         fillMode: Image.PreserveAspectFit
         opacity: iconImage.opacity
-        source: "../icons/navigation/arrow_right.png"
+        source: menuArrow === Qt.RightArrow ? "../icons/navigation/arrow_right.png" : "../icons/navigation/arrow_down.png"
     }
 
     Shortcut {

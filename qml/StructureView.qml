@@ -11,9 +11,11 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Item {
@@ -21,6 +23,7 @@ Item {
     signal requestEditor()
     signal releaseEditor()
 
+    readonly property real toolbarSize: toolbar.width
     readonly property size maxDragImageSize: Qt.size(36, 36)
 
     Rectangle {
@@ -40,7 +43,36 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             flow: Flow.TopToBottom
             layoutDirection: Qt.RightToLeft
-            property real columnWidth: newSceneButton.width
+            property real columnWidth: changeTabButton.width
+
+            ToolButton3 {
+                id: changeTabButton
+                visible: workspaceSettings.showNotebookInStructure
+                iconSource: "../icons/navigation/structure_tab.png"
+                hasMenu: true
+                ToolTip.text: "Switch between Structure & Notebook tabs."
+                onClicked: changeTabMenu.open()
+
+                Item {
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+
+                    Menu2 {
+                        id: changeTabMenu
+
+                        MenuItem2 {
+                            text: "Structure"
+                            icon.source: "../icons/navigation/check.png"
+                        }
+
+                        MenuItem2 {
+                            text: "Notebook"
+                            icon.source: "../icons/content/blank.png"
+                            onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "SwitchTab")
+                        }
+                    }
+                }
+            }
 
             ToolButton3 {
                 id: newSceneButton

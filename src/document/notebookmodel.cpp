@@ -215,6 +215,13 @@ QModelIndex NotebookModel::findModelIndexForTopLevelItem(const QString &label) c
     return this->indexFromItem(items.first());
 }
 
+void NotebookModel::refresh()
+{
+    emit aboutToRefresh();
+    this->reload();
+    emit justRefreshed();
+}
+
 QHash<int, QByteArray> NotebookModel::roleNames() const
 {
     return staticRoleNames();

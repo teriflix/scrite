@@ -12,6 +12,8 @@
         <file>icons/action/add_one_inverted.png</file>
         <file>icons/action/add_scene.png</file>
         <file>icons/action/add_scene_inverted.png</file>
+        <file>icons/action/attach_file.png</file>
+        <file>icons/action/attach_file_inverted.png</file>
         <file>icons/action/delete.png</file>
         <file>icons/action/delete_inverted.png</file>
         <file>icons/action/description.png</file>
@@ -145,6 +147,14 @@
         <file>icons/file/folder_open_inverted.png</file>
         <file>icons/file/import_export.png</file>
         <file>icons/file/import_export_inverted.png</file>
+        <file>icons/filetype/audio.png</file>
+        <file>icons/filetype/audio_inverted.png</file>
+        <file>icons/filetype/document.png</file>
+        <file>icons/filetype/document_inverted.png</file>
+        <file>icons/filetype/photo.png</file>
+        <file>icons/filetype/photo_inverted.png</file>
+        <file>icons/filetype/video.png</file>
+        <file>icons/filetype/video_inverted.png</file>
         <file>icons/hardware/keyboard.png</file>
         <file>icons/hardware/keyboard_hide.png</file>
         <file>icons/hardware/keyboard_hide_inverted.png</file>
@@ -171,6 +181,8 @@
         <file>icons/mediaplayer/sync_with_screenplay_inverted.png</file>
         <file>icons/mediaplayer/time_column.png</file>
         <file>icons/mediaplayer/time_column_inverted.png</file>
+        <file>icons/navigation/arrow_down.png</file>
+        <file>icons/navigation/arrow_down_inverted.png</file>
         <file>icons/navigation/arrow_left.png</file>
         <file>icons/navigation/arrow_left_inverted.png</file>
         <file>icons/navigation/arrow_right.png</file>
@@ -204,6 +216,8 @@
         <file>icons/navigation/shortcuts_windows.png</file>
         <file>icons/navigation/structure_tab.png</file>
         <file>icons/navigation/structure_tab_inverted.png</file>
+        <file>icons/navigation/sync.png</file>
+        <file>icons/navigation/sync_inverted.png</file>
         <file>icons/navigation/zoom_fit.png</file>
         <file>icons/navigation/zoom_fit_inverted.png</file>
         <file>icons/navigation/zoom_in.png</file>
@@ -224,15 +238,5 @@
         <file>icons/screenplay/shot_inverted.png</file>
         <file>icons/screenplay/transition.png</file>
         <file>icons/screenplay/transition_inverted.png</file>
-        <file>icons/action/attach_file.png</file>
-        <file>icons/action/attach_file_inverted.png</file>
-        <file>icons/filetype/audio.png</file>
-        <file>icons/filetype/audio_inverted.png</file>
-        <file>icons/filetype/document.png</file>
-        <file>icons/filetype/document_inverted.png</file>
-        <file>icons/filetype/photo.png</file>
-        <file>icons/filetype/photo_inverted.png</file>
-        <file>icons/filetype/video.png</file>
-        <file>icons/filetype/video_inverted.png</file>
     </qresource>
 </RCC>

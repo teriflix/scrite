@@ -29,7 +29,7 @@ Menu2 {
         sourceModel: scriteDocument.globalForms
         sortByProperty: "title"
         filterByProperty: "type"
-        filterValues: notes ? [notes.compatibleFormType] : undefined
+        filterValues: notes ? [notes.compatibleFormType] : []
     }
 
     enabled: formFilterModel.objectCount > 0

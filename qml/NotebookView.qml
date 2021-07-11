@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Dialogs 1.3
@@ -22,6 +23,8 @@ import Scrite 1.0
 
 Rectangle {
     id: notebookView
+
+    property real toolbarSize: 46
 
     function switchToStoryTab() {
         switchTo(scriteDocument.structure.notes)
@@ -50,6 +53,8 @@ Rectangle {
         id: notebookModel
         document: scriteDocument.loading ? null : scriteDocument
 
+        onAboutToRefresh: noteCurrentItem()
+        onJustRefreshed: restoreCurrentItem()
         onAboutToReloadScenes: noteCurrentItem()
         onJustReloadedScenes: restoreCurrentItem()
         onAboutToReloadCharacters: noteCurrentItem()
@@ -84,7 +89,11 @@ Rectangle {
 
     Connections {
         target: scriteDocument
-        onLoadingComplete: notebookTree.activateFromCurrentScreenplayElement()
+        ignoreUnknownSignals: true
+        onLoadingChanged: {
+            if(!scriteDocument.loading)
+                notebookTree.activateFromCurrentScreenplayElement()
+        }
     }
 
     Component.onCompleted: notebookTree.activateFromCurrentScreenplayElement()
@@ -94,9 +103,156 @@ Rectangle {
         font.pointSize: Math.ceil(app.idealFontPointSize*0.75)
     }
 
+    Loader {
+        id: toolbar
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.right: parent.right
+        active: ui.showNotebookInStructure
+        sourceComponent: Rectangle {
+            height: toolbarLayout.height+4
+            color: primaryColors.c100.background
+
+            property real toolButtonSize: Math.max(toolbarSize - 4, 20)
+
+            Row {
+                id: toolbarLayout
+                spacing: 0
+                width: parent.width-5
+                anchors.verticalCenter: parent.verticalCenter
+                property real rowHeight: changeTabButton.height
+
+                ToolButton3 {
+                    id: changeTabButton
+                    iconSource: "../icons/navigation/notebook_tab.png"
+                    hasMenu: true
+                    menuArrow: Qt.DownArrow
+                    ToolTip.text: "Switch between Structure & Notebook tabs."
+                    onClicked: changeTabMenu.open()
+                    suggestedWidth: toolButtonSize
+                    suggestedHeight: toolButtonSize
+
+                    Item {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+
+                        Menu2 {
+                            id: changeTabMenu
+
+                            MenuItem2 {
+                                text: "Structure"
+                                icon.source: "../icons/content/blank.png"
+                                onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "SwitchTab")
+                            }
+
+                            MenuItem2 {
+                                text: "Notebook"
+                                icon.source: "../icons/navigation/check.png"
+                            }
+                        }
+                    }
+                }
+
+                ToolButton3 {
+                    checkable: true
+                    iconSource: "../icons/navigation/sync.png"
+                    ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
+                    checked: workspaceSettings.syncCurrentSceneOnNotebook
+                    onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
+                    suggestedWidth: toolButtonSize
+                    suggestedHeight: toolButtonSize
+                }
+
+                ToolButton3 {
+                    iconSource: "../icons/navigation/refresh.png"
+                    ToolTip.text: "Reloads the notebook explorer tree."
+                    onClicked: notebookModel.refresh()
+                    suggestedWidth: toolButtonSize
+                    suggestedHeight: toolButtonSize
+                }
+
+                Item {
+                    width: Math.max(0, notebookTree.width-3*toolButtonSize-2*parent.spacing)
+                    height: parent.height
+                }
+
+                ToolButton3 {
+                    id: newNoteToolButton
+                    iconSource: "../icons/action/note_add.png"
+                    hasMenu: true
+                    menuArrow: Qt.DownArrow
+                    suggestedWidth: toolButtonSize
+                    suggestedHeight: toolButtonSize
+                    property Notes notes: notebookTree.currentNotes
+                    enabled: notes
+                    ToolTip.text: {
+                        var ret = "Adds a new text or form note"
+                        if(!enabled)
+                            return ret
+                        ret += " to" + notebookTree.currentData.notebookItemTitle
+                        return ret
+                    }
+                    onClicked: {
+                        newNoteMenu.notes = notes
+                        newNoteMenu.popup(newNoteToolButton, 0, newNoteToolButton.height)
+                    }
+                }
+
+                ToolButton3 {
+                    id: noteColorButton
+                    property Character character: notebookTree.currentCharacter
+                    property Note note: notebookTree.currentNote
+                    suggestedWidth: toolButtonSize
+                    suggestedHeight: toolButtonSize
+                    enabled: character || note
+                    iconSource: {
+                        if(note)
+                            return "image://color/" + note.color + "/1"
+                        if(character)
+                            return "image://color/" + character.color + "/1"
+                        return "image://color/#00ffffff/1"
+                    }
+                    down: noteColorMenu.visible
+                    onClicked: noteColorMenu.popup(noteColorButton, 0, noteColorButton.height)
+
+                    ColorMenu {
+                        id: noteColorMenu
+                        enabled: noteColorButton.enabled
+                        onMenuItemClicked: {
+                            if(noteColorButton.note)
+                                noteColorButton.note.color = color
+                            else if(noteColorButton.character)
+                                noteColorButton.character.color = color
+                        }
+                    }
+                }
+
+                ToolButton3 {
+                    id: deleteNoteButton
+                    suggestedWidth: toolButtonSize
+                    suggestedHeight: toolButtonSize
+                    enabled: noteColorButton.enabled
+                    ToolTip.text: "Delete the current note or character"
+                    iconSource: "../icons/action/delete.png"
+                    onClicked: notebookContentLoader.confirmAndDelete()
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                anchors.bottom: parent.bottom
+                color: primaryColors.borderColor
+            }
+        }
+    }
+
     SplitView {
         orientation: Qt.Horizontal
-        anchors.fill: parent
+        anchors.top: toolbar.active ? toolbar.bottom : parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
         Material.background: Qt.darker(primaryColors.button.background, 1.1)
 
         OldControls.TreeView {
@@ -114,6 +270,18 @@ Rectangle {
                 color: styleData.selected ? primaryColors.highlight.background : primaryColors.c10.background
             }
             property var currentData: model.modelIndexData(currentIndex)
+            property Notes currentNotes: {
+                if(currentData.notebookItemType === NotebookModel.NotesType)
+                    return currentData.notebookItemObject
+                if(currentData.notebookItemType === NotebookModel.NoteType)
+                    return currentData.notebookItemObject.notes
+                if(currentData.notebookItemType === NotebookModel.CategoryType &&
+                   currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
+                    return scriteDocument.structure.notes
+                return null
+            }
+            property Note currentNote: currentData.notebookItemType === NotebookModel.NoteType ? currentData.notebookItemObject : null
+            property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
 
             itemDelegate: Item {
                 width: notebookTree.width
@@ -250,10 +418,12 @@ Rectangle {
             function activateFromCurrentScreenplayElement() {
                 var spobj = scriteDocument.screenplay
                 var element = spobj.elementAt(spobj.currentElementIndex)
-                if(element.elementType === ScreenplayElement.BreakElementType)
-                    switchTo(element)
-                else
-                    switchTo(element.scene.notes)
+                if(element) {
+                    if(element.elementType === ScreenplayElement.BreakElementType)
+                        switchTo(element)
+                    else
+                        switchTo(element.scene.notes)
+                }
             }
 
             function activateScreenplayElement(_modelData) {
@@ -317,72 +487,140 @@ Rectangle {
             }
         }
 
-        Loader {
-            id: notebookContentLoader
-            active: notebookContentActiveProperty.value
+        Item {
+            Loader {
+                id: notebookContentLoader
+                active: notebookContentActiveProperty.value
+                anchors.fill: parent
 
-            property int currentNotebookItemId: notebookTree.currentData ? notebookTree.currentData.notebookItemId : -1
+                property int currentNotebookItemId: notebookTree.currentData ? notebookTree.currentData.notebookItemId : -1
 
-            ResetOnChange {
-                id: notebookContentActiveProperty
-                trackChangesOn: notebookContentLoader.currentNotebookItemId
-                from: false
-                to: true
-            }
-
-            sourceComponent: {
-                if(!notebookTree.currentData)
-                    return unknownComponent
-
-                switch(notebookTree.currentData.notebookItemType) {
-                case NotebookModel.CategoryType:
-                    switch(notebookTree.currentData.notebookItemCategory) {
-                    case NotebookModel.ScreenplayCategory:
-                        return screenplayComponent
-                    case NotebookModel.UnusedScenesCategory:
-                        return unusedScenesComponent
-                    case NotebookModel.CharactersCategory:
-                        return charactersComponent
-                    }
-                    break
-                case NotebookModel.NotesType:
-                    switch(notebookTree.currentData.notebookItemObject.ownerType) {
-                    case Notes.CharacterOwner:
-                        return characterNotesComponent
-                    case Notes.SceneOwner:
-                        return sceneNotesComponent
-                    default:
-                        return notesComponent
-                    }
-                case NotebookModel.NoteType:
-                    switch(notebookTree.currentData.notebookItemObject.type) {
-                    case Note.TextNoteType:
-                        return textNoteComponent
-                    case Note.FormNoteType:
-                        return formNoteComponent
-                    }
-                    break
-                case NotebookModel.EpisodeBreakType:
-                case NotebookModel.ActBreakType:
-                    return episodeOrActBreakComponent
+                ResetOnChange {
+                    id: notebookContentActiveProperty
+                    trackChangesOn: notebookContentLoader.currentNotebookItemId
+                    from: false
+                    to: true
                 }
 
-                return unknownComponent
+                sourceComponent: {
+                    if(!notebookTree.currentData)
+                        return unknownComponent
+
+                    switch(notebookTree.currentData.notebookItemType) {
+                    case NotebookModel.CategoryType:
+                        switch(notebookTree.currentData.notebookItemCategory) {
+                        case NotebookModel.ScreenplayCategory:
+                            return screenplayComponent
+                        case NotebookModel.UnusedScenesCategory:
+                            return unusedScenesComponent
+                        case NotebookModel.CharactersCategory:
+                            return charactersComponent
+                        }
+                        break
+                    case NotebookModel.NotesType:
+                        switch(notebookTree.currentData.notebookItemObject.ownerType) {
+                        case Notes.CharacterOwner:
+                            return characterNotesComponent
+                        case Notes.SceneOwner:
+                            return sceneNotesComponent
+                        default:
+                            return notesComponent
+                        }
+                    case NotebookModel.NoteType:
+                        switch(notebookTree.currentData.notebookItemObject.type) {
+                        case Note.TextNoteType:
+                            return textNoteComponent
+                        case Note.FormNoteType:
+                            return formNoteComponent
+                        }
+                        break
+                    case NotebookModel.EpisodeBreakType:
+                    case NotebookModel.ActBreakType:
+                        return episodeOrActBreakComponent
+                    }
+
+                    return unknownComponent
+                }
+                onLoaded: item.componentData = notebookTree.currentData
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.rgba(0,0,0,0.05)
+                    visible: notebookContentActiveProperty.value === false
+
+                    BusyIndicator {
+                        running: notebookContentActiveProperty.value === false
+                        anchors.centerIn: parent
+                    }
+                }
+
+                function confirmAndDelete() {
+                    deleteConfirmationBox.active = true
+                }
+                onActiveChanged: deleteConfirmationBox.active = false
             }
-            onLoaded: item.componentData = notebookTree.currentData
 
-            Rectangle {
+            Loader {
+                id: deleteConfirmationBox
                 anchors.fill: parent
-                color: Qt.rgba(0,0,0,0.05)
-                visible: notebookContentActiveProperty.value === false
+                active: false
+                sourceComponent: Rectangle {
+                    id: deleteConfirmationItem
+                    color: app.translucent(primaryColors.c600.background,0.85)
+                    focus: true
 
-                BusyIndicator {
-                    running: notebookContentActiveProperty.value === false
-                    anchors.centerIn: parent
+                    Component.onCompleted: {
+                        app.log("I am here..")
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                    }
+
+                    Column {
+                        width: parent.width-20
+                        anchors.centerIn: parent
+                        spacing: 40
+
+                        Text {
+                            text: {
+                                if(notebookTree.currentNote)
+                                    return "Are you sure you want to delete this note?"
+                                if(notebookTree.currentCharacter)
+                                    return "Are you sure you want to delete this character?"
+                                return "Cannot remove this item."
+                            }
+                            font.bold: true
+                            font.pointSize: app.idealFontPointSize
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WordWrap
+                            color: primaryColors.c600.text
+                        }
+
+                        Row {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 20
+
+                            Button2 {
+                                text: "Yes"
+                                focusPolicy: Qt.NoFocus
+                                onClicked: notebookContentLoader.item.deleteSelf()
+                                visible: notebookTree.currentNote || notebookTree.currentCharacter
+                            }
+
+                            Button2 {
+                                text: notebookTree.currentNote || notebookTree.currentCharacter ? "No" : "OK"
+                                focusPolicy: Qt.NoFocus
+                                onClicked: deleteConfirmationBox.active = false
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+
 
     Component {
         id: unknownComponent
@@ -631,48 +869,22 @@ Rectangle {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: newNoteMenu.open()
+                                onClicked: {
+                                    newNoteMenu.notes = notesSummary.notes
+                                    newNoteMenu.popup(newNoteButton, 0, newNoteButton.height)
+                                }
                             }
                         }
 
                         ToolButton3 {
+                            id: newNoteButton
                             anchors.centerIn: parent
                             ToolTip.text: "Add a new text or form note."
                             iconSource: "../icons/action/note_add.png"
-                            onClicked: newNoteMenu.open()
                             down: newNoteMenu.visible
-
-                            Item {
-                                anchors.left: parent.left
-                                anchors.top: parent.bottom
-
-                                Menu2 {
-                                    id: newNoteMenu
-
-                                    ColorMenu {
-                                        title: "Text Note"
-                                        onMenuItemClicked: {
-                                            var note = notes.addTextNote()
-                                            if(note) {
-                                                note.color = color
-                                                note.objectName = "_newNote"
-                                                app.execLater(note, 10, function() {
-                                                    switchTo(note);
-                                                })
-                                            }
-                                        }
-                                    }
-
-                                    FormMenu {
-                                        title: "Form Note"
-                                        notes: notesSummary.notes
-                                        onNoteAdded: {
-                                            app.execLater(note, 10, function() {
-                                                switchTo(note);
-                                            })
-                                        }
-                                    }
-                                }
+                            onClicked: {
+                                newNoteMenu.notes = notesSummary.notes
+                                newNoteMenu.popup(newNoteButton, 0, newNoteButton.height)
                             }
                         }
                     }
@@ -699,6 +911,12 @@ Rectangle {
             property var componentData
             property Note note: componentData.notebookItemObject
             color: Qt.tint(note.color, "#E7FFFFFF")
+
+            function deleteSelf() {
+                var notes = note.notes
+                notes.removeNote(note)
+                switchTo(notes)
+            }
 
             onNoteChanged: {
                 if(note.objectName === "_newNote")
@@ -765,6 +983,12 @@ Rectangle {
             property var componentData
             property Note note: componentData.notebookItemObject
             color: Qt.tint(note.color, "#E7FFFFFF")
+
+            function deleteSelf() {
+                var notes = note.notes
+                notes.removeNote(note)
+                switchTo(notes)
+            }
 
             FormView {
                 anchors.fill: parent
@@ -1354,6 +1578,11 @@ Rectangle {
             color: Qt.tint(character.color, "#e7ffffff")
 
             signal characterDoubleClicked(string characterName)
+
+            function deleteSelf() {
+                notebookModel.preferredItem = "Characters"
+                scriteDocument.structure.removeCharacter(character)
+            }
 
             TextTabBar {
                 id: characterTabBar
@@ -1976,6 +2205,39 @@ Rectangle {
     }
 
     Menu2 {
+        id: newNoteMenu
+        property Notes notes
+        enabled: notes
+        onAboutToHide: notes = null
+
+        ColorMenu {
+            title: "Text Note"
+            onMenuItemClicked: {
+                var note = newNoteMenu.notes.addTextNote()
+                if(note) {
+                    note.color = color
+                    note.objectName = "_newNote"
+                    app.execLater(note, 10, function() {
+                        switchTo(note);
+                    })
+                }
+                newNoteMenu.close()
+            }
+        }
+
+        FormMenu {
+            title: "Form Note"
+            notes: newNoteMenu.notes
+            onNoteAdded: {
+                app.execLater(note, 10, function() {
+                    switchTo(note);
+                })
+                newNoteMenu.close()
+            }
+        }
+    }
+
+    Menu2 {
         id: noteContextMenu
         property Note note
         enabled: note
@@ -1994,12 +2256,7 @@ Rectangle {
 
         MenuItem2 {
             text: "Delete Note"
-            onClicked: {
-                var notes = noteContextMenu.note.notes
-                notes.removeNote(noteContextMenu.note)
-                switchTo(notes)
-                noteContextMenu.close()
-            }
+            onClicked: notebookContentLoader.confirmAndDelete()
         }
     }
 
@@ -2022,11 +2279,7 @@ Rectangle {
 
         MenuItem2 {
             text: "Delete Character"
-            onClicked: {
-                notebookModel.preferredItem = "Characters"
-                scriteDocument.structure.removeCharacter(characterContextMenu.character)
-                characterContextMenu.close()
-            }
+            onClicked: notebookContentLoader.confirmAndDelete()
         }
     }
 

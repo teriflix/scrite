@@ -77,6 +77,7 @@ public:
 
     Q_INVOKABLE QModelIndex findModelIndexFor(QObject *owner) const;
     Q_INVOKABLE QModelIndex findModelIndexForTopLevelItem(const QString &label) const;
+    Q_INVOKABLE void refresh();
 
     // QAbstractItemModel interface
     QHash<int, QByteArray> roleNames() const;
@@ -84,6 +85,8 @@ public:
     static QHash<int, QByteArray> staticRoleNames();
 
 signals:
+    void justRefreshed();
+    void aboutToRefresh();
     void aboutToReloadScenes();
     void justReloadedScenes();
     void aboutToReloadCharacters();

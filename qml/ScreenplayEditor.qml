@@ -11,12 +11,14 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
+
+import Scrite 1.0
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
