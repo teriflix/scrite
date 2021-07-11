@@ -281,7 +281,8 @@ Item {
             if(scriteDocument.screenplay.currentElementIndex < 0) {
                 var index = scriteDocument.structure.currentElementIndex
                 var element = scriteDocument.structure.elementAt(index)
-                return element.scene
+                if(element)
+                    return element.scene
             }
 
             return scriteDocument.screenplay

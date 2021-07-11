@@ -676,8 +676,8 @@ Rectangle {
         Item {
             id: sceneNotesItem
             property var componentData
-            property Notes notes: componentData.notebookItemObject
-            property Scene scene: notes.scene
+            property Notes notes: componentData ? componentData.notebookItemObject : null
+            property Scene scene: notes ? notes.scene : null
 
             TextTabBar {
                 id: sceneTabBar
@@ -753,13 +753,13 @@ Rectangle {
                         AttachmentsView {
                             id: sceneAttachments
                             width: parent.width
-                            attachments: scene.attachments
+                            attachments: scene ? scene.attachments : null
                         }
                     }
 
                     AttachmentsDropArea2 {
                         anchors.fill: parent
-                        target: scene.attachments
+                        target: scene ? scene.attachments : null
                     }
                 }
 
@@ -948,7 +948,7 @@ Rectangle {
 
         Rectangle {
             property var componentData
-            property Note note: componentData.notebookItemObject
+            property Note note: componentData ? componentData.notebookItemObject : null
             color: Qt.tint(note.color, "#E7FFFFFF")
 
             function deleteSelf() {
@@ -998,7 +998,7 @@ Rectangle {
 
             AttachmentsView {
                 id: attachmentsArea
-                attachments: note.attachments
+                attachments: note ? note.attachments : null
                 orientation: ListView.Horizontal
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -1009,7 +1009,7 @@ Rectangle {
             AttachmentsDropArea2 {
                 id: attachmentsDropArea
                 anchors.fill: parent
-                target: note.attachments
+                target: note ? note.attachments : null
             }
         }
     }
@@ -1093,7 +1093,7 @@ Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        attachments: breakElement.attachments
+                        attachments: breakElement ? breakElement.attachments : null
                     }
                 }
             }
@@ -1101,7 +1101,7 @@ Rectangle {
             AttachmentsDropArea2 {
                 id: attachmentsDropArea
                 anchors.fill: parent
-                target: breakElement.attachments
+                target: breakElement ? breakElement.attachments : null
             }
 
             Text {
@@ -1613,7 +1613,7 @@ Rectangle {
         Rectangle {
             id: characterNotes
             property var componentData
-            property Character character: componentData.notebookItemObject.character
+            property Character character: componentData ? componentData.notebookItemObject.character : null
             color: Qt.tint(character.color, "#e7ffffff")
 
             signal characterDoubleClicked(string characterName)
@@ -1973,7 +1973,7 @@ Rectangle {
                                     anchors.right: characterSummaryField.right
                                     anchors.bottom: parent.bottom
                                     anchors.bottomMargin: 10
-                                    attachments: character.attachments
+                                    attachments: character ? character.attachments : null
                                 }
                             }
                         }
@@ -1983,7 +1983,7 @@ Rectangle {
 
                     AttachmentsDropArea2 {
                         anchors.fill: parent
-                        target: character.attachments
+                        target: character ? character.attachments : null
                     }
                 }
 
@@ -2224,22 +2224,6 @@ Rectangle {
                     }
                 }
             }
-        }
-    }
-
-    Component {
-        id: attachmentsComponent
-
-        Item {
-            id: attachmentsArea
-            property var componentData
-            property Attachments attachments: componentData.notebookItemObject.attachments
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.margins: 10
-            height: 60
         }
     }
 
