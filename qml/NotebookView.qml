@@ -25,6 +25,8 @@ Rectangle {
     id: notebookView
 
     property real toolbarSize: 46
+    property real toolbarSpacing: 0
+    property real toolbarLeftMargin: 0
 
     function switchToStoryTab() {
         switchTo(scriteDocument.structure.notes)
@@ -117,8 +119,11 @@ Rectangle {
 
             Row {
                 id: toolbarLayout
-                spacing: 0
-                width: parent.width-5
+                spacing: toolbarSpacing
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: toolbarLeftMargin
+                anchors.rightMargin: 5
                 anchors.verticalCenter: parent.verticalCenter
                 property real rowHeight: changeTabButton.height
 
@@ -184,7 +189,7 @@ Rectangle {
                     suggestedWidth: toolButtonSize
                     suggestedHeight: toolButtonSize
                     property Notes notes: notebookTree.currentNotes
-                    enabled: notes
+                    enabled: notes && !scriteDocument.readOnly
                     ToolTip.text: {
                         var ret = "Adds a new text or form note"
                         if(!enabled)
@@ -204,7 +209,7 @@ Rectangle {
                     property Note note: notebookTree.currentNote
                     suggestedWidth: toolButtonSize
                     suggestedHeight: toolButtonSize
-                    enabled: character || note
+                    enabled: (character || note) && !scriteDocument.readOnly
                     iconSource: {
                         if(note)
                             return "image://color/" + note.color + "/1"
@@ -231,10 +236,44 @@ Rectangle {
                     id: deleteNoteButton
                     suggestedWidth: toolButtonSize
                     suggestedHeight: toolButtonSize
-                    enabled: noteColorButton.enabled
+                    enabled: noteColorButton.enabled && !scriteDocument.readOnly
                     ToolTip.text: "Delete the current note or character"
                     iconSource: "../icons/action/delete.png"
                     onClicked: notebookContentLoader.confirmAndDelete()
+                }
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    color: primaryColors.separatorColor
+                    opacity: 0.5
+                }
+
+                ToolButton3 {
+                    iconSource: "../icons/action/add_episode.png"
+                    shortcut: "Ctrl+Shift+P"
+                    shortcutText: ""
+                    ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                    enabled: !scriteDocument.readOnly
+                    onClicked: globalScreenplayEditorToolbar.addEpisode()
+                }
+
+                ToolButton3 {
+                    iconSource: "../icons/action/add_act.png"
+                    shortcut: "Ctrl+Shift+B"
+                    shortcutText: ""
+                    ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                    enabled: !scriteDocument.readOnly
+                    onClicked: globalScreenplayEditorToolbar.addAct()
+                }
+
+                ToolButton3 {
+                    iconSource: "../icons/action/add_scene.png"
+                    shortcut: "Ctrl+Shift+N"
+                    shortcutText: ""
+                    ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+                    enabled: !scriteDocument.readOnly
+                    onClicked: globalScreenplayEditorToolbar.addScene()
                 }
             }
 
@@ -284,7 +323,7 @@ Rectangle {
             property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
 
             itemDelegate: Item {
-                width: notebookTree.width
+                width: notebookTree.width-1
 
                 Rectangle {
                     width: notebookTree.width - parent.x

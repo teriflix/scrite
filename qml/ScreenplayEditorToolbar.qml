@@ -131,24 +131,33 @@ Row {
         return idx
     }
 
+    function addEpisode() {
+        requestScreenplayEditor()
+        if(breakInsertIndex < 0)
+            scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
+        else
+            scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
+    }
+
     ToolButton3 {
         iconSource: "../icons/action/add_episode.png"
         shortcut: "Ctrl+Shift+P"
         shortcutText: ""
         ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
-        onClicked: {
-            requestScreenplayEditor()
-            if(breakInsertIndex < 0)
-                scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
-            else
-                scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
-        }
-
+        onClicked: addEpisode()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: shortcut
+    }
+
+    function addAct() {
+        requestScreenplayEditor()
+        if(breakInsertIndex < 0)
+            scriteDocument.screenplay.addBreakElement(Screenplay.Act)
+        else
+            scriteDocument.screenplay.insertBreakElement(Screenplay.Act, breakInsertIndex)
     }
 
     ToolButton3 {
@@ -157,18 +166,17 @@ Row {
         shortcutText: ""
         ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
-        onClicked: {
-            requestScreenplayEditor()
-            if(breakInsertIndex < 0)
-                scriteDocument.screenplay.addBreakElement(Screenplay.Act)
-            else
-                scriteDocument.screenplay.insertBreakElement(Screenplay.Act, breakInsertIndex)
-        }
-
+        onClicked: addAct()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Act Break" : "Insert Act Break"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: shortcut
+    }
+
+    function addScene() {
+        requestScreenplayEditor()
+        if(!scriteDocument.readOnly)
+            scriteDocument.createNewScene(mainTabBar.currentIndex > 0 ? mainUndoStack.screenplayEditorActive : false)
     }
 
     ToolButton3 {
@@ -177,12 +185,7 @@ Row {
         shortcutText: ""
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !showScreenplayPreview && !scriteDocument.readOnly
-        onClicked: {
-            requestScreenplayEditor()
-            if(!scriteDocument.readOnly)
-                scriteDocument.createNewScene(mainTabBar.currentIndex > 0 ? mainUndoStack.screenplayEditorActive : false)
-        }
-
+        onClicked: addScene()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Create New Scene"
         ShortcutsModelItem.enabled: !scriteDocument.readOnly

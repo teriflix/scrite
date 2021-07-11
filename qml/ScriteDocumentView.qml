@@ -1754,14 +1754,11 @@ Item {
                             Loader {
                                 id: notebookViewLoader
                                 anchors.fill: parent
-                                active: false
-                                visible: ui.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
-                                onVisibleChanged: {
-                                    if(visible && !active)
-                                        active = true
-                                }
+                                active: ui.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
                                 sourceComponent: NotebookView {
-                                    toolbarSize: structureViewLoader.item.toolbarSize
+                                    toolbarSize: appToolBar.height+4
+                                    toolbarSpacing: appToolBar.spacing
+                                    toolbarLeftMargin: appToolBar.anchors.leftMargin
                                 }
                             }
                         }
