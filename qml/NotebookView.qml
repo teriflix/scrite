@@ -1440,6 +1440,18 @@ Rectangle {
                         cellWidth: width/nrColumns
                         cellHeight: 120
                         ScrollBar.vertical: charactersListViewScrollBar
+                        highlightMoveDuration: 0
+                        highlight: Item {
+                            BoxShadow {
+                                anchors.fill: highlightedItem
+                                opacity: 0.5
+                            }
+                            Item {
+                                id: highlightedItem
+                                anchors.fill: parent
+                                anchors.margins: 5
+                            }
+                        }
                         delegate: Item {
                             width: charactersView.cellWidth
                             height: charactersView.cellHeight
@@ -1453,8 +1465,8 @@ Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
                                 color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : "#E7FFFFFF")
-                                border.width: charactersView.currentIndex === index ? 3 : 1
-                                border.color: app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "black" : primaryColors.borderColor) : character.color
+                                border.width: 1
+                                border.color: app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : primaryColors.borderColor) : character.color
 
                                 Row {
                                     anchors.fill: parent
