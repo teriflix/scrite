@@ -594,6 +594,7 @@ Rectangle {
                                         font.pointSize: app.idealFontPointSize-2
                                         text: objectItem.type === Note.TextNoteType ? objectItem.content : objectItem.summary
                                         color: headingText.color
+                                        opacity: 0.75
                                     }
                                 }
                             }
@@ -1090,40 +1091,14 @@ Rectangle {
                     }
                 }
 
-                Item {
+                FlickableTextArea {
+                    id: loglineFieldArea
                     width: screenplayTabContentArea.width
                     height: screenplayTabContentArea.height
                     visible: screenplayTabBar.tabIndex === 1
-
-                    Rectangle {
-                        anchors.fill: loglineFieldArea
-                        color: app.translucent(primaryColors.c100.background, 0.5)
-                        border.width: 1
-                        border.color: primaryColors.borderColor
-                    }
-
-                    Text {
-                        anchors.fill: loglineFieldArea
-                        anchors.margins: 20
-                        text: "<font size=\"+2\"><b>Logline</b></font><br/><br/>A logline is a one-sentence summary or description of a movie. Loglines distill the important elements of your screenplay—main character, setup, central conflict, antagonist—into a clear, concise teaser. The goal is to write a logline so enticing that it hooks the listener into reading the entire script."
-                        opacity: loglineFieldArea.textArea.cursorVisible ? 0.2 : 0.55
-                        visible: loglineFieldArea.textArea.length === 0
-                        font.pointSize: app.idealFontPointSize
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-                    }
-
-                    FlickableTextArea {
-                        id: loglineFieldArea
-                        width: Math.max(200, parent.width * 0.75)
-                        height: parent.height * 0.75
-                        anchors.centerIn: parent
-                        text: scriteDocument.screenplay.logline
-                        onTextChanged: scriteDocument.screenplay.logline = text
-                    }
+                    text: scriteDocument.screenplay.logline
+                    onTextChanged: scriteDocument.screenplay.logline = text
+                    placeholderText: "Logline: a one-sentence summary or description."
                 }
 
                 Loader {
@@ -1250,16 +1225,18 @@ Rectangle {
 
                                         Text {
                                             font.pointSize: app.idealFontPointSize - 2
-                                            text: [character.designation, character.type].join(", ")
+                                            text: "Role: " + polishStr(character.designation, "-")
                                             width: parent.width
                                             elide: Text.ElideRight
+                                            opacity: 0.75
                                         }
 
                                         Text {
                                             font.pointSize: app.idealFontPointSize - 2
-                                            text: ["Age: " + polishStr(character.age,"?"), "Gender: " + polishStr(character.gender,"?")].join(", ")
+                                            text: ["Age: " + polishStr(character.age, "-"), "Gender: " + polishStr(character.gender, "-")].join(", ")
                                             width: parent.width
                                             elide: Text.ElideRight
+                                            opacity: 0.75
                                         }
                                     }
                                 }
@@ -1426,7 +1403,7 @@ Rectangle {
 
                             Item {
                                 id: characterQuickInfoArea
-                                width: 300
+                                width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, ui.width*0.3)
                                 height: parent.height
 
                                 Connections {
@@ -1475,7 +1452,7 @@ Rectangle {
                                         spacing: 10
 
                                         Rectangle {
-                                            width: Math.min(parent.width, 300)
+                                            width: parent.width
                                             height: width
                                             color: photoSlides.currentIndex === photoSlides.count-1 ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0.75)
                                             border.width: 1
