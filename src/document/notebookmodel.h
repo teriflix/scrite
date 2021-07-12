@@ -71,10 +71,7 @@ public:
         ModelDataRole
     };
 
-    Q_INVOKABLE QVariant modelIndexData(const QModelIndex &index) const {
-        return this->data(index, ModelDataRole);
-    }
-
+    Q_INVOKABLE QVariant modelIndexData(const QModelIndex &index) const;
     Q_INVOKABLE QModelIndex findModelIndexFor(QObject *owner) const;
     Q_INVOKABLE QModelIndex findModelIndexForTopLevelItem(const QString &label) const;
     Q_INVOKABLE void refresh();

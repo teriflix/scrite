@@ -207,14 +207,17 @@ Rectangle {
                     id: noteColorButton
                     property Character character: notebookTree.currentCharacter
                     property Note note: notebookTree.currentNote
+                    property Notes notes: notebookTree.currentNotes
                     suggestedWidth: toolButtonSize
                     suggestedHeight: toolButtonSize
-                    enabled: (character || note) && !scriteDocument.readOnly
+                    enabled: (character || note || (notes && notes.ownerType === Notes.SceneOwner)) && !scriteDocument.readOnly
                     iconSource: {
                         if(note)
                             return "image://color/" + note.color + "/1"
                         if(character)
                             return "image://color/" + character.color + "/1"
+                        if(notes && notes.ownerType === Notes.SceneOwner)
+                            return "image://color/" + notes.scene.color + "/1"
                         return "image://color/#00ffffff/1"
                     }
                     down: noteColorMenu.visible
@@ -228,6 +231,8 @@ Rectangle {
                                 noteColorButton.note.color = color
                             else if(noteColorButton.character)
                                 noteColorButton.character.color = color
+                            else if(noteColorButton.notes && noteColorButton.notes.ownerType === Notes.SceneOwner)
+                                noteColorButton.notes.scene.color = color
                         }
                     }
                 }
@@ -236,7 +241,7 @@ Rectangle {
                     id: deleteNoteButton
                     suggestedWidth: toolButtonSize
                     suggestedHeight: toolButtonSize
-                    enabled: noteColorButton.enabled && !scriteDocument.readOnly
+                    enabled: (noteColorButton.note || noteColorButton.character) && !scriteDocument.readOnly
                     ToolTip.text: "Delete the current note or character"
                     iconSource: "../icons/action/delete.png"
                     onClicked: notebookContentLoader.confirmAndDelete()
@@ -673,11 +678,12 @@ Rectangle {
     Component {
         id: sceneNotesComponent
 
-        Item {
+        Rectangle {
             id: sceneNotesItem
             property var componentData
             property Notes notes: componentData ? componentData.notebookItemObject : null
             property Scene scene: notes ? notes.scene : null
+            color: Qt.tint(scene.color, "#e7ffffff")
 
             TextTabBar {
                 id: sceneTabBar

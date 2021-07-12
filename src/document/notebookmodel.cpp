@@ -177,6 +177,11 @@ void NotebookModel::setDocument(ScriteDocument *val)
     this->reload();
 }
 
+QVariant NotebookModel::modelIndexData(const QModelIndex &index) const
+{
+    return this->data(index, ModelDataRole);
+}
+
 QStandardItem *recursivelyFindItemForOnwer(QStandardItem *root, QObject *owner)
 {
     if(root == nullptr || owner == nullptr)
