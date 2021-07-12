@@ -27,6 +27,7 @@ Rectangle {
     property real toolbarSize: 46
     property real toolbarSpacing: 0
     property real toolbarLeftMargin: 0
+    property real toolButtonSize: Math.max(toolbarSize - 4, 20)
 
     function switchToStoryTab() {
         switchTo(scriteDocument.structure.notes)
@@ -105,196 +106,146 @@ Rectangle {
         font.pointSize: Math.ceil(app.idealFontPointSize*0.75)
     }
 
-    Loader {
+    Rectangle {
         id: toolbar
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.right: parent.right
-        active: ui.showNotebookInStructure
-        sourceComponent: Rectangle {
-            height: toolbarLayout.height+4
-            color: primaryColors.c100.background
+        width: toolButtonSize+4
+        height: parent.height
+        color: primaryColors.c100.background
 
-            property real toolButtonSize: Math.max(toolbarSize - 4, 20)
+        Column {
+            id: toolbarLayout
+            width: toolButtonSize
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            Row {
-                id: toolbarLayout
-                spacing: toolbarSpacing
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: toolbarLeftMargin
-                anchors.rightMargin: 5
-                anchors.verticalCenter: parent.verticalCenter
-                property real rowHeight: changeTabButton.height
+            ToolButton3 {
+                id: changeTabButton
+                iconSource: "../icons/navigation/notebook_tab.png"
+                hasMenu: true
+                ToolTip.text: "Switch between Structure & Notebook tabs."
+                onClicked: changeTabMenu.popup(changeTabButton, changeTabButton.width, 0)
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
 
-                ToolButton3 {
-                    id: changeTabButton
-                    iconSource: "../icons/navigation/notebook_tab.png"
-                    hasMenu: true
-                    menuArrow: Qt.DownArrow
-                    ToolTip.text: "Switch between Structure & Notebook tabs."
-                    onClicked: changeTabMenu.open()
-                    suggestedWidth: toolButtonSize
-                    suggestedHeight: toolButtonSize
+                Menu2 {
+                    id: changeTabMenu
 
-                    Item {
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
+                    MenuItem2 {
+                        text: "Structure"
+                        icon.source: "../icons/content/blank.png"
+                        onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "SwitchTab")
+                    }
 
-                        Menu2 {
-                            id: changeTabMenu
-
-                            MenuItem2 {
-                                text: "Structure"
-                                icon.source: "../icons/content/blank.png"
-                                onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "SwitchTab")
-                            }
-
-                            MenuItem2 {
-                                text: "Notebook"
-                                icon.source: "../icons/navigation/check.png"
-                            }
-                        }
+                    MenuItem2 {
+                        text: "Notebook"
+                        icon.source: "../icons/navigation/check.png"
                     }
                 }
+            }
 
-                ToolButton3 {
-                    checkable: true
-                    iconSource: "../icons/navigation/sync.png"
-                    ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
-                    checked: workspaceSettings.syncCurrentSceneOnNotebook
-                    onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
-                    suggestedWidth: toolButtonSize
-                    suggestedHeight: toolButtonSize
-                }
+            ToolButton3 {
+                checkable: true
+                iconSource: "../icons/navigation/sync.png"
+                ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
+                checked: workspaceSettings.syncCurrentSceneOnNotebook
+                onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+            }
 
-                ToolButton3 {
-                    iconSource: "../icons/navigation/refresh.png"
-                    ToolTip.text: "Reloads the notebook explorer tree."
-                    onClicked: notebookModel.refresh()
-                    suggestedWidth: toolButtonSize
-                    suggestedHeight: toolButtonSize
-                }
-
-                Item {
-                    width: Math.max(0, notebookTree.width-3*toolButtonSize-2*parent.spacing)
-                    height: parent.height
-                }
-
-                ToolButton3 {
-                    id: newNoteToolButton
-                    iconSource: "../icons/action/note_add.png"
-                    hasMenu: true
-                    menuArrow: Qt.DownArrow
-                    suggestedWidth: toolButtonSize
-                    suggestedHeight: toolButtonSize
-                    property Notes notes: notebookTree.currentNotes
-                    enabled: notes && !scriteDocument.readOnly
-                    ToolTip.text: {
-                        var ret = "Adds a new text or form note"
-                        if(!enabled)
-                            return ret
-                        ret += " to" + notebookTree.currentData.notebookItemTitle
-                        return ret
-                    }
-                    onClicked: {
-                        newNoteMenu.notes = notes
-                        newNoteMenu.popup(newNoteToolButton, 0, newNoteToolButton.height)
-                    }
-                }
-
-                ToolButton3 {
-                    id: noteColorButton
-                    property Character character: notebookTree.currentCharacter
-                    property Note note: notebookTree.currentNote
-                    property Notes notes: notebookTree.currentNotes
-                    suggestedWidth: toolButtonSize
-                    suggestedHeight: toolButtonSize
-                    enabled: (character || note || (notes && notes.ownerType === Notes.SceneOwner)) && !scriteDocument.readOnly
-                    iconSource: {
-                        if(note)
-                            return "image://color/" + note.color + "/1"
-                        if(character)
-                            return "image://color/" + character.color + "/1"
-                        if(notes && notes.ownerType === Notes.SceneOwner)
-                            return "image://color/" + notes.scene.color + "/1"
-                        return "image://color/#00ffffff/1"
-                    }
-                    down: noteColorMenu.visible
-                    onClicked: noteColorMenu.popup(noteColorButton, 0, noteColorButton.height)
-
-                    ColorMenu {
-                        id: noteColorMenu
-                        enabled: noteColorButton.enabled
-                        onMenuItemClicked: {
-                            if(noteColorButton.note)
-                                noteColorButton.note.color = color
-                            else if(noteColorButton.character)
-                                noteColorButton.character.color = color
-                            else if(noteColorButton.notes && noteColorButton.notes.ownerType === Notes.SceneOwner)
-                                noteColorButton.notes.scene.color = color
-                        }
-                    }
-                }
-
-                ToolButton3 {
-                    id: deleteNoteButton
-                    suggestedWidth: toolButtonSize
-                    suggestedHeight: toolButtonSize
-                    enabled: (noteColorButton.note || noteColorButton.character) && !scriteDocument.readOnly
-                    ToolTip.text: "Delete the current note or character"
-                    iconSource: "../icons/action/delete.png"
-                    onClicked: notebookContentLoader.confirmAndDelete()
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: primaryColors.separatorColor
-                    opacity: 0.5
-                }
-
-                ToolButton3 {
-                    iconSource: "../icons/action/add_episode.png"
-                    shortcut: "Ctrl+Shift+P"
-                    shortcutText: ""
-                    ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-                    enabled: !scriteDocument.readOnly
-                    onClicked: globalScreenplayEditorToolbar.addEpisode()
-                }
-
-                ToolButton3 {
-                    iconSource: "../icons/action/add_act.png"
-                    shortcut: "Ctrl+Shift+B"
-                    shortcutText: ""
-                    ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-                    enabled: !scriteDocument.readOnly
-                    onClicked: globalScreenplayEditorToolbar.addAct()
-                }
-
-                ToolButton3 {
-                    iconSource: "../icons/action/add_scene.png"
-                    shortcut: "Ctrl+Shift+N"
-                    shortcutText: ""
-                    ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-                    enabled: !scriteDocument.readOnly
-                    onClicked: globalScreenplayEditorToolbar.addScene()
-                }
+            ToolButton3 {
+                iconSource: "../icons/navigation/refresh.png"
+                ToolTip.text: "Reloads the notebook explorer tree."
+                onClicked: notebookModel.refresh()
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
             }
 
             Rectangle {
                 width: parent.width
                 height: 1
-                anchors.bottom: parent.bottom
-                color: primaryColors.borderColor
+                color: primaryColors.separatorColor
+                opacity: 0.5
             }
+
+            ToolButton3 {
+                id: newNoteToolButton
+                iconSource: "../icons/action/note_add.png"
+                hasMenu: true
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+                property Notes notes: notebookTree.currentNotes
+                enabled: notes && !scriteDocument.readOnly
+                ToolTip.text: {
+                    var ret = "Adds a new text or form note"
+                    if(!enabled)
+                        return ret
+                    ret += " to" + notebookTree.currentData.notebookItemTitle
+                    return ret
+                }
+                onClicked: {
+                    newNoteMenu.notes = notes
+                    newNoteMenu.popup(newNoteToolButton, newNoteToolButton.width, 0)
+                }
+            }
+
+            ToolButton3 {
+                id: noteColorButton
+                property Character character: notebookTree.currentCharacter
+                property Note note: notebookTree.currentNote
+                property Notes notes: notebookTree.currentNotes
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+                hasMenu: true
+                enabled: (character || note || (notes && notes.ownerType === Notes.SceneOwner)) && !scriteDocument.readOnly
+                iconSource: {
+                    if(note)
+                        return "image://color/" + note.color + "/1"
+                    if(character)
+                        return "image://color/" + character.color + "/1"
+                    if(notes && notes.ownerType === Notes.SceneOwner)
+                        return "image://color/" + notes.scene.color + "/1"
+                    return "image://color/#00ffffff/1"
+                }
+                down: noteColorMenu.visible
+                onClicked: noteColorMenu.popup(noteColorButton, noteColorButton.width, 0)
+
+                ColorMenu {
+                    id: noteColorMenu
+                    enabled: noteColorButton.enabled
+                    onMenuItemClicked: {
+                        if(noteColorButton.note)
+                            noteColorButton.note.color = color
+                        else if(noteColorButton.character)
+                            noteColorButton.character.color = color
+                        else if(noteColorButton.notes && noteColorButton.notes.ownerType === Notes.SceneOwner)
+                            noteColorButton.notes.scene.color = color
+                    }
+                }
+            }
+
+            ToolButton3 {
+                id: deleteNoteButton
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+                enabled: (noteColorButton.note || noteColorButton.character) && !scriteDocument.readOnly
+                ToolTip.text: "Delete the current note or character"
+                iconSource: "../icons/action/delete.png"
+                onClicked: notebookContentLoader.confirmAndDelete()
+            }
+        }
+
+        Rectangle {
+            width: 1
+            height: parent.height
+            anchors.right: parent.right
+            color: primaryColors.borderColor
         }
     }
 
     SplitView {
         orientation: Qt.Horizontal
-        anchors.top: toolbar.active ? toolbar.bottom : parent.top
-        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.left: toolbar.right
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         Material.background: Qt.darker(primaryColors.button.background, 1.1)
@@ -309,7 +260,6 @@ Rectangle {
             alternatingRowColors: false
             horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
             rowDelegate: Rectangle {
-                width: notebookTree.width
                 height: fontMetrics.height + 20
                 color: styleData.selected ? primaryColors.highlight.background : primaryColors.c10.background
             }
@@ -320,7 +270,7 @@ Rectangle {
                 if(currentData.notebookItemType === NotebookModel.NoteType)
                     return currentData.notebookItemObject.notes
                 if(currentData.notebookItemType === NotebookModel.CategoryType &&
-                   currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
+                        currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
                     return scriteDocument.structure.notes
                 return null
             }
@@ -328,8 +278,6 @@ Rectangle {
             property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
 
             itemDelegate: Item {
-                width: notebookTree.width-1
-
                 Rectangle {
                     width: notebookTree.width - parent.x
                     height: fontMetrics.height + 20
@@ -664,7 +612,6 @@ Rectangle {
             }
         }
     }
-
 
     Component {
         id: unknownComponent

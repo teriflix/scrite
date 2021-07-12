@@ -318,7 +318,7 @@ Item {
             id: appToolBar
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.leftMargin: 10
+            anchors.leftMargin: 5
             visible: appToolBarArea.width >= 1200
             onVisibleChanged: {
                 if(!visible)
