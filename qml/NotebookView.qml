@@ -130,13 +130,13 @@ Rectangle {
                     id: changeTabMenu
 
                     MenuItem2 {
-                        text: "Structure"
+                        text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
                         icon.source: "../icons/content/blank.png"
-                        onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "SwitchTab")
+                        onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
                     }
 
                     MenuItem2 {
-                        text: "Notebook"
+                        text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                         icon.source: "../icons/navigation/check.png"
                     }
                 }

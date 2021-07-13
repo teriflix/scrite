@@ -205,7 +205,6 @@ Item {
         sequence: "Alt+1"
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Screenplay"
-        ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 0
         ShortcutsModelItem.shortcut: sequence
         onActivated: mainTabBar.activateTab(0)
     }
@@ -215,9 +214,12 @@ Item {
         sequence: "Alt+2"
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Structure"
-        ShortcutsModelItem.enabled: mainTabBar.currentIndex !== 1
         ShortcutsModelItem.shortcut: sequence
-        onActivated: mainTabBar.activateTab(1)
+        onActivated: {
+            mainTabBar.activateTab(1)
+            if(ui.showNotebookInStructure)
+                Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
+        }
     }
 
     Shortcut {
@@ -225,11 +227,20 @@ Item {
         sequence: "Alt+3"
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Notebook"
-        ShortcutsModelItem.enabled: enabled && mainTabBar.currentIndex !== 2
         ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.visible: enabled
-        enabled: !ui.showNotebookInStructure
-        onActivated: mainTabBar.activateTab(2)
+        onActivated: {
+            if(ui.showNotebookInStructure) {
+                if(mainTabBar.currentIndex === 1)
+                    Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+                else {
+                    mainTabBar.activateTab(1)
+                    app.execLater(mainTabBar, 250, function() {
+                        Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+                    })
+                }
+            } else
+                mainTabBar.activateTab(2)
+        }
     }
 
     Shortcut {
@@ -237,10 +248,8 @@ Item {
         sequence: "Alt+4"
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Scrited"
-        ShortcutsModelItem.enabled: enabled && mainTabBar.currentIndex !== 3
         ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.visible: enabled
-        onActivated: mainTabBar.currentIndex = 3
+        onActivated: mainTabBar.activateTab(3)
     }
 
     Connections {
@@ -1729,7 +1738,10 @@ Item {
                             Announcement.onIncoming: {
                                 if(ui.showNotebookInStructure) {
                                     if(type === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
-                                        structureEditorTabs.currentTabIndex = (structureEditorTabs.currentTabIndex+1)%2
+                                        if(data == "Structure")
+                                            structureEditorTabs.currentTabIndex = 0
+                                        else if(data == "Notebook")
+                                            structureEditorTabs.currentTabIndex = 1
                                     } else if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
                                         structureEditorTabs.currentTabIndex = 1
                                         app.execLater(notebookViewLoader, 100, function() {
