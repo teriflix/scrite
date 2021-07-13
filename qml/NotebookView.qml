@@ -153,9 +153,18 @@ Rectangle {
             }
 
             ToolButton3 {
+                id: refreshButton
                 iconSource: "../icons/navigation/refresh.png"
-                ToolTip.text: "Reloads the notebook explorer tree."
-                onClicked: notebookModel.refresh()
+                ToolTip.text: "Reloads the current character relationships graph and the notebook tree."
+                property bool crGraphRefreshed: false
+                onClicked: {
+                    crGraphRefreshed = false
+                    Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "refresh")
+                    if(crGraphRefreshed)
+                        app.execLater(refreshButton, 250, function() { notebookModel.refresh() })
+                    else
+                        notebookModel.refresh()
+                }
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
             }
@@ -561,10 +570,6 @@ Rectangle {
                     color: app.translucent(primaryColors.c600.background,0.85)
                     focus: true
 
-                    Component.onCompleted: {
-                        app.log("I am here..")
-                    }
-
                     MouseArea {
                         anchors.fill: parent
                     }
@@ -717,6 +722,7 @@ Rectangle {
                 }
 
                 CharacterRelationshipsGraphView {
+                    id: crGraphView
                     visible: sceneTabBar.tabIndex === 1
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
@@ -737,6 +743,13 @@ Rectangle {
                     }
                     Component.onCompleted: app.execLater(sceneTabContentArea, 100, prepare)
                     onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
+
+                    Announcement.onIncoming: {
+                        if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                            crGraphView.resetGraph()
+                            refreshButton.crGraphRefreshed = true
+                        }
+                    }
                 }
 
                 Loader {
@@ -1548,6 +1561,7 @@ Rectangle {
                 }
 
                 CharacterRelationshipsGraphView {
+                    id: crGraphView
                     structure: null
                     showBusyIndicator: true
                     width: charactersTabContentArea.width
@@ -1566,6 +1580,13 @@ Rectangle {
                     }
                     Component.onCompleted: app.execLater(charactersTabContentArea, 100, prepare)
                     onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
+
+                    Announcement.onIncoming: {
+                        if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                            crGraphView.resetGraph()
+                            refreshButton.crGraphRefreshed = true
+                        }
+                    }
                 }
             }
         }
@@ -1953,6 +1974,7 @@ Rectangle {
                 }
 
                 CharacterRelationshipsGraphView {
+                    id: crGraphView
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
                     visible: characterTabBar.tabIndex === 1
@@ -1993,6 +2015,13 @@ Rectangle {
                     }
                     Component.onCompleted: app.execLater(characterTabContentArea, 100, prepare)
                     onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
+
+                    Announcement.onIncoming: {
+                        if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                            crGraphView.resetGraph()
+                            refreshButton.crGraphRefreshed = true
+                        }
+                    }
                 }
 
                 Loader {
@@ -2021,7 +2050,7 @@ Rectangle {
             }
 
             property Character character
-            readonly property var unrelatedCharacterNames: character.unrelatedCharacterNames()
+            property var unrelatedCharacterNames: [] // Loaded after 160 ms
 
             Item {
                 anchors.fill: parent
@@ -2188,6 +2217,25 @@ Rectangle {
                         }
                     }
                 }
+            }
+
+            BusyOverlay {
+                anchors.fill: parent
+                busyMessage: "Querying Characters ..."
+                visible: unrelatedCharacterNamesTimer.running
+            }
+
+            Behavior on height {
+                enabled: screenplayEditorSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
+
+            Timer {
+                id: unrelatedCharacterNamesTimer
+                running: true
+                interval: 160
+                repeat: false
+                onTriggered: unrelatedCharacterNames = character.unrelatedCharacterNames()
             }
         }
     }

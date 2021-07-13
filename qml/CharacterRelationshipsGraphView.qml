@@ -11,8 +11,10 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Rectangle {
@@ -29,6 +31,8 @@ Rectangle {
     color: app.translucent(primaryColors.c100.background, 0.5)
     border.width: 1
     border.color: primaryColors.borderColor
+
+    function resetGraph() { crgraph.reset() }
 
     CharacterRelationshipsGraph {
         id: crgraph
@@ -210,9 +214,73 @@ Rectangle {
             Item {
                 id: nodeItems
 
-                BoxShadow {
+                Item {
                     anchors.fill: canvas.selectedNodeItem
-                    visible: canvas.selectedNodeItem !== null
+                    visible: canvas.selectedNodeItem
+
+                    BoxShadow {
+                        anchors.fill: parent
+                    }
+
+                    BoxShadow {
+                        anchors.fill: floatingToolBar
+                        visible: floatingToolBar.visible
+                    }
+
+                    Rectangle {
+                        id: floatingToolBar
+                        height: floatingToolbarLayout.height + 4
+                        width: floatingToolbarLayout.width + 6
+                        color: primaryColors.windowColor
+                        border.width: 1
+                        border.color: primaryColors.borderColor
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.top
+                        anchors.bottomMargin: 5
+                        enabled: !removeRelationshipConfirmation.active
+                        opacity: enabled ? 1 : 0.5
+
+                        Row {
+                            id: floatingToolbarLayout
+                            height: 42
+                            anchors.centerIn: parent
+
+                            ToolButton3 {
+                                id: floatingRefreshButton
+                                onClicked: crgraph.reset()
+                                iconSource: "../icons/navigation/refresh.png"
+                                autoRepeat: true
+                                ToolTip.text: "Refresh"
+                                visible: !scriteDocument.readOnly && (crgraph.character ? crgraph.character == canvas.activeCharacter : true)
+                                suggestedWidth: parent.height
+                                suggestedHeight: parent.height
+                            }
+
+                            ToolButton3 {
+                                id: floatingAddButton
+                                onClicked: { canvas.reloadIfDirty(); addNewRelationshipRequest(this) }
+                                iconSource: "../icons/content/add_circle_outline.png"
+                                autoRepeat: false
+                                ToolTip.text: "Add A New Relationship"
+                                enabled: visible
+                                visible: crgraph.character && (crgraph.character && crgraph.character == canvas.activeCharacter) && editRelationshipsEnabled && !scriteDocument.readOnly
+                                suggestedWidth: parent.height
+                                suggestedHeight: parent.height
+                            }
+
+                            ToolButton3 {
+                                id: floatingDeleteButton
+                                onClicked: removeRelationshipConfirmation.active = true
+                                iconSource: "../icons/action/delete.png"
+                                autoRepeat: false
+                                ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
+                                enabled: visible
+                                visible: crgraph.character && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
+                                suggestedWidth: parent.height
+                                suggestedHeight: parent.height
+                            }
+                        }
+                    }
                 }
 
                 Repeater {
@@ -309,7 +377,95 @@ Rectangle {
                                           "Double click to add a relationship to this character." :
                                           "Double click to switch to " + character.name + "'s notes."
                             ToolTip.delay: 1500
-                            ToolTip.visible: containsMouse
+                            ToolTip.visible: containsMouse && !removeRelationshipConfirmation.active
+                        }
+                    }
+                }
+
+                Item {
+                    anchors.fill: canvas.selectedNodeItem
+                    visible: canvas.selectedNodeItem
+
+                    Loader {
+                        id: removeRelationshipConfirmation
+                        anchors.centerIn: parent
+                        active: false
+                        sourceComponent: Rectangle {
+                            id: removeRelationshipConfirmationItem
+                            color: app.translucent(primaryColors.c600.background,0.85)
+                            focus: true
+                            width: removeRelationshipConfirmationContentLayout.width + 20
+                            height: removeRelationshipConfirmationContentLayout.height + 20
+                            Component.onCompleted: {
+                                if(canvasScroll.zoomScale !== 1) {
+                                    canvasScroll.zoomOne()
+                                    zoomTimer.start()
+                                } else
+                                    zoom()
+                            }
+                            property bool initialized: false
+
+                            function zoom() {
+                                var area = mapToItem(canvas, 0, 0, width, height)
+                                canvasScroll.ensureVisible(area)
+                                forceActiveFocus()
+                                initialized = true
+                            }
+
+                            Timer {
+                                id: zoomTimer
+                                running: false
+                                interval: 250
+                                repeat: false
+                                onTriggered: removeRelationshipConfirmationItem.zoom()
+                            }
+
+                            property Item currentItem: canvas.selectedNodeItem
+                            onCurrentItemChanged: if(initialized) removeRelationshipConfirmation.active = false
+
+                            MouseArea {
+                                anchors.fill: parent
+                            }
+
+                            Column {
+                                id: removeRelationshipConfirmationContentLayout
+                                width: buttonRow.width
+                                anchors.centerIn: parent
+                                spacing: 40
+
+                                Text {
+                                    text: "Are you sure you want to delete this relationship?\n\nNOTE: This action cannot be undone!!"
+                                    font.bold: true
+                                    font.pointSize: app.idealFontPointSize
+                                    width: parent.width
+                                    horizontalAlignment: Text.AlignHCenter
+                                    wrapMode: Text.WordWrap
+                                    color: primaryColors.c600.text
+                                }
+
+                                Row {
+                                    id: buttonRow
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 20
+
+                                    Button2 {
+                                        text: "Yes"
+                                        focusPolicy: Qt.NoFocus
+                                        onClicked: {
+                                            removeRelationshipWithRequest(canvas.activeCharacter, this);
+                                            canvas.reloadIfDirty();
+                                            removeRelationshipConfirmation.active = false
+                                        }
+                                    }
+
+                                    Button2 {
+                                        text: "No"
+                                        focusPolicy: Qt.NoFocus
+                                        onClicked: removeRelationshipConfirmation.active = false
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
@@ -334,45 +490,6 @@ Rectangle {
             spacing: 10
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-
-            ToolButton3 {
-                onClicked: crgraph.reset()
-                iconSource: "../icons/navigation/refresh.png"
-                autoRepeat: true
-                ToolTip.text: "Refresh"
-                visible: !scriteDocument.readOnly
-                suggestedWidth: parent.height
-                suggestedHeight: parent.height
-            }
-
-            ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); addNewRelationshipRequest(this) }
-                iconSource: "../icons/content/add_circle_outline.png"
-                autoRepeat: false
-                ToolTip.text: "Add A New Relationship"
-                enabled: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
-                visible: crgraph.character !== null && editRelationshipsEnabled && !scriteDocument.readOnly
-                suggestedWidth: parent.height
-                suggestedHeight: parent.height
-            }
-
-            ToolButton3 {
-                onClicked: { canvas.reloadIfDirty(); removeRelationshipWithRequest(canvas.activeCharacter, this) }
-                iconSource: "../icons/action/delete.png"
-                autoRepeat: false
-                ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
-                enabled: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
-                visible: crgraph.character !== null && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
-                suggestedWidth: parent.height
-                suggestedHeight: parent.height
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.separatorColor
-                opacity: 0.5
-            }
 
             ToolButton3 {
                 iconSource: "../icons/hardware/mouse.png"

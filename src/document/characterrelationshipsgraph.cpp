@@ -325,7 +325,8 @@ CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
 
 CharacterRelationshipsGraph::~CharacterRelationshipsGraph()
 {
-
+    if(m_loadTimer.isActive())
+        this->load();
 }
 
 void CharacterRelationshipsGraph::setNodeSize(const QSizeF &val)
@@ -745,7 +746,7 @@ void CharacterRelationshipsGraph::load()
     };
     QRectF boundingRect(m_leftMargin,m_topMargin,0,0);
     int graphIndex = 0;
-    for(const GraphLayout::Graph &graph : graphs)
+    for(const GraphLayout::Graph &graph : qAsConst(graphs))
     {
         const int i = graphIndex++;
         if(graph.nodes.isEmpty())
