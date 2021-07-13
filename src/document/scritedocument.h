@@ -247,6 +247,11 @@ public:
     QJsonObject userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
+    Q_PROPERTY(QJsonArray bookmarkedNotes READ bookmarkedNotes WRITE setBookmarkedNotes NOTIFY bookmarkedNotesChanged)
+    void setBookmarkedNotes(const QJsonArray &val);
+    QJsonArray bookmarkedNotes() const { return m_bookmarkedNotes; }
+    Q_SIGNAL void bookmarkedNotesChanged();
+
     Q_PROPERTY(bool isCreatedOnThisComputer READ isCreatedOnThisComputer NOTIFY createdOnThisComputerChanged)
     bool isCreatedOnThisComputer() const { return m_createdOnThisComputer; }
     Q_SIGNAL void createdOnThisComputerChanged();
@@ -349,6 +354,7 @@ private:
     QString m_busyMessage;
     bool m_inCreateNewScene = false;
     bool m_createdOnThisComputer = true;
+    QJsonArray m_bookmarkedNotes;
     ExecLaterTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     ExecLaterTimer m_clearModifyTimer;

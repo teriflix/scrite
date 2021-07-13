@@ -233,6 +233,26 @@ Rectangle {
             }
 
             ToolButton3 {
+                id: bookmarkButton
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+                ToolTip.text: "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
+                enabled: noteColorButton.note || noteColorButton.notes || noteColorButton.character
+                property var notebookObject: notebookTree.currentData.notebookItemObject
+                onNotebookObjectChanged: updateIcon()
+                onClicked: {
+                    notebookModel.bookmarkedNotes.toggleBookmark(notebookObject)
+                    updateIcon()
+                }
+                function updateIcon() {
+                    if(enabled && notebookModel.bookmarkedNotes.isBookmarked(notebookObject))
+                        iconSource = "../icons/content/bookmark.png"
+                    else
+                        iconSource = "../icons/content/bookmark_outline.png"
+                }
+            }
+
+            ToolButton3 {
                 id: deleteNoteButton
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
@@ -517,6 +537,8 @@ Rectangle {
                             return unusedScenesComponent
                         case NotebookModel.CharactersCategory:
                             return charactersComponent
+                        case NotebookModel.BookmarksCategory:
+                            return bookmarksComponent
                         }
                         break
                     case NotebookModel.NotesType:
@@ -624,6 +646,140 @@ Rectangle {
 
         Item {
             property var componentData
+        }
+    }
+
+    Component {
+        id: bookmarksComponent
+
+        Rectangle {
+            id: bookmarksItem
+            property var componentData
+            color: app.translucent(primaryColors.c100.background, 0.5)
+            border.width: 1
+            border.color: primaryColors.borderColor
+            clip: true
+
+            GridView {
+                id: bookmarksView
+                anchors.fill: parent
+                anchors.rightMargin: contentHeight > height ? 17 : 12
+                model: notebookModel.bookmarkedNotes
+                property real idealCellWidth: Math.min(250,width)
+                property int nrColumns: Math.floor(width/idealCellWidth)
+                cellWidth: width/nrColumns
+                cellHeight: 150
+                ScrollBar.vertical: bookmarksViewScrollbar
+                highlightMoveDuration: 0
+                highlight: Item {
+                    BoxShadow {
+                        anchors.fill: highlightedItem
+                        opacity: 0.5
+                    }
+                    Item {
+                        id: highlightedItem
+                        anchors.fill: parent
+                        anchors.leftMargin: 12
+                        anchors.topMargin: 12
+                    }
+                }
+                delegate: Item {
+                    width: bookmarksView.cellWidth
+                    height: bookmarksView.cellHeight
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.leftMargin: 12
+                        anchors.topMargin: 12
+                        border.width: 1
+                        border.color: bookmarksView.currentIndex === index ? "darkgray" : primaryColors.borderColor
+
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            spacing: 10
+
+                            Row {
+                                width: parent.width
+                                spacing: 5
+
+                                Image {
+                                    width: 32
+                                    height: 32
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    mipmap: true
+                                    source: {
+                                        if(app.typeName(noteObject) === "Notes") {
+                                            switch(noteObject.ownerType) {
+                                            case Notes.SceneOwner:
+                                                return "../icons/content/scene.png"
+                                            case Notes.CharacterOwner:
+                                                return "../icons/content/person_outline.png"
+                                            case Notes.BreakOwner:
+                                                return "../icons/content/story.png"
+                                            default:
+                                                break
+                                            }
+                                        } else if(app.typeName(noteObject) === "Character")
+                                            return "../icons/content/person_outline.png"
+                                        else if(app.typeName(noteObject) === "Note") {
+                                            switch(styleData.value.notebookItemObject.type) {
+                                            case Note.TextNoteType:
+                                                return "../icons/content/note.png"
+                                            case Note.FormNoteType:
+                                                return "../icons/content/form.png"
+                                            default:
+                                                break
+                                            }
+                                        }
+                                        return "../icons/content/bookmark.png"
+                                    }
+                                }
+
+                                Text {
+                                    id: headingText
+                                    font.pointSize: app.idealFontPointSize
+                                    font.bold: true
+                                    maximumLineCount: 1
+                                    width: parent.width-32-parent.spacing
+                                    elide: Text.ElideRight
+                                    text: noteTitle
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Text {
+                                width: parent.width
+                                height: parent.height - headingText.height - parent.spacing
+                                wrapMode: Text.WordWrap
+                                elide: Text.ElideRight
+                                font.pointSize: app.idealFontPointSize-2
+                                text: noteSummary
+                                color: headingText.color
+                                opacity: 0.75
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: bookmarksView.currentIndex = index
+                        onDoubleClicked: {
+                            bookmarksView.currentIndex = index
+                            switchTo(noteObject)
+                        }
+                    }
+                }
+            }
+
+            ScrollBar2 {
+                id: bookmarksViewScrollbar
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                orientation: Qt.Vertical
+                flickable: bookmarksView
+            }
         }
     }
 
@@ -1383,7 +1539,6 @@ Rectangle {
                 anchors.top: charactersTabBar.bottom
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 10
-                clip: true
 
                 Item {
                     width: charactersTabContentArea.width
@@ -1628,7 +1783,6 @@ Rectangle {
                 anchors.top: characterTabBar.bottom
                 anchors.bottom: parent.bottom
                 anchors.topMargin: 10
-                clip: true
 
                 Item {
                     width: characterTabContentArea.width
@@ -1645,7 +1799,11 @@ Rectangle {
                     Flickable {
                         id: quickInfoFlickable
                         clip: true
-                        anchors.fill: parent
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: attachmentsView.top
+                        anchors.bottomMargin: 10
                         contentWidth: quickInfoFlickableContent.width
                         contentHeight: quickInfoFlickableContent.height
 
@@ -1718,7 +1876,6 @@ Rectangle {
                                                 id: photoSlides
                                                 anchors.fill: parent
                                                 anchors.margins: 2
-                                                clip: true
                                                 currentIndex: 0
 
                                                 Repeater {
@@ -1933,39 +2090,33 @@ Rectangle {
                                 width: parent.width - characterQuickInfoArea.width
                                 height: parent.height
 
-                                Rectangle {
-                                    anchors.fill: characterSummaryField
-                                    color: app.translucent(primaryColors.windowColor, 0.5)
-                                    border { width: 1; color: primaryColors.borderColor }
-                                }
-
                                 FlickableTextArea {
                                     id: characterSummaryField
-                                    anchors.top: parent.top
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.bottom: attachmentsView.top
-                                    anchors.topMargin: 0
-                                    anchors.leftMargin: 0
+                                    anchors.fill: parent
                                     anchors.rightMargin: 10
-                                    anchors.bottomMargin: 10
                                     text: character.summary
                                     onTextChanged: character.summary = text
                                     placeholderText: "Character Summary"
-                                }
-
-                                AttachmentsView {
-                                    id: attachmentsView
-                                    anchors.left: characterSummaryField.left
-                                    anchors.right: characterSummaryField.right
-                                    anchors.bottom: parent.bottom
-                                    anchors.bottomMargin: 10
-                                    attachments: character ? character.attachments : null
+                                    tabSequenceIndex: 8
+                                    tabSequenceManager: characterInfoTabSequence
+                                    background: Rectangle {
+                                        color: primaryColors.windowColor
+                                        opacity: 0.15
+                                    }
                                 }
                             }
                         }
 
                         ScrollBar.horizontal: ScrollBar2 { flickable: quickInfoFlickable }
+                    }
+
+                    AttachmentsView {
+                        id: attachmentsView
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 10
+                        attachments: character ? character.attachments : null
                     }
 
                     AttachmentsDropArea2 {

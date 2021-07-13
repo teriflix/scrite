@@ -19,12 +19,14 @@
 #include <QSortFilterProxyModel>
 
 #include "qobjectproperty.h"
+#include "objectlistpropertymodel.h"
 
 class Note;
 class Notes;
 class Scene;
 class Character;
 class ScriteDocument;
+class BookmarkedNotes;
 class ObjectListPropertyModelBase;
 
 class NotebookModel : public QStandardItemModel
@@ -52,6 +54,7 @@ public:
 
     enum ItemCategory
     {
+        BookmarksCategory,
         ScreenplayCategory,
         UnusedScenesCategory,
         CharactersCategory,
@@ -76,6 +79,10 @@ public:
     Q_INVOKABLE QModelIndex findModelIndexForTopLevelItem(const QString &label) const;
     Q_INVOKABLE void refresh();
 
+    Q_PROPERTY(BookmarkedNotes* bookmarkedNotes READ bookmarkedNotes CONSTANT STORED false)
+    BookmarkedNotes *bookmarkedNotes() const { return m_bookmarkedNotes; }
+    Q_SIGNAL void bookmarkedNotesChanged();
+
     // QAbstractItemModel interface
     QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -93,6 +100,7 @@ private:
     void resetDocument();
     void reload();
 
+    void loadBookmarks();
     void loadStory();
     void loadScenes();
     void loadCharacters();
@@ -106,9 +114,52 @@ private:
     void onDataChanged(const QModelIndex &start, const QModelIndex &end, const QVector<int> &roles);
 
 private:
-    QObjectProperty<ScriteDocument> m_document;
     QTimer m_syncScenesTimer;
     QTimer m_syncCharactersTimer;
+    QObjectProperty<ScriteDocument> m_document;
+    BookmarkedNotes *m_bookmarkedNotes = nullptr;
+};
+
+class BookmarkedNotes : public ObjectListPropertyModel<QObject *>
+{
+    Q_OBJECT
+
+public:
+    BookmarkedNotes(QObject *parent=nullptr);
+    ~BookmarkedNotes();
+
+    Q_INVOKABLE bool toggleBookmark(QObject *object);
+    Q_INVOKABLE bool addToBookmark(QObject *object);
+    Q_INVOKABLE bool removeFromBookmark(QObject *object);
+    Q_INVOKABLE bool isBookmarked(QObject *object) const;
+
+    enum Roles
+    {
+        TitleRole,
+        SummaryRole,
+        ObjectRole
+    };
+    QHash<int, QByteArray> roleNames() const;
+    QVariant data(const QModelIndex &index, int role) const;
+
+private:
+    QVariant data(QObject *ptr, int role) const;
+
+    void noteUpdated();
+    void notesUpdated();
+    void characterUpdated();
+
+    void objectUpdated(QObject *ptr);
+
+    void noteDestroyed(Note *ptr);
+    void notesDestroyed(Notes *ptr);
+    void characterDestroyed(Character *ptr);
+
+    void sync();
+    void reload();
+
+private:
+    bool m_blockReload = false;
 };
 
 #endif // NOTEBOOKMODEL_H

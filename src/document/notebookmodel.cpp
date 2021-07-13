@@ -21,6 +21,8 @@
 #include "timeprofiler.h"
 #include "scritedocument.h"
 
+#include <QScopedValueRollback>
+
 static int nextItemId()
 {
     static int id = 1000;
@@ -34,6 +36,19 @@ public:
         this->setData(id >= 0 ? id : ::nextItemId(), NotebookModel::IdRole);
     }
     ~StandardItemWithId() { }
+};
+
+class BookmarksItem : public StandardItemWithId
+{
+public:
+    BookmarksItem();
+    ~BookmarksItem();
+
+private:
+    void updateText();
+
+private:
+    QMetaObject::Connection m_connection;
 };
 
 class ObjectItem : public StandardItemWithId
@@ -129,7 +144,8 @@ private:
 
 NotebookModel::NotebookModel(QObject *parent)
     : QStandardItemModel(parent),
-      m_document(this, "document")
+      m_document(this, "document"),
+      m_bookmarkedNotes(new BookmarkedNotes(this))
 {
     m_syncScenesTimer.setSingleShot(true);
     m_syncCharactersTimer.setSingleShot(true);
@@ -286,12 +302,18 @@ void NotebookModel::reload()
     if(m_document == nullptr)
         return;
 
+    this->loadBookmarks();
     this->loadStory();
     this->loadScenes();
     this->loadCharacters();
     this->loadLocations();
     this->loadProps();
     this->loadOthers();
+}
+
+void NotebookModel::loadBookmarks()
+{
+    this->appendRow(new BookmarksItem);
 }
 
 void NotebookModel::loadStory()
@@ -463,11 +485,11 @@ void NotebookModel::syncScenes()
 
     removeTopLevelItems(this, unusedScenesItem);
     if(structureNode != nullptr)
-        this->insertRow(1, createItemForNode(structureNode));
+        this->insertRow(2, createItemForNode(structureNode));
 
     removeTopLevelItems(this, screenplayScenesItem);
     if(screenplayNode != nullptr)
-        this->insertRow(1, createItemForNode(screenplayNode));
+        this->insertRow(2, createItemForNode(screenplayNode));
 
     if(hasScenes)
         emit justReloadedScenes();
@@ -520,6 +542,31 @@ void NotebookModel::onDataChanged(const QModelIndex &start, const QModelIndex &e
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+BookmarksItem::BookmarksItem()
+    : StandardItemWithId(0)
+{
+    ScriteDocument *doc = ScriteDocument::instance();
+    m_connection = QObject::connect(doc, &ScriteDocument::bookmarkedNotesChanged, doc, [=]() {
+        this->updateText();
+    });
+    this->updateText();
+
+    this->setData(NotebookModel::CategoryType, NotebookModel::TypeRole);
+    this->setData(NotebookModel::BookmarksCategory, NotebookModel::CategoryRole);
+}
+
+BookmarksItem::~BookmarksItem()
+{
+    QObject::disconnect(m_connection);
+}
+
+void BookmarksItem::updateText()
+{
+    const ScriteDocument *doc = ScriteDocument::instance();
+    const int nr = doc->bookmarkedNotes().size();
+    this->setText( QStringLiteral("Bookmarks (") + QString::number(nr) + QStringLiteral(")") );
+}
 
 ObjectItem::ObjectItem(QObject *object)
     : StandardItemWithId(), m_object(object)
@@ -863,3 +910,266 @@ StoryNode *StoryNode::create(ScriteDocument *document)
 
     return rootNode;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+BookmarkedNotes::BookmarkedNotes(QObject *parent)
+    : ObjectListPropertyModel<QObject *>(parent)
+{
+    this->reload();
+}
+
+BookmarkedNotes::~BookmarkedNotes()
+{
+
+}
+
+bool BookmarkedNotes::toggleBookmark(QObject *object)
+{
+    if(this->indexOf(object) >= 0)
+        return this->removeFromBookmark(object);
+
+    return this->addToBookmark(object);
+}
+
+bool BookmarkedNotes::addToBookmark(QObject *object)
+{
+    if(object == nullptr)
+        return false;
+
+    const QMetaObject *mo = object->metaObject();
+    if( mo->inherits( &Notes::staticMetaObject ) )
+    {
+        Notes *notes = qobject_cast<Notes*>(object);
+        connect(notes, &Notes::aboutToDelete, this, &BookmarkedNotes::notesDestroyed);
+        connect(notes, &Notes::notesModified, this, &BookmarkedNotes::notesUpdated);
+        this->append(notes);
+        this->sync();
+        return true;
+    }
+
+    if( mo->inherits( &Note::staticMetaObject ) )
+    {
+        Note *note = qobject_cast<Note*>(object);
+        connect(note, &Note::aboutToDelete, this, &BookmarkedNotes::noteDestroyed);
+        connect(note, &Note::noteModified, this, &BookmarkedNotes::noteUpdated);
+        this->append(note);
+        this->sync();
+        return true;
+    }
+
+    if( mo->inherits( &Character::staticMetaObject ) )
+    {
+        Character *character = qobject_cast<Character*>(object);
+        connect(character, &Character::aboutToDelete, this, &BookmarkedNotes::characterDestroyed);
+        connect(character, &Character::characterChanged, this, &BookmarkedNotes::characterUpdated);
+        this->append(character);
+        this->sync();
+        return true;
+    }
+
+    return false;
+}
+
+bool BookmarkedNotes::removeFromBookmark(QObject *object)
+{
+    if(object == nullptr)
+        return false;
+
+    const int row = this->indexOf(object);
+    if(row < 0)
+        return false;
+
+    const QMetaObject *mo = object->metaObject();
+    if( mo->inherits( &Notes::staticMetaObject ) )
+    {
+        Notes *notes = qobject_cast<Notes*>(object);
+        disconnect(notes, &Notes::aboutToDelete, this, &BookmarkedNotes::notesDestroyed);
+        disconnect(notes, &Notes::notesModified, this, &BookmarkedNotes::notesUpdated);
+        this->removeAt(row);
+        this->sync();
+        return true;
+    }
+
+    if( mo->inherits( &Note::staticMetaObject ) )
+    {
+        Note *note = qobject_cast<Note*>(object);
+        disconnect(note, &Note::aboutToDelete, this, &BookmarkedNotes::noteDestroyed);
+        disconnect(note, &Note::noteModified, this, &BookmarkedNotes::noteUpdated);
+        this->removeAt(row);
+        this->sync();
+        return true;
+    }
+
+    if( mo->inherits( &Character::staticMetaObject ) )
+    {
+        Character *character = qobject_cast<Character*>(object);
+        disconnect(character, &Character::aboutToDelete, this, &BookmarkedNotes::characterDestroyed);
+        disconnect(character, &Character::characterChanged, this, &BookmarkedNotes::characterUpdated);
+        this->removeAt(row);
+        this->sync();
+        return true;
+    }
+
+    return false;
+}
+
+bool BookmarkedNotes::isBookmarked(QObject *object) const
+{
+    return this->indexOf(object) >= 0;
+}
+
+QHash<int, QByteArray> BookmarkedNotes::roleNames() const
+{
+    return
+        {
+            { TitleRole,   QByteArrayLiteral("noteTitle")   },
+            { SummaryRole, QByteArrayLiteral("noteSummary") },
+            { ObjectRole,  QByteArrayLiteral("noteObject")  }
+        };
+}
+
+QVariant BookmarkedNotes::data(const QModelIndex &index, int role) const
+{
+    if(index.isValid())
+    {
+        QObject *object = this->objectAt(index.row());
+        return this->data(object, role);
+    }
+
+    return QVariant();
+}
+
+QVariant BookmarkedNotes::data(QObject *ptr, int role) const
+{
+    if(ptr == nullptr)
+        return QVariant();
+
+    switch(role)
+    {
+    case TitleRole: {
+        if(ptr->metaObject()->inherits(&Notes::staticMetaObject)) {
+            Notes *notes = qobject_cast<Notes*>(ptr);
+            return notes->title();
+        } else if(ptr->metaObject()->inherits(&Note::staticMetaObject)) {
+            Note *note = qobject_cast<Note*>(ptr);
+            return note->title();
+        } else if(ptr->metaObject()->inherits(&Character::staticMetaObject)) {
+            Character *character = qobject_cast<Character*>(ptr);
+            return character->name();
+        }
+        } break;
+    case SummaryRole: {
+        if(ptr->metaObject()->inherits(&Notes::staticMetaObject)) {
+            Notes *notes = qobject_cast<Notes*>(ptr);
+            return notes->summary();
+        } else if(ptr->metaObject()->inherits(&Note::staticMetaObject)) {
+            Note *note = qobject_cast<Note*>(ptr);
+            return note->summary();
+        } else if(ptr->metaObject()->inherits(&Character::staticMetaObject)) {
+            Character *character = qobject_cast<Character*>(ptr);
+            return QStringList({ character->designation(), character->gender(), character->age() })
+                            .join( QStringLiteral(", ") );
+        }
+        } break;
+    case ObjectRole:
+        return QVariant::fromValue<QObject*>(ptr);
+    }
+
+    return QVariant();
+}
+
+void BookmarkedNotes::noteUpdated()
+{
+    QObject *ptr = this->sender();
+    this->objectUpdated(ptr);
+}
+
+void BookmarkedNotes::notesUpdated()
+{
+    QObject *ptr = this->sender();
+    this->objectUpdated(ptr);
+}
+
+void BookmarkedNotes::characterUpdated()
+{
+    QObject *ptr = this->sender();
+    this->objectUpdated(ptr);
+}
+
+void BookmarkedNotes::objectUpdated(QObject *ptr)
+{
+    const int row = this->indexOf(ptr);
+    const QModelIndex index = this->index(row, 0, QModelIndex());
+    emit dataChanged(index, index);
+}
+
+void BookmarkedNotes::noteDestroyed(Note *ptr)
+{
+    this->objectDestroyed(ptr);
+}
+
+void BookmarkedNotes::notesDestroyed(Notes *ptr)
+{
+    this->objectDestroyed(ptr);
+}
+
+void BookmarkedNotes::characterDestroyed(Character *ptr)
+{
+    this->objectDestroyed(ptr);
+}
+
+void BookmarkedNotes::sync()
+{
+    QScopedValueRollback<bool> block(m_blockReload, true);
+
+    QJsonArray array;
+
+    const QList<QObject*> objects = this->list();
+    for(QObject *ptr : objects)
+    {
+        QJsonObject item;
+        item.insert( QStringLiteral("type"), QString::fromLatin1(ptr->metaObject()->className()) );
+        item.insert( QStringLiteral("id"), ptr->property("id").toString() );
+        array.append(item);
+    }
+
+    ScriteDocument *doc = ScriteDocument::instance();
+    doc->setBookmarkedNotes(array);
+}
+
+void BookmarkedNotes::reload()
+{
+    if(m_blockReload)
+        return;
+
+    ScriteDocument *doc = ScriteDocument::instance();
+    disconnect(doc, &ScriteDocument::bookmarkedNotesChanged, this, &BookmarkedNotes::reload);
+
+    const QJsonArray array = doc->bookmarkedNotes();
+    for(const QJsonValue &value : array)
+    {
+        const QJsonObject item = value.toObject();
+        const QString type = item.value( QStringLiteral("type") ).toString();
+        const QString id = item.value( QStringLiteral("id") ).toString();
+
+        if(type == QStringLiteral("Notes"))
+        {
+            Notes *notes = Notes::findById(id);
+            this->append(notes);
+        }
+        else if(type == QStringLiteral("Note"))
+        {
+            Note *note = Note::findById(id);
+            this->append(note);
+        }
+        else if(type == QStringLiteral("Character"))
+        {
+            Character *character = doc->structure()->findCharacter(id);
+            this->append(character);
+        }
+    }
+
+    connect(doc, &ScriteDocument::bookmarkedNotesChanged, this, &BookmarkedNotes::reload);
+}
+

@@ -107,12 +107,12 @@ void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, 
 int main(int argc, char **argv)
 {
     const QVersionNumber applicationVersion(0, 6, 9);
-    Application::setApplicationName("Scrite");
-    Application::setOrganizationName("TERIFLIX");
-    Application::setOrganizationDomain("teriflix.com");
+    Application::setApplicationName(QStringLiteral("Scrite"));
+    Application::setOrganizationName(QStringLiteral("TERIFLIX"));
+    Application::setOrganizationDomain(QStringLiteral("teriflix.com"));
 
 #ifdef Q_OS_MAC
-    Application::setApplicationVersion(applicationVersion.toString() + "-beta");
+    Application::setApplicationVersion(applicationVersion.toString() + QStringLiteral("-beta"));
     if(QOperatingSystemVersion::current() > QOperatingSystemVersion::MacOSCatalina)
         qputenv("QT_MAC_WANTS_LAYER", QByteArrayLiteral("1"));
 #else
@@ -130,170 +130,172 @@ int main(int argc, char **argv)
     qInstallMessageHandler(ScriteQtMessageHandler);
 
     Application a(argc, argv, applicationVersion);
-    a.setWindowIcon(QIcon(":/images/appicon.png"));
+    a.setWindowIcon(QIcon(QStringLiteral(":/images/appicon.png")));
     a.computeIdealFontPointSize();
 
     QPalette palette = Application::palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0,0.4,1));
-    palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor("white"));
-    palette.setColor(QPalette::Active, QPalette::Text, QColor("black"));
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor(Qt::white));
+    palette.setColor(QPalette::Active, QPalette::Text, QColor(Qt::black));
     Application::setPalette(palette);
 
-    qmlRegisterSingletonType<Aggregation>("Scrite", 1, 0, "Aggregation", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
+    const char *scriteModuleUri = "Scrite";
+    const QString apreason = QStringLiteral("Use as attached property.");
+    const QString reason = QStringLiteral("Instantiation from QML not allowed.");
+
+    qmlRegisterSingletonType<Aggregation>(scriteModuleUri, 1, 0, "Aggregation", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
         return new Aggregation(engine);
     });
 
-    qmlRegisterSingletonType<StandardPaths>("Scrite", 1, 0, "StandardPaths", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
+    qmlRegisterSingletonType<StandardPaths>(scriteModuleUri, 1, 0, "StandardPaths", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
         return new StandardPaths(engine);
     });
 
-    const QString apreason("Use as attached property.");
-    const QString reason("Instantiation from QML not allowed.");
-
 #ifdef ENABLE_TIME_PROFILING
-    qmlRegisterUncreatableType<ProfilerItem>("Scrite", 1, 0, "Profiler", apreason);
+    qmlRegisterUncreatableType<ProfilerItem>(scriteModuleUri, 1, 0, "Profiler", apreason);
 #endif
 
-    qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
+    qmlRegisterUncreatableType<ScriteDocument>(scriteModuleUri, 1, 0, "ScriteDocument", reason);
 
-    qmlRegisterType<Scene>("Scrite", 1, 0, "Scene");
-    qmlRegisterType<SceneGroup>("Scrite", 1, 0, "SceneGroup");
-    qmlRegisterType<SceneSizeHintItem>("Scrite", 1, 0, "SceneSizeHint");
-    qmlRegisterUncreatableType<SceneHeading>("Scrite", 1, 0, "SceneHeading", reason);
-    qmlRegisterType<SceneElement>("Scrite", 1, 0, "SceneElement");
+    qmlRegisterType<Scene>(scriteModuleUri, 1, 0, "Scene");
+    qmlRegisterType<SceneGroup>(scriteModuleUri, 1, 0, "SceneGroup");
+    qmlRegisterType<SceneSizeHintItem>(scriteModuleUri, 1, 0, "SceneSizeHint");
+    qmlRegisterUncreatableType<SceneHeading>(scriteModuleUri, 1, 0, "SceneHeading", reason);
+    qmlRegisterType<SceneElement>(scriteModuleUri, 1, 0, "SceneElement");
 
-    qmlRegisterUncreatableType<Screenplay>("Scrite", 1, 0, "Screenplay", reason);
-    qmlRegisterType<ScreenplayElement>("Scrite", 1, 0, "ScreenplayElement");
-    qmlRegisterType<ScreenplayTracks>("Scrite", 1, 0, "ScreenplayTracks");
+    qmlRegisterUncreatableType<Screenplay>(scriteModuleUri, 1, 0, "Screenplay", reason);
+    qmlRegisterType<ScreenplayElement>(scriteModuleUri, 1, 0, "ScreenplayElement");
+    qmlRegisterType<ScreenplayTracks>(scriteModuleUri, 1, 0, "ScreenplayTracks");
 
-    qmlRegisterUncreatableType<Structure>("Scrite", 1, 0, "Structure", reason);
-    qmlRegisterType<StructureElement>("Scrite", 1, 0, "StructureElement");
-    qmlRegisterType<StructureElementConnector>("Scrite", 1, 0, "StructureElementConnector");
-    qmlRegisterType<StructureCanvasViewportFilterModel>("Scrite", 1, 0, "StructureCanvasViewportFilterModel");
-    qmlRegisterUncreatableType<StructureElementStack>("Scrite", 1, 0, "StructureElementStack", reason);
-    qmlRegisterUncreatableType<StructureElementStacks>("Scrite", 1, 0, "StructureElementStacks", reason);
+    qmlRegisterUncreatableType<Structure>(scriteModuleUri, 1, 0, "Structure", reason);
+    qmlRegisterType<StructureElement>(scriteModuleUri, 1, 0, "StructureElement");
+    qmlRegisterType<StructureElementConnector>(scriteModuleUri, 1, 0, "StructureElementConnector");
+    qmlRegisterType<StructureCanvasViewportFilterModel>(scriteModuleUri, 1, 0, "StructureCanvasViewportFilterModel");
+    qmlRegisterUncreatableType<StructureElementStack>(scriteModuleUri, 1, 0, "StructureElementStack", reason);
+    qmlRegisterUncreatableType<StructureElementStacks>(scriteModuleUri, 1, 0, "StructureElementStacks", reason);
 
-    qmlRegisterUncreatableType<Form>("Scrite", 1, 0, "Form", reason);
-    qmlRegisterUncreatableType<Forms>("Scrite", 1, 0, "Forms", reason);
-    qmlRegisterUncreatableType<FormQuestion>("Scrite", 1, 0, "FormQuestion", reason);
+    qmlRegisterUncreatableType<Form>(scriteModuleUri, 1, 0, "Form", reason);
+    qmlRegisterUncreatableType<Forms>(scriteModuleUri, 1, 0, "Forms", reason);
+    qmlRegisterUncreatableType<FormQuestion>(scriteModuleUri, 1, 0, "FormQuestion", reason);
 
-    qmlRegisterUncreatableType<Note>("Scrite", 1, 0, "Note", reason);
-    qmlRegisterUncreatableType<Notes>("Scrite", 1, 0, "Notes", reason);
-    qmlRegisterUncreatableType<Attachment>("Scrite", 1, 0, "Attachment", reason);
-    qmlRegisterUncreatableType<Attachments>("Scrite", 1, 0, "Attachments", reason);
-    qmlRegisterType<AttachmentsDropArea>("Scrite", 1, 0, "AttachmentsDropArea");
-    qmlRegisterType<Relationship>("Scrite", 1, 0, "Relationship");
-    qmlRegisterUncreatableType<Character>("Scrite", 1, 0, "Character", reason);
-    qmlRegisterType<CharacterRelationshipsGraph>("Scrite", 1, 0, "CharacterRelationshipsGraph");
+    qmlRegisterUncreatableType<Note>(scriteModuleUri, 1, 0, "Note", reason);
+    qmlRegisterUncreatableType<Notes>(scriteModuleUri, 1, 0, "Notes", reason);
+    qmlRegisterUncreatableType<Attachment>(scriteModuleUri, 1, 0, "Attachment", reason);
+    qmlRegisterUncreatableType<Attachments>(scriteModuleUri, 1, 0, "Attachments", reason);
+    qmlRegisterType<AttachmentsDropArea>(scriteModuleUri, 1, 0, "AttachmentsDropArea");
+    qmlRegisterType<Relationship>(scriteModuleUri, 1, 0, "Relationship");
+    qmlRegisterUncreatableType<Character>(scriteModuleUri, 1, 0, "Character", reason);
+    qmlRegisterType<CharacterRelationshipsGraph>(scriteModuleUri, 1, 0, "CharacterRelationshipsGraph");
 
-    qmlRegisterType<NotebookModel>("Scrite", 1, 0, "NotebookModel");
+    qmlRegisterType<NotebookModel>(scriteModuleUri, 1, 0, "NotebookModel");
+    qmlRegisterUncreatableType<BookmarkedNotes>(scriteModuleUri, 1, 0, "BookmarkedNotes", reason);
 
-    qmlRegisterUncreatableType<ScriteDocument>("Scrite", 1, 0, "ScriteDocument", reason);
-    qmlRegisterUncreatableType<ScreenplayFormat>("Scrite", 1, 0, "ScreenplayFormat", reason);
-    qmlRegisterUncreatableType<SceneElementFormat>("Scrite", 1, 0, "SceneElementFormat", reason);
-    qmlRegisterUncreatableType<ScreenplayPageLayout>("Scrite", 1, 0, "ScreenplayPageLayout", reason);
+    qmlRegisterUncreatableType<ScriteDocument>(scriteModuleUri, 1, 0, "ScriteDocument", reason);
+    qmlRegisterUncreatableType<ScreenplayFormat>(scriteModuleUri, 1, 0, "ScreenplayFormat", reason);
+    qmlRegisterUncreatableType<SceneElementFormat>(scriteModuleUri, 1, 0, "SceneElementFormat", reason);
+    qmlRegisterUncreatableType<ScreenplayPageLayout>(scriteModuleUri, 1, 0, "ScreenplayPageLayout", reason);
 
-    qmlRegisterType<SceneDocumentBinder>("Scrite", 1, 0, "SceneDocumentBinder");
-    qmlRegisterUncreatableType<TextFormat>("Scrite", 1, 0, "TextFormat", "Use the instance provided by SceneDocumentBinder.textFormat property.");
+    qmlRegisterType<SceneDocumentBinder>(scriteModuleUri, 1, 0, "SceneDocumentBinder");
+    qmlRegisterUncreatableType<TextFormat>(scriteModuleUri, 1, 0, "TextFormat", "Use the instance provided by SceneDocumentBinder.textFormat property.");
 
-    qmlRegisterType<GridBackgroundItem>("Scrite", 1, 0, "GridBackground");
-    qmlRegisterUncreatableType<GridBackgroundItemBorder>("Scrite", 1, 0, "GridBackgroundItemBorder", reason);
-    qmlRegisterType<CompletionModel>("Scrite", 1, 0, "CompletionModel");
+    qmlRegisterType<GridBackgroundItem>(scriteModuleUri, 1, 0, "GridBackground");
+    qmlRegisterUncreatableType<GridBackgroundItemBorder>(scriteModuleUri, 1, 0, "GridBackgroundItemBorder", reason);
+    qmlRegisterType<CompletionModel>(scriteModuleUri, 1, 0, "CompletionModel");
 
-    qmlRegisterUncreatableType<EventFilterResult>("Scrite", 1, 0, "EventFilterResult", "Use the instance provided by EventFilter.onFilter signal.");
-    qmlRegisterUncreatableType<EventFilter>("Scrite", 1, 0, "EventFilter", apreason);
+    qmlRegisterUncreatableType<EventFilterResult>(scriteModuleUri, 1, 0, "EventFilterResult", "Use the instance provided by EventFilter.onFilter signal.");
+    qmlRegisterUncreatableType<EventFilter>(scriteModuleUri, 1, 0, "EventFilter", apreason);
 
-    qmlRegisterType<PainterPathItem>("Scrite", 1, 0, "PainterPathItem");
-    qmlRegisterUncreatableType<AbstractPathElement>("Scrite", 1, 0, "PathElement", "Use subclasses of AbstractPathElement.");
-    qmlRegisterType<PainterPath>("Scrite", 1, 0, "PainterPath");
-    qmlRegisterType<MoveToElement>("Scrite", 1, 0, "MoveTo");
-    qmlRegisterType<LineToElement>("Scrite", 1, 0, "LineTo");
-    qmlRegisterType<CloseSubpathElement>("Scrite", 1, 0, "CloseSubpath");
-    qmlRegisterType<CubicToElement>("Scrite", 1, 0, "CubicTo");
-    qmlRegisterType<QuadToElement>("Scrite", 1, 0, "QuadTo");
-    qmlRegisterType<ArcToElement>("Scrite", 1, 0, "ArcTo");
-    qmlRegisterType<TextShapeItem>("Scrite", 1, 0, "TextShapeItem");
-    qmlRegisterType<UndoStack>("Scrite", 1, 0, "UndoStack");
-    qmlRegisterType<UndoHandler>("Scrite", 1, 0, "UndoHandler");
-    qmlRegisterUncreatableType<UndoResult>("Scrite", 1, 0, "UndoResult", "Use the instance provided by UndoHandler.onUndoRequest or UndoHandler.onReduRequest signal.");
+    qmlRegisterType<PainterPathItem>(scriteModuleUri, 1, 0, "PainterPathItem");
+    qmlRegisterUncreatableType<AbstractPathElement>(scriteModuleUri, 1, 0, "PathElement", "Use subclasses of AbstractPathElement.");
+    qmlRegisterType<PainterPath>(scriteModuleUri, 1, 0, "PainterPath");
+    qmlRegisterType<MoveToElement>(scriteModuleUri, 1, 0, "MoveTo");
+    qmlRegisterType<LineToElement>(scriteModuleUri, 1, 0, "LineTo");
+    qmlRegisterType<CloseSubpathElement>(scriteModuleUri, 1, 0, "CloseSubpath");
+    qmlRegisterType<CubicToElement>(scriteModuleUri, 1, 0, "CubicTo");
+    qmlRegisterType<QuadToElement>(scriteModuleUri, 1, 0, "QuadTo");
+    qmlRegisterType<ArcToElement>(scriteModuleUri, 1, 0, "ArcTo");
+    qmlRegisterType<TextShapeItem>(scriteModuleUri, 1, 0, "TextShapeItem");
+    qmlRegisterType<UndoStack>(scriteModuleUri, 1, 0, "UndoStack");
+    qmlRegisterType<UndoHandler>(scriteModuleUri, 1, 0, "UndoHandler");
+    qmlRegisterUncreatableType<UndoResult>(scriteModuleUri, 1, 0, "UndoResult", "Use the instance provided by UndoHandler.onUndoRequest or UndoHandler.onReduRequest signal.");
 
-    qmlRegisterType<SearchEngine>("Scrite", 1, 0, "SearchEngine");
-    qmlRegisterType<TextDocumentSearch>("Scrite", 1, 0, "TextDocumentSearch");
-    qmlRegisterUncreatableType<SearchAgent>("Scrite", 1, 0, "SearchAgent", apreason);
+    qmlRegisterType<SearchEngine>(scriteModuleUri, 1, 0, "SearchEngine");
+    qmlRegisterType<TextDocumentSearch>(scriteModuleUri, 1, 0, "TextDocumentSearch");
+    qmlRegisterUncreatableType<SearchAgent>(scriteModuleUri, 1, 0, "SearchAgent", apreason);
 
-    qmlRegisterUncreatableType<Notification>("Scrite", 1, 0, "Notification", apreason);
-    qmlRegisterUncreatableType<NotificationManager>("Scrite", 1, 0, "NotificationManager", "Use notificationManager instead.");
+    qmlRegisterUncreatableType<Notification>(scriteModuleUri, 1, 0, "Notification", apreason);
+    qmlRegisterUncreatableType<NotificationManager>(scriteModuleUri, 1, 0, "NotificationManager", "Use notificationManager instead.");
 
-    qmlRegisterUncreatableType<ErrorReport>("Scrite", 1, 0, "ErrorReport", reason);
-    qmlRegisterUncreatableType<ProgressReport>("Scrite", 1, 0, "ProgressReport", reason);
+    qmlRegisterUncreatableType<ErrorReport>(scriteModuleUri, 1, 0, "ErrorReport", reason);
+    qmlRegisterUncreatableType<ProgressReport>(scriteModuleUri, 1, 0, "ProgressReport", reason);
 
-    qmlRegisterUncreatableType<TransliterationEngine>("Scrite", 1, 0, "TransliterationEngine", "Use app.transliterationEngine instead.");
-    qmlRegisterUncreatableType<Transliterator>("Scrite", 1, 0, "Transliterator", apreason);
-    qmlRegisterType<TransliteratedText>("Scrite", 1, 0, "TransliteratedText");
+    qmlRegisterUncreatableType<TransliterationEngine>(scriteModuleUri, 1, 0, "TransliterationEngine", "Use app.transliterationEngine instead.");
+    qmlRegisterUncreatableType<Transliterator>(scriteModuleUri, 1, 0, "Transliterator", apreason);
+    qmlRegisterType<TransliteratedText>(scriteModuleUri, 1, 0, "TransliteratedText");
 
-    qmlRegisterUncreatableType<AbstractExporter>("Scrite", 1, 0, "AbstractExporter", reason);
-    qmlRegisterUncreatableType<AbstractReportGenerator>("Scrite", 1, 0, "AbstractReportGenerator", reason);
+    qmlRegisterUncreatableType<AbstractExporter>(scriteModuleUri, 1, 0, "AbstractExporter", reason);
+    qmlRegisterUncreatableType<AbstractReportGenerator>(scriteModuleUri, 1, 0, "AbstractReportGenerator", reason);
 
-    qmlRegisterUncreatableType<FocusTracker>("Scrite", 1, 0, "FocusTracker", reason);
-    qmlRegisterUncreatableType<FocusTrackerIndicator>("Scrite", 1, 0, "FocusTrackerIndicator", reason);
+    qmlRegisterUncreatableType<FocusTracker>(scriteModuleUri, 1, 0, "FocusTracker", reason);
+    qmlRegisterUncreatableType<FocusTrackerIndicator>(scriteModuleUri, 1, 0, "FocusTrackerIndicator", reason);
 
-    qmlRegisterUncreatableType<Application>("Scrite", 1, 0, "Application", reason);
-    qmlRegisterType<Annotation>("Scrite", 1, 0, "Annotation");
-    qmlRegisterType<DelayedPropertyBinder>("Scrite", 1, 0, "DelayedPropertyBinder");
-    qmlRegisterType<ResetOnChange>("Scrite", 1, 0, "ResetOnChange");
+    qmlRegisterUncreatableType<Application>(scriteModuleUri, 1, 0, "Application", reason);
+    qmlRegisterType<Annotation>(scriteModuleUri, 1, 0, "Annotation");
+    qmlRegisterType<DelayedPropertyBinder>(scriteModuleUri, 1, 0, "DelayedPropertyBinder");
+    qmlRegisterType<ResetOnChange>(scriteModuleUri, 1, 0, "ResetOnChange");
 
-    qmlRegisterUncreatableType<HeaderFooter>("Scrite", 1, 0, "HeaderFooter", reason);
-    qmlRegisterUncreatableType<QTextDocumentPagedPrinter>("Scrite", 1, 0, "QTextDocumentPagedPrinter", reason);
+    qmlRegisterUncreatableType<HeaderFooter>(scriteModuleUri, 1, 0, "HeaderFooter", reason);
+    qmlRegisterUncreatableType<QTextDocumentPagedPrinter>(scriteModuleUri, 1, 0, "QTextDocumentPagedPrinter", reason);
 
-    qmlRegisterUncreatableType<AutoUpdate>("Scrite", 1, 0, "AutoUpdate", reason);
+    qmlRegisterUncreatableType<AutoUpdate>(scriteModuleUri, 1, 0, "AutoUpdate", reason);
 
-    qmlRegisterType<MaterialColors>("Scrite", 1, 0, "MaterialColors");
+    qmlRegisterType<MaterialColors>(scriteModuleUri, 1, 0, "MaterialColors");
 
-    qmlRegisterType<GenericArrayModel>("Scrite", 1, 0, "GenericArrayModel");
-    qmlRegisterType<GenericArraySortFilterProxyModel>("Scrite", 1, 0, "GenericArraySortFilterProxyModel");
+    qmlRegisterType<GenericArrayModel>(scriteModuleUri, 1, 0, "GenericArrayModel");
+    qmlRegisterType<GenericArraySortFilterProxyModel>(scriteModuleUri, 1, 0, "GenericArraySortFilterProxyModel");
 
-    qmlRegisterUncreatableType<AbstractObjectTracker>("Scrite", 1, 0, "AbstractTracker", reason);
-    qmlRegisterType<TrackProperty>("Scrite", 1, 0, "TrackProperty");
-    qmlRegisterType<TrackSignal>("Scrite", 1, 0, "TrackSignal");
-    qmlRegisterType<TrackModelRow>("Scrite", 1, 0, "TrackModelRow");
-    qmlRegisterType<TrackerPack>("Scrite", 1, 0, "TrackerPack");
-    qmlRegisterType<PropertyAlias>("Scrite", 1, 0, "PropertyAlias");
+    qmlRegisterUncreatableType<AbstractObjectTracker>(scriteModuleUri, 1, 0, "AbstractTracker", reason);
+    qmlRegisterType<TrackProperty>(scriteModuleUri, 1, 0, "TrackProperty");
+    qmlRegisterType<TrackSignal>(scriteModuleUri, 1, 0, "TrackSignal");
+    qmlRegisterType<TrackModelRow>(scriteModuleUri, 1, 0, "TrackModelRow");
+    qmlRegisterType<TrackerPack>(scriteModuleUri, 1, 0, "TrackerPack");
+    qmlRegisterType<PropertyAlias>(scriteModuleUri, 1, 0, "PropertyAlias");
 
-    qmlRegisterType<ScreenplayAdapter>("Scrite", 1, 0, "ScreenplayAdapter");
-    qmlRegisterType<ScreenplayTextDocument>("Scrite", 1, 0, "ScreenplayTextDocument");
-    qmlRegisterType<ScreenplayElementPageBreaks>("Scrite", 1, 0, "ScreenplayElementPageBreaks");
-    qmlRegisterType<ImagePrinter>("Scrite", 1, 0, "ImagePrinter");
-    qmlRegisterType<TextDocumentItem>("Scrite", 1, 0, "TextDocumentItem");
-    qmlRegisterType<ScreenplayTextDocumentOffsets>("Scrite", 1, 0, "ScreenplayTextDocumentOffsets");
+    qmlRegisterType<ScreenplayAdapter>(scriteModuleUri, 1, 0, "ScreenplayAdapter");
+    qmlRegisterType<ScreenplayTextDocument>(scriteModuleUri, 1, 0, "ScreenplayTextDocument");
+    qmlRegisterType<ScreenplayElementPageBreaks>(scriteModuleUri, 1, 0, "ScreenplayElementPageBreaks");
+    qmlRegisterType<ImagePrinter>(scriteModuleUri, 1, 0, "ImagePrinter");
+    qmlRegisterType<TextDocumentItem>(scriteModuleUri, 1, 0, "TextDocumentItem");
+    qmlRegisterType<ScreenplayTextDocumentOffsets>(scriteModuleUri, 1, 0, "ScreenplayTextDocumentOffsets");
 
-    qmlRegisterType<RulerItem>("Scrite", 1, 0, "RulerItem");
-    qmlRegisterType<SimpleTabBarItem>("Scrite", 1, 0, "SimpleTabBarItem");
+    qmlRegisterType<RulerItem>(scriteModuleUri, 1, 0, "RulerItem");
+    qmlRegisterType<SimpleTabBarItem>(scriteModuleUri, 1, 0, "SimpleTabBarItem");
 
-    qmlRegisterType<SpellCheckService>("Scrite", 1, 0, "SpellCheckService");
+    qmlRegisterType<SpellCheckService>(scriteModuleUri, 1, 0, "SpellCheckService");
 
-    qmlRegisterType<BoundingBoxEvaluator>("Scrite", 1, 0, "BoundingBoxEvaluator");
-    qmlRegisterType<BoundingBoxPreview>("Scrite", 1, 0, "BoundingBoxPreview");
-    qmlRegisterUncreatableType<BoundingBoxItem>("Scrite", 1, 0, "BoundingBoxItem", apreason);
+    qmlRegisterType<BoundingBoxEvaluator>(scriteModuleUri, 1, 0, "BoundingBoxEvaluator");
+    qmlRegisterType<BoundingBoxPreview>(scriteModuleUri, 1, 0, "BoundingBoxPreview");
+    qmlRegisterUncreatableType<BoundingBoxItem>(scriteModuleUri, 1, 0, "BoundingBoxItem", apreason);
 
-    qmlRegisterType<FileInfo>("Scrite", 1, 0, "FileInfo");
+    qmlRegisterType<FileInfo>(scriteModuleUri, 1, 0, "FileInfo");
 
-    qmlRegisterUncreatableType<ShortcutsModelItem>("Scrite", 1, 0, "ShortcutsModelItem", apreason);
+    qmlRegisterUncreatableType<ShortcutsModelItem>(scriteModuleUri, 1, 0, "ShortcutsModelItem", apreason);
 
-    qmlRegisterType<LibraryService>("Scrite", 1, 0, "LibraryService");
-    qmlRegisterUncreatableType<Library>("Scrite", 1, 0, "Library", "Use from LibraryService.library");
+    qmlRegisterType<LibraryService>(scriteModuleUri, 1, 0, "LibraryService");
+    qmlRegisterUncreatableType<Library>(scriteModuleUri, 1, 0, "Library", "Use from LibraryService.library");
 
-    qmlRegisterType<UrlAttributes>("Scrite", 1, 0, "UrlAttributes");
+    qmlRegisterType<UrlAttributes>(scriteModuleUri, 1, 0, "UrlAttributes");
 
-    qmlRegisterUncreatableType<QAbstractItemModel>("Scrite", 1, 0, "Model", "Base type of models (QAbstractItemModel)");
+    qmlRegisterUncreatableType<QAbstractItemModel>(scriteModuleUri, 1, 0, "Model", "Base type of models (QAbstractItemModel)");
 
-    qmlRegisterType<TabSequenceManager>("Scrite", 1, 0, "TabSequenceManager");
-    qmlRegisterUncreatableType<TabSequenceItem>("Scrite", 1, 0, "TabSequenceItem", apreason);
+    qmlRegisterType<TabSequenceManager>(scriteModuleUri, 1, 0, "TabSequenceManager");
+    qmlRegisterUncreatableType<TabSequenceItem>(scriteModuleUri, 1, 0, "TabSequenceItem", apreason);
 
-    qmlRegisterUncreatableType<Announcement>("Scrite", 1, 0, "Announcement", apreason);
+    qmlRegisterUncreatableType<Announcement>(scriteModuleUri, 1, 0, "Announcement", apreason);
 
-    qmlRegisterType<ItemPositionMapper>("Scrite", 1, 0, "ItemPositionMapper");
+    qmlRegisterType<ItemPositionMapper>(scriteModuleUri, 1, 0, "ItemPositionMapper");
 
-    qmlRegisterType<SortFilterObjectListModel>("Scrite", 1, 0, "SortFilterObjectListModel");
+    qmlRegisterType<SortFilterObjectListModel>(scriteModuleUri, 1, 0, "SortFilterObjectListModel");
 
     NotificationManager notificationManager;
 

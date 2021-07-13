@@ -28,6 +28,9 @@ Flickable {
     property alias readonly: __textArea.readOnly
     property alias placeholderText: __textArea.placeholderText
     property alias readOnly: __textArea.readOnly
+    property alias background: __textArea.background
+    property TabSequenceManager tabSequenceManager
+    property int tabSequenceIndex: 0
 
     id: textAreaFlickable
     clip: true
@@ -82,5 +85,7 @@ Flickable {
                 return
             textAreaFlickable.contentY = cy
         }
+        TabSequenceItem.manager: tabSequenceManager
+        TabSequenceItem.sequence: tabSequenceIndex
     }
 }

@@ -668,6 +668,15 @@ void ScriteDocument::setUserData(const QJsonObject &val)
     emit userDataChanged();
 }
 
+void ScriteDocument::setBookmarkedNotes(const QJsonArray &val)
+{
+    if(m_bookmarkedNotes == val)
+        return;
+
+    m_bookmarkedNotes = val;
+    emit bookmarkedNotesChanged();
+}
+
 void ScriteDocument::reset()
 {
     HourGlass hourGlass;

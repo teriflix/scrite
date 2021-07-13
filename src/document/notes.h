@@ -38,12 +38,18 @@ class Note : public QObject, public QObjectSerializer::Interface
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
+    static Note *findById(const QString &id);
+
     Note(QObject *parent=nullptr);
     ~Note();
     Q_SIGNAL void aboutToDelete(Note *ptr);
 
     Q_PROPERTY(Notes* notes READ notes CONSTANT STORED false)
     Notes *notes() const;
+
+    Q_PROPERTY(QString id READ id NOTIFY idChanged)
+    QString id() const;
+    Q_SIGNAL void idChanged();
 
     enum Type
     {
@@ -102,6 +108,7 @@ public:
     void deserializeFromJson(const QJsonObject &);
 
 private:
+    void setId(const QString &val);
     void setType(Type val);
     void setFormId(const QString &val);
     void setForm(Form* val);
@@ -110,6 +117,7 @@ private:
 
 private:
     friend class Notes;
+    QString m_id;
     QString m_title;
     QString m_formId;
     QString m_summary;
@@ -128,6 +136,8 @@ class Notes : public ObjectListPropertyModel<Note *>, public QObjectSerializer::
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
+    static Notes *findById(const QString &id);
+
     Notes(QObject *parent = nullptr);
     ~Notes();
     Q_SIGNAL void aboutToDelete(Notes *ptr);
@@ -173,6 +183,14 @@ public:
     Prop *prop() const { return nullptr; }
     */
 
+    Q_PROPERTY(QString id READ id NOTIFY idChanged)
+    QString id() const;
+    Q_SIGNAL void idChanged();
+
+    // Called from BookmarkedNotes
+    QString title() const;
+    QString summary() const;
+
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
@@ -203,12 +221,14 @@ public:
     void loadOldNotes(const QJsonArray &array);
 
 private:
+    void setId(const QString &val);
     void addNote(Note *ptr);
     void setNotes(const QList<Note*> &list);
 
 private:
     friend class RemoveNoteUndoCommand;
     int m_compatibleFormType = -1;
+    QString m_id;
     QColor m_color = Qt::white;
     OwnerType m_ownerType = OtherOwner;
 };

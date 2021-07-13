@@ -352,6 +352,7 @@ public:
     Q_PROPERTY(bool valid READ isValid NOTIFY nameChanged)
     bool isValid() const { return !m_name.isEmpty(); }
 
+    Q_PROPERTY(QString id READ name NOTIFY nameChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     void setName(const QString &val);
     QString name() const { return m_name; }
