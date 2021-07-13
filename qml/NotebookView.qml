@@ -266,6 +266,7 @@ Rectangle {
             clip: true
             headerVisible: false
             model: notebookModel
+            frameVisible: false
             alternatingRowColors: false
             horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
             rowDelegate: Rectangle {
