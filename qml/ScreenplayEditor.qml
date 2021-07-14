@@ -2575,10 +2575,12 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
                             anchors.leftMargin: leftMargin
+                            anchors.right: parent.right
+                            elide: Text.ElideRight
                             font.family: "Courier Prime"
-                            font.pixelSize: 14
+                            font.pixelSize: app.idealFontPointSize+2
                             font.bold: screenplayAdapter.currentIndex < 0
-                            text: "[#] TITLE PAGE"
+                            text: scriteDocument.screenplay.title === "" ? "[#] TITLE PAGE" : scriteDocument.screenplay.title
                         }
 
                         MouseArea {
@@ -2628,7 +2630,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
-                            font.pixelSize: Math.ceil(app.idealFontPointSize*(parent.elementIsBreak ? 1 : 0.75))
+                            font.pointSize: Math.ceil(app.idealFontPointSize*(parent.elementIsBreak ? 1 : 0.75))
                             horizontalAlignment: parent.elementIsBreak & !sceneListView.hasEpisodes ? Qt.AlignHCenter : Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: Font.AllUppercase
