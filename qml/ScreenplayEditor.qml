@@ -2419,6 +2419,7 @@ Rectangle {
                 topPadding: 5
                 bottomPadding: 5
                 font.pointSize: sceneHeadingFieldsFontPointSize
+                visible: !scene.hasCharacters
             }
 
             Repeater {
