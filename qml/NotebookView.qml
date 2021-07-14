@@ -293,6 +293,14 @@ Rectangle {
                 height: fontMetrics.height + 20
                 color: styleData.selected ? primaryColors.highlight.background : primaryColors.c10.background
             }
+            EventFilter.events: [EventFilter.Wheel]
+            EventFilter.onFilter: {
+                if(event.type === EventFilter.Wheel && event.orientation === Qt.Horizontal) {
+                    result.filter = true
+                    result.acceptEvent = true
+                }
+            }
+
             property var currentData: model.modelIndexData(currentIndex)
             property Notes currentNotes: {
                 if(currentData.notebookItemType === NotebookModel.NotesType)

@@ -394,8 +394,8 @@ Rectangle {
                             id: removeRelationshipConfirmationItem
                             color: app.translucent(primaryColors.c600.background,0.85)
                             focus: true
-                            width: removeRelationshipConfirmationContentLayout.width + 20
-                            height: removeRelationshipConfirmationContentLayout.height + 20
+                            width: removeRelationshipConfirmationContentLayout.width + 45
+                            height: removeRelationshipConfirmationContentLayout.height + 40
                             Component.onCompleted: {
                                 if(canvasScroll.zoomScale !== 1) {
                                     canvasScroll.zoomOne()
@@ -429,13 +429,13 @@ Rectangle {
 
                             Column {
                                 id: removeRelationshipConfirmationContentLayout
-                                width: buttonRow.width
+                                width: buttonRow.width * 1.4
                                 anchors.centerIn: parent
+                                anchors.verticalCenterOffset: 5
                                 spacing: 40
 
                                 Text {
-                                    text: "Are you sure you want to delete this relationship?\n\nNOTE: This action cannot be undone!!"
-                                    font.bold: true
+                                    text: "<b>Are you sure you want to delete this relationship?</b><br/><br/>NOTE: This action cannot be undone!!"
                                     font.pointSize: app.idealFontPointSize
                                     width: parent.width
                                     horizontalAlignment: Text.AlignHCenter

@@ -2578,8 +2578,9 @@ Rectangle {
                             anchors.right: parent.right
                             elide: Text.ElideRight
                             font.family: "Courier Prime"
-                            font.pixelSize: app.idealFontPointSize+2
-                            font.bold: screenplayAdapter.currentIndex < 0
+                            font.pixelSize: app.idealFontPointSize
+                            font.bold: true
+                            font.capitalization: Font.AllUppercase
                             text: scriteDocument.screenplay.title === "" ? "[#] TITLE PAGE" : scriteDocument.screenplay.title
                         }
 
