@@ -1107,16 +1107,19 @@ void BookmarkedNotes::objectUpdated(QObject *ptr)
 void BookmarkedNotes::noteDestroyed(Note *ptr)
 {
     this->objectDestroyed(ptr);
+    this->sync();
 }
 
 void BookmarkedNotes::notesDestroyed(Notes *ptr)
 {
     this->objectDestroyed(ptr);
+    this->sync();
 }
 
 void BookmarkedNotes::characterDestroyed(Character *ptr)
 {
     this->objectDestroyed(ptr);
+    this->sync();
 }
 
 void BookmarkedNotes::sync()
