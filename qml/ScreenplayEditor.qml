@@ -1232,12 +1232,12 @@ Rectangle {
 
                         Text {
                             id: synopsisEditorHeading
-                            text: "Synopsis:"
+                            text: (contentItem.theScene.structureElement.hasNativeTitle ? contentItem.theScene.structureElement.nativeTitle : "Synopsis") + ":"
                             font.bold: true
                             font.pointSize: sceneHeadingFieldsFontPointSize
                             visible: synopsisEditorField.length > 0
-                            width: parent.width
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            width: parent.width*0.8
+                            elide: Text.ElideMiddle
                         }
 
                         TextArea {
