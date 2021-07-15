@@ -19,9 +19,20 @@ import QtQuick.Controls.Material 2.12
 import Scrite 1.0
 
 Item {
+    id: formView
     property Form form: note ? note.form : null
     property Note note
+    property int nrQuestionDigits: form ? evalNrQuestionDigits() : 2
     clip: true
+
+    function evalNrQuestionDigits() {
+        var nrQs = form.questionCount
+        if(nrQs < 10)
+            return 1
+        if(nrQs < 100)
+            return 2
+        return 3
+    }
 
     Flickable {
         id: formFlickable
@@ -82,18 +93,32 @@ Item {
                 }
             }
 
+            Label {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
+                text: form.moreInfoUrl == "" ? "" : "To learn more about this form, visit <a href=\"" + form.moreInfoUrl + "\">" + form.moreInfoUrl + "</a>"
+                visible: text !== ""
+                onLinkActivated: Qt.openUrlExternally(form.moreInfoUrl)
+            }
+
             Repeater {
                 model: form.questionsModel
 
                 FormField {
+                    anchors.right: parent.right
                     width: parent.width
+                    indentation: objectItem.indentation*50
                     spacing: parent.spacing/2
                     questionKey: objectItem.id
                     questionNumber: objectItem.number
                     question: objectItem.questionText
-                    placeholderText: objectItem.answerHint
+                    placeholderText: objectItem.answerHint === "" ? "Your answer ..." : objectItem.answerHint
+                    answerLength: objectItem.type
                     tabSequenceManager: formTabManager
                     tabSequenceIndex: 2+index
+                    nrQuestionDigits: formView.nrQuestionDigits
                     onCursorRectangleChanged: {
                         if(!textFieldHasActiveFocus)
                             return

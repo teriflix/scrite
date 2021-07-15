@@ -561,6 +561,9 @@ void Notes::removeNote(Note *ptr)
     disconnect(ptr, &Note::aboutToDelete, this, &Notes::removeNote);
     disconnect(ptr, &Note::noteModified, this, &Notes::notesModified);
 
+    if(ptr->type() == Note::FormNoteType && ptr->form() != nullptr)
+        ScriteDocument::instance()->releaseForm(ptr->form());
+
     this->removeAt(index);
 
     if(UndoStack::active() && RemoveNoteUndoCommand::noteCurrentlyBeingRemoved.isNull())

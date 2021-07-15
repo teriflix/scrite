@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "form.h"
+#include "application.h"
 #include "networkaccessmanager.h"
 
 #include <QDir>
@@ -19,6 +20,7 @@
 #include <QApplication>
 #include <QJsonDocument>
 #include <QNetworkReply>
+#include <QStack>
 
 FormQuestion::FormQuestion(QObject *parent)
     : QObject(parent)
@@ -40,13 +42,22 @@ void FormQuestion::setId(const QString &val)
     emit idChanged();
 }
 
-void FormQuestion::setNumber(int val)
+void FormQuestion::setNumber(const QString &val)
 {
-    if(m_number == val || m_number >= 0)
+    if(m_number == val || !m_number.isEmpty())
         return;
 
     m_number = val;
     emit numberChanged();
+}
+
+void FormQuestion::setIndentation(int val)
+{
+    if(m_indentation == val)
+        return;
+
+    m_indentation = val;
+    emit indentationChanged();
 }
 
 void FormQuestion::setQuestionText(const QString &val)
@@ -67,6 +78,24 @@ void FormQuestion::setAnswerHint(const QString &val)
     emit answerHintChanged();
 }
 
+void FormQuestion::setType(Type val)
+{
+    if(m_type == val)
+        return;
+
+    m_type = val;
+    emit typeChanged();
+}
+
+void FormQuestion::setMetaData(const QJsonObject &val)
+{
+    if(m_metaData == val)
+        return;
+
+    m_metaData = val;
+    emit metaDataChanged();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Form::Form(QObject *parent)
@@ -82,17 +111,17 @@ Form::~Form()
 
 QString Form::createdBy() const
 {
-    return m_createdBy.isEmpty() ? QStringLiteral("Scrite Project") : m_createdBy;
+    return m_createdBy;
 }
 
 QString Form::version() const
 {
-    return m_version.isEmpty() ? QStringLiteral("1.0") : m_version;
+    return m_version;
 }
 
 QUrl Form::moreInfoUrl() const
 {
-    return m_moreInfoUrl.isEmpty() ? QUrl( QStringLiteral("https://www.scrite.io") ) : m_moreInfoUrl;
+    return m_moreInfoUrl;
 }
 
 ObjectListPropertyModel<FormQuestion *> *Form::questionsModel() const
@@ -146,15 +175,21 @@ void Form::serializeToJson(QJsonObject &json) const
     json.insert( QStringLiteral("version"), m_version );
     json.insert( QStringLiteral("moreInfoUrl"), m_moreInfoUrl.toString() );
 
+    const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator( FormQuestion::staticMetaObject.indexOfEnumerator("Type") );
     const QList<FormQuestion*> list = m_questions.list();
 
     QJsonArray qArray;
     for(FormQuestion *q : list)
     {
+        const QString typeAsString = QLatin1String(formQuestionTypeEnum.valueToKey(q->type()));
+
         QJsonObject qjs;
         qjs.insert( QStringLiteral("id"), q->id() );
         qjs.insert( QStringLiteral("question"), q->questionText() );
         qjs.insert( QStringLiteral("answerHint"), q->answerHint() );
+        qjs.insert( QStringLiteral("type"), typeAsString );
+        qjs.insert( QStringLiteral("metaData"), q->metaData() );
+        qjs.insert( QStringLiteral("indentation"), q->indentation() );
         qArray.append(qjs);
     }
 
@@ -180,9 +215,20 @@ void Form::deserializeFromJson(const QJsonObject &json)
     this->setVersion( json.value(QStringLiteral("version")).toString() );
     this->setMoreInfoUrl( QUrl(json.value(QStringLiteral("moreInfoUrl")).toString()) );
 
+    const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator( FormQuestion::staticMetaObject.indexOfEnumerator("Type") );
     QList<FormQuestion*> list;
 
     const QJsonArray qArray = json.value( QStringLiteral("questions") ).toArray();
+
+    QStack<int> qnumberStack;
+    qnumberStack.push(0);
+    auto qnumber = [](const QStack <int> &stack) {
+        QStringList ret;
+        for(int val : stack)
+            ret << QString::number(val);
+        return ret.join( QStringLiteral(".") );
+    };
+
     for(const QJsonValue &qjsi : qArray)
     {
         const QJsonObject qjs = qjsi.toObject();
@@ -196,11 +242,37 @@ void Form::deserializeFromJson(const QJsonObject &json)
 
         const QString ques = qjs.value(QStringLiteral("question")).toString();
         const QString ansHint = qjs.value(QStringLiteral("answerHint")).toString();
-        const QString defAnsHint = QStringLiteral("Your answer for '%1' ...").arg(ques);
+        const QString qtypeAsString = qjs.value(QStringLiteral("type")).toString();
+        const QJsonObject metaData = qjs.value(QStringLiteral("metaData")).toObject();
+        const QJsonValue qindentValue = qjs.value(QStringLiteral("indentation"));
+        const int qindent = qMax(qindentValue.isString() ? qindentValue.toString().toInt() : qindentValue.toInt(), 0);
 
-        question->setQuestionText( ques );
-        question->setAnswerHint( ansHint.isEmpty() ? defAnsHint : ansHint );
-        question->setNumber( list.size()+1 );
+        if(qnumberStack.size() == qindent+1)
+            qnumberStack.top() += 1;
+        if(qnumberStack.size() < qindent+1)
+        {
+            while(qnumberStack.size() < qindent+1)
+                qnumberStack.push(1);
+        }
+        else if(qnumberStack.size() > qindent+1)
+        {
+            while(qnumberStack.size() > qindent+1)
+                qnumberStack.pop();
+            qnumberStack.top() += 1;
+        }
+
+        question->setQuestionText(ques);
+        question->setAnswerHint(ansHint);
+        question->setNumber( qnumber(qnumberStack) );
+        if(!qtypeAsString.isEmpty())
+        {
+            bool ok = false;
+            const int itype = formQuestionTypeEnum.keyToValue(qPrintable(qtypeAsString), &ok);
+            if(ok)
+                question->setType(FormQuestion::Type(itype));
+        }
+        question->setMetaData(metaData);
+        question->setIndentation(qindent);
 
         list.append(question);
     }

@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
@@ -24,30 +25,35 @@ Column {
     property string questionKey: questionNumber
     property alias questionNumber: questionNumberText.text
     property alias question: questionText.text
-    property alias answer: answerText.text
-    property alias placeholderText: answerText.placeholderText
+    property string answer
+    property string placeholderText
     property bool enableUndoRedo: true
     property rect cursorRectangle: {
-        var cr = answerText.cursorRectangle
-        return mapFromItem(answerText, cr.x, cr.y, cr.width, cr.height)
+        var cr = answerItemLoader.lod === answerItemLoader.eHIGH ? answerItemLoader.item.cursorRectangle : Qt.rect(0,0,1,12)
+        return mapFromItem(answerItemLoader, cr.x, cr.y, cr.width, cr.height)
     }
-    property alias cursorVisible: answerText.cursorVisible
+    property bool cursorVisible: answerItemLoader.lod === answerItemLoader.eHIGH ? answerItemLoader.item.cursorVisible : false
     property TextArea textFieldItem: answerText
     property TabSequenceManager tabSequenceManager
-    property bool textFieldHasActiveFocus: answerText.activeFocus
+    property bool textFieldHasActiveFocus: answerItemLoader.lod === answerItemLoader.eHIGH ? answerItemLoader.item.activeFocus : false
     property real minHeight: questionRow.height + answerArea.minHeight + spacing
     property int tabSequenceIndex: 0
+    property int nrQuestionDigits: 2
+    property int indentation: 0
+    property int answerLength: FormQuestion.LongParagraph
 
     Row {
         id: questionRow
-        width: parent.width
+        width: parent.width-indentation
+        anchors.right: parent.right
+
         spacing: 10
 
         Label {
             id: questionNumberText
             font.bold: true
             horizontalAlignment: Text.AlignRight
-            width: idealAppFontMetrics.averageCharacterWidth * 2
+            width: idealAppFontMetrics.averageCharacterWidth * nrQuestionDigits
             anchors.top: parent.top
         }
 
@@ -67,41 +73,68 @@ Column {
         color: app.translucent(primaryColors.c100.background, 0.75)
         border.width: 1
         border.color: app.translucent(primaryColors.borderColor, 0.25)
-        height: Math.max(minHeight, answerText.height)
-        readonly property real minHeight: 125
+        height: Math.max(minHeight, answerItemLoader.item.height)
+        property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength === FormQuestion.ShortParagraph ? 1 : 3)
 
-        TextArea {
-            id: answerText
+        MouseArea {
+            anchors.fill: parent
+            enabled: answerItemLoader.lod === answerItemLoader.eLOW
+            onClicked: answerItemLoader.TabSequenceItem.assumeFocus()
+        }
+
+        LodLoader {
+            id: answerItemLoader
             width: answerArea.width
             height: Math.max(answerArea.minHeight-topPadding-bottomPadding, contentHeight+20)
-            font.pointSize: app.idealFontPointSize
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            selectByMouse: true
-            selectByKeyboard: true
-            leftPadding: 5; rightPadding: 5
-            topPadding: 5; bottomPadding: 5
-            Transliterator.textDocument: textDocument
-            Transliterator.cursorPosition: cursorPosition
-            Transliterator.hasActiveFocus: activeFocus
-            Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-            readOnly: scriteDocument.readOnly
-            background: Item { }
-            SpecialSymbolsSupport {
-                anchors.top: parent.bottom
-                anchors.left: parent.left
-                textEditor: answerText
-                textEditorHasCursorInterface: true
-                enabled: !scriteDocument.readOnly
-            }
-            UndoHandler {
-                enabled: !answerText.readOnly && answerText.activeFocus && enableUndoRedo
-                canUndo: answerText.canUndo
-                canRedo: answerText.canRedo
-                onUndoRequest: answerText.undo()
-                onRedoRequest: answerText.redo()
-            }
+            lod: eLOW
             TabSequenceItem.manager: tabSequenceManager
             TabSequenceItem.sequence: tabSequenceIndex
+            TabSequenceItem.onAboutToReceiveFocus: lod = eHIGH
+
+            lowDetailComponent: Text {
+                font.pointSize: app.idealFontPointSize
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                text: formField.answer === "" ? formField.placeholderText : formField.answer
+                opacity: formField.answer === "" ? 0.5 : 1
+                padding: 5
+            }
+
+            highDetailComponent: TextArea {
+                id: answerText
+                font.pointSize: app.idealFontPointSize
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                selectByMouse: true
+                selectByKeyboard: true
+                leftPadding: 5; rightPadding: 5
+                topPadding: 5; bottomPadding: 5
+                Transliterator.textDocument: textDocument
+                Transliterator.cursorPosition: cursorPosition
+                Transliterator.hasActiveFocus: activeFocus
+                Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
+                readOnly: scriteDocument.readOnly
+                background: Item { }
+                SpecialSymbolsSupport {
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+                    textEditor: answerText
+                    textEditorHasCursorInterface: true
+                    enabled: !scriteDocument.readOnly
+                }
+                UndoHandler {
+                    enabled: !answerText.readOnly && answerText.activeFocus && enableUndoRedo
+                    canUndo: answerText.canUndo
+                    canRedo: answerText.canRedo
+                    onUndoRequest: answerText.undo()
+                    onRedoRequest: answerText.redo()
+                }
+                onActiveFocusChanged: {
+                    if(!activeFocus)
+                        answerItemLoader.lod = answerItemLoader.eLOW
+                }
+                Component.onCompleted: forceActiveFocus()
+                text: formField.answer
+                onTextChanged: formField.answer = text
+            }
         }
     }
 }

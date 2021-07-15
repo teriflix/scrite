@@ -37,8 +37,8 @@ public:
     QString id() const { return m_id; }
     Q_SIGNAL void idChanged();
 
-    Q_PROPERTY(int number READ number NOTIFY numberChanged)
-    int number() const { return m_number; }
+    Q_PROPERTY(QString number READ number NOTIFY numberChanged)
+    QString number() const { return m_number; }
     Q_SIGNAL void numberChanged();
 
     Q_PROPERTY(QString questionText READ questionText NOTIFY questionTextChanged)
@@ -49,18 +49,48 @@ public:
     QString answerHint() const { return m_answerHint; }
     Q_SIGNAL void answerHintChanged();
 
+    Q_PROPERTY(int indentation READ indentation NOTIFY indentationChanged)
+    int indentation() const { return m_indentation; }
+    Q_SIGNAL void indentationChanged();
+
+    enum Type
+    {
+        None,
+        ShortParagraph,
+        LongParagraph,
+        RadioButons,
+        CheckBoxes,
+        Date,
+        Time,
+        LinearScale
+    };
+    Q_ENUM(Type)
+    Q_PROPERTY(Type type READ type NOTIFY typeChanged)
+    Type type() const { return m_type; }
+    Q_SIGNAL void typeChanged();
+
+    Q_PROPERTY(QJsonObject metaData READ metaData NOTIFY metaDataChanged)
+    QJsonObject metaData() const { return m_metaData; }
+    Q_SIGNAL void metaDataChanged();
+
 private:
     void setId(const QString &val);
-    void setNumber(int val);
+    void setNumber(const QString &val);
+    void setIndentation(int val);
     void setQuestionText(const QString &val);
     void setAnswerHint(const QString &val);
+    void setType(Type val);
+    void setMetaData(const QJsonObject &val);
 
 private:
     friend class Form;
-    int m_number = -1;
     QString m_id;
+    QString m_number;
+    int m_indentation = 0;
     QString m_questionText;
     QString m_answerHint;
+    Type m_type = LongParagraph;
+    QJsonObject m_metaData;
 };
 
 class Form : public QObject, public QObjectSerializer::Interface
