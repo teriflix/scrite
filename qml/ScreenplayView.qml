@@ -51,8 +51,6 @@ Item {
         z: 1
         color: accentColors.c100.background
         width: screenplayToolsLayout.width+4
-        border.color: accentColors.borderColor
-        border.width: 1
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -103,6 +101,13 @@ Item {
                 }
                 autoRepeat: true
             }
+        }
+
+        Rectangle {
+            width: 1
+            height: parent.height
+            anchors.right: parent.right
+            color: accentColors.borderColor
         }
     }
 

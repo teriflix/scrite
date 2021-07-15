@@ -33,8 +33,6 @@ Item {
         anchors.bottom: statusBar.top
         color: primaryColors.c100.background
         width: toolbarLayout.width+4
-        border.color: primaryColors.borderColor
-        border.width: 1
 
         Flow {
             id: toolbarLayout
@@ -43,35 +41,29 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             flow: Flow.TopToBottom
             layoutDirection: Qt.RightToLeft
-            property real columnWidth: changeTabButton.width
+            property real columnWidth: structureTabButton.width
 
             ToolButton3 {
-                id: changeTabButton
+                id: structureTabButton
                 visible: workspaceSettings.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
-                hasMenu: true
-                ToolTip.text: "Switch between Structure & Notebook tabs."
-                onClicked: changeTabMenu.open()
+                down: true
+                ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+            }
 
-                Item {
-                    anchors.top: parent.top
-                    anchors.right: parent.right
+            ToolButton3 {
+                id: notebookTabButton
+                visible: workspaceSettings.showNotebookInStructure
+                iconSource: "../icons/navigation/notebook_tab.png"
+                ToolTip.text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+            }
 
-                    Menu2 {
-                        id: changeTabMenu
-
-                        MenuItem2 {
-                            text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
-                            icon.source: "../icons/navigation/check.png"
-                        }
-
-                        MenuItem2 {
-                            text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
-                            icon.source: "../icons/content/blank.png"
-                            onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
-                        }
-                    }
-                }
+            Rectangle {
+                width: toolbarLayout.columnWidth
+                height: 1
+                color: primaryColors.separatorColor
+                opacity: 0.5
             }
 
             ToolButton3 {
@@ -149,7 +141,7 @@ Item {
             }
 
             Rectangle {
-                width: parent.columnWidth
+                width: toolbarLayout.columnWidth
                 height: 1
                 color: primaryColors.separatorColor
                 opacity: 0.5
@@ -320,7 +312,7 @@ Item {
             }
 
             Rectangle {
-                width: parent.columnWidth
+                width: toolbarLayout.columnWidth
                 height: 1
                 color: primaryColors.separatorColor
                 opacity: 0.5
@@ -369,13 +361,13 @@ Item {
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
             }
+        }
 
-            Rectangle {
-                width: parent.columnWidth
-                height: 1
-                color: primaryColors.separatorColor
-                opacity: 0.5
-            }
+        Rectangle {
+            width: 1
+            height: parent.height
+            anchors.right: parent.right
+            color: primaryColors.borderColor
         }
     }
 

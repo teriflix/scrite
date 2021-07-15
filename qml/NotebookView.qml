@@ -118,28 +118,30 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
 
             ToolButton3 {
-                id: changeTabButton
-                iconSource: "../icons/navigation/notebook_tab.png"
-                hasMenu: true
-                ToolTip.text: "Switch between Structure & Notebook tabs."
-                onClicked: changeTabMenu.popup(changeTabButton, changeTabButton.width, 0)
+                id: structureTabButton
+                visible: workspaceSettings.showNotebookInStructure
+                iconSource: "../icons/navigation/structure_tab.png"
+                ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
+                onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
+            }
 
-                Menu2 {
-                    id: changeTabMenu
+            ToolButton3 {
+                id: notebookTabButton
+                visible: workspaceSettings.showNotebookInStructure
+                iconSource: "../icons/navigation/notebook_tab.png"
+                down: true
+                ToolTip.text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+            }
 
-                    MenuItem2 {
-                        text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
-                        icon.source: "../icons/content/blank.png"
-                        onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
-                    }
-
-                    MenuItem2 {
-                        text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
-                        icon.source: "../icons/navigation/check.png"
-                    }
-                }
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: primaryColors.separatorColor
+                opacity: 0.5
             }
 
             ToolButton3 {
