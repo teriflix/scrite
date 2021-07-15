@@ -34,6 +34,13 @@ Item {
         return 3
     }
 
+    EventFilter.events: [EventFilter.Wheel]
+    EventFilter.onFilter: {
+        EventFilter.forwardEventTo(formFlickable)
+        result.filter = true
+        result.accepted = true
+    }
+
     Flickable {
         id: formFlickable
         width: Math.max(200, Math.min(parent.width-17, 800))
@@ -43,64 +50,73 @@ Item {
         anchors.centerIn: parent
         ScrollBar.vertical: formVScrollBar
         ScrollBar.horizontal: formHScrollBar
+        flickableDirection: Flickable.VerticalFlick
 
         Column {
             id: formContentLayout
             width: formVScrollBar.needed ? formFlickable.width - 17 : formFlickable.width
             spacing: 20
 
-            Item {
+            Column {
                 width: parent.width
-                height: 1
-            }
+                spacing: parent.spacing
+                property bool visibleToUser: app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                                                    Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
+                opacity: visibleToUser ? 1 : 0
 
-            TextField2 {
-                id: titleField
-                text: note ? note.title : ""
-                width: parent.width
-                wrapMode: Text.WordWrap
-                font.bold: true
-                font.pointSize: app.idealFontPointSize + 2
-                placeholderText: "Title"
-                TabSequenceItem.manager: formTabManager
-                TabSequenceItem.sequence: 0
-                onTextChanged: {
-                    if(note)
-                        note.title = text
+                Item {
+                    width: parent.width
+                    height: 1
                 }
-                onActiveFocusChanged: {
-                    if(activeFocus)
-                        formFlickable.contentY = 0
-                }
-            }
 
-            TextField2 {
-                id: descriptionField
-                text: note ? note.content : ""
-                width: parent.width
-                wrapMode: Text.WordWrap
-                font.pointSize: app.idealFontPointSize
-                placeholderText: "Description"
-                TabSequenceItem.manager: formTabManager
-                TabSequenceItem.sequence: 1
-                onTextChanged: {
-                    if(note)
-                        note.content = text
+                TextField2 {
+                    id: titleField
+                    text: note ? note.title : ""
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    font.bold: true
+                    font.pointSize: app.idealFontPointSize + 2
+                    placeholderText: "Title"
+                    TabSequenceItem.manager: formTabManager
+                    TabSequenceItem.sequence: 0
+                    onTextChanged: {
+                        if(note)
+                            note.title = text
+                    }
+                    onActiveFocusChanged: {
+                        if(activeFocus)
+                            formFlickable.contentY = 0
+                    }
                 }
-                onActiveFocusChanged: {
-                    if(activeFocus)
-                        formFlickable.contentY = 0
-                }
-            }
 
-            Label {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                elide: Text.ElideRight
-                text: form.moreInfoUrl == "" ? "" : "To learn more about this form, visit <a href=\"" + form.moreInfoUrl + "\">" + form.moreInfoUrl + "</a>"
-                visible: text !== ""
-                onLinkActivated: Qt.openUrlExternally(form.moreInfoUrl)
+                TextField2 {
+                    id: descriptionField
+                    text: note ? note.content : ""
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    font.pointSize: app.idealFontPointSize
+                    placeholderText: "Description"
+                    TabSequenceItem.manager: formTabManager
+                    TabSequenceItem.sequence: 1
+                    onTextChanged: {
+                        if(note)
+                            note.content = text
+                    }
+                    onActiveFocusChanged: {
+                        if(activeFocus)
+                            formFlickable.contentY = 0
+                    }
+                }
+
+                Label {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                    text: form.moreInfoUrl == "" ? "" : "To learn more about this form, visit <a href=\"" + form.moreInfoUrl + "\">" + form.moreInfoUrl + "</a>"
+                    visible: text !== ""
+                    onLinkActivated: Qt.openUrlExternally(form.moreInfoUrl)
+                }
             }
 
             Repeater {
@@ -141,12 +157,18 @@ Item {
                         if(note)
                             answer = note.getFormData(objectItem.id)
                     }
+                    property bool visibleToUser: app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                                                        Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
+                    opacity: visibleToUser ? 1 : 0
                 }
             }
 
             Item {
                 width: parent.width
                 height: 20
+                property bool visibleToUser: app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                                                    Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
+                opacity: visibleToUser ? 1 : 0
             }
         }
 
