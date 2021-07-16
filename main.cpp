@@ -123,7 +123,20 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef Q_OS_WIN
-    Application::setAttribute(Qt::AA_Use96Dpi);
+    // Maybe helps address https://www.github.com/teriflix/scrite/issues/247
+    const QByteArray dpiMode = qgetenv("SCRITE_DPI_MODE");
+    if( dpiMode == QByteArrayLiteral("HIGH_DPI") )
+    {
+        Application::setAttribute(Qt::AA_EnableHighDpiScaling);
+        Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    }
+    else if( dpiMode == QByteArrayLiteral("96_DPI_ONLY") )
+    {
+        Application::setAttribute(Qt::AA_Use96Dpi);
+        Application::setAttribute(Qt::AA_DisableHighDpiScaling);
+    }
+    else
+        Application::setAttribute(Qt::AA_Use96Dpi);
     Application::setAttribute(Qt::AA_UseDesktopOpenGL);
 #endif
 
