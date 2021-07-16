@@ -328,12 +328,13 @@ bool DocumentFileSystem::save(const QString &fileName)
 #else
     // Starting with 0.5.5 Scrite documents are basically ZIP files.
     const QString headerFileName = d->folder->filePath(QStringLiteral("_header.json"));
-    QFile headerFile(headerFileName);
+    QSaveFile headerFile(headerFileName);
     if( !headerFile.open(QFile::WriteOnly) )
         return false;
 
     headerFile.write(d->header);
-    headerFile.close();
+    if( !headerFile.commit() )
+        return false;
 
     const QString tmpFileName = QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
                                  QStringLiteral("/scrite_") + QString::number(QDateTime::currentMSecsSinceEpoch()) +
