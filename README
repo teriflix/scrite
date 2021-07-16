@@ -17,6 +17,15 @@ Qt on your computer (Windows, macOS or Linux).
 
 Open scrite.pro in Qt Creator and build.
 
+Reporting Issues
+----------------
+If you run into bugs, crashes or find missing features OR features that
+are not working as expected, we recommend that you create a new topic on
+Forum first, discuss the issue there and then create a bug ticket on
+GitHub.
+
+Here is a link to our discussion forum: https://www.scrite.io/index.php/forum/activity/
+
 IMPORTANT
 ===============
 
