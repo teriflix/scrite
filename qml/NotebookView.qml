@@ -291,6 +291,7 @@ Rectangle {
             frameVisible: false
             alternatingRowColors: false
             horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
             rowDelegate: Rectangle {
                 height: fontMetrics.height + 20
                 color: styleData.selected ? primaryColors.highlight.background : primaryColors.c10.background
@@ -471,7 +472,8 @@ Rectangle {
                 switch(_modelData.notebookItemType) {
                 case NotebookModel.EpisodeBreakType:
                 case NotebookModel.ActBreakType:
-                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.indexOfElement(_modelData.notebookItemObject)
+                    if(_modelData.notebookItemObject)
+                        scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.indexOfElement(_modelData.notebookItemObject)
                     break
                 case NotebookModel.NotesType:
                     makeSceneCurrent(_modelData.notebookItemObject)
