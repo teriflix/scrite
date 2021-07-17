@@ -85,7 +85,7 @@ Column {
         LodLoader {
             id: answerItemLoader
             width: answerArea.width
-            height: Math.max(answerArea.minHeight-topPadding-bottomPadding, contentHeight+20)
+            height: Math.max(answerArea.minHeight-topPadding-bottomPadding, item.contentHeight+20)
             lod: eLOW
             TabSequenceItem.manager: tabSequenceManager
             TabSequenceItem.sequence: tabSequenceIndex

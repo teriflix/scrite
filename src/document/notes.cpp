@@ -621,7 +621,7 @@ void Notes::deserializeFromJson(const QJsonObject &json)
     {
         Note *note = new Note(this);
         if( QObjectSerializer::fromJson(jsNote, note) )
-            notes.prepend(note);
+            notes.append(note);
         else
             delete note;
     }
