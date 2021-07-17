@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "form.h"
 #include "characterreport.h"
 #include "transliteration.h"
 
@@ -156,7 +157,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
         cursor.insertText("NOTES:");
 
         const Structure *structure = this->document()->structure();
-        Q_FOREACH(QString characterName, m_characterNames)
+        for(const QString &characterName : qAsConst(m_characterNames))
         {
             blockFormat = defaultBlockFormat;
             blockFormat.setIndent(1);
@@ -169,6 +170,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
 
             charFormat.setFontWeight(QFont::Normal);
             cursor.setCharFormat(charFormat);
+
+            // TODO: Character summary???
 
             const Character *character = structure->findCharacter(characterName);
             const Notes *characterNotes = character ? character->notes() : nullptr;
@@ -183,9 +186,6 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             for(int i=0; i<characterNotes->noteCount(); i++)
             {
                 const Note *note = characterNotes->noteAt(i);
-                if(note->type() != Note::TextNoteType)
-                    continue;
-
                 QString heading = note->title().trimmed();
                 if(heading.isEmpty())
                     heading = "Note #" + QString::number(i+1);
@@ -195,20 +195,45 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 blockFormat.setTopMargin(10);
 
                 charFormat = defaultCharFormat;
+                charFormat.setFontPointSize(charFormat.fontPointSize()+2);
+                charFormat.setFontUnderline(true);
                 charFormat.setFontWeight(QFont::Bold);
 
                 cursor.insertBlock(blockFormat, charFormat);
                 cursor.insertText(heading);
 
+                charFormat.setFontPointSize(charFormat.fontPointSize()-2);
+                charFormat.setFontUnderline(false);
+
                 blockFormat.setTopMargin(0);
-                if(i == characterNotes->noteCount()-1 || characterName != m_characterNames.last())
-                    blockFormat.setBottomMargin(10);
+                blockFormat.setBottomMargin(0);
                 blockFormat.setAlignment(Qt::AlignJustify);
 
                 charFormat.setFontWeight(QFont::Normal);
                 cursor.insertBlock(blockFormat, charFormat);
+
                 cursor.insertText(note->content().toString());
+                if(note->type() == Note::FormNoteType)
+                {
+                    Form *form = note->form();
+                    if(form != nullptr)
+                    {
+                        for(int i=0; i<form->questionCount(); i++)
+                        {
+                            FormQuestion *q = form->questionAt(i);
+                            charFormat.setFontWeight(QFont::Bold);
+                            cursor.insertBlock(blockFormat, charFormat);
+                            cursor.insertBlock();
+                            cursor.insertText(q->questionText());
+                            charFormat.setFontWeight(QFont::Normal);
+                            cursor.insertBlock(blockFormat, charFormat);
+                            cursor.insertText(note->getFormData(q->id()).toString());
+                        }
+                    }
+                }
             }
+
+            cursor.insertBlock();
         }
     }
 
