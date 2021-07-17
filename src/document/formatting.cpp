@@ -2219,28 +2219,25 @@ void SceneDocumentBinder::resetCurrentElement()
 class ForceCursorPositionHack : public QObject
 {
 public:
-    ForceCursorPositionHack(const QTextBlock &block, SceneDocumentBinder *binder);
+    ForceCursorPositionHack(const QTextBlock &block, int cp, SceneDocumentBinder *binder);
     ~ForceCursorPositionHack();
 
     void timerEvent(QTimerEvent *event);
 
 private:
     QTextBlock m_block;
+    int m_cursorPosition = 0; // within m_block
     ExecLaterTimer m_timer;
     SceneDocumentBinder *m_binder = nullptr;
 };
 
-ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, SceneDocumentBinder *binder)
+ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, int cp, SceneDocumentBinder *binder)
     : QObject(const_cast<QTextDocument*>(block.document())),
       m_block(block),
+      m_cursorPosition(cp),
       m_timer("ForceCursorPositionHack.m_timer"),
       m_binder(binder)
 {
-    if(!m_block.text().isEmpty()) {
-        GarbageCollector::instance()->add(this);
-        return;
-    }
-
     QTextCursor cursor(m_block);
     cursor.insertText(QStringLiteral("("));
     m_timer.start(0, this);
@@ -2266,7 +2263,7 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
             }
         }
 
-        emit m_binder->requestCursorPosition(cursor.position());
+        emit m_binder->requestCursorPosition(m_block.position()+m_cursorPosition);
 
         GarbageCollector::instance()->add(this);
     }
@@ -2302,8 +2299,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
             // Only element type changes can be applied.
             userData->resetFormat();
             this->rehighlightBlock(block);
-            if(element->text().isEmpty())
-                new ForceCursorPositionHack(block, this);
+            new ForceCursorPositionHack(block, m_cursorPosition-block.position(), this);
             return true;
         }
         return false;

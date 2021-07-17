@@ -1765,8 +1765,11 @@ Rectangle {
 
                     Keys.onTabPressed: {
                         if(!scriteDocument.readOnly) {
-                            if(!acceptCompletionSuggestion())
-                                sceneDocumentBinder.tab()
+                            // if(!acceptCompletionSuggestion())
+                            // https://www.scrite.io/index.php/forum/topic/cant-press-tab-to-get-back-to-action/
+                            // This was a good suggestion. Since we now show auto-complete popup,
+                            // it just doesnt make sense to auto-complete on tab.
+                            sceneDocumentBinder.tab()
                             event.accepted = true
                         }
                     }
