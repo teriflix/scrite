@@ -238,5 +238,7 @@
         <file>icons/screenplay/shot_inverted.png</file>
         <file>icons/screenplay/transition.png</file>
         <file>icons/screenplay/transition_inverted.png</file>
+        <file>icons/action/close.png</file>
+        <file>icons/action/close_inverted.png</file>
     </qresource>
 </RCC>

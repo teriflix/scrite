@@ -23,7 +23,7 @@ Item {
 
     Loader {
         height: parent.height
-        active: scritedView !== null
+        active: scritedView
         anchors.centerIn: parent
         sourceComponent: Row {
             spacing: 1

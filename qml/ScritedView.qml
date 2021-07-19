@@ -38,12 +38,12 @@ Item {
 
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
-        if(!scritedViewSettings.experimentalFeatureNoticeDisplayed) {
+        if(!scritedSettings.experimentalFeatureNoticeDisplayed) {
             app.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
                 })
-                scritedViewSettings.experimentalFeatureNoticeDisplayed = true
+                scritedSettings.experimentalFeatureNoticeDisplayed = true
             })
         }
     }
@@ -133,18 +133,20 @@ Item {
     }
 
     Settings {
-        id: scritedViewSettings
+        id: scritedSettings
         fileName: app.settingsFilePath
         category: "Scrited"
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
         property bool experimentalFeatureNoticeDisplayed: false
         property bool codecsNoticeDisplayed: false
+        property real playerAreaRatio: 0.5
+        property bool videoPlayerVisible: true
     }
 
     FileDialog {
         id: fileDialog
-        folder: scritedViewSettings.lastOpenScritedFolderUrl
-        onFolderChanged: Qt.callLater( function() { scritedViewSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
+        folder: scritedSettings.lastOpenScritedFolderUrl
+        onFolderChanged: Qt.callLater( function() { scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
         selectFolder: false
         selectMultiple: false
         selectExisting: true
@@ -158,13 +160,6 @@ Item {
             })
             screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
         }
-    }
-
-    Settings {
-        id: scritedSettings
-        fileName: app.settingsFilePath
-        category: "Scrited"
-        property real playerAreaRatio: 0.5
     }
 
     SplitView {
@@ -201,6 +196,7 @@ Item {
                     width: parent.width
                     height: width / 16 * 9
                     color: "black"
+                    visible: scritedSettings.videoPlayerVisible || mediaIsLoaded
 
                     MediaPlayer {
                         id: mediaPlayer
@@ -280,6 +276,20 @@ Item {
                         source: "../images/appicon.png"
                         smooth: true; mipmap: true
                         fillMode: Image.PreserveAspectFit
+                    }
+
+                    ToolButton3 {
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.margins: 4
+                        iconSource: "../icons/action/close_inverted.png"
+                        suggestedWidth: 24
+                        suggestedHeight: 24
+                        visible: !mediaIsLoaded
+                        enabled: visible
+                        opacity: hovered ? 1 : 0.5
+                        onClicked: scritedSettings.videoPlayerVisible = false
+                        ToolTip.text: "Closes the video player until a video file is loaded."
                     }
 
                     Image {
@@ -554,7 +564,7 @@ Item {
 
                 Item {
                     width: parent.width
-                    height: parent.height - videoArea.height
+                    height: parent.height - (videoArea.visible ? videoArea.height : 0)
 
                     Component.onCompleted: {
                         app.execLater(screenplayOffsetsModel, 100, function() {
@@ -611,37 +621,41 @@ Item {
                             visible: logoOverlay.visible
                         }
 
-                        Rectangle {
+                        Item {
                             id: textDocumentFlickPadding
                             width: parent.width
-                            height: textDocumentArea.height*0.35
+                            height: videoArea.visible ? textDocumentArea.height*0.35 : textDocumentFlick.lineHeight
                             y: -1
-                            color: "black"
 
-                            gradient: Gradient {
-                                GradientStop {
-                                    position: 0
-                                    color: app.translucent(primaryColors.c600.background, 1)
-                                }
-                                GradientStop {
-                                    position: 0.175
-                                    color: app.translucent(primaryColors.c600.background, 0.5)
-                                }
-                                GradientStop {
-                                    position: 0.35
-                                    color: app.translucent(primaryColors.c600.background, 0.3)
-                                }
-                                GradientStop {
-                                    position: 0.56
-                                    color: app.translucent(primaryColors.c600.background, 0.1)
-                                }
-                                GradientStop {
-                                    position: 0.7
-                                    color: Qt.rgba(0,0,0,0)
-                                }
-                                GradientStop {
-                                    position: 0.7
-                                    color: Qt.rgba(0,0,0,0)
+                            Rectangle {
+                                anchors.fill: parent
+                                visible: videoArea.visible
+
+                                gradient: Gradient {
+                                    GradientStop {
+                                        position: 0
+                                        color: app.translucent(primaryColors.c600.background, 1)
+                                    }
+                                    GradientStop {
+                                        position: 0.175
+                                        color: app.translucent(primaryColors.c600.background, 0.5)
+                                    }
+                                    GradientStop {
+                                        position: 0.35
+                                        color: app.translucent(primaryColors.c600.background, 0.3)
+                                    }
+                                    GradientStop {
+                                        position: 0.56
+                                        color: app.translucent(primaryColors.c600.background, 0.1)
+                                    }
+                                    GradientStop {
+                                        position: 0.7
+                                        color: Qt.rgba(0,0,0,0)
+                                    }
+                                    GradientStop {
+                                        position: 0.7
+                                        color: Qt.rgba(0,0,0,0)
+                                    }
                                 }
                             }
                         }
@@ -756,6 +770,21 @@ Item {
                             result.filter = false
                             textDocumentArea.containsMouse = event.type === 127 || event.type === 129
                         }
+                    }
+
+                    ToolButton3 {
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.topMargin: 4
+                        anchors.rightMargin: textDocumentScrollBar.width + 4
+                        iconSource: "../icons/navigation/arrow_down.png"
+                        suggestedWidth: 24
+                        suggestedHeight: 24
+                        visible: !videoArea.visible
+                        enabled: visible
+                        opacity: hovered ? 1 : 0.5
+                        onClicked: scritedSettings.videoPlayerVisible = true
+                        ToolTip.text: "Shows the video player."
                     }
                 }
             }
@@ -1349,12 +1378,12 @@ Item {
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !scritedViewSettings.codecsNoticeDisplayed && !modalDialog.active && (app.isWindowsPlatform || app.isLinuxPlatform)
+        Notification.active: !scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (app.isWindowsPlatform || app.isLinuxPlatform)
         Notification.buttons: app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
-            scritedViewSettings.codecsNoticeDisplayed = true
+            scritedSettings.codecsNoticeDisplayed = true
         }
     }
 
