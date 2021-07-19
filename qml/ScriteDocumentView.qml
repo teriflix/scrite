@@ -58,6 +58,8 @@ Item {
         property bool scriptalayIntroduced: false
         property bool showNotebookInStructure: true
         property bool syncCurrentSceneOnNotebook: true
+        property bool animateStructureIcon: true
+        property bool animateNotebookIcon: true
         property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
         property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
         property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)

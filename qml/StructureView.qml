@@ -55,7 +55,7 @@ Item {
                 id: notebookTabButton
                 visible: workspaceSettings.showNotebookInStructure
                 iconSource: "../icons/navigation/notebook_tab.png"
-                ToolTip.text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                ToolTip.text: "Notebook Tab (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
             }
 
@@ -3613,5 +3613,22 @@ Item {
 
     function requestEditorLater() {
         app.execLater(structureView, 100, function() { requestEditor() })
+    }
+
+    Loader {
+        id: notebookIconAnimator
+        active: workspaceSettings.animateNotebookIcon && !modalDialog.active && ui.showNotebookInStructure
+        anchors.fill: parent
+        sourceComponent: UiElementHighlight {
+            uiElement: notebookTabButton
+            onDone: workspaceSettings.animateNotebookIcon = false
+            description: notebookTabButton.ToolTip.text
+            property bool scaleDone: false
+            onScaleAnimationDone: scaleDone = true
+            Component.onDestruction: {
+                if(scaleDone)
+                    workspaceSettings.animateNotebookIcon = false
+            }
+        }
     }
 }

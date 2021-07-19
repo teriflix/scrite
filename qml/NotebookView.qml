@@ -121,7 +121,7 @@ Rectangle {
                 id: structureTabButton
                 visible: workspaceSettings.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
-                ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                ToolTip.text: "Structure Tab (" + app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
@@ -2485,4 +2485,21 @@ Rectangle {
 
     FocusTracker.window: qmlWindow
     FocusTracker.onHasFocusChanged: mainUndoStack.notebookActive = FocusTracker.hasFocus
+
+    Loader {
+        id: structureIconAnimator
+        active: workspaceSettings.animateStructureIcon && !modalDialog.active && ui.showNotebookInStructure
+        anchors.fill: parent
+        sourceComponent: UiElementHighlight {
+            uiElement: structureTabButton
+            onDone: workspaceSettings.animateStructureIcon = false
+            description: structureTabButton.ToolTip.text
+            property bool scaleDone: false
+            onScaleAnimationDone: scaleDone = true
+            Component.onDestruction: {
+                if(scaleDone)
+                    workspaceSettings.animateStructureIcon = false
+            }
+        }
+    }
 }

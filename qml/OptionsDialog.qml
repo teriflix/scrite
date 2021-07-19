@@ -657,7 +657,13 @@ Item {
                             checked: ui.showNotebookInStructure
                             enabled: ui.canShowNotebookInStructure
                             text: "Move Notebook into the Structure tab"
-                            onToggled: workspaceSettings.showNotebookInStructure = checked
+                            onToggled: {
+                                workspaceSettings.showNotebookInStructure = checked
+                                if(checked) {
+                                    workspaceSettings.animateStructureIcon = true
+                                    workspaceSettings.animateNotebookIcon = true
+                                }
+                            }
                         }
                     }
                 }
