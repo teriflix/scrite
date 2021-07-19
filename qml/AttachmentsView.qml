@@ -136,6 +136,18 @@ ListView {
         id: attachmentContextMenu
 
         MenuItem2 {
+            text: "Edit"
+            enabled: attachmentsView.currentIndex >= 0
+            onClicked: {
+                var attm = attachments.attachmentAt(attachmentsView.currentIndex)
+                if(attm)
+                    attm.openAttachmentInPlace()
+            }
+        }
+
+        MenuSeparator { }
+
+        MenuItem2 {
             text: "Remove"
             enabled: attachmentsView.currentIndex >= 0
             onClicked: attachments.removeAttachment( attachments.attachmentAt(attachmentsView.currentIndex) )

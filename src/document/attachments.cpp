@@ -120,6 +120,14 @@ void Attachment::openAttachmentAnonymously()
     }
 }
 
+void Attachment::openAttachmentInPlace()
+{
+    ScriteDocument *doc = ScriteDocument::instance()->instance();
+    DocumentFileSystem *dfs = doc->fileSystem();
+    const QString path = dfs->absolutePath(m_filePath);
+    QDesktopServices::openUrl( QUrl::fromLocalFile(path) );
+}
+
 bool Attachment::isValid() const
 {
     return !( m_filePath.isEmpty() || m_title.isEmpty() || m_originalFileName.isEmpty() || m_mimeType.isEmpty() );

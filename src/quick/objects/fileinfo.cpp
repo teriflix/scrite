@@ -15,8 +15,9 @@
 #include "application.h"
 #include "attachments.h"
 
+#include <QIcon>
 #include <QPainter>
-#include <QFileIconProvider>
+#include <QMimeDatabase>
 
 FileInfo::FileInfo(QObject *parent)
     : QObject(parent)
@@ -106,8 +107,15 @@ QImage FileIconProvider::requestImage(const QString &id, QSize *size, const QSiz
     // appropriate to the file type.
 
     const QFileInfo fi(id);
-    const QFileIconProvider iconProvider;
-    const QIcon icon = iconProvider.icon(fi);
+    const QMimeDatabase mimeDb;
+    const QMimeType mimeType = mimeDb.mimeTypeForFile(fi);
+
+    const QIcon icon = QIcon::fromTheme(mimeType.name(), QIcon());
+    if(icon.isNull())
+    {
+        const QImage fallback = this->requestImage(fi);
+        return fallback;
+    }
 
     QSize iconSize(96, 96);
     if(requestedSize.isValid())
@@ -191,7 +199,6 @@ QImage FileIconProvider::requestImage(const QFileInfo &fi)
 
     paint.setBrush(Qt::white);
     paint.setPen(Qt::black);
-    paint.setOpacity(0.5);
     paint.drawRect(targetRect.adjusted(-2,-2,2,2));
 
     paint.translate(targetRect.left(), targetRect.top());

@@ -282,9 +282,7 @@ Item {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.margins: 4
-                        iconSource: "../icons/action/close_inverted.png"
-                        suggestedWidth: 24
-                        suggestedHeight: 24
+                        iconSource: "../icons/navigation/arrow_up_inverted.png"
                         visible: !mediaIsLoaded
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
@@ -778,8 +776,6 @@ Item {
                         anchors.topMargin: 4
                         anchors.rightMargin: textDocumentScrollBar.width + 4
                         iconSource: "../icons/navigation/arrow_down.png"
-                        suggestedWidth: 24
-                        suggestedHeight: 24
                         visible: !videoArea.visible
                         enabled: visible
                         opacity: hovered ? 1 : 0.5

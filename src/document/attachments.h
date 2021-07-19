@@ -62,6 +62,8 @@ public:
     Q_SIGNAL void mimeTypeChanged();
 
     Q_INVOKABLE void openAttachmentAnonymously();
+    Q_INVOKABLE void openAttachmentInPlace();
+
     Q_SIGNAL void attachmentModified();
 
     bool isValid() const;
