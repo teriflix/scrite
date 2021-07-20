@@ -916,6 +916,11 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     structure->setForceBeatBoardLayout(true);
 }
 
+void ScreenplayTextDocument::reload()
+{
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::classBegin()
 {
     m_updating = true;

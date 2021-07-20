@@ -214,6 +214,8 @@ public:
 
     Q_INVOKABLE void superImposeStructure(const QJsonObject &model);
 
+    Q_INVOKABLE void reload();
+
 signals:
     void updateScheduled();
     void updateStarted();

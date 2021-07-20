@@ -2306,7 +2306,7 @@ Item {
     BusyOverlay {
         id: appBusyOverlay
         anchors.fill: parent
-        busyMessage: "Loading Screenplay ..."
+        busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
         visible: refCount > 0
         property int refCount: 0
     }

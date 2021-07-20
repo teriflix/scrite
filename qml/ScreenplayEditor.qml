@@ -699,40 +699,6 @@ Rectangle {
             spacing: 10
 
             Image {
-                id: toggleLockButton
-                height: parent.height; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-                enabled: !scriteDocument.readOnly
-                source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
-                    ToolTip.visible: containsMouse
-
-                    onClicked: {
-                        var locked = !scriteDocument.locked
-                        scriteDocument.locked = locked
-
-                        var message = ""
-                        if(locked)
-                            message = "Document LOCKED. You will be able to edit it only on this computer."
-                        else
-                            message = "Document unlocked. You will be able to edit it on this and any other computer."
-
-                        showInformation({"message": message}, this)
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: primaryColors.borderColor
-            }
-
-            Image {
                 source: "../icons/content/page_count.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -844,19 +810,61 @@ Rectangle {
         Row {
             id: taggingOptions
             spacing: 10
-            visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: zoomSlider.left
             anchors.rightMargin: spacing
             height: zoomSlider.height
 
+            Image {
+                id: toggleLockButton
+                height: parent.height-4; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+                enabled: !scriteDocument.readOnly
+                source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
+                    ToolTip.visible: containsMouse
+
+                    onClicked: {
+                        var locked = !scriteDocument.locked
+                        scriteDocument.locked = locked
+
+                        var message = ""
+                        if(locked)
+                            message = "Document LOCKED. You will be able to edit it only on this computer."
+                        else
+                            message = "Document unlocked. You will be able to edit it on this and any other computer."
+
+                        showInformation({"message": message}, this)
+                    }
+                }
+            }
+
+            Image {
+                source: "../icons/navigation/refresh.png"
+                height: parent.height-4; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: screenplayTextDocument.reload()
+                    ToolTip.visible: containsMouse && !pressed
+                    ToolTip.text: "Computes page layout from scratch, thereby reevaluating page count and time."
+                }
+            }
+
             ToolButton3 {
                 iconSource: "../icons/action/layout_grouping.png"
-                height: parent.height; width: height;
+                height: parent.height; width: height
                 anchors.verticalCenter: parent.verticalCenter
                 down: taggingMenu.active
                 onClicked: taggingMenu.show()
                 ToolTip.text: "Grouping Options"
+                visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
 
                 MenuLoader {
                     id: taggingMenu

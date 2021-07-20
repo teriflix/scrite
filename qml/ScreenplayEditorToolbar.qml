@@ -11,9 +11,11 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
-import QtQuick.Controls 2.13
 import QtQuick.Layouts 1.13
+import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Row {
@@ -100,6 +102,17 @@ Row {
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Refresh"
         ShortcutsModelItem.shortcut: shortcut
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Shift+F5"
+        onActivated: screenplayTextDocument.reload()
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
+
+        ShortcutsModelItem.group: "Edit"
+        ShortcutsModelItem.title: "Redo Page Layout"
+        ShortcutsModelItem.shortcut: sequence
     }
 
     Rectangle {
