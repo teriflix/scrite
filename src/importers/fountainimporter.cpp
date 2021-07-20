@@ -38,7 +38,7 @@ bool FountainImporter::doImport(QIODevice *device)
     int sceneCounter = 0;
     Scene *currentScene = nullptr;
     Character *character = nullptr;
-    static const QStringList headerhints = {
+    static const QStringList headerHints = {
             QStringLiteral("INT"), QStringLiteral("EXT"),
             QStringLiteral("EST"), QStringLiteral("INT./EXT"),
             QStringLiteral("INT/EXT"), QStringLiteral("I/E")
@@ -86,8 +86,12 @@ bool FountainImporter::doImport(QIODevice *device)
     ts.setCodec("utf-8");
     ts.setAutoDetectUnicode(true);
 
+    int lineNr = 0;
+
     while(!ts.atEnd())
     {
+        ++lineNr;
+
         QString line = ts.readLine();
         line = line.trimmed();
         line.replace(multipleSpaces, singleSpace);
@@ -129,7 +133,7 @@ bool FountainImporter::doImport(QIODevice *device)
 
         // detect if ths line contains a header.
         bool isHeader = false;
-        if(!inCharacter && !isHeader)
+//        if(!inCharacter && !isHeader)
         {
             if(line.length() >= 2)
             {
@@ -139,11 +143,17 @@ bool FountainImporter::doImport(QIODevice *device)
 
             if(isHeader == false)
             {
-                Q_FOREACH(QString hint, headerhints)
+                Q_FOREACH(QString hint, headerHints)
                 {
                     if(line.startsWith(hint) && line.length() > hint.length() && !line.at(hint.length()).isLetterOrNumber())
                     {
-                        isHeader = true;
+                        if(inCharacter)
+                        {
+                            QString lt, l, m;
+                            isHeader = SceneHeading::parse(line, lt, l, m);
+                        }
+                        else
+                            isHeader = true;
                         break;
                     }
                 }
