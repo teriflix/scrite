@@ -69,8 +69,8 @@ private:
     qreal m_defaultMaximumVelocity = 2500; // Value of QML_FLICK_DEFAULTMAXVELOCITY in qquickflickablebehavior_p.h
     qreal m_defaultFlickDeceleration = 1500; // Value of QML_FLICK_DEFAULTDECELERATION in qquickflickablebehavior_p.h
     qreal m_factor = 1.0;
-    qreal m_maximumVelocityFactor = 1.0;
-    qreal m_flickDecelerationFactor = 1.0;
+    qreal m_maximumVelocityFactor = -1.0;
+    qreal m_flickDecelerationFactor = -1.0;
 };
 
 Q_DECLARE_METATYPE(FlickScrollSpeedControl*)

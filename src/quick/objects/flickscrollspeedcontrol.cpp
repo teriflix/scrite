@@ -69,7 +69,7 @@ void FlickScrollSpeedControl::setDefaultMaximumVelocity(qreal val)
 
 void FlickScrollSpeedControl::setFlickDecelerationFactor(qreal val)
 {
-    if(m_flickDecelerationFactor == val)
+    if( qFuzzyCompare(m_flickDecelerationFactor, val) )
         return;
 
     m_flickDecelerationFactor = val;
@@ -80,7 +80,7 @@ void FlickScrollSpeedControl::setFlickDecelerationFactor(qreal val)
 
 void FlickScrollSpeedControl::setMaximumVelocityFactor(qreal val)
 {
-    if(m_maximumVelocityFactor == val)
+    if( qFuzzyCompare(m_maximumVelocityFactor, val) )
         return;
 
     m_maximumVelocityFactor = val;
@@ -91,17 +91,10 @@ void FlickScrollSpeedControl::setMaximumVelocityFactor(qreal val)
 
 void FlickScrollSpeedControl::setFactor(qreal val)
 {
-    if(m_factor == val)
+    if( qFuzzyCompare(m_factor,val) )
         return;
 
     m_factor = val;
-
-    if(qFuzzyCompare(m_maximumVelocityFactor,1.0))
-        this->setMaximumVelocityFactor(val);
-
-    if(qFuzzyCompare(m_flickDecelerationFactor,1.0))
-        this->setFlickDecelerationFactor(val);
-
     emit factorChanged();
 
     this->computeValues();
@@ -112,8 +105,8 @@ void FlickScrollSpeedControl::computeValues()
     if(m_flickable.isNull())
         return;
 
-    const qreal mv = m_defaultMaximumVelocity * m_maximumVelocityFactor;
-    const qreal fd = m_defaultFlickDeceleration * m_flickDecelerationFactor;
+    const qreal mv = m_defaultMaximumVelocity * (m_maximumVelocityFactor < 0 ? m_factor : m_maximumVelocityFactor);
+    const qreal fd = m_defaultFlickDeceleration * (m_flickDecelerationFactor < 0 ? m_factor : m_flickDecelerationFactor);
     m_flickable->setProperty("flickDeceleration", fd);
     m_flickable->setProperty("maximumFlickVelocity", mv);
 }
