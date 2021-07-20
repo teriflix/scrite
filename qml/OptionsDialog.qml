@@ -335,11 +335,17 @@ Item {
                             id: resetFlickSpeedButton
                             iconSource: "../icons/action/reset.png"
                             anchors.verticalCenter: parent.verticalCenter
-                            onClicked: flickSpeedSlider.value = 1
+                            onClicked: workspaceSettings.flickScrollSpeedFactor = 1
                             ToolTip.text: "Reset flick/scroll speed to 100%"
                         }
                     }
                 }
+            }
+
+            Item {
+                height: 1
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
     }
