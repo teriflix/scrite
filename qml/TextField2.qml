@@ -163,6 +163,7 @@ TextField {
         contentItem: ListView {
             id: completionView
             model: completionModel
+            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
             delegate: Text {
                 width: completionView.width-1
                 text: string

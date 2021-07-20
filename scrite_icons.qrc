@@ -242,5 +242,7 @@
         <file>icons/action/close_inverted.png</file>
         <file>icons/navigation/arrow_up.png</file>
         <file>icons/navigation/arrow_up_inverted.png</file>
+        <file>icons/action/reset.png</file>
+        <file>icons/action/reset_inverted.png</file>
     </qresource>
 </RCC>

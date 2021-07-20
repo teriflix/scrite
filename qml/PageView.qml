@@ -14,6 +14,8 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
+import Scrite 1.0
+
 Rectangle {
     id: pageView
     property alias pagesArray: pageRepeater.model
@@ -96,6 +98,7 @@ Rectangle {
         property bool showScrollBars: contentHeight > height
         contentWidth: pageContentLoader.width
         contentHeight: pageContentLoader.height
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
         ScrollBar.vertical: ScrollBar2 { flickable: pageContentArea }
         Loader {

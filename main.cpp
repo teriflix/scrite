@@ -67,6 +67,7 @@
 #include "delayedpropertybinder.h"
 #include "screenplaytextdocument.h"
 #include "abstractreportgenerator.h"
+#include "flickscrollspeedcontrol.h"
 #include "objectlistpropertymodel.h"
 #include "qtextdocumentpagedprinter.h"
 #include "characterrelationshipsgraph.h"
@@ -168,6 +169,8 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<ProfilerItem>(scriteModuleUri, 1, 0, "Profiler", apreason);
 #endif
 
+    qmlRegisterUncreatableType<FlickScrollSpeedControl>(scriteModuleUri, 1, 0, "FlickScrollSpeedControl", apreason);
+
     qmlRegisterUncreatableType<ScriteDocument>(scriteModuleUri, 1, 0, "ScriteDocument", reason);
 
     qmlRegisterType<Scene>(scriteModuleUri, 1, 0, "Scene");
@@ -216,6 +219,7 @@ int main(int argc, char **argv)
     qmlRegisterType<CompletionModel>(scriteModuleUri, 1, 0, "CompletionModel");
 
     qmlRegisterUncreatableType<EventFilterResult>(scriteModuleUri, 1, 0, "EventFilterResult", "Use the instance provided by EventFilter.onFilter signal.");
+    qmlRegisterUncreatableType<EventFilter>(scriteModuleUri, 1, 0, "EventFilter", apreason);
     qmlRegisterUncreatableType<EventFilter>(scriteModuleUri, 1, 0, "EventFilter", apreason);
 
     qmlRegisterType<PainterPathItem>(scriteModuleUri, 1, 0, "PainterPathItem");

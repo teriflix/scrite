@@ -954,6 +954,7 @@ Rectangle {
                 property int currentIndex: 0
                 contentWidth: width
                 contentHeight: noteItemsFlow.height
+                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                 Flow {
                     id: noteItemsFlow
@@ -1301,6 +1302,7 @@ Rectangle {
                         property bool hscrollBarRequired: contentWidth > width
                         ScrollBar.vertical: titlePageVScrollBar
                         ScrollBar.horizontal: titlePageHScrollBar
+                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                         Column {
                             id: titlePageLayout
@@ -1818,6 +1820,7 @@ Rectangle {
                         anchors.bottomMargin: 10
                         contentWidth: quickInfoFlickableContent.width
                         contentHeight: quickInfoFlickableContent.height
+                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                         property bool scrollBarVisible: contentWidth > width
 
@@ -1870,6 +1873,7 @@ Rectangle {
                                     contentHeight: characterQuickInfoViewContent.height
                                     clip: true
                                     ScrollBar.vertical: characterQuickInfoViewScrollBar
+                                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                                     Column {
                                         id: characterQuickInfoViewContent

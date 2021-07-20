@@ -144,6 +144,7 @@ Item {
         interactive: false
         contentX: screenplayElementList.contentX - screenplayElementList.originX
         clip: true
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
         EventFilter.events: [31]
         EventFilter.onFilter: {
@@ -291,6 +292,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         anchors.topMargin: screenplayTracks.trackCount > 0 ? 0 : 3
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped

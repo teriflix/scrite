@@ -67,6 +67,7 @@ HEADERS += \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
+    src/quick/objects/flickscrollspeedcontrol.h \
     src/quick/objects/itempositionmapper.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
@@ -175,6 +176,7 @@ SOURCES += \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
+    src/quick/objects/flickscrollspeedcontrol.cpp \
     src/quick/objects/itempositionmapper.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \

@@ -25,6 +25,7 @@ ListView {
     orientation: ListView.Horizontal
     model: attachments
     onAttachmentsChanged: currentIndex = -1
+    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
     highlight: Rectangle {
         color: primaryColors.highlight.background
     }

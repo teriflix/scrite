@@ -666,6 +666,7 @@ Item {
                             width: parent.width
                             anchors.top: textDocumentFlickPadding.bottom
                             anchors.bottom: parent.bottom
+                            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                             property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
                             property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
@@ -1122,6 +1123,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
+                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height

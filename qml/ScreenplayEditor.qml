@@ -269,6 +269,7 @@ Rectangle {
                     property bool commentsExpanded: false
                     property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                     delegate: Loader {
                         id: contentViewDelegateLoader
                         property var componentData: modelData
@@ -1523,6 +1524,7 @@ Rectangle {
                             contentItem: ListView {
                                 id: completionView
                                 model: completionModel
+                                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                                 delegate: Text {
                                     width: completionView.width-1
                                     text: string
@@ -2556,6 +2558,7 @@ Rectangle {
                     clip: true
                     model: screenplayAdapter
                     currentIndex: screenplayAdapter.currentIndex
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 { flickable: sceneListView }
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0

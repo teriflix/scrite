@@ -1296,6 +1296,7 @@ Item {
                         height: contentHeight
                         interactive: contentWidth > width
                         clip: interactive
+                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                         SimpleTabBarItem {
                             id: tabBarItem
@@ -2538,6 +2539,7 @@ Item {
                             property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
                             ScrollBar.vertical: ScrollBar2 { flickable: synopsisFieldFlick }
                             flickableDirection: Flickable.VerticalFlick
+                            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                             TextArea {
                                 id: synopsisField
                                 width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width

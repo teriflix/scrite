@@ -31,6 +31,7 @@ Flickable {
     property alias background: __textArea.background
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
+    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
     id: textAreaFlickable
     clip: true

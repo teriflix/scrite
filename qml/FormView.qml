@@ -51,6 +51,7 @@ Item {
         ScrollBar.vertical: formVScrollBar
         ScrollBar.horizontal: formHScrollBar
         flickableDirection: Flickable.VerticalFlick
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
         Column {
             id: formContentLayout

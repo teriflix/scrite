@@ -35,6 +35,7 @@ Item {
         anchors.fill: parent
         anchors.margins: 5
         model: shortcutsModel
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: ScrollBar2 { flickable: shortcutsView }

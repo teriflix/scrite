@@ -494,6 +494,7 @@ Item {
                         id: locationListView
                         model: allLocations
                         clip: true
+                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                         delegate: CheckBox2 {
                             width: locationListView.width-1
                             font.family: scriteDocument.formatting.defaultFont.family
@@ -607,6 +608,7 @@ Item {
                     clip: true
                     property var selectedSceneNumbers: []
                     property var selectedEpisodeNumbers: generator.episodeNumbers
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                     function filter(scene) {
                         if(selectedEpisodeNumbers && selectedEpisodeNumbers.length > 0) {
@@ -761,6 +763,7 @@ Item {
                     model: scriteDocument.screenplay.episodeCount + 1
                     clip: true
                     property var episodeNumbers: generator.getConfigurationValue(fieldInfo.name)
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
                     function select(episodeNumber, flag) {
                         var numbers = generator.getConfigurationValue(fieldInfo.name)
@@ -843,6 +846,7 @@ Item {
                         array: scriteDocument.structure.groupsModel
                         objectMembers: ["category", "label", "name"]
                     }
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                     section.property: "category"
                     section.criteria: ViewSection.FullString
                     section.delegate: Item {

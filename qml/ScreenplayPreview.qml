@@ -81,6 +81,7 @@ Rectangle {
         contentWidth: pageViewContent.width
         contentHeight: pageViewContent.height
         clip: true
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
         property bool containsMouse: false
         ScrollBar.horizontal: ScrollBar2 { flickable: pageView }

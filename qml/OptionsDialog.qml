@@ -263,43 +263,81 @@ Item {
                 }
             }
 
-            GroupBox {
-                spacing: 10
-                width: timelineSettingsGroupBox.width
-                x: 30
-                label: Text {
-                    text: "Normal Font Size"
-                }
+            Row {
+                spacing: 20
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                Row {
-                    spacing: 10
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text { text: "Normal Font Size" }
 
-                    TextField {
-                        id: appFontSizeField
-                        text: app.customFontPointSize === 0 ? app.idealFontPointSize : app.customFontPointSize
-                        width: idealAppFontMetrics.averageCharacterWidth*5
-                        selectByMouse: true
-                        onActiveFocusChanged: {
-                            if(activeFocus)
-                                selectAll()
+                    Row {
+                        spacing: 10
+
+                        TextField {
+                            id: appFontSizeField
+                            text: app.customFontPointSize === 0 ? app.idealFontPointSize : app.customFontPointSize
+                            width: idealAppFontMetrics.averageCharacterWidth*5
+                            selectByMouse: true
+                            onActiveFocusChanged: {
+                                if(activeFocus)
+                                    selectAll()
+                            }
+                            validator: IntValidator {
+                                bottom: 0; top: 100
+                            }
+                            anchors.verticalCenter: parent.verticalCenter
+                            Component.onDestruction: applyCustomFontSize()
+
+                            function applyCustomFontSize() {
+                                if(length > 0)
+                                    app.customFontPointSize = parseInt(text)
+                                else
+                                    app.customFontPointSize = 0
+                            }
                         }
-                        validator: IntValidator {
-                            bottom: 0; top: 100
-                        }
-                        anchors.verticalCenter: parent.verticalCenter
-                        Component.onDestruction: applyCustomFontSize()
 
-                        function applyCustomFontSize() {
-                            if(length > 0)
-                                app.customFontPointSize = parseInt(text)
-                            else
-                                app.customFontPointSize = 0
+                        Text {
+                            text: "pt"
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
+                }
 
-                    Text {
-                        text: "pt"
-                        anchors.verticalCenter: parent.verticalCenter
+                GroupBox {
+                    width: (parent.width - parent.spacing)/2
+                    label: Text { text: "Scroll/Flick Speed" }
+
+                    Row {
+                        width: parent.width
+
+                        Slider {
+                            id: flickSpeedSlider
+                            from: 0.1
+                            to: 3
+                            value: workspaceSettings.flickScrollSpeedFactor
+                            stepSize: 0.1
+                            width: parent.width - flickSpeedLabel.width - resetFlickSpeedButton.width - 2*parent.spacing
+                            anchors.verticalCenter: parent.verticalCenter
+                            snapMode: Slider.SnapAlways
+                            onMoved: workspaceSettings.flickScrollSpeedFactor = value
+                            ToolTip.text: "Configure the scroll sensitivity of your mouse and trackpad."
+                        }
+
+                        Label {
+                            id: flickSpeedLabel
+                            text: Math.round( flickSpeedSlider.value*100 ) + "%"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        ToolButton3 {
+                            id: resetFlickSpeedButton
+                            iconSource: "../icons/action/reset.png"
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: flickSpeedSlider.value = 1
+                            ToolTip.text: "Reset flick/scroll speed to 100%"
+                        }
                     }
                 }
             }

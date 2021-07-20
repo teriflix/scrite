@@ -27,6 +27,7 @@ Flickable {
     property bool animatePanAndZoom: true
     property alias minimumScale: pinchHandler.minimumScale
     property alias maximumScale: pinchHandler.maximumScale
+    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
     boundsBehavior: Flickable.StopAtBounds
     clip: true

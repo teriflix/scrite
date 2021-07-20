@@ -29,6 +29,7 @@ Item {
         anchors.rightMargin: scrollBarVisible ? 0 : 10
         contentWidth: propertyEditorItems.width
         contentHeight: propertyEditorItems.height
+        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
         property bool scrollBarVisible: contentHeight > height
         ScrollBar.vertical: ScrollBar2 { flickable: propertyEditorView }
@@ -383,6 +384,7 @@ Item {
                 ListView {
                     id: fontListView
                     property var systemFontInfo
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                     anchors.top: fontSearchBar.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
