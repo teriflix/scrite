@@ -1962,6 +1962,7 @@ Rectangle {
                         if(hasSelection) {
                             sceneDocumentBinder.copy(selectionStart, selectionEnd)
                             remove(selectionStart, selectionEnd)
+                            justReceivedFocus = true
                         }
                     }
 
@@ -1982,6 +1983,7 @@ Rectangle {
                                 sceneTextEditor.paste()
                             else
                                 sceneTextEditor.cursorPosition = cp2
+                            justReceivedFocus = true
                         }
                     }
 
@@ -1999,6 +2001,14 @@ Rectangle {
                             cursorPosition = 0
                             contentItem.mergeWithPreviousScene()
                         })
+                    }
+
+                    // Highlight cursor after undo/redo
+                    Connections {
+                        target: contentItem.theScene
+                        ignoreUnknownSignals: true
+                        enabled: sceneTextEditor.activeFocus && !sceneTextEditor.readOnly
+                        onSceneReset: sceneTextEditor.justReceivedFocus = true
                     }
                 }
             }
