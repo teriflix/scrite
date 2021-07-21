@@ -447,6 +447,22 @@ QJsonArray SceneElement::find(const QString &text, int flags) const
     return SearchEngine::indexesOf(text, m_text, flags);
 }
 
+void SceneElement::deserializeFromJson(const QJsonObject &)
+{
+    if(m_type == SceneElement::Character)
+    {
+        const int bo = m_text.indexOf( QStringLiteral("(") );
+        if(bo > 0 && !m_text.at(bo-1).isSpace())
+        {
+            m_text.insert(bo, QChar(' '));
+            emit textChanged(m_text);
+
+            if(m_scene != nullptr)
+                emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+        }
+    }
+}
+
 bool SceneElement::event(QEvent *event)
 {
     if(event->type() == QEvent::ParentChange)

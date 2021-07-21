@@ -220,7 +220,7 @@ Item {
         ShortcutsModelItem.shortcut: sequence
         onActivated: {
             mainTabBar.activateTab(1)
-            if(ui.showNotebookInStructure)
+            if(showNotebookInStructure)
                 Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
         }
     }
@@ -233,7 +233,7 @@ Item {
         ShortcutsModelItem.title: "Notebook"
         ShortcutsModelItem.shortcut: sequence
         onActivated: {
-            if(ui.showNotebookInStructure) {
+            if(showNotebookInStructure) {
                 if(mainTabBar.currentIndex === 1)
                     Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                 else {
@@ -1388,7 +1388,7 @@ Item {
                                 text: "Notebook (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.activateTab(2)
                                 font.bold: mainTabBar.currentIndex === 2
-                                enabled: !ui.showNotebookInStructure
+                                enabled: !showNotebookInStructure
                             }
 
                             MenuItem2 {
@@ -1439,7 +1439,7 @@ Item {
                 editor: sceneEditor ? sceneEditor.editor : null
                 visible: {
                     var min = 0
-                    var max = ui.showNotebookInStructure ? 1 : 2
+                    var max = showNotebookInStructure ? 1 : 2
                     return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
                 }
             }
@@ -1492,7 +1492,7 @@ Item {
                 readonly property var tabs: [
                     { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true },
                     { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true },
-                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !ui.showNotebookInStructure },
+                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure },
                     { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": true }
                 ]
                 property var currentTabP1: currentTabExtents.value.p1
@@ -1730,14 +1730,14 @@ Item {
             zoomLevelModifier: screenplayZoomLevelModifier
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
-                    if(ui.showNotebookInStructure)
+                    if(showNotebookInStructure)
                         return [{"name": "Character Notes", "description": "Create/switch to notes for the character in notebook"}]
                 }
                 return []
             }
             additionalSceneMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
-                    if(ui.showNotebookInStructure)
+                    if(showNotebookInStructure)
                         return ["Scene Notes"]
                 }
                 return []
@@ -1750,7 +1750,7 @@ Item {
             enableSceneListPanel: mainTabBar.currentIndex === 0
 
             onAdditionalCharacterMenuItemClicked: {
-                if(menuItemName === "Character Notes" && ui.showNotebookInStructure) {
+                if(menuItemName === "Character Notes" && showNotebookInStructure) {
                     var ch = scriteDocument.structure.findCharacter(characterName)
                     if(ch === null)
                         scriteDocument.structure.addCharacter(characterName)
@@ -1788,7 +1788,7 @@ Item {
                         SplitView.fillWidth: true
                         color: primaryColors.c10.background
                         border {
-                            width: ui.showNotebookInStructure ? 0 : 1
+                            width: showNotebookInStructure ? 0 : 1
                             color: primaryColors.borderColor
                         }
 
@@ -1800,7 +1800,7 @@ Item {
                             Announcement.onIncoming: {
                                 var sdata = "" + data
                                 var stype = "" + type
-                                if(ui.showNotebookInStructure) {
+                                if(showNotebookInStructure) {
                                     if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
                                         if(sdata === "Structure")
                                             structureEditorTabs.currentTabIndex = 0
@@ -1829,14 +1829,14 @@ Item {
                             Loader {
                                 id: structureViewLoader
                                 anchors.fill: parent
-                                visible: !ui.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+                                visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                 sourceComponent: StructureView { }
                             }
 
                             Loader {
                                 id: notebookViewLoader
                                 anchors.fill: parent
-                                active: ui.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                active: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
                                 sourceComponent: NotebookView {
                                     toolbarSize: appToolBar.height+4
                                     toolbarSpacing: appToolBar.spacing
@@ -1993,7 +1993,7 @@ Item {
 
                     ScreenplayView {
                         anchors.fill: parent
-                        showNotesIcon: ui.showNotebookInStructure
+                        showNotesIcon: showNotebookInStructure
                     }
 
                     Rectangle {

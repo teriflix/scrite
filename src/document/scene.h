@@ -109,9 +109,10 @@ public:
     }
 };
 
-class SceneElement : public QObject, public Modifiable
+class SceneElement : public QObject, public Modifiable, public QObjectSerializer::Interface
 {
     Q_OBJECT
+    Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
     Q_INVOKABLE SceneElement(QObject *parent=nullptr);
@@ -153,6 +154,8 @@ public:
     Q_SIGNAL void elementChanged();
 
     Q_INVOKABLE QJsonArray find(const QString &text, int flags) const;
+
+    void deserializeFromJson(const QJsonObject &obj);
 
 protected:
     bool event(QEvent *event);
