@@ -246,6 +246,8 @@ Item {
                 mainTabBar.activateTab(2)
         }
 
+        property bool notebookTabVisible: mainTabBar.currentIndex = showNotebookInStructure ? 1 : 2
+
         function showBookmarkedNotes() {
             showNotes("Notebook Bookmarks")
         }
@@ -275,7 +277,7 @@ Item {
         sequence: "Ctrl+Shift+K"
         onActivated: notebookShortcut.showBookmarkedNotes()
 
-        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
         ShortcutsModelItem.title: "Bookmarked Notes"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
@@ -286,7 +288,7 @@ Item {
         sequence: "Ctrl+Shift+R"
         onActivated: notebookShortcut.showCharacterNotes()
 
-        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
         ShortcutsModelItem.title: "Charater Notes"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
@@ -297,7 +299,7 @@ Item {
         sequence: "Ctrl+Shift+Y"
         onActivated: notebookShortcut.showStoryNotes()
 
-        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
         ShortcutsModelItem.title: "Story Notes"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence

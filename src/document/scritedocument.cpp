@@ -730,6 +730,7 @@ void ScriteDocument::reset()
     this->setForms(new Forms(this));
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
+    this->setBookmarkedNotes(QJsonArray());
     this->setSpellCheckIgnoreList(QStringList());
     this->setFileName(QString());
     this->setUserData(QJsonObject());

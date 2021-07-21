@@ -206,6 +206,12 @@ Rectangle {
                     newNoteMenu.notes = notes
                     newNoteMenu.popup(newNoteToolButton, newNoteToolButton.width, 0)
                 }
+
+                shortcut: "Ctrl+T"
+                ShortcutsModelItem.group: "Notebook"
+                ShortcutsModelItem.title: "New Note"
+                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
@@ -261,6 +267,12 @@ Rectangle {
                     else
                         iconSource = "../icons/content/bookmark_outline.png"
                 }
+
+                shortcut: "Ctrl+D"
+                ShortcutsModelItem.group: "Notebook"
+                ShortcutsModelItem.title: "Toggle Bookmark"
+                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.enabled: enabled
             }
 
             ToolButton3 {
