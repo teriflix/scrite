@@ -102,6 +102,7 @@ void FlickScrollSpeedControl::setFactor(qreal val)
 
 void FlickScrollSpeedControl::computeValues()
 {
+#ifndef Q_OS_MAC
     if(m_flickable.isNull())
         return;
 
@@ -109,4 +110,5 @@ void FlickScrollSpeedControl::computeValues()
     const qreal fd = m_defaultFlickDeceleration * (m_flickDecelerationFactor < 0 ? m_factor : m_flickDecelerationFactor);
     m_flickable->setProperty("flickDeceleration", fd);
     m_flickable->setProperty("maximumFlickVelocity", mv);
+#endif
 }

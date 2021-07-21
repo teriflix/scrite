@@ -307,7 +307,9 @@ Item {
 
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Scroll/Flick Speed" }
+                    label: Text { text: app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+                    enabled: !app.isMacOSPlatform
+                    opacity: enabled ? 1 : 0.5
 
                     Row {
                         width: parent.width
