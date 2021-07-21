@@ -77,6 +77,7 @@ public:
     Q_INVOKABLE QVariant modelIndexData(const QModelIndex &index) const;
     Q_INVOKABLE QModelIndex findModelIndexFor(QObject *owner) const;
     Q_INVOKABLE QModelIndex findModelIndexForTopLevelItem(const QString &label) const;
+    Q_INVOKABLE QModelIndex findModelIndexForCategory(ItemCategory cat) const;
     Q_INVOKABLE void refresh();
 
     Q_PROPERTY(BookmarkedNotes* bookmarkedNotes READ bookmarkedNotes CONSTANT STORED false)

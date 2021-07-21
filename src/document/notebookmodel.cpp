@@ -236,6 +236,19 @@ QModelIndex NotebookModel::findModelIndexForTopLevelItem(const QString &label) c
     return this->indexFromItem(items.first());
 }
 
+QModelIndex NotebookModel::findModelIndexForCategory(ItemCategory cat) const
+{
+    const int nrItems = this->rowCount();
+    for(int i=0; i<nrItems; i++)
+    {
+        QStandardItem *row = this->item(i, 0);
+        if(row->data(CategoryRole).toInt() == cat)
+            return this->indexFromItem(row);
+    }
+
+    return QModelIndex();
+}
+
 void NotebookModel::refresh()
 {
     emit aboutToRefresh();

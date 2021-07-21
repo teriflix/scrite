@@ -46,9 +46,18 @@ Rectangle {
     }
 
     function switchTo(item) {
-        if(typeof item === "string")
-            notebookTree.setCurrentIndex( notebookTree.model.findModelIndexForTopLevelItem(item) )
-        else
+        if(typeof item === "string") {
+            var midx
+            if(item === "Notebook Bookmarks")
+                midx = notebookTree.model.findModelIndexForCategory(NotebookModel.BookmarksCategory)
+            else if(item === "Notebook Story")
+                midx = notebookTree.model.findModelIndexForCategory(NotebookModel.ScreenplayCategory)
+            else if(item === "Notebook Characters")
+                midx = notebookTree.model.findModelIndexForCategory(NotebookModel.CharactersCategory)
+            else
+                midx = notebookTree.model.findModelIndexForTopLevelItem(item)
+            notebookTree.setCurrentIndex( midx )
+        } else
             notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(item) )
     }
 

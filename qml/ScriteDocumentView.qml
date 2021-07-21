@@ -226,6 +226,7 @@ Item {
     }
 
     Shortcut {
+        id: notebookShortcut
         context: Qt.ApplicationShortcut
         sequence: "Alt+3"
         ShortcutsModelItem.group: "Application"
@@ -244,6 +245,62 @@ Item {
             } else
                 mainTabBar.activateTab(2)
         }
+
+        function showBookmarkedNotes() {
+            showNotes("Notebook Bookmarks")
+        }
+
+        function showStoryNotes() {
+            showNotes("Notebook Story")
+        }
+
+        function showCharacterNotes() {
+            showNotes("Notebook Characters")
+        }
+
+        function showNotes(type) {
+            var nbt = showNotebookInStructure ? 1 : 2
+            if(mainTabBar.currentIndex !== nbt) {
+                mainTabBar.activateTab(nbt)
+                app.execLater(mainTabBar, 250, function() {
+                    Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", type)
+                })
+            } else
+                Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", type)
+        }
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+K"
+        onActivated: notebookShortcut.showBookmarkedNotes()
+
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Bookmarked Notes"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: sequence
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+R"
+        onActivated: notebookShortcut.showCharacterNotes()
+
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Charater Notes"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: sequence
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+Y"
+        onActivated: notebookShortcut.showStoryNotes()
+
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Story Notes"
+        ShortcutsModelItem.enabled: enabled
+        ShortcutsModelItem.shortcut: sequence
     }
 
     Shortcut {
@@ -1739,19 +1796,26 @@ Item {
                             property int currentTabIndex: 0
 
                             Announcement.onIncoming: {
+                                var sdata = "" + data
+                                var stype = "" + type
                                 if(ui.showNotebookInStructure) {
-                                    if(type === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
-                                        if(data == "Structure")
+                                    if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
+                                        if(sdata === "Structure")
                                             structureEditorTabs.currentTabIndex = 0
-                                        else if(data == "Notebook")
+                                        else if(sdata.startsWith("Notebook")) {
                                             structureEditorTabs.currentTabIndex = 1
-                                    } else if(type === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
+                                            if(sdata !== "Notebook")
+                                                app.execLater(notebookViewLoader, 100, function() {
+                                                    notebookViewLoader.item.switchTo(sdata)
+                                                })
+                                        }
+                                    } else if(stype === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
                                         structureEditorTabs.currentTabIndex = 1
                                         app.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToCharacterTab(data)
                                         })
                                     }
-                                    else if(type === "41EE5E06-FF97-4DB6-B32D-F938418C9529") {
+                                    else if(stype === "41EE5E06-FF97-4DB6-B32D-F938418C9529") {
                                         structureEditorTabs.currentTabIndex = 1
                                         app.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToSceneTab(data)
@@ -1980,7 +2044,12 @@ Item {
         id: notebookEditorComponent
 
         NotebookView {
-
+            Announcement.onIncoming: {
+                var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
+                var sdata = "" + data
+                if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C")
+                    switchTo(sdata)
+            }
         }
     }
 

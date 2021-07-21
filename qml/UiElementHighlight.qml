@@ -45,11 +45,17 @@ Item {
         width: uiElement.width * uiElement.scale
         height: uiElement.height * uiElement.scale
 
+        BoxShadow {
+            anchors.fill: descTip
+        }
+
         Rectangle {
             id: descTip
             color: accentColors.highlight.background
             width: descLabel.width
             height: descLabel.height
+            border.width: 1
+            border.color: accentColors.borderColor
 
             Label {
                 id: descLabel
