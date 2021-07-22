@@ -718,12 +718,16 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 enabled: !scriteDocument.readOnly
                 source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
+                scale: toggleLockMouseArea.containsMouse ? (toggleLockMouseArea.pressed ? 1 : 1.5) : 1
+                Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
+                    id: toggleLockMouseArea
                     anchors.fill: parent
                     hoverEnabled: true
                     ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
                     ToolTip.visible: containsMouse
+                    ToolTip.delay: 1000
 
                     onClicked: {
                         var locked = !scriteDocument.locked
@@ -744,9 +748,12 @@ Rectangle {
                 source: "../icons/navigation/refresh.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: screenplayTextDocument.paused ? 0.5 : 1
+                opacity: screenplayTextDocument.paused ? 0.85 : 1
+                scale: refreshMouseArea.containsMouse ? (refreshMouseArea.pressed ? 1 : 1.5) : 1
+                Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
+                    id: refreshMouseArea
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
@@ -757,6 +764,7 @@ Rectangle {
                     }
                     ToolTip.visible: containsMouse && !pressed
                     ToolTip.text: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
+                    ToolTip.delay: 1000
                 }
             }
 
@@ -770,13 +778,18 @@ Rectangle {
                 source: "../icons/content/page_count.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: screenplayTextDocument.paused ? 0.5 : 1
+                opacity: screenplayTextDocument.paused ? 0.85 : 1
+                scale: pageCountMouseAra.containsMouse ? (pageCountMouseAra.pressed ? 1 : 1.5) : 1
+                Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
+                    id: pageCountMouseAra
                     anchors.fill: parent
                     onClicked: screenplayTextDocument.paused = !screenplayTextDocument.paused
                     hoverEnabled: true
+                    ToolTip.visible: containsMouse && !pressed
                     ToolTip.text: "Click here to toggle page computation, incase the app is not responding fast while typing."
+                    ToolTip.delay: 1000
                 }
             }
 
@@ -797,13 +810,18 @@ Rectangle {
                 source: "../icons/content/time.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: screenplayTextDocument.paused ? 0.5 : 1
+                opacity: screenplayTextDocument.paused ? 0.85 : 1
+                scale: timeMouseArea.containsMouse ? (timeMouseArea.pressed ? 1 : 1.5) : 1
+                Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
+                    id: timeMouseArea
                     anchors.fill: parent
                     onClicked: screenplayTextDocument.paused = !screenplayTextDocument.paused
                     hoverEnabled: true
+                    ToolTip.visible: containsMouse && !pressed
                     ToolTip.text: "Click here to toggle time computation, incase the app is not responding fast while typing."
+                    ToolTip.delay: 1000
                 }
             }
 
