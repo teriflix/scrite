@@ -2587,7 +2587,11 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
 {
     if(!m_sceneResetList.contains(scene))
         m_sceneResetList.append(scene);
+
+    const bool needsSignal = !m_sceneResetTimer.isActive();
     m_sceneResetTimer.start(100, this);
+    if(needsSignal)
+        emit updateScheduled();
 }
 
 void ScreenplayTextDocument::processSceneResetList()

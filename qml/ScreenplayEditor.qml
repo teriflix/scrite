@@ -1381,7 +1381,7 @@ Rectangle {
                                         property: "width"
                                         duration: 250
                                         from: sceneTextEditor.cursorRectangle.width*Screen.devicePixelRatio
-                                        to: sceneTextEditor.cursorRectangle.width*10
+                                        to: sceneTextEditor.cursorRectangle.width*20
                                     }
 
                                     NumberAnimation {
@@ -1389,7 +1389,7 @@ Rectangle {
                                         property: "height"
                                         duration: 250
                                         from: sceneTextEditor.cursorRectangle.height
-                                        to: sceneTextEditor.cursorRectangle.height*2
+                                        to: sceneTextEditor.cursorRectangle.height*4
                                     }
 
                                     NumberAnimation {
@@ -1406,7 +1406,7 @@ Rectangle {
                                         target: cursorRectangle
                                         property: "width"
                                         duration: 250
-                                        from: sceneTextEditor.cursorRectangle.width*10
+                                        from: sceneTextEditor.cursorRectangle.width*20
                                         to: sceneTextEditor.cursorRectangle.width*1.5
                                     }
 
@@ -1414,7 +1414,7 @@ Rectangle {
                                         target: cursorRectangle
                                         property: "height"
                                         duration: 250
-                                        from: sceneTextEditor.cursorRectangle.height*2
+                                        from: sceneTextEditor.cursorRectangle.height*4
                                         to: sceneTextEditor.cursorRectangle.height
                                     }
 
@@ -2008,7 +2008,16 @@ Rectangle {
                         target: contentItem.theScene
                         ignoreUnknownSignals: true
                         enabled: sceneTextEditor.activeFocus && !sceneTextEditor.readOnly
-                        onSceneReset: sceneTextEditor.justReceivedFocus = true
+                        onSceneRefreshed: sceneTextEditor.justReceivedFocus = true
+                    }
+
+                    Connections {
+                        target: screenplayTextDocument
+                        ignoreUnknownSignals: true
+                        enabled: sceneTextEditor.activeFocus && !sceneTextEditor.readOnly
+                        onUpdateFinished: Qt.callLater( function() {
+                            sceneTextEditor.justReceivedFocus = true
+                        })
                     }
                 }
             }
