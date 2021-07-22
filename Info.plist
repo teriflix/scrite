@@ -51,5 +51,25 @@
             </array>
         </dict>
     </array>
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.zip-archive</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>Scrite Screenplay Document</string>
+            <key>UTTypeIconFile</key>
+            <string>appicon.icns</string>
+            <key>UTTypeIdentifier</key>
+            <string>com.teriflix.scrite</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                    <key>public.filename-extension</key>
+                    <string>scrite</string>
+            </dict>
+        </dict>
+    </array>
 </dict>
 </plist>

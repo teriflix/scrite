@@ -13,6 +13,7 @@
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
+!include "FileAssociation.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -89,6 +90,7 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+  ${registerExtension} "$INSTDIR\scrite.exe" ".scrite" "Scrite Screenplay Document"
 SectionEnd
 
 
@@ -109,6 +111,7 @@ Section Uninstall
 
 $$WINDEPLOYQT_UNINSTALLS
 
+  ${unregisterExtension} ".scrite" "Scrite Screenplay Document"
   Delete "$INSTDIR\scrite.exe"
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\vcredist_x86.exe"

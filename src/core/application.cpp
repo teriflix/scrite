@@ -1532,6 +1532,7 @@ bool Application::loadScript() { return false; }
 bool Application::registerFileTypes()
 {
 #ifdef Q_OS_WIN
+#if 0 // Registration is done during setup
     const QString appFilePath = this->applicationFilePath();
     QSettings classes(QStringLiteral("HKEY_CURRENT_USER\\SOFTWARE\\CLASSES"), QSettings::NativeFormat);
 
@@ -1548,7 +1549,7 @@ bool Application::registerFileTypes()
             classes.setValue(extension + QStringLiteral("/DefaultIcon/."), QDir::toNativeSeparators(appFilePath));
     };
     registerFileExtension(".scrite", "Scrite Screenplay Document", QString());
-
+#endif // 0
     return true;
 #endif
 

@@ -291,6 +291,7 @@ DISTFILES += \
     README \
     packaging/linux/package.sh \
     packaging/linux/Scrite.desktop \
+    packaging/windows/FileAssociation.nsh \
     packaging/windows/package-x86.bat \
     packaging/windows/package-x64.bat \
     packaging/windows/installer-x86.nsi.in \
