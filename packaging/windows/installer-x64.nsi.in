@@ -43,6 +43,9 @@
 
 ; MUI end ------
 
+!define SHCNE_ASSOCCHANGED 0x08000000
+!define SHCNF_IDLIST 0
+
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}-64bit-Setup.exe"
 InstallDir "$PROGRAMFILES64\Scrite"
@@ -90,7 +93,10 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+
   ${registerExtension} "$INSTDIR\scrite.exe" ".scrite" "Scrite Screenplay Document"
+  System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
+
 SectionEnd
 
 
@@ -111,7 +117,6 @@ Section Uninstall
 
 $$WINDEPLOYQT_UNINSTALLS
 
-  ${unregisterExtension} ".scrite" "Scrite Screenplay Document"
   Delete "$INSTDIR\scrite.exe"
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\vcredist_x64.exe"
@@ -122,6 +127,9 @@ $$WINDEPLOYQT_UNINSTALLS
   Delete "$DESKTOP\Scrite.lnk"
   RMDir "$SMPROGRAMS\Scrite"  
   RMDir /r "$INSTDIR"
+
+  ${unregisterExtension} ".scrite" "Scrite Screenplay Document"
+  System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
