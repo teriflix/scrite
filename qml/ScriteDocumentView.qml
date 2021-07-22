@@ -98,6 +98,8 @@ Item {
 
         property real textFormatDockWidgetX: -1
         property real textFormatDockWidgetY: -1
+
+        property bool pausePageAndTimeComputation: false
     }
 
     Settings {
@@ -364,7 +366,10 @@ Item {
         id: screenplayTextDocument
         screenplay: scriteDocument.loading || paused ? null : (enabled ? screenplayAdapter.screenplay : null)
         formatting: scriteDocument.loading || paused ? null : (enabled ? scriteDocument.printFormat : null)
-        property bool paused: false
+        property bool paused: screenplayEditorSettings.pausePageAndTimeComputation
+        onPausedChanged: Qt.callLater( function() {
+            screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
+        })
         syncEnabled: true
         sceneNumbers: false
         titlePage: false
