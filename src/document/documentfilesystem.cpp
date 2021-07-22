@@ -345,7 +345,8 @@ bool DocumentFileSystem::save(const QString &fileName)
 
     if(success && QFile::exists(tmpFileName) && QFileInfo(tmpFileName).size() > 0)
     {
-        success &= QFile::remove(fileName);
+        if(QFile::exists(fileName))
+            success &= QFile::remove(fileName);
         if(success)
             success &= QFile::copy(tmpFileName, fileName);
         QFile::remove(tmpFileName);

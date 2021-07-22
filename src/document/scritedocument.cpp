@@ -795,17 +795,9 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     fileName = Application::instance()->sanitiseFileName(fileName);
 
     m_errorReport->clear();
-    if(fileName.isEmpty())
-        return;
 
-    QFile file(fileName);
-    if( !file.open(QFile::WriteOnly) )
-    {
-        m_errorReport->setErrorMessage( QString("Cannot open %1 for writing.").arg(fileName) );
+    if(!this->runSaveSanityChecks(fileName))
         return;
-    }
-
-    file.close();
 
     if(!m_autoSaveMode)
         this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
@@ -817,8 +809,18 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     const QJsonObject json = QObjectSerializer::toJson(this);
     const QByteArray bytes = QJsonDocument(json).toJson();
     m_docFileSystem.setHeader(bytes);
-    if( !m_docFileSystem.save(fileName) )
+
+    const bool success = m_docFileSystem.save(fileName);
+
+    if(!success)
+    {
         m_errorReport->setErrorMessage( QStringLiteral("Couldn't save document \"") + fileName + QStringLiteral("\"") );
+        emit justSaved();
+        m_progressReport->finish();
+        if(!m_autoSaveMode)
+            this->clearBusyMessage();
+        return;
+    }
 
 #ifndef QT_NO_DEBUG
     {
@@ -851,6 +853,9 @@ void ScriteDocument::save()
     HourGlass hourGlass;
 
     if(m_readOnly)
+        return;
+
+    if(!this->runSaveSanityChecks(m_fileName))
         return;
 
     QFileInfo fi(m_fileName);
@@ -1268,6 +1273,63 @@ void ScriteDocument::timerEvent(QTimerEvent *event)
     }
 
     QObject::timerEvent(event);
+}
+
+bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
+{
+    const QString fileName = givenFileName.trimmed();
+
+    // Multiple things could go wrong while saving a file.
+    // 1. File name is empty.
+    if(fileName.isEmpty())
+    {
+        m_errorReport->setErrorMessage( QStringLiteral("File name cannot be empty") );
+        return false;
+    }
+
+    QFileInfo fi(fileName);
+
+    // 2. Filename must not contain special characters
+    // It is true that file names will have already been sanitized using Application::sanitiseFileName()
+    // But we double check it here anyway.
+    static const QList<QChar> allowedChars = {'-', '_', '[', ']', '(', ')', '{', '}', '&', ' '};
+    const QString baseFileName = fi.baseName();
+    for(const QChar ch : baseFileName)
+    {
+        if(ch.isLetterOrNumber() || ch.isSpace())
+            continue;
+
+        if(allowedChars.contains(ch))
+            continue;
+
+        m_errorReport->setErrorMessage( QStringLiteral("File name cannot contain special character '%1'").arg(ch) );
+        return false;
+    }
+
+    // 3. File already exists, but has become readonly now.
+    if( fi.exists() && !fi.isWritable() )
+    {
+        m_errorReport->setErrorMessage( QStringLiteral("Cannot open '%1' for writing.").arg(fileName) );
+        return false;
+    }
+
+    // 4. Folder in which the file exists seems have become readonly
+    QDir dir = fi.absoluteDir();
+    {
+        // Try to write something in this folder.
+        const QString tmpFile = dir.absoluteFilePath( QStringLiteral("scrite_tmp_") + QString::number( QDateTime::currentMSecsSinceEpoch() ) + QStringLiteral(".dat") );
+        QFile file(tmpFile);
+        if(!file.open(QFile::WriteOnly))
+        {
+            m_errorReport->setErrorMessage( QStringLiteral("Cannot write into folder '%1'").arg(dir.absolutePath()) );
+            return false;
+        }
+
+        file.close();
+        QFile::remove(tmpFile);
+    }
+
+    return true;
 }
 
 void ScriteDocument::setReadOnly(bool val)

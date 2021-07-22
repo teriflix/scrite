@@ -883,7 +883,7 @@ QString Application::sanitiseFileName(const QString &fileName) const
         if(ch.isLetterOrNumber())
             continue;
 
-        static const QList<QChar> allowedChars = QList<QChar>() << QChar('_') << QChar('-') << QChar(' ');
+        static const QList<QChar> allowedChars = {'-', '_', '[', ']', '(', ')', '{', '}', '&', ' '};
         if(allowedChars.contains(ch))
             continue;
 

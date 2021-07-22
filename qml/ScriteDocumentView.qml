@@ -607,8 +607,10 @@ Item {
                 function doClick() {
                     if(scriteDocument.fileName === "")
                         fileDialog.launch("SAVE")
-                    else
+                    else {
+                        fileDialog.mode = "SAVE"
                         scriteDocument.save()
+                    }
                 }
 
                 ShortcutsModelItem.group: "File"

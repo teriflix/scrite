@@ -305,6 +305,7 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
+    bool runSaveSanityChecks(const QString &fileName);
     void setReadOnly(bool val);
     void setLoading(bool val);
     void prepareAutoSave();
