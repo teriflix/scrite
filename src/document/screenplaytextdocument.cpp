@@ -2588,14 +2588,47 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
     if(!m_sceneResetList.contains(scene))
         m_sceneResetList.append(scene);
 
-    const bool needsSignal = !m_sceneResetTimer.isActive();
+    if(m_sceneResetList.isEmpty())
+        return;
+
     m_sceneResetTimer.start(100, this);
-    if(needsSignal)
-        emit updateScheduled();
+    if(!m_sceneResetHasTriggeredUpdateScheduled)
+    {
+        int nrBlocks = 0;
+        for(Scene *s : qAsConst(m_sceneResetList))
+        {
+            const QList<int> sil = s->screenplayElementIndexList();
+            for(int si : sil)
+            {
+                ScreenplayElement *e = m_screenplay->elementAt(si);
+                if(e)
+                {
+                    QTextFrame *f = m_elementFrameMap.value(e);
+                    QTextCursor cursor = f->firstCursorPosition();
+                    int fblocks = 0;
+                    while(cursor.currentFrame() == f)
+                    {
+                        ++fblocks;
+                        cursor.movePosition(QTextCursor::NextBlock);
+                    }
+
+                    nrBlocks += qAbs(s->elementCount()-fblocks);
+                }
+            }
+        }
+
+        if(nrBlocks > 5)
+        {
+            emit updateScheduled();
+            m_sceneResetHasTriggeredUpdateScheduled = true;
+        }
+    }
 }
 
 void ScreenplayTextDocument::processSceneResetList()
 {
+    m_sceneResetHasTriggeredUpdateScheduled = false;
+
     if(m_sceneResetList.isEmpty())
         return;
 

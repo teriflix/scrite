@@ -323,6 +323,7 @@ private:
     bool m_screenplayIsBeingReset = false;
     QList<Scene*> m_sceneResetList;
     ExecLaterTimer m_sceneResetTimer;
+    bool m_sceneResetHasTriggeredUpdateScheduled = false;
     bool m_printEachSceneOnANewPage = false;
     bool m_printEachActOnANewPage = false;
     bool m_includeActBreaks = false;

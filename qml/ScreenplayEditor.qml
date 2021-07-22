@@ -1326,6 +1326,23 @@ Rectangle {
                                 }
                             }
                         }
+
+                        Rectangle {
+                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus
+                            x: 0; y: sceneTextEditor.cursorRectangle.y-2*zoomLevel
+                            width: parent.width
+                            height: sceneTextEditor.cursorRectangle.height+4*zoomLevel
+                            color: primaryColors.c100.background
+
+                            Rectangle {
+                                width: currentSceneHighlight.width
+                                anchors.left: parent.left
+                                anchors.leftMargin: currentSceneHighlight.width
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                color: currentSceneHighlight.color
+                            }
+                        }
                     }
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font: screenplayFormat.defaultFont2
@@ -2015,14 +2032,21 @@ Rectangle {
                         target: screenplayTextDocument
                         ignoreUnknownSignals: true
                         enabled: sceneTextEditor.activeFocus && !sceneTextEditor.readOnly
-                        onUpdateFinished: Qt.callLater( function() {
-                            sceneTextEditor.justReceivedFocus = true
-                        })
+                        property bool needsCursorAnimation: false
+                        onUpdateScheduled: needsCursorAnimation = true
+                        onUpdateFinished: {
+                            if(needsCursorAnimation)
+                                Qt.callLater( function() {
+                                    sceneTextEditor.justReceivedFocus = true
+                                })
+                            needsCursorAnimation = false
+                        }
                     }
                 }
             }
 
             Rectangle {
+                id: currentSceneHighlight
                 width: parent.width * 0.01
                 anchors.left: parent.left
                 anchors.top: parent.top
