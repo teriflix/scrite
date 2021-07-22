@@ -2024,6 +2024,9 @@ Rectangle {
 
                     // Custom Copy & Paste
                     function cut2() {
+                        if(scriteDocument.readOnly)
+                            return
+
                         if(hasSelection) {
                             sceneDocumentBinder.copy(selectionStart, selectionEnd)
                             remove(selectionStart, selectionEnd)
@@ -2037,6 +2040,9 @@ Rectangle {
                     }
 
                     function paste2() {
+                        if(scriteDocument.readOnly)
+                            return
+
                         if(canPaste) {
                             // Fix for https://github.com/teriflix/scrite/issues/195
                             // [0.5.2 All] Pasting doesnt replace the selected text #195
@@ -2053,6 +2059,9 @@ Rectangle {
                     }
 
                     function splitSceneAt(pos) {
+                        if(scriteDocument.readOnly)
+                            return
+
                         Qt.callLater( function() {
                             forceActiveFocus()
                             cursorPosition = pos
@@ -2061,6 +2070,9 @@ Rectangle {
                     }
 
                     function mergeWithPreviousScene() {
+                        if(scriteDocument.readOnly)
+                            return
+
                         Qt.callLater( function() {
                             forceActiveFocus()
                             cursorPosition = 0
