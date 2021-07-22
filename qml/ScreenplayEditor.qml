@@ -691,6 +691,20 @@ Rectangle {
         border.color: primaryColors.borderColor
         clip: true
 
+        Item {
+            anchors.fill: metricsDisplay
+
+            ToolTip.text: "Page count and time estimates are approximate, assuming " + screenplayTextDocument.timePerPageAsString + " per page."
+            ToolTip.delay: 1000
+            ToolTip.visible: metricsDisplayOverlayMouseArea.containsMouse
+
+            MouseArea {
+                id: metricsDisplayOverlayMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+            }
+        }
+
         Row {
             id: metricsDisplay
             anchors.verticalCenter: parent.verticalCenter
@@ -699,15 +713,78 @@ Rectangle {
             spacing: 10
 
             Image {
+                id: toggleLockButton
+                height: parent.height; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+                enabled: !scriteDocument.readOnly
+                source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
+                    ToolTip.visible: containsMouse
+
+                    onClicked: {
+                        var locked = !scriteDocument.locked
+                        scriteDocument.locked = locked
+
+                        var message = ""
+                        if(locked)
+                            message = "Document LOCKED. You will be able to edit it only on this computer."
+                        else
+                            message = "Document unlocked. You will be able to edit it on this and any other computer."
+
+                        showInformation({"message": message}, this)
+                    }
+                }
+            }
+
+            Image {
+                source: "../icons/navigation/refresh.png"
+                height: parent.height; width: height; mipmap: true
+                anchors.verticalCenter: parent.verticalCenter
+                opacity: screenplayTextDocument.paused ? 0.5 : 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if(screenplayTextDocument.paused)
+                            screenplayTextDocument.paused = false
+                        else
+                            screenplayTextDocument.reload()
+                    }
+                    ToolTip.visible: containsMouse && !pressed
+                    ToolTip.text: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
+                }
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.borderColor
+            }
+
+            Image {
                 source: "../icons/content/page_count.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
+                opacity: screenplayTextDocument.paused ? 0.5 : 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: screenplayTextDocument.paused = !screenplayTextDocument.paused
+                    hoverEnabled: true
+                    ToolTip.text: "Click here to toggle page computation, incase the app is not responding fast while typing."
+                }
             }
 
             Text {
                 font.pixelSize: statusBar.height * 0.5
-                text: screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount
+                text: screenplayTextDocument.paused ? "- of -" : (screenplayTextDocument.currentPage + " of " + screenplayTextDocument.pageCount)
                 anchors.verticalCenter: parent.verticalCenter
+                opacity: screenplayTextDocument.paused ? 0.5 : 1
             }
 
             Rectangle {
@@ -720,26 +797,21 @@ Rectangle {
                 source: "../icons/content/time.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
+                opacity: screenplayTextDocument.paused ? 0.5 : 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: screenplayTextDocument.paused = !screenplayTextDocument.paused
+                    hoverEnabled: true
+                    ToolTip.text: "Click here to toggle time computation, incase the app is not responding fast while typing."
+                }
             }
 
             Text {
                 font.pixelSize: statusBar.height * 0.5
-                text: screenplayTextDocument.currentTimeAsString + " of " + (screenplayTextDocument.pageCount > 1 ? screenplayTextDocument.totalTimeAsString : screenplayTextDocument.timePerPageAsString)
+                text: screenplayTextDocument.paused ? "- of -" : (screenplayTextDocument.currentTimeAsString + " of " + (screenplayTextDocument.pageCount > 1 ? screenplayTextDocument.totalTimeAsString : screenplayTextDocument.timePerPageAsString))
                 anchors.verticalCenter: parent.verticalCenter
-            }
-        }
-
-        Item {
-            anchors.fill: metricsDisplay
-
-            ToolTip.text: "Page count and time estimates are approximate, assuming " + screenplayTextDocument.timePerPageAsString + " per page."
-            ToolTip.delay: 1000
-            ToolTip.visible: metricsDisplayOverlayMouseArea.containsMouse
-
-            MouseArea {
-                id: metricsDisplayOverlayMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
+                opacity: screenplayTextDocument.paused ? 0.5 : 1
             }
         }
 
@@ -814,48 +886,6 @@ Rectangle {
             anchors.right: zoomSlider.left
             anchors.rightMargin: spacing
             height: zoomSlider.height
-
-            Image {
-                id: toggleLockButton
-                height: parent.height-4; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-                enabled: !scriteDocument.readOnly
-                source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
-                    ToolTip.visible: containsMouse
-
-                    onClicked: {
-                        var locked = !scriteDocument.locked
-                        scriteDocument.locked = locked
-
-                        var message = ""
-                        if(locked)
-                            message = "Document LOCKED. You will be able to edit it only on this computer."
-                        else
-                            message = "Document unlocked. You will be able to edit it on this and any other computer."
-
-                        showInformation({"message": message}, this)
-                    }
-                }
-            }
-
-            Image {
-                source: "../icons/navigation/refresh.png"
-                height: parent.height-4; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: screenplayTextDocument.reload()
-                    ToolTip.visible: containsMouse && !pressed
-                    ToolTip.text: "Computes page layout from scratch, thereby reevaluating page count and time."
-                }
-            }
 
             ToolButton3 {
                 iconSource: "../icons/action/layout_grouping.png"
@@ -1298,7 +1328,7 @@ Rectangle {
                             id: document
                             trackChangesOn: sceneDocumentBinder.documentLoadCount + zoomSlider.value
                             from: null
-                            to: screenplayTextDocument
+                            to: screenplayTextDocument.paused ? null : screenplayTextDocument
                             delay: 100
                         }
 
@@ -1398,7 +1428,7 @@ Rectangle {
                                         property: "width"
                                         duration: 250
                                         from: sceneTextEditor.cursorRectangle.width*Screen.devicePixelRatio
-                                        to: sceneTextEditor.cursorRectangle.width*20
+                                        to: sceneTextEditor.cursorRectangle.width*10
                                     }
 
                                     NumberAnimation {
@@ -1406,7 +1436,7 @@ Rectangle {
                                         property: "height"
                                         duration: 250
                                         from: sceneTextEditor.cursorRectangle.height
-                                        to: sceneTextEditor.cursorRectangle.height*4
+                                        to: sceneTextEditor.cursorRectangle.height*2
                                     }
 
                                     NumberAnimation {
@@ -1423,7 +1453,7 @@ Rectangle {
                                         target: cursorRectangle
                                         property: "width"
                                         duration: 250
-                                        from: sceneTextEditor.cursorRectangle.width*20
+                                        from: sceneTextEditor.cursorRectangle.width*10
                                         to: sceneTextEditor.cursorRectangle.width*1.5
                                     }
 
@@ -1431,7 +1461,7 @@ Rectangle {
                                         target: cursorRectangle
                                         property: "height"
                                         duration: 250
-                                        from: sceneTextEditor.cursorRectangle.height*4
+                                        from: sceneTextEditor.cursorRectangle.height*2
                                         to: sceneTextEditor.cursorRectangle.height
                                     }
 

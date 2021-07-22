@@ -2617,7 +2617,7 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
             }
         }
 
-        if(nrBlocks > 5)
+        if(nrBlocks >= 3)
         {
             emit updateScheduled();
             m_sceneResetHasTriggeredUpdateScheduled = true;

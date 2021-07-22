@@ -1485,6 +1485,9 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     int nrElements = 0;
     ds >> nrElements;
 
+    QList<SceneElement*> paras;
+    paras.reserve(nrElements);
+
     for(int i=0; i<nrElements; i++)
     {
         SceneElement *element = new SceneElement(this);
@@ -1497,12 +1500,12 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         ds >> text;
         element->setText(text);
 
-        this->addElement(element);
+        paras.append(element);
     }
 
+    this->setElementsList(paras);
+
     emit sceneReset(curPosition);
-    emit sceneChanged();
-    emit sceneRefreshed();
 
     return true;
 }

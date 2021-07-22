@@ -362,8 +362,9 @@ Item {
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: scriteDocument.loading && enabled ? null : screenplayAdapter.screenplay
-        formatting: scriteDocument.loading && enabled ? null : scriteDocument.printFormat
+        screenplay: scriteDocument.loading || paused ? null : (enabled ? screenplayAdapter.screenplay : null)
+        formatting: scriteDocument.loading || paused ? null : (enabled ? scriteDocument.printFormat : null)
+        property bool paused: false
         syncEnabled: true
         sceneNumbers: false
         titlePage: false
