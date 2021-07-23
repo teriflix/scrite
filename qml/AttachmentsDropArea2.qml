@@ -19,6 +19,8 @@ AttachmentsDropArea {
     id: attachmentsDropArea
     enabled: !scriteDocument.readOnly
 
+    property string attachmentNoticeSuffix: "Add this file as attachment by dropping it here."
+
     Rectangle {
         anchors.fill: parent
         visible: attachmentsDropArea.active
@@ -37,7 +39,7 @@ AttachmentsDropArea {
             width: parent.width * 0.5
             wrapMode: Text.WordWrap
             color: primaryColors.c700.text
-            text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>Add this file as attachment by dropping it here." : ""
+            text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>" + attachmentNoticeSuffix : ""
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: app.idealFontPointSize
         }

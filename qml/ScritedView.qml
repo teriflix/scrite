@@ -132,6 +132,17 @@ Item {
         screenplayOffsetsModel.unlockAllSceneTimes()
     }
 
+    function loadMediaUrl(fileUrl) {
+        mediaPlayer.source = fileUrl
+        mediaPlayer.play()
+        Qt.callLater( function() {
+            mediaPlayer.pause()
+            mediaPlayer.seek(0)
+            screenplayOffsetsView.adjustTextDocumentAndMedia()
+        })
+        screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
+    }
+
     Settings {
         id: scritedSettings
         fileName: app.settingsFilePath
@@ -150,16 +161,7 @@ Item {
         selectFolder: false
         selectMultiple: false
         selectExisting: true
-        onAccepted: {
-            mediaPlayer.source = fileUrl
-            mediaPlayer.play()
-            Qt.callLater( function() {
-                mediaPlayer.pause()
-                mediaPlayer.seek(0)
-                screenplayOffsetsView.adjustTextDocumentAndMedia()
-            })
-            screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
-        }
+        onAccepted: loadMediaUrl(fileUrl)
     }
 
     SplitView {
@@ -1389,5 +1391,15 @@ Item {
         anchors.fill: parent
         visible: screenplayOffsetsModel.busy
         busyMessage: "Computing offsets & preparing screenplay for continuous scroll ..."
+    }
+
+    AttachmentsDropArea2 {
+        anchors.fill: parent
+        enabled: !mediaIsLoaded && !scriteDocument.empty
+        allowedType: Attachments.VideosOnly
+        property string droppedFilePath
+        property string droppedFileName
+        onDropped: loadMediaUrl( app.localFileToUrl(attachment.filePath) )
+        attachmentNoticeSuffix: "Drop this file to load video."
     }
 }

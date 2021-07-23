@@ -71,6 +71,7 @@ public:
     int customFontPointSize() const { return m_customFontPointSize; }
     Q_SIGNAL void customFontPointSizeChanged();
 
+    Q_INVOKABLE QUrl localFileToUrl(const QString &fileName) const { return QUrl::fromLocalFile(fileName); }
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) const { return url.toLocalFile(); }
     Q_INVOKABLE QUrl toHttpUrl(const QUrl &url) const;
 

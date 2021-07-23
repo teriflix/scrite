@@ -1857,6 +1857,7 @@ Item {
     AttachmentsDropArea2 {
         allowedType: Attachments.PhotosOnly
         anchors.fill: canvasScroll
+        attachmentNoticeSuffix: "Drop this photo here as an annotation."
         onDropped: {
             var pos = canvas.mapFromItem(canvasScroll, mouse.x, mouse.y)
             createNewImageAnnotation(pos.x, pos.y, attachment.filePath)

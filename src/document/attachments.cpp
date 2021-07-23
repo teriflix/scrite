@@ -28,7 +28,7 @@ static QStringList supportedExtensions(Attachment::Type type)
 {
     const QChar comma(',');
     static const QStringList photoExtensions = QStringLiteral("jpg,bmp,png,jpeg,svg").split(comma, QString::SkipEmptyParts);
-    static const QStringList videoExtensions = QStringLiteral("mp4,mov,avi,wmv,m4v").split(comma, QString::SkipEmptyParts);
+    static const QStringList videoExtensions = QStringLiteral("mp4,mov,avi,wmv,m4v,mpg,mpeg").split(comma, QString::SkipEmptyParts);
     static const QStringList audioExtensions = QStringLiteral("mp3,wav,m4a,ogg,flac,aiff,au").split(QChar(','), QString::SkipEmptyParts);
     static const QStringList documentExtensions = QStringLiteral("pdf,txt,zip,docx,xlsx,doc,xls,ppt,pptx,odt,odp,ods,ics,ical,scrite,fdx,xml").split(QChar(','), QString::SkipEmptyParts);
     switch(type)

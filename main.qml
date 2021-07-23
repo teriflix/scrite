@@ -139,6 +139,16 @@ Rectangle {
                     text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
                 }
 
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    color: primaryColors.c700.text
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: app.idealFontPointSize
+                    visible: !scriteDocument.empty || scriteDocument.fileName !== ""
+                    text: "NOTE: Any unsaved changes in the currently open document will be discarded."
+                }
+
                 Row {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
