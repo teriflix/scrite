@@ -87,12 +87,28 @@ bool FountainImporter::doImport(QIODevice *device)
     ts.setAutoDetectUnicode(true);
 
     int lineNr = 0;
+    int nrWhiteSpacesInPrevLine = -1;
+    int nrWhiteSpaces = -1;
 
     while(!ts.atEnd())
     {
         ++lineNr;
 
         QString line = ts.readLine();
+
+        nrWhiteSpacesInPrevLine = nrWhiteSpaces;
+        nrWhiteSpaces = 0;
+        while(line.length())
+        {
+            const QCharRef ch = line.front();
+            if(ch.isSpace())
+            {
+                line = line.mid(1);
+                ++nrWhiteSpaces;
+            }
+            else
+                break;
+        }
         line = line.trimmed();
         line.replace(multipleSpaces, singleSpace);
 
@@ -103,6 +119,12 @@ bool FountainImporter::doImport(QIODevice *device)
             character = nullptr;
             mergeWithLastPara = false;
             continue;
+        }
+
+        if(inCharacter && nrWhiteSpacesInPrevLine > 0 && nrWhiteSpaces == 0)
+        {
+            inCharacter = false;
+            character = nullptr;
         }
 
         if(line.startsWith(pound))
@@ -333,7 +355,7 @@ bool FountainImporter::doImport(QIODevice *device)
         else
         {
             currentScene->addElement(para);
-            mergeWithLastPara = true;
+            mergeWithLastPara = nrWhiteSpaces == nrWhiteSpacesInPrevLine;
         }
     }
 
