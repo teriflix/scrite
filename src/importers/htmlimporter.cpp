@@ -24,6 +24,11 @@ HtmlImporter::~HtmlImporter()
 
 }
 
+bool HtmlImporter::canImport(const QString &fileName) const
+{
+    return QFileInfo(fileName).suffix().toLower() == QStringLiteral("html");
+}
+
 bool HtmlImporter::doImport(QIODevice *device)
 {
     const QByteArray bytes = this->preprocess(device);

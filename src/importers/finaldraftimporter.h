@@ -27,6 +27,8 @@ public:
     Q_INVOKABLE FinalDraftImporter(QObject *parent=nullptr);
     ~FinalDraftImporter();
 
+    bool canImport(const QString &fileName) const;
+
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
 };

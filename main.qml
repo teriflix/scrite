@@ -76,10 +76,93 @@ Rectangle {
         active: screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
     }
 
+    AttachmentsDropArea {
+        id: fileOpenDropArea
+        anchors.fill: parent
+        enabled: ui.enabled && !modalDialog.active
+        allowedType: Attachments.NoMedia
+        allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
+        property string droppedFilePath
+        property string droppedFileName
+        onDropped: {
+            if(scriteDocument.empty)
+                scriteDocument.openOrImport(attachment.filePath)
+            else {
+                droppedFilePath = attachment.filePath
+                droppedFileName = attachment.originalFileName
+            }
+        }
+    }
+
     UI.ScriteDocumentView {
         id: ui
         anchors.fill: parent
-        enabled: !dialogUnderlay.visible
+        enabled: !dialogUnderlay.visible && !fileOpenDropAreaNotification.active
+    }
+
+    Loader {
+        id: fileOpenDropAreaNotification
+        anchors.fill: fileOpenDropArea
+        active: fileOpenDropArea.active || fileOpenDropArea.droppedFilePath !== ""
+        sourceComponent: Rectangle {
+            color: app.translucent(primaryColors.c500.background, 0.5)
+
+            Rectangle {
+                anchors.fill: fileOpenDropAreaNotice
+                anchors.margins: -30
+                radius: 4
+                color: primaryColors.c700.background
+            }
+
+            Column {
+                id: fileOpenDropAreaNotice
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                spacing: 20
+
+                Text {
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                    color: primaryColors.c700.text
+                    font.bold: true
+                    text: parent.visible ? fileOpenDropArea.active ? fileOpenDropArea.attachment.originalFileName : fileOpenDropArea.droppedFileName : ""
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: app.idealFontPointSize
+                }
+
+                Text {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    color: primaryColors.c700.text
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: app.idealFontPointSize
+                    text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
+                }
+
+                Row {
+                    spacing: 20
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: !scriteDocument.empty
+
+                    UI.Button2 {
+                        text: "Open/Import"
+                        onClicked: {
+                            scriteDocument.openOrImport(fileOpenDropArea.droppedFilePath)
+                            fileOpenDropArea.droppedFileName = ""
+                            fileOpenDropArea.droppedFilePath = ""
+                        }
+                    }
+
+                    UI.Button2 {
+                        text: "Cancel"
+                        onClicked:  {
+                            fileOpenDropArea.droppedFileName = ""
+                            fileOpenDropArea.droppedFilePath = ""
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Loader {

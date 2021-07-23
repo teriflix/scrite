@@ -295,7 +295,7 @@ bool Attachments::canAllow(const QFileInfo &fi, AllowedType allowed)
 
     bool ret = false;
     if(allowed == NoMedia)
-        ret = (type == Attachment::Photo || type == Attachment::Video || type == Attachment::Photo);
+        ret = !(type == Attachment::Photo || type == Attachment::Video || type == Attachment::Audio);
     else if(allowed & PhotosOnly)
         ret = type == Attachment::Photo;
     else if(allowed & AudioOnly)
@@ -505,9 +505,18 @@ void AttachmentsDropArea::setAllowedType(int val)
     emit allowedTypeChanged();
 }
 
+void AttachmentsDropArea::setAllowedExtensions(const QStringList &val)
+{
+    if(m_allowedExtensions == val)
+        return;
+
+    m_allowedExtensions = val;
+    emit allowedExtensionsChanged();
+}
+
 void AttachmentsDropArea::allowDrop()
 {
-    m_allowDrop = false;
+    m_allowDrop = true;
 }
 
 void AttachmentsDropArea::denyDrop()
@@ -628,6 +637,12 @@ bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeDat
     }
 
     if(!Attachments::canAllow(fi, Attachments::AllowedType(m_allowedType)))
+    {
+        this->setAttachment(nullptr);
+        return false;
+    }
+
+    if(!m_allowedExtensions.isEmpty() && !m_allowedExtensions.contains(fi.suffix(), Qt::CaseInsensitive))
     {
         this->setAttachment(nullptr);
         return false;

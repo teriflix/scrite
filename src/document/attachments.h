@@ -179,6 +179,11 @@ public:
     int allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
 
+    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions NOTIFY allowedExtensionsChanged)
+    void setAllowedExtensions(const QStringList &val);
+    QStringList allowedExtensions() const { return m_allowedExtensions; }
+    Q_SIGNAL void allowedExtensionsChanged();
+
     Q_PROPERTY(bool active READ isActive NOTIFY attachmentChanged)
     bool isActive() const { return m_attachment != nullptr; }
 
@@ -214,6 +219,7 @@ private:
     QPointF m_mouse;
     bool m_allowDrop = true;
     int m_allowedType = 0;
+    QStringList m_allowedExtensions;
     Attachment* m_attachment = nullptr;
     Attachments* m_target = nullptr;
 };

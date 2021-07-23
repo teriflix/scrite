@@ -34,6 +34,9 @@ public:
     LibraryService(QObject *parent=nullptr);
     ~LibraryService();
 
+    // This this class cannot be used to import anything from a local file system
+    bool canImport(const QString &) const { return false; }
+
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const;
     Q_SIGNAL void busyChanged();

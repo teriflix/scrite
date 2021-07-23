@@ -258,6 +258,8 @@ public:
 
     Q_INVOKABLE void reset();
 
+    Q_INVOKABLE void openOrImport(const QString &fileName);
+
     Q_INVOKABLE void open(const QString &fileName);
     Q_INVOKABLE void openAnonymously(const QString &fileName);
     Q_INVOKABLE void saveAs(const QString &fileName);
@@ -285,6 +287,7 @@ public:
     Q_INVOKABLE QString reportFileSuffix() const;
 
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
+    bool importFile(AbstractImporter *importer, const QString &fileName);
     Q_INVOKABLE bool exportFile(const QString &fileName, const QString &format);
     Q_INVOKABLE bool exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx, const QString &imageFileName);
 

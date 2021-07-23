@@ -25,6 +25,11 @@ FinalDraftImporter::~FinalDraftImporter()
 
 }
 
+bool FinalDraftImporter::canImport(const QString &fileName) const
+{
+    return QFileInfo(fileName).suffix().toLower() == QStringLiteral("fdx");
+}
+
 bool FinalDraftImporter::doImport(QIODevice *device)
 {
     QString errMsg;

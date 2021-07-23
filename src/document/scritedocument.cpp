@@ -759,6 +759,33 @@ void ScriteDocument::reset()
     emit justReset();
 }
 
+void ScriteDocument::openOrImport(const QString &fileName)
+{
+    if(fileName.isEmpty())
+        return;
+
+
+    const QFileInfo fi(fileName);
+    const QString absFileName = fi.absoluteFilePath();
+
+    if( fi.suffix() == QStringLiteral("scrite") )
+    {
+        this->open( absFileName );
+        return;
+    }
+
+    const QList<QByteArray> keys = ::deviceIOFactories->ImporterFactory.keys();
+    for(const QByteArray &key : keys)
+    {
+        QScopedPointer<AbstractImporter> importer(::deviceIOFactories->ImporterFactory.create<AbstractImporter>(key, this));
+        if(importer->canImport(absFileName))
+        {
+            this->importFile(importer.data(), fileName);
+            return;
+        }
+    }
+}
+
 void ScriteDocument::open(const QString &fileName)
 {
     if(fileName == m_fileName)
@@ -1012,11 +1039,16 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
         return false;
     }
 
+    return this->importFile(importer.data(), fileName);
+}
+
+bool ScriteDocument::importFile(AbstractImporter *importer, const QString &fileName)
+{
     this->setLoading(true);
 
     Aggregation aggregation;
-    m_errorReport->setProxyFor(aggregation.findErrorReport(importer.data()));
-    m_progressReport->setProxyFor(aggregation.findProgressReport(importer.data()));
+    m_errorReport->setProxyFor(aggregation.findErrorReport(importer));
+    m_progressReport->setProxyFor(aggregation.findProgressReport(importer));
 
     importer->setFileName(fileName);
     importer->setDocument(this);
@@ -1027,6 +1059,7 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
     this->setLoading(false);
 
     return success;
+
 }
 
 bool ScriteDocument::exportFile(const QString &fileName, const QString &format)

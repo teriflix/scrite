@@ -27,6 +27,8 @@ public:
 
     Q_INVOKABLE bool read();
 
+    virtual bool canImport(const QString &fileName) const = 0;
+
 protected:
     AbstractImporter(QObject *parent=nullptr);
     virtual bool doImport(QIODevice *device) = 0;

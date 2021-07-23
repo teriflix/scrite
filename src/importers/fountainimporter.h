@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE FountainImporter(QObject *parent=nullptr);
     ~FountainImporter();
 
+    bool canImport(const QString &fileName) const;
+
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
     void preprocess(QByteArray &bytes);

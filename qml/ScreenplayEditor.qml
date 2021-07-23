@@ -788,7 +788,7 @@ Rectangle {
                     onClicked: screenplayTextDocument.paused = !screenplayTextDocument.paused
                     hoverEnabled: true
                     ToolTip.visible: containsMouse && !pressed
-                    ToolTip.text: "Click here to toggle page computation, incase the app is not responding fast while typing."
+                    ToolTip.text: "Click here to toggle page computation, in case the app is not responding fast while typing."
                     ToolTip.delay: 1000
                 }
             }
@@ -820,7 +820,7 @@ Rectangle {
                     onClicked: screenplayTextDocument.paused = !screenplayTextDocument.paused
                     hoverEnabled: true
                     ToolTip.visible: containsMouse && !pressed
-                    ToolTip.text: "Click here to toggle time computation, incase the app is not responding fast while typing."
+                    ToolTip.text: "Click here to toggle time computation, in case the app is not responding fast while typing."
                     ToolTip.delay: 1000
                 }
             }

@@ -27,6 +27,12 @@ FountainImporter::~FountainImporter()
 
 }
 
+bool FountainImporter::canImport(const QString &fileName) const
+{
+    const QStringList suffixes = { QStringLiteral("fountain"), QStringLiteral("txt") };
+    return suffixes.contains(QFileInfo(fileName).suffix().toLower());
+}
+
 bool FountainImporter::doImport(QIODevice *device)
 {
     // Have tried to parse the Fountain file as closely as possible to

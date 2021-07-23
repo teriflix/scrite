@@ -27,6 +27,8 @@ public:
     Q_INVOKABLE HtmlImporter(QObject *parent=nullptr);
     ~HtmlImporter();
 
+    bool canImport(const QString &fileName) const;
+
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
     QByteArray preprocess(QIODevice *device) const;
