@@ -2606,19 +2606,22 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
                 ScreenplayElement *e = m_screenplay->elementAt(si);
                 if(e)
                 {
-                    QTextFrame *f = m_elementFrameMap.value(e);
+                    int fblocks = 0;
+
+                    QTextFrame *f = m_elementFrameMap.value(e, nullptr);
                     if(f)
                     {
+                        const int lastPosition = f->lastPosition();
                         QTextCursor cursor = f->firstCursorPosition();
-                        int fblocks = 0;
-                        while(cursor.currentFrame() == f)
+                        while(cursor.currentFrame() && cursor.currentFrame() == f && cursor.position() <= lastPosition)
                         {
                             ++fblocks;
-                            cursor.movePosition(QTextCursor::NextBlock);
+                            if(!cursor.movePosition(QTextCursor::NextBlock))
+                                break;
                         }
-
-                        nrBlocks += qAbs(s->elementCount()-fblocks);
                     }
+
+                    nrBlocks += qAbs(s->elementCount()-fblocks);
                 }
             }
         }
