@@ -202,6 +202,7 @@ Rectangle {
                     ret += " to" + notebookTree.currentData.notebookItemTitle
                     return ret
                 }
+                down: newNoteMenu.visible
                 onClicked: {
                     newNoteMenu.notes = notes
                     newNoteMenu.popup(newNoteToolButton, newNoteToolButton.width, 0)
@@ -1692,6 +1693,10 @@ Rectangle {
                         property int nrRows: Math.ceil(model.objectCount/nrColumns)
                         footer: nrRows > nrVisibleRows ? addNewCharacter : null
                         header: addNewCharacter
+
+                        Component.onCompleted: {
+                            headerItem.assumeFocus()
+                        }
                     }
 
                     Component {
@@ -1700,6 +1705,10 @@ Rectangle {
                         Item {
                             width: charactersView.width
                             height: 60
+
+                            function assumeFocus() {
+                                characterNameField.forceActiveFocus()
+                            }
 
                             Rectangle {
                                 anchors.fill: parent
