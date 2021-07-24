@@ -154,6 +154,18 @@ bool AbstractReportGenerator::generate()
         }
     }
 
+    if(m_format == OpenDocumentFormat)
+    {
+        if(this->canDirectExportToOdf())
+        {
+            this->progress()->start();
+            bool success = this->directExportToOdf(&file);
+            this->progress()->finish();
+            GarbageCollector::instance()->add(this);
+            return success;
+        }
+    }
+
     QTextDocument textDocument;
 
     textDocument.setDefaultFont(format->defaultFont());

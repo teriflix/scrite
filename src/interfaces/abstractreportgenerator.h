@@ -91,6 +91,9 @@ protected:
     virtual bool directPrintToPdf(QPdfWriter *) { return false; }
     virtual bool directPrintToPdf(QPrinter *) { return false; }
 
+    virtual bool canDirectExportToOdf() const { return false; }
+    virtual bool directExportToOdf(QIODevice *) { return false; }
+
 private:
     Format m_format = AdobePDF;
     QString m_comment;

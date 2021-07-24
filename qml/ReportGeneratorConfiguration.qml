@@ -936,6 +936,7 @@ Item {
             TextField2 {
                 width: parent.width - 30
                 label: ""
+                text: generator.getConfigurationValue(fieldInfo.name)
                 placeholderText: fieldInfo.label
                 onTextChanged: {
                     if(generator)

@@ -16,6 +16,8 @@
 
 #include "abstractreportgenerator.h"
 
+class ScreenplayElement;
+
 class SceneCharacterMatrixReport : public AbstractReportGenerator
 {
     Q_OBJECT
@@ -46,6 +48,15 @@ public:
     int type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
+    Q_CLASSINFO("marker_FieldGroup", "Characters")
+    Q_CLASSINFO("marker_FieldLabel", "Marker (CSV/ODF Only)")
+    Q_CLASSINFO("marker_FieldNote", "Marker text to use while generating CSV.")
+    Q_CLASSINFO("marker_FieldEditor", "TextBox")
+    Q_PROPERTY(QString marker READ marker WRITE setMarker NOTIFY markerChanged)
+    void setMarker(const QString &val);
+    QString marker() const { return m_marker; }
+    Q_SIGNAL void markerChanged();
+
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldNote", "If no characters are selected, then the report is generted for all characters in the screenplay.")
@@ -74,21 +85,29 @@ public:
     Q_SIGNAL void tagsChanged();
 
 protected:
+    // AbstractDeviceIO interface
+    QString polishFileName(const QString &fileName) const;
+
     // AbstractReportGenerator interface
     bool usePdfWriter() const { return true; }
-    bool supportsFormat(Format) const;
     bool doGenerate(QTextDocument *document);
     void configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const;
     void configureWriter(QPrinter *printer, const QTextDocument *document) const;
+    virtual bool canDirectExportToOdf() const;
+    virtual bool directExportToOdf(QIODevice *);
 
 private:
     void configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const;
+
+    QList<ScreenplayElement*> getScreenplayElements();
+    void finalizeCharacterNames();
 
 private:
     QStringList m_tags;
     QStringList m_characterNames;
     int m_type = SceneVsCharacter;
     QList<int> m_episodeNumbers;
+    QString m_marker = QStringLiteral("YES");
 };
 
 #endif // SCENECHARACTERMATRIXREPORT_H

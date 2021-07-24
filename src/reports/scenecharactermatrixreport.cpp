@@ -45,6 +45,15 @@ void SceneCharacterMatrixReport::setType(int val)
     emit typeChanged();
 }
 
+void SceneCharacterMatrixReport::setMarker(const QString &val)
+{
+    if(m_marker == val)
+        return;
+
+    m_marker = val;
+    emit markerChanged();
+}
+
 void SceneCharacterMatrixReport::setCharacterNames(const QStringList &val)
 {
     if(m_characterNames == val)
@@ -72,9 +81,15 @@ void SceneCharacterMatrixReport::setTags(const QStringList &val)
     emit tagsChanged();
 }
 
-bool SceneCharacterMatrixReport::supportsFormat(AbstractReportGenerator::Format format) const
+QString SceneCharacterMatrixReport::polishFileName(const QString &fileName) const
 {
-    return format == AdobePDF;
+    if(this->format() == OpenDocumentFormat)
+    {
+        QFileInfo fi(fileName);
+        return fi.absoluteDir().absoluteFilePath( fi.baseName() + QStringLiteral(".csv") );
+    }
+
+    return AbstractReportGenerator::polishFileName(fileName);
 }
 
 struct CreateColumnHeadingImageFunctor
@@ -113,67 +128,8 @@ struct CreateColumnHeadingImageFunctor
 bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
 {
     const Screenplay *screenplay = this->document()->screenplay();
-    const Structure *structure = this->document()->structure();
-    const QStringList availableCharacters = structure->characterNames();
-
-    const bool hasEpisodes = screenplay->episodeCount() > 0;
-    int episodeNr = 0; // Episode number is 1+episodeIndex
-    QList<ScreenplayElement*> screenplayElements;
-    for(int i=0; i<screenplay->elementCount(); i++)
-    {
-        ScreenplayElement *element = screenplay->elementAt(i);
-        if(hasEpisodes && !m_episodeNumbers.isEmpty())
-        {
-            if(element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode)
-                ++episodeNr;
-            else if(i==0)
-                ++episodeNr;
-
-            if(!m_episodeNumbers.contains(episodeNr))
-                continue;
-        }
-
-        if(!m_tags.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType && element->scene() != nullptr)
-        {
-            Scene *scene = element->scene();
-
-            const QStringList sceneTags = scene->groups();
-            if(sceneTags.isEmpty())
-                continue;
-
-            QStringList tags;
-            std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
-                         [=](const QString &sceneTag) {
-                return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
-            });
-
-            if(tags.isEmpty())
-                continue;
-        }
-
-        if(element->scene() == nullptr)
-            continue;
-
-        screenplayElements.append(element);
-    }
-
-    // Validate the given set of character names. Ensure that they
-    // exist in the screenplay.
-    if(m_characterNames.isEmpty())
-        m_characterNames = availableCharacters;
-    else
-    {
-        for(int i=m_characterNames.size()-1; i>=0; i--)
-        {
-            m_characterNames[i] = m_characterNames[i].toUpper();
-            const QString name = m_characterNames.at(i);
-            if( !availableCharacters.contains(name) )
-                m_characterNames.removeAt(i);
-        }
-
-        if(m_characterNames.isEmpty())
-            m_characterNames = availableCharacters;
-    }
+    QList<ScreenplayElement*> screenplayElements = this->getScreenplayElements();
+    this->finalizeCharacterNames();
 
     // Lets compile a list of scene names.
     auto compileSceneTitles = [screenplayElements]() {
@@ -349,6 +305,88 @@ void SceneCharacterMatrixReport::configureWriter(QPrinter *printer, const QTextD
     this->configureWriterImpl(printer, document);
 }
 
+bool SceneCharacterMatrixReport::canDirectExportToOdf() const
+{
+    return true;
+}
+
+bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
+{
+    QList<ScreenplayElement*> screenplayElements = this->getScreenplayElements();
+    this->finalizeCharacterNames();
+
+    QTextStream ts(device);
+    ts.setAutoDetectUnicode(true);
+    ts.setCodec("utf-8");
+
+    const int nrRows = m_type == SceneVsCharacter ? screenplayElements.size() : m_characterNames.size();
+    const int nrCols = m_type == SceneVsCharacter ? m_characterNames.size() : screenplayElements.size();
+    auto escapeComma = [](const QString &text) {
+        if(!text.contains(QChar(',')))
+            return text;
+        const QString quote = QStringLiteral("\"");
+        return quote + text + quote;
+    };
+
+    if(m_type == SceneVsCharacter)
+        ts << "SNo.,Type,Location,Time";
+
+    // Column headings
+    for(int j=0; j<nrCols; j++)
+    {
+        const QString colName = m_type == SceneVsCharacter ? m_characterNames.at(j) : screenplayElements.at(j)->resolvedSceneNumber();
+        ts << "," << escapeComma(colName);
+    }
+    ts << "\n";
+
+    // Row contents
+    const QString checkMark = m_marker.isEmpty() ? QStringLiteral("✓") : escapeComma(m_marker);
+    for(int i=0; i<nrRows; i++)
+    {
+        if(m_type == SceneVsCharacter)
+        {
+            Scene *scene = screenplayElements.at(i)->scene();
+            ts << screenplayElements.at(i)->resolvedSceneNumber() << ",";
+            if(scene->heading()->isEnabled())
+                ts << escapeComma(scene->heading()->locationType()) << ","
+                   << escapeComma(scene->heading()->location()) << ","
+                   << escapeComma(scene->heading()->moment());
+            else
+                ts << "-,-,-";
+        }
+        else
+            ts << escapeComma(m_characterNames.at(i));
+
+        for(int j=0; j<nrCols; j++)
+        {
+            ts << ",";
+
+            Scene *scene = nullptr;
+            QString characterName;
+
+            if(m_type == SceneVsCharacter)
+            {
+                scene = screenplayElements.at(i)->scene();
+                characterName = m_characterNames.at(j);
+            }
+            else
+            {
+                scene = screenplayElements.at(j)->scene();
+                characterName = m_characterNames.at(i);
+            }
+
+            if(scene->characterNames().contains(characterName))
+                ts << checkMark;
+        }
+
+        ts << "\n";
+    }
+
+    ts.flush();
+
+    return true;
+}
+
 Q_DECL_IMPORT int qt_defaultDpi();
 
 void SceneCharacterMatrixReport::configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const
@@ -370,4 +408,75 @@ void SceneCharacterMatrixReport::configureWriterImpl(QPagedPaintDevice *ppd, con
     requiredPdfPageSize *= scale;
     requiredPdfPageSize += QSizeF(margin, margin); // margin
     ppd->setPageSize( QPageSize(requiredPdfPageSize,QPageSize::Inch,"Custom",QPageSize::FuzzyMatch) );
+}
+
+QList<ScreenplayElement *> SceneCharacterMatrixReport::getScreenplayElements()
+{
+    const Screenplay *screenplay = this->document()->screenplay();
+
+    const bool hasEpisodes = screenplay->episodeCount() > 0;
+    int episodeNr = 0; // Episode number is 1+episodeIndex
+    QList<ScreenplayElement*> screenplayElements;
+    for(int i=0; i<screenplay->elementCount(); i++)
+    {
+        ScreenplayElement *element = screenplay->elementAt(i);
+        if(hasEpisodes && !m_episodeNumbers.isEmpty())
+        {
+            if(element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode)
+                ++episodeNr;
+            else if(i==0)
+                ++episodeNr;
+
+            if(!m_episodeNumbers.contains(episodeNr))
+                continue;
+        }
+
+        if(!m_tags.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType && element->scene() != nullptr)
+        {
+            Scene *scene = element->scene();
+
+            const QStringList sceneTags = scene->groups();
+            if(sceneTags.isEmpty())
+                continue;
+
+            QStringList tags;
+            std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
+                         [=](const QString &sceneTag) {
+                return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
+            });
+
+            if(tags.isEmpty())
+                continue;
+        }
+
+        if(element->scene() == nullptr)
+            continue;
+
+        screenplayElements.append(element);
+    }
+
+    return screenplayElements;
+}
+
+void SceneCharacterMatrixReport::finalizeCharacterNames()
+{
+    // Validate the given set of character names. Ensure that they
+    // exist in the screenplay.
+    const Structure *structure = this->document()->structure();
+    const QStringList availableCharacters = structure->characterNames();
+    if(m_characterNames.isEmpty())
+        m_characterNames = availableCharacters;
+    else
+    {
+        for(int i=m_characterNames.size()-1; i>=0; i--)
+        {
+            m_characterNames[i] = m_characterNames[i].toUpper();
+            const QString name = m_characterNames.at(i);
+            if( !availableCharacters.contains(name) )
+                m_characterNames.removeAt(i);
+        }
+
+        if(m_characterNames.isEmpty())
+            m_characterNames = availableCharacters;
+    }
 }
