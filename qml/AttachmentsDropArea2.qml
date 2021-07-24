@@ -18,6 +18,7 @@ import Scrite 1.0
 AttachmentsDropArea {
     id: attachmentsDropArea
     enabled: !scriteDocument.readOnly
+    property real noticeWidthFactor: 0.5
 
     property string attachmentNoticeSuffix: "Add this file as attachment by dropping it here."
 
@@ -36,7 +37,7 @@ AttachmentsDropArea {
         Text {
             id: attachmentNotice
             anchors.centerIn: parent
-            width: parent.width * 0.5
+            width: parent.width * noticeWidthFactor
             wrapMode: Text.WordWrap
             color: primaryColors.c700.text
             text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>" + attachmentNoticeSuffix : ""

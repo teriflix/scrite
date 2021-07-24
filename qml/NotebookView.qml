@@ -2130,11 +2130,26 @@ Rectangle {
                                     orientation: Qt.Vertical
                                     flickable: characterQuickInfoView
                                 }
+
+                                AttachmentsDropArea2 {
+                                    anchors.fill: parent
+                                    attachmentNoticeSuffix: "Drop this photo here to capture as character pic."
+                                    allowedType: Attachments.PhotosOnly
+                                    onDropped: {
+                                        character.addPhoto(attachment.filePath)
+                                        photoSlides.currentIndex = character.photos.length - 1
+                                    }
+                                }
                             }
 
                             Item {
                                 width: parent.width - characterQuickInfoArea.width
                                 height: parent.height
+
+                                AttachmentsDropArea2 {
+                                    anchors.fill: parent
+                                    target: character ? character.attachments : null
+                                }
 
                                 FlickableTextArea {
                                     id: characterSummaryField
@@ -2163,11 +2178,12 @@ Rectangle {
                         anchors.bottom: parent.bottom
                         anchors.margins: 10
                         attachments: character ? character.attachments : null
-                    }
 
-                    AttachmentsDropArea2 {
-                        anchors.fill: parent
-                        target: character ? character.attachments : null
+                        AttachmentsDropArea2 {
+                            anchors.fill: parent
+                            noticeWidthFactor: 0.8
+                            target: character ? character.attachments : null
+                        }
                     }
                 }
 
