@@ -2585,6 +2585,9 @@ void ScreenplayTextDocument::clearTextFrames()
 
 void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
 {
+    if(scene == nullptr)
+        return;
+
     if(!m_sceneResetList.contains(scene))
         m_sceneResetList.append(scene);
 
@@ -2604,15 +2607,18 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
                 if(e)
                 {
                     QTextFrame *f = m_elementFrameMap.value(e);
-                    QTextCursor cursor = f->firstCursorPosition();
-                    int fblocks = 0;
-                    while(cursor.currentFrame() == f)
+                    if(f)
                     {
-                        ++fblocks;
-                        cursor.movePosition(QTextCursor::NextBlock);
-                    }
+                        QTextCursor cursor = f->firstCursorPosition();
+                        int fblocks = 0;
+                        while(cursor.currentFrame() == f)
+                        {
+                            ++fblocks;
+                            cursor.movePosition(QTextCursor::NextBlock);
+                        }
 
-                    nrBlocks += qAbs(s->elementCount()-fblocks);
+                        nrBlocks += qAbs(s->elementCount()-fblocks);
+                    }
                 }
             }
         }
