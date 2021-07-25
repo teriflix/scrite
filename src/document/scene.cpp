@@ -587,6 +587,7 @@ Scene::Scene(QObject *parent)
     connect(m_notes, &Notes::notesModified, this, &Scene::sceneChanged);
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::characterRelationshipGraphChanged, this, &Scene::sceneChanged);
+    connect(this, &Scene::commentsChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::enabledChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::sceneChanged, [=](){

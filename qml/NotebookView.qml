@@ -835,8 +835,8 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.margins: 8
                 onTabIndexChanged: sceneNotesTabIndex = tabIndex
-                name: componentData ? "Scene " + componentData.notebookItemTitle.substr(0, componentData.notebookItemTitle.indexOf(']')+1) : "Scene"
-                tabs: ["Synopsis", "Relationships", "Notes"]
+                name: componentData ? componentData.notebookItemTitle.substr(0, componentData.notebookItemTitle.indexOf(']')+1) : "Scene"
+                tabs: ["Synopsis", "Relationships", "Notes", "Comments"]
             }
 
             Item {
@@ -950,6 +950,18 @@ Rectangle {
                     active: sceneNotesItem.notes
                     onLoaded: item.notes = sceneNotesItem.notes
                     visible: sceneTabBar.tabIndex === 2
+                }
+
+                FlickableTextArea {
+                    id: sceneCommentsField
+                    width: sceneTabContentArea.width
+                    height: sceneTabContentArea.height
+                    text: scene.comments
+                    placeholderText: "Scene Comments"
+                    readOnly: scriteDocument.readOnly
+                    onTextChanged: scene.comments = text
+                    undoRedoEnabled: true
+                    visible: sceneTabBar.tabIndex === 3
                 }
             }
         }
