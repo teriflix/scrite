@@ -1707,7 +1707,8 @@ Rectangle {
                         header: addNewCharacter
 
                         Component.onCompleted: {
-                            headerItem.assumeFocus()
+                            if(charactersTabBar.tabIndex === 0)
+                                headerItem.assumeFocus()
                         }
                     }
 
@@ -1717,6 +1718,7 @@ Rectangle {
                         Item {
                             width: charactersView.width
                             height: 60
+                            enabled: charactersTabBar.tabIndex === 0
 
                             function assumeFocus() {
                                 characterNameField.forceActiveFocus()

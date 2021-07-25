@@ -55,6 +55,8 @@ TextField {
     onActiveFocusChanged: {
         if(activeFocus)
             selectAll()
+        else
+            completionViewPopup.close()
     }
 
     CompletionModel {
@@ -159,7 +161,7 @@ TextField {
         width: parent.width
         height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
         focus: false
-        closePolicy: Popup.NoAutoClose
+        closePolicy: textField.length === 0 ? Popup.CloseOnPressOutside : Popup.NoAutoClose
         contentItem: ListView {
             id: completionView
             model: completionModel
