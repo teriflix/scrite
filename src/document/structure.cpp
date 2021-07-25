@@ -1105,6 +1105,7 @@ Character::Character(QObject *parent)
     connect(this, &Character::genderChanged, this, &Character::characterChanged);
     connect(this, &Character::aliasesChanged, this, &Character::characterChanged);
     connect(this, &Character::bodyTypeChanged, this, &Character::characterChanged);
+    connect(this, &Character::summaryChanged, this, &Character::characterChanged);
     connect(m_notes, &Notes::notesModified, this, &Character::characterChanged);
     connect(this, &Character::designationChanged, this, &Character::characterChanged);
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
