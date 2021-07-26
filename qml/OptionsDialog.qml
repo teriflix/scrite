@@ -659,7 +659,7 @@ Item {
                         Text {
                             width: parent.width
                             wrapMode: Text.WordWrap
-                            text: "Default Resolution: <strong>" + scriteDocument.displayFormat.pageLayout.defaultResolution + "</strong>"
+                            text: "Default Resolution: <strong>" + Math.round(scriteDocument.displayFormat.pageLayout.defaultResolution) + "</strong>"
                         }
 
                         TextField2 {
