@@ -33,8 +33,10 @@ Item {
             return
         if(sourceItem && screenplayEditorSettings.enableAnimations)
             showAnimation.start()
-        else
+        else {
+            container.t = 1
             visible = true
+        }
     }
 
     function hide() {
@@ -42,8 +44,10 @@ Item {
             return
         if(sourceItem && screenplayEditorSettings.enableAnimations)
             hideAnimation.start()
-        else
+        else {
+            container.t = 1
             visible = false
+        }
     }
 
     function toggle() {
