@@ -158,7 +158,11 @@ Rectangle {
                 iconSource: "../icons/navigation/sync.png"
                 ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
                 checked: workspaceSettings.syncCurrentSceneOnNotebook
-                onToggled: workspaceSettings.syncCurrentSceneOnNotebook = checked
+                onToggled: {
+                    workspaceSettings.syncCurrentSceneOnNotebook = checked
+                    if(checked)
+                        notebookTree.activateFromCurrentScreenplayElement()
+                }
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
             }
