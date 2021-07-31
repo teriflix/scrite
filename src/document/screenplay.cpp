@@ -35,6 +35,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
     connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::breakTitleChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::breakSubtitleChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::breakSummaryChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::editorHintsChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::elementChanged, [=](){
         this->markAsModified();
