@@ -1246,6 +1246,7 @@ Rectangle {
                             font.pointSize: app.idealFontPointSize + 5
                             placeholderText: breakKind + " Name"
                             onTextChanged: breakElement.breakSubtitle = text
+                            tabItem: breakElementSummaryField.textArea
                         }
                     }
 
@@ -1260,6 +1261,7 @@ Rectangle {
                         anchors.bottom: breakElementAttachmentsView.top
                         anchors.topMargin: 10
                         anchors.bottomMargin: 10
+                        backTabItem: breakElementHeadingField
                     }
 
                     AttachmentsView {
