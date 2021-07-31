@@ -73,7 +73,7 @@ Column {
         color: app.translucent(primaryColors.c100.background, 0.75)
         border.width: 1
         border.color: app.translucent(primaryColors.borderColor, 0.25)
-        height: Math.max(minHeight, answerItemLoader.item.height)
+        height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
         property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength === FormQuestion.ShortParagraph ? 1 : 3)
 
         MouseArea {
@@ -85,7 +85,7 @@ Column {
         LodLoader {
             id: answerItemLoader
             width: answerArea.width
-            height: Math.max(answerArea.minHeight-topPadding-bottomPadding, item.contentHeight+20)
+            height: Math.max(answerArea.minHeight-topPadding-bottomPadding, item ? item.contentHeight+20 : 0)
             lod: eLOW
             TabSequenceItem.manager: tabSequenceManager
             TabSequenceItem.sequence: tabSequenceIndex
@@ -127,14 +127,19 @@ Column {
                     onUndoRequest: answerText.undo()
                     onRedoRequest: answerText.redo()
                 }
+
                 onActiveFocusChanged: {
-                    if(!activeFocus)
+                    if(!activeFocus) {
+                        if(dialogUnderlay.visible)
+                            return
                         answerItemLoader.lod = answerItemLoader.eLOW
+                    }
                 }
                 Component.onCompleted: forceActiveFocus()
                 text: formField.answer
                 onTextChanged: formField.answer = text
             }
         }
+
     }
 }
