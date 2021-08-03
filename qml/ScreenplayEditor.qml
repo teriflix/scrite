@@ -2912,8 +2912,8 @@ Rectangle {
         anchors.fill: parent
         sourceComponent: ScreenplayPreview {
             purpose: ScreenplayTextDocument.ForPrinting
-            screenplay: screenplayTextDocument.screenplay
-            screenplayFormat: screenplayTextDocument.formatting
+            screenplay: screenplayTextDocument.paused ? scriteDocument.screenplay : screenplayTextDocument.screenplay
+            screenplayFormat: screenplayTextDocument.paused ? scriteDocument.printFormat : screenplayTextDocument.formatting
             titlePage: screenplayEditorSettings.includeTitlePageInPreview
             titlePageIsCentered: scriteDocument.screenplay.titlePageIsCentered
         }
