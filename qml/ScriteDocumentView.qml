@@ -514,10 +514,19 @@ Item {
                         id: recentFilesMenu
                         width: recentFiles.length > 1 ? 400 : 200
 
+                        Connections {
+                            target: scriteDocument
+                            onJustLoaded: recentFilesMenu.add(scriteDocument.fileName)
+                        }
+
                         property int nrRecentFiles: recentFiles.length
                         property var recentFiles: []
                         function add(filePath) {
+                            if(filePath === "")
+                                return
                             var r = recentFiles
+                            if(r.length > 0 && r[r.length-1] === filePath)
+                                return
                             for(var i=0; i<r.length; i++) {
                                 if(r[i] === filePath)
                                     r.splice(i,1);

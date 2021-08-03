@@ -258,10 +258,10 @@ public:
 
     Q_INVOKABLE void reset();
 
-    Q_INVOKABLE void openOrImport(const QString &fileName);
+    Q_INVOKABLE bool openOrImport(const QString &fileName);
 
-    Q_INVOKABLE void open(const QString &fileName);
-    Q_INVOKABLE void openAnonymously(const QString &fileName);
+    Q_INVOKABLE bool open(const QString &fileName);
+    Q_INVOKABLE bool openAnonymously(const QString &fileName);
     Q_INVOKABLE void saveAs(const QString &fileName);
     Q_INVOKABLE void save();
 

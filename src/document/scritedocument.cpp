@@ -759,60 +759,60 @@ void ScriteDocument::reset()
     emit justReset();
 }
 
-void ScriteDocument::openOrImport(const QString &fileName)
+bool ScriteDocument::openOrImport(const QString &fileName)
 {
     if(fileName.isEmpty())
-        return;
-
+        return false;
 
     const QFileInfo fi(fileName);
     const QString absFileName = fi.absoluteFilePath();
 
     if( fi.suffix() == QStringLiteral("scrite") )
-    {
-        this->open( absFileName );
-        return;
-    }
+        return this->open( absFileName );
 
     const QList<QByteArray> keys = ::deviceIOFactories->ImporterFactory.keys();
     for(const QByteArray &key : keys)
     {
         QScopedPointer<AbstractImporter> importer(::deviceIOFactories->ImporterFactory.create<AbstractImporter>(key, this));
         if(importer->canImport(absFileName))
-        {
-            this->importFile(importer.data(), fileName);
-            return;
-        }
+            return this->importFile(importer.data(), fileName);
     }
+
+    return false;
 }
 
-void ScriteDocument::open(const QString &fileName)
+bool ScriteDocument::open(const QString &fileName)
 {
     if(fileName == m_fileName)
-        return;
+        return false;
 
     HourGlass hourGlass;
 
     this->setBusyMessage("Loading " + QFileInfo(fileName).baseName() + " ...");
     this->reset();
-    if( this->load(fileName) )
+    const bool ret = this->load(fileName);
+    if(ret)
         this->setFileName(fileName);
     this->setModified(false);
     this->clearBusyMessage();
+
+    return ret;
 }
 
-void ScriteDocument::openAnonymously(const QString &fileName)
+bool ScriteDocument::openAnonymously(const QString &fileName)
 {
     HourGlass hourGlass;
 
     this->setBusyMessage("Loading ...");
     this->reset();
-    this->load(fileName);
+    const bool ret = this->load(fileName);
     this->setModified(false);
     this->clearBusyMessage();
 
     m_fileName.clear();
     emit fileNameChanged();
+
+    return ret;
 }
 
 void ScriteDocument::saveAs(const QString &givenFileName)
