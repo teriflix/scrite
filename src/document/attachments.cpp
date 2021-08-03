@@ -20,9 +20,10 @@
 #include <QFileInfo>
 #include <QMimeType>
 #include <QMimeData>
+#include <QQuickWindow>
+#include <QTemporaryDir>
 #include <QMimeDatabase>
 #include <QDesktopServices>
-#include <QTemporaryDir>
 
 static QStringList supportedExtensions(Attachment::Type type)
 {
@@ -533,6 +534,17 @@ void AttachmentsDropArea::dragEnterEvent(QDragEnterEvent *de)
     const QMimeData *mimeData = de->mimeData();
     if( this->prepareAttachmentFromMimeData(mimeData) )
         de->acceptProposedAction();
+
+    if(m_raiseWindowTimer.isNull())
+    {
+        m_raiseWindowTimer = new QTimer(this);
+        connect(m_raiseWindowTimer, &QTimer::timeout, this, [=]() {
+            this->raiseWindow();
+        });
+        m_raiseWindowTimer->setSingleShot(true);
+        m_raiseWindowTimer->setInterval(500);
+        m_raiseWindowTimer->start();
+    }
 }
 
 void AttachmentsDropArea::dragMoveEvent(QDragMoveEvent *de)
@@ -556,12 +568,20 @@ void AttachmentsDropArea::dragLeaveEvent(QDragLeaveEvent *)
         if(ptr != nullptr)
             ptr->deleteLater();
     }
+
+    if(!m_raiseWindowTimer.isNull())
+    {
+        m_raiseWindowTimer->stop();
+        m_raiseWindowTimer->deleteLater();
+    }
 }
 
 void AttachmentsDropArea::dropEvent(QDropEvent *de)
 {
     if(m_attachment != nullptr)
     {
+        this->raiseWindow();
+
         this->setMouse(de->posF());
         m_allowDrop = true;
 
@@ -577,6 +597,19 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
 
         m_attachment->deleteLater();
         this->setAttachment(nullptr);
+    }
+}
+
+void AttachmentsDropArea::raiseWindow()
+{
+    QQuickWindow *qmlWindow = this->window();
+    if(qmlWindow)
+        qmlWindow->raise();
+
+    if(!m_raiseWindowTimer.isNull())
+    {
+        m_raiseWindowTimer->stop();
+        m_raiseWindowTimer->deleteLater();
     }
 }
 

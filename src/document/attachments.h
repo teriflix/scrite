@@ -209,6 +209,7 @@ protected:
     void dropEvent(QDropEvent *);
 
 private:
+    void raiseWindow();
     void resetAttachments();
     void setAttachment(Attachment* val);
     void setMouse(const QPointF &val);
@@ -222,6 +223,7 @@ private:
     QStringList m_allowedExtensions;
     Attachment* m_attachment = nullptr;
     Attachments* m_target = nullptr;
+    QPointer<QTimer> m_raiseWindowTimer;
 };
 
 #endif // ATTACHMENTS_H
