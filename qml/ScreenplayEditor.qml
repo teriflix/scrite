@@ -394,7 +394,12 @@ Rectangle {
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
                         width: contentView.width
-                        height: (logLineEditor.visible ? logLineEditor.contentHeight : 0) + (screenplayAdapter.isSourceScreenplay ? (titleCardLoader.active ? titleCardLoader.height : ruler.topMarginPx) : 0)
+                        height: {
+                            var ret = logLineEditor.visible ? logLineEditor.contentHeight : 0;
+                            if(screenplayAdapter.isSourceScreenplay)
+                                ret += titleCardLoader.active ? titleCardLoader.height : Math.max(ruler.topMarginPx,editTitlePageButton.height+20)
+                            return ret
+                        }
                         property real padding: width * 0.1
 
                         function editTitlePage(source) {
@@ -431,9 +436,7 @@ Rectangle {
                             height: implicitHeight * 1.25
                             visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
-                            anchors.top: parent.top
-                            anchors.topMargin: (ruler.topMarginPx-height)/2
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.centerIn: parent
                             onClicked: editTitlePage(this)
                             enabled: !scriteDocument.readOnly
                         }
@@ -492,7 +495,7 @@ Rectangle {
 
                         Row {
                             anchors.centerIn: parent
-                            visible: screenplayAdapter.screenplay === scriteDocument.screenplay && enabled
+                            visible: screenplayAdapter.isSourceScreenplay && enabled
                             enabled: !scriteDocument.readOnly
                             spacing: 20
 
@@ -502,7 +505,8 @@ Rectangle {
                                 shortcutText: "Ctrl+Shift+N"
                                 ToolTip.delay: 0
                                 text: "Add Scene"
-                                width: Math.max(60 * zoomLevel, 45); height: width
+                                suggestedWidth: 48
+                                suggestedHeight: 48
                                 onClicked: {
                                     scriteDocument.screenplay.currentElementIndex = -1
                                     if(!scriteDocument.readOnly)
@@ -516,7 +520,8 @@ Rectangle {
                                 shortcutText: "Ctrl+Shift+B"
                                 ToolTip.delay: 0
                                 text: "Add Act Break"
-                                width: Math.max(60 * zoomLevel, 45); height: width
+                                suggestedWidth: 48
+                                suggestedHeight: 48
                                 onClicked: scriteDocument.screenplay.addBreakElement(Screenplay.Act)
                             }
 
@@ -526,7 +531,8 @@ Rectangle {
                                 shortcutText: "Ctrl+Shift+P"
                                 ToolTip.delay: 0
                                 text: "Add Episode Break"
-                                width: Math.max(60 * zoomLevel, 45); height: width
+                                suggestedWidth: 48
+                                suggestedHeight: 48
                                 onClicked: scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
                             }
                         }
