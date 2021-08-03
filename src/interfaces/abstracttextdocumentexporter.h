@@ -54,6 +54,7 @@ public:
     virtual bool isPrintEachSceneOnANewPage() const { return false; }
     virtual bool isPrintEachActOnANewPage() const { return false; }
     virtual bool isIncludeActBreaks() const { return false; }
+    virtual bool isExportForPrintingPurpose() const { return true; }
 
     bool requiresConfiguration() const { return true; }
 

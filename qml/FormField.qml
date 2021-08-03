@@ -140,6 +140,5 @@ Column {
                 onTextChanged: formField.answer = text
             }
         }
-
     }
 }

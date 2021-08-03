@@ -85,6 +85,7 @@ public:
     Q_SIGNAL void commentChanged();
 
     bool canBundleFonts() const { return false; }
+    bool isExportForPrintingPurpose() const { return true; }
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface

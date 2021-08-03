@@ -2252,7 +2252,6 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
         if(!newBlock)
             cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
 
-
         if(data->isModified())
             cursor.insertText(paraText);
 #if 0
@@ -2310,7 +2309,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(nullptr));
 
-            if(m_sceneIcons)
+            if(m_sceneIcons && m_purpose == ForPrinting)
             {
                 QTextCharFormat sceneIconFormat;
                 sceneIconFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
@@ -2320,7 +2319,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneIconFormat);
             }
 
-            if(m_sceneNumbers)
+            if(m_sceneNumbers && m_purpose == ForPrinting)
             {
                 QTextCharFormat sceneNumberFormat;
                 sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
@@ -2342,6 +2341,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     cursor.insertText( element->resolvedSceneNumber() + QStringLiteral(". ") );
                 cursor.insertText(headingText);
             }
+
             insertBlock = true;
         }
 
@@ -3038,8 +3038,6 @@ void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRe
     const QString sceneNumber = data.at(0).toString();
     if(sceneNumber.isEmpty())
         return;
-
-    const QString sceneHeading = data.at(1).toString();
 
     QRectF rect = givenRect;
     rect.setLeft(rect.left()*0.55);

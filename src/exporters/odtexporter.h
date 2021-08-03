@@ -35,6 +35,8 @@ public:
 
     bool generateTitlePage() const { return false; }
 
+    bool isExportForPrintingPurpose() const { return false; }
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
