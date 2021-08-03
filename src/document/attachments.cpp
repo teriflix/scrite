@@ -13,6 +13,7 @@
 
 #include "attachments.h"
 
+#include "application.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
 #include "documentfilesystem.h"
@@ -604,7 +605,10 @@ void AttachmentsDropArea::raiseWindow()
 {
     QQuickWindow *qmlWindow = this->window();
     if(qmlWindow)
+    {
+        qmlWindow->requestActivate();
         qmlWindow->raise();
+    }
 
     if(!m_raiseWindowTimer.isNull())
     {
