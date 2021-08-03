@@ -127,6 +127,16 @@ Item {
 
     Shortcut {
         context: Qt.ApplicationShortcut
+        sequence: "Ctrl+P"
+
+        ShortcutsModelItem.group: "Application"
+        ShortcutsModelItem.title: "Export To PDF"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: exportTimer.formatName = "Screenplay/Adobe PDF"
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
         sequence: "F1"
 
         ShortcutsModelItem.group: "Application"
