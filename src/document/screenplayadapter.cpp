@@ -274,11 +274,11 @@ void ScreenplayAdapter::fetchMore(const QModelIndex &parent)
     {
         const Screenplay *screenplay = this->screenplay();
         const int delta = m_initialLoadTreshold < 0 ? MAX_ELEMENT_COUNT : m_initialLoadTreshold;
-        const int is = qMax(0, qMin(m_maxRows-1, screenplay->elementCount()-1));
-        const int ie = qMin(screenplay->elementCount()-1, is+delta);
+        const int is = qMax(0, qMin(m_maxRows, screenplay->elementCount()-1));
+        const int ie = qMin(screenplay->elementCount()-1, is+delta-1);
         if(ie > is)
             this->beginInsertRows(QModelIndex(), is, ie);
-        m_maxRows = ie >= screenplay->elementCount()-1 ? MAX_ELEMENT_COUNT : ie+1;
+        m_maxRows = ie >= screenplay->elementCount()-1 ? INT_MAX : ie+1;
         if(ie > is)
         {
             this->endInsertRows();
