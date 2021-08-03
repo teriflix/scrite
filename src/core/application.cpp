@@ -1094,7 +1094,7 @@ QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, co
     const QSizeF aroundSize = around2.size();
 
     around2 = in.intersected(around2);
-    if(around2.width() == aroundSize.width() && around2.height() == aroundSize.height())
+    if( qFuzzyCompare(around2.width(), aroundSize.width()) && qFuzzyCompare(around2.height(), aroundSize.height()))
         return around2;
 
     around2.setSize(aroundSize);
