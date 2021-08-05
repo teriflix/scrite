@@ -374,8 +374,8 @@ Item {
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: scriteDocument.loading || paused ? null : screenplayAdapter.screenplay
-        formatting: scriteDocument.loading || paused ? null : scriteDocument.printFormat
+        screenplay: scriteDocument.loading || paused ? null : (editor ? screenplayAdapter.screenplay : null)
+        formatting: scriteDocument.loading || paused ? null : (editor ? scriteDocument.printFormat : null)
         property bool paused: screenplayEditorSettings.pausePageAndTimeComputation
         onPausedChanged: Qt.callLater( function() {
             screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
@@ -389,8 +389,18 @@ Item {
         printEachSceneOnANewPage: false
         secondsPerPage: scriteDocument.printFormat.secondsPerPage
         property Item editor
-        onUpdateScheduled: appBusyOverlay.refCount = appBusyOverlay.refCount+1
-        onUpdateFinished: appBusyOverlay.refCount = Math.max(appBusyOverlay.refCount-1,0)
+        property bool overlayRefCountModified: false
+        onUpdateScheduled: {
+            if(mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive) {
+                appBusyOverlay.refCount = appBusyOverlay.refCount+1
+                overlayRefCountModified = true
+            }
+        }
+        onUpdateFinished: {
+            if(overlayRefCountModified)
+                appBusyOverlay.refCount = Math.max(appBusyOverlay.refCount-1,0)
+            overlayRefCountModified = false
+        }
         Component.onCompleted: app.registerObject(screenplayTextDocument, "screenplayTextDocument")
     }
 
