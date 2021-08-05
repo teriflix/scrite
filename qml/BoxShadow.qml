@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
+import QtQuick 2.13
 
 BorderImage {
     source: "../icons/content/shadow.png"

@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtMultimedia 5.13
 import QtQuick.Dialogs 1.3
@@ -733,7 +734,6 @@ Item {
                             Behavior on contentY {
                                 enabled: mediaIsLoaded && mediaIsPlaying
                                 NumberAnimation {
-                                    id: contentYAnimation
                                     duration: Math.max(mediaPlayer.notifyInterval, 0)
                                 }
                             }

@@ -11,7 +11,9 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.5
+import QtQml 2.13
+import QtQuick 2.13
+
 import Scrite 1.0
 
 Rectangle {
