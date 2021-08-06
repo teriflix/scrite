@@ -2193,8 +2193,8 @@ Item {
             Image {
                 id: dragHandle
                 visible: !parent.editing && !scriteDocument.readOnly
-                enabled: canvasScroll.editItem === null && !scriteDocument.readOnly
-                source: "../icons/action/view_array.png"
+                enabled: !canvasScroll.editItem && !scriteDocument.readOnly
+                source: elementItem.element.scene.addedToScreenplay ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
                 width: 24; height: 24
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
@@ -2210,8 +2210,8 @@ Item {
                 MouseArea {
                     id: dragMouseArea
                     anchors.fill: parent
-                    drag.target: parent
-                    cursorShape: Qt.SizeAllCursor
+                    drag.target: elementItem.element.scene.addedToScreenplay ? parent : null
+                    cursorShape: elementItem.element.scene.addedToScreenplay ? Qt.SizeAllCursor : Qt.ArrowCursor
                     drag.onActiveChanged: {
                         if(drag.active)
                             canvas.forceActiveFocus()
@@ -2229,6 +2229,7 @@ Item {
                         if(canvasScroll.maybeDragItem === elementItem)
                             canvasScroll.maybeDragItem = null
                     }
+                    onClicked: scriteDocument.screenplay.addScene(elementItem.element.scene)
                 }
             }
         }
@@ -2681,7 +2682,7 @@ Item {
 
                     Image {
                         id: dragHandle
-                        source: "../icons/action/view_array.png"
+                        source: elementItem.element.scene.addedToScreenplay ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
                         width: 24; height: 24
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -2696,8 +2697,8 @@ Item {
                             id: dragHandleMouseArea
                             anchors.fill: parent
                             hoverEnabled: !canvasScroll.flicking && !canvasScroll.moving && elementItem.selected
-                            drag.target: parent
-                            cursorShape: Qt.SizeAllCursor
+                            drag.target: elementItem.element.scene.addedToScreenplay ? parent : null
+                            cursorShape: elementItem.element.scene.addedToScreenplay ? Qt.SizeAllCursor : Qt.ArrowCursor
                             drag.onActiveChanged: {
                                 if(drag.active)
                                     canvas.forceActiveFocus()
@@ -2715,6 +2716,7 @@ Item {
                                 if(canvasScroll.maybeDragItem === elementItem)
                                     canvasScroll.maybeDragItem = null
                             }
+                            onClicked: scriteDocument.screenplay.addScene(elementItem.element.scene)
                         }
                     }
                 }
