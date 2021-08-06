@@ -871,8 +871,9 @@ Rectangle {
                             placeholderText: "Scene Heading"
                             readOnly: scriteDocument.readOnly
                             enabled: scene.heading.enabled
-                            onTextChanged: scene.heading.parseFrom(text)
+                            onEditingComplete: scene.heading.parseFrom(text)
                             tabItem: sceneTitleField
+                            font.capitalization: Font.AllUppercase
                             font.family: scriteDocument.formatting.elementFormat(SceneElement.Heading).font.family
                             font.pointSize: app.idealFontPointSize+2
                         }
