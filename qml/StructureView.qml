@@ -274,15 +274,13 @@ Item {
                         return "Tag the selected index card."
                     return ""
                 }
-                onClicked: {
-                    tagMenuLoader.popup()
-                }
+                onClicked: tagMenuLoader.popup()
                 down: tagMenuLoader.active
 
                 MenuLoader {
                     id: tagMenuLoader
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
+                    anchors.top: parent.top
+                    anchors.right: parent.right
 
                     menu: StructureGroupsMenu {
                         innerTitle: tagMenuOption.ToolTip.text
@@ -308,6 +306,89 @@ Item {
                         }
                         onClosed: sceneGroup.clearScenes()
                     }
+                }
+            }
+
+            ToolButton3 {
+                id: changeColorOption
+                enabled: (selection.hasItems || currentElementItemBinder.get !== null)
+                property Scene scene: currentElementItemBinder.get ? currentElementItemBinder.get.element.scene :
+                                      (selection.hasItems ? selection.items[0].element.scene : null)
+                iconSource: scene ? "image://color/" + scene.color + "/1" : "image://color/gray/1"
+                down: colorMenuLoader.active
+                onClicked: colorMenuLoader.popup()
+                ToolTip.text: "Change current scene(s) color."
+
+                MenuLoader {
+                    id: colorMenuLoader
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+
+                   menu: ColorMenu {
+                        title: "Scenes Color"
+                        onMenuItemClicked: {
+                            if(selection.hasItems) {
+                                var items = selection.items
+                                items.forEach( function(item) {
+                                    item.element.scene.color = color
+                                })
+                            } else {
+                                currentElementItemBinder.get.element.scene.color = color
+                            }
+                            colorMenuLoader.active = false
+                        }
+                    }
+                }
+            }
+
+            ToolButton3 {
+                id: changeSceneTypeOption
+                enabled: changeColorOption.enabled
+                readonly property var sceneTypeModel: app.enumerationModelForType("Scene", "Type")
+                property Scene scene: currentElementItemBinder.get ? currentElementItemBinder.get.element.scene :
+                                      (selection.hasItems ? selection.items[0].element.scene : null)
+                property int sceneType: (scene && scene.type !== Scene.Standard) ? scene.type : Scene.Standard
+                iconSource: {
+                    if(sceneType === Scene.Standard)
+                        return "../icons/content/standard_scene.png"
+                    return sceneTypeModel[sceneType].icon
+                }
+                onClicked: sceneTypeMenuLoader.popup()
+                down: sceneTypeMenuLoader.active
+                ToolTip.text: enabled ? "Change scene type from '" + (sceneTypeModel[sceneType].key) + "' to something else." : ""
+
+                MenuLoader {
+                    id: sceneTypeMenuLoader
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    menu: MarkSceneAsMenu {
+                        enableValidation: false
+                        onTriggered: {
+                            if(selection.hasItems) {
+                                var items = selection.items
+                                items.forEach( function(item) {
+                                    item.element.scene.type = type
+                                })
+                            } else {
+                                currentElementItemBinder.get.element.scene.type = type
+                            }
+                            sceneTypeMenuLoader.active = false
+                        }
+                    }
+                }
+            }
+
+            ToolButton3 {
+                id: deleteSceneOption
+                enabled: !selection.hasItems && currentElementItemBinder.get
+                iconSource: "../icons/action/delete.png"
+                ToolTip.text: enabled ? "Delete selected scene." : ""
+                onClicked: {
+                    var element = currentElementItemBinder.get.element
+                    if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
+                        element.follow.confirmAndDeleteSelf()
+                    else
+                        canvasScroll.deleteElement(element)
                 }
             }
 
@@ -1390,22 +1471,15 @@ Item {
                         }
                     }
 
-                    Menu2 {
+                    MarkSceneAsMenu {
                         title: "Mark Scenes As"
-
-                        Repeater {
-                            model: app.enumerationModelForType("Scene", "Type")
-
-                            MenuItem2 {
-                                text: modelData.key
-                                onTriggered: {
-                                    var items = selection.items
-                                    items.forEach( function(item) {
-                                        item.element.scene.type = modelData.value
-                                    })
-                                    selectionContextMenu.close()
-                                }
-                            }
+                        enableValidation: false
+                        onTriggered: {
+                            var items = selection.items
+                            items.forEach( function(item) {
+                                item.element.scene.type = type
+                            })
+                            selectionContextMenu.close()
                         }
                     }
 

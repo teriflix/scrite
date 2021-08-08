@@ -244,5 +244,7 @@
         <file>icons/navigation/arrow_up_inverted.png</file>
         <file>icons/action/reset.png</file>
         <file>icons/action/reset_inverted.png</file>
+        <file>icons/content/standard_scene_inverted.png</file>
+        <file>icons/content/standard_scene.png</file>
     </qresource>
 </RCC>
