@@ -125,6 +125,16 @@ public:
     Q_PROPERTY(SpellCheckService* spellCheck READ spellCheck CONSTANT STORED false)
     SpellCheckService *spellCheck() const;
 
+    /*
+     * The 'id' is a special property. It can be set only once. If it is not
+     * set an ID is automatically generated whenever the property value is
+     * queried for the first time.
+    */
+    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
+    void setId(const QString &val);
+    QString id() const;
+    Q_SIGNAL void idChanged();
+
     enum Type { Action, Character, Dialogue, Parenthetical, Shot, Transition, Heading, Min=Action, Max=Heading };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
@@ -161,6 +171,7 @@ protected:
     bool event(QEvent *event);
 
 private:
+    mutable QString m_id;
     Type m_type = Action;
     QString m_text;
     Scene* m_scene = nullptr;
