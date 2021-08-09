@@ -352,6 +352,23 @@ SpellCheckService *SceneElement::spellCheck() const
     return m_spellCheck;
 }
 
+void SceneElement::setId(const QString &val)
+{
+    if(m_id == val || !m_id.isEmpty())
+        return;
+
+    m_id = val;
+    emit idChanged();
+}
+
+QString SceneElement::id() const
+{
+    if(m_id.isEmpty())
+        m_id = QUuid::createUuid().toString();
+
+    return m_id;
+}
+
 void SceneElement::setType(SceneElement::Type val)
 {
     if(m_type == val)
@@ -1435,6 +1452,7 @@ QByteArray Scene::toByteArray() const
     ds << m_elements.size();
     Q_FOREACH(SceneElement *element, m_elements)
     {
+        ds << element->id();
         ds << int(element->type());
         ds << element->text();
     }
@@ -1456,8 +1474,6 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         return false;
 
     emit sceneAboutToReset();
-
-    this->clearElements();
 
     QString title;
     ds >> title;
@@ -1486,25 +1502,46 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     int nrElements = 0;
     ds >> nrElements;
 
-    QList<SceneElement*> paras;
-    paras.reserve(nrElements);
+    int paraIndex = 0;
+    QList<SceneElement*> parasToRemove;
 
     for(int i=0; i<nrElements; i++)
     {
-        SceneElement *element = new SceneElement(this);
+        QString id;
+        ds >> id;
 
         int type = SceneElement::Action;
         ds >> type;
-        element->setType( SceneElement::Type(type) );
 
         QString text;
         ds >> text;
+
+        bool elementNeedsToBeInserted = false;
+        SceneElement *element = this->elementAt(paraIndex++);
+        if(element == nullptr || element->id() != id)
+        {
+            if(element && !parasToRemove.contains(element))
+                parasToRemove.append(element);
+
+            element = new SceneElement(this);
+            element->setId(id);
+            elementNeedsToBeInserted = true;
+        }
+        else
+            parasToRemove.removeOne(element);
+
+        element->setType( SceneElement::Type(type) );
         element->setText(text);
 
-        paras.append(element);
+        if(elementNeedsToBeInserted)
+            this->insertElementAt(element, i);
     }
 
-    this->setElementsList(paras);
+    while(!parasToRemove.isEmpty())
+    {
+        SceneElement *para = parasToRemove.takeLast();
+        this->removeElement(para);
+    }
 
     emit sceneReset(curPosition);
 
