@@ -2621,7 +2621,7 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
                         }
                     }
 
-                    nrBlocks += qAbs(s->elementCount()-fblocks);
+                    nrBlocks += fblocks < s->elementCount() ? qAbs(s->elementCount()-fblocks) : s->elementCount();
                 }
             }
         }
