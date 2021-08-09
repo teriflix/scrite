@@ -1260,7 +1260,7 @@ Rectangle {
                 Loader {
                     id: sceneHeadingAreaLoader
                     width: parent.width
-                    active: contentItem.theScene !== null
+                    active: contentItem.theScene
                     sourceComponent: sceneHeadingArea
                     z: 1
                     onItemChanged: {
@@ -1274,6 +1274,14 @@ Rectangle {
                     function edit() {
                         if(item)
                             item.edit()
+                    }
+
+                    Announcement.onIncoming: (type, data) => {
+                        var sdata = "" + data
+                        if(type === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8") {
+                            if(sdata === "Scene Heading")
+                                sceneHeadingAreaLoader.edit()
+                        }
                     }
                 }
 

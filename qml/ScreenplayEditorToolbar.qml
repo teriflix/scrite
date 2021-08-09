@@ -32,6 +32,7 @@ Row {
     clip: true
 
     property var tools: [
+        { "value": SceneElement.Heading, "display": "Current Scene Heading", "icon": "../icons/screenplay/heading.png" },
         { "value": SceneElement.Action, "display": "Action", "icon": "../icons/screenplay/action.png" },
         { "value": SceneElement.Character, "display": "Character", "icon": "../icons/screenplay/character.png" },
         { "value": SceneElement.Dialogue, "display": "Dialogue", "icon": "../icons/screenplay/dialogue.png" },
@@ -47,7 +48,7 @@ Row {
         ToolTip.text: "Preview the screenplay in print format."
         checkable: true
         checked: false
-        enabled: screenplayTextDocument.editor !== null
+        enabled: screenplayTextDocument.editor
     }
 
     ToolButton3 {
@@ -57,7 +58,7 @@ Row {
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor
         onToggled: {
             if(!checked)
                 showReplace = false
@@ -79,7 +80,7 @@ Row {
                 showReplace = !showReplace
             }
         }
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find & Replace"
@@ -108,7 +109,7 @@ Row {
         context: Qt.ApplicationShortcut
         sequence: "Shift+F5"
         onActivated: screenplayTextDocument.reload()
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor !== null
+        enabled: !showScreenplayPreview && screenplayTextDocument.editor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Redo Page Layout"
@@ -231,11 +232,16 @@ Row {
         opacity: 0.5
     }
 
-    QtObject {
-        ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: "Current Scene Heading"
-        ShortcutsModelItem.shortcut: "Ctrl+0"
-        ShortcutsModelItem.enabled: enabled
+    property bool formattable: {
+        if(scriteDocument.readOnly)
+            return false
+        if(showScreenplayPreview)
+            return false
+        if(!binder)
+            return false
+        if(!binder.currentElement)
+            return false
+        return true
     }
 
     Repeater {
@@ -243,22 +249,19 @@ Row {
 
         ToolButton3 {
             iconSource: modelData.icon
-            shortcut: "Ctrl+" + (index+1)
+            shortcut: "Ctrl+" + index
             shortcutText: (index+1)
             ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
-            enabled: {
-                if(scriteDocument.readOnly)
-                    return false
-                if(showScreenplayPreview)
-                    return false
-                if(binder === null)
-                    return false
-                if(binder.currentElement === null)
-                    return false
-                return true
+            enabled: screenplayEditorToolbar.formattable
+            down: binder ? (binder.currentElement ? binder.currentElement.type === modelData.value : false) : false
+            onClicked: {
+                if(index === 0) {
+                    if(!binder.scene.heading.enabled)
+                        binder.scene.heading.enabled = true
+                    Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Heading")
+                } else
+                    binder.currentElement.type = modelData.value
             }
-            down: binder ? (binder.currentElement === null ? false : binder.currentElement.type === modelData.value) : false
-            onClicked: binder.currentElement.type = modelData.value
 
             ShortcutsModelItem.group: "Formatting"
             ShortcutsModelItem.title: modelData.display
