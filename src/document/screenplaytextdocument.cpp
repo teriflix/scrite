@@ -3079,19 +3079,39 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     if(sceneType == Scene::Standard)
         return;
 
-    static const QImage musicIcon(":/icons/content/queue_mus24px.png");
-    static const QImage actionIcon(":/icons/content/fight_scene.png");
+    static const QJsonArray sceneTypeModel = Application::instance()->enumerationModelForType(QStringLiteral("Scene"), QStringLiteral("Type"));
+    if(sceneType < 0 || sceneType >= sceneTypeModel.size())
+        return;
+
+    const QJsonObject sceneTypeInfo = sceneTypeModel.at(sceneType).toObject();
+
     const qreal iconSize = givenRect.height();
-    QImage icon = sceneType == Scene::Action ? actionIcon : musicIcon;
+    QString iconFile = sceneTypeInfo.value( QStringLiteral("icon") ).toString();
+    if(iconFile.isEmpty())
+        return;
+
+    iconFile.replace(0, 2, ':');
+    const QImage icon(iconFile);
+    if(icon.isNull())
+        return;
 
     QRectF rect = givenRect;
     rect.setLeft( rect.left()*0.45 );
     rect.moveBottom( rect.bottom()+iconSize*0.15 );
+    rect = QRectF(rect.left()-iconSize, rect.bottom()-iconSize, iconSize, iconSize);
 
     const bool flag = painter->renderHints().testFlag(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-    painter->drawImage(QRectF(rect.left()-iconSize, rect.bottom()-iconSize, iconSize, iconSize), icon);
+    painter->drawImage(rect, icon);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
+
+    const QString iconKey = sceneTypeInfo.value( QStringLiteral("key") ).toString();
+    QRectF iconKeyRect = rect;
+    iconKeyRect.moveTop( rect.bottom() + rect.height()*0.5 );
+    painter->save();
+    painter->setFont( QFont(painter->font().family(), painter->font().pointSize()-4) );
+    this->drawText(painter, iconKeyRect, QStringLiteral("(") + iconKey + QStringLiteral(")") );
+    painter->restore();
 }
 
 void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &rect, const QString &text)
