@@ -1277,6 +1277,8 @@ Rectangle {
                     }
 
                     Announcement.onIncoming: (type, data) => {
+                        if(!sceneTextEditor.activeFocus)
+                            return
                         var sdata = "" + data
                         if(type === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8") {
                             if(sdata === "Scene Heading")
