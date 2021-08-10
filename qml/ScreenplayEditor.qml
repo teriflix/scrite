@@ -1052,13 +1052,14 @@ Rectangle {
 
             ToolButton3 {
                 id: deleteBreakButton
-                iconSource: "../icons/navigation/close.png"
+                iconSource: "../icons/action/delete.png"
                 width: headingFontMetrics.lineSpacing
                 height: headingFontMetrics.lineSpacing
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: ruler.rightMarginPx
                 onClicked: screenplayAdapter.screenplay.removeElement(episodeBreakItem.theElement)
+                ToolTip.text: "Deletes this episode break."
             }
         }
     }
@@ -1105,13 +1106,14 @@ Rectangle {
 
             ToolButton3 {
                 id: deleteBreakButton
-                iconSource: "../icons/navigation/close.png"
+                iconSource: "../icons/action/delete.png"
                 width: headingFontMetrics.lineSpacing
                 height: headingFontMetrics.lineSpacing
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: ruler.rightMarginPx
                 onClicked: screenplayAdapter.screenplay.removeElement(actBreakItem.theElement)
+                ToolTip.text: "Deletes this act break."
             }
         }
     }
