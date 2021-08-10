@@ -2253,7 +2253,7 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
             if(m_block.text().isEmpty())
             {
                 cursor.insertText(QStringLiteral("()"));
-                cursor.movePosition(QTextCursor::Left);
+                m_cursorPosition = 1;
             }
         }
 
