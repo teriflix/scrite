@@ -2250,10 +2250,27 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(m_block);
         if(userData && userData->sceneElement()->type() == SceneElement::Parenthetical)
         {
+            const QString bo = QStringLiteral("(");
+            const QString bc = QStringLiteral(")");
+
             if(m_block.text().isEmpty())
             {
                 cursor.insertText(QStringLiteral("()"));
                 m_cursorPosition = 1;
+            }
+            else
+            {
+                const QString blockText = m_block.text();
+                if(!blockText.startsWith(bo))
+                {
+                    cursor.insertText(bo);
+                    m_cursorPosition += 1;
+                }
+                if(!blockText.endsWith(bc))
+                {
+                    cursor.movePosition(QTextCursor::EndOfBlock);
+                    cursor.insertText(bc);
+                }
             }
         }
 
