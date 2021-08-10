@@ -1035,9 +1035,9 @@ Rectangle {
                 id: episodeBreakSubtitle
                 label: ""
                 anchors.left: parent.left
-                anchors.right: parent.right
+                anchors.right: deleteBreakButton.left
                 anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: ruler.rightMarginPx
+                anchors.rightMargin: 5
                 anchors.bottom: parent.bottom
                 placeholderText: theElement.breakTitle
                 font.family: headingFontMetrics.font.family
@@ -1048,6 +1048,17 @@ Rectangle {
                 enableTransliteration: true
                 onTextEdited: theElement.breakSubtitle = text
                 onEditingComplete: theElement.breakSubtitle = text
+            }
+
+            ToolButton3 {
+                id: deleteBreakButton
+                iconSource: "../icons/navigation/close.png"
+                width: headingFontMetrics.lineSpacing
+                height: headingFontMetrics.lineSpacing
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: ruler.rightMarginPx
+                onClicked: screenplayAdapter.screenplay.removeElement(episodeBreakItem.theElement)
             }
         }
     }
@@ -1083,13 +1094,24 @@ Rectangle {
                 font.capitalization: Font.AllUppercase
                 font.pointSize: headingFontMetrics.font.pointSize
                 anchors.left: parent.left
-                anchors.right: parent.right
+                anchors.right: deleteBreakButton.left
                 anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: ruler.rightMarginPx
+                anchors.rightMargin: 5
                 topPadding: headingFontMetrics.lineSpacing*0.15
                 bottomPadding: topPadding
                 color:  primaryColors.c10.text
                 text: parent.theElement.breakTitle
+            }
+
+            ToolButton3 {
+                id: deleteBreakButton
+                iconSource: "../icons/navigation/close.png"
+                width: headingFontMetrics.lineSpacing
+                height: headingFontMetrics.lineSpacing
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: ruler.rightMarginPx
+                onClicked: screenplayAdapter.screenplay.removeElement(actBreakItem.theElement)
             }
         }
     }
