@@ -2619,9 +2619,9 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
                             if(!cursor.movePosition(QTextCursor::NextBlock))
                                 break;
                         }
-                    }
 
-                    nrBlocks += qAbs(s->elementCount()-fblocks);
+                        nrBlocks += qAbs(s->elementCount()-fblocks);
+                    }
                 }
             }
         }
