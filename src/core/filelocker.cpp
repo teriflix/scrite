@@ -45,11 +45,14 @@ FileLocker::~FileLocker()
 
 void FileLocker::setFilePath(const QString &val)
 {
-    if(m_filePath == val)
+    const QFileInfo fi(val);
+    const QString val2 = fi.canonicalFilePath();
+
+    if(m_filePath == val2)
         return;
 
     this->cleanup();
-    m_filePath = val;
+    m_filePath = val2;
     this->initialize();
 
     emit filePathChanged();
