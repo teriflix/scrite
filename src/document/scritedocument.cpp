@@ -14,7 +14,7 @@
 #include "scritedocument.h"
 
 #include "form.h"
-#include "lockfile.h"
+#include "filelocker.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "aggregation.h"
@@ -411,7 +411,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
                   m_forms(this, "forms"),
                   m_evaluateStructureElementSequenceTimer("ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
-    m_lockFile = new LockFile(this);
+    m_fileLocker = new FileLocker(this);
 
     this->reset();
     this->updateDocumentWindowTitle();
@@ -837,14 +837,14 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     if( QFile::exists(fileName) )
     {
-        const QString lockFilePath = m_lockFile->filePath();
-        m_lockFile->setFilePath(fileName);
-        if( !m_lockFile->isClaimed() && !m_lockFile->canWrite() )
-            m_lockFile->claim();
+        const QString lockFilePath = m_fileLocker->filePath();
+        m_fileLocker->setFilePath(fileName);
+        if( !m_fileLocker->isClaimed() && !m_fileLocker->canWrite() )
+            m_fileLocker->claim();
 
-        if( !m_lockFile->canWrite() )
+        if( !m_fileLocker->canWrite() )
         {
-            m_lockFile->setFilePath(lockFilePath);
+            m_fileLocker->setFilePath(lockFilePath);
             m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another user. Please ask the other user to close the file, or manually delete the lock file yourself.").arg(fileName) );
             return;
         }
@@ -1554,7 +1554,7 @@ void ScriteDocument::setFileName(const QString &val)
     m_fileName = this->polishFileName(val);
     emit fileNameChanged();
 
-    m_lockFile->setFilePath(m_fileName);
+    m_fileLocker->setFilePath(m_fileName);
 }
 
 bool ScriteDocument::load(const QString &fileName)
@@ -1567,10 +1567,10 @@ bool ScriteDocument::load(const QString &fileName)
         return false;
     }
 
-    m_lockFile->setFilePath(fileName);
-    if(m_lockFile->isClaimed() && !m_lockFile->canRead())
+    m_fileLocker->setFilePath(fileName);
+    if(m_fileLocker->isClaimed() && !m_fileLocker->canRead())
     {
-        m_lockFile->setFilePath(QString());
+        m_fileLocker->setFilePath(QString());
         m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another user. Please ask the other user to close the file, or manually delete the lock file yourself.").arg(fileName) );
         return false;
     }

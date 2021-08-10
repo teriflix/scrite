@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef LOCKFILE_H
-#define LOCKFILE_H
+#ifndef FILELOCKER_H
+#define FILELOCKER_H
 
 #include <QObject>
 #include <QJsonObject>
@@ -49,13 +49,13 @@ class QFileSystemWatcher;
  * Plus we need a mechanism to auto-update claim status when it changes AND
  * force-claim a file when the owner is done.
  */
-class LockFile : public QObject
+class FileLocker : public QObject
 {
     Q_OBJECT
 
 public:
-    LockFile(QObject *parent=nullptr);
-    ~LockFile();
+    FileLocker(QObject *parent=nullptr);
+    ~FileLocker();
 
     Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged)
     void setFilePath(const QString &val);
@@ -114,4 +114,4 @@ private:
     QTimer *m_modifiedTimer = nullptr;
 };
 
-#endif // LOCKFILE_H
+#endif // FILELOCKER_H

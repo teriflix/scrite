@@ -28,7 +28,7 @@
 #include "documentfilesystem.h"
 
 class Forms;
-class LockFile;
+class FileLocker;
 class ScriteDocument;
 class AbstractExporter;
 class QFileSystemWatcher;
@@ -239,9 +239,6 @@ public:
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
-    Q_PROPERTY(LockFile* lockFile READ lockFile CONSTANT)
-    LockFile *lockFile() const { return m_lockFile; }
-
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     bool isLoading() const { return m_loading; }
     Q_SIGNAL void loadingChanged();
@@ -360,7 +357,7 @@ private:
     QJsonObject m_userData;
     QString m_fileName;
     QString m_busyMessage;
-    LockFile *m_lockFile = nullptr;
+    FileLocker *m_fileLocker = nullptr;
     bool m_inCreateNewScene = false;
     bool m_createdOnThisComputer = true;
     QJsonArray m_bookmarkedNotes;

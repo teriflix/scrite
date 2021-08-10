@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "lockfile.h"
+#include "filelocker.h"
 
 #include <QDir>
 #include <QUuid>
@@ -22,28 +22,28 @@
 #include <QCoreApplication>
 #include <QFileSystemWatcher>
 
-LockFile::LockFile(QObject *parent)
+FileLocker::FileLocker(QObject *parent)
     : QObject(parent)
 {
     m_modifiedTimer = new QTimer(this);
     m_modifiedTimer->setSingleShot(true);
     m_modifiedTimer->setInterval(0);
 
-    connect(m_modifiedTimer, &QTimer::timeout, this, &LockFile::modified);
+    connect(m_modifiedTimer, &QTimer::timeout, this, &FileLocker::modified);
 
-    connect(this, &LockFile::canReadChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &LockFile::canWriteChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &LockFile::lockInfoChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &LockFile::claimedChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &LockFile::filePathChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
+    connect(this, &FileLocker::canReadChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
+    connect(this, &FileLocker::canWriteChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
+    connect(this, &FileLocker::lockInfoChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
+    connect(this, &FileLocker::claimedChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
+    connect(this, &FileLocker::filePathChanged, m_modifiedTimer, QOverload<>::of(&QTimer::start));
 }
 
-LockFile::~LockFile()
+FileLocker::~FileLocker()
 {
     this->cleanup();
 }
 
-void LockFile::setFilePath(const QString &val)
+void FileLocker::setFilePath(const QString &val)
 {
     if(m_filePath == val)
         return;
@@ -55,7 +55,7 @@ void LockFile::setFilePath(const QString &val)
     emit filePathChanged();
 }
 
-void LockFile::setStrategy(Strategy val)
+void FileLocker::setStrategy(Strategy val)
 {
     if(m_strategy == val)
         return;
@@ -66,14 +66,14 @@ void LockFile::setStrategy(Strategy val)
     this->updateStatus();
 }
 
-bool LockFile::claim()
+bool FileLocker::claim()
 {
     this->setLockInfo( QJsonObject() );
     this->updateStatus();
     return this->isClaimed();
 }
 
-void LockFile::cleanup()
+void FileLocker::cleanup()
 {
     const QJsonObject linfo = m_lockInfo;
 
@@ -98,7 +98,7 @@ void LockFile::cleanup()
     m_uniqueId.clear();
 }
 
-void LockFile::initialize()
+void FileLocker::initialize()
 {
     // The assumption is that cleanup() is called before this function is called.
 
@@ -114,7 +114,7 @@ void LockFile::initialize()
     this->updateStatus();
 }
 
-void LockFile::updateStatus()
+void FileLocker::updateStatus()
 {
     if(m_lockFilePath.isEmpty())
         return;
@@ -164,7 +164,7 @@ void LockFile::updateStatus()
     {
         m_fsWatcher = new QFileSystemWatcher(this);
         m_fsWatcher->addPath(m_lockFilePath);
-        connect(m_fsWatcher, &QFileSystemWatcher::fileChanged, this, &LockFile::updateStatus);
+        connect(m_fsWatcher, &QFileSystemWatcher::fileChanged, this, &FileLocker::updateStatus);
     }
 
     this->setLockInfo( QJsonDocument::fromJson(file.readAll()).object() );
@@ -191,7 +191,7 @@ void LockFile::updateStatus()
     this->setClaimed(true);
 }
 
-void LockFile::setCanRead(bool val)
+void FileLocker::setCanRead(bool val)
 {
     if(m_canRead == val)
         return;
@@ -200,7 +200,7 @@ void LockFile::setCanRead(bool val)
     emit canReadChanged();
 }
 
-void LockFile::setCanWrite(bool val)
+void FileLocker::setCanWrite(bool val)
 {
     if(m_canWrite == val)
         return;
@@ -209,7 +209,7 @@ void LockFile::setCanWrite(bool val)
     emit canWriteChanged();
 }
 
-void LockFile::setLockInfo(const QJsonObject &val)
+void FileLocker::setLockInfo(const QJsonObject &val)
 {
     if(m_lockInfo == val)
         return;
@@ -218,7 +218,7 @@ void LockFile::setLockInfo(const QJsonObject &val)
     emit lockInfoChanged();
 }
 
-void LockFile::setClaimed(bool val)
+void FileLocker::setClaimed(bool val)
 {
     if(m_claimed == val)
         return;
