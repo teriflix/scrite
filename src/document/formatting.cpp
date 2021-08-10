@@ -1319,14 +1319,11 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
         this->document()->setUndoRedoEnabled(true);
         this->document()->removeEventFilter(this);
 
-        disconnect( this->document(), &QTextDocument::contentsChange,
-                    this, &SceneDocumentBinder::onContentsChange);
-        disconnect( this->document(), &QTextDocument::blockCountChanged,
-                    this, &SceneDocumentBinder::syncSceneFromDocument);
+        disconnect( this->document(), &QTextDocument::contentsChange, this, &SceneDocumentBinder::onContentsChange);
+        disconnect( this->document(), &QTextDocument::blockCountChanged, this, &SceneDocumentBinder::syncSceneFromDocument);
 
         if(m_scene != nullptr)
-            disconnect(m_scene, &Scene::sceneElementChanged,
-                       this, &SceneDocumentBinder::onSceneElementChanged);
+            disconnect(m_scene, &Scene::sceneElementChanged, this, &SceneDocumentBinder::onSceneElementChanged);
 
         this->setCurrentElement(nullptr);
         this->setCursorPosition(-1);
@@ -1350,14 +1347,11 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
         this->document()->setUndoRedoEnabled(false);
         this->document()->installEventFilter(this);
 
-        connect(this->document(), &QTextDocument::contentsChange,
-                this, &SceneDocumentBinder::onContentsChange);
-        connect(this->document(), &QTextDocument::blockCountChanged,
-                    this, &SceneDocumentBinder::syncSceneFromDocument);
+        connect(this->document(), &QTextDocument::contentsChange, this, &SceneDocumentBinder::onContentsChange, Qt::UniqueConnection);
+        connect(this->document(), &QTextDocument::blockCountChanged, this, &SceneDocumentBinder::syncSceneFromDocument, Qt::UniqueConnection);
 
         if(m_scene != nullptr)
-            connect(m_scene, &Scene::sceneElementChanged,
-                    this, &SceneDocumentBinder::onSceneElementChanged);
+            connect(m_scene, &Scene::sceneElementChanged, this, &SceneDocumentBinder::onSceneElementChanged, Qt::UniqueConnection);
 
 #if 0 // At the moment, this seems to be causing more trouble than help.
         this->document()->setTextWidth(m_textWidth);
@@ -2297,9 +2291,9 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::Sc
         if(userData != nullptr && userData->sceneElement() == element) {
             // Text changes from scene element to block are not applied
             // Only element type changes can be applied.
+            new ForceCursorPositionHack(block, m_cursorPosition-block.position(), this);
             userData->resetFormat();
             this->rehighlightBlock(block);
-            new ForceCursorPositionHack(block, m_cursorPosition-block.position(), this);
             return true;
         }
         return false;

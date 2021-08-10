@@ -1527,12 +1527,12 @@ void ScreenplayTextDocument::connectToScreenplaySignals()
     if(m_screenplay == nullptr || !m_syncEnabled || m_connectedToScreenplaySignals)
         return;
 
-    connect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved);
-    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset);
-    connect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayTextDocument::onSceneRemoved);
-    connect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayTextDocument::onSceneInserted);
-    connect(m_screenplay, &Screenplay::activeSceneChanged, this, &ScreenplayTextDocument::onActiveSceneChanged);
-    connect(m_screenplay, &Screenplay::modelAboutToBeReset, this, &ScreenplayTextDocument::onScreenplayAboutToReset);
+    connect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayTextDocument::onSceneRemoved, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayTextDocument::onSceneInserted, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::activeSceneChanged, this, &ScreenplayTextDocument::onActiveSceneChanged, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::modelAboutToBeReset, this, &ScreenplayTextDocument::onScreenplayAboutToReset, Qt::UniqueConnection);
 
     for(int i=0; i<m_screenplay->elementCount(); i++)
     {
@@ -1554,14 +1554,14 @@ void ScreenplayTextDocument::connectToScreenplayFormatSignals()
     if(m_formatting == nullptr || !m_syncEnabled || m_connectedToFormattingSignals)
         return;
 
-    connect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged);
-    connect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged);
-    connect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged);
+    connect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged, Qt::UniqueConnection);
+    connect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged, Qt::UniqueConnection);
+    connect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged, Qt::UniqueConnection);
 
     for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
     {
         SceneElementFormat *elementFormat = m_formatting->elementFormat(i);
-        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayTextDocument::onElementFormatChanged);
+        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayTextDocument::onElementFormatChanged, Qt::UniqueConnection);
     }
 
     m_connectedToFormattingSignals = true;
