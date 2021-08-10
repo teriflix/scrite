@@ -829,12 +829,6 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     if(!this->runSaveSanityChecks(fileName))
         return;
 
-    if( !QFileInfo(fileName).isWritable() )
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Cannot open '%1' for writing.").arg(fileName) );
-        return;
-    }
-
     if( QFile::exists(fileName) )
     {
         const QString lockFilePath = m_fileLocker->filePath();
