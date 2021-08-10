@@ -845,7 +845,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         if( !m_fileLocker->canWrite() )
         {
             m_fileLocker->setFilePath(lockFilePath);
-            m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another user. Please ask the other user to close the file, or manually delete the lock file yourself.").arg(fileName) );
+            m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName) );
             return;
         }
     }
@@ -1571,7 +1571,7 @@ bool ScriteDocument::load(const QString &fileName)
     if(m_fileLocker->isClaimed() && !m_fileLocker->canRead())
     {
         m_fileLocker->setFilePath(QString());
-        m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another user. Please ask the other user to close the file, or manually delete the lock file yourself.").arg(fileName) );
+        m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName) );
         return false;
     }
 
