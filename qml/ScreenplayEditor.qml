@@ -2231,7 +2231,7 @@ Rectangle {
 
                 contentView.scrollIntoView(idx)
                 Qt.callLater( function(iidx) {
-                    contentView.positionViewAtIndex(iidx, ListView.Contain)
+                    //contentView.positionViewAtIndex(iidx, ListView.Contain)
                     var item = contentView.loadedItemAtIndex(iidx)
                     item.assumeFocusAt(-1)
                 }, idx)
@@ -2247,7 +2247,7 @@ Rectangle {
 
                 contentView.scrollIntoView(idx)
                 Qt.callLater( function(iidx) {
-                    contentView.positionViewAtIndex(iidx, ListView.Contain)
+                    //contentView.positionViewAtIndex(iidx, ListView.Contain)
                     var item = contentView.loadedItemAtIndex(iidx)
                     item.assumeFocusAt(0)
                 }, idx)
