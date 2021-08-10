@@ -46,6 +46,7 @@ HEADERS += \
     src/automation/pausestep.h \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
+    src/core/lockfile.h \
     src/core/networkaccessmanager.h \
     src/core/objectlistpropertymodel.h \
     src/core/printerobject.h \
@@ -156,6 +157,7 @@ SOURCES += \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
     src/core/application_build_timestamp.cpp \
+    src/core/lockfile.cpp \
     src/core/networkaccessmanager.cpp \
     src/core/objectlistpropertymodel.cpp \
     src/core/qobjectproperty.cpp \
