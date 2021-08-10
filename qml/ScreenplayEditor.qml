@@ -1416,7 +1416,7 @@ Rectangle {
                         }
 
                         Rectangle {
-                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus
+                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && screenplayEditorSettings.highlightCurrentLine
                             x: 0; y: sceneTextEditor.cursorRectangle.y-2*zoomLevel
                             width: parent.width
                             height: sceneTextEditor.cursorRectangle.height+4*zoomLevel

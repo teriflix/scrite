@@ -100,6 +100,7 @@ Item {
         property real textFormatDockWidgetY: -1
 
         property bool pausePageAndTimeComputation: false
+        property bool highlightCurrentLine: true
     }
 
     Settings {
@@ -202,6 +203,15 @@ Item {
         ShortcutsModelItem.title: screenplayEditorSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
         ShortcutsModelItem.shortcut: sequence
         onActivated: screenplayEditorSettings.enableAnimations = !screenplayEditorSettings.enableAnimations
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+H"
+        ShortcutsModelItem.group: "Settings"
+        ShortcutsModelItem.title: screenplayEditorSettings.highlightCurrentLine ? "Line Highlight Off" : "Line Highlight On"
+        ShortcutsModelItem.shortcut: sequence
+        onActivated: screenplayEditorSettings.highlightCurrentLine = !screenplayEditorSettings.highlightCurrentLine
     }
 
     Shortcut {
