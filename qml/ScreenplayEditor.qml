@@ -671,7 +671,7 @@ Rectangle {
 
         BusyIndicator {
             anchors.centerIn: parent
-            running: scriteDocument.loading || screenplayTextDocument.updating
+            running: scriteDocument.loading || !screenplayTextDocument.paused && screenplayTextDocument.updating
             visible: running
         }
     }

@@ -258,7 +258,7 @@ Item {
                 mainTabBar.activateTab(2)
         }
 
-        property bool notebookTabVisible: mainTabBar.currentIndex = showNotebookInStructure ? 1 : 2
+        property bool notebookTabVisible: mainTabBar.currentIndex === (showNotebookInStructure ? 1 : 2)
 
         function showBookmarkedNotes() {
             showNotes("Notebook Bookmarks")
