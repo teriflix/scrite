@@ -762,6 +762,7 @@ Item {
                             anchors.bottom: parent.bottom
                             orientation: Qt.Vertical
                             flickable: textDocumentFlick
+                            visible: !mediaPlayer.keepScreenplayInSyncWithPosition
                         }
 
                         EventFilter.acceptHoverEvents: true
