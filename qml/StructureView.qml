@@ -2303,7 +2303,10 @@ Item {
                         if(canvasScroll.maybeDragItem === elementItem)
                             canvasScroll.maybeDragItem = null
                     }
-                    onClicked: scriteDocument.screenplay.addScene(elementItem.element.scene)
+                    onClicked: {
+                        if(!elementItem.element.scene.addedToScreenplay)
+                            scriteDocument.screenplay.addScene(elementItem.element.scene)
+                    }
                 }
             }
         }
@@ -2790,7 +2793,10 @@ Item {
                                 if(canvasScroll.maybeDragItem === elementItem)
                                     canvasScroll.maybeDragItem = null
                             }
-                            onClicked: scriteDocument.screenplay.addScene(elementItem.element.scene)
+                            onClicked: {
+                                if(!elementItem.element.scene.addedToScreenplay)
+                                    scriteDocument.screenplay.addScene(elementItem.element.scene)
+                            }
                         }
                     }
                 }
