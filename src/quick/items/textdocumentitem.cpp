@@ -123,6 +123,19 @@ void TextDocumentItem::setVerticalPadding(qreal val)
 
     m_verticalPadding = val;
     emit verticalPaddingChanged();
+
+    m_viewportUpdateHandler->start();
+}
+
+void TextDocumentItem::setInvertColors(bool val)
+{
+    if(m_invertColors == val)
+        return;
+
+    m_invertColors = val;
+    emit invertColorsChanged();
+
+    m_viewportUpdateHandler->start();
 }
 
 void TextDocumentItem::updateViewport()
