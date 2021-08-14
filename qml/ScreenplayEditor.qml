@@ -2286,6 +2286,8 @@ Rectangle {
                     anchors.top: parent.top
                     anchors.topMargin: parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
                     spacing: 20
+                    property bool headingFieldOnly: !screenplayEditorSettings.displaySceneCharacters && !screenplayEditorSettings.displaySceneSynopsis
+                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
                     SceneTypeImage {
                         width: sceneHeadingField.height * 0.55
@@ -2303,6 +2305,7 @@ Rectangle {
                         font: headingFontMetrics.font
                         onTextChanged: headingItem.theElement.userSceneNumber = text
                         maximumLength: 5
+                        background: Item { }
                         placeholderText: headingItem.theElement.sceneNumber
                         visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType &&
                                  headingItem.theScene.heading.enabled &&
@@ -2321,57 +2324,66 @@ Rectangle {
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 8
+                anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters || screenplayEditorSettings.displaySceneSynopsis ? 8 : 4
 
                 Row {
                     spacing: 5
                     width: parent.width
 
-                    TextField2 {
-                        id: sceneHeadingField
+                    Item {
                         width: parent.width - sceneMenuButton.width - parent.spacing - (sceneTaggingButton.visible ? (sceneTaggingButton.width+parent.spacing) : 0)
-                        text: headingItem.theScene.heading.text
-                        enabled: headingItem.theScene.heading.enabled
-                        label: ""
-                        placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
-                        maximumLength: 140
-                        font.family: headingFontMetrics.font.family
-                        font.pointSize: headingFontMetrics.font.pointSize
-                        font.bold: headingFontMetrics.font.bold
-                        font.underline: headingFontMetrics.font.underline
-                        font.italic: headingFontMetrics.font.italic
-                        font.letterSpacing: headingFontMetrics.font.letterSpacing
-                        font.capitalization: currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase
-                        color: headingFontMetrics.format.textColor
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        readOnly: scriteDocument.readOnly
-                        onEditingComplete: headingItem.theScene.heading.parseFrom(text)
-                        onActiveFocusChanged: {
-                            if(activeFocus)
-                                screenplayAdapter.currentIndex = headingItem.theElementIndex
-                        }
-                        tabItem: headingItem.sceneTextEditor
+                        height: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters || screenplayEditorSettings.displaySceneSynopsis ? 0 : headingFontMetrics.descent
 
-                        enableTransliteration: true
-                        property var currentLanguage: app.transliterationEngine.language
-
-                        property int dotPosition: text.indexOf(".")
-                        property int dashPosition: text.lastIndexOf("-")
-                        property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
-                        completionStrings: editingLocationPart ? scriteDocument.structure.allLocations() : []
-                        completionPrefix: editingLocationPart ? text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim() : ""
-                        includeSuggestion: function(suggestion) {
-                            if(editingLocationPart) {
-                                var one = text.substring(0, dotPosition).trim() + ". "
-                                var two = suggestion
-                                var three = dashPosition < 0 ? "" : (" - " + text.substring(dashPosition+1).trim())
-                                if(dashPosition >= 0)
-                                    Qt.callLater( function() {
-                                        sceneHeadingField.cursorPosition = dashPosition+1
-                                    })
-                                return one + two + three
+                        TextField2 {
+                            id: sceneHeadingField
+                            width: parent.width
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: headingItem.theScene.heading.text
+                            enabled: headingItem.theScene.heading.enabled
+                            label: ""
+                            placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+                            maximumLength: 140
+                            font.family: headingFontMetrics.font.family
+                            font.pointSize: headingFontMetrics.font.pointSize
+                            font.bold: headingFontMetrics.font.bold
+                            font.underline: headingFontMetrics.font.underline
+                            font.italic: headingFontMetrics.font.italic
+                            font.letterSpacing: headingFontMetrics.font.letterSpacing
+                            font.capitalization: currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase
+                            color: headingFontMetrics.format.textColor
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            readOnly: scriteDocument.readOnly
+                            background: Item { }
+                            onEditingComplete: headingItem.theScene.heading.parseFrom(text)
+                            onActiveFocusChanged: {
+                                if(activeFocus)
+                                    screenplayAdapter.currentIndex = headingItem.theElementIndex
                             }
-                            return suggestion
+                            tabItem: headingItem.sceneTextEditor
+
+                            enableTransliteration: true
+                            property var currentLanguage: app.transliterationEngine.language
+
+                            property int dotPosition: text.indexOf(".")
+                            property int dashPosition: text.lastIndexOf("-")
+                            property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
+                            completionStrings: editingLocationPart ? scriteDocument.structure.allLocations() : []
+                            completionPrefix: editingLocationPart ? text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim() : ""
+                            includeSuggestion: function(suggestion) {
+                                if(editingLocationPart) {
+                                    var one = text.substring(0, dotPosition).trim() + ". "
+                                    var two = suggestion
+                                    var three = dashPosition < 0 ? "" : (" - " + text.substring(dashPosition+1).trim())
+                                    if(dashPosition >= 0)
+                                        Qt.callLater( function() {
+                                            sceneHeadingField.cursorPosition = dashPosition+1
+                                        })
+                                    return one + two + three
+                                }
+                                return suggestion
+                            }
                         }
                     }
 
