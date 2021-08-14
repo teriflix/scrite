@@ -590,7 +590,8 @@ Rectangle {
                             // Find out the item under mouse and make it current.
                             pos = mapToItem(contentItem, pos.x, pos.y)
                             ci = indexAt(pos.x, pos.y)
-                            screenplayAdapter.currentIndex = ci
+                            if(ci >= 0 && ci <= screenplayAdapter.elementCount-1)
+                                screenplayAdapter.currentIndex = ci
                         }
                     }
 
