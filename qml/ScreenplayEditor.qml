@@ -1310,8 +1310,9 @@ Rectangle {
                     Announcement.onIncoming: {
                         if(!sceneTextEditor.activeFocus)
                             return
+                        var stype = "" + type
                         var sdata = "" + data
-                        if(type === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8") {
+                        if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8") {
                             if(sdata === "Scene Heading")
                                 sceneHeadingAreaLoader.edit()
                             else if(sdata === "Scene Number")
@@ -1364,26 +1365,33 @@ Rectangle {
                             background: Item { }
                             onActiveFocusChanged: {
                                 if(activeFocus) {
-                                    contentView.ensureVisible(synopsisEditorField, cursorRectangle)
+                                    contentView.ensureVisible(synopsisEditorField, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
                                     screenplayAdapter.currentIndex = contentItem.theIndex
-                                }
+                                } else
+                                    Qt.callLater( function() { synopsisEditorField.cursorPosition = -1 } )
                             }
                             Keys.onTabPressed: sceneTextEditor.forceActiveFocus()
+
+                            property int sceneTextEditorCursorPosition: -1
                             Keys.onReturnPressed: {
                                 if(event.modifiers & Qt.ShiftModifier) {
                                     event.accepted = false
                                     return
                                 }
+                                if(sceneTextEditorCursorPosition >= 0)
+                                    sceneTextEditor.cursorPosition = sceneTextEditorCursorPosition
                                 sceneTextEditor.forceActiveFocus()
                             }
 
                             Announcement.onIncoming: {
-                                if(!sceneTextEditor.activeFocus)
+                                if(!sceneTextEditor.activeFocus || !screenplayEditorSettings.displaySceneSynopsis)
                                     return
                                 var sdata = "" + data
                                 var stype = "" + type
-                                if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Scene Synopsis")
+                                if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Scene Synopsis") {
+                                    synopsisEditorField.sceneTextEditorCursorPosition = sceneTextEditor.cursorPosition
                                     synopsisEditorField.forceActiveFocus()
+                                }
                             }
                         }
                     }
@@ -2580,7 +2588,8 @@ Rectangle {
                 Loader {
                     id: sceneCharactersListLoader
                     width: parent.width
-                    readonly property bool editorHasActiveFocus: headingItem.sceneHasFocus
+                    property bool editorHasActiveFocus: headingItem.sceneHasFocus
+                    property int sceneEditorCursorPosition: headingItem.sceneTextEditor.cursorPosition
                     property Scene scene: headingItem.theScene
                     property bool allow: true
                     active: screenplayEditorSettings.displaySceneCharacters && allow
@@ -2615,7 +2624,13 @@ Rectangle {
 
                     Connections {
                         target: sceneCharactersListLoader.item
-                        onNewCharacterAdded: headingItem.sceneTextEditor.forceActiveFocus()
+                        onNewCharacterAdded: {
+                            headingItem.sceneTextEditor.forceActiveFocus()
+                            if(curPosition >= 0)
+                                Qt.callLater( function(cp) {
+                                    headingItem.sceneTextEditor.cursorPosition = cp
+                                }, curPosition )
+                        }
                     }
                 }
 
@@ -2668,7 +2683,7 @@ Rectangle {
             spacing: 5
             flow: Flow.LeftToRight
 
-            signal newCharacterAdded(string characterName)
+            signal newCharacterAdded(string characterName, int curPosition)
 
             Text {
                 id: sceneCharactersListHeading
@@ -2713,9 +2728,15 @@ Rectangle {
                 id: newCharacterInput
                 width: active && item ? Math.max(item.contentWidth, 100) : 0
                 active: false
+                property int sceneTextEditorCursorPosition: -1
+                onActiveChanged: {
+                    if(!active)
+                        Qt.callLater( function() { newCharacterInput.sceneTextEditorCursorPosition = -1 } )
+                }
                 sourceComponent: Item {
                     property alias contentWidth: textViewEdit.contentWidth
                     height: textViewEdit.height
+                    Component.onCompleted: contentView.ensureVisible(newCharacterInput, Qt.rect(0,0,width,height))
 
                     TextViewEdit {
                         id: textViewEdit
@@ -2730,7 +2751,7 @@ Rectangle {
                         completionStrings: scriteDocument.structure.characterNames
                         onEditingFinished: {
                             scene.addMuteCharacter(text)
-                            sceneCharacterListItem.newCharacterAdded(text)
+                            sceneCharacterListItem.newCharacterAdded(text, newCharacterInput.sceneTextEditorCursorPosition)
                             newCharacterInput.active = false
                         }
 
@@ -2770,8 +2791,10 @@ Rectangle {
 
                     var sdata = "" + data
                     var stype = "" + type
-                    if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Add Mute Character")
+                    if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Add Mute Character") {
+                        newCharacterInput.sceneTextEditorCursorPosition = sceneEditorCursorPosition
                         newCharacterInput.active = true
+                    }
                 }
             }
         }
