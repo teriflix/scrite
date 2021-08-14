@@ -951,7 +951,7 @@ Item {
 
                         MenuItem2 {
                             id: settingsMenuItem
-                            text: "Settings\t" + app.polishShortcutTextForDisplay("Ctrl+,")
+                            text: "Settings\t\t" + app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "../icons/action/settings_applications.png"
                             onClicked: activate()
                             enabled: appToolBar.visible
@@ -976,7 +976,7 @@ Item {
 
                         MenuItem2 {
                             id: shortcutsMenuItem
-                            text: "Shortcuts\t" + app.polishShortcutTextForDisplay("Ctrl+E")
+                            text: "Shortcuts\t\t" + app.polishShortcutTextForDisplay("Ctrl+E")
                             icon.source: {
                                 if(app.isMacOSPlatform)
                                     return "../icons/navigation/shortcuts_macos.png"
@@ -1005,7 +1005,7 @@ Item {
 
                         MenuItem2 {
                             icon.source: "../icons/action/help.png"
-                            text: "Help\tF1"
+                            text: "Help\t\tF1"
                             onClicked: Qt.openUrlExternally(helpUrl)
                         }
 
@@ -1048,25 +1048,25 @@ Item {
                             }
 
                             MenuItem2 {
+                                text: "Scene Synopsis\t\t" + app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
+                                icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
+                            }
+
+                            MenuItem2 {
+                                text: "Scene Comments\t\t" + app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
+                                icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
+                            }
+
+                            MenuItem2 {
                                 text: "Scene Characters and Tags\t" + app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
                             }
 
                             MenuItem2 {
-                                text: "Scene Synopsis\t" + app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
-                                icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
-                            }
-
-                            MenuItem2 {
-                                text: "Scene Comments\t" + app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
-                                icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
-                            }
-
-                            MenuItem2 {
-                                text: "Allow Tagging Of Scenes\t" +app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
+                                text: "Enable Tagging Of Scenes\t" +app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
                             }
