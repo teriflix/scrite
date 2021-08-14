@@ -46,11 +46,17 @@ public:
     qreal verticalPadding() const { return m_verticalPadding; }
     Q_SIGNAL void verticalPaddingChanged();
 
+    Q_PROPERTY(bool invertColors READ isInvertColors WRITE setInvertColors NOTIFY invertColorsChanged)
+    void setInvertColors(bool val);
+    bool isInvertColors() const { return m_invertColors; }
+    Q_SIGNAL void invertColorsChanged();
+
 private:
     void updateViewport();
     void onDocumentChanged();
 
 private:
+    bool m_invertColors = false;
     qreal m_documentScale = 1.0;
     qreal m_verticalPadding = 0;
     QQuickItem* m_flickable = nullptr;

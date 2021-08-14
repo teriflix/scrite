@@ -2622,14 +2622,18 @@ Rectangle {
                         onSceneRefreshed: sceneCharactersListLoader.reloadLater()
                     }
 
+                    property int cursorPositionWhenNewCharacterWasAdded: -1
                     Connections {
                         target: sceneCharactersListLoader.item
                         onNewCharacterAdded: {
                             headingItem.sceneTextEditor.forceActiveFocus()
-                            if(curPosition >= 0)
-                                Qt.callLater( function(cp) {
-                                    headingItem.sceneTextEditor.cursorPosition = cp
-                                }, curPosition )
+                            sceneCharactersListLoader.cursorPositionWhenNewCharacterWasAdded = curPosition
+                            if(curPosition >= 0) {
+                                app.execLater(sceneCharactersListLoader, 250, function() {
+                                    headingItem.sceneTextEditor.cursorPosition = sceneCharactersListLoader.cursorPositionWhenNewCharacterWasAdded
+                                    sceneCharactersListLoader.cursorPositionWhenNewCharacterWasAdded = -1
+                                })
+                            }
                         }
                     }
                 }
