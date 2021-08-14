@@ -2342,8 +2342,11 @@ Rectangle {
                             id: sceneHeadingField
                             width: parent.width
                             anchors.verticalCenter: parent.verticalCenter
-                            text: headingItem.theScene.heading.text
-                            enabled: headingItem.theScene.heading.enabled
+
+                            property SceneHeading sceneHeading: headingItem.theScene.heading
+
+                            text: sceneHeading.text
+                            enabled: sceneHeading.enabled
                             label: ""
                             placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
                             maximumLength: 140
@@ -2358,10 +2361,12 @@ Rectangle {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             readOnly: scriteDocument.readOnly
                             background: Item { }
-                            onEditingComplete: headingItem.theScene.heading.parseFrom(text)
+                            onEditingComplete: sceneHeading.parseFrom(text)
                             onActiveFocusChanged: {
                                 if(activeFocus)
                                     screenplayAdapter.currentIndex = headingItem.theElementIndex
+                                else
+                                    sceneHeading.parseFrom(text)
                             }
                             tabItem: headingItem.sceneTextEditor
 
@@ -2370,20 +2375,51 @@ Rectangle {
 
                             property int dotPosition: text.indexOf(".")
                             property int dashPosition: text.lastIndexOf("-")
+                            property bool editingLocationTypePart: dotPosition < 0 || cursorPosition < dotPosition
+                            property bool editingMomentPart: dashPosition > 0 && cursorPosition >= dashPosition
                             property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
-                            completionStrings: editingLocationPart ? scriteDocument.structure.allLocations() : []
-                            completionPrefix: editingLocationPart ? text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim() : ""
+                            completionStrings: {
+                                if(editingLocationPart)
+                                    return scriteDocument.structure.allLocations()
+                                if(editingLocationTypePart)
+                                    return scriteDocument.structure.standardLocationTypes()
+                                if(editingMomentPart)
+                                    return scriteDocument.structure.standardMoments()
+                                return []
+                            }
+                            completionPrefix: {
+                                if(editingLocationPart)
+                                    return text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim()
+                                if(editingLocationTypePart)
+                                    return text.substring(0, dotPosition).trim()
+                                if(editingMomentPart)
+                                    return text.substring(dashPosition+1).trim()
+                                return ""
+                            }
                             includeSuggestion: function(suggestion) {
-                                if(editingLocationPart) {
-                                    var one = text.substring(0, dotPosition).trim() + ". "
-                                    var two = suggestion
-                                    var three = dashPosition < 0 ? "" : (" - " + text.substring(dashPosition+1).trim())
-                                    if(dashPosition >= 0)
-                                        Qt.callLater( function() {
-                                            sceneHeadingField.cursorPosition = dashPosition+1
-                                        })
-                                    return one + two + three
+                                if(editingLocationPart || editingLocationTypePart || editingMomentPart) {
+                                    var one = editingLocationTypePart ? suggestion : text.substring(0, dotPosition).trim()
+                                    var two = editingLocationPart ? suggestion : (dotPosition > 0 ? text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim() : "")
+                                    var three = editingMomentPart ? suggestion : (dashPosition < 0 ? "" : text.substring(dashPosition+1).trim())
+
+                                    var cp = 0
+                                    if(editingLocationTypePart)
+                                        cp = one.length + 2
+                                    else if(editingLocationPart)
+                                        cp = one.length + 2 + two.length + 3
+                                    else if(editingMomentPart)
+                                        cp = one.length + two.length + three.length + 2 + 3
+
+                                    Qt.callLater( function() {
+                                        sceneHeadingField.cursorPosition = cp
+                                    })
+
+                                    var ret = one + ". "
+                                    if(two.length > 0 || three.length > 0)
+                                        ret += two + " - " + three
+                                    return ret
                                 }
+
                                 return suggestion
                             }
                         }
@@ -2560,6 +2596,7 @@ Rectangle {
                     color: font.underline ? "blue" : "black"
                     MouseArea {
                         id: sceneGroupTagsTextMouseArea
+                        enabled: sceneTaggingButton.visible
                         hoverEnabled: true
                         anchors.fill: parent
                         onClicked: sceneTagMenuLoader.show()
