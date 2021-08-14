@@ -1296,18 +1296,26 @@ Rectangle {
                             item.sceneTextEditor = sceneTextEditor
                         }
                     }
+
                     function edit() {
                         if(item)
                             item.edit()
                     }
 
-                    Announcement.onIncoming: (type, data) => {
+                    function editSceneNumber() {
+                        if(item)
+                            item.editSceneNumber()
+                    }
+
+                    Announcement.onIncoming: {
                         if(!sceneTextEditor.activeFocus)
                             return
                         var sdata = "" + data
                         if(type === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8") {
                             if(sdata === "Scene Heading")
                                 sceneHeadingAreaLoader.edit()
+                            else if(sdata === "Scene Number")
+                                sceneHeadingAreaLoader.editSceneNumber()
                         }
                     }
                 }
@@ -1359,6 +1367,23 @@ Rectangle {
                                     contentView.ensureVisible(synopsisEditorField, cursorRectangle)
                                     screenplayAdapter.currentIndex = contentItem.theIndex
                                 }
+                            }
+                            Keys.onTabPressed: sceneTextEditor.forceActiveFocus()
+                            Keys.onReturnPressed: {
+                                if(event.modifiers & Qt.ShiftModifier) {
+                                    event.accepted = false
+                                    return
+                                }
+                                sceneTextEditor.forceActiveFocus()
+                            }
+
+                            Announcement.onIncoming: {
+                                if(!sceneTextEditor.activeFocus)
+                                    return
+                                var sdata = "" + data
+                                var stype = "" + type
+                                if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Scene Synopsis")
+                                    synopsisEditorField.forceActiveFocus()
                             }
                         }
                     }
@@ -2275,6 +2300,13 @@ Rectangle {
                 }
             }
 
+            function editSceneNumber() {
+                if(theScene.heading.enabled) {
+                    sceneNumberField.forceActiveFocus()
+                    contentView.ensureVisible(sceneHeadingField, sceneHeadingField.cursorRectangle)
+                }
+            }
+
             height: sceneHeadingLayout.height + 12*Math.min(zoomLevel,1)
             color: Qt.tint(theScene.color, "#E7FFFFFF")
 
@@ -2299,6 +2331,7 @@ Rectangle {
                     }
 
                     TextField2 {
+                        id: sceneNumberField
                         label: cursorVisible ? "Scene No." : ""
                         labelAlwaysVisible: false
                         width: headingFontMetrics.averageCharacterWidth*maximumLength
@@ -2313,6 +2346,7 @@ Rectangle {
                                  headingItem.theScene.heading.enabled &&
                                  screenplayAdapter.isSourceScreenplay
                         onActiveFocusChanged: screenplayAdapter.currentIndex = headingItem.theElementIndex
+                        tabItem: headingItem.sceneTextEditor
                     }
                 }
             }
@@ -2553,7 +2587,9 @@ Rectangle {
                     sourceComponent: sceneCharactersList
 
                     Announcement.onIncoming: {
-                        if(type === "E69D2EA0-D26D-4C60-B551-FD3B45C5BE60" && data === headingItem.theScene.id) {
+                        var stype = "" + type
+                        var sdata = "" + data
+                        if(stype === "E69D2EA0-D26D-4C60-B551-FD3B45C5BE60" && sdata === headingItem.theScene.id) {
                             sceneCharactersListLoader.allow = false
                             Qt.callLater( function() {
                                 sceneCharactersListLoader.allow = true
@@ -2726,6 +2762,16 @@ Rectangle {
                     hoverEnabled: true
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                     onClicked: newCharacterInput.active = true
+                }
+
+                Announcement.onIncoming: {
+                    if(!editorHasActiveFocus)
+                        return
+
+                    var sdata = "" + data
+                    var stype = "" + type
+                    if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Add Mute Character")
+                        newCharacterInput.active = true
                 }
             }
         }

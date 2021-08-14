@@ -270,4 +270,40 @@ Row {
             ShortcutsModelItem.priority: -index
         }
     }
+
+    Shortcut {
+        sequence: "Ctrl+7"
+
+        ShortcutsModelItem.group: "Formatting"
+        ShortcutsModelItem.title: "Add Mute Character"
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && screenplayEditorSettings.displaySceneCharacters
+        ShortcutsModelItem.priority: -7
+
+        onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Add Mute Character")
+    }
+
+    Shortcut {
+        sequence: "Ctrl+8"
+
+        ShortcutsModelItem.group: "Formatting"
+        ShortcutsModelItem.title: "Synopsis"
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && screenplayEditorSettings.displaySceneSynopsis
+        ShortcutsModelItem.priority: -8
+
+        onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Synopsis")
+    }
+
+    Shortcut {
+        sequence: "Ctrl+9"
+
+        ShortcutsModelItem.group: "Formatting"
+        ShortcutsModelItem.title: "Scene Number"
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.enabled: binder && binder.currentElement && binder.currentElement.scene.heading.enabled
+        ShortcutsModelItem.priority: -9
+
+        onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Number")
+    }
 }
