@@ -1353,6 +1353,7 @@ Rectangle {
                             onTextChanged: contentItem.theScene.title = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
+                            background: Item { }
                             onActiveFocusChanged: {
                                 if(activeFocus) {
                                     contentView.ensureVisible(synopsisEditorField, cursorRectangle)
@@ -2325,7 +2326,7 @@ Rectangle {
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters || screenplayEditorSettings.displaySceneSynopsis ? 8 : 4
+                anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters ? 8 : 4
 
                 Row {
                     spacing: 5
@@ -2335,7 +2336,7 @@ Rectangle {
                         width: parent.width - sceneMenuButton.width - parent.spacing - (sceneTaggingButton.visible ? (sceneTaggingButton.width+parent.spacing) : 0)
                         height: 2
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters || screenplayEditorSettings.displaySceneSynopsis ? 0 : headingFontMetrics.descent
+                        anchors.verticalCenterOffset: headingFontMetrics.descent
 
                         TextField2 {
                             id: sceneHeadingField
@@ -2500,6 +2501,12 @@ Rectangle {
                     }
                 }
 
+                Item {
+                    width: parent.width
+                    height: 5*Math.min(zoomLevel,1)
+                    visible: sceneCharactersListLoader.active
+                }
+
                 Loader {
                     id: sceneCharactersListLoader
                     width: parent.width
@@ -2541,18 +2548,27 @@ Rectangle {
                 }
 
                 Text {
+                    id: sceneGroupTagsText
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font.pointSize: sceneHeadingFieldsFontPointSize
                     text: sceneCharactersListLoader.active ? scriteDocument.structure.presentableGroupNames(headingItem.theScene.groups) : ""
                     visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
-                    topPadding: 5
-                    bottomPadding: (screenplayEditorSettings.displaySceneSynopsis ? 5 : 15) * Math.min(zoomLevel,1)
+                    topPadding: 5*Math.min(zoomLevel,1)
+                    bottomPadding: 5*Math.min(zoomLevel,1)
+                    font.underline: sceneGroupTagsTextMouseArea.containsMouse && !sceneTagMenuLoader.active
+                    color: font.underline ? "blue" : "black"
+                    MouseArea {
+                        id: sceneGroupTagsTextMouseArea
+                        hoverEnabled: true
+                        anchors.fill: parent
+                        onClicked: sceneTagMenuLoader.show()
+                    }
                 }
 
                 Item {
                     width: parent.width
-                    height: 10 * Math.min(zoomLevel,1)
+                    height: 10*Math.min(zoomLevel,1)
                     visible: !screenplayEditorSettings.displaySceneSynopsis
                 }
             }
