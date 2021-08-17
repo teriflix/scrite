@@ -261,6 +261,25 @@ Rectangle {
                     }
                 }
 
+                Timer {
+                    id: postSplitElementTimer
+                    property int newCurrentIndex: -1
+                    running: false
+                    repeat: false
+                    interval: 250
+                    onTriggered: {
+                        if(newCurrentIndex < 0)
+                            return
+                        contentView.positionViewAtIndex(newCurrentIndex, ListView.Center)
+                        app.execLater(postSplitElementTimer, 250, function() {
+                            var item = contentView.itemAtIndex(postSplitElementTimer.newCurrentIndex)
+                            if(item)
+                                item.item.assumeFocus()
+                            postSplitElementTimer.newCurrentIndex = -1
+                        })
+                    }
+                }
+
                 ListView {
                     id: contentView
                     anchors.fill: parent
@@ -2227,12 +2246,14 @@ Rectangle {
 
             function splitSceneImpl() {
                 screenplayTextDocument.syncEnabled = false
+                postSplitElementTimer.newCurrentIndex = contentItem.theIndex+1
                 var ret = screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
                 screenplayTextDocument.syncEnabled = true
                 scriteDocument.clearBusyMessage()
                 if(ret === null)
                     showCantSplitSceneMessage()
-                contentView.scrollIntoView(screenplayAdapter.currentIndex)
+                else
+                    postSplitElementTimer.start()
             }
 
             function showCantSplitSceneMessage() {
