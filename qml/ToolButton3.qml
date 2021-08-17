@@ -107,6 +107,8 @@ Item {
     ToolTip.visible: ToolTip.text === "" ? false : (toolButtonMouseArea.containsMouse && !down)
     ToolTip.delay: 500
 
+    property bool containsMouse: toolButtonMouseArea.containsMouse
+
     MouseArea {
         id: toolButtonMouseArea
         anchors.fill: parent

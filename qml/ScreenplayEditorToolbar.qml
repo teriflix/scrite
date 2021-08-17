@@ -251,6 +251,7 @@ Row {
             iconSource: modelData.icon
             shortcut: "Ctrl+" + index
             shortcutText: (index+1)
+            ToolTip.visible: containsMouse
             ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
             enabled: screenplayEditorToolbar.formattable
             down: binder ? (binder.currentElement ? binder.currentElement.type === modelData.value : false) : false
