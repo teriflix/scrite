@@ -709,8 +709,8 @@ public:
 
     Q_INVOKABLE void scanForMuteCharacters();
 
-    Q_INVOKABLE QStringList standardLocationTypes() const;
-    Q_INVOKABLE QStringList standardMoments() const;
+    Q_INVOKABLE static QStringList standardLocationTypes();
+    Q_INVOKABLE static QStringList standardMoments();
 
     Q_INVOKABLE QStringList allLocations() const { return m_locationHeadingsMap.keys(); }
     QMap< QString, QList<SceneHeading*> > locationHeadingsMap() const { return m_locationHeadingsMap; }

@@ -302,7 +302,11 @@ bool SceneHeading::parse(const QString &text, QString &locationType, QString &lo
     locationType = heading.left(field1SepLoc).trimmed();
     moment = heading.mid(field2SepLoc+1).trimmed();
     location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
-    return true;
+
+    if( strict )
+        return Structure::standardLocationTypes().contains(locationType);
+
+    return false;
 }
 
 void SceneHeading::parseFrom(const QString &text)
@@ -1345,8 +1349,6 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
         return nullptr;
 
     // We cannot split the scene across these types.
-    static const QList<SceneElement::Type> unsplittableTypes = QList<SceneElement::Type>()
-            << SceneElement::Heading << SceneElement::Parenthetical;
     if(element->type() == SceneElement::Heading || element->type() == SceneElement::Parenthetical)
         return nullptr;
 
@@ -1354,8 +1356,11 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
 
     emit sceneAboutToReset();
 
+    const bool splitTitleAlso = !m_title.trimmed().isEmpty();
+
     Scene *newScene = new Scene(parent);
-    newScene->setTitle("2nd Part Of " + this->title());
+    if(splitTitleAlso)
+        newScene->setTitle("2nd Part Of " + this->title());
     newScene->setColor(this->color());
     newScene->heading()->setEnabled( this->heading()->isEnabled() );
     newScene->heading()->setLocationType( this->heading()->locationType() );
@@ -1363,12 +1368,27 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     newScene->heading()->setMoment("LATER");
     newScene->id(); // trigger creation of new Scene ID
 
-    this->setTitle("1st Part Of " + this->title());
+    if(splitTitleAlso)
+        this->setTitle("1st Part Of " + this->title());
 
     // Move all elements from index onwards to the new scene.
     for(int i=this->elementCount()-1; i>=index; i--)
     {
         SceneElement *oldElement = this->elementAt(i);
+
+        if(i==index)
+        {
+            const QString oldElementText = oldElement->text();
+            QString locType, location, moment;
+            if(SceneHeading::parse(oldElementText, locType, location, moment, true))
+            {
+                newScene->heading()->setLocationType(locType);
+                newScene->heading()->setLocation(location);
+                newScene->heading()->setMoment(moment);
+                this->removeElement(oldElement);
+                continue;
+            }
+        }
 
         SceneElement *newElement = new SceneElement(newScene);
         newElement->setType( oldElement->type() );

@@ -3029,17 +3029,21 @@ void Structure::scanForMuteCharacters()
     m_scriteDocument->clearBusyMessage();
 }
 
-QStringList Structure::standardLocationTypes() const
+QStringList Structure::standardLocationTypes()
 {
-    static const QStringList list = QStringList() << "INT" << "EXT" << "I/E";
+    static const QStringList list =
+        { QStringLiteral("INT"), QStringLiteral("EXT"), QStringLiteral("I/E") };
     return list;
 }
 
-QStringList Structure::standardMoments() const
+QStringList Structure::standardMoments()
 {
-    static const QStringList list = QStringList() << "DAY" << "NIGHT" << "MORNING" << "AFTERNOON"
-        << "EVENING" << "LATER" << "MOMENTS LATER" << "CONTINUOUS" << "THE NEXT DAY" << "EARLIER"
-        << "MOMENTS EARLIER" << "THE PREVIOUS DAY" << "DAWN" << "DUSK";
+    static const QStringList list =
+            { QStringLiteral("DAY"), QStringLiteral("NIGHT"), QStringLiteral("MORNING"),
+              QStringLiteral("AFTERNOON"), QStringLiteral("EVENING"), QStringLiteral("LATER"),
+              QStringLiteral("MOMENTS LATER"), QStringLiteral("CONTINUOUS"), QStringLiteral("THE NEXT DAY"),
+              QStringLiteral("EARLIER"), QStringLiteral("MOMENTS EARLIER"), QStringLiteral("THE PREVIOUS DAY"),
+              QStringLiteral("DAWN"), QStringLiteral("DUSK") };
     return list;
 }
 
