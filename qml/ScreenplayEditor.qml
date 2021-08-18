@@ -289,6 +289,16 @@ Rectangle {
                     property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+
+                    property bool allowContentYAnimation
+                    Behavior on contentY {
+                        enabled: screenplayEditorSettings.enableAnimations && contentView.allowContentYAnimation
+                        NumberAnimation {
+                            duration: 100
+                            onFinished: contentView.allowContentYAnimation = false
+                        }
+                    }
+
                     delegate: Loader {
                         id: contentViewDelegateLoader
                         property var componentData: modelData
@@ -655,7 +665,6 @@ Rectangle {
                         if( pt.y >= startY && pt.y <= endY )
                             return
 
-                        var newContentY = 0
                         if( pt.y < startY )
                             contentView.contentY = pt.y
                         else
@@ -1507,8 +1516,13 @@ Rectangle {
                     }
 
                     onCursorRectangleChanged: {
-                        if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/)
-                            contentView.ensureVisible(sceneTextEditor, cursorRectangle)
+                        if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/) {
+                            var buffer = Math.max(contentView.height * 0.2, cursorRectangle.height*3)
+                            var cr = Qt.rect(cursorRectangle.x, cursorRectangle.y-buffer*0.3,
+                                             cursorRectangle.width, buffer)
+                            contentView.allowContentYAnimation = true
+                            contentView.ensureVisible(sceneTextEditor, cr)
+                        }
                     }
 
                     property bool justReceivedFocus: false
