@@ -1368,6 +1368,20 @@ Item {
                         onClicked: fileDialog.open()
                     }
 
+                    AttachmentsDropArea2 {
+                        anchors.fill: parent
+                        attachmentNoticeSuffix: "Drop to set as cover page photo."
+                        visible: !scriteDocument.readOnly
+                        allowedType: Attachments.PhotosOnly
+                        onDropped: {
+                            scriteDocument.screenplay.clearCoverPagePhoto()
+                            var filePath = attachment.filePath
+                            Qt.callLater( function(fp) {
+                                scriteDocument.screenplay.setCoverPagePhoto(fp)
+                            }, filePath)
+                        }
+                    }
+
                     Column {
                         spacing: 0
                         anchors.left: parent.right
