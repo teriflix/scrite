@@ -1833,6 +1833,7 @@ Item {
 
                     Rectangle {
                         SplitView.fillWidth: true
+                        SplitView.minimumWidth: 80
                         color: primaryColors.c10.background
                         border {
                             width: showNotebookInStructure ? 0 : 1
@@ -2021,10 +2022,17 @@ Item {
                     Loader {
                         id: screenplayEditor2
                         SplitView.preferredWidth: ui.width * 0.5
+                        SplitView.minimumWidth: 16
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
                         readonly property int screenplayZoomLevelModifier: -3
                         active: width >= 50
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
+
+                        Rectangle {
+                            visible: !parent.active
+                            anchors.fill: parent
+                            color: primaryColors.c400.background
+                        }
                     }
                 }
             }
@@ -2032,7 +2040,7 @@ Item {
             Loader {
                 id: structureEditorRow2
                 SplitView.preferredHeight: 155 + minimumAppFontMetrics.height*screenplayTracks.trackCount
-                SplitView.minimumHeight: SplitView.preferredHeight
+                SplitView.minimumHeight: 16
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
                 sourceComponent: Rectangle {
@@ -2048,6 +2056,12 @@ Item {
                         color: Qt.rgba(0,0,0,0)
                         border { width: 1; color: accentColors.borderColor }
                     }
+                }
+
+                Rectangle {
+                    visible: !parent.active
+                    anchors.fill: parent
+                    color: primaryColors.c400.background
                 }
             }
 
