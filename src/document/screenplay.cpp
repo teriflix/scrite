@@ -400,9 +400,13 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::emptyChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::coverPagePhotoChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
+    connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateParagraphCountsLater);
     connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::titlePageIsCenteredChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::screenplayChanged, [=](){ this->markAsModified(); });
+    connect(this, &Screenplay::screenplayChanged, [=](){
+        this->evaluateParagraphCountsLater();
+        this->markAsModified();
+    });
 
     m_author = QSysInfo::machineHostName();
     m_version = QStringLiteral("Initial Draft");
@@ -2021,6 +2025,11 @@ void Screenplay::timerEvent(QTimerEvent *te)
         m_updateBreakTitlesTimer.stop();
         this->updateBreakTitles();
     }
+    else if(te->timerId() == m_paragraphCountEvaluationTimer.timerId())
+    {
+        m_paragraphCountEvaluationTimer.stop();
+        this->evaluateParagraphCounts();
+    }
 }
 
 void Screenplay::resetActiveScene()
@@ -2161,6 +2170,45 @@ void Screenplay::validateCurrentElementIndex()
     }
 
     this->setCurrentElementIndex(val);
+}
+
+void Screenplay::evaluateParagraphCounts()
+{
+    int min = -1, max = -1, avg = 0, total = 0, count=0;
+    for(ScreenplayElement *element : qAsConst(m_elements))
+    {
+        Scene *scene = element->scene();
+        if(scene == nullptr)
+            continue;
+
+        if(min < 0)
+            min = scene->elementCount();
+        else
+            min = qMin(min, scene->elementCount());
+
+        if(max < 0)
+            max = scene->elementCount();
+        else
+            max = qMax(max, scene->elementCount());
+
+        total += scene->elementCount();
+        ++count;
+    }
+
+    if(count > 0)
+        avg = qRound( qreal(total)/qreal(count) );
+    else
+        avg = 0;
+
+    m_minimumParagraphCount = min;
+    m_maximumParagraphCount = max;
+    m_averageParagraphCount = avg;
+    emit paragraphCountChanged();
+}
+
+void Screenplay::evaluateParagraphCountsLater()
+{
+    m_paragraphCountEvaluationTimer.start(0, this);
 }
 
 void Screenplay::setHasNonStandardScenes(bool val)

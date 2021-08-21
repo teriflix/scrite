@@ -43,6 +43,28 @@
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
 
+inline QTime secondsToTime(int seconds)
+{
+    if(seconds == 0)
+        return QTime(0,0,0);
+    const int s = seconds > 60 ? seconds % 60 : seconds;
+    const int tm = seconds > 60 ? (seconds-s)/60 : 0;
+    const int m = tm > 60 ? tm%60 : tm;
+    const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
+    return QTime(h, m, s);
+}
+
+inline QString timeToString(const QTime &t)
+{
+    if(t == QTime(0,0,0))
+        return QStringLiteral("00:00");
+
+    if(t.hour() > 0)
+        return t.toString(QStringLiteral("H:mm:ss"));
+
+    return t.toString(QStringLiteral("m:ss"));
+}
+
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
 public:
@@ -436,17 +458,6 @@ void ScreenplayTextDocument::setTimePerPage(const QTime &val)
     this->evaluatePageBoundariesLater();
 }
 
-inline QString timeToString(const QTime &t)
-{
-    if(t == QTime(0,0,0))
-        return QStringLiteral("00:00");
-
-    if(t.hour() > 0)
-        return t.toString(QStringLiteral("H:mm:ss"));
-
-    return t.toString(QStringLiteral("m:ss"));
-}
-
 QString ScreenplayTextDocument::timePerPageAsString() const
 {
     return timeToString(m_timePerPage);
@@ -562,13 +573,29 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     return ret;
 }
 
+QTime ScreenplayTextDocument::lengthInTime(ScreenplayElement *from, ScreenplayElement *to) const
+{
+    const qreal nrPages = this->lengthInPages(from, to);
+    const QTime ret = ::secondsToTime(secondsPerPage() * nrPages);
+    return ret;
+}
+
+QString ScreenplayTextDocument::lengthInTimeAsString(ScreenplayElement *from, ScreenplayElement *to) const
+{
+    const QTime time = this->lengthInTime(from, to);
+    return ::timeToString(time);
+}
+
 qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *from, ScreenplayElement *to) const
 {
-    if(from == nullptr)
+    if(m_screenplay == nullptr || m_formatting == nullptr || from == nullptr)
         return 0;
 
-    const int fromIndex = from->elementIndex();
-    const int toIndex   = to ? to->elementIndex() : fromIndex;
+    if((from && from->screenplay() != m_screenplay) || (to && to->screenplay() != m_screenplay))
+        return 0;
+
+    const int fromIndex = m_screenplay->indexOfElement(from);
+    const int toIndex   = to ? m_screenplay->indexOfElement(to) : fromIndex;
 
     qreal ret = 0;
     for(int i=fromIndex; i<=toIndex; i++)
@@ -587,6 +614,12 @@ qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *from, Screenplay
 
 qreal ScreenplayTextDocument::lengthInPages(ScreenplayElement *from, ScreenplayElement *to) const
 {
+    if(m_screenplay == nullptr || m_formatting == nullptr)
+        return 0;
+
+    if((from && from->screenplay() != m_screenplay) || (to && to->screenplay() != m_screenplay))
+        return 0;
+
     const qreal pxLength = this->lengthInPixels(from, to);
     if( qFuzzyIsNull(pxLength) )
         return 0;
@@ -984,17 +1017,6 @@ void ScreenplayTextDocument::setUpdating(bool val)
         this->evaluatePageBoundariesLater();
         emit updateFinished();
     }
-}
-
-inline QTime secondsToTime(int seconds)
-{
-    if(seconds == 0)
-        return QTime(0,0,0);
-    const int s = seconds > 60 ? seconds % 60 : seconds;
-    const int tm = seconds > 60 ? (seconds-s)/60 : 0;
-    const int m = tm > 60 ? tm%60 : tm;
-    const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
-    return QTime(h, m, s);
 }
 
 void ScreenplayTextDocument::setPageCount(qreal val)

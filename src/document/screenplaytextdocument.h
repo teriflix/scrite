@@ -202,6 +202,8 @@ public:
     QList< QPair<int,int> > pageBoundaries() const { return m_pageBoundaries; }
     Q_SIGNAL void pageBoundariesChanged();
 
+    Q_INVOKABLE QTime lengthInTime(ScreenplayElement *from, ScreenplayElement *to=nullptr) const;
+    Q_INVOKABLE QString lengthInTimeAsString(ScreenplayElement *from, ScreenplayElement *to=nullptr) const;
     Q_INVOKABLE qreal lengthInPixels(ScreenplayElement *from, ScreenplayElement *to=nullptr) const;
     Q_INVOKABLE qreal lengthInPages(ScreenplayElement *from, ScreenplayElement *to=nullptr) const;
 

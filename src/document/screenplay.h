@@ -368,6 +368,17 @@ public:
     Q_INVOKABLE QJsonArray search(const QString &text, int flags=0) const;
     Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags=0);
 
+    Q_PROPERTY(int minimumParagraphCount READ minimumParagraphCount NOTIFY paragraphCountChanged)
+    int minimumParagraphCount() const { return m_minimumParagraphCount; }
+
+    Q_PROPERTY(int maximumParagraphCount READ maximumParagraphCount NOTIFY paragraphCountChanged)
+    int maximumParagraphCount() const { return m_maximumParagraphCount; }
+
+    Q_PROPERTY(int averageParagraphCount READ averageParagraphCount NOTIFY paragraphCountChanged)
+    int averageParagraphCount() const { return m_averageParagraphCount; }
+
+    Q_SIGNAL void paragraphCountChanged();
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
@@ -388,6 +399,8 @@ protected:
     void evaluateSceneNumbers();
     void evaluateSceneNumbersLater();
     void validateCurrentElementIndex();
+    void evaluateParagraphCounts();
+    void evaluateParagraphCountsLater();
     void setHasNonStandardScenes(bool val);
     void setHasTitlePageAttributes(bool val);
     void evaluateHasTitlePageAttributes();
@@ -409,6 +422,9 @@ private:
     QString m_phoneNumber;
     QString m_coverPagePhoto;
     bool m_titlePageIsCentered = true;
+    int m_minimumParagraphCount = 0;
+    int m_maximumParagraphCount = 0;
+    int m_averageParagraphCount = 0;
     bool m_hasTitlePageAttributes = false;
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
@@ -426,6 +442,7 @@ private:
 
     ExecLaterTimer m_updateBreakTitlesTimer;
     ExecLaterTimer m_sceneNumberEvaluationTimer;
+    ExecLaterTimer m_paragraphCountEvaluationTimer;
 };
 
 /**

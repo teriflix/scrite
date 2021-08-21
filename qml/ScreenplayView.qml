@@ -297,9 +297,26 @@ Item {
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
         model: scriteDocument.loading ? null : scriteDocument.screenplay
-        property real minimumDelegateWidth: 100
-        property real breakDelegateWidth: 70
-        property real perElementWidth: 2.5
+        property real minimumDelegateWidth: {
+            var treshold = Math.floor(width / 100)
+            if(scriteDocument.screenplay.elementCount < treshold)
+                return 100
+
+            var pc = scriteDocument.screenplay.maximumParagraphCount
+            if(pc < 4)
+                return 100
+            if(pc >= 5 && pc < 10)
+                return 50
+            return 34
+        }
+        Behavior on minimumDelegateWidth {
+            enabled: screenplayEditorSettings.enableAnimations
+            NumberAnimation { duration: 250 }
+        }
+
+        readonly property real breakDelegateWidth: 70
+        readonly property real perElementWidth: 2.5
+        readonly property real minimumDelegateWidthForTextVisibility: 50
         property bool moveMode: false
         orientation: Qt.Horizontal
         currentIndex: scriteDocument.screenplay.currentElementIndex
@@ -337,7 +354,7 @@ Item {
 
         footer: Item {
             property bool highlightAsDropArea: false
-            width: screenplayElementList.minimumDelegateWidth
+            width: 100 // screenplayElementList.minimumDelegateWidth
             height: screenplayElementList.height
 
             Rectangle {
@@ -541,6 +558,7 @@ Item {
                         anchors.topMargin: breakTypeIcon.visible ? 0 : (notesIconLoader.active ? 30 : 5)
                         anchors.leftMargin: 5
                         anchors.rightMargin: 5
+                        visible: isBreakElement || parent.width > screenplayElementList.minimumDelegateWidthForTextVisibility
 
                         Text {
                             text: sceneTitle
@@ -548,7 +566,6 @@ Item {
                             elide: Text.ElideRight
                             width: parent.width
                             height: parent.height
-                            visible: isBreakElement ? true : width >= 80
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             font.bold: isBreakElement
                             lineHeight: 1.25
@@ -564,7 +581,33 @@ Item {
 
                     MouseArea {
                         anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton|Qt.RightButton
+                        hoverEnabled: !isBreakElement
+                        ToolTip.visible: hoverEnabled && containsMouse
+                        function evalToolTipText() {
+                            if(isBreakElement)
+                                return ""
+
+                            var ret = ""
+                            var pc = elementItemDelegate.element.scene.elementCount
+                            ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
+
+                            if(!screenplayTextDocument.paused)
+                                ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element,elementItemDelegate.element)
+
+                            if(parent.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
+                                var str = elementItemDelegate.sceneTitle
+                                if(str.length > 140)
+                                    str = str.substring(0, 130) + "..."
+                                if(str.length > 0)
+                                    ret = "(" + ret + ") " + str
+                            }
+
+                            return ret
+                        }
+                        onContainsMouseChanged: {
+                            if(containsMouse)
+                                ToolTip.text = evalToolTipText()
+                        }
                         onClicked: {
                             parent.forceActiveFocus()
                             screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
@@ -623,6 +666,7 @@ Item {
                         width: 24; height: 24
                         opacity: 0.5
                         showTooltip: false
+                        visible: !isBreakElement && parent.width > screenplayElementList.minimumDelegateWidthForTextVisibility
                         sceneType: elementItemDelegate.element.scene ? elementItemDelegate.element.scene.type : Scene.Standard
                     }
 
@@ -630,10 +674,10 @@ Item {
                         id: dragTriggerButton
                         source: "../icons/action/view_array.png"
                         width: 24; height: 24
-                        anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
-                        anchors.rightMargin: 5
+                        anchors.right: parent.right
+                        anchors.rightMargin: parent.width > width+10 ? 5 : (parent.width - width)/2
                         opacity: dragMouseArea.containsMouse ? 1 : 0.1
                         scale: dragMouseArea.containsMouse ? 2 : 1
                         visible: !scriteDocument.readOnly && enableDragDrop
