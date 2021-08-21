@@ -855,8 +855,11 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
         if( !m_fileLocker->canWrite() )
         {
+            QJsonObject details;
+            details.insert( QStringLiteral("revealOnDesktopRequest"), m_fileLocker->lockFilePath() );
+
             m_fileLocker->setFilePath(lockFilePath);
-            m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName) );
+            m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName), details );
             return;
         }
     }
