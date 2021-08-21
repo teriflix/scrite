@@ -1746,7 +1746,7 @@ Rectangle {
                                         id: characterNameField
                                         completionStrings: scriteDocument.structure.characterNames
                                         width: parent.width - characterAddButton.width - parent.spacing
-                                        placeholderText: "Enter character name to search/add."
+                                        placeholderText: scriteDocument.readOnly ? "Enter character name to search." : "Enter character name to search/add."
                                         label: ""
                                         onReturnPressed: characterAddButton.click()
                                     }
@@ -1760,7 +1760,7 @@ Rectangle {
                                             var ch = scriteDocument.structure.findCharacter(chName)
                                             if(ch)
                                                 switchTo(ch.notes)
-                                            else {
+                                            else if(!scriteDocument.readOnly) {
                                                 ch = scriteDocument.structure.addCharacter(chName)
                                                 notebookModel.preferredItem = ch.notes
                                             }
@@ -1803,7 +1803,8 @@ Rectangle {
                     onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
 
                     Announcement.onIncoming: {
-                        if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                        var stype = "" + type
+                        if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
                             crGraphView.resetGraph()
                             refreshButton.crGraphRefreshed = true
                         }
@@ -2252,7 +2253,8 @@ Rectangle {
                     onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
 
                     Announcement.onIncoming: {
-                        if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                        var stype = "" + type
+                        if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
                             crGraphView.resetGraph()
                             refreshButton.crGraphRefreshed = true
                         }

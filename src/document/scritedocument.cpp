@@ -1380,6 +1380,13 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
         QFile::remove(tmpFile);
     }
 
+    // 5. If the scrite document is locked for whatever reason
+    if(m_locked && !m_createdOnThisComputer)
+    {
+        m_errorReport->setErrorMessage( QStringLiteral("Cannot write into '%1' because it is locked").arg(fileName) );
+        return false;
+    }
+
     return true;
 }
 
@@ -1555,17 +1562,21 @@ bool ScriteDocument::load(const QString &fileName)
 {
     m_errorReport->clear();
 
+    QJsonObject details;
+    details.insert( QStringLiteral("revealOnDesktopRequest"), fileName );
+
     if( !QFileInfo(fileName).isReadable() )
     {
-        m_errorReport->setErrorMessage( QStringLiteral("Cannot open %1 for reading.").arg(fileName));
+        m_errorReport->setErrorMessage( QStringLiteral("Cannot open %1 for reading.").arg(fileName), details );
         return false;
     }
 
     m_fileLocker->setFilePath(fileName);
     if(m_fileLocker->isClaimed() && !m_fileLocker->canRead())
     {
+        details.insert( QStringLiteral("revealOnDesktopRequest"), m_fileLocker->lockFilePath() );
         m_fileLocker->setFilePath(QString());
-        m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName) );
+        m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName), details );
         return false;
     }
 
@@ -1576,7 +1587,7 @@ bool ScriteDocument::load(const QString &fileName)
 
     if(!loaded)
     {
-        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName) );
+        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName), details );
         return false;
     }
 
@@ -1623,14 +1634,14 @@ bool ScriteDocument::load(const QString &fileName)
     const QJsonObject json = jsonDoc.object();
     if(json.isEmpty())
     {
-        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName) );
+        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName), details );
         return false;
     }
 
     const QJsonObject metaInfo = json.value("meta").toObject();
     if(metaInfo.value("appName").toString().toLower() != qApp->applicationName().toLower())
     {
-        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an unrecognised app.").arg(fileName));
+        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an unrecognised app.").arg(fileName), details );;
         return false;
     }
 
@@ -1638,7 +1649,7 @@ bool ScriteDocument::load(const QString &fileName)
     const QVersionNumber appVersion = Application::instance()->versionNumber();
     if(appVersion < docVersion)
     {
-        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an updated version.").arg(fileName));
+        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an updated version.").arg(fileName), details );
         return false;
     }
 

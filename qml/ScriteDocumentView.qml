@@ -2184,7 +2184,11 @@ Item {
         Notification.text: errorReport.errorMessage
         Notification.active: errorReport.hasError
         Notification.autoClose: false
-        Notification.onDismissed: errorReport.clear()
+        Notification.onDismissed: {
+            if(errorReport.details && errorReport.details.revealOnDesktopRequest)
+                app.revealFileOnDesktop(errorReport.details.revealOnDesktopRequest)
+            errorReport.clear()
+        }
 
         Component.onCompleted: {
             var availableModes = {

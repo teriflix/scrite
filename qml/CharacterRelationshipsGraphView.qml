@@ -219,10 +219,6 @@ Rectangle {
                     visible: canvas.selectedNodeItem
 
                     BoxShadow {
-                        anchors.fill: parent
-                    }
-
-                    BoxShadow {
                         anchors.fill: floatingToolBar
                         visible: floatingToolBar.visible
                     }
@@ -239,6 +235,7 @@ Rectangle {
                         anchors.bottomMargin: 5
                         enabled: !removeRelationshipConfirmation.active
                         opacity: enabled ? 1 : 0.5
+                        visible: floatingToolbarLayout.width >= floatingToolbarLayout.height
 
                         Row {
                             id: floatingToolbarLayout

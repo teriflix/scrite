@@ -55,12 +55,13 @@ void ErrorReport::setProxyFor(ErrorReport *val)
     emit proxyForChanged();
 }
 
-void ErrorReport::setErrorMessage(const QString &val)
+void ErrorReport::setErrorMessage(const QString &val, const QJsonObject &details)
 {
     if(m_errorMessage == val)
         return;
 
     m_errorMessage = val;
+    m_details = details;
     emit errorMessageChanged();
 }
 

@@ -62,6 +62,8 @@ public:
     QString filePath() const { return m_filePath; }
     Q_SIGNAL void filePathChanged();
 
+    QString lockFilePath() const { return m_lockFilePath; }
+
     enum Strategy
     {
         MultipleReadSingleWrite,

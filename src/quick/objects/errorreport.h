@@ -14,6 +14,7 @@
 #ifndef ERRORREPORT_H
 #define ERRORREPORT_H
 
+#include <QJsonObject>
 #include <QAbstractListModel>
 
 #include "qobjectproperty.h"
@@ -32,10 +33,13 @@ public:
     ErrorReport* proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
 
-    Q_PROPERTY(QString errorMessage READ errorMessage WRITE setErrorMessage NOTIFY errorMessageChanged)
-    void setErrorMessage(const QString &val);
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    void setErrorMessage(const QString &val, const QJsonObject &details=QJsonObject());
     QString errorMessage() const { return m_errorMessage; }
     Q_SIGNAL void errorMessageChanged();
+
+    Q_PROPERTY(QJsonObject details READ details NOTIFY errorMessageChanged)
+    QJsonObject details() const { return m_details; }
 
     Q_PROPERTY(bool hasError READ hasError NOTIFY errorMessageChanged)
     bool hasError() const { return !m_errorMessage.isEmpty(); }
@@ -65,6 +69,7 @@ private:
     void updateWarningMessageFromProxy();
 
 private:
+    QJsonObject m_details;
     QString m_errorMessage;
     QStringList m_warningMessages;
     QObjectProperty<ErrorReport> m_proxyFor;
