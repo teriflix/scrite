@@ -257,6 +257,11 @@ public:
     bool isCreatedOnThisComputer() const { return m_createdOnThisComputer; }
     Q_SIGNAL void createdOnThisComputerChanged();
 
+    Q_PROPERTY(int maxBackupCount READ maxBackupCount WRITE setMaxBackupCount NOTIFY maxBackupCountChanged)
+    void setMaxBackupCount(int val);
+    int maxBackupCount() const { return m_maxBackupCount; }
+    Q_SIGNAL void maxBackupCountChanged();
+
     Q_INVOKABLE void reset();
 
     Q_INVOKABLE bool openOrImport(const QString &fileName);
@@ -353,6 +358,7 @@ private:
     bool m_autoSave = true;
     bool m_readOnly = false;
     bool m_autoSaveMode = false;
+    int m_maxBackupCount = 20;
     QString m_sessionId;
     QJsonObject m_userData;
     QString m_fileName;

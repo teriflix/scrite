@@ -146,32 +146,60 @@ Item {
 
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Auto Save" }
+                    label: Text { text: "Saving Files" }
                     height: screenplayEditorSettingsGroupBox.height
 
                     Column {
                         width: parent.width
                         spacing: 10
+                        anchors.centerIn: parent
 
-                        CheckBox2 {
-                            text: "Enable AutoSave"
-                            checked: scriteDocument.autoSave
-                            onToggled: scriteDocument.autoSave = checked
-                        }
-
-                        Text {
+                        Row {
                             width: parent.width
-                            text: "Auto Save Interval (in seconds)"
-                        }
 
-                        TextField2 {
-                            width: parent.width
-                            enabled: scriteDocument.autoSave
-                            text: scriteDocument.autoSaveDurationInSeconds
-                            validator: IntValidator {
-                                bottom: 1; top: 3600
+                            CheckBox2 {
+                                text: "Auto Save"
+                                checked: scriteDocument.autoSave
+                                onToggled: scriteDocument.autoSave = checked
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width/2
                             }
-                            onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
+
+                            TextField2 {
+                                label: enabled ? "Interval in seconds:" : ""
+                                enabled: scriteDocument.autoSave
+                                text: enabled ? scriteDocument.autoSaveDurationInSeconds : "No Auto Save"
+                                width: parent.width/2
+                                validator: IntValidator {
+                                    bottom: 1; top: 3600
+                                }
+                                onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        Row {
+                            width: parent.width
+
+                            CheckBox2 {
+                                text: "Limit Backups"
+                                checked: scriteDocument.maxBackupCount > 0
+                                onToggled: scriteDocument.maxBackupCount = checked ? 20 : 0
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width/2
+                            }
+
+                            TextField2 {
+                                label: enabled ? "Number of backups to retain:" : ""
+                                enabled: scriteDocument.maxBackupCount > 0
+                                text: enabled ? scriteDocument.maxBackupCount : "Unlimited Backups"
+                                width: parent.width/2
+                                validator: IntValidator {
+                                    bottom: 1; top: 3600
+                                }
+                                onTextEdited: scriteDocument.maxBackupCount = parseInt(text)
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
                     }
                 }

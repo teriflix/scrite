@@ -432,6 +432,11 @@ ScriteDocument::ScriteDocument(QObject *parent)
 
     m_autoSaveTimer.setRepeat(true);
     this->prepareAutoSave();
+
+    QSettings *settings = Application::instance()->settings();
+    const QVariant mbc = settings->value( QStringLiteral("Installation/maxBackupCount") );
+    if(!mbc.isNull())
+        m_maxBackupCount = mbc.toInt();
 }
 
 ScriteDocument::~ScriteDocument()
@@ -680,6 +685,18 @@ void ScriteDocument::setBookmarkedNotes(const QJsonArray &val)
     emit bookmarkedNotesChanged();
 }
 
+void ScriteDocument::setMaxBackupCount(int val)
+{
+    if(m_maxBackupCount == val)
+        return;
+
+    m_maxBackupCount = val;
+    emit maxBackupCountChanged();
+
+    QSettings *settings = Application::instance()->settings();
+    settings->setValue( QStringLiteral("Installation/maxBackupCount"), m_maxBackupCount );
+}
+
 void ScriteDocument::reset()
 {
     HourGlass hourGlass;
@@ -923,11 +940,14 @@ void ScriteDocument::save()
         const bool firstBackup = backupEntries.isEmpty();
         if(!backupEntries.isEmpty())
         {
-            static const int maxBackups = 20;
-            while(backupEntries.size() > maxBackups-1)
+            const int maxBackups = m_maxBackupCount;
+            if(maxBackups > 0)
             {
-                const QFileInfo oldestEntry = backupEntries.takeFirst();
-                QFile::remove(oldestEntry.absoluteFilePath());
+                while(backupEntries.size() > maxBackups-1)
+                {
+                    const QFileInfo oldestEntry = backupEntries.takeFirst();
+                    QFile::remove(oldestEntry.absoluteFilePath());
+                }
             }
 
             const QFileInfo latestEntry = backupEntries.takeLast();
