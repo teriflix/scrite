@@ -234,7 +234,7 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.topMargin: ruler.visible ? 5 : 1
-                color: "white"
+                color: screenplayAdapter.elementCount === 0 || contentView.spacing === 0 ? "white" : Qt.rgba(0,0,0,0)
 
                 TrackerPack {
                     id: trackerPack
@@ -284,6 +284,7 @@ Rectangle {
                     id: contentView
                     anchors.fill: parent
                     model: contentViewModel.value
+                    spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
                     property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
@@ -309,6 +310,20 @@ Rectangle {
 
                         active: false
                         sourceComponent: modelData.scene ? contentComponent : (modelData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)
+
+                        Rectangle {
+                            z: -1
+                            anchors.fill: parent
+                            anchors.leftMargin: -1
+                            anchors.rightMargin: -1
+                            anchors.topMargin: modelData.scene ? -1 : -contentView.spacing/2
+                            anchors.bottomMargin: modelData.scene ? -1 : -contentView.spacing/2
+                            visible: contentView.spacing > 0
+                            color: modelData.scene ? Qt.rgba(0,0,0,0) : (modelData.breakType === Screenplay.Episode ? accentColors.c100.background : accentColors.c50.background)
+                            border.width: modelData.scene ? 1 : 0
+                            border.color: modelData.scene ? (app.isLightColor(modelData.scene.color) ? "black" : modelData.scene.color) : Qt.rgba(0,0,0,0)
+                            opacity: modelData.scene ? 0.25 : 1
+                        }
 
                         /*
                         Profiler.context: "ScreenplayEditorContentDelegate"
@@ -427,9 +442,15 @@ Rectangle {
                             var ret = logLineEditor.visible ? logLineEditor.contentHeight : 0;
                             if(screenplayAdapter.isSourceScreenplay)
                                 ret += titleCardLoader.active ? titleCardLoader.height : Math.max(ruler.topMarginPx,editTitlePageButton.height+20)
-                            return ret
+                            return ret + contentView.spacing
                         }
                         property real padding: width * 0.1
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.bottomMargin: contentView.spacing
+                            visible: screenplayAdapter.elementCount > 0 && contentView.spacing > 0
+                        }
 
                         function editTitlePage(source) {
                             modalDialog.arguments = {"activeTabIndex": 2}
@@ -466,6 +487,7 @@ Rectangle {
                             visible: screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
+                            anchors.verticalCenterOffset: screenplayAdapter.elementCount > 0 ? -contentView.spacing/2 : 0
                             onClicked: editTitlePage(this)
                             enabled: !scriteDocument.readOnly
                         }
@@ -520,10 +542,17 @@ Rectangle {
                     }
                     footer: Item {
                         width: contentView.width
-                        height: Math.max(ruler.bottomMarginPx, addEpisodeButton.height+20)
+                        height: Math.max(ruler.bottomMarginPx, addEpisodeButton.height+20) + contentView.spacing
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.topMargin: contentView.spacing
+                            visible: screenplayAdapter.elementCount > 0 && contentView.spacing > 0
+                        }
 
                         Row {
                             anchors.centerIn: parent
+                            anchors.verticalCenterOffset: screenplayAdapter.elementCount > 0 ? contentView.spacing/2 : 0
                             visible: screenplayAdapter.isSourceScreenplay && enabled
                             enabled: !scriteDocument.readOnly
                             spacing: 20
@@ -537,7 +566,7 @@ Rectangle {
                                 suggestedWidth: 48
                                 suggestedHeight: 48
                                 onClicked: {
-                                    scriteDocument.screenplay.currentElementIndex = -1
+                                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.lastSceneIndex()
                                     if(!scriteDocument.readOnly)
                                         scriteDocument.createNewScene(true)
                                 }
@@ -1211,24 +1240,18 @@ Rectangle {
                 delay: 100
             }
 
-            BoxShadow {
-                visible: screenplayAdapter.currentIndex === contentItem.theIndex && commentsSidePanel.expanded && commentsSidePanel.visible
-                anchors.fill: commentsSidePanel
-                anchors.leftMargin: 9
-                opacity: 1
-            }
-
             SidePanel {
                 id: commentsSidePanel
+                property color theSceneDarkColor: app.isLightColor(contentItem.theScene.color) ? "black" : contentItem.theScene.color
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
-                borderColor: expanded ? primaryColors.borderColor : Qt.rgba(0,0,0,0)
+                borderColor: expanded ? primaryColors.borderColor : (contentView.spacing > 0 ? app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
                 anchors.top: parent.top
                 anchors.left: parent.right
 
                 property real screenY: screenplayEditor.mapFromItem(parent, 0, 0).y
                 property real maxTopMargin: contentItem.height-height-20
-                anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : 0
+                anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : -1
 
                 Connections {
                     target: contentView

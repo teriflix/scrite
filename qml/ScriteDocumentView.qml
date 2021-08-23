@@ -91,6 +91,7 @@ Item {
         property bool showSpellCheckRefreshNoticeBox: true
         property bool showLoglineEditor: false
         property bool allowTaggingOfScenes: false
+        property real spaceBetweenScenes: 0
         onEnableAnimationsChanged: {
             modalDialog.animationsEnabled = enableAnimations
             statusText.enableAnimations = enableAnimations

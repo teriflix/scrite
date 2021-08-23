@@ -145,9 +145,9 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 GroupBox {
+                    id: fileSaveSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
                     label: Text { text: "Saving Files" }
-                    height: screenplayEditorSettingsGroupBox.height
 
                     Column {
                         width: parent.width
@@ -207,29 +207,43 @@ Item {
                 GroupBox {
                     id: screenplayEditorSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
+                    height: fileSaveSettingsGroupBox.height
                     label: Text {
                         text: "Screenplay Editor"
                     }
 
-                    Column {
+                    Grid {
+                        id: screenplayEditorSettingsGrid
                         width: parent.width
+                        columns: 2
+                        anchors.centerIn: parent
 
                         CheckBox2 {
                             checked: screenplayEditorSettings.enableSpellCheck
-                            text: "Enable spell check"
+                            text: "Spell Check"
+                            width: parent.width/2
                             onToggled: screenplayEditorSettings.enableSpellCheck = checked
                         }
 
                         CheckBox2 {
                             checked: screenplayEditorSettings.displayRuler
-                            text: "Display Ruler"
+                            text: "Ruler"
+                            width: parent.width/2
                             onToggled: screenplayEditorSettings.displayRuler = checked
                         }
 
                         CheckBox2 {
                             checked: screenplayEditorSettings.showLoglineEditor
-                            text: "Show Logline Editor"
+                            text: "Logline Editor"
+                            width: parent.width/2
                             onToggled: screenplayEditorSettings.showLoglineEditor = checked
+                        }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.spaceBetweenScenes > 0
+                            text: "Scene Blocks"
+                            width: parent.width/2
+                            onToggled: screenplayEditorSettings.spaceBetweenScenes = checked ? 40 : 0
                         }
                     }
                 }
