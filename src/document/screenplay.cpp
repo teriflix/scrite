@@ -715,6 +715,8 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     {
         scene->setAct(QString());
         scene->setActIndex(-1);
+        scene->setEpisode(QString());
+        scene->setEpisodeIndex(-1);
         scene->setScreenplayElementIndexList(QList<int>());
 
         // If this scene still exists as another element in the screenplay, then
@@ -1155,6 +1157,17 @@ void Screenplay::clearElements()
         ScreenplayElement *ptr = m_elements.takeLast();
         emit elementRemoved(ptr, m_elements.size());
         disconnect(ptr, nullptr, this, nullptr);
+
+        Scene *scene = ptr->scene();
+        if(scene != nullptr)
+        {
+            scene->setAct(QString());
+            scene->setActIndex(-1);
+            scene->setEpisode(QString());
+            scene->setEpisodeIndex(-1);
+            scene->setScreenplayElementIndexList(QList<int>());
+        }
+
         GarbageCollector::instance()->add(ptr);
     }
 
@@ -1162,6 +1175,7 @@ void Screenplay::clearElements()
 
     emit elementCountChanged();
     emit elementsChanged();
+    this->evaluateSceneNumbersLater();
     this->validateCurrentElementIndex();
 
     if(UndoStack::active())
