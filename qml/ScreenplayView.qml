@@ -608,6 +608,7 @@ Item {
                             if(containsMouse)
                                 ToolTip.text = evalToolTipText()
                         }
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onClicked: {
                             parent.forceActiveFocus()
                             screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
