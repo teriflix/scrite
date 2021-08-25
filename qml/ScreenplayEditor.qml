@@ -1246,6 +1246,7 @@ Rectangle {
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
                 borderColor: expanded ? primaryColors.borderColor : (contentView.spacing > 0 ? app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
+                borderWidth: contentItem.isCurrent ? 2 : 1
                 anchors.top: parent.top
                 anchors.left: parent.right
 

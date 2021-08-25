@@ -23,6 +23,7 @@ Item {
     property alias buttonColor: expandCollapseButton.color
     property alias backgroundColor: panelBackground.color
     property color borderColor: primaryColors.borderColor
+    property real borderWidth: 1
 
     property bool expanded: false
     property alias content: contentLoader.sourceComponent
@@ -46,16 +47,17 @@ Item {
         anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
         border { left: 21; top: 21; right: 21; bottom: 21 }
         opacity: 0.25
-        visible: contentLoader.opacity === 1
+        visible: contentLoader.visible
     }
 
     Rectangle {
         id: panelBackground
         anchors.fill: parent
         color: "white"
+        visible: contentLoader.visible
         opacity: contentLoader.opacity
         border.color: borderColor
-        border.width: 1
+        border.width: borderWidth
     }
 
     Item {
