@@ -3133,9 +3133,12 @@ Rectangle {
                         var toIndex = index < 0 ? index : (fromIndex < index ? index-1 : index)
                         var curIndex = index < 0 ? scriteDocument.screenplay.elementCount-1 : toIndex
                         scriteDocument.screenplay.moveElement(scene, toIndex)
-                        screenplayAdapter.refresh()
-                        positionViewAtIndex(curIndex, ListView.Contain)
-                        screenplayAdapter.currentIndex = curIndex
+                        model = null
+                        // positionViewAtIndex(curIndex, ListView.Contain)
+                        Qt.callLater( function(ci) {
+                            screenplayAdapter.currentIndex = ci
+                            sceneListView.model = screenplayAdapter
+                        }, curIndex )
                     }
                 }
             }
