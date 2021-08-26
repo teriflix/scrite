@@ -439,6 +439,8 @@ Rectangle {
                     header: Item {
                         width: contentView.width
                         height: {
+                            if(!screenplayAdapter.isSourceScreenplay)
+                                return contentView.spacing
                             var ret = logLineEditor.visible ? logLineEditor.contentHeight : 0;
                             if(screenplayAdapter.isSourceScreenplay)
                                 ret += titleCardLoader.active ? titleCardLoader.height : Math.max(ruler.topMarginPx,editTitlePageButton.height+20)
@@ -449,7 +451,7 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             anchors.bottomMargin: contentView.spacing
-                            visible: screenplayAdapter.elementCount > 0 && contentView.spacing > 0
+                            visible: screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && screenplayAdapter.isSourceScreenplay
                         }
 
                         function editTitlePage(source) {
@@ -542,12 +544,16 @@ Rectangle {
                     }
                     footer: Item {
                         width: contentView.width
-                        height: Math.max(ruler.bottomMarginPx, addEpisodeButton.height+20) + contentView.spacing
+                        height: {
+                            if(!screenplayAdapter.isSourceScreenplay)
+                                return contentView.spacing
+                            return Math.max(ruler.bottomMarginPx, addEpisodeButton.height+20) + contentView.spacing
+                        }
 
                         Rectangle {
                             anchors.fill: parent
                             anchors.topMargin: contentView.spacing
-                            visible: screenplayAdapter.elementCount > 0 && contentView.spacing > 0
+                            visible: screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && screenplayAdapter.isSourceScreenplay
                         }
 
                         Row {
