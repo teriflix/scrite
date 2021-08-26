@@ -2932,6 +2932,7 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateGroupsImp
             return ret;
         };
 
+        QList<StructureElement*> unusedElements = m_elements.list();
         QHash<Scene*, int> sceneIndexMap;
         QHash<Scene*, int> actIndexMap;
 
@@ -2955,8 +2956,12 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateGroupsImp
             const int index = this->indexOfScene(scene);
             StructureElement *selement = this->elementAt(index);
             if(selement != nullptr)
+            {
                 for(const QString &group : sceneGroups)
                     map[group].append(selement);
+
+                unusedElements.removeOne(selement);
+            }
         }
 
         QMap< QString, QList<StructureElement*> >::const_iterator it = map.constBegin();
@@ -2995,6 +3000,9 @@ QList< QPair<QString, QList<StructureElement *> > > Structure::evaluateGroupsImp
                      const QPair<QString, QList<StructureElement *> > &b) {
             return a.second.size() > b.second.size();
         });
+
+        if(!unusedElements.isEmpty())
+            ret.append( qMakePair(QStringLiteral("Unused Scenes"), unusedElements) );
     }
 
     for(int i=ret.size()-1; i>=0; i--)

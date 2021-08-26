@@ -1133,7 +1133,7 @@ Item {
                     y: modelData.geometry.y - 120 - topMarginForStacks
                     width: modelData.geometry.width + 80
                     height: modelData.geometry.height + 120 + topMarginForStacks + 40
-                    color: app.translucent(accentColors.windowColor, 0.1)
+                    color: app.translucent(accentColors.windowColor, scriteDocument.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 2
                     border.color: accentColors.c600.background
                     enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
@@ -1180,7 +1180,7 @@ Item {
                     width: modelData.geometry.width + 40
                     height: modelData.geometry.height + 40 + topMarginForStacks
                     radius: 0
-                    color: app.translucent(accentColors.windowColor, 0.1)
+                    color: app.translucent(accentColors.windowColor, scriteDocument.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 1
                     border.color: accentColors.borderColor
                     enabled: !createItemMouseHandler.enabled && !annotationGripLoader.active
@@ -1240,7 +1240,7 @@ Item {
                         id: canvasBeatMouseArea
                         anchors.fill: parent
                         drag.target: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
-                        drag.axis: Drag.XAndYAxis
+                        drag.axis: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
                         cursorShape: Qt.SizeAllCursor
                         property bool controlPressed: false
                         onPressed: {
