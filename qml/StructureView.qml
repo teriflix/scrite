@@ -1575,6 +1575,27 @@ Item {
                         }
                     }
 
+                    MenuItem2 {
+                        text: "Remove From Timeline"
+                        enabled: {
+                            if(!selection.hasItems)
+                                return false
+                            var items = selection.items
+                            for(var i=0; i<items.length; i++) {
+                                if(items[i].element.scene.addedToScreenplay)
+                                    continue
+                                return false
+                            }
+                            return true
+                        }
+                        onClicked: {
+                            var items = selection.items
+                            items.forEach( function(item) {
+                                scriteDocument.screenplay.removeSceneElements(item.element.scene)
+                            })
+                        }
+                    }
+
                     StructureGroupsMenu {
                         sceneGroup: SceneGroup {
                             structure: scriteDocument.structure
@@ -1718,6 +1739,7 @@ Item {
 
             Menu2 {
                 id: elementContextMenu
+                width: 250
                 property StructureElement element
                 onElementChanged: {
                     if(element)
@@ -1757,13 +1779,22 @@ Item {
                 MenuItem2 {
                     text: "Add To Timeline"
                     property Scene lastScene: scriteDocument.screenplay.elementCount > 0 && scriteDocument.screenplay.elementAt(scriteDocument.screenplay.elementCount-1).scene
-                    enabled: elementContextMenu.element !== null && elementContextMenu.element.scene !== lastScene
+                    enabled: elementContextMenu.element && elementContextMenu.element.scene !== lastScene
                     onClicked: {
                         var lastScreenplayScene = null
                         if(scriteDocument.screenplay.elementCount > 0)
                             lastScreenplayScene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.elementCount-1).scene
                         if(lastScreenplayScene === null || elementContextMenu.element.scene !== lastScreenplayScene)
                             scriteDocument.screenplay.addScene(elementContextMenu.element.scene)
+                        elementContextMenu.element = null
+                    }
+                }
+
+                MenuItem2 {
+                    text: "Remove From Timeline"
+                    enabled: elementContextMenu.element && elementContextMenu.element.scene.addedToScreenplay
+                    onClicked: {
+                        scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
                         elementContextMenu.element = null
                     }
                 }
