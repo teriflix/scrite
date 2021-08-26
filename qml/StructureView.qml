@@ -231,6 +231,14 @@ Item {
                     target: scriteDocument.structure
                     onForceBeatBoardLayoutChanged: beatBoardLayoutToolButton.checked = scriteDocument.structure.forceBeatBoardLayout
                 }
+
+                Connections {
+                    target: scriteDocument.screenplay
+                    enabled: scriteDocument.structure.forceBeatBoardLayout
+                    onElementRemoved: Qt.callLater( function() {
+                        scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+                    })
+                }
             }
 
             ToolButton3 {
