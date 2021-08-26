@@ -2045,7 +2045,13 @@ Item {
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
                 sourceComponent: Rectangle {
-                    color: accentColors.c200.background
+                    color: FocusTracker.hasFocus ? accentColors.c300.background : accentColors.c200.background
+                    FocusTracker.window: qmlWindow
+
+                    Behavior on color {
+                        enabled: screenplayEditorSettings.enableAnimations
+                        ColorAnimation { duration: 250 }
+                    }
 
                     ScreenplayView {
                         anchors.fill: parent

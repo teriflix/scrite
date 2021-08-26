@@ -146,7 +146,7 @@ Item {
         clip: true
         FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
-        EventFilter.events: [31]
+        EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
             EventFilter.forwardEventTo(screenplayElementList)
             result.filter = true
@@ -322,6 +322,27 @@ Item {
         currentIndex: scriteDocument.screenplay.currentElementIndex
         Keys.onRightPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex+1
         Keys.onLeftPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex-1
+        Keys.onPressed: {
+            if(event.key === Qt.Key_Backspace || Qt.Key_Delete) {
+                if(event.isAutoRepeat)
+                    return false
+                if(event.modifiers !== Qt.NoModifier)
+                    return
+                Qt.callLater(removeCurrentElement)
+                event.accepted = true
+            }
+        }
+
+        function removeCurrentElement() {
+            if(scriteDocument.loading)
+                return
+            var cidx = currentIndex
+            if(cidx < 0)
+                return
+            var celement = scriteDocument.screenplay.elementAt(cidx)
+            if(celement)
+                scriteDocument.screenplay.removeElement(celement)
+        }
 
         property bool scrollBarRequired: screenplayElementList.width < screenplayElementList.contentWidth
         ScrollBar.horizontal: ScrollBar2 {
@@ -342,7 +363,7 @@ Item {
         move: moveAndDisplace
 
         EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
-        EventFilter.events: [31]
+        EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
             if(event.delta < 0)
                 contentX = Math.min(contentX+20, contentWidth-width)
@@ -521,8 +542,6 @@ Item {
                 color: accentColors.a700.background
             }
 
-            Keys.onDeletePressed: scriteDocument.screenplay.removeElement(element)
-
             Loader {
                 id: elementItemBox
                 anchors.fill: parent
@@ -610,7 +629,7 @@ Item {
                         }
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onClicked: {
-                            parent.forceActiveFocus()
+                            screenplayElementList.forceActiveFocus()
                             screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
                             if(screenplayElementList.mutiSelectionMode)
                                 elementItemDelegate.element.toggleSelection()
@@ -840,7 +859,7 @@ Item {
 
         ColorMenu {
             title: "Color"
-            enabled: elementItemMenu.element !== null
+            enabled: elementItemMenu.element
             onMenuItemClicked: {
                 elementItemMenu.element.scene.color = color
                 elementItemMenu.close()
