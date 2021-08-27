@@ -2454,7 +2454,7 @@ Item {
             }
 
             width: 350
-            height: Math.max(indexCardLayout.height+6, minIndexCardHeight)
+            height: Math.max(indexCardLayout.height+10, minIndexCardHeight)
 
             Rectangle {
                 id: background
@@ -2521,8 +2521,10 @@ Item {
 
             Column {
                 id: indexCardLayout
-                width: parent.width - 20
-                anchors.centerIn: parent
+                width: parent.width - 14
+                anchors.top: parent.top
+                anchors.topMargin: 3
+                anchors.horizontalCenter: parent.horizontalCenter
                 spacing: 10
 
                 LodLoader {
@@ -2612,7 +2614,7 @@ Item {
                     }
                     TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
 
-                    property real idealHeight: Math.max(minIndexCardHeight-headingFieldLoader.height-groupsRow.height-charactersRow.height-3*parent.spacing, 200)
+                    property real idealHeight: Math.max(minIndexCardHeight-headingFieldLoader.height-footerRow.height-2*parent.spacing, 200)
 
                     property bool hasFocus: false
 
@@ -2756,21 +2758,11 @@ Item {
                     }
                 }
 
-                Text {
-                    id: groupsRow
-                    x: characterList.x
-                    text: scriteDocument.structure.presentableGroupNames(element.scene.groups)
-                    width: element.scene.hasCharacters ? characterList.width : parent.width
-                    visible: element.scene.groups.length > 0
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    font.pointSize: app.idealAppFontSize - 2
-                    horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
-                }
-
-                Item {
-                    id: charactersRow
+                Row {
+                    id: footerRow
                     width: parent.width
-                    height: Math.max(characterList.height, dragHandle.height)
+                    height: Math.max(Math.max(sceneTypeImage.height, dragHandle.height), footerLabels.height)
+                    spacing: 5
 
                     SceneTypeImage {
                         id: sceneTypeImage
@@ -2778,25 +2770,37 @@ Item {
                         opacity: 0.5
                         showTooltip: false
                         sceneType: element.scene.type
-                        anchors.left: parent.left
                         anchors.bottom: parent.bottom
                         visible: sceneType !== Scene.Standard
                     }
 
-                    Text {
-                        id: characterList
-                        font.pointSize: app.idealAppFontSize - 2
-                        anchors.left: sceneTypeImage.visible ? sceneTypeImage.right : parent.left
-                        anchors.right: dragHandle.left
-                        anchors.margins: sceneTypeImage.visible ? 5 : 0
-                        anchors.verticalCenter: parent.verticalCenter
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        horizontalAlignment: width < contentWidth ? Text.AlignHCenter : Text.AlignLeft
-                        opacity: element.scene.hasCharacters ? 1 : 0
-                        text: {
-                            if(element.scene.hasCharacters)
-                                return "<b>Characters</b>: " + element.scene.characterNames.join(", ")
-                            return ""
+                    Column {
+                        id: footerLabels
+                        width: parent.width - (sceneTypeImage.visible ? (sceneTypeImage.width+parent.spacing) : 0) - (dragHandle.width+parent.spacing)
+                        y: Math.max(0, (parent.height-height)/2)
+                        spacing: 5
+
+                        Text {
+                            id: groupsLabel
+                            x: characterList.x
+                            text: scriteDocument.structure.presentableGroupNames(element.scene.groups)
+                            width: parent.width
+                            visible: element.scene.groups.length > 0 || !element.scene.hasCharacters
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            font.pointSize: app.idealAppFontSize - 2
+                        }
+
+                        Text {
+                            id: characterList
+                            font.pointSize: app.idealAppFontSize - 2
+                            width: parent.width
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            visible: element.scene.hasCharacters
+                            text: {
+                                if(element.scene.hasCharacters)
+                                    return "<b>Characters</b>: " + element.scene.characterNames.join(", ")
+                                return ""
+                            }
                         }
                     }
 
@@ -2804,7 +2808,6 @@ Item {
                         id: dragHandle
                         source: elementItem.element.scene.addedToScreenplay ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
                         width: 24; height: 24
-                        anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         scale: dragHandleMouseArea.pressed ? 2 : 1
                         opacity: elementItem.selected ? 1 : 0.1
