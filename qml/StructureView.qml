@@ -2758,11 +2758,11 @@ Item {
                     }
                 }
 
-                Row {
+                Item {
                     id: footerRow
                     width: parent.width
                     height: Math.max(Math.max(sceneTypeImage.height, dragHandle.height), footerLabels.height)
-                    spacing: 5
+                    readonly property real spacing: 5
 
                     SceneTypeImage {
                         id: sceneTypeImage
@@ -2770,13 +2770,17 @@ Item {
                         opacity: 0.5
                         showTooltip: false
                         sceneType: element.scene.type
+                        anchors.left: parent.left
                         anchors.bottom: parent.bottom
                         visible: sceneType !== Scene.Standard
                     }
 
                     Column {
                         id: footerLabels
-                        width: parent.width - (sceneTypeImage.visible ? (sceneTypeImage.width+parent.spacing) : 0) - (dragHandle.width+parent.spacing)
+                        anchors.left: sceneTypeImage.visible ? sceneTypeImage.right : parent.left
+                        anchors.right: dragHandle.left
+                        anchors.leftMargin: sceneTypeImage.visible ? parent.spacing : 0
+                        anchors.rightMargin: parent.spacing
                         y: Math.max(0, (parent.height-height)/2)
                         spacing: 5
 
@@ -2808,6 +2812,7 @@ Item {
                         id: dragHandle
                         source: elementItem.element.scene.addedToScreenplay ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
                         width: 24; height: 24
+                        anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         scale: dragHandleMouseArea.pressed ? 2 : 1
                         opacity: elementItem.selected ? 1 : 0.1
