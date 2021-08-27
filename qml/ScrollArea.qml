@@ -116,6 +116,32 @@ Flickable {
     ScrollBar.horizontal: ScrollBar2 { flickable: scrollAreaFlickable }
     ScrollBar.vertical: ScrollBar2 { flickable: scrollAreaFlickable }
 
+    Timer {
+        id: ensureItemVisibleTimer
+        property Item item
+        property real scaling
+        property real leaveMargin
+        repeat: false
+        interval: 250
+        running: false
+        onTriggered: {
+            app.log("ensureItemVisible(" + item + ", " + scaling + ", " + leaveMargin + ")")
+            ensureItemVisible(item, scaling, leaveMargin)
+            item = null
+            scaling = 1
+            leaveMargin = 0
+            delay = 250
+        }
+    }
+
+    function ensureItemVisibleLater(item, scaling, leaveMargin, delay) {
+        ensureItemVisibleTimer.item = item
+        ensureItemVisibleTimer.scaling = scaling ? scaling : 1
+        ensureItemVisibleTimer.leaveMargin = leaveMargin ? leaveMargin : 0
+        ensureItemVisibleTimer.interval = delay ? delay : 500
+        ensureItemVisibleTimer.start()
+    }
+
     function ensureItemVisible(item, scaling, leaveMargin) {
         if(item === null)
             return

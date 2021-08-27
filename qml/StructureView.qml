@@ -1590,9 +1590,12 @@ Item {
                         }
                         onClicked: {
                             var items = selection.items
+                            var firstItem = items[0]
                             items.forEach( function(item) {
                                 scriteDocument.screenplay.removeSceneElements(item.element.scene)
                             })
+                            selection.clear()
+                            canvasScroll.ensureItemVisibleLater(firstItem, canvas.scale)
                         }
                     }
 
@@ -1754,7 +1757,7 @@ Item {
                         checkable: true
                         checked: elementContextMenu.element ? elementContextMenu.element.scene.heading.enabled : false
                     }
-                    enabled: elementContextMenu.element !== null
+                    enabled: elementContextMenu.element
                     onTriggered: {
                         elementContextMenu.element.scene.heading.enabled = action.checked
                         elementContextMenu.element = null
@@ -1763,7 +1766,7 @@ Item {
 
                 ColorMenu {
                     title: "Color"
-                    enabled: elementContextMenu.element !== null
+                    enabled: elementContextMenu.element
                     onMenuItemClicked: {
                         elementContextMenu.element.scene.color = color
                         elementContextMenu.element = null
@@ -1795,6 +1798,7 @@ Item {
                     enabled: elementContextMenu.element && elementContextMenu.element.scene.addedToScreenplay
                     onClicked: {
                         scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
+                        canvasScroll.ensureItemVisibleLater(elementContextMenu.element.follow, canvas.scale)
                         elementContextMenu.element = null
                     }
                 }
@@ -1815,7 +1819,7 @@ Item {
 
                 MenuItem2 {
                     text: "Delete"
-                    enabled: elementContextMenu.element !== null
+                    enabled: elementContextMenu.element
                     onClicked: {
                         var element = elementContextMenu.element
                         elementContextMenu.element = null
