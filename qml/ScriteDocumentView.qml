@@ -375,8 +375,13 @@ Item {
             if(scriteDocument.screenplay.currentElementIndex < 0) {
                 var index = scriteDocument.structure.currentElementIndex
                 var element = scriteDocument.structure.elementAt(index)
-                if(element)
+                if(element) {
+                    if(element.scene.addedToScreenplay) {
+                        scriteDocument.screenplay.currentElementIndex = element.scene.screenplayElementIndexList[0]
+                        return scriteDocument.screenplay
+                    }
                     return element.scene
+                }
             }
 
             return scriteDocument.screenplay
