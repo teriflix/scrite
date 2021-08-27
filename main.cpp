@@ -107,7 +107,7 @@ void ScriteQtMessageHandler(QtMsgType type, const QMessageLogContext & context, 
 
 int main(int argc, char **argv)
 {
-    const QVersionNumber applicationVersion(0, 7, 7);
+    const QVersionNumber applicationVersion(0, 7, 8);
     Application::setApplicationName(QStringLiteral("Scrite"));
     Application::setOrganizationName(QStringLiteral("TERIFLIX"));
     Application::setOrganizationDomain(QStringLiteral("teriflix.com"));

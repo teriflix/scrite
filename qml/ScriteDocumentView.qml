@@ -1758,7 +1758,6 @@ Item {
                 anchors.fill: parent
                 anchors.topMargin: 1
                 clip: true
-                readonly property int screenplayZoomLevelModifier: 0
                 sourceComponent: {
                     switch(mainTabBar.currentIndex) {
                     case 1: return structureEditorComponent
@@ -1775,7 +1774,7 @@ Item {
         id: screenplayEditorComponent
 
         ScreenplayEditor {
-            zoomLevelModifier: screenplayZoomLevelModifier
+            zoomLevelModifier: mainTabBar.currentIndex > 0 ? -3 : 0
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(showNotebookInStructure)
@@ -2025,7 +2024,6 @@ Item {
                         SplitView.preferredWidth: ui.width * 0.5
                         SplitView.minimumWidth: 16
                         onWidthChanged: workspaceSettings.screenplayEditorWidth = width
-                        readonly property int screenplayZoomLevelModifier: -3
                         active: width >= 50
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
 
@@ -2040,7 +2038,7 @@ Item {
 
             Loader {
                 id: structureEditorRow2
-                SplitView.preferredHeight: 155 + minimumAppFontMetrics.height*screenplayTracks.trackCount
+                SplitView.preferredHeight: 140 + minimumAppFontMetrics.height*screenplayTracks.trackCount
                 SplitView.minimumHeight: 16
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50

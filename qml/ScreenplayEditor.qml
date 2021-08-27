@@ -2426,7 +2426,6 @@ Rectangle {
 
             Column {
                 id: sceneHeadingLayout
-                // spacing: sceneCharactersListLoader.active ? 5 : 0
                 spacing: 5
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -2441,7 +2440,8 @@ Rectangle {
 
                     Item {
                         width: parent.width - sceneMenuButton.width - parent.spacing - (sceneTaggingButton.visible ? (sceneTaggingButton.width+parent.spacing) : 0)
-                        height: 2
+                        height: headingFontMetrics.lineSpacing * lineCount
+                        property int lineCount: Math.ceil((sceneHeadingField.length * headingFontMetrics.averageCharacterWidth)/width)
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.verticalCenterOffset: headingFontMetrics.descent
 
