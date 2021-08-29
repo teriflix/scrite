@@ -323,9 +323,10 @@ Item {
         Keys.onRightPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex+1
         Keys.onLeftPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex-1
         Keys.onPressed: {
-            if(event.key === Qt.Key_Backspace || Qt.Key_Delete) {
+            event.accepted = false
+            if(event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
                 if(event.isAutoRepeat)
-                    return false
+                    return
                 if(event.modifiers !== Qt.NoModifier)
                     return
                 Qt.callLater(removeCurrentElement)
