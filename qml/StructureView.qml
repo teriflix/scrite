@@ -2000,6 +2000,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: statusBar.height * 0.5
             text: {
+                if(!canvasScroll.interactive)
+                    return "Canvas Locked While Index Card Has Focus. Hit ESC To Release Focus."
                 var ret = scriteDocument.structure.elementCount + " Scenes";
                 if(canvas.episodeBoxes.length > 0)
                     ret += ", " + canvas.episodeBoxes.length + " Episodes";
