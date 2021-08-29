@@ -2397,9 +2397,10 @@ Rectangle {
                     onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
                     SceneTypeImage {
-                        width: sceneHeadingField.height * 0.55
+                        width: headingFontMetrics.height
                         height: width
-                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenter: sceneNumberField.verticalCenter
+                        anchors.verticalCenterOffset: -headingFontMetrics.descent
                         sceneType: headingItem.theScene.type
                     }
 
