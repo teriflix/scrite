@@ -2542,7 +2542,7 @@ Rectangle {
                         down: sceneTagMenuLoader.active
                         onClicked: sceneTagMenuLoader.show()
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: sceneMenuButton.right
+                        anchors.right: sceneMenuButton.left
                         anchors.rightMargin: parent.spacing
                         width: headingFontMetrics.lineSpacing
                         height: headingFontMetrics.lineSpacing
