@@ -2434,12 +2434,15 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters ? 8 : 4
 
-                Row {
-                    spacing: 5
+                Item {
+                    property real spacing: 5
                     width: parent.width
+                    height: Math.max(sceneHeadingFieldArea.height, sceneMenuButton.height)
 
                     Item {
-                        width: parent.width - sceneMenuButton.width - parent.spacing - (sceneTaggingButton.visible ? (sceneTaggingButton.width+parent.spacing) : 0)
+                        id: sceneHeadingFieldArea
+                        anchors.left: parent.left
+                        anchors.right: sceneTaggingButton.visible ? sceneTaggingButton.left : sceneMenuButton.left
                         height: headingFontMetrics.lineSpacing * lineCount
                         property int lineCount: Math.ceil((sceneHeadingField.length * headingFontMetrics.averageCharacterWidth)/width)
                         anchors.verticalCenter: parent.verticalCenter
@@ -2539,6 +2542,8 @@ Rectangle {
                         down: sceneTagMenuLoader.active
                         onClicked: sceneTagMenuLoader.show()
                         anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: sceneMenuButton.right
+                        anchors.rightMargin: parent.spacing
                         width: headingFontMetrics.lineSpacing
                         height: headingFontMetrics.lineSpacing
                         ToolTip.text: "Tag Scene"
@@ -2569,6 +2574,7 @@ Rectangle {
                         ToolTip.delay: 1000
                         onClicked: sceneMenu.visible = true
                         down: sceneMenu.visible
+                        anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         width: headingFontMetrics.lineSpacing
                         height: headingFontMetrics.lineSpacing
