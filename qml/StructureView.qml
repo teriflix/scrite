@@ -1270,9 +1270,17 @@ Item {
                         MouseArea {
                             id: canvasBeatLabelMouseArea
                             anchors.fill: parent
-                            drag.target: canvasGroupBoxItem
-                            drag.axis: Drag.XAndYAxis
+                            drag.target: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
+                            drag.axis: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
                             cursorShape: Qt.SizeAllCursor
+                            property bool controlPressed: false
+                            onPressed: {
+                                controlPressed = mouse.modifiers & Qt.ControlModifier
+                                if(controlPressed) {
+                                    mouse.accepted = false
+                                    return
+                                }
+                            }
                             drag.onActiveChanged: {
                                 selection.clear()
                                 canvasGroupBoxItem.refX = canvasGroupBoxItem.x
