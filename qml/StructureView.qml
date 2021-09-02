@@ -711,6 +711,7 @@ Item {
                 scriteDocument.structure.addElement(element)
                 scriteDocument.structure.currentElementIndex = scriteDocument.structure.elementCount-1
                 requestEditorLater()
+                canvas.forceActiveFocus()
                 element.scene.undoRedoEnabled = true
             }
 
