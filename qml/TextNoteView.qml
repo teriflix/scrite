@@ -43,7 +43,7 @@ Item {
         TextField2 {
             id: titleField
             text: note ? note.title : ""
-            width: parent.width >= 820 ? 800 : parent.width-20
+            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
             anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.WordWrap
             font.bold: true
@@ -64,7 +64,7 @@ Item {
         FlickableTextArea {
             id: contentField
             text: note ? note.content : ""
-            width: parent.width >= 820 ? 800 : parent.width-20
+            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
             anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height - titleField.height - parent.spacing
             tabSequenceManager: noteTabManager

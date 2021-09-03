@@ -28,6 +28,8 @@ Rectangle {
     property real toolbarSpacing: 0
     property real toolbarLeftMargin: 0
     property real toolButtonSize: Math.max(toolbarSize - 4, 20)
+    property real maxTextAreaSize: idealAppFontMetrics.averageCharacterWidth * 80
+    property real minTextAreaSize: idealAppFontMetrics.averageCharacterWidth * 20
 
     function switchToStoryTab() {
         switchTo(scriteDocument.structure.notes)
@@ -877,7 +879,7 @@ Rectangle {
                             id: sceneHeadingField
                             text: scene.heading.text
                             label: ""
-                            width: parent.width >= 820 ? 800 : parent.width-20
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Heading"
                             readOnly: scriteDocument.readOnly
@@ -894,7 +896,7 @@ Rectangle {
                             id: sceneTitleField
                             text: scene.structureElement.nativeTitle
                             label: ""
-                            width: parent.width >= 820 ? 800 : parent.width-20
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Title"
                             readOnly: scriteDocument.readOnly
@@ -907,7 +909,7 @@ Rectangle {
 
                         FlickableTextArea {
                             id: sceneSynopsisField
-                            width: parent.width >= 820 ? 800 : parent.width-20
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - parent.spacing*2
                             text: scene.title
                             placeholderText: "Scene Synopsis"
@@ -991,6 +993,7 @@ Rectangle {
                 Item {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
+                    visible: sceneTabBar.tabIndex === 3
 
                     EventFilter.events: [EventFilter.Wheel]
                     EventFilter.onFilter: {
@@ -1006,14 +1009,13 @@ Rectangle {
 
                         FlickableTextArea {
                             id: sceneCommentsField
-                            width: parent.width >= 820 ? 800 : parent.width-20
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height
                             text: scene.comments
                             placeholderText: "Scene Comments"
                             readOnly: scriteDocument.readOnly
                             onTextChanged: scene.comments = text
                             undoRedoEnabled: true
-                            visible: sceneTabBar.tabIndex === 3
                             ScrollBar.vertical: sceneCommentsVScrollBar
                             adjustTextWidthBasedOnScrollBar: false
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -1257,7 +1259,7 @@ Rectangle {
 
                         Row {
                             id: breakElementHeadingRow
-                            width: parent.width >= 820 ? 800 : parent.width-20
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 10
 
@@ -1286,7 +1288,7 @@ Rectangle {
                             placeholderText: breakKind + " Summary ..."
                             text: breakElement.breakSummary
                             onTextChanged: breakElement.breakSummary = text
-                            width: parent.width >= 820 ? 800 : parent.width-20
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height - breakElementHeadingRow.height - parent.spacing
                             anchors.horizontalCenter: parent.horizontalCenter
                             backTabItem: breakElementHeadingField
@@ -1576,14 +1578,51 @@ Rectangle {
                     }
                 }
 
-                FlickableTextArea {
-                    id: loglineFieldArea
+                Item {
                     width: screenplayTabContentArea.width
                     height: screenplayTabContentArea.height
                     visible: screenplayTabBar.tabIndex === 1
-                    text: scriteDocument.screenplay.logline
-                    onTextChanged: scriteDocument.screenplay.logline = text
-                    placeholderText: "Logline: a one-sentence summary or description."
+
+                    EventFilter.events: [EventFilter.Wheel]
+                    EventFilter.onFilter: {
+                        EventFilter.forwardEventTo(loglineFieldArea)
+                        result.filter = true
+                        result.accepted = true
+                    }
+
+                    Item {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+
+                        FlickableTextArea {
+                            id: loglineFieldArea
+                            text: scriteDocument.screenplay.logline
+                            onTextChanged: scriteDocument.screenplay.logline = text
+                            placeholderText: "Logline: a one-sentence summary or description."
+                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            height: parent.height
+                            readOnly: scriteDocument.readOnly
+                            undoRedoEnabled: true
+                            visible: sceneTabBar.tabIndex === 3
+                            ScrollBar.vertical: loglineVScrollBar
+                            adjustTextWidthBasedOnScrollBar: false
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            background: Rectangle {
+                                color: primaryColors.windowColor
+                                opacity: 0.15
+                            }
+                        }
+                    }
+
+                    ScrollBar2 {
+                        id: loglineVScrollBar
+                        orientation: Qt.Vertical
+                        flickable: loglineFieldArea
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: attachmentsArea.top
+                    }
                 }
 
                 Loader {
@@ -2218,7 +2257,7 @@ Rectangle {
 
                                 FlickableTextArea {
                                     id: characterSummaryField
-                                    width: parent.width >= 820 ? 800 : parent.width-20
+                                    width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                                     height: parent.height
                                     anchors.centerIn: parent
                                     anchors.horizontalCenterOffset: -5
@@ -2332,7 +2371,7 @@ Rectangle {
         id: addRelationshipDialogComponent
 
         Rectangle {
-            width: Math.max(800, ui.width*0.5)
+            width: Math.max(maxTextAreaSize, ui.width*0.5)
             height: Math.min(ui.height*0.85, Math.min(charactersList.height, 500) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80)
             color: primaryColors.c10.background
 

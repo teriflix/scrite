@@ -43,7 +43,7 @@ Item {
 
     Flickable {
         id: formFlickable
-        width: Math.max(200, Math.min(parent.width-17, 800))
+        width: Math.max(minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
         height: parent.height
         contentWidth: formContentLayout.width
         contentHeight: formContentLayout.height
