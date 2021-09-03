@@ -28,7 +28,7 @@ ScrollBar {
         mid: Qt.rgba(0,0,0,0.25)
         dark: Qt.rgba(0,0,0,0.75)
     }
-    opacity: active ? 1 : 0.2
+    opacity: active ? 1 : 0.4
     Behavior on opacity {
         enabled: screenplayEditorSettings.enableAnimations
         NumberAnimation { duration: 250 }

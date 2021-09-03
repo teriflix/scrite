@@ -858,15 +858,26 @@ Rectangle {
                     height: sceneTabContentArea.height
 
                     Column {
-                        anchors.fill: parent
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: sceneAttachments.top
                         anchors.margins: 10
+                        anchors.bottomMargin: 0
                         spacing: 10
+
+                        EventFilter.events: [EventFilter.Wheel]
+                        EventFilter.onFilter: {
+                            EventFilter.forwardEventTo(sceneSynopsisField)
+                            result.filter = true
+                            result.accepted = true
+                        }
 
                         TextField2 {
                             id: sceneHeadingField
                             text: scene.heading.text
                             label: ""
-                            width: parent.width
+                            width: parent.width >= 820 ? 800 : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Heading"
                             readOnly: scriteDocument.readOnly
@@ -876,13 +887,14 @@ Rectangle {
                             font.capitalization: Font.AllUppercase
                             font.family: scriteDocument.formatting.elementFormat(SceneElement.Heading).font.family
                             font.pointSize: app.idealFontPointSize+2
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
 
                         TextField2 {
                             id: sceneTitleField
                             text: scene.structureElement.nativeTitle
                             label: ""
-                            width: parent.width
+                            width: parent.width >= 820 ? 800 : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Title"
                             readOnly: scriteDocument.readOnly
@@ -890,25 +902,44 @@ Rectangle {
                             tabItem: sceneSynopsisField.textArea
                             backTabItem: sceneHeadingField
                             font.capitalization: Font.AllUppercase
+                            anchors.horizontalCenter: parent.horizontalCenter
                         }
 
                         FlickableTextArea {
                             id: sceneSynopsisField
-                            width: parent.width
-                            height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneAttachments.height - parent.spacing*3
+                            width: parent.width >= 820 ? 800 : parent.width-20
+                            height: parent.height - sceneHeadingField.height - sceneTitleField.height - parent.spacing*2
                             text: scene.title
                             placeholderText: "Scene Synopsis"
                             readOnly: scriteDocument.readOnly
                             onTextChanged: scene.title = text
                             undoRedoEnabled: true
                             backTabItem: sceneTitleField
+                            adjustTextWidthBasedOnScrollBar: false
+                            ScrollBar.vertical: sceneSynopsisVScrollBar
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            background: Rectangle {
+                                color: primaryColors.windowColor
+                                opacity: 0.15
+                            }
                         }
+                    }
 
-                        AttachmentsView {
-                            id: sceneAttachments
-                            width: parent.width
-                            attachments: scene ? scene.attachments : null
-                        }
+                    ScrollBar2 {
+                        id: sceneSynopsisVScrollBar
+                        orientation: Qt.Vertical
+                        flickable: sceneSynopsisField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: sceneAttachments.top
+                    }
+
+                    AttachmentsView {
+                        id: sceneAttachments
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        attachments: scene ? scene.attachments : null
                     }
 
                     AttachmentsDropArea2 {
@@ -957,16 +988,50 @@ Rectangle {
                     visible: sceneTabBar.tabIndex === 2
                 }
 
-                FlickableTextArea {
-                    id: sceneCommentsField
+                Item {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
-                    text: scene.comments
-                    placeholderText: "Scene Comments"
-                    readOnly: scriteDocument.readOnly
-                    onTextChanged: scene.comments = text
-                    undoRedoEnabled: true
-                    visible: sceneTabBar.tabIndex === 3
+
+                    EventFilter.events: [EventFilter.Wheel]
+                    EventFilter.onFilter: {
+                        EventFilter.forwardEventTo(sceneCommentsField)
+                        result.filter = true
+                        result.accepted = true
+                    }
+
+                    Item {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+
+                        FlickableTextArea {
+                            id: sceneCommentsField
+                            width: parent.width >= 820 ? 800 : parent.width-20
+                            height: parent.height
+                            text: scene.comments
+                            placeholderText: "Scene Comments"
+                            readOnly: scriteDocument.readOnly
+                            onTextChanged: scene.comments = text
+                            undoRedoEnabled: true
+                            visible: sceneTabBar.tabIndex === 3
+                            ScrollBar.vertical: sceneCommentsVScrollBar
+                            adjustTextWidthBasedOnScrollBar: false
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            background: Rectangle {
+                                color: primaryColors.windowColor
+                                opacity: 0.15
+                            }
+                        }
+                    }
+
+                    ScrollBar2 {
+                        id: sceneCommentsVScrollBar
+                        orientation: Qt.Vertical
+                        flickable: sceneCommentsField
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.bottom: attachmentsArea.top
+                    }
                 }
             }
         }
@@ -1132,59 +1197,9 @@ Rectangle {
                 switchTo(notes)
             }
 
-            onNoteChanged: {
-                if(note.objectName === "_newNote")
-                    noteHeadingField.forceActiveFocus()
-                else
-                    noteContentFieldArea.textArea.forceActiveFocus()
-                note.objectName = ""
-            }
-
-            TextField2 {
-                id: noteHeadingField
-                font.pointSize: app.idealFontPointSize + 5
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.margins: 10
-                text: note.title
-                readOnly: scriteDocument.readOnly
-                onTextChanged: note.title = text
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                maximumLength: 256
-                placeholderText: "Note Heading"
-                label: ""
-                tabItem: noteContentFieldArea.textArea
-                onReturnPressed: noteContentFieldArea.textArea.forceActiveFocus()
-            }
-
-            FlickableTextArea {
-                id: noteContentFieldArea
-                anchors.top: noteHeadingField.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: attachmentsArea.top
-                anchors.margins: 10
-                text: note.content
-                onTextChanged: note.content = text
-                backTabItem: noteHeadingField
-                placeholderText: "Note Content ..."
-            }
-
-            AttachmentsView {
-                id: attachmentsArea
-                attachments: note ? note.attachments : null
-                orientation: ListView.Horizontal
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.margins: 10
-            }
-
-            AttachmentsDropArea2 {
-                id: attachmentsDropArea
+            TextNoteView {
                 anchors.fill: parent
-                target: note ? note.attachments : null
+                note: parent.note
             }
         }
     }
@@ -1222,47 +1237,76 @@ Rectangle {
             Loader {
                 active: breakElement !== null
                 anchors.fill: parent
-                anchors.margins: 10
                 sourceComponent: Item {
-                    Row {
-                        id: breakElementHeadingRow
-                        anchors.top: parent.top
+
+                    EventFilter.events: [EventFilter.Wheel]
+                    EventFilter.onFilter: {
+                        EventFilter.forwardEventTo(breakElementSummaryField)
+                        result.filter = true
+                        result.accepted = true
+                    }
+
+                    Column {
                         anchors.left: parent.left
                         anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: breakElementAttachmentsView.top
+                        anchors.margins: 10
+                        anchors.bottomMargin: 0
                         spacing: 10
 
-                        Text {
-                            id: headingLabel
-                            text: breakElement.breakTitle + ": "
-                            font.pointSize: app.idealFontPointSize + 3
-                            anchors.baseline: breakElementHeadingField.baseline
+                        Row {
+                            id: breakElementHeadingRow
+                            width: parent.width >= 820 ? 800 : parent.width-20
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 10
+
+                            Text {
+                                id: headingLabel
+                                text: breakElement.breakTitle + ": "
+                                font.pointSize: app.idealFontPointSize + 3
+                                anchors.baseline: breakElementHeadingField.baseline
+                            }
+
+                            TextField2 {
+                                id: breakElementHeadingField
+                                text: breakElement.breakSubtitle
+                                width: parent.width - headingLabel.width - parent.spacing
+                                label: ""
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                font.pointSize: app.idealFontPointSize + 5
+                                placeholderText: breakKind + " Name"
+                                onTextChanged: breakElement.breakSubtitle = text
+                                tabItem: breakElementSummaryField.textArea
+                            }
                         }
 
-                        TextField2 {
-                            id: breakElementHeadingField
-                            text: breakElement.breakSubtitle
-                            width: parent.width - headingLabel.width - parent.spacing
-                            label: ""
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            font.pointSize: app.idealFontPointSize + 5
-                            placeholderText: breakKind + " Name"
-                            onTextChanged: breakElement.breakSubtitle = text
-                            tabItem: breakElementSummaryField.textArea
+                        FlickableTextArea {
+                            id: breakElementSummaryField
+                            placeholderText: breakKind + " Summary ..."
+                            text: breakElement.breakSummary
+                            onTextChanged: breakElement.breakSummary = text
+                            width: parent.width >= 820 ? 800 : parent.width-20
+                            height: parent.height - breakElementHeadingRow.height - parent.spacing
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            backTabItem: breakElementHeadingField
+                            adjustTextWidthBasedOnScrollBar: false
+                            ScrollBar.vertical: breakSummaryVScrollBar
+                            background: Rectangle {
+                                color: primaryColors.windowColor
+                                opacity: 0.15
+                            }
                         }
                     }
 
-                    FlickableTextArea {
-                        id: breakElementSummaryField
-                        placeholderText: breakKind + " Summary ..."
-                        text: breakElement.breakSummary
-                        onTextChanged: breakElement.breakSummary = text
-                        anchors.top: breakElementHeadingRow.bottom
-                        anchors.left: parent.left
+
+                    ScrollBar2 {
+                        id: breakSummaryVScrollBar
+                        orientation: Qt.Vertical
+                        flickable: breakElementSummaryField
+                        anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.bottom: breakElementAttachmentsView.top
-                        anchors.topMargin: 10
-                        anchors.bottomMargin: 10
-                        backTabItem: breakElementHeadingField
                     }
 
                     AttachmentsView {
@@ -1869,7 +1913,6 @@ Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: attachmentsView.top
-                        anchors.bottomMargin: 10
                         contentWidth: quickInfoFlickableContent.width
                         contentHeight: quickInfoFlickableContent.height
                         FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
@@ -2175,8 +2218,10 @@ Rectangle {
 
                                 FlickableTextArea {
                                     id: characterSummaryField
-                                    anchors.fill: parent
-                                    anchors.rightMargin: 10
+                                    width: parent.width >= 820 ? 800 : parent.width-20
+                                    height: parent.height
+                                    anchors.centerIn: parent
+                                    anchors.horizontalCenterOffset: -5
                                     text: character.summary
                                     onTextChanged: character.summary = text
                                     placeholderText: "Character Summary"
@@ -2186,6 +2231,17 @@ Rectangle {
                                         color: primaryColors.windowColor
                                         opacity: 0.15
                                     }
+                                    adjustTextWidthBasedOnScrollBar: false
+                                    ScrollBar.vertical: characterSummaryVScrollBar
+                                }
+
+                                ScrollBar2 {
+                                    id: characterSummaryVScrollBar
+                                    orientation: Qt.Vertical
+                                    flickable: characterSummaryField
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
                                 }
                             }
                         }
@@ -2198,7 +2254,6 @@ Rectangle {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
-                        anchors.margins: 10
                         attachments: character ? character.attachments : null
 
                         AttachmentsDropArea2 {

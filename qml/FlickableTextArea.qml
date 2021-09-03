@@ -20,6 +20,7 @@ import Scrite 1.0
 Flickable {
     property Item textArea: __textArea
     property bool scrollBarRequired: contentHeight > height
+    property bool adjustTextWidthBasedOnScrollBar: true
     property bool undoRedoEnabled: true
     property alias text: __textArea.text
     property alias font: __textArea.font
@@ -41,7 +42,7 @@ Flickable {
 
     TextArea {
         id: __textArea
-        width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired ? 20 : 0)
+        width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired && textAreaFlickable.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
         font.pointSize: app.idealFontPointSize
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere

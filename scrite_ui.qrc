@@ -73,5 +73,6 @@
         <file>qml/ScrollBar2.qml</file>
         <file>qml/FormMenu.qml</file>
         <file>qml/UiElementHighlight.qml</file>
+        <file>qml/TextNoteView.qml</file>
     </qresource>
 </RCC>
