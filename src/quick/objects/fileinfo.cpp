@@ -14,6 +14,7 @@
 #include "fileinfo.h"
 #include "application.h"
 #include "attachments.h"
+#include "scritedocument.h"
 
 #include <QIcon>
 #include <QPainter>
@@ -151,6 +152,14 @@ QImage FileIconProvider::requestImage(const QFileInfo &fi)
         return m_suffixImageMap.value(suffix);
 
     Attachment::Type type = Attachment::determineType(fi);
+    if(type == Attachment::Photo)
+    {
+        const QString absFilePath = ScriteDocument::instance()->fileSystem()->absolutePath(fi.filePath());
+        QImage image(absFilePath);
+        image = image.scaled(96, 96, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        return image;
+    }
+
     static const QMap<Attachment::Type, QString> typeIconBase
             = {
                     { Attachment::Photo, QStringLiteral("photo") },
