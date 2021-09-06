@@ -255,7 +255,18 @@ void SceneHeading::setMoment(const QString &val2)
 QString SceneHeading::text() const
 {
     if(m_enabled)
-        return m_locationType + ". " + m_location + " - " + m_moment;
+    {
+        const QString dot = QStringLiteral(". ");
+        const QString dash = QStringLiteral(" - ");
+
+        if(m_locationType.isEmpty())
+            return m_moment.isEmpty() ? m_location : (m_location + dash + m_moment);
+
+        if(m_moment.isEmpty())
+            return m_locationType + dot + m_location;
+
+        return m_locationType + dot + m_location + dash + m_moment;
+    }
 
     return QString();
 }
@@ -303,10 +314,11 @@ bool SceneHeading::parse(const QString &text, QString &locationType, QString &lo
     moment = heading.mid(field2SepLoc+1).trimmed();
     location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
 
-    if( strict )
+    if(strict)
         return Structure::standardLocationTypes().contains(locationType);
 
-    return false;
+    return structure->standardLocationTypes().contains(locationType) &&
+           structure->standardMoments().contains(moment);
 }
 
 void SceneHeading::parseFrom(const QString &text)
@@ -317,12 +329,9 @@ void SceneHeading::parseFrom(const QString &text)
     QString _locationType, _location, _moment;
     parse(text, _locationType, _location, _moment);
 
-    if(!_locationType.isEmpty())
-        this->setLocationType(_locationType);
-    if(!_location.isEmpty())
-        this->setLocation(_location);
-    if(!_moment.isEmpty())
-        this->setMoment(_moment);
+    this->setLocationType(_locationType);
+    this->setLocation(_location);
+    this->setMoment(_moment);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1376,15 +1385,37 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     {
         SceneElement *oldElement = this->elementAt(i);
 
-        if(i==index)
+        if(i==index && oldElement->type() == SceneElement::Action)
         {
-            const QString oldElementText = oldElement->text();
+            const QString oldElementText = oldElement->text().trimmed();
             QString locType, location, moment;
             if(SceneHeading::parse(oldElementText, locType, location, moment, true))
             {
+                newScene->heading()->setEnabled(true);
                 newScene->heading()->setLocationType(locType);
                 newScene->heading()->setLocation(location);
                 newScene->heading()->setMoment(moment);
+                this->removeElement(oldElement);
+                continue;
+            }
+
+            bool couldBeHeading = true;
+            for(const QChar ch : oldElementText)
+            {
+                if(ch.isLetter())
+                {
+                    couldBeHeading = ch.script() == QChar::Script_Latin && ch.isUpper();
+                    if(!couldBeHeading)
+                        break;
+                }
+            }
+
+            if(couldBeHeading)
+            {
+                newScene->heading()->setEnabled(true);
+                newScene->heading()->setLocationType(this->heading()->locationType());
+                newScene->heading()->setLocation(oldElementText);
+                newScene->heading()->setMoment(this->heading()->moment().isEmpty() ? QString() : QStringLiteral("CONTINUOUS"));
                 this->removeElement(oldElement);
                 continue;
             }
