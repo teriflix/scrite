@@ -64,6 +64,7 @@ Item {
         FlickableTextArea {
             id: contentField
             text: note ? note.content : ""
+            placeholderText: "Content"
             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
             anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height - titleField.height - parent.spacing
