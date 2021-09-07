@@ -1963,10 +1963,11 @@ Rectangle {
                             width: Math.max(550, quickInfoFlickable.width)
                             height: quickInfoFlickable.scrollBarVisible ? quickInfoFlickable.height-17 : quickInfoFlickable.height
 
-                            Item {
+                            Rectangle {
                                 id: characterQuickInfoArea
                                 width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, ui.width*0.3)
                                 height: parent.height
+                                color: app.translucent(primaryColors.c100.background, 0.5)
 
                                 Connections {
                                     target: characterNotes
@@ -2015,7 +2016,8 @@ Rectangle {
                                         spacing: 10
 
                                         Rectangle {
-                                            width: parent.width
+                                            property bool fillWidth: parent.width < 320
+                                            width: parent.width-(fillWidth ? 0 : 90)
                                             height: width
                                             color: photoSlides.currentIndex === photoSlides.count-1 ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0.75)
                                             border.width: 1
@@ -2027,6 +2029,7 @@ Rectangle {
                                                 anchors.fill: parent
                                                 anchors.margins: 2
                                                 currentIndex: 0
+                                                clip: true
 
                                                 Repeater {
                                                     model: character.photos
@@ -2055,7 +2058,8 @@ Rectangle {
                                             ToolButton3 {
                                                 anchors.verticalCenter: photoSlides.verticalCenter
                                                 anchors.left: parent.left
-                                                iconSource: "../icons/navigation/arrow_left_inverted.png"
+                                                anchors.leftMargin: parent.fillWidth ? 0 : -width
+                                                iconSource: parent.fillWidth ? "../icons/navigation/arrow_left_inverted.png" : "../icons/navigation/arrow_left.png"
                                                 enabled: photoSlides.currentIndex > 0
                                                 onClicked: photoSlides.currentIndex = Math.max(photoSlides.currentIndex-1, 0)
                                             }
@@ -2063,7 +2067,8 @@ Rectangle {
                                             ToolButton3 {
                                                 anchors.verticalCenter: photoSlides.verticalCenter
                                                 anchors.right: parent.right
-                                                iconSource: "../icons/navigation/arrow_right_inverted.png"
+                                                anchors.rightMargin: parent.fillWidth ? 0 : -width
+                                                iconSource: parent.fillWidth ? "../icons/navigation/arrow_right_inverted.png" : "../icons/navigation/arrow_right.png"
                                                 enabled: photoSlides.currentIndex < photoSlides.count-1
                                                 onClicked: photoSlides.currentIndex = Math.min(photoSlides.currentIndex+1, photoSlides.count-1)
                                             }
@@ -2071,7 +2076,8 @@ Rectangle {
                                             ToolButton3 {
                                                 anchors.top: parent.top
                                                 anchors.right: parent.right
-                                                iconSource: "../icons/action/delete_inverted.png"
+                                                anchors.rightMargin: parent.fillWidth ? 0 : -width
+                                                iconSource: parent.fillWidth ? "../icons/action/delete_inverted.png" : "../icons/action/delete.png"
                                                 visible: photoSlides.currentIndex < photoSlides.count-1
                                                 onClicked: {
                                                     var ci = photoSlides.currentIndex
