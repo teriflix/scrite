@@ -1553,45 +1553,52 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     int nrElements = 0;
     ds >> nrElements;
 
-    int paraIndex = 0;
-    QList<SceneElement*> parasToRemove;
-
-    for(int i=0; i<nrElements; i++)
+    struct _Paragraph
     {
         QString id;
-        ds >> id;
-
         int type = SceneElement::Action;
-        ds >> type;
-
         QString text;
-        ds >> text;
+    };
+    QVector<_Paragraph> paragraphs;
+    QStringList paragraphIds;
 
-        bool elementNeedsToBeInserted = false;
-        SceneElement *element = this->elementAt(paraIndex++);
-        if(element == nullptr || element->id() != id)
-        {
-            if(element && !parasToRemove.contains(element))
-                parasToRemove.append(element);
-
-            element = new SceneElement(this);
-            element->setId(id);
-            elementNeedsToBeInserted = true;
-        }
-        else
-            parasToRemove.removeOne(element);
-
-        element->setType( SceneElement::Type(type) );
-        element->setText(text);
-
-        if(elementNeedsToBeInserted)
-            this->insertElementAt(element, i);
+    paragraphs.reserve(nrElements);
+    for(int i=0; i<nrElements; i++)
+    {
+        _Paragraph e;
+        ds >> e.id;
+        ds >> e.type;
+        ds >> e.text;
+        paragraphIds.append(e.id);
+        paragraphs.append(e);
     }
 
-    while(!parasToRemove.isEmpty())
+    // Remove stale paragraphs
+    for(int i=m_elements.size()-1; i>=0; i--)
     {
-        SceneElement *para = parasToRemove.takeLast();
+        SceneElement *para = m_elements.at(i);
+        if(paragraphIds.removeOne(para->id()))
+            continue;
         this->removeElement(para);
+    }
+
+    // Insert new paragraphs
+    for(int i=0; i<paragraphs.size(); i++)
+    {
+        const _Paragraph para = paragraphs.at(i);
+        SceneElement *element = i <= m_elements.size()-1 ? m_elements.at(i) : nullptr;
+        if(element && element->id() == para.id)
+        {
+            element->setType( SceneElement::Type(para.type) );
+            element->setText(para.text);
+            continue;
+        }
+
+        element = new SceneElement(this);
+        element->setId(para.id);
+        element->setType( SceneElement::Type(para.type) );
+        element->setText(para.text);
+        this->insertElementAt(element, i);
     }
 
     emit sceneReset(curPosition);
