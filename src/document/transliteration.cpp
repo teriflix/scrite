@@ -1067,7 +1067,8 @@ void Transliterator::processTransliteration(int from, int charsRemoved, int char
             // Select the word that is just before the cursor.
             cursor.setPosition(from);
             cursor.movePosition(QTextCursor::PreviousWord, QTextCursor::MoveAnchor, 1);
-            cursor.movePosition(QTextCursor::NextWord, QTextCursor::KeepAnchor, 1);
+            // cursor.movePosition(QTextCursor::NextWord, QTextCursor::KeepAnchor, 1);
+            cursor.setPosition(from, QTextCursor::KeepAnchor);
             this->transliterate(cursor);
             return;
         }
