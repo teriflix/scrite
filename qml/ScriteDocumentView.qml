@@ -332,9 +332,11 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Alt+4"
+        enabled: workspaceSettings.showScritedTab
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Scrited"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.enabled: enabled
         onActivated: mainTabBar.activateTab(3)
     }
 
@@ -1475,7 +1477,7 @@ Item {
             anchors.right: editTools.visible ? editTools.left : parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 10
-            visible: scritedView !== null
+            visible: scritedView
         }
 
         Row {
@@ -1646,29 +1648,37 @@ Item {
             }
         }
 
-        Image {
+        Item {
             id: appLogo
             anchors.right: parent.right
-            source: documentUI.width >= 1440 ? "../images/teriflix_logo.png" : "../images/teriflix_icon.png"
-            height: parent.height
-            smooth: true
-            mipmap: true
-            fillMode: Image.PreserveAspectFit
+            width: 32+20+10
+            height: 32
             anchors.verticalCenter: parent.verticalCenter
-            transformOrigin: Item.Right
-            ToolTip.text: "Click here to provide feedback"
 
-            MouseArea {
-                hoverEnabled: true
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onEntered: parent.ToolTip.visible = true
-                onExited: parent.ToolTip.visible = false
-                enabled: appToolBar.visible
-                onClicked: {
-                    modalDialog.sourceComponent = aboutBoxComponent
-                    modalDialog.popupSource = parent
-                    modalDialog.active = true
+            Image {
+                // source: documentUI.width >= 1440 ? "../images/teriflix_logo.png" : "../images/teriflix_icon.png"
+                source: "../images/appicon.png"
+                x: 20
+                height: parent.height
+                width: parent.height
+                smooth: true
+                mipmap: true
+                fillMode: Image.PreserveAspectFit
+                transformOrigin: Item.Right
+                ToolTip.text: "About, Help & Feedback"
+
+                MouseArea {
+                    hoverEnabled: true
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: parent.ToolTip.visible = true
+                    onExited: parent.ToolTip.visible = false
+                    enabled: appToolBar.visible
+                    onClicked: {
+                        modalDialog.sourceComponent = aboutBoxComponent
+                        modalDialog.popupSource = parent
+                        modalDialog.active = true
+                    }
                 }
             }
         }
