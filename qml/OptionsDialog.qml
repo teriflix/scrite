@@ -753,6 +753,16 @@ Item {
                                 }
                             }
                         }
+
+                        CheckBox2 {
+                            checked: workspaceSettings.showScritedTab
+                            text: "Show Scrited Tab"
+                            onToggled: {
+                                if(!checked && mainTabBar.currentIndex === 3)
+                                    mainTabBar.activateTab(0)
+                                workspaceSettings.showScritedTab = checked
+                            }
+                        }
                     }
                 }
 

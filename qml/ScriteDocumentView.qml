@@ -61,6 +61,7 @@ Item {
         property bool animateStructureIcon: true
         property bool animateNotebookIcon: true
         property real flickScrollSpeedFactor: 1.0
+        property bool showScritedTab: false
         property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
         property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
         property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
@@ -1546,7 +1547,7 @@ Item {
                     { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true },
                     { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true },
                     { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure },
-                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": true }
+                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": workspaceSettings.showScritedTab }
                 ]
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
