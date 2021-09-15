@@ -121,6 +121,7 @@ Item {
             }
 
             Repeater {
+                id: formFieldsRepeater
                 model: form.questionsModel
 
                 FormField {
@@ -209,5 +210,13 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    Component.onCompleted: descriptionField.forceActiveFocus()
+    onNoteChanged: {
+        if(note.objectName === "_newNote")
+            descriptionField.forceActiveFocus()
+        else if(note.objectName === "_focusNote") {
+            descriptionField.forceActiveFocus()
+            formTabManager.focusNext()
+        }
+        note.objectName = ""
+    }
 }

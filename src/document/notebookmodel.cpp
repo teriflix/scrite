@@ -423,7 +423,7 @@ void NotebookModel::loadCharacters()
 
     this->syncCharacters();
 
-    connect(structure, &Structure::characterNamesChanged, &m_syncCharactersTimer, QOverload<>::of(&QTimer::start), Qt::UniqueConnection);
+    connect(structure, &Structure::characterCountChanged, &m_syncCharactersTimer, QOverload<>::of(&QTimer::start), Qt::UniqueConnection);
 }
 
 void NotebookModel::loadLocations()

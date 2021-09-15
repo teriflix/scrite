@@ -115,7 +115,7 @@ Item {
     onNoteChanged: {
         if(note.objectName === "_newNote")
             titleField.forceActiveFocus()
-        else
+        else if(note.objectName === "_focusNote")
             contentField.textArea.forceActiveFocus()
         note.objectName = ""
     }
