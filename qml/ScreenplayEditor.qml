@@ -2467,7 +2467,7 @@ Rectangle {
                             font.underline: headingFontMetrics.font.underline
                             font.italic: headingFontMetrics.font.italic
                             font.letterSpacing: headingFontMetrics.font.letterSpacing
-                            font.capitalization: currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase
+                            font.capitalization: activeFocus ? (currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
                             color: headingFontMetrics.format.textColor
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             readOnly: scriteDocument.readOnly
