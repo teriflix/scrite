@@ -396,6 +396,7 @@ Item {
                     highlightMoveDuration: 0
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
+                    keyNavigationEnabled: false
                     delegate: Text {
                         font.family: modelData
                         font.pointSize: app.idealFontPointSize

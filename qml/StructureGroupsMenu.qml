@@ -82,6 +82,7 @@ Menu2 {
                     anchors.margins: 5
                     clip: true
                     model: sceneGroup
+                    keyNavigationEnabled: false
                     section.property: "category"
                     section.criteria: ViewSection.FullString
                     section.delegate: Rectangle {

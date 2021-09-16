@@ -434,6 +434,7 @@ Rectangle {
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds
                     boundsMovement: Flickable.StopAtBounds
+                    keyNavigationEnabled: false
                     ScrollBar.vertical: verticalScrollBar
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
@@ -1736,6 +1737,7 @@ Rectangle {
                                 id: completionView
                                 model: completionModel
                                 FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                                interactive: false
                                 delegate: Text {
                                     width: completionView.width-1
                                     text: string
@@ -2925,6 +2927,7 @@ Rectangle {
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
+                    keyNavigationEnabled: false
                     property bool hasEpisodes: screenplayAdapter.isSourceScreenplay ? screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     header: Rectangle {

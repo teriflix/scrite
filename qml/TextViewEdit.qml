@@ -167,6 +167,7 @@ Loader {
                     id: completionView
                     model: completionModel
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    keyNavigationEnabled: false
                     delegate: Text {
                         width: completionView.width-1
                         text: string
