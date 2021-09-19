@@ -1055,13 +1055,24 @@ void Screenplay::removeSelectedElements()
 
 void Screenplay::clearSelection()
 {
-    for(ScreenplayElement *element : m_elements)
+    for(ScreenplayElement *element : qAsConst(m_elements))
         element->setSelected(false);
 }
 
 ScreenplayElement *Screenplay::elementAt(int index) const
 {
     return index < 0 || index >= m_elements.size() ? nullptr : m_elements.at(index);
+}
+
+ScreenplayElement *Screenplay::elementWithIndex(int index) const
+{
+    for(ScreenplayElement *ret : qAsConst(m_elements))
+    {
+        if(ret->elementIndex() == index)
+            return ret;
+    }
+
+    return nullptr;
 }
 
 int Screenplay::elementCount() const
@@ -1602,6 +1613,30 @@ int Screenplay::lastSceneIndex() const
     }
 
     return -1;
+}
+
+QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element)
+{
+    QList<int> ret;
+
+    int _index = this->indexOfElement(element);
+
+    while(1)
+    {
+        ScreenplayElement *_element = this->elementAt(++_index);
+        if(_element == nullptr)
+            break;
+
+        if(_element->elementType() == ScreenplayElement::BreakElementType)
+        {
+           if(_element->breakType() == element->breakType())
+               break;
+        }
+        else
+            ret << _index;
+    }
+
+    return ret;
 }
 
 bool Screenplay::setElements(const QList<ScreenplayElement *> &list)

@@ -603,7 +603,7 @@ qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *from, Screenplay
         ScreenplayElement *element = m_screenplay->elementAt(i);
         QTextFrame *frame = this->findTextFrame(element);
         if(frame == nullptr)
-            return 0;
+            continue;
 
         QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
         ret += layout->frameBoundingRect(frame).height();
@@ -940,6 +940,9 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     // Remove all act breaks that existed before.
     while(!actBreaksToRemove.isEmpty())
         m_screenplay->removeElement(actBreaksToRemove.takeLast());
+
+    // Rework all numbers.
+    m_screenplay->evaluateSceneNumbers();
 
     // Set the preferred grouping to the newly loaded tag group.
     structure->setPreferredGroupCategory(tagGroup);

@@ -26,6 +26,7 @@
 class Screenplay;
 class ScriteDocument;
 class AbstractImporter;
+class ScreenplayTextDocument;
 class AbstractScreenplaySubsetReport;
 
 class ScreenplayElement : public QObject, public Modifiable, public QObjectSerializer::Interface
@@ -303,6 +304,7 @@ public:
     Q_INVOKABLE void removeSelectedElements();
     Q_INVOKABLE void clearSelection();
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
+    Q_INVOKABLE ScreenplayElement *elementWithIndex(int index) const;
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const;
     Q_INVOKABLE void clearElements();
@@ -324,6 +326,7 @@ public:
     QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
     Q_INVOKABLE int firstSceneIndex() const;
     Q_INVOKABLE int lastSceneIndex() const;
+    Q_INVOKABLE QList<int> sceneElementsInBreak(ScreenplayElement *element);
 
     QList<ScreenplayElement*> getElements() const { return m_elements; }
     bool setElements(const QList<ScreenplayElement*> &list);
@@ -428,6 +431,7 @@ private:
     bool m_hasTitlePageAttributes = false;
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
+    friend class ScreenplayTextDocument;
 
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);

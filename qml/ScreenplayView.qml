@@ -226,9 +226,20 @@ Item {
 
                                 function maybeTooltip() {
                                     if(containsMouse) {
+                                        var ttText = "<b>" + trackData.category + " &gt; " + groupData.group + "</b>, "
+                                        if(groupData.endIndex === groupData.startIndex)
+                                            ttText += "1 Scene"
+                                        else
+                                            ttText += (1 + groupData.endIndex - groupData.startIndex) + " Scenes"
+                                        if(!screenplayTextDocument.paused) {
+                                            var from = scriteDocument.screenplay.elementWithIndex(groupData.startIndex)
+                                            var to = scriteDocument.screenplay.elementWithIndex(groupData.endIndex)
+                                            ttText += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
+                                        }
+
                                         toolTipItem.x = mouseX + parent.x
                                         toolTipItem.y = mouseY
-                                        toolTipItem.ToolTip.text = trackData.category + " > " + groupData.group
+                                        toolTipItem.ToolTip.text = ttText
                                         toolTipItem.ToolTip.visible = true
                                         toolTipItem.source = groupMouseArea
                                     } else if(toolTipItem.source === groupMouseArea) {
@@ -601,18 +612,33 @@ Item {
 
                     MouseArea {
                         anchors.fill: parent
-                        hoverEnabled: !isBreakElement
+                        hoverEnabled: true // !isBreakElement
                         ToolTip.visible: hoverEnabled && containsMouse
                         function evalToolTipText() {
-                            if(isBreakElement)
-                                return ""
-
                             var ret = ""
+
+                            if(isBreakElement) {
+                                var idxList = scriteDocument.screenplay.sceneElementsInBreak(elementItemDelegate.element)
+                                if(idxList.length === 0)
+                                    return "No Scenes"
+
+                                if(idxList.length === 1)
+                                    ret = "1 Scene"
+                                else
+                                    ret = idxList.length + " Scenes"
+
+                                var from = scriteDocument.screenplay.elementAt(idxList[0])
+                                var to = scriteDocument.screenplay.elementAt(idxList[idxList.length-1])
+                                ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
+
+                                return ret
+                            }
+
                             var pc = elementItemDelegate.element.scene.elementCount
                             ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
 
                             if(!screenplayTextDocument.paused)
-                                ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element,elementItemDelegate.element)
+                                ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element, null)
 
                             if(parent.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
                                 var str = elementItemDelegate.sceneTitle
