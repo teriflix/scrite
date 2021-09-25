@@ -38,6 +38,15 @@ PdfExporter::~PdfExporter()
 
 }
 
+void PdfExporter::setGenerateTitlePage(bool val)
+{
+    if(m_generateTitlePage == val)
+        return;
+
+    m_generateTitlePage = val;
+    emit generateTitlePageChanged();
+}
+
 void PdfExporter::setIncludeSceneNumbers(bool val)
 {
     if(m_includeSceneNumbers == val)
@@ -162,11 +171,9 @@ bool PdfExporter::doExport(QIODevice *device)
     textDocument.setProperty("#watermark", m_watermark);
 
     QTextDocumentPagedPrinter printer;
-    printer.header()->setVisibleFromPageOne(false);
-    printer.footer()->setVisibleFromPageOne(false);
-    printer.watermark()->setVisibleFromPageOne(false);
-    bool success = printer.print(&textDocument, pdfDevice);
-
+    printer.header()->setVisibleFromPageOne(!m_generateTitlePage);
+    printer.footer()->setVisibleFromPageOne(!m_generateTitlePage);
+    printer.watermark()->setVisibleFromPageOne(!m_generateTitlePage);    bool success = printer.print(&textDocument, pdfDevice);
     if(!qprinter.isNull())
     {
         const QString pdfFileName = qprinter->outputFileName();

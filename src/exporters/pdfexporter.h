@@ -26,6 +26,13 @@ public:
     Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
     ~PdfExporter();
 
+    Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
+    Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY generateTitlePageChanged)
+    void setGenerateTitlePage(bool val);
+    bool isGenerateTitlePage() const { return m_generateTitlePage; }
+    Q_SIGNAL void generateTitlePageChanged();
+
     Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
     Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
     Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY usePageBreaksChanged)
@@ -84,6 +91,7 @@ public:
     QString comment() const { return m_comment; }
     Q_SIGNAL void commentChanged();
 
+    bool generateTitlePage() const { return m_generateTitlePage; }
     bool canBundleFonts() const { return false; }
     bool isExportForPrintingPurpose() const { return true; }
 
@@ -95,6 +103,7 @@ private:
     QString m_comment;
     QString m_watermark;
     bool m_usePageBreaks = true;
+    bool m_generateTitlePage = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
     bool m_printEachSceneOnANewPage = false;
