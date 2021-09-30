@@ -291,7 +291,7 @@ Rectangle {
                         y: modelData.rect.y
                         width: modelData.rect.width
                         height: modelData.rect.height
-                        color: character.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                        color: character.photos.length === 0 ? Qt.tint(character.color, "#C0FFFFFF") : Qt.rgba(0,0,0,0)
                         Component.onCompleted: {
                             modelData.item = nodeItem
                             if(crgraph.character === modelData.character)
@@ -315,7 +315,7 @@ Rectangle {
                                 anchors.fill: infoLabel
                                 anchors.margins: -4
                                 radius: 4
-                                color: modelData.marked ? accentColors.a700.background : "white"
+                                color: modelData.marked ? accentColors.a700.background : Qt.tint(character.color, "#C0FFFFFF")
                                 opacity: character.photos.length === 0 ? 1 : 0.8
                                 border.width: 1
                                 border.color: modelData.marked ? accentColors.a700.text : "black"
