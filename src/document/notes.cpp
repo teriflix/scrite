@@ -611,10 +611,27 @@ void Notes::deserializeFromJson(const QJsonObject &json)
         return;
 
     // Remove duplicate notes.
+    const QString idAttr = QStringLiteral("id");
+
     QList<Note*> notes;
-    QSet<QJsonObject> uniqueJsNotes;
-    for(const QJsonValue &jsNotesItem : jsNotes)
-        uniqueJsNotes |= jsNotesItem.toObject();
+    QList<QJsonObject> uniqueJsNotes;
+    for(const QJsonValue &jsNoteItemValue : jsNotes)
+    {
+        const QJsonObject jsNoteItem = jsNoteItemValue.toObject();
+        const QString jsNoteId = jsNoteItem.value(idAttr).toString();
+        bool jsNoteIsUnique = true;
+        for(const QJsonObject &uniqueJsNote : qAsConst(uniqueJsNotes))
+        {
+            if(uniqueJsNote.value(idAttr).toString() == jsNoteId)
+            {
+                jsNoteIsUnique = false;
+                break;
+            }
+        }
+
+        if(jsNoteIsUnique)
+            uniqueJsNotes.append(jsNoteItem);
+    }
 
     notes.reserve(jsNotes.size());
     for(const QJsonObject &jsNote : qAsConst(uniqueJsNotes))
