@@ -126,6 +126,7 @@ Item {
         property int activeTab: 0 // 0 = Relationships, 1 = Notes
         property int graphLayoutMaxTime: 1000
         property int graphLayoutMaxIterations: 50000
+        property bool showAllFormQuestions: true
     }
 
     Shortcut {

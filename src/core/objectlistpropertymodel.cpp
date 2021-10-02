@@ -13,6 +13,8 @@
 
 #include "objectlistpropertymodel.h"
 
+#include <QJSEngine>
+
 ObjectListPropertyModelBase::ObjectListPropertyModelBase(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -85,6 +87,30 @@ void SortFilterObjectListModel::setFilterMode(FilterMode val)
     this->invalidateFilter();
 }
 
+void SortFilterObjectListModel::setSortFunction(const QJSValue &val)
+{
+    if(m_sortFunction.equals(val))
+        return;
+
+    if(!val.isCallable())
+        return;
+
+    m_sortFunction = val;
+    emit sortFunctionChanged();
+}
+
+void SortFilterObjectListModel::setFilterFunction(const QJSValue &val)
+{
+    if(m_filterFunction.equals(val))
+        return;
+
+    if(!val.isCallable())
+        return;
+
+    m_filterFunction = val;
+    emit filterFunctionChanged();
+}
+
 QHash<int, QByteArray> SortFilterObjectListModel::roleNames() const
 {
     return {
@@ -95,7 +121,7 @@ QHash<int, QByteArray> SortFilterObjectListModel::roleNames() const
 
 bool SortFilterObjectListModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
 {
-    if(m_sortByProperty.isEmpty())
+    if(m_sortByProperty.isEmpty() && !m_sortFunction.isCallable())
         return false;
 
     const QMetaObject *mo = this->sourceModel()->metaObject();
@@ -107,6 +133,15 @@ bool SortFilterObjectListModel::lessThan(const QModelIndex &source_left, const Q
     if(left_object == nullptr || right_object == nullptr)
         return false;
 
+    QJSEngine *engine = m_sortFunction.isCallable() ? qjsEngine(this) : nullptr;
+    if(engine != nullptr)
+    {
+        QJSValueList args;
+        args.append( engine->newQObject(left_object) );
+        args.append( engine->newQObject(right_object) );
+        return m_sortFunction.call(args).toBool();
+    }
+
     const QVariant left = left_object->property(m_sortByProperty);
     const QVariant right = right_object->property(m_sortByProperty);
     return left < right;
@@ -114,7 +149,7 @@ bool SortFilterObjectListModel::lessThan(const QModelIndex &source_left, const Q
 
 bool SortFilterObjectListModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    if(m_filterByProperty.isEmpty() || m_filterValues.isEmpty())
+    if( (m_filterByProperty.isEmpty() || m_filterValues.isEmpty()) && !m_filterFunction.isCallable() )
         return true;
 
     const QMetaObject *mo = this->sourceModel()->metaObject();
@@ -128,6 +163,14 @@ bool SortFilterObjectListModel::filterAcceptsRow(int source_row, const QModelInd
     QObject *source_object = source_index.data(ObjectListPropertyModelBase::ObjectItemRole).value<QObject*>();
     if(source_object == nullptr)
         return true;
+
+    QJSEngine *engine = m_filterFunction.isCallable() ? qjsEngine(this) : nullptr;
+    if(engine != nullptr)
+    {
+        QJSValueList args;
+        args.append( engine->newQObject(source_object) );
+        return m_filterFunction.call(args).toBool();
+    }
 
     const QVariant value = source_object->property(m_filterByProperty);
     const bool flag = m_filterValues.contains(value);

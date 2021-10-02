@@ -16,6 +16,7 @@
 
 #include <QSet>
 #include <QList>
+#include <QJSValue>
 #include <QMetaMethod>
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
@@ -268,6 +269,16 @@ public:
     FilterMode filterMode() const { return m_filterMode; }
     Q_SIGNAL void filterModeChanged();
 
+    Q_PROPERTY(QJSValue sortFunction READ sortFunction WRITE setSortFunction NOTIFY sortFunctionChanged)
+    void setSortFunction(const QJSValue &val);
+    QJSValue sortFunction() const { return m_sortFunction; }
+    Q_SIGNAL void sortFunctionChanged();
+
+    Q_PROPERTY(QJSValue filterFunction READ filterFunction WRITE setFilterFunction NOTIFY filterFunctionChanged)
+    void setFilterFunction(const QJSValue &val);
+    QJSValue filterFunction() const { return m_filterFunction; }
+    Q_SIGNAL void filterFunctionChanged();
+
     QHash<int, QByteArray> roleNames() const;
 
 protected:
@@ -276,6 +287,8 @@ protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 private:
+    mutable QJSValue m_sortFunction;
+    mutable QJSValue m_filterFunction;
     QVariantList m_filterValues;
     QByteArray m_sortByProperty;
     QByteArray m_filterByProperty;

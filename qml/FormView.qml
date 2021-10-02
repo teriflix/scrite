@@ -41,6 +41,21 @@ Item {
         result.accepted = true
     }
 
+    SortFilterObjectListModel {
+        id: formQuestionsModel
+        sourceModel: form.questionsModel
+        filterFunction: formFilterFunction
+
+        property bool filterForms: !notebookSettings.showAllFormQuestions
+        onFilterFormsChanged: invalidate()
+
+        function formFilterFunction(form) {
+            if(filterForms)
+                return note.getFormData(form.id) !== ""
+            return true;
+        }
+    }
+
     Flickable {
         id: formFlickable
         width: Math.max(minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
@@ -120,9 +135,30 @@ Item {
                 }
             }
 
+            Row {
+                spacing: 10
+
+                Label {
+                    text: "View"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                RadioButton2 {
+                    text: "All"
+                    checked: notebookSettings.showAllFormQuestions
+                    onToggled: notebookSettings.showAllFormQuestions = true
+                }
+
+                RadioButton2 {
+                    text: "Answered"
+                    checked: !notebookSettings.showAllFormQuestions
+                    onToggled: notebookSettings.showAllFormQuestions = false
+                }
+            }
+
             Repeater {
                 id: formFieldsRepeater
-                model: form.questionsModel
+                model: formQuestionsModel
 
                 FormField {
                     anchors.right: parent.right
