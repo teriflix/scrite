@@ -33,6 +33,7 @@ TextField {
     property var includeSuggestion: function(suggestion) {
         return suggestion
     }
+    property bool tabItemUponReturn: true
     selectedTextColor: accentColors.c700.text
     selectionColor: accentColors.c700.background
     selectByMouse: true
@@ -68,7 +69,7 @@ TextField {
         sortStrings: false
         completionPrefix: textField.length >= textField.minimumCompletionPrefixLength ? textField.text : ""
         filterKeyStrokes: textField.activeFocus
-        onRequestCompletion: autoCompleteOrFocusNext()
+        onRequestCompletion: autoCompleteOrFocusNext(tabItemUponReturn)
         property bool hasItems: count > 0
         onHasItemsChanged: {
             if(hasItems)
@@ -100,21 +101,21 @@ TextField {
     }
 
     Keys.onReturnPressed: {
-        autoCompleteOrFocusNext()
+        autoCompleteOrFocusNext(tabItemUponReturn)
         returnPressed()
     }
     Keys.onEnterPressed: {
-        autoCompleteOrFocusNext()
+        autoCompleteOrFocusNext(tabItemUponReturn)
         returnPressed()
     }
 
-    Keys.onTabPressed: autoCompleteOrFocusNext()
+    Keys.onTabPressed: autoCompleteOrFocusNext(true)
 
-    function autoCompleteOrFocusNext() {
+    function autoCompleteOrFocusNext(doTabItem) {
         if(completionModel.hasSuggestion && completionModel.suggestion !== text) {
             text = includeSuggestion(completionModel.suggestion)
             editingFinished()
-        } else if(tabItem) {
+        } else if(tabItem && (doTabItem === undefined || doTabItem === true)) {
             editingFinished()
             tabItem.forceActiveFocus()
         } else
@@ -166,6 +167,8 @@ TextField {
             id: completionView
             model: completionModel
             FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
             keyNavigationEnabled: false
             delegate: Text {
                 width: completionView.width-1

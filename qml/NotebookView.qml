@@ -907,6 +907,100 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
+                        Flow {
+                            id: sceneCharactersList
+                            spacing: 5
+                            width: sceneTitleField.width
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            flow: Flow.LeftToRight
+
+                            Text {
+                                id: sceneCharactersListHeading
+                                text: "Characters: "
+                                font.bold: true
+                                topPadding: 5
+                                bottomPadding: 5
+                                font.pointSize: app.idealFontPointSize
+                                visible: !scene.hasCharacters
+                            }
+
+                            Repeater {
+                                model: scene ? scene.characterNames : 0
+
+                                TagText {
+                                    id: characterNameLabel
+                                    property var colors: containsMouse ? accentColors.c900 : accentColors.c600
+                                    border.width: 1
+                                    border.color: colors.text
+                                    color: colors.background
+                                    textColor: colors.text
+                                    text: modelData
+                                    topPadding: 5; bottomPadding: 5
+                                    leftPadding: 10; rightPadding: 10
+                                    font.family: "Courier Prime"
+                                    font.capitalization: Font.AllUppercase
+                                    font.pointSize: app.idealFontPointSize
+                                    closable: scene.isCharacterMute(modelData) && !scriteDocument.readOnly
+                                    onCloseRequest: {
+                                        if(!scriteDocument.readOnly)
+                                            scene.removeMuteCharacter(modelData)
+                                    }
+                                }
+                            }
+
+                            Loader {
+                                id: newCharacterNameInputLoader
+                                active: false
+                                width: active && item ? Math.max(250, item.contentWidth) : 0
+                                visible: active
+                                sourceComponent: TextField2 {
+                                    id: newCharacterNameInput
+                                    readOnly: scriteDocument.readOnly
+                                    font.family: "Courier Prime"
+                                    font.capitalization: length > 0 ? Font.AllUppercase : Font.MixedCase
+                                    font.pointSize: app.idealFontPointSize
+                                    wrapMode: Text.NoWrap
+                                    completionStrings: scriteDocument.structure.characterNames
+                                    placeholderText: "New Character Name"
+                                    onEditingFinished: {
+                                        if(text === "")
+                                            tabItem.forceActiveFocus()
+                                        else {
+                                            scene.addMuteCharacter(text)
+                                            clear()
+                                        }
+                                    }
+                                    onActiveFocusChanged: {
+                                        if(!activeFocus)
+                                            newCharacterNameInputLoader.active = false
+                                    }
+                                    tabItemUponReturn: false
+                                    tabItem: sceneSynopsisField.textArea
+                                    backTabItem: sceneTitleField
+                                    Component.onCompleted: forceActiveFocus()
+                                }
+                            }
+
+                            Image {
+                                source: "../icons/content/add_box.png"
+                                width: sceneCharactersListHeading.height
+                                height: width
+                                opacity: 0.5
+                                visible: !newCharacterNameInputLoader.active
+                                enabled: !scriteDocument.readOnly
+
+                                MouseArea {
+                                    ToolTip.text: "Click here to add a new character to this scene."
+                                    ToolTip.delay: 1000
+                                    ToolTip.visible: containsMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
+                                    onClicked: newCharacterNameInputLoader.active = true
+                                }
+                            }
+                        }
+
                         FlickableTextArea {
                             id: sceneSynopsisField
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
