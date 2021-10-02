@@ -76,6 +76,7 @@ public:
     QString elementText() const;
     const SceneElement *element() const { return m_element; }
     bool isFirstElementInScene() const;
+    bool doesDialogueFinish() const;
 
     const SceneElement *getCharacterElement() const;
     QString getCharacterElementText() const;
@@ -125,6 +126,24 @@ bool ScreenplayParagraphBlockData::isFirstElementInScene() const
     if(m_element)
         return m_element->scene()->elementAt(0) == m_element;
     return false;
+}
+
+bool ScreenplayParagraphBlockData::doesDialogueFinish() const
+{
+    SceneElement *element = const_cast<SceneElement*>(m_element);
+    auto isDialogueOrParenthetical = [](SceneElement *e) {
+        return e && (e->type() == SceneElement::Dialogue || e->type() == SceneElement::Parenthetical);
+    };
+
+    if(isDialogueOrParenthetical(element))
+    {
+        const int index = element->scene()->indexOfElement(element);
+        element = element->scene()->elementAt(index+1);
+        if(isDialogueOrParenthetical(element))
+            return false;
+    }
+
+    return true;
 }
 
 const SceneElement *ScreenplayParagraphBlockData::getCharacterElement() const
@@ -1356,6 +1375,12 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
         cursor.mergeBlockFormat(blockFormat);
         cursor.clearSelection();
+
+        // Top Margin of the block moved to the next page should become 0
+        cursor.movePosition(QTextCursor::NextBlock);
+        blockFormat = cursor.blockFormat();
+        blockFormat.setTopMargin(0);
+        cursor.setBlockFormat(blockFormat);
     };
 
     const ScreenplayFormat *format = m_formatting;
@@ -1461,7 +1486,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                 }
                 } break;
             case SceneElement::Dialogue:
-                if(block.position()+block.length()-1 > lastPosition) {
+                if(block.position()+block.length()-1 > lastPosition || !blockData->doesDialogueFinish()) {
                     const QString blockText = block.text();
                     const SceneElement *dialogElement = blockData->element();
 
