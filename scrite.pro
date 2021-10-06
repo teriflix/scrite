@@ -96,6 +96,7 @@ HEADERS += \
     src/reports/characterreport.h \
     src/reports/locationreport.h \
     src/reports/scenecharactermatrixreport.h \
+    src/reports/statisticsreport.h \
     src/utils/execlatertimer.h \
     src/utils/graphlayout.h \
     src/utils/timeprofiler.h \
@@ -206,6 +207,7 @@ SOURCES += \
     src/reports/characterreport.cpp \
     src/reports/locationreport.cpp \
     src/reports/scenecharactermatrixreport.cpp \
+    src/reports/statisticsreport.cpp \
     src/utils/execlatertimer.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/graphlayout.cpp \

@@ -1348,6 +1348,69 @@ void Scene::endUndoCapture()
     m_pushUndoCommand = nullptr;
 }
 
+int Scene::totalTextLengthOf(SceneElement::Type type) const
+{
+    int ret = 0;
+    if(type == SceneElement::Heading || type == SceneElement::All)
+        ret = m_heading->isEnabled() ? m_heading->text().length() : 0;
+
+    if(type == SceneElement::Heading)
+        return ret;
+
+    for(SceneElement *element : m_elements)
+    {
+        if(element->type() == type || type == SceneElement::All)
+            ret += element->text().length();
+    }
+
+    return ret;
+}
+
+QMap<int, int> Scene::totalTextLengths() const
+{
+    QMap<int,int> ret;
+    for(SceneElement *element : m_elements)
+    {
+        const int len = element->text().length();
+        ret[SceneElement::All] += len;
+        ret[element->type()] += len;
+    }
+
+    const int hlen = m_heading->isEnabled() ? m_heading->text().length() : 0;
+    ret[SceneElement::All] += hlen;
+    ret[SceneElement::Heading] += hlen;
+
+    return ret;
+}
+
+QMap<QString, QPair<int, int> > Scene::dialogueTextLengths() const
+{
+    QMap<QString, QPair<int, int> > ret;
+    QString characterName;
+
+    for(SceneElement *element : m_elements)
+    {
+        if(element->type() == SceneElement::Character)
+        {
+            characterName = element->formattedText().section('(', 0, 0).trimmed();
+            if(!characterName.isEmpty())
+                ret[characterName].first++;
+        }
+        else if(element->type() == SceneElement::Dialogue)
+        {
+            if(!characterName.isEmpty())
+            {
+                const int len = element->text().length();
+                ret[characterName].second += len;
+            }
+        }
+        else if(element->type() != SceneElement::Parenthetical)
+            characterName.clear();
+    }
+
+    return ret;
+}
+
 Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *parent)
 {
     if(element == nullptr)

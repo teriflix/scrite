@@ -29,6 +29,7 @@
 #include "qobjectfactory.h"
 #include "locationreport.h"
 #include "characterreport.h"
+#include "statisticsreport.h"
 #include "fountainimporter.h"
 #include "fountainexporter.h"
 #include "structureexporter.h"
@@ -385,6 +386,7 @@ DeviceIOFactories::DeviceIOFactories()
     ReportsFactory.addClass<CharacterReport>();
     ReportsFactory.addClass<CharacterScreenplayReport>();
     ReportsFactory.addClass<SceneCharacterMatrixReport>();
+    ReportsFactory.addClass<StatisticsReport>();
 }
 
 DeviceIOFactories::~DeviceIOFactories()

@@ -135,7 +135,7 @@ public:
     QString id() const;
     Q_SIGNAL void idChanged();
 
-    enum Type { Action, Character, Dialogue, Parenthetical, Shot, Transition, Heading, Min=Action, Max=Heading };
+    enum Type { Action, Character, Dialogue, Parenthetical, Shot, Transition, Heading, Min=Action, Max=Heading, All=-1 };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
     Q_CLASSINFO("UndoBundleFor_type", "cursorPosition")
@@ -395,6 +395,11 @@ public:
 
     Q_INVOKABLE void beginUndoCapture(bool allowMerging=true);
     Q_INVOKABLE void endUndoCapture();
+
+    // Used by stats report generator code.
+    int totalTextLengthOf(SceneElement::Type type) const;
+    QMap<int,int> totalTextLengths() const;
+    QMap<QString,QPair<int,int> > dialogueTextLengths() const;
 
     Scene *splitScene(SceneElement *element, int textPosition, QObject *parent=nullptr);
     bool mergeInto(Scene *another);

@@ -217,7 +217,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         blockFormat.setBottomMargin(20);
         charFormat = defaultCharFormat;
         cursor.insertBlock(blockFormat, charFormat);
-        cursor.insertHtml("This report was generated using <strong>scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
+        cursor.insertHtml("This report was generated using <strong>Scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
         cursor.insertBlock(blockFormat, charFormat);
         cursor.insertText("--");
     }
