@@ -33,6 +33,7 @@
 #include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
+#include "restapicall.h"
 #include "timeprofiler.h"
 #include "announcement.h"
 #include "imageprinter.h"
@@ -313,6 +314,9 @@ int main(int argc, char **argv)
     qmlRegisterType<ItemPositionMapper>(scriteModuleUri, 1, 0, "ItemPositionMapper");
 
     qmlRegisterType<SortFilterObjectListModel>(scriteModuleUri, 1, 0, "SortFilterObjectListModel");
+
+    qmlRegisterType<RestApiCall>(scriteModuleUri, 1, 0, "RestApiCall");
+    printf("%s\n", qPrintable(RestApiCall::defaultKey()));
 
     NotificationManager notificationManager;
 

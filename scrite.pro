@@ -12,7 +12,7 @@ CONFIG(release, debug|release): {
     CONFIG += qtquickcompiler
 }
 
-INCLUDEPATH += . \
+INCLUDEPATH += ../apikeys . \
         ./src \
         ./src/core \
         ./src/importers \
@@ -26,6 +26,7 @@ INCLUDEPATH += . \
         ./src/interfaces \
         ./src/reports \
         ./src/automation
+        ./src/restapikey
 
 HEADERS += \
     3rdparty/phtranslator/LanguageCodes.h \
@@ -51,6 +52,7 @@ HEADERS += \
     src/core/objectlistpropertymodel.h \
     src/core/printerobject.h \
     src/core/qobjectproperty.h \
+    src/core/restapicall.h \
     src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipsgraph.h \
@@ -162,6 +164,7 @@ SOURCES += \
     src/core/networkaccessmanager.cpp \
     src/core/objectlistpropertymodel.cpp \
     src/core/qobjectproperty.cpp \
+    src/core/restapicall.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipsgraph.cpp \
