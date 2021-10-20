@@ -15,6 +15,7 @@ CONFIG(release, debug|release): {
 INCLUDEPATH += ../apikeys . \
         ./src \
         ./src/core \
+        ./src/network \
         ./src/importers \
         ./src/exporters \
         ./src/printing \
@@ -48,11 +49,9 @@ HEADERS += \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
     src/core/filelocker.h \
-    src/core/networkaccessmanager.h \
     src/core/objectlistpropertymodel.h \
     src/core/printerobject.h \
     src/core/qobjectproperty.h \
-    src/core/restapicall.h \
     src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipsgraph.h \
@@ -62,6 +61,9 @@ HEADERS += \
     src/document/screenplaytextdocumentoffsets.h \
     src/exporters/structureexporter_p.h \
     src/importers/openfromlibrary.h \
+    src/network/jsonhttprequest.h \
+    src/network/networkaccessmanager.h \
+    src/network/user.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/printing/imageprinter.h \
     src/quick/items/boundingboxevaluator.h \
@@ -161,10 +163,8 @@ SOURCES += \
     src/automation/windowcapture.cpp \
     src/core/application_build_timestamp.cpp \
     src/core/filelocker.cpp \
-    src/core/networkaccessmanager.cpp \
     src/core/objectlistpropertymodel.cpp \
     src/core/qobjectproperty.cpp \
-    src/core/restapicall.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipsgraph.cpp \
@@ -174,6 +174,9 @@ SOURCES += \
     src/document/screenplaytextdocumentoffsets.cpp \
     src/exporters/structureexporter_p.cpp \
     src/importers/openfromlibrary.cpp \
+    src/network/jsonhttprequest.cpp \
+    src/network/networkaccessmanager.cpp \
+    src/network/user.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/printing/imageprinter.cpp \
     src/quick/items/boundingboxevaluator.cpp \

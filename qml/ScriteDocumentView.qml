@@ -1020,6 +1020,16 @@ Item {
                         }
 
                         MenuItem2 {
+                            icon.source: "../icons/action/info.png"
+                            text: "About"
+                            onClicked: {
+                                modalDialog.sourceComponent = aboutBoxComponent
+                                modalDialog.popupSource = parent
+                                modalDialog.active = true
+                            }
+                        }
+
+                        MenuItem2 {
                             text: "Toggle Fullscreen\tF7"
                             icon.source: "../icons/navigation/fullscreen.png"
                             onClicked: app.execLater(app, 100, function() { app.toggleFullscreen(qmlWindow) })
@@ -1483,7 +1493,7 @@ Item {
 
         Row {
             id: editTools
-            x: appToolBar.visible ? (parent.width - appLogo.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
+            x: appToolBar.visible ? (parent.width - userLogin.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
             height: parent.height
             spacing: 20
 
@@ -1649,39 +1659,10 @@ Item {
             }
         }
 
-        Item {
-            id: appLogo
+        UserLogin {
+            id: userLogin
             anchors.right: parent.right
-            width: 32+20+10
-            height: 32
             anchors.verticalCenter: parent.verticalCenter
-
-            Image {
-                // source: documentUI.width >= 1440 ? "../images/teriflix_logo.png" : "../images/teriflix_icon.png"
-                source: "../images/appicon.png"
-                x: 20
-                height: parent.height
-                width: parent.height
-                smooth: true
-                mipmap: true
-                fillMode: Image.PreserveAspectFit
-                transformOrigin: Item.Right
-                ToolTip.text: "About, Help & Feedback"
-
-                MouseArea {
-                    hoverEnabled: true
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onEntered: parent.ToolTip.visible = true
-                    onExited: parent.ToolTip.visible = false
-                    enabled: appToolBar.visible
-                    onClicked: {
-                        modalDialog.sourceComponent = aboutBoxComponent
-                        modalDialog.popupSource = parent
-                        modalDialog.active = true
-                    }
-                }
-            }
         }
     }
 

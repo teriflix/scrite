@@ -248,5 +248,7 @@
         <file>icons/content/standard_scene.png</file>
         <file>icons/screenplay/heading.png</file>
         <file>icons/screenplay/heading_inverted.png</file>
+        <file>icons/action/info.png</file>
+        <file>icons/action/info_inverted.png</file>
     </qresource>
 </RCC>

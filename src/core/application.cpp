@@ -19,6 +19,7 @@
 #include "timeprofiler.h"
 #include "execlatertimer.h"
 #include "scritedocument.h"
+#include "jsonhttprequest.h"
 
 #include <QDir>
 #include <QUuid>
@@ -1310,6 +1311,9 @@ void Application::launchNewInstanceAndOpenAnonymously(QWindow *window, const QSt
     }
     else
         args += { QStringLiteral("--geodelta"), QStringLiteral("30") };
+
+    if( !JsonHttpRequest::sessionToken().isEmpty() )
+        args += { QStringLiteral("--sessionToken"), JsonHttpRequest::sessionToken() };
 
     QProcess::startDetached(appPath, args);
 }

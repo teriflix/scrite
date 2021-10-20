@@ -23,6 +23,7 @@
 #include <QFontDatabase>
 #include <QOperatingSystemVersion>
 
+#include "user.h"
 #include "form.h"
 #include "notes.h"
 #include "fileinfo.h"
@@ -33,7 +34,6 @@
 #include "trackobject.h"
 #include "aggregation.h"
 #include "eventfilter.h"
-#include "restapicall.h"
 #include "timeprofiler.h"
 #include "announcement.h"
 #include "imageprinter.h"
@@ -49,6 +49,7 @@
 #include "scritedocument.h"
 #include "shortcutsmodel.h"
 #include "materialcolors.h"
+#include "jsonhttprequest.h"
 #include "completionmodel.h"
 #include "painterpathitem.h"
 #include "transliteration.h"
@@ -315,8 +316,12 @@ int main(int argc, char **argv)
 
     qmlRegisterType<SortFilterObjectListModel>(scriteModuleUri, 1, 0, "SortFilterObjectListModel");
 
-    qmlRegisterType<RestApiCall>(scriteModuleUri, 1, 0, "RestApiCall");
-    printf("%s\n", qPrintable(RestApiCall::defaultKey()));
+    qmlRegisterType<JsonHttpRequest>(scriteModuleUri, 1, 0, "JsonHttpRequest");
+    qmlRegisterSingletonType(scriteModuleUri, 1, 0, "User",
+                             [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QJSValue {
+        Q_UNUSED(scriptEngine);
+        return engine->newQObject(User::instance());
+    });
 
     NotificationManager notificationManager;
 
@@ -368,6 +373,7 @@ int main(int argc, char **argv)
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, &qmlView, &QQuickView::setTitle);
     qmlView.engine()->addImageProvider(QStringLiteral("color"), new ColorImageProvider);
     qmlView.engine()->addImageProvider(QStringLiteral("fileIcon"), new FileIconProvider);
+    qmlView.engine()->addImageProvider(QStringLiteral("userIcon"), new UserIconProvider);
     qmlView.engine()->rootContext()->setContextProperty("app", &a);
     qmlView.engine()->rootContext()->setContextProperty("qmlWindow", &qmlView);
     qmlView.engine()->rootContext()->setContextProperty("scriteDocument", scriteDocument);

@@ -11,9 +11,8 @@
 **
 ****************************************************************************/
 
-#include "restapicall.h"
 #include "application.h"
-#include "restapikey/restapikey.h"
+#include "jsonhttprequest.h"
 #include "networkaccessmanager.h"
 
 #include <QSysInfo>
@@ -29,18 +28,33 @@ inline QJsonValue jsonFetch(const QJsonObject &object, const QString &attr)
     return object.contains(attr) ? object.value(attr) : QJsonValue();
 }
 
-RestApiCall::RestApiCall(QObject *parent) : QObject(parent)
+JsonHttpRequest::JsonHttpRequest(QObject *parent) : QObject(parent)
 {
     this->setKey( this->defaultKey() );
     this->setToken( this->sessionToken() );
+
+    connect(this, &JsonHttpRequest::finished, [=]() {
+        if(!m_isQmlInstance && m_autoDelete)
+            this->deleteLater();
+    });
 }
 
-RestApiCall::~RestApiCall()
+JsonHttpRequest::~JsonHttpRequest()
 {
 
 }
 
-void RestApiCall::setType(Type val)
+bool JsonHttpRequest::autoDelete() const
+{
+    return m_autoDelete;
+}
+
+void JsonHttpRequest::setAutoDelete(bool val)
+{
+    m_autoDelete = val;
+}
+
+void JsonHttpRequest::setType(Type val)
 {
     if(m_type == val)
         return;
@@ -49,7 +63,7 @@ void RestApiCall::setType(Type val)
     emit typeChanged();
 }
 
-void RestApiCall::setHost(const QUrl &val)
+void JsonHttpRequest::setHost(const QUrl &val)
 {
     if(m_host == val)
         return;
@@ -58,7 +72,7 @@ void RestApiCall::setHost(const QUrl &val)
     emit hostChanged();
 }
 
-void RestApiCall::setRoot(const QString &val)
+void JsonHttpRequest::setRoot(const QString &val)
 {
     if(m_root == val)
         return;
@@ -67,7 +81,7 @@ void RestApiCall::setRoot(const QString &val)
     emit rootChanged();
 }
 
-void RestApiCall::setApi(const QString &val)
+void JsonHttpRequest::setApi(const QString &val)
 {
     if(m_api == val)
         return;
@@ -76,7 +90,7 @@ void RestApiCall::setApi(const QString &val)
     emit apiChanged();
 }
 
-void RestApiCall::setData(const QJsonObject &val)
+void JsonHttpRequest::setData(const QJsonObject &val)
 {
     if(m_data == val)
         return;
@@ -85,12 +99,12 @@ void RestApiCall::setData(const QJsonObject &val)
     emit dataChanged();
 }
 
-QString RestApiCall::defaultKey()
-{
+QString JsonHttpRequest::defaultKey()
+{    
     return QStringLiteral(REST_API_KEY);
 }
 
-void RestApiCall::setKey(const QString &val)
+void JsonHttpRequest::setKey(const QString &val)
 {
     if(m_key == val)
         return;
@@ -99,31 +113,43 @@ void RestApiCall::setKey(const QString &val)
     emit keyChanged();
 }
 
-QString RestApiCall::loginToken()
+QString JsonHttpRequest::loginToken()
 {
+    return fetch( QStringLiteral("loginToken") ).toString();
+}
+
+QString JsonHttpRequest::sessionToken()
+{
+    return fetch( QStringLiteral("sessionToken") ).toString();
+}
+
+static QString & SessionToken()
+{
+    static QString TheSessionToken;
+    return TheSessionToken;
+}
+
+void JsonHttpRequest::store(const QString &key, const QVariant &value)
+{
+    if(key == QStringLiteral("sessionToken"))
+        ::SessionToken() = value.toString();
+    else
+    {
+        QSettings *settings = Application::instance()->settings();
+        settings->setValue( QStringLiteral("RestApi/") + key, value );
+    }
+}
+
+QVariant JsonHttpRequest::fetch(const QString &key)
+{
+    if(key == QStringLiteral("sessionToken"))
+        return ::SessionToken();
+
     const QSettings *settings = Application::instance()->settings();
-    return settings->value( QStringLiteral("RestApi/loginToken") ).toString();
+    return settings->value( QStringLiteral("RestApi/") + key );
 }
 
-QString RestApiCall::sessionToken()
-{
-    const QSettings *settings = Application::instance()->settings();
-    return settings->value( QStringLiteral("RestApi/sessionToken") ).toString();
-}
-
-void RestApiCall::updateTokensFromResponse()
-{
-    const QString ltoken = ::jsonFetch(this->responseData(), QStringLiteral("loginToken") ).toString();
-    const QString stoken = ::jsonFetch(this->responseData(), QStringLiteral("sessionToken") ).toString();
-
-    QSettings *settings = Application::instance()->settings();
-    if(!ltoken.isEmpty())
-        settings->setValue( QStringLiteral("RestApi/loginToken"), ltoken );
-    if(!stoken.isEmpty())
-        settings->setValue( QStringLiteral("RestApi/sessionToken"), stoken );
-}
-
-void RestApiCall::setToken(const QString &val)
+void JsonHttpRequest::setToken(const QString &val)
 {
     if(m_token == val)
         return;
@@ -132,17 +158,22 @@ void RestApiCall::setToken(const QString &val)
     emit tokenChanged();
 }
 
-QString RestApiCall::clientId()
+QString JsonHttpRequest::email()
+{
+    return fetch( QStringLiteral("email") ).toString();
+}
+
+QString JsonHttpRequest::clientId()
 {
     return Application::instance()->installationId();
 }
 
-QString RestApiCall::deviceId()
+QString JsonHttpRequest::deviceId()
 {
     return QString::fromLatin1( QSysInfo::machineUniqueId().toHex() );
 }
 
-QString RestApiCall::platform()
+QString JsonHttpRequest::platform()
 {
     switch(Application::instance()->platform())
     {
@@ -159,12 +190,12 @@ QString RestApiCall::platform()
     return QStringLiteral("Unknown");
 }
 
-QString RestApiCall::platformVersion()
+QString JsonHttpRequest::platformVersion()
 {
     return QOperatingSystemVersion::current().name();
 }
 
-QString RestApiCall::platformType()
+QString JsonHttpRequest::platformType()
 {
     if(QSysInfo::WordSize == 32)
         return QStringLiteral("x32");
@@ -172,47 +203,53 @@ QString RestApiCall::platformType()
     return QStringLiteral("x64");
 }
 
-QString RestApiCall::appVersion()
+QString JsonHttpRequest::appVersion()
 {
     return Application::instance()->applicationVersion();
 }
 
-QString RestApiCall::responseCode() const
+QString JsonHttpRequest::responseCode() const
 {
     return ::jsonFetch(m_response, QStringLiteral("code")).toString();
 }
 
-QString RestApiCall::responseText() const
+QString JsonHttpRequest::responseText() const
 {
     return ::jsonFetch(m_response, QStringLiteral("text")).toString();
 }
 
-QJsonObject RestApiCall::responseData() const
+QJsonObject JsonHttpRequest::responseData() const
 {
     return ::jsonFetch(m_response, QStringLiteral("data")).toObject();
 }
 
-QString RestApiCall::errorCode() const
+QString JsonHttpRequest::errorCode() const
 {
-    return ::jsonFetch(m_response, QStringLiteral("code")).toString();
+    return ::jsonFetch(m_error, QStringLiteral("code")).toString();
 }
 
-QString RestApiCall::errorText() const
+QString JsonHttpRequest::errorText() const
 {
-    return ::jsonFetch(m_response, QStringLiteral("text")).toString();
+    return ::jsonFetch(m_error, QStringLiteral("text")).toString();
 }
 
-QJsonObject RestApiCall::errorData() const
+QJsonObject JsonHttpRequest::errorData() const
 {
-    return ::jsonFetch(m_response, QStringLiteral("data")).toObject();
+    return ::jsonFetch(m_error, QStringLiteral("data")).toObject();
 }
 
-bool RestApiCall::call()
+bool JsonHttpRequest::call()
 {
     if(m_api.isEmpty() || m_reply != nullptr)
         return false;
 
-    const QString path = m_root.isEmpty() ? m_api : m_root + QStringLiteral("/") + m_api;
+    this->clearError();
+    this->clearResponse();
+
+    emit aboutToCall();
+
+    QString path = QStringLiteral("/") + m_root + QStringLiteral("/") + m_api;
+    path = path.replace(QRegExp(QStringLiteral("/+")), QStringLiteral("/"));
 
     QUrl url = m_host;
     url.setPath(path);
@@ -237,10 +274,10 @@ bool RestApiCall::call()
         req.setRawHeader( QByteArrayLiteral("token"), m_token.toLatin1() );
 
     static const QString userAgentString = []() {
-        const QString ret = QStringLiteral("scrite-") + RestApiCall::appVersion() +
-                            QStringLiteral("-") + RestApiCall::platform() +
-                            QStringLiteral("-") + RestApiCall::platformVersion() +
-                            QStringLiteral("-") + RestApiCall::platformType();
+        const QString ret = QStringLiteral("scrite-") + JsonHttpRequest::appVersion() +
+                            QStringLiteral("-") + JsonHttpRequest::platform() +
+                            QStringLiteral("-") + JsonHttpRequest::platformVersion() +
+                            QStringLiteral("-") + JsonHttpRequest::platformType();
         return ret;
     } ();
     if( !userAgentString.isEmpty() )
@@ -266,16 +303,18 @@ bool RestApiCall::call()
 
     if(m_reply)
     {
-        connect(m_reply, &QNetworkReply::finished, this, &RestApiCall::onNetworkReplyFinished);
-        connect(m_reply,  QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-                this, &RestApiCall::onNetworkReplyError);
+        emit justIssuedCall();
         emit busyChanged();
+
+        connect(m_reply, &QNetworkReply::finished, this, &JsonHttpRequest::onNetworkReplyFinished);
+        connect(m_reply,  QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+                this, &JsonHttpRequest::onNetworkReplyError);
     }
 
     return true;
 }
 
-void RestApiCall::setError(const QJsonObject &val)
+void JsonHttpRequest::setError(const QJsonObject &val)
 {
     if(m_error == val)
         return;
@@ -284,7 +323,7 @@ void RestApiCall::setError(const QJsonObject &val)
     emit errorChanged();
 }
 
-void RestApiCall::setResponse(const QJsonObject &val)
+void JsonHttpRequest::setResponse(const QJsonObject &val)
 {
     if(m_response == val)
         return;
@@ -293,14 +332,16 @@ void RestApiCall::setResponse(const QJsonObject &val)
     emit responseChanged();
 }
 
-void RestApiCall::onNetworkReplyError()
+void JsonHttpRequest::onNetworkReplyError()
 {
     if(m_reply->error() == QNetworkReply::NoError)
         return;
 
+    disconnect(m_reply, &QNetworkReply::finished, this, &JsonHttpRequest::onNetworkReplyFinished);
+
     QJsonObject json;
     json.insert( QStringLiteral("code"), QStringLiteral("E_NETWORK") );
-    json.insert( QStringLiteral("text"), QStringLiteral("Error making network call.") );
+    json.insert( QStringLiteral("text"), m_reply->errorString() );
     this->setError(json);
 
     m_reply->deleteLater();
@@ -310,7 +351,7 @@ void RestApiCall::onNetworkReplyError()
     emit finished();
 }
 
-void RestApiCall::onNetworkReplyFinished()
+void JsonHttpRequest::onNetworkReplyFinished()
 {
     if(m_reply->error() == QNetworkReply::NoError)
     {
@@ -319,8 +360,12 @@ void RestApiCall::onNetworkReplyFinished()
         const QString errorAttr = QStringLiteral("error");
         const QString responseAttr = QStringLiteral("response");
 
+
         if( json.contains(errorAttr) )
+        {
+            qDebug("PA: %s", bytes.constData());
             this->setError(json.value(errorAttr).toObject());
+        }
         else if( json.contains(responseAttr) )
             this->setResponse(json.value(responseAttr).toObject());
 
