@@ -293,12 +293,13 @@ bool JsonHttpRequest::call()
         m_reply = nam->get(req);
     else if(m_type == POST)
     {
+        QByteArray bytes;
         if(!m_data.isEmpty())
         {
-            const QByteArray bytes = QJsonDocument(m_data).toJson(QJsonDocument::Compact);
+            bytes = QJsonDocument(m_data).toJson(QJsonDocument::Compact);
             req.setHeader(QNetworkRequest::ContentLengthHeader, bytes.length());
-            m_reply = nam->post(req, bytes);
         }
+        m_reply = nam->post(req, bytes);
     }
 
     if(m_reply)

@@ -209,7 +209,11 @@ void User::reload()
 
     // User should have logged in once.
     if(JsonHttpRequest::loginToken().isEmpty() || JsonHttpRequest::email().isEmpty())
+    {
+        this->setInfo(QJsonObject());
+        this->setInstallations(QJsonArray());
         return;
+    }
 
     if( JsonHttpRequest::sessionToken().isEmpty() )
     {

@@ -370,6 +370,13 @@ Item {
                     }
                 }
 
+                Button2 {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: !buttonsRow.visible
+                    text: "Deactivate"
+                    onClicked: deactivateHttpRequest.call()
+                }
+
                 Label {
                     id: statusText
                     width: parent.width
@@ -378,15 +385,21 @@ Item {
                     maximumLineCount: 2
                     color: "red"
                     horizontalAlignment: Text.AlignHCenter
-                    text: userInfoHttpRequest.hasError ? userInfoHttpRequest.errorText : ""
+                    text: {
+                        if(userInfoHttpRequest.hasError)
+                            return userInfoHttpRequest.errorText
+                        if(deactivateHttpRequest.hasError)
+                            return deactivateHttpRequest.errorText
+                        return ""
+                    }
                 }
             }
 
             BusyOverlay {
                 id: busyOverlay
                 anchors.fill: parent
-                visible: User.busy || userInfoHttpRequest.busy
-                busyMessage: "Saving changes..."
+                visible: User.busy || userInfoHttpRequest.busy || deactivateHttpRequest.busy
+                busyMessage: deactivateHttpRequest.busy ? "Deactivating..." : "Saving changes..."
             }
 
             JsonHttpRequest {
@@ -397,6 +410,21 @@ Item {
                     if(hasError)
                         return
                     User.reload()
+                }
+            }
+
+            JsonHttpRequest {
+                id: deactivateHttpRequest
+                type: JsonHttpRequest.POST
+                api: "app/deactivate"
+                onFinished: {
+                    if(hasError)
+                        return
+                    store("email", "")
+                    store("loginToken", "")
+                    store("sessionToken", "");
+                    User.reload()
+                    modalDialog.close()
                 }
             }
 
