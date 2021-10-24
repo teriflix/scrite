@@ -84,6 +84,8 @@ public:
     Q_INVOKABLE static QString platformVersion();
     Q_INVOKABLE static QString platformType();
     Q_INVOKABLE static QString appVersion();
+    static QString encrypt(const QString &text);
+    static QString decrypt(const QString &text);
 
     Q_PROPERTY(QJsonObject response READ response NOTIFY responseChanged)
     QJsonObject response() const { return m_response; }
@@ -120,6 +122,11 @@ public:
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
     bool isBusy() const { return m_reply != nullptr; }
     Q_SIGNAL void busyChanged();
+
+    Q_PROPERTY(bool reportNetworkErrors READ isReportNetworkErrors WRITE setReportNetworkErrors NOTIFY reportNetworkErrorsChanged)
+    void setReportNetworkErrors(bool val);
+    bool isReportNetworkErrors() const { return m_reportNetworkErrors; }
+    Q_SIGNAL void reportNetworkErrorsChanged();
 
     Q_INVOKABLE bool call();
 
@@ -162,6 +169,8 @@ private:
     bool m_autoDelete = true;
     bool m_isQmlInstance = false;
     QNetworkReply *m_reply = nullptr;
+    bool m_reportNetworkErrors = false; // when false, networkError() signal is emited to report
+                                        // network errors. When true, they are reported via error() also.
 };
 
 #endif // JSONHTTPREQUEST_H

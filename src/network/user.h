@@ -126,7 +126,6 @@ public:
     Q_PROPERTY(bool enabled READ isEnabled NOTIFY enabledChanged)
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
-    bool m_enabled = false;
 
 private:
     void reevaluate();
@@ -135,6 +134,7 @@ private:
 private:
     QString m_featureName;
     int m_feature = -1;
+    bool m_enabled = false;
 };
 
 #endif // USER_H

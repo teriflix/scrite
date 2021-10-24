@@ -114,6 +114,7 @@ Item {
                     id: emailField
                     width: parent.width
                     placeholderText: "Email"
+                    text: activateHttpRequest.email()
                     validator: RegExpValidator {
                         regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                     }
@@ -199,7 +200,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottomMargin: 10
                 color: "red"
-                text: activateHttpRequest.hasError ? activateHttpRequest.errorText : ""
+                text: activateHttpRequest.hasError ? (activateHttpRequest.errorCode + ":" + activateHttpRequest.errorText) : ""
             }
 
             BusyOverlay {
@@ -213,21 +214,21 @@ Item {
                 type: JsonHttpRequest.POST
                 api: "app/activate"
                 token: ""
+                reportNetworkErrors: true
                 onFinished: {
+                    if(hasError || !hasResponse)
+                        return
+
                     if(activationCodeSent) {
-                        if(activateHttpRequest.hasResponse) {
-                            activateHttpRequest.store("email", activationEmail)
-                            activateHttpRequest.store("loginToken", activateHttpRequest.responseData.loginToken)
-                            activateHttpRequest.store("sessionToken", activateHttpRequest.responseData.sessionToken)
-                            User.reload()
-                            app.execLater(userLogin, 500, showAccountProfileDialog)
-                            modalDialog.close()
-                        }
+                        activateHttpRequest.store("email", activationEmail)
+                        activateHttpRequest.store("loginToken", activateHttpRequest.responseData.loginToken)
+                        activateHttpRequest.store("sessionToken", activateHttpRequest.responseData.sessionToken)
+                        User.reload()
+                        app.execLater(userLogin, 500, showAccountProfileDialog)
+                        modalDialog.close()
                     } else {
-                        if(activateHttpRequest.hasResponse) {
-                            activationEmail = data.email
-                            activationCodeSent = true
-                        }
+                        activationEmail = data.email
+                        activationCodeSent = true
                     }
                 }
             }
@@ -253,7 +254,7 @@ Item {
                 font.bold: true
                 text: "Account Information"
                 anchors.top: parent.top
-                anchors.topMargin: 20
+                anchors.topMargin: Math.max(20, parent.height-userInfoFlickable.contentHeight-footerRow.height-80-height)
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
@@ -381,11 +382,20 @@ Item {
                     }
                 }
 
-                Button2 {
-                    anchors.horizontalCenter: parent.horizontalCenter
+                Row {
+                    spacing: 20
                     visible: !buttonsRow.visible
-                    text: "Deactivate"
-                    onClicked: deactivateHttpRequest.call()
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Button2 {
+                        text: "Refresh"
+                        onClicked: User.reload()
+                    }
+
+                    Button2 {
+                        text: "Deactivate"
+                        onClicked: deactivateHttpRequest.call()
+                    }
                 }
 
                 Label {
@@ -398,9 +408,9 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     text: {
                         if(userInfoHttpRequest.hasError)
-                            return userInfoHttpRequest.errorText
+                            return userInfoHttpRequest.errorCode + ": " + userInfoHttpRequest.errorText
                         if(deactivateHttpRequest.hasError)
-                            return deactivateHttpRequest.errorText
+                            return deactivateHttpRequest.errorCode + ": " + deactivateHttpRequest.errorText
                         return ""
                     }
                 }
@@ -417,9 +427,11 @@ Item {
                 id: userInfoHttpRequest
                 type: JsonHttpRequest.POST
                 api: "user/me"
+                reportNetworkErrors: true
                 onFinished: {
-                    if(hasError)
+                    if(hasError || !hasResponse)
                         return
+
                     User.reload()
                 }
             }
@@ -428,9 +440,11 @@ Item {
                 id: deactivateHttpRequest
                 type: JsonHttpRequest.POST
                 api: "app/deactivate"
+                reportNetworkErrors: true
                 onFinished: {
-                    if(hasError)
+                    if(hasError || !hasResponse)
                         return
+
                     store("email", "")
                     store("loginToken", "")
                     store("sessionToken", "");

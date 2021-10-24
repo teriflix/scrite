@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "application.h"
+#include "simplecrypt.h"
 #include "jsonhttprequest.h"
 #include "networkaccessmanager.h"
 
@@ -136,7 +137,7 @@ void JsonHttpRequest::store(const QString &key, const QVariant &value)
     else
     {
         QSettings *settings = Application::instance()->settings();
-        settings->setValue( QStringLiteral("RestApi/") + key, value );
+        settings->setValue( QStringLiteral("Registration/") + key, value );
     }
 }
 
@@ -146,7 +147,7 @@ QVariant JsonHttpRequest::fetch(const QString &key)
         return ::SessionToken();
 
     const QSettings *settings = Application::instance()->settings();
-    return settings->value( QStringLiteral("RestApi/") + key );
+    return settings->value( QStringLiteral("Registration/") + key );
 }
 
 void JsonHttpRequest::setToken(const QString &val)
@@ -208,6 +209,18 @@ QString JsonHttpRequest::appVersion()
     return Application::instance()->applicationVersion();
 }
 
+QString JsonHttpRequest::encrypt(const QString &text)
+{
+    SimpleCrypt sc(REST_CRYPT_KEY);
+    return sc.encryptToString(text);
+}
+
+QString JsonHttpRequest::decrypt(const QString &text)
+{
+    SimpleCrypt sc(REST_CRYPT_KEY);
+    return sc.decryptToString(text);
+}
+
 QString JsonHttpRequest::responseCode() const
 {
     return ::jsonFetch(m_response, QStringLiteral("code")).toString();
@@ -236,6 +249,15 @@ QString JsonHttpRequest::errorText() const
 QJsonObject JsonHttpRequest::errorData() const
 {
     return ::jsonFetch(m_error, QStringLiteral("data")).toObject();
+}
+
+void JsonHttpRequest::setReportNetworkErrors(bool val)
+{
+    if(m_reportNetworkErrors == val)
+        return;
+
+    m_reportNetworkErrors = val;
+    emit reportNetworkErrorsChanged();
 }
 
 bool JsonHttpRequest::call()
@@ -345,6 +367,14 @@ void JsonHttpRequest::onNetworkReplyError()
     const QString code = Application::instance()->enumerationKey(m_reply, "NetworkError", m_reply->error());
     const QString msg = m_reply->errorString();
     emit networkError(code, msg);
+
+    if(m_reportNetworkErrors)
+    {
+        QJsonObject errObject;
+        errObject.insert( QStringLiteral("code"), code );
+        errObject.insert( QStringLiteral("text"), msg );
+        this->setError(errObject);
+    }
 
     m_reply->deleteLater();
     m_reply = nullptr;

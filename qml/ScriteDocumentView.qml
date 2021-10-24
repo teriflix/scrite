@@ -41,7 +41,7 @@ Item {
         font: format ? format.font2 : scriteDocument.formatting.defaultFont2
     }
 
-    property bool canShowNotebookInStructure: width > 1600
+    property bool canShowNotebookInStructure: width > 1600 && structureAppFeature.enabled
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
         app.execLater(workspaceSettings, 100, function() {
@@ -1898,7 +1898,6 @@ Item {
                                     anchors.fill: parent
                                     visible: !parent.active
                                     featureName: "Structure"
-                                    suggestion: "Login & activate your device to access this feature for free."
                                 }
                             }
 
@@ -1917,7 +1916,6 @@ Item {
                                     anchors.fill: parent
                                     visible: !parent.active
                                     featureName: "Notebook"
-                                    suggestion: "Login & activate your device to access this feature for free."
                                 }
                             }
                         }
@@ -2155,7 +2153,6 @@ Item {
                 anchors.fill: parent
                 visible: !parent.active
                 featureName: "Notebook"
-                suggestion: "Login & activate your device to access this feature for free."
             }
         }
     }
@@ -2173,7 +2170,6 @@ Item {
                 anchors.fill: parent
                 visible: !parent.active
                 featureName: "Scrited"
-                suggestion: "Login & activate your device to access this feature for free."
             }
         }
     }

@@ -16,7 +16,14 @@
 
 #include <QtDebug>
 #include <QPainter>
+#include <QJsonDocument>
 #include <QCoreApplication>
+#include <QDateTime>
+
+static QString GetSessionExpiredErrorMessage()
+{
+    return QStringLiteral("Your login session has expired and therefore your device is deactivated. Please connect to the Internet and login/reactivate your installation of Scrite.");
+}
 
 User *User::instance()
 {
@@ -111,9 +118,26 @@ void User::setInstallations(const QJsonArray &val)
         const QJsonObject installation = item.toObject();
         if(installation.value(QStringLiteral("deviceId")).toString() == JsonHttpRequest::deviceId())
         {
+            const QString dtFormat = QStringLiteral("yyyy-MM-ddThh:mm:ss.zzz");
+            const QString lastActivatedDateString = installation.value(QStringLiteral("lastActivationDate")).toString();
+            if(!lastActivatedDateString.isEmpty())
+            {
+                const QDateTime lastActivateDate = QDateTime::fromString( lastActivatedDateString.left(lastActivatedDateString.length()-1), dtFormat );
+                const int nrDaysFromLastActivation = lastActivateDate.daysTo(QDateTime::currentDateTime());
+                if( nrDaysFromLastActivation > 28 )
+                    break;
+            }
+
             m_currentInstallationIndex = index;
             break;
         }
+    }
+
+    if(m_currentInstallationIndex < 0)
+    {
+        m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+        m_installations = QJsonArray();
+        this->logout();
     }
 
     emit installationsChanged();
@@ -130,7 +154,39 @@ void User::activateCallDone()
         }
 
         if(!m_call->hasResponse())
+        {
+            // Load information stored in the previous session
+            {
+                QJsonParseError parseError;
+                const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("userInfo") ).toString();
+                const QString crypt = JsonHttpRequest::decrypt(cryptText);
+                const QJsonObject object = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).object();
+                if(parseError.error == QJsonParseError::NoError && !object.isEmpty())
+                    this->setInfo(object);
+                else
+                {
+                    m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+                    this->logout();
+                    return;
+                }
+            }
+
+            {
+                QJsonParseError parseError;
+                const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("devices") ).toString();
+                const QString crypt = JsonHttpRequest::decrypt(cryptText);
+                const QJsonArray array = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).array();
+                if(parseError.error == QJsonParseError::NoError && !array.isEmpty())
+                    this->setInstallations(array);
+                else
+                {
+                    m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+                    this->logout();
+                }
+            }
+
             return;
+        }
 
         const QJsonObject tokens = m_call->responseData();
         const QString sessionTokenKey = QStringLiteral("sessionToken");
@@ -161,6 +217,10 @@ void User::userInfoCallDone()
 
         const QJsonObject userInfo = m_call->responseData();
         this->setInfo(userInfo);
+
+        const QString text = QJsonDocument(m_info).toJson();
+        const QString cryptText = JsonHttpRequest::encrypt(text);
+        JsonHttpRequest::store( QStringLiteral("userInfo"), cryptText );
     }
 
     // Fetch installations information
@@ -187,6 +247,10 @@ void User::installationsCallDone()
         const QJsonObject installationsInfo = m_call->responseData();
         const QJsonArray installations = installationsInfo.value(QStringLiteral("list")).toArray();
         this->setInstallations( installations );
+
+        const QString text = QJsonDocument(installations).toJson();
+        const QString cryptText = JsonHttpRequest::encrypt(text);
+        JsonHttpRequest::store( QStringLiteral("devices"), cryptText );
 
         // All done.
     }

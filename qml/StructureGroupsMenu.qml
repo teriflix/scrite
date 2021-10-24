@@ -188,7 +188,6 @@ Menu2 {
                 color: Qt.rgba(1,1,1,0.8)
                 visible: !structureAppFeature.enabled
                 featureName: "Structure Tagging"
-                suggestion: "Login & activate your device to access this feature for free."
                 onClicked: structureGroupsMenu.close()
             }
         }

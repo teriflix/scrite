@@ -15,8 +15,8 @@ import QtQuick 2.13
 import Scrite 1.0
 
 Rectangle {
-    property string reason
-    property string suggestion
+    property string reason: User.loggedIn ? "This feature is not enabled in your subscription." : ""
+    property string suggestion: User.loggedIn ? "Please sign up for a subscription to use this feature." : "Login & activate your device to access this feature."
     property string featureName
     color: primaryColors.c100.background
 
@@ -29,7 +29,8 @@ Rectangle {
 
         Text {
             text: featureName
-            font.pointSize: 20
+            font.pointSize: app.idealFontPointSize + 8
+            font.bold: true
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -52,7 +53,7 @@ Rectangle {
         }
 
         Button2 {
-            text: User.loggedIn ? "Subscribe" : "Login & Activate"
+            text: User.loggedIn ? "Subscribe" : "Login / Activate"
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: Announcement.shout("97369507-721E-4A7F-886C-4CE09A5BCCFB", null)
         }

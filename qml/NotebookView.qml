@@ -130,7 +130,7 @@ Rectangle {
 
             ToolButton3 {
                 id: structureTabButton
-                visible: ui.showNotebookInStructure
+                visible: ui.showNotebookInStructure && structureAppFeature.enabled
                 iconSource: "../icons/navigation/structure_tab.png"
                 ToolTip.text: "Structure Tab (" + app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
@@ -140,7 +140,7 @@ Rectangle {
 
             ToolButton3 {
                 id: notebookTabButton
-                visible: ui.showNotebookInStructure
+                visible: ui.showNotebookInStructure && structureAppFeature.enabled
                 iconSource: "../icons/navigation/notebook_tab.png"
                 down: true
                 ToolTip.text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
