@@ -47,6 +47,7 @@ Item {
                 scritedSettings.experimentalFeatureNoticeDisplayed = true
             })
         }
+        User.logActivity1("scrited")
     }
     Component.onDestruction: scritedToolbar.scritedView = null
 

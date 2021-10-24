@@ -110,7 +110,10 @@ Rectangle {
         }
     }
 
-    Component.onCompleted: notebookTree.activateFromCurrentScreenplayElement()
+    Component.onCompleted: {
+        notebookTree.activateFromCurrentScreenplayElement()
+        User.logActivity1("notebook")
+    }
 
     FontMetrics {
         id: fontMetrics

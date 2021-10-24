@@ -13,6 +13,7 @@
 
 #include "abstractexporter.h"
 #include "application.h"
+#include "user.h"
 
 AbstractExporter::AbstractExporter(QObject *parent)
                  :AbstractDeviceIO(parent)
@@ -83,6 +84,9 @@ bool AbstractExporter::write()
     this->progress()->finish();
 
     GarbageCollector::instance()->add(this);
+
+    const QString exporterName = QString::fromLatin1(this->metaObject()->className());
+    User::instance()->logActivity2( QStringLiteral("export"), exporterName );
 
     return ret;
 }

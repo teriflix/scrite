@@ -38,11 +38,17 @@ JsonHttpRequest::JsonHttpRequest(QObject *parent) : QObject(parent)
         if(!m_isQmlInstance && m_autoDelete)
             this->deleteLater();
     });
+
+#ifndef QT_NODEBUG
+    qDebug() << "PA: ";
+#endif
 }
 
 JsonHttpRequest::~JsonHttpRequest()
 {
-
+#ifndef QT_NODEBUG
+    qDebug() << "PA: " << m_type << m_api;
+#endif
 }
 
 bool JsonHttpRequest::autoDelete() const
@@ -326,7 +332,9 @@ bool JsonHttpRequest::call()
 
     if(m_reply)
     {
+#ifndef QT_NODEBUG
         qDebug() << "PA: Call Issued - " << m_type << m_api;
+#endif
 
         emit justIssuedCall();
         emit busyChanged();
@@ -366,6 +374,11 @@ void JsonHttpRequest::onNetworkReplyError()
 
     const QString code = Application::instance()->enumerationKey(m_reply, "NetworkError", m_reply->error());
     const QString msg = m_reply->errorString();
+
+#ifndef QT_NODEBUG
+    qDebug() << "PA: Network Error - " << m_type << m_api << code << msg;
+#endif
+
     emit networkError(code, msg);
 
     if(m_reportNetworkErrors)
@@ -392,7 +405,9 @@ void JsonHttpRequest::onNetworkReplyFinished()
         const QString errorAttr = QStringLiteral("error");
         const QString responseAttr = QStringLiteral("response");
 
+#ifndef QT_NODEBUG
         qDebug() << "PA: Response Received - " << m_type << m_api;
+#endif
 
         if( json.contains(errorAttr) )
             this->setError(json.value(errorAttr).toObject());

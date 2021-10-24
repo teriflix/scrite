@@ -13,6 +13,7 @@
 
 #include "abstractreportgenerator.h"
 
+#include "user.h"
 #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
@@ -247,6 +248,9 @@ bool AbstractReportGenerator::generate()
     this->progress()->finish();
 
     GarbageCollector::instance()->add(this);
+
+    const QString reportName = QString::fromLatin1(this->metaObject()->className());
+    User::instance()->logActivity2( QStringLiteral("report"), reportName );
 
     return ret;
 }

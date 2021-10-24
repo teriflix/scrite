@@ -3776,4 +3776,6 @@ Item {
             }
         }
     }
+
+    Component.onCompleted: User.logActivity1("structure")
 }

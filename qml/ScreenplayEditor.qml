@@ -3470,6 +3470,8 @@ Rectangle {
     Component.onCompleted: {
         restoreLayoutDetails()
         screenplayTextDocument.editor = screenplayEditor
+        if(mainTabBar.currentIndex === 0)
+            User.logActivity1("screenplay")
     }
     Component.onDestruction: {
         saveLayoutDetails()

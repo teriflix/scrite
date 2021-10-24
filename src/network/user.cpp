@@ -12,13 +12,14 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "application.h"
 #include "jsonhttprequest.h"
 
 #include <QtDebug>
 #include <QPainter>
+#include <QDateTime>
 #include <QJsonDocument>
 #include <QCoreApplication>
-#include <QDateTime>
 
 static QString GetSessionExpiredErrorMessage()
 {
@@ -278,7 +279,9 @@ void User::onCallDestroyed()
     m_call = nullptr;
     emit busyChanged();
 
+#ifndef QT_NODEBUG
     qDebug() << "PA: ";
+#endif
 }
 
 void User::reload()
@@ -322,6 +325,28 @@ void User::logout()
     this->setInfo( QJsonObject() );
     this->setInstallations( QJsonArray() );
     JsonHttpRequest::store( QStringLiteral("sessionToken"), QVariant() );
+}
+
+void User::logActivity2(const QString &givenActivity, const QJsonValue &data)
+{
+    if(JsonHttpRequest::sessionToken().isEmpty())
+        return;
+
+    const QString activity = givenActivity.isEmpty() ? QStringLiteral("touch") : givenActivity.toLower().simplified();
+
+    // !!!NOT CALLING newCall() on PURPOSE!!!!
+    // While logging activity, we do not need User.busy to become true
+    JsonHttpRequest *call = new JsonHttpRequest(this);
+    call->setAutoDelete(true);
+    call->setType(JsonHttpRequest::POST);
+    call->setApi( QStringLiteral("activity/log") );
+    const QJsonObject callData = {
+        { QStringLiteral("appVersion"), Application::instance()->applicationVersion() },
+        { QStringLiteral("activity"), activity },
+        { QStringLiteral("data"), data },
+    };
+    call->setData(callData);
+    call->call(); // Fire and Forget
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -408,12 +433,11 @@ AppFeature::AppFeature(QObject *parent)
 {
     connect(User::instance(), &User::infoChanged, this, &AppFeature::reevaluate);
     connect(User::instance(), &User::loggedInChanged, this, &AppFeature::reevaluate);
-    qDebug() << "PA: " << m_featureName << m_feature << m_enabled;
 }
 
 AppFeature::~AppFeature()
 {
-    qDebug() << "PA: " << m_featureName << m_feature << m_enabled;
+
 }
 
 void AppFeature::setFeatureName(const QString &val)

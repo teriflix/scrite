@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "user.h"
 #include "undoredo.h"
 #include "application.h"
 #include "abstractimporter.h"
@@ -84,6 +85,9 @@ bool AbstractImporter::read()
     this->progress()->finish();
 
     GarbageCollector::instance()->add(this);
+
+    const QString importerName = QString::fromLatin1(this->metaObject()->className());
+    User::instance()->logActivity2( QStringLiteral("export"), importerName );
 
     return ret;
 }

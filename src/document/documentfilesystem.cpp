@@ -133,7 +133,9 @@ void DocumentFileSystem::reset()
 
     d->folder.reset(new QTemporaryDir);
 
+#ifndef QT_NODEBUG
     qDebug() << "PA: " << d->folder->path();
+#endif
 }
 
 bool doUnzip(const QFileInfo &fileInfo, const QTemporaryDir &dstDir)

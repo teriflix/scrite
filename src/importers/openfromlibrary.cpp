@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "user.h"
 #include "openfromlibrary.h"
 #include "networkaccessmanager.h"
 
@@ -175,6 +176,9 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
         m_importing = false;
         emit importFinished(index);
     });
+
+    const QString activity = library == this->templates() ? QStringLiteral("template") : QStringLiteral("scriptalay");
+    User::instance()->logActivity2(activity, name);
 }
 
 bool LibraryService::doImport(QIODevice *device)
