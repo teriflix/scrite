@@ -383,8 +383,6 @@ void AppFeature::reevaluate()
     }
     else
         this->setEnabled(false);
-
-    qDebug() << "PA: " << m_featureName << m_feature << m_enabled;
 }
 
 void AppFeature::setEnabled(bool val)

@@ -33,13 +33,13 @@ Menu2 {
         height: structureGroupsMenu.height
 
         background: Item { }
-        contentItem: Item {            
+        contentItem: Item {
             Rectangle {
                 anchors.fill: parent
                 anchors.bottomMargin: structureGroupsMenu.bottomPadding
                 border.width: 1
                 border.color: primaryColors.borderColor
-                enabled: sceneGroup.sceneCount > 0
+                enabled: structureAppFeature.enabled && sceneGroup.sceneCount > 0
                 opacity: enabled ? 1 : 0.5
 
                 Rectangle {
@@ -181,6 +181,15 @@ Menu2 {
                         }
                     }
                 }
+            }
+
+            DisabledFeatureNotice {
+                anchors.fill: parent
+                color: Qt.rgba(1,1,1,0.8)
+                visible: !structureAppFeature.enabled
+                featureName: "Structure Tagging"
+                suggestion: "Login & activate your device to access this feature for free."
+                onClicked: structureGroupsMenu.close()
             }
         }
     }

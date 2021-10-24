@@ -61,6 +61,16 @@ Item {
         }
     }
 
+    Announcement.onIncoming: {
+        var stype = "" + type
+        if(stype === "97369507-721E-4A7F-886C-4CE09A5BCCFB") {
+            if(User.loggedIn)
+                showAccountProfileDialog()
+            else
+                showLoginDialog()
+        }
+    }
+
     function showLoginDialog() {
         modalDialog.sourceComponent = userLoginDialog
         modalDialog.popupSource = profilePic

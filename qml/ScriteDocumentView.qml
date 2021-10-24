@@ -49,6 +49,21 @@ Item {
         })
     }
 
+    AppFeature {
+        id: structureAppFeature
+        feature: UserType.StructureFeature
+    }
+
+    AppFeature {
+        id: notebookAppFeature
+        feature: UserType.NotebookFeature
+    }
+
+    AppFeature {
+        id: scritedAppFeature
+        feature: UserType.ScritedFeature
+    }
+
     Settings {
         id: workspaceSettings
         fileName: app.settingsFilePath
@@ -1876,17 +1891,33 @@ Item {
                                 id: structureViewLoader
                                 anchors.fill: parent
                                 visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+                                active: structureAppFeature.enabled
                                 sourceComponent: StructureView { }
+
+                                DisabledFeatureNotice {
+                                    anchors.fill: parent
+                                    visible: !parent.active
+                                    featureName: "Structure"
+                                    suggestion: "Login & activate your device to access this feature for free."
+                                }
                             }
 
                             Loader {
                                 id: notebookViewLoader
                                 anchors.fill: parent
-                                active: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                visible: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                active: visible && notebookAppFeature.enabled
                                 sourceComponent: NotebookView {
                                     toolbarSize: appToolBar.height+4
                                     toolbarSpacing: appToolBar.spacing
                                     toolbarLeftMargin: appToolBar.anchors.leftMargin
+                                }
+
+                                DisabledFeatureNotice {
+                                    anchors.fill: parent
+                                    visible: !parent.active
+                                    featureName: "Notebook"
+                                    suggestion: "Login & activate your device to access this feature for free."
                                 }
                             }
                         }
@@ -2109,12 +2140,22 @@ Item {
     Component {
         id: notebookEditorComponent
 
-        NotebookView {
-            Announcement.onIncoming: {
-                var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
-                var sdata = "" + data
-                if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C")
-                    switchTo(sdata)
+        Loader {
+            active: notebookAppFeature.enabled
+            sourceComponent: NotebookView {
+                Announcement.onIncoming: {
+                    var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
+                    var sdata = "" + data
+                    if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C")
+                        switchTo(sdata)
+                }
+            }
+
+            DisabledFeatureNotice {
+                anchors.fill: parent
+                visible: !parent.active
+                featureName: "Notebook"
+                suggestion: "Login & activate your device to access this feature for free."
             }
         }
     }
@@ -2122,8 +2163,18 @@ Item {
     Component {
         id: scritedComponent
 
-        ScritedView {
+        Loader {
+            active: scritedAppFeature.enabled
+            sourceComponent: ScritedView {
 
+            }
+
+            DisabledFeatureNotice {
+                anchors.fill: parent
+                visible: !parent.active
+                featureName: "Scrited"
+                suggestion: "Login & activate your device to access this feature for free."
+            }
         }
     }
 

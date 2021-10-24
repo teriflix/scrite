@@ -75,5 +75,6 @@
         <file>qml/UiElementHighlight.qml</file>
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
+        <file>qml/DisabledFeatureNotice.qml</file>
     </qresource>
 </RCC>
