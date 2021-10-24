@@ -134,6 +134,7 @@ signals:
     void aboutToCall();
     void justIssuedCall();
     void finished();
+    void networkError(const QString &code, const QString &message);
 
 private:
     void setError(const QJsonObject &val);

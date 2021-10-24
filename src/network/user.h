@@ -105,4 +105,36 @@ public:
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
+class AppFeature : public QObject
+{
+    Q_OBJECT
+
+public:
+    AppFeature(QObject *parent=nullptr);
+    ~AppFeature();
+
+    Q_PROPERTY(QString featureName READ featureName WRITE setFeatureName NOTIFY featureNameChanged)
+    void setFeatureName(const QString &val);
+    QString featureName() const { return m_featureName; }
+    Q_SIGNAL void featureNameChanged();
+
+    Q_PROPERTY(int feature READ feature WRITE setFeature NOTIFY featureChanged)
+    void setFeature(int val);
+    int feature() const { return m_feature; }
+    Q_SIGNAL void featureChanged();
+
+    Q_PROPERTY(bool enabled READ isEnabled NOTIFY enabledChanged)
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+    bool m_enabled = false;
+
+private:
+    void reevaluate();
+    void setEnabled(bool val);
+
+private:
+    QString m_featureName;
+    int m_feature = -1;
+};
+
 #endif // USER_H

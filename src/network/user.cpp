@@ -80,12 +80,16 @@ void User::setInfo(const QJsonObject &val)
             QStringLiteral("import"), QStringLiteral("export"), QStringLiteral("scrited")
         };
         const QJsonArray features = m_info.value( QStringLiteral("enabledAppFeatures") ).toArray();
+        QSet<int> ifeatures;
         for(const QJsonValue &featureItem : features)
         {
-            const QString feature = featureItem.toString();
-            m_enabledFeatures << availableFeatures.indexOf(feature);
+            const QString feature = featureItem.toString().toLower();
+            const int index = availableFeatures.indexOf(feature);
+            if(index >= 0)
+                ifeatures += index;
         }
 
+        m_enabledFeatures = ifeatures.toList();
         std::sort(m_enabledFeatures.begin(), m_enabledFeatures.end());
     }
 
@@ -125,6 +129,9 @@ void User::activateCallDone()
             return;
         }
 
+        if(!m_call->hasResponse())
+            return;
+
         const QJsonObject tokens = m_call->responseData();
         const QString sessionTokenKey = QStringLiteral("sessionToken");
         const QString sessionToken = tokens.value(sessionTokenKey).toString();
@@ -149,6 +156,9 @@ void User::userInfoCallDone()
             return;
         }
 
+        if(!m_call->hasResponse())
+            return;
+
         const QJsonObject userInfo = m_call->responseData();
         this->setInfo(userInfo);
     }
@@ -170,6 +180,9 @@ void User::installationsCallDone()
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
             return;
         }
+
+        if(!m_call->hasResponse())
+            return;
 
         const QJsonObject installationsInfo = m_call->responseData();
         const QJsonArray installations = installationsInfo.value(QStringLiteral("list")).toArray();
@@ -200,6 +213,8 @@ void User::onCallDestroyed()
 {
     m_call = nullptr;
     emit busyChanged();
+
+    qDebug() << "PA: ";
 }
 
 void User::reload()
@@ -322,4 +337,61 @@ QImage UserIconProvider::requestImage(const QString &id, QSize *size, const QSiz
     return image;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 
+AppFeature::AppFeature(QObject *parent)
+    :QObject(parent)
+{
+    connect(User::instance(), &User::infoChanged, this, &AppFeature::reevaluate);
+    connect(User::instance(), &User::loggedInChanged, this, &AppFeature::reevaluate);
+    qDebug() << "PA: " << m_featureName << m_feature << m_enabled;
+}
+
+AppFeature::~AppFeature()
+{
+    qDebug() << "PA: " << m_featureName << m_feature << m_enabled;
+}
+
+void AppFeature::setFeatureName(const QString &val)
+{
+    if(m_featureName == val)
+        return;
+
+    m_featureName = val;
+    emit featureNameChanged();
+    this->reevaluate();
+}
+
+void AppFeature::setFeature(int val)
+{
+    if(m_feature == val)
+        return;
+
+    m_feature = val;
+    emit featureChanged();
+    this->reevaluate();
+}
+
+void AppFeature::reevaluate()
+{
+    if(User::instance()->isLoggedIn())
+    {
+        if(m_featureName.isEmpty())
+            this->setEnabled( User::instance()->isFeatureEnabled(User::AppFeature(m_feature)) );
+        else
+            this->setEnabled( User::instance()->isFeatureNameEnabled(m_featureName) );
+    }
+    else
+        this->setEnabled(false);
+
+    qDebug() << "PA: " << m_featureName << m_feature << m_enabled;
+}
+
+void AppFeature::setEnabled(bool val)
+{
+    if(m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}

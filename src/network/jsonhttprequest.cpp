@@ -304,6 +304,8 @@ bool JsonHttpRequest::call()
 
     if(m_reply)
     {
+        qDebug() << "PA: Call Issued - " << m_type << m_api;
+
         emit justIssuedCall();
         emit busyChanged();
 
@@ -340,10 +342,9 @@ void JsonHttpRequest::onNetworkReplyError()
 
     disconnect(m_reply, &QNetworkReply::finished, this, &JsonHttpRequest::onNetworkReplyFinished);
 
-    QJsonObject json;
-    json.insert( QStringLiteral("code"), QStringLiteral("E_NETWORK") );
-    json.insert( QStringLiteral("text"), m_reply->errorString() );
-    this->setError(json);
+    const QString code = Application::instance()->enumerationKey(m_reply, "NetworkError", m_reply->error());
+    const QString msg = m_reply->errorString();
+    emit networkError(code, msg);
 
     m_reply->deleteLater();
     m_reply = nullptr;
@@ -361,12 +362,10 @@ void JsonHttpRequest::onNetworkReplyFinished()
         const QString errorAttr = QStringLiteral("error");
         const QString responseAttr = QStringLiteral("response");
 
+        qDebug() << "PA: Response Received - " << m_type << m_api;
 
         if( json.contains(errorAttr) )
-        {
-            qDebug("PA: %s", bytes.constData());
             this->setError(json.value(errorAttr).toObject());
-        }
         else if( json.contains(responseAttr) )
             this->setResponse(json.value(responseAttr).toObject());
 

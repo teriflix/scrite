@@ -317,6 +317,8 @@ int main(int argc, char **argv)
     qmlRegisterType<SortFilterObjectListModel>(scriteModuleUri, 1, 0, "SortFilterObjectListModel");
 
     qmlRegisterType<JsonHttpRequest>(scriteModuleUri, 1, 0, "JsonHttpRequest");
+    qmlRegisterType<AppFeature>(scriteModuleUri, 1, 0, "AppFeature");
+    qmlRegisterUncreatableType<User>(scriteModuleUri, 1, 0, "UserType", reason);
     qmlRegisterSingletonType(scriteModuleUri, 1, 0, "User",
                              [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QJSValue {
         Q_UNUSED(scriptEngine);

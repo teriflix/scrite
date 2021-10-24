@@ -37,6 +37,7 @@ Item {
         ToolTip.text: User.loggedIn ? "Account Information" : "Login"
 
         BusyIndicator {
+            visible: User.busy
             running: User.busy
             anchors.centerIn: parent
             onRunningChanged: parent.counter = parent.counter+1
