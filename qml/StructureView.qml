@@ -45,7 +45,7 @@ Item {
 
             ToolButton3 {
                 id: structureTabButton
-                visible: workspaceSettings.showNotebookInStructure
+                visible: ui.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
                 down: true
                 ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
@@ -53,7 +53,7 @@ Item {
 
             ToolButton3 {
                 id: notebookTabButton
-                visible: workspaceSettings.showNotebookInStructure
+                visible: ui.showNotebookInStructure
                 iconSource: "../icons/navigation/notebook_tab.png"
                 ToolTip.text: "Notebook Tab (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
