@@ -15,6 +15,7 @@ import QtQuick 2.13
 import Scrite 1.0
 
 Rectangle {
+    id: dfNotice
     property string reason: User.loggedIn ? "This feature is not enabled in your subscription." : ""
     property string suggestion: User.loggedIn ? "Please sign up for a subscription to use this feature." : "Login & activate your device to access this feature."
     property string featureName
@@ -55,7 +56,10 @@ Rectangle {
         Button2 {
             text: User.loggedIn ? "Subscribe" : "Login / Activate"
             anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: Announcement.shout("97369507-721E-4A7F-886C-4CE09A5BCCFB", null)
+            onClicked: {
+                dfNotice.clicked()
+                Announcement.shout("97369507-721E-4A7F-886C-4CE09A5BCCFB", null)
+            }
         }
     }
 }

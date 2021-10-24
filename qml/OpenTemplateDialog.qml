@@ -11,9 +11,11 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Item {
@@ -26,6 +28,11 @@ Item {
     signal importCancelled()
 
     Component.onCompleted: modalDialog.closeOnEscape = true
+
+    AppFeature {
+        id: templateAppFeature
+        feature: UserType.TemplateFeature
+    }
 
     LibraryService {
         id: libraryService
@@ -78,6 +85,8 @@ Item {
 
             GridView {
                 id: templatesGridView
+                enabled: templateAppFeature.enabled
+                opacity: enabled ? 1 : 0.5
                 anchors.fill: parent
                 anchors.margins: 2
                 model: libraryService.templates
@@ -243,9 +252,14 @@ Item {
                     }
                 }
             }
+
+            DisabledFeatureNotice {
+                anchors.fill: parent
+                color: Qt.rgba(1,1,1,0.9)
+                featureName: "New Document From Template"
+                visible: !templateAppFeature.enabled
+            }
         }
-
-
 
         Item {
             id: buttonRow
@@ -278,6 +292,7 @@ Item {
 
                 Button2 {
                     text: "OK"
+                    enabled: templatesGridView.currentIndex === 0 || templateAppFeature.enabled
                     onClicked: {
                         newFileDialog.enabled = false
                         libraryService.openTemplateAt(templatesGridView.currentIndex)

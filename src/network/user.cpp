@@ -99,6 +99,10 @@ void User::setInfo(const QJsonObject &val)
 
         m_enabledFeatures = ifeatures.toList();
         std::sort(m_enabledFeatures.begin(), m_enabledFeatures.end());
+
+#ifndef QT_NODEBUG
+        qDebug() << "PA: " << m_enabledFeatures << m_info;
+#endif
     }
 
     emit infoChanged();
@@ -134,7 +138,7 @@ void User::setInstallations(const QJsonArray &val)
         }
     }
 
-    if(m_currentInstallationIndex < 0)
+    if(m_currentInstallationIndex < 0 && !m_installations.isEmpty())
     {
         m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
         m_installations = QJsonArray();
@@ -471,6 +475,10 @@ void AppFeature::reevaluate()
     }
     else
         this->setEnabled(false);
+
+#ifndef QT_NODEBUG
+    qDebug() << "PA: " << m_featureName << "/" << m_feature << " = " << m_enabled;
+#endif
 }
 
 void AppFeature::setEnabled(bool val)

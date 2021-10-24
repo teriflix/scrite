@@ -11,9 +11,11 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 Item {
@@ -105,8 +107,8 @@ Item {
         pageListWidth: 180
 
         pagesArray: [
-            { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>." },
-            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com." }
+            { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>.", appFeature: UserType.ScriptalayFeature },
+            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com.", appFeature: UserType.TemplateFeature }
         ]
 
         pageTitleRole: "title"
@@ -131,6 +133,11 @@ Item {
         pageContent: Item {
             height: pageView.height
 
+            AppFeature {
+                id: appFeatureCheck
+                feature: pageView.pagesArray[pageView.currentIndex].appFeature
+            }
+
             Rectangle {
                 anchors.left: parent.left
                 anchors.top: parent.top
@@ -146,12 +153,21 @@ Item {
                     id: loader
                     anchors.fill: parent
                     anchors.margins: 3
+                    enabled: appFeatureCheck.enabled
+                    opacity: enabled ? 1 : 0.5
                     sourceComponent: {
                         switch(pageView.currentIndex) {
                         case 0: return scriptalayComponent
                         case 1: return templatesComponent
                         }
                     }
+                }
+
+                DisabledFeatureNotice {
+                    anchors.fill: parent
+                    color: Qt.rgba(1,1,1,0.9)
+                    featureName: "Loading " + pageView.pagesArray[pageView.currentIndex].kind + " From Scriptalay"
+                    visible: !appFeatureCheck.enabled
                 }
             }
 
@@ -189,7 +205,7 @@ Item {
                     Button2 {
                         id: openButton
                         text: "Open"
-                        enabled: (loader.item && loader.item.somethingIsSelected) && !libraryService.busy
+                        enabled: (loader.item && loader.item.somethingIsSelected) && !libraryService.busy && loader.enabled
                         function click() {
                             importFromLibraryUi.enabled = false
                             loader.item.openSelected()
@@ -198,6 +214,8 @@ Item {
                     }
                 }
             }
+
+
         }
     }
 

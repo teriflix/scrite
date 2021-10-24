@@ -420,7 +420,7 @@ Item {
                 id: busyOverlay
                 anchors.fill: parent
                 visible: User.busy || userInfoHttpRequest.busy || deactivateHttpRequest.busy
-                busyMessage: deactivateHttpRequest.busy ? "Deactivating..." : "Saving changes..."
+                busyMessage: deactivateHttpRequest.busy ? "Deactivating..." : "Please wait..."
             }
 
             JsonHttpRequest {
