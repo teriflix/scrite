@@ -41,7 +41,7 @@ Item {
         font: format ? format.font2 : scriteDocument.formatting.defaultFont2
     }
 
-    property bool canShowNotebookInStructure: width > 1600 && structureAppFeature.enabled
+    property bool canShowNotebookInStructure: width > 1600
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
         app.execLater(workspaceSettings, 100, function() {
@@ -1888,8 +1888,49 @@ Item {
                             }
 
                             Loader {
+                                id: structureEditorTabBar
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                active: !structureAppFeature.enabled && ui.showNotebookInStructure
+                                visible: active && structureEditorTabs.currentTabIndex === 0
+                                sourceComponent: Rectangle {
+                                    color: primaryColors.c100.background
+                                    width: appToolBar.height+4
+
+                                    Column {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        ToolButton3 {
+                                            down: true
+                                            visible: ui.showNotebookInStructure
+                                            iconSource: "../icons/navigation/structure_tab.png"
+                                            ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                                        }
+
+                                        ToolButton3 {
+                                            visible: ui.showNotebookInStructure
+                                            iconSource: "../icons/navigation/notebook_tab.png"
+                                            ToolTip.text: "Notebook Tab (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                                            onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 1
+                                        height: parent.height
+                                        anchors.right: parent.right
+                                        color: primaryColors.borderColor
+                                    }
+                                }
+                            }
+
+                            Loader {
                                 id: structureViewLoader
-                                anchors.fill: parent
+                                anchors.top: parent.top
+                                anchors.left: structureEditorTabBar.active ? structureEditorTabBar.right : parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
                                 visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                 active: structureAppFeature.enabled
                                 sourceComponent: StructureView { }
