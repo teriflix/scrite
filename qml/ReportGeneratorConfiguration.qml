@@ -94,6 +94,8 @@ Item {
                 anchors.bottom: buttonRow.top
                 anchors.topMargin: 15
                 anchors.bottomMargin: 10
+                enabled: generator.featureEnabled
+                opacity: enabled ? 1 : 0.5
 
                 Rectangle {
                     id: pageList
@@ -258,6 +260,13 @@ Item {
                 }
             }
 
+            DisabledFeatureNotice {
+                anchors.fill: formOptionsArea
+                visible: !generator.featureEnabled
+                color: Qt.rgba(1,1,1,0.9)
+                featureName: ""
+            }
+
             Row {
                 id: buttonRow
                 anchors.right: parent.right
@@ -288,7 +297,7 @@ Item {
                 }
 
                 Button2 {
-                    enabled: fileSelector.absoluteFilePath !== ""
+                    enabled: fileSelector.absoluteFilePath !== "" && generator.featureEnabled
                     text: "Generate"
                     Material.background: primaryColors.c100.background
                     Material.foreground: primaryColors.c100.text

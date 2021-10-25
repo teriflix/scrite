@@ -31,7 +31,7 @@
 AbstractReportGenerator::AbstractReportGenerator(QObject *parent)
                         :AbstractDeviceIO(parent)
 {
-
+    connect(User::instance(), &User::infoChanged, this, &AbstractReportGenerator::featureEnabledChanged);
 }
 
 AbstractReportGenerator::~AbstractReportGenerator()
@@ -53,6 +53,30 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
         const QFileInfo fileInfo(this->fileName());
         this->setFileName( fileInfo.absoluteDir().absoluteFilePath(fileInfo.baseName() + suffix) );
     }
+}
+
+QString AbstractReportGenerator::title() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("Title");
+    return cii >= 0 ? QString::fromLatin1(this->metaObject()->classInfo(cii).value()) : QString();
+}
+
+QString AbstractReportGenerator::description() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("Description");
+    return cii >= 0 ? QString::fromLatin1(this->metaObject()->classInfo(cii).value()) : QString();
+}
+
+bool AbstractReportGenerator::isFeatureEnabled() const
+{
+    if(User::instance()->isLoggedIn())
+    {
+        const bool allReportsEnabled = User::instance()->isFeatureEnabled(User::ReportFeature);
+        const bool thisSpecificImporterEnabled = allReportsEnabled ? User::instance()->isFeatureNameEnabled(QStringLiteral("report/") + this->title()) : false;
+        return allReportsEnabled && thisSpecificImporterEnabled;
+    }
+
+    return QStringList({QStringLiteral("Character Report"), QStringLiteral("Location Report")}).contains(this->title());
 }
 
 void AbstractReportGenerator::setWatermark(const QString &val)
@@ -90,6 +114,12 @@ bool AbstractReportGenerator::generate()
     ScreenplayFormat *format = document->printFormat();
 
     this->error()->clear();
+
+    if(!this->isFeatureEnabled())
+    {
+        this->error()->setErrorMessage(this->title() + QStringLiteral(" is disabled."));
+        return false;
+    }
 
     if(fileName.isEmpty())
     {

@@ -35,6 +35,10 @@ public:
     Q_PROPERTY(QString nameFilters READ nameFilters CONSTANT)
     QString nameFilters() const;
 
+    Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
+    bool isFeatureEnabled() const;
+    Q_SIGNAL void featureEnabledChanged();
+
     Q_PROPERTY(bool canBundleFonts READ canBundleFonts CONSTANT)
     virtual bool canBundleFonts() const { return false; }
 

@@ -25,6 +25,16 @@ class AbstractImporter : public AbstractDeviceIO
 public:
     ~AbstractImporter();
 
+    Q_PROPERTY(QString format READ format CONSTANT)
+    QString format() const;
+
+    Q_PROPERTY(QString nameFilters READ nameFilters CONSTANT)
+    QString nameFilters() const;
+
+    Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
+    bool isFeatureEnabled() const;
+    Q_SIGNAL void featureEnabledChanged();
+
     Q_INVOKABLE bool read();
 
     virtual bool canImport(const QString &fileName) const = 0;

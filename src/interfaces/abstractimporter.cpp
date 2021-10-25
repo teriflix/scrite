@@ -23,12 +23,36 @@
 AbstractImporter::AbstractImporter(QObject *parent)
                  :AbstractDeviceIO(parent)
 {
-
+    connect(User::instance(), &User::infoChanged, this, &AbstractImporter::featureEnabledChanged);
 }
 
 AbstractImporter::~AbstractImporter()
 {
 
+}
+
+QString AbstractImporter::format() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("Format");
+    return QString::fromLatin1(this->metaObject()->classInfo(cii).value());
+}
+
+QString AbstractImporter::nameFilters() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("NameFilters");
+    return QString::fromLatin1(this->metaObject()->classInfo(cii).value());
+}
+
+bool AbstractImporter::isFeatureEnabled() const
+{
+    if(User::instance()->isLoggedIn())
+    {
+        const bool allImportersEnabled = User::instance()->isFeatureEnabled(User::ImportFeature);
+        const bool thisSpecificImporterEnabled = allImportersEnabled ? User::instance()->isFeatureNameEnabled(QStringLiteral("import/") + this->format()) : false;
+        return allImportersEnabled && thisSpecificImporterEnabled;
+    }
+
+    return QStringList({QStringLiteral("Final Draft"), QStringLiteral("Fountain")}).contains(this->format());
 }
 
 bool AbstractImporter::read()
@@ -38,15 +62,21 @@ bool AbstractImporter::read()
 
     this->error()->clear();
 
+    if(!this->isFeatureEnabled())
+    {
+        this->error()->setErrorMessage(QStringLiteral("Importing from ") + this->format() + QStringLiteral(" is not enabled."));
+        return false;
+    }
+
     if(fileName.isEmpty())
     {
-        this->error()->setErrorMessage("Nothing to import.");
+        this->error()->setErrorMessage(QStringLiteral("Nothing to import."));
         return false;
     }
 
     if(document == nullptr)
     {
-        this->error()->setErrorMessage("No document available to import into.");
+        this->error()->setErrorMessage(QStringLiteral("No document available to import into."));
         return false;
     }
 

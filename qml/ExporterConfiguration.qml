@@ -69,6 +69,8 @@ Item {
                 anchors.margins: 20
                 anchors.bottomMargin: 10
                 clip: true
+                enabled: exporter.featureEnabled
+                opacity: enabled ? 1 : 0.5
 
                 property bool scrollBarRequired: formView.height < formView.contentHeight
                 ScrollBar.vertical.policy: formView.scrollBarRequired ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -146,6 +148,13 @@ Item {
                 }
             }
 
+            DisabledFeatureNotice {
+                anchors.fill: formView
+                visible: !exporter.featureEnabled
+                color: Qt.rgba(1,1,1,0.9)
+                featureName: exporter.formatName + " - Export"
+            }
+
             Row {
                 id: buttonRow
                 anchors.right: parent.right
@@ -173,7 +182,7 @@ Item {
                 }
 
                 Button2 {
-                    enabled: fileSelector.absoluteFilePath !== ""
+                    enabled: fileSelector.absoluteFilePath !== "" && exporter.featureEnabled
                     text: "Export"
                     onClicked: busyOverlay.visible = true
                 }

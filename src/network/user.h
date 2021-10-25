@@ -56,15 +56,17 @@ public:
         ReportFeature,
         ImportFeature,
         ExportFeature,
-        ScritedFeature
+        ScritedFeature,
+        MinFeature = ScreenplayFeature,
+        MaxFeature = ScritedFeature
     };
     Q_ENUM(AppFeature)
 
-    Q_PROPERTY(QList<int> enabledFeatures READ enabledFeatures NOTIFY infoChanged)
     QList<int> enabledFeatures() const { return m_enabledFeatures; }
-
-    Q_INVOKABLE bool isFeatureEnabled(AppFeature feature) const { return m_enabledFeatures.contains(feature); }
-    Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
+    bool isFeatureEnabled(AppFeature feature) const {
+        return m_enabledFeatures.contains(feature);
+    }
+    bool isFeatureNameEnabled(const QString &featureName) const;
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const { return m_call != nullptr; }

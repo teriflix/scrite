@@ -65,11 +65,22 @@ bool User::isFeatureNameEnabled(const QString &featureName) const
     if(m_info.isEmpty())
         return false;
 
+    const QString lfeatureName = featureName.toLower();
     const QJsonArray features = m_info.value( QStringLiteral("enabledAppFeatures") ).toArray();
-    QJsonArray::const_iterator it = std::find_if(features.constBegin(), features.constEnd(), [featureName](const QJsonValue &item) {
-        return (item.toString() == featureName);
-    });
-    return it != features.constEnd();
+    const auto featurePredicate = [lfeatureName](const QJsonValue &item) -> bool {
+        const QString istring = item.toString().toLower();
+        return (istring == lfeatureName);
+    };
+    const auto wildCardPredicate = [](const QJsonValue &item) -> bool { return item.toString() == QStringLiteral("*"); };
+    const auto notFeaturePredicate = [lfeatureName](const QJsonValue &item) -> bool {
+        const QString istring = item.toString().toLower();
+        return istring.startsWith(QChar('!')) && (istring.mid(1) == lfeatureName);
+    };
+
+    const bool featureEnabled = std::find_if(features.constBegin(), features.constEnd(), featurePredicate) != features.constEnd();
+    const bool allFeaturesEnabled = std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate) != features.constEnd();
+    const bool featureDisabled = std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate) != features.constEnd();
+    return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
 }
 
 void User::setInfo(const QJsonObject &val)
@@ -92,9 +103,26 @@ void User::setInfo(const QJsonObject &val)
         for(const QJsonValue &featureItem : features)
         {
             const QString feature = featureItem.toString().toLower();
-            const int index = availableFeatures.indexOf(feature);
-            if(index >= 0)
-                ifeatures += index;
+            if(feature.isEmpty())
+                continue;
+
+            if(feature == QStringLiteral("*"))
+            {
+                for(int i=MinFeature; i<=MaxFeature; i++)
+                    ifeatures += i;
+            }
+            else
+            {
+                const bool invert = feature.startsWith(QChar('!'));
+                const int index = availableFeatures.indexOf(invert ? feature.mid(1) : feature);
+                if(index >= 0)
+                {
+                    if(invert)
+                        ifeatures -= index;
+                    else
+                        ifeatures += index;
+                }
+            }
         }
 
         m_enabledFeatures = ifeatures.toList();
@@ -402,7 +430,7 @@ QImage UserIconProvider::requestImage(const QString &id, QSize *size, const QSiz
         {
             const QFontMetricsF fm = paint.fontMetrics();
             QRectF brect = fm.boundingRect(initials); brect.moveTopLeft(QPointF(0,0));
-            qreal scale = qreal(dim)*0.75/qMax(brect.width(),brect.height());
+            qreal scale = qreal(dim)*0.65/qMax(brect.width(),brect.height());
 
             paint.save();
             paint.translate(image.rect().center());
@@ -468,10 +496,9 @@ void AppFeature::reevaluate()
 {
     if(User::instance()->isLoggedIn())
     {
-        if(m_featureName.isEmpty())
-            this->setEnabled( User::instance()->isFeatureEnabled(User::AppFeature(m_feature)) );
-        else
-            this->setEnabled( User::instance()->isFeatureNameEnabled(m_featureName) );
+        const bool flag1 = m_feature < 0 ? true : User::instance()->isFeatureEnabled(User::AppFeature(m_feature));
+        const bool flag2 = m_featureName.isEmpty() ? true : User::instance()->isFeatureNameEnabled(m_featureName);
+        this->setEnabled(flag1 && flag2);
     }
     else
         this->setEnabled(false);

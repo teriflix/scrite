@@ -43,6 +43,16 @@ public:
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
+    Q_PROPERTY(QString title READ title CONSTANT)
+    QString title() const;
+
+    Q_PROPERTY(QString description READ description CONSTANT)
+    QString description() const;
+
+    Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
+    bool isFeatureEnabled() const;
+    Q_SIGNAL void featureEnabledChanged();
+
     Q_CLASSINFO("watermark_FieldGroup", "Basic")
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled. (PDF Only)")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")

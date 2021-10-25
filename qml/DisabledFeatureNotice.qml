@@ -33,6 +33,7 @@ Rectangle {
             font.pointSize: app.idealFontPointSize + 8
             font.bold: true
             anchors.horizontalCenter: parent.horizontalCenter
+            visible: text !== ""
         }
 
         Text {
