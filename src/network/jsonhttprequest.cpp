@@ -199,7 +199,10 @@ QString JsonHttpRequest::platform()
 
 QString JsonHttpRequest::platformVersion()
 {
-    return QOperatingSystemVersion::current().name();
+    const auto osver = QOperatingSystemVersion::current();
+    if(osver.name().isEmpty())
+        return QVersionNumber(osver.majorVersion(),osver.minorVersion(),osver.microVersion()).toString();
+    return osver.name();
 }
 
 QString JsonHttpRequest::platformType()
