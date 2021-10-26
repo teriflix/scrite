@@ -64,6 +64,11 @@ Item {
         feature: UserType.ScritedFeature
     }
 
+    AppFeature {
+        id: crgraphAppFeature
+        feature: UserType.RelationshipGraphFeature
+    }
+
     Settings {
         id: workspaceSettings
         fileName: app.settingsFilePath

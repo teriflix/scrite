@@ -51,6 +51,7 @@ public:
         ScreenplayFeature,
         StructureFeature,
         NotebookFeature,
+        RelationshipGraphFeature,
         ScriptalayFeature,
         TemplateFeature,
         ReportFeature,

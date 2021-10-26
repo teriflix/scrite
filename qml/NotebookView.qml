@@ -1047,34 +1047,44 @@ Rectangle {
                     }
                 }
 
-                CharacterRelationshipsGraphView {
-                    id: crGraphView
-                    visible: sceneTabBar.tabIndex === 1
+                Loader {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
-                    scene: null
-                    structure: null
-                    showBusyIndicator: true
-                    onCharacterDoubleClicked: {
-                        var ch = scriteDocument.structure.findCharacter(characterName)
-                        if(ch)
-                            switchTo(ch.notes)
-                    }
-                    function prepare() {
-                        if(visible) {
-                            scene = sceneNotesItem.scene
-                            structure = scriteDocument.structure
-                            showBusyIndicator = false
+                    visible: sceneTabBar.tabIndex === 1
+                    active: crgraphAppFeature.enabled
+                    sourceComponent: CharacterRelationshipsGraphView {
+                        id: crGraphView
+                        scene: null
+                        structure: null
+                        showBusyIndicator: true
+                        onCharacterDoubleClicked: {
+                            var ch = scriteDocument.structure.findCharacter(characterName)
+                            if(ch)
+                                switchTo(ch.notes)
                         }
-                    }
-                    Component.onCompleted: app.execLater(sceneTabContentArea, 100, prepare)
-                    onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
+                        function prepare() {
+                            if(visible) {
+                                scene = sceneNotesItem.scene
+                                structure = scriteDocument.structure
+                                showBusyIndicator = false
+                            }
+                        }
+                        Component.onCompleted: app.execLater(sceneTabContentArea, 100, prepare)
+                        onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
 
-                    Announcement.onIncoming: {
-                        if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                            crGraphView.resetGraph()
-                            refreshButton.crGraphRefreshed = true
+                        Announcement.onIncoming: {
+                            if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                                crGraphView.resetGraph()
+                                refreshButton.crGraphRefreshed = true
+                            }
                         }
+                    }
+
+                    DisabledFeatureNotice {
+                        color: Qt.rgba(0,0,0,0)
+                        anchors.fill: parent
+                        visible: !crgraphAppFeature.enabled
+                        featureName: "Relationship Map"
                     }
                 }
 
@@ -1960,33 +1970,43 @@ Rectangle {
                     }
                 }
 
-                CharacterRelationshipsGraphView {
-                    id: crGraphView
-                    structure: null
-                    showBusyIndicator: true
+                Loader {
                     width: charactersTabContentArea.width
                     height: charactersTabContentArea.height
                     visible: charactersTabBar.tabIndex === 1
-                    onCharacterDoubleClicked: {
-                        var ch = scriteDocument.structure.findCharacter(characterName)
-                        if(ch)
-                            switchTo(ch.notes)
-                    }
-                    function prepare() {
-                        if(visible) {
-                            structure = scriteDocument.structure
-                            showBusyIndicator = false
+                    active: crgraphAppFeature.enabled
+                    sourceComponent: CharacterRelationshipsGraphView {
+                        id: crGraphView
+                        structure: null
+                        showBusyIndicator: true
+                        onCharacterDoubleClicked: {
+                            var ch = scriteDocument.structure.findCharacter(characterName)
+                            if(ch)
+                                switchTo(ch.notes)
                         }
-                    }
-                    Component.onCompleted: app.execLater(charactersTabContentArea, 100, prepare)
-                    onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
+                        function prepare() {
+                            if(visible) {
+                                structure = scriteDocument.structure
+                                showBusyIndicator = false
+                            }
+                        }
+                        Component.onCompleted: app.execLater(charactersTabContentArea, 100, prepare)
+                        onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
 
-                    Announcement.onIncoming: {
-                        var stype = "" + type
-                        if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                            crGraphView.resetGraph()
-                            refreshButton.crGraphRefreshed = true
+                        Announcement.onIncoming: {
+                            var stype = "" + type
+                            if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                                crGraphView.resetGraph()
+                                refreshButton.crGraphRefreshed = true
+                            }
                         }
+                    }
+
+                    DisabledFeatureNotice {
+                        color: Qt.rgba(0,0,0,0)
+                        anchors.fill: parent
+                        visible: !crgraphAppFeature.enabled
+                        featureName: "Relationship Map"
                     }
                 }
             }
@@ -2405,55 +2425,65 @@ Rectangle {
                     }
                 }
 
-                CharacterRelationshipsGraphView {
-                    id: crGraphView
+                Loader {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
                     visible: characterTabBar.tabIndex === 1
-                    character: null
-                    structure: null
-                    showBusyIndicator: true
-                    editRelationshipsEnabled: !scriteDocument.readOnly
-                    onCharacterDoubleClicked:  {
-                        if(characterNotes.character.name === characterName) {
-                            doAddNewRelationship(chNodeItem)
-                            return
+                    active: crgraphAppFeature.enabled
+                    sourceComponent: CharacterRelationshipsGraphView {
+                        id: crGraphView
+                        character: null
+                        structure: null
+                        showBusyIndicator: true
+                        editRelationshipsEnabled: !scriteDocument.readOnly
+                        onCharacterDoubleClicked:  {
+                            if(characterNotes.character.name === characterName) {
+                                doAddNewRelationship(chNodeItem)
+                                return
+                            }
+
+                            var ch = scriteDocument.structure.findCharacter(characterName)
+                            if(ch)
+                                switchTo(ch.notes)
+                        }
+                        onAddNewRelationshipRequest: doAddNewRelationship(sourceItem)
+                        onRemoveRelationshipWithRequest: {
+                            var relationship = character.findRelationship(otherCharacter)
+                            character.removeRelationship(relationship)
                         }
 
-                        var ch = scriteDocument.structure.findCharacter(characterName)
-                        if(ch)
-                            switchTo(ch.notes)
-                    }
-                    onAddNewRelationshipRequest: doAddNewRelationship(sourceItem)
-                    onRemoveRelationshipWithRequest: {
-                        var relationship = character.findRelationship(otherCharacter)
-                        character.removeRelationship(relationship)
-                    }
+                        function doAddNewRelationship(psitem) {
+                            modalDialog.closeable = false
+                            modalDialog.popupSource = psitem
+                            modalDialog.arguments = character
+                            modalDialog.sourceComponent = addRelationshipDialogComponent
+                            modalDialog.active = true
+                        }
 
-                    function doAddNewRelationship(psitem) {
-                        modalDialog.closeable = false
-                        modalDialog.popupSource = psitem
-                        modalDialog.arguments = character
-                        modalDialog.sourceComponent = addRelationshipDialogComponent
-                        modalDialog.active = true
-                    }
+                        function prepare() {
+                            if(visible) {
+                                character = characterNotes.character
+                                structure = scriteDocument.structure
+                                showBusyIndicator = false
+                            }
+                        }
+                        Component.onCompleted: app.execLater(characterTabContentArea, 100, prepare)
+                        onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
 
-                    function prepare() {
-                        if(visible) {
-                            character = characterNotes.character
-                            structure = scriteDocument.structure
-                            showBusyIndicator = false
+                        Announcement.onIncoming: {
+                            var stype = "" + type
+                            if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                                crGraphView.resetGraph()
+                                refreshButton.crGraphRefreshed = true
+                            }
                         }
                     }
-                    Component.onCompleted: app.execLater(characterTabContentArea, 100, prepare)
-                    onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
 
-                    Announcement.onIncoming: {
-                        var stype = "" + type
-                        if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                            crGraphView.resetGraph()
-                            refreshButton.crGraphRefreshed = true
-                        }
+                    DisabledFeatureNotice {
+                        color: Qt.rgba(0,0,0,0)
+                        anchors.fill: parent
+                        visible: !crgraphAppFeature.enabled
+                        featureName: "Relationship Map"
                     }
                 }
 

@@ -95,6 +95,7 @@ void User::setInfo(const QJsonObject &val)
     {
         static const QStringList availableFeatures = {
             QStringLiteral("screenplay"), QStringLiteral("structure"), QStringLiteral("notebook"),
+            QStringLiteral("relationshipgraph"),
             QStringLiteral("scriptalay"), QStringLiteral("template"), QStringLiteral("report"),
             QStringLiteral("import"), QStringLiteral("export"), QStringLiteral("scrited")
         };
