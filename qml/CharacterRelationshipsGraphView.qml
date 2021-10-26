@@ -307,7 +307,7 @@ Rectangle {
                             anchors.margins: -Math.min(width,height)*0.075
                             color: app.translucent(character.color, 0.15)
                             border.width: 1
-                            border.color: character.color
+                            border.color: app.translucent(character.color, 0.5)
                         }
 
                         Image {
