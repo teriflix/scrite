@@ -1129,7 +1129,7 @@ Rectangle {
                         flickable: sceneCommentsField
                         anchors.top: parent.top
                         anchors.right: parent.right
-                        anchors.bottom: attachmentsArea.top
+                        anchors.bottom: parent.bottom
                     }
                 }
             }
@@ -1701,7 +1701,6 @@ Rectangle {
                             height: parent.height
                             readOnly: scriteDocument.readOnly
                             undoRedoEnabled: true
-                            visible: sceneTabBar.tabIndex === 3
                             ScrollBar.vertical: loglineVScrollBar
                             adjustTextWidthBasedOnScrollBar: false
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -1718,7 +1717,7 @@ Rectangle {
                         flickable: loglineFieldArea
                         anchors.top: parent.top
                         anchors.right: parent.right
-                        anchors.bottom: attachmentsArea.top
+                        anchors.bottom: parent.bottom
                     }
                 }
 

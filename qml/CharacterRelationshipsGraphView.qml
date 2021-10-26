@@ -232,7 +232,7 @@ Rectangle {
                         border.color: primaryColors.borderColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.top
-                        anchors.bottomMargin: 5
+                        anchors.bottomMargin: canvas.selectedNodeItem ? Math.min(canvas.selectedNodeItem.width,canvas.selectedNodeItem.height)*0.075+5 : 5
                         enabled: !removeRelationshipConfirmation.active
                         opacity: enabled ? 1 : 0.5
                         visible: floatingToolbarLayout.width >= floatingToolbarLayout.height
@@ -299,6 +299,16 @@ Rectangle {
                         }
 
                         BoundingBoxItem.evaluator: nodeItemsBoxEvaluator
+
+                        Rectangle {
+                            visible: character.photos.length > 0
+                            anchors.fill: parent
+                            radius: Math.min(width,height)*0.0375
+                            anchors.margins: -Math.min(width,height)*0.075
+                            color: app.translucent(character.color, 0.15)
+                            border.width: 1
+                            border.color: character.color
+                        }
 
                         Image {
                             anchors.fill: parent
