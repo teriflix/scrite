@@ -73,8 +73,10 @@ public:
     bool busy() const { return m_call != nullptr; }
     Q_SIGNAL void busyChanged();
 
+    Q_SLOT void refresh();
     Q_SLOT void reload();
     Q_SLOT void logout();
+    Q_SLOT void update(const QJsonObject &newInfo);
 
     Q_SLOT void logActivity1(const QString &activity) { this->logActivity2(activity, QJsonValue()); }
     Q_SLOT void logActivity2(const QString &activity, const QJsonValue &data);

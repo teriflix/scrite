@@ -51,10 +51,7 @@ Item {
             onExited: parent.ToolTip.visible = false
             enabled: appToolBar.visible && !User.busy
             onClicked: {
-                if(User.loggedIn)
-                    modalDialog.sourceComponent = userProfileDialog
-                else
-                    modalDialog.sourceComponent = userLoginDialog
+                modalDialog.sourceComponent = loginWizard
                 modalDialog.popupSource = profilePic
                 modalDialog.active = true
             }
@@ -64,153 +61,156 @@ Item {
     Announcement.onIncoming: {
         var stype = "" + type
         if(stype === "97369507-721E-4A7F-886C-4CE09A5BCCFB") {
-            if(User.loggedIn)
-                showAccountProfileDialog()
-            else
-                showLoginDialog()
+            modalDialog.sourceComponent = loginWizard
+            modalDialog.popupSource = profilePic
+            modalDialog.active = true
         }
     }
 
-    function showLoginDialog() {
-        modalDialog.sourceComponent = userLoginDialog
-        modalDialog.popupSource = profilePic
-        modalDialog.active = true
-    }
+    Component {
+        id: loginWizard
 
-    function showAccountProfileDialog() {
-        modalDialog.sourceComponent = userProfileDialog
-        modalDialog.popupSource = profilePic
-        modalDialog.active = true
+        Item {
+            width: 720
+            height: 480
+
+
+            Rectangle {
+                id: titleBar
+                color: "#65318f"
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 80
+
+                Text {
+                    anchors.centerIn: parent
+                    font.pointSize: parent.height * 0.3
+                    text: pageLoader.item.pageTitle
+                    color: "white"
+                }
+            }
+
+            Loader {
+                id: pageLoader
+                anchors.top: titleBar.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                property int page: 0
+
+                sourceComponent: {
+                    switch(page) {
+                    case 0: return loginWizardPage1
+                    case 1: return loginWizardPage2
+                    default: break
+                    }
+                    return loginWizardPage3
+                }
+
+                Component.onCompleted: page = User.loggedIn ? 2 : 0
+
+                Announcement.onIncoming: {
+                    const stype = "" + type
+                    if(stype === "93DC1133-58CA-4EDD-B803-82D9B6F2AA50")
+                        page = page + data
+                }
+            }
+        }
     }
 
     Component {
-        id: userLoginDialog
+        id: loginWizardPage1
 
         Item {
-            width: 500
-            height: 400
-            property bool activationCodeSent: false
-            property string activationEmail: ""
+            property string pageTitle: "Sign Up / Login"
+            Component.onCompleted: modalDialog.closeable = true
 
-            Component.onCompleted: modalDialog.closeable = false
-            Component.onDestruction: modalDialog.closeable = true
-
-            TabSequenceManager {
-                id: loginFieldsTabManager
-            }
-
-            Column {
-                width: parent.width*0.8
-                spacing: 20
-                anchors.centerIn: parent
-
-                Label {
-                    font.pointSize: app.idealFontPointSize + 4
-                    text: "Login & Activate"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                TextField {
-                    id: emailField
-                    width: parent.width
-                    placeholderText: "Email"
-                    text: activateHttpRequest.email()
-                    validator: RegExpValidator {
-                        regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    }
-                    selectByMouse: true
-                    horizontalAlignment: Text.AlignHCenter
-                    TabSequenceItem.manager: loginFieldsTabManager
-                    TabSequenceItem.sequence: 0
-                    onTextEdited: {
-                        if(activationEmail !== "")
-                            activationCodeSent = activationEmail === text
-                    }
-                }
+            Item {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: nextButton.top
 
                 Column {
-                    width: parent.width
-                    spacing: parent.spacing/3
-                    visible: activationCodeSent
-
-                    Label {
-                        width: parent.width
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        text: "An activation code has been sent to your email."
-                        horizontalAlignment: Text.AlignHCenter
-                    }
+                    width: parent.width*0.8
+                    anchors.centerIn: parent
+                    spacing: 40
 
                     TextField {
-                        id: activationCodeField
+                        id: emailField
                         width: parent.width
-                        placeholderText: "Paste the activation code here."
+                        placeholderText: "Email"
+                        font.pointSize: app.idealFontPointSize + 2
+                        text: sendActivationCodeCall.email()
+                        validator: RegExpValidator {
+                            regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                        }
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
-                        TabSequenceItem.manager: loginFieldsTabManager
-                        TabSequenceItem.sequence: 1
-                    }
-                }
-
-                Item { width: parent.width; height: 20 }
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 20
-
-                    Button2 {
-                        text: activationCodeSent ? "Activate" : "Send Activation Code"
-                        enabled: activationCodeSent ? activationCodeField.length > 0 : emailField.acceptableInput
-                        onClicked: {
-                            if(activationCodeSent) {
-                                activateHttpRequest.data = {
-                                    email: activationEmail,
-                                    activationCode: activationCodeField.text,
-                                    clientId: activateHttpRequest.clientId(),
-                                    deviceId: activateHttpRequest.deviceId(),
-                                    platform: activateHttpRequest.platform(),
-                                    platformType: activateHttpRequest.platformType(),
-                                    appVersion: activateHttpRequest.appVersion()
-                                }
-                            } else {
-                                activateHttpRequest.data = {
-                                    email: emailField.text,
-                                    request: "resendActivationCode"
-                                }
-                            }
-
-                            activateHttpRequest.call()
-                        }
+                        Component.onCompleted: forceActiveFocus()
                     }
 
-                    Button2 {
-                        text: "Cancel"
-                        onClicked: modalDialog.closeRequest()
+                    Text {
+                        width: parent.width * 0.8
+                        wrapMode: Text.WordWrap
+                        font.pointSize: app.idealFontPointSize
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Sign up / login with your email to unlock Structure, Notebook and many more features in Scrite."
                     }
                 }
             }
 
-            Label {
-                id: statusText
-                width: parent.width*0.8
-                wrapMode: Text.WordWrap
-                elide: Text.ElideRight
-                maximumLineCount: 2
-                horizontalAlignment: Text.AlignHCenter
+            Button2 {
+                id: cancelButton
+                text: "Cancel"
+                anchors.left: parent.left
+                anchors.verticalCenter: nextButton.verticalCenter
+                anchors.leftMargin: 30
+                onClicked: modalDialog.close()
+            }
+
+            Item {
+                anchors.top: nextButton.top
+                anchors.left: cancelButton.right
+                anchors.right: nextButton.left
+                anchors.bottom: nextButton.bottom
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
+
+                Text {
+                    width: parent.width
+                    anchors.centerIn: parent
+                    wrapMode: Text.WordWrap
+                    color: "red"
+                    text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
+                }
+            }
+
+            Button2 {
+                id: nextButton
+                text: "Next >"
+                anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: 10
-                color: "red"
-                text: activateHttpRequest.hasError ? (activateHttpRequest.errorCode + ":" + activateHttpRequest.errorText) : ""
+                anchors.margins: 30
+                onClicked: {
+                    sendActivationCodeCall.data = {
+                        "email": emailField.text,
+                        "request": "resendActivationCode"
+                    }
+                    sendActivationCodeCall.call()
+                }
             }
 
             BusyOverlay {
                 anchors.fill: parent
-                visible: activateHttpRequest.busy
+                visible: sendActivationCodeCall.busy
                 busyMessage: "Please wait.."
             }
 
             JsonHttpRequest {
-                id: activateHttpRequest
+                id: sendActivationCodeCall
                 type: JsonHttpRequest.POST
                 api: "app/activate"
                 token: ""
@@ -219,242 +219,354 @@ Item {
                     if(hasError || !hasResponse)
                         return
 
-                    if(activationCodeSent) {
-                        activateHttpRequest.store("email", activationEmail)
-                        activateHttpRequest.store("loginToken", activateHttpRequest.responseData.loginToken)
-                        activateHttpRequest.store("sessionToken", activateHttpRequest.responseData.sessionToken)
-                        User.reload()
-                        app.execLater(userLogin, 500, showAccountProfileDialog)
-                        modalDialog.close()
-                    } else {
-                        activationEmail = data.email
-                        activationCodeSent = true
-                    }
+                    store("email", emailField.text)
+                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", 1)
                 }
+                onBusyChanged: modalDialog.closeable = !busy
             }
         }
     }
 
     Component {
-        id: userProfileDialog
+        id: loginWizardPage2
 
         Item {
-            width: 400
-            height: Math.min(ui.height*0.8,600)
+            property string pageTitle: "Activate"
+            Component.onCompleted: modalDialog.closeable = true
 
-            Component.onDestruction: modalDialog.closeable = true
-
-            TabSequenceManager {
-                id: userProfileTabManager
-            }
-
-            Text {
-                id: titleText
-                font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
-                font.bold: true
-                text: "Account Information"
+            Item {
                 anchors.top: parent.top
-                anchors.topMargin: Math.max(20, parent.height-userInfoFlickable.contentHeight-footerRow.height-80-height)
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Flickable {
-                id: userInfoFlickable
-                anchors.top: titleText.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: footerRow.top
-                anchors.margins: 20
-                clip: true
-                contentWidth: userInfoLayout.width
-                contentHeight: userInfoLayout.height
-                ScrollBar.vertical: ScrollBar2 {
-                    flickable: userInfoFlickable
-                }
+                anchors.bottom: nextButton.top
 
                 Column {
-                    id: userInfoLayout
-                    width: userInfoFlickable.width
-                    spacing: 10
+                    width: parent.width*0.8
+                    anchors.centerIn: parent
+                    spacing: 40
 
                     TextField {
-                        readOnly: true
+                        id: activationCodeField
                         width: parent.width
-                        text: User.info.email
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 0
+                        placeholderText: "Paste the activation code here..."
+                        font.pointSize: app.idealFontPointSize + 2
+                        selectByMouse: true
+                        horizontalAlignment: Text.AlignHCenter
+                        Component.onCompleted: forceActiveFocus()
                     }
 
-                    TextField2 {
-                        id: firstNameField
-                        placeholderText: "First Name"
+                    Text {
+                        width: parent.width * 0.8
+                        wrapMode: Text.WordWrap
+                        font.pointSize: app.idealFontPointSize
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "We have emailed an activation code to <b>" + activateCall.fetch("email") + "</b>."
+                    }
+                }
+            }
+
+            Button2 {
+                id: changeEmailButton
+                text: "Change Email"
+                anchors.left: parent.left
+                anchors.verticalCenter: nextButton.verticalCenter
+                anchors.leftMargin: 30
+                onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -1)
+            }
+
+            Item {
+                anchors.top: nextButton.top
+                anchors.left: changeEmailButton.right
+                anchors.right: nextButton.left
+                anchors.bottom: nextButton.bottom
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
+
+                Text {
+                    width: parent.width
+                    anchors.centerIn: parent
+                    wrapMode: Text.WordWrap
+                    color: "red"
+                    text: activateCall.hasError ? (activateCall.errorCode + ": " + activateCall.errorText) : ""
+                }
+            }
+
+            Button2 {
+                id: nextButton
+                text: "Activate"
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 30
+                onClicked: {
+                    activateCall.data = {
+                        "email": activateCall.email(),
+                        "activationCode": activationCodeField.text,
+                        "clientId": activateCall.clientId(),
+                        "deviceId": activateCall.deviceId(),
+                        "platform": activateCall.platform(),
+                        "platformType": activateCall.platformType(),
+                        "appVersion": activateCall.appVersion()
+                    }
+                    activateCall.call()
+                }
+            }
+
+            BusyOverlay {
+                anchors.fill: parent
+                visible: activateCall.busy
+                busyMessage: "Please wait.."
+            }
+
+            JsonHttpRequest {
+                id: activateCall
+                type: JsonHttpRequest.POST
+                api: "app/activate"
+                token: ""
+                reportNetworkErrors: true
+                onFinished: {
+                    if(hasError || !hasResponse)
+                        return
+
+                    store("loginToken", responseData.loginToken)
+                    store("sessionToken", responseData.sessionToken)
+                    User.reload()
+                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", 1)
+                }
+                onBusyChanged: modalDialog.closeable = !busy
+            }
+        }
+    }
+
+    Component {
+        id: loginWizardPage3
+
+        Item {
+            property string pageTitle: {
+                if(User.loggedIn) {
+                    if(User.info.firstName !== "")
+                        return "Hi, " + User.info.firstName
+                    if(User.info.lastName !== "")
+                        return "Hi, " + User.info.lastName
+                }
+                return "Hi, there"
+            }
+
+            TabSequenceManager {
+                id: userInfoFields
+            }
+
+            Item {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: rightSideLinks.top
+
+                Column {
+                    width: parent.width*0.8
+                    anchors.centerIn: parent
+                    spacing: 40
+
+                    Text {
                         width: parent.width
-                        text: User.info.firstName
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 1
+                        wrapMode: Text.WordWrap
+                        font.pointSize: app.idealFontPointSize
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: User.loggedIn
+                        text: "You're currently logged in via <b>" + User.info.email + "</b>."
                     }
 
-                    TextField2 {
-                        id: lastNameField
-                        placeholderText: "Last Name"
+                    Grid {
+                        columns: 2
                         width: parent.width
-                        text: User.info.lastName
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 2
+                        rowSpacing: parent.spacing/2
+                        columnSpacing: parent.spacing/2
+
+                        TextField2 {
+                            id: nameField
+                            width: (parent.width-parent.columnSpacing)/2
+                            placeholderText: "Name"
+                            text: {
+                                if(User.info.firstName && User.info.lastName)
+                                    return User.info.firstName + " " + User.info.lastName
+                                if(User.info.firstName)
+                                    return User.info.firstName
+                                return User.info.lastName ? User.info.lastName : ""
+                            }
+                            Component.onCompleted: forceActiveFocus()
+                            TabSequenceItem.manager: userInfoFields
+                            TabSequenceItem.sequence: 0
+                        }
+
+                        TextField2 {
+                            id: experienceField
+                            width: (parent.width-parent.columnSpacing)/2
+                            text: User.info.experience
+                            placeholderText: "Experience"
+                            TabSequenceItem.manager: userInfoFields
+                            TabSequenceItem.sequence: 1
+                        }
+
+                        TextField2 {
+                            id: cityField
+                            width: (parent.width-parent.columnSpacing)/2
+                            text: User.info.city
+                            placeholderText: "City"
+                            TabSequenceItem.manager: userInfoFields
+                            TabSequenceItem.sequence: 2
+                        }
+
+                        TextField2 {
+                            id: countryField
+                            width: (parent.width-parent.columnSpacing)/2
+                            text: User.info.country
+                            placeholderText: "Country"
+                            TabSequenceItem.manager: userInfoFields
+                            TabSequenceItem.sequence: 3
+                        }
+                    }
+                }
+            }
+
+            property bool needsSaving: nameField.text.trim() !== (User.info.firstName + " " + User.info.lastName).trim() ||
+                                       cityField.text.trim() !== User.info.city ||
+                                       countryField.text.trim() !== User.info.country ||
+                                       experienceField.text.trim() !== User.info.experience
+            onNeedsSavingChanged: highlightSaveAnimation.restart()
+
+            Column {
+                id: leftSideLinks
+                spacing: 10
+                anchors.left: parent.left
+                anchors.bottom: rightSideLinks.bottom
+                anchors.leftMargin: 30
+
+                Link {
+                    id: saveRefreshLink
+                    text: needsSaving ? "Save" : "Refresh"
+                    transformOrigin: Item.BottomLeft
+                    onClicked: {
+                        if(needsSaving) {
+                            const names = nameField.text.split(' ')
+                            const newInfo = {
+                                firstName: names.length > 0 ? names[0] : "",
+                                lastName: names.length > 1 ? names[names.length-1] : "",
+                                experience: experienceField.text,
+                                city: cityField.text,
+                                country: countryField.text
+                            }
+                            User.update(newInfo)
+                        } else
+                            User.reload()
                     }
 
-                    TextField2 {
-                        id: experienceField
-                        width: parent.width
-                        text: User.info.experience
-                        placeholderText: "Experience"
-                        completionStrings: ["Novice", "Film School Student", "Wannabe Screenwriter", "Professional Screenwriter"]
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 3
-                    }
+                    SequentialAnimation {
+                        id: highlightSaveAnimation
+                        loops: 1
+                        running: false
 
-                    TextField2 {
-                        id: cityField
-                        placeholderText: "City"
-                        width: parent.width
-                        text: User.info.city
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 4
-                    }
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "scale"
+                                to: 2.5
+                                duration: 350
+                            }
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "opacity"
+                                to: 0.1
+                                duration: 350
+                            }
+                        }
 
-                    TextField2 {
-                        id: stateField
-                        placeholderText: "State"
-                        width: parent.width
-                        text: User.info.state
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 5
-                    }
+                        PauseAnimation {
+                            duration: 100
+                        }
 
-                    TextField2 {
-                        id: countryField
-                        placeholderText: "Country"
-                        width: parent.width
-                        text: User.info.country
-                        TabSequenceItem.manager: userProfileTabManager
-                        TabSequenceItem.sequence: 6
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "scale"
+                                to: 1
+                                duration: 250
+                            }
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "opacity"
+                                to: 1
+                                duration: 250
+                            }
+                        }
+
+                        ScriptAction {
+                            script: {
+                                saveRefreshLink.font.bold = needsSaving
+                                saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 3 : 0)
+                            }
+                        }
                     }
+                }
+
+                Link {
+                    text: "Feedback / About"
+                    opacity: needsSaving ? 0.75 : 1
+                    onClicked: {
+                        modalDialog.close()
+                        var time = 100
+                        if(modalDialog.animationsEnabled)
+                            time += modalDialog.animationDuration
+                        Announcement.shout("72892ED6-BA58-47EC-B045-E92D9EC1C47A", time)
+                    }
+                }
+            }
+
+            Item {
+                anchors.top: rightSideLinks.top
+                anchors.left: leftSideLinks.right
+                anchors.right: rightSideLinks.left
+                anchors.bottom: rightSideLinks.bottom
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
+
+                Text {
+                    width: parent.width
+                    anchors.centerIn: parent
+                    wrapMode: Text.WordWrap
+                    color: "red"
+                    text: userError.hasError ? userError.details.code + ": " + userError.details.message : ""
+                    property ErrorReport userError: Aggregation.findErrorReport(User)
                 }
             }
 
             Column {
-                id: footerRow
-                anchors.left: parent.left
+                id: rightSideLinks
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.margins: 20
+                anchors.margins: 30
                 spacing: 10
 
-                Row {
-                    id: buttonsRow
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 20
-                    visible: firstNameField.text !== User.info.firstName ||
-                             lastNameField.text !== User.info.lastName ||
-                             experienceField.text !== User.info.experience ||
-                             cityField.text !== User.info.city ||
-                             stateField.text !== User.info.state ||
-                             countryField.text !== User.info.country
-
-                    Button2 {
-                        text: "Apply"
-                        onClicked: {
-                            userInfoHttpRequest.data = {
-                                firstName: firstNameField.text,
-                                lastName: lastNameField.text,
-                                experience: experienceField.text,
-                                city: cityField.text,
-                                state: stateField.text,
-                                country: countryField.text
-                            }
-                            userInfoHttpRequest.call()
+                Link {
+                    text: needsSaving ? "Cancel" : "Logout"
+                    opacity: needsSaving ? 0.75 : 1
+                    onClicked: {
+                        if(needsSaving)
+                            User.refresh()
+                        else {
+                            User.logout()
+                            Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
                         }
-                    }
-
-                    Button2 {
-                        text: "Cancel"
-                        onClicked: modalDialog.close()
-                    }
-                }
-
-                Row {
-                    spacing: 20
-                    visible: !buttonsRow.visible
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    Button2 {
-                        text: "Refresh"
-                        onClicked: User.reload()
-                    }
-
-                    Button2 {
-                        text: "Deactivate"
-                        onClicked: deactivateHttpRequest.call()
-                    }
-                }
-
-                Label {
-                    id: statusText
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    elide: Text.ElideRight
-                    maximumLineCount: 2
-                    color: "red"
-                    horizontalAlignment: Text.AlignHCenter
-                    text: {
-                        if(userInfoHttpRequest.hasError)
-                            return userInfoHttpRequest.errorCode + ": " + userInfoHttpRequest.errorText
-                        if(deactivateHttpRequest.hasError)
-                            return deactivateHttpRequest.errorCode + ": " + deactivateHttpRequest.errorText
-                        return ""
                     }
                 }
             }
 
             BusyOverlay {
-                id: busyOverlay
                 anchors.fill: parent
-                visible: User.busy || userInfoHttpRequest.busy || deactivateHttpRequest.busy
-                busyMessage: deactivateHttpRequest.busy ? "Deactivating..." : "Please wait..."
+                visible: User.busy
+                busyMessage: "Please wait.."
+                onVisibleChanged: modalDialog.closeable = !visible
             }
-
-            JsonHttpRequest {
-                id: userInfoHttpRequest
-                type: JsonHttpRequest.POST
-                api: "user/me"
-                reportNetworkErrors: true
-                onFinished: {
-                    if(hasError || !hasResponse)
-                        return
-
-                    User.reload()
-                }
-            }
-
-            JsonHttpRequest {
-                id: deactivateHttpRequest
-                type: JsonHttpRequest.POST
-                api: "app/deactivate"
-                reportNetworkErrors: true
-                onFinished: {
-                    if(hasError || !hasResponse)
-                        return
-
-                    store("email", "")
-                    store("loginToken", "")
-                    store("sessionToken", "");
-                    User.reload()
-                    modalDialog.close()
-                }
-            }
-
-            property bool modalDialogClosable: !buttonsRow.visible && !busyOverlay.visible
-            onModalDialogClosableChanged: modalDialog.closeable = modalDialogClosable
         }
     }
 

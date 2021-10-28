@@ -76,5 +76,6 @@
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
         <file>qml/DisabledFeatureNotice.qml</file>
+        <file>qml/Link.qml</file>
     </qresource>
 </RCC>

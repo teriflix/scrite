@@ -30,6 +30,7 @@ Rectangle {
     property bool closeOnEscape: closeable || closeUponClickOutsideContentArea
     property bool closeUponClickOutsideContentArea: false
     property bool animationsEnabled: true
+    readonly property int animationDuration: 150
     signal closeRequest()
     signal aboutToClose()
 
@@ -75,7 +76,7 @@ Rectangle {
         enabled: animationsEnabled
         NumberAnimation {
             id: tAnimation
-            duration: 150
+            duration: animationDuration
             easing.type: Easing.Linear
         }
     }

@@ -83,6 +83,12 @@ bool User::isFeatureNameEnabled(const QString &featureName) const
     return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
 }
 
+void User::refresh()
+{
+    emit infoChanged();
+    emit installationsChanged();
+}
+
 void User::setInfo(const QJsonObject &val)
 {
     if(m_info == val)
@@ -357,7 +363,33 @@ void User::logout()
 {
     this->setInfo( QJsonObject() );
     this->setInstallations( QJsonArray() );
+    JsonHttpRequest::store( QStringLiteral("loginToken"), QVariant() );
     JsonHttpRequest::store( QStringLiteral("sessionToken"), QVariant() );
+}
+
+void User::update(const QJsonObject &newInfo)
+{
+    if(JsonHttpRequest::sessionToken().isEmpty())
+        return;
+
+    JsonHttpRequest *call = this->newCall();
+    call->setAutoDelete(true);
+    call->setType(JsonHttpRequest::POST);
+    call->setApi( QStringLiteral("user/me") );
+    call->setData(newInfo);
+    connect(call, &JsonHttpRequest::finished, this, [=]() {
+        if(call->hasError())
+            m_errorReport->setErrorMessage(call->errorText(), call->error());
+        else if(call->hasResponse())
+            this->setInfo(call->responseData());
+        else {
+            const QString errMsg = QStringLiteral("Couldn't update user information.");
+            m_errorReport->setErrorMessage(errMsg,
+                   QJsonObject({{QStringLiteral("code"), QStringLiteral("E_USERINFO")},
+                                {QStringLiteral("text"), errMsg}}));
+        }
+    });
+    call->call();
 }
 
 void User::logActivity2(const QString &givenActivity, const QJsonValue &data)

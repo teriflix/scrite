@@ -1042,7 +1042,19 @@ Item {
                         MenuItem2 {
                             icon.source: "../icons/action/info.png"
                             text: "About"
-                            onClicked: {
+                            onClicked: showAboutDialog()
+
+                            Announcement.onIncoming: {
+                                const stype = "" + type
+                                if(stype === "72892ED6-BA58-47EC-B045-E92D9EC1C47A") {
+                                    if(data && typeof data === "number")
+                                        app.execLater(ui, data, showAboutDialog)
+                                    else
+                                        showAboutDialog()
+                                }
+                            }
+
+                            function showAboutDialog() {
                                 modalDialog.sourceComponent = aboutBoxComponent
                                 modalDialog.popupSource = parent
                                 modalDialog.active = true
