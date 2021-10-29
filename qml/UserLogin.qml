@@ -397,6 +397,8 @@ Item {
                             Component.onCompleted: forceActiveFocus()
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 0
+                            maximumLength: 128
+                            onTextEdited: allowHighlightSaveAnimation = true
                         }
 
                         TextField2 {
@@ -406,6 +408,10 @@ Item {
                             placeholderText: "Experience"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 1
+                            maximumLength: 128
+                            onTextEdited: allowHighlightSaveAnimation = true
+                            completionStrings: ["Novice", "Learning", "Written Few, None Made", "Have Produced Credits", "Experienced"]
+                            minimumCompletionPrefixLength: 0
                         }
 
                         TextField2 {
@@ -415,6 +421,8 @@ Item {
                             placeholderText: "City"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 2
+                            maximumLength: 128
+                            onTextEdited: allowHighlightSaveAnimation = true
                         }
 
                         TextField2 {
@@ -424,6 +432,8 @@ Item {
                             placeholderText: "Country"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 3
+                            maximumLength: 128
+                            onTextEdited: allowHighlightSaveAnimation = true
                         }
                     }
                 }
@@ -433,7 +443,9 @@ Item {
                                        cityField.text.trim() !== User.info.city ||
                                        countryField.text.trim() !== User.info.country ||
                                        experienceField.text.trim() !== User.info.experience
-            onNeedsSavingChanged: highlightSaveAnimation.restart()
+
+            property bool allowHighlightSaveAnimation: false
+            onNeedsSavingChanged: if(allowHighlightSaveAnimation) highlightSaveAnimation.restart()
 
             Column {
                 id: leftSideLinks
@@ -456,9 +468,20 @@ Item {
                                 city: cityField.text,
                                 country: countryField.text
                             }
+                            allowHighlightSaveAnimation = false
                             User.update(newInfo)
                         } else
                             User.reload()
+                    }
+
+                    Connections {
+                        target: User
+                        onInfoChanged: saveRefreshLink.restore()
+                    }
+
+                    function restore() {
+                        saveRefreshLink.font.bold = needsSaving
+                        saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 3 : 0)
                     }
 
                     SequentialAnimation {
@@ -501,10 +524,7 @@ Item {
                         }
 
                         ScriptAction {
-                            script: {
-                                saveRefreshLink.font.bold = needsSaving
-                                saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 3 : 0)
-                            }
+                            script: saveRefreshLink.restore()
                         }
                     }
                 }

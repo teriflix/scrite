@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
@@ -192,7 +193,7 @@ Item {
 
                     Button2 {
                         text: "Feedback"
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/#feedback")
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
                     }
                 }
             }
