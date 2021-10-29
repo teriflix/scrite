@@ -207,6 +207,8 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
+                    font.pointSize: app.idealFontPointSize-2
+                    maximumLineCount: 3
                     color: "red"
                     text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
                 }
@@ -311,6 +313,8 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
+                    font.pointSize: app.idealFontPointSize-2
+                    maximumLineCount: 3
                     color: "red"
                     text: activateCall.hasError ? (activateCall.errorCode + ": " + activateCall.errorText) : ""
                 }
@@ -594,6 +598,8 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
+                    font.pointSize: app.idealFontPointSize-2
+                    maximumLineCount: 3
                     color: "red"
                     text: userError.hasError ? userError.details.code + ": " + userError.details.message : ""
                     property ErrorReport userError: Aggregation.findErrorReport(User)
