@@ -5,5 +5,6 @@
         <file>misc/fetchogattribs.js</file>
         <file>misc/structure_groups.lst</file>
         <file>misc/scrited_closing_frame_video.mp4</file>
+        <file>misc/city-country-map.json.compressed</file>
     </qresource>
 </RCC>

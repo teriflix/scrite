@@ -43,6 +43,14 @@ public:
     QJsonArray installations() const { return m_installations; }
     Q_SIGNAL void installationsChanged();
 
+    Q_PROPERTY(QStringList countryNames READ countryNames CONSTANT)
+    static QStringList countryNames();
+
+    Q_PROPERTY(QStringList cityNames READ cityNames CONSTANT)
+    static QStringList cityNames();
+
+    Q_INVOKABLE static QStringList countries(const QString &cityName);
+
     Q_PROPERTY(int currentInstallationIndex READ currentInstallationIndex NOTIFY installationsChanged)
     int currentInstallationIndex() const { return m_currentInstallationIndex; }
 

@@ -13,6 +13,7 @@
 
 #include "user.h"
 #include "application.h"
+#include "timeprofiler.h"
 #include "jsonhttprequest.h"
 
 #include <QtDebug>
@@ -26,8 +27,54 @@ static QString GetSessionExpiredErrorMessage()
     return QStringLiteral("Your login session has expired and therefore your device is deactivated. Please connect to the Internet and login/reactivate your installation of Scrite.");
 }
 
+struct CityCountryInfo
+{
+    CityCountryInfo();
+    QStringList countryNames;
+    QMap< QString,QList<int> > cityCountryName;
+};
+static const CityCountryInfo & GlobalCityCountryInfo()
+{
+    static CityCountryInfo theInstance;
+    return theInstance;
+}
+
+CityCountryInfo::CityCountryInfo()
+{
+    PROFILE_THIS_FUNCTION2;
+
+    QFile ccdb( QStringLiteral(":/misc/city-country-map.json.compressed") );
+    if(!ccdb.open(QFile::ReadOnly))
+        return;
+
+    const QByteArray json = qUncompress(ccdb.readAll());
+    const QJsonObject jsonMap = QJsonDocument::fromJson(json).object();
+    QJsonObject::const_iterator it = jsonMap.constBegin();
+    QJsonObject::const_iterator end = jsonMap.constEnd();
+    QSet<QString> countries;
+    while(it != end)
+    {
+        const QString country = it.value().toString();
+        countries += country;
+        ++it;
+    }
+
+    this->countryNames = countries.toList();
+
+    it = jsonMap.constBegin();
+    while(it != end)
+    {
+        const QString country = it.value().toString();
+        const int cindex = this->countryNames.indexOf(country);
+        cityCountryName[it.key()].append(cindex);
+        ++it;
+    }
+}
+
 User *User::instance()
 {
+    ::GlobalCityCountryInfo();
+
     static User *theUser = new User(qApp);
     return theUser;
 }
@@ -58,6 +105,34 @@ User::~User()
 bool User::isLoggedIn() const
 {
     return !m_info.isEmpty() && !m_installations.isEmpty();
+}
+
+QStringList User::countryNames()
+{
+    return ::GlobalCityCountryInfo().countryNames;
+}
+
+QStringList User::cityNames()
+{
+    return ::GlobalCityCountryInfo().cityCountryName.keys();
+}
+
+QStringList User::countries(const QString &cityName)
+{
+    const QList<int> idxList = ::GlobalCityCountryInfo().cityCountryName.value(cityName);
+    if(idxList.isEmpty())
+        return QStringList();
+
+    const QStringList &countryNames = ::GlobalCityCountryInfo().countryNames;
+
+    QStringList ret;
+    for(int idx : idxList)
+    {
+        if(idx >= 0 || idx < countryNames.size())
+            ret << countryNames.at(idx);
+    }
+
+    return ret;
 }
 
 bool User::isFeatureNameEnabled(const QString &featureName) const

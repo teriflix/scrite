@@ -49,7 +49,7 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onEntered: parent.ToolTip.visible = true
             onExited: parent.ToolTip.visible = false
-            enabled: appToolBar.visible && !User.busy
+            enabled: appToolBar.visible
             onClicked: {
                 modalDialog.sourceComponent = loginWizard
                 modalDialog.popupSource = profilePic
@@ -74,7 +74,6 @@ Item {
             width: 720
             height: 480
 
-
             Rectangle {
                 id: titleBar
                 color: "#65318f"
@@ -97,10 +96,11 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                property int page: 0
+                property int page: -1
 
                 sourceComponent: {
                     switch(page) {
+                    case -1: return loginWizardPage0
                     case 0: return loginWizardPage1
                     case 1: return loginWizardPage2
                     default: break
@@ -108,13 +108,37 @@ Item {
                     return loginWizardPage3
                 }
 
-                Component.onCompleted: page = User.loggedIn ? 2 : 0
+                Component.onCompleted: page = User.busy ? -1 : (User.loggedIn ? 2 : 0)
 
                 Announcement.onIncoming: {
                     const stype = "" + type
                     if(stype === "93DC1133-58CA-4EDD-B803-82D9B6F2AA50")
                         page = page + data
+                    else if(stype === "76281526-A16C-4414-8129-AD8770A17F16") {
+                        active = false
+                        Qt.callLater( function() { pageLoader.active = true } )
+                    }
                 }
+            }
+        }
+    }
+
+    Component {
+        id: loginWizardPage0
+
+        Item {
+            property string pageTitle: "Account Information"
+
+            BusyOverlay {
+                anchors.fill: parent
+                visible: true
+                busyMessage: "Please wait ..."
+            }
+
+            Timer {
+                running: !User.busy
+                interval: 100
+                onTriggered: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", User.loggedIn ? 3 : 1)
             }
         }
     }
@@ -345,11 +369,11 @@ Item {
             property string pageTitle: {
                 if(User.loggedIn) {
                     if(User.info.firstName !== "")
-                        return "Hi, " + User.info.firstName
+                        return "Hi, " + User.info.firstName + "."
                     if(User.info.lastName !== "")
-                        return "Hi, " + User.info.lastName
+                        return "Hi, " + User.info.lastName + "."
                 }
-                return "Hi, there"
+                return "Hi, there."
             }
 
             TabSequenceManager {
@@ -360,12 +384,13 @@ Item {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: rightSideLinks.top
+                anchors.bottom: leftSideLinks.bottom
+                anchors.bottomMargin: Math.max(leftSideLinks.height, rightSideLinks.height)
 
                 Column {
                     width: parent.width*0.8
                     anchors.centerIn: parent
-                    spacing: 40
+                    spacing: 50
 
                     Text {
                         width: parent.width
@@ -423,6 +448,12 @@ Item {
                             TabSequenceItem.sequence: 2
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
+                            completionStrings: User.cityNames
+                            minimumCompletionPrefixLength: 0
+                            onEditingComplete: {
+                                const countries = User.countries(text)
+                                countryField.text = countries.length === 0 ? "" : countries[0]
+                            }
                         }
 
                         TextField2 {
@@ -434,6 +465,8 @@ Item {
                             TabSequenceItem.sequence: 3
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
+                            completionStrings: User.countryNames
+                            minimumCompletionPrefixLength: 0
                         }
                     }
                 }
@@ -458,6 +491,8 @@ Item {
                     id: saveRefreshLink
                     text: needsSaving ? "Save" : "Refresh"
                     transformOrigin: Item.BottomLeft
+                    property real characterSpacing: 0
+                    font.letterSpacing: characterSpacing
                     onClicked: {
                         if(needsSaving) {
                             const names = nameField.text.split(' ')
@@ -492,7 +527,7 @@ Item {
                         ParallelAnimation {
                             NumberAnimation {
                                 target: saveRefreshLink
-                                property: "scale"
+                                property: "characterSpacing"
                                 to: 2.5
                                 duration: 350
                             }
@@ -511,8 +546,8 @@ Item {
                         ParallelAnimation {
                             NumberAnimation {
                                 target: saveRefreshLink
-                                property: "scale"
-                                to: 1
+                                property: "characterSpacing"
+                                to: 0
                                 duration: 250
                             }
                             NumberAnimation {
@@ -571,9 +606,9 @@ Item {
                     text: needsSaving ? "Cancel" : "Logout"
                     opacity: needsSaving ? 0.75 : 1
                     onClicked: {
-                        if(needsSaving)
-                            User.refresh()
-                        else {
+                        if(needsSaving) {
+                            Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
+                        } else {
                             User.logout()
                             Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
                         }
