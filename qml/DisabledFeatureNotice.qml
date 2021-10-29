@@ -17,7 +17,7 @@ import Scrite 1.0
 Rectangle {
     id: dfNotice
     property string reason: User.loggedIn ? "This feature is not enabled in your subscription." : ""
-    property string suggestion: User.loggedIn ? "Please sign up for a subscription to use this feature." : "Login & activate your device to access this feature."
+    property string suggestion: User.loggedIn ? "Please opt-in for a subscription to use this feature." : "Sign up / login with your email to unlock this feature."
     property string featureName
     color: primaryColors.c100.background
 
@@ -55,7 +55,7 @@ Rectangle {
         }
 
         Button2 {
-            text: User.loggedIn ? "Subscribe" : "Login / Activate"
+            text: User.loggedIn ? "Subscribe" : "Sign Up / Login"
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: {
                 dfNotice.clicked()

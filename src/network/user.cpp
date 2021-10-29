@@ -41,8 +41,6 @@ static const CityCountryInfo & GlobalCityCountryInfo()
 
 CityCountryInfo::CityCountryInfo()
 {
-    PROFILE_THIS_FUNCTION2;
-
     QFile ccdb( QStringLiteral(":/misc/city-country-map.json.compressed") );
     if(!ccdb.open(QFile::ReadOnly))
         return;

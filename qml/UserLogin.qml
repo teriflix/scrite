@@ -214,7 +214,7 @@ Item {
 
             Button2 {
                 id: nextButton
-                text: "Next >"
+                text: "Next »"
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 30
@@ -292,7 +292,7 @@ Item {
 
             Button2 {
                 id: changeEmailButton
-                text: "Change Email"
+                text: "« Change Email"
                 anchors.left: parent.left
                 anchors.verticalCenter: nextButton.verticalCenter
                 anchors.leftMargin: 30
@@ -318,7 +318,7 @@ Item {
 
             Button2 {
                 id: nextButton
-                text: "Activate"
+                text: "Activate »"
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 30
@@ -368,13 +368,15 @@ Item {
         Item {
             property string pageTitle: {
                 if(User.loggedIn) {
-                    if(User.info.firstName !== "")
+                    if(User.info.firstName && User.info.firstName !== "")
                         return "Hi, " + User.info.firstName + "."
-                    if(User.info.lastName !== "")
+                    if(User.info.lastName && User.info.lastName !== "")
                         return "Hi, " + User.info.lastName + "."
                 }
                 return "Hi, there."
             }
+
+            Component.onCompleted: modalDialog.closeable = Qt.binding( () => { return !needsSaving } )
 
             TabSequenceManager {
                 id: userInfoFields
@@ -478,7 +480,10 @@ Item {
                                        experienceField.text.trim() !== User.info.experience
 
             property bool allowHighlightSaveAnimation: false
-            onNeedsSavingChanged: if(allowHighlightSaveAnimation) highlightSaveAnimation.restart()
+            onNeedsSavingChanged: {
+                if(allowHighlightSaveAnimation)
+                    highlightSaveAnimation.restart()
+            }
 
             Column {
                 id: leftSideLinks
