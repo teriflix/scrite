@@ -71,8 +71,8 @@ Item {
         id: loginWizard
 
         Item {
-            width: 720
-            height: 480
+            width: 800
+            height: 520
 
             Rectangle {
                 id: titleBar
@@ -396,7 +396,7 @@ Item {
                 Column {
                     width: parent.width*0.8
                     anchors.centerIn: parent
-                    spacing: 50
+                    spacing: 30
 
                     Text {
                         width: parent.width
@@ -405,6 +405,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         visible: User.loggedIn
+                        bottomPadding: 20
                         text: "You're currently logged in via <b>" + User.info.email + "</b>."
                     }
 
@@ -474,6 +475,24 @@ Item {
                             completionStrings: User.countryNames
                             minimumCompletionPrefixLength: 0
                         }
+
+                        CheckBox2 {
+                            id: chkAnalyticsConsent
+                            checked: User.info.consent.activity
+                            text: "Send analytics data."
+                            TabSequenceItem.manager: userInfoFields
+                            TabSequenceItem.sequence: 4
+                            onToggled: allowHighlightSaveAnimation = true
+                        }
+
+                        CheckBox2 {
+                            id: chkEmailConsent
+                            checked: User.info.consent.email
+                            text: "Send marketing email."
+                            TabSequenceItem.manager: userInfoFields
+                            TabSequenceItem.sequence: 5
+                            onToggled: allowHighlightSaveAnimation = true
+                        }
                     }
                 }
             }
@@ -481,13 +500,17 @@ Item {
             property bool needsSaving: nameField.text.trim() !== (User.info.firstName + " " + User.info.lastName).trim() ||
                                        cityField.text.trim() !== User.info.city ||
                                        countryField.text.trim() !== User.info.country ||
-                                       experienceField.text.trim() !== User.info.experience
+                                       experienceField.text.trim() !== User.info.experience ||
+                                       chkAnalyticsConsent.checked !== User.info.consent.activity ||
+                                       chkEmailConsent.checked !== User.info.consent.email
 
             property bool allowHighlightSaveAnimation: false
-            onNeedsSavingChanged: {
+            property bool animationFlags: needsSaving || allowHighlightSaveAnimation
+
+            onAnimationFlagsChanged: Qt.callLater( function() {
                 if(allowHighlightSaveAnimation)
                     highlightSaveAnimation.restart()
-            }
+            })
 
             Column {
                 id: leftSideLinks
@@ -497,78 +520,14 @@ Item {
                 anchors.leftMargin: 30
 
                 Link {
-                    id: saveRefreshLink
-                    text: needsSaving ? "Save" : "Refresh"
-                    transformOrigin: Item.BottomLeft
-                    property real characterSpacing: 0
-                    font.letterSpacing: characterSpacing
+                    text: needsSaving ? "Cancel" : "Logout"
+                    opacity: needsSaving ? 0.75 : 1
                     onClicked: {
                         if(needsSaving) {
-                            const names = nameField.text.split(' ')
-                            const newInfo = {
-                                firstName: names.length > 0 ? names[0] : "",
-                                lastName: names.length > 1 ? names[names.length-1] : "",
-                                experience: experienceField.text,
-                                city: cityField.text,
-                                country: countryField.text
-                            }
-                            allowHighlightSaveAnimation = false
-                            User.update(newInfo)
-                        } else
-                            User.reload()
-                    }
-
-                    Connections {
-                        target: User
-                        onInfoChanged: saveRefreshLink.restore()
-                    }
-
-                    function restore() {
-                        saveRefreshLink.font.bold = needsSaving
-                        saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 3 : 0)
-                    }
-
-                    SequentialAnimation {
-                        id: highlightSaveAnimation
-                        loops: 1
-                        running: false
-
-                        ParallelAnimation {
-                            NumberAnimation {
-                                target: saveRefreshLink
-                                property: "characterSpacing"
-                                to: 2.5
-                                duration: 350
-                            }
-                            NumberAnimation {
-                                target: saveRefreshLink
-                                property: "opacity"
-                                to: 0.1
-                                duration: 350
-                            }
-                        }
-
-                        PauseAnimation {
-                            duration: 100
-                        }
-
-                        ParallelAnimation {
-                            NumberAnimation {
-                                target: saveRefreshLink
-                                property: "characterSpacing"
-                                to: 0
-                                duration: 250
-                            }
-                            NumberAnimation {
-                                target: saveRefreshLink
-                                property: "opacity"
-                                to: 1
-                                duration: 250
-                            }
-                        }
-
-                        ScriptAction {
-                            script: saveRefreshLink.restore()
+                            Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
+                        } else {
+                            User.logout()
+                            Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
                         }
                     }
                 }
@@ -614,16 +573,92 @@ Item {
                 spacing: 10
 
                 Link {
-                    text: needsSaving ? "Cancel" : "Logout"
-                    opacity: needsSaving ? 0.75 : 1
+                    id: saveRefreshLink
+                    text: needsSaving ? "Save" : "Refresh"
+                    transformOrigin: Item.BottomRight
+                    anchors.right: parent.right
+                    property real characterSpacing: 0
+                    font.letterSpacing: characterSpacing
                     onClicked: {
                         if(needsSaving) {
-                            Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
-                        } else {
-                            User.logout()
-                            Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
+                            const names = nameField.text.split(' ')
+                            const newInfo = {
+                                firstName: names.length > 0 ? names[0] : "",
+                                lastName: names.length > 1 ? names[names.length-1] : "",
+                                experience: experienceField.text,
+                                city: cityField.text,
+                                country: countryField.text,
+                                consent: {
+                                    activity: chkAnalyticsConsent.checked,
+                                    email: chkEmailConsent.checked
+                                }
+                            }
+                            allowHighlightSaveAnimation = false
+                            User.update(newInfo)
+                        } else
+                            User.reload()
+                    }
+
+                    Connections {
+                        target: User
+                        onInfoChanged: saveRefreshLink.restore()
+                    }
+
+                    function restore() {
+                        saveRefreshLink.font.bold = needsSaving
+                        saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 3 : 0)
+                    }
+
+                    SequentialAnimation {
+                        id: highlightSaveAnimation
+                        loops: 1
+                        running: false
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "characterSpacing"
+                                to: 2.5
+                                duration: 350
+                            }
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "opacity"
+                                to: 0.3
+                                duration: 350
+                            }
+                        }
+
+                        PauseAnimation {
+                            duration: 100
+                        }
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "characterSpacing"
+                                to: 0
+                                duration: 250
+                            }
+                            NumberAnimation {
+                                target: saveRefreshLink
+                                property: "opacity"
+                                to: 1
+                                duration: 250
+                            }
+                        }
+
+                        ScriptAction {
+                            script: saveRefreshLink.restore()
                         }
                     }
+                }
+
+                Link {
+                    text: "Privacy Policy"
+                    opacity: needsSaving ? 0.75 : 1
+                    anchors.right: parent.right
+                    onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
                 }
             }
 

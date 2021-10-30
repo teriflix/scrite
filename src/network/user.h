@@ -106,6 +106,7 @@ private:
     QJsonObject m_info;
     QList<int> m_enabledFeatures;
     QJsonArray m_installations;
+    bool m_analyticsConsent = false;
     int m_currentInstallationIndex = -1;
     JsonHttpRequest *m_call = nullptr;
     ErrorReport *m_errorReport = new ErrorReport(this);

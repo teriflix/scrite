@@ -164,11 +164,9 @@ void User::refresh()
 
 void User::setInfo(const QJsonObject &val)
 {
-    if(m_info == val)
-        return;
-
     m_info = val;
     m_enabledFeatures.clear();
+    m_analyticsConsent = false;
 
     if(!m_info.isEmpty())
     {
@@ -207,6 +205,9 @@ void User::setInfo(const QJsonObject &val)
 
         m_enabledFeatures = ifeatures.toList();
         std::sort(m_enabledFeatures.begin(), m_enabledFeatures.end());
+
+        const QJsonObject consentObj = m_info.value( QStringLiteral("consent") ).toObject();
+        m_analyticsConsent = consentObj.value( QStringLiteral("activity") ).toBool(false);
 
 #ifndef QT_NODEBUG
         qDebug() << "PA: " << m_enabledFeatures << m_info;
@@ -436,6 +437,8 @@ void User::logout()
 {
     this->setInfo( QJsonObject() );
     this->setInstallations( QJsonArray() );
+    JsonHttpRequest::store( QStringLiteral("devices"), QVariant() );
+    JsonHttpRequest::store( QStringLiteral("userInfo"), QVariant() );
     JsonHttpRequest::store( QStringLiteral("loginToken"), QVariant() );
     JsonHttpRequest::store( QStringLiteral("sessionToken"), QVariant() );
 }
@@ -467,7 +470,7 @@ void User::update(const QJsonObject &newInfo)
 
 void User::logActivity2(const QString &givenActivity, const QJsonValue &data)
 {
-    if(JsonHttpRequest::sessionToken().isEmpty())
+    if(JsonHttpRequest::sessionToken().isEmpty() || !m_analyticsConsent)
         return;
 
     const QString activity = givenActivity.isEmpty() ? QStringLiteral("touch") : givenActivity.toLower().simplified();
