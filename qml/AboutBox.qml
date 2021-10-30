@@ -169,6 +169,17 @@ Item {
                                 onClicked: aboutBoxPages.currentIndex = 1
                             }
                         }
+
+                        Text {
+                            text: "Using <strong>SimpleCrypt</strong>.<br/><font color=\"blue\">Click here</font> to know more."
+                            font.pointSize: app.idealFontPointSize - 2
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Qt.openUrlExternally("https://wiki.qt.io/Simple_encryption_with_SimpleCrypt")
+                            }
+                        }
                     }
                 }
 

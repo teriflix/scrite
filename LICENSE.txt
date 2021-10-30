@@ -27,6 +27,13 @@ licenses compatible with GPLv3.
    saving Scrite documents. We use QuaZip as is, statically linked with Scrite,
    to load and save Scrite documents from version 0.5.5 onwards.
 
+6. 3rdparty/simplecrypt: This library offers a way to encrypt and decrypt data
+   using a seed. While the encryption is not fool-proof, it is good enough for
+   use with this app. The library is statically linked with Scrite. It is provided
+   under a simple 3-clause BSD license, by its copyright holder Andre Somers.
+   Additional information about this library can be found at the following link:
+   https://wiki.qt.io/Simple_encryption_with_SimpleCrypt
+
 ===============================================================================
 
 Scrite is originally developed by TERIFLIX Entertainment Spaces Pvt. Ltd.
