@@ -533,15 +533,10 @@ Item {
                 }
 
                 Link {
-                    text: "Feedback / About"
+                    text: "Privacy Policy"
                     opacity: needsSaving ? 0.75 : 1
-                    onClicked: {
-                        modalDialog.close()
-                        var time = 100
-                        if(modalDialog.animationsEnabled)
-                            time += modalDialog.animationDuration
-                        Announcement.shout("72892ED6-BA58-47EC-B045-E92D9EC1C47A", time)
-                    }
+                    anchors.right: parent.right
+                    onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
                 }
             }
 
@@ -565,7 +560,7 @@ Item {
                 }
             }
 
-            Column {
+                Column {
                 id: rightSideLinks
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
@@ -655,10 +650,15 @@ Item {
                 }
 
                 Link {
-                    text: "Privacy Policy"
+                    text: "Feedback / About"
                     opacity: needsSaving ? 0.75 : 1
-                    anchors.right: parent.right
-                    onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
+                    onClicked: {
+                        modalDialog.close()
+                        var time = 100
+                        if(modalDialog.animationsEnabled)
+                            time += modalDialog.animationDuration
+                        Announcement.shout("72892ED6-BA58-47EC-B045-E92D9EC1C47A", time)
+                    }
                 }
             }
 

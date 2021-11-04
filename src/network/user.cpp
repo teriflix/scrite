@@ -329,12 +329,27 @@ void User::userInfoCallDone()
         if(!m_call->hasResponse())
             return;
 
-        const QJsonObject userInfo = m_call->responseData();
+        const QString ikey = QStringLiteral("installations");
+
+        QJsonObject userInfo = m_call->responseData();
+        QJsonValue installationsValue = userInfo.value(ikey);
+        userInfo.remove(ikey);
         this->setInfo(userInfo);
 
         const QString text = QJsonDocument(m_info).toJson();
         const QString cryptText = JsonHttpRequest::encrypt(text);
         JsonHttpRequest::store( QStringLiteral("userInfo"), cryptText );
+
+        if(installationsValue.isArray())
+        {
+            const QJsonArray installations = installationsValue.toArray();
+            this->setInstallations( installations );
+
+            const QString text = QJsonDocument(installations).toJson();
+            const QString cryptText = JsonHttpRequest::encrypt(text);
+            JsonHttpRequest::store( QStringLiteral("devices"), cryptText );
+            return;
+        }
     }
 
     // Fetch installations information
