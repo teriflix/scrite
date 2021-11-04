@@ -303,10 +303,12 @@ bool JsonHttpRequest::call()
         req.setRawHeader( QByteArrayLiteral("token"), m_token.toLatin1() );
 
     static const QString userAgentString = []() {
+        const QString space = QStringLiteral(" ");
         const QString ret = QStringLiteral("scrite-") + JsonHttpRequest::appVersion() +
-                            QStringLiteral("-") + JsonHttpRequest::platform() +
-                            QStringLiteral("-") + JsonHttpRequest::platformVersion() +
-                            QStringLiteral("-") + JsonHttpRequest::platformType();
+                            space + JsonHttpRequest::platform() +
+                            space + JsonHttpRequest::platformVersion() +
+                            space + JsonHttpRequest::platformType() +
+                            space + JsonHttpRequest::clientId();
         return ret;
     } ();
     if( !userAgentString.isEmpty() )
