@@ -188,7 +188,7 @@ public:
 
     Q_INVOKABLE void execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
 
-    Q_INVOKABLE QColor translucent(const QColor &input, qreal alpha=0.5) const;
+    Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha=0.5);
 
     QSettings *settings() const { return m_settings; }
 
@@ -202,8 +202,8 @@ public:
     Q_SIGNAL void standardColorsChanged();
 
     Q_INVOKABLE QColor pickStandardColor(int counter) const;
-    Q_INVOKABLE bool isLightColor(const QColor &color) const;
-    Q_INVOKABLE QColor textColorFor(const QColor &bgColor) const;
+    Q_INVOKABLE static bool isLightColor(const QColor &color);
+    Q_INVOKABLE static QColor textColorFor(const QColor &bgColor);
     const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
 
     Q_INVOKABLE QRectF largestBoundingRect(const QStringList &text, const QFont &font) const;
@@ -270,8 +270,8 @@ public:
     void setHandleFileOpenEvents(bool val=true) { m_handleFileOpenEvents = val; }
 #endif
 
-    QString painterPathToString(const QPainterPath &val) const;
-    QPainterPath stringToPainterPath(const QString &val) const;
+    static QString painterPathToString(const QPainterPath &val);
+    static QPainterPath stringToPainterPath(const QString &val);
 
     Q_SIGNAL void openFileRequest(const QString &filePath);
 

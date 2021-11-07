@@ -18,6 +18,7 @@
 
 #include "structure.h"
 #include "graphlayout.h"
+#include "errorreport.h"
 #include "qobjectproperty.h"
 #include "objectlistpropertymodel.h"
 
@@ -186,6 +187,10 @@ public:
     Character* character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
+    Q_PROPERTY(QString title READ title NOTIFY titleChanged)
+    QString title() const { return m_title; }
+    Q_SIGNAL void titleChanged();
+
     Q_PROPERTY(int maxTime READ maxTime WRITE setMaxTime NOTIFY maxTimeChanged)
     void setMaxTime(int val);
     int maxTime() const { return m_maxTime; }
@@ -230,6 +235,8 @@ public:
 
     Q_INVOKABLE void reload();
     Q_INVOKABLE void reset();
+    Q_INVOKABLE bool exportToPdf(const QString &fileName);
+    Q_INVOKABLE QString suggestPdfFileName() const;
 
     Q_SIGNAL void updated();
 
@@ -251,6 +258,7 @@ private:
     void resetCharacter();
     void load();
     void loadLater();
+    void evaluateTitle();
     void markDirty() { this->setDirty(true); }
     void setDirty(bool val);
     void setBusy(bool val);
@@ -259,6 +267,7 @@ private:
     bool m_busy = false;
     bool m_dirty = false;
     int m_maxTime = 100;
+    QString m_title;
     QSizeF m_nodeSize = QSizeF(100,100);
     qreal m_topMargin = 0;
     qreal m_leftMargin = 0;
@@ -269,6 +278,7 @@ private:
     bool m_componentLoaded = false;
     QRectF m_graphBoundingRect = QRectF(0,0,500,500);
     ExecLaterTimer m_loadTimer;
+    ErrorReport *m_errorReport = new ErrorReport(this);
     QObjectProperty<Character> m_character;
     QObjectProperty<Structure> m_structure;
     ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;

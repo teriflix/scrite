@@ -72,12 +72,6 @@ void StructureExporter::setComment(const QString &val)
 
 bool StructureExporter::doExport(QIODevice *device)
 {
-#ifdef Q_OS_MAC
-    const qreal dpi = 72.0;
-#else
-    const qreal dpi = 96.0;
-#endif
-
     const Screenplay *screenplay = this->document()->screenplay();
     const Structure *structure = this->document()->structure();
 
@@ -89,6 +83,7 @@ bool StructureExporter::doExport(QIODevice *device)
 
     // Construct the graphics scene with content of the structure
     StructureExporterScene scene(this);
+    scene.setTitle(screenplay->title() + QStringLiteral(" - Structure"));
     return scene.exportToPdf(device);
 }
 

@@ -14,7 +14,10 @@
 #ifndef PDFEXPORTABLEGRAPHICSSCENE_H
 #define PDFEXPORTABLEGRAPHICSSCENE_H
 
+#include <QGraphicsItem>
 #include <QGraphicsScene>
+
+#include "qtextdocumentpagedprinter.h"
 
 class PdfExportableGraphicsScene : public QGraphicsScene
 {
@@ -24,16 +27,74 @@ public:
     PdfExportableGraphicsScene(QObject *parent=nullptr);
     ~PdfExportableGraphicsScene();
 
-    Q_PROPERTY(QString pdfTitle READ pdfTitle WRITE setPdfTitle NOTIFY pdfTitleChanged)
-    void setPdfTitle(QString val);
-    QString pdfTitle() const { return m_pdfTitle; }
-    Q_SIGNAL void pdfTitleChanged();
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    void setTitle(QString val);
+    QString title() const { return m_title; }
+    Q_SIGNAL void titleChanged();
+
+    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    void setComment(const QString &val);
+    QString comment() const { return m_comment; }
+    Q_SIGNAL void commentChanged();
+
+    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    void setWatermark(const QString &val);
+    QString watermark() const { return m_watermark; }
+    Q_SIGNAL void watermarkChanged();
 
     bool exportToPdf(const QString &fileName);
     bool exportToPdf(QIODevice *device);
 
+protected:
+    enum StandardItems
+    {
+        HeaderFooterOnly = 1,
+        WatermarkOnly = 2,
+        HeaderFooterAndWatermark = 3
+    };
+    void addStandardItems(int items=HeaderFooterAndWatermark);
+
 private:
-    QString m_pdfTitle;
+    QString m_title;
+    QString m_comment;
+    QString m_watermark;
+};
+
+class GraphicsHeaderFooterItem : public QGraphicsItem
+{
+public:
+    GraphicsHeaderFooterItem(HeaderFooter *headerFooter, const QMap<HeaderFooter::Field, QString> &fields);
+    ~GraphicsHeaderFooterItem();
+
+    void setRect(const QRectF &rect);
+    QRectF rect() const { return m_rect; }
+
+    // QGraphicsItem interface
+    QRectF boundingRect() const { return m_rect; }
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+private:
+    QRectF m_rect;
+    HeaderFooter *m_headerFooter = nullptr;
+    QMap<HeaderFooter::Field,QString> m_fields;
+};
+
+class GraphicsWatermarkItem : public QGraphicsItem
+{
+public:
+    GraphicsWatermarkItem(Watermark *watermark);
+    ~GraphicsWatermarkItem();
+
+    void setRect(const QRectF &rect);
+    QRectF rect() const { return m_rect; }
+
+    // QGraphicsItem interface
+    QRectF boundingRect() const { return m_rect; }
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+private:
+    QRectF m_rect;
+    Watermark *m_watermark = nullptr;
 };
 
 #endif // PDFEXPORTABLEGRAPHICSSCENE_H

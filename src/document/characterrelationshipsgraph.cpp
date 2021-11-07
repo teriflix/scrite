@@ -12,15 +12,21 @@
 ****************************************************************************/
 
 #include "characterrelationshipsgraph.h"
+#include "characterrelationshipsgraph_p.h"
 
 #include "hourglass.h"
+#include "screenplay.h"
 #include "application.h"
+#include "scritedocument.h"
 
 #include <QtMath>
 #include <QtDebug>
+#include <QDateTime>
+#include <QPdfWriter>
 #include <QQuickItem>
 #include <QFontMetrics>
 #include <QElapsedTimer>
+#include <QStandardPaths>
 
 CharacterRelationshipsGraphNode::CharacterRelationshipsGraphNode(QObject *parent)
     : QObject(parent),
@@ -320,7 +326,12 @@ CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
       m_character(this, "character"),
       m_structure(this, "structure")
 {
-
+    connect(this, &CharacterRelationshipsGraph::structureChanged,
+            this, &CharacterRelationshipsGraph::evaluateTitle);
+    connect(this, &CharacterRelationshipsGraph::sceneChanged,
+            this, &CharacterRelationshipsGraph::evaluateTitle);
+    connect(this, &CharacterRelationshipsGraph::characterChanged,
+            this, &CharacterRelationshipsGraph::evaluateTitle);
 }
 
 CharacterRelationshipsGraph::~CharacterRelationshipsGraph()
@@ -466,6 +477,43 @@ void CharacterRelationshipsGraph::reset()
         gjObject->setProperty("characterRelationshipGraph", QVariant::fromValue<QJsonObject>(QJsonObject()));
 
     this->reload();
+}
+
+bool CharacterRelationshipsGraph::exportToPdf(const QString &fileName)
+{
+    m_errorReport->clear();
+
+    if(m_structure == nullptr && m_character == nullptr && m_scene == nullptr)
+        return false;
+
+    if(fileName.isEmpty())
+    {
+        m_errorReport->setErrorMessage(QStringLiteral("Cannot export to empty filename."));
+        return false;
+    }
+
+    QFile file(fileName);
+    if(!file.open(QFile::WriteOnly))
+    {
+        m_errorReport->setErrorMessage(QStringLiteral("Could not open '%1' for writing.").arg(fileName));
+        return false;
+    }
+
+    CharacterRelationshipsGraphScene scene(this);
+    scene.setTitle(m_title);
+    return scene.exportToPdf(&file);
+}
+
+QString CharacterRelationshipsGraph::suggestPdfFileName() const
+{
+    if(m_title.isEmpty() || (m_structure == nullptr && m_character == nullptr && m_scene == nullptr))
+        return QString();
+
+    const QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+
+    QString pdfFileName = m_title + QStringLiteral(".pdf");
+    pdfFileName = QDir(downloadsFolder).absoluteFilePath(pdfFileName);
+    return Application::instance()->sanitiseFileName(pdfFileName);
 }
 
 QObject *CharacterRelationshipsGraph::graphJsonObject() const
@@ -849,6 +897,29 @@ void CharacterRelationshipsGraph::load()
 void CharacterRelationshipsGraph::loadLater()
 {
     m_loadTimer.start(0, this);
+}
+
+void CharacterRelationshipsGraph::evaluateTitle()
+{
+    QStringList comps;
+    if(m_character || m_scene)
+    {
+        if(m_character)
+            comps << m_character->name();
+        else
+            comps << m_scene->name();
+    }
+
+    const ScriteDocument *doc = ScriteDocument::instance();
+    const Screenplay *screenplay = doc->screenplay();
+    const QString title = screenplay->title();
+
+    comps << (title.isEmpty() ? QStringLiteral("Unnamed Screenplay") : title);
+    comps << QStringLiteral("Relationship Graph");
+    comps << QDateTime::currentDateTime().toString( QStringLiteral("MMMM dd, yyyy") );
+
+    m_title = comps.join( QStringLiteral("-") );
+    emit titleChanged();
 }
 
 void CharacterRelationshipsGraph::setDirty(bool val)

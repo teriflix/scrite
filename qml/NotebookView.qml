@@ -189,6 +189,15 @@ Rectangle {
                 suggestedHeight: toolButtonSize
             }
 
+            ToolButton3 {
+                id: pdfExportButton
+                iconSource: "../icons/file/file_pdf.png"
+                ToolTip.text: "Exports the current character relationship graph to PDF."
+                onClicked: Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "pdfexport")
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+            }
+
             Rectangle {
                 width: parent.width
                 height: 1
@@ -1073,9 +1082,14 @@ Rectangle {
                         onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
 
                         Announcement.onIncoming: {
-                            if(type === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                                crGraphView.resetGraph()
-                                refreshButton.crGraphRefreshed = true
+                            const stype = ""+type
+                            const sdata = ""+data
+                            if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
+                                if(sdata === "refresh") {
+                                    crGraphView.resetGraph()
+                                    refreshButton.crGraphRefreshed = true
+                                } else if(sdata == "pdfexport")
+                                    crGraphView.exportToPdf()
                             }
                         }
                     }
@@ -1994,10 +2008,14 @@ Rectangle {
                         onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
 
                         Announcement.onIncoming: {
-                            var stype = "" + type
+                            const stype = "" + type
+                            const sdata = "" + data
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                                crGraphView.resetGraph()
-                                refreshButton.crGraphRefreshed = true
+                                if(sdata === "refresh") {
+                                    crGraphView.resetGraph()
+                                    refreshButton.crGraphRefreshed = true
+                                } else if(sdata == "pdfexport")
+                                    crGraphView.exportToPdf()
                             }
                         }
                     }
@@ -2471,10 +2489,14 @@ Rectangle {
                         onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
 
                         Announcement.onIncoming: {
-                            var stype = "" + type
+                            const stype = "" + type
+                            const sdata = "" + data
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                                crGraphView.resetGraph()
-                                refreshButton.crGraphRefreshed = true
+                                if(sdata === "refresh") {
+                                    crGraphView.resetGraph()
+                                    refreshButton.crGraphRefreshed = true
+                                } else if(sdata == "pdfexport")
+                                    crGraphView.exportToPdf()
                             }
                         }
                     }

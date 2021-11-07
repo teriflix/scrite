@@ -18,7 +18,6 @@
 #include <QGraphicsScene>
 
 #include "structure.h"
-#include "qtextdocumentpagedprinter.h"
 #include "pdfexportablegraphicsscene.h"
 
 class StructureExporter;
@@ -113,7 +112,6 @@ public:
     ~StructureOvalAnnotation();
 };
 
-
 class StructureUnknownAnnotation : public QGraphicsRectItem
 {
 public:
@@ -126,43 +124,6 @@ class StructureTitleCard : public QGraphicsRectItem
 public:
     StructureTitleCard(const Structure *structure, const QString &comment);
     ~StructureTitleCard();
-};
-
-class StructureHeaderFooter : public QGraphicsItem
-{
-public:
-    StructureHeaderFooter(HeaderFooter *headerFooter, const QMap<HeaderFooter::Field, QString> &fields);
-    ~StructureHeaderFooter();
-
-    void setRect(const QRectF &rect);
-    QRectF rect() const { return m_rect; }
-
-    // QGraphicsItem interface
-    QRectF boundingRect() const { return m_rect; }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-private:
-    QRectF m_rect;
-    HeaderFooter *m_headerFooter = nullptr;
-    QMap<HeaderFooter::Field,QString> m_fields;
-};
-
-class StructureWatermark : public QGraphicsItem
-{
-public:
-    StructureWatermark(Watermark *watermark);
-    ~StructureWatermark();
-
-    void setRect(const QRectF &rect);
-    QRectF rect() const { return m_rect; }
-
-    // QGraphicsItem interface
-    QRectF boundingRect() const { return m_rect; }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-private:
-    QRectF m_rect;
-    Watermark *m_watermark = nullptr;
 };
 
 #endif // STRUCTUREEXPORTER_P_H

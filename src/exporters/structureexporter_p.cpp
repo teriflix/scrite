@@ -34,7 +34,6 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
 {
     ScriteDocument *document = exporter->document();
     const Structure *structure = document->structure();
-    const Screenplay *screenplay = document->screenplay();
 
     this->setBackgroundBrush(Qt::white);
 
@@ -147,77 +146,13 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
         QRectF titleCardRect = titleCard->boundingRect();
         titleCardRect.setLeft(indexCardsBox.left()+20);
         titleCardRect.moveBottom(indexCardsBox.top()-20);
-        if( !this->items(titleCardRect).isEmpty() )
+        if( !this->items(titleCardRect).isEmpty())
             titleCardRect.moveBottom(contentsRect.top()-20);
         titleCard->setPos(titleCardRect.topLeft());
         this->addItem(titleCard);
     }
 
-    QGraphicsSimpleTextItem *appInfo = new QGraphicsSimpleTextItem;
-    appInfo->setFont( ::applicationFont() );
-    appInfo->setText( QStringLiteral("Created using Scrite (www.scrite.io)") );
-
-    QRectF appInfoRect = appInfo->boundingRect();
-    appInfoRect.moveCenter(contentsRect.center());
-    appInfoRect.moveTop(contentsRect.bottom() + 50);
-    appInfo->setPos(appInfoRect.topLeft());
-    this->addItem(appInfo);
-
-    contentsRect = this->itemsBoundingRect();
-
-    QMap<HeaderFooter::Field,QString> fields;
-    if(exporter->isEnableHeaderFooter())
-    {
-        fields[HeaderFooter::AppName] = Application::instance()->applicationName();
-        fields[HeaderFooter::AppVersion] = Application::instance()->applicationVersion();
-        fields[HeaderFooter::Title] = screenplay->title();
-        fields[HeaderFooter::Subtitle] = screenplay->subtitle();
-        fields[HeaderFooter::Author] = screenplay->author();
-        fields[HeaderFooter::Contact] = screenplay->contact();
-        fields[HeaderFooter::Version] = screenplay->version();
-        fields[HeaderFooter::Email] = screenplay->email();
-        fields[HeaderFooter::Phone] = screenplay->phoneNumber();
-        fields[HeaderFooter::Website] = screenplay->website();
-        fields[HeaderFooter::Comment] = exporter->comment();
-        fields[HeaderFooter::Watermark] = exporter->watermark();
-        fields[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
-        fields[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
-        fields[HeaderFooter::DateTime] = QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
-        fields[HeaderFooter::PageNumber] = QStringLiteral("1.");
-        fields[HeaderFooter::PageNumberOfCount] = QStringLiteral("1/1");
-    }
-
-    HeaderFooter *header = exporter->isEnableHeaderFooter() ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
-    HeaderFooter *footer = exporter->isEnableHeaderFooter() ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
-    Watermark *watermark = new Watermark(this);
-    QTextDocumentPagedPrinter::loadSettings(header, footer, watermark);
-
-    if(exporter->isEnableHeaderFooter())
-    {
-        QRectF headerRect = contentsRect;
-        headerRect.setHeight(40);
-        headerRect.moveBottom(contentsRect.top());
-        StructureHeaderFooter *headerItem = new StructureHeaderFooter(header, fields);
-        headerItem->setRect(headerRect);
-        headerItem->setZValue(11);
-        this->addItem(headerItem);
-
-        QRectF footerRect = contentsRect;
-        footerRect.setHeight(40);
-        footerRect.moveTop(contentsRect.bottom());
-        StructureHeaderFooter *footerItem = new StructureHeaderFooter(footer, fields);
-        footerItem->setRect(footerRect);
-        footerItem->setZValue(11);
-        this->addItem(footerItem);
-    }
-
-    if(!exporter->watermark().isEmpty())
-        watermark->setText(exporter->watermark());
-
-    StructureWatermark *watermarkItem = new StructureWatermark(watermark);
-    watermarkItem->setRect(contentsRect);
-    watermarkItem->setZValue(11);
-    this->addItem(watermarkItem);
+    this->addStandardItems(WatermarkOnly + (exporter->isEnableHeaderFooter() ? HeaderFooterOnly : 0));
 }
 
 StructureExporterScene::~StructureExporterScene()
@@ -1247,70 +1182,4 @@ StructureTitleCard::~StructureTitleCard()
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-StructureHeaderFooter::StructureHeaderFooter(HeaderFooter *headerFooter, const QMap<HeaderFooter::Field,QString> &fields)
-    : m_headerFooter(headerFooter), m_fields(fields)
-{
-    if(m_headerFooter != nullptr)
-        m_headerFooter->setVisibleFromPageOne(true);
-}
-
-StructureHeaderFooter::~StructureHeaderFooter()
-{
-    if(m_headerFooter != nullptr && m_headerFooter->parent() == nullptr)
-        delete m_headerFooter;
-}
-
-void StructureHeaderFooter::setRect(const QRectF &rect)
-{
-    this->setPos(rect.topLeft());
-    this->prepareGeometryChange();
-    m_rect = QRectF(0, 0, rect.width(), rect.height());
-    this->update();
-}
-
-void StructureHeaderFooter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    if(m_headerFooter == nullptr)
-        return;
-
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    m_headerFooter->prepare(m_fields, m_rect, painter->paintEngine()->paintDevice());
-    m_headerFooter->paint(painter, m_rect, 1, 1);
-}
-
-StructureWatermark::StructureWatermark(Watermark *watermark)
-    : m_watermark(watermark)
-{
-    if(m_watermark != nullptr)
-        m_watermark->setVisibleFromPageOne(true);
-}
-
-StructureWatermark::~StructureWatermark()
-{
-    if(m_watermark != nullptr && m_watermark->parent() == nullptr)
-        delete m_watermark;
-}
-
-void StructureWatermark::setRect(const QRectF &rect)
-{
-    this->setPos(rect.topLeft());
-    this->prepareGeometryChange();
-    m_rect = QRectF(0, 0, rect.width(), rect.height());
-    this->update();
-}
-
-void StructureWatermark::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    if(m_watermark == nullptr)
-        return;
-
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    m_watermark->paint(painter, m_rect, 1, 1);
-}
 

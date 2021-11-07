@@ -1046,9 +1046,10 @@ Item {
 
                             Announcement.onIncoming: {
                                 const stype = "" + type
+                                const sdata = "" + data
                                 if(stype === "72892ED6-BA58-47EC-B045-E92D9EC1C47A") {
-                                    if(data && typeof data === "number")
-                                        app.execLater(ui, data, showAboutDialog)
+                                    if(sdata && typeof sdata === "number")
+                                        app.execLater(ui, sdata, showAboutDialog)
                                     else
                                         showAboutDialog()
                                 }

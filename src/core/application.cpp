@@ -564,7 +564,7 @@ void Application::execLater(QObject *context, int howMuchLater, const QJSValue &
     new ExecLater(howMuchLater, function, args, parent);
 }
 
-QColor Application::translucent(const QColor &input, qreal alpha) const
+QColor Application::translucent(const QColor &input, qreal alpha)
 {
     QColor ret = input;
     ret.setAlphaF(qBound(0.0, ret.alphaF() * alpha, 1.0));
@@ -852,7 +852,7 @@ void Application::computeIdealFontPointSize()
     }
 }
 
-QString Application::painterPathToString(const QPainterPath &val) const
+QString Application::painterPathToString(const QPainterPath &val)
 {
     QByteArray ret;
     {
@@ -863,7 +863,7 @@ QString Application::painterPathToString(const QPainterPath &val) const
     return QString::fromLatin1(ret.toHex());
 }
 
-QPainterPath Application::stringToPainterPath(const QString &val) const
+QPainterPath Application::stringToPainterPath(const QString &val)
 {
     const QByteArray bytes = QByteArray::fromHex(val.toLatin1());
     QDataStream ds(bytes);
@@ -980,12 +980,12 @@ inline qreal evaluateLuminance(const QColor &color)
     return ((0.299 * color.redF()) + (0.587 * color.greenF()) + (0.114 * color.blueF()));
 }
 
-bool Application::isLightColor(const QColor &color) const
+bool Application::isLightColor(const QColor &color)
 {
     return evaluateLuminance(color) > 0.5;
 }
 
-QColor Application::textColorFor(const QColor &bgColor) const
+QColor Application::textColorFor(const QColor &bgColor)
 {
     // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
     return evaluateLuminance(bgColor) > 0.5 ? Qt::black : Qt::white;

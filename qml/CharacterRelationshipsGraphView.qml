@@ -33,6 +33,11 @@ Rectangle {
     border.color: primaryColors.borderColor
 
     function resetGraph() { crgraph.reset() }
+    function exportToPdf() {
+        const pdfFileName = crgraph.suggestPdfFileName()
+        if(crgraph.exportToPdf(pdfFileName))
+            app.revealFileOnDesktop(pdfFileName)
+    }
 
     CharacterRelationshipsGraph {
         id: crgraph
@@ -42,12 +47,15 @@ Rectangle {
         maxIterations: notebookSettings.graphLayoutMaxIterations
         leftMargin: 1000
         topMargin: 1000
-        onUpdated: app.execLater(crgraph, 250, function() {
-            canvasScroll.animatePanAndZoom = false
-            canvas.zoomFit()
-            canvasScroll.animatePanAndZoom = true
-            canvas.selectedNodeItem = canvas.mainCharacterNodeItem
-        })
+        onUpdated: {
+            app.execLater(crgraph, 250, function() {
+                canvasScroll.animatePanAndZoom = false
+                canvas.zoomFit()
+                canvasScroll.animatePanAndZoom = true
+                canvas.selectedNodeItem = canvas.mainCharacterNodeItem
+                crgraphExportPdfTimer.start()
+            })
+        }
     }
 
     onVisibleChanged: {
@@ -105,7 +113,10 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 enabled: canvas.selectedNodeItem !== null || crgraph.dirty
-                onClicked: { canvas.selectedNodeItem = null; canvas.reloadIfDirty(); }
+                onClicked: {
+                    canvas.selectedNodeItem = null;
+                    canvas.reloadIfDirty();
+                }
             }
 
             property Character activeCharacter: selectedNodeItem ? selectedNodeItem.character : null

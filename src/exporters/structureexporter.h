@@ -36,9 +36,9 @@ public:
     bool isInsertTitleCard() const { return m_insertTitleCard; }
     Q_SIGNAL void insertTitleCardChanged();
 
-//    Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
-//    Q_CLASSINFO("enableHeaderFooter_FieldEditor", "CheckBox")
-//    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY enableHeaderFooterChanged)
+    Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
+    Q_CLASSINFO("enableHeaderFooter_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY enableHeaderFooterChanged)
     void setEnableHeaderFooter(bool val);
     bool isEnableHeaderFooter() const { return m_enableHeaderFooter; }
     Q_SIGNAL void enableHeaderFooterChanged();
