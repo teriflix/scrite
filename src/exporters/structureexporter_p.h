@@ -19,10 +19,11 @@
 
 #include "structure.h"
 #include "qtextdocumentpagedprinter.h"
+#include "pdfexportablegraphicsscene.h"
 
 class StructureExporter;
 
-class StructureExporterScene : public QGraphicsScene
+class StructureExporterScene : public PdfExportableGraphicsScene
 {
     Q_OBJECT
 

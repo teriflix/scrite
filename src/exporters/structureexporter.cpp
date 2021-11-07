@@ -89,41 +89,7 @@ bool StructureExporter::doExport(QIODevice *device)
 
     // Construct the graphics scene with content of the structure
     StructureExporterScene scene(this);
-
-    // How big is the scene?
-    QRectF sceneRect = scene.itemsBoundingRect();
-
-    // We are going to need atleast 1" border around.
-    sceneRect.adjust(-dpi, -dpi, dpi, dpi);
-
-    // Figure out the page size in which we have to create the PDF
-    QPageSize pageSize(sceneRect.size()/dpi, QPageSize::Inch, QStringLiteral("Custom"), QPageSize::FuzzyMatch );
-
-    // Now, figure out the rect available on paper for printing
-    QRectF pageRect = pageSize.rectPixels(dpi);
-
-    // Now, calculate the target rect on paper.
-    QRectF targetRect(0, 0, sceneRect.width(), sceneRect.height());
-    targetRect.moveCenter(pageRect.center());
-
-    // Now, lets create a PDF writer and draw the scene into it.
-    QPdfWriter pdfWriter(device);
-    pdfWriter.setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
-    pdfWriter.setTitle(screenplay->title() + QStringLiteral(" - Structure"));
-    pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-    pdfWriter.setPageSize(pageSize);
-
-    const qreal dpiScaleX = qreal(pdfWriter.logicalDpiX()) / dpi;
-    const qreal dpiScaleY = qreal(pdfWriter.logicalDpiY()) / dpi;
-
-    QPainter paint(&pdfWriter);
-    paint.setRenderHint(QPainter::Antialiasing);
-    paint.setRenderHint(QPainter::SmoothPixmapTransform);
-    paint.scale(dpiScaleX, dpiScaleY);
-    scene.render(&paint, targetRect, sceneRect, Qt::KeepAspectRatio);
-    paint.end();
-
-    return true;
+    return scene.exportToPdf(device);
 }
 
 QString StructureExporter::polishFileName(const QString &fileName) const

@@ -30,7 +30,7 @@ inline QFont applicationFont()
 }
 
 StructureExporterScene::StructureExporterScene(const StructureExporter *exporter, QObject *parent)
-    : QGraphicsScene(parent)
+    : PdfExportableGraphicsScene(parent)
 {
     ScriteDocument *document = exporter->document();
     const Structure *structure = document->structure();
