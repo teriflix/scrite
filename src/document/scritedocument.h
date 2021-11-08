@@ -300,6 +300,9 @@ public:
     Q_INVOKABLE AbstractExporter *createExporter(const QString &format);
     Q_INVOKABLE AbstractReportGenerator *createReportGenerator(const QString &report);
 
+    void setupExporter(AbstractExporter *exporter);
+    void setupReportGenerator(AbstractReportGenerator *reportGenerator);
+
     Q_PROPERTY(QAbstractListModel* structureElementConnectors READ structureElementConnectors CONSTANT STORED false)
     QAbstractListModel *structureElementConnectors() const;
 

@@ -23,6 +23,7 @@
 #include "objectlistpropertymodel.h"
 
 class CharacterRelationshipsGraph;
+class CharacterRelationshipsGraphExporter;
 
 class CharacterRelationshipsGraphNode : public QObject, public GraphLayout::AbstractNode
 {
@@ -167,6 +168,10 @@ public:
         return &(const_cast<CharacterRelationshipsGraph*>(this))->m_edges;
     }
 
+    Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
+    bool isEmpty() const;
+    Q_SIGNAL void emptyChanged();
+
     Q_PROPERTY(QSizeF nodeSize READ nodeSize WRITE setNodeSize NOTIFY nodeSizeChanged)
     void setNodeSize(const QSizeF &val);
     QSizeF nodeSize() const { return m_nodeSize; }
@@ -235,10 +240,11 @@ public:
 
     Q_INVOKABLE void reload();
     Q_INVOKABLE void reset();
-    Q_INVOKABLE bool exportToPdf(const QString &fileName);
-    Q_INVOKABLE QString suggestPdfFileName() const;
 
     Q_SIGNAL void updated();
+
+    CharacterRelationshipsGraphExporter *createExporter();
+    Q_INVOKABLE QObject *createExporterObject();
 
     QObject *graphJsonObject() const;
 

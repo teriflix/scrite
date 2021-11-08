@@ -17,6 +17,7 @@
 #include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
+#include "structureexporter.h"
 
 #include <QDir>
 #include <QStack>
@@ -3758,6 +3759,18 @@ void Structure::setCharacterRelationshipGraph(const QJsonObject &val)
 
     m_characterRelationshipGraph = val;
     emit characterRelationshipGraphChanged();
+}
+
+StructureExporter *Structure::createExporter()
+{
+    StructureExporter *exporter = new StructureExporter(this);
+    m_scriteDocument->setupExporter(exporter);
+    return exporter;
+}
+
+QObject *Structure::createExporterObject()
+{
+    return this->createExporter();
 }
 
 void Structure::serializeToJson(QJsonObject &) const

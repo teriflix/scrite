@@ -11,30 +11,27 @@
 **
 ****************************************************************************/
 
-#ifndef STRUCTUREEXPORTER_H
-#define STRUCTUREEXPORTER_H
+#ifndef CHARACTERRELATIONSHIPSGRAPHEXPORTER_H
+#define CHARACTERRELATIONSHIPSGRAPHEXPORTER_H
 
 #include "abstractexporter.h"
 
-class StructureExporter : public AbstractExporter
+class CharacterRelationshipsGraph;
+
+class CharacterRelationshipsGraphExporter : public AbstractExporter
 {
     Q_OBJECT
-    Q_CLASSINFO("Format", "Structure/Screenplay Structure")
+    Q_CLASSINFO("Format", "Notebook/Character Relationship Graph")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
-    Q_INVOKABLE StructureExporter(QObject *parent=nullptr);
-    ~StructureExporter();
+    CharacterRelationshipsGraphExporter(QObject *parent=nullptr);
+    ~CharacterRelationshipsGraphExporter();
 
-    // AbstractExporter interface
-    bool requiresConfiguration() const { return true; }
+    void setGraph(CharacterRelationshipsGraph* val);
+    CharacterRelationshipsGraph* graph() const { return m_graph; }
 
-    Q_CLASSINFO("insertTitleCard_FieldLabel", "Include title card in the generated PDF.")
-    Q_CLASSINFO("insertTitleCard_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool insertTitleCard READ isInsertTitleCard WRITE setInsertTitleCard NOTIFY insertTitleCardChanged)
-    void setInsertTitleCard(bool val);
-    bool isInsertTitleCard() const { return m_insertTitleCard; }
-    Q_SIGNAL void insertTitleCardChanged();
+    virtual bool requiresConfiguration() const { return true; }
 
     Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
     Q_CLASSINFO("enableHeaderFooter_FieldEditor", "CheckBox")
@@ -62,10 +59,10 @@ protected:
     QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
 
 private:
-    bool m_insertTitleCard = true;
     bool m_enableHeaderFooter = true;
     QString m_comment;
     QString m_watermark;
+    CharacterRelationshipsGraph *m_graph = nullptr;
 };
 
-#endif // STRUCTUREEXPORTER_H
+#endif // CHARACTERRELATIONSHIPSGRAPHEXPORTER_H

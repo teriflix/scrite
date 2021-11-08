@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef CHARACTERRELATIONSHIPSGRAPH_P_H
-#define CHARACTERRELATIONSHIPSGRAPH_P_H
+#ifndef CHARACTERRELATIONSHIPSGRAPHEXPORTER_P_H
+#define CHARACTERRELATIONSHIPSGRAPHEXPORTER_P_H
 
 #include <QGraphicsRectItem>
 
@@ -46,4 +46,4 @@ public:
     ~CharacterRelationshipsGraphEdgeItem();
 };
 
-#endif // CHARACTERRELATIONSHIPSGRAPH_P_H
+#endif // CHARACTERRELATIONSHIPSGRAPHEXPORTER_P_H

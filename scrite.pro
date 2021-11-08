@@ -56,11 +56,12 @@ HEADERS += \
     src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipsgraph.h \
-    src/document/characterrelationshipsgraph_p.h \
     src/document/form.h \
     src/document/notebookmodel.h \
     src/document/notes.h \
     src/document/screenplaytextdocumentoffsets.h \
+    src/exporters/characterrelationshipsgraphexporter.h \
+    src/exporters/characterrelationshipsgraphexporter_p.h \
     src/exporters/structureexporter_p.h \
     src/importers/openfromlibrary.h \
     src/network/jsonhttprequest.h \
@@ -171,11 +172,12 @@ SOURCES += \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipsgraph.cpp \
-    src/document/characterrelationshipsgraph_p.cpp \
     src/document/form.cpp \
     src/document/notebookmodel.cpp \
     src/document/notes.cpp \
     src/document/screenplaytextdocumentoffsets.cpp \
+    src/exporters/characterrelationshipsgraphexporter.cpp \
+    src/exporters/characterrelationshipsgraphexporter_p.cpp \
     src/exporters/structureexporter_p.cpp \
     src/importers/openfromlibrary.cpp \
     src/network/jsonhttprequest.cpp \

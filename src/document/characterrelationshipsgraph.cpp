@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "characterrelationshipsgraph.h"
-#include "characterrelationshipsgraph_p.h"
+#include "characterrelationshipsgraphexporter.h"
 
 #include "hourglass.h"
 #include "screenplay.h"
@@ -332,12 +332,19 @@ CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
             this, &CharacterRelationshipsGraph::evaluateTitle);
     connect(this, &CharacterRelationshipsGraph::characterChanged,
             this, &CharacterRelationshipsGraph::evaluateTitle);
+    connect(this, &CharacterRelationshipsGraph::updated,
+            this, &CharacterRelationshipsGraph::emptyChanged);
 }
 
 CharacterRelationshipsGraph::~CharacterRelationshipsGraph()
 {
     if(m_loadTimer.isActive())
         this->load();
+}
+
+bool CharacterRelationshipsGraph::isEmpty() const
+{
+    return m_nodes.isEmpty();
 }
 
 void CharacterRelationshipsGraph::setNodeSize(const QSizeF &val)
@@ -479,41 +486,20 @@ void CharacterRelationshipsGraph::reset()
     this->reload();
 }
 
-bool CharacterRelationshipsGraph::exportToPdf(const QString &fileName)
+CharacterRelationshipsGraphExporter *CharacterRelationshipsGraph::createExporter()
 {
-    m_errorReport->clear();
+    CharacterRelationshipsGraphExporter *exporter = new CharacterRelationshipsGraphExporter(this);
 
-    if(m_structure == nullptr && m_character == nullptr && m_scene == nullptr)
-        return false;
+    ScriteDocument *document = ScriteDocument::instance();
+    document->setupExporter(exporter);
+    exporter->setGraph(this);
 
-    if(fileName.isEmpty())
-    {
-        m_errorReport->setErrorMessage(QStringLiteral("Cannot export to empty filename."));
-        return false;
-    }
-
-    QFile file(fileName);
-    if(!file.open(QFile::WriteOnly))
-    {
-        m_errorReport->setErrorMessage(QStringLiteral("Could not open '%1' for writing.").arg(fileName));
-        return false;
-    }
-
-    CharacterRelationshipsGraphScene scene(this);
-    scene.setTitle(m_title);
-    return scene.exportToPdf(&file);
+    return exporter;
 }
 
-QString CharacterRelationshipsGraph::suggestPdfFileName() const
+QObject *CharacterRelationshipsGraph::createExporterObject()
 {
-    if(m_title.isEmpty() || (m_structure == nullptr && m_character == nullptr && m_scene == nullptr))
-        return QString();
-
-    const QString downloadsFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-
-    QString pdfFileName = m_title + QStringLiteral(".pdf");
-    pdfFileName = QDir(downloadsFolder).absoluteFilePath(pdfFileName);
-    return Application::instance()->sanitiseFileName(pdfFileName);
+    return this->createExporter();
 }
 
 QObject *CharacterRelationshipsGraph::graphJsonObject() const
@@ -901,24 +887,19 @@ void CharacterRelationshipsGraph::loadLater()
 
 void CharacterRelationshipsGraph::evaluateTitle()
 {
-    QStringList comps;
-    if(m_character || m_scene)
-    {
-        if(m_character)
-            comps << m_character->name();
-        else
-            comps << m_scene->name();
-    }
+    const QString defaultTitle = QStringLiteral("Character Relationship Graph");
 
-    const ScriteDocument *doc = ScriteDocument::instance();
-    const Screenplay *screenplay = doc->screenplay();
-    const QString title = screenplay->title();
+    Screenplay *screenplay = ScriteDocument::instance()->screenplay();
 
-    comps << (title.isEmpty() ? QStringLiteral("Unnamed Screenplay") : title);
-    comps << QStringLiteral("Relationship Graph");
-    comps << QDateTime::currentDateTime().toString( QStringLiteral("MMMM dd, yyyy") );
+    if(m_character != nullptr)
+        m_title = QStringLiteral("Relationships Of \"") + m_character->name() + QStringLiteral("\" in \"") + screenplay->title() + QStringLiteral("\"");
+    else if(m_scene != nullptr)
+        m_title = QStringLiteral("Characters In A Scene Of \"") + screenplay->title() + QStringLiteral("\"");
+    else if(m_structure != nullptr)
+        m_title = QStringLiteral("All Characters Of \"") + screenplay->title() + QStringLiteral("\"");
+    else
+        m_title = defaultTitle;
 
-    m_title = comps.join( QStringLiteral("-") );
     emit titleChanged();
 }
 

@@ -36,6 +36,7 @@ class Screenplay;
 class SceneHeading;
 class ScriteDocument;
 class StructureLayout;
+class StructureExporter;
 class ScreenplayElement;
 class StructureElementStack;
 class StructureElementStacks;
@@ -796,6 +797,9 @@ public:
 
     Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
     Attachments *attachments() const { return m_attachments; }
+
+    StructureExporter *createExporter();
+    Q_INVOKABLE QObject *createExporterObject();
 
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;

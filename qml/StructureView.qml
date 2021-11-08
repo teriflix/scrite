@@ -450,6 +450,19 @@ Item {
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
             }
+
+            ToolButton3 {
+                id: pdfExportButton
+                iconSource: "../icons/file/generate_pdf.png"
+                ToolTip.text: "Exports the contents of the structure canvas to PDF."
+                onClicked: {
+                    modalDialog.closeable = false
+                    modalDialog.arguments = scriteDocument.structure.createExporterObject()
+                    modalDialog.sourceComponent = exporterConfigurationComponent
+                    modalDialog.popupSource = pdfExportButton
+                    modalDialog.active = true
+                }
+            }
         }
 
         Rectangle {

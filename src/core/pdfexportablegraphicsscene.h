@@ -42,10 +42,6 @@ public:
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();
 
-    bool exportToPdf(const QString &fileName);
-    bool exportToPdf(QIODevice *device);
-
-protected:
     enum StandardItems
     {
         HeaderFooterOnly = 1,
@@ -53,6 +49,11 @@ protected:
         HeaderFooterAndWatermark = 3
     };
     void addStandardItems(int items=HeaderFooterAndWatermark);
+
+    bool exportToPdf(const QString &fileName);
+    bool exportToPdf(QIODevice *device);
+
+protected:
 
 private:
     QString m_title;

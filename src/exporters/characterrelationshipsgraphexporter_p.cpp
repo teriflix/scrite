@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "application.h"
-#include "characterrelationshipsgraph_p.h"
+#include "characterrelationshipsgraphexporter_p.h"
 
 #include <QPainter>
 #include <QAbstractTextDocumentLayout>
@@ -58,7 +58,19 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(const Charact
         this->addItem(edgeItem);
     }
 
-    this->addStandardItems();
+    const QRectF contentsRect = this->itemsBoundingRect();
+
+    this->setTitle(graph->title());
+
+    QGraphicsTextItem *titleItem = new QGraphicsTextItem(nullptr);
+    titleItem->setTextWidth(contentsRect.width());
+    titleItem->setHtml(QStringLiteral("<center><h1>%1</h1><center>").arg(this->title()));
+
+    QRectF titleRect = titleItem->boundingRect();
+    titleRect.moveCenter(contentsRect.center());
+    titleRect.moveBottom(contentsRect.top());
+    titleItem->setPos(titleRect.topLeft());
+    this->addItem(titleItem);
 }
 
 CharacterRelationshipsGraphScene::~CharacterRelationshipsGraphScene()

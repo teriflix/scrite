@@ -191,11 +191,19 @@ Rectangle {
 
             ToolButton3 {
                 id: pdfExportButton
-                iconSource: "../icons/file/file_pdf.png"
+                iconSource: "../icons/file/generate_pdf.png"
                 ToolTip.text: "Exports the current character relationship graph to PDF."
                 onClicked: Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "pdfexport")
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
+                property int crGraphViewCount: 0
+                enabled: crGraphViewCount > 0
+                Announcement.onIncoming: {
+                    const stype = ""+type
+                    const idata = 0+data
+                    if(stype === "4D37E093-1F58-4978-8060-CD6B9AD4E03C")
+                        crGraphViewCount += idata
+                }
             }
 
             Rectangle {
@@ -1081,6 +1089,10 @@ Rectangle {
                         Component.onCompleted: app.execLater(sceneTabContentArea, 100, prepare)
                         onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
 
+                        property bool pdfExportPossible: !graphIsEmpty && visible
+                        onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
+                        Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
+
                         Announcement.onIncoming: {
                             const stype = ""+type
                             const sdata = ""+data
@@ -1089,7 +1101,7 @@ Rectangle {
                                     crGraphView.resetGraph()
                                     refreshButton.crGraphRefreshed = true
                                 } else if(sdata == "pdfexport")
-                                    crGraphView.exportToPdf()
+                                    crGraphView.exportToPdf(pdfExportButton)
                             }
                         }
                     }
@@ -2007,6 +2019,10 @@ Rectangle {
                         Component.onCompleted: app.execLater(charactersTabContentArea, 100, prepare)
                         onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
 
+                        property bool pdfExportPossible: !graphIsEmpty && visible
+                        onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
+                        Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
+
                         Announcement.onIncoming: {
                             const stype = "" + type
                             const sdata = "" + data
@@ -2015,7 +2031,7 @@ Rectangle {
                                     crGraphView.resetGraph()
                                     refreshButton.crGraphRefreshed = true
                                 } else if(sdata == "pdfexport")
-                                    crGraphView.exportToPdf()
+                                    crGraphView.exportToPdf(pdfExportButton)
                             }
                         }
                     }
@@ -2488,6 +2504,10 @@ Rectangle {
                         Component.onCompleted: app.execLater(characterTabContentArea, 100, prepare)
                         onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
 
+                        property bool pdfExportPossible: !graphIsEmpty && visible
+                        onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
+                        Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
+
                         Announcement.onIncoming: {
                             const stype = "" + type
                             const sdata = "" + data
@@ -2496,7 +2516,7 @@ Rectangle {
                                     crGraphView.resetGraph()
                                     refreshButton.crGraphRefreshed = true
                                 } else if(sdata == "pdfexport")
-                                    crGraphView.exportToPdf()
+                                    crGraphView.exportToPdf(pdfExportButton)
                             }
                         }
                     }

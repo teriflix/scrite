@@ -1910,8 +1910,15 @@ Item {
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
-                                active: !structureAppFeature.enabled && ui.showNotebookInStructure
-                                visible: active && structureEditorTabs.currentTabIndex === 0
+                                // active: !structureAppFeature.enabled && ui.showNotebookInStructure
+                                active: {
+                                    if(structureEditorTabs.currentTabIndex === 0)
+                                        return !structureAppFeature.enabled && ui.showNotebookInStructure
+                                    else if(structureEditorTabs.currentTabIndex === 1)
+                                        return !notebookAppFeature.enabled && ui.showNotebookInStructure
+                                    return false
+                                }
+                                visible: active
                                 sourceComponent: Rectangle {
                                     color: primaryColors.c100.background
                                     width: appToolBar.height+4
@@ -1920,13 +1927,15 @@ Item {
                                         anchors.horizontalCenter: parent.horizontalCenter
 
                                         ToolButton3 {
-                                            down: true
+                                            down: structureEditorTabs.currentTabIndex === 0
                                             visible: ui.showNotebookInStructure
                                             iconSource: "../icons/navigation/structure_tab.png"
                                             ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                                            onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
                                         }
 
                                         ToolButton3 {
+                                            down: structureEditorTabs.currentTabIndex === 1
                                             visible: ui.showNotebookInStructure
                                             iconSource: "../icons/navigation/notebook_tab.png"
                                             ToolTip.text: "Notebook Tab (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
@@ -1962,7 +1971,10 @@ Item {
 
                             Loader {
                                 id: notebookViewLoader
-                                anchors.fill: parent
+                                anchors.top: parent.top
+                                anchors.left: structureEditorTabBar.active ? structureEditorTabBar.right : parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
                                 visible: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
                                 active: visible && notebookAppFeature.enabled
                                 sourceComponent: NotebookView {

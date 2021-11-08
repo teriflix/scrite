@@ -21,6 +21,7 @@ Rectangle {
     property alias scene: crgraph.scene
     property alias character: crgraph.character
     property alias structure: crgraph.structure
+    property alias graphIsEmpty: crgraph.empty
     property bool editRelationshipsEnabled: false
     property bool showBusyIndicator: false
 
@@ -33,10 +34,12 @@ Rectangle {
     border.color: primaryColors.borderColor
 
     function resetGraph() { crgraph.reset() }
-    function exportToPdf() {
-        const pdfFileName = crgraph.suggestPdfFileName()
-        if(crgraph.exportToPdf(pdfFileName))
-            app.revealFileOnDesktop(pdfFileName)
+    function exportToPdf(popupSource) {
+        modalDialog.closeable = false
+        modalDialog.arguments = crgraph.createExporterObject()
+        modalDialog.sourceComponent = exporterConfigurationComponent
+        modalDialog.popupSource = popupSource
+        modalDialog.active = true
     }
 
     CharacterRelationshipsGraph {
@@ -53,7 +56,6 @@ Rectangle {
                 canvas.zoomFit()
                 canvasScroll.animatePanAndZoom = true
                 canvas.selectedNodeItem = canvas.mainCharacterNodeItem
-                crgraphExportPdfTimer.start()
             })
         }
     }

@@ -250,5 +250,6 @@
         <file>icons/screenplay/heading_inverted.png</file>
         <file>icons/action/info.png</file>
         <file>icons/action/info_inverted.png</file>
+        <file>icons/file/generate_pdf.png</file>
     </qresource>
 </RCC>

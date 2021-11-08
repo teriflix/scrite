@@ -11,10 +11,12 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
+
+import Scrite 1.0
 
 Item {
     id: configurationBox
@@ -28,7 +30,7 @@ Item {
     Component.onCompleted: {
         modalDialog.closeOnEscape = false
 
-        exporter = scriteDocument.createExporter(modalDialog.arguments)
+        exporter = typeof modalDialog.arguments === "string" ? scriteDocument.createExporter(modalDialog.arguments) : modalDialog.arguments
         if(exporter === null) {
             modalDialog.closeable = true
             var exportKind = modalDialog.arguments.split("/").last()

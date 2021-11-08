@@ -377,7 +377,6 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<HtmlExporter>();
     ExporterFactory.addClass<TextExporter>();
     ExporterFactory.addClass<FountainExporter>();
-    ExporterFactory.addClass<StructureExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
 
     ReportsFactory.addClass<ScreenplaySubsetReport>();
@@ -1224,6 +1223,28 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
     if(exporter == nullptr)
         return nullptr;
 
+    this->setupExporter(exporter);
+
+    return exporter;
+}
+
+AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)
+{
+    const QByteArray reportKey = report.toLatin1();
+    AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportsFactory.create<AbstractReportGenerator>(reportKey, this);
+    if(reportGenerator == nullptr)
+        return nullptr;
+
+    this->setupReportGenerator(reportGenerator);
+
+    return reportGenerator;
+}
+
+void ScriteDocument::setupExporter(AbstractExporter *exporter)
+{
+    if(exporter == nullptr)
+        return;
+
     exporter->setDocument(this);
 
     if(exporter->fileName().isEmpty())
@@ -1259,16 +1280,12 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
                 this->clearBusyMessage();
         });
     }
-
-    return exporter;
 }
 
-AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)
+void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerator)
 {
-    const QByteArray reportKey = report.toLatin1();
-    AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportsFactory.create<AbstractReportGenerator>(reportKey, this);
     if(reportGenerator == nullptr)
-        return nullptr;
+        return;
 
     reportGenerator->setDocument(this);
 
@@ -1306,8 +1323,6 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
                 this->clearBusyMessage();
         });
     }
-
-    return reportGenerator;
 }
 
 QAbstractListModel *ScriteDocument::structureElementConnectors() const
