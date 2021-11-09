@@ -112,9 +112,9 @@ Item {
 
                 Announcement.onIncoming: {
                     const stype = "" + type
-                    const sdata = "" + data
+                    const idata = data
                     if(stype === "93DC1133-58CA-4EDD-B803-82D9B6F2AA50")
-                        page = page + sdata
+                        page = page + idata
                     else if(stype === "76281526-A16C-4414-8129-AD8770A17F16") {
                         active = false
                         Qt.callLater( function() { pageLoader.active = true } )

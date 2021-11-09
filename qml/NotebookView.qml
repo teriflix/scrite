@@ -192,7 +192,7 @@ Rectangle {
             ToolButton3 {
                 id: pdfExportButton
                 iconSource: "../icons/file/generate_pdf.png"
-                ToolTip.text: "Exports the current character relationship graph to PDF."
+                ToolTip.text: "Export the current character relationship graph to PDF."
                 onClicked: Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "pdfexport")
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize

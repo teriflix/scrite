@@ -454,7 +454,7 @@ Item {
             ToolButton3 {
                 id: pdfExportButton
                 iconSource: "../icons/file/generate_pdf.png"
-                ToolTip.text: "Exports the contents of the structure canvas to PDF."
+                ToolTip.text: "Export the contents of the structure canvas to PDF."
                 onClicked: {
                     modalDialog.closeable = false
                     modalDialog.arguments = scriteDocument.structure.createExporterObject()
