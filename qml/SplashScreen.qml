@@ -45,7 +45,7 @@ Item {
             id: versionText
             x: (1018 / splashImage.sourceSize.width) * parent.width
             y: (187 / splashImage.sourceSize.height) * parent.height
-            font.pixelSize: 24
+            font.pixelSize: app.idealFontPointSize + 3
             text: app.applicationVersion
             color: "#4a4a4a"
         }

@@ -561,7 +561,7 @@ Item {
                 }
             }
 
-                Column {
+            Column {
                 id: rightSideLinks
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom

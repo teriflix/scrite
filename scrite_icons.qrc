@@ -251,5 +251,11 @@
         <file>icons/action/info.png</file>
         <file>icons/action/info_inverted.png</file>
         <file>icons/file/generate_pdf.png</file>
+        <file>icons/action/share_on_email.png</file>
+        <file>icons/action/share_on_facebook.png</file>
+        <file>icons/action/share_on_linkedin.png</file>
+        <file>icons/action/share_on_twitter.png</file>
+        <file>icons/action/share_inverted.png</file>
+        <file>icons/action/share.png</file>
     </qresource>
 </RCC>

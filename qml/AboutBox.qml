@@ -21,8 +21,9 @@ Item {
     readonly property real splashWidth: 1464
     readonly property real splashHeight: 978
     readonly property real iscale: (ui.width * 0.5)/splashWidth
-    width: Math.max(iscale * splashWidth, 897)
-    height: Math.max(iscale * splashHeight, 600)
+    readonly property real ascale: width/splashWidth
+    width: Math.max(iscale * splashWidth, 973)
+    height: Math.max(iscale * splashHeight, 650)
 
     Component.onCompleted: {
         modalDialog.closeUponClickOutsideContentArea = true
@@ -44,8 +45,8 @@ Item {
 
             Text {
                 id: versionText
-                x: 60 * iscale
-                y: 125 * iscale
+                x: 60 * ascale
+                y: 135 * ascale
                 font.pixelSize: 18
                 color: "white"
                 text: app.applicationVersion
@@ -96,7 +97,7 @@ Item {
 
                 Item {
                     width: parent.width
-                    height: 50
+                    height: 30
                 }
 
                 Row {
@@ -185,7 +186,11 @@ Item {
 
                 Item {
                     width: parent.width
-                    height: 50
+                    height: 20
+                }
+
+                SocialShareIcons {
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Row {
