@@ -15,6 +15,7 @@
 #define APPLICATION_H
 
 #include <QUrl>
+#include <QTime>
 #include <QRectF>
 #include <QColor>
 #include <QAction>
@@ -249,6 +250,8 @@ public:
     Q_INVOKABLE static QString createUniqueId();
 
     Q_INVOKABLE void sleep(int ms);
+
+    Q_INVOKABLE static QTime secondsToTime(int nrSeconds);
 
     Q_PROPERTY(Forms* forms READ forms CONSTANT)
     Forms *forms() const;

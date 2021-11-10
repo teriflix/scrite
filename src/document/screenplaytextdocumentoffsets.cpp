@@ -673,7 +673,7 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
      */
     QTimer *reloadNowTimer = new QTimer(this);
     reloadNowTimer->setInterval(100);
-    connect(reloadNowTimer, &QTimer::timeout, [=]() {
+    connect(reloadNowTimer, &QTimer::timeout, this, [=]() {
         this->reloadDocumentNow();
         reloadNowTimer->deleteLater();
         this->setBusy(false);

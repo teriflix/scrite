@@ -320,6 +320,10 @@ public:
         return m_characterElementMap.containsCharacter(characterName);
     }
 
+    Q_INVOKABLE int characterPresence(const QString &characterName) const {
+        return m_characterElementMap.characterElements(characterName).size();
+    }
+
     Q_INVOKABLE void addMuteCharacter(const QString &characterName);
     Q_INVOKABLE void removeMuteCharacter(const QString &characterName);
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
@@ -397,9 +401,7 @@ public:
     Q_INVOKABLE void endUndoCapture();
 
     // Used by stats report generator code.
-    int totalTextLengthOf(SceneElement::Type type) const;
-    QMap<int,int> totalTextLengths() const;
-    QMap<QString,QPair<int,int> > dialogueTextLengths() const;
+    QHash<QString, QList<SceneElement *> > dialogueElements() const;
 
     Scene *splitScene(SceneElement *element, int textPosition, QObject *parent=nullptr);
     bool mergeInto(Scene *another);

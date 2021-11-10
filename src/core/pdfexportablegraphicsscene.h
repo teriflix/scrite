@@ -19,6 +19,8 @@
 
 #include "qtextdocumentpagedprinter.h"
 
+class QPdfWriter;
+
 class PdfExportableGraphicsScene : public QGraphicsScene
 {
     Q_OBJECT
@@ -44,14 +46,16 @@ public:
 
     enum StandardItems
     {
-        HeaderFooterOnly = 1,
-        WatermarkOnly = 2,
-        HeaderFooterAndWatermark = 3
+        HeaderFooterLayer = 1,
+        WatermarkUnderlayLayer = 2,
+        WatermarkOverlayLayer = 4,
+        HeaderFooterAndWatermarkUnderlay = 3
     };
-    void addStandardItems(int items=HeaderFooterAndWatermark);
+    void addStandardItems(int items=HeaderFooterAndWatermarkUnderlay);
 
     bool exportToPdf(const QString &fileName);
     bool exportToPdf(QIODevice *device);
+    bool exportToPdf(QPdfWriter *pdfWriter);
 
 protected:
 

@@ -1416,6 +1416,17 @@ void Application::sleep(int ms)
         eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
+QTime Application::secondsToTime(int seconds)
+{
+    if(seconds == 0)
+        return QTime(0,0,0);
+    const int s = seconds > 60 ? seconds % 60 : seconds;
+    const int tm = seconds > 60 ? (seconds-s)/60 : 0;
+    const int m = tm > 60 ? tm%60 : tm;
+    const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
+    return QTime(h, m, s);
+}
+
 Forms *Application::forms() const
 {
     return Forms::global();

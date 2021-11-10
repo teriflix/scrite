@@ -326,9 +326,11 @@ public:
     QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
     Q_INVOKABLE int firstSceneIndex() const;
     Q_INVOKABLE int lastSceneIndex() const;
-    Q_INVOKABLE QList<int> sceneElementsInBreak(ScreenplayElement *element);
+    Q_INVOKABLE QList<int> sceneElementsInBreak(ScreenplayElement *element) const;
 
+    int dialogueCount() const;
     QList<ScreenplayElement*> getElements() const { return m_elements; }
+    QList<ScreenplayElement*> getFilteredElements(std::function<bool(ScreenplayElement*item)> filterFunc) const;
     bool setElements(const QList<ScreenplayElement*> &list);
 
     enum BreakType
@@ -346,6 +348,14 @@ public:
     Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
     void updateBreakTitlesLater();
+
+    Q_PROPERTY(int sceneCount READ sceneCount NOTIFY sceneCountChanged)
+    int sceneCount() const { return m_sceneCount; }
+    Q_SIGNAL void sceneCountChanged();
+
+    Q_PROPERTY(int actCount READ actCount NOTIFY actCountChanged)
+    int actCount() const { return m_actCount; }
+    Q_SIGNAL void actCountChanged();
 
     Q_PROPERTY(int episodeCount READ episodeCount NOTIFY episodeCountChanged)
     int episodeCount() const { return m_episodeCount; }
@@ -408,6 +418,8 @@ protected:
     void setHasTitlePageAttributes(bool val);
     void evaluateHasTitlePageAttributes();
     QList<ScreenplayElement*> takeSelectedElements();
+    void setActCount(int val);
+    void setSceneCount(int val);
     void setEpisodeCount(int val);
     void onDfsAuction(const QString &filePath, int *claims);
 
@@ -443,6 +455,8 @@ private:
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
     int m_episodeCount = 0;
+    int m_actCount = 0;
+    int m_sceneCount = 0;
 
     ExecLaterTimer m_updateBreakTitlesTimer;
     ExecLaterTimer m_sceneNumberEvaluationTimer;

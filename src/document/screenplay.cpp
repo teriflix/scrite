@@ -1615,7 +1615,7 @@ int Screenplay::lastSceneIndex() const
     return -1;
 }
 
-QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element)
+QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element) const
 {
     QList<int> ret;
 
@@ -1636,6 +1636,33 @@ QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element)
             ret << _index;
     }
 
+    return ret;
+}
+
+int Screenplay::dialogueCount() const
+{
+    int ret = 0;
+    for(const ScreenplayElement *element : qAsConst(m_elements))
+    {
+        const Scene *scene = element->scene();
+        if(scene == nullptr)
+            continue;
+
+        const int nrParas = scene->elementCount();
+        for(int i=0; i<nrParas; i++)
+            ret += scene->elementAt(i)->type() == SceneElement::Character ? 1 : 0;
+    }
+
+    return ret;
+}
+
+QList<ScreenplayElement *> Screenplay::getFilteredElements(std::function<bool (ScreenplayElement *)> filterFunc) const
+{
+    const QList<ScreenplayElement *> allElements = m_elements;
+    QList<ScreenplayElement*> ret;
+    for(ScreenplayElement *element : allElements)
+        if(filterFunc(element))
+            ret.append(element);
     return ret;
 }
 
@@ -1733,6 +1760,24 @@ void Screenplay::updateBreakTitles()
     }
 
     this->evaluateSceneNumbers();
+}
+
+void Screenplay::setActCount(int val)
+{
+    if(m_actCount == val)
+        return;
+
+    m_actCount = val;
+    emit actCountChanged();
+}
+
+void Screenplay::setSceneCount(int val)
+{
+    if(m_sceneCount == val)
+        return;
+
+    m_sceneCount = val;
+    emit sceneCountChanged();
 }
 
 void Screenplay::setEpisodeCount(int val)
@@ -2114,14 +2159,14 @@ void Screenplay::evaluateSceneNumbers()
         return;
 
     int number = 1;
-    int actIndex = -1;
+    int actIndex = -1, totalActIndex=-1;
     int episodeIndex = -1;
     int elementIndex = -1;
+    int nrScenes = 0;
     bool containsNonStandardScenes = false;
 
     ScreenplayElement *lastEpisodeElement = nullptr;
     ScreenplayElement *lastActElement = nullptr;
-    ScreenplayElement *lastSceneElement = nullptr;
 
     QHash< Scene*, QList<int> > indexListMap;
 
@@ -2151,6 +2196,9 @@ void Screenplay::evaluateSceneNumbers()
             scene->setEpisode(lastEpisodeElement ? lastEpisodeElement->breakTitle() : QStringLiteral("EPISODE 1"));
             scene->setEpisodeIndex(episodeIndex);
             indexListMap[scene].append(index);
+
+            if(scene->heading()->isEnabled())
+                ++nrScenes;
         }
         else
         {
@@ -2158,9 +2206,11 @@ void Screenplay::evaluateSceneNumbers()
             if(element->breakType() == Screenplay::Act)
             {
                 ++actIndex;
+                if(totalActIndex < 0)
+                    ++totalActIndex;
+                ++totalActIndex;
 
                 lastActElement = element;
-                lastSceneElement = nullptr;
             }
             else if(element->breakType() == Screenplay::Episode)
             {
@@ -2190,10 +2240,9 @@ void Screenplay::evaluateSceneNumbers()
         ++it;
     }
 
-    if(lastEpisodeElement)
-        this->setEpisodeCount(episodeIndex+1);
-    else
-        this->setEpisodeCount(0);
+    this->setSceneCount(nrScenes);
+    this->setEpisodeCount(lastEpisodeElement ? episodeIndex+1 : 0);
+    this->setActCount(lastEpisodeElement ? totalActIndex+1: (lastActElement ? actIndex+1 : 0));
 
     this->setHasNonStandardScenes(containsNonStandardScenes);
 }
@@ -2284,7 +2333,7 @@ void Screenplay::evaluateHasTitlePageAttributes()
             !m_title.isEmpty() &&
             !m_author.isEmpty() &&
             !m_version.isEmpty()
-                );
+        );
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)

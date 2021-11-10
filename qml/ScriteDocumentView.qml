@@ -1751,6 +1751,7 @@ Item {
     ScreenplayTracks {
         id: screenplayTracks
         screenplay: scriteDocument.screenplay
+        Component.onCompleted: app.registerObject(screenplayTracks, "screenplayTracks")
     }
 
     Component {

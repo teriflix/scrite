@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport svg
+QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport svg charts
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
@@ -104,6 +104,7 @@ HEADERS += \
     src/reports/locationreport.h \
     src/reports/scenecharactermatrixreport.h \
     src/reports/statisticsreport.h \
+    src/reports/statisticsreport_p.h \
     src/utils/execlatertimer.h \
     src/utils/graphlayout.h \
     src/utils/timeprofiler.h \
@@ -220,6 +221,7 @@ SOURCES += \
     src/reports/locationreport.cpp \
     src/reports/scenecharactermatrixreport.cpp \
     src/reports/statisticsreport.cpp \
+    src/reports/statisticsreport_p.cpp \
     src/utils/execlatertimer.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/graphlayout.cpp \

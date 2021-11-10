@@ -73,6 +73,12 @@ bool PdfExportableGraphicsScene::exportToPdf(const QString &fileName)
 
 bool PdfExportableGraphicsScene::exportToPdf(QIODevice *device)
 {
+    QPdfWriter pdfWriter(device);
+    return this->exportToPdf(&pdfWriter);
+}
+
+bool PdfExportableGraphicsScene::exportToPdf(QPdfWriter *pdfWriter)
+{
     HourGlass hourGlass;
 
 #ifdef Q_OS_MAC
@@ -98,17 +104,16 @@ bool PdfExportableGraphicsScene::exportToPdf(QIODevice *device)
     targetRect.moveCenter(pageRect.center());
 
     // Now, lets create a PDF writer and draw the scene into it.
-    QPdfWriter pdfWriter(device);
-    pdfWriter.setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
-    pdfWriter.setTitle(m_title);
-    pdfWriter.setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
-    pdfWriter.setPageSize(pageSize);
-    pdfWriter.setResolution(int(dpi));
+    pdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
+    pdfWriter->setTitle(m_title);
+    pdfWriter->setCreator(qApp->applicationName() + " " + qApp->applicationVersion());
+    pdfWriter->setPageSize(pageSize);
+    pdfWriter->setResolution(int(dpi));
 
-    const qreal dpiScaleX = qreal(pdfWriter.logicalDpiX()) / dpi;
-    const qreal dpiScaleY = qreal(pdfWriter.logicalDpiY()) / dpi;
+    const qreal dpiScaleX = qreal(pdfWriter->logicalDpiX()) / dpi;
+    const qreal dpiScaleY = qreal(pdfWriter->logicalDpiY()) / dpi;
 
-    QPainter paint(&pdfWriter);
+    QPainter paint(pdfWriter);
     paint.setRenderHint(QPainter::Antialiasing);
     paint.setRenderHint(QPainter::SmoothPixmapTransform);
     paint.scale(dpiScaleX, dpiScaleY);
@@ -138,7 +143,7 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
     contentsRect = this->itemsBoundingRect();
 
     QMap<HeaderFooter::Field,QString> fields;
-    if(items & HeaderFooterOnly)
+    if(items & HeaderFooterLayer)
     {
         fields[HeaderFooter::AppName] = Application::instance()->applicationName();
         fields[HeaderFooter::AppVersion] = Application::instance()->applicationVersion();
@@ -159,12 +164,12 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         fields[HeaderFooter::PageNumberOfCount] = QStringLiteral("1/1");
     }
 
-    HeaderFooter *header = (items & HeaderFooterOnly) ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
-    HeaderFooter *footer = (items & HeaderFooterOnly) ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
-    Watermark *watermark = (items & WatermarkOnly) ? new Watermark(this) : nullptr;
+    HeaderFooter *header = (items & HeaderFooterLayer) ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
+    HeaderFooter *footer = (items & HeaderFooterLayer) ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
+    Watermark *watermark = ((items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer)) ? new Watermark(this) : nullptr;
     QTextDocumentPagedPrinter::loadSettings(header, footer, watermark);
 
-    if(items & HeaderFooterOnly)
+    if(items & HeaderFooterLayer)
     {
         QRectF headerRect = contentsRect;
         headerRect.setHeight(40);
@@ -183,14 +188,14 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         this->addItem(footerItem);
     }
 
-    if(items & WatermarkOnly)
+    if( (items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer) )
     {
         if(!m_watermark.isEmpty())
             watermark->setText(m_watermark);
 
         GraphicsWatermarkItem *watermarkItem = new GraphicsWatermarkItem(watermark);
         watermarkItem->setRect(contentsRect);
-        watermarkItem->setZValue(-999);
+        watermarkItem->setZValue((items & WatermarkUnderlayLayer) ? -999 : 999);
         this->addItem(watermarkItem);
     }
 }
