@@ -22,6 +22,7 @@
 
 class StatisticsReportPage;
 class ScreenplayTextDocument;
+class StatisticsReportTimeline;
 
 class StatisticsReport : public AbstractReportGenerator
 {
@@ -32,6 +33,18 @@ class StatisticsReport : public AbstractReportGenerator
 public:
     Q_INVOKABLE StatisticsReport(QObject *parent=nullptr);
     ~StatisticsReport();
+
+    bool requiresConfiguration() const { return true; }
+
+    Q_CLASSINFO("maxPresenceGraphs_FieldLabel", "Maximum Number Of Character & Location Presence Graphs")
+    Q_CLASSINFO("maxPresenceGraphs_FieldEditor", "IntegerSpinBox")
+    Q_CLASSINFO("maxPresenceGraphs_FieldMinValue", "1")
+    Q_CLASSINFO("maxPresenceGraphs_FieldMaxValue", "100")
+    Q_CLASSINFO("maxPresenceGraphs_FieldDefaultValue", "6")
+    Q_PROPERTY(int maxPresenceGraphs READ maxPresenceGraphs WRITE setMaxPresenceGraphs NOTIFY maxPresenceGraphsChanged)
+    void setMaxPresenceGraphs(int val);
+    int maxPresenceGraphs() const { return m_maxPresenceGraphs; }
+    Q_SIGNAL void maxPresenceGraphsChanged();
 
     struct Distribution
     {
@@ -73,6 +86,7 @@ protected:
     bool directPrintToPdf(QPdfWriter *);
 
 private:
+    friend class StatisticsReportTimeline;
     void prepareTextDocument();
     void cleanupTextDocument();
 
@@ -114,6 +128,7 @@ private:
     qreal m_pageHeight = 0;
     qreal m_lineHeight = 0;
     qreal m_scaleFactor = 1.0;
+    int m_maxPresenceGraphs = 6;
     qreal m_paragraphsLength = 0; // usually smaller than pageHeight
     qreal m_millisecondsPerPixel = 0;
 };

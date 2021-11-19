@@ -37,6 +37,15 @@ StatisticsReport::~StatisticsReport()
 
 }
 
+void StatisticsReport::setMaxPresenceGraphs(int val)
+{
+    if(m_maxPresenceGraphs == val)
+        return;
+
+    m_maxPresenceGraphs = val;
+    emit maxPresenceGraphsChanged();
+}
+
 QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool compact) const
 {
     QList<StatisticsReport::Distribution> ret;

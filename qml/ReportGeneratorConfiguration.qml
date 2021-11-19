@@ -349,6 +349,8 @@ Item {
             return editor_EnumSelector
         if(kind === "TextBox")
             return editor_TextBox
+        if(kind === "IntegerSpinBox")
+            return editor_IntegerSpinBox
         return editor_Unknown
     }
 
@@ -951,6 +953,35 @@ Item {
                     if(generator)
                         generator.setConfigurationValue(fieldInfo.name, text)
                 }
+            }
+        }
+    }
+
+    Component {
+        id: editor_IntegerSpinBox
+
+        Column {
+            property var fieldInfo
+            spacing: 10
+
+            Text {
+                text: fieldInfo.label
+                width: parent.width
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
+                font.pointSize: app.idealFontPointSize
+            }
+
+            SpinBox {
+                from: fieldInfo.min
+                to: fieldInfo.max
+                value: generator ? generator.getConfigurationValue(fieldInfo.name) : 0
+                onValueModified: {
+                    if(generator)
+                        generator.setConfigurationValue(fieldInfo.name, value)
+                }
+                TabSequenceItem.manager: tabSequence
             }
         }
     }

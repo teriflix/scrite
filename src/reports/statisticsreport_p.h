@@ -47,7 +47,28 @@ private:
     qreal evalPixelLength(const QList<StatisticsReport::Distribution> &dist) const;
 
     QList< QPair<QString, QList<int> > > evalCharacterPresence(const StatisticsReport *report) const;
-    QGraphicsRectItem *createCharacterPresenceGraph(const StatisticsReport *report, QGraphicsItem *container, const QGraphicsRectItem *sceneItems);
+    QList< QPair<QString, QList<int> > > evalLocationPresence(const StatisticsReport *report) const;
+    QList< QPair<QString, QList<int> > > evalPresence(const StatisticsReport *report,
+                                                      const QStringList &allNames,
+                                                      std::function<int(const Scene*,const QString &)> determinePresenceFunc) const;
+
+    QGraphicsRectItem *createCharacterPresenceGraph(const StatisticsReport *report,
+                                                    QGraphicsItem *container,
+                                                    const QGraphicsRectItem *sceneItemsContainer);
+    QGraphicsRectItem *createLocationPresenceGraph(const StatisticsReport *report,
+                                                   QGraphicsItem *container,
+                                                   const QGraphicsRectItem *sceneItemsContainer);
+    QGraphicsRectItem *createPresenceGraph(const QList< QPair<QString, QList<int> > > &presence,
+                                           std::function<QColor(const QString &)> evalColorFunc,
+                                           std::function<QString(const QString &, const QList<int>&)> evalLabelFunc,
+                                           const StatisticsReport *report,
+                                           QGraphicsItem *container,
+                                           const QGraphicsRectItem *sceneItems);
+
+    QGraphicsRectItem *createSeparator(QGraphicsItem *container, const QString &label, const QColor &color) const;
+
+private:
+    int m_maxPresenceGraphs = 6;
 };
 
 class StatisticsReportDialogueActionRatio : public QGraphicsRectItem
