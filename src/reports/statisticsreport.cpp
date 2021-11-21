@@ -37,6 +37,29 @@ StatisticsReport::~StatisticsReport()
 
 }
 
+const QVector<QColor> StatisticsReport::colors(ColorGroup group)
+{
+    if(group == Character)
+        return QVector<QColor>({ QColor("#5e368a"), QColor("#e8bf5a") });
+
+    return QVector<QColor>({ QColor("#864879"), QColor("#3F3351") });
+}
+
+const QColor StatisticsReport::pickColor(int index, bool cycleAround, ColorGroup group)
+{
+    const QVector<QColor> colors = StatisticsReport::colors(group);
+    const QColor baseColor = colors.at( index%(colors.length()) );
+    index = qAbs(index);
+
+    if(cycleAround || index < colors.size())
+        return baseColor;
+
+    const int batch = qFloor( qreal(index)/colors.size() );
+    const bool lighter = batch%2;
+    const int factor = 100+batch*50;
+    return lighter ? baseColor.lighter(factor) : baseColor.darker(factor);
+}
+
 void StatisticsReport::setMaxPresenceGraphs(int val)
 {
     if(m_maxPresenceGraphs == val)
@@ -260,7 +283,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
     }
 
     int episodeIndex = 0;
-    QColor baseColor = screenplay->episodeCount() > 0 ? ::pickStatsReportColor(episodeIndex) : Qt::transparent;
+    QColor baseColor = screenplay->episodeCount() > 0 ? StatisticsReport::pickColor(episodeIndex) : Qt::transparent;
     actIndex = 0;
     for(auto actScenes : qAsConst(actScenesList))
     {
@@ -268,11 +291,11 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
         item.key = actScenes.first;
 
         if(baseColor == Qt::transparent)
-            item.color = ::pickStatsReportColor(actIndex++);
+            item.color = StatisticsReport::pickColor(actIndex++);
         else
         {
             if(actIndex > 0 && item.key == actName(0))
-                baseColor = ::pickStatsReportColor(++episodeIndex);
+                baseColor = StatisticsReport::pickColor(++episodeIndex);
 
             const bool baseColorIsLight = Application::isLightColor(baseColor);
             item.color = (actIndex++%2) ? baseColor.lighter(baseColorIsLight ? 150 : 240) : baseColor.lighter(baseColorIsLight ? 120 : 200);
@@ -336,7 +359,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::episodeDistribution() co
     {
         StatisticsReport::Distribution item;
         item.key = episodeScenes.first;
-        item.color = ::pickStatsReportColor(epIndex++);
+        item.color = StatisticsReport::pickColor(epIndex++);
 
         for(Scene *scene : qAsConst(episodeScenes.second))
             item.pixelLength += this->pixelLength(scene);

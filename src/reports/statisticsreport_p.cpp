@@ -142,6 +142,8 @@ StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *r
         });
 
     const int nrDialogues = screenplay->dialogueCount();
+    const qreal avgScenePxLength = report->totalPixelLength() / sceneElements.size();
+    const QTime avgSceneTime = report->pixelLengthToTime(avgScenePxLength);
 
     const QStringList statLabels = {
         QStringLiteral("Est. Runtime: ") + ::timeToString(report->estimatedTime()),
@@ -149,9 +151,11 @@ StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *r
         QString::number(structure->characterNames().size()) + QStringLiteral(" Characters"),
         QString::number(report->pageCount()) + QStringLiteral(" Pages"),
         QString::number(nrDialogues) + QStringLiteral(" Dialogues"),
+        QString::number(structure->allLocations().size()) + QStringLiteral(" Locations"),
+        QStringLiteral("Avg. Scene Time: ") + ::timeToString(avgSceneTime,true)
     };
 
-    const QColor bgColor = ::pickStatsReportColor(0);
+    const QColor bgColor = StatisticsReport::pickColor(0);
     const QColor textColor = Application::textColorFor(bgColor);
 
     QPointF pos(0,0);
@@ -235,9 +239,10 @@ StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth, const S
     }
 
     QGraphicsRectItem *sceneItemsContainer = prevItem;
-    this->createSeparator(container, QStringLiteral("Character Presence"), ::pickStatsReportColor(0));
+    this->createScenePullouts(report, container, sceneItemsContainer);
+    this->createSeparator(container, QStringLiteral("Character Presence"), StatisticsReport::pickColor(0));
     this->createCharacterPresenceGraph(report, container, sceneItemsContainer);
-    this->createSeparator(container, QStringLiteral("Location Presence"), ::pickStatsReportColor(1));
+    this->createSeparator(container, QStringLiteral("Location Presence"), StatisticsReport::pickColor(0,false,StatisticsReport::Location));
     this->createLocationPresenceGraph(report, container, sceneItemsContainer);
 
     QRectF containerItemsRect = container->childrenBoundingRect();
@@ -336,7 +341,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRe
         rect.moveTopLeft( rect.topRight() );
         rect.setWidth( distItem.pixelLength*pixelScaleFactor );
 
-        const QColor color = distItem.color == Qt::transparent ? ::pickStatsReportColor(i) : distItem.color;
+        const QColor color = distItem.color == Qt::transparent ? StatisticsReport::pickColor(i) : distItem.color;
         QPen pen;
         pen.setColor(Application::isLightColor(color) ? Qt::gray : color);
         pen.setCosmetic(true);
@@ -419,6 +424,167 @@ qreal StatisticsReportTimeline::evalPixelLength(const QList<StatisticsReport::Di
     return ret;
 }
 
+QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report, QGraphicsRectItem *container, QGraphicsRectItem *sceneItemsContainer) const
+{
+    const Screenplay *screenplay = report->document()->screenplay();
+    const QList<ScreenplayElement*> sceneElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
+        return e->scene() != nullptr;
+    });
+
+    struct SceneInfo
+    {
+        int index = -1;
+        QString sceneNumber;
+        qreal pixelLength = 0;
+        qreal pageLength = 0;
+        int nrCharacters = 0;
+        QTime timeLength;
+        QString label;
+
+        QString makeLabel(const QString &prefix) const {
+            return prefix + QStringLiteral(": ") + sceneNumber + QStringLiteral(", ") +
+                    QString::number(nrCharacters) + QStringLiteral(" Characters, ") +
+                    QString::number(this->pageLength, 'g', 1) + QStringLiteral(" Pages, ") +
+                    ::timeToString(timeLength);
+        }
+    };
+
+    int sceneIndex = -1;
+    QVector<SceneInfo> sceneInfos;
+    for(int i=0; i<sceneElements.size(); i++)
+    {
+        const Scene *scene = sceneElements.at(i)->scene();
+        if(scene->heading()->isEnabled() || sceneInfos.isEmpty())
+            sceneInfos.append(SceneInfo());
+
+        SceneInfo &info = sceneInfos.last();
+        if(info.index < 0)
+        {
+            info.index = ++sceneIndex;
+            info.sceneNumber = sceneElements.at(i)->resolvedSceneNumber();
+        }
+        info.pixelLength += report->pixelLength(scene);
+        info.nrCharacters += scene->characterNames().size();
+        info.timeLength = report->pixelLengthToTime(info.pixelLength);
+        info.pageLength = report->pageLength(info.pixelLength);
+    }
+
+    // Longest & Smallest Scene
+    std::sort(sceneInfos.begin(), sceneInfos.end(), [](const SceneInfo &a, const SceneInfo &b) {
+        return a.pixelLength < b.pixelLength;
+    });
+
+    SceneInfo shortestScene = sceneInfos.first();
+    shortestScene.label = shortestScene.makeLabel(QStringLiteral("Shortest Scene"));
+
+    SceneInfo longestScene = sceneInfos.last();
+    longestScene.label = longestScene.makeLabel(QStringLiteral("Longest Scene"));
+
+    // Most & Least Crowded Scene
+    for(int i=sceneInfos.size()-1; i>=0; i--)
+    {
+        if(sceneInfos.at(i).nrCharacters == 0)
+            sceneInfos.removeAt(i);
+    }
+    std::sort(sceneInfos.begin(), sceneInfos.end(), [](const SceneInfo &a, const SceneInfo &b) {
+        if(a.nrCharacters == b.nrCharacters)
+            return a.pixelLength/a.nrCharacters > b.pixelLength/b.nrCharacters;
+        return a.nrCharacters < b.nrCharacters;
+    });
+
+    SceneInfo leastCrowdedScene = sceneInfos.first();
+    leastCrowdedScene.label = leastCrowdedScene.makeLabel(QStringLiteral("Least Crowded Scene"));
+
+    SceneInfo mostCrowdedScene = sceneInfos.last();
+    mostCrowdedScene.label = mostCrowdedScene.makeLabel(QStringLiteral("Most Crowded Scene"));
+
+    // Now prepare to render these labels from left-to-right
+    sceneInfos = QVector<SceneInfo>({shortestScene,longestScene,mostCrowdedScene,leastCrowdedScene});
+    std::sort(sceneInfos.begin(), sceneInfos.end(), [](const SceneInfo &a, const SceneInfo &b) {
+        return a.index < b.index;
+    });
+
+    // Container for labels.
+    QGraphicsRectItem *labelsItem = new QGraphicsRectItem(container);
+    labelsItem->setPen(Qt::NoPen);
+    labelsItem->setBrush(Qt::NoBrush);
+    labelsItem->setPos( sceneItemsContainer->boundingRect().bottomLeft() + sceneItemsContainer->pos() );
+    labelsItem->setRect(QRectF(0, 0, sceneItemsContainer->boundingRect().width(), 10));
+
+    // Create the labels themselves.
+    qreal labelY = 50;
+    QList<QGraphicsRectItem*> labelItems;
+    for(int i=0; i<sceneInfos.size(); i++)
+    {
+        const SceneInfo &sceneInfo = sceneInfos[i];
+
+        QGraphicsRectItem *labelBg = new QGraphicsRectItem(labelsItem);
+        labelBg->setOpacity(0.75);
+        labelBg->setBrush(StatisticsReport::pickColor(i,true,StatisticsReport::Location));
+        labelBg->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren);
+
+        QGraphicsSimpleTextItem *labelText = new QGraphicsSimpleTextItem(labelBg);
+        labelText->setText(sceneInfo.label);
+        labelText->setBrush(Application::textColorFor(labelBg->brush().color()));
+
+        QRectF labelRect = labelText->boundingRect();
+        labelRect.adjust(-5, -3, 5, 3);
+        labelRect.moveTopLeft(QPointF(0,0));
+        labelBg->setRect(labelRect);
+        labelBg->setPos(QPointF(0, labelY));
+        labelY += labelRect.height() + 20;
+
+        labelRect = labelText->boundingRect();
+        labelRect.moveCenter(labelBg->boundingRect().center());
+        labelText->setPos(labelRect.topLeft());
+
+        labelItems << labelBg;
+    }
+
+    for(int i=0; i<sceneInfos.size(); i++)
+    {
+        const SceneInfo &sceneInfo = sceneInfos[i];
+
+        QPen pen;
+        pen.setColor(StatisticsReport::pickColor(i,true,StatisticsReport::Location));
+        pen.setJoinStyle(Qt::RoundJoin);
+
+        QGraphicsPathItem *lineItem = new QGraphicsPathItem(labelsItem);
+        lineItem->setZValue(-1);
+        lineItem->setPen(pen);
+
+        const QGraphicsItem *sceneItem = sceneItemsContainer->childItems().at(sceneInfo.index);
+        const QGraphicsRectItem *labelItem = labelItems.at(i);
+        const QRectF labelRect = labelItem->mapToParent(labelItem->boundingRect()).boundingRect();
+
+        const QPointF p1 = labelsItem->mapFromItem(sceneItem, QPointF(sceneItem->boundingRect().center().x(),sceneItem->boundingRect().bottom()));
+        const qreal lrx = labelRect.center().x() + (labelRect.width()/9);
+
+        QPainterPath path;
+        path.moveTo(p1.x(), p1.y()+1);
+
+        if(p1.x() < labelRect.right())
+        {
+            path.lineTo( p1.x(), 25.0 );
+            path.lineTo( lrx, path.currentPosition().y() );
+            path.lineTo( lrx, labelRect.top() );
+        }
+        else
+        {
+            path.lineTo( QPointF(p1.x(), labelRect.center().y()) );
+            path.lineTo( QPointF(labelRect.right(), labelRect.center().y()) );
+        }
+
+        path.moveTo(p1.x()-5,p1.y()+10);
+        path.lineTo(p1);
+        path.lineTo(p1.x()+5,p1.y()+10);
+
+        lineItem->setPath(path);
+    }
+
+    return labelsItem;
+}
+
 QList<QPair<QString, QList<int> > > StatisticsReportTimeline::evalCharacterPresence(const StatisticsReport *report) const
 {
     const Structure *structure = report->document()->structure();
@@ -426,7 +592,7 @@ QList<QPair<QString, QList<int> > > StatisticsReportTimeline::evalCharacterPrese
 
     const QList<QPair<QString, QList<int> > > ret =
             this->evalPresence(report, allCharacterNames, [](const Scene *scene, const QString &characterName) -> int {
-                return scene->hasCharacter(characterName) ? scene->characterPresence(characterName) + 10 : 0;
+                return scene->hasCharacter(characterName) ? scene->characterPresence(characterName) + 2 : 0;
             });
 
     return ret;
@@ -484,20 +650,38 @@ QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(const 
         return character ? character->color() : Qt::white;
     };
 
-    const QList<StatisticsReport::Distribution> dialogueDist = report->dialogueDistribution();
-    auto evalCharacterLabel = [dialogueDist](const QString &characterName, const QList<int> presence) -> QString {
-        // number of scenes is the number of items in presence with non-zero value
-        int nrScenes = 0; for(int p : presence) nrScenes += p>0 ? 1 : 0;
+    const Screenplay *screenplay = report->document()->screenplay();
+    const QList<ScreenplayElement*> sceneElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
+        return e->scene() != nullptr;
+    });
 
-        // screen-time and dialogue count can be found from dialogue dist
+    const QList<StatisticsReport::Distribution> dialogueDist = report->dialogueDistribution();
+    auto evalCharacterLabel = [=](const QString &characterName, const QList<int> presence) -> QString {
+        // dialogue count & time can be found from dialogue distribution
         auto it = std::find_if(dialogueDist.begin(), dialogueDist.end(), [characterName](const StatisticsReport::Distribution &dist) {
             return dist.key == characterName;
         });
 
+        // screen time can be found by summing up scene times across all scenes
+        // in which the character exists.
+        int nrScenes = 0;
+        qreal screenPresenceLength = 0;
+        for(int scIdx=0; scIdx<presence.size(); scIdx++) {
+            if(presence[scIdx] > 0) {
+                ++nrScenes;
+                const Scene *scene = sceneElements.at(scIdx)->scene();
+                const qreal scenePixelLength = report->pixelLength(scene);
+                screenPresenceLength += scenePixelLength;
+            }
+        }
+
+        const QTime screenTime = report->pixelLengthToTime(screenPresenceLength);
+
         // Prepare to format with what we have now.
-        QString ret = characterName + QStringLiteral(" - Sc: ") + QString::number(nrScenes);
+        QString ret = characterName + QStringLiteral(" - Sc: ") + QString::number(nrScenes) + QStringLiteral(", ") + timeToString(screenTime);
         if(it == dialogueDist.end())
             return ret;
+
         ret += QStringLiteral(", D: ") + QString::number(it->count) + QStringLiteral(", ") + timeToString(it->timeLength);
         return ret;
     };
@@ -528,7 +712,12 @@ QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(const S
         return locationName + QStringLiteral(" - Sc: ") + QString::number(nrScenes) + QStringLiteral(", ") + timeToString(timeLength);
     };
 
-    return this->createPresenceGraph(locationPresence, nullptr, evalLocationLabel, report, container, sceneItemsContainer);
+    int locationIndex = 0;
+    auto evalColorFunc = [&locationIndex](const QString &) {
+        return StatisticsReport::pickColor(locationIndex++%2,true,StatisticsReport::Location);
+    };
+
+    return this->createPresenceGraph(locationPresence, evalColorFunc, evalLocationLabel, report, container, sceneItemsContainer);
 }
 
 QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPair<QString, QList<int> > > &presence,
@@ -616,11 +805,11 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPa
 
         auto polishColor = [&uncoloredCount](const QColor &color) {
             if(color == Qt::white)
-                return ::pickStatsReportColor(uncoloredCount++);
+                return StatisticsReport::pickColor(uncoloredCount++);
             return color.darker();
         };
         const Character *character = structure->findCharacter(presenceItem.first);
-        const QColor evaledColor = evalColorFunc ? polishColor( evalColorFunc(presenceItem.first) ) : ::pickStatsReportColor(uncoloredCount++);
+        const QColor evaledColor = evalColorFunc ? polishColor( evalColorFunc(presenceItem.first) ) : StatisticsReport::pickColor(uncoloredCount++);
 
         QPen chartPen(evaledColor);
         chartPen.setCapStyle(Qt::RoundCap);
@@ -734,7 +923,7 @@ StatisticsReportDialogueActionRatio::StatisticsReportDialogueActionRatio(const S
     QtCharts::QPieSeries *pieSeries = new QtCharts::QPieSeries(chart);
     for(const auto &dist : qAsConst(textDistrubution))
     {
-        const QColor color = ::pickStatsReportColor(pieSeries->slices().size());
+        const QColor color = StatisticsReport::pickColor(pieSeries->slices().size());
         QtCharts::QPieSlice *slice = pieSeries->append(dist.key, dist.ratio);
         slice->setBrush(color);
         slice->setLabel(dist.percent);
@@ -863,7 +1052,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     while(it1 != end1)
     {
         const int percent = qRound(100.0*qreal(it1->second)/qreal(sceneElements.size()));
-        const QColor color = ::pickStatsReportColor(typeSeries->slices().size(),false);
+        const QColor color = StatisticsReport::pickColor(typeSeries->slices().size(),false);
         const QString label = QString::number(it1->second) + QStringLiteral(" Scenes: ") + QString::number(percent) + QStringLiteral("%");
         QtCharts::QPieSlice *slice = typeSeries->append(label, it1->second);
         slice->setBrush(color);
@@ -965,7 +1154,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     locationSeries->setLabelsPosition(QtCharts::QStackedBarSeries::LabelsCenter);
 
     QtCharts::QBarSet *locationBarSet = new QtCharts::QBarSet(QString(), locationSeries);
-    locationBarSet->setColor(::pickStatsReportColor(2,false));
+    locationBarSet->setColor(QColor("#864879"));
     locationSeries->append(locationBarSet);
     locationBarSet->setLabelFont(tinyFont);
     locationBarSet->setLabelColor(Application::textColorFor(locationBarSet->color()));
@@ -973,15 +1162,12 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     // Location lookup will be another legend, but without color.
     StatisticsReportGraphVLegend *locationLegend = new StatisticsReportGraphVLegend(this);
     locationLegend->setFont(smallFont);
-
-    categoryWidth = 60;
     while(it3 != end3)
     {
         const bool othersLoc = it3->first == othersKey;
         if(!othersLoc)
         {
-            const QString locName = othersLoc ? it3->first : QStringLiteral("LOC %1").arg(locationNameAxis->count()+1);
-            categoryWidth = qMax(categoryWidth, fm.boundingRect(locName).width());
+            const QString locName = othersLoc ? it3->first : QStringLiteral("L%1").arg(locationNameAxis->count()+1);
             locationBarSet->append( it3->second );
             locationNameAxis->append(locName);
             locationLegend->add(Qt::transparent, locName + QStringLiteral(": ") + it3->first + QStringLiteral (" (") + QString::number(it3->second) + QStringLiteral(")"));
@@ -991,14 +1177,13 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
         ++it3;
     }
 
-    categoryWidth *= 1.2;
     locationNameAxis->setLabelsFont(tinyFont);
     locationChart->addSeries(locationSeries);
     locationChart->addAxis(locationNameAxis, Qt::AlignBottom);
     locationChart->addAxis(locationValueAxis, Qt::AlignLeft);
     locationSeries->attachAxis(locationNameAxis);
     locationSeries->attachAxis(locationValueAxis);
-    locationChart->resize(categoryWidth*locationMap.size(), chartSize);
+    locationChart->resize(categoryWidth*(locationMap.size()-1), chartSize);
 
     // Place them in a horizontal row
     typeChart->setPos(0, 0);

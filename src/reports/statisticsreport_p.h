@@ -45,6 +45,7 @@ private:
     QGraphicsRectItem *createTimelineItem(const StatisticsReport *report, QGraphicsRectItem *container) const;
     QGraphicsRectItem *createDistributionItems(QGraphicsRectItem *container, const QList<StatisticsReport::Distribution> &dist, qreal heightHint, qreal totalPixelLength, bool lightenFillColors=false) const;
     qreal evalPixelLength(const QList<StatisticsReport::Distribution> &dist) const;
+    QGraphicsRectItem *createScenePullouts(const StatisticsReport *report, QGraphicsRectItem *container, QGraphicsRectItem *sceneItemsContainer) const;
 
     QList< QPair<QString, QList<int> > > evalCharacterPresence(const StatisticsReport *report) const;
     QList< QPair<QString, QList<int> > > evalLocationPresence(const StatisticsReport *report) const;
@@ -97,7 +98,7 @@ public:
     void place(const QRectF &rect, Qt::Alignment alignment=Qt::AlignRight);
     void add(const QColor &color, const QString &label);
     void add(const QString &label) {
-        return this->add(::pickStatsReportColor(this->childItems().size(),false),label);
+        return this->add(StatisticsReport::pickColor(this->childItems().size(),false),label);
     }
 
 private:

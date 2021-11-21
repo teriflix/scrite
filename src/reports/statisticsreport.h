@@ -23,6 +23,7 @@
 class StatisticsReportPage;
 class ScreenplayTextDocument;
 class StatisticsReportTimeline;
+class StatisticsReportKeyNumbers;
 
 class StatisticsReport : public AbstractReportGenerator
 {
@@ -33,6 +34,14 @@ class StatisticsReport : public AbstractReportGenerator
 public:
     Q_INVOKABLE StatisticsReport(QObject *parent=nullptr);
     ~StatisticsReport();
+
+    enum ColorGroup
+    {
+        Character,
+        Location
+    };
+    static const QVector<QColor> colors(ColorGroup group=Character);
+    static const QColor pickColor(int index, bool cycleAround=true, ColorGroup group=Character);
 
     bool requiresConfiguration() const { return true; }
 
@@ -87,6 +96,8 @@ protected:
 
 private:
     friend class StatisticsReportTimeline;
+    friend class StatisticsReportKeyNumbers;
+
     void prepareTextDocument();
     void cleanupTextDocument();
 
@@ -132,26 +143,5 @@ private:
     qreal m_paragraphsLength = 0; // usually smaller than pageHeight
     qreal m_millisecondsPerPixel = 0;
 };
-
-inline const QVector<QColor> statsReportColors()
-{
-    static const QVector<QColor> colors = { QColor("#5e368a"), QColor("#e8bf5a") };
-    return colors;
-}
-
-inline const QColor pickStatsReportColor(int index, bool cycleAround=true)
-{
-    const QVector<QColor> colors = ::statsReportColors();
-    const QColor baseColor = colors.at( index%(colors.length()) );
-    index = qAbs(index);
-
-    if(cycleAround || index < colors.size())
-        return baseColor;
-
-    const int batch = qFloor( qreal(index)/colors.size() );
-    const bool lighter = batch%2;
-    const int factor = 100+batch*50;
-    return lighter ? baseColor.lighter(factor) : baseColor.darker(factor);
-}
 
 #endif // STATISTICSREPORT_H
