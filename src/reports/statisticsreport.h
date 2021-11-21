@@ -45,15 +45,47 @@ public:
 
     bool requiresConfiguration() const { return true; }
 
-    Q_CLASSINFO("maxPresenceGraphs_FieldLabel", "Maximum Number Of Character & Location Presence Graphs")
-    Q_CLASSINFO("maxPresenceGraphs_FieldEditor", "IntegerSpinBox")
-    Q_CLASSINFO("maxPresenceGraphs_FieldMinValue", "1")
-    Q_CLASSINFO("maxPresenceGraphs_FieldMaxValue", "100")
-    Q_CLASSINFO("maxPresenceGraphs_FieldDefaultValue", "6")
-    Q_PROPERTY(int maxPresenceGraphs READ maxPresenceGraphs WRITE setMaxPresenceGraphs NOTIFY maxPresenceGraphsChanged)
-    void setMaxPresenceGraphs(int val);
-    int maxPresenceGraphs() const { return m_maxPresenceGraphs; }
-    Q_SIGNAL void maxPresenceGraphsChanged();
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldGroup", "Characters")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldLabel", "Maximum Number Of Characters")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldNote", "If one or more characters are explicitly picked, then preference is given to them.")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldEditor", "IntegerSpinBox")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldMinValue", "0")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldMaxValue", "500")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldDefaultValue", "6")
+    Q_PROPERTY(int maxCharacterPresenceGraphs READ maxCharacterPresenceGraphs WRITE setMaxCharacterPresenceGraphs NOTIFY maxCharacterPresenceGraphsChanged)
+    void setMaxCharacterPresenceGraphs(int val);
+    int maxCharacterPresenceGraphs() const { return m_maxCharacterPresenceGraphs; }
+    Q_SIGNAL void maxCharacterPresenceGraphsChanged();
+
+    Q_CLASSINFO("characterNames_FieldGroup", "Characters")
+    Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the presence graphs.")
+    Q_CLASSINFO("characterNames_FieldNote", "Leave it empty to let Scrite automatically pick from most active characters.")
+    Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
+    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
+    void setCharacterNames(const QStringList &val);
+    QStringList characterNames() const { return m_characterNames; }
+    Q_SIGNAL void characterNamesChanged();
+
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldGroup", "Locations")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldLabel", "Maximum Number Of Locations")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldNote", "If one or more locations are explicitly picked, then preference is given to them.")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldEditor", "IntegerSpinBox")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldMinValue", "0")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldMaxValue", "500")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldDefaultValue", "6")
+    Q_PROPERTY(int maxLocationPresenceGraphs READ maxLocationPresenceGraphs WRITE setMaxLocationPresenceGraphs NOTIFY maxLocationPresenceGraphsChanged)
+    void setMaxLocationPresenceGraphs(int val);
+    int maxLocationPresenceGraphs() const { return m_maxLocationPresenceGraphs; }
+    Q_SIGNAL void maxLocationPresenceGraphsChanged();
+
+    Q_CLASSINFO("locations_FieldGroup", "Locations")
+    Q_CLASSINFO("locations_FieldLabel", "Locations to include in the presence graphs.")
+    Q_CLASSINFO("locations_FieldNote", "Leave it empty to let Scrite automatically pick from most busy locations.")
+    Q_CLASSINFO("locations_FieldEditor", "MultipleLocationSelector")
+    Q_PROPERTY(QStringList locations READ locations WRITE setLocations NOTIFY locationsChanged)
+    void setLocations(const QStringList &val);
+    QStringList locations() const { return m_locations; }
+    Q_SIGNAL void locationsChanged();
 
     struct Distribution
     {
@@ -139,9 +171,12 @@ private:
     qreal m_pageHeight = 0;
     qreal m_lineHeight = 0;
     qreal m_scaleFactor = 1.0;
-    int m_maxPresenceGraphs = 6;
+    int m_maxLocationPresenceGraphs = 6;
+    int m_maxCharacterPresenceGraphs = 6;
     qreal m_paragraphsLength = 0; // usually smaller than pageHeight
     qreal m_millisecondsPerPixel = 0;
+    QStringList m_locations;
+    QStringList m_characterNames;
 };
 
 #endif // STATISTICSREPORT_H

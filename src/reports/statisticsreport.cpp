@@ -60,13 +60,40 @@ const QColor StatisticsReport::pickColor(int index, bool cycleAround, ColorGroup
     return lighter ? baseColor.lighter(factor) : baseColor.darker(factor);
 }
 
-void StatisticsReport::setMaxPresenceGraphs(int val)
+void StatisticsReport::setCharacterNames(const QStringList &val)
 {
-    if(m_maxPresenceGraphs == val)
+    if(m_characterNames == val)
         return;
 
-    m_maxPresenceGraphs = val;
-    emit maxPresenceGraphsChanged();
+    m_characterNames = val;
+    emit characterNamesChanged();
+}
+
+void StatisticsReport::setMaxLocationPresenceGraphs(int val)
+{
+    if(m_maxLocationPresenceGraphs == val)
+        return;
+
+    m_maxLocationPresenceGraphs = val;
+    emit maxLocationPresenceGraphsChanged();
+}
+
+void StatisticsReport::setLocations(const QStringList &val)
+{
+    if(m_locations == val)
+        return;
+
+    m_locations = val;
+    emit locationsChanged();
+}
+
+void StatisticsReport::setMaxCharacterPresenceGraphs(int val)
+{
+    if(m_maxCharacterPresenceGraphs == val)
+        return;
+
+    m_maxCharacterPresenceGraphs = val;
+    emit maxCharacterPresenceGraphsChanged();
 }
 
 QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool compact) const

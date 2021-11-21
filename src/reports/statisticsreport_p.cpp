@@ -219,8 +219,6 @@ StatisticsReportKeyNumbers::~StatisticsReportKeyNumbers()
 StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth, const StatisticsReport *report, QGraphicsItem *parent)
     :QGraphicsRectItem(parent)
 {
-    m_maxPresenceGraphs = report->maxPresenceGraphs();
-
     this->setRect(0, 0, suggestedWidth, 1300);
     this->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
     this->setPen(Qt::NoPen);
@@ -611,11 +609,17 @@ QList<QPair<QString, QList<int> > > StatisticsReportTimeline::evalCharacterPrese
 {
     const Structure *structure = report->document()->structure();
     const QStringList allCharacterNames = structure->characterNames();
+    const QStringList specificCharacterNames = report->characterNames();
+    const QStringList characterNames = specificCharacterNames.isEmpty() ? allCharacterNames : specificCharacterNames;
 
-    const QList<QPair<QString, QList<int> > > ret =
-            this->evalPresence(report, allCharacterNames, [](const Scene *scene, const QString &characterName) -> int {
+    QList<QPair<QString, QList<int> > > ret =
+            this->evalPresence(report, characterNames, [](const Scene *scene, const QString &characterName) -> int {
                 return scene->hasCharacter(characterName) ? scene->characterPresence(characterName) + 2 : 0;
             });
+    if(!specificCharacterNames.isEmpty())
+        ret = ret.mid(0, specificCharacterNames.size());
+    else if(report->maxCharacterPresenceGraphs() > 1)
+        ret = ret.mid(0, report->maxCharacterPresenceGraphs());
 
     return ret;
 }
@@ -624,15 +628,22 @@ QList<QPair<QString, QList<int> > > StatisticsReportTimeline::evalLocationPresen
 {
     const Structure *structure = report->document()->structure();
     const QStringList allLocations = structure->allLocations();
+    const QStringList specificLocations = report->locations();
+    const QStringList locations = specificLocations.isEmpty() ? allLocations : specificLocations;
 
     QString lastLocation;
-    const QList<QPair<QString, QList<int> > > ret =
-        this->evalPresence(report, allLocations, [&lastLocation](const Scene *scene, const QString &location) -> int {
+    QList<QPair<QString, QList<int> > > ret =
+        this->evalPresence(report, locations, [&lastLocation](const Scene *scene, const QString &location) -> int {
             const QString sceneLocation = scene->heading()->isEnabled() ? scene->heading()->location() : lastLocation;
             const int ret = sceneLocation == location ? 10 : 0;
             lastLocation = sceneLocation;
             return ret;
         });
+
+    if(!specificLocations.isEmpty())
+        ret = ret.mid(0, specificLocations.size());
+    else if(report->maxLocationPresenceGraphs() > 0)
+        ret = ret.mid(0, report->maxLocationPresenceGraphs());
 
     return ret;
 }
@@ -755,7 +766,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPa
 
     const qreal containerWidth = container->boundingRect().width();
     const qreal heightPerGraph = 40;
-    const int   nrGraphs = qMin(structure->characterNames().size(),m_maxPresenceGraphs);
+    const int   nrGraphs = presence.size();
     const QPointF sceneItemsBottomLeft = container->mapFromItem(sceneItemsContainer, sceneItemsContainer->boundingRect().bottomLeft());
     const QPointF containerBottomLeft = container->childrenBoundingRect().bottomLeft();
     const QPointF graphContainerPos(sceneItemsBottomLeft.x(), containerBottomLeft.y() + 20);

@@ -364,24 +364,36 @@ Item {
                 if(fieldInfo)
                     generator.setConfigurationValue(fieldInfo.name, characterNames)
             }
-            height: fieldTitleText.height + (characterNameListView.visible ? 275 : 0)
+            height: fieldTitleText.height + fieldLabelText.height + (characterNameListView.visible ? 275 : 10)
 
             onFieldInfoChanged: {
                 characterNameListView.selectedCharacters = generator.getConfigurationValue(fieldInfo.name)
                 characterNameListView.visible = characterNameListView.selectedCharacters.length === 0
             }
 
+            Text {
+                id: fieldLabelText
+                text: fieldInfo.label
+                width: parent.width
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
+                font.pointSize: app.idealFontPointSize
+            }
+
             Loader {
                 id: fieldTitleText
                 width: parent.width-30
+                anchors.top: fieldLabelText.bottom
+                anchors.topMargin: 10
                 sourceComponent: Flow {
                     spacing: 5
                     flow: Flow.LeftToRight
 
                     Text {
-                        id: sceneCharactersListHeading
-                        text: fieldInfo.label + ": "
-                        topPadding: 5
+                        id: charactersPrefix
+                        text: characterNames.length === 0 ? "No Characters Selected" : "»"
+                        topPadding: 0
                         bottomPadding: 5
                     }
 
@@ -411,8 +423,8 @@ Item {
 
                     Image {
                         source: "../icons/content/add_box.png"
-                        width: sceneCharactersListHeading.height
-                        height: sceneCharactersListHeading.height
+                        width: charactersPrefix.height
+                        height: charactersPrefix.height
                         opacity: 0.5
                         visible: !characterNameListView.visible
 
@@ -429,8 +441,8 @@ Item {
 
                     Image {
                         source: "../icons/content/clear_all.png"
-                        width: sceneCharactersListHeading.height
-                        height: sceneCharactersListHeading.height
+                        width: charactersPrefix.height
+                        height: charactersPrefix.height
                         opacity: 0.5
                         visible: characterNameListView.selectedCharacters.length > 0
 
@@ -480,9 +492,12 @@ Item {
                 spacing: 5
 
                 Text {
+                    text: fieldInfo.label
                     width: parent.width
                     wrapMode: Text.WordWrap
-                    text: fieldInfo.label
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
+                    font.pointSize: app.idealFontPointSize
                 }
 
                 Text {
@@ -495,7 +510,7 @@ Item {
 
                 ScrollView {
                     width: parent.width - 20
-                    height: 400
+                    height: 300
                     background: Rectangle {
                         color: primaryColors.c50.background
                         border.width: 1
@@ -941,7 +956,19 @@ Item {
 
             Text {
                 text: fieldInfo.name
+                width: parent.width
+                wrapMode: Text.WordWrap
                 font.capitalization: Font.Capitalize
+                font.pointSize: app.idealFontPointSize-2
+            }
+
+            Text {
+                text: fieldInfo.note
+                width: parent.width
+                wrapMode: Text.WordWrap
+                font.pointSize: app.idealFontPointSize-2
+                font.italic: true
+                visible: text !== ""
             }
 
             TextField2 {
@@ -971,6 +998,15 @@ Item {
                 maximumLineCount: 2
                 elide: Text.ElideRight
                 font.pointSize: app.idealFontPointSize
+            }
+
+            Text {
+                text: fieldInfo.note
+                width: parent.width
+                wrapMode: Text.WordWrap
+                font.pointSize: app.idealFontPointSize-2
+                font.italic: true
+                visible: text !== ""
             }
 
             SpinBox {

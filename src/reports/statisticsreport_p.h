@@ -67,9 +67,6 @@ private:
                                            const QGraphicsRectItem *sceneItems) const;
 
     QGraphicsRectItem *createSeparator(QGraphicsItem *container, const QString &label, const QColor &color) const;
-
-private:
-    int m_maxPresenceGraphs = 6;
 };
 
 class StatisticsReportDialogueActionRatio : public QGraphicsRectItem
