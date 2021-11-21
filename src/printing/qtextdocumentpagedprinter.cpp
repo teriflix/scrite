@@ -116,15 +116,16 @@ void HeaderFooter::prepare(const QMap<Field, QString> &fieldValues, const QRectF
         fm.horizontalAdvance(m_columns[1].content),
         fm.horizontalAdvance(m_columns[2].content)
     };
-    qreal totalSize = colSizes[0] + colSizes[1] + colSizes[2];
-    if( qFuzzyIsNull(totalSize) )
-        totalSize = rect.width();
+
+    const qreal sideColumnWidth = qMin( qMax(colSizes[0], colSizes[2]), rect.width() * 0.4 );
+    const qreal middleColumnWidth = rect.width() - 2*sideColumnWidth;
+    const qreal columnWidths[] = {sideColumnWidth, middleColumnWidth, sideColumnWidth};
 
     // Lets distribute the space available in the ratio of sizes
     for(int i=0; i<3; i++)
     {
          QRectF colRect = rect;
-         colRect.setWidth( (colSizes[i]/totalSize)*rect.width() );
+         colRect.setWidth( columnWidths[i] );
          if(i > 0)
              colRect.moveLeft(m_columns[i-1].columnRect.right());
          m_columns[i].columnRect = colRect;

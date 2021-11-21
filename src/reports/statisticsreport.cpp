@@ -516,7 +516,7 @@ bool StatisticsReport::directPrintToPdf(QPdfWriter *pdfWriter)
     StatisticsReportPage scene(this);
     scene.setWatermark(this->watermark());
     scene.setComment(this->comment());
-    scene.addStandardItems(StatisticsReportPage::WatermarkOverlayLayer|StatisticsReportPage::HeaderFooterLayer);
+    scene.addStandardItems(StatisticsReportPage::WatermarkOverlayLayer|StatisticsReportPage::FooterLayer|StatisticsReportPage::DontIncludeScriteLink);
     scene.setTitle(screenplay->title() + QStringLiteral(" - Statistics"));
     const bool ret = scene.exportToPdf(pdfWriter);
     return ret;

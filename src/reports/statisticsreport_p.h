@@ -55,16 +55,16 @@ private:
 
     QGraphicsRectItem *createCharacterPresenceGraph(const StatisticsReport *report,
                                                     QGraphicsItem *container,
-                                                    const QGraphicsRectItem *sceneItemsContainer);
+                                                    const QGraphicsRectItem *sceneItemsContainer) const;
     QGraphicsRectItem *createLocationPresenceGraph(const StatisticsReport *report,
                                                    QGraphicsItem *container,
-                                                   const QGraphicsRectItem *sceneItemsContainer);
+                                                   const QGraphicsRectItem *sceneItemsContainer) const;
     QGraphicsRectItem *createPresenceGraph(const QList< QPair<QString, QList<int> > > &presence,
                                            std::function<QColor(const QString &)> evalColorFunc,
                                            std::function<QString(const QString &, const QList<int>&)> evalLabelFunc,
                                            const StatisticsReport *report,
                                            QGraphicsItem *container,
-                                           const QGraphicsRectItem *sceneItems);
+                                           const QGraphicsRectItem *sceneItems) const;
 
     QGraphicsRectItem *createSeparator(QGraphicsItem *container, const QString &label, const QColor &color) const;
 
@@ -103,6 +103,13 @@ public:
 
 private:
     QFont m_font;
+};
+
+class StatisticsReportHeaderItem : public QGraphicsRectItem
+{
+public:
+    StatisticsReportHeaderItem(const StatisticsReport *report, qreal containerWidth);
+    ~StatisticsReportHeaderItem();
 };
 
 #endif // STATISTICSREPORT_P_H

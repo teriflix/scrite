@@ -46,10 +46,13 @@ public:
 
     enum StandardItems
     {
-        HeaderFooterLayer = 1,
-        WatermarkUnderlayLayer = 2,
-        WatermarkOverlayLayer = 4,
-        HeaderFooterAndWatermarkUnderlay = 3
+        HeaderLayer = 1,
+        FooterLayer = 2,
+        HeaderFooterLayer = 3,
+        WatermarkUnderlayLayer = 4,
+        WatermarkOverlayLayer = 8,
+        HeaderFooterAndWatermarkUnderlay = 7,
+        DontIncludeScriteLink = 16
     };
     void addStandardItems(int items=HeaderFooterAndWatermarkUnderlay);
 

@@ -28,6 +28,14 @@
 #include <QStackedBarSeries>
 #include <QGraphicsBlurEffect>
 
+/**
+ * Note from Prashanth:
+ * The code in this file (and its header) could be cleaner. I do hope
+ * to get around to cleaning it up sometime. I wrote this quickly, just
+ * to get this stats report feature out for the 0.8 release. It works, but
+ * not as modular and maintanable as I would like it to be.
+ */
+
 template <class Key, class Value>
 class SequentialMap
 {
@@ -98,30 +106,43 @@ inline static QString timeToString(const QTime &time, bool inclSecs=false)
     return timeComps.isEmpty() ? QStringLiteral("0m") : timeComps.join(QStringLiteral(" "));
 }
 
-StatisticsReportPage::StatisticsReportPage(StatisticsReport *parent)
-    :PdfExportableGraphicsScene(parent)
+StatisticsReportPage::StatisticsReportPage(StatisticsReport *report)
+    :PdfExportableGraphicsScene(report)
 {
     auto ir = [](const QGraphicsItem *item) {
         return item->mapToScene(item->boundingRect()).boundingRect();
     };
 
-    StatisticsReportKeyNumbers *keyNumbers = new StatisticsReportKeyNumbers(parent);
+    StatisticsReportKeyNumbers *keyNumbers = new StatisticsReportKeyNumbers(report);
     keyNumbers->setPos(0, 0);
     this->addItem(keyNumbers);
 
-    StatisticsReportDialogueActionRatio *dialogueActionPieChart = new StatisticsReportDialogueActionRatio(parent);
+    StatisticsReportDialogueActionRatio *dialogueActionPieChart = new StatisticsReportDialogueActionRatio(report);
     dialogueActionPieChart->setPos(ir(keyNumbers).bottomLeft() + QPointF(0,20));
     this->addItem(dialogueActionPieChart);
 
-    StatisticsReportSceneHeadingStats *headingStats = new StatisticsReportSceneHeadingStats(parent);
+    StatisticsReportSceneHeadingStats *headingStats = new StatisticsReportSceneHeadingStats(report);
     headingStats->setPos(ir(dialogueActionPieChart).topRight() + QPointF(20,0));
     this->addItem(headingStats);
 
     QRectF brect = this->itemsBoundingRect();
 
-    StatisticsReportTimeline *actLengths = new StatisticsReportTimeline(brect.width(), parent);
+    StatisticsReportTimeline *actLengths = new StatisticsReportTimeline(brect.width(), report);
     actLengths->setPos(brect.bottomLeft());
     this->addItem(actLengths);
+
+    QGraphicsRectItem *headerItem = new StatisticsReportHeaderItem(report, brect.width());
+    QRectF headerItemRect = headerItem->boundingRect();
+    headerItemRect.moveBottomLeft(brect.topLeft());
+    headerItem->setPos(headerItemRect.topLeft());
+    this->addItem(headerItem);
+
+    brect = this->itemsBoundingRect().adjusted(0, 0, 0, 20);
+
+    QGraphicsLineItem *footerSeparator = new QGraphicsLineItem;
+    footerSeparator->setLine( QLineF(brect.bottomLeft(), brect.bottomRight()) );
+    footerSeparator->setPen(QPen(Qt::gray));
+    this->addItem(footerSeparator);
 }
 
 StatisticsReportPage::~StatisticsReportPage()
@@ -434,6 +455,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     struct SceneInfo
     {
         int index = -1;
+        QColor color;
         QString sceneNumber;
         qreal pixelLength = 0;
         qreal pageLength = 0;
@@ -462,6 +484,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
         {
             info.index = ++sceneIndex;
             info.sceneNumber = sceneElements.at(i)->resolvedSceneNumber();
+            info.color = scene->color();
         }
         info.pixelLength += report->pixelLength(scene);
         info.nrCharacters += scene->characterNames().size();
@@ -519,13 +542,12 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
         const SceneInfo &sceneInfo = sceneInfos[i];
 
         QGraphicsRectItem *labelBg = new QGraphicsRectItem(labelsItem);
-        labelBg->setOpacity(0.75);
-        labelBg->setBrush(StatisticsReport::pickColor(i,true,StatisticsReport::Location));
+        labelBg->setOpacity(0.35);
+        labelBg->setBrush(sceneInfo.color);
         labelBg->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren);
 
         QGraphicsSimpleTextItem *labelText = new QGraphicsSimpleTextItem(labelBg);
         labelText->setText(sceneInfo.label);
-        labelText->setBrush(Application::textColorFor(labelBg->brush().color()));
 
         QRectF labelRect = labelText->boundingRect();
         labelRect.adjust(-5, -3, 5, 3);
@@ -546,7 +568,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
         const SceneInfo &sceneInfo = sceneInfos[i];
 
         QPen pen;
-        pen.setColor(StatisticsReport::pickColor(i,true,StatisticsReport::Location));
+        pen.setColor(Application::isLightColor(sceneInfo.color) ? sceneInfo.color.darker() : sceneInfo.color);
         pen.setJoinStyle(Qt::RoundJoin);
 
         QGraphicsPathItem *lineItem = new QGraphicsPathItem(labelsItem);
@@ -641,7 +663,7 @@ QList<QPair<QString, QList<int> > > StatisticsReportTimeline::evalPresence(const
     return ret;
 }
 
-QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(const StatisticsReport *report, QGraphicsItem *container, const QGraphicsRectItem *sceneItemsContainer)
+QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(const StatisticsReport *report, QGraphicsItem *container, const QGraphicsRectItem *sceneItemsContainer) const
 {
     const Structure *structure = report->document()->structure();
     const QList<QPair<QString, QList<int> > > characterPresence = this->evalCharacterPresence(report);
@@ -689,7 +711,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(const 
     return this->createPresenceGraph(characterPresence, evalCharacterColor, evalCharacterLabel, report, container, sceneItemsContainer);
 }
 
-QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(const StatisticsReport *report, QGraphicsItem *container, const QGraphicsRectItem *sceneItemsContainer)
+QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(const StatisticsReport *report, QGraphicsItem *container, const QGraphicsRectItem *sceneItemsContainer) const
 {
     const QList<QPair<QString, QList<int> > > locationPresence = this->evalLocationPresence(report);
 
@@ -725,7 +747,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPa
                                                                  std::function<QString(const QString &, const QList<int>&)> evalLabelFunc,
                                                                  const StatisticsReport *report,
                                                                  QGraphicsItem *container,
-                                                                 const QGraphicsRectItem *sceneItemsContainer)
+                                                                 const QGraphicsRectItem *sceneItemsContainer) const
 {
     const Structure *structure = report->document()->structure();
     if(presence.isEmpty())
@@ -1273,4 +1295,85 @@ void StatisticsReportGraphVLegend::add(const QColor &color, const QString &label
     }
 
     this->setRect(this->childrenBoundingRect());
+}
+
+StatisticsReportHeaderItem::StatisticsReportHeaderItem(const StatisticsReport *report, qreal containerWidth)
+    :QGraphicsRectItem(nullptr)
+{
+    this->setBrush(Qt::NoBrush);
+    this->setPen(Qt::NoPen);
+
+    const QString title = report->document()->screenplay()->title();
+    const QString subtitle = QStringLiteral("Key Statistics");
+
+    const qreal maxTitleWidth = containerWidth * 0.35;
+
+    QFont titleFont = Application::font();
+    titleFont.setPointSize(24);
+    titleFont.setBold(true);
+
+    const QFontMetricsF titleFontMetrics(titleFont);
+    const qreal actualTitleWidth = titleFontMetrics.width(title);
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
+    titleText->setTextWidth(qMin(actualTitleWidth,maxTitleWidth));
+    titleText->setFont(titleFont);
+    titleText->setPlainText(title);
+    titleText->document()->setDocumentMargin(0);
+
+    QFont subtitleFont = Application::font();
+    subtitleFont.setPointSize(14);
+    subtitleFont.setBold(true);
+
+    const QFontMetricsF subtitleFontMetrics(subtitleFont);
+
+    const QPointF subtitleTextBottomLeft = this->childrenBoundingRect().bottomRight() + QPointF(20, 0);
+
+    QGraphicsTextItem *subtitleText = new QGraphicsTextItem(this);
+    subtitleText->setFont(subtitleFont);
+    subtitleText->setPlainText(subtitle);
+    subtitleText->setOpacity(0.75);
+    subtitleText->document()->setDocumentMargin(0);
+
+    QRectF subtitleTextRect = subtitleText->boundingRect();
+    subtitleTextRect.moveBottomLeft(subtitleTextBottomLeft);
+    subtitleTextRect.moveBottom( subtitleTextRect.bottom()-(titleFontMetrics.descent()-subtitleFontMetrics.descent()) );
+    subtitleText->setPos(subtitleTextRect.topLeft());
+
+    const QRectF subtitleRect = subtitleText->mapToParent(subtitleText->boundingRect()).boundingRect();
+
+    QGraphicsLineItem *separator = new QGraphicsLineItem(this);
+    separator->setLine( QLineF(subtitleRect.topLeft()-QPointF(10,0), subtitleRect.bottomLeft()-QPointF(10,0)) );
+    separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
+    separator->setOpacity(0.75);
+
+    {
+        const QPixmap scriteLogo(QStringLiteral(":/images/scrite_logo_for_report_header.png"));
+        const qreal scale = this->childrenBoundingRect().height() / scriteLogo.height();
+
+        QRectF scriteLogoRect( QPointF(0,0), QSizeF(scriteLogo.size())*scale );
+        scriteLogoRect.moveRight(containerWidth);
+        scriteLogoRect.moveBottom(this->childrenBoundingRect().bottom());
+
+        QGraphicsPixmapItem *scriteLogoItem = new QGraphicsPixmapItem(this);
+        scriteLogoItem->setPixmap(scriteLogo);
+        scriteLogoItem->setPos(scriteLogoRect.topLeft());
+        scriteLogoItem->setScale(scale);
+    }
+
+    {
+        QRectF cbrect = this->childrenBoundingRect();
+        cbrect.setHeight( cbrect.height() + 20 );
+
+        QGraphicsLineItem *separator = new QGraphicsLineItem(this);
+        separator->setLine( QLineF(cbrect.bottomLeft(), cbrect.bottomRight()) );
+        separator->setPen(QPen(Qt::gray));
+    }
+
+    this->setRect(this->childrenBoundingRect().adjusted(0, 0, 0, 20));
+}
+
+StatisticsReportHeaderItem::~StatisticsReportHeaderItem()
+{
+
 }

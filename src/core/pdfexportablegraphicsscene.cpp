@@ -130,17 +130,20 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
 
     QRectF contentsRect = this->itemsBoundingRect();
 
-    QGraphicsSimpleTextItem *appInfoItem = new QGraphicsSimpleTextItem;
-    appInfoItem->setText( QStringLiteral("Created using Scrite (www.scrite.io)") );
-    appInfoItem->setZValue(999);
+    if( !(items & DontIncludeScriteLink) )
+    {
+        QGraphicsSimpleTextItem *appInfoItem = new QGraphicsSimpleTextItem;
+        appInfoItem->setText( QStringLiteral("Created using Scrite (www.scrite.io)") );
+        appInfoItem->setZValue(999);
 
-    QRectF appInfoRect = appInfoItem->boundingRect();
-    appInfoRect.moveCenter(contentsRect.center());
-    appInfoRect.moveTop(contentsRect.bottom() + 50);
-    appInfoItem->setPos(appInfoRect.topLeft());
-    this->addItem(appInfoItem);
+        QRectF appInfoRect = appInfoItem->boundingRect();
+        appInfoRect.moveCenter(contentsRect.center());
+        appInfoRect.moveTop(contentsRect.bottom() + 50);
+        appInfoItem->setPos(appInfoRect.topLeft());
+        this->addItem(appInfoItem);
 
-    contentsRect = this->itemsBoundingRect();
+        contentsRect = this->itemsBoundingRect();
+    }
 
     QMap<HeaderFooter::Field,QString> fields;
     if(items & HeaderFooterLayer)
@@ -164,12 +167,12 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         fields[HeaderFooter::PageNumberOfCount] = QStringLiteral("1/1");
     }
 
-    HeaderFooter *header = (items & HeaderFooterLayer) ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
-    HeaderFooter *footer = (items & HeaderFooterLayer) ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
+    HeaderFooter *header = (items & HeaderLayer) ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
+    HeaderFooter *footer = (items & FooterLayer) ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
     Watermark *watermark = ((items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer)) ? new Watermark(this) : nullptr;
     QTextDocumentPagedPrinter::loadSettings(header, footer, watermark);
 
-    if(items & HeaderFooterLayer)
+    if(items & HeaderLayer)
     {
         QRectF headerRect = contentsRect;
         headerRect.setHeight(40);
@@ -178,7 +181,10 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         headerItem->setRect(headerRect);
         headerItem->setZValue(999);
         this->addItem(headerItem);
+    }
 
+    if(items & FooterLayer)
+    {
         QRectF footerRect = contentsRect;
         footerRect.setHeight(40);
         footerRect.moveTop(contentsRect.bottom());
