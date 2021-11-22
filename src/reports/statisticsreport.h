@@ -46,9 +46,17 @@ public:
 
     bool requiresConfiguration() const { return true; }
 
+    Q_CLASSINFO("includeCharacterPresenceGraphs_FieldGroup", "Basic")
+    Q_CLASSINFO("includeCharacterPresenceGraphs_FieldLabel", "Include character presense graphs.")
+    Q_CLASSINFO("includeCharacterPresenceGraphs_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeCharacterPresenceGraphs READ isIncludeCharacterPresenceGraphs WRITE setIncludeCharacterPresenceGraphs NOTIFY includeCharacterPresenceGraphsChanged)
+    void setIncludeCharacterPresenceGraphs(bool val);
+    bool isIncludeCharacterPresenceGraphs() const { return m_includeCharacterPresenceGraphs; }
+    Q_SIGNAL void includeCharacterPresenceGraphsChanged();
+
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldGroup", "Characters")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldLabel", "Maximum Number Of Characters")
-    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldNote", "If one or more characters are explicitly picked, then preference is given to them.")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldNote", "Value of ZERO, means you need all character's graphs plotted. If one or more characters are explicitly picked, then preference is given to them.")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldEditor", "IntegerSpinBox")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldMinValue", "0")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldMaxValue", "500")
@@ -67,9 +75,17 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_CLASSINFO("includeLocationPresenceGraphs_FieldGroup", "Basic")
+    Q_CLASSINFO("includeLocationPresenceGraphs_FieldLabel", "Include location presense graphs.")
+    Q_CLASSINFO("includeLocationPresenceGraphs_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeLocationPresenceGraphs READ isIncludeLocationPresenceGraphs WRITE setIncludeLocationPresenceGraphs NOTIFY includeLocationPresenceGraphsChanged)
+    void setIncludeLocationPresenceGraphs(bool val);
+    bool isIncludeLocationPresenceGraphs() const { return m_includeLocationPresenceGraphs; }
+    Q_SIGNAL void includeLocationPresenceGraphsChanged();
+
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldGroup", "Locations")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldLabel", "Maximum Number Of Locations")
-    Q_CLASSINFO("maxLocationPresenceGraphs_FieldNote", "If one or more locations are explicitly picked, then preference is given to them.")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldNote", "Value of ZERO, means you need all location's graphs plotted. If one or more locations are explicitly picked, then preference is given to them.")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldEditor", "IntegerSpinBox")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldMinValue", "0")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldMaxValue", "500")
@@ -178,6 +194,8 @@ private:
     qreal m_millisecondsPerPixel = 0;
     QStringList m_locations;
     QStringList m_characterNames;
+    bool m_includeLocationPresenceGraphs = true;
+    bool m_includeCharacterPresenceGraphs = true;
 };
 
 #endif // STATISTICSREPORT_H

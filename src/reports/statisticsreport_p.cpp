@@ -266,10 +266,17 @@ StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth, const S
     }
 
     this->createScenePullouts(report, container, sceneItemsContainer);
-    this->createSeparator(container, QStringLiteral("Character Presence"), StatisticsReport::pickColor(0));
-    this->createCharacterPresenceGraph(report, container, sceneItemsContainer);
-    this->createSeparator(container, QStringLiteral("Location Presence"), StatisticsReport::pickColor(0,false,StatisticsReport::Location));
-    this->createLocationPresenceGraph(report, container, sceneItemsContainer);
+    if(report->isIncludeCharacterPresenceGraphs())
+    {
+        this->createSeparator(container, QStringLiteral("Character Presence"), StatisticsReport::pickColor(0));
+        this->createCharacterPresenceGraph(report, container, sceneItemsContainer);
+    }
+
+    if(report->isIncludeLocationPresenceGraphs())
+    {
+        this->createSeparator(container, QStringLiteral("Location Presence"), StatisticsReport::pickColor(0,false,StatisticsReport::Location));
+        this->createLocationPresenceGraph(report, container, sceneItemsContainer);
+    }
 
     QRectF containerItemsRect = container->childrenBoundingRect();
     containerItemsRect.moveTopLeft(QPointF(0,0));

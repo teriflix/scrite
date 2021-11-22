@@ -24,7 +24,7 @@ Item {
     property var formInfo: {"title": "Unknown", "description": "", "groupedFields": []}
 
     width: 750
-    height: formInfo.fields.length > 0 ? 700 : 275
+    height: formInfo.fields.length > 0 ? 720 : 275
     readonly property color dialogColor: primaryColors.c300.background
 
     Component.onCompleted: {
@@ -918,6 +918,7 @@ Item {
             property var fieldInfo
             text: fieldInfo.label
             checkable: true
+            font.pointSize: app.idealFontPointSize
             checked: generator ? generator.getConfigurationValue(fieldInfo.name) : false
             onToggled: generator ? generator.setConfigurationValue(fieldInfo.name, checked) : false
         }
@@ -989,7 +990,7 @@ Item {
 
         Column {
             property var fieldInfo
-            spacing: 10
+            spacing: 6
 
             Text {
                 text: fieldInfo.label
@@ -1002,9 +1003,9 @@ Item {
 
             Text {
                 text: fieldInfo.note
-                width: parent.width
+                width: parent.width-10
                 wrapMode: Text.WordWrap
-                font.pointSize: app.idealFontPointSize-2
+                font.pointSize: app.idealFontPointSize-4
                 font.italic: true
                 visible: text !== ""
             }
