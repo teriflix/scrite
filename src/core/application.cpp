@@ -1168,7 +1168,7 @@ QPointF Application::globalMousePosition() const
     return QCursor::pos();
 }
 
-QString Application::camelCased(const QString &val) const
+QString Application::camelCased(const QString &val)
 {
 //    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
 //        return val;

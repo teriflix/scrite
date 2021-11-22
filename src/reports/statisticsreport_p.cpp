@@ -258,6 +258,13 @@ StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth, const S
     }
 
     QGraphicsRectItem *sceneItemsContainer = prevItem;
+    QGraphicsRectItem *tracksItem = this->createScreenplayTracks(report, container, 40, totalPixelLength);
+    if(tracksItem != nullptr)
+    {
+        tracksItem->setPos(sceneItemsContainer->pos());
+        sceneItemsContainer->setPos( tracksItem->pos() + tracksItem->boundingRect().bottomLeft() + QPointF(0,10) );
+    }
+
     this->createScenePullouts(report, container, sceneItemsContainer);
     this->createSeparator(container, QStringLiteral("Character Presence"), StatisticsReport::pickColor(0));
     this->createCharacterPresenceGraph(report, container, sceneItemsContainer);
@@ -434,6 +441,274 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRe
     return itemsLayout;
 }
 
+QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const StatisticsReport *report, QGraphicsRectItem *container, qreal heightHint, qreal totalPixelLength)
+{
+    // We are not using ScreenplayTracks here, because
+    // ScreenplayTracks is meant to be used only as a model with the timeline.
+    // The data that it gives is not sufficient for use with this report.
+    struct BeatTrack
+    {
+        QString tag;
+        struct {
+            qreal from = 0;
+            qreal to = 0;
+        } pixel;
+        QTime timeLength;
+        int sceneIndex = -1;
+    };
+    QList<BeatTrack> overlappingTracks;
+
+    const Screenplay *screenplay = report->document()->screenplay();
+    const QList<ScreenplayElement*> sceneElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
+        return e->scene() != nullptr;
+    });
+
+    qreal currentPixel = 0;
+    int currentSceneIndex = -1;
+
+    auto addBeatTrack = [&](const QString &tag, qreal pixelLength) -> BeatTrack & {
+        for(int i=overlappingTracks.size()-1; i>=0; i--) {
+            BeatTrack &track = overlappingTracks[i];
+            if(track.tag == tag && qAbs(track.sceneIndex-currentSceneIndex) == 1) {
+                track.sceneIndex = currentSceneIndex;
+                track.pixel.to += pixelLength;
+                track.timeLength = report->pixelLengthToTime(track.pixel.to-track.pixel.from);
+                return track;
+            }
+        }
+
+        BeatTrack track;
+        track.tag = tag;
+        track.sceneIndex = currentSceneIndex;
+        track.pixel.from = currentPixel;
+        track.pixel.to = currentPixel + pixelLength;
+        track.timeLength = report->pixelLengthToTime(track.pixel.to-track.pixel.from);
+        overlappingTracks.append(track);
+        return overlappingTracks.last();
+    };
+
+    for(auto sceneElement : sceneElements)
+    {
+        ++currentSceneIndex;
+        const Scene *scene = sceneElement->scene();
+        const qreal pixelLength = report->pixelLength(sceneElement);
+
+        const QStringList tags = scene->groups();
+        for(const QString &tag : tags)
+            addBeatTrack(tag, pixelLength);
+
+        currentPixel += pixelLength;
+    }
+
+    if(overlappingTracks.isEmpty())
+        return nullptr;
+
+    QList< QList<BeatTrack> > distinctTracks;
+    distinctTracks << QList<BeatTrack>();
+
+    for(const auto & track : qAsConst(overlappingTracks))
+    {
+        bool trackAdded = false;
+
+        for(auto & tracks : distinctTracks)
+        {
+            bool trackOverlaps = false;
+            for(auto & item : tracks)
+            {
+                if( (track.pixel.from >= item.pixel.from && track.pixel.from < item.pixel.to) ||
+                    (track.pixel.to >= item.pixel.from && track.pixel.to < item.pixel.to) )
+                {
+                    trackOverlaps = true;
+                    break;
+                }
+            }
+
+            if(!trackOverlaps)
+            {
+                tracks.append(track);
+                trackAdded = true;
+                break;
+            }
+        }
+
+        if(!trackAdded)
+        {
+            QList<BeatTrack> newTrack;
+            newTrack << track;
+            distinctTracks.append(newTrack);
+        }
+    }
+
+    const QPointF tracksContainerPos = container->childrenBoundingRect().bottomLeft();
+    const qreal containerWidth = container->boundingRect().width();
+
+    QGraphicsRectItem *tracksContainer = new QGraphicsRectItem(container);
+    tracksContainer->setBrush(Qt::NoBrush);
+    tracksContainer->setPen(Qt::NoPen);
+    tracksContainer->setPos(tracksContainerPos);
+    tracksContainer->setRect(QRectF(0,0,containerWidth,heightHint*distinctTracks.size()));
+
+    QFont smallFont = Application::font();
+    smallFont.setPointSize(8);
+
+    QList<QStringList> numberedBeats;
+
+    int trackNr = 0;
+    qreal trackItemY = 0;
+    for(const auto &tracks : qAsConst(distinctTracks))
+    {
+        bool firstTrack = true;
+        for(const auto &track : tracks)
+        {
+            QGraphicsRectItem *trackItem = new QGraphicsRectItem(tracksContainer);
+            trackItem->setBrush(StatisticsReport::pickColor(trackNr++,false,StatisticsReport::Beat));
+            trackItem->setPen(Qt::NoPen);
+            trackItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+
+            QRectF rect(0, trackItemY, 0, heightHint);
+            rect.setLeft(containerWidth*(track.pixel.from/totalPixelLength));
+            rect.setRight(containerWidth*(track.pixel.to/totalPixelLength));
+            trackItem->setRect( QRectF(0,0,rect.width(),rect.height()) );
+            trackItem->setPos( rect.topLeft() );
+
+            QPainterPath trackBorderPath;
+            trackBorderPath.moveTo(trackItem->boundingRect().topLeft());
+            trackBorderPath.lineTo(trackItem->boundingRect().topRight());
+            trackBorderPath.lineTo(trackItem->boundingRect().bottomRight());
+            trackBorderPath.lineTo(trackItem->boundingRect().bottomLeft());
+            if(firstTrack)
+                trackBorderPath.closeSubpath();
+
+            QGraphicsPathItem *trackBorderItem = new QGraphicsPathItem(trackItem);
+            trackBorderItem->setPath(trackBorderPath);
+            trackBorderItem->setBrush(Qt::NoBrush);
+            trackBorderItem->setPen( QPen(trackItem->brush().color().darker(),1,Qt::SolidLine,Qt::RoundCap,Qt::MiterJoin) );
+
+            const QString text = Application::camelCased(track.tag.section(QStringLiteral("/"),1).section(QStringLiteral("("),0,0));
+            const QString timeString = ::timeToString(track.timeLength);
+            const QString percent = QString::number(qRound( 100*(track.pixel.to-track.pixel.from)/totalPixelLength )) + QStringLiteral("%");
+            const QString labelHtml = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2 - %3</font></center>")
+                    .arg(text, timeString, percent);
+
+            QGraphicsTextItem *label = new QGraphicsTextItem(trackItem);
+            label->setHtml(labelHtml);
+            label->setDefaultTextColor(Application::textColorFor(trackItem->brush().color()));
+
+            QRectF labelRect = label->boundingRect();
+            if(labelRect.width() > trackItem->rect().width())
+            {
+                const QString labelHtml2 = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
+                        .arg(text, timeString);
+                label->setHtml(labelHtml2);
+                labelRect = label->boundingRect();
+            }
+            if(labelRect.width() > trackItem->rect().width())
+            {
+                const QString labelHtml3 = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
+                        .arg(text, percent);
+                label->setHtml(labelHtml3);
+                labelRect = label->boundingRect();
+            }
+            if(labelRect.width() > trackItem->rect().width())
+            {
+                label->setPlainText(text);
+                labelRect = label->boundingRect();
+            }
+
+            if(labelRect.width() > trackItem->rect().width())
+            {
+                label->setFont(smallFont);
+                label->setPlainText( QString::number(trackNr) );
+                labelRect = label->boundingRect();
+
+                numberedBeats << QStringList({QString::number(trackNr)+QStringLiteral(": "),text,timeString,percent});
+            }
+
+            if(labelRect.width() > trackItem->rect().width())
+                label->setVisible(false);
+            else
+            {
+                labelRect.moveCenter(trackItem->boundingRect().center());
+                label->setPos(labelRect.topLeft());
+            }
+
+            firstTrack = false;
+        }
+
+        trackItemY += heightHint;
+    }
+
+    if(numberedBeats.isEmpty())
+        return tracksContainer;
+
+    const QFontMetricsF fontMetrics(Application::font());
+
+    QVector<qreal> colWidths({0,0,0,0});
+    for(const auto &row : qAsConst(numberedBeats))
+    {
+        for(int i=0; i<row.size(); i++)
+            colWidths[i] = qMax(colWidths[i], fontMetrics.horizontalAdvance(row[i])+fontMetrics.averageCharWidth());
+    }
+
+    qreal tableWidth = std::accumulate(colWidths.begin(), colWidths.end(), 0.0);
+    const int nrTables = qMax(1, qFloor(containerWidth/tableWidth)-1);
+    const qreal tableXStep = containerWidth/nrTables;
+
+    int tableIndex = 0;
+    qreal tableRowY = (tracksContainer->boundingRect().bottomLeft() + QPointF(0,10)).y();
+
+    for(const auto &row : qAsConst(numberedBeats))
+    {
+        qreal tableRowX = tableIndex * tableXStep + (tableXStep-tableWidth)/2;
+        for(int i=0; i<row.size(); i++)
+        {
+            const QString text = row.at(i);
+            const QRectF tableCellRect(tableRowX, tableRowY, colWidths[i], fontMetrics.lineSpacing());
+
+            QGraphicsSimpleTextItem *cellText = new QGraphicsSimpleTextItem(tracksContainer);
+            cellText->setFont(Application::font());
+            cellText->setText(text);
+
+            QRectF cellTextRect = cellText->boundingRect();
+            cellTextRect.moveCenter(tableCellRect.center());
+            if(i)
+                cellTextRect.moveLeft(tableCellRect.left());
+            else
+                cellTextRect.moveRight(tableCellRect.right());
+            cellText->setPos(cellTextRect.topLeft());
+
+            tableRowX += tableCellRect.width();
+        }
+
+        tableIndex  = (tableIndex+1)%nrTables;
+        if(tableIndex == 0)
+            tableRowY += fontMetrics.lineSpacing();
+    }
+
+    tableRowY += fontMetrics.lineSpacing();
+
+    for(int i=1; i<nrTables; i++)
+    {
+        const qreal lineY1 = (tracksContainer->boundingRect().bottomLeft() + QPointF(0,10)).y();
+        const qreal lineY2 = tableRowY;
+        const qreal lineX  = i*tableXStep;
+
+        QGraphicsLineItem *lineItem = new QGraphicsLineItem(tracksContainer);
+        lineItem->setLine(lineX, lineY1, lineX, lineY2);
+
+        QPen pen;
+        pen.setColor(Qt::black);
+        pen.setStyle(Qt::DashDotDotLine);
+        lineItem->setPen(pen);
+    }
+
+    QRectF tracksContainerRect = tracksContainer->rect();
+    tracksContainerRect.setHeight(tableRowY);
+    tracksContainer->setRect(tracksContainerRect);
+
+    return tracksContainer;
+}
+
 qreal StatisticsReportTimeline::evalPixelLength(const QList<StatisticsReport::Distribution> &dist) const
 {
     qreal ret = 0;
@@ -513,14 +788,20 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
         return a.nrCharacters < b.nrCharacters;
     });
 
-    SceneInfo leastCrowdedScene = sceneInfos.first();
+    SceneInfo leastCrowdedScene = sceneInfos.isEmpty() ? SceneInfo() : sceneInfos.first();
     leastCrowdedScene.label = leastCrowdedScene.makeLabel(QStringLiteral("Least Crowded Scene"));
 
-    SceneInfo mostCrowdedScene = sceneInfos.last();
+    SceneInfo mostCrowdedScene = sceneInfos.isEmpty() ? SceneInfo() : sceneInfos.last();
     mostCrowdedScene.label = mostCrowdedScene.makeLabel(QStringLiteral("Most Crowded Scene"));
 
     // Now prepare to render these labels from left-to-right
     sceneInfos = QVector<SceneInfo>({shortestScene,longestScene,mostCrowdedScene,leastCrowdedScene});
+    for(int i=sceneInfos.size()-1; i>=0; i--)
+    {
+        const SceneInfo &sceneInfo = sceneInfos[i];
+        if(sceneInfo.index < 0)
+            sceneInfos.removeAt(i);
+    }
     std::sort(sceneInfos.begin(), sceneInfos.end(), [](const SceneInfo &a, const SceneInfo &b) {
         return a.index < b.index;
     });
@@ -538,6 +819,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     for(int i=0; i<sceneInfos.size(); i++)
     {
         const SceneInfo &sceneInfo = sceneInfos[i];
+        if(sceneInfo.index < 0)
+            continue;
 
         QGraphicsRectItem *labelBg = new QGraphicsRectItem(labelsItem);
         labelBg->setOpacity(0.35);
@@ -564,6 +847,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     for(int i=0; i<sceneInfos.size(); i++)
     {
         const SceneInfo &sceneInfo = sceneInfos[i];
+        if(sceneInfo.index < 0)
+            continue;
 
         QPen pen;
         pen.setColor(Application::isLightColor(sceneInfo.color) ? sceneInfo.color.darker() : sceneInfo.color);

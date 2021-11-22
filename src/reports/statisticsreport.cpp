@@ -41,6 +41,13 @@ const QVector<QColor> StatisticsReport::colors(ColorGroup group)
 {
     if(group == Character)
         return QVector<QColor>({ QColor("#5e368a"), QColor("#e8bf5a") });
+    if(group == Beat)
+        return QVector<QColor>({ QColor("#CEE5D0"), QColor("#F3F0D7"), QColor("#FED2AA"), QColor("#FFBF86"),
+                                 QColor("#DBD0C0"), QColor("#FAEEE0"), QColor("#F9E4C8"), QColor("#F9CF93"),
+                                 QColor("#79B4B7"), QColor("#FEFBF3"), QColor("#F8F0DF"), QColor("#9D9D9D"),
+                                 QColor("#FFE699"), QColor("#FFF9B6"), QColor("#FF9292"), QColor("#FFCCD2"),
+                                 QColor("#E99497"), QColor("#F3C583"), QColor("#E8E46E"), QColor("#B3E283"),
+                                 QColor("#867AE9"), QColor("#FFF5AB"), QColor("#FFCEAD"), QColor("#C449C2") });
 
     return QVector<QColor>({ QColor("#864879"), QColor("#3F3351") });
 }

@@ -140,6 +140,7 @@ bool FountainImporter::doImport(QIODevice *device)
 
             ScreenplayElement *element = new ScreenplayElement(screenplay);
             element->setElementType(ScreenplayElement::BreakElementType);
+            element->setBreakType(Screenplay::Act);
             this->setBreakTitle(element, line);
             screenplay->addElement(element);
             continue;

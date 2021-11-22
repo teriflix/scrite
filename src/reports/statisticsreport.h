@@ -38,7 +38,8 @@ public:
     enum ColorGroup
     {
         Character,
-        Location
+        Location,
+        Beat
     };
     static const QVector<QColor> colors(ColorGroup group=Character);
     static const QColor pickColor(int index, bool cycleAround=true, ColorGroup group=Character);

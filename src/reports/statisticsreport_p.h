@@ -44,6 +44,7 @@ public:
 private:
     QGraphicsRectItem *createTimelineItem(const StatisticsReport *report, QGraphicsRectItem *container) const;
     QGraphicsRectItem *createDistributionItems(QGraphicsRectItem *container, const QList<StatisticsReport::Distribution> &dist, qreal heightHint, qreal totalPixelLength, bool lightenFillColors=false) const;
+    QGraphicsRectItem *createScreenplayTracks(const StatisticsReport *report, QGraphicsRectItem *container, qreal heightHint, qreal totalPixelLength);
     qreal evalPixelLength(const QList<StatisticsReport::Distribution> &dist) const;
     QGraphicsRectItem *createScenePullouts(const StatisticsReport *report, QGraphicsRectItem *container, QGraphicsRectItem *sceneItemsContainer) const;
 

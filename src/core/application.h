@@ -233,7 +233,7 @@ public:
 
     Q_INVOKABLE QPointF globalMousePosition() const;
 
-    Q_INVOKABLE QString camelCased(const QString &val) const;
+    Q_INVOKABLE static QString camelCased(const QString &val);
 
     Q_INVOKABLE void saveWindowGeometry(QWindow *window, const QString &group);
     Q_INVOKABLE bool restoreWindowGeometry(QWindow *window, const QString &group);
