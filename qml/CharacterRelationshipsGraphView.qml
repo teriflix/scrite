@@ -114,7 +114,7 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvas.selectedNodeItem !== null || crgraph.dirty
+                enabled: canvas.selectedNodeItem || crgraph.dirty
                 onClicked: {
                     canvas.selectedNodeItem = null;
                     canvas.reloadIfDirty();

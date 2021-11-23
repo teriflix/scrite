@@ -264,6 +264,7 @@ void User::activateCallDone()
         if(m_call->hasError())
         {
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
+            emit forceLoginRequest();
             return;
         }
 
@@ -422,6 +423,7 @@ void User::reload()
     {
         this->setInfo(QJsonObject());
         this->setInstallations(QJsonArray());
+        emit forceLoginRequest();
         return;
     }
 

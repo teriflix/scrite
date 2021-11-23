@@ -20,7 +20,10 @@ Text {
 
     font.pointSize: app.idealFontPointSize
     font.underline: true
-    color: linkMouseArea.containsMouse ? "blue" : primaryColors.c10.text
+    color: linkMouseArea.containsMouse ? hoverColor : defaultColor
+
+    property color hoverColor: "blue"
+    property color defaultColor: primaryColors.c10.text
 
     MouseArea {
         id: linkMouseArea

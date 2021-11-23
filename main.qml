@@ -538,7 +538,7 @@ Rectangle {
             return ""
         }
         Notification.buttons: autoUpdate.updateAvailable ? ["Download", "Ignore"] : ["Participate", "Not Now", "Dont Ask Again"]
-        Notification.onButtonClicked: {
+        Notification.onButtonClicked: (index) => {
             if(autoUpdate.updateAvailable) {
                 if(index === 0)
                     Qt.openUrlExternally(autoUpdate.updateDownloadUrl)

@@ -50,12 +50,37 @@ Item {
             onEntered: parent.ToolTip.visible = true
             onExited: parent.ToolTip.visible = false
             enabled: appToolBar.visible
-            onClicked: {
-                modalDialog.sourceComponent = loginWizard
-                modalDialog.popupSource = profilePic
-                modalDialog.active = true
+            onClicked: showLoginWizard()
+        }
+    }
+
+    QtObject {
+        id: privateData
+        property bool showLoginWizardOnForceLoginRequest: true
+        property bool receivedForceLoginRequest: true
+        property bool loginPageShownForTheFirstTime: true
+    }
+
+    Connections {
+        target: User
+        enabled: showLoginWizardOnForceLoginRequest
+        onForceLoginRequest: {
+            if(privateData.showLoginWizardOnForceLoginRequest) {
+                if(splashLoader.active)
+                    splashLoader.activeChanged.connect( () => {
+                        showLoginWizard()
+                    })
+                else
+                    showLoginWizard()
+                privateData.showLoginWizardOnForceLoginRequest = false
             }
         }
+    }
+
+    function showLoginWizard() {
+        modalDialog.sourceComponent = loginWizard
+        modalDialog.popupSource = profilePic
+        modalDialog.active = true
     }
 
     Announcement.onIncoming: {
@@ -148,59 +173,92 @@ Item {
         id: loginWizardPage1
 
         Item {
-            property string pageTitle: "Sign Up / Login"
-            Component.onCompleted: modalDialog.closeable = true
+            property string pageTitle: privateData.loginPageShownForTheFirstTime ? "Something's New! Please Login to Continue" : "Sign Up / Login"
+            Component.onCompleted: modalDialog.closeable = false
+            Component.onDestruction: privateData.loginPageShownForTheFirstTime = false
 
             Item {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: nextButton.top
+                anchors.bottom: releaseNotesLink.bottom
+                anchors.bottomMargin: Math.max(releaseNotesLink.height, noLoginContinueLink.height)
 
                 Column {
                     width: parent.width*0.8
                     anchors.centerIn: parent
                     spacing: 40
 
+                    Text {
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        font.pointSize: app.idealFontPointSize + 4
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Signup / login with your email to unlock Structure, Notebook and many more features in Scrite."
+                        color: Qt.darker("#65318f")
+                        visible: !privateData.loginPageShownForTheFirstTime
+                    }
+
                     TextField {
                         id: emailField
                         width: parent.width
-                        placeholderText: "Email"
-                        font.pointSize: app.idealFontPointSize + 2
+                        placeholderText: "Enter Email ID and hit Return"
+                        font.pointSize: app.idealFontPointSize + 4
                         text: sendActivationCodeCall.email()
                         validator: RegExpValidator {
                             regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         }
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
-                        Component.onCompleted: forceActiveFocus()
-                    }
+                        Component.onCompleted: Qt.callLater( () => {
+                                forceActiveFocus()
+                                cursorPosition = Math.max(0,length)
+                            })
+                        Keys.onReturnPressed: {
+                            if(acceptableInput) {
+                                sendActivationCodeCall.data = {
+                                    "email": emailField.text,
+                                    "request": "resendActivationCode"
+                                }
+                                sendActivationCodeCall.call()
+                            }
+                        }
 
-                    Text {
-                        width: parent.width * 0.8
-                        wrapMode: Text.WordWrap
-                        font.pointSize: app.idealFontPointSize
-                        horizontalAlignment: Text.AlignHCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Sign up / login with your email to unlock Structure, Notebook and many more features in Scrite."
+                        Text {
+                            anchors.bottom: privateData.loginPageShownForTheFirstTime ? parent.top : undefined
+                            anchors.top: privateData.loginPageShownForTheFirstTime ? undefined : parent.bottom
+                            anchors.margins: 10
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pointSize: privateData.loginPageShownForTheFirstTime ? parent.font.pointSize : app.idealFontPointSize-2
+                            text: parent.length > 0 && parent.acceptableInput ? "Hit Return to Continue" : parent.placeholderText
+                            color: primaryColors.c500.background
+                            visible: parent.cursorVisible
+                        }
                     }
                 }
             }
 
-            Button2 {
-                id: cancelButton
-                text: "Cancel"
+            Link {
+                id: releaseNotesLink
+                font.underline: false
+                text: "Wondering why you are being asked to login? Please read <u>Release Notes</u>."
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/login-and-activation/")
+                width: parent.width*0.4
+                wrapMode: Text.WordWrap
                 anchors.left: parent.left
-                anchors.verticalCenter: nextButton.verticalCenter
-                anchors.leftMargin: 30
-                onClicked: modalDialog.close()
+                anchors.bottom: parent.bottom
+                anchors.margins: 30
+                enabled: !sendActivationCodeCall.busy
+                defaultColor: "#65318f"
+                hoverColor: Qt.darker(defaultColor)
             }
 
             Item {
-                anchors.top: nextButton.top
-                anchors.left: cancelButton.right
-                anchors.right: nextButton.left
-                anchors.bottom: nextButton.bottom
+                anchors.top: releaseNotesLink.top
+                anchors.left: releaseNotesLink.right
+                anchors.right: noLoginContinueLink.left
+                anchors.bottom: noLoginContinueLink.bottom
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
 
@@ -215,19 +273,20 @@ Item {
                 }
             }
 
-            Button2 {
-                id: nextButton
-                text: "Next »"
+            Link {
+                id: noLoginContinueLink
+                font.underline: false
+                text: "Or <u>Continue Without Logging In</u> »"
+                horizontalAlignment: Text.AlignRight
+                width: parent.width*0.3
+                wrapMode: Text.WordWrap
+                onClicked: modalDialog.close()
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 30
-                onClicked: {
-                    sendActivationCodeCall.data = {
-                        "email": emailField.text,
-                        "request": "resendActivationCode"
-                    }
-                    sendActivationCodeCall.call()
-                }
+                enabled: !sendActivationCodeCall.busy
+                defaultColor: "#65318f"
+                hoverColor: Qt.darker(defaultColor)
             }
 
             BusyOverlay {

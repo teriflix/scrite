@@ -89,6 +89,9 @@ public:
     Q_SLOT void logActivity1(const QString &activity) { this->logActivity2(activity, QJsonValue()); }
     Q_SLOT void logActivity2(const QString &activity, const QJsonValue &data);
 
+signals:
+    void forceLoginRequest();
+
 private:
     User(QObject *parent=nullptr);
     void setInfo(const QJsonObject &val);
