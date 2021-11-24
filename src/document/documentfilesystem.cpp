@@ -22,12 +22,17 @@
 
 #include "quazip.h"
 #include "quazipfile.h"
+#include "simplecrypt.h"
+#include "restapikey/restapikey.h"
 
 struct DocumentFileSystemData
 {
     QByteArray header;
     QList<DocumentFile*> files;
     QScopedPointer<QTemporaryDir> folder;
+
+    static const QString normalHeaderFile;
+    static const QString encryptedHeaderFile;
 
     void pack(QDataStream &ds, const QString &path);
 
@@ -40,6 +45,9 @@ struct DocumentFileSystemData
 private:
     void filePaths(QStringList &paths, const QString &dirPath) const;
 };
+
+const QString DocumentFileSystemData::normalHeaderFile = QStringLiteral("_header.json");
+const QString DocumentFileSystemData::encryptedHeaderFile = QStringLiteral("_header.json_encrypted");
 
 void DocumentFileSystemData::pack(QDataStream &ds, const QString &path)
 {
@@ -228,9 +236,28 @@ bool DocumentFileSystem::load(const QString &fileName, Format *format)
 
     if( doUnzip( QFileInfo(fileName), *d->folder ) )
     {
-        const QString headerFileName = d->folder->filePath(QStringLiteral("_header.json"));
-        QFile headerFile(headerFileName);
-        d->header = headerFile.open(QFile::ReadOnly) ? headerFile.readAll() : QByteArray();
+        QString headerPath;
+
+        const QString normalPath = d->folder->filePath(DocumentFileSystemData::normalHeaderFile);
+        const QString encryptedPath = d->folder->filePath(DocumentFileSystemData::encryptedHeaderFile);
+        if( QFile::exists(normalPath) )
+            headerPath = normalPath;
+        else if( QFile::exists(encryptedPath) )
+            headerPath = encryptedPath;
+        else
+            return false;
+
+        QFile headerFile(headerPath);
+
+        const QByteArray headerData = headerFile.open(QFile::ReadOnly) ? headerFile.readAll() : QByteArray();
+        if(headerPath == encryptedPath)
+        {
+            SimpleCrypt sc(REST_CRYPT_KEY);
+            d->header = sc.decryptToByteArray(headerData);
+        }
+        else
+            d->header = headerData;
+
         if(format)
             *format = ZipFormat;
     }
@@ -302,7 +329,7 @@ bool doZip(const QFileInfo &fileInfo, const QTemporaryDir &srcDir)
     return true;
 }
 
-bool DocumentFileSystem::save(const QString &fileName)
+bool DocumentFileSystem::save(const QString &fileName, bool encrypt)
 {
     if(fileName.isEmpty())
         return false;
@@ -329,12 +356,19 @@ bool DocumentFileSystem::save(const QString &fileName)
     return true;
 #else
     // Starting with 0.5.5 Scrite documents are basically ZIP files.
-    const QString headerFileName = d->folder->filePath(QStringLiteral("_header.json"));
+    const QString headerFileName = d->folder->filePath(encrypt ? DocumentFileSystemData::encryptedHeaderFile : DocumentFileSystemData::normalHeaderFile);
     QSaveFile headerFile(headerFileName);
     if( !headerFile.open(QFile::WriteOnly) )
         return false;
 
-    headerFile.write(d->header);
+    QByteArray headerData = d->header;
+    if(encrypt)
+    {
+        SimpleCrypt sc(REST_CRYPT_KEY);
+        headerData = sc.encryptToByteArray(headerData);
+    }
+
+    headerFile.write(headerData);
     if( !headerFile.commit() )
         return false;
 

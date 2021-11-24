@@ -38,7 +38,7 @@ public:
 
     void reset();
     bool load(const QString &fileName, Format *format=nullptr);
-    bool save(const QString &fileName);
+    bool save(const QString &fileName, bool encrypt=false);
 
     void setHeader(const QByteArray &header);
     QByteArray header() const;
