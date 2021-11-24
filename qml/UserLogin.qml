@@ -215,7 +215,9 @@ Item {
                                 forceActiveFocus()
                                 cursorPosition = Math.max(0,length)
                             })
-                        Keys.onReturnPressed: {
+                        Keys.onReturnPressed: requestActivationCode()
+
+                        function requestActivationCode() {
                             if(acceptableInput) {
                                 sendActivationCodeCall.data = {
                                     "email": emailField.text,
@@ -234,6 +236,19 @@ Item {
                             text: parent.length > 0 && parent.acceptableInput ? "Hit Return to Continue" : parent.placeholderText
                             color: primaryColors.c500.background
                             visible: parent.cursorVisible
+                        }
+
+                        Link {
+                            id: continueLink
+                            anchors.top: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.topMargin: 10
+                            text: "Continue »"
+                            defaultColor: releaseNotesLink.defaultColor
+                            hoverColor: releaseNotesLink.hoverColor
+                            font.underline: false
+                            visible: !parent.focus || !parent.cursorVisible
+                            onClicked: parent.requestActivationCode()
                         }
                     }
                 }
@@ -609,6 +624,7 @@ Item {
                 anchors.rightMargin: 20
 
                 Text {
+                    id: errorText
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
@@ -617,6 +633,25 @@ Item {
                     color: "red"
                     text: userError.hasError ? userError.details.code + ": " + userError.details.message : ""
                     property ErrorReport userError: Aggregation.findErrorReport(User)
+                }
+
+                Image {
+                    source: "../images/scrite_discord_button.png"
+                    height: parent.height
+                    fillMode: Image.PreserveAspectFit
+                    anchors.centerIn: parent
+                    visible: User.info.discordInviteUrl && User.info.discordInviteUrl !== "" && errorText.text === ""
+                    enabled: visible
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Qt.openUrlExternally(User.info.discordInviteUrl)
+                        ToolTip.text: "Ask questions, post feedback, request features and connect with other Scrite users."
+                        ToolTip.visible: containsMouse
+                        ToolTip.delay: 1000
+                        hoverEnabled: true
+                    }
                 }
             }
 
