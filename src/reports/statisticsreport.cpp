@@ -599,8 +599,7 @@ void StatisticsReport::prepareTextDocument()
 
     auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
         const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
-        Q_FOREACH(TransliterationEngine::Boundary item, items)
-        {
+        Q_FOREACH(TransliterationEngine::Boundary item, items) {
             if(item.string.isEmpty())
                 continue;
             const QFont font = TransliterationEngine::instance()->languageFont(item.language);
@@ -640,6 +639,13 @@ void StatisticsReport::prepareTextDocument()
         }
     }
 
+    if(m_textDocument.isEmpty() || m_textBlockMap.isEmpty())
+    {
+        m_paragraphsLength = 0;
+        m_lineHeight = 1;
+        return;
+    }
+
     QAbstractTextDocumentLayout *layout = m_textDocument.documentLayout();
     auto it = m_textBlockMap.constBegin();
     auto end = m_textBlockMap.constEnd();
@@ -655,6 +661,26 @@ void StatisticsReport::prepareTextDocument()
             m_lineHeight = qMin(paraHeight, m_lineHeight);
 
         ++it;
+    }
+
+    for(int i=0; i<nrElements; i++)
+    {
+        const ScreenplayElement *element = screenplay->elementAt(i);
+        if(element->scene() == nullptr)
+            continue;
+
+        const Scene *scene = element->scene();
+        const QObject *para = scene->heading()->isEnabled() ? (QObject*)scene->heading() : (QObject*)scene->elementAt(0);
+        const QTextBlock block = m_textBlockMap.value(para);
+        if(block.isValid())
+        {
+            QTextCursor cursor(block);
+            cursor.select(QTextCursor::BlockUnderCursor);
+
+            QTextBlockFormat format;
+            format.setTopMargin(block.blockFormat().topMargin() + m_lineHeight);
+            cursor.mergeBlockFormat(format);
+        }
     }
 }
 

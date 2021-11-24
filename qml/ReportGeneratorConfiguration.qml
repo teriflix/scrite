@@ -12,6 +12,8 @@
 ****************************************************************************/
 
 import Scrite 1.0
+
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Layouts 1.13
@@ -525,7 +527,6 @@ Item {
                             width: locationListView.width-1
                             font.family: scriteDocument.formatting.defaultFont.family
                             text: modelData
-                            enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
                             onToggled: {
                                 var locs = selectedLocations
                                 if(checked)
@@ -1018,7 +1019,6 @@ Item {
                     if(generator)
                         generator.setConfigurationValue(fieldInfo.name, value)
                 }
-                TabSequenceItem.manager: tabSequence
             }
         }
     }

@@ -63,7 +63,7 @@ Item {
 
     Connections {
         target: User
-        enabled: showLoginWizardOnForceLoginRequest
+        enabled: privateData.showLoginWizardOnForceLoginRequest
         onForceLoginRequest: {
             if(privateData.showLoginWizardOnForceLoginRequest) {
                 if(splashLoader.active)

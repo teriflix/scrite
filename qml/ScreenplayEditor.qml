@@ -2395,8 +2395,8 @@ Rectangle {
                     anchors.top: parent.top
                     anchors.topMargin: parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
                     spacing: 20
-                    property bool headingFieldOnly: !screenplayEditorSettings.displaySceneCharacters && !screenplayEditorSettings.displaySceneSynopsis
-                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
+//                    property bool headingFieldOnly: !screenplayEditorSettings.displaySceneCharacters && !screenplayEditorSettings.displaySceneSynopsis
+//                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
                     SceneTypeImage {
                         width: headingFontMetrics.height
