@@ -442,6 +442,7 @@ int main(int argc, char **argv)
     qmlView.show();
 #endif
     qmlView.raise();
+    qmlView.requestActivate();
 
 #ifdef Q_OS_MAC
     QObject::connect(quitAction, &QAction::triggered, &qmlView, &QQuickView::close);
