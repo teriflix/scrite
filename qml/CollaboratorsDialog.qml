@@ -47,7 +47,7 @@ Item {
                     if(scriteDocument.canModifyCollaborators) {
                         var ret = "Allow opening of this screenplay only on Scrite installations logged in with <strong>" + User.info.email + "</strong>. "
                         if(scriteDocument.hasCollaborators)
-                            ret += "You can optionally add emails of one or more collaborators in the list below."
+                            ret += "You can optionally add emails of one or more collaborators to the list below."
                         return ret
                     }
                     return "This screenplay has been marked for collaboration by <strong>" + scriteDocument.primaryCollaborator + "</strong> with the emails listed below."
