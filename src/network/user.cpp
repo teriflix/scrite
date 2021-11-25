@@ -112,6 +112,36 @@ QString User::email() const
     return m_info.value(QStringLiteral("email")).toString().toLower();
 }
 
+QString User::firstName() const
+{
+    return m_info.value(QStringLiteral("firstName")).toString();
+}
+
+QString User::lastName() const
+{
+    return m_info.value(QStringLiteral("lastName")).toString();
+}
+
+QString User::fullName() const
+{
+    return QStringList({this->firstName(), this->lastName()}).join(QStringLiteral(" ")).trimmed();
+}
+
+QString User::city() const
+{
+    return m_info.value(QStringLiteral("city")).toString();
+}
+
+QString User::country() const
+{
+    return m_info.value(QStringLiteral("country")).toString();
+}
+
+QString User::experience() const
+{
+    return m_info.value(QStringLiteral("experience")).toString();
+}
+
 QStringList User::countryNames()
 {
     return ::GlobalCityCountryInfo().countryNames;

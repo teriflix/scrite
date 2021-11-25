@@ -354,6 +354,7 @@ Item {
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
                         Component.onCompleted: forceActiveFocus()
+                        Keys.onReturnPressed: nextButton.click()
                     }
 
                     Text {
@@ -401,7 +402,8 @@ Item {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 30
-                onClicked: {
+                onClicked: click()
+                function click() {
                     activateCall.data = {
                         "email": activateCall.email(),
                         "activationCode": activationCodeField.text,
@@ -572,10 +574,10 @@ Item {
                 }
             }
 
-            property bool needsSaving: nameField.text.trim() !== (User.info.firstName + " " + User.info.lastName).trim() ||
-                                       cityField.text.trim() !== User.info.city ||
-                                       countryField.text.trim() !== User.info.country ||
-                                       experienceField.text.trim() !== User.info.experience ||
+            property bool needsSaving: nameField.text.trim() !== User.fullName ||
+                                       cityField.text.trim() !== User.city ||
+                                       countryField.text.trim() !== User.country ||
+                                       experienceField.text.trim() !== User.experience ||
                                        chkAnalyticsConsent.checked !== User.info.consent.activity ||
                                        chkEmailConsent.checked !== User.info.consent.email
 

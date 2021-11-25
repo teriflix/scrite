@@ -38,6 +38,24 @@ public:
     Q_PROPERTY(QString email READ email NOTIFY infoChanged)
     QString email() const;
 
+    Q_PROPERTY(QString firstName READ firstName NOTIFY infoChanged)
+    QString firstName() const;
+
+    Q_PROPERTY(QString lastName READ lastName NOTIFY infoChanged)
+    QString lastName() const;
+
+    Q_PROPERTY(QString fullName READ fullName NOTIFY infoChanged)
+    QString fullName() const;
+
+    Q_PROPERTY(QString city READ city NOTIFY infoChanged)
+    QString city() const;
+
+    Q_PROPERTY(QString country READ country NOTIFY infoChanged)
+    QString country() const;
+
+    Q_PROPERTY(QString experience READ experience NOTIFY infoChanged)
+    QString experience() const;
+
     Q_PROPERTY(QJsonObject info READ info NOTIFY infoChanged)
     QJsonObject info() const { return m_info; }
     Q_SIGNAL void infoChanged();
