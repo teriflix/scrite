@@ -14,6 +14,7 @@
 #include "user.h"
 #include "application.h"
 #include "timeprofiler.h"
+#include "scritedocument.h"
 #include "jsonhttprequest.h"
 
 #include <QtDebug>
@@ -89,6 +90,7 @@ User::User(QObject *parent)
         JsonHttpRequest::store( QStringLiteral("sessionToken"), stok );
     }
 
+    this->loadStoredUserInformation();
     QMetaObject::invokeMethod(this, "reload", Qt::QueuedConnection);
 
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
@@ -103,6 +105,11 @@ User::~User()
 bool User::isLoggedIn() const
 {
     return !m_info.isEmpty() && !m_installations.isEmpty();
+}
+
+QString User::email() const
+{
+    return m_info.value(QStringLiteral("email")).toString().toLower();
 }
 
 QStringList User::countryNames()
@@ -269,39 +276,7 @@ void User::activateCallDone()
         }
 
         if(!m_call->hasResponse())
-        {
-            // Load information stored in the previous session
-            {
-                QJsonParseError parseError;
-                const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("userInfo") ).toString();
-                const QString crypt = JsonHttpRequest::decrypt(cryptText);
-                const QJsonObject object = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).object();
-                if(parseError.error == QJsonParseError::NoError && !object.isEmpty())
-                    this->setInfo(object);
-                else
-                {
-                    m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
-                    this->logout();
-                    return;
-                }
-            }
-
-            {
-                QJsonParseError parseError;
-                const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("devices") ).toString();
-                const QString crypt = JsonHttpRequest::decrypt(cryptText);
-                const QJsonArray array = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).array();
-                if(parseError.error == QJsonParseError::NoError && !array.isEmpty())
-                    this->setInstallations(array);
-                else
-                {
-                    m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
-                    this->logout();
-                }
-            }
-
             return;
-        }
 
         const QJsonObject tokens = m_call->responseData();
         const QString sessionTokenKey = QStringLiteral("sessionToken");
@@ -386,6 +361,39 @@ void User::installationsCallDone()
     }
 }
 
+void User::loadStoredUserInformation()
+{
+    // Load information stored in the previous session
+    {
+        QJsonParseError parseError;
+        const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("userInfo") ).toString();
+        const QString crypt = JsonHttpRequest::decrypt(cryptText);
+        const QJsonObject object = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).object();
+        if(parseError.error == QJsonParseError::NoError && !object.isEmpty())
+            this->setInfo(object);
+        else
+        {
+            m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+            this->logout();
+            return;
+        }
+    }
+
+    {
+        QJsonParseError parseError;
+        const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("devices") ).toString();
+        const QString crypt = JsonHttpRequest::decrypt(cryptText);
+        const QJsonArray array = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).array();
+        if(parseError.error == QJsonParseError::NoError && !array.isEmpty())
+            this->setInstallations(array);
+        else
+        {
+            m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+            this->logout();
+        }
+    }
+}
+
 JsonHttpRequest *User::newCall()
 {
     if(m_call)
@@ -452,6 +460,15 @@ void User::reload()
 
 void User::logout()
 {
+    ScriteDocument *document = ScriteDocument::instance();
+    if(!document->isEmpty() || document->isModified())
+    {
+        m_errorReport->setErrorMessage( QStringLiteral("Current document is not saved. Please save the document before logging out.") );
+        return;
+    }
+
+    document->reset();
+
     this->setInfo( QJsonObject() );
     this->setInstallations( QJsonArray() );
     JsonHttpRequest::store( QStringLiteral("devices"), QVariant() );

@@ -257,5 +257,9 @@
         <file>icons/action/share_on_twitter.png</file>
         <file>icons/action/share_inverted.png</file>
         <file>icons/action/share.png</file>
+        <file>icons/file/unprotected.png</file>
+        <file>icons/file/unprotected_inverted.png</file>
+        <file>icons/file/protected.png</file>
+        <file>icons/file/protected_inverted.png</file>
     </qresource>
 </RCC>

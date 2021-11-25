@@ -35,6 +35,9 @@ public:
     bool isLoggedIn() const;
     Q_SIGNAL void loggedInChanged();
 
+    Q_PROPERTY(QString email READ email NOTIFY infoChanged)
+    QString email() const;
+
     Q_PROPERTY(QJsonObject info READ info NOTIFY infoChanged)
     QJsonObject info() const { return m_info; }
     Q_SIGNAL void infoChanged();
@@ -100,6 +103,8 @@ private:
     void activateCallDone();
     void userInfoCallDone();
     void installationsCallDone();
+
+    void loadStoredUserInformation();
 
     JsonHttpRequest *newCall();
     void onCallDestroyed();

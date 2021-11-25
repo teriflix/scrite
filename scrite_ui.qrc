@@ -78,5 +78,6 @@
         <file>qml/DisabledFeatureNotice.qml</file>
         <file>qml/Link.qml</file>
         <file>qml/SocialShareIcons.qml</file>
+        <file>qml/CollaboratorsDialog.qml</file>
     </qresource>
 </RCC>

@@ -47,7 +47,7 @@ public:
     bool requiresConfiguration() const { return true; }
 
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldGroup", "Basic")
-    Q_CLASSINFO("includeCharacterPresenceGraphs_FieldLabel", "Include character presense graphs.")
+    Q_CLASSINFO("includeCharacterPresenceGraphs_FieldLabel", "Include Character Presence Graphs.")
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeCharacterPresenceGraphs READ isIncludeCharacterPresenceGraphs WRITE setIncludeCharacterPresenceGraphs NOTIFY includeCharacterPresenceGraphsChanged)
     void setIncludeCharacterPresenceGraphs(bool val);
@@ -76,7 +76,7 @@ public:
     Q_SIGNAL void characterNamesChanged();
 
     Q_CLASSINFO("includeLocationPresenceGraphs_FieldGroup", "Basic")
-    Q_CLASSINFO("includeLocationPresenceGraphs_FieldLabel", "Include location presense graphs.")
+    Q_CLASSINFO("includeLocationPresenceGraphs_FieldLabel", "Include Location Presence Graphs.")
     Q_CLASSINFO("includeLocationPresenceGraphs_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeLocationPresenceGraphs READ isIncludeLocationPresenceGraphs WRITE setIncludeLocationPresenceGraphs NOTIFY includeLocationPresenceGraphsChanged)
     void setIncludeLocationPresenceGraphs(bool val);

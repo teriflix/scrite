@@ -125,7 +125,11 @@ Flickable {
         interval: 250
         running: false
         onTriggered: {
-            app.log("ensureItemVisible(" + item + ", " + scaling + ", " + leaveMargin + ")")
+            if(scrollAreaFlickable.moving || scrollAreaFlickable.flicking) {
+                Qt.callLater(start)
+                return
+            }
+
             ensureItemVisible(item, scaling, leaveMargin)
             item = null
             scaling = 1

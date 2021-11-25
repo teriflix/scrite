@@ -14,6 +14,7 @@
 #include "scritedocument.h"
 
 #include "form.h"
+#include "user.h"
 #include "filelocker.h"
 #include "undoredo.h"
 #include "hourglass.h"
@@ -29,6 +30,7 @@
 #include "qobjectfactory.h"
 #include "locationreport.h"
 #include "characterreport.h"
+#include "jsonhttprequest.h"
 #include "statisticsreport.h"
 #include "fountainimporter.h"
 #include "fountainexporter.h"
@@ -49,6 +51,7 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QDateTime>
+#include <QScopeGuard>
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QFutureWatcher>
@@ -438,6 +441,9 @@ ScriteDocument::ScriteDocument(QObject *parent)
     const QVariant mbc = settings->value( QStringLiteral("Installation/maxBackupCount") );
     if(!mbc.isNull())
         m_maxBackupCount = mbc.toInt();
+
+    connect(this, &ScriteDocument::collaboratorsChanged, this, &ScriteDocument::canModifyCollaboratorsChanged);
+    connect(User::instance(), &User::loggedInChanged, this, &ScriteDocument::canModifyCollaboratorsChanged);
 }
 
 ScriteDocument::~ScriteDocument()
@@ -466,6 +472,79 @@ bool ScriteDocument::isEmpty() const
                             m_structure->attachments()->attachmentCount();
     const bool ret = objectCount == 0 && m_screenplay->isEmpty();
     return ret;
+}
+
+void ScriteDocument::setCollaborators(const QStringList &val)
+{
+    if(m_collaborators == val || !User::instance()->isLoggedIn() || !this->canModifyCollaborators())
+        return;
+
+    if(val.isEmpty())
+        m_collaborators = val;
+    else
+    {
+        QStringList newCollaborators({User::instance()->email()});
+        for(const QString &item : val)
+        {
+            const QString item2 = item.trimmed().toLower();
+            if(item2.isEmpty())
+                continue;
+
+            if(!newCollaborators.contains(item2))
+                newCollaborators.append(item2);
+        }
+
+        m_collaborators = newCollaborators;
+    }
+
+    emit collaboratorsChanged();
+}
+
+bool ScriteDocument::canModifyCollaborators() const
+{
+    return m_collaborators.isEmpty() ||
+           m_collaborators.first().compare( User::instance()->email(), Qt::CaseInsensitive ) == 0;
+}
+
+void ScriteDocument::addCollaborator(const QString &email)
+{
+    if(this->hasCollaborators())
+    {
+        QStringList collabs = m_collaborators;
+        if(collabs.contains(email))
+            return;
+
+        collabs.append(email.toLower());
+        this->setCollaborators(collabs);
+    }
+}
+
+void ScriteDocument::removeCollaborator(const QString &email)
+{
+    if(this->hasCollaborators())
+    {
+        QStringList collabs = m_collaborators;
+        const int idx = collabs.indexOf(email);
+        if(idx == 0)
+            return;
+
+        collabs.removeAt(idx);
+        this->setCollaborators(collabs);
+    }
+}
+
+void ScriteDocument::enableCollaboration()
+{
+    if(this->hasCollaborators())
+        return;
+
+    if(User::instance()->isLoggedIn())
+        this->setCollaborators( QStringList({User::instance()->email()}) );
+}
+
+void ScriteDocument::disableCollaboration()
+{
+    this->setCollaborators(QStringList());
 }
 
 void ScriteDocument::setAutoSaveDurationInSeconds(int val)
@@ -738,6 +817,9 @@ void ScriteDocument::reset()
     this->setReadOnly(false);
     this->setLocked(false);
 
+    m_collaborators = QStringList();
+    emit collaboratorsChanged();
+
     if(m_formatting == nullptr)
         this->setFormatting(new ScreenplayFormat(this));
     else
@@ -876,7 +958,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     const QByteArray bytes = QJsonDocument(json).toJson();
     m_docFileSystem.setHeader(bytes);
 
-    const bool success = m_docFileSystem.save(fileName);
+    const bool success = m_docFileSystem.save(fileName, !m_collaborators.isEmpty());
 
     if(!success)
     {
@@ -1620,17 +1702,6 @@ bool ScriteDocument::load(const QString &fileName)
         return false;
     }
 
-    int format = DocumentFileSystem::ScriteFormat;
-    bool loaded = this->classicLoad(fileName);
-    if(!loaded)
-        loaded = this->modernLoad(fileName, &format);
-
-    if(!loaded)
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName), details );
-        return false;
-    }
-
     struct LoadCleanup
     {
         LoadCleanup(ScriteDocument *doc)
@@ -1656,6 +1727,17 @@ bool ScriteDocument::load(const QString &fileName)
         bool m_loadBegun = false;
         ScriteDocument *m_document;
     } loadCleanup(this);
+
+    int format = DocumentFileSystem::ScriteFormat;
+    bool loaded = this->classicLoad(fileName);
+    if(!loaded)
+        loaded = this->modernLoad(fileName, &format);
+
+    if(!loaded)
+    {
+        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName), details );
+        return false;
+    }
 
     const QJsonDocument jsonDoc = format == DocumentFileSystem::ZipFormat ?
                                   QJsonDocument::fromJson(m_docFileSystem.header()) :
@@ -1691,6 +1773,37 @@ bool ScriteDocument::load(const QString &fileName)
     {
         m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an updated version.").arg(fileName), details );
         return false;
+    }
+
+    {
+        const QJsonArray jsCollaborators = json.value( QStringLiteral("collaborators") ).toArray();
+        for(const QJsonValue &item : jsCollaborators)
+        {
+            const QString collaborator = item.toString();
+            if(collaborator.isEmpty())
+                continue;
+
+            m_collaborators << collaborator;
+        }
+
+        if(!m_collaborators.isEmpty())
+        {
+            if(!User::instance()->isLoggedIn())
+            {
+                m_collaborators.clear();
+                m_errorReport->setErrorMessage(QStringLiteral("This document is protected. Please sign-up/login to open it."));
+                return false;
+            }
+
+            const QString infoEmail = User::instance()->email();
+            const QString jhrEmail = JsonHttpRequest::email();
+            if(infoEmail.isEmpty() || jhrEmail.isEmpty() || infoEmail != jhrEmail || !m_collaborators.contains(jhrEmail,Qt::CaseInsensitive))
+            {
+                m_collaborators.clear();
+                m_errorReport->setErrorMessage(QStringLiteral("This document is protected. You are not authorized to view it."));
+                return false;
+            }
+        }
     }
 
     m_fileName = fileName;
@@ -1729,6 +1842,7 @@ bool ScriteDocument::load(const QString &fileName)
         notification->setActive(true);
     }
 
+    emit collaboratorsChanged();
     emit justLoaded();
 
     return ret;
@@ -1837,6 +1951,8 @@ bool ScriteDocument::canSerialize(const QMetaObject *, const QMetaProperty &) co
 
 void ScriteDocument::serializeToJson(QJsonObject &json) const
 {
+    json.insert( QStringLiteral("collaborators"), QJsonValue::fromVariant(m_collaborators) );
+
     QJsonObject metaInfo;
     metaInfo.insert( QStringLiteral("appName"), qApp->applicationName());
     metaInfo.insert( QStringLiteral("orgName"), qApp->organizationName());
@@ -2264,3 +2380,191 @@ QJsonObject ScriteDocumentBackups::MetaData::toJson() const
     ret.insert(QStringLiteral("sceneCount"), qMax(this->structureElementCount,this->screenplayElementCount));
     return ret;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+ScriteDocumentCollaborators::ScriteDocumentCollaborators(QObject *parent)
+    :QAbstractListModel(parent)
+{
+    this->setDocument(ScriteDocument::instance());
+}
+
+ScriteDocumentCollaborators::~ScriteDocumentCollaborators()
+{
+
+}
+
+void ScriteDocumentCollaborators::setDocument(ScriteDocument *val)
+{
+    if(m_document == val)
+        return;
+
+    if(m_document)
+        disconnect(m_document, nullptr, this, nullptr);
+
+    if(!m_otherCollaborators.isEmpty())
+    {
+        this->beginRemoveRows(QModelIndex(), 0, m_otherCollaborators.size());
+        m_otherCollaborators.clear();
+        this->endRemoveRows();
+    }
+
+    m_document = val;
+
+    if(m_document)
+    {
+        connect(m_document, &ScriteDocument::collaboratorsChanged, this, &ScriteDocumentCollaborators::updateModelAndFetchUsersInfoIfRequired);
+        this->updateModelAndFetchUsersInfoIfRequired();
+    }
+
+    emit documentChanged();
+}
+
+int ScriteDocumentCollaborators::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_otherCollaborators.size();
+}
+
+QVariant ScriteDocumentCollaborators::data(const QModelIndex &index, int role) const
+{
+    if(index.row() < 0 || index.row() >= m_otherCollaborators.size())
+        return QVariant();
+
+    const auto item = m_otherCollaborators.at(index.row());
+    switch(role)
+    {
+    case CollaboratorNameRole:
+        return item.second;
+    case CollaboratorEmailRole:
+        return item.first;
+    case CollaboratorRole:
+        return item.second.isEmpty() ? item.first : (item.second + QStringLiteral(" <") + item.first + QStringLiteral(">"));
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> ScriteDocumentCollaborators::roleNames() const
+{
+    return QHash<int,QByteArray>({
+         { CollaboratorRole, QByteArrayLiteral("collaborator") },
+         { CollaboratorEmailRole, QByteArrayLiteral("collaboratorEmail") },
+         { CollaboratorNameRole, QByteArrayLiteral("collaboratorName") }
+    });
+}
+
+int ScriteDocumentCollaborators::updateModel()
+{
+    int nrUnknownEmails = 0;
+
+    QMap< QString, QString > infoMap;
+    for(auto & item : m_otherCollaborators)
+        infoMap[item.first] = item.second;
+
+    this->beginResetModel();
+
+    const QStringList collaborators = m_document ? m_document->otherCollaborators() : QStringList();
+    m_otherCollaborators.clear();
+
+    for(const QString &collaborator : collaborators)
+    {
+        auto item = qMakePair(collaborator, infoMap.value(collaborator));
+        if(item.second.isEmpty())
+        {
+            const QJsonObject userInfo = m_usersInfoMap.value(item.first).toObject();
+            if(!userInfo.isEmpty())
+            {
+                const QString firstName = userInfo.value( QStringLiteral("firstName") ).toString();
+                const QString lastName = userInfo.value( QStringLiteral("lastName") ).toString();
+                item.second = QStringList({firstName, lastName}).join(QStringLiteral(" "));
+            }
+        }
+        m_otherCollaborators.append(item);
+
+        if(item.second.isEmpty())
+            ++nrUnknownEmails;
+    }
+
+    this->endResetModel();
+
+    return nrUnknownEmails;
+}
+
+void ScriteDocumentCollaborators::fetchUsersInfo()
+{
+    if(!m_document)
+        return;
+
+    const QStringList collaborators = m_document->otherCollaborators();
+    if(collaborators.isEmpty())
+        return;
+
+    const QString callObjectName = QStringLiteral("call");
+    JsonHttpRequest *call = this->findChild<JsonHttpRequest*>(callObjectName, Qt::FindDirectChildrenOnly);
+    if(call != nullptr)
+    {
+        ++m_pendingFetchUsersInfoRequests;
+        return;
+    }
+
+    QStringList pendingCollaborators;
+    for(const QString &collaborator : collaborators)
+    {
+        if(m_usersInfoMap.contains(collaborator))
+            continue;
+        pendingCollaborators << collaborator;
+    }
+
+    if(pendingCollaborators.isEmpty())
+        return;
+
+    call = new JsonHttpRequest(this);
+    call->setObjectName(callObjectName);
+    call->setAutoDelete(true);
+    call->setType(JsonHttpRequest::POST);
+    call->setApi(QStringLiteral("app/users"));
+    QJsonObject data;
+    data.insert( QStringLiteral("emailIds"), QJsonValue::fromVariant(pendingCollaborators) );
+    call->setData(data);
+
+    connect(call, &JsonHttpRequest::finished, this, &ScriteDocumentCollaborators::onCallFinished);
+    call->call();
+}
+
+void ScriteDocumentCollaborators::updateModelAndFetchUsersInfoIfRequired()
+{
+    if(this->updateModel() > 0)
+        this->fetchUsersInfo();
+}
+
+void ScriteDocumentCollaborators::onCallFinished()
+{
+    JsonHttpRequest *call = qobject_cast<JsonHttpRequest*>(this->sender());
+    if(call == nullptr)
+        call = this->findChild<JsonHttpRequest*>(QStringLiteral("call"), Qt::FindDirectChildrenOnly);;
+    if(call == nullptr)
+        return;
+
+    if(call->hasError() || !call->hasResponse())
+        return;
+
+    const QJsonObject response = call->responseData();
+    auto it = response.begin();
+    auto end = response.end();
+    while(it != end) {
+        m_usersInfoMap.insert(it.key(), it.value());
+        ++it;
+    }
+
+    this->updateModel();
+
+    if(m_pendingFetchUsersInfoRequests > 0) {
+        QTimer *timer = new QTimer(this);
+        timer->setInterval(0);
+        timer->setSingleShot(true);
+        QObject::connect(timer, &QTimer::timeout, this, &ScriteDocumentCollaborators::fetchUsersInfo);
+        QObject::connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
+        timer->start();
+    }
+}
+

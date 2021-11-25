@@ -596,19 +596,22 @@ Item {
 
                 Link {
                     text: needsSaving ? "Cancel" : "Logout"
+                    font.pointSize: app.idealFontPointSize-2
                     opacity: needsSaving ? 0.75 : 1
                     onClicked: {
                         if(needsSaving) {
                             Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
                         } else {
                             User.logout()
-                            Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
+                            if(!User.loggedIn)
+                                Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
                         }
                     }
                 }
 
                 Link {
                     text: "Privacy Policy"
+                    font.pointSize: app.idealFontPointSize-2
                     opacity: needsSaving ? 0.75 : 1
                     anchors.right: parent.right
                     onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
@@ -631,7 +634,11 @@ Item {
                     font.pointSize: app.idealFontPointSize-2
                     maximumLineCount: 3
                     color: "red"
-                    text: userError.hasError ? userError.details.code + ": " + userError.details.message : ""
+                    text: {
+                        if(userError.hasError)
+                            return userError.details && userError.details.code && userError.details.message ? (userError.details.code + ": " + userError.details.message) : ""
+                        return ""
+                    }
                     property ErrorReport userError: Aggregation.findErrorReport(User)
                 }
 
@@ -665,6 +672,7 @@ Item {
                 Link {
                     id: saveRefreshLink
                     text: needsSaving ? "Save" : "Refresh"
+                    font.pointSize: app.idealFontPointSize-2
                     transformOrigin: Item.BottomRight
                     anchors.right: parent.right
                     property real characterSpacing: 0
@@ -746,6 +754,7 @@ Item {
 
                 Link {
                     text: "Feedback / About"
+                    font.pointSize: app.idealFontPointSize-2
                     opacity: needsSaving ? 0.75 : 1
                     onClicked: {
                         modalDialog.close()
@@ -768,8 +777,8 @@ Item {
 
     property ErrorReport userErrorReport: Aggregation.findErrorReport(User)
     Notification.active: userErrorReport.hasError
-    Notification.title: "User Account / Device Activation Error"
-    Notification.text: userErrorReport.details.code + ": " + userErrorReport.errorMessage
+    Notification.title: "User Account"
+    Notification.text: (userErrorReport.details && userErrorReport.details.code ? (userErrorReport.details.code + ": ") : "") + userErrorReport.errorMessage
     Notification.autoClose: false
     Notification.onDismissed: userErrorReport.clear()
 }

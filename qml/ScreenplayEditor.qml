@@ -788,7 +788,13 @@ Rectangle {
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
                 enabled: !scriteDocument.readOnly
-                source: scriteDocument.readOnly ? "../icons/action/lock_outline.png" : (scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png")
+                source: {
+                    if(scriteDocument.readOnly)
+                        return "../icons/action/lock_outline.png"
+                    if(User.loggedIn)
+                        return scriteDocument.hasCollaborators ? "../icons/file/protected.png" : "../icons/file/unprotected.png"
+                    return scriteDocument.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
+                }
                 scale: toggleLockMouseArea.containsMouse ? (toggleLockMouseArea.pressed ? 1 : 1.5) : 1
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
@@ -796,11 +802,35 @@ Rectangle {
                     id: toggleLockMouseArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    ToolTip.text: scriteDocument.readOnly ? "Cannot lock/unlock for editing on this computer." : (scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer.")
+                    ToolTip.text: {
+                        if(scriteDocument.readOnly)
+                            return "Cannot lock/unlock for editing on this computer."
+                        if(User.loggedIn)
+                            return scriteDocument.hasCollaborators ? "Add/Remove collaborators who can view & edit this document." : "Protect this document so that you and select collaborators can view/edit it."
+                        return scriteDocument.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer."
+                    }
                     ToolTip.visible: containsMouse
                     ToolTip.delay: 1000
 
                     onClicked: {
+                        if(User.loggedIn)
+                            editCollaborators()
+                        else
+                            toggleLock()
+                    }
+
+                    Component {
+                        id: collaboratorsDialog
+                        CollaboratorsDialog { }
+                    }
+
+                    function editCollaborators() {
+                        modalDialog.sourceComponent = collaboratorsDialog
+                        modalDialog.popupSource = parent
+                        modalDialog.active = true
+                    }
+
+                    function toggleLock() {
                         var locked = !scriteDocument.locked
                         scriteDocument.locked = locked
 

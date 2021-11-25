@@ -167,7 +167,7 @@ void JsonHttpRequest::setToken(const QString &val)
 
 QString JsonHttpRequest::email()
 {
-    return fetch( QStringLiteral("email") ).toString();
+    return fetch( QStringLiteral("email") ).toString().toLower();
 }
 
 QString JsonHttpRequest::clientId()

@@ -138,6 +138,38 @@ private:
     QFileSystemWatcher *m_fsWatcher = nullptr;
 };
 
+class ScriteDocumentCollaborators : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    ScriteDocumentCollaborators(QObject *parent=nullptr);
+    ~ScriteDocumentCollaborators();
+
+    Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged)
+    void setDocument(ScriteDocument* val);
+    ScriteDocument* document() const { return m_document; }
+    Q_SIGNAL void documentChanged();
+
+    // QAbstractItemModel interface
+    enum { CollaboratorRole = Qt::UserRole, CollaboratorEmailRole, CollaboratorNameRole };
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int,QByteArray> roleNames() const;
+
+private:
+    int  updateModel();
+    void fetchUsersInfo();
+    void updateModelAndFetchUsersInfoIfRequired();
+    void onCallFinished();
+
+private:
+    ScriteDocument* m_document = nullptr;
+    QJsonObject m_usersInfoMap;
+    int m_pendingFetchUsersInfoRequests = 0;
+    QList< QPair<QString,QString> > m_otherCollaborators;
+};
+
 class ScriteDocument : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
@@ -165,6 +197,30 @@ public:
     Q_PROPERTY(QString sessionId READ sessionId NOTIFY sessionIdChanged)
     QString sessionId() const { return m_sessionId; }
     Q_SIGNAL void sessionIdChanged();
+
+    // List of email-ids of collaborators who can read/modify this document
+    // When this list is empty, anybody can alter the list.
+    // When not empty, it can be altered only by the first collaborator in
+    // the list. This attribute cannot be altered unless there is a User login.
+    Q_PROPERTY(QStringList collaborators READ collaborators WRITE setCollaborators NOTIFY collaboratorsChanged STORED false)
+    void setCollaborators(const QStringList &val);
+    QStringList collaborators() const { return m_collaborators; }
+    Q_SIGNAL void collaboratorsChanged();
+
+    Q_PROPERTY(bool hasCollaborators READ hasCollaborators NOTIFY collaboratorsChanged)
+    bool hasCollaborators() const { return !m_collaborators.isEmpty(); }
+
+    Q_PROPERTY(QStringList otherCollaborators READ otherCollaborators NOTIFY collaboratorsChanged)
+    QStringList otherCollaborators() const { return m_collaborators.mid(1); }
+
+    Q_PROPERTY(bool canModifyCollaborators READ canModifyCollaborators NOTIFY canModifyCollaboratorsChanged)
+    bool canModifyCollaborators() const;
+    Q_SIGNAL void canModifyCollaboratorsChanged();
+
+    Q_INVOKABLE void addCollaborator(const QString &email);
+    Q_INVOKABLE void removeCollaborator(const QString &email);
+    Q_INVOKABLE void enableCollaboration();
+    Q_INVOKABLE void disableCollaboration();
 
     Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)
     void setAutoSaveDurationInSeconds(int val);
@@ -366,6 +422,7 @@ private:
     QJsonObject m_userData;
     QString m_fileName;
     QString m_busyMessage;
+    QStringList m_collaborators;
     FileLocker *m_fileLocker = nullptr;
     bool m_inCreateNewScene = false;
     bool m_createdOnThisComputer = true;

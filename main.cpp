@@ -316,6 +316,8 @@ int main(int argc, char **argv)
 
     qmlRegisterType<SortFilterObjectListModel>(scriteModuleUri, 1, 0, "SortFilterObjectListModel");
 
+    qmlRegisterType<ScriteDocumentCollaborators>(scriteModuleUri, 1, 0, "ScriteDocumentCollaborators");
+
     qmlRegisterType<JsonHttpRequest>(scriteModuleUri, 1, 0, "JsonHttpRequest");
     qmlRegisterType<AppFeature>(scriteModuleUri, 1, 0, "AppFeature");
     qmlRegisterUncreatableType<User>(scriteModuleUri, 1, 0, "UserType", reason);
