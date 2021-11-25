@@ -210,6 +210,9 @@ public:
     Q_PROPERTY(bool hasCollaborators READ hasCollaborators NOTIFY collaboratorsChanged)
     bool hasCollaborators() const { return !m_collaborators.isEmpty(); }
 
+    Q_PROPERTY(QString primaryCollaborator READ primaryCollaborator NOTIFY collaboratorsChanged)
+    QString primaryCollaborator() const { return m_collaborators.isEmpty() ? QString() : m_collaborators.first(); }
+
     Q_PROPERTY(QStringList otherCollaborators READ otherCollaborators NOTIFY collaboratorsChanged)
     QStringList otherCollaborators() const { return m_collaborators.mid(1); }
 

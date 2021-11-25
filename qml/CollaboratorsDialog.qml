@@ -20,7 +20,7 @@ import Scrite 1.0
 
 Item {
     width: 640
-    height: 480
+    height: 550
 
     Column {
         anchors.fill: parent
@@ -43,7 +43,15 @@ Item {
 
             Text {
                 width: parent.width - protectionSwitch.width - parent.spacing
-                text: "Allow opening of this screenplay only on Scrite installations logged in with <strong>" + User.info.email + "</strong> or any of the emails listed below."
+                text: {
+                    if(scriteDocument.canModifyCollaborators) {
+                        var ret = "Allow opening of this screenplay only on Scrite installations logged in with <strong>" + User.info.email + "</strong>. "
+                        if(scriteDocument.hasCollaborators)
+                            ret += "You can optionally add emails of one or more collaborators in the list below."
+                        return ret
+                    }
+                    return "This screenplay has been marked for collaboration by <strong>" + scriteDocument.primaryCollaborator + "</strong> with the emails listed below."
+                }
                 font.pointSize: app.idealFontPointSize
                 wrapMode: Text.WordWrap
                 anchors.verticalCenter: parent.verticalCenter
@@ -63,109 +71,102 @@ Item {
             }
         }
 
-        Column {
+        Rectangle {
             width: parent.width
-            spacing: parent.spacing/2
             height: parent.height - titleText.height - protectionSwitchRow.height - 2*parent.spacing
+            border.width: 1
+            border.color: primaryColors.c700.background
+            color: primaryColors.c100.background
             enabled: scriteDocument.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 
-            Text {
-                id: collaboratorsLabel
-                width: parent.width
-                font.pointSize: app.idealFontPointSize
-                wrapMode: Text.WordWrap
-                text: "Collaborators:"
-            }
+            ListView {
+                id: collaboratorsList
+                anchors.fill: parent
+                anchors.margins: 5
+                anchors.leftMargin: 10
+                clip: true
+                property real viewportWidth: contentHeight > height ? width-20 : width-1
+                ScrollBar.vertical: ScrollBar2 {
+                    flickable: collaboratorsList
+                }
+                header: scriteDocument.canModifyCollaborators ? collaboratorsListHeader : null
 
-            Rectangle {
-                width: parent.width
-                height: parent.height - collaboratorsLabel.height - parent.spacing
-                border.width: 1
-                border.color: primaryColors.c700.background
-                color: primaryColors.c100.background
+                model: ScriteDocumentCollaborators { }
+                property var collaboratorsMetaData
 
-                ListView {
-                    id: collaboratorsList
-                    anchors.fill: parent
-                    anchors.margins: 5
-                    anchors.leftMargin: 10
-                    clip: true
-                    property real viewportWidth: contentHeight > height ? width-20 : width-1
-                    ScrollBar.vertical: ScrollBar2 {
-                        flickable: collaboratorsList
+                delegate: Item {
+                    width: collaboratorsList.viewportWidth
+                    height: delegateLayout.height + 4
+
+                    MouseArea {
+                        id: delegateMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
                     }
-                    header: Row {
-                        width: collaboratorsList.width
-                        enabled: scriteDocument.canModifyCollaborators
-                        opacity: enabled ? 1 : 0.5
 
-                        TextField {
-                            id: newCollaboratorEmail
-                            width: parent.width - addCollaboratorButton.width - parent.spacing
-                            placeholderText: "Enter Email ID and hit Return"
+                    Row {
+                        id: delegateLayout
+                        spacing: 5
+                        width: parent.width-5
+                        anchors.centerIn: parent
+
+                        Text {
+                            width: parent.width - (deleteIcon.opacity > 0 ? (deleteIcon.width+parent.spacing) : 0)
+                            wrapMode: Text.WordWrap
                             font.pointSize: app.idealFontPointSize
-                            validator: RegExpValidator {
-                                regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                            }
-                            selectByMouse: true
-                            Keys.onReturnPressed: addCollaborator()
-
-                            function addCollaborator() {
-                                if(acceptableInput) {
-                                    scriteDocument.addCollaborator(text)
-                                    clear()
-                                    forceActiveFocus()
-                                    queryCollaboratorsCall.fetchUsersInfo()
-                                }
-                            }
+                            font.italic: collaboratorName === ""
+                            text: collaborator
+                            anchors.verticalCenter: parent.verticalCenter
                         }
 
                         ToolButton3 {
-                            id: addCollaboratorButton
-                            iconSource: "../icons/content/add_box.png"
+                            id: deleteIcon
+                            opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
+                            iconSource: "../icons/action/close.png"
                             anchors.verticalCenter: parent.verticalCenter
-                            onClicked: newCollaboratorEmail.addCollaborator()
-                            enabled: newCollaboratorEmail.acceptableInput
+                            onClicked: scriteDocument.removeCollaborator(collaboratorEmail)
+                            enabled: scriteDocument.canModifyCollaborators
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: collaboratorsListHeader
+
+                Row {
+                    width: collaboratorsList.width
+                    enabled: scriteDocument.canModifyCollaborators
+                    opacity: enabled ? 1 : 0.5
+
+                    TextField {
+                        id: newCollaboratorEmail
+                        width: parent.width - addCollaboratorButton.width - parent.spacing
+                        placeholderText: "Enter Email ID and hit Return"
+                        font.pointSize: app.idealFontPointSize
+                        validator: RegExpValidator {
+                            regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                        }
+                        selectByMouse: true
+                        Keys.onReturnPressed: addCollaborator()
+
+                        function addCollaborator() {
+                            if(acceptableInput) {
+                                scriteDocument.addCollaborator(text)
+                                clear()
+                                forceActiveFocus()
+                                queryCollaboratorsCall.fetchUsersInfo()
+                            }
                         }
                     }
 
-                    model: ScriteDocumentCollaborators { }
-                    property var collaboratorsMetaData
-
-                    delegate: Item {
-                        width: collaboratorsList.viewportWidth
-                        height: delegateLayout.height + 4
-
-                        MouseArea {
-                            id: delegateMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                        }
-
-                        Row {
-                            id: delegateLayout
-                            spacing: 5
-                            width: parent.width-5
-                            anchors.centerIn: parent
-
-                            Text {
-                                width: parent.width - (deleteIcon.opacity > 0 ? (deleteIcon.width+parent.spacing) : 0)
-                                wrapMode: Text.WordWrap
-                                font.pointSize: app.idealFontPointSize
-                                text: collaborator
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            ToolButton3 {
-                                id: deleteIcon
-                                opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
-                                iconSource: "../icons/action/close.png"
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: scriteDocument.removeCollaborator(collaboratorEmail)
-                                enabled: scriteDocument.canModifyCollaborators
-                            }
-                        }
+                    ToolButton3 {
+                        id: addCollaboratorButton
+                        iconSource: "../icons/content/add_box.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: newCollaboratorEmail.addCollaborator()
+                        enabled: newCollaboratorEmail.acceptableInput
                     }
                 }
             }

@@ -420,6 +420,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
     this->reset();
     this->updateDocumentWindowTitle();
 
+    connect(this, &ScriteDocument::collaboratorsChanged, this, &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::spellCheckIgnoreListChanged, this, &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::userDataChanged, this, &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::modifiedChanged, this, &ScriteDocument::updateDocumentWindowTitle);
@@ -2476,7 +2477,9 @@ int ScriteDocumentCollaborators::updateModel()
             {
                 const QString firstName = userInfo.value( QStringLiteral("firstName") ).toString();
                 const QString lastName = userInfo.value( QStringLiteral("lastName") ).toString();
-                item.second = QStringList({firstName, lastName}).join(QStringLiteral(" "));
+                item.second = QStringList({firstName, lastName}).join(QStringLiteral(" ")).trimmed();
+                if(item.second.isEmpty())
+                    item.second = QStringLiteral("Registered User");
             }
         }
         m_otherCollaborators.append(item);
@@ -2551,7 +2554,8 @@ void ScriteDocumentCollaborators::onCallFinished()
     const QJsonObject response = call->responseData();
     auto it = response.begin();
     auto end = response.end();
-    while(it != end) {
+    while(it != end)
+    {
         m_usersInfoMap.insert(it.key(), it.value());
         ++it;
     }
