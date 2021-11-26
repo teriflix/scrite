@@ -95,6 +95,18 @@ User::User(QObject *parent)
 
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
     connect(this, &User::installationsChanged, this, &User::loggedInChanged);
+
+    m_touchLogTimer.setSingleShot(false);
+    m_touchLogTimer.setInterval(10 * 60 * 1000); // 10 minutes
+    connect(&m_touchLogTimer, &QTimer::timeout, this, [=]() {
+        this->logActivity1(QStringLiteral("touch"));
+    });
+    connect(this, &User::loggedInChanged, this, [=]() {
+        if(this->isLoggedIn())
+            m_touchLogTimer.start();
+        else
+            m_touchLogTimer.stop();
+    });
 }
 
 User::~User()
@@ -451,6 +463,26 @@ void User::onCallDestroyed()
 #endif
 }
 
+void User::onLogActivityCallFinished()
+{
+    JsonHttpRequest *call = qobject_cast<JsonHttpRequest*>(this->sender());
+    if(call == nullptr)
+        return;
+
+    if(call->hasError())
+    {
+        const QStringList errorCodes({QStringLiteral("E_NO_ACTIVATION"),QStringLiteral("E_NO_SESSION"),QStringLiteral("E_NO_USER")});
+        if(errorCodes.contains(call->errorCode()))
+        {
+            m_errorReport->setErrorMessage( QStringLiteral("Please login/sign-up once again.") );
+            this->logout();
+            return;
+        }
+
+        // Other error codes are fine, no issues
+    }
+}
+
 void User::reload()
 {
     if(m_call != nullptr)
@@ -551,7 +583,12 @@ void User::logActivity2(const QString &givenActivity, const QJsonValue &data)
         { QStringLiteral("data"), data },
     };
     call->setData(callData);
+    connect(call, &JsonHttpRequest::finished, this, &User::onLogActivityCallFinished);
     call->call(); // Fire and Forget
+
+    // Trigger a touch log after 10 minutes
+    m_touchLogTimer.stop();
+    m_touchLogTimer.start();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

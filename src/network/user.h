@@ -14,6 +14,7 @@
 #ifndef USER_H
 #define USER_H
 
+#include <QTimer>
 #include <QObject>
 #include <QPointer>
 #include <QJsonArray>
@@ -126,10 +127,12 @@ private:
 
     JsonHttpRequest *newCall();
     void onCallDestroyed();
+    void onLogActivityCallFinished();
 
 private:
     bool m_busy = false;
     QJsonObject m_info;
+    QTimer m_touchLogTimer;
     QList<int> m_enabledFeatures;
     QJsonArray m_installations;
     bool m_analyticsConsent = false;
