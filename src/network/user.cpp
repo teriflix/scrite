@@ -90,13 +90,13 @@ User::User(QObject *parent)
         JsonHttpRequest::store( QStringLiteral("sessionToken"), stok );
     }
 
-    this->loadStoredUserInformation();
-    QMetaObject::invokeMethod(this, "reload", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "firstReload", Qt::QueuedConnection);
 
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
     connect(this, &User::installationsChanged, this, &User::loggedInChanged);
 
     m_touchLogTimer.setSingleShot(false);
+    // m_touchLogTimer.setInterval(5000);
     m_touchLogTimer.setInterval(10 * 60 * 1000); // 10 minutes
     connect(&m_touchLogTimer, &QTimer::timeout, this, [=]() {
         this->logActivity1(QStringLiteral("touch"));
@@ -274,6 +274,31 @@ void User::setInstallations(const QJsonArray &val)
     m_installations = val;
     m_currentInstallationIndex = -1;
 
+    auto sortVersionsArray = [](QJsonObject &object, const QString &key) {
+        QJsonArray array = object.value(key).toArray();
+        if(array.isEmpty())
+            return;
+
+        QVariantList varList = array.toVariantList();
+        std::sort(varList.begin(), varList.end(), [](const QVariant &va, const QVariant &vb) {
+            const QString vas = va.toString();
+            const QString vbs = vb.toString();
+            return QVersionNumber::fromString(vas) > QVersionNumber::fromString(vbs);
+        });
+
+        array = QJsonArray::fromVariantList(varList);
+        object.insert(key, array);
+    };
+
+    // Sort version fields appVersions and pastVersions
+    for(QJsonValueRef item : m_installations)
+    {
+        QJsonObject installation = item.toObject();
+        sortVersionsArray(installation, QStringLiteral("appVersions"));
+        sortVersionsArray(installation, QStringLiteral("pastVersions"));
+        item = installation;
+    }
+
     int index = -1;
     for(const QJsonValue &item : qAsConst(m_installations))
     {
@@ -306,19 +331,37 @@ void User::setInstallations(const QJsonArray &val)
     emit installationsChanged();
 }
 
+void User::firstReload()
+{
+    this->loadStoredUserInformation();
+    this->reload();
+}
+
+void User::reset()
+{
+    ScriteDocument *document = ScriteDocument::instance();
+    if(document)
+        document->reset();
+
+    this->setInstallations( QJsonArray() );
+    this->setInfo( QJsonObject() );
+    JsonHttpRequest::store( QStringLiteral("devices"), QVariant() );
+    JsonHttpRequest::store( QStringLiteral("userInfo"), QVariant() );
+    JsonHttpRequest::store( QStringLiteral("loginToken"), QVariant() );
+    JsonHttpRequest::store( QStringLiteral("sessionToken"), QVariant() );
+}
+
 void User::activateCallDone()
 {
     if(m_call)
     {
-        if(m_call->hasError())
+        if(m_call->hasError() || !m_call->hasResponse())
         {
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
+            this->reset();
             emit forceLoginRequest();
             return;
         }
-
-        if(!m_call->hasResponse())
-            return;
 
         const QJsonObject tokens = m_call->responseData();
         const QString sessionTokenKey = QStringLiteral("sessionToken");
@@ -338,14 +381,13 @@ void User::userInfoCallDone()
 {
     if(m_call)
     {
-        if(m_call->hasError())
+        if(m_call->hasError() || !m_call->hasResponse())
         {
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
+            this->reset();
+            emit forceLoginRequest();
             return;
         }
-
-        if(!m_call->hasResponse())
-            return;
 
         const QString ikey = QStringLiteral("installations");
 
@@ -353,19 +395,13 @@ void User::userInfoCallDone()
         QJsonValue installationsValue = userInfo.value(ikey);
         userInfo.remove(ikey);
         this->setInfo(userInfo);
-
-        const QString text = QJsonDocument(m_info).toJson();
-        const QString cryptText = JsonHttpRequest::encrypt(text);
-        JsonHttpRequest::store( QStringLiteral("userInfo"), cryptText );
+        this->storeUserInfo();
 
         if(installationsValue.isArray())
         {
             const QJsonArray installations = installationsValue.toArray();
             this->setInstallations( installations );
-
-            const QString text = QJsonDocument(installations).toJson();
-            const QString cryptText = JsonHttpRequest::encrypt(text);
-            JsonHttpRequest::store( QStringLiteral("devices"), cryptText );
+            this->storeInstallations();
             return;
         }
     }
@@ -382,22 +418,18 @@ void User::installationsCallDone()
 {
     if(m_call)
     {
-        if(m_call->hasError())
+        if(m_call->hasError() || !m_call->hasResponse())
         {
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
+            this->reset();
+            emit forceLoginRequest();
             return;
         }
-
-        if(!m_call->hasResponse())
-            return;
 
         const QJsonObject installationsInfo = m_call->responseData();
         const QJsonArray installations = installationsInfo.value(QStringLiteral("list")).toArray();
         this->setInstallations( installations );
-
-        const QString text = QJsonDocument(installations).toJson();
-        const QString cryptText = JsonHttpRequest::encrypt(text);
-        JsonHttpRequest::store( QStringLiteral("devices"), cryptText );
+        this->storeInstallations();
 
         // All done.
     }
@@ -406,9 +438,11 @@ void User::installationsCallDone()
 void User::loadStoredUserInformation()
 {
     // Load information stored in the previous session
+    const QVariant userInfoVariant = JsonHttpRequest::fetch( QStringLiteral("userInfo") );
+    if(userInfoVariant.isValid() && !userInfoVariant.isNull() && userInfoVariant.canConvert(QMetaType::QString))
     {
         QJsonParseError parseError;
-        const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("userInfo") ).toString();
+        const QString cryptText = userInfoVariant.toString();
         const QString crypt = JsonHttpRequest::decrypt(cryptText);
         const QJsonObject object = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).object();
         if(parseError.error == QJsonParseError::NoError && !object.isEmpty())
@@ -416,14 +450,18 @@ void User::loadStoredUserInformation()
         else
         {
             m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
-            this->logout();
+            this->reset();
             return;
         }
     }
+    else
+        return;
 
+    const QVariant devicesVariant = JsonHttpRequest::fetch( QStringLiteral("devices") );
+    if(devicesVariant.isValid() && !devicesVariant.isNull() && devicesVariant.canConvert(QMetaType::QString))
     {
         QJsonParseError parseError;
-        const QString cryptText = JsonHttpRequest::fetch( QStringLiteral("devices") ).toString();
+        const QString cryptText = devicesVariant.toString();
         const QString crypt = JsonHttpRequest::decrypt(cryptText);
         const QJsonArray array = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).array();
         if(parseError.error == QJsonParseError::NoError && !array.isEmpty())
@@ -431,7 +469,7 @@ void User::loadStoredUserInformation()
         else
         {
             m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
-            this->logout();
+            this->reset();
         }
     }
 }
@@ -474,13 +512,45 @@ void User::onLogActivityCallFinished()
         const QStringList errorCodes({QStringLiteral("E_NO_ACTIVATION"),QStringLiteral("E_NO_SESSION"),QStringLiteral("E_NO_USER")});
         if(errorCodes.contains(call->errorCode()))
         {
-            m_errorReport->setErrorMessage( QStringLiteral("Please login/sign-up once again.") );
+            m_errorReport->setErrorMessage( ::GetSessionExpiredErrorMessage() );
             this->logout();
             return;
         }
 
         // Other error codes are fine, no issues
     }
+}
+
+void User::onDeactivateInstallationFinished()
+{
+    JsonHttpRequest *call = qobject_cast<JsonHttpRequest*>(this->sender());
+    if(call == nullptr)
+        return;
+
+    if(call->hasError() || !call->hasResponse())
+    {
+        m_errorReport->setErrorMessage( QStringLiteral("Could not deactivate installation."), call->error() );
+        return;
+    }
+
+    const QJsonObject response = call->responseData();
+    const QJsonArray installations = response.value( QStringLiteral("list") ).toArray();
+    this->setInstallations(installations);
+    this->storeInstallations();
+}
+
+void User::storeUserInfo()
+{
+    const QString text = QJsonDocument(m_info).toJson();
+    const QString cryptText = JsonHttpRequest::encrypt(text);
+    JsonHttpRequest::store( QStringLiteral("userInfo"), cryptText );
+}
+
+void User::storeInstallations()
+{
+    const QString text = QJsonDocument(m_installations).toJson();
+    const QString cryptText = JsonHttpRequest::encrypt(text);
+    JsonHttpRequest::store( QStringLiteral("devices"), cryptText );
 }
 
 void User::reload()
@@ -523,20 +593,13 @@ void User::reload()
 void User::logout()
 {
     ScriteDocument *document = ScriteDocument::instance();
-    if(document->isModified())
+    if(document && document->isModified())
     {
         m_errorReport->setErrorMessage( QStringLiteral("Current document is not saved. Please save the document before logging out.") );
         return;
     }
 
-    document->reset();
-
-    this->setInfo( QJsonObject() );
-    this->setInstallations( QJsonArray() );
-    JsonHttpRequest::store( QStringLiteral("devices"), QVariant() );
-    JsonHttpRequest::store( QStringLiteral("userInfo"), QVariant() );
-    JsonHttpRequest::store( QStringLiteral("loginToken"), QVariant() );
-    JsonHttpRequest::store( QStringLiteral("sessionToken"), QVariant() );
+    this->reset();
 }
 
 void User::update(const QJsonObject &newInfo)
@@ -561,6 +624,19 @@ void User::update(const QJsonObject &newInfo)
                                 {QStringLiteral("text"), errMsg}}));
         }
     });
+    call->call();
+}
+
+void User::deactivateInstallation(const QString &id)
+{
+    if(id.isEmpty() || !this->isLoggedIn())
+        return;
+
+    JsonHttpRequest *call = this->newCall();
+    call->setType(JsonHttpRequest::POST);
+    call->setApi(QStringLiteral("user/deactivateInstallation"));
+    call->setData( QJsonObject({{QStringLiteral("installationId"),id}}) );
+    connect(call, &JsonHttpRequest::finished, this, &User::onDeactivateInstallationFinished);
     call->call();
 }
 

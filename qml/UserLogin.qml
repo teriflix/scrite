@@ -23,6 +23,12 @@ Item {
     width: 32+20+10
     height: 32
 
+    readonly property int e_BUSY_PAGE: -1
+    readonly property int e_LOGIN_EMAIL_PAGE: 0
+    readonly property int e_LOGIN_ACTIVATION_PAGE: 1
+    readonly property int e_USER_PROFILE_PAGE: 2
+    readonly property int e_USER_INSTALLATIONS_PAGE: 3
+
     Image {
         id: profilePic
         property int counter: 0
@@ -121,25 +127,27 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                property int page: -1
+                property int page: e_BUSY_PAGE
 
                 sourceComponent: {
                     switch(page) {
-                    case -1: return loginWizardPage0
-                    case 0: return loginWizardPage1
-                    case 1: return loginWizardPage2
+                    case e_BUSY_PAGE: return loginWizardBusyPage
+                    case e_LOGIN_EMAIL_PAGE: return loginWizardEmailPage
+                    case e_LOGIN_ACTIVATION_PAGE: return loginWizardActivationCodePage
+                    case e_USER_PROFILE_PAGE: return loginWizardUserProfilePage
+                    case e_USER_INSTALLATIONS_PAGE: return loginWizardUserInstallationsPage
                     default: break
                     }
-                    return loginWizardPage3
+                    return User.busy ? loginWizardBusyPage : (User.loggedIn ? loginWizardUserProfilePage : loginWizardEmailPage)
                 }
 
-                Component.onCompleted: page = User.busy ? -1 : (User.loggedIn ? 2 : 0)
+                Component.onCompleted: page = User.busy ? e_BUSY_PAGE : (User.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
 
                 Announcement.onIncoming: {
                     const stype = "" + type
                     const idata = data
                     if(stype === "93DC1133-58CA-4EDD-B803-82D9B6F2AA50")
-                        page = page + idata
+                        page = idata
                     else if(stype === "76281526-A16C-4414-8129-AD8770A17F16") {
                         active = false
                         Qt.callLater( function() { pageLoader.active = true } )
@@ -150,7 +158,7 @@ Item {
     }
 
     Component {
-        id: loginWizardPage0
+        id: loginWizardBusyPage
 
         Item {
             property string pageTitle: "Account Information"
@@ -164,13 +172,13 @@ Item {
             Timer {
                 running: !User.busy
                 interval: 100
-                onTriggered: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", User.loggedIn ? 3 : 1)
+                onTriggered: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", User.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
             }
         }
     }
 
     Component {
-        id: loginWizardPage1
+        id: loginWizardEmailPage
 
         Item {
             property string pageTitle: privateData.loginPageShownForTheFirstTime ? "Something's New! Please Login to Continue" : "Sign Up / Login"
@@ -250,6 +258,19 @@ Item {
                             visible: !parent.focus || !parent.cursorVisible
                             onClicked: parent.requestActivationCode()
                         }
+
+                        Text {
+                            id: errorText
+                            width: parent.width
+                            anchors.top: continueLink.bottom
+                            anchors.topMargin: 20
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WordWrap
+                            font.pointSize: app.idealFontPointSize-2
+                            maximumLineCount: 3
+                            color: "red"
+                            text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
+                        }
                     }
                 }
             }
@@ -267,25 +288,6 @@ Item {
                 enabled: !sendActivationCodeCall.busy
                 defaultColor: "#65318f"
                 hoverColor: Qt.darker(defaultColor)
-            }
-
-            Item {
-                anchors.top: releaseNotesLink.top
-                anchors.left: releaseNotesLink.right
-                anchors.right: noLoginContinueLink.left
-                anchors.bottom: noLoginContinueLink.bottom
-                anchors.leftMargin: 20
-                anchors.rightMargin: 20
-
-                Text {
-                    width: parent.width
-                    anchors.centerIn: parent
-                    wrapMode: Text.WordWrap
-                    font.pointSize: app.idealFontPointSize-2
-                    maximumLineCount: 3
-                    color: "red"
-                    text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
-                }
             }
 
             Link {
@@ -321,7 +323,7 @@ Item {
                         return
 
                     store("email", emailField.text)
-                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", 1)
+                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_ACTIVATION_PAGE)
                 }
                 onBusyChanged: modalDialog.closeable = !busy
             }
@@ -329,7 +331,7 @@ Item {
     }
 
     Component {
-        id: loginWizardPage2
+        id: loginWizardActivationCodePage
 
         Item {
             property string pageTitle: "Activate"
@@ -374,7 +376,7 @@ Item {
                 anchors.left: parent.left
                 anchors.verticalCenter: nextButton.verticalCenter
                 anchors.leftMargin: 30
-                onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -1)
+                onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
             }
 
             Item {
@@ -436,7 +438,7 @@ Item {
                     store("loginToken", responseData.loginToken)
                     store("sessionToken", responseData.sessionToken)
                     User.reload()
-                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", 1)
+                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_PROFILE_PAGE)
                 }
                 onBusyChanged: modalDialog.closeable = !busy
             }
@@ -444,7 +446,7 @@ Item {
     }
 
     Component {
-        id: loginWizardPage3
+        id: loginWizardUserProfilePage
 
         Item {
             property string pageTitle: {
@@ -457,6 +459,11 @@ Item {
                 return "Hi, there."
             }
 
+            property bool userLoggedIn: User.loggedIn
+            onUserLoggedInChanged: {
+                if(!userLoggedIn)
+                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
+            }
             Component.onCompleted: modalDialog.closeable = Qt.binding( () => { return !needsSaving } )
 
             TabSequenceManager {
@@ -475,15 +482,33 @@ Item {
                     anchors.centerIn: parent
                     spacing: 30
 
-                    Text {
+                    Column {
                         width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pointSize: app.idealFontPointSize
-                        horizontalAlignment: Text.AlignHCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        visible: User.loggedIn
-                        bottomPadding: 20
-                        text: "You're currently logged in via <b>" + User.info.email + "</b>."
+                        spacing: 5
+
+                        Text {
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            font.pointSize: app.idealFontPointSize
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            visible: User.loggedIn
+                            text: "You're currently logged in via <b>" + User.info.email + "</b>."
+                        }
+
+                        Link {
+                            width: parent.width
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            font.pointSize: app.idealFontPointSize-2
+                            text: "Review Your Scrite Installations »"
+                            onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_INSTALLATIONS_PAGE)
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: 15
+                        }
                     }
 
                     Grid {
@@ -606,7 +631,7 @@ Item {
                         } else {
                             User.logout()
                             if(!User.loggedIn)
-                                Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", -2)
+                                Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
                         }
                     }
                 }
@@ -773,6 +798,127 @@ Item {
                 visible: User.busy
                 busyMessage: "Please wait.."
                 onVisibleChanged: modalDialog.closeable = !visible
+            }
+        }
+    }
+
+    Component {
+        id: loginWizardUserInstallationsPage
+
+        Item {
+            property string pageTitle: "Your Scrite Installations"
+
+            property bool userLoggedIn: User.loggedIn
+            onUserLoggedInChanged: {
+                if(!userLoggedIn)
+                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
+            }
+
+            Link {
+                id: backLink
+                text: "« Back"
+                font.pointSize: app.idealFontPointSize
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 20
+                onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_PROFILE_PAGE)
+            }
+
+            ListView {
+                id: installationsView
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: backLink.bottom
+                anchors.bottom: parent.bottom
+                anchors.margins: 20
+
+                model: User.installations
+                ScrollBar.vertical: ScrollBar2 {
+                    flickable: installationsView
+                }
+                spacing: 20
+                property real availableDelegateWidth: width - (contentHeight > height ? 20 : 0)
+                header: Text {
+                    width: installationsView.availableDelegateWidth
+                    wrapMode: Text.WordWrap
+                    font.pointSize: app.idealFontPointSize
+                    text: "<strong>" + User.email + "</strong> is currently logged in at " + (User.installations.length) + " computers(s)."
+                    horizontalAlignment: Text.AlignHCenter
+                    padding: 10
+                }
+
+                delegate: Rectangle {
+                    property var colors: index%2 ? primaryColors.c200 : primaryColors.c300
+                    width: installationsView.availableDelegateWidth
+                    height: Math.max(infoLayout.height, logoutButton.height) + 16
+                    color: colors.background
+                    radius: 8
+
+                    Item {
+                        anchors.fill: parent
+                        anchors.margins: 8
+                        anchors.leftMargin: 16
+
+                        Column {
+                            id: infoLayout
+                            anchors.left: parent.left
+                            anchors.right: logoutButton.left
+                            anchors.top: parent.top
+                            spacing: 4
+
+                            Text {
+                                font.pointSize: app.idealFontPointSize
+                                font.bold: true
+                                text: modelData.platform + " (" + modelData.platformType + "), Version: " + modelData.platformVersion
+                                color: colors.text
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                font.pointSize: app.idealFontPointSize
+                                text: "Runs Scrite " + modelData.appVersions[0]
+                                color: colors.text
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                font.pointSize: app.idealFontPointSize-4
+                                text: "Since: " + app.relativeTime(new Date(modelData.firstActivationDate))
+                                color: colors.text
+                                opacity: 0.90
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                font.pointSize: app.idealFontPointSize-4
+                                text: "Last login: " + app.relativeTime(new Date(modelData.lastActivationDate))
+                                color: colors.text
+                                opacity: 0.75
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        ToolButton3 {
+                            id: logoutButton
+                            iconSource: "../icons/action/logout.png"
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            enabled: index !== User.currentInstallationIndex
+                            opacity: enabled ? 1 : 0.2
+                            onClicked: User.deactivateInstallation(modelData._id)
+                        }
+                    }
+                }
+            }
+
+            BusyOverlay {
+                anchors.fill: parent
+                visible: User.busy
+                busyMessage: "Please wait ..."
             }
         }
     }

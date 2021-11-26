@@ -261,5 +261,7 @@
         <file>icons/file/unprotected_inverted.png</file>
         <file>icons/file/protected.png</file>
         <file>icons/file/protected_inverted.png</file>
+        <file>icons/action/logout_inverted.png</file>
+        <file>icons/action/logout.png</file>
     </qresource>
 </RCC>

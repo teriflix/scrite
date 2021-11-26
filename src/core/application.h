@@ -252,6 +252,7 @@ public:
     Q_INVOKABLE void sleep(int ms);
 
     Q_INVOKABLE static QTime secondsToTime(int nrSeconds);
+    Q_INVOKABLE static QString relativeTime(const QDateTime &dt);
 
     Q_PROPERTY(Forms* forms READ forms CONSTANT)
     Forms *forms() const;

@@ -29,6 +29,12 @@ inline QJsonValue jsonFetch(const QJsonObject &object, const QString &attr)
     return object.contains(attr) ? object.value(attr) : QJsonValue();
 }
 
+static QString & SessionToken()
+{
+    static QString TheSessionToken;
+    return TheSessionToken;
+}
+
 JsonHttpRequest::JsonHttpRequest(QObject *parent) : QObject(parent)
 {
     this->setKey( this->defaultKey() );
@@ -127,13 +133,7 @@ QString JsonHttpRequest::loginToken()
 
 QString JsonHttpRequest::sessionToken()
 {
-    return fetch( QStringLiteral("sessionToken") ).toString();
-}
-
-static QString & SessionToken()
-{
-    static QString TheSessionToken;
-    return TheSessionToken;
+    return ::SessionToken();
 }
 
 void JsonHttpRequest::store(const QString &key, const QVariant &value)
@@ -143,7 +143,11 @@ void JsonHttpRequest::store(const QString &key, const QVariant &value)
     else
     {
         QSettings *settings = Application::instance()->settings();
-        settings->setValue( QStringLiteral("Registration/") + key, value );
+        const QString key2 = QStringLiteral("Registration/") + key;
+        if(value.isValid())
+            settings->setValue(key2, value );
+        else
+            settings->remove(key2);
     }
 }
 
@@ -300,7 +304,11 @@ bool JsonHttpRequest::call()
     if( !m_key.isEmpty() )
         req.setRawHeader( QByteArrayLiteral("key"), m_key.toLatin1() );
     if( !m_token.isEmpty() )
+    {
         req.setRawHeader( QByteArrayLiteral("token"), m_token.toLatin1() );
+        req.setRawHeader( QByteArrayLiteral("client-id"), clientId().toLatin1() );
+        req.setRawHeader( QByteArrayLiteral("device-id"), deviceId().toLatin1() );
+    }
 
     static const QString userAgentString = []() {
         const QString space = QStringLiteral(" ");

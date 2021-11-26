@@ -31,6 +31,5 @@ Text {
         hoverEnabled: true
         onClicked: parent.clicked()
         cursorShape: Qt.PointingHandCursor
-        onContainsMouseChanged: console.log("PA: " + text + "/" + containsMouse)
     }
 }

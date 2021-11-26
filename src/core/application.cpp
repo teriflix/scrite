@@ -1427,6 +1427,63 @@ QTime Application::secondsToTime(int seconds)
     return QTime(h, m, s);
 }
 
+QString Application::relativeTime(const QDateTime &dt)
+{
+    if(!dt.isValid())
+        return QStringLiteral("Unknown Time");
+
+    const QDateTime now = QDateTime::currentDateTime();
+    if(now.date() == dt.date())
+    {
+        const int secsInMin = 60;
+        const int secsInHour = secsInMin * 60;
+
+        // Just say how many minutes or hours ago.
+        const int nrSecs = dt.time().secsTo(now.time());
+        const int nrHours = nrSecs > secsInHour ? qFloor( qreal(nrSecs)/qreal(secsInHour) ) : 0;
+        const int nrSecsRemaining = nrSecs-nrHours*secsInHour;
+        const int nrMins = nrSecs > secsInMin ? qCeil( qreal(nrSecsRemaining)/qreal(secsInMin) ) : 0;
+
+        if(nrMins == 0)
+            return QStringLiteral("Less than a minute ago");
+        if(nrHours == 0)
+            return QString::number( qCeil(qreal(nrSecs)/qreal(secsInMin)) ) + QStringLiteral("m ago");
+
+        return QString::number(nrHours) + QStringLiteral("h ") + QString::number(nrMins) + QStringLiteral("m ago");
+    }
+
+    const int nrDays = dt.date().daysTo(now.date());
+    const QString time = dt.time().toString(QStringLiteral("h:mm A"));
+    switch(nrDays)
+    {
+    case 1:
+        return QStringLiteral("Yesterday @ ") + time;
+    case 2:
+        return QStringLiteral("Day before yesterday @ ") + time;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        return QString::number(nrDays) + QStringLiteral(" days ago @ ") + time;
+    default:
+        break;
+    }
+
+    if(nrDays >= 7 && nrDays < 14)
+        return QStringLiteral("Last week ") + QLocale::system().standaloneDayName(dt.date().dayOfWeek()) + " @ " + time;
+
+    if(nrDays >= 14 && nrDays < 21)
+        return QStringLiteral("Two weeks ago");
+
+    if(nrDays >= 21 && nrDays < 28)
+        return QStringLiteral("Three weeks ago");
+
+    if(nrDays >= 28 && nrDays < 60)
+        return QStringLiteral("Little more than a month ago");
+
+    return QStringLiteral("More than two months ago");
+}
+
 Forms *Application::forms() const
 {
     return Forms::global();
