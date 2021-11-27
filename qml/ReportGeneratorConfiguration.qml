@@ -26,7 +26,7 @@ Item {
     property var formInfo: {"title": "Unknown", "description": "", "groupedFields": []}
 
     width: 750
-    height: formInfo.fields.length > 0 ? 720 : 275
+    height: formInfo.fields.length > 0 || (generator && !generator.featureEnabled) ? 720 : 275
     readonly property color dialogColor: primaryColors.c300.background
 
     Component.onCompleted: {

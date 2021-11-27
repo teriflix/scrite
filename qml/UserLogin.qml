@@ -278,7 +278,7 @@ Item {
             Link {
                 id: releaseNotesLink
                 font.underline: false
-                text: "Wondering why you are being asked to login? Please read <u>Release Notes</u>."
+                text: "Wondering why you are being asked to login? <u>Click here</u> ..."
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/login-and-activation/")
                 width: parent.width*0.4
                 wrapMode: Text.WordWrap

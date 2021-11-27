@@ -30,7 +30,7 @@ Item {
     Component.onCompleted: {
         tabView.currentIndex = modalDialog.arguments && modalDialog.arguments.activeTabIndex ? modalDialog.arguments.activeTabIndex : 0
         modalDialog.arguments = undefined
-        // modalDialog.closeable = false
+        modalDialog.closeable = true
 
         scriteDocument.formatting.beginTransaction();
         scriteDocument.printFormat.beginTransaction();
@@ -55,7 +55,7 @@ Item {
         currentIndex: 0
         onCurrentIndexChanged: {
             modalDialog.closeOnEscape = true
-            modalDialog.closeable = currentIndex !== 4
+            modalDialog.closeable = currentIndex === 4 ? !structureAppFeature.enabled : true
         }
 
         tabsArray: [
@@ -2256,36 +2256,48 @@ Item {
     Component {
         id: categoriesAndStructureComponent
 
-        PageView {
-            id: categoriesAndStructurePages
-            pagesArray: [
-                { "title": "This Document" },
-                { "title": "Default Global" }
-            ]
-            pageTitleRole:  "title"
-            currentIndex: 0
-            cornerContent: Item {
-                Text {
-                    width: parent.width-20
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pointSize: app.idealFontPointSize-2
-                    horizontalAlignment: Text.AlignLeft
-                    wrapMode: Text.WordWrap
-                    color: primaryColors.c100.background
-                    text: "Customize categories & groups you use for tagging index cards on the structure canvas. Each document has its own groups, there is a system wide copy as well."
+        Item {
+            PageView {
+                id: categoriesAndStructurePages
+                anchors.fill: parent
+                enabled: structureAppFeature.enabled
+                opacity: enabled ? 1 : 0.5
+                pagesArray: [
+                    { "title": "This Document" },
+                    { "title": "Default Global" }
+                ]
+                pageTitleRole:  "title"
+                currentIndex: 0
+                cornerContent: Item {
+                    Text {
+                        width: parent.width-20
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pointSize: app.idealFontPointSize-2
+                        horizontalAlignment: Text.AlignLeft
+                        wrapMode: Text.WordWrap
+                        color: primaryColors.c100.background
+                        text: "Customize categories & groups you use for tagging index cards on the structure canvas. Each document has its own groups, there is a system wide copy as well."
+                    }
+                }
+                pageContent: Loader {
+                    height: categoriesAndStructurePages.height
+                    sourceComponent: {
+                        switch(categoriesAndStructurePages.currentIndex) {
+                        case 0: return currentDocumentGroupsEditor
+                        case 1: return defaultGlobalGroupsEditor
+                        }
+                        return unknownSettingsComponent
+                    }
                 }
             }
-            pageContent: Loader {
-                height: categoriesAndStructurePages.height
-                sourceComponent: {
-                    switch(categoriesAndStructurePages.currentIndex) {
-                    case 0: return currentDocumentGroupsEditor
-                    case 1: return defaultGlobalGroupsEditor
-                    }
-                    return unknownSettingsComponent
-                }
+
+            DisabledFeatureNotice {
+                visible: !structureAppFeature.enabled
+                anchors.fill: parent
+                featureName: "Structure Settings"
+                color: Qt.rgba(1,1,1,0.9)
             }
         }
     }

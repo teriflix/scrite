@@ -24,8 +24,11 @@ Item {
     property var formInfo: exporter ? exporter.configurationFormInfo() : {"title": "Unknown", "fields": []}
 
     width: 700
-    height: exporter && (exporter.requiresConfiguration || exporter.canBundleFonts) ?
-            Math.min(documentUI.height*0.9, contentLoader.item.idealHeight) : 300
+    height: {
+        if(exporter && exporter.featureEnabled)
+            return (exporter.requiresConfiguration || exporter.canBundleFonts) ? Math.min(documentUI.height*0.9, contentLoader.item.idealHeight) : 300
+        return 500
+    }
 
     Component.onCompleted: {
         modalDialog.closeOnEscape = false
@@ -38,6 +41,8 @@ Item {
         } else if(app.verifyType(exporter, "StructureExporter"))
             mainTabBar.currentIndex = 1 // FIXME: Ugly hack to ensure that structure tab is active for StructureExporter.
         modalDialog.arguments = undefined
+
+        app.log((exporter && exporter.featureEnabled) ? 300 : 500 + "/" + height)
     }
 
     Text {
