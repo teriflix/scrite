@@ -640,6 +640,19 @@ void User::deactivateInstallation(const QString &id)
     call->call();
 }
 
+void User::refreshInstallations()
+{
+    if(m_call)
+        return;
+
+    m_call = this->newCall();
+    m_call->setAutoDelete(true);
+    m_call->setType(JsonHttpRequest::GET);
+    m_call->setApi(QStringLiteral("user/installations"));
+    connect(m_call, &JsonHttpRequest::finished, this, &User::installationsCallDone);
+    m_call->call();
+}
+
 void User::logActivity2(const QString &givenActivity, const QJsonValue &data)
 {
     if(JsonHttpRequest::sessionToken().isEmpty() || !m_analyticsConsent)

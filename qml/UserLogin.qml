@@ -814,6 +814,11 @@ Item {
                     Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
             }
 
+            Component.onCompleted: {
+                busyOverlay.busyMessage = "Fetching installations information ..."
+                User.refreshInstallations()
+            }
+
             Link {
                 id: backLink
                 text: "« Back"
@@ -857,13 +862,14 @@ Item {
                     Item {
                         anchors.fill: parent
                         anchors.margins: 8
-                        anchors.leftMargin: 16
 
                         Column {
                             id: infoLayout
                             anchors.left: parent.left
                             anchors.right: logoutButton.left
                             anchors.top: parent.top
+                            anchors.leftMargin: 30
+                            anchors.rightMargin: 30
                             spacing: 4
 
                             Text {
@@ -894,7 +900,7 @@ Item {
 
                             Text {
                                 font.pointSize: app.idealFontPointSize-4
-                                text: "Last login: " + app.relativeTime(new Date(modelData.lastActivationDate))
+                                text: "Last Login: " + app.relativeTime(new Date(modelData.lastActivationDate))
                                 color: colors.text
                                 opacity: 0.75
                                 width: parent.width
@@ -909,13 +915,17 @@ Item {
                             anchors.right: parent.right
                             enabled: index !== User.currentInstallationIndex
                             opacity: enabled ? 1 : 0.2
-                            onClicked: User.deactivateInstallation(modelData._id)
+                            onClicked: {
+                                busyOverlay.busyMessage = "Logging out of selected installation ..."
+                                User.deactivateInstallation(modelData._id)
+                            }
                         }
                     }
                 }
             }
 
             BusyOverlay {
+                id: busyOverlay
                 anchors.fill: parent
                 visible: User.busy
                 busyMessage: "Please wait ..."

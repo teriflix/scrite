@@ -108,6 +108,7 @@ public:
     Q_SLOT void logout();
     Q_SLOT void update(const QJsonObject &newInfo);
     Q_SLOT void deactivateInstallation(const QString &id);
+    Q_SLOT void refreshInstallations();
 
     Q_SLOT void logActivity1(const QString &activity) { this->logActivity2(activity, QJsonValue()); }
     Q_SLOT void logActivity2(const QString &activity, const QJsonValue &data);

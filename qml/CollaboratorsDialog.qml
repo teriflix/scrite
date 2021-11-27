@@ -30,7 +30,7 @@ Item {
 
         Text {
             id: titleText
-            text: "Protect Your Screenplay"
+            text: "Screenplay Protection"
             font.bold: true
             font.pointSize: 24
             anchors.horizontalCenter: parent.horizontalCenter
