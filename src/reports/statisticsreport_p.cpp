@@ -813,6 +813,13 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
         return a.index < b.index;
     });
 
+    int letter = 0;
+    QMap<int,QStringList> labelMap;
+    for(const auto &sceneInfo : qAsConst(sceneInfos))
+        labelMap[sceneInfo.index] << QString::number(++letter);
+
+    QFont font = Application::font();
+
     // Container for labels.
     QGraphicsRectItem *labelsItem = new QGraphicsRectItem(container);
     labelsItem->setPen(Qt::NoPen);
@@ -821,78 +828,85 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     labelsItem->setRect(QRectF(0, 0, sceneItemsContainer->boundingRect().width(), 10));
 
     // Create the labels themselves.
-    qreal labelY = 50;
-    QList<QGraphicsRectItem*> labelItems;
     for(int i=0; i<sceneInfos.size(); i++)
     {
         const SceneInfo &sceneInfo = sceneInfos[i];
         if(sceneInfo.index < 0)
             continue;
 
-        QGraphicsRectItem *labelBg = new QGraphicsRectItem(labelsItem);
-        labelBg->setOpacity(0.35);
-        labelBg->setBrush(sceneInfo.color);
-        labelBg->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren);
-
-        QGraphicsSimpleTextItem *labelText = new QGraphicsSimpleTextItem(labelBg);
-        labelText->setText(sceneInfo.label);
-
-        QRectF labelRect = labelText->boundingRect();
-        labelRect.adjust(-5, -3, 5, 3);
-        labelRect.moveTopLeft(QPointF(0,0));
-        labelBg->setRect(labelRect);
-        labelBg->setPos(QPointF(0, labelY));
-        labelY += labelRect.height() + 20;
-
-        labelRect = labelText->boundingRect();
-        labelRect.moveCenter(labelBg->boundingRect().center());
-        labelText->setPos(labelRect.topLeft());
-
-        labelItems << labelBg;
-    }
-
-    for(int i=0; i<sceneInfos.size(); i++)
-    {
-        const SceneInfo &sceneInfo = sceneInfos[i];
-        if(sceneInfo.index < 0)
+        const QStringList labelText = labelMap.take(sceneInfo.index);
+        if(labelText.isEmpty())
             continue;
-
-        QPen pen;
-        pen.setColor(Application::isLightColor(sceneInfo.color) ? sceneInfo.color.darker() : sceneInfo.color);
-        pen.setJoinStyle(Qt::RoundJoin);
-
-        QGraphicsPathItem *lineItem = new QGraphicsPathItem(labelsItem);
-        lineItem->setZValue(-1);
-        lineItem->setPen(pen);
 
         const QGraphicsItem *sceneItem = sceneItemsContainer->childItems().at(sceneInfo.index);
-        const QGraphicsRectItem *labelItem = labelItems.at(i);
-        const QRectF labelRect = labelItem->mapToParent(labelItem->boundingRect()).boundingRect();
+        const QRectF sceneItemRect = labelsItem->mapFromItem(sceneItem, sceneItem->boundingRect()).boundingRect();
+        const QPointF p1( sceneItemRect.center().x(), sceneItemRect.bottom() );
+        const QPointF p2 = p1 + QPointF(0, 30);
 
-        const QPointF p1 = labelsItem->mapFromItem(sceneItem, QPointF(sceneItem->boundingRect().center().x(),sceneItem->boundingRect().bottom()));
-        const qreal lrx = labelRect.center().x() + (labelRect.width()/9);
+        QGraphicsLineItem *lineItem = new QGraphicsLineItem(labelsItem);
+        lineItem->setLine( QLineF(p1,p2) );
+        lineItem->setPen( QPen(Application::isLightColor(sceneInfo.color) ? sceneInfo.color.darker() : sceneInfo.color) );
+
+        QGraphicsSimpleTextItem *labelItem = new QGraphicsSimpleTextItem(lineItem);
+        labelItem->setText( labelText.join(QStringLiteral(", ")) );
+        labelItem->setFont(font);
+
+        QRectF labelItemRect = labelItem->boundingRect();
+        labelItemRect.moveCenter(p2);
+        labelItemRect.moveTop(p2.y() + 5);
+        labelItem->setPos(labelItemRect.topLeft());
+
+        QGraphicsPathItem *pathItem = new QGraphicsPathItem(labelItem);
+
+        const qreal size = 8+qMax(labelItem->boundingRect().width(), labelItem->boundingRect().height());
+        QRectF pathRect(0, 0, size, size);
+        pathRect.moveCenter(labelItem->boundingRect().center());
 
         QPainterPath path;
-        path.moveTo(p1.x(), p1.y()+1);
-
-        if(p1.x() < labelRect.right())
-        {
-            path.lineTo( p1.x(), 25.0 );
-            path.lineTo( lrx, path.currentPosition().y() );
-            path.lineTo( lrx, labelRect.top() );
-        }
-        else
-        {
-            path.lineTo( QPointF(p1.x(), labelRect.center().y()) );
-            path.lineTo( QPointF(labelRect.right(), labelRect.center().y()) );
-        }
-
-        path.moveTo(p1.x()-5,p1.y()+10);
-        path.lineTo(p1);
-        path.lineTo(p1.x()+5,p1.y()+10);
-
-        lineItem->setPath(path);
+        path.addEllipse(pathRect);
+        pathItem->setPath(path);
+        pathItem->setPen(QPen(Qt::black));
+        pathItem->setBrush(sceneInfo.color);
+        pathItem->setFlag(QGraphicsItem::ItemStacksBehindParent);
+        pathItem->setOpacity(0.5);
     }
+
+    const qreal cellWidth = labelsItem->rect().width() / sceneInfos.size();
+    const qreal cellY = labelsItem->childrenBoundingRect().bottom() + 20;
+
+    for(int i=0; i<sceneInfos.size(); i++)
+    {
+        const SceneInfo &sceneInfo = sceneInfos[i];
+        if(sceneInfo.index < 0)
+            continue;
+
+        const QRectF cellRect(i*cellWidth, cellY, cellWidth, 30);
+
+        QGraphicsTextItem *textItem = new QGraphicsTextItem(labelsItem);
+        textItem->setTextWidth(cellWidth-10);
+        textItem->setFont(font);
+        textItem->setHtml( QStringLiteral("<center>") + QString::number(i+1) + QStringLiteral(": ") + sceneInfo.label + QStringLiteral("</center>") );
+
+        QRectF textItemRect = textItem->boundingRect();
+        textItemRect.moveCenter( cellRect.center() );
+        textItemRect.moveTop(cellRect.top());
+        textItem->setPos(textItemRect.topLeft());
+
+        if(i < sceneInfos.size()-1)
+        {
+            QGraphicsLineItem *lineItem = new QGraphicsLineItem(labelsItem);
+            lineItem->setLine( QLineF(cellRect.topRight(), cellRect.bottomRight()) );
+
+            QPen pen;
+            pen.setColor(Qt::black);
+            pen.setStyle(Qt::DashDotDotLine);
+            lineItem->setPen(pen);
+        }
+    }
+
+    QRectF labelsItemRect = labelsItem->rect();
+    labelsItemRect.setBottom( labelsItem->childrenBoundingRect().bottom() );
+    labelsItem->setRect(labelsItemRect);
 
     return labelsItem;
 }
