@@ -41,8 +41,6 @@ Item {
         } else if(app.verifyType(exporter, "StructureExporter"))
             mainTabBar.currentIndex = 1 // FIXME: Ugly hack to ensure that structure tab is active for StructureExporter.
         modalDialog.arguments = undefined
-
-        app.log((exporter && exporter.featureEnabled) ? 300 : 500 + "/" + height)
     }
 
     Text {
