@@ -1906,6 +1906,7 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     metaInfo.insert( QStringLiteral("appName"), qApp->applicationName());
     metaInfo.insert( QStringLiteral("orgName"), qApp->organizationName());
     metaInfo.insert( QStringLiteral("orgDomain"), qApp->organizationDomain());
+    metaInfo.insert( QStringLiteral("appVersion"), QStringLiteral("0.7.12"));
 
     /**
      * Nightly builds are x.y.z, where z is odd for nightly builds and even
@@ -1917,8 +1918,7 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     QVersionNumber appVersion = QVersionNumber::fromString(Application::instance()->versionNumber().toString());
     if(appVersion.microVersion() % 2)
         appVersion = QVersionNumber(appVersion.majorVersion(), appVersion.minorVersion(), appVersion.microVersion()-1);
-
-    metaInfo.insert( QStringLiteral("appVersion"), appVersion.toString());
+    metaInfo.insert( QStringLiteral("createdWith"), appVersion.toString());
 
     QJsonObject systemInfo;
     systemInfo.insert( QStringLiteral("machineHostName"), QSysInfo::machineHostName());
