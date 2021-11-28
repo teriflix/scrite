@@ -16,6 +16,7 @@
 #include "jsonhttprequest.h"
 #include "networkaccessmanager.h"
 
+#include <QUuid>
 #include <QSysInfo>
 #include <QUrlQuery>
 #include <QSettings>
@@ -181,7 +182,23 @@ QString JsonHttpRequest::clientId()
 
 QString JsonHttpRequest::deviceId()
 {
-    return QString::fromLatin1( QSysInfo::machineUniqueId().toHex() );
+    static QString ret;
+    if(ret.isEmpty())
+    {
+        ret = QString::fromLatin1( QSysInfo::machineUniqueId().toHex() );
+        if(!ret.isEmpty())
+            return ret;
+
+        const QString deviceIdKey = QStringLiteral("deviceId");
+        ret = fetch(deviceIdKey).toString();
+        if(!ret.isEmpty())
+            return ret;
+
+        ret = QUuid::createUuid().toString();
+        store(deviceIdKey, ret);
+    }
+
+    return ret;
 }
 
 QString JsonHttpRequest::platform()
