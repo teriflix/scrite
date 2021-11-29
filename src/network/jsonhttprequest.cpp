@@ -222,7 +222,21 @@ QString JsonHttpRequest::platformVersion()
 {
     const auto osvername = QSysInfo::productVersion();
     if(!osvername.isEmpty())
+    {
+#ifdef Q_OS_MAC
+        static QHash<QString,QString> macOSVersionMap = {
+            { QStringLiteral("10.12"), QStringLiteral("Sierra") },
+            { QStringLiteral("10.13"), QStringLiteral("High Sierra") },
+            { QStringLiteral("10.14"), QStringLiteral("Mojave") },
+            { QStringLiteral("10.15"), QStringLiteral("Catalina") },
+            { QStringLiteral("10.16"), QStringLiteral("Big Sur or Monterey") },
+            { QStringLiteral("10.17"), QStringLiteral("Monterey") },
+        };
+        return macOSVersionMap.value(osvername, osvername);
+#else
         return osvername;
+#endif
+    }
 
     const auto osver = QOperatingSystemVersion::current();
     return QVersionNumber(osver.majorVersion(),osver.minorVersion(),osver.microVersion()).toString();
