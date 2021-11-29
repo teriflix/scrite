@@ -1186,8 +1186,6 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPa
         textItemBg->setPos(textItem->pos());
 
         graphs.append(chartOutline);
-        if(graphs.size() >= nrGraphs)
-            break;
     }
 
     return graphContainer;

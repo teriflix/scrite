@@ -29,7 +29,7 @@ class StatisticsReport : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Statistics Report")
-    Q_CLASSINFO("Description", "Generate a report key statistics of the screenplay.")
+    Q_CLASSINFO("Description", "Generate a report with key statistics of the screenplay.")
 
 public:
     Q_INVOKABLE StatisticsReport(QObject *parent=nullptr);
