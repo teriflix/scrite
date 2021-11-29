@@ -72,6 +72,8 @@ $$WINDEPLOYQT_INSTALLS
   SetOutPath "$INSTDIR"
   File "scrite.exe"
   File "vcredist_x64.exe"
+  File "libssl-1_1-x64.dll"
+  File "libcrypto-1_1-x64.dll"
   CreateDirectory "$SMPROGRAMS\Scrite"
   CreateShortCut "$SMPROGRAMS\Scrite\Scrite.lnk" "$INSTDIR\scrite.exe"
   CreateShortCut "$DESKTOP\Scrite.lnk" "$INSTDIR\scrite.exe"
@@ -117,6 +119,8 @@ Section Uninstall
 
 $$WINDEPLOYQT_UNINSTALLS
 
+  Delete "$INSTDIR\libssl-1_1-x64.dll"
+  Delete "$INSTDIR\libcrypto-1_1-x64.dll"
   Delete "$INSTDIR\scrite.exe"
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\vcredist_x64.exe"
