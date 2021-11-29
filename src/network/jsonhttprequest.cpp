@@ -211,8 +211,6 @@ QString JsonHttpRequest::platform()
         return QStringLiteral("Linux");
     case Application::MacOS:
         return QStringLiteral("macOS");
-    default:
-        break;
     }
 
     return QStringLiteral("Unknown");
@@ -220,7 +218,16 @@ QString JsonHttpRequest::platform()
 
 QString JsonHttpRequest::platformVersion()
 {
+#ifdef Q_OS_MAC
     const auto osvername = QSysInfo::productVersion();
+#else
+#ifdef Q_OS_WIN
+    const auto osvername = QSysInfo::productVersion();
+#else
+    const auto osvername = QSysInfo::prettyProductName();
+#endif
+#endif
+
     if(!osvername.isEmpty())
     {
 #ifdef Q_OS_MAC
