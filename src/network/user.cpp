@@ -578,7 +578,10 @@ void User::reload()
                 { QStringLiteral("clientId"), JsonHttpRequest::clientId() },
                 { QStringLiteral("deviceId"), JsonHttpRequest::deviceId() },
                 { QStringLiteral("appVersion"), JsonHttpRequest::appVersion() },
-                { QStringLiteral("loginToken"), JsonHttpRequest::loginToken() }
+                { QStringLiteral("loginToken"), JsonHttpRequest::loginToken() },
+                { QStringLiteral("platform"), JsonHttpRequest::platform() },
+                { QStringLiteral("platformType"), JsonHttpRequest::platformType() },
+                { QStringLiteral("platformVersion"), JsonHttpRequest::platformVersion() }
             }));
         m_call->call();
     }

@@ -409,6 +409,7 @@ Item {
                         "deviceId": activateCall.deviceId(),
                         "platform": activateCall.platform(),
                         "platformType": activateCall.platformType(),
+                        "platformVersion": activateCall.platformVersion(),
                         "appVersion": activateCall.appVersion()
                     }
                     activateCall.call()
@@ -871,7 +872,7 @@ Item {
                             Text {
                                 font.pointSize: app.idealFontPointSize
                                 font.bold: true
-                                text: modelData.platform + " (" + modelData.platformType + "), Version: " + modelData.platformVersion
+                                text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
                                 color: colors.text
                                 width: parent.width
                                 elide: Text.ElideRight
