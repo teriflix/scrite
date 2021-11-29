@@ -393,6 +393,10 @@ ScriteDocument::ScriteDocument(QObject *parent)
 
     connect(this, &ScriteDocument::collaboratorsChanged, this, &ScriteDocument::canModifyCollaboratorsChanged);
     connect(User::instance(), &User::loggedInChanged, this, &ScriteDocument::canModifyCollaboratorsChanged);
+    connect(this, &ScriteDocument::collaboratorsChanged, this, [=]() {
+        if(!m_fileName.isEmpty())
+            this->save();
+    });
 }
 
 ScriteDocument::~ScriteDocument()
