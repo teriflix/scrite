@@ -238,17 +238,6 @@ Item {
                             }
                         }
 
-                        Text {
-                            anchors.bottom: privateData.loginPageShownForTheFirstTime ? parent.top : undefined
-                            anchors.top: privateData.loginPageShownForTheFirstTime ? undefined : parent.bottom
-                            anchors.margins: 10
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pointSize: privateData.loginPageShownForTheFirstTime ? parent.font.pointSize : (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
-                            text: parent.placeholderText
-                            color: primaryColors.c500.background
-                            visible: parent.cursorVisible
-                        }
-
                         Link {
                             id: continueLink
                             anchors.top: parent.bottom
@@ -258,7 +247,8 @@ Item {
                             defaultColor: releaseNotesLink.defaultColor
                             hoverColor: releaseNotesLink.hoverColor
                             font.underline: false
-                            visible: parent.focus ? parent.acceptableInput : true
+                            enabled: parent.focus ? parent.acceptableInput : true
+                            opacity: enabled ? 1.0 : 0.5
                             onClicked: parent.requestActivationCode()
                         }
 
