@@ -599,6 +599,12 @@ void User::logout()
         return;
     }
 
+    JsonHttpRequest *call = new JsonHttpRequest(this);
+    call->setAutoDelete(true);
+    call->setType(JsonHttpRequest::POST);
+    call->setApi(QStringLiteral("app/deactivate"));
+    call->call(); // Fire and forget.
+
     this->reset();
 }
 
