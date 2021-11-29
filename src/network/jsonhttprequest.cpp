@@ -210,7 +210,7 @@ QString JsonHttpRequest::platform()
     case Application::LinuxDesktop:
         return QStringLiteral("Linux");
     case Application::MacOS:
-        return QStringLiteral("Mac");
+        return QStringLiteral("macOS");
     default:
         break;
     }
@@ -220,6 +220,10 @@ QString JsonHttpRequest::platform()
 
 QString JsonHttpRequest::platformVersion()
 {
+    const auto osvername = QSysInfo::productVersion();
+    if(!osvername.isEmpty())
+        return osvername;
+
     const auto osver = QOperatingSystemVersion::current();
     return QVersionNumber(osver.majorVersion(),osver.minorVersion(),osver.microVersion()).toString();
 }
