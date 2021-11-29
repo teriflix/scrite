@@ -245,7 +245,7 @@ QString JsonHttpRequest::platformVersion()
 QString JsonHttpRequest::platformType()
 {
     if(QSysInfo::WordSize == 32)
-        return QStringLiteral("x32");
+        return QStringLiteral("x86");
 
     return QStringLiteral("x64");
 }
