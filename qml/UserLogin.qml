@@ -243,7 +243,7 @@ Item {
                             anchors.top: privateData.loginPageShownForTheFirstTime ? undefined : parent.bottom
                             anchors.margins: 10
                             anchors.horizontalCenter: parent.horizontalCenter
-                            font.pointSize: privateData.loginPageShownForTheFirstTime ? parent.font.pointSize : app.idealFontPointSize-2
+                            font.pointSize: privateData.loginPageShownForTheFirstTime ? parent.font.pointSize : (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                             text: parent.placeholderText
                             color: primaryColors.c500.background
                             visible: parent.cursorVisible
@@ -269,7 +269,7 @@ Item {
                             anchors.topMargin: 20
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
-                            font.pointSize: app.idealFontPointSize-2
+                            font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                             maximumLineCount: 3
                             color: "red"
                             text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
@@ -394,7 +394,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                     maximumLineCount: 3
                     color: "red"
                     text: activateCall.hasError ? (activateCall.errorCode + ": " + activateCall.errorText) : ""
@@ -506,7 +506,7 @@ Item {
                             width: parent.width
                             anchors.horizontalCenter: parent.horizontalCenter
                             horizontalAlignment: Text.AlignHCenter
-                            font.pointSize: app.idealFontPointSize-2
+                            font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                             text: "Review Your Scrite Installations »"
                             onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_INSTALLATIONS_PAGE)
                         }
@@ -629,7 +629,7 @@ Item {
 
                 Link {
                     text: needsSaving ? "Cancel" : "Logout"
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                     opacity: needsSaving ? 0.75 : 1
                     onClicked: {
                         if(needsSaving) {
@@ -644,7 +644,7 @@ Item {
 
                 Link {
                     text: "Privacy Policy"
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                     opacity: needsSaving ? 0.75 : 1
                     anchors.right: parent.right
                     onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
@@ -664,7 +664,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                     maximumLineCount: 3
                     color: "red"
                     text: {
@@ -705,7 +705,7 @@ Item {
                 Link {
                     id: saveRefreshLink
                     text: needsSaving ? "Save" : "Refresh"
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                     transformOrigin: Item.BottomRight
                     anchors.right: parent.right
                     property real characterSpacing: 0
@@ -787,7 +787,7 @@ Item {
 
                 Link {
                     text: "Feedback / About"
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
                     opacity: needsSaving ? 0.75 : 1
                     onClicked: {
                         modalDialog.close()
