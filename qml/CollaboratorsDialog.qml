@@ -80,6 +80,12 @@ Item {
             enabled: scriteDocument.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 
+            Connections {
+                target: scriteDocument
+                onCollaboratorsChanged: Qt.callLater(saveDocument)
+                function saveDocument() { scriteDocument.save() }
+            }
+
             ListView {
                 id: collaboratorsList
                 anchors.fill: parent
