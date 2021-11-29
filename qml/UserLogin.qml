@@ -214,7 +214,7 @@ Item {
                     TextField {
                         id: emailField
                         width: parent.width
-                        placeholderText: "Enter Email ID and hit Return"
+                        placeholderText: length > 0 && acceptableInput ? "Hit Return to Continue" : "Enter Email ID and hit Return"
                         font.pointSize: app.idealFontPointSize + 4
                         text: sendActivationCodeCall.email()
                         validator: RegExpValidator {
@@ -244,7 +244,7 @@ Item {
                             anchors.margins: 10
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pointSize: privateData.loginPageShownForTheFirstTime ? parent.font.pointSize : app.idealFontPointSize-2
-                            text: parent.length > 0 && parent.acceptableInput ? "Hit Return to Continue" : parent.placeholderText
+                            text: parent.placeholderText
                             color: primaryColors.c500.background
                             visible: parent.cursorVisible
                         }
@@ -258,7 +258,7 @@ Item {
                             defaultColor: releaseNotesLink.defaultColor
                             hoverColor: releaseNotesLink.hoverColor
                             font.underline: false
-                            visible: !parent.focus || !parent.cursorVisible
+                            visible: parent.focus ? parent.acceptableInput : true
                             onClicked: parent.requestActivationCode()
                         }
 
@@ -283,7 +283,7 @@ Item {
                 font.underline: false
                 text: "Wondering why you are being asked to login? <u>Click here</u> ..."
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/login-and-activation/")
-                width: parent.width*0.4
+                width: parent.width*0.35
                 wrapMode: Text.WordWrap
                 anchors.left: parent.left
                 anchors.bottom: parent.bottom
@@ -298,7 +298,7 @@ Item {
                 font.underline: false
                 text: "Or <u>Continue Without Logging In</u> »"
                 horizontalAlignment: Text.AlignRight
-                width: parent.width*0.3
+                width: parent.width*0.25
                 wrapMode: Text.WordWrap
                 onClicked: modalDialog.close()
                 anchors.right: parent.right
@@ -407,11 +407,14 @@ Item {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.margins: 30
+                enabled: activationCodeField.length >= 20
                 onClicked: click()
                 function click() {
+                    if(!enabled)
+                        return
                     activateCall.data = {
                         "email": activateCall.email(),
-                        "activationCode": activationCodeField.text,
+                        "activationCode": activationCodeField.text.trim(),
                         "clientId": activateCall.clientId(),
                         "deviceId": activateCall.deviceId(),
                         "platform": activateCall.platform(),

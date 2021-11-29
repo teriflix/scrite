@@ -19,14 +19,23 @@ import Scrite 1.0
 
 Rectangle {
     id: dfNotice
-    property string reason: User.loggedIn ? "This feature is not enabled in your subscription." : "Some features are accessible only after you sign-up or login."
-    property string suggestion: User.loggedIn ? "Please opt-in for a subscription to use this feature." : "Sign up / login with your email to unlock this feature."
+    property string reason: User.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
+    property string suggestion: User.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
     color: primaryColors.c100.background
     clip: true
 
     signal clicked()
 
+    QtObject {
+        id: privateData
+
+        readonly property string loggedInReason: "This feature is not available in your subscription plan."
+        readonly property string loggedInSuggestion: "Please review and upgrade your subscription plan."
+
+        readonly property string loggedOutReason: "Some features of Scrite are user profile linked and require you to be logged in to access it."
+        readonly property string loggedOutSuggestion: "Please sign-up/login to continue."
+    }
 
     Flickable {
         id: contentsFlick
@@ -54,7 +63,7 @@ Rectangle {
             }
 
             Text {
-                text: "Unlock '" + featureName + "'"
+                text: featureName
                 font.pointSize: app.idealFontPointSize + 8
                 font.bold: true
                 anchors.horizontalCenter: parent.horizontalCenter
