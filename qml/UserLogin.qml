@@ -114,8 +114,11 @@ Item {
                 height: 80
 
                 Text {
-                    anchors.centerIn: parent
-                    font.pointSize: parent.height * 0.3
+                    width: parent.width-25
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
+                    font.pixelSize: parent.height * 0.3
                     text: pageLoader.item.pageTitle
                     color: "white"
                 }
