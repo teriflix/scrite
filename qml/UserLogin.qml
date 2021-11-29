@@ -833,6 +833,7 @@ Item {
                 anchors.top: backLink.bottom
                 anchors.bottom: parent.bottom
                 anchors.margins: 20
+                clip: true
 
                 model: User.installations
                 ScrollBar.vertical: ScrollBar2 {
