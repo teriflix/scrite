@@ -621,7 +621,7 @@ Item {
                 Link {
                     text: needsSaving ? "Cancel" : "Logout"
                     font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
-                    opacity: needsSaving ? 0.75 : 1
+                    opacity: needsSaving ? 0.85 : 1
                     onClicked: {
                         if(needsSaving) {
                             Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
@@ -635,8 +635,8 @@ Item {
 
                 Link {
                     text: "Privacy Policy"
+                    opacity: needsSaving ? 0.5 : 1
                     font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
-                    opacity: needsSaving ? 0.75 : 1
                     anchors.right: parent.right
                     onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
                 }
@@ -673,6 +673,7 @@ Item {
                     anchors.centerIn: parent
                     visible: User.info.discordInviteUrl && User.info.discordInviteUrl !== "" && errorText.text === ""
                     enabled: visible
+                    opacity: needsSaving ? 0.5 : 1
 
                     MouseArea {
                         anchors.fill: parent
@@ -703,10 +704,15 @@ Item {
                     font.letterSpacing: characterSpacing
                     onClicked: {
                         if(needsSaving) {
-                            const names = nameField.text.split(' ')
+                            var names = nameField.text.split(' ')
+
+                            const _lastName = names.length > 1 ? names[names.length-1] : ""
+                            names.pop()
+                            const _firstName = names.join(" ")
+
                             const newInfo = {
-                                firstName: names.length > 0 ? names[0] : "",
-                                lastName: names.length > 1 ? names[names.length-1] : "",
+                                firstName: _firstName,
+                                lastName: _lastName,
                                 experience: experienceField.text,
                                 city: cityField.text,
                                 country: countryField.text,
@@ -728,7 +734,7 @@ Item {
 
                     function restore() {
                         saveRefreshLink.font.bold = needsSaving
-                        saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 3 : 0)
+                        saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 5 : 0)
                     }
 
                     SequentialAnimation {
@@ -778,8 +784,8 @@ Item {
 
                 Link {
                     text: "Feedback / About"
+                    opacity: needsSaving ? 0.5 : 1
                     font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
-                    opacity: needsSaving ? 0.75 : 1
                     onClicked: {
                         modalDialog.close()
                         var time = 100
