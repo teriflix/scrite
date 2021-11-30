@@ -30,7 +30,7 @@ Item {
 
         Text {
             id: titleText
-            text: "Screenplay Protection"
+            text: "Shield"
             font.bold: true
             font.pointSize: 24
             anchors.horizontalCenter: parent.horizontalCenter
@@ -83,7 +83,10 @@ Item {
             Connections {
                 target: scriteDocument
                 onCollaboratorsChanged: Qt.callLater(saveDocument)
-                function saveDocument() { scriteDocument.save() }
+                function saveDocument() {
+                    if(scriteDocument.fileName !== "")
+                        scriteDocument.save()
+                }
             }
 
             ListView {
