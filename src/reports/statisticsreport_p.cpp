@@ -1662,12 +1662,33 @@ StatisticsReportHeaderItem::StatisticsReportHeaderItem(const StatisticsReport *r
     separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
     separator->setOpacity(0.75);
 
+    subtitleFont.setBold(false);
+
+    QGraphicsTextItem *urlLinkText = new QGraphicsTextItem(this);
+    urlLinkText->setFont(subtitleFont);
+    urlLinkText->setDefaultTextColor(Qt::black);
+    urlLinkText->setHtml(QStringLiteral("scrite.io"));
+    urlLinkText->setOpacity(0.75);
+    urlLinkText->document()->setDocumentMargin(0);
+
+    QRectF urlLinkTextRect = urlLinkText->boundingRect();
+    urlLinkTextRect.moveRight(containerWidth);
+    urlLinkTextRect.moveBottom(subtitleRect.bottom());
+    urlLinkText->setPos(urlLinkTextRect.topLeft());
+
+    urlLinkTextRect = urlLinkText->mapToParent(urlLinkText->boundingRect()).boundingRect();
+
+    separator = new QGraphicsLineItem(this);
+    separator->setLine( QLineF(urlLinkTextRect.topLeft()-QPointF(10,0), urlLinkTextRect.bottomLeft()-QPointF(10,0)) );
+    separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
+    separator->setOpacity(0.75);
+
     {
         const QPixmap scriteLogo(QStringLiteral(":/images/scrite_logo_for_report_header.png"));
         const qreal scale = this->childrenBoundingRect().height() / scriteLogo.height();
 
         QRectF scriteLogoRect( QPointF(0,0), QSizeF(scriteLogo.size())*scale );
-        scriteLogoRect.moveRight(containerWidth);
+        scriteLogoRect.moveRight(urlLinkTextRect.left()-20);
         scriteLogoRect.moveBottom(this->childrenBoundingRect().bottom());
 
         QGraphicsPixmapItem *scriteLogoItem = new QGraphicsPixmapItem(this);
