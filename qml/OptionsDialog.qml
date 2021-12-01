@@ -1470,6 +1470,7 @@ Item {
 
                     Column {
                         width: (parent.width - parent.spacing)/2
+                        spacing: 10
 
                         // Title field
                         Row {
@@ -1614,6 +1615,7 @@ Item {
 
                     Column {
                         width: (parent.width - parent.spacing)/2
+                        spacing: 10
 
                         // Contact field
                         Row {
