@@ -461,7 +461,6 @@ Item {
                 if(!userLoggedIn)
                     Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
             }
-            Component.onCompleted: modalDialog.closeable = Qt.binding( () => { return !needsSaving } )
 
             TabSequenceManager {
                 id: userInfoFields
@@ -525,6 +524,7 @@ Item {
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
+                            undoRedoEnabled: true
                         }
 
                         TextField2 {
@@ -541,6 +541,7 @@ Item {
                             maxCompletionItems: -1
                             maxVisibleItems: 6
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
+                            undoRedoEnabled: true
                         }
 
                         TextField2 {
@@ -555,6 +556,7 @@ Item {
                             completionStrings: User.locations
                             minimumCompletionPrefixLength: 0
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
+                            undoRedoEnabled: true
                         }
 
                         TextField2 {
@@ -583,6 +585,7 @@ Item {
                             maxCompletionItems: -1
                             maxVisibleItems: 6
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
+                            undoRedoEnabled: true
                         }
 
                         CheckBox2 {
@@ -612,6 +615,8 @@ Item {
                                        wdyhasField.text.trim() !== User.wdyhas ||
                                        chkAnalyticsConsent.checked !== User.info.consent.activity ||
                                        chkEmailConsent.checked !== User.info.consent.email
+            onNeedsSavingChanged: modalDialog.closeable = !needsSaving
+            Component.onCompleted: modalDialog.closeable = !needsSaving
 
             property bool allowHighlightSaveAnimation: false
             property bool animationFlags: needsSaving || allowHighlightSaveAnimation
@@ -717,18 +722,19 @@ Item {
 
                     function click() {
                         if(needsSaving) {
-                            var names = nameField.text.split(' ')
+                            var names = nameField.text.trim().split(' ')
 
                             const _lastName = names.length > 1 ? names[names.length-1] : ""
-                            names.pop()
+                            if(names.length > 1)
+                                names.pop()
                             const _firstName = names.join(" ")
 
                             const newInfo = {
                                 firstName: _firstName,
                                 lastName: _lastName,
-                                experience: experienceField.text,
-                                location: locationField.text,
-                                wdyhas: wdyhasField.text,
+                                experience: experienceField.text.trim(),
+                                location: locationField.text.trim(),
+                                wdyhas: wdyhasField.text.trim(),
                                 consent: {
                                     activity: chkAnalyticsConsent.checked,
                                     email: chkEmailConsent.checked
