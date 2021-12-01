@@ -248,7 +248,7 @@ void CompletionModel::filterStrings()
     });
 
     this->beginResetModel();
-    m_filteredStrings = fstrings.mid(0, m_maxVisibleItems);
+    m_filteredStrings = m_maxVisibleItems > 0 ? fstrings.mid(0, m_maxVisibleItems) : fstrings;
     this->endResetModel();
 
     if(m_filteredStrings.isEmpty())

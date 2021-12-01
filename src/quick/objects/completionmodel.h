@@ -54,7 +54,8 @@ public:
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
 
-    Q_PROPERTY(int currentRow READ currentRow NOTIFY currentRowChanged)
+    Q_PROPERTY(int currentRow READ currentRow WRITE setCurrentRow NOTIFY currentRowChanged)
+    void setCurrentRow(int val);
     int currentRow() const { return m_currentRow; }
     Q_SIGNAL void currentRowChanged();
 
@@ -86,7 +87,6 @@ protected:
     bool eventFilter(QObject *target, QEvent *event);
 
 private:
-    void setCurrentRow(int val);
     void filterStrings();
 
 private:

@@ -19,6 +19,7 @@ TextField {
     id: textField
     property alias completionStrings: completionModel.strings
     property alias completionPrefix: completionModel.completionPrefix
+    property alias maxVisibleItems: completionModel.maxVisibleItems
     property int minimumCompletionPrefixLength: 1
     signal requestCompletion(string string)
 
@@ -149,7 +150,7 @@ TextField {
     Text {
         id: labelText
         text: parent.placeholderText
-        font.pointSize: app.idealFontPointSize/2
+        font.pointSize: 2*app.idealFontPointSize/3
         anchors.left: parent.left
         anchors.verticalCenter: parent.top
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
@@ -176,6 +177,14 @@ TextField {
                 padding: 5
                 font: textField.font
                 color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
+                MouseArea {
+                    id: textMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onContainsMouseChanged: completionModel.currentRow = index
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: completionModel.requestCompletion(parent.text)
+                }
             }
             highlight: Rectangle {
                 color: primaryColors.highlight.background
