@@ -684,6 +684,7 @@ Item {
                     visible: User.info.discordInviteUrl && User.info.discordInviteUrl !== "" && errorText.text === ""
                     enabled: visible
                     opacity: needsSaving ? 0.5 : 1
+                    mipmap: true
 
                     MouseArea {
                         anchors.fill: parent
