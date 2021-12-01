@@ -58,19 +58,17 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(const Charact
         this->addItem(edgeItem);
     }
 
-    const QRectF contentsRect = this->itemsBoundingRect();
+    const QRectF brect = this->itemsBoundingRect();
 
-    this->setTitle(graph->title());
+    const QString title = graph->character()->name();
+    const QString subtitle = QStringLiteral("Relationships");
+    this->setTitle(title + QStringLiteral(" ") + subtitle);
 
-    QGraphicsTextItem *titleItem = new QGraphicsTextItem(nullptr);
-    titleItem->setTextWidth(contentsRect.width());
-    titleItem->setHtml(QStringLiteral("<center><h1>%1</h1><center>").arg(this->title()));
-
-    QRectF titleRect = titleItem->boundingRect();
-    titleRect.moveCenter(contentsRect.center());
-    titleRect.moveBottom(contentsRect.top());
-    titleItem->setPos(titleRect.topLeft());
-    this->addItem(titleItem);
+    GraphicsHeaderItem *headerItem = new GraphicsHeaderItem(title, subtitle, brect.width());
+    QRectF headerItemRect = headerItem->boundingRect();
+    headerItemRect.moveBottomLeft(brect.topLeft());
+    headerItem->setPos(headerItemRect.topLeft());
+    this->addItem(headerItem);
 }
 
 CharacterRelationshipsGraphScene::~CharacterRelationshipsGraphScene()

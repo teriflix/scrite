@@ -105,4 +105,11 @@ private:
     Watermark *m_watermark = nullptr;
 };
 
+class GraphicsHeaderItem : public QGraphicsRectItem
+{
+public:
+    GraphicsHeaderItem(const QString &title, const QString &subtitle, qreal containerWidth);
+    ~GraphicsHeaderItem();
+};
+
 #endif // PDFEXPORTABLEGRAPHICSSCENE_H

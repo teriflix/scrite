@@ -92,9 +92,9 @@ bool CharacterRelationshipsGraphExporter::doExport(QIODevice *device)
     scene.setComment(m_comment);
     scene.setWatermark(m_watermark);
     if(m_enableHeaderFooter)
-        scene.addStandardItems(PdfExportableGraphicsScene::HeaderFooterAndWatermarkUnderlay);
+        scene.addStandardItems(PdfExportableGraphicsScene::WatermarkOverlayLayer|PdfExportableGraphicsScene::FooterLayer|PdfExportableGraphicsScene::DontIncludeScriteLink);
     else
-        scene.addStandardItems(PdfExportableGraphicsScene::WatermarkUnderlayLayer);
+        scene.addStandardItems(PdfExportableGraphicsScene::WatermarkOverlayLayer);
     return scene.exportToPdf(device);
 }
 

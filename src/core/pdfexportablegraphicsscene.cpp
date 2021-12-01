@@ -274,3 +274,105 @@ void GraphicsWatermarkItem::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     m_watermark->paint(painter, m_rect, 1, 1);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subtitle, qreal containerWidth)
+    :QGraphicsRectItem(nullptr)
+{
+    this->setBrush(Qt::NoBrush);
+    this->setPen(Qt::NoPen);
+
+    const qreal maxTitleWidth = containerWidth * 0.35;
+
+    QFont titleFont = Application::font();
+    titleFont.setPointSize(24);
+    titleFont.setBold(true);
+
+    const QFontMetricsF titleFontMetrics(titleFont);
+    const qreal actualTitleWidth = titleFontMetrics.width(title);
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
+    titleText->setTextWidth(qMin(actualTitleWidth,maxTitleWidth));
+    titleText->setFont(titleFont);
+    titleText->setPlainText(title);
+    titleText->document()->setDocumentMargin(0);
+
+    QFont subtitleFont = Application::font();
+    subtitleFont.setPointSize(14);
+    subtitleFont.setBold(true);
+
+    const QFontMetricsF subtitleFontMetrics(subtitleFont);
+
+    const QPointF subtitleTextBottomLeft = this->childrenBoundingRect().bottomRight() + QPointF(20, 0);
+
+    QGraphicsTextItem *subtitleText = new QGraphicsTextItem(this);
+    subtitleText->setFont(subtitleFont);
+    subtitleText->setPlainText(subtitle);
+    subtitleText->setOpacity(0.75);
+    subtitleText->document()->setDocumentMargin(0);
+
+    QRectF subtitleTextRect = subtitleText->boundingRect();
+    subtitleTextRect.moveBottomLeft(subtitleTextBottomLeft);
+    subtitleTextRect.moveBottom( subtitleTextRect.bottom()-(titleFontMetrics.descent()-subtitleFontMetrics.descent()) );
+    subtitleText->setPos(subtitleTextRect.topLeft());
+
+    const QRectF subtitleRect = subtitleText->mapToParent(subtitleText->boundingRect()).boundingRect();
+
+    QGraphicsLineItem *separator = new QGraphicsLineItem(this);
+    separator->setLine( QLineF(subtitleRect.topLeft()-QPointF(10,0), subtitleRect.bottomLeft()-QPointF(10,0)) );
+    separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
+    separator->setOpacity(0.75);
+
+    subtitleFont.setBold(false);
+
+    QGraphicsTextItem *urlLinkText = new QGraphicsTextItem(this);
+    urlLinkText->setFont(subtitleFont);
+    urlLinkText->setDefaultTextColor(Qt::black);
+    urlLinkText->setHtml(QStringLiteral("scrite.io"));
+    urlLinkText->setOpacity(0.75);
+    urlLinkText->document()->setDocumentMargin(0);
+
+    QRectF urlLinkTextRect = urlLinkText->boundingRect();
+    urlLinkTextRect.moveRight(containerWidth);
+    urlLinkTextRect.moveBottom(subtitleRect.bottom());
+    urlLinkText->setPos(urlLinkTextRect.topLeft());
+
+    urlLinkTextRect = urlLinkText->mapToParent(urlLinkText->boundingRect()).boundingRect();
+
+    separator = new QGraphicsLineItem(this);
+    separator->setLine( QLineF(urlLinkTextRect.topLeft()-QPointF(10,0), urlLinkTextRect.bottomLeft()-QPointF(10,0)) );
+    separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
+    separator->setOpacity(0.75);
+
+    {
+        const QPixmap scriteLogo(QStringLiteral(":/images/scrite_logo_for_report_header.png"));
+        const qreal scale = this->childrenBoundingRect().height() / scriteLogo.height();
+
+        QRectF scriteLogoRect( QPointF(0,0), QSizeF(scriteLogo.size())*scale );
+        scriteLogoRect.moveRight(urlLinkTextRect.left()-20);
+        scriteLogoRect.moveBottom(this->childrenBoundingRect().bottom());
+
+        QGraphicsPixmapItem *scriteLogoItem = new QGraphicsPixmapItem(this);
+        scriteLogoItem->setPixmap(scriteLogo);
+        scriteLogoItem->setPos(scriteLogoRect.topLeft());
+        scriteLogoItem->setScale(scale);
+    }
+
+    {
+        QRectF cbrect = this->childrenBoundingRect();
+        cbrect.setHeight( cbrect.height() + 20 );
+
+        QGraphicsLineItem *separator = new QGraphicsLineItem(this);
+        separator->setLine( QLineF(cbrect.bottomLeft(), cbrect.bottomRight()) );
+        separator->setPen(QPen(Qt::gray));
+    }
+
+    this->setRect(this->childrenBoundingRect().adjusted(0, 0, 0, 20));
+}
+
+GraphicsHeaderItem::~GraphicsHeaderItem()
+{
+
+}
+

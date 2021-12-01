@@ -103,11 +103,4 @@ private:
     QFont m_font;
 };
 
-class StatisticsReportHeaderItem : public QGraphicsRectItem
-{
-public:
-    StatisticsReportHeaderItem(const StatisticsReport *report, qreal containerWidth);
-    ~StatisticsReportHeaderItem();
-};
-
 #endif // STATISTICSREPORT_P_H
