@@ -538,7 +538,8 @@ Item {
                             onTextEdited: allowHighlightSaveAnimation = true
                             completionStrings: ["Novice", "Learning", "Written Few, None Made", "Have Produced Credits", "Experienced"]
                             minimumCompletionPrefixLength: 0
-                            maxVisibleItems: -1
+                            maxCompletionItems: -1
+                            maxVisibleItems: 6
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
                         }
 
@@ -579,7 +580,8 @@ Item {
                                 "YouTube"
                             ]
                             minimumCompletionPrefixLength: 0
-                            maxVisibleItems: -1
+                            maxCompletionItems: -1
+                            maxVisibleItems: 6
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
                         }
 

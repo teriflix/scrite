@@ -11,15 +11,18 @@
 **
 ****************************************************************************/
 
+import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
+
 import Scrite 1.0
 
 TextField {
     id: textField
     property alias completionStrings: completionModel.strings
     property alias completionPrefix: completionModel.completionPrefix
-    property alias maxVisibleItems: completionModel.maxVisibleItems
+    property alias maxCompletionItems: completionModel.maxVisibleItems
+    property int maxVisibleItems: maxCompletionItems
     property int minimumCompletionPrefixLength: 1
     signal requestCompletion(string string)
 
@@ -156,23 +159,31 @@ TextField {
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
     }
 
+    FontMetrics {
+        id: fontMetrics
+        font: textField.font
+    }
+
     Popup {
         id: completionViewPopup
         x: 0
         y: parent.height
         width: parent.width
-        height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+        height: completionView.height + topInset + bottomInset + topPadding + bottomPadding
         focus: false
         closePolicy: textField.length === 0 ? Popup.CloseOnPressOutside : Popup.NoAutoClose
         contentItem: ListView {
             id: completionView
+            clip: true
             model: completionModel
             FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
             highlightMoveDuration: 0
             highlightResizeDuration: 0
             keyNavigationEnabled: false
+            property real delegateHeight: fontMetrics.lineSpacing + 10
             delegate: Text {
-                width: completionView.width-1
+                width: completionView.width - (completionView.contentHeight > completionView.height ? 20 : 1)
+                height: completionView.delegateHeight
                 text: string
                 padding: 5
                 font: textField.font
@@ -190,7 +201,8 @@ TextField {
                 color: primaryColors.highlight.background
             }
             currentIndex: completionModel.currentRow
-            height: contentHeight
+            height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
+            ScrollBar.vertical: ScrollBar2 { flickable: completionView }
         }
     }
 }
