@@ -518,24 +518,19 @@ Item {
                             id: nameField
                             width: (parent.width-parent.columnSpacing)/2
                             placeholderText: "Name"
-                            text: {
-                                if(User.info.firstName && User.info.lastName)
-                                    return User.info.firstName + " " + User.info.lastName
-                                if(User.info.firstName)
-                                    return User.info.firstName
-                                return User.info.lastName ? User.info.lastName : ""
-                            }
+                            text: User.fullName
                             Component.onCompleted: forceActiveFocus()
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 0
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
+                            onReturnPressed: if(needsSaving) saveRefreshLink.click()
                         }
 
                         TextField2 {
                             id: experienceField
                             width: (parent.width-parent.columnSpacing)/2
-                            text: User.info.experience
+                            text: User.experience
                             placeholderText: "Experience"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 1
@@ -543,36 +538,49 @@ Item {
                             onTextEdited: allowHighlightSaveAnimation = true
                             completionStrings: ["Novice", "Learning", "Written Few, None Made", "Have Produced Credits", "Experienced"]
                             minimumCompletionPrefixLength: 0
+                            maxVisibleItems: -1
+                            onReturnPressed: if(needsSaving) saveRefreshLink.click()
                         }
 
                         TextField2 {
-                            id: cityField
+                            id: locationField
                             width: (parent.width-parent.columnSpacing)/2
-                            text: User.info.city
-                            placeholderText: "City"
+                            text: User.location
+                            placeholderText: "Location (City, Country)"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 2
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
-                            completionStrings: User.cityNames
+                            completionStrings: User.locations
                             minimumCompletionPrefixLength: 0
-                            onEditingComplete: {
-                                const countries = User.countries(text)
-                                countryField.text = countries.length === 0 ? "" : countries[0]
-                            }
+                            onReturnPressed: if(needsSaving) saveRefreshLink.click()
                         }
 
                         TextField2 {
-                            id: countryField
+                            id: wdyhasField
                             width: (parent.width-parent.columnSpacing)/2
-                            text: User.info.country
-                            placeholderText: "Country"
+                            text: User.wdyhas
+                            placeholderText: "Where did you hear about Scrite?"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 3
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
-                            completionStrings: User.countryNames
+                            completionStrings: [
+                                "Colleague",
+                                "Email",
+                                "Facebook",
+                                "Filmschool",
+                                "Friend",
+                                "Instagram",
+                                "Internet Search",
+                                "LinkedIn",
+                                "Twitter",
+                                "Workshop",
+                                "YouTube"
+                            ]
                             minimumCompletionPrefixLength: 0
+                            maxVisibleItems: -1
+                            onReturnPressed: if(needsSaving) saveRefreshLink.click()
                         }
 
                         CheckBox2 {
@@ -597,9 +605,9 @@ Item {
             }
 
             property bool needsSaving: nameField.text.trim() !== User.fullName ||
-                                       cityField.text.trim() !== User.city ||
-                                       countryField.text.trim() !== User.country ||
+                                       locationField.text.trim() !== User.location ||
                                        experienceField.text.trim() !== User.experience ||
+                                       wdyhasField.text.trim() !== User.wdyhas ||
                                        chkAnalyticsConsent.checked !== User.info.consent.activity ||
                                        chkEmailConsent.checked !== User.info.consent.email
 
@@ -702,7 +710,9 @@ Item {
                     anchors.right: parent.right
                     property real characterSpacing: 0
                     font.letterSpacing: characterSpacing
-                    onClicked: {
+                    onClicked: click()
+
+                    function click() {
                         if(needsSaving) {
                             var names = nameField.text.split(' ')
 
@@ -714,8 +724,8 @@ Item {
                                 firstName: _firstName,
                                 lastName: _lastName,
                                 experience: experienceField.text,
-                                city: cityField.text,
-                                country: countryField.text,
+                                location: locationField.text,
+                                wdyhas: wdyhasField.text,
                                 consent: {
                                     activity: chkAnalyticsConsent.checked,
                                     email: chkEmailConsent.checked

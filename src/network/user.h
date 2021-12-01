@@ -48,14 +48,15 @@ public:
     Q_PROPERTY(QString fullName READ fullName NOTIFY infoChanged)
     QString fullName() const;
 
-    Q_PROPERTY(QString city READ city NOTIFY infoChanged)
-    QString city() const;
-
-    Q_PROPERTY(QString country READ country NOTIFY infoChanged)
-    QString country() const;
+    Q_PROPERTY(QString location READ location NOTIFY infoChanged)
+    QString location() const;
 
     Q_PROPERTY(QString experience READ experience NOTIFY infoChanged)
     QString experience() const;
+
+    // Where did you hear about Scrite?
+    Q_PROPERTY(QString wdyhas READ wdyhas NOTIFY infoChanged)
+    QString wdyhas() const;
 
     Q_PROPERTY(QJsonObject info READ info NOTIFY infoChanged)
     QJsonObject info() const { return m_info; }
@@ -65,13 +66,8 @@ public:
     QJsonArray installations() const { return m_installations; }
     Q_SIGNAL void installationsChanged();
 
-    Q_PROPERTY(QStringList countryNames READ countryNames CONSTANT)
-    static QStringList countryNames();
-
-    Q_PROPERTY(QStringList cityNames READ cityNames CONSTANT)
-    static QStringList cityNames();
-
-    Q_INVOKABLE static QStringList countries(const QString &cityName);
+    Q_PROPERTY(QStringList locations READ locations CONSTANT)
+    Q_INVOKABLE static QStringList locations();
 
     Q_PROPERTY(int currentInstallationIndex READ currentInstallationIndex NOTIFY installationsChanged)
     int currentInstallationIndex() const { return m_currentInstallationIndex; }
