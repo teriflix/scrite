@@ -23,6 +23,7 @@
 #include <QSettings>
 #include <QPdfWriter>
 #include <QJsonArray>
+#include <QScopeGuard>
 #include <QJsonObject>
 #include <QMetaObject>
 #include <QMetaClassInfo>
@@ -139,6 +140,11 @@ bool AbstractReportGenerator::generate()
         this->error()->setErrorMessage( QString("Could not open file '%1' for writing.").arg(fileName) );
         return false;
     }
+
+    qScopeGuard([=]() {
+        const QString reportName = QString::fromLatin1(this->metaObject()->className());
+        User::instance()->logActivity2( QStringLiteral("report"), reportName );
+    });
 
     const bool usePdfWriter = this->usePdfWriter();
 
@@ -278,9 +284,6 @@ bool AbstractReportGenerator::generate()
     this->progress()->finish();
 
     GarbageCollector::instance()->add(this);
-
-    const QString reportName = QString::fromLatin1(this->metaObject()->className());
-    User::instance()->logActivity2( QStringLiteral("report"), reportName );
 
     return ret;
 }

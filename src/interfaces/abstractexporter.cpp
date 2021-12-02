@@ -15,6 +15,8 @@
 #include "application.h"
 #include "user.h"
 
+#include <QScopeGuard>
+
 AbstractExporter::AbstractExporter(QObject *parent)
                  :AbstractDeviceIO(parent)
 {
@@ -94,6 +96,11 @@ bool AbstractExporter::write()
         return false;
     }
 
+    qScopeGuard([=]() {
+        const QString exporterName = QString::fromLatin1(this->metaObject()->className());
+        User::instance()->logActivity2( QStringLiteral("export"), exporterName );
+    });
+
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
     this->progress()->setProgressText( QStringLiteral("Generating \"%1\"").arg(classInfo.value()));
@@ -103,9 +110,6 @@ bool AbstractExporter::write()
     this->progress()->finish();
 
     GarbageCollector::instance()->add(this);
-
-    const QString exporterName = QString::fromLatin1(this->metaObject()->className());
-    User::instance()->logActivity2( QStringLiteral("export"), exporterName );
 
     return ret;
 }
