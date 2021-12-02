@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "user.h"
 #include "hourglass.h"
 #include "application.h"
 #include "timeprofiler.h"
@@ -148,9 +149,10 @@ void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
     m_transliterator = transliteratorFor(m_language);
 
     QSettings *settings = Application::instance()->settings();
-    const QMetaObject *mo = this->metaObject();
+    const QMetaObject *mo = &TransliterationEngine::staticMetaObject;
     const QMetaEnum metaEnum = mo->enumerator( mo->indexOfEnumerator("Language") );
-    settings->setValue("Transliteration/currentLanguage", QString::fromLatin1(metaEnum.valueToKey(m_language)));
+    const QString languageName = QString::fromLatin1(metaEnum.valueToKey(m_language));
+    settings->setValue("Transliteration/currentLanguage", languageName);
 
     SystemTextInputManager *tisManager = SystemTextInputManager::instance();
     const QString tisId = m_tisMap.value(val);
@@ -170,6 +172,8 @@ void TransliterationEngine::setLanguage(TransliterationEngine::Language val)
     }
 
     emit languageChanged();
+
+    User::instance()->logActivity2(QStringLiteral("language"), languageName);
 }
 
 QString TransliterationEngine::languageAsString() const
