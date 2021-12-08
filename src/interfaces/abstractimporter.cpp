@@ -17,6 +17,7 @@
 #include "abstractimporter.h"
 
 #include <QFile>
+#include <QScopeGuard>
 #include <QRandomGenerator>
 #include <QRegularExpression>
 
@@ -89,6 +90,11 @@ bool AbstractImporter::read()
         return false;
     }
 
+    qScopeGuard([=]() {
+        const QString importerName = QString::fromLatin1(this->metaObject()->className());
+        User::instance()->logActivity2( QStringLiteral("import"), importerName );
+    });
+
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
     this->progress()->setProgressText( QString("Importing from \"%1\"").arg(classInfo.value()));
@@ -115,9 +121,6 @@ bool AbstractImporter::read()
     this->progress()->finish();
 
     GarbageCollector::instance()->add(this);
-
-    const QString importerName = QString::fromLatin1(this->metaObject()->className());
-    User::instance()->logActivity2( QStringLiteral("export"), importerName );
 
     return ret;
 }
