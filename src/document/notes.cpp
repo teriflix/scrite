@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "user.h"
 #include "form.h"
 #include "notes.h"
 #include "scene.h"
@@ -118,6 +119,11 @@ void Note::setForm(Form *val)
             m_summary += questions.join( QStringLiteral(", ") );
             emit summaryChanged();
         }
+
+        User::instance()->logActivity2( QStringLiteral("notebookform"), QJsonObject({
+                            { QStringLiteral("id"), m_form->id() },
+                            { QStringLiteral("name"), m_form->title() }
+                        }));
     }
     else
     {

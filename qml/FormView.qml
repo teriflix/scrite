@@ -159,11 +159,6 @@ Item {
             Repeater {
                 id: formFieldsRepeater
                 model: formQuestionsModel
-                onCountChanged: Qt.callLater(logFormActivity)
-
-                function logFormActivity() {
-                    User.logActivity2("notebookform", {"id": form.id, "name": form.title})
-                }
 
                 FormField {
                     anchors.right: parent.right

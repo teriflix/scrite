@@ -1929,13 +1929,6 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     metaInfo.insert( QStringLiteral("orgDomain"), qApp->organizationDomain());
     metaInfo.insert( QStringLiteral("appVersion"), QStringLiteral("0.7.12"));
 
-    /**
-     * Nightly builds are x.y.z, where z is odd for nightly builds and even
-     * for public builds. Users using nightly builds must be able to create a file
-     * using it and open it using the public builds. Just in case the nightly
-     * build crashes, they shouldnt be constrained from opening the file using a
-     * previous public build.
-     */
     QVersionNumber appVersion = QVersionNumber::fromString(Application::instance()->versionNumber().toString());
     if(appVersion.microVersion() % 2)
         appVersion = QVersionNumber(appVersion.majorVersion(), appVersion.minorVersion(), appVersion.microVersion()-1);
