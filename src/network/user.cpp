@@ -312,13 +312,16 @@ void User::activateCallDone()
 {
     if(m_call)
     {
-        if(m_call->hasError() || !m_call->hasResponse())
+        if(m_call->hasError())
         {
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
             this->reset();
             emit forceLoginRequest();
             return;
         }
+
+        if(!m_call->hasResponse())
+            return; // use stored login credentials
 
         const QJsonObject tokens = m_call->responseData();
         const QString sessionTokenKey = QStringLiteral("sessionToken");
@@ -375,13 +378,16 @@ void User::installationsCallDone()
 {
     if(m_call)
     {
-        if(m_call->hasError() || !m_call->hasResponse())
+        if(m_call->hasError())
         {
             m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
             this->reset();
             emit forceLoginRequest();
             return;
         }
+
+        if(!m_call->hasResponse())
+            return; // Use stored credentials
 
         const QJsonObject installationsInfo = m_call->responseData();
         const QJsonArray installations = installationsInfo.value(QStringLiteral("list")).toArray();
