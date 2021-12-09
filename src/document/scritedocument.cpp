@@ -418,7 +418,8 @@ bool ScriteDocument::isEmpty() const
                             m_screenplay->elementCount() +
                             m_structure->notes()->noteCount() +
                             m_structure->characterCount() +
-                            m_structure->attachments()->attachmentCount();
+                            m_structure->attachments()->attachmentCount() +
+                            m_collaborators.size();
     const bool ret = objectCount == 0 && m_screenplay->isEmpty();
     return ret;
 }
@@ -465,6 +466,11 @@ void ScriteDocument::addCollaborator(const QString &email)
 
         collabs.append(email.toLower());
         this->setCollaborators(collabs);
+
+        User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
+                { QStringLiteral("action"), QStringLiteral("add") },
+                { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+            }) );
     }
 }
 
@@ -479,6 +485,11 @@ void ScriteDocument::removeCollaborator(const QString &email)
 
         collabs.removeAt(idx);
         this->setCollaborators(collabs);
+
+        User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
+                { QStringLiteral("action"), QStringLiteral("remove") },
+                { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+            }) );
     }
 }
 
@@ -488,11 +499,21 @@ void ScriteDocument::enableCollaboration()
         return;
 
     if(User::instance()->isLoggedIn())
+    {
         this->setCollaborators( QStringList({User::instance()->email()}) );
+        User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
+                { QStringLiteral("action"), QStringLiteral("enable") },
+                { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+            }) );
+    }
 }
 
 void ScriteDocument::disableCollaboration()
 {
+    User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
+            { QStringLiteral("action"), QStringLiteral("disable") },
+            { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+        }) );
     this->setCollaborators(QStringList());
 }
 
