@@ -1059,7 +1059,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(const S
         return StatisticsReport::pickColor(locationIndex++%2,true,StatisticsReport::Location);
     };
 
-    return this->createPresenceGraph(locationPresence, evalColorFunc, evalLocationLabel, report, container, sceneItemsContainer);
+    return this->createPresenceGraph(locationPresence, evalColorFunc, evalLocationLabel, report, container, sceneItemsContainer, false);
 }
 
 QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPair<QString, QList<int> > > &presence,
@@ -1067,7 +1067,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPa
                                                                  std::function<QString(const QString &, const QList<int>&)> evalLabelFunc,
                                                                  const StatisticsReport *report,
                                                                  QGraphicsItem *container,
-                                                                 const QGraphicsRectItem *sceneItemsContainer) const
+                                                                 const QGraphicsRectItem *sceneItemsContainer,
+                                                                 bool useCurvedPath) const
 {
     const Structure *structure = report->document()->structure();
     if(presence.isEmpty())
@@ -1117,24 +1118,37 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(const QList<QPa
 
             hasPresence = true;
             const int presence = presenceItem.second.at(i);
-            const qreal x = graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect().center()).x();
+            const QRectF sceneItemRect = graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect()).boundingRect();
             const qreal y = heightPerGraph - presence*heightPerPresence;
-
             const QPointF prevPos = path.currentPosition();
-            const QPointF newPos = QPointF(x,y);
-            if( qAbs(newPos.y()-prevPos.y()) > cubicCurveThreshold )
+
+            if(useCurvedPath)
             {
-                // Approxmiating a spline curve
-                const QRectF posRect = QRectF(prevPos,newPos).normalized();
-                const QPointF topCenter(posRect.center().x(), posRect.top()+1);
-                const QPointF bottomCenter(posRect.center().x(), posRect.bottom()-1);
-                const bool goingUp = newPos.y() < prevPos.y();
-                const QPointF ctrlPoint1 = goingUp ? bottomCenter : topCenter;
-                const QPointF ctrlPoint2 = goingUp ? topCenter : bottomCenter;
-                path.cubicTo(ctrlPoint1, ctrlPoint2, newPos);
+                const qreal x = graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect().center()).x();
+
+                const QPointF newPos = QPointF(x,y);
+                if( qAbs(newPos.y()-prevPos.y()) > cubicCurveThreshold )
+                {
+                    // Approxmiating a spline curve
+                    const QRectF posRect = QRectF(prevPos,newPos).normalized();
+                    const QPointF topCenter(posRect.center().x(), posRect.top()+1);
+                    const QPointF bottomCenter(posRect.center().x(), posRect.bottom()-1);
+                    const bool goingUp = newPos.y() < prevPos.y();
+                    const QPointF ctrlPoint1 = goingUp ? bottomCenter : topCenter;
+                    const QPointF ctrlPoint2 = goingUp ? topCenter : bottomCenter;
+                    path.cubicTo(ctrlPoint1, ctrlPoint2, newPos);
+                }
+                else
+                    path.lineTo(newPos);
             }
             else
-                path.lineTo(newPos);
+            {
+                const QPointF tl( sceneItemRect.left(), y );
+                const QPointF tr( sceneItemRect.right(), y );
+                if( !qFuzzyCompare(prevPos.y(), y) )
+                    path.lineTo(tl);
+                path.lineTo(tr);
+            }
         }
 
         path.lineTo(containerWidth,heightPerGraph);

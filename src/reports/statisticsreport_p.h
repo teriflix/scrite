@@ -65,7 +65,8 @@ private:
                                            std::function<QString(const QString &, const QList<int>&)> evalLabelFunc,
                                            const StatisticsReport *report,
                                            QGraphicsItem *container,
-                                           const QGraphicsRectItem *sceneItems) const;
+                                           const QGraphicsRectItem *sceneItems,
+                                           bool useCurvedPath=true) const;
 
     QGraphicsRectItem *createSeparator(QGraphicsItem *container, const QString &label, const QColor &color) const;
 };
