@@ -27,7 +27,7 @@ public:
     ModelAggregator(QObject *parent = nullptr);
     ~ModelAggregator();
 
-    typedef std::function<void(const QModelIndex &,QVariant &)> AggregateFunction;
+    typedef std::function<void(const QModelIndex &, QVariant &)> AggregateFunction;
     void setAggregateFunction(AggregateFunction val) { m_aggregateFunction = val; }
     AggregateFunction aggregateFunction() const { return m_aggregateFunction; }
 
@@ -37,8 +37,8 @@ public:
     Q_SIGNAL void finalizeFunctionChanged();
 
     Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel RESET resetModel NOTIFY modelChanged)
-    void setModel(QAbstractItemModel* val);
-    QAbstractItemModel* model() const { return m_model; }
+    void setModel(QAbstractItemModel *val);
+    QAbstractItemModel *model() const { return m_model; }
     Q_SIGNAL void modelChanged();
 
     Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)

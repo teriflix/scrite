@@ -21,7 +21,7 @@ class CompletionModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    CompletionModel(QObject *parent=nullptr);
+    CompletionModel(QObject *parent = nullptr);
     ~CompletionModel();
 
     Q_PROPERTY(QStringList strings READ strings WRITE setStrings NOTIFY stringsChanged)

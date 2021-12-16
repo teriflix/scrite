@@ -61,34 +61,31 @@
 #include <QFileSystemWatcher>
 #include <QScopedValueRollback>
 
-ScriteDocumentBackups::ScriteDocumentBackups(QObject *parent)
-    : QAbstractListModel(parent)
+ScriteDocumentBackups::ScriteDocumentBackups(QObject *parent) : QAbstractListModel(parent)
 {
     m_reloadTimer.setSingleShot(true);
     m_reloadTimer.setInterval(50);
-    connect(&m_reloadTimer, &QTimer::timeout, this, &ScriteDocumentBackups::reloadBackupFileInformation);
+    connect(&m_reloadTimer, &QTimer::timeout, this,
+            &ScriteDocumentBackups::reloadBackupFileInformation);
 }
 
-ScriteDocumentBackups::~ScriteDocumentBackups()
-{
-
-}
+ScriteDocumentBackups::~ScriteDocumentBackups() { }
 
 QJsonObject ScriteDocumentBackups::at(int index) const
 {
     QJsonObject ret;
 
-    if(index < 0 || index >= m_backupFiles.size())
+    if (index < 0 || index >= m_backupFiles.size())
         return ret;
 
     const QModelIndex idx = this->index(index, 0, QModelIndex());
 
-    const QHash<int,QByteArray> roles = this->roleNames();
+    const QHash<int, QByteArray> roles = this->roleNames();
     auto it = roles.begin();
     auto end = roles.end();
-    while(it != end)
-    {
-        ret.insert( QString::fromLatin1(it.value()), QJsonValue::fromVariant(this->data(idx, it.key())) );
+    while (it != end) {
+        ret.insert(QString::fromLatin1(it.value()),
+                   QJsonValue::fromVariant(this->data(idx, it.key())));
         ++it;
     }
 
@@ -102,12 +99,11 @@ int ScriteDocumentBackups::rowCount(const QModelIndex &parent) const
 
 QVariant ScriteDocumentBackups::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid() || index.row() < 0 || index.row() >= m_backupFiles.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_backupFiles.size())
         return QVariant();
 
     const QFileInfo fi = m_backupFiles.at(index.row());
-    switch(role)
-    {
+    switch (role) {
     case TimestampRole:
         return fi.birthTime().toMSecsSinceEpoch();
     case TimestampAsStringRole:
@@ -122,8 +118,8 @@ QVariant ScriteDocumentBackups::data(const QModelIndex &index, int role) const
     case FileSizeRole:
         return fi.size();
     case MetaDataRole:
-        if(!m_metaDataList.at(index.row()).loaded)
-            (const_cast<ScriteDocumentBackups*>(this))->loadMetaData(index.row());
+        if (!m_metaDataList.at(index.row()).loaded)
+            (const_cast<ScriteDocumentBackups *>(this))->loadMetaData(index.row());
         return m_metaDataList.at(index.row()).toJson();
     }
 
@@ -132,16 +128,14 @@ QVariant ScriteDocumentBackups::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> ScriteDocumentBackups::roleNames() const
 {
-    static QHash<int, QByteArray> roles =
-        {
-            { TimestampRole, QByteArrayLiteral("timestamp") },
-            { TimestampAsStringRole, QByteArrayLiteral("timestampAsString") },
-            { RelativeTimeRole, QByteArrayLiteral("relativeTime")},
-            { FileNameRole, QByteArrayLiteral("fileName") },
-            { FilePathRole, QByteArrayLiteral("filePath") },
-            { FileSizeRole, QByteArrayLiteral("fileSize") },
-            { MetaDataRole,QByteArrayLiteral("metaData") }
-        };
+    static QHash<int, QByteArray> roles = { { TimestampRole, QByteArrayLiteral("timestamp") },
+                                            { TimestampAsStringRole,
+                                              QByteArrayLiteral("timestampAsString") },
+                                            { RelativeTimeRole, QByteArrayLiteral("relativeTime") },
+                                            { FileNameRole, QByteArrayLiteral("fileName") },
+                                            { FilePathRole, QByteArrayLiteral("filePath") },
+                                            { FileSizeRole, QByteArrayLiteral("fileSize") },
+                                            { MetaDataRole, QByteArrayLiteral("metaData") } };
     return roles;
 }
 
@@ -152,7 +146,7 @@ QString ScriteDocumentBackups::relativeTime(const QDateTime &dt)
 
 void ScriteDocumentBackups::setDocumentFilePath(const QString &val)
 {
-    if(m_documentFilePath == val)
+    if (m_documentFilePath == val)
         return;
 
     m_documentFilePath = val;
@@ -163,29 +157,26 @@ void ScriteDocumentBackups::setDocumentFilePath(const QString &val)
 
 void ScriteDocumentBackups::loadBackupFileInformation()
 {
-    if(m_documentFilePath.isEmpty())
-    {
+    if (m_documentFilePath.isEmpty()) {
         this->clear();
         return;
     }
 
     const QFileInfo fi(m_documentFilePath);
-    if(!fi.exists() || fi.suffix() != QStringLiteral("scrite"))
-    {
+    if (!fi.exists() || fi.suffix() != QStringLiteral("scrite")) {
         this->clear();
         return;
     }
 
-    const QString backupDirPath(fi.absolutePath() + QStringLiteral("/") + fi.baseName() + QStringLiteral(" Backups"));
+    const QString backupDirPath(fi.absolutePath() + QStringLiteral("/") + fi.baseName()
+                                + QStringLiteral(" Backups"));
     QDir backupDir(backupDirPath);
-    if(!backupDir.exists())
-    {
+    if (!backupDir.exists()) {
         this->clear();
         return;
     }
 
-    if(m_fsWatcher == nullptr)
-    {
+    if (m_fsWatcher == nullptr) {
         m_fsWatcher = new QFileSystemWatcher(this);
         connect(m_fsWatcher, SIGNAL(directoryChanged(QString)), &m_reloadTimer, SLOT(start()));
         m_fsWatcher->addPath(backupDirPath);
@@ -198,8 +189,7 @@ void ScriteDocumentBackups::loadBackupFileInformation()
 void ScriteDocumentBackups::reloadBackupFileInformation()
 {
     const QString futureWatcherName = QStringLiteral("ReloadFutureWatcher");
-    if(this->findChild<QFutureWatcherBase*>(futureWatcherName,Qt::FindDirectChildrenOnly))
-    {
+    if (this->findChild<QFutureWatcherBase *>(futureWatcherName, Qt::FindDirectChildrenOnly)) {
         m_reloadTimer.start();
         return;
     }
@@ -216,7 +206,8 @@ void ScriteDocumentBackups::reloadBackupFileInformation()
      * done.
      */
     QFuture<QFileInfoList> future = QtConcurrent::run([=]() -> QFileInfoList {
-        return m_backupFilesDir.entryInfoList({QStringLiteral("*.scrite")}, QDir::Files, QDir::Time);
+        return m_backupFilesDir.entryInfoList({ QStringLiteral("*.scrite") }, QDir::Files,
+                                              QDir::Time);
     });
     QFutureWatcher<QFileInfoList> *futureWatcher = new QFutureWatcher<QFileInfoList>(this);
     futureWatcher->setObjectName(futureWatcherName);
@@ -235,7 +226,7 @@ void ScriteDocumentBackups::reloadBackupFileInformation()
 
 void ScriteDocumentBackups::loadMetaData(int row)
 {
-    if(row < 0 || row >= m_backupFiles.size())
+    if (row < 0 || row >= m_backupFiles.size())
         return;
 
     const QString futureWatcherName = QStringLiteral("loadMetaDataFuture");
@@ -243,33 +234,38 @@ void ScriteDocumentBackups::loadMetaData(int row)
     const QFileInfo fi = m_backupFiles.at(row);
     const QString fileName = fi.absoluteFilePath();
 
-    QFuture<MetaData> future = QtConcurrent::run([](const QString &fileName) -> MetaData {
-        MetaData ret;
+    QFuture<MetaData> future = QtConcurrent::run(
+            [](const QString &fileName) -> MetaData {
+                MetaData ret;
 
-        DocumentFileSystem dfs;
-        if( !dfs.load(fileName) ) {
-            ret.loaded = true;
-            return ret;
-        }
+                DocumentFileSystem dfs;
+                if (!dfs.load(fileName)) {
+                    ret.loaded = true;
+                    return ret;
+                }
 
-        const QJsonDocument jsonDoc = QJsonDocument::fromJson(dfs.header());
-        const QJsonObject docObj = jsonDoc.object();
+                const QJsonDocument jsonDoc = QJsonDocument::fromJson(dfs.header());
+                const QJsonObject docObj = jsonDoc.object();
 
-        const QJsonObject structure = docObj.value(QStringLiteral("structure")).toObject();
-        ret.structureElementCount = structure.value(QStringLiteral("elements")).toArray().size();
+                const QJsonObject structure = docObj.value(QStringLiteral("structure")).toObject();
+                ret.structureElementCount =
+                        structure.value(QStringLiteral("elements")).toArray().size();
 
-        const QJsonObject screenplay = docObj.value(QStringLiteral("screenplay")).toObject();
-        ret.screenplayElementCount = screenplay.value(QStringLiteral("elements")).toArray().size();
+                const QJsonObject screenplay =
+                        docObj.value(QStringLiteral("screenplay")).toObject();
+                ret.screenplayElementCount =
+                        screenplay.value(QStringLiteral("elements")).toArray().size();
 
-        ret.loaded = true;
+                ret.loaded = true;
 
-        return ret;
-    }, fileName);
+                return ret;
+            },
+            fileName);
 
     QFutureWatcher<MetaData> *futureWatcher = new QFutureWatcher<MetaData>(this);
     futureWatcher->setObjectName(futureWatcherName);
     connect(futureWatcher, &QFutureWatcher<MetaData>::finished, [=]() {
-        if(row < 0 || row >= m_metaDataList.size())
+        if (row < 0 || row >= m_metaDataList.size())
             return;
 
         m_metaDataList.replace(row, future.result());
@@ -279,7 +275,8 @@ void ScriteDocumentBackups::loadMetaData(int row)
     });
     futureWatcher->setFuture(future);
 
-    connect(this, &ScriteDocumentBackups::modelAboutToBeReset, futureWatcher, &QObject::deleteLater);
+    connect(this, &ScriteDocumentBackups::modelAboutToBeReset, futureWatcher,
+            &QObject::deleteLater);
 }
 
 void ScriteDocumentBackups::clear()
@@ -289,7 +286,7 @@ void ScriteDocumentBackups::clear()
 
     m_backupFilesDir = QDir();
 
-    if(m_backupFiles.isEmpty())
+    if (m_backupFiles.isEmpty())
         return;
 
     this->beginResetModel();
@@ -339,9 +336,7 @@ DeviceIOFactories::DeviceIOFactories()
     ReportsFactory.addClass<StatisticsReport>();
 }
 
-DeviceIOFactories::~DeviceIOFactories()
-{
-}
+DeviceIOFactories::~DeviceIOFactories() { }
 
 Q_GLOBAL_STATIC(DeviceIOFactories, deviceIOFactories)
 
@@ -352,16 +347,17 @@ ScriteDocument *ScriteDocument::instance()
 }
 
 ScriteDocument::ScriteDocument(QObject *parent)
-                :QObject(parent),
-                  m_autoSaveTimer("ScriteDocument.m_autoSaveTimer"),
-                  m_clearModifyTimer("ScriteDocument.m_clearModifyTimer"),
-                  m_structure(this, "structure"),
-                  m_connectors(this),
-                  m_screenplay(this, "screenplay"),
-                  m_formatting(this, "formatting"),
-                  m_printFormat(this, "printFormat"),
-                  m_forms(this, "forms"),
-                  m_evaluateStructureElementSequenceTimer("ScriteDocument.m_evaluateStructureElementSequenceTimer")
+    : QObject(parent),
+      m_autoSaveTimer("ScriteDocument.m_autoSaveTimer"),
+      m_clearModifyTimer("ScriteDocument.m_clearModifyTimer"),
+      m_structure(this, "structure"),
+      m_connectors(this),
+      m_screenplay(this, "screenplay"),
+      m_formatting(this, "formatting"),
+      m_printFormat(this, "printFormat"),
+      m_forms(this, "forms"),
+      m_evaluateStructureElementSequenceTimer(
+              "ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
     m_fileLocker = new FileLocker(this);
 
@@ -369,40 +365,41 @@ ScriteDocument::ScriteDocument(QObject *parent)
     this->updateDocumentWindowTitle();
 
     connect(this, &ScriteDocument::collaboratorsChanged, this, &ScriteDocument::markAsModified);
-    connect(this, &ScriteDocument::spellCheckIgnoreListChanged, this, &ScriteDocument::markAsModified);
+    connect(this, &ScriteDocument::spellCheckIgnoreListChanged, this,
+            &ScriteDocument::markAsModified);
     connect(this, &ScriteDocument::userDataChanged, this, &ScriteDocument::markAsModified);
-    connect(this, &ScriteDocument::modifiedChanged, this, &ScriteDocument::updateDocumentWindowTitle);
-    connect(this, &ScriteDocument::fileNameChanged, this, &ScriteDocument::updateDocumentWindowTitle);
-    connect(this, &ScriteDocument::fileNameChanged, [=]() {
-        m_documentBackupsModel.setDocumentFilePath( m_fileName );
-    });
+    connect(this, &ScriteDocument::modifiedChanged, this,
+            &ScriteDocument::updateDocumentWindowTitle);
+    connect(this, &ScriteDocument::fileNameChanged, this,
+            &ScriteDocument::updateDocumentWindowTitle);
+    connect(this, &ScriteDocument::fileNameChanged,
+            [=]() { m_documentBackupsModel.setDocumentFilePath(m_fileName); });
 
     const QVariant ase = Application::instance()->settings()->value("AutoSave/autoSaveEnabled");
-    this->setAutoSave( ase.isValid() ? ase.toBool() : m_autoSave );
+    this->setAutoSave(ase.isValid() ? ase.toBool() : m_autoSave);
 
     const QVariant asd = Application::instance()->settings()->value("AutoSave/autoSaveInterval");
-    this->setAutoSaveDurationInSeconds( asd.isValid() ? asd.toInt() : m_autoSaveDurationInSeconds );
+    this->setAutoSaveDurationInSeconds(asd.isValid() ? asd.toInt() : m_autoSaveDurationInSeconds);
 
     m_autoSaveTimer.setRepeat(true);
     this->prepareAutoSave();
 
     QSettings *settings = Application::instance()->settings();
-    const QVariant mbc = settings->value( QStringLiteral("Installation/maxBackupCount") );
-    if(!mbc.isNull())
+    const QVariant mbc = settings->value(QStringLiteral("Installation/maxBackupCount"));
+    if (!mbc.isNull())
         m_maxBackupCount = mbc.toInt();
 
-    connect(this, &ScriteDocument::collaboratorsChanged, this, &ScriteDocument::canModifyCollaboratorsChanged);
-    connect(User::instance(), &User::loggedInChanged, this, &ScriteDocument::canModifyCollaboratorsChanged);
+    connect(this, &ScriteDocument::collaboratorsChanged, this,
+            &ScriteDocument::canModifyCollaboratorsChanged);
+    connect(User::instance(), &User::loggedInChanged, this,
+            &ScriteDocument::canModifyCollaboratorsChanged);
 }
 
-ScriteDocument::~ScriteDocument()
-{
-
-}
+ScriteDocument::~ScriteDocument() { }
 
 void ScriteDocument::setLocked(bool val)
 {
-    if(m_locked == val)
+    if (m_locked == val)
         return;
 
     m_locked = val;
@@ -413,34 +410,30 @@ void ScriteDocument::setLocked(bool val)
 
 bool ScriteDocument::isEmpty() const
 {
-    const int objectCount = m_structure->elementCount() +
-                            m_structure->annotationCount() +
-                            m_screenplay->elementCount() +
-                            m_structure->notes()->noteCount() +
-                            m_structure->characterCount() +
-                            m_structure->attachments()->attachmentCount() +
-                            m_collaborators.size();
+    const int objectCount = m_structure->elementCount() + m_structure->annotationCount()
+            + m_screenplay->elementCount() + m_structure->notes()->noteCount()
+            + m_structure->characterCount() + m_structure->attachments()->attachmentCount()
+            + m_collaborators.size();
     const bool ret = objectCount == 0 && m_screenplay->isEmpty();
     return ret;
 }
 
 void ScriteDocument::setCollaborators(const QStringList &val)
 {
-    if(m_collaborators == val || !User::instance()->isLoggedIn() || !this->canModifyCollaborators())
+    if (m_collaborators == val || !User::instance()->isLoggedIn()
+        || !this->canModifyCollaborators())
         return;
 
-    if(val.isEmpty())
+    if (val.isEmpty())
         m_collaborators = val;
-    else
-    {
-        QStringList newCollaborators({User::instance()->email()});
-        for(const QString &item : val)
-        {
+    else {
+        QStringList newCollaborators({ User::instance()->email() });
+        for (const QString &item : val) {
             const QString item2 = item.trimmed().toLower();
-            if(item2.isEmpty())
+            if (item2.isEmpty())
                 continue;
 
-            if(!newCollaborators.contains(item2))
+            if (!newCollaborators.contains(item2))
                 newCollaborators.append(item2);
         }
 
@@ -452,75 +445,80 @@ void ScriteDocument::setCollaborators(const QStringList &val)
 
 bool ScriteDocument::canModifyCollaborators() const
 {
-    return m_collaborators.isEmpty() ||
-           m_collaborators.first().compare( User::instance()->email(), Qt::CaseInsensitive ) == 0;
+    return m_collaborators.isEmpty()
+            || m_collaborators.first().compare(User::instance()->email(), Qt::CaseInsensitive) == 0;
 }
 
 void ScriteDocument::addCollaborator(const QString &email)
 {
-    if(this->hasCollaborators())
-    {
+    if (this->hasCollaborators()) {
         QStringList collabs = m_collaborators;
-        if(collabs.contains(email))
+        if (collabs.contains(email))
             return;
 
         collabs.append(email.toLower());
         this->setCollaborators(collabs);
 
-        User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
-                { QStringLiteral("action"), QStringLiteral("add") },
-                { QStringLiteral("size"), QString::number(m_collaborators.size()) },
-            }) );
+        User::instance()->logActivity2(
+                QStringLiteral("collaboration"),
+                QJsonObject({
+                        { QStringLiteral("action"), QStringLiteral("add") },
+                        { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+                }));
     }
 }
 
 void ScriteDocument::removeCollaborator(const QString &email)
 {
-    if(this->hasCollaborators())
-    {
+    if (this->hasCollaborators()) {
         QStringList collabs = m_collaborators;
         const int idx = collabs.indexOf(email);
-        if(idx == 0)
+        if (idx == 0)
             return;
 
         collabs.removeAt(idx);
         this->setCollaborators(collabs);
 
-        User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
-                { QStringLiteral("action"), QStringLiteral("remove") },
-                { QStringLiteral("size"), QString::number(m_collaborators.size()) },
-            }) );
+        User::instance()->logActivity2(
+                QStringLiteral("collaboration"),
+                QJsonObject({
+                        { QStringLiteral("action"), QStringLiteral("remove") },
+                        { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+                }));
     }
 }
 
 void ScriteDocument::enableCollaboration()
 {
-    if(this->hasCollaborators())
+    if (this->hasCollaborators())
         return;
 
-    if(User::instance()->isLoggedIn())
-    {
-        this->setCollaborators( QStringList({User::instance()->email()}) );
-        User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
-                { QStringLiteral("action"), QStringLiteral("enable") },
-                { QStringLiteral("size"), QString::number(m_collaborators.size()) },
-            }) );
+    if (User::instance()->isLoggedIn()) {
+        this->setCollaborators(QStringList({ User::instance()->email() }));
+        User::instance()->logActivity2(
+                QStringLiteral("collaboration"),
+                QJsonObject({
+                        { QStringLiteral("action"), QStringLiteral("enable") },
+                        { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+                }));
     }
 }
 
 void ScriteDocument::disableCollaboration()
 {
-    User::instance()->logActivity2( QStringLiteral("collaboration"), QJsonObject({
-            { QStringLiteral("action"), QStringLiteral("disable") },
-            { QStringLiteral("size"), QString::number(m_collaborators.size()) },
-        }) );
+    User::instance()->logActivity2(
+            QStringLiteral("collaboration"),
+            QJsonObject({
+                    { QStringLiteral("action"), QStringLiteral("disable") },
+                    { QStringLiteral("size"), QString::number(m_collaborators.size()) },
+            }));
     this->setCollaborators(QStringList());
 }
 
 void ScriteDocument::setAutoSaveDurationInSeconds(int val)
 {
     val = qBound(1, val, 3600);
-    if(m_autoSaveDurationInSeconds == val)
+    if (m_autoSaveDurationInSeconds == val)
         return;
 
     m_autoSaveDurationInSeconds = val;
@@ -531,7 +529,7 @@ void ScriteDocument::setAutoSaveDurationInSeconds(int val)
 
 void ScriteDocument::setAutoSave(bool val)
 {
-    if(m_autoSave == val)
+    if (m_autoSave == val)
         return;
 
     m_autoSave = val;
@@ -542,13 +540,13 @@ void ScriteDocument::setAutoSave(bool val)
 
 void ScriteDocument::setBusy(bool val)
 {
-    if(m_busy == val)
+    if (m_busy == val)
         return;
 
     m_busy = val;
     emit busyChanged();
 
-    if(val)
+    if (val)
         qApp->setOverrideCursor(Qt::WaitCursor);
     else
         qApp->restoreOverrideCursor();
@@ -556,7 +554,7 @@ void ScriteDocument::setBusy(bool val)
 
 void ScriteDocument::setBusyMessage(const QString &val)
 {
-    if(m_busyMessage == val)
+    if (m_busyMessage == val)
         return;
 
     m_busyMessage = val;
@@ -569,7 +567,7 @@ void ScriteDocument::setSpellCheckIgnoreList(const QStringList &val)
 {
     QStringList val2 = val.toSet().toList(); // so that we eliminate all duplicates
     std::sort(val2.begin(), val2.end());
-    if(m_spellCheckIgnoreList == val)
+    if (m_spellCheckIgnoreList == val)
         return;
 
     m_spellCheckIgnoreList = val;
@@ -578,7 +576,7 @@ void ScriteDocument::setSpellCheckIgnoreList(const QStringList &val)
 
 void ScriteDocument::addToSpellCheckIgnoreList(const QString &word)
 {
-    if(word.isEmpty() || m_spellCheckIgnoreList.contains(word))
+    if (word.isEmpty() || m_spellCheckIgnoreList.contains(word))
         return;
 
     m_spellCheckIgnoreList.append(word);
@@ -594,15 +592,13 @@ Forms *ScriteDocument::globalForms() const
 Form *ScriteDocument::requestForm(const QString &id)
 {
     Form *ret = m_forms->findForm(id);
-    if(ret)
-    {
+    if (ret) {
         ret->ref();
         return ret;
     }
 
     ret = Forms::global()->findForm(id);
-    if(ret)
-    {
+    if (ret) {
         const QJsonObject fjs = QObjectSerializer::toJson(ret);
         ret = m_forms->addForm(fjs);
         ret->ref();
@@ -615,11 +611,10 @@ Form *ScriteDocument::requestForm(const QString &id)
 void ScriteDocument::releaseForm(Form *form)
 {
     const int index = form == nullptr ? -1 : m_forms->indexOf(form);
-    if(index < 0)
+    if (index < 0)
         return;
 
-    if(form->deref() <= 0)
-    {
+    if (form->deref() <= 0) {
         m_forms->removeAt(index);
         form->deleteLater();
     }
@@ -636,8 +631,8 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     QScopedValueRollback<bool> createNewSceneRollback(m_inCreateNewScene, true);
 
     StructureElement *structureElement = nullptr;
-    int structureElementIndex = m_structure->elementCount()-1;
-    if(m_structure->currentElementIndex() >= 0)
+    int structureElementIndex = m_structure->elementCount() - 1;
+    if (m_structure->currentElementIndex() >= 0)
         structureElementIndex = m_structure->currentElementIndex();
 
     structureElement = m_structure->elementAt(structureElementIndex);
@@ -645,15 +640,18 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
     const QVector<QColor> standardColors = Application::standardColors(QVersionNumber());
-    const QColor defaultColor = standardColors.at( QRandomGenerator::global()->bounded(standardColors.size()-1) );
+    const QColor defaultColor =
+            standardColors.at(QRandomGenerator::global()->bounded(standardColors.size() - 1));
 
     Scene *scene = new Scene(m_structure);
     scene->setColor(activeScene ? activeScene->color() : defaultColor);
-    if(m_structure->canvasUIMode() != Structure::IndexCardUI)
-        scene->setTitle( QStringLiteral("New Scene") );
+    if (m_structure->canvasUIMode() != Structure::IndexCardUI)
+        scene->setTitle(QStringLiteral("New Scene"));
     scene->heading()->setEnabled(true);
-    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType() : QStringLiteral("EXT"));
-    scene->heading()->setLocation(activeScene ? activeScene->heading()->location() : QStringLiteral("SOMEWHERE"));
+    scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType()
+                                                  : QStringLiteral("EXT"));
+    scene->heading()->setLocation(activeScene ? activeScene->heading()->location()
+                                              : QStringLiteral("SOMEWHERE"));
     scene->heading()->setMoment(activeScene ? QStringLiteral("LATER") : QStringLiteral("DAY"));
 
     SceneElement *firstPara = new SceneElement(scene);
@@ -664,50 +662,48 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     newStructureElement->setScene(scene);
     m_structure->addElement(newStructureElement);
 
-    const bool asLastScene = m_screenplay->currentElementIndex() < 0 ||
-                            (fuzzyScreenplayInsert && m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
+    const bool asLastScene = m_screenplay->currentElementIndex() < 0
+            || (fuzzyScreenplayInsert
+                && m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
 
     ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
     newScreenplayElement->setScene(scene);
     int newScreenplayElementIndex = -1;
-    if(asLastScene)
-    {
+    if (asLastScene) {
         newScreenplayElementIndex = m_screenplay->elementCount();
         m_screenplay->addElement(newScreenplayElement);
-    }
-    else
-    {
-        newScreenplayElementIndex = m_screenplay->currentElementIndex()+1;
-        m_screenplay->insertElementAt(newScreenplayElement, m_screenplay->currentElementIndex()+1);
+    } else {
+        newScreenplayElementIndex = m_screenplay->currentElementIndex() + 1;
+        m_screenplay->insertElementAt(newScreenplayElement,
+                                      m_screenplay->currentElementIndex() + 1);
     }
 
-    if(m_screenplay->elementAt(newScreenplayElementIndex) != newScreenplayElement)
+    if (m_screenplay->elementAt(newScreenplayElementIndex) != newScreenplayElement)
         newScreenplayElementIndex = m_screenplay->indexOfElement(newScreenplayElement);
 
     m_structure->placeElement(newStructureElement, m_screenplay);
-    m_structure->setCurrentElementIndex(m_structure->elementCount()-1);
+    m_structure->setCurrentElementIndex(m_structure->elementCount() - 1);
     m_screenplay->setCurrentElementIndex(newScreenplayElementIndex);
 
-    if(structureElement && !structureElement->stackId().isEmpty())
-    {
-        ScreenplayElement *spe_before = m_screenplay->elementAt(newScreenplayElementIndex-1);
-        ScreenplayElement *spe_after = m_screenplay->elementAt(newScreenplayElementIndex+1);
-        if(spe_before && spe_after)
-        {
-            StructureElement *ste_before = m_structure->elementAt(m_structure->indexOfScene(spe_before->scene()));
-            StructureElement *ste_after = m_structure->elementAt(m_structure->indexOfScene(spe_after->scene()));
-            if(ste_before && ste_after)
-            {
-                if(ste_before->stackId() == ste_after->stackId())
+    if (structureElement && !structureElement->stackId().isEmpty()) {
+        ScreenplayElement *spe_before = m_screenplay->elementAt(newScreenplayElementIndex - 1);
+        ScreenplayElement *spe_after = m_screenplay->elementAt(newScreenplayElementIndex + 1);
+        if (spe_before && spe_after) {
+            StructureElement *ste_before =
+                    m_structure->elementAt(m_structure->indexOfScene(spe_before->scene()));
+            StructureElement *ste_after =
+                    m_structure->elementAt(m_structure->indexOfScene(spe_after->scene()));
+            if (ste_before && ste_after) {
+                if (ste_before->stackId() == ste_after->stackId())
                     newStructureElement->setStackId(ste_before->stackId());
             }
         }
     }
 
-    if(newScreenplayElementIndex > 0 && newScreenplayElementIndex == m_screenplay->elementCount()-1)
-    {
-        ScreenplayElement *prevElement = m_screenplay->elementAt(newScreenplayElementIndex-1);
-        if(prevElement->elementType() == ScreenplayElement::BreakElementType)
+    if (newScreenplayElementIndex > 0
+        && newScreenplayElementIndex == m_screenplay->elementCount() - 1) {
+        ScreenplayElement *prevElement = m_screenplay->elementAt(newScreenplayElementIndex - 1);
+        if (prevElement->elementType() == ScreenplayElement::BreakElementType)
             scene->setColor(defaultColor);
     }
 
@@ -719,7 +715,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
 
 void ScriteDocument::setUserData(const QJsonObject &val)
 {
-    if(m_userData == val)
+    if (m_userData == val)
         return;
 
     m_userData = val;
@@ -728,7 +724,7 @@ void ScriteDocument::setUserData(const QJsonObject &val)
 
 void ScriteDocument::setBookmarkedNotes(const QJsonArray &val)
 {
-    if(m_bookmarkedNotes == val)
+    if (m_bookmarkedNotes == val)
         return;
 
     m_bookmarkedNotes = val;
@@ -737,14 +733,14 @@ void ScriteDocument::setBookmarkedNotes(const QJsonArray &val)
 
 void ScriteDocument::setMaxBackupCount(int val)
 {
-    if(m_maxBackupCount == val)
+    if (m_maxBackupCount == val)
         return;
 
     m_maxBackupCount = val;
     emit maxBackupCountChanged();
 
     QSettings *settings = Application::instance()->settings();
-    settings->setValue( QStringLiteral("Installation/maxBackupCount"), m_maxBackupCount );
+    settings->setValue(QStringLiteral("Installation/maxBackupCount"), m_maxBackupCount);
 }
 
 void ScriteDocument::reset()
@@ -753,49 +749,61 @@ void ScriteDocument::reset()
 
     m_connectors.clear();
 
-    if(m_structure != nullptr)
-    {
-        disconnect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
-        disconnect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
-        disconnect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
-        disconnect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
-        disconnect(m_structure->notes(), &Notes::notesModified, this, &ScriteDocument::emptyChanged);
-        disconnect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
-        disconnect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
+    if (m_structure != nullptr) {
+        disconnect(m_structure, &Structure::currentElementIndexChanged, this,
+                   &ScriteDocument::structureElementIndexChanged);
+        disconnect(m_structure, &Structure::structureChanged, this,
+                   &ScriteDocument::markAsModified);
+        disconnect(m_structure, &Structure::elementCountChanged, this,
+                   &ScriteDocument::emptyChanged);
+        disconnect(m_structure, &Structure::annotationCountChanged, this,
+                   &ScriteDocument::emptyChanged);
+        disconnect(m_structure->notes(), &Notes::notesModified, this,
+                   &ScriteDocument::emptyChanged);
+        disconnect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay,
+                   &Screenplay::updateBreakTitlesLater);
+        disconnect(m_structure, &Structure::groupsModelChanged, m_screenplay,
+                   &Screenplay::updateBreakTitlesLater);
     }
 
-    if(m_screenplay != nullptr)
-    {
-        disconnect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
-        disconnect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::markAsModified);
-        disconnect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::evaluateStructureElementSequenceLater);
-        disconnect(m_screenplay, &Screenplay::elementRemoved, this, &ScriteDocument::screenplayElementRemoved);
+    if (m_screenplay != nullptr) {
+        disconnect(m_screenplay, &Screenplay::currentElementIndexChanged, this,
+                   &ScriteDocument::screenplayElementIndexChanged);
+        disconnect(m_screenplay, &Screenplay::screenplayChanged, this,
+                   &ScriteDocument::markAsModified);
+        disconnect(m_screenplay, &Screenplay::screenplayChanged, this,
+                   &ScriteDocument::evaluateStructureElementSequenceLater);
+        disconnect(m_screenplay, &Screenplay::elementRemoved, this,
+                   &ScriteDocument::screenplayElementRemoved);
         disconnect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
-        disconnect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
+        disconnect(m_screenplay, &Screenplay::elementCountChanged, this,
+                   &ScriteDocument::emptyChanged);
     }
 
-    if(m_formatting != nullptr)
-        disconnect(m_formatting, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+    if (m_formatting != nullptr)
+        disconnect(m_formatting, &ScreenplayFormat::formatChanged, this,
+                   &ScriteDocument::markAsModified);
 
-    if(m_printFormat != nullptr)
-        disconnect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
+    if (m_printFormat != nullptr)
+        disconnect(m_printFormat, &ScreenplayFormat::formatChanged, this,
+                   &ScriteDocument::markAsModified);
 
     UndoStack::clearAllStacks();
     m_docFileSystem.reset();
 
-    this->setSessionId( QUuid::createUuid().toString() );
+    this->setSessionId(QUuid::createUuid().toString());
     this->setReadOnly(false);
     this->setLocked(false);
 
     m_collaborators = QStringList();
     emit collaboratorsChanged();
 
-    if(m_formatting == nullptr)
+    if (m_formatting == nullptr)
         this->setFormatting(new ScreenplayFormat(this));
     else
         m_formatting->resetToDefaults();
 
-    if(m_printFormat == nullptr)
+    if (m_printFormat == nullptr)
         this->setPrintFormat(new ScreenplayFormat(this));
     else
         m_printFormat->resetToDefaults();
@@ -811,18 +819,24 @@ void ScriteDocument::reset()
     this->setModified(false);
     emit emptyChanged();
 
-    connect(m_structure, &Structure::currentElementIndexChanged, this, &ScriteDocument::structureElementIndexChanged);
+    connect(m_structure, &Structure::currentElementIndexChanged, this,
+            &ScriteDocument::structureElementIndexChanged);
     connect(m_structure, &Structure::structureChanged, this, &ScriteDocument::markAsModified);
     connect(m_structure, &Structure::elementCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure, &Structure::annotationCountChanged, this, &ScriteDocument::emptyChanged);
     connect(m_structure->notes(), &Notes::notesModified, this, &ScriteDocument::emptyChanged);
-    connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
-    connect(m_structure, &Structure::groupsModelChanged, m_screenplay, &Screenplay::updateBreakTitlesLater);
+    connect(m_structure, &Structure::preferredGroupCategoryChanged, m_screenplay,
+            &Screenplay::updateBreakTitlesLater);
+    connect(m_structure, &Structure::groupsModelChanged, m_screenplay,
+            &Screenplay::updateBreakTitlesLater);
 
-    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScriteDocument::screenplayElementIndexChanged);
+    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this,
+            &ScriteDocument::screenplayElementIndexChanged);
     connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::markAsModified);
-    connect(m_screenplay, &Screenplay::screenplayChanged, this, &ScriteDocument::evaluateStructureElementSequenceLater);
-    connect(m_screenplay, &Screenplay::elementRemoved, this, &ScriteDocument::screenplayElementRemoved);
+    connect(m_screenplay, &Screenplay::screenplayChanged, this,
+            &ScriteDocument::evaluateStructureElementSequenceLater);
+    connect(m_screenplay, &Screenplay::elementRemoved, this,
+            &ScriteDocument::screenplayElementRemoved);
     connect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
     connect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
 
@@ -834,20 +848,20 @@ void ScriteDocument::reset()
 
 bool ScriteDocument::openOrImport(const QString &fileName)
 {
-    if(fileName.isEmpty())
+    if (fileName.isEmpty())
         return false;
 
     const QFileInfo fi(fileName);
     const QString absFileName = fi.absoluteFilePath();
 
-    if( fi.suffix() == QStringLiteral("scrite") )
-        return this->open( absFileName );
+    if (fi.suffix() == QStringLiteral("scrite"))
+        return this->open(absFileName);
 
     const QList<QByteArray> keys = ::deviceIOFactories->ImporterFactory.keys();
-    for(const QByteArray &key : keys)
-    {
-        QScopedPointer<AbstractImporter> importer(::deviceIOFactories->ImporterFactory.create<AbstractImporter>(key, this));
-        if(importer->canImport(absFileName))
+    for (const QByteArray &key : keys) {
+        QScopedPointer<AbstractImporter> importer(
+                ::deviceIOFactories->ImporterFactory.create<AbstractImporter>(key, this));
+        if (importer->canImport(absFileName))
             return this->importFile(importer.data(), fileName);
     }
 
@@ -856,7 +870,7 @@ bool ScriteDocument::openOrImport(const QString &fileName)
 
 bool ScriteDocument::open(const QString &fileName)
 {
-    if(fileName == m_fileName)
+    if (fileName == m_fileName)
         return false;
 
     HourGlass hourGlass;
@@ -864,7 +878,7 @@ bool ScriteDocument::open(const QString &fileName)
     this->setBusyMessage("Loading " + QFileInfo(fileName).baseName() + " ...");
     this->reset();
     const bool ret = this->load(fileName);
-    if(ret)
+    if (ret)
         this->setFileName(fileName);
     this->setModified(false);
     this->clearBusyMessage();
@@ -896,28 +910,32 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     m_errorReport->clear();
 
-    if(!this->runSaveSanityChecks(fileName))
+    if (!this->runSaveSanityChecks(fileName))
         return;
 
-    if( QFile::exists(fileName) )
-    {
+    if (QFile::exists(fileName)) {
         const QString lockFilePath = m_fileLocker->filePath();
         m_fileLocker->setFilePath(fileName);
-        if( !m_fileLocker->isClaimed() && !m_fileLocker->canWrite() )
+        if (!m_fileLocker->isClaimed() && !m_fileLocker->canWrite())
             m_fileLocker->claim();
 
-        if( !m_fileLocker->canWrite() )
-        {
+        if (!m_fileLocker->canWrite()) {
             QJsonObject details;
-            details.insert( QStringLiteral("revealOnDesktopRequest"), m_fileLocker->lockFilePath() );
+            details.insert(QStringLiteral("revealOnDesktopRequest"), m_fileLocker->lockFilePath());
 
             m_fileLocker->setFilePath(lockFilePath);
-            m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName), details );
+            m_errorReport->setErrorMessage(
+                    QStringLiteral("File '%1' is locked by another Scrite instance on this "
+                                   "computer or elsewhere. Please "
+                                   "close other Scrite instances using this file, or manually "
+                                   "delete the lock file.")
+                            .arg(fileName),
+                    details);
             return;
         }
     }
 
-    if(!m_autoSaveMode)
+    if (!m_autoSaveMode)
         this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
 
     m_progressReport->start();
@@ -930,12 +948,12 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     const bool success = m_docFileSystem.save(fileName, !m_collaborators.isEmpty());
 
-    if(!success)
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Couldn't save document \"") + fileName + QStringLiteral("\"") );
+    if (!success) {
+        m_errorReport->setErrorMessage(QStringLiteral("Couldn't save document \"") + fileName
+                                       + QStringLiteral("\""));
         emit justSaved();
         m_progressReport->finish();
-        if(!m_autoSaveMode)
+        if (!m_autoSaveMode)
             this->clearBusyMessage();
         return;
     }
@@ -962,7 +980,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 
     this->setReadOnly(false);
 
-    if(!m_autoSaveMode)
+    if (!m_autoSaveMode)
         this->clearBusyMessage();
 }
 
@@ -970,15 +988,14 @@ void ScriteDocument::save()
 {
     HourGlass hourGlass;
 
-    if(m_readOnly)
+    if (m_readOnly)
         return;
 
-    if(!this->runSaveSanityChecks(m_fileName))
+    if (!this->runSaveSanityChecks(m_fileName))
         return;
 
     QFileInfo fi(m_fileName);
-    if(fi.exists())
-    {
+    if (fi.exists()) {
         const QString backupDirPath(fi.absolutePath() + "/" + fi.baseName() + " Backups");
         QDir().mkpath(backupDirPath);
 
@@ -992,32 +1009,30 @@ void ScriteDocument::save()
         };
 
         const QDir backupDir(backupDirPath);
-        QFileInfoList backupEntries = backupDir.entryInfoList(QStringList() << QStringLiteral("*.scrite"), QDir::Files, QDir::Name);
+        QFileInfoList backupEntries = backupDir.entryInfoList(
+                QStringList() << QStringLiteral("*.scrite"), QDir::Files, QDir::Name);
         const bool firstBackup = backupEntries.isEmpty();
-        if(!backupEntries.isEmpty())
-        {
+        if (!backupEntries.isEmpty()) {
             const int maxBackups = m_maxBackupCount;
-            if(maxBackups > 0)
-            {
-                while(backupEntries.size() > maxBackups-1)
-                {
+            if (maxBackups > 0) {
+                while (backupEntries.size() > maxBackups - 1) {
                     const QFileInfo oldestEntry = backupEntries.takeFirst();
                     QFile::remove(oldestEntry.absoluteFilePath());
                 }
             }
 
             const QFileInfo latestEntry = backupEntries.takeLast();
-            if(latestEntry.suffix() == QStringLiteral("scrite"))
-            {
-                if(timeGapInSeconds(latestEntry) < 60)
+            if (latestEntry.suffix() == QStringLiteral("scrite")) {
+                if (timeGapInSeconds(latestEntry) < 60)
                     QFile::remove(latestEntry.absoluteFilePath());
             }
         }
 
-        const QString backupFileName = backupDirPath + "/" + fi.baseName() + " [" + QString::number(now) + "].scrite";
+        const QString backupFileName =
+                backupDirPath + "/" + fi.baseName() + " [" + QString::number(now) + "].scrite";
         const bool backupSuccessful = QFile::copy(m_fileName, backupFileName);
 
-        if(firstBackup && backupSuccessful)
+        if (firstBackup && backupSuccessful)
             m_documentBackupsModel.loadBackupFileInformation();
     }
 
@@ -1028,19 +1043,20 @@ QStringList ScriteDocument::supportedImportFormats() const
 {
     static QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
     static QStringList formats;
-    if(formats.isEmpty())
-        Q_FOREACH(QByteArray key, keys) formats << key;
+    if (formats.isEmpty())
+        Q_FOREACH (QByteArray key, keys)
+            formats << key;
     return formats;
 }
 
 QString ScriteDocument::importFormatFileSuffix(const QString &format) const
 {
     const QMetaObject *mo = deviceIOFactories->ImporterFactory.find(format.toLatin1());
-    if(mo == nullptr)
+    if (mo == nullptr)
         return QString();
 
     const int ciIndex = mo->indexOfClassInfo("NameFilters");
-    if(ciIndex < 0)
+    if (ciIndex < 0)
         return QString();
 
     const QMetaClassInfo classInfo = mo->classInfo(ciIndex);
@@ -1051,23 +1067,21 @@ QStringList ScriteDocument::supportedExportFormats() const
 {
     static QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
     static QStringList formats;
-    if(formats.isEmpty())
-    {
-        Q_FOREACH(QByteArray key, keys) formats << key;
+    if (formats.isEmpty()) {
+        Q_FOREACH (QByteArray key, keys)
+            formats << key;
         std::sort(formats.begin(), formats.end());
 
-        if(formats.size() >= 2)
-        {
+        if (formats.size() >= 2) {
             QList<int> seps;
-            for(int i=formats.size()-2; i>=0; i--)
-            {
+            for (int i = formats.size() - 2; i >= 0; i--) {
                 QString thisFormat = formats.at(i);
-                QString previousFormat = formats.at(i+1);
-                if(thisFormat.split("/").first() != previousFormat.split("/").first())
-                    seps << i+1;
+                QString previousFormat = formats.at(i + 1);
+                if (thisFormat.split("/").first() != previousFormat.split("/").first())
+                    seps << i + 1;
             }
 
-            Q_FOREACH(int sep, seps)
+            Q_FOREACH (int sep, seps)
                 formats.insert(sep, QString());
         }
     }
@@ -1077,11 +1091,11 @@ QStringList ScriteDocument::supportedExportFormats() const
 QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
 {
     const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(format.toLatin1());
-    if(mo == nullptr)
+    if (mo == nullptr)
         return QString();
 
     const int ciIndex = mo->indexOfClassInfo("NameFilters");
-    if(ciIndex < 0)
+    if (ciIndex < 0)
         return QString();
 
     const QMetaClassInfo classInfo = mo->classInfo(ciIndex);
@@ -1092,16 +1106,14 @@ QJsonArray ScriteDocument::supportedReports() const
 {
     static QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
     static QJsonArray reports;
-    if(reports.isEmpty())
-    {
-        Q_FOREACH(QByteArray key, keys)
-        {
+    if (reports.isEmpty()) {
+        Q_FOREACH (QByteArray key, keys) {
             QJsonObject item;
             item.insert("name", QString::fromLatin1(key));
 
             const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
             const int ciIndex = mo->indexOfClassInfo("Description");
-            if(ciIndex >= 0)
+            if (ciIndex >= 0)
                 item.insert("description", QString::fromLatin1(mo->classInfo(ciIndex).value()));
             else
                 item.insert("description", QString::fromLatin1(key));
@@ -1125,10 +1137,10 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
     m_errorReport->clear();
 
     const QByteArray formatKey = format.toLatin1();
-    QScopedPointer<AbstractImporter> importer( deviceIOFactories->ImporterFactory.create<AbstractImporter>(formatKey, this) );
+    QScopedPointer<AbstractImporter> importer(
+            deviceIOFactories->ImporterFactory.create<AbstractImporter>(formatKey, this));
 
-    if(importer.isNull())
-    {
+    if (importer.isNull()) {
         m_errorReport->setErrorMessage("Cannot import from this format.");
         return false;
     }
@@ -1153,7 +1165,6 @@ bool ScriteDocument::importFile(AbstractImporter *importer, const QString &fileN
     this->setLoading(false);
 
     return success;
-
 }
 
 bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
@@ -1163,10 +1174,10 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     m_errorReport->clear();
 
     const QByteArray formatKey = format.toLatin1();
-    QScopedPointer<AbstractExporter> exporter( deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this) );
+    QScopedPointer<AbstractExporter> exporter(
+            deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this));
 
-    if(exporter.isNull())
-    {
+    if (exporter.isNull()) {
         m_errorReport->setErrorMessage("Cannot export to this format.");
         return false;
     }
@@ -1184,13 +1195,14 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     return ret;
 }
 
-bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx, const QString &imageFileName)
+bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx,
+                                   const QString &imageFileName)
 {
     const int nrScenes = m_screenplay->elementCount();
-    if(fromSceneIdx < 0 || fromSceneIdx >= nrScenes)
+    if (fromSceneIdx < 0 || fromSceneIdx >= nrScenes)
         return false;
 
-    if(toSceneIdx < 0 || toSceneIdx >= nrScenes)
+    if (toSceneIdx < 0 || toSceneIdx >= nrScenes)
         return false;
 
     QTextDocument document;
@@ -1208,41 +1220,37 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
         cursor.setBlockFormat(blockFormat);
     };
 
-    for(int i=fromSceneIdx; i<=toSceneIdx; i++)
-    {
+    for (int i = fromSceneIdx; i <= toSceneIdx; i++) {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
-        if(element->scene() == nullptr)
+        if (element->scene() == nullptr)
             continue;
 
         const Scene *scene = element->scene();
         int startParaIdx = -1, endParaIdx = -1;
 
-        if(cursor.position() > 0)
-        {
+        if (cursor.position() > 0) {
             cursor.insertBlock();
             startParaIdx = qMax(fromParaIdx, 0);
-        }
-        else
+        } else
             startParaIdx = 0;
 
-        endParaIdx = (i == toSceneIdx) ? qMin(toParaIdx, scene->elementCount()-1) : toParaIdx;
-        if(endParaIdx < 0)
-            endParaIdx = scene->elementCount()-1;
+        endParaIdx = (i == toSceneIdx) ? qMin(toParaIdx, scene->elementCount() - 1) : toParaIdx;
+        if (endParaIdx < 0)
+            endParaIdx = scene->elementCount() - 1;
 
-        if(startParaIdx == 0 && scene->heading()->isEnabled())
-        {
+        if (startParaIdx == 0 && scene->heading()->isEnabled()) {
             prepareCursor(cursor, SceneElement::Heading);
-            cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] "));
+            cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber()
+                              + QStringLiteral("] "));
             cursor.insertText(scene->heading()->text());
             cursor.insertBlock();
         }
 
-        for(int p=startParaIdx; p<=endParaIdx; p++)
-        {
+        for (int p = startParaIdx; p <= endParaIdx; p++) {
             const SceneElement *para = scene->elementAt(p);
             prepareCursor(cursor, para->type());
             cursor.insertText(para->text());
-            if(p < endParaIdx)
+            if (p < endParaIdx)
                 cursor.insertBlock();
         }
     }
@@ -1254,7 +1262,7 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
 
     QPainter paint(&image);
     paint.scale(2.0, 2.0);
-    document.drawContents(&paint, QRectF( QPointF(0,0), docSize) );
+    document.drawContents(&paint, QRectF(QPointF(0, 0), docSize));
     paint.end();
 
     const QString format = QFileInfo(imageFileName).suffix().toUpper();
@@ -1271,8 +1279,9 @@ inline QString createTimestampString(const QDateTime &dt = QDateTime::currentDat
 AbstractExporter *ScriteDocument::createExporter(const QString &format)
 {
     const QByteArray formatKey = format.toLatin1();
-    AbstractExporter *exporter = deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this);
-    if(exporter == nullptr)
+    AbstractExporter *exporter =
+            deviceIOFactories->ExporterFactory.create<AbstractExporter>(formatKey, this);
+    if (exporter == nullptr)
         return nullptr;
 
     this->setupExporter(exporter);
@@ -1283,8 +1292,9 @@ AbstractExporter *ScriteDocument::createExporter(const QString &format)
 AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &report)
 {
     const QByteArray reportKey = report.toLatin1();
-    AbstractReportGenerator *reportGenerator = deviceIOFactories->ReportsFactory.create<AbstractReportGenerator>(reportKey, this);
-    if(reportGenerator == nullptr)
+    AbstractReportGenerator *reportGenerator =
+            deviceIOFactories->ReportsFactory.create<AbstractReportGenerator>(reportKey, this);
+    if (reportGenerator == nullptr)
         return nullptr;
 
     this->setupReportGenerator(reportGenerator);
@@ -1294,41 +1304,43 @@ AbstractReportGenerator *ScriteDocument::createReportGenerator(const QString &re
 
 void ScriteDocument::setupExporter(AbstractExporter *exporter)
 {
-    if(exporter == nullptr)
+    if (exporter == nullptr)
         return;
 
     exporter->setDocument(this);
 
-    if(exporter->fileName().isEmpty())
-    {
+    if (exporter->fileName().isEmpty()) {
         QString suggestedName = m_screenplay->title();
-        if(suggestedName.isEmpty())
+        if (suggestedName.isEmpty())
             suggestedName = QFileInfo(m_fileName).baseName();
-        if(suggestedName.isEmpty())
+        if (suggestedName.isEmpty())
             suggestedName = QStringLiteral("Scrite - Screenplay");
         else
             suggestedName += QStringLiteral(" - Screenplay");
         suggestedName += QStringLiteral(" - ") + createTimestampString();
 
         QFileInfo fi(m_fileName);
-        if(fi.exists())
-            exporter->setFileName( fi.absoluteDir().absoluteFilePath(suggestedName) );
-        else
-        {
-            const QUrl folderUrl( Application::instance()->settings()->value(QStringLiteral("Workspace/lastOpenExportFolderUrl")).toString() );
-            const QString path = folderUrl.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-                                                     : folderUrl.toLocalFile();
-            exporter->setFileName( path + QStringLiteral("/") + suggestedName );
+        if (fi.exists())
+            exporter->setFileName(fi.absoluteDir().absoluteFilePath(suggestedName));
+        else {
+            const QUrl folderUrl(
+                    Application::instance()
+                            ->settings()
+                            ->value(QStringLiteral("Workspace/lastOpenExportFolderUrl"))
+                            .toString());
+            const QString path = folderUrl.isEmpty()
+                    ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+                    : folderUrl.toLocalFile();
+            exporter->setFileName(path + QStringLiteral("/") + suggestedName);
         }
     }
 
-    ProgressReport *progressReport = exporter->findChild<ProgressReport*>();
-    if(progressReport)
-    {
-        connect(progressReport, &ProgressReport::statusChanged, [progressReport,this,exporter]() {
-            if(progressReport->status() == ProgressReport::Started)
+    ProgressReport *progressReport = exporter->findChild<ProgressReport *>();
+    if (progressReport) {
+        connect(progressReport, &ProgressReport::statusChanged, [progressReport, this, exporter]() {
+            if (progressReport->status() == ProgressReport::Started)
                 this->setBusyMessage("Exporting into \"" + exporter->fileName() + "\" ...");
-            else if(progressReport->status() == ProgressReport::Finished)
+            else if (progressReport->status() == ProgressReport::Finished)
                 this->clearBusyMessage();
         });
     }
@@ -1336,80 +1348,82 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
 
 void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerator)
 {
-    if(reportGenerator == nullptr)
+    if (reportGenerator == nullptr)
         return;
 
     reportGenerator->setDocument(this);
 
-    if(reportGenerator->fileName().isEmpty())
-    {
+    if (reportGenerator->fileName().isEmpty()) {
         QString suggestedName = m_screenplay->title();
-        if(suggestedName.isEmpty())
+        if (suggestedName.isEmpty())
             suggestedName = QFileInfo(m_fileName).baseName();
-        if(suggestedName.isEmpty())
+        if (suggestedName.isEmpty())
             suggestedName = QStringLiteral("Scrite");
 
         const QString reportName = reportGenerator->name();
-        const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
-        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ") + createTimestampString() + suffix;
+        const QString suffix =
+                reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
+        suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ")
+                + createTimestampString() + suffix;
 
         QFileInfo fi(m_fileName);
-        if(fi.exists())
-            reportGenerator->setFileName( fi.absoluteDir().absoluteFilePath(suggestedName) );
-        else
-        {
-            const QUrl folderUrl( Application::instance()->settings()->value(QStringLiteral("Workspace/lastOpenReportsFolderUrl")).toString() );
-            const QString path = folderUrl.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-                                                     : folderUrl.toLocalFile();
-            reportGenerator->setFileName( path + QStringLiteral("/") + suggestedName );
+        if (fi.exists())
+            reportGenerator->setFileName(fi.absoluteDir().absoluteFilePath(suggestedName));
+        else {
+            const QUrl folderUrl(
+                    Application::instance()
+                            ->settings()
+                            ->value(QStringLiteral("Workspace/lastOpenReportsFolderUrl"))
+                            .toString());
+            const QString path = folderUrl.isEmpty()
+                    ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+                    : folderUrl.toLocalFile();
+            reportGenerator->setFileName(path + QStringLiteral("/") + suggestedName);
         }
     }
 
-    ProgressReport *progressReport = reportGenerator->findChild<ProgressReport*>();
-    if(progressReport)
-    {
-        connect(progressReport, &ProgressReport::statusChanged, [progressReport,this,reportGenerator]() {
-            if(progressReport->status() == ProgressReport::Started)
-                this->setBusyMessage("Generating \"" + reportGenerator->fileName() + "\" ...");
-            else if(progressReport->status() == ProgressReport::Finished)
-                this->clearBusyMessage();
-        });
+    ProgressReport *progressReport = reportGenerator->findChild<ProgressReport *>();
+    if (progressReport) {
+        connect(progressReport, &ProgressReport::statusChanged,
+                [progressReport, this, reportGenerator]() {
+                    if (progressReport->status() == ProgressReport::Started)
+                        this->setBusyMessage("Generating \"" + reportGenerator->fileName()
+                                             + "\" ...");
+                    else if (progressReport->status() == ProgressReport::Finished)
+                        this->clearBusyMessage();
+                });
     }
 }
 
 QAbstractListModel *ScriteDocument::structureElementConnectors() const
 {
-    ScriteDocument *that = const_cast<ScriteDocument*>(this);
+    ScriteDocument *that = const_cast<ScriteDocument *>(this);
     return &(that->m_connectors);
 }
 
 void ScriteDocument::clearModified()
 {
-    if(m_screenplay->elementCount() == 0 && m_structure->elementCount() == 0)
+    if (m_screenplay->elementCount() == 0 && m_structure->elementCount() == 0)
         this->setModified(false);
 }
 
 void ScriteDocument::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_evaluateStructureElementSequenceTimer.timerId())
-    {
+    if (event->timerId() == m_evaluateStructureElementSequenceTimer.timerId()) {
         m_evaluateStructureElementSequenceTimer.stop();
         this->evaluateStructureElementSequence();
         return;
     }
 
-    if(event->timerId() == m_autoSaveTimer.timerId())
-    {
-        if(m_modified && !m_fileName.isEmpty() && QFileInfo(m_fileName).isWritable())
-        {
+    if (event->timerId() == m_autoSaveTimer.timerId()) {
+        if (m_modified && !m_fileName.isEmpty() && QFileInfo(m_fileName).isWritable()) {
             QScopedValueRollback<bool> autoSave(m_autoSaveMode, true);
             this->save();
         }
         return;
     }
 
-    if(event->timerId() == m_clearModifyTimer.timerId())
-    {
+    if (event->timerId() == m_clearModifyTimer.timerId()) {
         m_clearModifyTimer.stop();
         this->setModified(false);
         return;
@@ -1424,35 +1438,34 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
 
     // Multiple things could go wrong while saving a file.
     // 1. File name is empty.
-    if(fileName.isEmpty())
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("File name cannot be empty") );
+    if (fileName.isEmpty()) {
+        m_errorReport->setErrorMessage(QStringLiteral("File name cannot be empty"));
         return false;
     }
 
     QFileInfo fi(fileName);
 
     // 2. Filename must not contain special characters
-    // It is true that file names will have already been sanitized using Application::sanitiseFileName()
-    // But we double check it here anyway.
-    static const QList<QChar> allowedChars = {'-', '_', '[', ']', '(', ')', '{', '}', '&', ' '};
+    // It is true that file names will have already been sanitized using
+    // Application::sanitiseFileName() But we double check it here anyway.
+    static const QList<QChar> allowedChars = { '-', '_', '[', ']', '(', ')', '{', '}', '&', ' ' };
     const QString baseFileName = fi.baseName();
-    for(const QChar ch : baseFileName)
-    {
-        if(ch.isLetterOrNumber() || ch.isSpace())
+    for (const QChar ch : baseFileName) {
+        if (ch.isLetterOrNumber() || ch.isSpace())
             continue;
 
-        if(allowedChars.contains(ch))
+        if (allowedChars.contains(ch))
             continue;
 
-        m_errorReport->setErrorMessage( QStringLiteral("File name cannot contain special character '%1'").arg(ch) );
+        m_errorReport->setErrorMessage(
+                QStringLiteral("File name cannot contain special character '%1'").arg(ch));
         return false;
     }
 
     // 3. File already exists, but has become readonly now.
-    if( fi.exists() && !fi.isWritable() )
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Cannot open '%1' for writing.").arg(fileName) );
+    if (fi.exists() && !fi.isWritable()) {
+        m_errorReport->setErrorMessage(
+                QStringLiteral("Cannot open '%1' for writing.").arg(fileName));
         return false;
     }
 
@@ -1460,11 +1473,13 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
     QDir dir = fi.absoluteDir();
     {
         // Try to write something in this folder.
-        const QString tmpFile = dir.absoluteFilePath( QStringLiteral("scrite_tmp_") + QString::number( QDateTime::currentMSecsSinceEpoch() ) + QStringLiteral(".dat") );
+        const QString tmpFile = dir.absoluteFilePath(
+                QStringLiteral("scrite_tmp_") + QString::number(QDateTime::currentMSecsSinceEpoch())
+                + QStringLiteral(".dat"));
         QFile file(tmpFile);
-        if(!file.open(QFile::WriteOnly))
-        {
-            m_errorReport->setErrorMessage( QStringLiteral("Cannot write into folder '%1'").arg(dir.absolutePath()) );
+        if (!file.open(QFile::WriteOnly)) {
+            m_errorReport->setErrorMessage(
+                    QStringLiteral("Cannot write into folder '%1'").arg(dir.absolutePath()));
             return false;
         }
 
@@ -1473,9 +1488,9 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
     }
 
     // 5. If the scrite document is locked for whatever reason
-    if(m_locked && !m_createdOnThisComputer)
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Cannot write into '%1' because it is locked").arg(fileName) );
+    if (m_locked && !m_createdOnThisComputer) {
+        m_errorReport->setErrorMessage(
+                QStringLiteral("Cannot write into '%1' because it is locked").arg(fileName));
         return false;
     }
 
@@ -1484,7 +1499,7 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
 
 void ScriteDocument::setReadOnly(bool val)
 {
-    if(m_readOnly == val)
+    if (m_readOnly == val)
         return;
 
     m_readOnly = val;
@@ -1493,7 +1508,7 @@ void ScriteDocument::setReadOnly(bool val)
 
 void ScriteDocument::setLoading(bool val)
 {
-    if(m_loading == val)
+    if (m_loading == val)
         return;
 
     m_loading = val;
@@ -1502,8 +1517,8 @@ void ScriteDocument::setLoading(bool val)
 
 void ScriteDocument::prepareAutoSave()
 {
-    if(m_autoSave)
-        m_autoSaveTimer.start(m_autoSaveDurationInSeconds*1000, this);
+    if (m_autoSave)
+        m_autoSaveTimer.start(m_autoSaveDurationInSeconds * 1000, this);
     else
         m_autoSaveTimer.stop();
 }
@@ -1511,9 +1526,9 @@ void ScriteDocument::prepareAutoSave()
 void ScriteDocument::updateDocumentWindowTitle()
 {
     QString title;
-    if(m_modified)
+    if (m_modified)
         title += QStringLiteral("* ");
-    if(m_fileName.isEmpty())
+    if (m_fileName.isEmpty())
         title += QStringLiteral("[noname]");
     else
         title += QFileInfo(m_fileName).baseName();
@@ -1523,7 +1538,7 @@ void ScriteDocument::updateDocumentWindowTitle()
 
 void ScriteDocument::setDocumentWindowTitle(const QString &val)
 {
-    if(m_documentWindowTitle == val)
+    if (m_documentWindowTitle == val)
         return;
 
     m_documentWindowTitle = val;
@@ -1532,10 +1547,10 @@ void ScriteDocument::setDocumentWindowTitle(const QString &val)
 
 void ScriteDocument::setStructure(Structure *val)
 {
-    if(m_structure == val)
+    if (m_structure == val)
         return;
 
-    if(m_structure != nullptr)
+    if (m_structure != nullptr)
         GarbageCollector::instance()->add(m_structure);
 
     m_structure = val;
@@ -1547,10 +1562,10 @@ void ScriteDocument::setStructure(Structure *val)
 
 void ScriteDocument::setScreenplay(Screenplay *val)
 {
-    if(m_screenplay == val)
+    if (m_screenplay == val)
         return;
 
-    if(m_screenplay != nullptr)
+    if (m_screenplay != nullptr)
         GarbageCollector::instance()->add(m_screenplay);
 
     m_screenplay = val;
@@ -1562,15 +1577,15 @@ void ScriteDocument::setScreenplay(Screenplay *val)
 
 void ScriteDocument::setFormatting(ScreenplayFormat *val)
 {
-    if(m_formatting == val)
+    if (m_formatting == val)
         return;
 
-    if(m_formatting != nullptr)
+    if (m_formatting != nullptr)
         GarbageCollector::instance()->add(m_formatting);
 
     m_formatting = val;
 
-    if(m_formatting != nullptr)
+    if (m_formatting != nullptr)
         m_formatting->setParent(this);
 
     emit formattingChanged();
@@ -1578,15 +1593,15 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
 
 void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
 {
-    if(m_printFormat == val)
+    if (m_printFormat == val)
         return;
 
-    if(m_printFormat != nullptr)
+    if (m_printFormat != nullptr)
         GarbageCollector::instance()->add(m_printFormat);
 
     m_printFormat = val;
 
-    if(m_formatting != nullptr)
+    if (m_formatting != nullptr)
         m_printFormat->setParent(this);
 
     emit printFormatChanged();
@@ -1594,15 +1609,15 @@ void ScriteDocument::setPrintFormat(ScreenplayFormat *val)
 
 void ScriteDocument::setForms(Forms *val)
 {
-    if(m_forms == val)
+    if (m_forms == val)
         return;
 
-    if(m_forms != nullptr)
+    if (m_forms != nullptr)
         GarbageCollector::instance()->add(m_forms);
 
     m_forms = val;
 
-    if(m_forms != nullptr)
+    if (m_forms != nullptr)
         m_forms->setParent(this);
 
     emit formsChanged();
@@ -1625,13 +1640,13 @@ void ScriteDocument::markAsModified()
 
 void ScriteDocument::setModified(bool val)
 {
-    if(m_readOnly)
+    if (m_readOnly)
         val = false;
 
-    if(m_modified == val)
+    if (m_modified == val)
         return;
 
-    if(m_structure == nullptr || m_screenplay == nullptr)
+    if (m_structure == nullptr || m_screenplay == nullptr)
         return;
 
     m_modified = val;
@@ -1641,8 +1656,8 @@ void ScriteDocument::setModified(bool val)
 
 void ScriteDocument::setFileName(const QString &val)
 {
-    if(m_fileName == val)
-        return;        
+    if (m_fileName == val)
+        return;
 
     m_fileName = this->polishFileName(val);
     emit fileNameChanged();
@@ -1655,39 +1670,43 @@ bool ScriteDocument::load(const QString &fileName)
     m_errorReport->clear();
 
     QJsonObject details;
-    details.insert( QStringLiteral("revealOnDesktopRequest"), fileName );
+    details.insert(QStringLiteral("revealOnDesktopRequest"), fileName);
 
-    if( !QFileInfo(fileName).isReadable() )
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Cannot open %1 for reading.").arg(fileName), details );
+    if (!QFileInfo(fileName).isReadable()) {
+        m_errorReport->setErrorMessage(QStringLiteral("Cannot open %1 for reading.").arg(fileName),
+                                       details);
         return false;
     }
 
     m_fileLocker->setFilePath(fileName);
-    if(m_fileLocker->isClaimed() && !m_fileLocker->canRead())
-    {
-        details.insert( QStringLiteral("revealOnDesktopRequest"), m_fileLocker->lockFilePath() );
+    if (m_fileLocker->isClaimed() && !m_fileLocker->canRead()) {
+        details.insert(QStringLiteral("revealOnDesktopRequest"), m_fileLocker->lockFilePath());
         m_fileLocker->setFilePath(QString());
-        m_errorReport->setErrorMessage( QStringLiteral("File '%1' is locked by another Scrite instance on this computer or elsewhere. Please close other Scrite instances using this file, or manually delete the lock file.").arg(fileName), details );
+        m_errorReport->setErrorMessage(
+                QStringLiteral(
+                        "File '%1' is locked by another Scrite instance on this computer or "
+                        "elsewhere. Please close "
+                        "other Scrite instances using this file, or manually delete the lock file.")
+                        .arg(fileName),
+                details);
         return false;
     }
 
     struct LoadCleanup
     {
-        LoadCleanup(ScriteDocument *doc)
-            : m_document(doc) {
-            m_document->m_errorReport->clear();
-        }
+        LoadCleanup(ScriteDocument *doc) : m_document(doc) { m_document->m_errorReport->clear(); }
 
-        ~LoadCleanup() {
-            if(m_loadBegun) {
+        ~LoadCleanup()
+        {
+            if (m_loadBegun) {
                 m_document->m_progressReport->finish();
                 m_document->setLoading(false);
             } else
                 m_document->m_docFileSystem.reset();
         }
 
-        void begin() {
+        void begin()
+        {
             m_loadBegun = true;
             m_document->m_progressReport->start();
             m_document->setLoading(true);
@@ -1700,18 +1719,18 @@ bool ScriteDocument::load(const QString &fileName)
 
     int format = DocumentFileSystem::ScriteFormat;
     bool loaded = this->classicLoad(fileName);
-    if(!loaded)
+    if (!loaded)
         loaded = this->modernLoad(fileName, &format);
 
-    if(!loaded)
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName), details );
+    if (!loaded) {
+        m_errorReport->setErrorMessage(QStringLiteral("%1 is not a Scrite document.").arg(fileName),
+                                       details);
         return false;
     }
 
-    const QJsonDocument jsonDoc = format == DocumentFileSystem::ZipFormat ?
-                                  QJsonDocument::fromJson(m_docFileSystem.header()) :
-                                  QJsonDocument::fromBinaryData(m_docFileSystem.header());
+    const QJsonDocument jsonDoc = format == DocumentFileSystem::ZipFormat
+            ? QJsonDocument::fromJson(m_docFileSystem.header())
+            : QJsonDocument::fromBinaryData(m_docFileSystem.header());
 
 #ifndef QT_NO_DEBUG
     {
@@ -1724,53 +1743,58 @@ bool ScriteDocument::load(const QString &fileName)
 #endif
 
     const QJsonObject json = jsonDoc.object();
-    if(json.isEmpty())
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("%1 is not a Scrite document.").arg(fileName), details );
+    if (json.isEmpty()) {
+        m_errorReport->setErrorMessage(QStringLiteral("%1 is not a Scrite document.").arg(fileName),
+                                       details);
         return false;
     }
 
     const QJsonObject metaInfo = json.value("meta").toObject();
-    if(metaInfo.value("appName").toString().toLower() != qApp->applicationName().toLower())
-    {
-        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an unrecognised app.").arg(fileName), details );;
+    if (metaInfo.value("appName").toString().toLower() != qApp->applicationName().toLower()) {
+        m_errorReport->setErrorMessage(
+                QStringLiteral("Scrite document '%1' was created using an unrecognised app.")
+                        .arg(fileName),
+                details);
+        ;
         return false;
     }
 
-    const QVersionNumber docVersion = QVersionNumber::fromString( metaInfo.value(QStringLiteral("appVersion")).toString() );
+    const QVersionNumber docVersion =
+            QVersionNumber::fromString(metaInfo.value(QStringLiteral("appVersion")).toString());
     const QVersionNumber appVersion = Application::instance()->versionNumber();
-    if(appVersion < docVersion)
-    {
-        m_errorReport->setErrorMessage(QStringLiteral("Scrite document '%1' was created using an updated version.").arg(fileName), details );
+    if (appVersion < docVersion) {
+        m_errorReport->setErrorMessage(
+                QStringLiteral("Scrite document '%1' was created using an updated version.")
+                        .arg(fileName),
+                details);
         return false;
     }
 
     {
-        const QJsonArray jsCollaborators = json.value( QStringLiteral("collaborators") ).toArray();
-        for(const QJsonValue &item : jsCollaborators)
-        {
+        const QJsonArray jsCollaborators = json.value(QStringLiteral("collaborators")).toArray();
+        for (const QJsonValue &item : jsCollaborators) {
             const QString collaborator = item.toString();
-            if(collaborator.isEmpty())
+            if (collaborator.isEmpty())
                 continue;
 
             m_collaborators << collaborator;
         }
 
-        if(!m_collaborators.isEmpty())
-        {
-            if(!User::instance()->isLoggedIn())
-            {
+        if (!m_collaborators.isEmpty()) {
+            if (!User::instance()->isLoggedIn()) {
                 m_collaborators.clear();
-                m_errorReport->setErrorMessage(QStringLiteral("This document is protected. Please sign-up/login to open it."));
+                m_errorReport->setErrorMessage(QStringLiteral(
+                        "This document is protected. Please sign-up/login to open it."));
                 return false;
             }
 
             const QString infoEmail = User::instance()->email();
             const QString jhrEmail = JsonHttpRequest::email();
-            if(infoEmail.isEmpty() || jhrEmail.isEmpty() || infoEmail != jhrEmail || !m_collaborators.contains(jhrEmail,Qt::CaseInsensitive))
-            {
+            if (infoEmail.isEmpty() || jhrEmail.isEmpty() || infoEmail != jhrEmail
+                || !m_collaborators.contains(jhrEmail, Qt::CaseInsensitive)) {
                 m_collaborators.clear();
-                m_errorReport->setErrorMessage(QStringLiteral("This document is protected. You are not authorized to view it."));
+                m_errorReport->setErrorMessage(QStringLiteral(
+                        "This document is protected. You are not authorized to view it."));
                 return false;
             }
         }
@@ -1787,7 +1811,7 @@ bool ScriteDocument::load(const QString &fileName)
 
     UndoStack::ignoreUndoCommands = true;
     const bool ret = QObjectSerializer::fromJson(json, this);
-    if(m_screenplay->currentElementIndex() == 0)
+    if (m_screenplay->currentElementIndex() == 0)
         m_screenplay->setCurrentElementIndex(-1);
     UndoStack::ignoreUndoCommands = false;
     UndoStack::clearAllStacks();
@@ -1801,13 +1825,14 @@ bool ScriteDocument::load(const QString &fileName)
     // set to false after the QML UI has finished its lazy loading.
     m_clearModifyTimer.start(100, this);
 
-    if(ro)
-    {
+    if (ro) {
         Notification *notification = new Notification(this);
         connect(notification, &Notification::dismissed, &Notification::deleteLater);
 
         notification->setTitle(QStringLiteral("File only has read permission."));
-        notification->setText(QStringLiteral("This document is being opened in read only mode.\nTo edit this document, please apply write-permissions for the file in your computer."));
+        notification->setText(QStringLiteral("This document is being opened in read only mode.\nTo "
+                                             "edit this document, please apply "
+                                             "write-permissions for the file in your computer."));
         notification->setAutoClose(false);
         notification->setActive(true);
     }
@@ -1820,16 +1845,16 @@ bool ScriteDocument::load(const QString &fileName)
 
 bool ScriteDocument::classicLoad(const QString &fileName)
 {
-    if(fileName.isEmpty())
+    if (fileName.isEmpty())
         return false;
 
     QFile file(fileName);
-    if(!file.open(QFile::ReadOnly))
+    if (!file.open(QFile::ReadOnly))
         return false;
 
     static const QByteArray classicMarker("qbjs");
     const QByteArray marker = file.read(classicMarker.length());
-    if(marker != classicMarker)
+    if (marker != classicMarker)
         return false;
 
     file.seek(0);
@@ -1843,38 +1868,37 @@ bool ScriteDocument::modernLoad(const QString &fileName, int *format)
 {
     DocumentFileSystem::Format dfsFormat;
     const bool ret = m_docFileSystem.load(fileName, &dfsFormat);
-    if(format)
+    if (format)
         *format = dfsFormat;
     return ret;
 }
 
 void ScriteDocument::structureElementIndexChanged()
 {
-    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex || m_inCreateNewScene)
+    if (m_screenplay == nullptr || m_structure == nullptr
+        || m_syncingStructureScreenplayCurrentIndex || m_inCreateNewScene)
         return;
 
     QScopedValueRollback<bool> rollback(m_syncingStructureScreenplayCurrentIndex, true);
 
     StructureElement *element = m_structure->elementAt(m_structure->currentElementIndex());
-    if(element == nullptr)
-    {
+    if (element == nullptr) {
         m_screenplay->setActiveScene(nullptr);
         m_screenplay->setCurrentElementIndex(-1);
-    }
-    else
+    } else
         m_screenplay->setActiveScene(element->scene());
 }
 
 void ScriteDocument::screenplayElementIndexChanged()
 {
-    if(m_screenplay == nullptr || m_structure == nullptr || m_syncingStructureScreenplayCurrentIndex || m_inCreateNewScene)
+    if (m_screenplay == nullptr || m_structure == nullptr
+        || m_syncingStructureScreenplayCurrentIndex || m_inCreateNewScene)
         return;
 
     QScopedValueRollback<bool> rollback(m_syncingStructureScreenplayCurrentIndex, true);
 
     ScreenplayElement *element = m_screenplay->elementAt(m_screenplay->currentElementIndex());
-    if(element != nullptr)
-    {
+    if (element != nullptr) {
         int index = m_structure->indexOfScene(element->scene());
         m_structure->setCurrentElementIndex(index);
     }
@@ -1882,7 +1906,7 @@ void ScriteDocument::screenplayElementIndexChanged()
 
 void ScriteDocument::setCreatedOnThisComputer(bool val)
 {
-    if(m_createdOnThisComputer == val)
+    if (m_createdOnThisComputer == val)
         return;
 
     m_createdOnThisComputer = val;
@@ -1893,11 +1917,9 @@ void ScriteDocument::screenplayElementRemoved(ScreenplayElement *ptr, int)
 {
     Scene *scene = ptr->scene();
     int index = m_screenplay->firstIndexOfScene(scene);
-    if(index < 0)
-    {
+    if (index < 0) {
         index = m_structure->indexOfScene(scene);
-        if(index >= 0)
-        {
+        if (index >= 0) {
             StructureElement *element = m_structure->elementAt(index);
             element->setStackId(QString());
         }
@@ -1921,136 +1943,132 @@ bool ScriteDocument::canSerialize(const QMetaObject *, const QMetaProperty &) co
 
 void ScriteDocument::serializeToJson(QJsonObject &json) const
 {
-    json.insert( QStringLiteral("collaborators"), QJsonValue::fromVariant(m_collaborators) );
+    json.insert(QStringLiteral("collaborators"), QJsonValue::fromVariant(m_collaborators));
 
     QJsonObject metaInfo;
-    metaInfo.insert( QStringLiteral("appName"), qApp->applicationName());
-    metaInfo.insert( QStringLiteral("orgName"), qApp->organizationName());
-    metaInfo.insert( QStringLiteral("orgDomain"), qApp->organizationDomain());
-    metaInfo.insert( QStringLiteral("appVersion"), QStringLiteral("0.7.12"));
+    metaInfo.insert(QStringLiteral("appName"), qApp->applicationName());
+    metaInfo.insert(QStringLiteral("orgName"), qApp->organizationName());
+    metaInfo.insert(QStringLiteral("orgDomain"), qApp->organizationDomain());
+    metaInfo.insert(QStringLiteral("appVersion"), QStringLiteral("0.7.12"));
 
-    QVersionNumber appVersion = QVersionNumber::fromString(Application::instance()->versionNumber().toString());
-    if(appVersion.microVersion() % 2)
-        appVersion = QVersionNumber(appVersion.majorVersion(), appVersion.minorVersion(), appVersion.microVersion()-1);
-    metaInfo.insert( QStringLiteral("createdWith"), appVersion.toString());
+    QVersionNumber appVersion =
+            QVersionNumber::fromString(Application::instance()->versionNumber().toString());
+    if (appVersion.microVersion() % 2)
+        appVersion = QVersionNumber(appVersion.majorVersion(), appVersion.minorVersion(),
+                                    appVersion.microVersion() - 1);
+    metaInfo.insert(QStringLiteral("createdWith"), appVersion.toString());
 
     QJsonObject systemInfo;
-    systemInfo.insert( QStringLiteral("machineHostName"), QSysInfo::machineHostName());
-    systemInfo.insert( QStringLiteral("machineUniqueId"), QString::fromLatin1(QSysInfo::machineUniqueId()));
-    systemInfo.insert( QStringLiteral("prettyProductName"), QSysInfo::prettyProductName());
-    systemInfo.insert( QStringLiteral("productType"), QSysInfo::productType());
-    systemInfo.insert( QStringLiteral("productVersion"), QSysInfo::productVersion());
-    metaInfo.insert( QStringLiteral("system"), systemInfo);
+    systemInfo.insert(QStringLiteral("machineHostName"), QSysInfo::machineHostName());
+    systemInfo.insert(QStringLiteral("machineUniqueId"),
+                      QString::fromLatin1(QSysInfo::machineUniqueId()));
+    systemInfo.insert(QStringLiteral("prettyProductName"), QSysInfo::prettyProductName());
+    systemInfo.insert(QStringLiteral("productType"), QSysInfo::productType());
+    systemInfo.insert(QStringLiteral("productVersion"), QSysInfo::productVersion());
+    metaInfo.insert(QStringLiteral("system"), systemInfo);
 
     QJsonObject installationInfo;
-    installationInfo.insert( QStringLiteral("id"), Application::instance()->installationId());
-    installationInfo.insert( QStringLiteral("since"), Application::instance()->installationTimestamp().toMSecsSinceEpoch());
-    installationInfo.insert( QStringLiteral("launchCount"), Application::instance()->launchCounter());
-    metaInfo.insert( QStringLiteral("installation"), installationInfo);
+    installationInfo.insert(QStringLiteral("id"), Application::instance()->installationId());
+    installationInfo.insert(QStringLiteral("since"),
+                            Application::instance()->installationTimestamp().toMSecsSinceEpoch());
+    installationInfo.insert(QStringLiteral("launchCount"),
+                            Application::instance()->launchCounter());
+    metaInfo.insert(QStringLiteral("installation"), installationInfo);
 
-    json.insert( QStringLiteral("meta"), metaInfo);
+    json.insert(QStringLiteral("meta"), metaInfo);
 }
 
 void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonObject metaInfo = json.value( QStringLiteral("meta") ).toObject();
-    const QJsonObject systemInfo = metaInfo.value( QStringLiteral("system") ).toObject();
+    const QJsonObject metaInfo = json.value(QStringLiteral("meta")).toObject();
+    const QJsonObject systemInfo = metaInfo.value(QStringLiteral("system")).toObject();
 
     const QString thisMachineId = QString::fromLatin1(QSysInfo::machineUniqueId());
-    const QString jsonMachineId = systemInfo.value( QStringLiteral("machineUniqueId") ).toString() ;
+    const QString jsonMachineId = systemInfo.value(QStringLiteral("machineUniqueId")).toString();
     this->setCreatedOnThisComputer(jsonMachineId == thisMachineId);
 
-    const QString appVersion = metaInfo.value( QStringLiteral("appVersion") ).toString();
+    const QString appVersion = metaInfo.value(QStringLiteral("appVersion")).toString();
     const QVersionNumber version = QVersionNumber::fromString(appVersion);
-    if( version <= QVersionNumber(0,1,9) )
-    {
+    if (version <= QVersionNumber(0, 1, 9)) {
         const qreal dx = -130;
         const qreal dy = -22;
 
         const int nrElements = m_structure->elementCount();
-        for(int i=0; i<nrElements; i++)
-        {
+        for (int i = 0; i < nrElements; i++) {
             StructureElement *element = m_structure->elementAt(i);
-            element->setX( element->x()+dx );
-            element->setY( element->y()+dy );
+            element->setX(element->x() + dx);
+            element->setY(element->y() + dy);
         }
     }
 
-    if( version <= QVersionNumber(0,2,6) )
-    {
+    if (version <= QVersionNumber(0, 2, 6)) {
         const int nrElements = m_structure->elementCount();
-        for(int i=0; i<nrElements; i++)
-        {
+        for (int i = 0; i < nrElements; i++) {
             StructureElement *element = m_structure->elementAt(i);
             Scene *scene = element->scene();
-            if(scene == nullptr)
+            if (scene == nullptr)
                 continue;
 
             SceneHeading *heading = scene->heading();
             QString val = heading->locationType();
-            if(val ==  QStringLiteral("INTERIOR") )
-                val =  QStringLiteral("INT") ;
-            if(val ==  QStringLiteral("EXTERIOR") )
-                val =  QStringLiteral("EXT") ;
-            if(val ==  QStringLiteral("BOTH") )
+            if (val == QStringLiteral("INTERIOR"))
+                val = QStringLiteral("INT");
+            if (val == QStringLiteral("EXTERIOR"))
+                val = QStringLiteral("EXT");
+            if (val == QStringLiteral("BOTH"))
                 val = "I/E";
             heading->setLocationType(val);
         }
     }
 
-    if(m_screenplay->currentElementIndex() < 0)
-    {
-        if(m_screenplay->elementCount() > 0)
+    if (m_screenplay->currentElementIndex() < 0) {
+        if (m_screenplay->elementCount() > 0)
             m_screenplay->setCurrentElementIndex(0);
-        else if(m_structure->elementCount() > 0)
+        else if (m_structure->elementCount() > 0)
             m_structure->setCurrentElementIndex(0);
     }
 
     const QVector<QColor> versionColors = Application::standardColors(version);
-    const QVector<QColor> newColors     = Application::standardColors(QVersionNumber());
-    if(versionColors != newColors)
-    {
-        auto evalNewColor = [versionColors,newColors](const QColor &color) {
+    const QVector<QColor> newColors = Application::standardColors(QVersionNumber());
+    if (versionColors != newColors) {
+        auto evalNewColor = [versionColors, newColors](const QColor &color) {
             const int oldColorIndex = versionColors.indexOf(color);
-            const QColor newColor = oldColorIndex < 0 ? newColors.last() : newColors.at( oldColorIndex%newColors.size() );
+            const QColor newColor = oldColorIndex < 0
+                    ? newColors.last()
+                    : newColors.at(oldColorIndex % newColors.size());
             return newColor;
         };
 
         const int nrElements = m_structure->elementCount();
-        for(int i=0; i<nrElements; i++)
-        {
+        for (int i = 0; i < nrElements; i++) {
             StructureElement *element = m_structure->elementAt(i);
             Scene *scene = element->scene();
-            if(scene == nullptr)
+            if (scene == nullptr)
                 continue;
 
-            scene->setColor( evalNewColor(scene->color()) );
+            scene->setColor(evalNewColor(scene->color()));
 
             const int nrNotes = scene->notes()->noteCount();
-            for(int n=0; n<nrNotes; n++)
-            {
+            for (int n = 0; n < nrNotes; n++) {
                 Note *note = scene->notes()->noteAt(n);
-                note->setColor( evalNewColor(note->color()) );
+                note->setColor(evalNewColor(note->color()));
             }
         }
 
         const int nrNotes = m_structure->notes()->noteCount();
-        for(int n=0; n<nrNotes; n++)
-        {
+        for (int n = 0; n < nrNotes; n++) {
             Note *note = m_structure->notes()->noteAt(n);
-            note->setColor( evalNewColor(note->color()) );
+            note->setColor(evalNewColor(note->color()));
         }
 
         const int nrChars = m_structure->characterCount();
-        for(int c=0; c<nrChars; c++)
-        {
+        for (int c = 0; c < nrChars; c++) {
             Character *character = m_structure->characterAt(c);
 
             const int nrNotes = character->notes()->noteCount();
-            for(int n=0; n<nrNotes; n++)
-            {
+            for (int n = 0; n < nrNotes; n++) {
                 Note *note = character->notes()->noteAt(n);
-                note->setColor( evalNewColor(note->color()) );
+                note->setColor(evalNewColor(note->color()));
             }
         }
     }
@@ -2059,46 +2077,46 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // store formatting options. So, the old formatting options data doesnt
     // work anymore. We better reset to defaults in the new version and then
     // let the user alter it anyway he sees fit.
-    if( version <= QVersionNumber(0,3,9) )
-    {
+    if (version <= QVersionNumber(0, 3, 9)) {
         m_formatting->resetToDefaults();
         m_printFormat->resetToDefaults();
     }
 
     // Starting with 0.4.5, it is possible for users to lock a document
     // such that it is editable only the system in which it was created.
-    if(m_locked && !m_readOnly)
-    {
-        const QJsonObject installationInfo = metaInfo.value( QStringLiteral("installation") ).toObject();
-        const QString docClientId = installationInfo.value( QStringLiteral("id") ).toString();
+    if (m_locked && !m_readOnly) {
+        const QJsonObject installationInfo =
+                metaInfo.value(QStringLiteral("installation")).toObject();
+        const QString docClientId = installationInfo.value(QStringLiteral("id")).toString();
         const QString myClientId = Application::instance()->installationId();
-        if(!myClientId.isEmpty() && !docClientId.isEmpty() )
-        {
+        if (!myClientId.isEmpty() && !docClientId.isEmpty()) {
             const bool ro = myClientId != docClientId;
-            this->setReadOnly( ro );
-            if(ro)
-            {
+            this->setReadOnly(ro);
+            if (ro) {
                 Notification *notification = new Notification(this);
                 connect(notification, &Notification::dismissed, &Notification::deleteLater);
 
                 notification->setTitle(QStringLiteral("Document is locked for edit."));
-                notification->setText(QStringLiteral("This document is being opened in read only mode.\nYou cannot edit this document on your computer, because it has been locked for edit on another computer.\nYou can however save a copy using the 'Save As' option and edit the copy on your computer."));
+                notification->setText(QStringLiteral(
+                        "This document is being opened in read only mode.\nYou cannot edit this "
+                        "document on your "
+                        "computer, because it has been locked for edit on another computer.\nYou "
+                        "can however save a "
+                        "copy using the 'Save As' option and edit the copy on your computer."));
                 notification->setAutoClose(false);
                 notification->setActive(true);
             }
         }
     }
 
-    if(version <= QVersionNumber(0,4,7))
-    {
-        for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-        {
-            SceneElementFormat *format = m_formatting->elementFormat( SceneElement::Type(i) );
-            if(qFuzzyCompare(format->lineHeight(), 1.0))
+    if (version <= QVersionNumber(0, 4, 7)) {
+        for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
+            SceneElementFormat *format = m_formatting->elementFormat(SceneElement::Type(i));
+            if (qFuzzyCompare(format->lineHeight(), 1.0))
                 format->setLineHeight(0.85);
             const qreal lineHeight = format->lineHeight();
 
-            format = m_printFormat->elementFormat( SceneElement::Type(i) );
+            format = m_printFormat->elementFormat(SceneElement::Type(i));
             format->setLineHeight(lineHeight);
         }
     }
@@ -2112,8 +2130,7 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // Although its not specified anywhere that transitions must be right aligned,
     // many writers who are early adopters of Scrite are insisting on it.
     // So, going forward transition paragraphs will be right aligned by default.
-    if(version <= QVersionNumber(0,5,1))
-    {
+    if (version <= QVersionNumber(0, 5, 1)) {
         SceneElementFormat *format = m_formatting->elementFormat(SceneElement::Transition);
         format->setTextAlignment(Qt::AlignRight);
 
@@ -2123,7 +2140,7 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 
     // Documents created using Scrite version 0.5.2 or before use SynopsisEditorUI
     // by default.
-    if(version <= QVersionNumber(0,5,2))
+    if (version <= QVersionNumber(0, 5, 2))
         m_structure->setCanvasUIMode(Structure::SynopsisEditorUI);
 }
 
@@ -2131,12 +2148,13 @@ QString ScriteDocument::polishFileName(const QString &givenFileName) const
 {
     QString fileName = givenFileName.trimmed();
 
-    if(!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         QFileInfo fi(fileName);
-        if(fi.isDir())
-            fileName = fi.absolutePath() + QStringLiteral("/Screenplay-") + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".scrite");
-        else if(fi.suffix() != QStringLiteral("scrite"))
+        if (fi.isDir())
+            fileName = fi.absolutePath() + QStringLiteral("/Screenplay-")
+                    + QString::number(QDateTime::currentSecsSinceEpoch())
+                    + QStringLiteral(".scrite");
+        else if (fi.suffix() != QStringLiteral("scrite"))
             fileName += QStringLiteral(".scrite");
     }
 
@@ -2145,7 +2163,7 @@ QString ScriteDocument::polishFileName(const QString &givenFileName) const
 
 void ScriteDocument::setSessionId(QString val)
 {
-    if(m_sessionId == val)
+    if (m_sessionId == val)
         return;
 
     m_sessionId = val;
@@ -2155,20 +2173,15 @@ void ScriteDocument::setSessionId(QString val)
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementConnectors::StructureElementConnectors(ScriteDocument *parent)
-    : QAbstractListModel(parent),
-      m_document(parent)
+    : QAbstractListModel(parent), m_document(parent)
 {
-
 }
 
-StructureElementConnectors::~StructureElementConnectors()
-{
-
-}
+StructureElementConnectors::~StructureElementConnectors() { }
 
 StructureElement *StructureElementConnectors::fromElement(int row) const
 {
-    if(row < 0 || row >= m_items.size())
+    if (row < 0 || row >= m_items.size())
         return nullptr;
 
     const Item item = m_items.at(row);
@@ -2177,7 +2190,7 @@ StructureElement *StructureElementConnectors::fromElement(int row) const
 
 StructureElement *StructureElementConnectors::toElement(int row) const
 {
-    if(row < 0 || row >= m_items.size())
+    if (row < 0 || row >= m_items.size())
         return nullptr;
 
     const Item item = m_items.at(row);
@@ -2186,7 +2199,7 @@ StructureElement *StructureElementConnectors::toElement(int row) const
 
 QString StructureElementConnectors::label(int row) const
 {
-    if(row < 0 || row >= m_items.size())
+    if (row < 0 || row >= m_items.size())
         return nullptr;
 
     const Item item = m_items.at(row);
@@ -2200,23 +2213,27 @@ int StructureElementConnectors::rowCount(const QModelIndex &parent) const
 
 QVariant StructureElementConnectors::data(const QModelIndex &index, int role) const
 {
-    if(index.row() < 0 || index.row() >= m_items.size())
+    if (index.row() < 0 || index.row() >= m_items.size())
         return QVariant();
 
     const Item item = m_items.at(index.row());
-    switch(role)
-    {
-    case FromElementRole: return QVariant::fromValue<QObject*>(item.from);
-    case ToElementRole: return QVariant::fromValue<QObject*>(item.to);
-    case LabelRole: return item.label;
-    default: break;
+    switch (role) {
+    case FromElementRole:
+        return QVariant::fromValue<QObject *>(item.from);
+    case ToElementRole:
+        return QVariant::fromValue<QObject *>(item.to);
+    case LabelRole:
+        return item.label;
+    default:
+        break;
     }
 
     return QVariant();
 }
 
-QHash<int, QByteArray> StructureElementConnectors::roleNames() const {
-    QHash<int,QByteArray> roles;
+QHash<int, QByteArray> StructureElementConnectors::roleNames() const
+{
+    QHash<int, QByteArray> roles;
     roles[FromElementRole] = QByteArrayLiteral("connectorFromElement");
     roles[ToElementRole] = QByteArrayLiteral("connectorToElement");
     roles[LabelRole] = QByteArrayLiteral("connectorLabel");
@@ -2225,7 +2242,7 @@ QHash<int, QByteArray> StructureElementConnectors::roleNames() const {
 
 void StructureElementConnectors::clear()
 {
-    if(m_items.isEmpty())
+    if (m_items.isEmpty())
         return;
 
     this->beginResetModel();
@@ -2238,15 +2255,13 @@ void StructureElementConnectors::reload()
 {
     const Structure *structure = m_document->structure();
     const Screenplay *screenplay = m_document->screenplay();
-    if(structure == nullptr || screenplay == nullptr)
-    {
+    if (structure == nullptr || screenplay == nullptr) {
         this->clear();
         return;
     }
 
     const int nrElements = screenplay->elementCount();
-    if(nrElements <= 1)
-    {
+    if (nrElements <= 1) {
         this->clear();
         return;
     }
@@ -2258,31 +2273,26 @@ void StructureElementConnectors::reload()
     int itemIndex = 0;
 
     const bool itemsWasEmpty = m_items.isEmpty();
-    if(itemsWasEmpty)
+    if (itemsWasEmpty)
         this->beginResetModel();
 
-    for(int i=0; i<nrElements-1; i++)
-    {
+    for (int i = 0; i < nrElements - 1; i++) {
         fromElement = fromElement ? fromElement : screenplay->elementAt(i);
-        toElement = toElement ? toElement : screenplay->elementAt(i+1);
+        toElement = toElement ? toElement : screenplay->elementAt(i + 1);
         fromIndex = fromIndex >= 0 ? fromIndex : structure->indexOfScene(fromElement->scene());
         toIndex = toIndex >= 0 ? toIndex : structure->indexOfScene(toElement->scene());
 
-        if(fromIndex >= 0 && toIndex >= 0)
-        {
+        if (fromIndex >= 0 && toIndex >= 0) {
             Item item;
             item.from = structure->elementAt(fromIndex);
             item.to = structure->elementAt(toIndex);
-            item.label = QString::number(itemIndex+1);
+            item.label = QString::number(itemIndex + 1);
 
-            if(itemsWasEmpty)
+            if (itemsWasEmpty)
                 m_items.append(item);
-            else
-            {
-                if(itemIndex < m_items.size())
-                {
-                    if( !(m_items.at(itemIndex) == item) )
-                    {
+            else {
+                if (itemIndex < m_items.size()) {
+                    if (!(m_items.at(itemIndex) == item)) {
                         this->beginRemoveRows(QModelIndex(), itemIndex, itemIndex);
                         m_items.removeAt(itemIndex);
                         this->endRemoveRows();
@@ -2291,9 +2301,7 @@ void StructureElementConnectors::reload()
                         m_items.insert(itemIndex, item);
                         this->endInsertRows();
                     }
-                }
-                else
-                {
+                } else {
                     this->beginInsertRows(QModelIndex(), itemIndex, itemIndex);
                     m_items.append(item);
                     this->endInsertRows();
@@ -2305,9 +2313,7 @@ void StructureElementConnectors::reload()
 
             fromElement = toElement;
             fromIndex = toIndex;
-        }
-        else
-        {
+        } else {
             fromElement = nullptr;
             fromIndex = -1;
         }
@@ -2316,18 +2322,14 @@ void StructureElementConnectors::reload()
         toIndex = -1;
     }
 
-    if(itemsWasEmpty)
-    {
+    if (itemsWasEmpty) {
         this->endResetModel();
         emit countChanged();
-    }
-    else
-    {
+    } else {
         const int expectedCount = itemIndex;
-        if(m_items.size() > expectedCount)
-        {
-            this->beginRemoveRows(QModelIndex(), expectedCount, m_items.size()-1);
-            while(m_items.size() != expectedCount)
+        if (m_items.size() > expectedCount) {
+            this->beginRemoveRows(QModelIndex(), expectedCount, m_items.size() - 1);
+            while (m_items.size() != expectedCount)
                 m_items.removeLast();
             this->endRemoveRows();
         }
@@ -2340,33 +2342,30 @@ QJsonObject ScriteDocumentBackups::MetaData::toJson() const
     ret.insert(QStringLiteral("loaded"), this->loaded);
     ret.insert(QStringLiteral("structureElementCount"), this->structureElementCount);
     ret.insert(QStringLiteral("screenplayElementCount"), this->screenplayElementCount);
-    ret.insert(QStringLiteral("sceneCount"), qMax(this->structureElementCount,this->screenplayElementCount));
+    ret.insert(QStringLiteral("sceneCount"),
+               qMax(this->structureElementCount, this->screenplayElementCount));
     return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ScriteDocumentCollaborators::ScriteDocumentCollaborators(QObject *parent)
-    :QAbstractListModel(parent)
+    : QAbstractListModel(parent)
 {
     this->setDocument(ScriteDocument::instance());
 }
 
-ScriteDocumentCollaborators::~ScriteDocumentCollaborators()
-{
-
-}
+ScriteDocumentCollaborators::~ScriteDocumentCollaborators() { }
 
 void ScriteDocumentCollaborators::setDocument(ScriteDocument *val)
 {
-    if(m_document == val)
+    if (m_document == val)
         return;
 
-    if(m_document)
+    if (m_document)
         disconnect(m_document, nullptr, this, nullptr);
 
-    if(!m_otherCollaborators.isEmpty())
-    {
+    if (!m_otherCollaborators.isEmpty()) {
         this->beginRemoveRows(QModelIndex(), 0, m_otherCollaborators.size());
         m_otherCollaborators.clear();
         this->endRemoveRows();
@@ -2374,9 +2373,9 @@ void ScriteDocumentCollaborators::setDocument(ScriteDocument *val)
 
     m_document = val;
 
-    if(m_document)
-    {
-        connect(m_document, &ScriteDocument::collaboratorsChanged, this, &ScriteDocumentCollaborators::updateModelAndFetchUsersInfoIfRequired);
+    if (m_document) {
+        connect(m_document, &ScriteDocument::collaboratorsChanged, this,
+                &ScriteDocumentCollaborators::updateModelAndFetchUsersInfoIfRequired);
         this->updateModelAndFetchUsersInfoIfRequired();
     }
 
@@ -2390,18 +2389,19 @@ int ScriteDocumentCollaborators::rowCount(const QModelIndex &parent) const
 
 QVariant ScriteDocumentCollaborators::data(const QModelIndex &index, int role) const
 {
-    if(index.row() < 0 || index.row() >= m_otherCollaborators.size())
+    if (index.row() < 0 || index.row() >= m_otherCollaborators.size())
         return QVariant();
 
     const auto item = m_otherCollaborators.at(index.row());
-    switch(role)
-    {
+    switch (role) {
     case CollaboratorNameRole:
         return item.second;
     case CollaboratorEmailRole:
         return item.first;
     case CollaboratorRole:
-        return item.second.isEmpty() ? item.first : (item.second + QStringLiteral(" <") + item.first + QStringLiteral(">"));
+        return item.second.isEmpty()
+                ? item.first
+                : (item.second + QStringLiteral(" <") + item.first + QStringLiteral(">"));
     }
 
     return QVariant();
@@ -2409,19 +2409,18 @@ QVariant ScriteDocumentCollaborators::data(const QModelIndex &index, int role) c
 
 QHash<int, QByteArray> ScriteDocumentCollaborators::roleNames() const
 {
-    return QHash<int,QByteArray>({
-         { CollaboratorRole, QByteArrayLiteral("collaborator") },
-         { CollaboratorEmailRole, QByteArrayLiteral("collaboratorEmail") },
-         { CollaboratorNameRole, QByteArrayLiteral("collaboratorName") }
-    });
+    return QHash<int, QByteArray>(
+            { { CollaboratorRole, QByteArrayLiteral("collaborator") },
+              { CollaboratorEmailRole, QByteArrayLiteral("collaboratorEmail") },
+              { CollaboratorNameRole, QByteArrayLiteral("collaboratorName") } });
 }
 
 int ScriteDocumentCollaborators::updateModel()
 {
     int nrUnknownEmails = 0;
 
-    QMap< QString, QString > infoMap;
-    for(auto & item : m_otherCollaborators)
+    QMap<QString, QString> infoMap;
+    for (auto &item : m_otherCollaborators)
         infoMap[item.first] = item.second;
 
     this->beginResetModel();
@@ -2429,24 +2428,22 @@ int ScriteDocumentCollaborators::updateModel()
     const QStringList collaborators = m_document ? m_document->otherCollaborators() : QStringList();
     m_otherCollaborators.clear();
 
-    for(const QString &collaborator : collaborators)
-    {
+    for (const QString &collaborator : collaborators) {
         auto item = qMakePair(collaborator, infoMap.value(collaborator));
-        if(item.second.isEmpty())
-        {
+        if (item.second.isEmpty()) {
             const QJsonObject userInfo = m_usersInfoMap.value(item.first).toObject();
-            if(!userInfo.isEmpty())
-            {
-                const QString firstName = userInfo.value( QStringLiteral("firstName") ).toString();
-                const QString lastName = userInfo.value( QStringLiteral("lastName") ).toString();
-                item.second = QStringList({firstName, lastName}).join(QStringLiteral(" ")).trimmed();
-                if(item.second.isEmpty())
+            if (!userInfo.isEmpty()) {
+                const QString firstName = userInfo.value(QStringLiteral("firstName")).toString();
+                const QString lastName = userInfo.value(QStringLiteral("lastName")).toString();
+                item.second =
+                        QStringList({ firstName, lastName }).join(QStringLiteral(" ")).trimmed();
+                if (item.second.isEmpty())
                     item.second = QStringLiteral("Registered User");
             }
         }
         m_otherCollaborators.append(item);
 
-        if(item.second.isEmpty())
+        if (item.second.isEmpty())
             ++nrUnknownEmails;
     }
 
@@ -2457,30 +2454,29 @@ int ScriteDocumentCollaborators::updateModel()
 
 void ScriteDocumentCollaborators::fetchUsersInfo()
 {
-    if(!m_document)
+    if (!m_document)
         return;
 
     const QStringList collaborators = m_document->otherCollaborators();
-    if(collaborators.isEmpty())
+    if (collaborators.isEmpty())
         return;
 
     const QString callObjectName = QStringLiteral("call");
-    JsonHttpRequest *call = this->findChild<JsonHttpRequest*>(callObjectName, Qt::FindDirectChildrenOnly);
-    if(call != nullptr)
-    {
+    JsonHttpRequest *call =
+            this->findChild<JsonHttpRequest *>(callObjectName, Qt::FindDirectChildrenOnly);
+    if (call != nullptr) {
         ++m_pendingFetchUsersInfoRequests;
         return;
     }
 
     QStringList pendingCollaborators;
-    for(const QString &collaborator : collaborators)
-    {
-        if(m_usersInfoMap.contains(collaborator))
+    for (const QString &collaborator : collaborators) {
+        if (m_usersInfoMap.contains(collaborator))
             continue;
         pendingCollaborators << collaborator;
     }
 
-    if(pendingCollaborators.isEmpty())
+    if (pendingCollaborators.isEmpty())
         return;
 
     call = new JsonHttpRequest(this);
@@ -2489,7 +2485,7 @@ void ScriteDocumentCollaborators::fetchUsersInfo()
     call->setType(JsonHttpRequest::POST);
     call->setApi(QStringLiteral("app/users"));
     QJsonObject data;
-    data.insert( QStringLiteral("emailIds"), QJsonValue::fromVariant(pendingCollaborators) );
+    data.insert(QStringLiteral("emailIds"), QJsonValue::fromVariant(pendingCollaborators));
     call->setData(data);
 
     connect(call, &JsonHttpRequest::finished, this, &ScriteDocumentCollaborators::onCallFinished);
@@ -2498,39 +2494,40 @@ void ScriteDocumentCollaborators::fetchUsersInfo()
 
 void ScriteDocumentCollaborators::updateModelAndFetchUsersInfoIfRequired()
 {
-    if(this->updateModel() > 0)
+    if (this->updateModel() > 0)
         this->fetchUsersInfo();
 }
 
 void ScriteDocumentCollaborators::onCallFinished()
 {
-    JsonHttpRequest *call = qobject_cast<JsonHttpRequest*>(this->sender());
-    if(call == nullptr)
-        call = this->findChild<JsonHttpRequest*>(QStringLiteral("call"), Qt::FindDirectChildrenOnly);;
-    if(call == nullptr)
+    JsonHttpRequest *call = qobject_cast<JsonHttpRequest *>(this->sender());
+    if (call == nullptr)
+        call = this->findChild<JsonHttpRequest *>(QStringLiteral("call"),
+                                                  Qt::FindDirectChildrenOnly);
+    ;
+    if (call == nullptr)
         return;
 
-    if(call->hasError() || !call->hasResponse())
+    if (call->hasError() || !call->hasResponse())
         return;
 
     const QJsonObject response = call->responseData();
     auto it = response.begin();
     auto end = response.end();
-    while(it != end)
-    {
+    while (it != end) {
         m_usersInfoMap.insert(it.key(), it.value());
         ++it;
     }
 
     this->updateModel();
 
-    if(m_pendingFetchUsersInfoRequests > 0) {
+    if (m_pendingFetchUsersInfoRequests > 0) {
         QTimer *timer = new QTimer(this);
         timer->setInterval(0);
         timer->setSingleShot(true);
-        QObject::connect(timer, &QTimer::timeout, this, &ScriteDocumentCollaborators::fetchUsersInfo);
+        QObject::connect(timer, &QTimer::timeout, this,
+                         &ScriteDocumentCollaborators::fetchUsersInfo);
         QObject::connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
         timer->start();
     }
 }
-

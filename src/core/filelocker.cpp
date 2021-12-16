@@ -22,8 +22,7 @@
 #include <QCoreApplication>
 #include <QFileSystemWatcher>
 
-FileLocker::FileLocker(QObject *parent)
-    : QObject(parent)
+FileLocker::FileLocker(QObject *parent) : QObject(parent)
 {
     m_modifiedTimer = new QTimer(this);
     m_modifiedTimer->setSingleShot(true);
@@ -48,7 +47,7 @@ void FileLocker::setFilePath(const QString &val)
     const QFileInfo fi(val);
     const QString val2 = fi.canonicalFilePath();
 
-    if(m_filePath == val2)
+    if (m_filePath == val2)
         return;
 
     this->cleanup();
@@ -60,7 +59,7 @@ void FileLocker::setFilePath(const QString &val)
 
 void FileLocker::setStrategy(Strategy val)
 {
-    if(m_strategy == val)
+    if (m_strategy == val)
         return;
 
     m_strategy = val;
@@ -71,7 +70,7 @@ void FileLocker::setStrategy(Strategy val)
 
 bool FileLocker::claim()
 {
-    this->setLockInfo( QJsonObject() );
+    this->setLockInfo(QJsonObject());
     this->updateStatus();
     return this->isClaimed();
 }
@@ -85,15 +84,14 @@ void FileLocker::cleanup()
     this->setLockInfo(QJsonObject());
     this->setClaimed(false);
 
-    if(m_fsWatcher)
+    if (m_fsWatcher)
         delete m_fsWatcher;
     m_fsWatcher = nullptr;
 
-    if(!m_lockFilePath.isEmpty() && QFile::exists(m_lockFilePath))
-    {
+    if (!m_lockFilePath.isEmpty() && QFile::exists(m_lockFilePath)) {
         const bool hasUniqueId = !m_uniqueId.isEmpty();
         const QString ownerUniqueId = linfo.value(QStringLiteral("id")).toString();
-        if(hasUniqueId && ownerUniqueId == m_uniqueId)
+        if (hasUniqueId && ownerUniqueId == m_uniqueId)
             QFile::remove(m_lockFilePath);
     }
 
@@ -105,11 +103,11 @@ void FileLocker::initialize()
 {
     // The assumption is that cleanup() is called before this function is called.
 
-    if(m_filePath.isEmpty())
+    if (m_filePath.isEmpty())
         return;
 
     QFileInfo fi(m_filePath);
-    if(!fi.exists() || !fi.isFile())
+    if (!fi.exists() || !fi.isFile())
         return;
 
     m_uniqueId = QUuid::createUuid().toString();
@@ -119,17 +117,14 @@ void FileLocker::initialize()
 
 void FileLocker::updateStatus()
 {
-    if(m_lockFilePath.isEmpty())
+    if (m_lockFilePath.isEmpty())
         return;
 
     QFileInfo fi(m_lockFilePath);
-    if(!fi.exists())
-    {
-        if(m_lockInfo.isEmpty())
-        {
+    if (!fi.exists()) {
+        if (m_lockInfo.isEmpty()) {
             QFile file(m_lockFilePath);
-            if( !file.open(QFile::WriteOnly|QFile::Unbuffered|QFile::Text) )
-            {
+            if (!file.open(QFile::WriteOnly | QFile::Unbuffered | QFile::Text)) {
                 this->setCanRead(false);
                 this->setCanWrite(false);
                 this->setLockInfo(QJsonObject());
@@ -137,25 +132,23 @@ void FileLocker::updateStatus()
             }
 
             QJsonObject info;
-            info.insert( QStringLiteral("name"), qApp->applicationName() );
-            info.insert( QStringLiteral("pid"), qApp->applicationPid() );
-            info.insert( QStringLiteral("id"), m_uniqueId );
-            info.insert( QStringLiteral("version"), qApp->applicationVersion() );
-            info.insert( QStringLiteral("org"), qApp->organizationName() );
-            info.insert( QStringLiteral("domain"), qApp->organizationDomain() );
-            info.insert( QStringLiteral("timestamp"), QDateTime::currentDateTime().toString() );
+            info.insert(QStringLiteral("name"), qApp->applicationName());
+            info.insert(QStringLiteral("pid"), qApp->applicationPid());
+            info.insert(QStringLiteral("id"), m_uniqueId);
+            info.insert(QStringLiteral("version"), qApp->applicationVersion());
+            info.insert(QStringLiteral("org"), qApp->organizationName());
+            info.insert(QStringLiteral("domain"), qApp->organizationDomain());
+            info.insert(QStringLiteral("timestamp"), QDateTime::currentDateTime().toString());
 
-            file.write( QJsonDocument(info).toJson() );
+            file.write(QJsonDocument(info).toJson());
 
             this->setClaimed(true);
-        }
-        else
+        } else
             this->setClaimed(false);
     }
 
     QFile file(m_lockFilePath);
-    if( !file.open(QFile::ReadOnly) )
-    {
+    if (!file.open(QFile::ReadOnly)) {
         this->setCanRead(false);
         this->setCanWrite(false);
         this->setLockInfo(QJsonObject());
@@ -163,30 +156,26 @@ void FileLocker::updateStatus()
         return;
     }
 
-    if(m_fsWatcher == nullptr)
-    {
+    if (m_fsWatcher == nullptr) {
         m_fsWatcher = new QFileSystemWatcher(this);
         m_fsWatcher->addPath(m_lockFilePath);
         connect(m_fsWatcher, &QFileSystemWatcher::fileChanged, this, &FileLocker::updateStatus);
     }
 
-    this->setLockInfo( QJsonDocument::fromJson(file.readAll()).object() );
-    if(m_lockInfo.isEmpty())
-    {
+    this->setLockInfo(QJsonDocument::fromJson(file.readAll()).object());
+    if (m_lockInfo.isEmpty()) {
         this->setCanRead(false);
         this->setCanWrite(false);
         this->setClaimed(false);
         return;
     }
 
-    const bool lockedBySomeoneElse = m_lockInfo.value( QStringLiteral("id") ).toString() != m_uniqueId;
-    if(lockedBySomeoneElse)
-    {
+    const bool lockedBySomeoneElse =
+            m_lockInfo.value(QStringLiteral("id")).toString() != m_uniqueId;
+    if (lockedBySomeoneElse) {
         this->setCanWrite(false);
         this->setCanRead(m_strategy == MultipleReadSingleWrite);
-    }
-    else
-    {
+    } else {
         this->setCanRead(true);
         this->setCanWrite(true);
     }
@@ -196,7 +185,7 @@ void FileLocker::updateStatus()
 
 void FileLocker::setCanRead(bool val)
 {
-    if(m_canRead == val)
+    if (m_canRead == val)
         return;
 
     m_canRead = val;
@@ -205,7 +194,7 @@ void FileLocker::setCanRead(bool val)
 
 void FileLocker::setCanWrite(bool val)
 {
-    if(m_canWrite == val)
+    if (m_canWrite == val)
         return;
 
     m_canWrite = val;
@@ -214,7 +203,7 @@ void FileLocker::setCanWrite(bool val)
 
 void FileLocker::setLockInfo(const QJsonObject &val)
 {
-    if(m_lockInfo == val)
+    if (m_lockInfo == val)
         return;
 
     m_lockInfo = val;
@@ -223,14 +212,13 @@ void FileLocker::setLockInfo(const QJsonObject &val)
 
 void FileLocker::setClaimed(bool val)
 {
-    if(m_claimed == val)
+    if (m_claimed == val)
         return;
 
     m_claimed = val;
     emit claimedChanged();
 
-    if(!val && m_fsWatcher != nullptr)
-    {
+    if (!val && m_fsWatcher != nullptr) {
         delete m_fsWatcher;
         m_fsWatcher = nullptr;
     }

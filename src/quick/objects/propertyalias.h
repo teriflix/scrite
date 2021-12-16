@@ -22,12 +22,12 @@ class PropertyAlias : public QObject
     Q_OBJECT
 
 public:
-    PropertyAlias(QObject *parent=nullptr);
+    PropertyAlias(QObject *parent = nullptr);
     ~PropertyAlias();
 
     Q_PROPERTY(QObject* sourceObject READ sourceObject WRITE setSourceObject NOTIFY sourceObjectChanged)
-    void setSourceObject(QObject* val);
-    QObject* sourceObject() const { return m_sourceObject; }
+    void setSourceObject(QObject *val);
+    QObject *sourceObject() const { return m_sourceObject; }
     Q_SIGNAL void sourceObjectChanged();
 
     Q_PROPERTY(QByteArray sourceProperty READ sourceProperty WRITE setSourceProperty NOTIFY sourcePropertyChanged)

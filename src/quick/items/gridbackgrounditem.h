@@ -37,7 +37,7 @@ public:
 
 private:
     friend class GridBackgroundItem;
-    GridBackgroundItemBorder(QObject *parent=nullptr);
+    GridBackgroundItemBorder(QObject *parent = nullptr);
 
 private:
     qreal m_width = 2.0;
@@ -49,7 +49,7 @@ class GridBackgroundItem : public QQuickItem
     Q_OBJECT
 
 public:
-    GridBackgroundItem(QQuickItem *parent=nullptr);
+    GridBackgroundItem(QQuickItem *parent = nullptr);
     ~GridBackgroundItem();
 
     Q_PROPERTY(qreal tickDistance READ tickDistance WRITE setTickDistance NOTIFY tickDistanceChanged)
@@ -93,7 +93,7 @@ public:
     Q_SIGNAL void gridIsVisibleChanged();
 
     Q_PROPERTY(GridBackgroundItemBorder* border READ border CONSTANT)
-    GridBackgroundItemBorder* border() const { return m_border; }
+    GridBackgroundItemBorder *border() const { return m_border; }
     Q_SIGNAL void borderChanged();
 
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
@@ -108,7 +108,7 @@ protected:
 private:
     bool m_gridIsVisible = true;
     qreal m_tickDistance = 10;
-    int   m_majorTickStride = 10;
+    int m_majorTickStride = 10;
     qreal m_tickColorOpacity = 1.0;
     qreal m_minorTickLineWidth = 1;
     qreal m_majorTickLineWidth = 2;

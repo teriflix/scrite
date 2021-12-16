@@ -24,8 +24,7 @@
 #include <QtConcurrentMap>
 #include <QQuickItemGrabResult>
 
-BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent)
-    : QObject(parent)
+BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent) : QObject(parent)
 {
     /**
       Preview updates are time consumping operations and hence are done
@@ -37,14 +36,11 @@ BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent)
     m_threadPool.setMaxThreadCount(1);
 }
 
-BoundingBoxEvaluator::~BoundingBoxEvaluator()
-{
-
-}
+BoundingBoxEvaluator::~BoundingBoxEvaluator() { }
 
 void BoundingBoxEvaluator::setMargin(qreal val)
 {
-    if( qFuzzyCompare(m_margin, val) )
+    if (qFuzzyCompare(m_margin, val))
         return;
 
     m_margin = val;
@@ -55,7 +51,7 @@ void BoundingBoxEvaluator::setMargin(qreal val)
 
 void BoundingBoxEvaluator::setInitialRect(const QRectF &val)
 {
-    if(m_initialRect == val)
+    if (m_initialRect == val)
         return;
 
     m_initialRect = val;
@@ -66,7 +62,7 @@ void BoundingBoxEvaluator::setInitialRect(const QRectF &val)
 
 void BoundingBoxEvaluator::setPreviewScale(qreal val)
 {
-    if( qFuzzyCompare(m_previewScale, val) )
+    if (qFuzzyCompare(m_previewScale, val))
         return;
 
     m_previewScale = val;
@@ -81,13 +77,10 @@ QPicture BoundingBoxEvaluator::preview() const
 
 void BoundingBoxEvaluator::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_evaluationTimer.timerId())
-    {
+    if (event->timerId() == m_evaluationTimer.timerId()) {
         m_evaluationTimer.stop();
         this->evaluateNow();
-    }
-    else if(event->timerId() == m_updatePreviewTimer.timerId())
-    {
+    } else if (event->timerId() == m_updatePreviewTimer.timerId()) {
         m_updatePreviewTimer.stop();
         this->updatePreview();
     }
@@ -95,7 +88,7 @@ void BoundingBoxEvaluator::timerEvent(QTimerEvent *event)
 
 void BoundingBoxEvaluator::setBoundingBox(const QRectF &val)
 {
-    if(m_boundingBox == val)
+    if (m_boundingBox == val)
         return;
 
     m_boundingBox = val;
@@ -115,7 +108,8 @@ void BoundingBoxEvaluator::addItem(BoundingBoxItem *item)
 void BoundingBoxEvaluator::removeItem(BoundingBoxItem *item)
 {
     disconnect(item, &BoundingBoxItem::aboutToDestroy, this, &BoundingBoxEvaluator::removeItem);
-    disconnect(item, &BoundingBoxItem::previewUpdated, this, &BoundingBoxEvaluator::markPreviewDirty);
+    disconnect(item, &BoundingBoxItem::previewUpdated, this,
+               &BoundingBoxEvaluator::markPreviewDirty);
     m_items.removeOne(item);
     this->evaluateLater();
 
@@ -126,9 +120,8 @@ void BoundingBoxEvaluator::evaluateNow()
 {
     QRectF rect = m_initialRect;
 
-    for(BoundingBoxItem *item : qAsConst(m_items))
-    {
-        if(item->item())
+    for (BoundingBoxItem *item : qAsConst(m_items)) {
+        if (item->item())
             rect |= item->boundingRect();
     }
 
@@ -143,11 +136,11 @@ void BoundingBoxEvaluator::updatePreview()
 #ifndef QT_NO_DEBUG
     qDebug("BoundingBoxEvaluator is updating preview picture");
 #endif
-    if(!m_preview.isNull())
+    if (!m_preview.isNull())
         return;
 
     const QString futureWatcherName = QStringLiteral("CreatePreviewPictureFuture");
-    if( this->findChild<QFutureWatcherBase*>(futureWatcherName) != nullptr )
+    if (this->findChild<QFutureWatcherBase *>(futureWatcherName) != nullptr)
         return;
 
     /**
@@ -160,15 +153,17 @@ void BoundingBoxEvaluator::updatePreview()
      * get a function to create preview-picture in a thread.
      */
     QList<QJsonObject> itemInfoArray;
-    for(BoundingBoxItem *item : qAsConst(m_items))
+    for (BoundingBoxItem *item : qAsConst(m_items))
         itemInfoArray << item->asJson();
 
-    QFuture<QPicture> future = QtConcurrent::run(&m_threadPool,
-        [=](const QList<QJsonObject> &items, const QRectF &bbox, const qreal scale) -> QPicture {
-            QMutexLocker locker(&m_previewLock);
-            return BoundingBoxEvaluator::createPreviewPicture(items, bbox, scale);
-        },
-        itemInfoArray, m_boundingBox, m_previewScale);
+    QFuture<QPicture> future = QtConcurrent::run(
+            &m_threadPool,
+            [=](const QList<QJsonObject> &items, const QRectF &bbox,
+                const qreal scale) -> QPicture {
+                QMutexLocker locker(&m_previewLock);
+                return BoundingBoxEvaluator::createPreviewPicture(items, bbox, scale);
+            },
+            itemInfoArray, m_boundingBox, m_previewScale);
     QFutureWatcher<QPicture> *futureWatcher = new QFutureWatcher<QPicture>(this);
     futureWatcher->setObjectName(futureWatcherName);
     connect(futureWatcher, &QFutureWatcher<QPicture>::finished, this, [=]() {
@@ -179,14 +174,15 @@ void BoundingBoxEvaluator::updatePreview()
     futureWatcher->setFuture(future);
 }
 
-QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &items, const QRectF &bbox, const qreal scale)
+QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &items,
+                                                    const QRectF &bbox, const qreal scale)
 {
     // Make a copy, so we can sort the copy by stack order.
     QList<QJsonObject> itemsCopy = items;
 
     QSizeF boxSize = bbox.size();
     boxSize *= scale;
-    if(boxSize.isEmpty())
+    if (boxSize.isEmpty())
         return QPicture();
 
     const QString stackOrderAttrib = QStringLiteral("stackOrder");
@@ -197,7 +193,7 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
     std::sort(itemsCopy.begin(), itemsCopy.end(), lessThan);
 
     QPicture picture;
-    picture.setBoundingRect( QRectF( QPointF(0,0), boxSize ).toRect() );
+    picture.setBoundingRect(QRectF(QPointF(0, 0), boxSize).toRect());
 
     QTransform tx;
     tx.translate(-bbox.left(), -bbox.top());
@@ -209,14 +205,14 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
     paint.setTransform(tx);
 
     auto rectFromJson = [](const QJsonObject &jsRect) {
-        return QRectF( jsRect.value(QStringLiteral("x")).toDouble(),
-                       jsRect.value(QStringLiteral("y")).toDouble(),
-                       jsRect.value(QStringLiteral("width")).toDouble(),
-                       jsRect.value(QStringLiteral("height")).toDouble() );
+        return QRectF(jsRect.value(QStringLiteral("x")).toDouble(),
+                      jsRect.value(QStringLiteral("y")).toDouble(),
+                      jsRect.value(QStringLiteral("width")).toDouble(),
+                      jsRect.value(QStringLiteral("height")).toDouble());
     };
 
     auto imageFromJson = [](const QJsonValue &value) {
-        if(value.isNull() || value.isUndefined())
+        if (value.isNull() || value.isUndefined())
             return QImage();
 
         const QByteArray base64 = value.toString().toLatin1();
@@ -230,25 +226,26 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
         return ret;
     };
 
-    for(const QJsonObject &item : qAsConst(itemsCopy))
-    {
-        const QRectF itemRect = rectFromJson( item.value(QStringLiteral("boundingRect")).toObject() );
+    for (const QJsonObject &item : qAsConst(itemsCopy)) {
+        const QRectF itemRect = rectFromJson(item.value(QStringLiteral("boundingRect")).toObject());
         const bool isLivePreview = item.value(QStringLiteral("livePreview")).toBool();
-        const QImage itemPreview = isLivePreview ? imageFromJson( item.value(QStringLiteral("preview")) ) : QImage();
-        const QColor previewBorderColor(item.value(QStringLiteral("previewBorderColor")).toString());
+        const QImage itemPreview =
+                isLivePreview ? imageFromJson(item.value(QStringLiteral("preview"))) : QImage();
+        const QColor previewBorderColor(
+                item.value(QStringLiteral("previewBorderColor")).toString());
         const QColor previewFillColor(item.value(QStringLiteral("previewFillColor")).toString());
-        const qreal previewBorderWidth = item.value(QStringLiteral("previewBorderWidth")).toDouble();
+        const qreal previewBorderWidth =
+                item.value(QStringLiteral("previewBorderWidth")).toDouble();
 
-        if(isLivePreview && !itemPreview.isNull())
+        if (isLivePreview && !itemPreview.isNull())
             paint.drawImage(itemRect, itemPreview);
-        else if(previewBorderColor.alpha() > 0 || previewFillColor.alpha() > 0)
-        {
+        else if (previewBorderColor.alpha() > 0 || previewFillColor.alpha() > 0) {
             QPen pen(previewBorderColor);
             pen.setCosmetic(true);
             pen.setWidthF(previewBorderWidth);
 
             paint.setPen(pen);
-            paint.setBrush( QBrush(previewFillColor) );
+            paint.setBrush(QBrush(previewFillColor));
             paint.drawRect(itemRect);
         }
     }
@@ -268,13 +265,12 @@ void BoundingBoxEvaluator::markPreviewDirty()
 
 BoundingBoxItem::BoundingBoxItem(QObject *parent)
     : QObject(parent),
-      m_item(qobject_cast<QQuickItem*>(parent)),
+      m_item(qobject_cast<QQuickItem *>(parent)),
       m_updatePreviewTimer("BoundingBoxItem.updatePreviewTimer"),
       m_viewportItem(this, "viewportItem"),
       m_evaluator(this, "evaluator")
 {
-    if(m_item)
-    {
+    if (m_item) {
         connect(m_item, &QQuickItem::xChanged, this, &BoundingBoxItem::requestReevaluation);
         connect(m_item, &QQuickItem::yChanged, this, &BoundingBoxItem::requestReevaluation);
         connect(m_item, &QQuickItem::widthChanged, this, &BoundingBoxItem::requestReevaluation);
@@ -282,8 +278,10 @@ BoundingBoxItem::BoundingBoxItem(QObject *parent)
 
         connect(m_item, &QQuickItem::xChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
         connect(m_item, &QQuickItem::yChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-        connect(m_item, &QQuickItem::widthChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-        connect(m_item, &QQuickItem::heightChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
+        connect(m_item, &QQuickItem::widthChanged, &m_jsonUpdateTimer,
+                QOverload<>::of(&QTimer::start));
+        connect(m_item, &QQuickItem::heightChanged, &m_jsonUpdateTimer,
+                QOverload<>::of(&QTimer::start));
 
         connect(m_item, &QQuickItem::xChanged, this, &BoundingBoxItem::determineVisibility);
         connect(m_item, &QQuickItem::yChanged, this, &BoundingBoxItem::determineVisibility);
@@ -291,18 +289,22 @@ BoundingBoxItem::BoundingBoxItem(QObject *parent)
         connect(m_item, &QQuickItem::heightChanged, this, &BoundingBoxItem::determineVisibility);
     }
 
-    connect(this, &BoundingBoxItem::stackOrderChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &BoundingBoxItem::previewFillColorChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &BoundingBoxItem::previewBorderColorChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &BoundingBoxItem::previewBorderWidthChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &BoundingBoxItem::livePreviewChanged, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
-    connect(this, &BoundingBoxItem::previewUpdated, &m_jsonUpdateTimer, QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::stackOrderChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::previewFillColorChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::previewBorderColorChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::previewBorderWidthChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::livePreviewChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::previewUpdated, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
 
     m_jsonUpdateTimer.setInterval(0);
     m_jsonUpdateTimer.setSingleShot(true);
-    connect(&m_jsonUpdateTimer, &QTimer::timeout, this, [=]() {
-        m_json = this->toJson();
-    });
+    connect(&m_jsonUpdateTimer, &QTimer::timeout, this, [=]() { m_json = this->toJson(); });
 }
 
 BoundingBoxItem::~BoundingBoxItem()
@@ -324,15 +326,15 @@ QRectF BoundingBoxItem::boundingRect() const
 
 void BoundingBoxItem::setEvaluator(BoundingBoxEvaluator *val)
 {
-    if(m_evaluator == val)
+    if (m_evaluator == val)
         return;
 
-    if(m_evaluator)
+    if (m_evaluator)
         m_evaluator->removeItem(this);
 
     m_evaluator = val;
 
-    if(m_evaluator)
+    if (m_evaluator)
         m_evaluator->addItem(this);
 
     this->updatePreviewLater();
@@ -342,7 +344,7 @@ void BoundingBoxItem::setEvaluator(BoundingBoxEvaluator *val)
 
 void BoundingBoxItem::setStackOrder(qreal val)
 {
-    if( qFuzzyCompare(m_stackOrder, val) )
+    if (qFuzzyCompare(m_stackOrder, val))
         return;
 
     m_stackOrder = val;
@@ -353,7 +355,7 @@ void BoundingBoxItem::setStackOrder(qreal val)
 
 void BoundingBoxItem::setPreviewFillColor(const QColor &val)
 {
-    if(m_previewFillColor == val)
+    if (m_previewFillColor == val)
         return;
 
     m_previewFillColor = val;
@@ -364,7 +366,7 @@ void BoundingBoxItem::setPreviewFillColor(const QColor &val)
 
 void BoundingBoxItem::setPreviewBorderColor(const QColor &val)
 {
-    if(m_previewBorderColor == val)
+    if (m_previewBorderColor == val)
         return;
 
     m_previewBorderColor = val;
@@ -375,7 +377,7 @@ void BoundingBoxItem::setPreviewBorderColor(const QColor &val)
 
 void BoundingBoxItem::setPreviewBorderWidth(qreal val)
 {
-    if( qFuzzyCompare(m_previewBorderWidth, val) )
+    if (qFuzzyCompare(m_previewBorderWidth, val))
         return;
 
     m_previewBorderWidth = val;
@@ -386,7 +388,7 @@ void BoundingBoxItem::setPreviewBorderWidth(qreal val)
 
 void BoundingBoxItem::setLivePreview(bool val)
 {
-    if(m_livePreview == val)
+    if (m_livePreview == val)
         return;
 
     m_livePreview = val;
@@ -397,7 +399,7 @@ void BoundingBoxItem::setLivePreview(bool val)
 
 void BoundingBoxItem::setVisibilityMode(BoundingBoxItem::VisibilityMode val)
 {
-    if(m_visibilityMode == val)
+    if (m_visibilityMode == val)
         return;
 
     m_visibilityMode = val;
@@ -408,7 +410,7 @@ void BoundingBoxItem::setVisibilityMode(BoundingBoxItem::VisibilityMode val)
 
 void BoundingBoxItem::setViewportItem(QQuickItem *val)
 {
-    if(m_viewportItem == val)
+    if (m_viewportItem == val)
         return;
 
     m_viewportItem = val;
@@ -419,7 +421,7 @@ void BoundingBoxItem::setViewportItem(QQuickItem *val)
 
 void BoundingBoxItem::setViewportRect(const QRectF &val)
 {
-    if(m_viewportRect == val)
+    if (m_viewportRect == val)
         return;
 
     m_viewportRect = val;
@@ -430,7 +432,7 @@ void BoundingBoxItem::setViewportRect(const QRectF &val)
 
 void BoundingBoxItem::setVisibilityProperty(const QByteArray &val)
 {
-    if(m_visibilityProperty == val)
+    if (m_visibilityProperty == val)
         return;
 
     m_visibilityProperty = val;
@@ -448,29 +450,28 @@ QJsonObject BoundingBoxItem::toJson() const
 {
     QJsonObject ret;
 
-    ret.insert( QStringLiteral("stackOrder"), m_stackOrder );
-    ret.insert( QStringLiteral("previewFillColor"), m_previewFillColor.name(QColor::HexArgb) );
-    ret.insert( QStringLiteral("previewBorderColor"), m_previewBorderColor.name(QColor::HexArgb) );
-    ret.insert( QStringLiteral("previewBorderWidth"), m_previewBorderWidth );
-    ret.insert( QStringLiteral("livePreview"), m_livePreview );
+    ret.insert(QStringLiteral("stackOrder"), m_stackOrder);
+    ret.insert(QStringLiteral("previewFillColor"), m_previewFillColor.name(QColor::HexArgb));
+    ret.insert(QStringLiteral("previewBorderColor"), m_previewBorderColor.name(QColor::HexArgb));
+    ret.insert(QStringLiteral("previewBorderWidth"), m_previewBorderWidth);
+    ret.insert(QStringLiteral("livePreview"), m_livePreview);
 
     const QRectF bRect = this->boundingRect();
 
     QJsonObject jsRect;
-    jsRect.insert( QStringLiteral("x"), bRect.x() );
-    jsRect.insert( QStringLiteral("y"), bRect.y() );
-    jsRect.insert( QStringLiteral("width"), bRect.width() );
-    jsRect.insert( QStringLiteral("height"), bRect.height() );
-    ret.insert( QStringLiteral("boundingRect"), jsRect );
+    jsRect.insert(QStringLiteral("x"), bRect.x());
+    jsRect.insert(QStringLiteral("y"), bRect.y());
+    jsRect.insert(QStringLiteral("width"), bRect.width());
+    jsRect.insert(QStringLiteral("height"), bRect.height());
+    ret.insert(QStringLiteral("boundingRect"), jsRect);
 
-    if(m_livePreview)
-    {
+    if (m_livePreview) {
         QByteArray bytes;
         QBuffer buffer(&bytes);
         buffer.open(QIODevice::WriteOnly);
         m_preview.save(&buffer, "PNG"); // writes image into ba in PNG format
         bytes = bytes.toBase64();
-        ret.insert( QStringLiteral("preview"), QString::fromLatin1(bytes));
+        ret.insert(QStringLiteral("preview"), QString::fromLatin1(bytes));
     }
 
     return ret;
@@ -478,8 +479,7 @@ QJsonObject BoundingBoxItem::toJson() const
 
 void BoundingBoxItem::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_updatePreviewTimer.timerId())
-    {
+    if (event->timerId() == m_updatePreviewTimer.timerId()) {
         m_updatePreviewTimer.stop();
         this->updatePreview();
     }
@@ -487,7 +487,7 @@ void BoundingBoxItem::timerEvent(QTimerEvent *event)
 
 void BoundingBoxItem::requestReevaluation()
 {
-    if(m_evaluator)
+    if (m_evaluator)
         m_evaluator->markDirty(this);
 
     this->updatePreviewLater();
@@ -509,20 +509,17 @@ void BoundingBoxItem::resetViewportItem()
 
 void BoundingBoxItem::updatePreview()
 {
-    if(m_item == nullptr)
-    {
+    if (m_item == nullptr) {
         this->setPreview(QImage());
         return;
     }
 
-    if(m_livePreview)
-    {
-        QSizeF previewSize( m_item->width(), m_item->height() );
-        if(m_evaluator != nullptr)
+    if (m_livePreview) {
+        QSizeF previewSize(m_item->width(), m_item->height());
+        if (m_evaluator != nullptr)
             previewSize *= m_evaluator->previewScale();
 
-        if(previewSize.isNull())
-        {
+        if (previewSize.isNull()) {
             this->setPreview(QImage());
             return;
         }
@@ -532,10 +529,8 @@ void BoundingBoxItem::updatePreview()
             this->setPreview(m_itemGrabResult->image());
             m_itemGrabResult.clear();
         });
-    }
-    else
-    {
-        if(!m_preview.isNull())
+    } else {
+        if (!m_preview.isNull())
             m_preview = QImage();
 
         emit previewUpdated();
@@ -544,21 +539,18 @@ void BoundingBoxItem::updatePreview()
 
 void BoundingBoxItem::updatePreviewLater()
 {
-    if(m_item != nullptr)
-    {
-        if(!m_livePreview && m_preview.isNull())
-        {
+    if (m_item != nullptr) {
+        if (!m_livePreview && m_preview.isNull()) {
             m_updatePreviewTimer.stop();
             emit previewUpdated();
-        }
-        else
+        } else
             m_updatePreviewTimer.start(500, this);
     }
 }
 
 void BoundingBoxItem::setPreview(const QImage &image)
 {
-    if(image.isNull() && m_preview.isNull())
+    if (image.isNull() && m_preview.isNull())
         return;
 
     m_preview = image;
@@ -567,12 +559,11 @@ void BoundingBoxItem::setPreview(const QImage &image)
 
 void BoundingBoxItem::determineVisibility()
 {
-    if(m_item == nullptr || m_visibilityMode == IgnoreVisibility)
+    if (m_item == nullptr || m_visibilityMode == IgnoreVisibility)
         return;
 
-    if(m_visibilityMode == AlwaysVisible || m_visibilityMode == AlwaysInvisible)
-    {
-        if(m_visibilityProperty.isEmpty())
+    if (m_visibilityMode == AlwaysVisible || m_visibilityMode == AlwaysInvisible) {
+        if (m_visibilityProperty.isEmpty())
             m_item->setVisible(m_visibilityMode == AlwaysVisible);
         else
             m_item->setProperty(m_visibilityProperty, m_visibilityMode == AlwaysVisible);
@@ -580,25 +571,24 @@ void BoundingBoxItem::determineVisibility()
     }
 
     QRectF itemRect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
-    if(!m_viewportItem.isNull())
-    {
+    if (!m_viewportItem.isNull()) {
         /**
           QQuickItem::mapToItem() is slightly time-consuming function call. Maybe a good idea
           to avoid calling it if we can avoid. If the items parent is same as viewport, then
           item's position is its position with respect to the parent.
           */
-        if(m_item->parentItem() != m_viewportItem)
-        {
-            const QPointF pos = m_item->mapToItem(m_viewportItem, QPointF(0,0));
+        if (m_item->parentItem() != m_viewportItem) {
+            const QPointF pos = m_item->mapToItem(m_viewportItem, QPointF(0, 0));
             itemRect.moveTopLeft(pos);
         }
     }
 
-    const bool wasVisible = m_visibilityProperty.isEmpty() ? m_item->isVisible() : m_item->property(m_visibilityProperty).toBool();
+    const bool wasVisible = m_visibilityProperty.isEmpty()
+            ? m_item->isVisible()
+            : m_item->property(m_visibilityProperty).toBool();
     bool visible = true;
 
-    switch(m_visibilityMode)
-    {
+    switch (m_visibilityMode) {
     case IgnoreVisibility:
         visible = wasVisible;
         break;
@@ -609,17 +599,20 @@ void BoundingBoxItem::determineVisibility()
         visible = false;
         break;
     case VisibleUponViewportIntersection:
-        visible = m_viewportRect.isValid() && itemRect.isValid() ? m_viewportRect.intersects(itemRect) : true;
+        visible = m_viewportRect.isValid() && itemRect.isValid()
+                ? m_viewportRect.intersects(itemRect)
+                : true;
         break;
     case VisibleUponViewportContains:
-        visible = m_viewportRect.isValid() && itemRect.isValid() ? m_viewportRect.contains(itemRect) : true;
+        visible = m_viewportRect.isValid() && itemRect.isValid() ? m_viewportRect.contains(itemRect)
+                                                                 : true;
         break;
     }
 
-    if(wasVisible == visible)
+    if (wasVisible == visible)
         return;
 
-    if(m_visibilityProperty.isEmpty())
+    if (m_visibilityProperty.isEmpty())
         m_item->setVisible(visible);
     else
         m_item->setProperty(m_visibilityProperty, visible);
@@ -635,20 +628,15 @@ void BoundingBoxItem::updateJson()
 ///////////////////////////////////////////////////////////////////////////////
 
 BoundingBoxPreview::BoundingBoxPreview(QQuickItem *parent)
-    : QQuickPaintedItem(parent),
-      m_evaluator(this, "evaluator")
+    : QQuickPaintedItem(parent), m_evaluator(this, "evaluator")
 {
-
 }
 
-BoundingBoxPreview::~BoundingBoxPreview()
-{
-
-}
+BoundingBoxPreview::~BoundingBoxPreview() { }
 
 void BoundingBoxPreview::setBackgroundColor(const QColor &val)
 {
-    if(m_backgroundColor == val)
+    if (m_backgroundColor == val)
         return;
 
     m_backgroundColor = val;
@@ -657,7 +645,7 @@ void BoundingBoxPreview::setBackgroundColor(const QColor &val)
 
 void BoundingBoxPreview::setBackgroundOpacity(qreal val)
 {
-    if( qFuzzyCompare(m_backgroundOpacity, val) )
+    if (qFuzzyCompare(m_backgroundOpacity, val))
         return;
 
     m_backgroundOpacity = val;
@@ -666,16 +654,18 @@ void BoundingBoxPreview::setBackgroundOpacity(qreal val)
 
 void BoundingBoxPreview::setEvaluator(BoundingBoxEvaluator *val)
 {
-    if(m_evaluator == val)
+    if (m_evaluator == val)
         return;
 
-    if(m_evaluator != nullptr)
-        disconnect(m_evaluator, &BoundingBoxEvaluator::previewUpdated, this, &BoundingBoxPreview::updatePreviewImage);
+    if (m_evaluator != nullptr)
+        disconnect(m_evaluator, &BoundingBoxEvaluator::previewUpdated, this,
+                   &BoundingBoxPreview::updatePreviewImage);
 
     m_evaluator = val;
 
-    if(m_evaluator != nullptr)
-        connect(m_evaluator, &BoundingBoxEvaluator::previewUpdated, this, &BoundingBoxPreview::updatePreviewImage);
+    if (m_evaluator != nullptr)
+        connect(m_evaluator, &BoundingBoxEvaluator::previewUpdated, this,
+                &BoundingBoxPreview::updatePreviewImage);
 
     emit evaluatorChanged();
 
@@ -688,7 +678,7 @@ void BoundingBoxPreview::paint(QPainter *painter)
     qDebug("BoundingBoxPreview is painting");
 #endif
 
-    if(m_evaluator == nullptr || !this->isVisible() || qFuzzyIsNull(this->opacity()))
+    if (m_evaluator == nullptr || !this->isVisible() || qFuzzyIsNull(this->opacity()))
         return;
 
     painter->drawImage(0, 0, m_previewImage);
@@ -696,7 +686,7 @@ void BoundingBoxPreview::paint(QPainter *painter)
 
 void BoundingBoxPreview::updatePreviewImage()
 {
-    if(m_evaluator == nullptr)
+    if (m_evaluator == nullptr)
         return;
 
     auto capturePreviewAsPicture = [=]() -> QImage {
@@ -717,12 +707,12 @@ void BoundingBoxPreview::updatePreviewImage()
          * screen. Bad idea right?
          */
 
-        QImage image( (pictureRect.size()*2.0).toSize(), QImage::Format_ARGB32 );
+        QImage image((pictureRect.size() * 2.0).toSize(), QImage::Format_ARGB32);
         image.setDevicePixelRatio(2.0);
         image.fill(Qt::transparent);
 
         QPicture preview = m_evaluator->preview();
-        if(preview.isNull())
+        if (preview.isNull())
             return image;
 
         QPainter painter(&image);
@@ -733,7 +723,7 @@ void BoundingBoxPreview::updatePreviewImage()
         QSizeF previewSize = preview.boundingRect().size();
         previewSize.scale(pictureRect.size(), Qt::KeepAspectRatio);
 
-        QRectF previewRect( QPointF(0,0), previewSize );
+        QRectF previewRect(QPointF(0, 0), previewSize);
         // previewRect.moveCenter(itemRect.center());
 
         painter.translate(previewRect.topLeft());
@@ -750,7 +740,7 @@ void BoundingBoxPreview::updatePreviewImage()
     };
 
     const QString futureWatcherName = QStringLiteral("RedrawFutureWatcher");
-    if( this->findChild<QFutureWatcherBase*>(futureWatcherName) != nullptr )
+    if (this->findChild<QFutureWatcherBase *>(futureWatcherName) != nullptr)
         return;
 
     QFuture<QImage> future = QtConcurrent::run(&m_evaluator->m_threadPool, capturePreviewAsPicture);

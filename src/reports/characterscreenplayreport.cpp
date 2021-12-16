@@ -15,19 +15,15 @@
 #include "screenplaytextdocument.h"
 
 CharacterScreenplayReport::CharacterScreenplayReport(QObject *parent)
-    :AbstractScreenplaySubsetReport(parent)
+    : AbstractScreenplaySubsetReport(parent)
 {
-
 }
 
-CharacterScreenplayReport::~CharacterScreenplayReport()
-{
-
-}
+CharacterScreenplayReport::~CharacterScreenplayReport() { }
 
 void CharacterScreenplayReport::setIncludeNotes(bool val)
 {
-    if(m_includeNotes == val)
+    if (m_includeNotes == val)
         return;
 
     m_includeNotes = val;
@@ -36,7 +32,7 @@ void CharacterScreenplayReport::setIncludeNotes(bool val)
 
 void CharacterScreenplayReport::setHighlightDialogues(bool val)
 {
-    if(m_highlightDialogues == val)
+    if (m_highlightDialogues == val)
         return;
 
     m_highlightDialogues = val;
@@ -45,7 +41,7 @@ void CharacterScreenplayReport::setHighlightDialogues(bool val)
 
 void CharacterScreenplayReport::setCharacterNames(const QStringList &val)
 {
-    if(m_characterNames == val)
+    if (m_characterNames == val)
         return;
 
     m_characterNames = val;
@@ -55,15 +51,15 @@ void CharacterScreenplayReport::setCharacterNames(const QStringList &val)
 bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
     const Scene *scene = element->scene();
-    if(scene == nullptr)
+    if (scene == nullptr)
         return false;
 
-    if(m_characterNames.isEmpty())
+    if (m_characterNames.isEmpty())
         return true;
 
     const QStringList sceneCharacters = scene->characterNames();
-    Q_FOREACH(QString characterName, m_characterNames)
-        if(sceneCharacters.contains(characterName))
+    Q_FOREACH (QString characterName, m_characterNames)
+        if (sceneCharacters.contains(characterName))
             return true;
 
     return false;
@@ -71,28 +67,32 @@ bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement
 
 QString CharacterScreenplayReport::screenplaySubtitle() const
 {
-    if(m_characterNames.isEmpty())
+    if (m_characterNames.isEmpty())
         return QStringLiteral("Location Screenplay of: ALL CHARACTERS");
 
-    const QString subtitle = QStringLiteral("Character Screenplay Of: ") + m_characterNames.join(", ");
-    if(subtitle.length() > 60)
-        return  m_characterNames.first() + QStringLiteral(" and ") +
-                QString::number(m_characterNames.size()-1) + QStringLiteral(" other characters(s).");
+    const QString subtitle =
+            QStringLiteral("Character Screenplay Of: ") + m_characterNames.join(", ");
+    if (subtitle.length() > 60)
+        return m_characterNames.first() + QStringLiteral(" and ")
+                + QString::number(m_characterNames.size() - 1)
+                + QStringLiteral(" other characters(s).");
 
     return subtitle;
 }
 
 void CharacterScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDocument &stDoc)
 {
-    if(m_highlightDialogues)
+    if (m_highlightDialogues)
         stDoc.setHighlightDialoguesOf(m_characterNames);
 }
 
-void CharacterScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
+void CharacterScreenplayReport::inject(
+        QTextCursor &cursor,
+        AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
     AbstractScreenplaySubsetReport::inject(cursor, location);
 
-    if(location != AfterTitlePage || !m_includeNotes)
+    if (location != AfterTitlePage || !m_includeNotes)
         return;
 
     const QFont defaultFont = this->document()->printFormat()->defaultFont();
@@ -117,8 +117,7 @@ void CharacterScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTe
     cursor.insertText("NOTES:");
 
     const Structure *structure = this->document()->structure();
-    Q_FOREACH(QString characterName, m_characterNames)
-    {
+    Q_FOREACH (QString characterName, m_characterNames) {
         blockFormat = defaultBlockFormat;
         blockFormat.setIndent(1);
 
@@ -133,20 +132,19 @@ void CharacterScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTe
 
         const Character *character = structure->findCharacter(characterName);
         const Notes *characterNotes = character ? character->notes() : nullptr;
-        if(characterNotes == nullptr || characterNotes->noteCount() == 0)
-        {
+        if (characterNotes == nullptr || characterNotes->noteCount() == 0) {
             cursor.insertText(": no notes available.");
             continue;
         }
 
-        cursor.insertText(": " + QString::number(characterNotes->noteCount()) + " note(s) available.");
+        cursor.insertText(": " + QString::number(characterNotes->noteCount())
+                          + " note(s) available.");
 
-        for(int i=0; i<characterNotes->noteCount(); i++)
-        {
+        for (int i = 0; i < characterNotes->noteCount(); i++) {
             const Note *note = characterNotes->noteAt(i);
             QString heading = note->title().trimmed();
-            if(heading.isEmpty())
-                heading = "Note #" + QString::number(i+1);
+            if (heading.isEmpty())
+                heading = "Note #" + QString::number(i + 1);
 
             blockFormat = defaultBlockFormat;
             blockFormat.setIndent(2);
@@ -159,7 +157,7 @@ void CharacterScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTe
             cursor.insertText(heading);
 
             blockFormat.setTopMargin(0);
-            if(i == characterNotes->noteCount()-1 || characterName != m_characterNames.last())
+            if (i == characterNotes->noteCount() - 1 || characterName != m_characterNames.last())
                 blockFormat.setBottomMargin(10);
             blockFormat.setAlignment(Qt::AlignJustify);
 

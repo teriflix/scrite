@@ -50,10 +50,10 @@ inline QTime secondsToTime(int seconds)
 
 inline QString timeToString(const QTime &t)
 {
-    if(t == QTime(0,0,0))
+    if (t == QTime(0, 0, 0))
         return QStringLiteral("00:00");
 
-    if(t.hour() > 0)
+    if (t.hour() > 0)
         return t.toString(QStringLiteral("H:mm:ss"));
 
     return t.toString(QStringLiteral("m:ss"));
@@ -75,13 +75,15 @@ public:
     const SceneElement *getCharacterElement() const;
     QString getCharacterElementText() const;
 
-    bool isModified() const {
-        if(m_element)
+    bool isModified() const
+    {
+        if (m_element)
             return m_element->isModified(&m_elementModificationTime);
         return true;
     }
-    void touch() {
-        if(m_element)
+    void touch()
+    {
+        if (m_element)
             m_element->isModified(&m_elementModificationTime);
     }
 
@@ -117,23 +119,24 @@ QString ScreenplayParagraphBlockData::elementText() const
 
 bool ScreenplayParagraphBlockData::isFirstElementInScene() const
 {
-    if(m_element)
+    if (m_element)
         return m_element->scene()->elementAt(0) == m_element;
     return false;
 }
 
 bool ScreenplayParagraphBlockData::doesDialogueFinish() const
 {
-    SceneElement *element = const_cast<SceneElement*>(m_element);
+    SceneElement *element = const_cast<SceneElement *>(m_element);
     auto isDialogueOrParenthetical = [](SceneElement *e) {
-        return e && (e->type() == SceneElement::Dialogue || e->type() == SceneElement::Parenthetical);
+        return e
+                && (e->type() == SceneElement::Dialogue
+                    || e->type() == SceneElement::Parenthetical);
     };
 
-    if(isDialogueOrParenthetical(element))
-    {
+    if (isDialogueOrParenthetical(element)) {
         const int index = element->scene()->indexOfElement(element);
-        element = element->scene()->elementAt(index+1);
-        if(isDialogueOrParenthetical(element))
+        element = element->scene()->elementAt(index + 1);
+        if (isDialogueOrParenthetical(element))
             return false;
     }
 
@@ -142,15 +145,15 @@ bool ScreenplayParagraphBlockData::doesDialogueFinish() const
 
 const SceneElement *ScreenplayParagraphBlockData::getCharacterElement() const
 {
-    if(m_element && (m_element->type() == SceneElement::Dialogue || m_element->type() == SceneElement::Parenthetical))
-    {
+    if (m_element
+        && (m_element->type() == SceneElement::Dialogue
+            || m_element->type() == SceneElement::Parenthetical)) {
         Scene *scene = m_element->scene();
-        SceneElement *element = const_cast<SceneElement*>(m_element);
+        SceneElement *element = const_cast<SceneElement *>(m_element);
         int index = m_element->scene()->indexOfElement(element) - 1;
-        while(index >= 0)
-        {
+        while (index >= 0) {
             element = scene->elementAt(index);
-            if(element->type() == SceneElement::Character)
+            if (element->type() == SceneElement::Character)
                 return element;
             --index;
         }
@@ -172,10 +175,11 @@ ScreenplayParagraphBlockData *ScreenplayParagraphBlockData::get(const QTextBlock
 
 ScreenplayParagraphBlockData *ScreenplayParagraphBlockData::get(QTextBlockUserData *userData)
 {
-    if(userData == nullptr)
+    if (userData == nullptr)
         return nullptr;
 
-    ScreenplayParagraphBlockData *userData2 = reinterpret_cast<ScreenplayParagraphBlockData*>(userData);
+    ScreenplayParagraphBlockData *userData2 =
+            reinterpret_cast<ScreenplayParagraphBlockData *>(userData);
     return userData2;
 }
 
@@ -184,13 +188,14 @@ ScreenplayParagraphBlockData *ScreenplayParagraphBlockData::get(QTextBlockUserDa
 class ScreenplayTextDocumentUpdate
 {
 public:
-    ScreenplayTextDocumentUpdate(ScreenplayTextDocument *document)
-        : m_document(document) {
-        if(m_document)
+    ScreenplayTextDocumentUpdate(ScreenplayTextDocument *document) : m_document(document)
+    {
+        if (m_document)
             m_document->setUpdating(true);
     }
-    ~ScreenplayTextDocumentUpdate() {
-        if(m_document)
+    ~ScreenplayTextDocumentUpdate()
+    {
+        if (m_document)
             m_document->setUpdating(false);
     }
 
@@ -228,16 +233,16 @@ ScreenplayTextDocument::~ScreenplayTextDocument()
     m_loadScreenplayTimer.stop();
     m_pageBoundaryEvalTimer.stop();
 
-    if(m_textDocument != nullptr && m_textDocument->parent() == this)
+    if (m_textDocument != nullptr && m_textDocument->parent() == this)
         m_textDocument->setUndoRedoEnabled(true);
 }
 
 void ScreenplayTextDocument::setTextDocument(QTextDocument *val)
 {
-    if(m_textDocument != nullptr && m_textDocument == val)
+    if (m_textDocument != nullptr && m_textDocument == val)
         return;
 
-    if(m_textDocument != nullptr && m_textDocument->parent() == this)
+    if (m_textDocument != nullptr && m_textDocument->parent() == this)
         delete m_textDocument;
 
     m_textDocument = val ? val : new QTextDocument(this);
@@ -249,18 +254,20 @@ void ScreenplayTextDocument::setTextDocument(QTextDocument *val)
 
 void ScreenplayTextDocument::setScreenplay(Screenplay *val)
 {
-    if(m_screenplay == val)
+    if (m_screenplay == val)
         return;
 
     this->disconnectFromScreenplaySignals();
 
-    if(m_screenplay)
-        disconnect(m_screenplay, &Screenplay::aboutToDelete, this, &ScreenplayTextDocument::resetScreenplay);
+    if (m_screenplay)
+        disconnect(m_screenplay, &Screenplay::aboutToDelete, this,
+                   &ScreenplayTextDocument::resetScreenplay);
 
     m_screenplay = val;
 
-    if(m_screenplay)
-        connect(m_screenplay, &Screenplay::aboutToDelete, this, &ScreenplayTextDocument::resetScreenplay);
+    if (m_screenplay)
+        connect(m_screenplay, &Screenplay::aboutToDelete, this,
+                &ScreenplayTextDocument::resetScreenplay);
 
     this->loadScreenplayLater();
 
@@ -269,12 +276,12 @@ void ScreenplayTextDocument::setScreenplay(Screenplay *val)
 
 void ScreenplayTextDocument::setFormatting(ScreenplayFormat *val)
 {
-    if(m_formatting == val)
+    if (m_formatting == val)
         return;
 
     this->disconnectFromScreenplayFormatSignals();
 
-    if(m_formatting && m_formatting->parent() == this)
+    if (m_formatting && m_formatting->parent() == this)
         GarbageCollector::instance()->add(m_formatting);
 
     m_formatting = val;
@@ -309,7 +316,7 @@ void ScreenplayTextDocument::resetTextDocument()
 
 void ScreenplayTextDocument::setTitlePage(bool val)
 {
-    if(m_titlePage == val)
+    if (m_titlePage == val)
         return;
 
     m_titlePage = val;
@@ -320,7 +327,7 @@ void ScreenplayTextDocument::setTitlePage(bool val)
 
 void ScreenplayTextDocument::setSceneNumbers(bool val)
 {
-    if(m_sceneNumbers == val)
+    if (m_sceneNumbers == val)
         return;
 
     m_sceneNumbers = val;
@@ -331,7 +338,7 @@ void ScreenplayTextDocument::setSceneNumbers(bool val)
 
 void ScreenplayTextDocument::setSceneIcons(bool val)
 {
-    if(m_sceneIcons == val)
+    if (m_sceneIcons == val)
         return;
 
     m_sceneIcons = val;
@@ -342,20 +349,17 @@ void ScreenplayTextDocument::setSceneIcons(bool val)
 
 void ScreenplayTextDocument::setSyncEnabled(bool val)
 {
-    if(m_syncEnabled == val)
+    if (m_syncEnabled == val)
         return;
 
     m_syncEnabled = val;
     m_loadScreenplayTimer.stop();
 
-    if(m_syncEnabled)
-    {
+    if (m_syncEnabled) {
         this->connectToScreenplaySignals();
         this->connectToScreenplayFormatSignals();
         this->syncNow();
-    }
-    else
-    {
+    } else {
         this->disconnectFromScreenplaySignals();
         this->disconnectFromScreenplayFormatSignals();
     }
@@ -365,7 +369,7 @@ void ScreenplayTextDocument::setSyncEnabled(bool val)
 
 void ScreenplayTextDocument::setListSceneCharacters(bool val)
 {
-    if(m_listSceneCharacters == val)
+    if (m_listSceneCharacters == val)
         return;
 
     m_listSceneCharacters = val;
@@ -376,7 +380,7 @@ void ScreenplayTextDocument::setListSceneCharacters(bool val)
 
 void ScreenplayTextDocument::setHighlightDialoguesOf(QStringList val)
 {
-    if(m_highlightDialoguesOf == val)
+    if (m_highlightDialoguesOf == val)
         return;
 
     m_highlightDialoguesOf = val;
@@ -387,7 +391,7 @@ void ScreenplayTextDocument::setHighlightDialoguesOf(QStringList val)
 
 void ScreenplayTextDocument::setIncludeSceneSynopsis(bool val)
 {
-    if(m_includeSceneSynopsis == val)
+    if (m_includeSceneSynopsis == val)
         return;
 
     m_includeSceneSynopsis = val;
@@ -398,7 +402,7 @@ void ScreenplayTextDocument::setIncludeSceneSynopsis(bool val)
 
 void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 {
-    if(m_purpose == val)
+    if (m_purpose == val)
         return;
 
     m_purpose = val;
@@ -407,7 +411,7 @@ void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 
 void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
 {
-    if(m_printEachSceneOnANewPage == val)
+    if (m_printEachSceneOnANewPage == val)
         return;
 
     m_printEachSceneOnANewPage = val;
@@ -418,7 +422,7 @@ void ScreenplayTextDocument::setPrintEachSceneOnANewPage(bool val)
 
 void ScreenplayTextDocument::setPrintEachActOnANewPage(bool val)
 {
-    if(m_printEachActOnANewPage == val)
+    if (m_printEachActOnANewPage == val)
         return;
 
     m_printEachActOnANewPage = val;
@@ -429,7 +433,7 @@ void ScreenplayTextDocument::setPrintEachActOnANewPage(bool val)
 
 void ScreenplayTextDocument::setIncludeActBreaks(bool val)
 {
-    if(m_includeActBreaks == val)
+    if (m_includeActBreaks == val)
         return;
 
     m_includeActBreaks = val;
@@ -438,7 +442,7 @@ void ScreenplayTextDocument::setIncludeActBreaks(bool val)
 
 void ScreenplayTextDocument::setTitlePageIsCentered(bool val)
 {
-    if(m_titlePageIsCentered == val)
+    if (m_titlePageIsCentered == val)
         return;
 
     m_titlePageIsCentered = val;
@@ -451,18 +455,18 @@ void ScreenplayTextDocument::setSecondsPerPage(int val)
 {
     val = qBound(15, val, 300);
     const int secs = val % 60;
-    const int mins = (val - secs)/60;
-    this->setTimePerPage( QTime(0,mins,secs) );
+    const int mins = (val - secs) / 60;
+    this->setTimePerPage(QTime(0, mins, secs));
 }
 
 int ScreenplayTextDocument::secondsPerPage() const
 {
-    return m_timePerPage.minute()*60 + m_timePerPage.second();
+    return m_timePerPage.minute() * 60 + m_timePerPage.second();
 }
 
 void ScreenplayTextDocument::setTimePerPage(const QTime &val)
 {
-    if(m_timePerPage == val)
+    if (m_timePerPage == val)
         return;
 
     m_timePerPage = val;
@@ -490,41 +494,40 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 {
     HourGlass hourGlass;
 
-    if(m_textDocument == nullptr || m_screenplay == nullptr || m_formatting == nullptr)
+    if (m_textDocument == nullptr || m_screenplay == nullptr || m_formatting == nullptr)
         return;
 
-    if(m_loadScreenplayTimer.isActive() || m_textDocument->isEmpty())
+    if (m_loadScreenplayTimer.isActive() || m_textDocument->isEmpty())
         this->syncNow();
 
     QPagedPaintDevice *printer = nullptr;
 
-    QPdfWriter *pdfWriter = qobject_cast<QPdfWriter*>(printerObject);
-    PrinterObject *qprinter = pdfWriter ? nullptr : qobject_cast<PrinterObject*>(printerObject);
-    ImagePrinter *imagePrinter = pdfWriter || qprinter ? nullptr : qobject_cast<ImagePrinter*>(printerObject);
+    QPdfWriter *pdfWriter = qobject_cast<QPdfWriter *>(printerObject);
+    PrinterObject *qprinter = pdfWriter ? nullptr : qobject_cast<PrinterObject *>(printerObject);
+    ImagePrinter *imagePrinter =
+            pdfWriter || qprinter ? nullptr : qobject_cast<ImagePrinter *>(printerObject);
 
-    if(pdfWriter)
-    {
+    if (pdfWriter) {
         printer = pdfWriter;
 
         pdfWriter->setTitle(m_screenplay->title());
-        pdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+        pdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                              + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
         pdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
-    }
-    else if(qprinter)
-    {
+    } else if (qprinter) {
         printer = qprinter;
 
         qprinter->setDocName(m_screenplay->title());
-        qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
-        if(qprinter->outputFormat() == QPrinter::PdfFormat)
+        qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                             + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+        if (qprinter->outputFormat() == QPrinter::PdfFormat)
             qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
-    } else if(imagePrinter)
+    } else if (imagePrinter)
         printer = imagePrinter;
 
-    if(printer)
-    {
+    if (printer) {
         m_formatting->pageLayout()->configure(printer);
-        printer->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+        printer->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
     }
 
     QTextDocumentPagedPrinter docPrinter;
@@ -534,14 +537,14 @@ void ScreenplayTextDocument::print(QObject *printerObject)
     docPrinter.print(m_textDocument, printer);
 }
 
-QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *element) const
+QList<QPair<int, int>> ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *element) const
 {
-    QList< QPair<int,int> > ret;
-    if(element == nullptr)
+    QList<QPair<int, int>> ret;
+    if (element == nullptr)
         return ret;
 
     QTextFrame *frame = this->findTextFrame(element);
-    if(frame == nullptr)
+    if (frame == nullptr)
         return ret;
 
     // We need to know three positions within each scene frame.
@@ -551,7 +554,7 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
     QTextCursor cursor = frame->firstCursorPosition();
     QTextBlock block = cursor.block();
     ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-    if(blockData && blockData->elementType() == SceneElement::Heading)
+    if (blockData && blockData->elementType() == SceneElement::Heading)
         block = block.next();
 
     // This is the range of cursor positions inside the frame
@@ -561,26 +564,26 @@ QList< QPair<int,int> > ScreenplayTextDocument::pageBreaksFor(ScreenplayElement 
 
     // This method includes 'pageBorderPosition' and 'pageNumber' in the returned list
     // If pageBorderPosition lies within the frame, then it is included in the list.
-    auto checkAndAdd = [sceneHeadingStart,paragraphStart,paragraphEnd,&ret](int pageBorderPosition, int pageNumber) {
-        if(pageBorderPosition >= sceneHeadingStart && pageBorderPosition <= paragraphEnd) {
+    auto checkAndAdd = [sceneHeadingStart, paragraphStart, paragraphEnd,
+                        &ret](int pageBorderPosition, int pageNumber) {
+        if (pageBorderPosition >= sceneHeadingStart && pageBorderPosition <= paragraphEnd) {
             const int offset = qMax(pageBorderPosition - paragraphStart, -1);
-            if(ret.isEmpty() || ret.last().first != offset)
+            if (ret.isEmpty() || ret.last().first != offset)
                 ret << qMakePair(offset, pageNumber);
         }
     };
 
     // Special case for page #1
-    if(element == m_screenplay->elementAt(0))
+    if (element == m_screenplay->elementAt(0))
         checkAndAdd(sceneHeadingStart, 1);
 
     // Now loop through all pages and gather all pages that lie within the scene boundaries
-    for(int i=0; i<m_pageBoundaries.count(); i++)
-    {
-        const QPair<int,int> pgBoundary = m_pageBoundaries.at(i);
-        if(pgBoundary.first > paragraphEnd)
+    for (int i = 0; i < m_pageBoundaries.count(); i++) {
+        const QPair<int, int> pgBoundary = m_pageBoundaries.at(i);
+        if (pgBoundary.first > paragraphEnd)
             break;
 
-        checkAndAdd(pgBoundary.first, i+1);
+        checkAndAdd(pgBoundary.first, i + 1);
     }
 
     return ret;
@@ -593,7 +596,8 @@ QTime ScreenplayTextDocument::lengthInTime(ScreenplayElement *from, ScreenplayEl
     return ret;
 }
 
-QString ScreenplayTextDocument::lengthInTimeAsString(ScreenplayElement *from, ScreenplayElement *to) const
+QString ScreenplayTextDocument::lengthInTimeAsString(ScreenplayElement *from,
+                                                     ScreenplayElement *to) const
 {
     const QTime time = this->lengthInTime(from, to);
     return ::timeToString(time);
@@ -601,21 +605,20 @@ QString ScreenplayTextDocument::lengthInTimeAsString(ScreenplayElement *from, Sc
 
 qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *from, ScreenplayElement *to) const
 {
-    if(m_screenplay == nullptr || m_formatting == nullptr || from == nullptr)
+    if (m_screenplay == nullptr || m_formatting == nullptr || from == nullptr)
         return 0;
 
-    if((from && from->screenplay() != m_screenplay) || (to && to->screenplay() != m_screenplay))
+    if ((from && from->screenplay() != m_screenplay) || (to && to->screenplay() != m_screenplay))
         return 0;
 
     const int fromIndex = m_screenplay->indexOfElement(from);
-    const int toIndex   = to ? m_screenplay->indexOfElement(to) : fromIndex;
+    const int toIndex = to ? m_screenplay->indexOfElement(to) : fromIndex;
 
     qreal ret = 0;
-    for(int i=fromIndex; i<=toIndex; i++)
-    {
+    for (int i = fromIndex; i <= toIndex; i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
         QTextFrame *frame = this->findTextFrame(element);
-        if(frame == nullptr)
+        if (frame == nullptr)
             continue;
 
         QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
@@ -627,21 +630,21 @@ qreal ScreenplayTextDocument::lengthInPixels(ScreenplayElement *from, Screenplay
 
 qreal ScreenplayTextDocument::lengthInPages(ScreenplayElement *from, ScreenplayElement *to) const
 {
-    if(m_screenplay == nullptr || m_formatting == nullptr)
+    if (m_screenplay == nullptr || m_formatting == nullptr)
         return 0;
 
-    if((from && from->screenplay() != m_screenplay) || (to && to->screenplay() != m_screenplay))
+    if ((from && from->screenplay() != m_screenplay) || (to && to->screenplay() != m_screenplay))
         return 0;
 
     const qreal pxLength = this->lengthInPixels(from, to);
-    if( qFuzzyIsNull(pxLength) )
+    if (qFuzzyIsNull(pxLength))
         return 0;
 
     const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
     const qreal topMargin = rootFrameFormat.topMargin();
     const qreal bottomMargin = rootFrameFormat.bottomMargin();
     const qreal pageLength = m_textDocument->pageSize().height() - topMargin - bottomMargin;
-    if( qFuzzyIsNull(pageLength) )
+    if (qFuzzyIsNull(pageLength))
         return 0;
 
     return pxLength / pageLength;
@@ -649,15 +652,15 @@ qreal ScreenplayTextDocument::lengthInPages(ScreenplayElement *from, ScreenplayE
 
 void ScreenplayTextDocument::setInjection(QObject *val)
 {
-    if(m_injection == val)
+    if (m_injection == val)
         return;
 
-    if(m_injection != val)
+    if (m_injection != val)
         disconnect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::resetInjection);
 
     m_injection = val;
 
-    if(m_injection != val)
+    if (m_injection != val)
         connect(m_injection, &QObject::destroyed, this, &ScreenplayTextDocument::resetInjection);
 
     emit injectionChanged();
@@ -705,19 +708,20 @@ screenplayTextDocument.superImposeStructure(structure)
 */
 void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 {
-    if(m_screenplay == nullptr || m_screenplay->scriteDocument() == nullptr || m_textDocument == nullptr)
+    if (m_screenplay == nullptr || m_screenplay->scriteDocument() == nullptr
+        || m_textDocument == nullptr)
         return;
 
-    if(m_purpose == ForPrinting)
+    if (m_purpose == ForPrinting)
         return;
 
     ScriteDocument *document = m_screenplay->scriteDocument();
     Structure *structure = document->structure();
     const int nrPages = model.value(QStringLiteral("pageCount")).toInt();
-    if(nrPages <= 0)
+    if (nrPages <= 0)
         return;
 
-    const QString tagGroup = model.value( QStringLiteral("name") ).toString();
+    const QString tagGroup = model.value(QStringLiteral("name")).toString();
     struct TagInfo
     {
         QString name;
@@ -739,40 +743,38 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
         ts << "[" << tagGroup << "]\n";
 
         const QJsonArray elements = model.value(QStringLiteral("elements")).toArray();
-        tags.reserve( elements.size() );
+        tags.reserve(elements.size());
 
-        for(const QJsonValue &item : elements)
-        {
+        for (const QJsonValue &item : elements) {
             const QJsonObject element = item.toObject();
 
             TagInfo tag;
-            tag.name = element.value( QStringLiteral("name") ).toString();
-            tag.act = element.value( QStringLiteral("act") ).toString();
-            tag.allowMultiple = element.value( QStringLiteral("allowMultiple") ).toBool(tag.allowMultiple);
+            tag.name = element.value(QStringLiteral("name")).toString();
+            tag.act = element.value(QStringLiteral("act")).toString();
+            tag.allowMultiple =
+                    element.value(QStringLiteral("allowMultiple")).toBool(tag.allowMultiple);
 
-            const QJsonValue pageValue = element.value( QStringLiteral("page") );
+            const QJsonValue pageValue = element.value(QStringLiteral("page"));
             const QString page = pageValue.toVariant().toString();
-            if(page.contains(QStringLiteral("-")))
-            {
+            if (page.contains(QStringLiteral("-"))) {
                 const QStringList fields = page.split(QStringLiteral("-"), QString::SkipEmptyParts);
                 const int a = fields.size() >= 2 ? fields.first().toInt() : 0;
                 const int b = fields.size() >= 2 ? fields.last().toInt() : 0;
-                if(a == 0 || b == 0)
+                if (a == 0 || b == 0)
                     return;
 
                 tag.fromPageNr = qMin(a, b);
                 tag.toPageNr = qMax(a, b);
-            }
-            else
-            {
+            } else {
                 tag.fromPageNr = page.toInt();
-                if(tag.fromPageNr == 0)
+                if (tag.fromPageNr == 0)
                     return;
 
                 tag.toPageNr = tag.fromPageNr;
             }
 
-            tag.id = tagGroup + QStringLiteral("/") + tag.name + QStringLiteral(" (") + page + QStringLiteral(")");
+            tag.id = tagGroup + QStringLiteral("/") + tag.name + QStringLiteral(" (") + page
+                    + QStringLiteral(")");
             tag.id = tag.id.toUpper();
 
             ts << "<" << tag.act << ">" << tag.name << " (" << page << ")\n";
@@ -781,14 +783,14 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 
         ts.flush();
 
-        if(tags.isEmpty())
+        if (tags.isEmpty())
             return;
 
         structure->setGroupsData(groupsData);
     }
 
     // Lets sync the document if it has not already been done
-    if(m_loadScreenplayTimer.isActive())
+    if (m_loadScreenplayTimer.isActive())
         this->syncNow();
 
     // What we have in the screenplay is (potentially) a bunch of episodes.
@@ -811,34 +813,32 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     QList<_Episode> episodes;
 
     // First lets gather all episodes from the screenplay. There will always be atleast one episode.
-    QList<ScreenplayElement*> actBreaksToRemove;
+    QList<ScreenplayElement *> actBreaksToRemove;
     const int nrElements = m_screenplay->elementCount();
-    for(int i=0; i<nrElements; i++)
-    {
+    for (int i = 0; i < nrElements; i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
-        if(element->elementType() != ScreenplayElement::SceneElementType)
-        {
-            if(element->breakType() == Screenplay::Episode)
-                episodes.append( _Episode() );
+        if (element->elementType() != ScreenplayElement::SceneElementType) {
+            if (element->breakType() == Screenplay::Episode)
+                episodes.append(_Episode());
             else
                 actBreaksToRemove.append(element);
             continue;
         }
 
         Scene *scene = element->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
         StructureElement *selement = scene->structureElement();
-        if(selement == nullptr)
+        if (selement == nullptr)
             continue;
 
         QTextFrame *frame = this->findTextFrame(element);
-        if(frame == nullptr)
+        if (frame == nullptr)
             return;
 
-        if(episodes.isEmpty())
-            episodes.append( _Episode() );
+        if (episodes.isEmpty())
+            episodes.append(_Episode());
 
         _SceneFrame sceneFrame;
         sceneFrame.element = selement;
@@ -848,8 +848,8 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 
     auto findTags = [tags](int pageNr) -> QVector<TagInfo> {
         QVector<TagInfo> ret;
-        for(const TagInfo &tag : qAsConst(tags)) {
-            if(pageNr >= tag.fromPageNr && pageNr <= tag.toPageNr)
+        for (const TagInfo &tag : qAsConst(tags)) {
+            if (pageNr >= tag.fromPageNr && pageNr <= tag.toPageNr)
                 ret.append(tag);
         }
         return ret;
@@ -863,53 +863,47 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 
     // Now lets compute page extents of each episode and each scene in those episodes.
     QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
-    for(_Episode &episode : episodes)
-    {
-        if(episode.sceneFrames.isEmpty())
+    for (_Episode &episode : episodes) {
+        if (episode.sceneFrames.isEmpty())
             episode.pageCount = 0;
-        else
-        {
+        else {
             qreal episodeY = -1;
-            for(_SceneFrame &sceneFrame : episode.sceneFrames)
-            {
+            for (_SceneFrame &sceneFrame : episode.sceneFrames) {
                 const QRectF rect = layout->frameBoundingRect(sceneFrame.textFrame);
-                if(episodeY < 0)
+                if (episodeY < 0)
                     episodeY = rect.top();
 
-                sceneFrame.startPage = (rect.top() - episodeY)/pageLength;
-                sceneFrame.endPage = (rect.bottom() - episodeY)/pageLength;
+                sceneFrame.startPage = (rect.top() - episodeY) / pageLength;
+                sceneFrame.endPage = (rect.bottom() - episodeY) / pageLength;
                 sceneFrame.pageCount = sceneFrame.endPage - sceneFrame.startPage;
             }
 
-            episode.pageCount = episode.sceneFrames.last().endPage - episode.sceneFrames.first().startPage;
+            episode.pageCount =
+                    episode.sceneFrames.last().endPage - episode.sceneFrames.first().startPage;
         }
     }
 
     // Now we go ahead and apply tags to each scene.
-    for(const _Episode &episode : qAsConst(episodes))
-    {
-        if(episode.pageCount == 0)
+    for (const _Episode &episode : qAsConst(episodes)) {
+        if (episode.pageCount == 0)
             continue;
 
         const qreal pageScale = qreal(nrPages) / episode.pageCount;
-        for(const _SceneFrame &sceneFrame : qAsConst(episode.sceneFrames))
-        {
+        for (const _SceneFrame &sceneFrame : qAsConst(episode.sceneFrames)) {
             const int pageNr = 1 + floor(sceneFrame.startPage * pageScale);
             const QVector<TagInfo> sceneTags = findTags(pageNr);
-            if(sceneTags.isEmpty())
+            if (sceneTags.isEmpty())
                 continue;
 
             QStringList tagGroups;
-            if(sceneTags.size() == 0)
+            if (sceneTags.size() == 0)
                 tagGroups << sceneTags.first().id;
-            else
-            {
-                for(const TagInfo &sceneTag : sceneTags)
-                {
-                    if(sceneTag.fromPageNr == sceneTag.toPageNr)
+            else {
+                for (const TagInfo &sceneTag : sceneTags) {
+                    if (sceneTag.fromPageNr == sceneTag.toPageNr)
                         tagGroups.clear();
                     tagGroups << sceneTag.id;
-                    if(sceneTag.fromPageNr == sceneTag.toPageNr)
+                    if (sceneTag.fromPageNr == sceneTag.toPageNr)
                         break;
                 }
             }
@@ -921,27 +915,23 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     // Insert act breaks
     QString actName = tags.first().act;
     int startingElementIndex = 0;
-    while(!tags.isEmpty())
-    {
-        if(tags.first().act == actName)
-        {
+    while (!tags.isEmpty()) {
+        if (tags.first().act == actName) {
             tags.takeFirst();
             continue;
         }
 
-        for(int i=startingElementIndex; i<m_screenplay->elementCount(); i++)
-        {
+        for (int i = startingElementIndex; i < m_screenplay->elementCount(); i++) {
             ScreenplayElement *element = m_screenplay->elementAt(i);
-            if(element->scene() == nullptr)
+            if (element->scene() == nullptr)
                 continue;
 
-            if(element->scene()->groups().contains(tags.first().id))
-            {
+            if (element->scene()->groups().contains(tags.first().id)) {
                 ScreenplayElement *actBreak = new ScreenplayElement(m_screenplay);
                 actBreak->setElementType(ScreenplayElement::BreakElementType);
                 actBreak->setBreakType(Screenplay::Act);
                 m_screenplay->insertElementAt(actBreak, i);
-                startingElementIndex = i+1;
+                startingElementIndex = i + 1;
                 break;
             }
         }
@@ -951,7 +941,7 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     }
 
     // Remove all act breaks that existed before.
-    while(!actBreaksToRemove.isEmpty())
+    while (!actBreaksToRemove.isEmpty())
         m_screenplay->removeElement(actBreaksToRemove.takeLast());
 
     // Rework all numbers.
@@ -986,50 +976,43 @@ void ScreenplayTextDocument::componentComplete()
 
 void ScreenplayTextDocument::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_loadScreenplayTimer.timerId())
-    {
+    if (event->timerId() == m_loadScreenplayTimer.timerId()) {
         this->syncNow();
         this->connectToScreenplaySignals();
         this->connectToScreenplayFormatSignals();
-    }
-    else if(event->timerId() == m_pageBoundaryEvalTimer.timerId())
-    {
+    } else if (event->timerId() == m_pageBoundaryEvalTimer.timerId()) {
         m_pageBoundaryEvalTimer.stop();
         this->evaluatePageBoundaries();
-    }
-    else if(event->timerId() == m_sceneResetTimer.timerId())
-    {
+    } else if (event->timerId() == m_sceneResetTimer.timerId()) {
         m_sceneResetTimer.stop();
         this->processSceneResetList();
-    }
-    else
+    } else
         QObject::timerEvent(event);
 }
 
 void ScreenplayTextDocument::init()
 {
-    if(m_textDocument == nullptr)
+    if (m_textDocument == nullptr)
         m_textDocument = new QTextDocument(this);
 
 #ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
     m_sceneFrameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
     m_sceneFrameFormat.setBorderBrush(QBrush(Qt::black));
-    m_sceneFrameFormat.setBackground(QBrush(QColor(255,0,255,64)));
+    m_sceneFrameFormat.setBackground(QBrush(QColor(255, 0, 255, 64)));
 #endif
 }
 
 void ScreenplayTextDocument::setUpdating(bool val)
 {
-    if(m_updating == val)
+    if (m_updating == val)
         return;
 
     m_updating = val;
     emit updatingChanged();
 
-    if(val)
+    if (val)
         emit updateStarted();
-    else
-    {
+    else {
         this->evaluatePageBoundariesLater();
         emit updateFinished();
     }
@@ -1037,17 +1020,16 @@ void ScreenplayTextDocument::setUpdating(bool val)
 
 void ScreenplayTextDocument::setPageCount(qreal val)
 {
-    if(qCeil(val) != m_pageCount)
-    {
+    if (qCeil(val) != m_pageCount) {
         m_pageCount = qCeil(val);
         emit pageCountChanged();
     }
 
-    const int secsPerPage = m_timePerPage.hour()*60*60 + m_timePerPage.minute()*60 + m_timePerPage.second();
-    const int totalSecs = int( qCeil(val * secsPerPage) );
+    const int secsPerPage =
+            m_timePerPage.hour() * 60 * 60 + m_timePerPage.minute() * 60 + m_timePerPage.second();
+    const int totalSecs = int(qCeil(val * secsPerPage));
     const QTime totalT = ::secondsToTime(totalSecs);
-    if(m_totalTime != totalT)
-    {
+    if (m_totalTime != totalT) {
         m_totalTime = totalT;
         emit totalTimeChanged();
     }
@@ -1056,25 +1038,23 @@ void ScreenplayTextDocument::setPageCount(qreal val)
 void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
 {
     page = m_pageCount > 0 ? qBound(1, page, qCeil(m_pageCount)) : 0;
-    if(m_currentPage != page)
-    {
+    if (m_currentPage != page) {
         m_currentPage = page;
         emit currentPageChanged();
     }
 
     pos = m_pageCount > 0 ? qBound(0.0, pos, 1.0) : 0;
-    if( !qFuzzyCompare(pos, m_currentPosition) )
-    {
+    if (!qFuzzyCompare(pos, m_currentPosition)) {
         m_currentPosition = pos;
         emit currentPositionChanged();
     }
 
-    const int totalSecs = m_totalTime.hour()*60*60 + m_totalTime.minute()*60 + m_totalTime.second();
+    const int totalSecs =
+            m_totalTime.hour() * 60 * 60 + m_totalTime.minute() * 60 + m_totalTime.second();
     const int currentSecs = int(m_currentPosition * qreal(totalSecs));
 
     const QTime currentT = ::secondsToTime(currentSecs);
-    if(m_currentTime != currentT)
-    {
+    if (m_currentTime != currentT) {
         m_currentTime = currentT;
         emit currentTimeChanged();
     }
@@ -1082,10 +1062,10 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
 
 inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
 {
-    const QList<TransliterationEngine::Boundary> items = TransliterationEngine::instance()->evaluateBoundaries(text);
-    Q_FOREACH(TransliterationEngine::Boundary item, items)
-    {
-        if(item.string.isEmpty())
+    const QList<TransliterationEngine::Boundary> items =
+            TransliterationEngine::instance()->evaluateBoundaries(text);
+    Q_FOREACH (TransliterationEngine::Boundary item, items) {
+        if (item.string.isEmpty())
             continue;
 
         const QFont font = TransliterationEngine::instance()->languageFont(item.language);
@@ -1104,10 +1084,8 @@ void ScreenplayTextDocument::loadScreenplay()
 {
 #ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
     static QTextEdit *textEdit = nullptr;
-    if(m_purpose == ForDisplay)
-    {
-        if(textEdit == nullptr)
-        {
+    if (m_purpose == ForDisplay) {
+        if (textEdit == nullptr) {
             textEdit = new QTextEdit;
             textEdit->setDocument(m_textDocument);
             textEdit->setReadOnly(true);
@@ -1120,10 +1098,11 @@ void ScreenplayTextDocument::loadScreenplay()
 
     HourGlass hourGlass;
 
-    if(m_updating || !m_componentComplete) // so that we avoid recursive updates
+    if (m_updating || !m_componentComplete) // so that we avoid recursive updates
         return;
 
-    if(!m_screenplayModificationTracker.isModified(m_screenplay) && !m_formattingModificationTracker.isModified(m_formatting))
+    if (!m_screenplayModificationTracker.isModified(m_screenplay)
+        && !m_formattingModificationTracker.isModified(m_formatting))
         return;
 
     ScreenplayTextDocumentUpdate update(this);
@@ -1137,26 +1116,26 @@ void ScreenplayTextDocument::loadScreenplay()
     m_sceneResetTimer.stop();
     m_pageBoundaryEvalTimer.stop();
 
-    if(m_screenplay == nullptr)
+    if (m_screenplay == nullptr)
         return;
 
-    if(m_screenplay->elementCount() == 0)
+    if (m_screenplay->elementCount() == 0)
         return;
 
-    if(m_formatting == nullptr)
+    if (m_formatting == nullptr)
         this->setFormatting(new ScreenplayFormat(this));
 
     m_textDocument->setDefaultFont(m_formatting->defaultFont());
     m_formatting->pageLayout()->configure(m_textDocument);
     m_textDocument->setIndentWidth(10);
 
-    if(m_sceneNumbers || (m_purpose == ForPrinting && m_syncEnabled) || m_sceneIcons)
-    {
-        ScreenplayTextObjectInterface *toi = m_textDocument->findChild<ScreenplayTextObjectInterface*>();
-        if(toi == nullptr)
-        {
+    if (m_sceneNumbers || (m_purpose == ForPrinting && m_syncEnabled) || m_sceneIcons) {
+        ScreenplayTextObjectInterface *toi =
+                m_textDocument->findChild<ScreenplayTextObjectInterface *>();
+        if (toi == nullptr) {
             toi = new ScreenplayTextObjectInterface(m_textDocument);
-            m_textDocument->documentLayout()->registerHandler(ScreenplayTextObjectInterface::Kind, toi);
+            m_textDocument->documentLayout()->registerHandler(ScreenplayTextObjectInterface::Kind,
+                                                              toi);
         }
     }
 
@@ -1178,13 +1157,13 @@ void ScreenplayTextDocument::loadScreenplay()
     QTextCursor cursor(m_textDocument);
 
     // Title Page
-    if(m_titlePage)
-    {
-        ScreenplayTitlePageObjectInterface *tpoi = m_textDocument->findChild<ScreenplayTitlePageObjectInterface*>();
-        if(tpoi == nullptr)
-        {
+    if (m_titlePage) {
+        ScreenplayTitlePageObjectInterface *tpoi =
+                m_textDocument->findChild<ScreenplayTitlePageObjectInterface *>();
+        if (tpoi == nullptr) {
             tpoi = new ScreenplayTitlePageObjectInterface(m_textDocument);
-            m_textDocument->documentLayout()->registerHandler(ScreenplayTitlePageObjectInterface::Kind, tpoi);
+            m_textDocument->documentLayout()->registerHandler(
+                    ScreenplayTitlePageObjectInterface::Kind, tpoi);
         }
 
         QTextBlockFormat pageBreakFormat;
@@ -1193,37 +1172,42 @@ void ScreenplayTextDocument::loadScreenplay()
 
         QTextCharFormat titlePageFormat;
         titlePageFormat.setObjectType(ScreenplayTitlePageObjectInterface::Kind);
-        titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::ScreenplayProperty, QVariant::fromValue<QObject*>(m_screenplay));
-        titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::TitlePageIsCentered, m_titlePageIsCentered);
+        titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::ScreenplayProperty,
+                                    QVariant::fromValue<QObject *>(m_screenplay));
+        titlePageFormat.setProperty(ScreenplayTitlePageObjectInterface::TitlePageIsCentered,
+                                    m_titlePageIsCentered);
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), titlePageFormat);
     }
 
-    AbstractScreenplayTextDocumentInjectionInterface *injection = qobject_cast<AbstractScreenplayTextDocumentInjectionInterface*>(m_injection);
-    if(injection != nullptr)
+    AbstractScreenplayTextDocumentInjectionInterface *injection =
+            qobject_cast<AbstractScreenplayTextDocumentInjectionInterface *>(m_injection);
+    if (injection != nullptr)
         injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterTitlePage);
 
     bool hasEpisdoes = m_screenplay->episodeCount() > 0;
-    if(m_screenplay->scriteDocument() == nullptr)
-    {
-        const QList<ScreenplayElement*> allElements = m_screenplay->getElements();
+    if (m_screenplay->scriteDocument() == nullptr) {
+        const QList<ScreenplayElement *> allElements = m_screenplay->getElements();
 
-        QList<ScreenplayElement*> episodeElements;
-        std::copy_if(allElements.begin(), allElements.end(),
-                     std::back_inserter(episodeElements), [](ScreenplayElement *e) {
-            return e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Episode;
-        });
+        QList<ScreenplayElement *> episodeElements;
+        std::copy_if(allElements.begin(), allElements.end(), std::back_inserter(episodeElements),
+                     [](ScreenplayElement *e) {
+                         return e->elementType() == ScreenplayElement::BreakElementType
+                                 && e->breakType() == Screenplay::Episode;
+                     });
 
         hasEpisdoes = !episodeElements.isEmpty();
     }
 
     const ScreenplayElement *lastPrintedElement = nullptr;
 
-    auto printActBreak = [=](QTextCursor &cursor, const ScreenplayElement *element, bool addPageBreak) {
+    auto printActBreak = [=](QTextCursor &cursor, const ScreenplayElement *element,
+                             bool addPageBreak) {
         QTextBlockFormat actBlockFormat;
-        if(addPageBreak)
+        if (addPageBreak)
             actBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysBefore);
         else {
-            const SceneElementFormat *firstParaFormat = m_formatting->elementFormat(SceneElement::Heading);
+            const SceneElementFormat *firstParaFormat =
+                    m_formatting->elementFormat(SceneElement::Heading);
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
             actBlockFormat.setTopMargin(blockFormat.topMargin());
@@ -1237,66 +1221,67 @@ void ScreenplayTextDocument::loadScreenplay()
         actCharFormat.setFontWeight(QFont::ExtraBold);
         cursor.setCharFormat(actCharFormat);
 
-        if(hasEpisdoes && (!lastPrintedElement || lastPrintedElement->elementType() != ScreenplayElement::BreakElementType))
-            cursor.insertText(QStringLiteral("Episode ") + QString::number(element->episodeIndex()+1) + QStringLiteral(": "));
+        if (hasEpisdoes
+            && (!lastPrintedElement
+                || lastPrintedElement->elementType() != ScreenplayElement::BreakElementType))
+            cursor.insertText(QStringLiteral("Episode ")
+                              + QString::number(element->episodeIndex() + 1)
+                              + QStringLiteral(": "));
         cursor.insertText(element->breakTitle());
     };
 
     const int fsi = m_screenplay->firstSceneIndex();
-    for(int i=0; i<m_screenplay->elementCount(); i++)
-    {
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
 
-        if(!m_printEachSceneOnANewPage)
-        {
-            if(hasEpisdoes && element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Episode)
-            {
+        if (!m_printEachSceneOnANewPage) {
+            if (hasEpisdoes && element->elementType() == ScreenplayElement::BreakElementType
+                && element->breakType() == Screenplay::Episode) {
                 QTextBlockFormat episodeBlockFormat;
-                if(i > 0)
+                if (i > 0)
                     episodeBlockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysBefore);
 
                 cursor.insertBlock();
                 cursor.setBlockFormat(episodeBlockFormat);
 
                 QTextCharFormat episodeCharFormat;
-                episodeCharFormat.setFontPointSize(m_textDocument->defaultFont().pointSize()+2);
+                episodeCharFormat.setFontPointSize(m_textDocument->defaultFont().pointSize() + 2);
                 episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
                 cursor.insertText(element->breakTitle().toUpper());
 
-                if(!element->breakSubtitle().isEmpty())
-                    cursor.insertText( QStringLiteral(": ") + element->breakSubtitle().toUpper() );
+                if (!element->breakSubtitle().isEmpty())
+                    cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
 
                 lastPrintedElement = element;
                 continue;
             }
 
-            if(m_printEachActOnANewPage && element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Act)
-            {
-                printActBreak(cursor, element, i>0);
+            if (m_printEachActOnANewPage
+                && element->elementType() == ScreenplayElement::BreakElementType
+                && element->breakType() == Screenplay::Act) {
+                printActBreak(cursor, element, i > 0);
                 lastPrintedElement = element;
                 continue;
             }
         }
 
-        if(m_includeActBreaks && element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == Screenplay::Act && lastPrintedElement != element)
-        {
+        if (m_includeActBreaks && element->elementType() == ScreenplayElement::BreakElementType
+            && element->breakType() == Screenplay::Act && lastPrintedElement != element) {
             printActBreak(cursor, element, false);
             lastPrintedElement = element;
             continue;
         }
 
-        if(element->elementType() != ScreenplayElement::SceneElementType)
+        if (element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
         QTextFrameFormat frameFormat = m_sceneFrameFormat;
         const Scene *scene = element->scene();
-        if(scene != nullptr && (i > fsi || element != lastPrintedElement))
-        {
+        if (scene != nullptr && (i > fsi || element != lastPrintedElement)) {
             SceneElement::Type firstParaType = SceneElement::Heading;
-            if(!scene->heading()->isEnabled() && scene->elementCount())
-            {
+            if (!scene->heading()->isEnabled() && scene->elementCount()) {
                 SceneElement *firstPara = scene->elementAt(0);
                 firstParaType = firstPara->type();
             }
@@ -1307,8 +1292,8 @@ void ScreenplayTextDocument::loadScreenplay()
             frameFormat.setTopMargin(blockFormat.topMargin());
         }
 
-        if(i > 0 && m_printEachSceneOnANewPage)
-            frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);            
+        if (i > 0 && m_printEachSceneOnANewPage)
+            frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);
 
         // Each screenplay element (or scene) has its own frame. That makes
         // moving them in one bunch easy.
@@ -1324,7 +1309,7 @@ void ScreenplayTextDocument::loadScreenplay()
         lastPrintedElement = element;
     }
 
-    if(injection != nullptr)
+    if (injection != nullptr)
         injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterLastScene);
 
     this->includeMoreAndContdMarkers();
@@ -1333,7 +1318,7 @@ void ScreenplayTextDocument::loadScreenplay()
 
 void ScreenplayTextDocument::includeMoreAndContdMarkers()
 {
-    if(m_purpose != ForPrinting/* || m_syncEnabled*/)
+    if (m_purpose != ForPrinting /* || m_syncEnabled*/)
         return;
 
     /**
@@ -1343,7 +1328,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
       2. Character name cannot be on the last line of the page
       3. If only one line of the dialogue can be squeezed into the last line of the page, then
          we must move it to the next page along with the charactername.
-      4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with character name.
+      4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with
+      character name.
       */
     const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
     const QMarginsF pageMargins = pageLayout->margins();
@@ -1366,7 +1352,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         blockFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
         QTextCursor cursor(block);
         cursor.setPosition(block.position());
-        cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+        cursor.setPosition(block.position() + block.length() - 1, QTextCursor::KeepAnchor);
         cursor.mergeBlockFormat(blockFormat);
         cursor.clearSelection();
 
@@ -1381,22 +1367,25 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
     const SceneElementFormat *characterFormat = format->elementFormat(SceneElement::Character);
     const SceneElementFormat *dialogueFormat = format->elementFormat(SceneElement::Dialogue);
     const QFontMetricsF dialogFontMetrics(dialogueFormat->font());
-    const int nrCharsPerDialogLine = int(qCeil((pageLayout->contentWidth()-pageLayout->leftMargin()-pageLayout->rightMargin()-dialogueFormat->leftMargin()-dialogueFormat->rightMargin())/dialogFontMetrics.averageCharWidth()));
+    const int nrCharsPerDialogLine = int(
+            qCeil((pageLayout->contentWidth() - pageLayout->leftMargin() - pageLayout->rightMargin()
+                   - dialogueFormat->leftMargin() - dialogueFormat->rightMargin())
+                  / dialogFontMetrics.averageCharWidth()));
 
     auto insertMarkers = [=](const QTextBlock &block) {
         ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-        if(blockData == nullptr)
+        if (blockData == nullptr)
             return;
 
         const QString characterName = blockData ? blockData->getCharacterElementText() : QString();
-        if(characterName.isEmpty())
+        if (characterName.isEmpty())
             return;
 
         SceneElementFormat *elementFormat = format->elementFormat(blockData->elementType());
         const QFont font = elementFormat->font();
 
         QTextCursor cursor(block);
-        cursor.setPosition(block.position()+block.length()-1, QTextCursor::KeepAnchor);
+        cursor.setPosition(block.position() + block.length() - 1, QTextCursor::KeepAnchor);
 
         const QTextBlockFormat restoreBlockFormat = cursor.blockFormat();
         const QTextCharFormat restoreCharFormat = cursor.charFormat();
@@ -1410,8 +1399,10 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         moreMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
         moreMarkerFormat.setFont(font);
         moreMarkerFormat.setForeground(elementFormat->textColor());
-        moreMarkerFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::MoreMarkerType);
-        moreMarkerFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, QStringLiteral("  (MORE)"));
+        moreMarkerFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty,
+                                     ScreenplayTextObjectInterface::MoreMarkerType);
+        moreMarkerFormat.setProperty(ScreenplayTextObjectInterface::DataProperty,
+                                     QStringLiteral("  (MORE)"));
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), moreMarkerFormat);
 
         QTextBlockFormat characterBlockFormat = characterFormat->createBlockFormat();
@@ -1419,7 +1410,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         characterBlockFormat.setTopMargin(0);
         cursor.insertBlock(characterBlockFormat, characterCharFormat);
         // cursor.insertText(characterName);
-        if(m_purpose == ForDisplay)
+        if (m_purpose == ForDisplay)
             cursor.insertText(characterName);
         else
             polishFontsAndInsertTextAtCursor(cursor, characterName);
@@ -1428,38 +1419,40 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         contdMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
         contdMarkerFormat.setFont(characterFormat->font());
         contdMarkerFormat.setForeground(characterFormat->textColor());
-        contdMarkerFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::ContdMarkerType);
-        contdMarkerFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, QStringLiteral(" (CONT'D)"));
+        contdMarkerFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty,
+                                      ScreenplayTextObjectInterface::ContdMarkerType);
+        contdMarkerFormat.setProperty(ScreenplayTextObjectInterface::DataProperty,
+                                      QStringLiteral(" (CONT'D)"));
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), contdMarkerFormat);
     };
 
-    while(pageIndex < nrPages)
-    {
-        paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
-        const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
-        const int lastPosition = pageIndex == nrPages-1 ? endCursor.position() : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
+    while (pageIndex < nrPages) {
+        paperRect =
+                QRectF(0, pageIndex * paperRect.height(), paperRect.width(), paperRect.height());
+        const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(),
+                                                       -pageMargins.right(), -pageMargins.bottom());
+        const int lastPosition = pageIndex == nrPages - 1
+                ? endCursor.position()
+                : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
 
         QTextCursor cursor(m_textDocument);
-        cursor.setPosition(lastPosition-1);
+        cursor.setPosition(lastPosition - 1);
 
         QTextBlock block = cursor.block();
         ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-        if(blockData == nullptr)
-        {
+        if (blockData == nullptr) {
             block = block.previous();
             blockData = ScreenplayParagraphBlockData::get(block);
         }
 
-        if(blockData)
-        {
-            switch(blockData->elementType())
-            {
+        if (blockData) {
+            switch (blockData->elementType()) {
             case SceneElement::Character: {
                 const SceneElement *element = blockData->element();
-                if(element->scene()->elementAt(0) == element)
+                if (element->scene()->elementAt(0) == element)
                     block = block.previous();
                 insertPageBreakAfter(block.previous());
-                } break;
+            } break;
             case SceneElement::Heading:
                 insertPageBreakAfter(block.previous());
                 break;
@@ -1469,18 +1462,20 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                 break; // do nothing for these
             case SceneElement::Parenthetical: {
                 QTextBlock previousBlock = block.previous();
-                ScreenplayParagraphBlockData *previousBlockData = ScreenplayParagraphBlockData::get(previousBlock);
-                if(previousBlockData) {
-                    if(previousBlockData->elementType() == SceneElement::Character) {
+                ScreenplayParagraphBlockData *previousBlockData =
+                        ScreenplayParagraphBlockData::get(previousBlock);
+                if (previousBlockData) {
+                    if (previousBlockData->elementType() == SceneElement::Character) {
                         previousBlock = previousBlock.previous();
                         insertPageBreakAfter(previousBlock);
-                    } else if(previousBlockData->elementType() == SceneElement::Dialogue) {
+                    } else if (previousBlockData->elementType() == SceneElement::Dialogue) {
                         insertMarkers(previousBlock);
                     }
                 }
-                } break;
+            } break;
             case SceneElement::Dialogue:
-                if(block.position()+block.length()-1 > lastPosition || !blockData->doesDialogueFinish()) {
+                if (block.position() + block.length() - 1 > lastPosition
+                    || !blockData->doesDialogueFinish()) {
                     const QString blockText = block.text();
                     const SceneElement *dialogElement = blockData->element();
 
@@ -1488,26 +1483,29 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
 
                     QString blockTextPart1 = cursor.selectedText();
                     blockTextPart1.chop(nrCharsPerDialogLine);
-                    while(blockTextPart1.length() && !blockTextPart1.at(blockTextPart1.length()-1).isSpace())
+                    while (blockTextPart1.length()
+                           && !blockTextPart1.at(blockTextPart1.length() - 1).isSpace())
                         blockTextPart1.chop(1);
                     blockTextPart1.chop(1);
 
                     // if(blockTextPart1.length() < nrCharsPerDialogLine) {
-                    if(blockTextPart1.isEmpty()) {
+                    if (blockTextPart1.isEmpty()) {
                         QTextBlock previousBlock = block.previous();
-                        ScreenplayParagraphBlockData *previousBlockData = ScreenplayParagraphBlockData::get(previousBlock);
-                        if(previousBlockData->elementType() == SceneElement::Character) {
-                            if(previousBlockData->isFirstElementInScene())
+                        ScreenplayParagraphBlockData *previousBlockData =
+                                ScreenplayParagraphBlockData::get(previousBlock);
+                        if (previousBlockData->elementType() == SceneElement::Character) {
+                            if (previousBlockData->isFirstElementInScene())
                                 previousBlock = previousBlock.previous();
                             insertPageBreakAfter(previousBlock.previous());
                             break;
                         }
                     }
 
-                    QString blockTextPart2 = blockTextPart1.isEmpty() ? blockText :
-                                             blockText.mid(blockTextPart1.length()+1);
-                                             // Why +1? Because we want to skip the space
-                                             // between blockTextPart1 & blockTextPart2.
+                    QString blockTextPart2 = blockTextPart1.isEmpty()
+                            ? blockText
+                            : blockText.mid(blockTextPart1.length() + 1);
+                    // Why +1? Because we want to skip the space
+                    // between blockTextPart1 & blockTextPart2.
 
                     cursor.clearSelection();
                     cursor.select(QTextCursor::BlockUnderCursor);
@@ -1516,7 +1514,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     QTextBlockFormat dialogBlockFormat = dialogueFormat->createBlockFormat();
                     QTextCharFormat dialogCharFormat = dialogueFormat->createCharFormat();
                     cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
-                    if(m_purpose == ForDisplay)
+                    if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart1);
                     else
                         polishFontsAndInsertTextAtCursor(cursor, blockTextPart1);
@@ -1524,7 +1522,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
                     cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
-                    if(m_purpose == ForDisplay)
+                    if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart2);
                     else
                         polishFontsAndInsertTextAtCursor(cursor, blockTextPart2);
@@ -1544,17 +1542,16 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
 
 void ScreenplayTextDocument::loadScreenplayLater()
 {
-    if(m_textDocument != nullptr)
+    if (m_textDocument != nullptr)
         m_textDocument->clear();
 
-    if(m_syncEnabled)
-    {
+    if (m_syncEnabled) {
         this->disconnectFromScreenplaySignals();
         this->disconnectFromScreenplayFormatSignals();
 
         const bool updateWasScheduled = m_loadScreenplayTimer.isActive();
         m_loadScreenplayTimer.start(50, this);
-        if(!updateWasScheduled)
+        if (!updateWasScheduled)
             emit updateScheduled();
     }
 }
@@ -1568,21 +1565,26 @@ void ScreenplayTextDocument::resetScreenplay()
 
 void ScreenplayTextDocument::connectToScreenplaySignals()
 {
-    if(m_screenplay == nullptr || !m_syncEnabled || m_connectedToScreenplaySignals)
+    if (m_screenplay == nullptr || !m_syncEnabled || m_connectedToScreenplaySignals)
         return;
 
-    connect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved, Qt::UniqueConnection);
-    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset, Qt::UniqueConnection);
-    connect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayTextDocument::onSceneRemoved, Qt::UniqueConnection);
-    connect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayTextDocument::onSceneInserted, Qt::UniqueConnection);
-    connect(m_screenplay, &Screenplay::activeSceneChanged, this, &ScreenplayTextDocument::onActiveSceneChanged, Qt::UniqueConnection);
-    connect(m_screenplay, &Screenplay::modelAboutToBeReset, this, &ScreenplayTextDocument::onScreenplayAboutToReset, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved,
+            Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset,
+            Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementRemoved, this,
+            &ScreenplayTextDocument::onSceneRemoved, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementInserted, this,
+            &ScreenplayTextDocument::onSceneInserted, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::activeSceneChanged, this,
+            &ScreenplayTextDocument::onActiveSceneChanged, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::modelAboutToBeReset, this,
+            &ScreenplayTextDocument::onScreenplayAboutToReset, Qt::UniqueConnection);
 
-    for(int i=0; i<m_screenplay->elementCount(); i++)
-    {
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
         Scene *scene = element->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
         this->connectToSceneSignals(scene);
@@ -1595,17 +1597,20 @@ void ScreenplayTextDocument::connectToScreenplaySignals()
 
 void ScreenplayTextDocument::connectToScreenplayFormatSignals()
 {
-    if(m_formatting == nullptr || !m_syncEnabled || m_connectedToFormattingSignals)
+    if (m_formatting == nullptr || !m_syncEnabled || m_connectedToFormattingSignals)
         return;
 
-    connect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged, Qt::UniqueConnection);
-    connect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged, Qt::UniqueConnection);
-    connect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged, Qt::UniqueConnection);
+    connect(m_formatting, &ScreenplayFormat::defaultFontChanged, this,
+            &ScreenplayTextDocument::onDefaultFontChanged, Qt::UniqueConnection);
+    connect(m_formatting, &ScreenplayFormat::screenChanged, this,
+            &ScreenplayTextDocument::onFormatScreenChanged, Qt::UniqueConnection);
+    connect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this,
+            &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged, Qt::UniqueConnection);
 
-    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-    {
+    for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
         SceneElementFormat *elementFormat = m_formatting->elementFormat(i);
-        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayTextDocument::onElementFormatChanged, Qt::UniqueConnection);
+        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this,
+                &ScreenplayTextDocument::onElementFormatChanged, Qt::UniqueConnection);
     }
 
     m_connectedToFormattingSignals = true;
@@ -1613,21 +1618,26 @@ void ScreenplayTextDocument::connectToScreenplayFormatSignals()
 
 void ScreenplayTextDocument::disconnectFromScreenplaySignals()
 {
-    if(m_screenplay == nullptr || !m_connectedToScreenplaySignals)
+    if (m_screenplay == nullptr || !m_connectedToScreenplaySignals)
         return;
 
-    disconnect(m_screenplay, &Screenplay::elementMoved, this, &ScreenplayTextDocument::onSceneMoved);
-    disconnect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayTextDocument::onScreenplayReset);
-    disconnect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayTextDocument::onSceneRemoved);
-    disconnect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayTextDocument::onSceneInserted);
-    disconnect(m_screenplay, &Screenplay::activeSceneChanged, this, &ScreenplayTextDocument::onActiveSceneChanged);
-    disconnect(m_screenplay, &Screenplay::modelAboutToBeReset, this, &ScreenplayTextDocument::onScreenplayAboutToReset);
+    disconnect(m_screenplay, &Screenplay::elementMoved, this,
+               &ScreenplayTextDocument::onSceneMoved);
+    disconnect(m_screenplay, &Screenplay::modelReset, this,
+               &ScreenplayTextDocument::onScreenplayReset);
+    disconnect(m_screenplay, &Screenplay::elementRemoved, this,
+               &ScreenplayTextDocument::onSceneRemoved);
+    disconnect(m_screenplay, &Screenplay::elementInserted, this,
+               &ScreenplayTextDocument::onSceneInserted);
+    disconnect(m_screenplay, &Screenplay::activeSceneChanged, this,
+               &ScreenplayTextDocument::onActiveSceneChanged);
+    disconnect(m_screenplay, &Screenplay::modelAboutToBeReset, this,
+               &ScreenplayTextDocument::onScreenplayAboutToReset);
 
-    for(int i=0; i<m_screenplay->elementCount(); i++)
-    {
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
         Scene *scene = element->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
         this->disconnectFromSceneSignals(scene);
@@ -1638,17 +1648,20 @@ void ScreenplayTextDocument::disconnectFromScreenplaySignals()
 
 void ScreenplayTextDocument::disconnectFromScreenplayFormatSignals()
 {
-    if(m_formatting == nullptr || !m_connectedToFormattingSignals)
+    if (m_formatting == nullptr || !m_connectedToFormattingSignals)
         return;
 
-    disconnect(m_formatting, &ScreenplayFormat::defaultFontChanged, this, &ScreenplayTextDocument::onDefaultFontChanged);
-    disconnect(m_formatting, &ScreenplayFormat::screenChanged, this, &ScreenplayTextDocument::onFormatScreenChanged);
-    disconnect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged);
+    disconnect(m_formatting, &ScreenplayFormat::defaultFontChanged, this,
+               &ScreenplayTextDocument::onDefaultFontChanged);
+    disconnect(m_formatting, &ScreenplayFormat::screenChanged, this,
+               &ScreenplayTextDocument::onFormatScreenChanged);
+    disconnect(m_formatting, &ScreenplayFormat::fontPointSizeDeltaChanged, this,
+               &ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged);
 
-    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-    {
+    for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
         SceneElementFormat *elementFormat = m_formatting->elementFormat(i);
-        disconnect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayTextDocument::onElementFormatChanged);
+        disconnect(elementFormat, &SceneElementFormat::elementFormatChanged, this,
+                   &ScreenplayTextDocument::onElementFormatChanged);
     }
 
     m_connectedToFormattingSignals = false;
@@ -1656,38 +1669,52 @@ void ScreenplayTextDocument::disconnectFromScreenplayFormatSignals()
 
 void ScreenplayTextDocument::connectToSceneSignals(Scene *scene)
 {
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
-    connect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset, Qt::UniqueConnection);
-    connect(scene, &Scene::modelReset, this, &ScreenplayTextDocument::onSceneResetModel, Qt::UniqueConnection);
-    connect(scene, &Scene::sceneRefreshed, this, &ScreenplayTextDocument::onSceneRefreshed, Qt::UniqueConnection);
-    connect(scene, &Scene::elementCountChanged, this, &ScreenplayTextDocument::onSceneReset, Qt::UniqueConnection);
-    connect(scene, &Scene::sceneAboutToReset, this, &ScreenplayTextDocument::onSceneAboutToReset, Qt::UniqueConnection);
-    connect(scene, &Scene::sceneElementChanged, this, &ScreenplayTextDocument::onSceneElementChanged, Qt::UniqueConnection);
-    connect(scene, &Scene::modelAboutToBeReset, this, &ScreenplayTextDocument::onSceneAboutToResetModel, Qt::UniqueConnection);
+    connect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset,
+            Qt::UniqueConnection);
+    connect(scene, &Scene::modelReset, this, &ScreenplayTextDocument::onSceneResetModel,
+            Qt::UniqueConnection);
+    connect(scene, &Scene::sceneRefreshed, this, &ScreenplayTextDocument::onSceneRefreshed,
+            Qt::UniqueConnection);
+    connect(scene, &Scene::elementCountChanged, this, &ScreenplayTextDocument::onSceneReset,
+            Qt::UniqueConnection);
+    connect(scene, &Scene::sceneAboutToReset, this, &ScreenplayTextDocument::onSceneAboutToReset,
+            Qt::UniqueConnection);
+    connect(scene, &Scene::sceneElementChanged, this,
+            &ScreenplayTextDocument::onSceneElementChanged, Qt::UniqueConnection);
+    connect(scene, &Scene::modelAboutToBeReset, this,
+            &ScreenplayTextDocument::onSceneAboutToResetModel, Qt::UniqueConnection);
 
     SceneHeading *heading = scene->heading();
-    connect(heading, &SceneHeading::textChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged, Qt::UniqueConnection);
-    connect(heading, &SceneHeading::enabledChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged, Qt::UniqueConnection);
+    connect(heading, &SceneHeading::textChanged, this,
+            &ScreenplayTextDocument::onSceneHeadingChanged, Qt::UniqueConnection);
+    connect(heading, &SceneHeading::enabledChanged, this,
+            &ScreenplayTextDocument::onSceneHeadingChanged, Qt::UniqueConnection);
 }
 
 void ScreenplayTextDocument::disconnectFromSceneSignals(Scene *scene)
 {
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
     disconnect(scene, &Scene::sceneReset, this, &ScreenplayTextDocument::onSceneReset);
     disconnect(scene, &Scene::modelReset, this, &ScreenplayTextDocument::onSceneResetModel);
     disconnect(scene, &Scene::sceneRefreshed, this, &ScreenplayTextDocument::onSceneRefreshed);
     disconnect(scene, &Scene::elementCountChanged, this, &ScreenplayTextDocument::onSceneReset);
-    disconnect(scene, &Scene::sceneAboutToReset, this, &ScreenplayTextDocument::onSceneAboutToReset);
-    disconnect(scene, &Scene::sceneElementChanged, this, &ScreenplayTextDocument::onSceneElementChanged);
-    disconnect(scene, &Scene::modelAboutToBeReset, this, &ScreenplayTextDocument::onSceneAboutToResetModel);
+    disconnect(scene, &Scene::sceneAboutToReset, this,
+               &ScreenplayTextDocument::onSceneAboutToReset);
+    disconnect(scene, &Scene::sceneElementChanged, this,
+               &ScreenplayTextDocument::onSceneElementChanged);
+    disconnect(scene, &Scene::modelAboutToBeReset, this,
+               &ScreenplayTextDocument::onSceneAboutToResetModel);
 
     SceneHeading *heading = scene->heading();
-    disconnect(heading, &SceneHeading::textChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged);
-    disconnect(heading, &SceneHeading::enabledChanged, this, &ScreenplayTextDocument::onSceneHeadingChanged);
+    disconnect(heading, &SceneHeading::textChanged, this,
+               &ScreenplayTextDocument::onSceneHeadingChanged);
+    disconnect(heading, &SceneHeading::enabledChanged, this,
+               &ScreenplayTextDocument::onSceneHeadingChanged);
 }
 
 void ScreenplayTextDocument::onScreenplayAboutToReset()
@@ -1709,22 +1736,24 @@ void ScreenplayTextDocument::onSceneMoved(ScreenplayElement *element, int from, 
 
 void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int index)
 {
-    if(m_screenplayIsBeingReset)
+    if (m_screenplayIsBeingReset)
         return;
 
     Q_UNUSED(index)
-    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating while new scene was removed.");
+    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument",
+               "Document was updating while new scene was removed.");
 
     Scene *scene = element->scene();
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
     QTextFrame *frame = this->findTextFrame(element);
 #ifdef QT_NO_DEBUG
-    if(frame == nullptr)
+    if (frame == nullptr)
         return;
 #else
-    Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to remove a scene before it was included in the text document.");
+    Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument",
+               "Attempting to remove a scene before it was included in the text document.");
 #endif
 
     ScreenplayTextDocumentUpdate update(this);
@@ -1735,64 +1764,61 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
     cursor.removeSelectedText();
     this->removeTextFrame(element);
 
-    if(m_sceneResetList.removeOne(scene))
+    if (m_sceneResetList.removeOne(scene))
         m_sceneResetTimer.start(100, this);
 
     this->disconnectFromSceneSignals(scene);
 
-    if(m_syncEnabled)
+    if (m_syncEnabled)
         this->evaluatePageBoundariesLater();
 }
 
 void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int index)
 {
-    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating while new scene was inserted.");
+    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument",
+               "Document was updating while new scene was inserted.");
 
     Scene *scene = element->scene();
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
     ScreenplayTextDocumentUpdate update(this);
     QTextFrame *rootFrame = m_textDocument->rootFrame();
 
     QTextCursor cursor(m_textDocument);
-    if(index == m_screenplay->elementCount()-1)
+    if (index == m_screenplay->elementCount() - 1)
         cursor = rootFrame->lastCursorPosition();
-    else if(index > 0)
-    {
+    else if (index > 0) {
         const int sindex = index;
         ScreenplayElement *before = nullptr;
-        while(before == nullptr && index >= 0)
-        {
+        while (before == nullptr && index >= 0) {
             before = m_screenplay->elementAt(--index);
-            if(before == nullptr || before->scene() == nullptr)
-            {
+            if (before == nullptr || before->scene() == nullptr) {
                 before = nullptr;
                 continue;
             }
         }
         index = sindex;
 
-        if(before != nullptr)
-        {
+        if (before != nullptr) {
             QTextFrame *beforeFrame = this->findTextFrame(before);
 #ifdef QT_NO_DEBUG
             // This cannot be fixed in the next update cycle. The document will
             // be completely out of sync with the scenes. So we should take some
             // time now and deal with it.
-            if(beforeFrame == nullptr)
-            {
+            if (beforeFrame == nullptr) {
                 this->loadScreenplay();
 
                 beforeFrame = this->findTextFrame(before);
 
                 // Okay, if this is happening again - then something is seriously wrong.
                 // We better let the user move on for now and not block the UI.
-                if(beforeFrame == nullptr)
+                if (beforeFrame == nullptr)
                     return;
             }
 #else
-            Q_ASSERT_X(beforeFrame != nullptr, "ScreenplayTextDocument", "Attempting to insert scene before screenplay is loaded.");
+            Q_ASSERT_X(beforeFrame != nullptr, "ScreenplayTextDocument",
+                       "Attempting to insert scene before screenplay is loaded.");
 #endif
             cursor = beforeFrame->lastCursorPosition();
             cursor.movePosition(QTextCursor::Down);
@@ -1801,11 +1827,9 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
 
     QTextFrameFormat frameFormat = m_sceneFrameFormat;
     const int fsi = m_screenplay->firstSceneIndex();
-    if(index > fsi)
-    {
+    if (index > fsi) {
         SceneElement::Type firstParaType = SceneElement::Heading;
-        if(!scene->heading()->isEnabled() && scene->elementCount())
-        {
+        if (!scene->heading()->isEnabled() && scene->elementCount()) {
             SceneElement *firstPara = scene->elementAt(0);
             firstParaType = firstPara->type();
         }
@@ -1820,8 +1844,7 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
     this->registerTextFrame(element, frame);
     this->loadScreenplayElement(element, cursor);
 
-    if(m_syncEnabled)
-    {
+    if (m_syncEnabled) {
         this->connectToSceneSignals(scene);
         this->evaluatePageBoundariesLater();
     }
@@ -1829,11 +1852,12 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
 
 void ScreenplayTextDocument::onSceneReset()
 {
-    Scene *scene = qobject_cast<Scene*>(this->sender());
-    if(scene == nullptr)
-    {
-        scene = this->sender() && this->sender()->parent() ? qobject_cast<Scene*>(this->sender()->parent()) : nullptr;
-        if(scene == nullptr)
+    Scene *scene = qobject_cast<Scene *>(this->sender());
+    if (scene == nullptr) {
+        scene = this->sender() && this->sender()->parent()
+                ? qobject_cast<Scene *>(this->sender()->parent())
+                : nullptr;
+        if (scene == nullptr)
             return;
     }
 
@@ -1847,8 +1871,8 @@ void ScreenplayTextDocument::onSceneRefreshed()
 
 void ScreenplayTextDocument::onSceneAboutToReset()
 {
-    Scene *scene = qobject_cast<Scene*>(this->sender());
-    if(scene == nullptr)
+    Scene *scene = qobject_cast<Scene *>(this->sender());
+    if (scene == nullptr)
         return;
 
     this->disconnectFromSceneSignals(scene);
@@ -1860,17 +1884,20 @@ void ScreenplayTextDocument::onSceneHeadingChanged()
     this->onSceneReset();
 }
 
-void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::SceneElementChangeType type)
+void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
+                                                   Scene::SceneElementChangeType type)
 {
-    Scene *scene = qobject_cast<Scene*>(this->sender());
-    if(scene == nullptr)
+    Scene *scene = qobject_cast<Scene *>(this->sender());
+    if (scene == nullptr)
         return;
 
-    Q_ASSERT_X(para->scene() == scene, "ScreenplayTextDocument", "Attempting to modify paragraph from outside the scene.");
-    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument", "Document was updating while a scene's paragraph was changed.");
+    Q_ASSERT_X(para->scene() == scene, "ScreenplayTextDocument",
+               "Attempting to modify paragraph from outside the scene.");
+    Q_ASSERT_X(m_updating == false, "ScreenplayTextDocument",
+               "Document was updating while a scene's paragraph was changed.");
 
     const int paraIndex = scene->indexOfElement(para);
-    if(paraIndex < 0)
+    if (paraIndex < 0)
         return; // This can happen when the paragraph is not part of the scene text, but
                 // it exists as a way to capture a mute-character in the scene.
 
@@ -1878,18 +1905,18 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
 
     const SceneElementContentChange lastParaChange = para->lastContentChange();
 
-    QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
-    for(ScreenplayElement *element : qAsConst(elements))
-    {
+    QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
+    for (ScreenplayElement *element : qAsConst(elements)) {
         QTextFrame *frame = this->findTextFrame(element);
 #ifdef QT_NO_DEBUG
         // This will probably get updated in the next cycle. Trying to fix
         // this here & right now will likely lead to slow UI updates, which
         // is much worse than having to live with dirty text document.
-        if(frame == nullptr)
+        if (frame == nullptr)
             continue;
 #else
-        Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
+        Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument",
+                   "Attempting to update a scene before it was included in the text document.");
 #endif
         const int nrBlocks = paraIndex + (scene->heading()->isEnabled() ? 1 : 0);
 
@@ -1898,46 +1925,39 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para, Scene::Sc
 
         QTextBlock block = cursor.block();
         ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
-        if(data && data->contains(para))
-        {
-            if(type == Scene::ElementTypeChange)
+        if (data && data->contains(para)) {
+            if (type == Scene::ElementTypeChange)
                 this->formatBlock(block);
-            else if(type == Scene::ElementTextChange)
-            {
-                if(m_purpose == ForDisplay && !block.text().isEmpty())
-                {
+            else if (type == Scene::ElementTextChange) {
+                if (m_purpose == ForDisplay && !block.text().isEmpty()) {
                     QTextCursor cursor(block);
-                    if(lastParaChange.isValid())
-                    {
-                        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, lastParaChange.position);
-                        if(lastParaChange.charsRemoved > 0)
-                        {
-                            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, lastParaChange.charsRemoved);
+                    if (lastParaChange.isValid()) {
+                        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor,
+                                            lastParaChange.position);
+                        if (lastParaChange.charsRemoved > 0) {
+                            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                                                lastParaChange.charsRemoved);
                             cursor.removeSelectedText();
                         }
 
-                        if(lastParaChange.charsAdded > 0)
+                        if (lastParaChange.charsAdded > 0)
                             cursor.insertText(lastParaChange.content);
-                    }
-                    else
-                    {
+                    } else {
                         cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
                         cursor.insertText(para->text());
                     }
-                }
-                else
+                } else
                     this->formatBlock(block, para->text());
             }
-        }
-        else
+        } else
             this->addToSceneResetList(scene);
     }
 }
 
 void ScreenplayTextDocument::onSceneAboutToResetModel()
 {
-    Scene *scene = qobject_cast<Scene*>(this->sender());
-    if(scene == nullptr)
+    Scene *scene = qobject_cast<Scene *>(this->sender());
+    if (scene == nullptr)
         return;
 
     this->disconnectFromSceneSignals(scene);
@@ -1946,8 +1966,8 @@ void ScreenplayTextDocument::onSceneAboutToResetModel()
 
 void ScreenplayTextDocument::onSceneResetModel()
 {
-    Scene *scene = qobject_cast<Scene*>(this->sender());
-    if(scene == nullptr)
+    Scene *scene = qobject_cast<Scene *>(this->sender());
+    if (scene == nullptr)
         return;
 
     disconnect(scene, &Scene::modelReset, this, &ScreenplayTextDocument::onSceneResetModel);
@@ -1956,8 +1976,8 @@ void ScreenplayTextDocument::onSceneResetModel()
 
 void ScreenplayTextDocument::onElementFormatChanged()
 {
-    SceneElementFormat *seformat = qobject_cast<SceneElementFormat*>(this->sender());
-    if(seformat && seformat->isInTransaction())
+    SceneElementFormat *seformat = qobject_cast<SceneElementFormat *>(this->sender());
+    if (seformat && seformat->isInTransaction())
         return;
 
     // It is less time consuming to reload the whole document than it is
@@ -1997,20 +2017,21 @@ void ScreenplayTextDocument::onFormatFontPointSizeDeltaChanged()
 void ScreenplayTextDocument::onActiveSceneChanged()
 {
     Scene *activeScene = m_screenplay->activeScene();
-    if(m_activeScene != activeScene)
-    {
-        if(m_activeScene)
-        {
-            disconnect(m_activeScene, &Scene::aboutToDelete, this, &ScreenplayTextDocument::onActiveSceneDestroyed);
-            disconnect(m_activeScene, &Scene::cursorPositionChanged, this, &ScreenplayTextDocument::onActiveSceneCursorPositionChanged);
+    if (m_activeScene != activeScene) {
+        if (m_activeScene) {
+            disconnect(m_activeScene, &Scene::aboutToDelete, this,
+                       &ScreenplayTextDocument::onActiveSceneDestroyed);
+            disconnect(m_activeScene, &Scene::cursorPositionChanged, this,
+                       &ScreenplayTextDocument::onActiveSceneCursorPositionChanged);
         }
 
         m_activeScene = activeScene;
 
-        if(m_activeScene)
-        {
-            connect(m_activeScene, &Scene::aboutToDelete, this, &ScreenplayTextDocument::onActiveSceneDestroyed);
-            connect(m_activeScene, &Scene::cursorPositionChanged, this, &ScreenplayTextDocument::onActiveSceneCursorPositionChanged);
+        if (m_activeScene) {
+            connect(m_activeScene, &Scene::aboutToDelete, this,
+                    &ScreenplayTextDocument::onActiveSceneDestroyed);
+            connect(m_activeScene, &Scene::cursorPositionChanged, this,
+                    &ScreenplayTextDocument::onActiveSceneCursorPositionChanged);
         }
     }
 
@@ -2019,7 +2040,7 @@ void ScreenplayTextDocument::onActiveSceneChanged()
 
 void ScreenplayTextDocument::onActiveSceneDestroyed(Scene *ptr)
 {
-    if(ptr == m_activeScene)
+    if (ptr == m_activeScene)
         m_activeScene = nullptr;
 }
 
@@ -2030,22 +2051,22 @@ void ScreenplayTextDocument::onActiveSceneCursorPositionChanged()
 
 void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
 {
-    if(m_screenplay == nullptr || m_activeScene == nullptr || m_textDocument == nullptr || m_formatting == nullptr)
-    {
+    if (m_screenplay == nullptr || m_activeScene == nullptr || m_textDocument == nullptr
+        || m_formatting == nullptr) {
         this->setCurrentPageAndPosition(0, 0);
         return;
     }
 
-    if(m_screenplay->currentElementIndex() < 0 || m_textDocument->isEmpty())
-    {
+    if (m_screenplay->currentElementIndex() < 0 || m_textDocument->isEmpty()) {
         this->setCurrentPageAndPosition(0, 0);
         return;
     }
 
     ScreenplayElement *element = m_screenplay->elementAt(m_screenplay->currentElementIndex());
-    QTextFrame *frame = element && element->scene() && element->scene() == m_activeScene ? this->findTextFrame(element) : nullptr;
-    if(frame == nullptr)
-    {
+    QTextFrame *frame = element && element->scene() && element->scene() == m_activeScene
+            ? this->findTextFrame(element)
+            : nullptr;
+    if (frame == nullptr) {
         this->setCurrentPageAndPosition(0, 0);
         return;
     }
@@ -2053,29 +2074,26 @@ void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
     QTextCursor endCursor(m_textDocument);
     endCursor.movePosition(QTextCursor::End);
 
-    if(endCursor.position() == 0)
-    {
+    if (endCursor.position() == 0) {
         this->setCurrentPageAndPosition(0, 0);
         return;
     }
 
     const int documentLength = endCursor.position();
-    if(documentLength > 0 && m_pageBoundaries.isEmpty())
+    if (documentLength > 0 && m_pageBoundaries.isEmpty())
         this->evaluatePageBoundaries();
 
     QTextCursor userCursor = frame->firstCursorPosition();
     QTextBlock block = userCursor.block();
     ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-    if(blockData && blockData->elementType() == SceneElement::Heading)
+    if (blockData && blockData->elementType() == SceneElement::Heading)
         block = block.next();
 
     const int cursorPosition = m_activeScene->cursorPosition() + block.position();
-    for(int i=0; i<m_pageBoundaries.size(); i++)
-    {
-        const QPair<int,int> pgBoundary = m_pageBoundaries.at(i);
-        if(cursorPosition >= pgBoundary.first-1 && cursorPosition < pgBoundary.second)
-        {
-            this->setCurrentPageAndPosition(i+1, qreal(cursorPosition)/qreal(documentLength));
+    for (int i = 0; i < m_pageBoundaries.size(); i++) {
+        const QPair<int, int> pgBoundary = m_pageBoundaries.at(i);
+        if (cursorPosition >= pgBoundary.first - 1 && cursorPosition < pgBoundary.second) {
+            this->setCurrentPageAndPosition(i + 1, qreal(cursorPosition) / qreal(documentLength));
             return;
         }
     }
@@ -2089,10 +2107,9 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
 {
     // NOTE: Please do not call this function from anywhere other than
     // timerEvent(), while handling m_pageBoundaryEvalTimer
-    QList< QPair<int,int> > pgBoundaries;
+    QList<QPair<int, int>> pgBoundaries;
 
-    if(m_formatting != nullptr && m_textDocument != nullptr && m_screenplay != nullptr)
-    {
+    if (m_formatting != nullptr && m_textDocument != nullptr && m_screenplay != nullptr) {
         m_textDocument->setDefaultFont(m_formatting->defaultFont());
         m_formatting->pageLayout()->configure(m_textDocument);
 
@@ -2102,37 +2119,43 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
         QRectF paperRect = pageLayout->paperRect();
         QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
 
-        const int endCursorPosition = m_textDocument->characterCount()-1;
+        const int endCursorPosition = m_textDocument->characterCount() - 1;
 
         qreal fpageCount = 0.1;
 
         const int pageCount = m_textDocument->pageCount();
         int pageIndex = 0;
-        while(pageIndex < pageCount)
-        {
-            paperRect = QRectF(0, pageIndex*paperRect.height(), paperRect.width(), paperRect.height());
-            const QRectF contentsRect = paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(), -pageMargins.bottom());
-            const int firstPosition = pgBoundaries.isEmpty() ? layout->hitTest(contentsRect.topLeft(), Qt::FuzzyHit) : pgBoundaries.last().second+1;
-            const int lastPosition = pageIndex == pageCount-1 ? endCursorPosition : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
-            pgBoundaries << qMakePair(firstPosition, lastPosition >= 0 ? lastPosition : endCursorPosition);
+        while (pageIndex < pageCount) {
+            paperRect = QRectF(0, pageIndex * paperRect.height(), paperRect.width(),
+                               paperRect.height());
+            const QRectF contentsRect =
+                    paperRect.adjusted(pageMargins.left(), pageMargins.top(), -pageMargins.right(),
+                                       -pageMargins.bottom());
+            const int firstPosition = pgBoundaries.isEmpty()
+                    ? layout->hitTest(contentsRect.topLeft(), Qt::FuzzyHit)
+                    : pgBoundaries.last().second + 1;
+            const int lastPosition = pageIndex == pageCount - 1
+                    ? endCursorPosition
+                    : layout->hitTest(contentsRect.bottomRight(), Qt::FuzzyHit);
+            pgBoundaries << qMakePair(firstPosition,
+                                      lastPosition >= 0 ? lastPosition : endCursorPosition);
 
             ++pageIndex;
 
-            if(pageIndex == pageCount)
-            {
-                ScreenplayElement *lastElement = m_screenplay->elementAt(m_screenplay->elementCount()-1);
-                if(lastElement == nullptr)
+            if (pageIndex == pageCount) {
+                ScreenplayElement *lastElement =
+                        m_screenplay->elementAt(m_screenplay->elementCount() - 1);
+                if (lastElement == nullptr)
                     fpageCount = 0.01;
-                else
-                {
+                else {
                     QTextFrame *lastFrame = this->findTextFrame(lastElement);
-                    if(lastFrame == nullptr)
+                    if (lastFrame == nullptr)
                         fpageCount = pageCount;
-                    else
-                    {
+                    else {
                         const QRectF lastFrameRect = layout->frameBoundingRect(lastFrame);
-                        fpageCount = pageCount-1;
-                        fpageCount += (lastFrameRect.bottom() - contentsRect.top())/contentsRect.height();
+                        fpageCount = pageCount - 1;
+                        fpageCount += (lastFrameRect.bottom() - contentsRect.top())
+                                / contentsRect.height();
                     }
                 }
             }
@@ -2154,13 +2177,13 @@ void ScreenplayTextDocument::evaluatePageBoundariesLater()
 
 void ScreenplayTextDocument::formatAllBlocks()
 {
-    if(m_screenplay == nullptr || m_formatting == nullptr || m_updating || !m_componentComplete || m_textDocument == nullptr || m_textDocument->isEmpty())
+    if (m_screenplay == nullptr || m_formatting == nullptr || m_updating || !m_componentComplete
+        || m_textDocument == nullptr || m_textDocument->isEmpty())
         return;
 
     QTextCursor cursor(m_textDocument);
     QTextBlock block = cursor.block();
-    while(block.isValid())
-    {
+    while (block.isValid()) {
         this->formatBlock(block);
         block = block.next();
     }
@@ -2169,21 +2192,21 @@ void ScreenplayTextDocument::formatAllBlocks()
 bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement *element)
 {
     QTextFrame *frame = this->findTextFrame(element);
-    if(frame == nullptr)
+    if (frame == nullptr)
         return false;
 
     Scene *scene = element->scene();
-    if(scene == nullptr)
+    if (scene == nullptr)
         return false;
 
     int nrParagraphs = scene->elementCount() + 1;
 
     // We should have a text-block for each scene element (paragraph),
     // and one for the scene heading
-    QList< QPair<SceneElement*,QTextBlock> > paraBlocks;
+    QList<QPair<SceneElement *, QTextBlock>> paraBlocks;
     paraBlocks.reserve(nrParagraphs);
     paraBlocks << qMakePair(nullptr, QTextBlock());
-    for(int i=0; i<scene->elementCount(); i++)
+    for (int i = 0; i < scene->elementCount(); i++)
         paraBlocks << qMakePair(scene->elementAt(i), QTextBlock());
 
     // Lets go over the whole frame and take stock of what exists
@@ -2192,37 +2215,31 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
     QTextFrame::iterator it = frame->begin();
     QTextFrame::iterator end = frame->end();
     QVector<QTextBlock> blocksToRemove;
-    while(it != end)
-    {
+    while (it != end) {
         QTextBlock block = it.currentBlock();
         ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
-        if(data)
-        {
-            if(data->element())
-            {
-                SceneElement *para = const_cast<SceneElement*>(data->element());
+        if (data) {
+            if (data->element()) {
+                SceneElement *para = const_cast<SceneElement *>(data->element());
                 int paraIndex = scene->indexOfElement(para);
-                if(paraIndex < 0)
+                if (paraIndex < 0)
                     // This block is no longer backed by an
                     // actual paragraph in the scene. So we should
                     // remove the block.
                     blocksToRemove.append(block);
-                else
-                {
+                else {
                     // This block is required. Lets retain it, but
                     // place it at the appropriate position in the
                     // frame.
                     ++paraIndex;
                     paraBlocks[paraIndex].second = block;
                 }
-            }
-            else if(frame->begin() == it && data->elementType() == SceneElement::Heading)
+            } else if (frame->begin() == it && data->elementType() == SceneElement::Heading)
                 paraBlocks.first().second = block;
             else
                 // We honestly dont know what this block is doing.
                 blocksToRemove.append(block);
-        }
-        else
+        } else
             // We honestly dont know what this block is doing.
             blocksToRemove.append(block);
 
@@ -2231,21 +2248,21 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
 
     // Remove blocks that are created for paragraphs that no longer exist
     // in the scene.
-    while(!blocksToRemove.isEmpty())
-    {
+    while (!blocksToRemove.isEmpty()) {
         QTextCursor cursor(blocksToRemove.takeLast());
-        cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
         cursor.removeSelectedText();
         cursor.deleteChar();
     }
 
-    QMap<SceneElement::Type, QPair<QTextCharFormat,QTextBlockFormat> > formatMap;
+    QMap<SceneElement::Type, QPair<QTextCharFormat, QTextBlockFormat>> formatMap;
 
-    auto applyFormattingOnCursor = [&](QTextCursor &cursor, SceneElement::Type paraType, bool firstParagraph) {
+    auto applyFormattingOnCursor = [&](QTextCursor &cursor, SceneElement::Type paraType,
+                                       bool firstParagraph) {
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
 
-        if(!formatMap.contains(paraType)) {
+        if (!formatMap.contains(paraType)) {
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const SceneElementFormat *format = m_formatting->elementFormat(paraType);
             blockFormat = format->createBlockFormat(&pageWidth);
@@ -2257,7 +2274,7 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
             blockFormat = formatPair.second;
         }
 
-        if(firstParagraph)
+        if (firstParagraph)
             blockFormat.setTopMargin(0);
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
@@ -2268,35 +2285,36 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
 #if 0
     SceneElement::Type lastParaType = SceneElement::Heading;
 #endif
-    for(int i=0; i<paraBlocks.size(); i++)
-    {
-        const QPair<SceneElement*, QTextBlock> item = paraBlocks.at(i);
+    for (int i = 0; i < paraBlocks.size(); i++) {
+        const QPair<SceneElement *, QTextBlock> item = paraBlocks.at(i);
 
         QTextBlock block = item.second;
         SceneElement *para = item.first;
         bool newBlock = !block.isValid();
-        if(newBlock)
-        {
+        if (newBlock) {
             QTextCursor cursor(m_textDocument);
             cursor.setPosition(position);
             cursor.insertBlock();
-            applyFormattingOnCursor(cursor, para ? para->type() : SceneElement::Heading, i==0);
+            applyFormattingOnCursor(cursor, para ? para->type() : SceneElement::Heading, i == 0);
             block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
         }
 
-        const QString paraText = para ? para->text() : (scene->heading()->isEnabled() ? scene->heading()->text() : QStringLiteral("NO SCENE HEADING"));
+        const QString paraText = para
+                ? para->text()
+                : (scene->heading()->isEnabled() ? scene->heading()->text()
+                                                 : QStringLiteral("NO SCENE HEADING"));
 
-        if(para)
+        if (para)
             para->lastContentChange();
 
         ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
 
         QTextCursor cursor(block);
-        if(!newBlock)
-            cursor.movePosition(QTextCursor::EndOfBlock,QTextCursor::KeepAnchor);
+        if (!newBlock)
+            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
 
-        if(data->isModified())
+        if (data->isModified())
             cursor.insertText(paraText);
 #if 0
         if(lastParaType != data->elementType())
@@ -2318,26 +2336,27 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
     return true;
 }
 
-void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor)
+void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *element,
+                                                   QTextCursor &cursor)
 {
-    Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element),
-               "ScreenplayTextDocument", "Screenplay element can be loaded only after a frame for it has been created");
+    Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element), "ScreenplayTextDocument",
+               "Screenplay element can be loaded only after a frame for it has been created");
 
     QTextCharFormat highlightCharFormat;
     highlightCharFormat.setBackground(Qt::yellow);
 
     const Scene *scene = element->scene();
-    if(scene != nullptr)
-    {
+    if (scene != nullptr) {
         bool insertBlock = false; // the newly inserted frame has a default first block.
                                   // its only from the second paragraph, that we need a new block.
 
-        auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType, bool firstParagraph) {
+        auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
+                                 bool firstParagraph) {
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const SceneElementFormat *format = m_formatting->elementFormat(paraType);
             QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
             QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
-            if(firstParagraph)
+            if (firstParagraph)
                 blockFormat.setTopMargin(0);
             cursor.setCharFormat(charFormat);
             cursor.setBlockFormat(blockFormat);
@@ -2345,119 +2364,127 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
         const SceneHeading *heading = scene->heading();
         const bool headingEnabled = heading->isEnabled() || (m_purpose == ForDisplay);
-        if(headingEnabled)
-        {
-            if(insertBlock)
+        if (headingEnabled) {
+            if (insertBlock)
                 cursor.insertBlock();
 
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(nullptr));
 
-            if(m_sceneIcons && m_purpose == ForPrinting)
-            {
+            if (m_sceneIcons && m_purpose == ForPrinting) {
                 QTextCharFormat sceneIconFormat;
                 sceneIconFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
                 sceneIconFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
-                sceneIconFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneIconType);
-                sceneIconFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, scene->type());
+                sceneIconFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty,
+                                            ScreenplayTextObjectInterface::SceneIconType);
+                sceneIconFormat.setProperty(ScreenplayTextObjectInterface::DataProperty,
+                                            scene->type());
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneIconFormat);
             }
 
-            if(m_sceneNumbers && m_purpose == ForPrinting)
-            {
+            if (m_sceneNumbers && m_purpose == ForPrinting) {
                 QTextCharFormat sceneNumberFormat;
                 sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
-                sceneNumberFormat.setFont(m_formatting->elementFormat(SceneElement::Heading)->font());
-                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty, ScreenplayTextObjectInterface::SceneNumberType);
-                const QVariantList data = QVariantList() << element->resolvedSceneNumber() << scene->heading()->text() << m_screenplay->indexOfElement(const_cast<ScreenplayElement*>(element));
+                sceneNumberFormat.setFont(
+                        m_formatting->elementFormat(SceneElement::Heading)->font());
+                sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::TypeProperty,
+                                              ScreenplayTextObjectInterface::SceneNumberType);
+                const QVariantList data = QVariantList()
+                        << element->resolvedSceneNumber() << scene->heading()->text()
+                        << m_screenplay->indexOfElement(const_cast<ScreenplayElement *>(element));
                 sceneNumberFormat.setProperty(ScreenplayTextObjectInterface::DataProperty, data);
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
 
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
 
-            const QString headingText = heading->isEnabled() ? heading->text() : QStringLiteral("NO SCENE HEADING");
-            if(m_purpose == ForPrinting)
+            const QString headingText =
+                    heading->isEnabled() ? heading->text() : QStringLiteral("NO SCENE HEADING");
+            if (m_purpose == ForPrinting)
                 polishFontsAndInsertTextAtCursor(cursor, headingText);
-            else
-            {
-                if(m_sceneNumbers)
-                    cursor.insertText( element->resolvedSceneNumber() + QStringLiteral(". ") );
+            else {
+                if (m_sceneNumbers)
+                    cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
                 cursor.insertText(headingText);
             }
 
             insertBlock = true;
         }
 
-        AbstractScreenplayTextDocumentInjectionInterface *injection = qobject_cast<AbstractScreenplayTextDocumentInjectionInterface*>(m_injection);
-        if(injection != nullptr)
-        {
+        AbstractScreenplayTextDocumentInjectionInterface *injection =
+                qobject_cast<AbstractScreenplayTextDocumentInjectionInterface *>(m_injection);
+        if (injection != nullptr) {
             injection->setScreenplayElement(element);
-            injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterSceneHeading);
+            injection->inject(cursor,
+                              AbstractScreenplayTextDocumentInjectionInterface::AfterSceneHeading);
             injection->setScreenplayElement(nullptr);
         }
 
-        if(m_listSceneCharacters)
-        {
+        if (m_listSceneCharacters) {
             const QStringList sceneCharacters = scene->characterNames();
-            if(!sceneCharacters.isEmpty())
-            {
-                if(insertBlock)
+            if (!sceneCharacters.isEmpty()) {
+                if (insertBlock)
                     cursor.insertBlock();
 
                 prepareCursor(cursor, SceneElement::Action, !insertBlock);
 
-                if(m_purpose == ForDisplay)
-                {
-                    cursor.insertHtml( QStringLiteral("<strong>Characters: </strong>") );
-                    cursor.insertHtml( sceneCharacters.join(QStringLiteral(", ") ) );
-                }
-                else
-                {
+                if (m_purpose == ForDisplay) {
+                    cursor.insertHtml(QStringLiteral("<strong>Characters: </strong>"));
+                    cursor.insertHtml(sceneCharacters.join(QStringLiteral(", ")));
+                } else {
                     QFont font = m_textDocument->defaultFont();
-                    font.setPointSize(font.pointSize()-2);
+                    font.setPointSize(font.pointSize() - 2);
 
                     const QFontMetrics fontMetrics(font);
                     const qreal ipr = 2.0; // Image Pixel Ratio
                     const int padding = 6;
 
-                    QVariantMap characterImageResourceUrls = m_textDocument->property("#characterImageResourceUrls").toMap();
+                    QVariantMap characterImageResourceUrls =
+                            m_textDocument->property("#characterImageResourceUrls").toMap();
 
-                    auto insertTextAsImage = [&](const QString &name, const QString &text, bool withBackground) {
+                    auto insertTextAsImage = [&](const QString &name, const QString &text,
+                                                 bool withBackground) {
                         QUrl url;
 
-                        if(characterImageResourceUrls.contains(name)) {
+                        if (characterImageResourceUrls.contains(name)) {
                             url = characterImageResourceUrls.value(name).toUrl();
                         } else {
-                            url = QStringLiteral("scrite://character_") + QString::number(characterImageResourceUrls.size()) + QStringLiteral(".png");
+                            url = QStringLiteral("scrite://character_")
+                                    + QString::number(characterImageResourceUrls.size())
+                                    + QStringLiteral(".png");
 
                             QRect textRect = fontMetrics.boundingRect(text);
-                            textRect.moveTopLeft( QPoint(0,0) );
-                            textRect.setWidth( textRect.width() + 2*fontMetrics.averageCharWidth() );
+                            textRect.moveTopLeft(QPoint(0, 0));
+                            textRect.setWidth(textRect.width()
+                                              + 2 * fontMetrics.averageCharWidth());
                             textRect.adjust(padding, padding, padding, padding);
 
-                            const QSize imageSize = (textRect.size() + QSize(padding,padding)*2)*ipr;
+                            const QSize imageSize =
+                                    (textRect.size() + QSize(padding, padding) * 2) * ipr;
 
                             QImage image(imageSize, QImage::Format_ARGB32);
                             image.setDevicePixelRatio(ipr);
                             image.fill(Qt::transparent);
 
-                            const QRect bgRect = textRect.adjusted(-padding/2, -padding/2, padding/2, padding/2);
+                            const QRect bgRect = textRect.adjusted(-padding / 2, -padding / 2,
+                                                                   padding / 2, padding / 2);
 
                             QPainter paint(&image);
                             paint.setRenderHint(QPainter::Antialiasing);
                             paint.setRenderHint(QPainter::TextAntialiasing);
                             paint.setFont(font);
-                            paint.setPen( QPen(Qt::black,0.5) );
-                            if(withBackground) {
-                                paint.setBrush(QColor(245,245,245));
-                                paint.drawRoundedRect(bgRect, bgRect.height()/2, bgRect.height()/2);
+                            paint.setPen(QPen(Qt::black, 0.5));
+                            if (withBackground) {
+                                paint.setBrush(QColor(245, 245, 245));
+                                paint.drawRoundedRect(bgRect, bgRect.height() / 2,
+                                                      bgRect.height() / 2);
                             }
                             paint.drawText(textRect, Qt::AlignCenter, text);
                             paint.end();
 
                             characterImageResourceUrls.insert(name, url);
-                            m_textDocument->addResource(QTextDocument::ImageResource, url, QVariant::fromValue<QImage>(image));
+                            m_textDocument->addResource(QTextDocument::ImageResource, url,
+                                                        QVariant::fromValue<QImage>(image));
                         }
 
                         QTextImageFormat imageFormat;
@@ -2468,18 +2495,18 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     };
 
                     insertTextAsImage(QString(), QStringLiteral("Characters:"), false);
-                    for(const QString &sceneCharacter : sceneCharacters)
+                    for (const QString &sceneCharacter : sceneCharacters)
                         insertTextAsImage(sceneCharacter, sceneCharacter, true);
 
-                    m_textDocument->setProperty("#characterImageResourceUrls", characterImageResourceUrls);
+                    m_textDocument->setProperty("#characterImageResourceUrls",
+                                                characterImageResourceUrls);
                 }
 
                 insertBlock = true;
             }
         }
 
-        if(m_includeSceneSynopsis && !scene->title().isEmpty())
-        {
+        if (m_includeSceneSynopsis && !scene->title().isEmpty()) {
             QColor sceneColor = scene->color().lighter(175);
             sceneColor.setAlphaF(0.5);
 
@@ -2491,7 +2518,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             charFormat.setFont(Application::instance()->font());
 
             QString synopsis = scene->title();
-            synopsis.replace( QRegularExpression("\n+"), QStringLiteral("\n") );
+            synopsis.replace(QRegularExpression("\n+"), QStringLiteral("\n"));
 
             cursor.insertBlock(blockFormat, charFormat);
             cursor.insertText(synopsis);
@@ -2500,50 +2527,52 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         }
 
         bool highlightParagraph = false;
-        for(int j=0; j<scene->elementCount(); j++)
-        {
+        for (int j = 0; j < scene->elementCount(); j++) {
             const SceneElement *para = scene->elementAt(j);
-            if(injection != nullptr)
-            {
+            if (injection != nullptr) {
                 injection->setSceneElement(para);
-                injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::BeforeSceneElement);
-                if(injection->filterSceneElement())
-                {
-                    injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterSceneElement);
+                injection->inject(
+                        cursor,
+                        AbstractScreenplayTextDocumentInjectionInterface::BeforeSceneElement);
+                if (injection->filterSceneElement()) {
+                    injection->inject(
+                            cursor,
+                            AbstractScreenplayTextDocumentInjectionInterface::AfterSceneElement);
                     continue;
                 }
             }
 
-            if(insertBlock)
+            if (insertBlock)
                 cursor.insertBlock();
 
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
             prepareCursor(cursor, para->type(), !insertBlock);
 
-            if(!m_highlightDialoguesOf.isEmpty())
-            {
-                if(para->type() == SceneElement::Character)
-                {
+            if (!m_highlightDialoguesOf.isEmpty()) {
+                if (para->type() == SceneElement::Character) {
                     const QString chName = para->text().section('(', 0, 0).trimmed();
-                    highlightParagraph = (m_highlightDialoguesOf.contains(chName, Qt::CaseInsensitive));
-                }
-                else if(para->type() != SceneElement::Parenthetical && para->type() != SceneElement::Dialogue)
+                    highlightParagraph =
+                            (m_highlightDialoguesOf.contains(chName, Qt::CaseInsensitive));
+                } else if (para->type() != SceneElement::Parenthetical
+                           && para->type() != SceneElement::Dialogue)
                     highlightParagraph = false;
             }
 
-            if(highlightParagraph)
+            if (highlightParagraph)
                 cursor.mergeCharFormat(highlightCharFormat);
 
             para->lastContentChange();
             const QString text = para->text();
-            if(m_purpose == ForPrinting)
+            if (m_purpose == ForPrinting)
                 polishFontsAndInsertTextAtCursor(cursor, text);
             else
                 cursor.insertText(text);
 
-            if(injection != nullptr)
-                injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterSceneElement);
+            if (injection != nullptr)
+                injection->inject(
+                        cursor,
+                        AbstractScreenplayTextDocumentInjectionInterface::AfterSceneElement);
 
             insertBlock = true;
         }
@@ -2552,11 +2581,11 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
 void ScreenplayTextDocument::formatBlock(const QTextBlock &block, const QString &text)
 {
-    if(m_formatting == nullptr)
+    if (m_formatting == nullptr)
         return;
 
     ScreenplayParagraphBlockData *blockData = ScreenplayParagraphBlockData::get(block);
-    if(blockData == nullptr)
+    if (blockData == nullptr)
         return;
 
     const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
@@ -2568,7 +2597,7 @@ void ScreenplayTextDocument::formatBlock(const QTextBlock &block, const QString 
     cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
     cursor.setBlockFormat(blockFormat);
     cursor.setCharFormat(charFormat);
-    if(!text.isEmpty())
+    if (!text.isEmpty())
         cursor.insertText(text);
 }
 
@@ -2580,15 +2609,14 @@ void ScreenplayTextDocument::removeTextFrame(const ScreenplayElement *element)
 void ScreenplayTextDocument::registerTextFrame(const ScreenplayElement *element, QTextFrame *frame)
 {
     QTextFrame *existingFrame = m_elementFrameMap.value(element, nullptr);
-    if(existingFrame != nullptr && existingFrame != frame)
-    {
+    if (existingFrame != nullptr && existingFrame != frame) {
         m_elementFrameMap.remove(element);
         m_frameElementMap.remove(existingFrame);
-        disconnect(existingFrame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
+        disconnect(existingFrame, &QTextFrame::destroyed, this,
+                   &ScreenplayTextDocument::onTextFrameDestroyed);
     }
 
-    if(frame != nullptr)
-    {
+    if (frame != nullptr) {
         m_elementFrameMap[element] = frame;
         m_frameElementMap[frame] = element;
         connect(frame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
@@ -2598,10 +2626,9 @@ void ScreenplayTextDocument::registerTextFrame(const ScreenplayElement *element,
 QTextFrame *ScreenplayTextDocument::findTextFrame(const ScreenplayElement *element) const
 {
     QTextFrame *frame = m_elementFrameMap.value(element, nullptr);
-    if(frame != nullptr)
-    {
+    if (frame != nullptr) {
         const ScreenplayElement *frameElement = m_frameElementMap.value(frame, nullptr);
-        if(frameElement == element)
+        if (frameElement == element)
             return frame;
     }
 
@@ -2611,7 +2638,7 @@ QTextFrame *ScreenplayTextDocument::findTextFrame(const ScreenplayElement *eleme
 void ScreenplayTextDocument::onTextFrameDestroyed(QObject *object)
 {
     const ScreenplayElement *element = m_frameElementMap.value(object, nullptr);
-    if(element != nullptr)
+    if (element != nullptr)
         m_frameElementMap.remove(object);
 
     m_elementFrameMap.remove(element);
@@ -2621,57 +2648,52 @@ void ScreenplayTextDocument::clearTextFrames()
 {
     m_elementFrameMap.clear();
 
-    QList<QObject*> textFrames = m_frameElementMap.keys();
-    Q_FOREACH(QObject *textFrame, textFrames)
-        disconnect(textFrame, &QTextFrame::destroyed, this, &ScreenplayTextDocument::onTextFrameDestroyed);
+    QList<QObject *> textFrames = m_frameElementMap.keys();
+    Q_FOREACH (QObject *textFrame, textFrames)
+        disconnect(textFrame, &QTextFrame::destroyed, this,
+                   &ScreenplayTextDocument::onTextFrameDestroyed);
     m_frameElementMap.clear();
 }
 
 void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
 {
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
-    if(!m_sceneResetList.contains(scene))
+    if (!m_sceneResetList.contains(scene))
         m_sceneResetList.append(scene);
 
-    if(m_sceneResetList.isEmpty())
+    if (m_sceneResetList.isEmpty())
         return;
 
     m_sceneResetTimer.start(100, this);
-    if(!m_sceneResetHasTriggeredUpdateScheduled)
-    {
+    if (!m_sceneResetHasTriggeredUpdateScheduled) {
         int nrBlocks = 0;
-        for(Scene *s : qAsConst(m_sceneResetList))
-        {
+        for (Scene *s : qAsConst(m_sceneResetList)) {
             const QList<int> sil = s->screenplayElementIndexList();
-            for(int si : sil)
-            {
+            for (int si : sil) {
                 ScreenplayElement *e = m_screenplay->elementAt(si);
-                if(e)
-                {
+                if (e) {
                     int fblocks = 0;
 
                     QTextFrame *f = m_elementFrameMap.value(e, nullptr);
-                    if(f)
-                    {
+                    if (f) {
                         const int lastPosition = f->lastPosition();
                         QTextCursor cursor = f->firstCursorPosition();
-                        while(cursor.currentFrame() && cursor.currentFrame() == f && cursor.position() <= lastPosition)
-                        {
+                        while (cursor.currentFrame() && cursor.currentFrame() == f
+                               && cursor.position() <= lastPosition) {
                             ++fblocks;
-                            if(!cursor.movePosition(QTextCursor::NextBlock))
+                            if (!cursor.movePosition(QTextCursor::NextBlock))
                                 break;
                         }
 
-                        nrBlocks += qAbs(s->elementCount()-fblocks);
+                        nrBlocks += qAbs(s->elementCount() - fblocks);
                     }
                 }
             }
         }
 
-        if(nrBlocks >= 3)
-        {
+        if (nrBlocks >= 3) {
             emit updateScheduled();
             m_sceneResetHasTriggeredUpdateScheduled = true;
         }
@@ -2682,34 +2704,32 @@ void ScreenplayTextDocument::processSceneResetList()
 {
     m_sceneResetHasTriggeredUpdateScheduled = false;
 
-    if(m_sceneResetList.isEmpty())
+    if (m_sceneResetList.isEmpty())
         return;
 
     ScreenplayTextDocumentUpdate update(this);
 
-    QList<Scene*> scenes = m_sceneResetList;
+    QList<Scene *> scenes = m_sceneResetList;
     m_sceneResetList.clear();
 
-    while(!scenes.isEmpty())
-    {
+    while (!scenes.isEmpty()) {
         Scene *scene = scenes.takeFirst();
 
-        QList<ScreenplayElement*> elements = m_screenplay->sceneElements(scene);
-        Q_FOREACH(ScreenplayElement *element, elements)
-        {
+        QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
+        Q_FOREACH (ScreenplayElement *element, elements) {
             QTextFrame *frame = this->findTextFrame(element);
 #ifdef QT_NO_DEBUG
             // This will probably get updated in the next cycle. Trying to fix
             // this here & right now will likely lead to slow UI updates, which
             // is much worse than having to live with dirty text document.
-            if(frame == nullptr)
+            if (frame == nullptr)
                 continue;
 #else
-            Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument", "Attempting to update a scene before it was included in the text document.");
+            Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument",
+                       "Attempting to update a scene before it was included in the text document.");
 #endif
-            if(m_purpose == ForDisplay)
-            {
-                if(this->updateFromScreenplayElement(element))
+            if (m_purpose == ForDisplay) {
+                if (this->updateFromScreenplayElement(element))
                     continue;
             }
 
@@ -2740,28 +2760,24 @@ ScreenplayElementPageBreaks::ScreenplayElementPageBreaks(QObject *parent)
       m_screenplayElement(this, "screenplayElement"),
       m_screenplayDocument(this, "screenplayDocument")
 {
-
 }
 
-ScreenplayElementPageBreaks::~ScreenplayElementPageBreaks()
-{
-
-}
+ScreenplayElementPageBreaks::~ScreenplayElementPageBreaks() { }
 
 void ScreenplayElementPageBreaks::setScreenplayDocument(ScreenplayTextDocument *val)
 {
-    if(m_screenplayDocument == val)
+    if (m_screenplayDocument == val)
         return;
 
-    if(m_screenplayDocument != nullptr)
-        disconnect(m_screenplayDocument, &ScreenplayTextDocument::pageBoundariesChanged,
-                this, &ScreenplayElementPageBreaks::updatePageBreaks);
+    if (m_screenplayDocument != nullptr)
+        disconnect(m_screenplayDocument, &ScreenplayTextDocument::pageBoundariesChanged, this,
+                   &ScreenplayElementPageBreaks::updatePageBreaks);
 
     m_screenplayDocument = val;
 
-    if(m_screenplayDocument != nullptr)
-        connect(m_screenplayDocument, &ScreenplayTextDocument::pageBoundariesChanged,
-                this, &ScreenplayElementPageBreaks::updatePageBreaks);
+    if (m_screenplayDocument != nullptr)
+        connect(m_screenplayDocument, &ScreenplayTextDocument::pageBoundariesChanged, this,
+                &ScreenplayElementPageBreaks::updatePageBreaks);
 
     emit screenplayDocumentChanged();
 
@@ -2770,7 +2786,7 @@ void ScreenplayElementPageBreaks::setScreenplayDocument(ScreenplayTextDocument *
 
 void ScreenplayElementPageBreaks::setScreenplayElement(ScreenplayElement *val)
 {
-    if(m_screenplayElement == val)
+    if (m_screenplayElement == val)
         return;
 
     m_screenplayElement = val;
@@ -2797,15 +2813,14 @@ void ScreenplayElementPageBreaks::updatePageBreaks()
 {
     QJsonArray breaks;
 
-    if(m_screenplayDocument != nullptr && m_screenplayElement != nullptr)
-    {
+    if (m_screenplayDocument != nullptr && m_screenplayElement != nullptr) {
         const QString positionKey = QStringLiteral("position");
         const QString pageNumberKey = QStringLiteral("pageNumber");
 
-        const QList< QPair<int,int> > ibreaks = m_screenplayDocument->pageBreaksFor(m_screenplayElement);
-        QPair<int,int> ibreak;
-        Q_FOREACH(ibreak, ibreaks)
-        {
+        const QList<QPair<int, int>> ibreaks =
+                m_screenplayDocument->pageBreaksFor(m_screenplayElement);
+        QPair<int, int> ibreak;
+        Q_FOREACH (ibreak, ibreaks) {
             QJsonObject item;
             item.insert(positionKey, ibreak.first);
             item.insert(pageNumberKey, ibreak.second);
@@ -2818,7 +2833,7 @@ void ScreenplayElementPageBreaks::updatePageBreaks()
 
 void ScreenplayElementPageBreaks::setPageBreaks(const QJsonArray &val)
 {
-    if(m_pageBreaks == val)
+    if (m_pageBreaks == val)
         return;
 
     m_pageBreaks = val;
@@ -2831,27 +2846,27 @@ Q_DECL_IMPORT int qt_defaultDpi();
 ScreenplayTitlePageObjectInterface::ScreenplayTitlePageObjectInterface(QObject *parent)
     : QObject(parent)
 {
-
 }
 
-ScreenplayTitlePageObjectInterface::~ScreenplayTitlePageObjectInterface()
-{
+ScreenplayTitlePageObjectInterface::~ScreenplayTitlePageObjectInterface() { }
 
-}
-
-QSizeF ScreenplayTitlePageObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
+QSizeF ScreenplayTitlePageObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument,
+                                                         const QTextFormat &format)
 {
     Q_UNUSED(format)
     Q_UNUSED(posInDocument)
 
     const QSizeF pageSize = doc->pageSize();
     const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
-    const QSizeF ret( (pageSize.width() - rootFrameFormat.leftMargin() - rootFrameFormat.rightMargin()),
-                   (pageSize.height() - rootFrameFormat.topMargin() - rootFrameFormat.bottomMargin()) );
+    const QSizeF ret(
+            (pageSize.width() - rootFrameFormat.leftMargin() - rootFrameFormat.rightMargin()),
+            (pageSize.height() - rootFrameFormat.topMargin() - rootFrameFormat.bottomMargin()));
     return ret;
 }
 
-void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect,
+                                                    QTextDocument *doc, int posInDocument,
+                                                    const QTextFormat &format)
 {
     Q_UNUSED(posInDocument)
 
@@ -2879,20 +2894,22 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
       */
     auto evaluateCenteredPaintRect = [=]() {
         const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
-        const qreal margin = (rootFrameFormat.rightMargin() + rootFrameFormat.leftMargin())/2;
+        const qreal margin = (rootFrameFormat.rightMargin() + rootFrameFormat.leftMargin()) / 2;
         QRectF ret = givenRect;
         ret.moveLeft(margin);
         return ret;
     };
-    const QRectF rect = format.property(TitlePageIsCentered).toBool() ? evaluateCenteredPaintRect() : givenRect;
+    const QRectF rect =
+            format.property(TitlePageIsCentered).toBool() ? evaluateCenteredPaintRect() : givenRect;
 
-    const Screenplay *screenplay = qobject_cast<Screenplay*>(format.property(ScreenplayProperty).value<QObject*>());
-    if(screenplay == nullptr)
+    const Screenplay *screenplay =
+            qobject_cast<Screenplay *>(format.property(ScreenplayProperty).value<QObject *>());
+    if (screenplay == nullptr)
         return;
 
     const Screenplay *masterScreenplay = ScriteDocument::instance()->screenplay();
     const Screenplay *coverPageImageScreenplay = screenplay;
-    if(screenplay->property("#useDocumentScreenplayForCoverPagePhoto").toBool() == true)
+    if (screenplay->property("#useDocumentScreenplayForCoverPagePhoto").toBool() == true)
         coverPageImageScreenplay = masterScreenplay;
 
     auto fetch = [](const QString &given, const QString &defaultValue) {
@@ -2918,7 +2935,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     QFont titleFont = normalFont;
     titleFont.setBold(true);
-    titleFont.setPointSize(titleFont.pointSize()+2);
+    titleFont.setPointSize(titleFont.pointSize() + 2);
     const QFontMetricsF titleFontMetrics(titleFont);
 
     QFont marketingFont = normalFont;
@@ -2927,22 +2944,25 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     const QString newline = QStringLiteral("\n");
     const QString emptyPara = QStringLiteral(".");
-    auto createParagraph = [newline,emptyPara](const QStringList &items) {
+    auto createParagraph = [newline, emptyPara](const QStringList &items) {
         QString ret;
-        for(int i=0; i<items.size(); i++) {
+        for (int i = 0; i < items.size(); i++) {
             const QString item = items.at(i);
-            if(item.isEmpty())
+            if (item.isEmpty())
                 continue;
-            if(!ret.isEmpty())
+            if (!ret.isEmpty())
                 ret += newline;
-            if(item != emptyPara)
+            if (item != emptyPara)
                 ret += item;
         }
         return ret.trimmed();
     };
 
-    const QString centerFrameText = createParagraph( QStringList() << subtitle << emptyPara << writtenBy << authors << emptyPara << basedOn << emptyPara << version);
-    QRectF centerFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, centerFrameText);
+    const QString centerFrameText =
+            createParagraph(QStringList() << subtitle << emptyPara << writtenBy << authors
+                                          << emptyPara << basedOn << emptyPara << version);
+    QRectF centerFrameRect =
+            normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, centerFrameText);
     centerFrameRect.moveCenter(rect.center());
     centerFrameRect.moveBottom(rect.center().y());
 
@@ -2952,24 +2972,29 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     titleFrameRect.moveBottom(centerFrameRect.top());
 
     const QString marketingText = marketing;
-    QRectF marketingFrame = marketingFontMetrics.boundingRect(rect, Qt::TextWordWrap, marketingText);
+    QRectF marketingFrame =
+            marketingFontMetrics.boundingRect(rect, Qt::TextWordWrap, marketingText);
     marketingFrame.moveCenter(rect.center());
-    marketingFrame.moveTop( rect.bottom() + marketingFrame.height()*3 );
+    marketingFrame.moveTop(rect.bottom() + marketingFrame.height() * 3);
 
-    const QString contactFrameText = createParagraph( QStringList() << contact << address << phoneNumber << email << website );
-    QRectF contactFrameRect = normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, contactFrameText);
+    const QString contactFrameText =
+            createParagraph(QStringList() << contact << address << phoneNumber << email << website);
+    QRectF contactFrameRect =
+            normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, contactFrameText);
     contactFrameRect.moveBottomLeft(rect.bottomLeft());
 
     const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
     const qreal defaultDpi = qt_defaultDpi();
-    auto paintText = [isPdfDevice,defaultDpi](QPainter *painter, const QRectF &rect, int flags, const QString &text) {
-        if(isPdfDevice) {
+    auto paintText = [isPdfDevice, defaultDpi](QPainter *painter, const QRectF &rect, int flags,
+                                               const QString &text) {
+        if (isPdfDevice) {
             const qreal invScaleX = defaultDpi / qreal(painter->device()->logicalDpiX());
             const qreal invScaleY = defaultDpi / qreal(painter->device()->logicalDpiY());
             painter->save();
             painter->translate(rect.left(), rect.top());
             painter->scale(invScaleX, invScaleY);
-            const QRectF textRect(0,0,(rect.width()*1.1)/invScaleX,rect.height()/invScaleY);
+            const QRectF textRect(0, 0, (rect.width() * 1.1) / invScaleX,
+                                  rect.height() / invScaleY);
             painter->drawText(textRect, flags, text);
             painter->restore();
         } else
@@ -2978,8 +3003,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     painter->save();
 
-    if(!coverPageImageScreenplay->coverPagePhoto().isEmpty())
-    {
+    if (!coverPageImageScreenplay->coverPagePhoto().isEmpty()) {
         QImage photo(coverPageImageScreenplay->coverPagePhoto());
         QRectF photoRect = photo.rect();
         QSizeF photoSize = photoRect.size();
@@ -2988,17 +3012,18 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         spaceAvailable.setBottom(titleFrameRect.top() - titleFrameRect.height());
         photoSize.scale(spaceAvailable.size(), Qt::KeepAspectRatio);
 
-        switch(coverPageImageScreenplay->coverPagePhotoSize())
-        {
+        switch (coverPageImageScreenplay->coverPagePhotoSize()) {
         case Screenplay::LargeCoverPhoto:
             break;
         case Screenplay::MediumCoverPhoto:
             photoSize /= 2.0;
-            photo = photo.scaled( photo.size()/2.0, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+            photo = photo.scaled(photo.size() / 2.0, Qt::IgnoreAspectRatio,
+                                 Qt::SmoothTransformation);
             break;
         case Screenplay::SmallCoverPhoto:
             photoSize /= 4.0;
-            photo = photo.scaled( photo.size()/4.0, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+            photo = photo.scaled(photo.size() / 4.0, Qt::IgnoreAspectRatio,
+                                 Qt::SmoothTransformation);
             break;
         }
 
@@ -3013,53 +3038,50 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     }
 
     painter->setFont(titleFont);
-    paintText(painter, titleFrameRect, Qt::AlignHCenter|Qt::TextWordWrap, titleFrameText);
+    paintText(painter, titleFrameRect, Qt::AlignHCenter | Qt::TextWordWrap, titleFrameText);
 
     painter->setFont(normalFont);
-    paintText(painter, centerFrameRect, Qt::AlignHCenter|Qt::TextWordWrap, centerFrameText);
-    paintText(painter, contactFrameRect, Qt::AlignLeft|Qt::TextWordWrap, contactFrameText);
+    paintText(painter, centerFrameRect, Qt::AlignHCenter | Qt::TextWordWrap, centerFrameText);
+    paintText(painter, contactFrameRect, Qt::AlignLeft | Qt::TextWordWrap, contactFrameText);
 
     painter->setFont(marketingFont);
     painter->setPen(Qt::darkGray);
-    paintText(painter, marketingFrame, Qt::AlignRight|Qt::TextWordWrap, marketingText);
+    paintText(painter, marketingFrame, Qt::AlignRight | Qt::TextWordWrap, marketingText);
 
     painter->restore();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ScreenplayTextObjectInterface::ScreenplayTextObjectInterface(QObject *parent)
-    : QObject(parent)
-{
+ScreenplayTextObjectInterface::ScreenplayTextObjectInterface(QObject *parent) : QObject(parent) { }
 
-}
+ScreenplayTextObjectInterface::~ScreenplayTextObjectInterface() { }
 
-ScreenplayTextObjectInterface::~ScreenplayTextObjectInterface()
-{
-
-}
-
-QSizeF ScreenplayTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format)
+QSizeF ScreenplayTextObjectInterface::intrinsicSize(QTextDocument *doc, int posInDocument,
+                                                    const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+    const QFont font(format.property(QTextFormat::FontFamily).toString(),
+                     format.property(QTextFormat::FontPointSize).toInt());
     const QFontMetricsF fontMetrics(font);
     return QSizeF(0, fontMetrics.lineSpacing() - fontMetrics.descent());
 }
 
-void ScreenplayTextObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTextObjectInterface::drawObject(QPainter *painter, const QRectF &givenRect,
+                                               QTextDocument *doc, int posInDocument,
+                                               const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
-    const QFont font( format.property(QTextFormat::FontFamily).toString(), format.property(QTextFormat::FontPointSize).toInt() );
+    const QFont font(format.property(QTextFormat::FontFamily).toString(),
+                     format.property(QTextFormat::FontPointSize).toInt());
     painter->setFont(font);
 
     int type = format.property(TypeProperty).toInt();
-    switch(type)
-    {
+    switch (type) {
     case SceneNumberType:
         this->drawSceneNumber(painter, givenRect, doc, posInDocument, format);
         break;
@@ -3073,97 +3095,104 @@ void ScreenplayTextObjectInterface::drawObject(QPainter *painter, const QRectF &
     }
 }
 
-void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRectF &givenRect,
+                                                    QTextDocument *doc, int posInDocument,
+                                                    const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
     const QVariantList data = format.property(DataProperty).toList();
     const QString sceneNumber = data.at(0).toString();
-    if(sceneNumber.isEmpty())
+    if (sceneNumber.isEmpty())
         return;
 
     QRectF rect = givenRect;
-    rect.setLeft(rect.left()*0.55);
+    rect.setLeft(rect.left() * 0.55);
 
     const QString sceneNumberText = sceneNumber + QStringLiteral(".");
     this->drawText(painter, rect, sceneNumberText);
 }
 
-void ScreenplayTextObjectInterface::drawMoreMarker(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTextObjectInterface::drawMoreMarker(QPainter *painter, const QRectF &givenRect,
+                                                   QTextDocument *doc, int posInDocument,
+                                                   const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
     const QString text = format.property(DataProperty).toString();
-    if(text.isEmpty())
+    if (text.isEmpty())
         return;
 
     QFontMetricsF fm(painter->font());
     QRectF rect = fm.boundingRect(text);
-    rect.moveLeft( givenRect.right() );
-    rect.moveBottom( givenRect.bottom() );
+    rect.moveLeft(givenRect.right());
+    rect.moveBottom(givenRect.bottom());
 
     const QPen oldPen = painter->pen();
 
     QColor textColor = format.foreground().color();
-    textColor.setAlphaF(textColor.alphaF()*0.75);
+    textColor.setAlphaF(textColor.alphaF() * 0.75);
     painter->setPen(textColor);
     this->drawText(painter, rect, text);
 
     painter->setPen(oldPen);
 }
 
-void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRectF &givenRect, QTextDocument *doc, int posInDocument, const QTextFormat &format)
+void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRectF &givenRect,
+                                                  QTextDocument *doc, int posInDocument,
+                                                  const QTextFormat &format)
 {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
 
     const int sceneType = format.property(DataProperty).toInt();
-    if(sceneType == Scene::Standard)
+    if (sceneType == Scene::Standard)
         return;
 
-    static const QJsonArray sceneTypeModel = Application::instance()->enumerationModelForType(QStringLiteral("Scene"), QStringLiteral("Type"));
-    if(sceneType < 0 || sceneType >= sceneTypeModel.size())
+    static const QJsonArray sceneTypeModel = Application::instance()->enumerationModelForType(
+            QStringLiteral("Scene"), QStringLiteral("Type"));
+    if (sceneType < 0 || sceneType >= sceneTypeModel.size())
         return;
 
     const QJsonObject sceneTypeInfo = sceneTypeModel.at(sceneType).toObject();
 
     const qreal iconSize = givenRect.height();
-    QString iconFile = sceneTypeInfo.value( QStringLiteral("icon") ).toString();
-    if(iconFile.isEmpty())
+    QString iconFile = sceneTypeInfo.value(QStringLiteral("icon")).toString();
+    if (iconFile.isEmpty())
         return;
 
     iconFile.replace(0, 2, ':');
     const QImage icon(iconFile);
-    if(icon.isNull())
+    if (icon.isNull())
         return;
 
     QRectF rect = givenRect;
-    rect.setLeft( rect.left()*0.45 );
-    rect.moveBottom( rect.bottom()+iconSize*0.15 );
-    rect = QRectF(rect.left()-iconSize, rect.bottom()-iconSize, iconSize, iconSize);
+    rect.setLeft(rect.left() * 0.45);
+    rect.moveBottom(rect.bottom() + iconSize * 0.15);
+    rect = QRectF(rect.left() - iconSize, rect.bottom() - iconSize, iconSize, iconSize);
 
     const bool flag = painter->renderHints().testFlag(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
     painter->drawImage(rect, icon);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
 
-    const QString iconKey = sceneTypeInfo.value( QStringLiteral("key") ).toString();
+    const QString iconKey = sceneTypeInfo.value(QStringLiteral("key")).toString();
     QRectF iconKeyRect = rect;
-    iconKeyRect.moveTop( rect.bottom() + rect.height()*0.5 );
+    iconKeyRect.moveTop(rect.bottom() + rect.height() * 0.5);
     painter->save();
-    painter->setFont( QFont(painter->font().family(), painter->font().pointSize()-4) );
-    this->drawText(painter, iconKeyRect, QStringLiteral("(") + iconKey + QStringLiteral(")") );
+    painter->setFont(QFont(painter->font().family(), painter->font().pointSize() - 4));
+    this->drawText(painter, iconKeyRect, QStringLiteral("(") + iconKey + QStringLiteral(")"));
     painter->restore();
 }
 
-void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &rect, const QString &text)
+void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &rect,
+                                             const QString &text)
 {
     const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
 
-    if(isPdfDevice)
-    {
+    if (isPdfDevice) {
         const qreal invScaleX = qreal(qt_defaultDpi()) / painter->device()->logicalDpiX();
         const qreal invScaleY = qreal(qt_defaultDpi()) / painter->device()->logicalDpiY();
 
@@ -3172,8 +3201,6 @@ void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &re
         painter->scale(invScaleX, invScaleY);
         painter->drawText(0, 0, text);
         painter->restore();
-    }
-    else
+    } else
         painter->drawText(rect.bottomLeft(), text);
 }
-

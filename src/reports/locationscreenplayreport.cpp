@@ -17,17 +17,13 @@
 LocationScreenplayReport::LocationScreenplayReport(QObject *parent)
     : AbstractScreenplaySubsetReport(parent)
 {
-
 }
 
-LocationScreenplayReport::~LocationScreenplayReport()
-{
-
-}
+LocationScreenplayReport::~LocationScreenplayReport() { }
 
 void LocationScreenplayReport::setLocations(const QStringList &val)
 {
-    if(m_locations == val)
+    if (m_locations == val)
         return;
 
     m_locations = val;
@@ -36,7 +32,7 @@ void LocationScreenplayReport::setLocations(const QStringList &val)
 
 void LocationScreenplayReport::setGenerateSummary(bool val)
 {
-    if(m_generateSummary == val)
+    if (m_generateSummary == val)
         return;
 
     m_generateSummary = val;
@@ -46,18 +42,17 @@ void LocationScreenplayReport::setGenerateSummary(bool val)
 bool LocationScreenplayReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
     const Scene *scene = element->scene();
-    if(scene == nullptr)
+    if (scene == nullptr)
         return false;
 
-    if(m_locations.isEmpty())
+    if (m_locations.isEmpty())
         return true;
 
-    if(!scene->heading()->isEnabled())
+    if (!scene->heading()->isEnabled())
         return false;
 
     const bool ret = m_locations.contains(scene->heading()->location(), Qt::CaseInsensitive);
-    if(ret)
-    {
+    if (ret) {
         const QString loc = scene->heading()->location().toUpper();
         m_locationSceneNumberList[loc] << element;
     }
@@ -67,13 +62,13 @@ bool LocationScreenplayReport::includeScreenplayElement(const ScreenplayElement 
 
 QString LocationScreenplayReport::screenplaySubtitle() const
 {
-    if(m_locations.isEmpty())
+    if (m_locations.isEmpty())
         return QStringLiteral("Location Screenplay of: ALL LOCATIONS");
 
     const QString subtitle = QStringLiteral("Location Screenplay of: ") + m_locations.join(", ");
-    if(subtitle.length() > 60)
-        return  m_locations.first() + QStringLiteral(" and ") +
-                QString::number(m_locations.size()-1) + QStringLiteral(" other locations(s).");
+    if (subtitle.length() > 60)
+        return m_locations.first() + QStringLiteral(" and ")
+                + QString::number(m_locations.size() - 1) + QStringLiteral(" other locations(s).");
 
     return subtitle;
 }
@@ -83,22 +78,22 @@ void LocationScreenplayReport::configureScreenplayTextDocument(ScreenplayTextDoc
     Q_UNUSED(stDoc);
 }
 
-void LocationScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
+void LocationScreenplayReport::inject(
+        QTextCursor &cursor,
+        AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
     AbstractScreenplaySubsetReport::inject(cursor, location);
 
-    if(!m_generateSummary)
+    if (!m_generateSummary)
         return;
 
-    if(location == AfterTitlePage)
-    {
+    if (location == AfterTitlePage) {
         m_summaryLocation = cursor.position();
         return;
     }
 
-    if(location == AfterLastScene)
-    {
-        if(m_locationSceneNumberList.isEmpty())
+    if (location == AfterLastScene) {
+        if (m_locationSceneNumberList.isEmpty())
             return;
 
         cursor.setPosition(m_summaryLocation);
@@ -124,10 +119,11 @@ void LocationScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTex
         cursor.insertBlock(blockFormat, charFormat);
         cursor.insertText("SUMMARY:");
 
-        QMap< QString, QList<const ScreenplayElement *> >::const_iterator it = m_locationSceneNumberList.constBegin();
-        QMap< QString, QList<const ScreenplayElement *> >::const_iterator end = m_locationSceneNumberList.constEnd();
-        while(it != end)
-        {
+        QMap<QString, QList<const ScreenplayElement *>>::const_iterator it =
+                m_locationSceneNumberList.constBegin();
+        QMap<QString, QList<const ScreenplayElement *>>::const_iterator end =
+                m_locationSceneNumberList.constEnd();
+        while (it != end) {
             blockFormat = defaultBlockFormat;
             blockFormat.setIndent(1);
 
@@ -141,14 +137,15 @@ void LocationScreenplayReport::inject(QTextCursor &cursor, AbstractScreenplayTex
             charFormat.setFontWeight(QFont::Normal);
 
             cursor.insertBlock(blockFormat, charFormat);
-            cursor.insertText( QStringLiteral("This location is referenced in ") + QString::number(it.value().size()) + QStringLiteral(" scene(s).") );
+            cursor.insertText(QStringLiteral("This location is referenced in ")
+                              + QString::number(it.value().size()) + QStringLiteral(" scene(s)."));
 
             blockFormat.setIndent(3);
 
-            Q_FOREACH(const ScreenplayElement *element, it.value())
-            {
+            Q_FOREACH (const ScreenplayElement *element, it.value()) {
                 cursor.insertBlock(blockFormat, charFormat);
-                cursor.insertText( QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] - ") + element->scene()->heading()->text() );
+                cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber()
+                                  + QStringLiteral("] - ") + element->scene()->heading()->text());
             }
 
             cursor.insertBlock(blockFormat, charFormat);

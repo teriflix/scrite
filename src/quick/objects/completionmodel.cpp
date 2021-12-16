@@ -17,41 +17,35 @@
 #include <QGuiApplication>
 #include <QKeyEvent>
 
-CompletionModel::CompletionModel(QObject *parent)
-    : QAbstractListModel(parent)
+CompletionModel::CompletionModel(QObject *parent) : QAbstractListModel(parent)
 {
     connect(this, &QAbstractListModel::rowsInserted, this, &CompletionModel::countChanged);
     connect(this, &QAbstractListModel::rowsRemoved, this, &CompletionModel::countChanged);
     connect(this, &QAbstractListModel::modelReset, this, &CompletionModel::countChanged);
 }
 
-CompletionModel::~CompletionModel()
-{
-
-}
+CompletionModel::~CompletionModel() { }
 
 void CompletionModel::setStrings(const QStringList &val)
 {
-    if(m_strings == val)
+    if (m_strings == val)
         return;
 
-    if(m_acceptEnglishStringsOnly)
-    {
+    if (m_acceptEnglishStringsOnly) {
         m_strings.clear();
-        std::copy_if(val.begin(), val.end(), std::back_inserter(m_strings),
-                     [](const QString &item) {
-            QList<QChar> nonLatinChars;
-            std::copy_if(item.begin(), item.end(), std::back_inserter(nonLatinChars),
-                         [](const QChar &ch) {
-                return ch.isLetter() && ch.script() != QChar::Script_Latin;
-            });
-            return nonLatinChars.isEmpty();
-        });
-    }
-    else
+        std::copy_if(
+                val.begin(), val.end(), std::back_inserter(m_strings), [](const QString &item) {
+                    QList<QChar> nonLatinChars;
+                    std::copy_if(item.begin(), item.end(), std::back_inserter(nonLatinChars),
+                                 [](const QChar &ch) {
+                                     return ch.isLetter() && ch.script() != QChar::Script_Latin;
+                                 });
+                    return nonLatinChars.isEmpty();
+                });
+    } else
         m_strings = val;
 
-    if(m_sortStrings)
+    if (m_sortStrings)
         std::sort(m_strings.begin(), m_strings.end());
 
     emit stringsChanged();
@@ -61,7 +55,7 @@ void CompletionModel::setStrings(const QStringList &val)
 
 void CompletionModel::setAcceptEnglishStringsOnly(bool val)
 {
-    if(m_acceptEnglishStringsOnly == val)
+    if (m_acceptEnglishStringsOnly == val)
         return;
 
     m_acceptEnglishStringsOnly = val;
@@ -70,14 +64,13 @@ void CompletionModel::setAcceptEnglishStringsOnly(bool val)
 
 void CompletionModel::setSortStrings(bool val)
 {
-    if(m_sortStrings == val)
+    if (m_sortStrings == val)
         return;
 
     m_sortStrings = val;
     emit sortStringsChanged();
 
-    if(val)
-    {
+    if (val) {
         std::sort(m_strings.begin(), m_strings.end());
         emit stringsChanged();
 
@@ -87,7 +80,7 @@ void CompletionModel::setSortStrings(bool val)
 
 void CompletionModel::setMaxVisibleItems(int val)
 {
-    if(m_maxVisibleItems == val)
+    if (m_maxVisibleItems == val)
         return;
 
     m_maxVisibleItems = val;
@@ -98,7 +91,7 @@ void CompletionModel::setMaxVisibleItems(int val)
 
 void CompletionModel::setMinimumCompletionPrefixLength(int val)
 {
-    if(m_minimumCompletionPrefixLength == val)
+    if (m_minimumCompletionPrefixLength == val)
         return;
 
     m_minimumCompletionPrefixLength = val;
@@ -109,7 +102,7 @@ void CompletionModel::setMinimumCompletionPrefixLength(int val)
 
 void CompletionModel::setCompletionPrefix(const QString &val)
 {
-    if(m_completionPrefix == val)
+    if (m_completionPrefix == val)
         return;
 
     m_completionPrefix = val;
@@ -120,12 +113,14 @@ void CompletionModel::setCompletionPrefix(const QString &val)
 
 QString CompletionModel::currentCompletion() const
 {
-    return m_currentRow < 0 || m_currentRow >= m_filteredStrings.size() ? QString() : m_filteredStrings.at(m_currentRow);
+    return m_currentRow < 0 || m_currentRow >= m_filteredStrings.size()
+            ? QString()
+            : m_filteredStrings.at(m_currentRow);
 }
 
 void CompletionModel::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
@@ -136,13 +131,13 @@ void CompletionModel::setEnabled(bool val)
 
 void CompletionModel::setFilterKeyStrokes(bool val)
 {
-    if(m_filterKeyStrokes == val)
+    if (m_filterKeyStrokes == val)
         return;
 
     m_filterKeyStrokes = val;
     emit filterKeyStrokesChanged();
 
-    if(val)
+    if (val)
         qApp->installEventFilter(this);
     else
         qApp->removeEventFilter(this);
@@ -155,10 +150,10 @@ int CompletionModel::rowCount(const QModelIndex &parent) const
 
 QVariant CompletionModel::data(const QModelIndex &index, int role) const
 {
-    if(index.row() < 0 || index.row() >= m_filteredStrings.size())
+    if (index.row() < 0 || index.row() >= m_filteredStrings.size())
         return QVariant();
 
-    if(role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole)
         return QVariant();
 
     return m_filteredStrings.at(index.row());
@@ -166,7 +161,7 @@ QVariant CompletionModel::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> CompletionModel::roleNames() const
 {
-    QHash<int,QByteArray> roles;
+    QHash<int, QByteArray> roles;
     roles[Qt::DisplayRole] = "string";
     return roles;
 }
@@ -175,23 +170,21 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
 {
     Q_UNUSED(target);
 
-    if(m_filteredStrings.isEmpty())
+    if (m_filteredStrings.isEmpty())
         return false;
 
-    if(event->type() == QEvent::KeyPress)
-    {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
-        switch(ke->key())
-        {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        switch (ke->key()) {
         case Qt::Key_Up:
-            if(m_currentRow > 0) {
-                this->setCurrentRow( qMax(m_currentRow-1,0) );
+            if (m_currentRow > 0) {
+                this->setCurrentRow(qMax(m_currentRow - 1, 0));
                 return true;
             }
             break;
         case Qt::Key_Down:
-            if(m_currentRow < m_filteredStrings.size()) {
-                this->setCurrentRow( qMin(m_currentRow+1,m_filteredStrings.size()-1) );
+            if (m_currentRow < m_filteredStrings.size()) {
+                this->setCurrentRow(qMin(m_currentRow + 1, m_filteredStrings.size() - 1));
                 return true;
             }
             break;
@@ -202,13 +195,12 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
             return true;
         case Qt::Key_Enter:
         case Qt::Key_Return: {
-                const QString cc = this->currentCompletion();
-                if(!cc.isEmpty()) {
-                    emit requestCompletion(cc);
-                    return true;
-                }
+            const QString cc = this->currentCompletion();
+            if (!cc.isEmpty()) {
+                emit requestCompletion(cc);
+                return true;
             }
-            break;
+        } break;
         }
     }
 
@@ -217,7 +209,7 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
 
 void CompletionModel::setCurrentRow(int val)
 {
-    if(m_currentRow == val)
+    if (m_currentRow == val)
         return;
 
     m_currentRow = val;
@@ -226,9 +218,8 @@ void CompletionModel::setCurrentRow(int val)
 
 void CompletionModel::filterStrings()
 {
-    if(!m_enabled || m_completionPrefix.size() < m_minimumCompletionPrefixLength)
-    {
-        if(m_filteredStrings.isEmpty())
+    if (!m_enabled || m_completionPrefix.size() < m_minimumCompletionPrefixLength) {
+        if (m_filteredStrings.isEmpty())
             return;
 
         this->beginResetModel();
@@ -243,18 +234,17 @@ void CompletionModel::filterStrings()
     QStringList fstrings;
     std::copy_if(m_strings.begin(), m_strings.end(), std::back_inserter(fstrings),
                  [=](const QString &item) {
-        return item.compare(m_completionPrefix, Qt::CaseInsensitive) &&
-               item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
-    });
+                     return item.compare(m_completionPrefix, Qt::CaseInsensitive)
+                             && item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
+                 });
 
     this->beginResetModel();
     m_filteredStrings = m_maxVisibleItems > 0 ? fstrings.mid(0, m_maxVisibleItems) : fstrings;
     this->endResetModel();
 
-    if(m_filteredStrings.isEmpty())
+    if (m_filteredStrings.isEmpty())
         this->setCurrentRow(-1);
-    else
-    {
+    else {
         m_currentRow = 0;
         emit currentRowChanged();
     }

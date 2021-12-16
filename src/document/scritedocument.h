@@ -50,13 +50,13 @@ public:
     QString label(int row) const;
 
     // QAbstractItemModel interface
-    enum  {  FromElementRole = Qt::UserRole, ToElementRole, LabelRole };
+    enum { FromElementRole = Qt::UserRole, ToElementRole, LabelRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    StructureElementConnectors(ScriteDocument *parent=nullptr);
+    StructureElementConnectors(ScriteDocument *parent = nullptr);
     void clear();
     void reload();
 
@@ -69,7 +69,8 @@ private:
         StructureElement *from = nullptr;
         StructureElement *to = nullptr;
         QString label;
-        bool operator == (const Item &other) const {
+        bool operator==(const Item &other) const
+        {
             return from == other.from && to == other.to && label == other.label;
         }
     };
@@ -93,12 +94,11 @@ public:
 
     Q_INVOKABLE QJsonObject at(int index) const;
     Q_INVOKABLE QJsonObject latestBackup() const { return this->at(0); }
-    Q_INVOKABLE QJsonObject oldestBackup() const { return this->at(m_backupFiles.size()-1); }
+    Q_INVOKABLE QJsonObject oldestBackup() const { return this->at(m_backupFiles.size() - 1); }
 
     // QAbstractItemModel interface
-    enum Roles
-    {
-        TimestampRole=Qt::UserRole,
+    enum Roles {
+        TimestampRole = Qt::UserRole,
         TimestampAsStringRole,
         RelativeTimeRole,
         FileNameRole,
@@ -114,7 +114,7 @@ public:
 
 private:
     friend class ScriteDocument;
-    ScriteDocumentBackups(QObject *parent=nullptr);
+    ScriteDocumentBackups(QObject *parent = nullptr);
     void setDocumentFilePath(const QString &val);
     void loadBackupFileInformation();
     void reloadBackupFileInformation();
@@ -143,31 +143,31 @@ class ScriteDocumentCollaborators : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ScriteDocumentCollaborators(QObject *parent=nullptr);
+    ScriteDocumentCollaborators(QObject *parent = nullptr);
     ~ScriteDocumentCollaborators();
 
     Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged)
-    void setDocument(ScriteDocument* val);
-    ScriteDocument* document() const { return m_document; }
+    void setDocument(ScriteDocument *val);
+    ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
     // QAbstractItemModel interface
     enum { CollaboratorRole = Qt::UserRole, CollaboratorEmailRole, CollaboratorNameRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
 private:
-    int  updateModel();
+    int updateModel();
     void fetchUsersInfo();
     void updateModelAndFetchUsersInfoIfRequired();
     void onCallFinished();
 
 private:
-    ScriteDocument* m_document = nullptr;
+    ScriteDocument *m_document = nullptr;
     QJsonObject m_usersInfoMap;
     int m_pendingFetchUsersInfoRequests = 0;
-    QList< QPair<QString,QString> > m_otherCollaborators;
+    QList<QPair<QString, QString>> m_otherCollaborators;
 };
 
 class ScriteDocument : public QObject, public QObjectSerializer::Interface
@@ -211,7 +211,10 @@ public:
     bool hasCollaborators() const { return !m_collaborators.isEmpty(); }
 
     Q_PROPERTY(QString primaryCollaborator READ primaryCollaborator NOTIFY collaboratorsChanged)
-    QString primaryCollaborator() const { return m_collaborators.isEmpty() ? QString() : m_collaborators.first(); }
+    QString primaryCollaborator() const
+    {
+        return m_collaborators.isEmpty() ? QString() : m_collaborators.first();
+    }
 
     Q_PROPERTY(QStringList otherCollaborators READ otherCollaborators NOTIFY collaboratorsChanged)
     QStringList otherCollaborators() const { return m_collaborators.mid(1); }
@@ -252,24 +255,24 @@ public:
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
 
     Q_PROPERTY(Forms* forms READ forms NOTIFY formsChanged)
-    Forms* forms() const { return m_forms; }
+    Forms *forms() const { return m_forms; }
     Q_SIGNAL void formsChanged();
 
     Q_PROPERTY(Structure* structure READ structure NOTIFY structureChanged)
-    Structure* structure() const { return m_structure; }
+    Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay NOTIFY screenplayChanged)
-    Screenplay* screenplay() const { return m_screenplay; }
+    Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(ScreenplayFormat* displayFormat READ formatting NOTIFY formattingChanged STORED false)
     Q_PROPERTY(ScreenplayFormat* formatting READ formatting NOTIFY formattingChanged)
-    ScreenplayFormat* formatting() const { return m_formatting; }
+    ScreenplayFormat *formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
     Q_PROPERTY(ScreenplayFormat* printFormat READ printFormat NOTIFY printFormatChanged)
-    ScreenplayFormat* printFormat() const { return m_printFormat; }
+    ScreenplayFormat *printFormat() const { return m_printFormat; }
     Q_SIGNAL void printFormatChanged();
 
     Q_PROPERTY(QStringList spellCheckIgnoreList READ spellCheckIgnoreList WRITE setSpellCheckIgnoreList NOTIFY spellCheckIgnoreListChanged)
@@ -287,7 +290,7 @@ public:
 
     // This function adds a new scene to both structure and screenplay
     // and inserts it right after the current element in both.
-    Q_INVOKABLE Scene *createNewScene(bool fuzzyScreenplayInsert=true);
+    Q_INVOKABLE Scene *createNewScene(bool fuzzyScreenplayInsert = true);
     Q_SIGNAL void newSceneCreated(Scene *scene, int screenplayIndex);
 
     Q_PROPERTY(bool modified READ isModified NOTIFY modifiedChanged)
@@ -336,7 +339,10 @@ public:
     Q_SIGNAL void justLoaded();
 
     Q_PROPERTY(QAbstractListModel* backupFilesModel READ backupFilesModel CONSTANT STORED false)
-    ScriteDocumentBackups *backupFilesModel() const { return &((const_cast<ScriteDocument*>(this))->m_documentBackupsModel); }
+    ScriteDocumentBackups *backupFilesModel() const
+    {
+        return &((const_cast<ScriteDocument *>(this))->m_documentBackupsModel);
+    }
 
     Q_PROPERTY(QStringList supportedImportFormats READ supportedImportFormats CONSTANT)
     QStringList supportedImportFormats() const;
@@ -354,7 +360,8 @@ public:
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
     bool importFile(AbstractImporter *importer, const QString &fileName);
     Q_INVOKABLE bool exportFile(const QString &fileName, const QString &format);
-    Q_INVOKABLE bool exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx, const QString &imageFileName);
+    Q_INVOKABLE bool exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx,
+                                   const QString &imageFileName);
 
     Q_INVOKABLE AbstractExporter *createExporter(const QString &format);
     Q_INVOKABLE AbstractReportGenerator *createReportGenerator(const QString &report);
@@ -382,11 +389,11 @@ private:
     void prepareAutoSave();
     void updateDocumentWindowTitle();
     void setDocumentWindowTitle(const QString &val);
-    void setStructure(Structure* val);
-    void setScreenplay(Screenplay* val);
-    void setFormatting(ScreenplayFormat* val);
+    void setStructure(Structure *val);
+    void setScreenplay(Screenplay *val);
+    void setFormatting(ScreenplayFormat *val);
     void setPrintFormat(ScreenplayFormat *val);
-    void setForms(Forms* val);
+    void setForms(Forms *val);
     void evaluateStructureElementSequence();
     void evaluateStructureElementSequenceLater();
     void markAsModified();
@@ -394,7 +401,7 @@ private:
     void setFileName(const QString &val);
     bool load(const QString &fileName);
     bool classicLoad(const QString &fileName);
-    bool modernLoad(const QString &fileName, int *format=nullptr);
+    bool modernLoad(const QString &fileName, int *format = nullptr);
     void structureElementIndexChanged();
     void screenplayElementIndexChanged();
     void setCreatedOnThisComputer(bool val);

@@ -23,13 +23,13 @@ class ProgressReport : public QObject
     Q_OBJECT
 
 public:
-    ProgressReport(QObject *parent=nullptr);
+    ProgressReport(QObject *parent = nullptr);
     ~ProgressReport();
     Q_SIGNAL void aboutToDelete(ProgressReport *val);
 
     Q_PROPERTY(ProgressReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET resetProxyFor)
-    void setProxyFor(ProgressReport* val);
-    ProgressReport* proxyFor() const { return m_proxyFor; }
+    void setProxyFor(ProgressReport *val);
+    ProgressReport *proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
 
     Q_PROPERTY(QString progressText READ progressText WRITE setProgressText NOTIFY progressTextChanged)
@@ -41,8 +41,7 @@ public:
     qreal progress() const { return m_progress; }
     Q_SIGNAL void progressChanged();
 
-    enum Status
-    {
+    enum Status {
         NotStarted = -1,
         Started,
         InProgress,

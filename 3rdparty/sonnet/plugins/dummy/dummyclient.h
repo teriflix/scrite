@@ -29,7 +29,7 @@ class DummyClient : public Sonnet::Client
     // Q_PLUGIN_METADATA(IID "in.scrite.Sonnet.DummyClient")
 
 public:
-    DummyClient(QObject *parent=nullptr);
+    DummyClient(QObject *parent = nullptr);
     ~DummyClient();
 
     // Sonnet::Client interface
@@ -55,4 +55,3 @@ public:
 };
 
 #endif
-

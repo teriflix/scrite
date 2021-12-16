@@ -29,7 +29,7 @@ class FormQuestion : public QObject
     Q_OBJECT
 
 public:
-    FormQuestion(QObject *parent=nullptr);
+    FormQuestion(QObject *parent = nullptr);
     ~FormQuestion();
     Q_SIGNAL void aboutToDelete(FormQuestion *ptr);
 
@@ -53,8 +53,7 @@ public:
     int indentation() const { return m_indentation; }
     Q_SIGNAL void indentationChanged();
 
-    enum Type
-    {
+    enum Type {
         None,
         ShortParagraph,
         LongParagraph,
@@ -103,8 +102,7 @@ public:
     ~Form();
     Q_SIGNAL void aboutToDelete(Form *ptr);
 
-    enum Type
-    {
+    enum Type {
         PropForm,
         SceneForm,
         StoryForm,
@@ -143,7 +141,7 @@ public:
     Q_SIGNAL void moreInfoUrlChanged();
 
     Q_PROPERTY(QAbstractListModel* questionsModel READ questionsModel CONSTANT STORED false)
-    ObjectListPropertyModel<FormQuestion*> *questionsModel() const;
+    ObjectListPropertyModel<FormQuestion *> *questionsModel() const;
 
     Q_INVOKABLE FormQuestion *questionAt(int index) const;
 
@@ -184,10 +182,10 @@ private:
     Type m_type = GeneralForm;
     QJsonObject m_formDataTemplate;
 
-    ObjectListPropertyModel<FormQuestion*> m_questions;
+    ObjectListPropertyModel<FormQuestion *> m_questions;
 };
 
-class Forms : public ObjectListPropertyModel<Form*>, public QObjectSerializer::Interface
+class Forms : public ObjectListPropertyModel<Form *>, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
@@ -195,7 +193,7 @@ class Forms : public ObjectListPropertyModel<Form*>, public QObjectSerializer::I
 public:
     static Forms *global();
 
-    Forms(QObject *parent=nullptr);
+    Forms(QObject *parent = nullptr);
     ~Forms();
 
     Q_PROPERTY(int formCount READ formCount NOTIFY formCountChanged)
@@ -205,11 +203,11 @@ public:
     Q_INVOKABLE Form *findForm(const QString &id) const;
     Q_INVOKABLE Form *formAt(int index) const { return this->at(index); }
 
-    Q_INVOKABLE QList<Form*> forms(Form::Type type) const;
+    Q_INVOKABLE QList<Form *> forms(Form::Type type) const;
 
     Q_INVOKABLE Form *addForm(const QJsonObject &val);
     Q_INVOKABLE Form *addFormFromFile(const QString &path);
-    Q_INVOKABLE QList<Form*> addFormsInFolder(const QString &dirPath);
+    Q_INVOKABLE QList<Form *> addFormsInFolder(const QString &dirPath);
 
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
@@ -220,7 +218,7 @@ protected:
     void itemRemoveEvent(Form *ptr);
 
 private:
-    Forms(bool fetchGlobal, QObject *parent=nullptr);
+    Forms(bool fetchGlobal, QObject *parent = nullptr);
     void downloadForms();
 
 private:

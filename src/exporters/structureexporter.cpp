@@ -23,20 +23,13 @@
 #include <QPainterPath>
 #include <QAbstractTextDocumentLayout>
 
-StructureExporter::StructureExporter(QObject *parent)
-    :AbstractExporter(parent)
-{
+StructureExporter::StructureExporter(QObject *parent) : AbstractExporter(parent) { }
 
-}
-
-StructureExporter::~StructureExporter()
-{
-
-}
+StructureExporter::~StructureExporter() { }
 
 void StructureExporter::setInsertTitleCard(bool val)
 {
-    if(m_insertTitleCard == val)
+    if (m_insertTitleCard == val)
         return;
 
     m_insertTitleCard = val;
@@ -45,7 +38,7 @@ void StructureExporter::setInsertTitleCard(bool val)
 
 void StructureExporter::setEnableHeaderFooter(bool val)
 {
-    if(m_enableHeaderFooter == val)
+    if (m_enableHeaderFooter == val)
         return;
 
     m_enableHeaderFooter = val;
@@ -54,7 +47,7 @@ void StructureExporter::setEnableHeaderFooter(bool val)
 
 void StructureExporter::setWatermark(const QString &val)
 {
-    if(m_watermark == val)
+    if (m_watermark == val)
         return;
 
     m_watermark = val;
@@ -63,7 +56,7 @@ void StructureExporter::setWatermark(const QString &val)
 
 void StructureExporter::setComment(const QString &val)
 {
-    if(m_comment == val)
+    if (m_comment == val)
         return;
 
     m_comment = val;
@@ -75,9 +68,9 @@ bool StructureExporter::doExport(QIODevice *device)
     const Screenplay *screenplay = this->document()->screenplay();
     const Structure *structure = this->document()->structure();
 
-    if(structure->canvasUIMode() != Structure::IndexCardUI)
-    {
-        this->error()->setErrorMessage( QStringLiteral("Only index card based structures can be exported.") );
+    if (structure->canvasUIMode() != Structure::IndexCardUI) {
+        this->error()->setErrorMessage(
+                QStringLiteral("Only index card based structures can be exported."));
         return false;
     }
 
@@ -92,8 +85,7 @@ QString StructureExporter::polishFileName(const QString &fileName) const
     QFileInfo fi(fileName);
 
     QString baseName = fi.baseName();
-    baseName.replace( QStringLiteral("Screenplay"), QStringLiteral("Structure") );
+    baseName.replace(QStringLiteral("Screenplay"), QStringLiteral("Structure"));
 
-    return fi.absoluteDir().absoluteFilePath( baseName + QStringLiteral(".pdf") );
+    return fi.absoluteDir().absoluteFilePath(baseName + QStringLiteral(".pdf"));
 }
-

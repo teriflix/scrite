@@ -27,20 +27,13 @@
 #include <QObjectCleanupHandler>
 #include <QAbstractTextDocumentLayout>
 
-PdfExporter::PdfExporter(QObject *parent)
-            : AbstractTextDocumentExporter(parent)
-{
+PdfExporter::PdfExporter(QObject *parent) : AbstractTextDocumentExporter(parent) { }
 
-}
-
-PdfExporter::~PdfExporter()
-{
-
-}
+PdfExporter::~PdfExporter() { }
 
 void PdfExporter::setGenerateTitlePage(bool val)
 {
-    if(m_generateTitlePage == val)
+    if (m_generateTitlePage == val)
         return;
 
     m_generateTitlePage = val;
@@ -49,7 +42,7 @@ void PdfExporter::setGenerateTitlePage(bool val)
 
 void PdfExporter::setIncludeSceneNumbers(bool val)
 {
-    if(m_includeSceneNumbers == val)
+    if (m_includeSceneNumbers == val)
         return;
 
     m_includeSceneNumbers = val;
@@ -58,7 +51,7 @@ void PdfExporter::setIncludeSceneNumbers(bool val)
 
 void PdfExporter::setIncludeSceneIcons(bool val)
 {
-    if(m_includeSceneIcons == val)
+    if (m_includeSceneIcons == val)
         return;
 
     m_includeSceneIcons = val;
@@ -67,31 +60,31 @@ void PdfExporter::setIncludeSceneIcons(bool val)
 
 void PdfExporter::setPrintEachSceneOnANewPage(bool val)
 {
-    if(m_printEachSceneOnANewPage == val)
+    if (m_printEachSceneOnANewPage == val)
         return;
 
     m_printEachSceneOnANewPage = val;
     emit printEachSceneOnANewPageChanged();
 
-    if(val)
+    if (val)
         this->setPrintEachActOnANewPage(false);
 }
 
 void PdfExporter::setPrintEachActOnANewPage(bool val)
 {
-    if(m_printEachActOnANewPage == val)
+    if (m_printEachActOnANewPage == val)
         return;
 
     m_printEachActOnANewPage = val;
     emit printEachActOnANewPageChanged();
 
-    if(val)
+    if (val)
         this->setPrintEachSceneOnANewPage(false);
 }
 
 void PdfExporter::setIncludeActBreaks(bool val)
 {
-    if(m_includeActBreaks == val)
+    if (m_includeActBreaks == val)
         return;
 
     m_includeActBreaks = val;
@@ -100,7 +93,7 @@ void PdfExporter::setIncludeActBreaks(bool val)
 
 void PdfExporter::setUsePageBreaks(bool val)
 {
-    if(m_usePageBreaks == val)
+    if (m_usePageBreaks == val)
         return;
 
     m_usePageBreaks = val;
@@ -109,7 +102,7 @@ void PdfExporter::setUsePageBreaks(bool val)
 
 void PdfExporter::setWatermark(const QString &val)
 {
-    if(m_watermark == val)
+    if (m_watermark == val)
         return;
 
     m_watermark = val;
@@ -118,7 +111,7 @@ void PdfExporter::setWatermark(const QString &val)
 
 void PdfExporter::setComment(const QString &val)
 {
-    if(m_comment == val)
+    if (m_comment == val)
         return;
 
     m_comment = val;
@@ -130,26 +123,28 @@ bool PdfExporter::doExport(QIODevice *device)
     Screenplay *screenplay = this->document()->screenplay();
     ScreenplayFormat *format = this->document()->printFormat();
 
-    const bool usePdfWriter = Application::instance()->settings()->value(QStringLiteral("PdfExport/usePdfDriver"), true).toBool();
+    const bool usePdfWriter = Application::instance()
+                                      ->settings()
+                                      ->value(QStringLiteral("PdfExport/usePdfDriver"), true)
+                                      .toBool();
 
     QScopedPointer<QPdfWriter> qpdfWriter;
     QScopedPointer<QPrinter> qprinter;
     QPagedPaintDevice *pdfDevice = nullptr;
 
-    if(usePdfWriter)
-    {
+    if (usePdfWriter) {
         qpdfWriter.reset(new QPdfWriter(device));
         qpdfWriter->setTitle(screenplay->title());
-        qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+        qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                               + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
         format->pageLayout()->configure(qpdfWriter.data());
-        qpdfWriter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+        qpdfWriter->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
         qpdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
 
         pdfDevice = qpdfWriter.data();
-    }
-    else
-    {
-        const QString pdfFileName = QDir::tempPath() + QStringLiteral("/scrite-pdfexporter-") + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".pdf");
+    } else {
+        const QString pdfFileName = QDir::tempPath() + QStringLiteral("/scrite-pdfexporter-")
+                + QString::number(QDateTime::currentSecsSinceEpoch()) + QStringLiteral(".pdf");
 
         qprinter.reset(new QPrinter);
         qprinter->setOutputFormat(QPrinter::PdfFormat);
@@ -157,36 +152,35 @@ bool PdfExporter::doExport(QIODevice *device)
 
         qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
         qprinter->setDocName(screenplay->title());
-        qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
+        qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                             + qApp->applicationVersion() + QStringLiteral(" Printer"));
         format->pageLayout()->configure(qprinter.data());
-        qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+        qprinter->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
 
         pdfDevice = qprinter.data();
     }
 
     const qreal pageWidth = pdfDevice->width();
     QTextDocument textDocument;
-    this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);    
+    this->AbstractTextDocumentExporter::generate(&textDocument, pageWidth);
     textDocument.setProperty("#comment", m_comment);
     textDocument.setProperty("#watermark", m_watermark);
 
     QTextDocumentPagedPrinter printer;
     printer.header()->setVisibleFromPageOne(!m_generateTitlePage);
     printer.footer()->setVisibleFromPageOne(!m_generateTitlePage);
-    printer.watermark()->setVisibleFromPageOne(!m_generateTitlePage);    bool success = printer.print(&textDocument, pdfDevice);
-    if(!qprinter.isNull())
-    {
+    printer.watermark()->setVisibleFromPageOne(!m_generateTitlePage);
+    bool success = printer.print(&textDocument, pdfDevice);
+    if (!qprinter.isNull()) {
         const QString pdfFileName = qprinter->outputFileName();
-        if(success)
-        {
+        if (success) {
             QFile pdfFile(pdfFileName);
             pdfFile.open(QFile::ReadOnly);
 
             const int bufferSize = 65535;
-            while(1)
-            {
+            while (1) {
                 const QByteArray bytes = pdfFile.read(bufferSize);
-                if(bytes.isEmpty())
+                if (bytes.isEmpty())
                     break;
                 device->write(bytes);
             }
@@ -201,7 +195,7 @@ bool PdfExporter::doExport(QIODevice *device)
 QString PdfExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if(fi.suffix().toLower() != "pdf")
+    if (fi.suffix().toLower() != "pdf")
         return fileName + ".pdf";
     return fileName;
 }

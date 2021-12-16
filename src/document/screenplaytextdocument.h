@@ -32,8 +32,7 @@ class ScreenplayTextDocument;
 class AbstractScreenplayTextDocumentInjectionInterface
 {
 public:
-    enum InjectLocation
-    {
+    enum InjectLocation {
         AfterTitlePage,
         AfterSceneHeading,
         AfterLastScene,
@@ -48,47 +47,44 @@ public:
 
 private:
     friend class ScreenplayTextDocument;
-    void setScreenplayElement(const ScreenplayElement *element) {
-        m_screenplayElement = element;
-    }
-    void setSceneElement(const SceneElement *element) {
-        m_sceneElement = element;
-    }
+    void setScreenplayElement(const ScreenplayElement *element) { m_screenplayElement = element; }
+    void setSceneElement(const SceneElement *element) { m_sceneElement = element; }
 
 private:
     const ScreenplayElement *m_screenplayElement = nullptr;
     const SceneElement *m_sceneElement = nullptr;
 };
 
-#define AbstractScreenplayTextDocumentInjectionInterface_iid "io.scrite.AbstractScreenplayTextDocumentInjectionInterface"
-Q_DECLARE_INTERFACE(AbstractScreenplayTextDocumentInjectionInterface, AbstractScreenplayTextDocumentInjectionInterface_iid)
+#define AbstractScreenplayTextDocumentInjectionInterface_iid                                       \
+    "io.scrite.AbstractScreenplayTextDocumentInjectionInterface"
+Q_DECLARE_INTERFACE(AbstractScreenplayTextDocumentInjectionInterface,
+                    AbstractScreenplayTextDocumentInjectionInterface_iid)
 
 class QQmlEngine;
 class ScreenplayTextDocumentUpdate;
-class ScreenplayTextDocument : public QObject,
-                               public QQmlParserStatus
+class ScreenplayTextDocument : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
 
 public:
-    ScreenplayTextDocument(QObject *parent=nullptr);
-    ScreenplayTextDocument(QTextDocument *document, QObject *parent=nullptr);
+    ScreenplayTextDocument(QObject *parent = nullptr);
+    ScreenplayTextDocument(QTextDocument *document, QObject *parent = nullptr);
     ~ScreenplayTextDocument();
 
     Q_PROPERTY(QTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
-    void setTextDocument(QTextDocument* val);
-    QTextDocument* textDocument() const { return m_textDocument; }
+    void setTextDocument(QTextDocument *val);
+    QTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged RESET resetScreenplay)
-    void setScreenplay(Screenplay* val);
-    Screenplay* screenplay() const { return m_screenplay; }
+    void setScreenplay(Screenplay *val);
+    Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(ScreenplayFormat* formatting READ formatting WRITE setFormatting NOTIFY formattingChanged RESET resetFormatting)
-    void setFormatting(ScreenplayFormat* val);
-    ScreenplayFormat* formatting() const { return m_formatting; }
+    void setFormatting(ScreenplayFormat *val);
+    ScreenplayFormat *formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
     Q_PROPERTY(bool titlePage READ hasTitlePage WRITE setTitlePage NOTIFY titlePageChanged)
@@ -197,9 +193,9 @@ public:
 
     Q_INVOKABLE void print(QObject *printerObject);
 
-    QList< QPair<int,int> > pageBreaksFor(ScreenplayElement *element) const;
+    QList<QPair<int, int>> pageBreaksFor(ScreenplayElement *element) const;
 
-    QList< QPair<int,int> > pageBoundaries() const { return m_pageBoundaries; }
+    QList<QPair<int, int>> pageBoundaries() const { return m_pageBoundaries; }
     Q_SIGNAL void pageBoundariesChanged();
 
     Q_INVOKABLE QTime lengthInTime(ScreenplayElement *from, ScreenplayElement *to) const;
@@ -208,8 +204,8 @@ public:
     Q_INVOKABLE qreal lengthInPages(ScreenplayElement *from, ScreenplayElement *to) const;
 
     Q_PROPERTY(QObject* injection READ injection WRITE setInjection NOTIFY injectionChanged RESET resetInjection)
-    void setInjection(QObject* val);
-    QObject* injection() const { return m_injection; }
+    void setInjection(QObject *val);
+    QObject *injection() const { return m_injection; }
     Q_SIGNAL void injectionChanged();
 
     void syncNow();
@@ -291,7 +287,7 @@ private:
     void formatAllBlocks();
     bool updateFromScreenplayElement(const ScreenplayElement *element);
     void loadScreenplayElement(const ScreenplayElement *element, QTextCursor &cursor);
-    void formatBlock(const QTextBlock &block, const QString &text=QString());
+    void formatBlock(const QTextBlock &block, const QString &text = QString());
 
     void removeTextFrame(const ScreenplayElement *element);
     void registerTextFrame(const ScreenplayElement *element, QTextFrame *frame);
@@ -323,7 +319,7 @@ private:
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
     bool m_screenplayIsBeingReset = false;
-    QList<Scene*> m_sceneResetList;
+    QList<Scene *> m_sceneResetList;
     ExecLaterTimer m_sceneResetTimer;
     bool m_sceneResetHasTriggeredUpdateScheduled = false;
     bool m_printEachSceneOnANewPage = false;
@@ -337,15 +333,15 @@ private:
     bool m_connectedToScreenplaySignals = false;
     bool m_connectedToFormattingSignals = false;
     QPagedPaintDevice::PageSize m_paperSize = QPagedPaintDevice::Letter;
-    QList< QPair<int,int> > m_pageBoundaries;
+    QList<QPair<int, int>> m_pageBoundaries;
     QObjectProperty<Screenplay> m_screenplay;
     friend class ScreenplayTextDocumentUpdate;
     QObjectProperty<QTextDocument> m_textDocument;
     QObjectProperty<ScreenplayFormat> m_formatting;
     ModificationTracker m_screenplayModificationTracker;
     ModificationTracker m_formattingModificationTracker;
-    QMap<QObject *, const ScreenplayElement*> m_frameElementMap;
-    QMap<const ScreenplayElement*, QTextFrame*> m_elementFrameMap;
+    QMap<QObject *, const ScreenplayElement *> m_frameElementMap;
+    QMap<const ScreenplayElement *, QTextFrame *> m_elementFrameMap;
 };
 
 class ScreenplayElementPageBreaks : public QObject
@@ -353,17 +349,17 @@ class ScreenplayElementPageBreaks : public QObject
     Q_OBJECT
 
 public:
-    ScreenplayElementPageBreaks(QObject *parent=nullptr);
+    ScreenplayElementPageBreaks(QObject *parent = nullptr);
     ~ScreenplayElementPageBreaks();
 
     Q_PROPERTY(ScreenplayTextDocument* screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged RESET resetScreenplayDocument)
-    void setScreenplayDocument(ScreenplayTextDocument* val);
-    ScreenplayTextDocument* screenplayDocument() const { return m_screenplayDocument; }
+    void setScreenplayDocument(ScreenplayTextDocument *val);
+    ScreenplayTextDocument *screenplayDocument() const { return m_screenplayDocument; }
     Q_SIGNAL void screenplayDocumentChanged();
 
     Q_PROPERTY(ScreenplayElement* screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged RESET resetScreenplayElement)
-    void setScreenplayElement(ScreenplayElement* val);
-    ScreenplayElement* screenplayElement() const { return m_screenplayElement; }
+    void setScreenplayElement(ScreenplayElement *val);
+    ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
 
     Q_PROPERTY(QJsonArray pageBreaks READ pageBreaks NOTIFY pageBreaksChanged)
@@ -388,18 +384,15 @@ class ScreenplayTitlePageObjectInterface : public QObject, public QTextObjectInt
     Q_INTERFACES(QTextObjectInterface)
 
 public:
-    ScreenplayTitlePageObjectInterface(QObject *parent=nullptr);
+    ScreenplayTitlePageObjectInterface(QObject *parent = nullptr);
     ~ScreenplayTitlePageObjectInterface();
 
-    enum { Kind=QTextFormat::UserObject+2 };
-    enum Property
-    {
-        ScreenplayProperty = QTextFormat::UserProperty+10,
-        TitlePageIsCentered
-    };
+    enum { Kind = QTextFormat::UserObject + 2 };
+    enum Property { ScreenplayProperty = QTextFormat::UserProperty + 10, TitlePageIsCentered };
 
     QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
-    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
+                    const QTextFormat &format);
 };
 
 class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterface
@@ -408,25 +401,25 @@ class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterfac
     Q_INTERFACES(QTextObjectInterface)
 
 public:
-    ScreenplayTextObjectInterface(QObject *parent=nullptr);
+    ScreenplayTextObjectInterface(QObject *parent = nullptr);
     ~ScreenplayTextObjectInterface();
 
-    enum { Kind=QTextFormat::UserObject+1 };
+    enum { Kind = QTextFormat::UserObject + 1 };
     enum Type { SceneNumberType, MoreMarkerType, ContdMarkerType, SceneIconType };
-    enum Property
-    {
-        TypeProperty = QTextFormat::UserProperty+1,
-        DataProperty
-    };
+    enum Property { TypeProperty = QTextFormat::UserProperty + 1, DataProperty };
 
     // QTextObjectInterface interface
     QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
-    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
+                    const QTextFormat &format);
 
 private:
-    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
-    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
-    void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc,
+                         int posInDocument, const QTextFormat &format);
+    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc,
+                        int posInDocument, const QTextFormat &format);
+    void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
+                       const QTextFormat &format);
     void drawText(QPainter *painter, const QRectF &rect, const QString &text);
 };
 

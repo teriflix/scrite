@@ -25,11 +25,10 @@ class UrlAttributes : public QObject
     Q_OBJECT
 
 public:
-    UrlAttributes(QObject *parent=nullptr);
+    UrlAttributes(QObject *parent = nullptr);
     ~UrlAttributes();
 
-    enum Status
-    {
+    enum Status {
         Null, // No URL set
         Ready, // Attributes available
         Loading, // Attributes being fetched

@@ -25,9 +25,7 @@ public:
     ~MaterialColorsDb();
 
     QJsonObject data() const { return m_data; }
-    QJsonObject data(const QString &name) const {
-        return m_data.value(name.toLower()).toObject();
-    }
+    QJsonObject data(const QString &name) const { return m_data.value(name.toLower()).toObject(); }
 
 private:
     QJsonObject m_data;
@@ -36,8 +34,7 @@ private:
 MaterialColorsDb::MaterialColorsDb()
 {
     QFile file(":/misc/material_colors_db.json");
-    if( file.open(QFile::ReadOnly) )
-    {
+    if (file.open(QFile::ReadOnly)) {
         const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         m_data = doc.object();
     }
@@ -46,27 +43,22 @@ MaterialColorsDb::MaterialColorsDb()
 MaterialColorsDb::~MaterialColorsDb() { }
 
 MaterialColors::MaterialColors(QObject *parent)
-    : QObject(parent),
-      m_jsEngine(qobject_cast<QJSEngine*>(parent))
+    : QObject(parent), m_jsEngine(qobject_cast<QJSEngine *>(parent))
 {
     this->setName("Blue Gray");
 }
 
 MaterialColors::MaterialColors(const QString &name, QObject *parent)
-    : QObject(parent),
-      m_jsEngine(qobject_cast<QJSEngine*>(parent))
+    : QObject(parent), m_jsEngine(qobject_cast<QJSEngine *>(parent))
 {
     this->setName(name);
 }
 
-MaterialColors::~MaterialColors()
-{
-
-}
+MaterialColors::~MaterialColors() { }
 
 void MaterialColors::setName(const QString &val)
 {
-    if(m_name == val)
+    if (m_name == val)
         return;
 
     static MaterialColorsDb db;
@@ -85,23 +77,22 @@ QJSValue MaterialColors::color(const QString &key) const
     QJSValue ret = engine->newObject();
     ret.setProperty("text", engine->toScriptValue<QColor>(m_defaultTextColor));
     ret.setProperty("background", engine->toScriptValue<QColor>(m_defaultBackgroundColor));
-    if(key == "c10")
+    if (key == "c10")
         return ret;
 
     const QJsonValue val = m_palette.value(key.toLower());
-    if(val.isUndefined())
+    if (val.isUndefined())
         return ret;
 
     const QJsonObject obj = val.toObject();
 
-    const QColor textColor( obj.value("text").toString() );
-    if(textColor.isValid())
+    const QColor textColor(obj.value("text").toString());
+    if (textColor.isValid())
         ret.setProperty("text", engine->toScriptValue<QColor>(textColor));
 
-    const QColor backgroundColor( obj.value("background").toString() );
-    if(backgroundColor.isValid())
+    const QColor backgroundColor(obj.value("background").toString());
+    if (backgroundColor.isValid())
         ret.setProperty("background", engine->toScriptValue<QColor>(backgroundColor));
 
     return ret;
 }
-

@@ -18,4 +18,3 @@
 #define REST_CRYPT_KEY 0xCE2CF0EC23BD1373
 
 #endif
-

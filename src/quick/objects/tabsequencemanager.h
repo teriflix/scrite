@@ -80,9 +80,9 @@ public:
     Q_SIGNAL void focusWasReleased();
 
 private:
-    bool switchFocus(int by=1);
-    bool switchFocusFrom(int fromItemIndex, int by=1);
-    int  fetchItemIndex(int from, int direction, bool enabledOnly=true) const;
+    bool switchFocus(int by = 1);
+    bool switchFocusFrom(int fromItemIndex, int by = 1);
+    int fetchItemIndex(int from, int direction, bool enabledOnly = true) const;
 
 protected:
     void timerEvent(QTimerEvent *te);
@@ -106,7 +106,7 @@ private:
     int m_tabKeyModifiers = Qt::NoModifier;
     int m_backtabKeyModifiers = Qt::NoModifier;
     int m_disabledKeyModifier = Qt::ControlModifier;
-    QList<TabSequenceItem*> m_tabSequenceItems;
+    QList<TabSequenceItem *> m_tabSequenceItems;
     int m_releaseFocusKey = Qt::Key_Escape;
     bool m_releaseFocusEnabled = false;
 };
@@ -126,8 +126,8 @@ public:
     Q_SIGNAL void enabledChanged();
 
     Q_PROPERTY(TabSequenceManager* manager READ manager WRITE setManager NOTIFY managerChanged RESET resetManager)
-    void setManager(TabSequenceManager* val);
-    TabSequenceManager* manager() const { return m_manager; }
+    void setManager(TabSequenceManager *val);
+    TabSequenceManager *manager() const { return m_manager; }
     Q_SIGNAL void managerChanged();
 
     Q_PROPERTY(int sequence READ sequence WRITE setSequence NOTIFY sequenceChanged)
@@ -146,7 +146,7 @@ public:
     Q_SIGNAL void aboutToReceiveFocus();
 
 protected:
-    TabSequenceItem(QObject *parent=nullptr);
+    TabSequenceItem(QObject *parent = nullptr);
     void resetManager();
     void resetKeyNavigationObject();
 
@@ -161,7 +161,7 @@ private:
     int m_insertIndex = -1;
     QObjectProperty<TabSequenceManager> m_manager;
 };
-Q_DECLARE_METATYPE(TabSequenceItem*)
+Q_DECLARE_METATYPE(TabSequenceItem *)
 QML_DECLARE_TYPEINFO(TabSequenceItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // TABSEQUENCEMANAGER_H

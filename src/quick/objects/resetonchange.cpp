@@ -14,28 +14,24 @@
 #include "resetonchange.h"
 
 ResetOnChange::ResetOnChange(QQuickItem *parent)
-    : QQuickItem(parent),
-      m_timer("ResetOnChange.m_timer")
+    : QQuickItem(parent), m_timer("ResetOnChange.m_timer")
 {
     this->setFlag(ItemHasContents, false);
     this->setVisible(false);
 }
 
-ResetOnChange::~ResetOnChange()
-{
-
-}
+ResetOnChange::~ResetOnChange() { }
 
 void ResetOnChange::setTrackChangesOn(const QVariant &val)
 {
-    if(m_trackChangesOn == val)
+    if (m_trackChangesOn == val)
         return;
 
     const bool resetNow = this->isEnabled() && m_trackChangesOn.isValid();
     m_trackChangesOn = val;
     emit trackChangesOnChanged();
 
-    if(resetNow)
+    if (resetNow)
         this->reset();
     else
         this->setValue(m_to);
@@ -43,7 +39,7 @@ void ResetOnChange::setTrackChangesOn(const QVariant &val)
 
 void ResetOnChange::setFrom(const QVariant &val)
 {
-    if(m_from == val)
+    if (m_from == val)
         return;
 
     m_from = val;
@@ -52,7 +48,7 @@ void ResetOnChange::setFrom(const QVariant &val)
 
 void ResetOnChange::setTo(const QVariant &val)
 {
-    if(m_to == val)
+    if (m_to == val)
         return;
 
     m_to = val;
@@ -63,7 +59,7 @@ void ResetOnChange::setTo(const QVariant &val)
 
 void ResetOnChange::setDelay(int val)
 {
-    if(m_delay == val)
+    if (m_delay == val)
         return;
 
     m_delay = val;
@@ -77,7 +73,7 @@ void ResetOnChange::resetNow()
 
 void ResetOnChange::setValue(const QVariant &val)
 {
-    if(m_value == val)
+    if (m_value == val)
         return;
 
     m_value = val;
@@ -93,8 +89,7 @@ void ResetOnChange::reset()
 
 void ResetOnChange::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_timer.timerId())
-    {
+    if (te->timerId() == m_timer.timerId()) {
         m_timer.stop();
         this->setValue(m_to);
         emit justReset();

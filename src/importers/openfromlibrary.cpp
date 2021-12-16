@@ -48,13 +48,12 @@ all SSL certificate validation bits for now. The data transferred is not mission
 anyway.
 */
 
-QNetworkAccessManager & LibraryNetworkAccess()
+QNetworkAccessManager &LibraryNetworkAccess()
 {
     return *NetworkAccessManager::instance();
 }
 
-LibraryService::LibraryService(QObject *parent)
-    : AbstractImporter(parent)
+LibraryService::LibraryService(QObject *parent) : AbstractImporter(parent)
 {
     connect(this->screenplays(), &Library::busyChanged, this, &LibraryService::busyChanged);
     connect(this->templates(), &Library::busyChanged, this, &LibraryService::busyChanged);
@@ -62,10 +61,7 @@ LibraryService::LibraryService(QObject *parent)
     connect(this, &LibraryService::importFinished, this, &LibraryService::busyChanged);
 }
 
-LibraryService::~LibraryService()
-{
-
-}
+LibraryService::~LibraryService() { }
 
 bool LibraryService::busy() const
 {
@@ -102,10 +98,10 @@ void LibraryService::openTemplateAt(int index)
 
 void LibraryService::openLibraryRecordAt(Library *library, int index)
 {
-    if(m_importing || library == nullptr)
+    if (m_importing || library == nullptr)
         return;
 
-    if(library != this->templates() && library != this->screenplays())
+    if (library != this->templates() && library != this->screenplays())
         return;
 
     this->error()->clear();
@@ -114,8 +110,7 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     m_importing = true;
     emit importStarted(index);
 
-    if(library == this->templates() && index == 0)
-    {
+    if (library == this->templates() && index == 0) {
         ScriteDocument::instance()->reset();
         this->progress()->finish();
 
@@ -130,14 +125,15 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     const QString name = record.value("name").toString();
 
     QUrl url;
-    if(record.value("url_kind").toString() == "relative")
+    if (record.value("url_kind").toString() == "relative")
         url = QUrl(library->baseUrl().toString() + "/" + record.value("url").toString());
     else
         url = QUrl(record.value("url").toString());
 
     const QNetworkRequest request(url);
 
-    this->progress()->setProgressText( QStringLiteral("Downloading \"") + name + QStringLiteral("\" from library...") );
+    this->progress()->setProgressText(QStringLiteral("Downloading \"") + name
+                                      + QStringLiteral("\" from library..."));
     qApp->setOverrideCursor(Qt::WaitCursor);
 
     QNetworkReply *reply = nam.get(request);
@@ -145,10 +141,11 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
         const QByteArray bytes = reply->readAll();
         reply->deleteLater();
 
-        if(bytes.isEmpty()) {
+        if (bytes.isEmpty()) {
             this->progress()->finish();
             qApp->restoreOverrideCursor();
-            this->error()->setErrorMessage( QStringLiteral("Error downloading ") + name + QStringLiteral(". Please try again later.") );
+            this->error()->setErrorMessage(QStringLiteral("Error downloading ") + name
+                                           + QStringLiteral(". Please try again later."));
             return;
         }
 
@@ -161,12 +158,10 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
         ScriteDocument::instance()->openAnonymously(tmpFile.fileName());
         ScriteDocument::instance()->screenplay()->setCurrentElementIndex(-1);
 
-        if(library->type() == Library::Templates)
-        {
+        if (library->type() == Library::Templates) {
             ScriteDocument::instance()->structure()->setCurrentElementIndex(-1);
             ScriteDocument::instance()->screenplay()->setCurrentElementIndex(
-                    ScriteDocument::instance()->screenplay()->firstSceneIndex()
-                );
+                    ScriteDocument::instance()->screenplay()->firstSceneIndex());
             ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
         }
 
@@ -177,7 +172,8 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
         emit importFinished(index);
     });
 
-    const QString activity = library == this->templates() ? QStringLiteral("template") : QStringLiteral("scriptalay");
+    const QString activity = library == this->templates() ? QStringLiteral("template")
+                                                          : QStringLiteral("scriptalay");
     User::instance()->logActivity2(activity, name);
 }
 
@@ -189,22 +185,17 @@ bool LibraryService::doImport(QIODevice *device)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Library::Library(Library::Type type, QObject *parent)
-        :QAbstractListModel(parent),
-          m_type(type)
+Library::Library(Library::Type type, QObject *parent) : QAbstractListModel(parent), m_type(type)
 {
-    this->setRecords( QJsonArray() );
+    this->setRecords(QJsonArray());
     this->fetchRecords();
 }
 
-Library::~Library()
-{
-
-}
+Library::~Library() { }
 
 QJsonObject Library::recordAt(int index) const
 {
-    if(index < 0 || index > m_records.size())
+    if (index < 0 || index > m_records.size())
         return QJsonObject();
 
     return m_records.at(index).toObject();
@@ -217,7 +208,7 @@ int Library::rowCount(const QModelIndex &parent) const
 
 QVariant Library::data(const QModelIndex &index, int role) const
 {
-    if(role == RecordRole)
+    if (role == RecordRole)
         return this->recordAt(index.row());
 
     return QVariant();
@@ -225,26 +216,27 @@ QVariant Library::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> Library::roleNames() const
 {
-    QHash<int,QByteArray> roles;
+    QHash<int, QByteArray> roles;
     roles[RecordRole] = "record";
     return roles;
 }
 
 void Library::reload()
 {
-    this->setRecords( QJsonArray() );
+    this->setRecords(QJsonArray());
     this->fetchRecords();
 }
 
 void Library::fetchRecords()
 {
-    if(m_busy)
+    if (m_busy)
         return;
 
-    const QString path = m_type == Screenplays ? QStringLiteral("/records.hexdb") : QStringLiteral("/templates.hexdb");
+    const QString path = m_type == Screenplays ? QStringLiteral("/records.hexdb")
+                                               : QStringLiteral("/templates.hexdb");
 
     QNetworkAccessManager &nam = ::LibraryNetworkAccess();
-    const QUrl url = QUrl( m_baseUrl.toString() + path );
+    const QUrl url = QUrl(m_baseUrl.toString() + path);
 
     this->setBusy(true);
 
@@ -263,7 +255,7 @@ void Library::loadDatabase(const QByteArray &bytes)
     const QByteArray bson = qUncompress(QByteArray::fromHex(bytes));
 
     const QJsonDocument doc = QJsonDocument::fromBinaryData(bson);
-    if(doc.isNull())
+    if (doc.isNull())
         return;
 
     const QJsonObject object = doc.object();
@@ -282,15 +274,16 @@ void Library::setRecords(const QJsonArray &array)
     }
 #else
     m_records = array;
-    if(m_type == Templates)
-    {
+    if (m_type == Templates) {
         QJsonObject defaultTemplate;
-        defaultTemplate.insert( QStringLiteral("name"), "Blank Document" );
-        defaultTemplate.insert( QStringLiteral("authors"), QStringLiteral("Scrite") );
-        defaultTemplate.insert( QStringLiteral("poster"), QStringLiteral("qrc:/images/blank_document.png") );
-        defaultTemplate.insert( QStringLiteral("url_kind"), QStringLiteral("local") );
-        defaultTemplate.insert( QStringLiteral("description"), QStringLiteral("An empty Scrite document.") );
-        defaultTemplate.insert( QStringLiteral("more_info"), QLatin1String() );
+        defaultTemplate.insert(QStringLiteral("name"), "Blank Document");
+        defaultTemplate.insert(QStringLiteral("authors"), QStringLiteral("Scrite"));
+        defaultTemplate.insert(QStringLiteral("poster"),
+                               QStringLiteral("qrc:/images/blank_document.png"));
+        defaultTemplate.insert(QStringLiteral("url_kind"), QStringLiteral("local"));
+        defaultTemplate.insert(QStringLiteral("description"),
+                               QStringLiteral("An empty Scrite document."));
+        defaultTemplate.insert(QStringLiteral("more_info"), QLatin1String());
         m_records.prepend(defaultTemplate);
     }
 #endif
@@ -301,16 +294,15 @@ void Library::setRecords(const QJsonArray &array)
 
 void Library::setBusy(bool val)
 {
-    if(m_busy == val)
+    if (m_busy == val)
         return;
 
     m_busy = val;
 
-    if(val)
+    if (val)
         qApp->setOverrideCursor(Qt::WaitCursor);
     else
         qApp->restoreOverrideCursor();
 
     emit busyChanged();
 }
-

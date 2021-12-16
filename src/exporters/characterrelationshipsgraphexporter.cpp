@@ -19,40 +19,38 @@
 #include <QStandardPaths>
 
 CharacterRelationshipsGraphExporter::CharacterRelationshipsGraphExporter(QObject *parent)
-    :AbstractExporter(parent)
+    : AbstractExporter(parent)
 {
-    this->setGraph(qobject_cast<CharacterRelationshipsGraph*>(this));
+    this->setGraph(qobject_cast<CharacterRelationshipsGraph *>(this));
 }
 
-CharacterRelationshipsGraphExporter::~CharacterRelationshipsGraphExporter()
-{
-
-}
+CharacterRelationshipsGraphExporter::~CharacterRelationshipsGraphExporter() { }
 
 void CharacterRelationshipsGraphExporter::setGraph(CharacterRelationshipsGraph *val)
 {
-    if(m_graph == val)
+    if (m_graph == val)
         return;
 
     m_graph = val;
 
     const QFileInfo fi(this->fileName());
-    const QDir dir = fi.isFile() ? fi.absoluteDir() : QDir(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+    const QDir dir = fi.isFile()
+            ? fi.absoluteDir()
+            : QDir(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
     const QString defaultFileName = QStringLiteral("Character Relationship Graph");
 
-    if(m_graph == nullptr)
-        this->setFileName( dir.absoluteFilePath(defaultFileName) );
-    else
-    {
+    if (m_graph == nullptr)
+        this->setFileName(dir.absoluteFilePath(defaultFileName));
+    else {
         QString title = m_graph->title();
-        title = title.remove( QStringLiteral("\"") );
-        this->setFileName( dir.absoluteFilePath(title) );
+        title = title.remove(QStringLiteral("\""));
+        this->setFileName(dir.absoluteFilePath(title));
     }
 }
 
 void CharacterRelationshipsGraphExporter::setEnableHeaderFooter(bool val)
 {
-    if(m_enableHeaderFooter == val)
+    if (m_enableHeaderFooter == val)
         return;
 
     m_enableHeaderFooter = val;
@@ -61,7 +59,7 @@ void CharacterRelationshipsGraphExporter::setEnableHeaderFooter(bool val)
 
 void CharacterRelationshipsGraphExporter::setWatermark(const QString &val)
 {
-    if(m_watermark == val)
+    if (m_watermark == val)
         return;
 
     m_watermark = val;
@@ -70,7 +68,7 @@ void CharacterRelationshipsGraphExporter::setWatermark(const QString &val)
 
 void CharacterRelationshipsGraphExporter::setComment(const QString &val)
 {
-    if(m_comment == val)
+    if (m_comment == val)
         return;
 
     m_comment = val;
@@ -81,8 +79,7 @@ bool CharacterRelationshipsGraphExporter::doExport(QIODevice *device)
 {
     this->error()->clear();
 
-    if(m_graph == nullptr || m_graph->isEmpty())
-    {
+    if (m_graph == nullptr || m_graph->isEmpty()) {
         this->error()->setErrorMessage(QStringLiteral("No graph to export."));
         return false;
     }
@@ -91,8 +88,10 @@ bool CharacterRelationshipsGraphExporter::doExport(QIODevice *device)
     scene.setTitle(m_graph->title());
     scene.setComment(m_comment);
     scene.setWatermark(m_watermark);
-    if(m_enableHeaderFooter)
-        scene.addStandardItems(PdfExportableGraphicsScene::WatermarkOverlayLayer|PdfExportableGraphicsScene::FooterLayer|PdfExportableGraphicsScene::DontIncludeScriteLink);
+    if (m_enableHeaderFooter)
+        scene.addStandardItems(PdfExportableGraphicsScene::WatermarkOverlayLayer
+                               | PdfExportableGraphicsScene::FooterLayer
+                               | PdfExportableGraphicsScene::DontIncludeScriteLink);
     else
         scene.addStandardItems(PdfExportableGraphicsScene::WatermarkOverlayLayer);
     return scene.exportToPdf(device);
@@ -105,9 +104,8 @@ QString CharacterRelationshipsGraphExporter::polishFileName(const QString &fileN
     const QString dot = QStringLiteral(".");
     const QString ext = QStringLiteral("pdf");
 
-    if(fi.suffix() != ext)
+    if (fi.suffix() != ext)
         return fileName + dot + ext;
 
     return fileName;
 }
-

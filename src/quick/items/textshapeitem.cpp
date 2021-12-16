@@ -13,20 +13,16 @@
 
 #include "textshapeitem.h"
 
-TextShapeItem::TextShapeItem(QQuickItem *parent)
-    : AbstractShapeItem(parent)
+TextShapeItem::TextShapeItem(QQuickItem *parent) : AbstractShapeItem(parent)
 {
-    this->setOutlineColor( QColor(0, 0, 0, 128) );
+    this->setOutlineColor(QColor(0, 0, 0, 128));
 }
 
-TextShapeItem::~TextShapeItem()
-{
-
-}
+TextShapeItem::~TextShapeItem() { }
 
 void TextShapeItem::setText(const QString &val)
 {
-    if(m_text == val)
+    if (m_text == val)
         return;
 
     m_text = val;
@@ -37,7 +33,7 @@ void TextShapeItem::setText(const QString &val)
 
 void TextShapeItem::setFont(const QFont &val)
 {
-    if(m_font == val)
+    if (m_font == val)
         return;
 
     m_font = val;
@@ -49,6 +45,6 @@ void TextShapeItem::setFont(const QFont &val)
 QPainterPath TextShapeItem::shape() const
 {
     QPainterPath path;
-    path.addText( QPointF(0,0), m_font, m_text );
+    path.addText(QPointF(0, 0), m_font, m_text);
     return path;
 }

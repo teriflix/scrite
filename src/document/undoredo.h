@@ -30,7 +30,7 @@ class UndoStack : public QUndoStack
     Q_OBJECT
 
 public:
-    UndoStack(QObject *parent=nullptr);
+    UndoStack(QObject *parent = nullptr);
     ~UndoStack();
 
     Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
@@ -108,31 +108,43 @@ private:
 class PushObjectPropertyUndoCommand
 {
 public:
-    PushObjectPropertyUndoCommand(QObject *object, const QByteArray &property, bool flag=true);
+    PushObjectPropertyUndoCommand(QObject *object, const QByteArray &property, bool flag = true);
     ~PushObjectPropertyUndoCommand();
 
 private:
     ObjectPropertyUndoCommand *m_command = nullptr;
 };
 
-template <class ParentClass, class ChildClass>
+template<class ParentClass, class ChildClass>
 class PushObjectListCommand;
 
-template <class ParentClass, class ChildClass>
+template<class ParentClass, class ChildClass>
 struct ObjectListPropertyMethods
 {
-    ObjectListPropertyMethods() : appendMethod(nullptr),
-        removeMethod(nullptr), insertMethod(nullptr),
-        atMethod(nullptr), indexOfMethod(nullptr) { }
+    ObjectListPropertyMethods()
+        : appendMethod(nullptr),
+          removeMethod(nullptr),
+          insertMethod(nullptr),
+          atMethod(nullptr),
+          indexOfMethod(nullptr)
+    {
+    }
 
-    ObjectListPropertyMethods( void (*append)(ParentClass*,ChildClass*),
-                               void (*remove)(ParentClass*,ChildClass*),
-                               void (*insert)(ParentClass*,ChildClass*,int),
-                               ChildClass* (*at)(ParentClass*,int),
-                               int (*indexOf)(ParentClass*,ChildClass*))
-        : appendMethod(append), removeMethod(remove), insertMethod(insert), atMethod(at), indexOfMethod(indexOf) { }
+    ObjectListPropertyMethods(void (*append)(ParentClass *, ChildClass *),
+                              void (*remove)(ParentClass *, ChildClass *),
+                              void (*insert)(ParentClass *, ChildClass *, int),
+                              ChildClass *(*at)(ParentClass *, int),
+                              int (*indexOf)(ParentClass *, ChildClass *))
+        : appendMethod(append),
+          removeMethod(remove),
+          insertMethod(insert),
+          atMethod(at),
+          indexOfMethod(indexOf)
+    {
+    }
 
-    ObjectListPropertyMethods(const ObjectListPropertyMethods<ParentClass,ChildClass> &other) {
+    ObjectListPropertyMethods(const ObjectListPropertyMethods<ParentClass, ChildClass> &other)
+    {
         appendMethod = other.appendMethod;
         removeMethod = other.removeMethod;
         insertMethod = other.insertMethod;
@@ -140,7 +152,9 @@ struct ObjectListPropertyMethods
         indexOfMethod = other.indexOfMethod;
     }
 
-    ObjectListPropertyMethods & operator = (const ObjectListPropertyMethods<ParentClass,ChildClass> &other) {
+    ObjectListPropertyMethods &
+    operator=(const ObjectListPropertyMethods<ParentClass, ChildClass> &other)
+    {
         appendMethod = other.appendMethod;
         removeMethod = other.removeMethod;
         insertMethod = other.insertMethod;
@@ -149,60 +163,57 @@ struct ObjectListPropertyMethods
         return *this;
     }
 
-    bool operator == (const ObjectListPropertyMethods<ParentClass,ChildClass> &other) const {
-        return appendMethod == other.appendMethod &&
-               removeMethod == other.removeMethod &&
-               insertMethod == other.indexOfMethod &&
-               atMethod == other.atMethod &&
-               indexOfMethod == other.indexOfMethod;
+    bool operator==(const ObjectListPropertyMethods<ParentClass, ChildClass> &other) const
+    {
+        return appendMethod == other.appendMethod && removeMethod == other.removeMethod
+                && insertMethod == other.indexOfMethod && atMethod == other.atMethod
+                && indexOfMethod == other.indexOfMethod;
     }
 
-    void (*appendMethod)(ParentClass*,ChildClass*) = nullptr;
-    void (*removeMethod)(ParentClass*,ChildClass*) = nullptr;
-    void (*insertMethod)(ParentClass*,ChildClass*,int) = nullptr;
-    ChildClass *(*atMethod)(ParentClass*,int) = nullptr;
-    int (*indexOfMethod)(ParentClass*,ChildClass*) = nullptr;
+    void (*appendMethod)(ParentClass *, ChildClass *) = nullptr;
+    void (*removeMethod)(ParentClass *, ChildClass *) = nullptr;
+    void (*insertMethod)(ParentClass *, ChildClass *, int) = nullptr;
+    ChildClass *(*atMethod)(ParentClass *, int) = nullptr;
+    int (*indexOfMethod)(ParentClass *, ChildClass *) = nullptr;
 };
 
-namespace ObjectList
-{
-    enum Operation
-    {
-        InsertOperation,
-        RemoveOperation
-    };
+namespace ObjectList {
+enum Operation { InsertOperation, RemoveOperation };
 }
 
-template <class ParentClass, class ChildClass>
+template<class ParentClass, class ChildClass>
 class ObjectListCommand : public QUndoCommand
 {
-    friend class PushObjectListCommand<ParentClass,ChildClass>;
+    friend class PushObjectListCommand<ParentClass, ChildClass>;
 
     ObjectListCommand(ChildClass *child, ParentClass *parent, const QByteArray &propertyName,
-          ObjectList::Operation operation, const ObjectListPropertyMethods<ParentClass,ChildClass> &methods)
-        : m_childIndex(-1), m_firstRedoDone(false), m_child(child), m_parent(parent), m_operation(operation),
-          m_parentPropertyInfo(nullptr), m_methods(methods)
+                      ObjectList::Operation operation,
+                      const ObjectListPropertyMethods<ParentClass, ChildClass> &methods)
+        : m_childIndex(-1),
+          m_firstRedoDone(false),
+          m_child(child),
+          m_parent(parent),
+          m_operation(operation),
+          m_parentPropertyInfo(nullptr),
+          m_methods(methods)
     {
-        if(parent != nullptr && child != nullptr)
-        {
+        if (parent != nullptr && child != nullptr) {
             m_parentPropertyInfo = ObjectPropertyInfo::get(parent, propertyName);
-            if(m_parentPropertyInfo != nullptr)
-            {
-                if(m_parentPropertyInfo->isLocked())
+            if (m_parentPropertyInfo != nullptr) {
+                if (m_parentPropertyInfo->isLocked())
                     m_parentPropertyInfo = nullptr;
-                else
-                {
+                else {
                     m_childMetaObject = child->metaObject();
                     const QString label = QString("%1 in %2.%3")
-                            .arg(child->metaObject()->className())
-                            .arg(parent->metaObject()->className())
-                            .arg(propertyName.constData());
+                                                  .arg(child->metaObject()->className())
+                                                  .arg(parent->metaObject()->className())
+                                                  .arg(propertyName.constData());
                     this->setText(label);
                     m_connection = QObject::connect(parent, &QObject::destroyed, [this]() {
                         m_parentPropertyInfo = nullptr;
                         this->setObsolete(true);
                     });
-                    if(m_methods.indexOfMethod != nullptr)
+                    if (m_methods.indexOfMethod != nullptr)
                         m_childIndex = (*m_methods.indexOfMethod)(m_parent, m_child);
                     m_childInfo = QObjectSerializer::toJson(m_child);
                 }
@@ -211,30 +222,31 @@ class ObjectListCommand : public QUndoCommand
     }
 
 public:
-    ~ObjectListCommand() {
-        QObject::disconnect(m_connection);
-    }
+    ~ObjectListCommand() { QObject::disconnect(m_connection); }
 
-    void pushToActiveStack() {
-        if(m_parentPropertyInfo != nullptr && UndoStack::active() && !m_child.isNull())
+    void pushToActiveStack()
+    {
+        if (m_parentPropertyInfo != nullptr && UndoStack::active() && !m_child.isNull())
             UndoStack::active()->push(this);
         else
             delete this;
     }
 
     // QUndoCommand interface
-    void undo() {
-        if(m_operation == ObjectList::InsertOperation)
+    void undo()
+    {
+        if (m_operation == ObjectList::InsertOperation)
             this->remove();
         else
             this->insert();
     }
-    void redo() {
-        if(!m_firstRedoDone) {
+    void redo()
+    {
+        if (!m_firstRedoDone) {
             m_firstRedoDone = true;
             return;
         }
-        if(m_operation == ObjectList::InsertOperation)
+        if (m_operation == ObjectList::InsertOperation)
             this->insert();
         else
             this->remove();
@@ -243,19 +255,20 @@ public:
     bool mergeWith(const QUndoCommand *) { return false; }
 
 private:
-    void remove() {
-        if(m_child.isNull())
+    void remove()
+    {
+        if (m_child.isNull())
             return;
 
-        if(m_parentPropertyInfo == nullptr)
+        if (m_parentPropertyInfo == nullptr)
             return;
 
         m_parentPropertyInfo->lock();
 
         m_childInfo = QObjectSerializer::toJson(m_child);
-        if(m_methods.removeMethod != nullptr)
+        if (m_methods.removeMethod != nullptr)
             (*m_methods.removeMethod)(m_parent, m_child);
-        if(!m_child.isNull()) {
+        if (!m_child.isNull()) {
             GarbageCollector::instance()->add(m_child);
             m_child.clear();
         }
@@ -263,11 +276,12 @@ private:
         m_parentPropertyInfo->unlock();
     }
 
-    void insert() {
-        if(!m_child.isNull())
+    void insert()
+    {
+        if (!m_child.isNull())
             return;
 
-        if(m_parentPropertyInfo == nullptr)
+        if (m_parentPropertyInfo == nullptr)
             return;
 
         m_parentPropertyInfo->lock();
@@ -277,11 +291,11 @@ private:
         m_child = factory.create<ChildClass>(QByteArray(m_childMetaObject->className()), m_parent);
         QObjectSerializer::fromJson(m_childInfo, m_child);
 
-        if(m_childIndex < 0) {
-            if(m_methods.appendMethod != nullptr)
+        if (m_childIndex < 0) {
+            if (m_methods.appendMethod != nullptr)
                 (*m_methods.appendMethod)(m_parent, m_child);
         } else {
-            if(m_methods.insertMethod != nullptr)
+            if (m_methods.insertMethod != nullptr)
                 (*m_methods.insertMethod)(m_parent, m_child, m_childIndex);
         }
 
@@ -298,26 +312,29 @@ private:
     const QMetaObject *m_childMetaObject = nullptr;
     QMetaObject::Connection m_connection;
     ObjectPropertyInfo *m_parentPropertyInfo = nullptr;
-    ObjectListPropertyMethods<ParentClass,ChildClass> m_methods;
+    ObjectListPropertyMethods<ParentClass, ChildClass> m_methods;
 };
 
-template <class ParentClass, class ChildClass>
+template<class ParentClass, class ChildClass>
 class PushObjectListCommand // WE need ObjectCreationAndDeletionCommand
 {
 public:
     PushObjectListCommand(ChildClass *child, ParentClass *parent, const QByteArray &propertyName,
                           ObjectList::Operation operation,
-                          const ObjectListPropertyMethods<ParentClass,ChildClass> &methods) {
-        if(UndoStack::active())
-            m_command = new ObjectListCommand<ParentClass,ChildClass>(child, parent, propertyName, operation, methods);
+                          const ObjectListPropertyMethods<ParentClass, ChildClass> &methods)
+    {
+        if (UndoStack::active())
+            m_command = new ObjectListCommand<ParentClass, ChildClass>(child, parent, propertyName,
+                                                                       operation, methods);
     }
-    ~PushObjectListCommand() {
-        if(m_command)
+    ~PushObjectListCommand()
+    {
+        if (m_command)
             m_command->pushToActiveStack();
     }
 
 private:
-    ObjectListCommand<ParentClass,ChildClass> *m_command = nullptr;
+    ObjectListCommand<ParentClass, ChildClass> *m_command = nullptr;
 };
 
 class UndoResult : public QObject
@@ -325,7 +342,7 @@ class UndoResult : public QObject
     Q_OBJECT
 
 public:
-    UndoResult(QObject *parent=nullptr);
+    UndoResult(QObject *parent = nullptr);
     ~UndoResult();
 
     Q_PROPERTY(bool success READ isSuccess WRITE setSuccess NOTIFY successChanged)
@@ -342,11 +359,11 @@ class UndoHandler : public QObject
     Q_OBJECT
 
 public:
-    static QList<UndoHandler*> all();
+    static QList<UndoHandler *> all();
     static bool handleUndo();
     static bool handleRedo();
 
-    UndoHandler(QObject *parent=nullptr);
+    UndoHandler(QObject *parent = nullptr);
     ~UndoHandler();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)

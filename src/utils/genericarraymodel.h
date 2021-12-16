@@ -26,7 +26,7 @@ class GenericArrayModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    GenericArrayModel(QObject *parent=nullptr);
+    GenericArrayModel(QObject *parent = nullptr);
     ~GenericArrayModel();
 
     Q_PROPERTY(QJsonArray array READ array WRITE setArray NOTIFY arrayChanged)
@@ -58,7 +58,7 @@ public:
     Q_INVOKABLE QJsonValue at(int row) const;
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent=QModelIndex()) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
@@ -76,12 +76,12 @@ class GenericArraySortFilterProxyModel : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    GenericArraySortFilterProxyModel(QObject *parent=nullptr);
+    GenericArraySortFilterProxyModel(QObject *parent = nullptr);
     ~GenericArraySortFilterProxyModel();
 
     Q_PROPERTY(GenericArrayModel* arrayModel READ arrayModel WRITE setArrayModel NOTIFY arrayModelChanged RESET resetArrayModel)
-    void setArrayModel(GenericArrayModel* val);
-    GenericArrayModel* arrayModel() const { return m_arrayModel; }
+    void setArrayModel(GenericArrayModel *val);
+    GenericArrayModel *arrayModel() const { return m_arrayModel; }
     Q_SIGNAL void arrayModelChanged();
 
     QHash<int, QByteArray> roleNames() const;
@@ -96,21 +96,19 @@ private:
 class ModelDataChangedTracker
 {
 public:
-    ModelDataChangedTracker(QAbstractItemModel *model)
-        : m_model(model) { }
-    ~ModelDataChangedTracker() {
-        this->notify();
-    }
+    ModelDataChangedTracker(QAbstractItemModel *model) : m_model(model) { }
+    ~ModelDataChangedTracker() { this->notify(); }
 
     int startRowIndex() const { return m_startRow; }
     int endRowIndex() const { return m_endRow; }
 
-    void changeRow(int row) {
-        if(m_startRow < 0 || m_endRow < 0) {
+    void changeRow(int row)
+    {
+        if (m_startRow < 0 || m_endRow < 0) {
             m_startRow = row;
             m_endRow = row;
         } else {
-            if(row-m_endRow > 1) {
+            if (row - m_endRow > 1) {
                 this->notify();
                 m_startRow = row;
                 m_endRow = row;
@@ -120,8 +118,9 @@ public:
     }
 
 private:
-    void notify() {
-        if(m_startRow >= 0 && m_endRow >= 0) {
+    void notify()
+    {
+        if (m_startRow >= 0 && m_endRow >= 0) {
             const int r1 = qMin(m_startRow, m_endRow);
             const int r2 = qMax(m_startRow, m_endRow);
             const QModelIndex start = m_model->index(r1, 0);

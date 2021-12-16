@@ -27,7 +27,7 @@ class AbstractAutomationStep : public QObject
     Q_OBJECT
 
 public:
-    AbstractAutomationStep(QObject *parent=nullptr);
+    AbstractAutomationStep(QObject *parent = nullptr);
     ~AbstractAutomationStep();
 
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
@@ -71,7 +71,7 @@ class Automation : public QObject, public QQmlParserStatus
 public:
     static void init(QQuickView *qmlWindow);
 
-    Automation(QObject *parent=nullptr);
+    Automation(QObject *parent = nullptr);
     ~Automation();
 
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
@@ -93,7 +93,8 @@ public:
     // Helper methods
     Q_INVOKABLE QString fromUrl(const QUrl &url) const { return url.toLocalFile(); }
     Q_INVOKABLE QString pathOf(const QString &absFileName) const;
-    Q_INVOKABLE QString fileNameOf(const QString &absFileName, const QString &newSuffix=QString()) const;
+    Q_INVOKABLE QString fileNameOf(const QString &absFileName,
+                                   const QString &newSuffix = QString()) const;
 
     Q_CLASSINFO("DefaultProperty", "steps")
     Q_PROPERTY(QQmlListProperty<AbstractAutomationStep> steps READ steps)
@@ -107,9 +108,11 @@ public:
     Q_SIGNAL void stepCountChanged();
 
 private:
-    static void staticAppendStep(QQmlListProperty<AbstractAutomationStep> *list, AbstractAutomationStep *ptr);
+    static void staticAppendStep(QQmlListProperty<AbstractAutomationStep> *list,
+                                 AbstractAutomationStep *ptr);
     static void staticClearSteps(QQmlListProperty<AbstractAutomationStep> *list);
-    static AbstractAutomationStep* staticStepAt(QQmlListProperty<AbstractAutomationStep> *list, int index);
+    static AbstractAutomationStep *staticStepAt(QQmlListProperty<AbstractAutomationStep> *list,
+                                                int index);
     static int staticStepCount(QQmlListProperty<AbstractAutomationStep> *list);
     QList<AbstractAutomationStep *> m_steps, m_pendingSteps;
 
@@ -140,4 +143,3 @@ public:
 #endif // SCRITE_ENABLE_AUTOMATION
 
 #endif // AUTOMATION_H
-

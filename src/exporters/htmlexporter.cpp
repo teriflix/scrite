@@ -17,20 +17,13 @@
 #include <QFileInfo>
 #include <QTextBoundaryFinder>
 
-HtmlExporter::HtmlExporter(QObject *parent)
-             :AbstractExporter(parent)
-{
+HtmlExporter::HtmlExporter(QObject *parent) : AbstractExporter(parent) { }
 
-}
-
-HtmlExporter::~HtmlExporter()
-{
-
-}
+HtmlExporter::~HtmlExporter() { }
 
 void HtmlExporter::setExportWithSceneColors(bool val)
 {
-    if(m_exportWithSceneColors == val)
+    if (m_exportWithSceneColors == val)
         return;
 
     m_exportWithSceneColors = val;
@@ -39,7 +32,7 @@ void HtmlExporter::setExportWithSceneColors(bool val)
 
 void HtmlExporter::setIncludeSceneNumbers(bool val)
 {
-    if(m_includeSceneNumbers == val)
+    if (m_includeSceneNumbers == val)
         return;
 
     m_includeSceneNumbers = val;
@@ -53,15 +46,16 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     // Different systems have different qt_defaultDpi() values. While that works for everything we
     // do in Scrite, it doesnt work for HTML export. So, we will have to do something else.
-    const qreal paperWidth = formatting->pageLayout()->paperSize() == ScreenplayPageLayout::A4 ? 794 : 816;
+    const qreal paperWidth =
+            formatting->pageLayout()->paperSize() == ScreenplayPageLayout::A4 ? 794 : 816;
     const qreal layoutScale = paperWidth / formatting->pageLayout()->paperWidth();
-    const int   topMargin = int(formatting->pageLayout()->topMargin() * layoutScale);
+    const int topMargin = int(formatting->pageLayout()->topMargin() * layoutScale);
     const qreal leftMargin = formatting->pageLayout()->leftMargin() * layoutScale;
     const qreal rightMargin = formatting->pageLayout()->rightMargin() * layoutScale;
-    const int   bottomMargin = int(formatting->pageLayout()->bottomMargin() * layoutScale);
+    const int bottomMargin = int(formatting->pageLayout()->bottomMargin() * layoutScale);
     const qreal contentWidth = formatting->pageLayout()->contentWidth() * layoutScale;
 
-    QMap<SceneElement::Type,QString> typeStringMap;
+    QMap<SceneElement::Type, QString> typeStringMap;
     typeStringMap[SceneElement::Heading] = "heading";
     typeStringMap[SceneElement::Action] = "action";
     typeStringMap[SceneElement::Character] = "character";
@@ -84,44 +78,50 @@ bool HtmlExporter::doExport(QIODevice *device)
     ts << "    <style>\n";
 
     const QMetaObject *tmo = TransliterationEngine::instance()->metaObject();
-    const QMetaEnum langEnum = tmo->enumerator( tmo->indexOfEnumerator("Language") );
+    const QMetaEnum langEnum = tmo->enumerator(tmo->indexOfEnumerator("Language"));
 
-    QMap<TransliterationEngine::Language,bool> langBundleMap = this->languageBundleMap();
-    QMap<TransliterationEngine::Language,bool>::const_iterator it = langBundleMap.constBegin();
-    QMap<TransliterationEngine::Language,bool>::const_iterator end = langBundleMap.constEnd();
+    QMap<TransliterationEngine::Language, bool> langBundleMap = this->languageBundleMap();
+    QMap<TransliterationEngine::Language, bool>::const_iterator it = langBundleMap.constBegin();
+    QMap<TransliterationEngine::Language, bool>::const_iterator end = langBundleMap.constEnd();
     const QString fontsDir = QFileInfo(this->fileName()).absolutePath() + "/fonts";
 
-    while(it != end)
-    {
-        if(it.value())
-        {
+    while (it != end) {
+        if (it.value()) {
             QDir().mkpath(fontsDir);
 
-            const QStringList fontSources = TransliterationEngine::instance()->languageFontFilePaths(it.key());
-            Q_FOREACH(QString fontSource, fontSources)
-            {
+            const QStringList fontSources =
+                    TransliterationEngine::instance()->languageFontFilePaths(it.key());
+            Q_FOREACH (QString fontSource, fontSources) {
                 const QString lang = QString::fromLatin1(langEnum.valueToKey(it.key()));
                 const QString fontFile = QFileInfo(fontSource).fileName();
                 const QString fontDest = fontsDir + "/" + lang + "/" + fontFile;
-                QDir().mkpath( QFileInfo(fontDest).absolutePath() );
+                QDir().mkpath(QFileInfo(fontDest).absolutePath());
                 QFile::copy(fontSource, fontDest);
 
                 QRawFont rawFont(fontSource, 12);
 
                 ts << "    @font-face {\n";
-                ts << "      font-family: lang_" <<  it.key() << "_" << rawFont.weight() << "_" << rawFont.style() << ";\n";
+                ts << "      font-family: lang_" << it.key() << "_" << rawFont.weight() << "_"
+                   << rawFont.style() << ";\n";
                 ts << "      src: url(fonts/" << lang << "/" << fontFile << ");\n";
                 ts << "      font-weight: " << rawFont.weight() << ";\n";
                 ts << "      ";
-                switch(rawFont.style())
-                {
-                case QFont::StyleNormal: ts << "normal;\n"; break;
-                case QFont::StyleItalic: ts << "italic;\n"; break;
-                case QFont::StyleOblique: ts << "oblique;\n"; break;
+                switch (rawFont.style()) {
+                case QFont::StyleNormal:
+                    ts << "normal;\n";
+                    break;
+                case QFont::StyleItalic:
+                    ts << "italic;\n";
+                    break;
+                case QFont::StyleOblique:
+                    ts << "oblique;\n";
+                    break;
                 }
                 ts << "    }\n";
-                ts << "    span.lang_" << it.key() << "_" << rawFont.weight() << "_" << rawFont.style() << " {\n";
-                ts << "      font-family: lang_" << it.key() << "_" << rawFont.weight() << "_" << rawFont.style() << ";\n";
+                ts << "    span.lang_" << it.key() << "_" << rawFont.weight() << "_"
+                   << rawFont.style() << " {\n";
+                ts << "      font-family: lang_" << it.key() << "_" << rawFont.weight() << "_"
+                   << rawFont.style() << ";\n";
                 ts << "    }\n";
             }
         }
@@ -129,9 +129,8 @@ bool HtmlExporter::doExport(QIODevice *device)
         ++it;
     }
 
-    for(int i=SceneElement::Min; i<=SceneElement::Max; i++)
-    {
-        if(i > SceneElement::Min)
+    for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
+        if (i > SceneElement::Min)
             ts << "\n";
 
         SceneElement::Type elementType = SceneElement::Type(i);
@@ -143,16 +142,15 @@ bool HtmlExporter::doExport(QIODevice *device)
         ts << "      font-family: \"Courier New\", Courier, monospace;\n";
 #endif
         ts << "      font-size: " << format->font().pointSize() << "pt;\n";
-        if(format->font().bold())
+        if (format->font().bold())
             ts << "      font-weight: bold;\n";
-        if(format->font().italic())
+        if (format->font().italic())
             ts << "      font-style: italic;\n";
         ts << "      color: " << format->textColor().name() << ";\n";
-        if(format->backgroundColor() != Qt::transparent)
+        if (format->backgroundColor() != Qt::transparent)
             ts << "      background-color: " << format->backgroundColor().name() << ";\n";
         ts << "      text-align: ";
-        switch(format->textAlignment())
-        {
+        switch (format->textAlignment()) {
         case Qt::AlignLeft:
             ts << "left;\n";
             break;
@@ -173,13 +171,14 @@ bool HtmlExporter::doExport(QIODevice *device)
 
         ts << "      padding-left: " << pLeftMargin << "px;\n";
         ts << "      padding-right: " << pRightMargin << "px;\n";
-        if(qFuzzyIsNull(format->lineSpacingBefore()) || format->elementType() == SceneElement::Heading)
+        if (qFuzzyIsNull(format->lineSpacingBefore())
+            || format->elementType() == SceneElement::Heading)
             ts << "      padding-top: 0px;\n";
         else
             ts << "      padding-top: " << format->lineSpacingBefore() << "em;\n";
         ts << "      padding-bottom: 0px;\n";
         ts << "      margin: 0px;\n";
-        ts << "      line-height: " << format->lineHeight()*1.1 << "em;\n";
+        ts << "      line-height: " << format->lineHeight() * 1.1 << "em;\n";
         ts << "    }\n";
     }
 
@@ -187,7 +186,7 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     ts << "\n";
     ts << "    div.scrite-scene {\n";
-    if(qFuzzyIsNull(headingFormat->lineSpacingBefore()))
+    if (qFuzzyIsNull(headingFormat->lineSpacingBefore()))
         ts << "      padding-top: 0px;\n";
     else
         ts << "      padding-top: " << headingFormat->lineSpacingBefore() << "em;\n";
@@ -210,58 +209,60 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     ts << "    <div class=\"scrite-screenplay\">\n";
 
-    auto writeParagraph = [&ts,typeStringMap,langBundleMap](SceneElement::Type type, const QString &text) {
+    auto writeParagraph = [&ts, typeStringMap, langBundleMap](SceneElement::Type type,
+                                                              const QString &text) {
         const QString styleName = "scrite-" + typeStringMap.value(type);
         ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">";
-        QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text);
-        Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
-            if(!langBundleMap.value(item.language,false))
+        QList<TransliterationEngine::Boundary> breakup =
+                TransliterationEngine::instance()->evaluateBoundaries(text);
+        Q_FOREACH (TransliterationEngine::Boundary item, breakup) {
+            if (!langBundleMap.value(item.language, false))
                 ts << "<span>" << item.string << "</span>";
             else
-                ts << "<span class=\"lang_" << item.language << "_" << QFont::Normal << "_" << QFont::StyleNormal << "\">" << item.string << "</span>";
+                ts << "<span class=\"lang_" << item.language << "_" << QFont::Normal << "_"
+                   << QFont::StyleNormal << "\">" << item.string << "</span>";
         }
         ts << "</p>\n";
     };
 
     const int nrScenes = screenplay->elementCount();
     int nrHeadings = 0;
-    for(int i=0; i<nrScenes; i++)
-    {
+    for (int i = 0; i < nrScenes; i++) {
         const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
-        if(screenplayElement->elementType() != ScreenplayElement::SceneElementType)
+        if (screenplayElement->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
         const Scene *scene = screenplayElement->scene();
 
-        if(m_exportWithSceneColors)
-        {
+        if (m_exportWithSceneColors) {
             const QColor sceneColor = scene->color();
-            const QString sceneColorText = "rgba(" + QString::number(sceneColor.red()) + "," +
-                    QString::number(sceneColor.green()) + "," +
-                    QString::number(sceneColor.blue()) + ",0.1)";
-            ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\" style=\"background-color: " << sceneColorText << ";\">\n";
-        }
-        else
+            const QString sceneColorText = "rgba(" + QString::number(sceneColor.red()) + ","
+                    + QString::number(sceneColor.green()) + "," + QString::number(sceneColor.blue())
+                    + ",0.1)";
+            ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\" "
+                  "style=\"background-color: "
+               << sceneColorText << ";\">\n";
+        } else
             ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\">\n";
 
         const SceneHeading *heading = scene->heading();
-        if(heading->isEnabled())
-        {
+        if (heading->isEnabled()) {
             ++nrHeadings;
-            if(m_includeSceneNumbers)
-                writeParagraph(SceneElement::Heading, "[" + screenplayElement->resolvedSceneNumber() + "] " + heading->text());
+            if (m_includeSceneNumbers)
+                writeParagraph(SceneElement::Heading,
+                               "[" + screenplayElement->resolvedSceneNumber() + "] "
+                                       + heading->text());
             else
                 writeParagraph(SceneElement::Heading, heading->text());
         }
 
         const int nrElements = scene->elementCount();
-        for(int j=0; j<nrElements; j++)
-        {
+        for (int j = 0; j < nrElements; j++) {
             SceneElement *element = scene->elementAt(j);
             writeParagraph(element->type(), element->formattedText());
         }
 
-        if(i == nrScenes-1)
+        if (i == nrScenes - 1)
             ts << "<p class=\"scrite-action\" custom-style=\"scrite-action\">&nbsp;</p>";
 
         ts << "      </div>\n";
@@ -280,7 +281,7 @@ bool HtmlExporter::doExport(QIODevice *device)
 QString HtmlExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if(fi.suffix().toLower() != "html")
+    if (fi.suffix().toLower() != "html")
         return fileName + ".html";
     return fileName;
 }

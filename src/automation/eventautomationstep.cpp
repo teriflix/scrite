@@ -21,20 +21,15 @@
 #include <QElapsedTimer>
 
 EventAutomationStep::EventAutomationStep(QObject *parent)
-    : AbstractAutomationStep(parent),
-      m_window(this, "window")
+    : AbstractAutomationStep(parent), m_window(this, "window")
 {
-
 }
 
-EventAutomationStep::~EventAutomationStep()
-{
-
-}
+EventAutomationStep::~EventAutomationStep() { }
 
 void EventAutomationStep::setWindow(QWindow *val)
 {
-    if(m_window == val)
+    if (m_window == val)
         return;
 
     m_window = val;
@@ -43,7 +38,7 @@ void EventAutomationStep::setWindow(QWindow *val)
 
 void EventAutomationStep::setDelay(int val)
 {
-    if(m_delay == val)
+    if (m_delay == val)
         return;
 
     m_delay = qBound(0, val, 1000);
@@ -55,49 +50,54 @@ void EventAutomationStep::mouseMove(qreal x, qreal y, int button, int modifiers)
     Q_UNUSED(button)
     Q_UNUSED(modifiers)
 
-    if(m_window.isNull())
+    if (m_window.isNull())
         return;
 
-    QTest::mouseMove(m_window, QPointF(x,y).toPoint());
+    QTest::mouseMove(m_window, QPointF(x, y).toPoint());
 }
 
 void EventAutomationStep::mouseClick(qreal x, qreal y, int button, int modifiers)
 {
-    QTest::mouseClick(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers), QPointF(x,y).toPoint());
+    QTest::mouseClick(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers),
+                      QPointF(x, y).toPoint());
 }
 
 void EventAutomationStep::mousePress(qreal x, qreal y, int button, int modifiers)
 {
-    if(m_window.isNull())
+    if (m_window.isNull())
         return;
 
-    QTest::mousePress(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers), QPointF(x,y).toPoint());
+    QTest::mousePress(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers),
+                      QPointF(x, y).toPoint());
 }
 
 void EventAutomationStep::mouseWheel(qreal x, qreal y, int delta, int orientation, int modifiers)
 {
-    if(m_window.isNull())
+    if (m_window.isNull())
         return;
 
-    const QPointF pos = QPointF(x,y); // * m_window->devicePixelRatio();
-    QWheelEvent event(pos, delta, Qt::NoButton, Qt::KeyboardModifiers(modifiers), Qt::Orientation(orientation));
+    const QPointF pos = QPointF(x, y); // * m_window->devicePixelRatio();
+    QWheelEvent event(pos, delta, Qt::NoButton, Qt::KeyboardModifiers(modifiers),
+                      Qt::Orientation(orientation));
     this->notifyWindow(&event);
 }
 
 void EventAutomationStep::mouseRelease(qreal x, qreal y, int button, int modifiers)
 {
-    if(m_window.isNull())
+    if (m_window.isNull())
         return;
 
-    QTest::mouseRelease(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers), QPointF(x,y).toPoint());
+    QTest::mouseRelease(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers),
+                        QPointF(x, y).toPoint());
 }
 
 void EventAutomationStep::mouseDoubleClick(qreal x, qreal y, int button, int modifiers)
 {
-    if(m_window.isNull())
+    if (m_window.isNull())
         return;
 
-    QTest::mouseDClick(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers), QPointF(x,y).toPoint());
+    QTest::mouseDClick(m_window, Qt::MouseButton(button), Qt::KeyboardModifiers(modifiers),
+                       QPointF(x, y).toPoint());
 }
 
 void EventAutomationStep::keyPress(int key, int modifiers)
@@ -124,16 +124,15 @@ void EventAutomationStep::keyClicks(const QString &text, int modifiers)
 
 void EventAutomationStep::sleep(int msecs)
 {
-    if(msecs <= 0)
+    if (msecs <= 0)
         return;
 
     QElapsedTimer timer;
     timer.start();
 
-    while(1)
-    {
+    while (1) {
         qApp->processEvents(QEventLoop::AllEvents);
-        if(timer.elapsed() >= msecs)
+        if (timer.elapsed() >= msecs)
             break;
     }
 }

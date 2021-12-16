@@ -54,7 +54,7 @@ class FileLocker : public QObject
     Q_OBJECT
 
 public:
-    FileLocker(QObject *parent=nullptr);
+    FileLocker(QObject *parent = nullptr);
     ~FileLocker();
 
     Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged)
@@ -64,11 +64,7 @@ public:
 
     QString lockFilePath() const { return m_lockFilePath; }
 
-    enum Strategy
-    {
-        MultipleReadSingleWrite,
-        SingleReadSingleWrite
-    };
+    enum Strategy { MultipleReadSingleWrite, SingleReadSingleWrite };
     Q_PROPERTY(Strategy strategy READ strategy WRITE setStrategy NOTIFY strategyChanged)
     void setStrategy(Strategy val);
     Strategy strategy() const { return m_strategy; }

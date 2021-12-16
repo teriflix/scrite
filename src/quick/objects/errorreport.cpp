@@ -13,11 +13,8 @@
 
 #include "errorreport.h"
 
-ErrorReport::ErrorReport(QObject *parent)
-            :QAbstractListModel(parent),
-              m_proxyFor(this, "proxyFor")
+ErrorReport::ErrorReport(QObject *parent) : QAbstractListModel(parent), m_proxyFor(this, "proxyFor")
 {
-
 }
 
 ErrorReport::~ErrorReport()
@@ -27,23 +24,25 @@ ErrorReport::~ErrorReport()
 
 void ErrorReport::setProxyFor(ErrorReport *val)
 {
-    if(m_proxyFor == val)
+    if (m_proxyFor == val)
         return;
 
-    if(m_proxyFor == nullptr)
-    {
+    if (m_proxyFor == nullptr) {
         disconnect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::resetProxyFor);
-        disconnect(m_proxyFor, &ErrorReport::errorMessageChanged, this, &ErrorReport::updateErrorMessageFromProxy);
-        disconnect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this, &ErrorReport::updateWarningMessageFromProxy);
+        disconnect(m_proxyFor, &ErrorReport::errorMessageChanged, this,
+                   &ErrorReport::updateErrorMessageFromProxy);
+        disconnect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this,
+                   &ErrorReport::updateWarningMessageFromProxy);
     }
 
     m_proxyFor = val;
 
-    if(m_proxyFor != nullptr)
-    {
+    if (m_proxyFor != nullptr) {
         connect(m_proxyFor, &ErrorReport::aboutToDelete, this, &ErrorReport::resetProxyFor);
-        connect(m_proxyFor, &ErrorReport::errorMessageChanged, this, &ErrorReport::updateErrorMessageFromProxy);
-        connect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this, &ErrorReport::updateWarningMessageFromProxy);
+        connect(m_proxyFor, &ErrorReport::errorMessageChanged, this,
+                &ErrorReport::updateErrorMessageFromProxy);
+        connect(m_proxyFor, &ErrorReport::warningMessageCountChanged, this,
+                &ErrorReport::updateWarningMessageFromProxy);
 
         this->setErrorMessage(m_proxyFor->errorMessage());
         this->beginResetModel();
@@ -57,7 +56,7 @@ void ErrorReport::setProxyFor(ErrorReport *val)
 
 void ErrorReport::setErrorMessage(const QString &val, const QJsonObject &details)
 {
-    if(m_errorMessage == val)
+    if (m_errorMessage == val)
         return;
 
     m_errorMessage = val;
@@ -90,13 +89,13 @@ int ErrorReport::rowCount(const QModelIndex &parent) const
 
 QVariant ErrorReport::data(const QModelIndex &index, int role) const
 {
-    return (index.isValid() && role==WarningMessageRole) ?
-                m_warningMessages.value(index.row()) : QString();
+    return (index.isValid() && role == WarningMessageRole) ? m_warningMessages.value(index.row())
+                                                           : QString();
 }
 
 QHash<int, QByteArray> ErrorReport::roleNames() const
 {
-    QHash<int,QByteArray> roles;
+    QHash<int, QByteArray> roles;
     roles[WarningMessageRole] = "warningMessage";
     return roles;
 }
@@ -109,12 +108,12 @@ void ErrorReport::resetProxyFor()
 
 void ErrorReport::updateErrorMessageFromProxy()
 {
-    if(m_proxyFor != nullptr)
+    if (m_proxyFor != nullptr)
         this->setErrorMessage(m_proxyFor->errorMessage());
 }
 
 void ErrorReport::updateWarningMessageFromProxy()
 {
-    if(m_proxyFor != nullptr)
+    if (m_proxyFor != nullptr)
         this->addWarning(m_proxyFor->lastWarningMessage());
 }

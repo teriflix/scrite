@@ -32,17 +32,12 @@ class StatisticsReport : public AbstractReportGenerator
     Q_CLASSINFO("Description", "Generate a report with key statistics of the screenplay.")
 
 public:
-    Q_INVOKABLE StatisticsReport(QObject *parent=nullptr);
+    Q_INVOKABLE StatisticsReport(QObject *parent = nullptr);
     ~StatisticsReport();
 
-    enum ColorGroup
-    {
-        Character,
-        Location,
-        Beat
-    };
-    static const QVector<QColor> colors(ColorGroup group=Character);
-    static const QColor pickColor(int index, bool cycleAround=true, ColorGroup group=Character);
+    enum ColorGroup { Character, Location, Beat };
+    static const QVector<QColor> colors(ColorGroup group = Character);
+    static const QColor pickColor(int index, bool cycleAround = true, ColorGroup group = Character);
 
     bool requiresConfiguration() const { return true; }
 
@@ -117,7 +112,7 @@ public:
     };
 
     // Distribution of Action, Dialogue and Heading paragraphs
-    QList<Distribution> textDistribution(bool compact=true) const;
+    QList<Distribution> textDistribution(bool compact = true) const;
 
     // Distribution of Character Dialogues
     QList<Distribution> dialogueDistribution() const;
@@ -153,17 +148,44 @@ private:
     qreal pageHeight() const { return m_pageHeight; }
 
     QTime timeLength() const { return this->pixelLengthToTime(this->pixelLength()); }
-    QTime timeLength(const Scene *scene) const { return this->pixelLengthToTime(this->pixelLength(scene)); }
-    QTime timeLength(const SceneHeading *heading) const { return this->pixelLengthToTime(this->pixelLength(heading)); }
-    QTime timeLength(const SceneElement *para) const { return this->pixelLengthToTime(this->pixelLength(para)); }
-    QTime timeLength(const ScreenplayElement *element) const { return this->pixelLengthToTime(this->pixelLength(element)); }
+    QTime timeLength(const Scene *scene) const
+    {
+        return this->pixelLengthToTime(this->pixelLength(scene));
+    }
+    QTime timeLength(const SceneHeading *heading) const
+    {
+        return this->pixelLengthToTime(this->pixelLength(heading));
+    }
+    QTime timeLength(const SceneElement *para) const
+    {
+        return this->pixelLengthToTime(this->pixelLength(para));
+    }
+    QTime timeLength(const ScreenplayElement *element) const
+    {
+        return this->pixelLengthToTime(this->pixelLength(element));
+    }
 
     qreal pageLength() const { return this->pageLength(this->pixelLength()); }
-    qreal pageLength(qreal pixelLength) const { return qFuzzyIsNull(m_pageHeight) ? 0 : pixelLength/m_pageHeight; }
-    qreal pageLength(const Scene *scene) const { return this->pageLength(this->pixelLength(scene)); }
-    qreal pageLength(const SceneHeading *heading) const { return this->pageLength(this->pixelLength(heading)); }
-    qreal pageLength(const SceneElement *para) const { return this->pageLength(this->pixelLength(para)); }
-    qreal pageLength(const ScreenplayElement *element) const { return this->pageLength(this->pixelLength(element)); }
+    qreal pageLength(qreal pixelLength) const
+    {
+        return qFuzzyIsNull(m_pageHeight) ? 0 : pixelLength / m_pageHeight;
+    }
+    qreal pageLength(const Scene *scene) const
+    {
+        return this->pageLength(this->pixelLength(scene));
+    }
+    qreal pageLength(const SceneHeading *heading) const
+    {
+        return this->pageLength(this->pixelLength(heading));
+    }
+    qreal pageLength(const SceneElement *para) const
+    {
+        return this->pageLength(this->pixelLength(para));
+    }
+    qreal pageLength(const ScreenplayElement *element) const
+    {
+        return this->pageLength(this->pixelLength(element));
+    }
 
     qreal pixelLength() const;
     qreal pixelLength(const Scene *scene) const;
@@ -172,19 +194,28 @@ private:
     qreal pixelLength(const ScreenplayElement *element) const;
 
     QRectF boundingRect(const Scene *scene) const;
-    QRectF boundingRect(const SceneHeading *heading) const { return this->boundingRectOfHeadingOrParagraph(heading); }
-    QRectF boundingRect(const SceneElement *para) const { return this->boundingRectOfHeadingOrParagraph(para); }
+    QRectF boundingRect(const SceneHeading *heading) const
+    {
+        return this->boundingRectOfHeadingOrParagraph(heading);
+    }
+    QRectF boundingRect(const SceneElement *para) const
+    {
+        return this->boundingRectOfHeadingOrParagraph(para);
+    }
     QRectF boundingRectOfHeadingOrParagraph(const QObject *object) const;
     QRectF boundingRect(const ScreenplayElement *element) const;
 
-    QTime pixelLengthToTime(qreal val) const { return this->pageLengthToTime(this->pageLength(val)); }
+    QTime pixelLengthToTime(qreal val) const
+    {
+        return this->pageLengthToTime(this->pageLength(val));
+    }
     QTime pageLengthToTime(qreal val) const;
 
     void polish(Distribution &report) const;
 
 private:
     QTextDocument m_textDocument;
-    QMap<const QObject*,QTextBlock> m_textBlockMap;
+    QMap<const QObject *, QTextBlock> m_textBlockMap;
     qreal m_pageHeight = 0;
     qreal m_lineHeight = 0;
     qreal m_scaleFactor = 1.0;

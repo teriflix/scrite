@@ -22,7 +22,7 @@ class ResetOnChange : public QQuickItem
     Q_OBJECT
 
 public:
-    ResetOnChange(QQuickItem *parent=nullptr);
+    ResetOnChange(QQuickItem *parent = nullptr);
     ~ResetOnChange();
 
     Q_PROPERTY(QVariant trackChangesOn READ trackChangesOn WRITE setTrackChangesOn NOTIFY trackChangesOnChanged)

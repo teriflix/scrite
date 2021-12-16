@@ -16,16 +16,9 @@
 
 #include <QFileInfo>
 
-AbstractAutomationStep::AbstractAutomationStep(QObject *parent)
-    : QObject(parent)
-{
+AbstractAutomationStep::AbstractAutomationStep(QObject *parent) : QObject(parent) { }
 
-}
-
-AbstractAutomationStep::~AbstractAutomationStep()
-{
-
-}
+AbstractAutomationStep::~AbstractAutomationStep() { }
 
 void AbstractAutomationStep::start()
 {
@@ -43,7 +36,7 @@ void AbstractAutomationStep::finish()
 
 void AbstractAutomationStep::setRunning(bool val)
 {
-    if(m_running == val)
+    if (m_running == val)
         return;
 
     m_running = val;
@@ -52,7 +45,7 @@ void AbstractAutomationStep::setRunning(bool val)
 
 void AbstractAutomationStep::setErrorMessage(const QString &val)
 {
-    if(m_errorMessage == val)
+    if (m_errorMessage == val)
         return;
 
     m_errorMessage = val;
@@ -63,20 +56,13 @@ void AbstractAutomationStep::setErrorMessage(const QString &val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Automation::Automation(QObject *parent)
-    : QObject(parent)
-{
+Automation::Automation(QObject *parent) : QObject(parent) { }
 
-}
-
-Automation::~Automation()
-{
-
-}
+Automation::~Automation() { }
 
 void Automation::setAutoRun(bool val)
 {
-    if(m_autoRun == val)
+    if (m_autoRun == val)
         return;
 
     m_autoRun = val;
@@ -85,7 +71,7 @@ void Automation::setAutoRun(bool val)
 
 void Automation::setQuitAppWhenFinished(bool val)
 {
-    if(m_quitAppWhenFinished == val)
+    if (m_quitAppWhenFinished == val)
         return;
 
     m_quitAppWhenFinished = val;
@@ -94,7 +80,7 @@ void Automation::setQuitAppWhenFinished(bool val)
 
 void Automation::start()
 {
-    if(m_running)
+    if (m_running)
         return;
 
     this->setRunning(true);
@@ -105,7 +91,7 @@ void Automation::start()
 
 QString Automation::pathOf(const QString &absFileName) const
 {
-    if(absFileName.isEmpty())
+    if (absFileName.isEmpty())
         return QString();
 
     const QFileInfo fi(absFileName);
@@ -114,11 +100,11 @@ QString Automation::pathOf(const QString &absFileName) const
 
 QString Automation::fileNameOf(const QString &absFileName, const QString &newSuffix) const
 {
-    if(absFileName.isEmpty())
+    if (absFileName.isEmpty())
         return QString();
 
     const QFileInfo fi(absFileName);
-    if(newSuffix.isEmpty())
+    if (newSuffix.isEmpty())
         return fi.fileName();
 
     return fi.baseName() + QStringLiteral(".") + newSuffix;
@@ -127,17 +113,14 @@ QString Automation::fileNameOf(const QString &absFileName, const QString &newSuf
 QQmlListProperty<AbstractAutomationStep> Automation::steps()
 {
     return QQmlListProperty<AbstractAutomationStep>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Automation::staticAppendStep,
-                &Automation::staticStepCount,
-                &Automation::staticStepAt,
-                &Automation::staticClearSteps);
+            reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+            &Automation::staticAppendStep, &Automation::staticStepCount, &Automation::staticStepAt,
+            &Automation::staticClearSteps);
 }
 
 void Automation::addStep(AbstractAutomationStep *ptr)
 {
-    if(ptr == nullptr || m_steps.indexOf(ptr) >= 0)
+    if (ptr == nullptr || m_steps.indexOf(ptr) >= 0)
         return;
 
     ptr->setParent(this);
@@ -148,14 +131,14 @@ void Automation::addStep(AbstractAutomationStep *ptr)
 
 void Automation::removeStep(AbstractAutomationStep *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = m_steps.indexOf(ptr);
-    if(index < 0)
-        return ;
+    if (index < 0)
+        return;
 
-    if(ptr->parent() == this)
+    if (ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
 
     m_steps.removeAt(index);
@@ -169,52 +152,50 @@ AbstractAutomationStep *Automation::stepAt(int index) const
 
 void Automation::clearSteps()
 {
-    while(m_steps.size())
+    while (m_steps.size())
         this->removeStep(m_steps.first());
 }
 
-void Automation::staticAppendStep(QQmlListProperty<AbstractAutomationStep> *list, AbstractAutomationStep *ptr)
+void Automation::staticAppendStep(QQmlListProperty<AbstractAutomationStep> *list,
+                                  AbstractAutomationStep *ptr)
 {
-    reinterpret_cast< Automation* >(list->data)->addStep(ptr);
+    reinterpret_cast<Automation *>(list->data)->addStep(ptr);
 }
 
 void Automation::staticClearSteps(QQmlListProperty<AbstractAutomationStep> *list)
 {
-    reinterpret_cast< Automation* >(list->data)->clearSteps();
+    reinterpret_cast<Automation *>(list->data)->clearSteps();
 }
 
-AbstractAutomationStep *Automation::staticStepAt(QQmlListProperty<AbstractAutomationStep> *list, int index)
+AbstractAutomationStep *Automation::staticStepAt(QQmlListProperty<AbstractAutomationStep> *list,
+                                                 int index)
 {
-    return reinterpret_cast< Automation* >(list->data)->stepAt(index);
+    return reinterpret_cast<Automation *>(list->data)->stepAt(index);
 }
 
 int Automation::staticStepCount(QQmlListProperty<AbstractAutomationStep> *list)
 {
-    return reinterpret_cast< Automation* >(list->data)->stepCount();
+    return reinterpret_cast<Automation *>(list->data)->stepCount();
 }
 
-void Automation::classBegin()
-{
-
-}
+void Automation::classBegin() { }
 
 void Automation::componentComplete()
 {
-    if(m_autoRun)
+    if (m_autoRun)
         this->start();
 }
 
 void Automation::startNextStep()
 {
-    AbstractAutomationStep *step = qobject_cast<AbstractAutomationStep*>(this->sender());
-    if(step != nullptr)
+    AbstractAutomationStep *step = qobject_cast<AbstractAutomationStep *>(this->sender());
+    if (step != nullptr)
         disconnect(step, &AbstractAutomationStep::finished, this, &Automation::startNextStep);
 
-    if(m_pendingSteps.isEmpty())
-    {
+    if (m_pendingSteps.isEmpty()) {
         this->setRunning(false);
 
-        if(m_quitAppWhenFinished)
+        if (m_quitAppWhenFinished)
             qApp->quit();
 
         return;
@@ -227,7 +208,7 @@ void Automation::startNextStep()
 
 void Automation::setRunning(bool val)
 {
-    if(m_running == val)
+    if (m_running == val)
         return;
 
     m_running = val;

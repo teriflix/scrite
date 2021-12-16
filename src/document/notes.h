@@ -40,7 +40,7 @@ class Note : public QObject, public QObjectSerializer::Interface
 public:
     static Note *findById(const QString &id);
 
-    Note(QObject *parent=nullptr);
+    Note(QObject *parent = nullptr);
     ~Note();
     Q_SIGNAL void aboutToDelete(Note *ptr);
 
@@ -51,11 +51,7 @@ public:
     QString id() const;
     Q_SIGNAL void idChanged();
 
-    enum Type
-    {
-        TextNoteType,
-        FormNoteType
-    };
+    enum Type { TextNoteType, FormNoteType };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type NOTIFY typeChanged)
     Type type() const { return m_type; }
@@ -86,7 +82,7 @@ public:
     Q_SIGNAL void formIdChanged();
 
     Q_PROPERTY(Form* form READ form RESET resetForm NOTIFY formChanged STORED false)
-    Form* form() const { return m_form; }
+    Form *form() const { return m_form; }
     Q_SIGNAL void formChanged();
 
     Q_PROPERTY(QJsonObject formData READ formData WRITE setFormData NOTIFY formDataChanged)
@@ -111,7 +107,7 @@ private:
     void setId(const QString &val);
     void setType(Type val);
     void setFormId(const QString &val);
-    void setForm(Form* val);
+    void setForm(Form *val);
     void resetForm();
     void addAttachment(Attachment *ptr);
 
@@ -142,8 +138,7 @@ public:
     ~Notes();
     Q_SIGNAL void aboutToDelete(Notes *ptr);
 
-    enum OwnerType
-    {
+    enum OwnerType {
         StructureOwner,
         SceneOwner,
         BreakOwner, // Act, Episode etc..
@@ -201,7 +196,7 @@ public:
     Q_INVOKABLE void removeNote(Note *ptr);
     Q_INVOKABLE Note *noteAt(int index) const;
     Q_INVOKABLE Note *firstNote() const { return this->noteAt(0); }
-    Q_INVOKABLE Note *lastNote() const { return this->noteAt(this->noteCount()-1); }
+    Q_INVOKABLE Note *lastNote() const { return this->noteAt(this->noteCount() - 1); }
     Q_INVOKABLE void clearNotes();
 
     Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
@@ -223,7 +218,7 @@ public:
 private:
     void setId(const QString &val);
     void addNote(Note *ptr);
-    void setNotes(const QList<Note*> &list);
+    void setNotes(const QList<Note *> &list);
 
 private:
     friend class RemoveNoteUndoCommand;

@@ -26,7 +26,7 @@ class AutomationRecorder : public QObject
     Q_OBJECT
 
 public:
-    AutomationRecorder(QObject *parent=nullptr);
+    AutomationRecorder(QObject *parent = nullptr);
     ~AutomationRecorder();
 
     Q_PROPERTY(bool recording READ isRecording NOTIFY recordingChanged)

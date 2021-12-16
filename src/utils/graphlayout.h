@@ -19,14 +19,14 @@
 #include <QVector>
 #include <QVector2D>
 
-namespace GraphLayout
-{
+namespace GraphLayout {
 
 class AbstractNode
 {
 public:
-    void setPosition(const QPointF &pos) {
-        if(m_position == pos)
+    void setPosition(const QPointF &pos)
+    {
+        if (m_position == pos)
             return;
         m_position = pos;
         this->move(m_position);
@@ -59,8 +59,8 @@ public:
 
 struct Graph
 {
-    QVector<AbstractNode*> nodes;
-    QVector<AbstractEdge*> edges;
+    QVector<AbstractNode *> nodes;
+    QVector<AbstractEdge *> edges;
 };
 
 class AbstractLayout

@@ -37,8 +37,8 @@ public:
     static SearchAgent *qmlAttachedProperties(QObject *object);
 
     Q_PROPERTY(SearchEngine* engine READ engine WRITE setEngine NOTIFY engineChanged RESET resetEngine)
-    void setEngine(SearchEngine* val);
-    SearchEngine* engine() const { return m_engine; }
+    void setEngine(SearchEngine *val);
+    SearchEngine *engine() const { return m_engine; }
     Q_SIGNAL void engineChanged();
 
     Q_PROPERTY(int sequenceNumber READ sequenceNumber WRITE setSequenceNumber NOTIFY sequenceNumberChanged)
@@ -59,8 +59,8 @@ public:
     Q_SIGNAL void currentSearchResultIndexChanged();
 
     Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
-    void setTextDocument(QQuickTextDocument* val);
-    QQuickTextDocument* textDocument() const { return m_textDocument; }
+    void setTextDocument(QQuickTextDocument *val);
+    QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
     Q_SIGNAL void replaceCurrent(const QString &replacementText);
@@ -74,10 +74,11 @@ public:
 
     // Helper function
     Q_INVOKABLE QJsonArray indexesOf(const QString &of, const QString &in) const;
-    Q_INVOKABLE QString createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const;
+    Q_INVOKABLE QString createMarkupText(const QString &text, int from, int to, const QColor &bg,
+                                         const QColor &fg) const;
 
 protected:
-    SearchAgent(QObject *parent=nullptr);
+    SearchAgent(QObject *parent = nullptr);
     void resetEngine();
     void resetTextDocument();
     void onSearchRequest(const QString &string);
@@ -89,9 +90,9 @@ private:
     int m_currentSearchResultIndex = -1;
     QObjectProperty<SearchEngine> m_engine;
     QObjectProperty<QQuickTextDocument> m_textDocument;
-    QList< QPair<int,int> > m_textDocumentSearchResults;
+    QList<QPair<int, int>> m_textDocumentSearchResults;
 };
-Q_DECLARE_METATYPE(SearchAgent*)
+Q_DECLARE_METATYPE(SearchAgent *)
 QML_DECLARE_TYPEINFO(SearchAgent, QML_HAS_ATTACHED_PROPERTIES)
 
 class SearchEngine : public QObject
@@ -99,7 +100,7 @@ class SearchEngine : public QObject
     Q_OBJECT
 
 public:
-    SearchEngine(QObject *parent=nullptr);
+    SearchEngine(QObject *parent = nullptr);
     ~SearchEngine();
 
     Q_PROPERTY(QQmlListProperty<SearchAgent> searchAgents READ searchAgents NOTIFY searchAgentsChanged)
@@ -111,11 +112,10 @@ public:
     Q_SIGNAL void searchAgentCountChanged();
     Q_SIGNAL void searchAgentsChanged();
 
-    enum SearchFlag
-    {
-        SearchBackward        = 0x00001,
+    enum SearchFlag {
+        SearchBackward = 0x00001,
         SearchCaseSensitively = 0x00002,
-        SearchWholeWords      = 0x00004
+        SearchWholeWords = 0x00004
     };
     Q_DECLARE_FLAGS(SearchFlags, SearchFlag)
     Q_PROPERTY(SearchFlags searchFlags READ searchFlags WRITE setSearchFlags NOTIFY searchFlagsChanged)
@@ -153,7 +153,8 @@ public:
     Q_INVOKABLE void cycleSearchResult();
 
     static QJsonArray indexesOf(const QString &of, const QString &in, int flags);
-    static QString createMarkupText(const QString &text, int from, int to, const QBrush &bg, const QBrush &fg);
+    static QString createMarkupText(const QString &text, int from, int to, const QBrush &bg,
+                                    const QBrush &fg);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -163,7 +164,7 @@ private:
     void removeSearchAgent(SearchAgent *ptr);
     void sortSearchAgents();
     void sortSearchAgentsLater();
-    static SearchAgent* staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, int index);
+    static SearchAgent *staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, int index);
     static int staticSearchAgentCount(QQmlListProperty<SearchAgent> *list);
 
     void doSearch();
@@ -180,7 +181,7 @@ private:
     ProgressReport *m_progressReport = new ProgressReport(this);
     ExecLaterTimer m_searchAgentSortTimer;
     QList<SearchAgent *> m_searchAgents;
-    QList< QPair<SearchAgent*,int> > m_searchResults;
+    QList<QPair<SearchAgent *, int>> m_searchResults;
 };
 
 class TextDocumentSearch : public QObject
@@ -188,12 +189,12 @@ class TextDocumentSearch : public QObject
     Q_OBJECT
 
 public:
-    TextDocumentSearch(QObject *parent=nullptr);
+    TextDocumentSearch(QObject *parent = nullptr);
     ~TextDocumentSearch();
 
     Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
-    void setTextDocument(QQuickTextDocument* val);
-    QQuickTextDocument* textDocument() const { return m_textDocument; }
+    void setTextDocument(QQuickTextDocument *val);
+    QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
     Q_PROPERTY(QString searchString READ searchString WRITE setSearchString NOTIFY searchStringChanged)
@@ -235,7 +236,7 @@ private:
     QString m_searchString;
     int m_currentResultIndex = -1;
     SearchEngine::SearchFlags m_searchFlags;
-    QList< QPair<int,int> > m_searchResults;
+    QList<QPair<int, int>> m_searchResults;
     QObjectProperty<QQuickTextDocument> m_textDocument;
 };
 

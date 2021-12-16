@@ -13,16 +13,9 @@
 
 #include "dummyclient.h"
 
-DummyClient::DummyClient(QObject *parent)
-    : Sonnet::Client(parent)
-{
+DummyClient::DummyClient(QObject *parent) : Sonnet::Client(parent) { }
 
-}
-
-DummyClient::~DummyClient()
-{
-
-}
+DummyClient::~DummyClient() { }
 
 int DummyClient::reliability() const
 {
@@ -42,15 +35,9 @@ QStringList DummyClient::languages() const
 ///////////////////////////////////////////////////////////////////////////////
 
 DummySpellerPlugin::DummySpellerPlugin(const QString &language)
-    : Sonnet::SpellerPlugin(language)
-{
+    : Sonnet::SpellerPlugin(language) { }
 
-}
-
-DummySpellerPlugin::~DummySpellerPlugin()
-{
-
-}
+DummySpellerPlugin::~DummySpellerPlugin() { }
 
 bool DummySpellerPlugin::isCorrect(const QString &word) const
 {
@@ -89,5 +76,3 @@ bool DummySpellerPlugin::addToSession(const QString &word)
     Q_UNUSED(word)
     return true;
 }
-
-

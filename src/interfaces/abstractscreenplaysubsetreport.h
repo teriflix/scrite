@@ -106,7 +106,7 @@ public:
     virtual bool includeScreenplayElement(const ScreenplayElement *) const { return true; }
 
 protected:
-    AbstractScreenplaySubsetReport(QObject *parent=nullptr);
+    AbstractScreenplaySubsetReport(QObject *parent = nullptr);
 
     Screenplay *screenplaySubset() const { return m_screenplaySubset; }
 

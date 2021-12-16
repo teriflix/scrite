@@ -17,8 +17,7 @@
 
 #include <QScopeGuard>
 
-AbstractExporter::AbstractExporter(QObject *parent)
-                 :AbstractDeviceIO(parent)
+AbstractExporter::AbstractExporter(QObject *parent) : AbstractDeviceIO(parent)
 {
     m_languageBundleMap = TransliterationEngine::instance()->activeLanguages();
     connect(User::instance(), &User::infoChanged, this, &AbstractExporter::featureEnabledChanged);
@@ -49,19 +48,23 @@ QString AbstractExporter::nameFilters() const
 
 bool AbstractExporter::isFeatureEnabled() const
 {
-    if(User::instance()->isLoggedIn())
-    {
+    if (User::instance()->isLoggedIn()) {
         const bool allReportsEnabled = User::instance()->isFeatureEnabled(User::ExportFeature);
-        const bool thisSpecificReportEnabled = allReportsEnabled ? User::instance()->isFeatureNameEnabled(QStringLiteral("export/") + this->formatName()) : false;
+        const bool thisSpecificReportEnabled = allReportsEnabled
+                ? User::instance()->isFeatureNameEnabled(QStringLiteral("export/")
+                                                         + this->formatName())
+                : false;
         return allReportsEnabled && thisSpecificReportEnabled;
     }
 
-    return this->formatName() == QStringLiteral("Adobe PDF"); // this is the only exporter we enable by default when not logged in.
+    return this->formatName() == QStringLiteral("Adobe PDF"); // this is the only exporter we enable
+                                                              // by default when not logged in.
 }
 
 QJsonObject AbstractExporter::configurationFormInfo() const
 {
-    return Application::instance()->objectConfigurationFormInfo(this, &AbstractExporter::staticMetaObject);
+    return Application::instance()->objectConfigurationFormInfo(
+            this, &AbstractExporter::staticMetaObject);
 }
 
 bool AbstractExporter::write()
@@ -71,39 +74,36 @@ bool AbstractExporter::write()
 
     this->error()->clear();
 
-    if(!this->isFeatureEnabled())
-    {
+    if (!this->isFeatureEnabled()) {
         this->error()->setErrorMessage(QStringLiteral("This exporter is not enabled."));
         return false;
     }
 
-    if(fileName.isEmpty())
-    {
+    if (fileName.isEmpty()) {
         this->error()->setErrorMessage(QStringLiteral("Cannot export to an empty file."));
         return false;
     }
 
-    if(document == nullptr)
-    {
+    if (document == nullptr) {
         this->error()->setErrorMessage(QStringLiteral("No document available to export."));
         return false;
     }
 
     QFile file(fileName);
-    if( !file.open(QFile::WriteOnly) )
-    {
-        this->error()->setErrorMessage( QStringLiteral("Could not open file '%1' for writing.").arg(fileName) );
+    if (!file.open(QFile::WriteOnly)) {
+        this->error()->setErrorMessage(
+                QStringLiteral("Could not open file '%1' for writing.").arg(fileName));
         return false;
     }
 
     qScopeGuard([=]() {
         const QString exporterName = QString::fromLatin1(this->metaObject()->className());
-        User::instance()->logActivity2( QStringLiteral("export"), exporterName );
+        User::instance()->logActivity2(QStringLiteral("export"), exporterName);
     });
 
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
-    this->progress()->setProgressText( QStringLiteral("Generating \"%1\"").arg(classInfo.value()));
+    this->progress()->setProgressText(QStringLiteral("Generating \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
     const bool ret = this->doExport(&file);

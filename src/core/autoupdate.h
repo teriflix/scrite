@@ -14,7 +14,6 @@
 #ifndef AUTOUPDATE_H
 #define AUTOUPDATE_H
 
-
 #include <QUrl>
 #include <QObject>
 #include <QJsonObject>
@@ -55,10 +54,10 @@ public:
 
     Q_SIGNAL void surveyInfoChanged();
 
-    Q_INVOKABLE void dontAskForSurveyAgain(bool val=true);
+    Q_INVOKABLE void dontAskForSurveyAgain(bool val = true);
 
 private:
-    AutoUpdate(QObject *parent=nullptr);
+    AutoUpdate(QObject *parent = nullptr);
     void setUpdateDownloadUrl(const QUrl &val);
     void setUpdateInfo(const QJsonObject &val);
     void setSurveyInfo(const QJsonObject &val);

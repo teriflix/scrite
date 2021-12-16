@@ -32,7 +32,7 @@ class WindowsClient : public Sonnet::Client
     // Q_PLUGIN_METADATA(IID "in.scrite.Sonnet.WindowsClient")
 
 public:
-    WindowsClient(QObject *parent=nullptr);
+    WindowsClient(QObject *parent = nullptr);
     ~WindowsClient();
 
     // Sonnet::Client interface
@@ -72,4 +72,3 @@ private:
 Q_DECLARE_LOGGING_CATEGORY(SONNET_WINDOWS_ISPELLCHECKER)
 
 #endif
-

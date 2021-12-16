@@ -35,7 +35,7 @@ TabSequenceManager::~TabSequenceManager()
 
 void TabSequenceManager::setTabKey(int val)
 {
-    if(m_tabKey == val)
+    if (m_tabKey == val)
         return;
 
     m_tabKey = val;
@@ -44,7 +44,7 @@ void TabSequenceManager::setTabKey(int val)
 
 void TabSequenceManager::setBacktabKey(int val)
 {
-    if(m_backtabKey == val)
+    if (m_backtabKey == val)
         return;
 
     m_backtabKey = val;
@@ -53,7 +53,7 @@ void TabSequenceManager::setBacktabKey(int val)
 
 void TabSequenceManager::setTabKeyModifiers(int val)
 {
-    if(m_tabKeyModifiers == val)
+    if (m_tabKeyModifiers == val)
         return;
 
     m_tabKeyModifiers = val;
@@ -62,7 +62,7 @@ void TabSequenceManager::setTabKeyModifiers(int val)
 
 void TabSequenceManager::setBacktabKeyModifiers(int val)
 {
-    if(m_backtabKeyModifiers == val)
+    if (m_backtabKeyModifiers == val)
         return;
 
     m_backtabKeyModifiers = val;
@@ -71,7 +71,7 @@ void TabSequenceManager::setBacktabKeyModifiers(int val)
 
 void TabSequenceManager::setDisabledKeyModifier(int val)
 {
-    if(m_disabledKeyModifier == val)
+    if (m_disabledKeyModifier == val)
         return;
 
     m_disabledKeyModifier = val;
@@ -80,7 +80,7 @@ void TabSequenceManager::setDisabledKeyModifier(int val)
 
 void TabSequenceManager::setReleaseFocusKey(int val)
 {
-    if(m_releaseFocusKey == val)
+    if (m_releaseFocusKey == val)
         return;
 
     m_releaseFocusKey = val;
@@ -89,7 +89,7 @@ void TabSequenceManager::setReleaseFocusKey(int val)
 
 void TabSequenceManager::setReleaseFocusEnabled(bool val)
 {
-    if(m_releaseFocusEnabled == val)
+    if (m_releaseFocusEnabled == val)
         return;
 
     m_releaseFocusEnabled = val;
@@ -98,7 +98,7 @@ void TabSequenceManager::setReleaseFocusEnabled(bool val)
 
 void TabSequenceManager::setWrapAround(bool val)
 {
-    if(m_wrapAround == val)
+    if (m_wrapAround == val)
         return;
 
     m_wrapAround = val;
@@ -109,38 +109,35 @@ void TabSequenceManager::setWrapAround(bool val)
 
 void TabSequenceManager::assumeFocusAt(int index)
 {
-    if(index < 0 || index >= m_tabSequenceItems.size())
+    if (index < 0 || index >= m_tabSequenceItems.size())
         return;
 
     TabSequenceItem *item = m_tabSequenceItems.at(index);
-    QQuickItem *qitem = qobject_cast<QQuickItem*>(item->parent());
-    if(qitem)
+    QQuickItem *qitem = qobject_cast<QQuickItem *>(item->parent());
+    if (qitem)
         qitem->setFocus(true);
 }
 
 void TabSequenceManager::releaseFocus()
 {
     bool hadFocus = false;
-    for(TabSequenceItem *item : qAsConst(m_tabSequenceItems))
-    {
-        QQuickItem *qitem = qobject_cast<QQuickItem*>(item->parent());
-        if(qitem)
-        {
+    for (TabSequenceItem *item : qAsConst(m_tabSequenceItems)) {
+        QQuickItem *qitem = qobject_cast<QQuickItem *>(item->parent());
+        if (qitem) {
             hadFocus |= qitem->hasFocus();
             qitem->setFocus(false);
         }
     }
 
-    if(hadFocus)
+    if (hadFocus)
         emit focusWasReleased();
 }
 
 bool TabSequenceManager::switchFocus(int by)
 {
-    for(int i=0; i<m_tabSequenceItems.size(); i++)
-    {
+    for (int i = 0; i < m_tabSequenceItems.size(); i++) {
         TabSequenceItem *item = m_tabSequenceItems.at(i);
-        if(item->hasFocus())
+        if (item->hasFocus())
             return this->switchFocusFrom(i, by);
     }
 
@@ -149,21 +146,21 @@ bool TabSequenceManager::switchFocus(int by)
 
 bool TabSequenceManager::switchFocusFrom(int fromItemIndex, int by)
 {
-    if(fromItemIndex < 0 || fromItemIndex >= m_tabSequenceItems.size())
+    if (fromItemIndex < 0 || fromItemIndex >= m_tabSequenceItems.size())
         return false;
 
     const int nextIndex = this->fetchItemIndex(fromItemIndex, by);
-    if(by > 0 && nextIndex < fromItemIndex && !m_wrapAround)
+    if (by > 0 && nextIndex < fromItemIndex && !m_wrapAround)
         return false;
 
-    if(by < 0 && nextIndex > fromItemIndex && !m_wrapAround)
+    if (by < 0 && nextIndex > fromItemIndex && !m_wrapAround)
         return false;
 
-    if(nextIndex < 0 || nextIndex >= m_tabSequenceItems.size())
+    if (nextIndex < 0 || nextIndex >= m_tabSequenceItems.size())
         return false;
 
     TabSequenceItem *item = m_tabSequenceItems.at(nextIndex);
-    if(item == nullptr)
+    if (item == nullptr)
         return false;
 
     return item->assumeFocus();
@@ -172,18 +169,18 @@ bool TabSequenceManager::switchFocusFrom(int fromItemIndex, int by)
 int TabSequenceManager::fetchItemIndex(int from, int direction, bool enabledOnly) const
 {
     int idx = from;
-    while(1) {
+    while (1) {
         idx += direction;
-        if(idx == from)
+        if (idx == from)
             break;
-        if(idx >= m_tabSequenceItems.size())
+        if (idx >= m_tabSequenceItems.size())
             idx = 0;
-        else if(idx < 0)
-            idx = m_tabSequenceItems.size()-1;
-        if(!enabledOnly)
+        else if (idx < 0)
+            idx = m_tabSequenceItems.size() - 1;
+        if (!enabledOnly)
             break;
         TabSequenceItem *item = m_tabSequenceItems.at(idx);
-        if(item->isEnabled())
+        if (item->isEnabled())
             break;
     }
     return idx;
@@ -191,22 +188,18 @@ int TabSequenceManager::fetchItemIndex(int from, int direction, bool enabledOnly
 
 void TabSequenceManager::timerEvent(QTimerEvent *te)
 {
-    if(m_timer.timerId() == te->timerId())
-    {
+    if (m_timer.timerId() == te->timerId()) {
         m_timer.stop();
         this->reworkSequence();
-    }
-    else
+    } else
         QObject::timerEvent(te);
 }
 
 bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
 {
-    if(event->type() == QEvent::KeyPress)
-    {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
-        if(m_releaseFocusEnabled && m_releaseFocusKey == ke->key())
-        {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        if (m_releaseFocusEnabled && m_releaseFocusKey == ke->key()) {
             this->releaseFocus();
             return true;
         }
@@ -214,60 +207,55 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
         auto isWatched = [watched](TabSequenceItem *item) {
             QObject *itemParent = item->parent();
             QObject *o = watched;
-            while(o != nullptr) {
-                if(o == itemParent)
+            while (o != nullptr) {
+                if (o == itemParent)
                     return true;
                 o = o->parent();
             }
             return false;
         };
 
-        if(ke->key() == m_tabKey || ke->key() == m_backtabKey)
-        {
+        if (ke->key() == m_tabKey || ke->key() == m_backtabKey) {
             int itemIndex = -1;
-            for(int i=0; i<m_tabSequenceItems.size(); i++)
-            {
+            for (int i = 0; i < m_tabSequenceItems.size(); i++) {
                 TabSequenceItem *item = m_tabSequenceItems.at(i);
-                if(item->hasFocus() && isWatched(item))
-                {
+                if (item->hasFocus() && isWatched(item)) {
                     itemIndex = i;
                     break;
                 }
             }
 
-            if(itemIndex < 0)
+            if (itemIndex < 0)
                 return false;
 
             const Qt::KeyboardModifiers kemods = ke->modifiers();
             auto compareModifiers = [kemods](int val) {
-                if(val == Qt::NoModifier)
+                if (val == Qt::NoModifier)
                     return true;
                 return int(kemods & Qt::KeyboardModifiers(val)) > 0;
             };
 
             int nextIndex = -1;
-            if(ke->key() == m_tabKey && compareModifiers(m_tabKeyModifiers))
-            {
+            if (ke->key() == m_tabKey && compareModifiers(m_tabKeyModifiers)) {
                 nextIndex = fetchItemIndex(itemIndex, 1, !compareModifiers(m_disabledKeyModifier));
-                if(nextIndex < itemIndex && !m_wrapAround)
+                if (nextIndex < itemIndex && !m_wrapAround)
                     return false;
             }
 
-            if(ke->key() == m_backtabKey && compareModifiers(m_backtabKeyModifiers))
-            {
+            if (ke->key() == m_backtabKey && compareModifiers(m_backtabKeyModifiers)) {
                 nextIndex = fetchItemIndex(itemIndex, -1, !compareModifiers(m_disabledKeyModifier));
-                if(nextIndex > itemIndex && !m_wrapAround)
+                if (nextIndex > itemIndex && !m_wrapAround)
                     return false;
             }
 
-            if(nextIndex < 0 || nextIndex >= m_tabSequenceItems.size())
+            if (nextIndex < 0 || nextIndex >= m_tabSequenceItems.size())
                 return false;
 
             TabSequenceItem *item = m_tabSequenceItems.at(nextIndex);
-            if(item == nullptr)
+            if (item == nullptr)
                 return false;
 
-            if(item->assumeFocus())
+            if (item->assumeFocus())
                 return true;
         }
     }
@@ -277,7 +265,7 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
 
 void TabSequenceManager::add(TabSequenceItem *ptr)
 {
-    if(ptr == nullptr || m_tabSequenceItems.contains(ptr))
+    if (ptr == nullptr || m_tabSequenceItems.contains(ptr))
         return;
 
     m_tabSequenceItems.append(ptr);
@@ -288,11 +276,11 @@ void TabSequenceManager::add(TabSequenceItem *ptr)
 
 void TabSequenceManager::remove(TabSequenceItem *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = m_tabSequenceItems.indexOf(ptr);
-    if(index < 0)
+    if (index < 0)
         return;
 
     m_tabSequenceItems.removeAt(index);
@@ -301,15 +289,16 @@ void TabSequenceManager::remove(TabSequenceItem *ptr)
 
 void TabSequenceManager::reworkSequence()
 {
-    if(m_tabSequenceItems.isEmpty())
+    if (m_tabSequenceItems.isEmpty())
         return;
 
     // sort the sequence
-    std::sort(m_tabSequenceItems.begin(), m_tabSequenceItems.end(), [](TabSequenceItem *a, TabSequenceItem *b) {
-        if(a->sequence() == b->sequence())
-            return a->insertIndex() < b->insertIndex();
-        return a->sequence() < b->sequence();
-    });
+    std::sort(m_tabSequenceItems.begin(), m_tabSequenceItems.end(),
+              [](TabSequenceItem *a, TabSequenceItem *b) {
+                  if (a->sequence() == b->sequence())
+                      return a->insertIndex() < b->insertIndex();
+                  return a->sequence() < b->sequence();
+              });
 }
 
 void TabSequenceManager::reworkSequenceLater()
@@ -319,18 +308,16 @@ void TabSequenceManager::reworkSequenceLater()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TabSequenceItem::TabSequenceItem(QObject *parent)
-    : QObject(parent),
-      m_manager(this, "manager")
+TabSequenceItem::TabSequenceItem(QObject *parent) : QObject(parent), m_manager(this, "manager")
 {
-    QQuickItem *qmlItem = qobject_cast<QQuickItem*>(parent);
-    if(qmlItem != nullptr)
+    QQuickItem *qmlItem = qobject_cast<QQuickItem *>(parent);
+    if (qmlItem != nullptr)
         connect(qmlItem, &QQuickItem::focusChanged, this, &TabSequenceItem::hasFocusChanged);
 }
 
 TabSequenceItem::~TabSequenceItem()
 {
-    if(!m_manager.isNull())
+    if (!m_manager.isNull())
         m_manager->remove(this);
 }
 
@@ -341,7 +328,7 @@ TabSequenceItem *TabSequenceItem::qmlAttachedProperties(QObject *object)
 
 void TabSequenceItem::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
@@ -350,15 +337,15 @@ void TabSequenceItem::setEnabled(bool val)
 
 void TabSequenceItem::setManager(TabSequenceManager *val)
 {
-    if(m_manager == val)
+    if (m_manager == val)
         return;
 
-    if(!m_manager.isNull())
+    if (!m_manager.isNull())
         m_manager->remove(this);
 
     m_manager = val;
 
-    if(!m_manager.isNull())
+    if (!m_manager.isNull())
         m_manager->add(this);
 
     emit managerChanged();
@@ -366,21 +353,20 @@ void TabSequenceItem::setManager(TabSequenceManager *val)
 
 void TabSequenceItem::setSequence(int val)
 {
-    if(m_sequence == val)
+    if (m_sequence == val)
         return;
 
     m_sequence = val;
     emit sequenceChanged();
 
-    if(!m_manager.isNull())
+    if (!m_manager.isNull())
         m_manager->reworkSequenceLater();
 }
 
 bool TabSequenceItem::hasFocus() const
 {
-    QQuickItem *qmlItem = qobject_cast<QQuickItem*>(this->parent());
-    if(qmlItem != nullptr)
-    {
+    QQuickItem *qmlItem = qobject_cast<QQuickItem *>(this->parent());
+    if (qmlItem != nullptr) {
         QQuickWindow *qmlWindow = qmlItem->window();
         return Application::instance()->hasActiveFocus(qmlWindow, qmlItem);
     }
@@ -390,10 +376,9 @@ bool TabSequenceItem::hasFocus() const
 
 bool TabSequenceItem::focusNext()
 {
-    if(m_manager != nullptr)
-    {
+    if (m_manager != nullptr) {
         int index = m_manager->indexOf(this);
-        if(index < 0)
+        if (index < 0)
             return false;
 
         return m_manager->switchFocusFrom(index, 1);
@@ -404,10 +389,9 @@ bool TabSequenceItem::focusNext()
 
 bool TabSequenceItem::focusPrevious()
 {
-    if(m_manager != nullptr)
-    {
+    if (m_manager != nullptr) {
         int index = m_manager->indexOf(this);
-        if(index < 0)
+        if (index < 0)
             return false;
 
         return m_manager->switchFocusFrom(index, -1);
@@ -418,9 +402,8 @@ bool TabSequenceItem::focusPrevious()
 
 bool TabSequenceItem::assumeFocus()
 {
-    QQuickItem *qmlItem = qobject_cast<QQuickItem*>(this->parent());
-    if(qmlItem != nullptr)
-    {
+    QQuickItem *qmlItem = qobject_cast<QQuickItem *>(this->parent());
+    if (qmlItem != nullptr) {
         emit aboutToReceiveFocus();
         qmlItem->setFocus(true);
         qmlItem->forceActiveFocus();
@@ -435,6 +418,3 @@ void TabSequenceItem::resetManager()
     m_manager = nullptr;
     emit managerChanged();
 }
-
-
-

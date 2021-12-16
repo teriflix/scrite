@@ -26,12 +26,12 @@ class EventAutomationStep : public AbstractAutomationStep
     Q_OBJECT
 
 public:
-    EventAutomationStep(QObject *parent=nullptr);
+    EventAutomationStep(QObject *parent = nullptr);
     ~EventAutomationStep();
 
     Q_PROPERTY(QWindow* window READ window WRITE setWindow RESET resetWindow NOTIFY windowChanged)
-    void setWindow(QWindow* val);
-    QWindow* window() const { return m_window; }
+    void setWindow(QWindow *val);
+    QWindow *window() const { return m_window; }
     Q_SIGNAL void windowChanged();
 
     Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
@@ -39,12 +39,18 @@ public:
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();
 
-    Q_INVOKABLE void mouseMove(qreal x, qreal y, int button=Qt::LeftButton, int modifiers=Qt::NoModifier);
-    Q_INVOKABLE void mouseClick(qreal x, qreal y, int button=Qt::LeftButton, int modifiers=Qt::NoModifier);
-    Q_INVOKABLE void mousePress(qreal x, qreal y, int button=Qt::LeftButton, int modifiers=Qt::NoModifier);
-    Q_INVOKABLE void mouseWheel(qreal x, qreal y, int delta, int orientation=Qt::Vertical, int modifiers=Qt::NoModifier);
-    Q_INVOKABLE void mouseRelease(qreal x, qreal y, int button=Qt::LeftButton, int modifiers=Qt::NoModifier);
-    Q_INVOKABLE void mouseDoubleClick(qreal x, qreal y, int button=Qt::LeftButton, int modifiers=Qt::NoModifier);
+    Q_INVOKABLE void mouseMove(qreal x, qreal y, int button = Qt::LeftButton,
+                               int modifiers = Qt::NoModifier);
+    Q_INVOKABLE void mouseClick(qreal x, qreal y, int button = Qt::LeftButton,
+                                int modifiers = Qt::NoModifier);
+    Q_INVOKABLE void mousePress(qreal x, qreal y, int button = Qt::LeftButton,
+                                int modifiers = Qt::NoModifier);
+    Q_INVOKABLE void mouseWheel(qreal x, qreal y, int delta, int orientation = Qt::Vertical,
+                                int modifiers = Qt::NoModifier);
+    Q_INVOKABLE void mouseRelease(qreal x, qreal y, int button = Qt::LeftButton,
+                                  int modifiers = Qt::NoModifier);
+    Q_INVOKABLE void mouseDoubleClick(qreal x, qreal y, int button = Qt::LeftButton,
+                                      int modifiers = Qt::NoModifier);
 
     Q_INVOKABLE void keyPress(int key, int modifiers);
     Q_INVOKABLE void keyRelease(int key, int modifiers);

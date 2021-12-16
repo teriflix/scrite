@@ -23,14 +23,14 @@ class FinalDraftExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
 
 public:
-    Q_INVOKABLE FinalDraftExporter(QObject *parent=nullptr);
+    Q_INVOKABLE FinalDraftExporter(QObject *parent = nullptr);
     ~FinalDraftExporter();
 
     Q_CLASSINFO("markLanguagesExplicitly_FieldLabel", "Explicity mark text-fragments of different languages.")
     Q_CLASSINFO("markLanguagesExplicitly_FieldEditor", "CheckBox")
     Q_PROPERTY(bool markLanguagesExplicitly READ isMarkLanguagesExplicitly WRITE setMarkLanguagesExplicitly NOTIFY markLanguagesExplicitlyChanged)
     void setMarkLanguagesExplicitly(bool val);
-    bool isMarkLanguagesExplicitly() const {return m_markLanguagesExplicitly; }
+    bool isMarkLanguagesExplicitly() const { return m_markLanguagesExplicitly; }
     Q_SIGNAL void markLanguagesExplicitlyChanged();
 
     bool canBundleFonts() const { return false; }

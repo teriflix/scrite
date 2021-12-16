@@ -31,8 +31,8 @@ public:
     ~AbstractObjectTracker();
 
     Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
-    void setTarget(QObject* val);
-    QObject* target() const { return m_target; }
+    void setTarget(QObject *val);
+    QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -55,7 +55,7 @@ protected:
     void resetTarget();
 
 protected:
-    AbstractObjectTracker(QObject *parent=nullptr);
+    AbstractObjectTracker(QObject *parent = nullptr);
     virtual void init() { }
 
     bool m_enabled = true;
@@ -68,7 +68,7 @@ class TrackProperty : public AbstractObjectTracker
     Q_OBJECT
 
 public:
-    TrackProperty(QObject *parent=nullptr);
+    TrackProperty(QObject *parent = nullptr);
     ~TrackProperty();
 
     Q_PROPERTY(QString property READ property WRITE setProperty NOTIFY propertyChanged)
@@ -88,7 +88,7 @@ class TrackModelRow : public AbstractObjectTracker
     Q_OBJECT
 
 public:
-    TrackModelRow(QObject *parent=nullptr);
+    TrackModelRow(QObject *parent = nullptr);
     ~TrackModelRow();
 
     Q_PROPERTY(int row READ row WRITE setRow NOTIFY rowChanged)
@@ -101,13 +101,7 @@ public:
     QModelIndex rootIndex() const { return m_rootIndex; }
     Q_SIGNAL void rootIndexChanged();
 
-    enum Event
-    {
-        RowAboutToRemove,
-        RowRemoved,
-        RowAboutToInsert,
-        RowInserted
-    };
+    enum Event { RowAboutToRemove, RowRemoved, RowAboutToInsert, RowInserted };
     Q_ENUM(Event)
     Q_PROPERTY(Event event READ rowEvent WRITE setRowEvent NOTIFY eventChanged)
     void setRowEvent(Event val);
@@ -132,7 +126,12 @@ private:
     int m_operation = None;
     int m_start = -1;
     int m_end = -1;
-    void resetOperation() { m_operation = None; m_start=-1; m_end=-1; }
+    void resetOperation()
+    {
+        m_operation = None;
+        m_start = -1;
+        m_end = -1;
+    }
 };
 
 class TrackSignal : public AbstractObjectTracker
@@ -140,7 +139,7 @@ class TrackSignal : public AbstractObjectTracker
     Q_OBJECT
 
 public:
-    TrackSignal(QObject *parent=nullptr);
+    TrackSignal(QObject *parent = nullptr);
     ~TrackSignal();
 
     Q_PROPERTY(QString signal READ signal WRITE setSignal NOTIFY signalChanged)
@@ -197,9 +196,11 @@ private:
     ExecLaterTimer m_timer;
     bool m_emitCallsWhileDisabled = false;
 
-    static void staticAppendTracker(QQmlListProperty<AbstractObjectTracker> *list, AbstractObjectTracker *ptr);
+    static void staticAppendTracker(QQmlListProperty<AbstractObjectTracker> *list,
+                                    AbstractObjectTracker *ptr);
     static void staticClearTrackers(QQmlListProperty<AbstractObjectTracker> *list);
-    static AbstractObjectTracker* staticTrackerAt(QQmlListProperty<AbstractObjectTracker> *list, int index);
+    static AbstractObjectTracker *staticTrackerAt(QQmlListProperty<AbstractObjectTracker> *list,
+                                                  int index);
     static int staticTrackerCount(QQmlListProperty<AbstractObjectTracker> *list);
     QList<AbstractObjectTracker *> m_trackers;
 };

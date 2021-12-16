@@ -33,14 +33,13 @@ public:
     enum Type { Header, Footer };
     Q_ENUM(Type)
 
-    HeaderFooter(Type type, QObject *parent=nullptr);
+    HeaderFooter(Type type, QObject *parent = nullptr);
     ~HeaderFooter();
 
     Q_PROPERTY(Type type READ type CONSTANT)
     Type type() const { return m_type; }
 
-    enum Field
-    {
+    enum Field {
         Nothing,
 
         Title, // query QTextDocument::property("#title") for this.
@@ -102,7 +101,7 @@ public:
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
 
-    void prepare(const QMap<Field,QString> &fieldValues, const QRectF &rect, QPaintDevice *pd);
+    void prepare(const QMap<Field, QString> &fieldValues, const QRectF &rect, QPaintDevice *pd);
     void paint(QPainter *paint, const QRectF &, int pageNr, int pageCount);
     void finish();
 
@@ -133,7 +132,7 @@ class Watermark : public QObject
     Q_OBJECT
 
 public:
-    Watermark(QObject *parent=nullptr);
+    Watermark(QObject *parent = nullptr);
     ~Watermark();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -201,14 +200,14 @@ class QTextDocumentPagedPrinter : public QObject
     Q_OBJECT
 
 public:
-    QTextDocumentPagedPrinter(QObject *parent=nullptr);
+    QTextDocumentPagedPrinter(QObject *parent = nullptr);
     ~QTextDocumentPagedPrinter();
 
     Q_PROPERTY(HeaderFooter* header READ header CONSTANT)
-    HeaderFooter* header() const { return m_header; }
+    HeaderFooter *header() const { return m_header; }
 
     Q_PROPERTY(HeaderFooter* footer READ footer CONSTANT)
-    HeaderFooter* footer() const { return m_footer; }
+    HeaderFooter *footer() const { return m_footer; }
 
     Q_PROPERTY(Watermark* watermark READ watermark CONSTANT)
     Watermark *watermark() const { return m_watermark; }
@@ -218,17 +217,19 @@ public:
     static void loadSettings(HeaderFooter *header, HeaderFooter *footer, Watermark *watermark);
 
 private:
-    void printPageContents(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body);
-    void printHeaderFooterWatermark(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc, const QRectF &body);
+    void printPageContents(int pageNr, int pageCount, QPainter *painter, const QTextDocument *doc,
+                           const QRectF &body);
+    void printHeaderFooterWatermark(int pageNr, int pageCount, QPainter *painter,
+                                    const QTextDocument *doc, const QRectF &body);
 
 private:
-    HeaderFooter* m_header = new HeaderFooter(HeaderFooter::Header, this);
-    HeaderFooter* m_footer = new HeaderFooter(HeaderFooter::Footer, this);
+    HeaderFooter *m_header = new HeaderFooter(HeaderFooter::Header, this);
+    HeaderFooter *m_footer = new HeaderFooter(HeaderFooter::Footer, this);
     Watermark *m_watermark = new Watermark(this);
     ErrorReport *m_errorReport = new ErrorReport(this);
     ProgressReport *m_progressReport = new ProgressReport(this);
-    QPagedPaintDevice* m_printer = nullptr;
-    QTextDocument* m_textDocument = nullptr;
+    QPagedPaintDevice *m_printer = nullptr;
+    QTextDocument *m_textDocument = nullptr;
     QRectF m_headerRect;
     QRectF m_footerRect;
 };

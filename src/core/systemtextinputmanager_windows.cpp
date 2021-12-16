@@ -15,7 +15,8 @@
 #include <QtDebug>
 #include <QGuiApplication>
 
-SystemTextInputManagerBackend_Windows::SystemTextInputManagerBackend_Windows(SystemTextInputManager *parent)
+SystemTextInputManagerBackend_Windows::SystemTextInputManagerBackend_Windows(
+        SystemTextInputManager *parent)
     : AbstractSystemTextInputManagerBackend(parent)
 {
     qApp->installNativeEventFilter(this);
@@ -24,7 +25,7 @@ SystemTextInputManagerBackend_Windows::SystemTextInputManagerBackend_Windows(Sys
 
 SystemTextInputManagerBackend_Windows::~SystemTextInputManagerBackend_Windows()
 {
-	// In anycase, this object will be removed from filter lists during destruction.
+    // In anycase, this object will be removed from filter lists during destruction.
     // qApp->removeNativeEventFilter(this);
     // qApp->removeEventFilter(this);
 }
@@ -33,25 +34,25 @@ QList<AbstractSystemTextInputSource *> SystemTextInputManagerBackend_Windows::re
 {
     QList<AbstractSystemTextInputSource *> ret;
     int nrKeyboards = GetKeyboardLayoutList(0, nullptr);
-    if(nrKeyboards == 0)
+    if (nrKeyboards == 0)
         return ret;
 
     QVector<HKL> keyboards(nrKeyboards, nullptr);
     nrKeyboards = GetKeyboardLayoutList(nrKeyboards, keyboards.data());
-    for(int i=0; i<nrKeyboards; i++)
+    for (int i = 0; i < nrKeyboards; i++)
         ret << new SystemTextInputSource_Windows(keyboards.at(i), this->inputManager());
 
     return ret;
 }
 
-bool SystemTextInputManagerBackend_Windows::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool SystemTextInputManagerBackend_Windows::nativeEventFilter(const QByteArray &eventType,
+                                                              void *message, long *result)
 {
     Q_UNUSED(eventType)
     Q_UNUSED(result)
 
-    const MSG *winMsg = static_cast<MSG*>(message);
-    if(winMsg->message == WM_INPUTLANGCHANGE)
-    {
+    const MSG *winMsg = static_cast<MSG *>(message);
+    if (winMsg->message == WM_INPUTLANGCHANGE) {
         this->determineSelectedInputSource();
         return false;
     }
@@ -72,7 +73,8 @@ bool SystemTextInputManagerBackend_Windows::eventFilter(QObject *object, QEvent 
       lost focus and got it back, but its a price we have to pay for Windows not giving us any
       WM_ message to notify us.
       */
-    if(event->type() == QEvent::ApplicationStateChange && object == qApp && qApp->applicationState() == Qt::ApplicationActive)
+    if (event->type() == QEvent::ApplicationStateChange && object == qApp
+        && qApp->applicationState() == Qt::ApplicationActive)
         this->inputManager()->reload();
 
     return false;
@@ -80,21 +82,23 @@ bool SystemTextInputManagerBackend_Windows::eventFilter(QObject *object, QEvent 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SystemTextInputSource_Windows::SystemTextInputSource_Windows(HKL keyboardLayoutHandle, SystemTextInputManager *parent)
+SystemTextInputSource_Windows::SystemTextInputSource_Windows(HKL keyboardLayoutHandle,
+                                                             SystemTextInputManager *parent)
     : AbstractSystemTextInputSource(parent), m_hkl(keyboardLayoutHandle)
 {
     // HKL is a 4-byte number where last 2 bytes is language code and first 2 bytes is layout type
-    LANGID languageId = LANGID( quint32(m_hkl) & 0x0000FFFF );
+    LANGID languageId = LANGID(quint32(m_hkl) & 0x0000FFFF);
     int layoutType = (quint32(m_hkl) & 0xFFFF0000) >> 16;
     auto toHex = [](const int number) {
-        QString ret = QString::number(number,16).toUpper();
-        if(ret.length() < 4)
-            ret.prepend( QString(4-ret.length(),QChar('0')) );
+        QString ret = QString::number(number, 16).toUpper();
+        if (ret.length() < 4)
+            ret.prepend(QString(4 - ret.length(), QChar('0')));
         return ret;
     };
 
     LCID locale = MAKELCID(languageId, SORT_DEFAULT);
-    wchar_t name[256]; memset(name, 0, sizeof(name));
+    wchar_t name[256];
+    memset(name, 0, sizeof(name));
     GetLocaleInfoW(locale, LOCALE_SLANGUAGE, name, 256);
     m_id = toHex(languageId) + QStringLiteral("-") + toHex(layoutType);
     m_displayName = QString::fromWCharArray(name);
@@ -103,19 +107,17 @@ SystemTextInputSource_Windows::SystemTextInputSource_Windows(HKL keyboardLayoutH
     GetLocaleInfoW(locale, LOCALE_SNAME, name, 256);
     const QString languageCode = QString::fromWCharArray(name).left(2);
 
-    static const QStringList languageCodes = QStringList() << QStringLiteral("en") << QStringLiteral("bn") <<
-        QStringLiteral("gu") << QStringLiteral("hi") << QStringLiteral("kn") << QStringLiteral("ml") <<
-        QStringLiteral("mr") << QStringLiteral("or") << QStringLiteral("pa") << QStringLiteral("sa") <<
-        QStringLiteral("ta") << QStringLiteral("te");
+    static const QStringList languageCodes = QStringList()
+            << QStringLiteral("en") << QStringLiteral("bn") << QStringLiteral("gu")
+            << QStringLiteral("hi") << QStringLiteral("kn") << QStringLiteral("ml")
+            << QStringLiteral("mr") << QStringLiteral("or") << QStringLiteral("pa")
+            << QStringLiteral("sa") << QStringLiteral("ta") << QStringLiteral("te");
     m_language = languageCodes.indexOf(languageCode);
 
-    this->setSelected( GetKeyboardLayout(0) == m_hkl );
+    this->setSelected(GetKeyboardLayout(0) == m_hkl);
 }
 
-SystemTextInputSource_Windows::~SystemTextInputSource_Windows()
-{
-
-}
+SystemTextInputSource_Windows::~SystemTextInputSource_Windows() { }
 
 void SystemTextInputSource_Windows::select()
 {
@@ -125,5 +127,5 @@ void SystemTextInputSource_Windows::select()
 
 void SystemTextInputSource_Windows::checkSelection()
 {
-    this->setSelected( GetKeyboardLayout(0) == m_hkl );
+    this->setSelected(GetKeyboardLayout(0) == m_hkl);
 }

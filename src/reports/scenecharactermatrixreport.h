@@ -25,16 +25,12 @@ class SceneCharacterMatrixReport : public AbstractReportGenerator
     Q_CLASSINFO("Description", "Generate a table of scene names and characters.")
 
 public:
-    Q_INVOKABLE SceneCharacterMatrixReport(QObject *parent=nullptr);
+    Q_INVOKABLE SceneCharacterMatrixReport(QObject *parent = nullptr);
     ~SceneCharacterMatrixReport();
 
     bool requiresConfiguration() const { return true; }
 
-    enum Type
-    {
-        SceneVsCharacter,
-        CharacterVsScene
-    };
+    enum Type { SceneVsCharacter, CharacterVsScene };
     Q_ENUM(Type)
     Q_CLASSINFO("Type_CharacterVsScene", "Character vs Scene")
     Q_CLASSINFO("Type_SceneVsCharacter", "Scene Vs Character")
@@ -99,7 +95,7 @@ protected:
 private:
     void configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const;
 
-    QList<ScreenplayElement*> getScreenplayElements();
+    QList<ScreenplayElement *> getScreenplayElements();
     void finalizeCharacterNames();
 
 private:

@@ -24,31 +24,33 @@
 #include <QSettings>
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
-    : QObject(parent),
-      m_scene(this, "scene"),
-      m_screenplay(this, "screenplay")
+    : QObject(parent), m_scene(this, "scene"), m_screenplay(this, "screenplay")
 {
-    m_screenplay = qobject_cast<Screenplay*>(parent);
+    m_screenplay = qobject_cast<Screenplay *>(parent);
 
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
-    connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::userSceneNumberChanged, this,
+            &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::breakTitleChanged, this, &ScreenplayElement::elementChanged);
-    connect(this, &ScreenplayElement::breakSubtitleChanged, this, &ScreenplayElement::elementChanged);
-    connect(this, &ScreenplayElement::breakSummaryChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::breakSubtitleChanged, this,
+            &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::breakSummaryChanged, this,
+            &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::editorHintsChanged, this, &ScreenplayElement::elementChanged);
-    connect(this, &ScreenplayElement::elementChanged, [=](){
-        this->markAsModified();
-    });
+    connect(this, &ScreenplayElement::elementChanged, [=]() { this->markAsModified(); });
 
     connect(this, &ScreenplayElement::sceneChanged, [=]() {
-        if(m_elementType == BreakElementType)
+        if (m_elementType == BreakElementType)
             emit breakTitleChanged();
     });
 
-    connect(this, &ScreenplayElement::sceneNumberChanged, this, &ScreenplayElement::resolvedSceneNumberChanged);
-    connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::resolvedSceneNumberChanged);
-    connect(this, &ScreenplayElement::userSceneNumberChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
+    connect(this, &ScreenplayElement::sceneNumberChanged, this,
+            &ScreenplayElement::resolvedSceneNumberChanged);
+    connect(this, &ScreenplayElement::userSceneNumberChanged, this,
+            &ScreenplayElement::resolvedSceneNumberChanged);
+    connect(this, &ScreenplayElement::userSceneNumberChanged, this,
+            &ScreenplayElement::evaluateSceneNumberRequest);
 }
 
 ScreenplayElement::~ScreenplayElement()
@@ -59,19 +61,16 @@ ScreenplayElement::~ScreenplayElement()
 
 void ScreenplayElement::setElementType(ScreenplayElement::ElementType val)
 {
-    if(m_elementType == val || m_elementTypeIsSet)
+    if (m_elementType == val || m_elementTypeIsSet)
         return;
 
     m_elementType = val;
     emit elementTypeChanged();
 
-    if(m_elementType == SceneElementType)
-    {
+    if (m_elementType == SceneElementType) {
         this->setNotes(nullptr);
         this->setAttachments(nullptr);
-    }
-    else
-    {
+    } else {
         this->setNotes(new Notes(this));
         this->setAttachments(new Attachments(this));
     }
@@ -79,7 +78,7 @@ void ScreenplayElement::setElementType(ScreenplayElement::ElementType val)
 
 void ScreenplayElement::setBreakType(int val)
 {
-    if(m_breakType == val || m_elementType != BreakElementType)
+    if (m_breakType == val || m_elementType != BreakElementType)
         return;
 
     m_breakType = val;
@@ -88,7 +87,7 @@ void ScreenplayElement::setBreakType(int val)
 
 void ScreenplayElement::setBreakSubtitle(const QString &val)
 {
-    if(m_breakSubtitle == val)
+    if (m_breakSubtitle == val)
         return;
 
     m_breakSubtitle = val;
@@ -97,7 +96,7 @@ void ScreenplayElement::setBreakSubtitle(const QString &val)
 
 void ScreenplayElement::setBreakTitle(const QString &val)
 {
-    if(m_breakTitle == val || m_elementType != BreakElementType)
+    if (m_breakTitle == val || m_elementType != BreakElementType)
         return;
 
     m_breakTitle = val;
@@ -106,10 +105,10 @@ void ScreenplayElement::setBreakTitle(const QString &val)
 
 void ScreenplayElement::setNotes(Notes *val)
 {
-    if(m_notes == val)
+    if (m_notes == val)
         return;
 
-    if(m_notes != nullptr)
+    if (m_notes != nullptr)
         m_notes->deleteLater();
 
     m_notes = val;
@@ -118,10 +117,10 @@ void ScreenplayElement::setNotes(Notes *val)
 
 void ScreenplayElement::setAttachments(Attachments *val)
 {
-    if(m_attachments == val)
+    if (m_attachments == val)
         return;
 
-    if(m_attachments != nullptr)
+    if (m_attachments != nullptr)
         m_attachments->deleteLater();
 
     m_attachments = val;
@@ -130,7 +129,7 @@ void ScreenplayElement::setAttachments(Attachments *val)
 
 void ScreenplayElement::setScreenplay(Screenplay *val)
 {
-    if(m_screenplay != nullptr || m_screenplay == val)
+    if (m_screenplay != nullptr || m_screenplay == val)
         return;
 
     m_screenplay = val;
@@ -140,42 +139,43 @@ void ScreenplayElement::setScreenplay(Screenplay *val)
 void ScreenplayElement::setSceneFromID(const QString &val)
 {
     m_sceneID = val;
-    if(m_elementType == BreakElementType)
+    if (m_elementType == BreakElementType)
         return;
 
-    if(m_screenplay == nullptr)
+    if (m_screenplay == nullptr)
         return;
 
     ScriteDocument *document = m_screenplay->scriteDocument();
-    if(document == nullptr)
+    if (document == nullptr)
         return;
 
     Structure *structure = document->structure();
-    if(structure == nullptr)
+    if (structure == nullptr)
         return;
 
     StructureElement *element = structure->findElementBySceneID(val);
-    if(element == nullptr)
+    if (element == nullptr)
         return;
 
     m_elementTypeIsSet = true;
     this->setScene(element->scene());
-    if(m_scene != nullptr)
+    if (m_scene != nullptr)
         m_sceneID.clear();
 }
 
 QString ScreenplayElement::sceneID() const
 {
-    if(m_elementType == BreakElementType)
-    {
-        if(m_sceneID.isEmpty())
-        {
-            switch(m_breakType)
-            {
-            case Screenplay::Act: return "Act";
-            case Screenplay::Episode: return "Episode";
-            case Screenplay::Interval: return "Interval";
-            default: break;
+    if (m_elementType == BreakElementType) {
+        if (m_sceneID.isEmpty()) {
+            switch (m_breakType) {
+            case Screenplay::Act:
+                return "Act";
+            case Screenplay::Episode:
+                return "Episode";
+            case Screenplay::Interval:
+                return "Interval";
+            default:
+                break;
             }
             return "Break";
         }
@@ -188,7 +188,7 @@ QString ScreenplayElement::sceneID() const
 
 void ScreenplayElement::setUserSceneNumber(const QString &val)
 {
-    if(m_userSceneNumber == val)
+    if (m_userSceneNumber == val)
         return;
 
     m_userSceneNumber = val.toUpper();
@@ -202,7 +202,7 @@ QString ScreenplayElement::resolvedSceneNumber() const
 
 void ScreenplayElement::setScene(Scene *val)
 {
-    if(m_scene == val || m_scene != nullptr || val == nullptr)
+    if (m_scene == val || m_scene != nullptr || val == nullptr)
         return;
 
     m_scene = val;
@@ -213,15 +213,16 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
     connect(m_scene, &Scene::groupsChanged, this, &ScreenplayElement::onSceneGroupsChanged);
 
-    if(m_screenplay)
-        connect(m_scene->heading(), &SceneHeading::enabledChanged, this, &ScreenplayElement::evaluateSceneNumberRequest);
+    if (m_screenplay)
+        connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
+                &ScreenplayElement::evaluateSceneNumberRequest);
 
     emit sceneChanged();
 }
 
 void ScreenplayElement::setExpanded(bool val)
 {
-    if(m_expanded == val)
+    if (m_expanded == val)
         return;
 
     m_expanded = val;
@@ -230,7 +231,7 @@ void ScreenplayElement::setExpanded(bool val)
 
 void ScreenplayElement::setUserData(const QJsonValue &val)
 {
-    if(m_userData == val)
+    if (m_userData == val)
         return;
 
     m_userData = val;
@@ -239,7 +240,7 @@ void ScreenplayElement::setUserData(const QJsonValue &val)
 
 void ScreenplayElement::setEditorHints(const QJsonValue &val)
 {
-    if(m_editorHints == val)
+    if (m_editorHints == val)
         return;
 
     m_editorHints = val;
@@ -248,7 +249,7 @@ void ScreenplayElement::setEditorHints(const QJsonValue &val)
 
 void ScreenplayElement::setSelected(bool val)
 {
-    if(m_selected == val)
+    if (m_selected == val)
         return;
 
     m_selected = val;
@@ -257,7 +258,7 @@ void ScreenplayElement::setSelected(bool val)
 
 void ScreenplayElement::setBreakSummary(const QString &val)
 {
-    if(m_breakSummary == val)
+    if (m_breakSummary == val)
         return;
 
     m_breakSummary = val;
@@ -266,19 +267,22 @@ void ScreenplayElement::setBreakSummary(const QString &val)
 
 bool ScreenplayElement::canSerialize(const QMetaObject *mo, const QMetaProperty &prop) const
 {
-    if(mo != &ScreenplayElement::staticMetaObject)
+    if (mo != &ScreenplayElement::staticMetaObject)
         return false;
 
-    static const int breakSummaryPropIndex = ScreenplayElement::staticMetaObject.indexOfProperty("breakSummary");
-    if(prop.propertyIndex() == breakSummaryPropIndex)
-        return (m_elementType == BreakElementType) && (m_breakType == Screenplay::Act || m_breakType == Screenplay::Episode);
+    static const int breakSummaryPropIndex =
+            ScreenplayElement::staticMetaObject.indexOfProperty("breakSummary");
+    if (prop.propertyIndex() == breakSummaryPropIndex)
+        return (m_elementType == BreakElementType)
+                && (m_breakType == Screenplay::Act || m_breakType == Screenplay::Episode);
 
     static const int notesPropIndex = ScreenplayElement::staticMetaObject.indexOfProperty("notes");
-    if(prop.propertyIndex() == notesPropIndex)
+    if (prop.propertyIndex() == notesPropIndex)
         return m_notes != nullptr;
 
-    static const int attachmentsPropIndex = ScreenplayElement::staticMetaObject.indexOfProperty("attachments");
-    if(prop.propertyIndex() == attachmentsPropIndex)
+    static const int attachmentsPropIndex =
+            ScreenplayElement::staticMetaObject.indexOfProperty("attachments");
+    if (prop.propertyIndex() == attachmentsPropIndex)
         return m_attachments != nullptr;
 
     return true;
@@ -286,18 +290,14 @@ bool ScreenplayElement::canSerialize(const QMetaObject *mo, const QMetaProperty 
 
 bool ScreenplayElement::event(QEvent *event)
 {
-    if(event->type() == QEvent::ParentChange)
-    {
-        this->setScreenplay( qobject_cast<Screenplay*>(this->parent()) );
-        if(m_scene == nullptr && !m_sceneID.isEmpty())
+    if (event->type() == QEvent::ParentChange) {
+        this->setScreenplay(qobject_cast<Screenplay *>(this->parent()));
+        if (m_scene == nullptr && !m_sceneID.isEmpty())
             this->setSceneFromID(m_sceneID);
-    }
-    else if(event->type() == QEvent::DynamicPropertyChange)
-    {
-        QDynamicPropertyChangeEvent *propEvent = static_cast<QDynamicPropertyChangeEvent*>(event);
+    } else if (event->type() == QEvent::DynamicPropertyChange) {
+        QDynamicPropertyChangeEvent *propEvent = static_cast<QDynamicPropertyChangeEvent *>(event);
         const QByteArray propName = propEvent->propertyName();
-        if( propName == QByteArrayLiteral("#sceneNumber") )
-        {
+        if (propName == QByteArrayLiteral("#sceneNumber")) {
             m_customSceneNumber = property(propName).toInt();
             emit sceneNumberChanged();
         }
@@ -309,31 +309,27 @@ bool ScreenplayElement::event(QEvent *event)
 void ScreenplayElement::evaluateSceneNumber(int &number)
 {
     int sn = -1;
-    if(!m_userSceneNumber.isEmpty())
+    if (!m_userSceneNumber.isEmpty())
         return;
 
-    if(m_scene != nullptr && m_scene->heading()->isEnabled())
-    {
-        if(number <= 0)
+    if (m_scene != nullptr && m_scene->heading()->isEnabled()) {
+        if (number <= 0)
             number = 1;
         sn = number++;
     }
 
-    if(m_sceneNumber != sn)
-    {
+    if (m_sceneNumber != sn) {
         m_sceneNumber = sn;
         emit sceneNumberChanged();
     }
 }
 
-
 void ScreenplayElement::resetScene()
 {
-    if(m_screenplay != nullptr)
+    if (m_screenplay != nullptr)
         m_screenplay->removeElement(this);
-    else
-    {
-        if(m_sceneID.isEmpty())
+    else {
+        if (m_sceneID.isEmpty())
             m_sceneID = m_scene->id();
         m_scene = nullptr;
         this->deleteLater();
@@ -350,7 +346,7 @@ void ScreenplayElement::resetScreenplay()
 
 void ScreenplayElement::setActIndex(int val)
 {
-    if(m_actIndex == val)
+    if (m_actIndex == val)
         return;
 
     m_actIndex = val;
@@ -359,7 +355,7 @@ void ScreenplayElement::setActIndex(int val)
 
 void ScreenplayElement::setEpisodeIndex(int val)
 {
-    if(m_episodeIndex == val)
+    if (m_episodeIndex == val)
         return;
 
     m_episodeIndex = val;
@@ -368,7 +364,7 @@ void ScreenplayElement::setEpisodeIndex(int val)
 
 void ScreenplayElement::setElementIndex(int val)
 {
-    if(m_elementIndex == val)
+    if (m_elementIndex == val)
         return;
 
     m_elementIndex = val;
@@ -381,7 +377,7 @@ static const QString coverPagePhotoPath("coverPage/photo.jpg");
 
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
-      m_scriteDocument(qobject_cast<ScriteDocument*>(parent)),
+      m_scriteDocument(qobject_cast<ScriteDocument *>(parent)),
       m_activeScene(this, "activeScene"),
       m_sceneNumberEvaluationTimer("Screenplay.m_sceneNumberEvaluationTimer")
 {
@@ -403,7 +399,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateParagraphCountsLater);
     connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::titlePageIsCenteredChanged, this, &Screenplay::screenplayChanged);
-    connect(this, &Screenplay::screenplayChanged, [=](){
+    connect(this, &Screenplay::screenplayChanged, [=]() {
         this->evaluateParagraphCountsLater();
         this->markAsModified();
     });
@@ -413,19 +409,19 @@ Screenplay::Screenplay(QObject *parent)
 
     QSettings *settings = Application::instance()->settings();
     auto fetchSettings = [=](const QString &field, QString &into) {
-        const QString value = settings->value( QStringLiteral("TitlePage/") + field, QString() ).toString();
-        if(!value.isEmpty())
+        const QString value =
+                settings->value(QStringLiteral("TitlePage/") + field, QString()).toString();
+        if (!value.isEmpty())
             into = value;
     };
-    fetchSettings( QStringLiteral("author"), m_author );
-    fetchSettings( QStringLiteral("contact"), m_contact );
-    fetchSettings( QStringLiteral("address"), m_address );
-    fetchSettings( QStringLiteral("email"), m_email );
-    fetchSettings( QStringLiteral("phone"), m_phoneNumber );
-    fetchSettings( QStringLiteral("website"), m_website );
+    fetchSettings(QStringLiteral("author"), m_author);
+    fetchSettings(QStringLiteral("contact"), m_contact);
+    fetchSettings(QStringLiteral("address"), m_address);
+    fetchSettings(QStringLiteral("email"), m_email);
+    fetchSettings(QStringLiteral("phone"), m_phoneNumber);
+    fetchSettings(QStringLiteral("website"), m_website);
 
-    if(m_scriteDocument != nullptr)
-    {
+    if (m_scriteDocument != nullptr) {
         DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
         connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
     }
@@ -439,7 +435,7 @@ Screenplay::~Screenplay()
 
 void Screenplay::setTitle(const QString &val)
 {
-    if(m_title == val)
+    if (m_title == val)
         return;
 
     m_title = val;
@@ -450,7 +446,7 @@ void Screenplay::setTitle(const QString &val)
 
 void Screenplay::setSubtitle(const QString &val)
 {
-    if(m_subtitle == val)
+    if (m_subtitle == val)
         return;
 
     m_subtitle = val;
@@ -459,12 +455,12 @@ void Screenplay::setSubtitle(const QString &val)
 
 void Screenplay::setLogline(const QString &val)
 {
-    if(m_logline == val)
+    if (m_logline == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "logline");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if (!info->isLocked())
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_logline = val;
@@ -473,7 +469,7 @@ void Screenplay::setLogline(const QString &val)
 
 void Screenplay::setBasedOn(const QString &val)
 {
-    if(m_basedOn == val)
+    if (m_basedOn == val)
         return;
 
     m_basedOn = val;
@@ -482,7 +478,7 @@ void Screenplay::setBasedOn(const QString &val)
 
 void Screenplay::setAuthor(const QString &val)
 {
-    if(m_author == val)
+    if (m_author == val)
         return;
 
     m_author = val;
@@ -493,7 +489,7 @@ void Screenplay::setAuthor(const QString &val)
 
 void Screenplay::setContact(const QString &val)
 {
-    if(m_contact == val)
+    if (m_contact == val)
         return;
 
     m_contact = val;
@@ -502,7 +498,7 @@ void Screenplay::setContact(const QString &val)
 
 void Screenplay::setAddress(QString val)
 {
-    if(m_address == val)
+    if (m_address == val)
         return;
 
     m_address = val;
@@ -511,7 +507,7 @@ void Screenplay::setAddress(QString val)
 
 void Screenplay::setPhoneNumber(QString val)
 {
-    if(m_phoneNumber == val)
+    if (m_phoneNumber == val)
         return;
 
     m_phoneNumber = val;
@@ -520,7 +516,7 @@ void Screenplay::setPhoneNumber(QString val)
 
 void Screenplay::setEmail(QString val)
 {
-    if(m_email == val)
+    if (m_email == val)
         return;
 
     m_email = val;
@@ -529,7 +525,7 @@ void Screenplay::setEmail(QString val)
 
 void Screenplay::setWebsite(QString val)
 {
-    if(m_website == val)
+    if (m_website == val)
         return;
 
     m_website = val;
@@ -538,7 +534,7 @@ void Screenplay::setWebsite(QString val)
 
 void Screenplay::setVersion(const QString &val)
 {
-    if(m_version == val)
+    if (m_version == val)
         return;
 
     m_version = val;
@@ -555,16 +551,17 @@ bool Screenplay::isEmpty() const
         return settings->value(titlePageGroup + QStringLiteral("/") + key).toString();
     };
 
-    const bool allEmpty = m_title.isEmpty() && m_elements.isEmpty() &&
-            m_subtitle.isEmpty() && m_logline.isEmpty() &&
-            m_basedOn.isEmpty() &&
-            (m_author == QSysInfo::machineHostName() || m_author == configuredValue( QStringLiteral("author")) ) &&
-            (m_contact.isEmpty() || m_contact == configuredValue( QStringLiteral("contact") )) &&
-            (m_address.isEmpty() || m_address == configuredValue( QStringLiteral("address") )) &&
-            (m_phoneNumber.isEmpty() || m_phoneNumber == configuredValue( QStringLiteral("phone") )) &&
-            (m_email.isEmpty() || m_email == configuredValue( QStringLiteral("email") )) &&
-            (m_website.isEmpty() || m_website == configuredValue( QStringLiteral("website")) ) &&
-            (m_version == QStringLiteral("Initial Draft"));
+    const bool allEmpty = m_title.isEmpty() && m_elements.isEmpty() && m_subtitle.isEmpty()
+            && m_logline.isEmpty() && m_basedOn.isEmpty()
+            && (m_author == QSysInfo::machineHostName()
+                || m_author == configuredValue(QStringLiteral("author")))
+            && (m_contact.isEmpty() || m_contact == configuredValue(QStringLiteral("contact")))
+            && (m_address.isEmpty() || m_address == configuredValue(QStringLiteral("address")))
+            && (m_phoneNumber.isEmpty()
+                || m_phoneNumber == configuredValue(QStringLiteral("phone")))
+            && (m_email.isEmpty() || m_email == configuredValue(QStringLiteral("email")))
+            && (m_website.isEmpty() || m_website == configuredValue(QStringLiteral("website")))
+            && (m_version == QStringLiteral("Initial Draft"));
     return allEmpty;
 }
 
@@ -576,7 +573,7 @@ void Screenplay::setCoverPagePhoto(const QString &val)
     connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
 
     const QSize fullHdSize(1920, 1080);
-    const QString val2 =dfs->addImage(val, coverPagePhotoPath, fullHdSize);
+    const QString val2 = dfs->addImage(val, coverPagePhotoPath, fullHdSize);
 
     m_coverPagePhoto.clear();
     emit coverPagePhotoChanged();
@@ -592,7 +589,7 @@ void Screenplay::clearCoverPagePhoto()
 
 void Screenplay::setCoverPagePhotoSize(Screenplay::CoverPagePhotoSize val)
 {
-    if(m_coverPagePhotoSize == val)
+    if (m_coverPagePhotoSize == val)
         return;
 
     m_coverPagePhotoSize = val;
@@ -601,7 +598,7 @@ void Screenplay::setCoverPagePhotoSize(Screenplay::CoverPagePhotoSize val)
 
 void Screenplay::setTitlePageIsCentered(bool val)
 {
-    if(m_titlePageIsCentered == val)
+    if (m_titlePageIsCentered == val)
         return;
 
     m_titlePageIsCentered = val;
@@ -611,12 +608,9 @@ void Screenplay::setTitlePageIsCentered(bool val)
 QQmlListProperty<ScreenplayElement> Screenplay::elements()
 {
     return QQmlListProperty<ScreenplayElement>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Screenplay::staticAppendElement,
-                &Screenplay::staticElementCount,
-                &Screenplay::staticElementAt,
-                &Screenplay::staticClearElements);
+            reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+            &Screenplay::staticAppendElement, &Screenplay::staticElementCount,
+            &Screenplay::staticElementAt, &Screenplay::staticClearElements);
 }
 
 void Screenplay::addElement(ScreenplayElement *ptr)
@@ -626,7 +620,7 @@ void Screenplay::addElement(ScreenplayElement *ptr)
 
 void Screenplay::addScene(Scene *scene)
 {
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
     ScreenplayElement *element = new ScreenplayElement(this);
@@ -634,29 +628,47 @@ void Screenplay::addScene(Scene *scene)
     this->addElement(element);
 }
 
-static void screenplayAppendElement(Screenplay *screenplay, ScreenplayElement *ptr) { screenplay->addElement(ptr); }
-static void screenplayRemoveElement(Screenplay *screenplay, ScreenplayElement *ptr) { screenplay->removeElement(ptr); }
-static void screenplayInsertElement(Screenplay *screenplay, ScreenplayElement *ptr, int index) { screenplay->insertElementAt(ptr, index); }
-static ScreenplayElement *screenplayElementAt(Screenplay *screenplay, int index) { return screenplay->elementAt(index); }
-static int screenplayIndexOfElement(Screenplay *screenplay, ScreenplayElement *ptr) { return screenplay->indexOfElement(ptr); }
+static void screenplayAppendElement(Screenplay *screenplay, ScreenplayElement *ptr)
+{
+    screenplay->addElement(ptr);
+}
+static void screenplayRemoveElement(Screenplay *screenplay, ScreenplayElement *ptr)
+{
+    screenplay->removeElement(ptr);
+}
+static void screenplayInsertElement(Screenplay *screenplay, ScreenplayElement *ptr, int index)
+{
+    screenplay->insertElementAt(ptr, index);
+}
+static ScreenplayElement *screenplayElementAt(Screenplay *screenplay, int index)
+{
+    return screenplay->elementAt(index);
+}
+static int screenplayIndexOfElement(Screenplay *screenplay, ScreenplayElement *ptr)
+{
+    return screenplay->indexOfElement(ptr);
+}
 
 void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
 {
-    if(ptr == nullptr || m_elements.indexOf(ptr) >= 0)
+    if (ptr == nullptr || m_elements.indexOf(ptr) >= 0)
         return;
 
     index = (index < 0 || index >= m_elements.size()) ? m_elements.size() : index;
 
-    QScopedPointer< PushObjectListCommand<Screenplay,ScreenplayElement> > cmd;
-    ObjectPropertyInfo *info = m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
-    if(info != nullptr && !info->isLocked())
-    {
-        ObjectListPropertyMethods<Screenplay,ScreenplayElement> methods(&screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement, &screenplayElementAt, screenplayIndexOfElement);
-        cmd.reset( new PushObjectListCommand<Screenplay,ScreenplayElement> (ptr, this, info->property, ObjectList::InsertOperation, methods) );
+    QScopedPointer<PushObjectListCommand<Screenplay, ScreenplayElement>> cmd;
+    ObjectPropertyInfo *info =
+            m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
+    if (info != nullptr && !info->isLocked()) {
+        ObjectListPropertyMethods<Screenplay, ScreenplayElement> methods(
+                &screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement,
+                &screenplayElementAt, screenplayIndexOfElement);
+        cmd.reset(new PushObjectListCommand<Screenplay, ScreenplayElement>(
+                ptr, this, info->property, ObjectList::InsertOperation, methods));
     }
 
     this->beginInsertRows(QModelIndex(), index, index);
-    if(index == m_elements.size())
+    if (index == m_elements.size())
         m_elements.append(ptr);
     else
         m_elements.insert(index, ptr);
@@ -667,9 +679,12 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
-    connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
-    connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
-    connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
+    connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
+            &Screenplay::evaluateSceneNumbersLater);
+    connect(ptr, &ScreenplayElement::sceneTypeChanged, this,
+            &Screenplay::evaluateSceneNumbersLater);
+    connect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
+            &Screenplay::elementSceneGroupsChanged);
     connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
     connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
     connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
@@ -680,11 +695,11 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     emit elementCountChanged();
     emit elementsChanged();
 
-    if(/*ptr->elementType() == ScreenplayElement::SceneElementType && */
-       (this->scriteDocument() && !this->scriteDocument()->isLoading()) )
+    if (/*ptr->elementType() == ScreenplayElement::SceneElementType && */
+        (this->scriteDocument() && !this->scriteDocument()->isLoading()))
         this->setCurrentElementIndex(index);
 
-    if(ptr->elementType() == ScreenplayElement::BreakElementType)
+    if (ptr->elementType() == ScreenplayElement::BreakElementType)
         this->updateBreakTitlesLater();
 }
 
@@ -692,27 +707,29 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
 {
     HourGlass hourGlass;
 
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int row = m_elements.indexOf(ptr);
-    if(row < 0)
+    if (row < 0)
         return;
 
-    QScopedPointer< PushObjectListCommand<Screenplay,ScreenplayElement> > cmd;
-    ObjectPropertyInfo *info = m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
-    if(info != nullptr && !info->isLocked())
-    {
-        ObjectListPropertyMethods<Screenplay,ScreenplayElement> methods(&screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement, &screenplayElementAt, screenplayIndexOfElement);
-        cmd.reset( new PushObjectListCommand<Screenplay,ScreenplayElement> (ptr, this, info->property, ObjectList::RemoveOperation, methods) );
+    QScopedPointer<PushObjectListCommand<Screenplay, ScreenplayElement>> cmd;
+    ObjectPropertyInfo *info =
+            m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
+    if (info != nullptr && !info->isLocked()) {
+        ObjectListPropertyMethods<Screenplay, ScreenplayElement> methods(
+                &screenplayAppendElement, &screenplayRemoveElement, &screenplayInsertElement,
+                &screenplayElementAt, screenplayIndexOfElement);
+        cmd.reset(new PushObjectListCommand<Screenplay, ScreenplayElement>(
+                ptr, this, info->property, ObjectList::RemoveOperation, methods));
     }
 
     this->beginRemoveRows(QModelIndex(), row, row);
     m_elements.removeAt(row);
 
     Scene *scene = ptr->scene();
-    if(scene != nullptr)
-    {
+    if (scene != nullptr) {
         scene->setAct(QString());
         scene->setActIndex(-1);
         scene->setEpisode(QString());
@@ -726,11 +743,16 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
-    disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
-    disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
-    disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
-    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
+    disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
+               &Screenplay::evaluateSceneNumbersLater);
+    disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this,
+               &Screenplay::evaluateSceneNumbersLater);
+    disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
+               &Screenplay::elementSceneGroupsChanged);
+    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this,
+               &Screenplay::updateBreakTitlesLater);
+    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this,
+               &Screenplay::updateBreakTitlesLater);
     disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
 
     this->endRemoveRows();
@@ -741,14 +763,15 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
 
     this->validateCurrentElementIndex();
 
-    if(ptr->parent() == this)
+    if (ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
 }
 
 class ScreenplayElementMoveCommand : public QUndoCommand
 {
 public:
-    ScreenplayElementMoveCommand(Screenplay *screenplay, ScreenplayElement *element, int fromRow, int toRow);
+    ScreenplayElementMoveCommand(Screenplay *screenplay, ScreenplayElement *element, int fromRow,
+                                 int toRow);
     ~ScreenplayElementMoveCommand();
 
     static bool lock;
@@ -768,25 +791,22 @@ private:
 
 bool ScreenplayElementMoveCommand::lock = false;
 
-ScreenplayElementMoveCommand::ScreenplayElementMoveCommand(Screenplay *screenplay, ScreenplayElement *element, int fromRow, int toRow)
+ScreenplayElementMoveCommand::ScreenplayElementMoveCommand(Screenplay *screenplay,
+                                                           ScreenplayElement *element, int fromRow,
+                                                           int toRow)
     : QUndoCommand(),
       m_toRow(toRow),
       m_fromRow(fromRow),
       m_screenplay(screenplay),
       m_element(element)
 {
-
 }
 
-ScreenplayElementMoveCommand::~ScreenplayElementMoveCommand()
-{
-
-}
+ScreenplayElementMoveCommand::~ScreenplayElementMoveCommand() { }
 
 void ScreenplayElementMoveCommand::undo()
 {
-    if(m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0)
-    {
+    if (m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0) {
         this->setObsolete(true);
         return;
     }
@@ -798,8 +818,7 @@ void ScreenplayElementMoveCommand::undo()
 
 void ScreenplayElementMoveCommand::redo()
 {
-    if(m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0)
-    {
+    if (m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0) {
         this->setObsolete(true);
         return;
     }
@@ -811,24 +830,25 @@ void ScreenplayElementMoveCommand::redo()
 
 void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
 {
-    if(ptr == nullptr || toRow >= m_elements.size())
+    if (ptr == nullptr || toRow >= m_elements.size())
         return;
 
-    if(toRow < 0)
-        toRow = m_elements.size()-1;
+    if (toRow < 0)
+        toRow = m_elements.size() - 1;
 
     const int fromRow = m_elements.indexOf(ptr);
-    if(fromRow < 0)
+    if (fromRow < 0)
         return;
 
-    if(fromRow == toRow)
+    if (fromRow == toRow)
         return;
 
-    this->beginMoveRows(QModelIndex(), fromRow, fromRow, QModelIndex(), toRow < fromRow ? toRow : toRow+1);
+    this->beginMoveRows(QModelIndex(), fromRow, fromRow, QModelIndex(),
+                        toRow < fromRow ? toRow : toRow + 1);
     m_elements.move(fromRow, toRow);
     this->endMoveRows();
 
-    if(fromRow == m_currentElementIndex)
+    if (fromRow == m_currentElementIndex)
         this->setCurrentElementIndex(toRow);
 
     emit elementMoved(ptr, fromRow, toRow);
@@ -836,7 +856,7 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
 
     this->updateBreakTitlesLater();
 
-    if(UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
+    if (UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
         UndoStack::active()->push(new ScreenplayElementMoveCommand(this, ptr, fromRow, toRow));
 }
 
@@ -864,14 +884,12 @@ private:
 };
 
 ScreenplayElementsMoveCommand::ScreenplayElementsMoveCommand(Screenplay *screenplay)
-    : QUndoCommand(QStringLiteral("Element Selection Move")),
-      m_screenplay(screenplay)
+    : QUndoCommand(QStringLiteral("Element Selection Move")), m_screenplay(screenplay)
 {
     m_before = this->save();
 
-    m_connection = QObject::connect(screenplay, &Screenplay::aboutToDelete, [=]() {
-        this->setObsolete(true);
-    });
+    m_connection = QObject::connect(screenplay, &Screenplay::aboutToDelete,
+                                    [=]() { this->setObsolete(true); });
 }
 
 ScreenplayElementsMoveCommand::~ScreenplayElementsMoveCommand()
@@ -881,23 +899,22 @@ ScreenplayElementsMoveCommand::~ScreenplayElementsMoveCommand()
 
 void ScreenplayElementsMoveCommand::undo()
 {
-    if(m_screenplay.isNull() || !this->restore(m_before))
+    if (m_screenplay.isNull() || !this->restore(m_before))
         this->setObsolete(true);
 }
 
 void ScreenplayElementsMoveCommand::redo()
 {
-    if(!m_initialized)
-    {
+    if (!m_initialized) {
         m_initialized = true;
-        if(m_screenplay.isNull())
+        if (m_screenplay.isNull())
             this->setObsolete(true);
         else
             m_after = this->save();
         return;
     }
 
-    if(m_screenplay.isNull() || !this->restore(m_after))
+    if (m_screenplay.isNull() || !this->restore(m_after))
         this->setObsolete(true);
 }
 
@@ -906,13 +923,12 @@ QVariantList ScreenplayElementsMoveCommand::save() const
     HourGlass hourGlass;
 
     QVariantList ret;
-    if(m_screenplay.isNull())
+    if (m_screenplay.isNull())
         return ret;
 
-    for(int i=0; i<m_screenplay->elementCount(); i++)
-    {
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
-        if(element->elementType() == ScreenplayElement::BreakElementType)
+        if (element->elementType() == ScreenplayElement::BreakElementType)
             ret << element->breakType();
         else
             ret << element->sceneID();
@@ -925,50 +941,50 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array) const
 {
     HourGlass hourGlass;
 
-    QList<ScreenplayElement*> elements = m_screenplay->getElements();
-    if(array.size() != elements.size())
+    QList<ScreenplayElement *> elements = m_screenplay->getElements();
+    if (array.size() != elements.size())
         return false;
 
     auto findSceneElement = [&elements](const QString &id) {
-        for(int i=0; i<elements.size(); i++) {
+        for (int i = 0; i < elements.size(); i++) {
             ScreenplayElement *element = elements.at(i);
-            if(element->sceneID() == id) {
+            if (element->sceneID() == id) {
                 elements.takeAt(i);
                 return element;
             }
         }
 
-        return (ScreenplayElement*)nullptr;
+        return (ScreenplayElement *)nullptr;
     };
 
     auto findBreakElement = [&elements](int type) {
-        for(int i=0; i<elements.size(); i++) {
+        for (int i = 0; i < elements.size(); i++) {
             ScreenplayElement *element = elements.at(i);
-            if(element->elementType() == ScreenplayElement::BreakElementType && element->breakType() == type) {
+            if (element->elementType() == ScreenplayElement::BreakElementType
+                && element->breakType() == type) {
                 elements.takeAt(i);
                 return element;
             }
         }
-        return (ScreenplayElement*)nullptr;
+        return (ScreenplayElement *)nullptr;
     };
 
-    QList<ScreenplayElement*> newElements;
-    for(QVariant item : array)
-    {
+    QList<ScreenplayElement *> newElements;
+    for (QVariant item : array) {
         ScreenplayElement *element = nullptr;
 
-        if(item.userType() == QMetaType::QString)
+        if (item.userType() == QMetaType::QString)
             element = findSceneElement(item.toString());
         else
             element = findBreakElement(item.toInt());
 
-        if(element == nullptr)
+        if (element == nullptr)
             return false;
 
         newElements.append(element);
     }
 
-    if(newElements.size() != array.size() || !elements.isEmpty())
+    if (newElements.size() != array.size() || !elements.isEmpty())
         return false;
 
     return m_screenplay->setElements(newElements);
@@ -978,35 +994,33 @@ void Screenplay::moveSelectedElements(int toRow)
 {
     HourGlass hourGlass;
 
-    toRow = qBound(0, toRow, m_elements.size()-1);
+    toRow = qBound(0, toRow, m_elements.size() - 1);
 
     /**
-     * Why are we resetting the models while moving multiple elements, instead of removing and inserting them?
-     * Or better yet, moving them?
+     * Why are we resetting the models while moving multiple elements, instead of removing and
+     * inserting them? Or better yet, moving them?
      *
-     * The ScreenplayTextDocument class was built with the assumption that elements will be added, removed or moved
-     * one at a time. So, if we removed all selected elements and reinserted them elsewhere; the text document
-     * wont get updated properly.
+     * The ScreenplayTextDocument class was built with the assumption that elements will be added,
+     * removed or moved one at a time. So, if we removed all selected elements and reinserted them
+     * elsewhere; the text document wont get updated properly.
      *
-     * But when we reset the model, it will simply update the whole screenplay at once. This could be a bit slow,
-     * but is still far better than moving one scene at a time.
+     * But when we reset the model, it will simply update the whole screenplay at once. This could
+     * be a bit slow, but is still far better than moving one scene at a time.
      */
     ScreenplayElementsMoveCommand *cmd = nullptr;
 
     ScreenplayElement *toRowElement = this->elementAt(toRow);
-    if(toRowElement == nullptr)
+    if (toRowElement == nullptr)
         return;
 
     int fromRow = -1;
-    QList<ScreenplayElement*> selectedElements;
-    for(int i=m_elements.size()-1; i>=0; i--)
-    {
+    QList<ScreenplayElement *> selectedElements;
+    for (int i = m_elements.size() - 1; i >= 0; i--) {
         ScreenplayElement *element = m_elements.at(i);
-        if(!element->isSelected())
+        if (!element->isSelected())
             continue;
 
-        if(cmd == nullptr)
-        {
+        if (cmd == nullptr) {
             cmd = new ScreenplayElementsMoveCommand(this);
             this->beginResetModel();
         }
@@ -1016,21 +1030,19 @@ void Screenplay::moveSelectedElements(int toRow)
         fromRow = i;
     }
 
-    if(cmd == nullptr)
+    if (cmd == nullptr)
         return;
 
     toRow = m_elements.indexOf(toRowElement);
-    if(toRow < 0)
-    {
+    if (toRow < 0) {
         delete cmd;
         return;
     }
 
-    if(toRow > fromRow)
+    if (toRow > fromRow)
         ++toRow;
 
-    while(!selectedElements.isEmpty())
-    {
+    while (!selectedElements.isEmpty()) {
         ScreenplayElement *element = selectedElements.takeLast();
         m_elements.insert(toRow, element);
     }
@@ -1041,21 +1053,18 @@ void Screenplay::moveSelectedElements(int toRow)
 
     this->updateBreakTitlesLater();
 
-    if(UndoStack::active() != nullptr)
+    if (UndoStack::active() != nullptr)
         UndoStack::active()->push(cmd);
 }
 
 // TODO implement undo-command to revert group remove operation
 // This could be a simple pre-and-post scene id list thing.
 
-void Screenplay::removeSelectedElements()
-{
-
-}
+void Screenplay::removeSelectedElements() { }
 
 void Screenplay::clearSelection()
 {
-    for(ScreenplayElement *element : qAsConst(m_elements))
+    for (ScreenplayElement *element : qAsConst(m_elements))
         element->setSelected(false);
 }
 
@@ -1066,9 +1075,8 @@ ScreenplayElement *Screenplay::elementAt(int index) const
 
 ScreenplayElement *Screenplay::elementWithIndex(int index) const
 {
-    for(ScreenplayElement *ret : qAsConst(m_elements))
-    {
-        if(ret->elementIndex() == index)
+    for (ScreenplayElement *ret : qAsConst(m_elements)) {
+        if (ret->elementIndex() == index)
             return ret;
     }
 
@@ -1098,14 +1106,14 @@ private:
     QMetaObject::Connection m_connection;
 };
 
-UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds)
+UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay,
+                                                       const QStringList &sceneIds)
     : QUndoCommand(), m_sceneIds(sceneIds), m_screenplay(screenplay)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
-    m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed, [this]() {
-        this->setObsolete(true);
-    });
+    m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed,
+                                    [this]() { this->setObsolete(true); });
 }
 
 UndoClearScreenplayCommand::~UndoClearScreenplayCommand()
@@ -1116,14 +1124,14 @@ UndoClearScreenplayCommand::~UndoClearScreenplayCommand()
 void UndoClearScreenplayCommand::undo()
 {
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(m_screenplay, "elements");
-    if(info) info->lock();
+    if (info)
+        info->lock();
 
     ScriteDocument *document = m_screenplay->scriteDocument();
     Structure *structure = document->structure();
-    Q_FOREACH(QString sceneId, m_sceneIds)
-    {
+    Q_FOREACH (QString sceneId, m_sceneIds) {
         StructureElement *element = structure->findElementBySceneID(sceneId);
-        if(element == nullptr)
+        if (element == nullptr)
             continue;
 
         Scene *scene = element->scene();
@@ -1132,36 +1140,38 @@ void UndoClearScreenplayCommand::undo()
         m_screenplay->addElement(screenplayElement);
     }
 
-    if(info) info->unlock();
+    if (info)
+        info->unlock();
 }
 
 void UndoClearScreenplayCommand::redo()
 {
-    if(!m_firstRedoDone)
-    {
+    if (!m_firstRedoDone) {
         m_firstRedoDone = true;
         return;
     }
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(m_screenplay, "elements");
-    if(info) info->lock();
+    if (info)
+        info->lock();
 
-    while(m_screenplay->elementCount())
-        m_screenplay->removeElement( m_screenplay->elementAt(0) );
+    while (m_screenplay->elementCount())
+        m_screenplay->removeElement(m_screenplay->elementAt(0));
 
-    if(info) info->unlock();
+    if (info)
+        info->unlock();
 }
 
 void Screenplay::clearElements()
 {
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if(info) info->lock();
+    if (info)
+        info->lock();
 
     this->beginResetModel();
 
     QStringList sceneIds;
-    while(m_elements.size())
-    {
+    while (m_elements.size()) {
         sceneIds << m_elements.first()->sceneID();
         // this->removeElement(m_elements.first());
 
@@ -1170,8 +1180,7 @@ void Screenplay::clearElements()
         disconnect(ptr, nullptr, this, nullptr);
 
         Scene *scene = ptr->scene();
-        if(scene != nullptr)
-        {
+        if (scene != nullptr) {
             scene->setAct(QString());
             scene->setActIndex(-1);
             scene->setEpisode(QString());
@@ -1189,10 +1198,11 @@ void Screenplay::clearElements()
     this->evaluateSceneNumbersLater();
     this->validateCurrentElementIndex();
 
-    if(UndoStack::active())
+    if (UndoStack::active())
         UndoStack::active()->push(new UndoClearScreenplayCommand(this, sceneIds));
 
-    if(info) info->unlock();
+    if (info)
+        info->unlock();
 }
 
 class SplitElementUndoCommand : public QUndoCommand
@@ -1212,7 +1222,7 @@ private:
     QByteArray captureScreenplayElements() const;
     void applyScreenplayElements(const QByteArray &bytes);
 
-    QPair<StructureElement*,StructureElement*> findStructureElements() const;
+    QPair<StructureElement *, StructureElement *> findStructureElements() const;
 
 private:
     QString m_splitSceneID;
@@ -1227,18 +1237,13 @@ private:
 SplitElementUndoCommand::SplitElementUndoCommand(ScreenplayElement *ptr)
     : QUndoCommand(), m_screenplayElement(ptr)
 {
-
 }
 
-SplitElementUndoCommand::~SplitElementUndoCommand()
-{
-
-}
+SplitElementUndoCommand::~SplitElementUndoCommand() { }
 
 void SplitElementUndoCommand::prepare()
 {
-    if(m_screenplayElement == nullptr)
-    {
+    if (m_screenplayElement == nullptr) {
         this->setObsolete(true);
         return;
     }
@@ -1252,8 +1257,7 @@ void SplitElementUndoCommand::prepare()
 
 void SplitElementUndoCommand::commit(Scene *splitScene)
 {
-    if(m_screenplayElement == nullptr || splitScene == nullptr || m_screenplay == nullptr)
-    {
+    if (m_screenplayElement == nullptr || splitScene == nullptr || m_screenplay == nullptr) {
         this->setObsolete(true);
         return;
     }
@@ -1268,9 +1272,8 @@ void SplitElementUndoCommand::undo()
 {
     QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
 
-    QPair<StructureElement*,StructureElement*> pair = this->findStructureElements();
-    if(pair.first == nullptr || pair.second == nullptr)
-    {
+    QPair<StructureElement *, StructureElement *> pair = this->findStructureElements();
+    if (pair.first == nullptr || pair.second == nullptr) {
         this->setObsolete(true);
         return;
     }
@@ -1282,8 +1285,8 @@ void SplitElementUndoCommand::undo()
     Scene *originalScene = pair.first->scene();
 
     // Reset our screenplay first, one of the scenes that it refers to is about to be destroyed.
-    Q_FOREACH(int index, m_splitElementIndexes)
-        m_screenplay->removeElement( m_screenplay->elementAt(index) );
+    Q_FOREACH (int index, m_splitElementIndexes)
+        m_screenplay->removeElement(m_screenplay->elementAt(index));
 
     // Destroy the split scene
     GarbageCollector::instance()->add(splitScene);
@@ -1297,18 +1300,15 @@ void SplitElementUndoCommand::undo()
 
 void SplitElementUndoCommand::redo()
 {
-    if(m_splitElementIndexes.isEmpty())
-    {
-        if(m_screenplayElement == nullptr)
-        {
+    if (m_splitElementIndexes.isEmpty()) {
+        if (m_screenplayElement == nullptr) {
             this->setObsolete(true);
             return;
         }
 
-        for(int i=m_screenplay->elementCount()-1; i>=0; i--)
-        {
+        for (int i = m_screenplay->elementCount() - 1; i >= 0; i--) {
             ScreenplayElement *element = m_screenplay->elementAt(i);
-            if(element->sceneID() == m_splitSceneID)
+            if (element->sceneID() == m_splitSceneID)
                 m_splitElementIndexes.append(i);
         }
 
@@ -1319,9 +1319,8 @@ void SplitElementUndoCommand::redo()
 
     QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
 
-    QPair<StructureElement*,StructureElement*> pair = this->findStructureElements();
-    if(pair.first == nullptr || pair.second != nullptr)
-    {
+    QPair<StructureElement *, StructureElement *> pair = this->findStructureElements();
+    if (pair.first == nullptr || pair.second != nullptr) {
         this->setObsolete(true);
         return;
     }
@@ -1338,15 +1337,14 @@ void SplitElementUndoCommand::redo()
     splitScene->setId(m_splitSceneID);
     splitScene->resetFromByteArray(m_splitScenesData[1]);
     splitStructureElement->setScene(splitScene);
-    structure->insertElement(splitStructureElement, structure->indexOfElement(pair.first)+1);
+    structure->insertElement(splitStructureElement, structure->indexOfElement(pair.first) + 1);
 
     // Update original scene with its split data
     Scene *originalScene = pair.first->scene();
     originalScene->resetFromByteArray(m_splitScenesData[0]);
 
     // Reset our screenplay now
-    Q_FOREACH(int index, m_splitElementIndexes)
-    {
+    Q_FOREACH (int index, m_splitElementIndexes) {
         ScreenplayElement *element = new ScreenplayElement(m_screenplay);
         element->setElementType(ScreenplayElement::SceneElementType);
         element->setScene(splitScene);
@@ -1362,8 +1360,7 @@ QByteArray SplitElementUndoCommand::captureScreenplayElements() const
 
     QDataStream ds(&bytes, QIODevice::WriteOnly);
     ds << m_screenplay->elementCount();
-    for(int i=0; i<m_screenplay->elementCount(); i++)
-    {
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
         ds << int(element->elementType());
         ds << element->sceneID();
@@ -1375,8 +1372,7 @@ QByteArray SplitElementUndoCommand::captureScreenplayElements() const
 
 void SplitElementUndoCommand::applyScreenplayElements(const QByteArray &bytes)
 {
-    if(bytes.isEmpty())
-    {
+    if (bytes.isEmpty()) {
         this->setObsolete(true);
         return;
     }
@@ -1388,13 +1384,12 @@ void SplitElementUndoCommand::applyScreenplayElements(const QByteArray &bytes)
 
     m_screenplay->clearElements();
 
-    for(int i=0; i<nrElements; i++)
-    {
+    for (int i = 0; i < nrElements; i++) {
         ScreenplayElement *element = new ScreenplayElement(m_screenplay);
 
         int type = -1;
         ds >> type;
-        element->setElementType( ScreenplayElement::ElementType(type) );
+        element->setElementType(ScreenplayElement::ElementType(type));
 
         QString sceneID;
         ds >> sceneID;
@@ -1413,59 +1408,61 @@ QPair<StructureElement *, StructureElement *> SplitElementUndoCommand::findStruc
     Structure *structure = m_screenplay->scriteDocument()->structure();
 
     StructureElement *splitSceneStructureElement = structure->findElementBySceneID(m_splitSceneID);
-    if(splitSceneStructureElement == nullptr || splitSceneStructureElement->scene() == nullptr)
+    if (splitSceneStructureElement == nullptr || splitSceneStructureElement->scene() == nullptr)
         splitSceneStructureElement = nullptr;
 
-    StructureElement *originalSceneStructureElement = structure->findElementBySceneID(m_originalSceneID);
-    if(originalSceneStructureElement == nullptr || originalSceneStructureElement->scene() == nullptr)
+    StructureElement *originalSceneStructureElement =
+            structure->findElementBySceneID(m_originalSceneID);
+    if (originalSceneStructureElement == nullptr
+        || originalSceneStructureElement->scene() == nullptr)
         originalSceneStructureElement = nullptr;
 
     return qMakePair(originalSceneStructureElement, splitSceneStructureElement);
 }
 
-ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition)
+ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement *element,
+                                            int textPosition)
 {
     ScreenplayElement *ret = nullptr;
-    QScopedPointer<SplitElementUndoCommand> undoCommand( new SplitElementUndoCommand(ptr) );
+    QScopedPointer<SplitElementUndoCommand> undoCommand(new SplitElementUndoCommand(ptr));
 
     {
         QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
 
-        if(ptr == nullptr)
+        if (ptr == nullptr)
             return ret;
 
         const int index = this->indexOfElement(ptr);
-        if(index < 0)
+        if (index < 0)
             return ret;
 
-        if(ptr->elementType() == ScreenplayElement::BreakElementType)
+        if (ptr->elementType() == ScreenplayElement::BreakElementType)
             return ret;
 
         Scene *scene = ptr->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             return ret;
 
         undoCommand->prepare();
 
         Structure *structure = this->scriteDocument()->structure();
         StructureElement *structureElement = structure->findElementBySceneID(scene->id());
-        if(structureElement == nullptr)
+        if (structureElement == nullptr)
             return ret;
 
-        StructureElement *newStructureElement = structure->splitElement(structureElement, element, textPosition);
-        if(newStructureElement == nullptr)
+        StructureElement *newStructureElement =
+                structure->splitElement(structureElement, element, textPosition);
+        if (newStructureElement == nullptr)
             return ret;
 
-        for(int i=this->elementCount()-1; i>=0; i--)
-        {
+        for (int i = this->elementCount() - 1; i >= 0; i--) {
             ScreenplayElement *screenplayElement = this->elementAt(i);
-            if(screenplayElement->scene() == scene)
-            {
+            if (screenplayElement->scene() == scene) {
                 ScreenplayElement *newScreenplayElement = new ScreenplayElement(this);
                 newScreenplayElement->setScene(newStructureElement->scene());
-                this->insertElementAt(newScreenplayElement, i+1);
+                this->insertElementAt(newScreenplayElement, i + 1);
 
-                if(screenplayElement == ptr)
+                if (screenplayElement == ptr)
                     ret = newScreenplayElement;
             }
         }
@@ -1475,8 +1472,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
         ptr->setEditorHints(QJsonValue());
     }
 
-    if(ret != nullptr && UndoStack::active() != nullptr)
-    {
+    if (ret != nullptr && UndoStack::active() != nullptr) {
         undoCommand->commit(ret->scene());
         undoCommand.take();
     }
@@ -1490,16 +1486,14 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
     QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
     Screenplay *screenplay = this;
 
-    if(element == nullptr || element->scene() == nullptr)
+    if (element == nullptr || element->scene() == nullptr)
         return nullptr;
 
     Scene *currentScene = element->scene();
-    int previousElementIndex = screenplay->indexOfElement(element)-1;
-    while(previousElementIndex >= 0)
-    {
+    int previousElementIndex = screenplay->indexOfElement(element) - 1;
+    while (previousElementIndex >= 0) {
         ScreenplayElement *element = screenplay->elementAt(previousElementIndex);
-        if(element == nullptr || element->scene() == nullptr)
-        {
+        if (element == nullptr || element->scene() == nullptr) {
             --previousElementIndex;
             continue;
         }
@@ -1507,7 +1501,7 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
         break;
     }
 
-    if(previousElementIndex < 0)
+    if (previousElementIndex < 0)
         return nullptr;
 
     ScreenplayElement *previousSceneElement = screenplay->elementAt(previousElementIndex);
@@ -1522,13 +1516,12 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
 
 void Screenplay::removeSceneElements(Scene *scene)
 {
-    if(scene == nullptr)
+    if (scene == nullptr)
         return;
 
-    for(int i=m_elements.size()-1; i>=0; i--)
-    {
+    for (int i = m_elements.size() - 1; i >= 0; i--) {
         ScreenplayElement *ptr = m_elements.at(i);
-        if(ptr->scene() == scene)
+        if (ptr->scene() == scene)
             this->removeElement(ptr);
     }
 }
@@ -1547,17 +1540,17 @@ int Screenplay::indexOfElement(ScreenplayElement *element) const
 QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const
 {
     QList<int> ret;
-    if(scene == nullptr || max == 0)
+    if (scene == nullptr || max == 0)
         return ret;
 
     ret = scene->screenplayElementIndexList();
-    if(max < 0 || max >= ret.size() || ret.isEmpty())
+    if (max < 0 || max >= ret.size() || ret.isEmpty())
         return ret;
 
-    if(max == 1)
+    if (max == 1)
         return QList<int>() << ret.first();
 
-    while(ret.size() > max)
+    while (ret.size() > max)
         ret.removeLast();
 
     return ret;
@@ -1566,19 +1559,15 @@ QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const
 QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) const
 {
     const QList<int> indexes = this->sceneElementIndexes(scene, max);
-    QList<ScreenplayElement*> elements;
+    QList<ScreenplayElement *> elements;
 
-    if(indexes.isEmpty())
-    {
-        for(ScreenplayElement *element : qAsConst(m_elements))
-        {
-            if(element->scene() == scene)
+    if (indexes.isEmpty()) {
+        for (ScreenplayElement *element : qAsConst(m_elements)) {
+            if (element->scene() == scene)
                 elements << element;
         }
-    }
-    else
-    {
-        for(int idx : indexes)
+    } else {
+        for (int idx : indexes)
             elements << m_elements.at(idx);
     }
 
@@ -1588,10 +1577,9 @@ QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) cons
 int Screenplay::firstSceneIndex() const
 {
     int index = 0;
-    while(index < m_elements.size())
-    {
+    while (index < m_elements.size()) {
         ScreenplayElement *element = m_elements.at(index);
-        if(element->scene() != nullptr)
+        if (element->scene() != nullptr)
             return index;
 
         ++index;
@@ -1602,11 +1590,10 @@ int Screenplay::firstSceneIndex() const
 
 int Screenplay::lastSceneIndex() const
 {
-    int index = m_elements.size()-1;
-    while(index >= 0)
-    {
+    int index = m_elements.size() - 1;
+    while (index >= 0) {
         ScreenplayElement *element = m_elements.at(index);
-        if(element->scene() != nullptr)
+        if (element->scene() != nullptr)
             return index;
 
         --index;
@@ -1621,18 +1608,15 @@ QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element) const
 
     int _index = this->indexOfElement(element);
 
-    while(1)
-    {
+    while (1) {
         ScreenplayElement *_element = this->elementAt(++_index);
-        if(_element == nullptr)
+        if (_element == nullptr)
             break;
 
-        if(_element->elementType() == ScreenplayElement::BreakElementType)
-        {
-           if(_element->breakType() == element->breakType())
-               break;
-        }
-        else
+        if (_element->elementType() == ScreenplayElement::BreakElementType) {
+            if (_element->breakType() == element->breakType())
+                break;
+        } else
             ret << _index;
     }
 
@@ -1642,26 +1626,26 @@ QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element) const
 int Screenplay::dialogueCount() const
 {
     int ret = 0;
-    for(const ScreenplayElement *element : qAsConst(m_elements))
-    {
+    for (const ScreenplayElement *element : qAsConst(m_elements)) {
         const Scene *scene = element->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
         const int nrParas = scene->elementCount();
-        for(int i=0; i<nrParas; i++)
+        for (int i = 0; i < nrParas; i++)
             ret += scene->elementAt(i)->type() == SceneElement::Character ? 1 : 0;
     }
 
     return ret;
 }
 
-QList<ScreenplayElement *> Screenplay::getFilteredElements(std::function<bool (ScreenplayElement *)> filterFunc) const
+QList<ScreenplayElement *>
+Screenplay::getFilteredElements(std::function<bool(ScreenplayElement *)> filterFunc) const
 {
     const QList<ScreenplayElement *> allElements = m_elements;
-    QList<ScreenplayElement*> ret;
-    for(ScreenplayElement *element : allElements)
-        if(filterFunc(element))
+    QList<ScreenplayElement *> ret;
+    for (ScreenplayElement *element : allElements)
+        if (filterFunc(element))
             ret.append(element);
     return ret;
 }
@@ -1670,19 +1654,18 @@ bool Screenplay::setElements(const QList<ScreenplayElement *> &list)
 {
     // Works only if the elements in the list supplied as parameters
     // is just a reordered list of elements already in the screenplay.
-    if(list == m_elements)
+    if (list == m_elements)
         return true;
 
-    QList<ScreenplayElement*> copy = m_elements;
-    for(ScreenplayElement *element : list)
-    {
+    QList<ScreenplayElement *> copy = m_elements;
+    for (ScreenplayElement *element : list) {
         const int index = copy.isEmpty() ? -1 : copy.indexOf(element);
-        if(index < 0)
+        if (index < 0)
             return false;
         copy.takeAt(index);
     }
 
-    if(!copy.isEmpty())
+    if (!copy.isEmpty())
         return false;
 
     this->beginResetModel();
@@ -1710,51 +1693,50 @@ void Screenplay::insertBreakElement(Screenplay::BreakType type, int index)
 void Screenplay::updateBreakTitles()
 {
     QStringList actNames;
-    if(this->scriteDocument() != nullptr)
-    {
+    if (this->scriteDocument() != nullptr) {
         Structure *structure = this->scriteDocument()->structure();
         const QString category = structure->preferredGroupCategory();
         actNames = structure->categoryActNames().value(category).toStringList();
     }
 
-    QList<ScreenplayElement*> episodes;
-    QList<ScreenplayElement*> episodeActs;
-    QList<ScreenplayElement*> episodeIntervals;
+    QList<ScreenplayElement *> episodes;
+    QList<ScreenplayElement *> episodeActs;
+    QList<ScreenplayElement *> episodeIntervals;
 
     int episodeOffset = 0;
     int actOffset = 0;
 
-    for(ScreenplayElement *e : qAsConst(m_elements))
-    {
-        if(e->elementType() != ScreenplayElement::BreakElementType)
-        {
-            if(episodeOffset == 0 && episodes.isEmpty())
+    for (ScreenplayElement *e : qAsConst(m_elements)) {
+        if (e->elementType() != ScreenplayElement::BreakElementType) {
+            if (episodeOffset == 0 && episodes.isEmpty())
                 ++episodeOffset;
 
-            if(actOffset == 0 && episodeActs.isEmpty())
+            if (actOffset == 0 && episodeActs.isEmpty())
                 ++actOffset;
 
             continue;
         }
 
-        switch(e->breakType())
-        {
+        switch (e->breakType()) {
         case Screenplay::Episode:
             episodeActs.clear();
             episodeIntervals.clear();
             episodes.append(e);
             actOffset = 0;
-            e->setBreakTitle( QStringLiteral("EPISODE ") + QString::number(episodes.size()+episodeOffset) );
+            e->setBreakTitle(QStringLiteral("EPISODE ")
+                             + QString::number(episodes.size() + episodeOffset));
             break;
         case Screenplay::Act:
             episodeActs.append(e);
-            e->setBreakTitle(episodeActs.size()+actOffset > actNames.size() ?
-                             QStringLiteral("ACT ") + QString::number(episodeActs.size()+actOffset) :
-                             actNames.at(episodeActs.size()+actOffset-1));
+            e->setBreakTitle(episodeActs.size() + actOffset > actNames.size()
+                                     ? QStringLiteral("ACT ")
+                                             + QString::number(episodeActs.size() + actOffset)
+                                     : actNames.at(episodeActs.size() + actOffset - 1));
             break;
         case Screenplay::Interval:
             episodeIntervals.append(e);
-            e->setBreakTitle(QStringLiteral("INTERVAL ") + QString::number(episodeIntervals.size()));
+            e->setBreakTitle(QStringLiteral("INTERVAL ")
+                             + QString::number(episodeIntervals.size()));
             break;
         }
     }
@@ -1764,7 +1746,7 @@ void Screenplay::updateBreakTitles()
 
 void Screenplay::setActCount(int val)
 {
-    if(m_actCount == val)
+    if (m_actCount == val)
         return;
 
     m_actCount = val;
@@ -1773,7 +1755,7 @@ void Screenplay::setActCount(int val)
 
 void Screenplay::setSceneCount(int val)
 {
-    if(m_sceneCount == val)
+    if (m_sceneCount == val)
         return;
 
     m_sceneCount = val;
@@ -1782,7 +1764,7 @@ void Screenplay::setSceneCount(int val)
 
 void Screenplay::setEpisodeCount(int val)
 {
-    if(m_episodeCount == val)
+    if (m_episodeCount == val)
         return;
 
     m_episodeCount = val;
@@ -1791,36 +1773,32 @@ void Screenplay::setEpisodeCount(int val)
 
 void Screenplay::onDfsAuction(const QString &filePath, int *claims)
 {
-    if(filePath == coverPagePhotoPath)
+    if (filePath == coverPagePhotoPath)
         *claims = *claims + 1;
 }
 
 void Screenplay::setCurrentElementIndex(int val)
 {
-    val = qBound(-1, val, m_elements.size()-1);
-    if(m_currentElementIndex == val)
+    val = qBound(-1, val, m_elements.size() - 1);
+    if (m_currentElementIndex == val)
         return;
 
     m_currentElementIndex = val;
     emit currentElementIndexChanged(m_currentElementIndex);
 
-    if(m_currentElementIndex >= 0)
-    {
+    if (m_currentElementIndex >= 0) {
         ScreenplayElement *element = m_elements.at(m_currentElementIndex);
         this->setActiveScene(element->scene());
-    }
-    else
+    } else
         this->setActiveScene(nullptr);
 }
 
 int Screenplay::nextSceneElementIndex()
 {
-    int index = m_currentElementIndex+1;
-    while(index < m_elements.size()-1)
-    {
+    int index = m_currentElementIndex + 1;
+    while (index < m_elements.size() - 1) {
         ScreenplayElement *element = m_elements.at(index);
-        if(element->elementType() == ScreenplayElement::BreakElementType)
-        {
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
             ++index;
             continue;
         }
@@ -1828,20 +1806,18 @@ int Screenplay::nextSceneElementIndex()
         break;
     }
 
-    if(index < m_elements.size())
+    if (index < m_elements.size())
         return index;
 
-    return m_elements.size()-1;
+    return m_elements.size() - 1;
 }
 
 int Screenplay::previousSceneElementIndex()
 {
-    int index = m_currentElementIndex-1;
-    while(index >= 0)
-    {
+    int index = m_currentElementIndex - 1;
+    while (index >= 0) {
         ScreenplayElement *element = m_elements.at(index);
-        if(element->elementType() == ScreenplayElement::BreakElementType)
-        {
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
             --index;
             continue;
         }
@@ -1849,7 +1825,7 @@ int Screenplay::previousSceneElementIndex()
         break;
     }
 
-    if(index >= 0)
+    if (index >= 0)
         return index;
 
     return 0;
@@ -1857,15 +1833,13 @@ int Screenplay::previousSceneElementIndex()
 
 void Screenplay::setActiveScene(Scene *val)
 {
-    if(m_activeScene == val)
+    if (m_activeScene == val)
         return;
 
     // Ensure that the scene belongs to this screenplay.
-    if(m_currentElementIndex >= 0)
-    {
+    if (m_currentElementIndex >= 0) {
         ScreenplayElement *element = this->elementAt(m_currentElementIndex);
-        if(element && element->scene() == val)
-        {
+        if (element && element->scene() == val) {
             m_activeScene = val;
             emit activeSceneChanged();
             return;
@@ -1873,16 +1847,12 @@ void Screenplay::setActiveScene(Scene *val)
     }
 
     const int index = this->firstIndexOfScene(val);
-    if(index < 0)
-    {
-        if(m_activeScene != nullptr)
-        {
+    if (index < 0) {
+        if (m_activeScene != nullptr) {
             m_activeScene = nullptr;
             emit activeSceneChanged();
         }
-    }
-    else
-    {
+    } else {
         m_activeScene = val;
         emit activeSceneChanged();
     }
@@ -1897,24 +1867,20 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
     QJsonArray ret;
 
     const int nrScenes = m_elements.size();
-    for(int i=0; i<nrScenes; i++)
-    {
+    for (int i = 0; i < nrScenes; i++) {
         Scene *scene = m_elements.at(i)->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
         int sceneResultIndex = 0;
 
         const int nrElements = scene->elementCount();
-        for(int j=0; j<nrElements; j++)
-        {
+        for (int j = 0; j < nrElements; j++) {
             SceneElement *element = scene->elementAt(j);
 
             const QJsonArray results = element->find(text, flags);
-            if(!results.isEmpty())
-            {
-                for(int r=0; r<results.size(); r++)
-                {
+            if (!results.isEmpty()) {
+                for (int r = 0; r < results.size(); r++) {
                     const QJsonObject result = results.at(r).toObject();
 
                     QJsonObject item;
@@ -1939,43 +1905,39 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     int counter = 0;
 
     const int nrScenes = m_elements.size();
-    for(int i=0; i<nrScenes; i++)
-    {
+    for (int i = 0; i < nrScenes; i++) {
         Scene *scene = m_elements.at(i)->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
         bool begunUndoCapture = false;
 
         const int nrElements = scene->elementCount();
-        for(int j=0; j<nrElements; j++)
-        {
+        for (int j = 0; j < nrElements; j++) {
             SceneElement *element = scene->elementAt(j);
             const QJsonArray results = element->find(text, flags);
             counter += results.size();
 
-            if(results.isEmpty())
+            if (results.isEmpty())
                 continue;
 
-            if(!begunUndoCapture)
-            {
+            if (!begunUndoCapture) {
                 scene->beginUndoCapture();
                 begunUndoCapture = true;
             }
 
             QString elementText = element->text();
-            for(int r=results.size()-1; r>=0; r--)
-            {
+            for (int r = results.size() - 1; r >= 0; r--) {
                 const QJsonObject result = results.at(r).toObject();
                 const int from = result.value("from").toInt();
                 const int to = result.value("to").toInt();
-                elementText = elementText.replace(from, to-from+1, replacementText);
+                elementText = elementText.replace(from, to - from + 1, replacementText);
             }
 
             element->setText(elementText);
         }
 
-        if(begunUndoCapture)
+        if (begunUndoCapture)
             scene->endUndoCapture();
     }
 
@@ -1990,17 +1952,15 @@ void Screenplay::serializeToJson(QJsonObject &json) const
 void Screenplay::deserializeFromJson(const QJsonObject &)
 {
     const QString cpPhotoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath);
-    if( QFile::exists(cpPhotoPath) )
-    {
+    if (QFile::exists(cpPhotoPath)) {
         m_coverPagePhoto = cpPhotoPath;
         emit coverPagePhotoChanged();
     }
 
     this->updateBreakTitlesLater();
 
-    if(!m_scriteDocument->isCreatedOnThisComputer())
-    {
-        for(ScreenplayElement *element : qAsConst(m_elements))
+    if (!m_scriteDocument->isCreatedOnThisComputer()) {
+        for (ScreenplayElement *element : qAsConst(m_elements))
             element->setEditorHints(QJsonValue());
 
         this->setCurrentElementIndex(-1);
@@ -2009,7 +1969,7 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const
 {
-    if(propName == QStringLiteral("elements"))
+    if (propName == QStringLiteral("elements"))
         return m_elements.isEmpty();
 
     return false;
@@ -2017,28 +1977,32 @@ bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const
 
 void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
 {
-    if(propName == QStringLiteral("elements"))
-    {
-        const QList<ScreenplayElement*> list = qobject_list_cast<ScreenplayElement*>(objects);
-        if(!m_elements.isEmpty() || list.isEmpty())
+    if (propName == QStringLiteral("elements")) {
+        const QList<ScreenplayElement *> list = qobject_list_cast<ScreenplayElement *>(objects);
+        if (!m_elements.isEmpty() || list.isEmpty())
             return;
 
         this->beginResetModel();
 
-        for(ScreenplayElement *ptr : list)
-        {
+        for (ScreenplayElement *ptr : list) {
             // Keep the following connections in sync with the ones we make in
             // Screenplay::insertElementAt()
             ptr->setParent(this);
             connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
             connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
             connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
-            connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this, &Screenplay::evaluateSceneNumbersLater);
-            connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater);
-            connect(ptr, &ScreenplayElement::sceneGroupsChanged, this, &Screenplay::elementSceneGroupsChanged);
-            connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
-            connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
-            connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+            connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
+                    &Screenplay::evaluateSceneNumbersLater);
+            connect(ptr, &ScreenplayElement::sceneTypeChanged, this,
+                    &Screenplay::evaluateSceneNumbersLater);
+            connect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
+                    &Screenplay::elementSceneGroupsChanged);
+            connect(ptr, &ScreenplayElement::elementTypeChanged, this,
+                    &Screenplay::updateBreakTitlesLater);
+            connect(ptr, &ScreenplayElement::breakTypeChanged, this,
+                    &Screenplay::updateBreakTitlesLater);
+            connect(ptr, &ScreenplayElement::breakTitleChanged, this,
+                    &Screenplay::breakTitleChanged);
 
             m_elements.append(ptr);
         }
@@ -2061,22 +2025,21 @@ int Screenplay::rowCount(const QModelIndex &parent) const
 
 QVariant Screenplay::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return QVariant();
 
     ScreenplayElement *element = this->elementAt(index.row());
-    switch(role)
-    {
+    switch (role) {
     case IdRole:
         return element->sceneID();
     case ScreenplayElementRole:
-        return QVariant::fromValue<ScreenplayElement*>(element);
+        return QVariant::fromValue<ScreenplayElement *>(element);
     case ScreenplayElementTypeRole:
         return element->elementType();
     case BreakTypeRole:
         return element->breakType();
     case SceneRole:
-        return QVariant::fromValue<Scene*>(element->scene());
+        return QVariant::fromValue<Scene *>(element->scene());
     default:
         break;
     }
@@ -2087,8 +2050,7 @@ QVariant Screenplay::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> Screenplay::roleNames() const
 {
     static QHash<int, QByteArray> roles;
-    if(roles.isEmpty())
-    {
+    if (roles.isEmpty()) {
         roles[IdRole] = "id";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
@@ -2101,26 +2063,21 @@ QHash<int, QByteArray> Screenplay::roleNames() const
 
 bool Screenplay::event(QEvent *event)
 {
-    if(event->type() == QEvent::ParentChange)
-        m_scriteDocument = qobject_cast<ScriteDocument*>(this->parent());
+    if (event->type() == QEvent::ParentChange)
+        m_scriteDocument = qobject_cast<ScriteDocument *>(this->parent());
 
     return QObject::event(event);
 }
 
 void Screenplay::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_sceneNumberEvaluationTimer.timerId())
-    {
+    if (te->timerId() == m_sceneNumberEvaluationTimer.timerId()) {
         m_sceneNumberEvaluationTimer.stop();
         this->evaluateSceneNumbers();
-    }
-    else if(te->timerId() == m_updateBreakTitlesTimer.timerId())
-    {
+    } else if (te->timerId() == m_updateBreakTitlesTimer.timerId()) {
         m_updateBreakTitlesTimer.stop();
         this->updateBreakTitles();
-    }
-    else if(te->timerId() == m_paragraphCountEvaluationTimer.timerId())
-    {
+    } else if (te->timerId() == m_paragraphCountEvaluationTimer.timerId()) {
         m_paragraphCountEvaluationTimer.stop();
         this->evaluateParagraphCounts();
     }
@@ -2135,12 +2092,12 @@ void Screenplay::resetActiveScene()
 
 void Screenplay::onSceneReset(int elementIndex)
 {
-    ScreenplayElement *element = qobject_cast<ScreenplayElement*>(this->sender());
-    if(element == nullptr)
+    ScreenplayElement *element = qobject_cast<ScreenplayElement *>(this->sender());
+    if (element == nullptr)
         return;
 
     int sceneIndex = this->indexOfElement(element);
-    if(sceneIndex < 0)
+    if (sceneIndex < 0)
         return;
 
     emit sceneReset(sceneIndex, elementIndex);
@@ -2155,11 +2112,11 @@ void Screenplay::evaluateSceneNumbers()
 {
     // Sometimes Screenplay is used by ScreenplayAdapter to house a single
     // scene. In such cases, we must not evaluate numbers.
-    if(m_scriteDocument == nullptr)
+    if (m_scriteDocument == nullptr)
         return;
 
     int number = 1;
-    int actIndex = -1, totalActIndex=-1;
+    int actIndex = -1, totalActIndex = -1;
     int episodeIndex = -1;
     int elementIndex = -1;
     int nrScenes = 0;
@@ -2168,22 +2125,20 @@ void Screenplay::evaluateSceneNumbers()
     ScreenplayElement *lastEpisodeElement = nullptr;
     ScreenplayElement *lastActElement = nullptr;
 
-    QHash< Scene*, QList<int> > indexListMap;
+    QHash<Scene *, QList<int>> indexListMap;
 
-    for(ScreenplayElement *element : qAsConst(m_elements))
-        if(element->scene())
+    for (ScreenplayElement *element : qAsConst(m_elements))
+        if (element->scene())
             indexListMap[element->scene()] = QList<int>();
 
-    int index=-1;
-    for(ScreenplayElement *element : qAsConst(m_elements))
-    {
+    int index = -1;
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
         ++index;
 
-        if(element->elementType() == ScreenplayElement::SceneElementType)
-        {
-            if(actIndex < 0)
+        if (element->elementType() == ScreenplayElement::SceneElementType) {
+            if (actIndex < 0)
                 ++actIndex;
-            if(episodeIndex < 0)
+            if (episodeIndex < 0)
                 ++episodeIndex;
 
             element->setElementIndex(++elementIndex);
@@ -2193,27 +2148,23 @@ void Screenplay::evaluateSceneNumbers()
             Scene *scene = element->scene();
             scene->setAct(lastActElement ? lastActElement->breakTitle() : QStringLiteral("ACT 1"));
             scene->setActIndex(actIndex);
-            scene->setEpisode(lastEpisodeElement ? lastEpisodeElement->breakTitle() : QStringLiteral("EPISODE 1"));
+            scene->setEpisode(lastEpisodeElement ? lastEpisodeElement->breakTitle()
+                                                 : QStringLiteral("EPISODE 1"));
             scene->setEpisodeIndex(episodeIndex);
             indexListMap[scene].append(index);
 
-            if(scene->heading()->isEnabled())
+            if (scene->heading()->isEnabled())
                 ++nrScenes;
-        }
-        else
-        {
+        } else {
             element->setElementIndex(-1);
-            if(element->breakType() == Screenplay::Act)
-            {
+            if (element->breakType() == Screenplay::Act) {
                 ++actIndex;
-                if(totalActIndex < 0)
+                if (totalActIndex < 0)
                     ++totalActIndex;
                 ++totalActIndex;
 
                 lastActElement = element;
-            }
-            else if(element->breakType() == Screenplay::Episode)
-            {
+            } else if (element->breakType() == Screenplay::Episode) {
                 ++episodeIndex;
 
                 actIndex = 0;
@@ -2228,21 +2179,21 @@ void Screenplay::evaluateSceneNumbers()
 
         element->evaluateSceneNumber(number);
 
-        if(!containsNonStandardScenes && element->scene() && element->scene()->type() != Scene::Standard)
+        if (!containsNonStandardScenes && element->scene()
+            && element->scene()->type() != Scene::Standard)
             containsNonStandardScenes = true;
     }
 
-    QHash< Scene*, QList<int> >::const_iterator it = indexListMap.constBegin();
-    QHash< Scene*, QList<int> >::const_iterator end = indexListMap.constEnd();
-    while(it != end)
-    {
+    QHash<Scene *, QList<int>>::const_iterator it = indexListMap.constBegin();
+    QHash<Scene *, QList<int>>::const_iterator end = indexListMap.constEnd();
+    while (it != end) {
         it.key()->setScreenplayElementIndexList(it.value());
         ++it;
     }
 
     this->setSceneCount(nrScenes);
-    this->setEpisodeCount(lastEpisodeElement ? episodeIndex+1 : 0);
-    this->setActCount(lastEpisodeElement ? totalActIndex+1: (lastActElement ? actIndex+1 : 0));
+    this->setEpisodeCount(lastEpisodeElement ? episodeIndex + 1 : 0);
+    this->setActCount(lastEpisodeElement ? totalActIndex + 1 : (lastActElement ? actIndex + 1 : 0));
 
     this->setHasNonStandardScenes(containsNonStandardScenes);
 }
@@ -2255,15 +2206,14 @@ void Screenplay::evaluateSceneNumbersLater()
 void Screenplay::validateCurrentElementIndex()
 {
     int val = m_currentElementIndex;
-    if(m_elements.isEmpty())
+    if (m_elements.isEmpty())
         val = -1;
     else
-        val = qBound(0, val, m_elements.size()-1);
+        val = qBound(0, val, m_elements.size() - 1);
 
-    if(val >= 0)
-    {
+    if (val >= 0) {
         Scene *currentScene = m_elements.at(val)->scene();
-        if(m_activeScene != currentScene)
+        if (m_activeScene != currentScene)
             m_currentElementIndex = -2;
     }
 
@@ -2272,19 +2222,18 @@ void Screenplay::validateCurrentElementIndex()
 
 void Screenplay::evaluateParagraphCounts()
 {
-    int min = -1, max = -1, avg = 0, total = 0, count=0;
-    for(ScreenplayElement *element : qAsConst(m_elements))
-    {
+    int min = -1, max = -1, avg = 0, total = 0, count = 0;
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
         Scene *scene = element->scene();
-        if(scene == nullptr)
+        if (scene == nullptr)
             continue;
 
-        if(min < 0)
+        if (min < 0)
             min = scene->elementCount();
         else
             min = qMin(min, scene->elementCount());
 
-        if(max < 0)
+        if (max < 0)
             max = scene->elementCount();
         else
             max = qMax(max, scene->elementCount());
@@ -2293,8 +2242,8 @@ void Screenplay::evaluateParagraphCounts()
         ++count;
     }
 
-    if(count > 0)
-        avg = qRound( qreal(total)/qreal(count) );
+    if (count > 0)
+        avg = qRound(qreal(total) / qreal(count));
     else
         avg = 0;
 
@@ -2311,7 +2260,7 @@ void Screenplay::evaluateParagraphCountsLater()
 
 void Screenplay::setHasNonStandardScenes(bool val)
 {
-    if(m_hasNonStandardScenes == val)
+    if (m_hasNonStandardScenes == val)
         return;
 
     m_hasNonStandardScenes = val;
@@ -2320,7 +2269,7 @@ void Screenplay::setHasNonStandardScenes(bool val)
 
 void Screenplay::setHasTitlePageAttributes(bool val)
 {
-    if(m_hasTitlePageAttributes == val)
+    if (m_hasTitlePageAttributes == val)
         return;
 
     m_hasTitlePageAttributes = val;
@@ -2329,63 +2278,57 @@ void Screenplay::setHasTitlePageAttributes(bool val)
 
 void Screenplay::evaluateHasTitlePageAttributes()
 {
-    this->setHasTitlePageAttributes(
-            !m_title.isEmpty() &&
-            !m_author.isEmpty() &&
-            !m_version.isEmpty()
-        );
+    this->setHasTitlePageAttributes(!m_title.isEmpty() && !m_author.isEmpty()
+                                    && !m_version.isEmpty());
 }
 
-void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr)
+void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list,
+                                     ScreenplayElement *ptr)
 {
-    reinterpret_cast< Screenplay* >(list->data)->addElement(ptr);
+    reinterpret_cast<Screenplay *>(list->data)->addElement(ptr);
 }
 
 void Screenplay::staticClearElements(QQmlListProperty<ScreenplayElement> *list)
 {
-    reinterpret_cast< Screenplay* >(list->data)->clearElements();
+    reinterpret_cast<Screenplay *>(list->data)->clearElements();
 }
 
 ScreenplayElement *Screenplay::staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index)
 {
-    return reinterpret_cast< Screenplay* >(list->data)->elementAt(index);
+    return reinterpret_cast<Screenplay *>(list->data)->elementAt(index);
 }
 
 int Screenplay::staticElementCount(QQmlListProperty<ScreenplayElement> *list)
 {
-    return reinterpret_cast< Screenplay* >(list->data)->elementCount();
+    return reinterpret_cast<Screenplay *>(list->data)->elementCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ScreenplayTracks::ScreenplayTracks(QObject *parent)
-    : QAbstractListModel(parent),
-      m_screenplay(this, "screenplay")
+    : QAbstractListModel(parent), m_screenplay(this, "screenplay")
 {
     connect(this, &ScreenplayTracks::modelReset, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsInserted, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsRemoved, this, &ScreenplayTracks::trackCountChanged);
 }
 
-ScreenplayTracks::~ScreenplayTracks()
-{
-
-}
+ScreenplayTracks::~ScreenplayTracks() { }
 
 void ScreenplayTracks::setScreenplay(Screenplay *val)
 {
-    if(m_screenplay == val)
+    if (m_screenplay == val)
         return;
 
-    if(!m_screenplay.isNull())
+    if (!m_screenplay.isNull())
         m_screenplay->disconnect(this);
 
     m_screenplay = val;
 
-    if(!m_screenplay.isNull())
-    {
+    if (!m_screenplay.isNull()) {
         connect(m_screenplay, &Screenplay::elementsChanged, this, &ScreenplayTracks::refreshLater);
-        connect(m_screenplay, &Screenplay::elementSceneGroupsChanged, this, &ScreenplayTracks::onElementSceneGroupsChanged);
+        connect(m_screenplay, &Screenplay::elementSceneGroupsChanged, this,
+                &ScreenplayTracks::onElementSceneGroupsChanged);
     }
 
     this->refreshLater();
@@ -2400,10 +2343,10 @@ int ScreenplayTracks::rowCount(const QModelIndex &parent) const
 
 QVariant ScreenplayTracks::data(const QModelIndex &index, int role) const
 {
-    if(index.row() < 0 || index.row() >= m_data.size() || role != ModelDataRole)
+    if (index.row() < 0 || index.row() >= m_data.size() || role != ModelDataRole)
         return QVariant();
 
-    return m_data.at( index.row() );
+    return m_data.at(index.row());
 }
 
 QHash<int, QByteArray> ScreenplayTracks::roleNames() const
@@ -2415,20 +2358,17 @@ QHash<int, QByteArray> ScreenplayTracks::roleNames() const
 
 void ScreenplayTracks::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_refreshTimer.timerId())
-    {
+    if (te->timerId() == m_refreshTimer.timerId()) {
         m_refreshTimer.stop();
         this->refresh();
-    }
-    else
+    } else
         QAbstractListModel::timerEvent(te);
 }
 
 void ScreenplayTracks::refresh()
 {
-    if(m_screenplay.isNull())
-    {
-        if(m_data.isEmpty())
+    if (m_screenplay.isNull()) {
+        if (m_data.isEmpty())
             return;
 
         this->beginResetModel();
@@ -2440,19 +2380,17 @@ void ScreenplayTracks::refresh()
 
     const QString slash = QStringLiteral("/");
 
-    QMap< QString, QMap< QString, QList<ScreenplayElement*> > > map;
-    for(int i=0; i<m_screenplay->elementCount(); i++)
-    {
+    QMap<QString, QMap<QString, QList<ScreenplayElement *>>> map;
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
-        if(element->elementType() != ScreenplayElement::SceneElementType)
+        if (element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
         const QStringList sceneGroups = element->scene()->groups();
-        if( sceneGroups.isEmpty() )
+        if (sceneGroups.isEmpty())
             continue;
 
-        for(const QString &sceneGroup : sceneGroups)
-        {
+        for (const QString &sceneGroup : sceneGroups) {
             const QString categoryName = sceneGroup.section(slash, 0, 0);
             const QString groupName = sceneGroup.section(slash, 1);
             map[categoryName][groupName].append(element);
@@ -2467,84 +2405,82 @@ void ScreenplayTracks::refresh()
 
     m_data.clear();
 
-    QMap< QString, QMap< QString, QList<ScreenplayElement*> > >::iterator it = map.begin();
-    QMap< QString, QMap< QString, QList<ScreenplayElement*> > >::iterator end = map.end();
-    while(it != end)
-    {
-        const QString category = Application::instance()->camelCased( it.key() );
-        const QMap< QString, QList<ScreenplayElement*> > groupElementsMap = it.value();
+    QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator it = map.begin();
+    QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator end = map.end();
+    while (it != end) {
+        const QString category = Application::instance()->camelCased(it.key());
+        const QMap<QString, QList<ScreenplayElement *>> groupElementsMap = it.value();
 
         QVariantList categoryTrackItems;
 
-        QMap< QString, QList<ScreenplayElement*> >::const_iterator it2 = groupElementsMap.begin();
-        QMap< QString, QList<ScreenplayElement*> >::const_iterator end2 = groupElementsMap.end();
-        while(it2 != end2)
-        {
-            const QString group = Application::instance()->camelCased( it2.key() );
-            QList<ScreenplayElement*> elements = it2.value();
-            std::sort(elements.begin(), elements.end(), [](ScreenplayElement *a, ScreenplayElement *b) {
-                return a->elementIndex() < b->elementIndex();
-            });
+        QMap<QString, QList<ScreenplayElement *>>::const_iterator it2 = groupElementsMap.begin();
+        QMap<QString, QList<ScreenplayElement *>>::const_iterator end2 = groupElementsMap.end();
+        while (it2 != end2) {
+            const QString group = Application::instance()->camelCased(it2.key());
+            QList<ScreenplayElement *> elements = it2.value();
+            std::sort(elements.begin(), elements.end(),
+                      [](ScreenplayElement *a, ScreenplayElement *b) {
+                          return a->elementIndex() < b->elementIndex();
+                      });
 
             QVariantMap groupTrackItem;
 
-            for(ScreenplayElement *element : qAsConst(elements))
-            {
-                const QVariantMap elementItem = {
-                    { startIndexKey, element->elementIndex() },
-                    { endIndexKey, element->elementIndex() },
-                    { groupKey, group }
-                };
+            for (ScreenplayElement *element : qAsConst(elements)) {
+                const QVariantMap elementItem = { { startIndexKey, element->elementIndex() },
+                                                  { endIndexKey, element->elementIndex() },
+                                                  { groupKey, group } };
 
-                if(groupTrackItem.isEmpty())
+                if (groupTrackItem.isEmpty())
                     groupTrackItem = elementItem;
-                else
-                {
-                    const int diff = element->elementIndex()-groupTrackItem.value(endIndexKey,-10).toInt();
-                    if(diff == 1)
+                else {
+                    const int diff = element->elementIndex()
+                            - groupTrackItem.value(endIndexKey, -10).toInt();
+                    if (diff == 1)
                         groupTrackItem.insert(endIndexKey, element->elementIndex());
-                    else
-                    {
+                    else {
                         categoryTrackItems.append(groupTrackItem);
                         groupTrackItem = elementItem;
                     }
                 }
             }
 
-            if(!groupTrackItem.isEmpty())
+            if (!groupTrackItem.isEmpty())
                 categoryTrackItems.append(groupTrackItem);
 
             ++it2;
         }
 
         std::sort(categoryTrackItems.begin(), categoryTrackItems.end(),
-                  [startIndexKey,endIndexKey](const QVariant &a, const QVariant &b) {
-            const QVariantMap trackA = a.toMap();
-            const QVariantMap trackB = b.toMap();
-            const int trackASize = trackA.value(endIndexKey).toInt() - trackA.value(startIndexKey).toInt();
-            const int trackBSize = trackB.value(endIndexKey).toInt() - trackB.value(startIndexKey).toInt();
-            return trackASize > trackBSize;
-        });
+                  [startIndexKey, endIndexKey](const QVariant &a, const QVariant &b) {
+                      const QVariantMap trackA = a.toMap();
+                      const QVariantMap trackB = b.toMap();
+                      const int trackASize = trackA.value(endIndexKey).toInt()
+                              - trackA.value(startIndexKey).toInt();
+                      const int trackBSize = trackB.value(endIndexKey).toInt()
+                              - trackB.value(startIndexKey).toInt();
+                      return trackASize > trackBSize;
+                  });
 
-        QList< QVariantList > nonIntersectionTracks;
+        QList<QVariantList> nonIntersectionTracks;
         nonIntersectionTracks << QVariantList();
 
-        auto includeTrack = [&nonIntersectionTracks,startIndexKey,endIndexKey,groupKey](const QVariantMap &trackB) {
-            for(int i=0; i<nonIntersectionTracks.size(); i++) {
+        auto includeTrack = [&nonIntersectionTracks, startIndexKey, endIndexKey,
+                             groupKey](const QVariantMap &trackB) {
+            for (int i = 0; i < nonIntersectionTracks.size(); i++) {
                 QVariantList &list = nonIntersectionTracks[i];
                 bool intersectionFound = false;
-                for(const QVariant &listItem : list) {
+                for (const QVariant &listItem : list) {
                     const QVariantMap &trackA = listItem.toMap();
                     const int startA = trackA.value(startIndexKey).toInt();
                     const int endA = trackA.value(endIndexKey).toInt();
                     const int startB = trackB.value(startIndexKey).toInt();
                     const int endB = trackB.value(endIndexKey).toInt();
-                    if( (startA <= startB && startB <= endA) || (startA <= endB && endB <= endA) ) {
+                    if ((startA <= startB && startB <= endA) || (startA <= endB && endB <= endA)) {
                         intersectionFound = true;
                         break;
                     }
                 }
-                if(!intersectionFound) {
+                if (!intersectionFound) {
                     list << trackB;
                     return;
                 }
@@ -2555,14 +2491,13 @@ void ScreenplayTracks::refresh()
             nonIntersectionTracks << newTrack;
         };
 
-        for(const QVariant &item : qAsConst(categoryTrackItems))
+        for (const QVariant &item : qAsConst(categoryTrackItems))
             includeTrack(item.toMap());
 
-        for(const QVariantList &tracks : qAsConst(nonIntersectionTracks))
-        {
+        for (const QVariantList &tracks : qAsConst(nonIntersectionTracks)) {
             QVariantMap row;
-            row.insert( QStringLiteral("category"), category );
-            row.insert( QStringLiteral("tracks"), tracks );
+            row.insert(QStringLiteral("category"), category);
+            row.insert(QStringLiteral("tracks"), tracks);
             m_data.append(row);
         }
 

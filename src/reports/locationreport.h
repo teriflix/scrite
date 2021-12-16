@@ -23,7 +23,7 @@ class LocationReport : public AbstractReportGenerator
     Q_CLASSINFO("Description", "Generate a summary report of all locations in the screenplay.")
 
 public:
-    Q_INVOKABLE LocationReport(QObject *parent=nullptr);
+    Q_INVOKABLE LocationReport(QObject *parent = nullptr);
     ~LocationReport();
 
     bool requiresConfiguration() const { return true; }

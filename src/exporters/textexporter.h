@@ -23,7 +23,7 @@ class TextExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Text File (*.txt)")
 
 public:
-    Q_INVOKABLE TextExporter(QObject *parent=nullptr);
+    Q_INVOKABLE TextExporter(QObject *parent = nullptr);
     ~TextExporter();
 
     bool canBundleFonts() const { return false; }

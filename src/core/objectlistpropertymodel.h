@@ -26,7 +26,7 @@ class ObjectListPropertyModelBase : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ObjectListPropertyModelBase(QObject *parent=nullptr);
+    ObjectListPropertyModelBase(QObject *parent = nullptr);
     ~ObjectListPropertyModelBase() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
@@ -36,31 +36,29 @@ public:
     Q_INVOKABLE virtual QObject *objectAt(int row) const = 0;
 
     // QAbstractListModel implementation
-    enum { ObjectItemRole = Qt::UserRole+1, ModelDataRole };
+    enum { ObjectItemRole = Qt::UserRole + 1, ModelDataRole };
     QHash<int, QByteArray> roleNames() const;
 };
 
-template <class T>
+template<class T>
 class ObjectListPropertyModel : public ObjectListPropertyModelBase
 {
 public:
-    ObjectListPropertyModel(QObject *parent=nullptr)
-        : ObjectListPropertyModelBase(parent) { }
+    ObjectListPropertyModel(QObject *parent = nullptr) : ObjectListPropertyModelBase(parent) { }
     ~ObjectListPropertyModel() { }
 
-    operator QList<T> () { return m_list; }
-    QList<T>& list() { return m_list; }
+    operator QList<T>() { return m_list; }
+    QList<T> &list() { return m_list; }
     const QList<T> &list() const { return m_list; }
 
     bool empty() const { return m_list.empty(); }
     bool isEmpty() const { return m_list.isEmpty(); }
 
-    void append(T ptr) {
-        this->insert(-1, ptr);
-    }
+    void append(T ptr) { this->insert(-1, ptr); }
 
-    void prepend(T ptr) {
-        if(m_list.contains(ptr) || ptr == nullptr)
+    void prepend(T ptr)
+    {
+        if (m_list.contains(ptr) || ptr == nullptr)
             return;
         this->beginInsertRows(QModelIndex(), 0, 0);
         m_list.prepend(ptr);
@@ -70,13 +68,15 @@ public:
 
     int indexOf(T ptr) const { return m_list.indexOf(ptr); }
 
-    void remove(T ptr) {
+    void remove(T ptr)
+    {
         const int index = this->indexOf(ptr);
         this->removeAt(index);
     }
 
-    void removeAt(int row) {
-        if(row < 0 || row >= m_list.size())
+    void removeAt(int row)
+    {
+        if (row < 0 || row >= m_list.size())
             return;
         this->beginRemoveRows(QModelIndex(), row, row);
         T ptr = m_list.at(row);
@@ -86,8 +86,9 @@ public:
         this->endRemoveRows();
     }
 
-    void insert(int row, T ptr) {
-        if(m_list.contains(ptr) || ptr == nullptr)
+    void insert(int row, T ptr)
+    {
+        if (m_list.contains(ptr) || ptr == nullptr)
             return;
         int iidx = row < 0 || row >= m_list.size() ? m_list.size() : row;
         this->beginInsertRows(QModelIndex(), iidx, iidx);
@@ -96,32 +97,35 @@ public:
         this->endInsertRows();
     }
 
-    void move(int fromRow, int toRow) {
-        if(fromRow == toRow)
+    void move(int fromRow, int toRow)
+    {
+        if (fromRow == toRow)
             return;
 
-        if(fromRow < 0 || fromRow >= m_list.size())
+        if (fromRow < 0 || fromRow >= m_list.size())
             return;
 
-        if(toRow < 0 || toRow >= m_list.size())
+        if (toRow < 0 || toRow >= m_list.size())
             return;
 
-        this->beginMoveRows(QModelIndex(), fromRow, fromRow, QModelIndex(), toRow < fromRow ? toRow : toRow+1);
+        this->beginMoveRows(QModelIndex(), fromRow, fromRow, QModelIndex(),
+                            toRow < fromRow ? toRow : toRow + 1);
         m_list.move(fromRow, toRow);
         this->endMoveRows();
     }
 
-    void assign(const QList<T> &list) {
+    void assign(const QList<T> &list)
+    {
         this->beginResetModel();
-        while(!m_list.isEmpty()) {
+        while (!m_list.isEmpty()) {
             T ptr = m_list.first();
             this->itemRemoveEvent(ptr);
             ptr->disconnect(this);
             m_list.takeFirst();
         }
-        if(!list.isEmpty()) {
-            for(T ptr : list) {
-                if(m_list.contains(ptr))
+        if (!list.isEmpty()) {
+            for (T ptr : list) {
+                if (m_list.contains(ptr))
                     continue;
                 this->itemInsertEvent(ptr);
                 m_list.append(ptr);
@@ -130,9 +134,10 @@ public:
         this->endResetModel();
     }
 
-    void clear() {
+    void clear()
+    {
         this->beginResetModel();
-        while(!m_list.isEmpty()) {
+        while (!m_list.isEmpty()) {
             T ptr = m_list.first();
             this->itemRemoveEvent(ptr);
             ptr->disconnect(this);
@@ -145,41 +150,45 @@ public:
     T at(int row) const { return row < 0 || row >= m_list.size() ? nullptr : m_list.at(row); }
 
     T first() const { return m_list.isEmpty() ? nullptr : m_list.first(); }
-    T takeFirst() {
+    T takeFirst()
+    {
         T ptr = this->first();
-        if(ptr == nullptr)
+        if (ptr == nullptr)
             return ptr;
         this->removeAt(0);
         return ptr;
     }
 
     T last() const { return m_list.isEmpty() ? nullptr : m_list.last(); }
-    T takeLast() const {
+    T takeLast() const
+    {
         T ptr = this->first();
-        if(ptr == nullptr)
+        if (ptr == nullptr)
             return ptr;
-        this->removeAt(m_list.size()-1);
+        this->removeAt(m_list.size() - 1);
         return ptr;
     }
 
-    T takeAt(int row) {
+    T takeAt(int row)
+    {
         T ptr = this->at(row);
-        if(ptr == nullptr)
+        if (ptr == nullptr)
             return ptr;
         this->removeAt(row);
         return ptr;
     }
 
-    void sortList(const std::function<bool(T,T)> &sortFunction) {
+    void sortList(const std::function<bool(T, T)> &sortFunction)
+    {
         bool shuffled = false;
         QList<T> copy = m_list;
-        std::sort(copy.begin(), copy.end(), [sortFunction,&shuffled](T a, T b) {
+        std::sort(copy.begin(), copy.end(), [sortFunction, &shuffled](T a, T b) {
             bool ret = sortFunction(a, b);
-            if(ret)
+            if (ret)
                 shuffled = true;
             return ret;
         });
-        if(shuffled) {
+        if (shuffled) {
             this->beginResetModel();
             m_list = copy;
             this->endResetModel();
@@ -187,13 +196,13 @@ public:
     }
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const {
-        return parent.isValid() ? 0 : m_list.size();
-    }
-    QVariant data(const QModelIndex &index, int role) const {
-        if(role == ObjectItemRole || role == ModelDataRole) {
-            QObject *ptr = index.row() < 0 || index.row() >= m_list.size() ? nullptr : m_list.at(index.row());
-            return QVariant::fromValue<QObject*>(ptr);
+    int rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : m_list.size(); }
+    QVariant data(const QModelIndex &index, int role) const
+    {
+        if (role == ObjectItemRole || role == ModelDataRole) {
+            QObject *ptr = index.row() < 0 || index.row() >= m_list.size() ? nullptr
+                                                                           : m_list.at(index.row());
+            return QVariant::fromValue<QObject *>(ptr);
         }
         return QVariant();
     }
@@ -203,22 +212,24 @@ public:
     QObject *objectAt(int row) const { return this->at(row); }
 
 public:
-    void objectChanged() {
+    void objectChanged()
+    {
         T ptr = qobject_cast<T>(this->sender());
-        if(ptr == nullptr)
+        if (ptr == nullptr)
             return;
         const int row = m_list.indexOf(ptr);
-        if(row < 0)
+        if (row < 0)
             return;
         const QModelIndex index = this->index(row, 0, QModelIndex());
         emit dataChanged(index, index);
     }
 
-    void objectDestroyed(T ptr) {
-        if(ptr == nullptr)
+    void objectDestroyed(T ptr)
+    {
+        if (ptr == nullptr)
             return;
         const int row = m_list.indexOf(ptr);
-        if(row < 0)
+        if (row < 0)
             return;
         this->removeAt(row);
     }
@@ -236,7 +247,7 @@ class SortFilterObjectListModel : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    SortFilterObjectListModel(QObject *parent=nullptr);
+    SortFilterObjectListModel(QObject *parent = nullptr);
     ~SortFilterObjectListModel() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
@@ -258,11 +269,7 @@ public:
     QVariantList filterValues() const { return m_filterValues; }
     Q_SIGNAL void filterValuesChanged();
 
-    enum FilterMode
-    {
-        IncludeFilterValues,
-        ExcludeFilterValues
-    };
+    enum FilterMode { IncludeFilterValues, ExcludeFilterValues };
     Q_ENUM(FilterMode)
     Q_PROPERTY(FilterMode filterMode READ filterMode WRITE setFilterMode NOTIFY filterModeChanged)
     void setFilterMode(FilterMode val);
@@ -295,17 +302,16 @@ private:
     FilterMode m_filterMode = IncludeFilterValues;
 };
 
-template <class T>
-inline QList<T> qobject_list_cast(const QList<QObject*> &list, bool deleteUncasedObjects=true)
+template<class T>
+inline QList<T> qobject_list_cast(const QList<QObject *> &list, bool deleteUncasedObjects = true)
 {
     QList<T> ret;
     ret.reserve(list.size());
-    for(QObject *ptr : list)
-    {
+    for (QObject *ptr : list) {
         T item = qobject_cast<T>(ptr);
-        if(item != nullptr)
+        if (item != nullptr)
             ret.append(item);
-        else if(deleteUncasedObjects)
+        else if (deleteUncasedObjects)
             ptr->deleteLater();
     }
 

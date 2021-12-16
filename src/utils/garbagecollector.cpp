@@ -21,10 +21,8 @@ GarbageCollector *GarbageCollector::instance()
 }
 
 GarbageCollector::GarbageCollector(QObject *parent)
-    : QObject(parent),
-      m_timer("GarbageCollector.m_timer")
+    : QObject(parent), m_timer("GarbageCollector.m_timer")
 {
-
 }
 
 GarbageCollector::~GarbageCollector()
@@ -35,8 +33,7 @@ GarbageCollector::~GarbageCollector()
 
 void GarbageCollector::avoidChildrenOf(QObject *parent)
 {
-    if(parent != nullptr)
-    {
+    if (parent != nullptr) {
         connect(parent, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
         m_avoidList.append(parent);
     }
@@ -44,10 +41,10 @@ void GarbageCollector::avoidChildrenOf(QObject *parent)
 
 void GarbageCollector::add(QObject *ptr)
 {
-    if(ptr == nullptr || m_objects.contains(ptr) || m_shredder.contains(ptr))
+    if (ptr == nullptr || m_objects.contains(ptr) || m_shredder.contains(ptr))
         return;
 
-    if(m_avoidList.contains(ptr->parent()))
+    if (m_avoidList.contains(ptr->parent()))
         return;
 
 #ifndef QT_NO_DEBUG
@@ -61,15 +58,13 @@ void GarbageCollector::add(QObject *ptr)
 
 void GarbageCollector::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_timer.timerId())
-    {
+    if (event->timerId() == m_timer.timerId()) {
         m_timer.stop();
 
         m_shredder = m_objects;
         m_objects.clear();
 
-        while(!m_shredder.isEmpty())
-        {
+        while (!m_shredder.isEmpty()) {
             QDeferredDeleteEvent dde;
             Application::instance()->sendEvent(m_shredder.takeFirst(), &dde);
         }
@@ -78,7 +73,7 @@ void GarbageCollector::timerEvent(QTimerEvent *event)
 
 void GarbageCollector::onObjectDestroyed(QObject *obj)
 {
-    if(m_objects.removeOne(obj))
+    if (m_objects.removeOne(obj))
         m_timer.start(100, this);
 
     m_shredder.removeOne(obj);

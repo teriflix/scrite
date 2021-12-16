@@ -26,7 +26,7 @@ class SimpleTabBarItem : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    SimpleTabBarItem(QQuickItem *parent=nullptr);
+    SimpleTabBarItem(QQuickItem *parent = nullptr);
     ~SimpleTabBarItem();
 
     Q_PROPERTY(int tabCount READ tabCount WRITE setTabCount NOTIFY tabCountChanged)
@@ -106,14 +106,7 @@ public:
     qreal minimumTabWidth() const { return m_minimumTabWidth; }
     Q_SIGNAL void minimumTabWidthChanged();
 
-    enum TabAttribute
-    {
-        TabColor,
-        TabBorderColor,
-        TabTextColor,
-        TabFont,
-        TabLabel
-    };
+    enum TabAttribute { TabColor, TabBorderColor, TabTextColor, TabFont, TabLabel };
     Q_ENUM(TabAttribute)
     Q_SIGNAL void attributeRequest(int index, TabAttribute attr);
 

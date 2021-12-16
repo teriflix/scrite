@@ -18,20 +18,13 @@
 #include <QDomAttr>
 #include <QFileInfo>
 
-FinalDraftExporter::FinalDraftExporter(QObject *parent)
-                   :AbstractExporter(parent)
-{
+FinalDraftExporter::FinalDraftExporter(QObject *parent) : AbstractExporter(parent) { }
 
-}
-
-FinalDraftExporter::~FinalDraftExporter()
-{
-
-}
+FinalDraftExporter::~FinalDraftExporter() { }
 
 void FinalDraftExporter::setMarkLanguagesExplicitly(bool val)
 {
-    if(m_markLanguagesExplicitly == val)
+    if (m_markLanguagesExplicitly == val)
         return;
 
     m_markLanguagesExplicitly = val;
@@ -46,13 +39,13 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QStringList locationTypes = structure->standardLocationTypes();
 
     const int nrElements = screenplay->elementCount();
-    if(screenplay->elementCount() == 0)
-    {
-        this->error()->setErrorMessage(QStringLiteral("There are no scenes in the screenplay to export."));
+    if (screenplay->elementCount() == 0) {
+        this->error()->setErrorMessage(
+                QStringLiteral("There are no scenes in the screenplay to export."));
         return false;
     }
 
-    this->progress()->setProgressStep( 1.0/qreal(nrElements+1) );
+    this->progress()->setProgressStep(1.0 / qreal(nrElements + 1));
 
     QDomDocument doc;
 
@@ -65,19 +58,24 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement contentE = doc.createElement(QStringLiteral("Content"));
     rootE.appendChild(contentE);
 
-    auto addTextToParagraph = [&doc,this](QDomElement &element, const QString &text) {
-        if(m_markLanguagesExplicitly) {
-            QList<TransliterationEngine::Boundary> breakup = TransliterationEngine::instance()->evaluateBoundaries(text, true);
-            Q_FOREACH(TransliterationEngine::Boundary item, breakup) {
+    auto addTextToParagraph = [&doc, this](QDomElement &element, const QString &text) {
+        if (m_markLanguagesExplicitly) {
+            QList<TransliterationEngine::Boundary> breakup =
+                    TransliterationEngine::instance()->evaluateBoundaries(text, true);
+            Q_FOREACH (TransliterationEngine::Boundary item, breakup) {
                 QDomElement textE = doc.createElement(QStringLiteral("Text"));
                 element.appendChild(textE);
-                if(item.language == TransliterationEngine::English) {
-                    textE.setAttribute(QStringLiteral("Font"), QStringLiteral("Courier Final Draft"));
+                if (item.language == TransliterationEngine::English) {
+                    textE.setAttribute(QStringLiteral("Font"),
+                                       QStringLiteral("Courier Final Draft"));
                     textE.setAttribute(QStringLiteral("Language"), QStringLiteral("English"));
                 } else {
-                    const QFont font = TransliterationEngine::instance()->languageFont(item.language, false);
+                    const QFont font =
+                            TransliterationEngine::instance()->languageFont(item.language, false);
                     textE.setAttribute(QStringLiteral("Font"), font.family());
-                    textE.setAttribute(QStringLiteral("Language"), TransliterationEngine::instance()->languageAsString(item.language));
+                    textE.setAttribute(
+                            QStringLiteral("Language"),
+                            TransliterationEngine::instance()->languageAsString(item.language));
                 }
                 textE.appendChild(doc.createTextNode(item.string));
             }
@@ -90,37 +88,34 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     };
 
     QStringList locations;
-    for(int i=0; i<nrElements; i++)
-    {
+    for (int i = 0; i < nrElements; i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if(element->elementType() != ScreenplayElement::SceneElementType)
+        if (element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
         const Scene *scene = element->scene();
         const SceneHeading *heading = scene->heading();
 
-        if(heading->isEnabled())
-        {
+        if (heading->isEnabled()) {
             QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
 
             paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
-            if(element->hasUserSceneNumber())
+            if (element->hasUserSceneNumber())
                 paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
 
             addTextToParagraph(paragraphE, heading->text());
             locations.append(heading->location());
 
-            if(!locationTypes.contains(heading->locationType()))
+            if (!locationTypes.contains(heading->locationType()))
                 locationTypes.append(heading->locationType());
 
-            if(!moments.contains(heading->moment()))
+            if (!moments.contains(heading->moment()))
                 moments.append(heading->moment());
         }
 
         const int nrSceneElements = scene->elementCount();
-        for(int j=0; j<nrSceneElements; j++)
-        {
+        for (int j = 0; j < nrSceneElements; j++) {
             const SceneElement *sceneElement = scene->elementAt(j);
             QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
@@ -142,8 +137,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const QStringList characters = structure->allCharacterNames();
     QDomElement charactersE = doc.createElement(QStringLiteral("Characters"));
     smartTypeE.appendChild(charactersE);
-    Q_FOREACH(QString name, characters)
-    {
+    Q_FOREACH (QString name, characters) {
         QDomElement characterE = doc.createElement(QStringLiteral("Character"));
         charactersE.appendChild(characterE);
         characterE.appendChild(doc.createTextNode(name));
@@ -156,8 +150,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     smartTypeE.appendChild(timesOfDayE);
     timesOfDayE.setAttribute(QStringLiteral("Separator"), QStringLiteral(" - "));
     std::sort(moments.begin(), moments.end());
-    Q_FOREACH(QString moment, moments)
-    {
+    Q_FOREACH (QString moment, moments) {
         QDomElement timeOfDayE = doc.createElement(QStringLiteral("TimeOfDay"));
         timesOfDayE.appendChild(timeOfDayE);
         timeOfDayE.appendChild(doc.createTextNode(moment));
@@ -167,8 +160,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement sceneIntrosE = doc.createElement(QStringLiteral("SceneIntros"));
     smartTypeE.appendChild(sceneIntrosE);
     sceneIntrosE.setAttribute(QStringLiteral("Separator"), QStringLiteral(". "));
-    Q_FOREACH(QString locationType, locationTypes)
-    {
+    Q_FOREACH (QString locationType, locationTypes) {
         QDomElement sceneIntroE = doc.createElement(QStringLiteral("SceneIntro"));
         sceneIntrosE.appendChild(sceneIntroE);
         sceneIntroE.appendChild(doc.createTextNode(locationType));
@@ -190,7 +182,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 QString FinalDraftExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if( fi.suffix().toLower() != "fdx" )
+    if (fi.suffix().toLower() != "fdx")
         return fileName + ".fdx";
     return fileName;
 }

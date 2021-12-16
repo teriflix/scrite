@@ -22,11 +22,7 @@
 #include <QNetworkReply>
 #include <QStack>
 
-FormQuestion::FormQuestion(QObject *parent)
-    : QObject(parent)
-{
-
-}
+FormQuestion::FormQuestion(QObject *parent) : QObject(parent) { }
 
 FormQuestion::~FormQuestion()
 {
@@ -35,7 +31,7 @@ FormQuestion::~FormQuestion()
 
 void FormQuestion::setId(const QString &val)
 {
-    if(m_id == val || !m_id.isEmpty())
+    if (m_id == val || !m_id.isEmpty())
         return;
 
     m_id = val;
@@ -44,7 +40,7 @@ void FormQuestion::setId(const QString &val)
 
 void FormQuestion::setNumber(const QString &val)
 {
-    if(m_number == val || !m_number.isEmpty())
+    if (m_number == val || !m_number.isEmpty())
         return;
 
     m_number = val;
@@ -53,7 +49,7 @@ void FormQuestion::setNumber(const QString &val)
 
 void FormQuestion::setIndentation(int val)
 {
-    if(m_indentation == val)
+    if (m_indentation == val)
         return;
 
     m_indentation = val;
@@ -62,7 +58,7 @@ void FormQuestion::setIndentation(int val)
 
 void FormQuestion::setQuestionText(const QString &val)
 {
-    if(m_questionText == val || !m_questionText.isEmpty())
+    if (m_questionText == val || !m_questionText.isEmpty())
         return;
 
     m_questionText = val;
@@ -71,7 +67,7 @@ void FormQuestion::setQuestionText(const QString &val)
 
 void FormQuestion::setAnswerHint(const QString &val)
 {
-    if(m_answerHint == val || !m_answerHint.isEmpty())
+    if (m_answerHint == val || !m_answerHint.isEmpty())
         return;
 
     m_answerHint = val;
@@ -80,7 +76,7 @@ void FormQuestion::setAnswerHint(const QString &val)
 
 void FormQuestion::setType(Type val)
 {
-    if(m_type == val)
+    if (m_type == val)
         return;
 
     m_type = val;
@@ -89,7 +85,7 @@ void FormQuestion::setType(Type val)
 
 void FormQuestion::setMetaData(const QJsonObject &val)
 {
-    if(m_metaData == val)
+    if (m_metaData == val)
         return;
 
     m_metaData = val;
@@ -98,11 +94,7 @@ void FormQuestion::setMetaData(const QJsonObject &val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Form::Form(QObject *parent)
-    :QObject(parent)
-{
-
-}
+Form::Form(QObject *parent) : QObject(parent) { }
 
 Form::~Form()
 {
@@ -126,7 +118,7 @@ QUrl Form::moreInfoUrl() const
 
 ObjectListPropertyModel<FormQuestion *> *Form::questionsModel() const
 {
-    return const_cast< ObjectListPropertyModel<FormQuestion*> *>(&m_questions);
+    return const_cast<ObjectListPropertyModel<FormQuestion *> *>(&m_questions);
 }
 
 FormQuestion *Form::questionAt(int index) const
@@ -136,15 +128,15 @@ FormQuestion *Form::questionAt(int index) const
 
 QJsonObject Form::formDataTemplate() const
 {
-    const QList<FormQuestion*> list = m_questions.list();
-    if(!m_formDataTemplate.isEmpty() || list.isEmpty())
+    const QList<FormQuestion *> list = m_questions.list();
+    if (!m_formDataTemplate.isEmpty() || list.isEmpty())
         return m_formDataTemplate;
 
     QJsonObject ret;
-    for(FormQuestion *q : list)
-        ret.insert( q->id(), QString() );
+    for (FormQuestion *q : list)
+        ret.insert(q->id(), QString());
 
-    (const_cast<Form*>(this))->m_formDataTemplate = ret;
+    (const_cast<Form *>(this))->m_formDataTemplate = ret;
     return m_formDataTemplate;
 }
 
@@ -153,9 +145,8 @@ void Form::validateFormData(QJsonObject &val)
     QJsonObject validated = this->formDataTemplate();
     QJsonObject::iterator it = validated.begin();
     QJsonObject::iterator end = validated.end();
-    while(it != end)
-    {
-        it.value() = val.value( it.key() );
+    while (it != end) {
+        it.value() = val.value(it.key());
         ++it;
     }
 
@@ -167,33 +158,33 @@ void Form::serializeToJson(QJsonObject &json) const
     // Since all properties in Form are read-only, we cannot expect QObjectSerializer
     // to serialize this class for us. That's the reason why we are explicitly
     // serializing the Form here.
-    json.insert( QStringLiteral("id"), m_id );
-    json.insert( QStringLiteral("type"), this->typeAsString() );
-    json.insert( QStringLiteral("title"), m_title );
-    json.insert( QStringLiteral("subtitle"), m_subtitle );
-    json.insert( QStringLiteral("createdBy"), m_createdBy );
-    json.insert( QStringLiteral("version"), m_version );
-    json.insert( QStringLiteral("moreInfoUrl"), m_moreInfoUrl.toString() );
+    json.insert(QStringLiteral("id"), m_id);
+    json.insert(QStringLiteral("type"), this->typeAsString());
+    json.insert(QStringLiteral("title"), m_title);
+    json.insert(QStringLiteral("subtitle"), m_subtitle);
+    json.insert(QStringLiteral("createdBy"), m_createdBy);
+    json.insert(QStringLiteral("version"), m_version);
+    json.insert(QStringLiteral("moreInfoUrl"), m_moreInfoUrl.toString());
 
-    const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator( FormQuestion::staticMetaObject.indexOfEnumerator("Type") );
-    const QList<FormQuestion*> list = m_questions.list();
+    const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator(
+            FormQuestion::staticMetaObject.indexOfEnumerator("Type"));
+    const QList<FormQuestion *> list = m_questions.list();
 
     QJsonArray qArray;
-    for(FormQuestion *q : list)
-    {
+    for (FormQuestion *q : list) {
         const QString typeAsString = QLatin1String(formQuestionTypeEnum.valueToKey(q->type()));
 
         QJsonObject qjs;
-        qjs.insert( QStringLiteral("id"), q->id() );
-        qjs.insert( QStringLiteral("question"), q->questionText() );
-        qjs.insert( QStringLiteral("answerHint"), q->answerHint() );
-        qjs.insert( QStringLiteral("type"), typeAsString );
-        qjs.insert( QStringLiteral("metaData"), q->metaData() );
-        qjs.insert( QStringLiteral("indentation"), q->indentation() );
+        qjs.insert(QStringLiteral("id"), q->id());
+        qjs.insert(QStringLiteral("question"), q->questionText());
+        qjs.insert(QStringLiteral("answerHint"), q->answerHint());
+        qjs.insert(QStringLiteral("type"), typeAsString);
+        qjs.insert(QStringLiteral("metaData"), q->metaData());
+        qjs.insert(QStringLiteral("indentation"), q->indentation());
         qArray.append(qjs);
     }
 
-    json.insert( QStringLiteral("questions"), qArray );
+    json.insert(QStringLiteral("questions"), qArray);
 }
 
 void Form::deserializeFromJson(const QJsonObject &json)
@@ -203,72 +194,71 @@ void Form::deserializeFromJson(const QJsonObject &json)
     // serializing the Form here.
     const QString idAttr = QStringLiteral("id");
 
-    if(json.contains(idAttr))
-        this->setId( json.value(idAttr).toString() );
+    if (json.contains(idAttr))
+        this->setId(json.value(idAttr).toString());
     else
-        this->setId( QUuid::createUuid().toString() );
+        this->setId(QUuid::createUuid().toString());
 
-    this->setTypeFromString( json.value(QStringLiteral("type")).toString() );
-    this->setTitle( json.value(QStringLiteral("title")).toString() );
-    this->setSubtitle( json.value(QStringLiteral("subtitle")).toString() );
-    this->setCreatedBy( json.value(QStringLiteral("createdBy")).toString() );
-    this->setVersion( json.value(QStringLiteral("version")).toString() );
-    this->setMoreInfoUrl( QUrl(json.value(QStringLiteral("moreInfoUrl")).toString()) );
+    this->setTypeFromString(json.value(QStringLiteral("type")).toString());
+    this->setTitle(json.value(QStringLiteral("title")).toString());
+    this->setSubtitle(json.value(QStringLiteral("subtitle")).toString());
+    this->setCreatedBy(json.value(QStringLiteral("createdBy")).toString());
+    this->setVersion(json.value(QStringLiteral("version")).toString());
+    this->setMoreInfoUrl(QUrl(json.value(QStringLiteral("moreInfoUrl")).toString()));
 
-    const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator( FormQuestion::staticMetaObject.indexOfEnumerator("Type") );
-    QList<FormQuestion*> list;
+    const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator(
+            FormQuestion::staticMetaObject.indexOfEnumerator("Type"));
+    QList<FormQuestion *> list;
 
-    const QJsonArray qArray = json.value( QStringLiteral("questions") ).toArray();
+    const QJsonArray qArray = json.value(QStringLiteral("questions")).toArray();
 
     QStack<int> qnumberStack;
     qnumberStack.push(0);
-    auto qnumber = [](const QStack <int> &stack) {
+    auto qnumber = [](const QStack<int> &stack) {
         QStringList ret;
-        for(int val : stack)
+        for (int val : stack)
             ret << QString::number(val);
-        return ret.join( QStringLiteral(".") );
+        return ret.join(QStringLiteral("."));
     };
 
-    for(const QJsonValue &qjsi : qArray)
-    {
+    for (const QJsonValue &qjsi : qArray) {
         const QJsonObject qjs = qjsi.toObject();
         FormQuestion *question = new FormQuestion(this);
-        connect(question, &FormQuestion::aboutToDelete, &m_questions, &ObjectListPropertyModel<FormQuestion*>::objectDestroyed);
+        connect(question, &FormQuestion::aboutToDelete, &m_questions,
+                &ObjectListPropertyModel<FormQuestion *>::objectDestroyed);
 
-        if(qjs.contains(idAttr))
-            question->setId( qjs.value(idAttr).toString() );
+        if (qjs.contains(idAttr))
+            question->setId(qjs.value(idAttr).toString());
         else
-            question->setId( QUuid::createUuid().toString() );
+            question->setId(QUuid::createUuid().toString());
 
         const QString ques = qjs.value(QStringLiteral("question")).toString();
         const QString ansHint = qjs.value(QStringLiteral("answerHint")).toString();
         const QString qtypeAsString = qjs.value(QStringLiteral("type")).toString();
         const QJsonObject metaData = qjs.value(QStringLiteral("metaData")).toObject();
         const QJsonValue qindentValue = qjs.value(QStringLiteral("indentation"));
-        const int qindent = qMax(qindentValue.isString() ? qindentValue.toString().toInt() : qindentValue.toInt(), 0);
+        const int qindent = qMax(qindentValue.isString() ? qindentValue.toString().toInt()
+                                                         : qindentValue.toInt(),
+                                 0);
 
-        if(qnumberStack.size() == qindent+1)
+        if (qnumberStack.size() == qindent + 1)
             qnumberStack.top() += 1;
-        if(qnumberStack.size() < qindent+1)
-        {
-            while(qnumberStack.size() < qindent+1)
+        if (qnumberStack.size() < qindent + 1) {
+            while (qnumberStack.size() < qindent + 1)
                 qnumberStack.push(1);
-        }
-        else if(qnumberStack.size() > qindent+1)
-        {
-            while(qnumberStack.size() > qindent+1)
+        } else if (qnumberStack.size() > qindent + 1) {
+            while (qnumberStack.size() > qindent + 1)
                 qnumberStack.pop();
             qnumberStack.top() += 1;
         }
 
         question->setQuestionText(ques);
         question->setAnswerHint(ansHint);
-        question->setNumber( qnumber(qnumberStack) );
-        if(!qtypeAsString.isEmpty())
-        {
+        question->setNumber(qnumber(qnumberStack));
+        if (!qtypeAsString.isEmpty()) {
             bool ok = false;
             const int itype = formQuestionTypeEnum.keyToValue(qPrintable(qtypeAsString), &ok);
-            if(ok)
+            if (ok)
                 question->setType(FormQuestion::Type(itype));
         }
         question->setMetaData(metaData);
@@ -282,7 +272,7 @@ void Form::deserializeFromJson(const QJsonObject &json)
 
 void Form::setType(Type val)
 {
-    if(m_type == val)
+    if (m_type == val)
         return;
 
     m_type = val;
@@ -291,7 +281,7 @@ void Form::setType(Type val)
 
 void Form::setId(const QString &val)
 {
-    if(m_id == val || !m_id.isEmpty())
+    if (m_id == val || !m_id.isEmpty())
         return;
 
     m_id = val;
@@ -300,7 +290,7 @@ void Form::setId(const QString &val)
 
 void Form::setTitle(const QString &val)
 {
-    if(m_title == val || !m_title.isEmpty())
+    if (m_title == val || !m_title.isEmpty())
         return;
 
     m_title = val;
@@ -309,7 +299,7 @@ void Form::setTitle(const QString &val)
 
 void Form::setSubtitle(const QString &val)
 {
-    if(m_subtitle == val || !m_subtitle.isEmpty())
+    if (m_subtitle == val || !m_subtitle.isEmpty())
         return;
 
     m_subtitle = val;
@@ -318,7 +308,7 @@ void Form::setSubtitle(const QString &val)
 
 void Form::setCreatedBy(const QString &val)
 {
-    if(m_createdBy == val || !m_createdBy.isEmpty())
+    if (m_createdBy == val || !m_createdBy.isEmpty())
         return;
 
     m_createdBy = val;
@@ -327,7 +317,7 @@ void Form::setCreatedBy(const QString &val)
 
 void Form::setVersion(const QString &val)
 {
-    if(m_version == val || !m_version.isEmpty())
+    if (m_version == val || !m_version.isEmpty())
         return;
 
     m_version = val;
@@ -336,7 +326,7 @@ void Form::setVersion(const QString &val)
 
 void Form::setMoreInfoUrl(const QUrl &val)
 {
-    if(m_moreInfoUrl == val || !m_moreInfoUrl.isEmpty())
+    if (m_moreInfoUrl == val || !m_moreInfoUrl.isEmpty())
         return;
 
     m_moreInfoUrl = val;
@@ -349,18 +339,18 @@ void Form::setTypeFromString(const QString &val)
     static const QMetaEnum enumerator = Form::staticMetaObject.enumerator(enumIndex);
 
     bool ok = true;
-    const int itype = enumerator.keyToValue( qPrintable(val), &ok );
-    if(!ok)
+    const int itype = enumerator.keyToValue(qPrintable(val), &ok);
+    if (!ok)
         this->setType(GeneralForm);
     else
-        this->setType( Type(itype) );
+        this->setType(Type(itype));
 }
 
 QString Form::typeAsString() const
 {
     static const int enumIndex = Form::staticMetaObject.indexOfEnumerator("Type");
     static const QMetaEnum enumerator = Form::staticMetaObject.enumerator(enumIndex);
-    return QString::fromLatin1( enumerator.valueToKey(m_type) );
+    return QString::fromLatin1(enumerator.valueToKey(m_type));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -371,33 +361,27 @@ Forms *Forms::global()
     return forms;
 }
 
-Forms::Forms(QObject *parent)
-      :ObjectListPropertyModel<Form*>(parent)
+Forms::Forms(QObject *parent) : ObjectListPropertyModel<Form *>(parent)
 {
-    connect(this, &ObjectListPropertyModel<Form*>::objectCountChanged,
-            this, &Forms::formCountChanged);
+    connect(this, &ObjectListPropertyModel<Form *>::objectCountChanged, this,
+            &Forms::formCountChanged);
 }
 
-Forms::Forms(bool, QObject *parent)
-      :ObjectListPropertyModel<Form*>(parent)
+Forms::Forms(bool, QObject *parent) : ObjectListPropertyModel<Form *>(parent)
 {
     this->downloadForms();
 }
 
-Forms::~Forms()
-{
-
-}
+Forms::~Forms() { }
 
 Form *Forms::findForm(const QString &id) const
 {
-    if(id.isEmpty())
+    if (id.isEmpty())
         return nullptr;
 
-    const QList<Form*> forms = this->list();
-    for(Form *form : forms)
-    {
-        if(form->id() == id)
+    const QList<Form *> forms = this->list();
+    for (Form *form : forms) {
+        if (form->id() == id)
             return form;
     }
 
@@ -406,11 +390,10 @@ Form *Forms::findForm(const QString &id) const
 
 QList<Form *> Forms::forms(Form::Type type) const
 {
-    const QList<Form*> forms = this->list();
-    QList<Form*> ret;
-    for(Form *form : forms)
-    {
-        if(form->type() == type)
+    const QList<Form *> forms = this->list();
+    QList<Form *> ret;
+    for (Form *form : forms) {
+        if (form->type() == type)
             ret << form;
     }
 
@@ -421,20 +404,18 @@ Form *Forms::addForm(const QJsonObject &val)
 {
     m_errorReport->clear();
 
-    if(val.isEmpty())
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Cannot load form from empty JSON data.") );
+    if (val.isEmpty()) {
+        m_errorReport->setErrorMessage(QStringLiteral("Cannot load form from empty JSON data."));
         return nullptr;
     }
 
     Form *form = new Form(this);
-    if( QObjectSerializer::fromJson(val, form) )
-    {
+    if (QObjectSerializer::fromJson(val, form)) {
         this->append(form);
         return form;
     }
 
-    m_errorReport->setErrorMessage( QStringLiteral("Couldnt load form from JSON data.") );
+    m_errorReport->setErrorMessage(QStringLiteral("Couldnt load form from JSON data."));
     delete form;
     return nullptr;
 }
@@ -443,24 +424,21 @@ Form *Forms::addFormFromFile(const QString &path)
 {
     m_errorReport->clear();
 
-    if( !QFile::exists(path) )
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("File '%1' does not exist.").arg(path) );
+    if (!QFile::exists(path)) {
+        m_errorReport->setErrorMessage(QStringLiteral("File '%1' does not exist.").arg(path));
         return nullptr;
     }
 
     QFile file(path);
-    if( !file.open(QFile::ReadOnly) )
-    {
-        m_errorReport->setErrorMessage( QStringLiteral("Couldn't load '%1' for reading.").arg(path) );
+    if (!file.open(QFile::ReadOnly)) {
+        m_errorReport->setErrorMessage(QStringLiteral("Couldn't load '%1' for reading.").arg(path));
         return nullptr;
     }
 
     QJsonParseError error;
     const QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), &error);
-    if(error.error != QJsonParseError::NoError)
-    {
-        m_errorReport->setErrorMessage( error.errorString() );
+    if (error.error != QJsonParseError::NoError) {
+        m_errorReport->setErrorMessage(error.errorString());
         return nullptr;
     }
 
@@ -468,70 +446,67 @@ Form *Forms::addFormFromFile(const QString &path)
     return this->addForm(jsonObj);
 }
 
-QList<Form*> Forms::addFormsInFolder(const QString &dirPath)
+QList<Form *> Forms::addFormsInFolder(const QString &dirPath)
 {
     m_errorReport->clear();
 
-    QList<Form*> ret;
+    QList<Form *> ret;
     const QDir dir(dirPath);
-    const QFileInfoList fiList = dir.entryInfoList({QStringLiteral("*.sform")}, QDir::Files, QDir::Name);
+    const QFileInfoList fiList =
+            dir.entryInfoList({ QStringLiteral("*.sform") }, QDir::Files, QDir::Name);
 
-    if(fiList.isEmpty())
+    if (fiList.isEmpty())
         return ret;
 
     ErrorReport *actualErrorReport = m_errorReport;
     QStringList errors;
 
-    for(const QFileInfo &fi : fiList)
-    {
+    for (const QFileInfo &fi : fiList) {
         ErrorReport tempErrorReport;
         m_errorReport = &tempErrorReport;
 
         Form *form = this->addFormFromFile(fi.absoluteFilePath());
 
-        if(form)
+        if (form)
             ret << form;
-        else
-        {
-            const QString error = fi.fileName() + QStringLiteral(": ") + tempErrorReport.errorMessage();
+        else {
+            const QString error =
+                    fi.fileName() + QStringLiteral(": ") + tempErrorReport.errorMessage();
             errors << error;
         }
     }
 
     m_errorReport = actualErrorReport;
 
-    if(!errors.isEmpty())
-        m_errorReport->setErrorMessage( errors.join(QStringLiteral(", ")) );
+    if (!errors.isEmpty())
+        m_errorReport->setErrorMessage(errors.join(QStringLiteral(", ")));
 
     return ret;
 }
 
 void Forms::serializeToJson(QJsonObject &json) const
 {
-    const QList<Form*> forms = this->list();
+    const QList<Form *> forms = this->list();
 
     QJsonArray data;
 
-    for(Form *form : forms)
-    {
+    for (Form *form : forms) {
         const QJsonObject formObj = QObjectSerializer::toJson(form);
         data.append(formObj);
     }
 
-    json.insert( QStringLiteral("#data"), data );
+    json.insert(QStringLiteral("#data"), data);
 }
 
 void Forms::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonArray data = json.value( QStringLiteral("#data") ).toArray();
-    QList<Form*> forms;
+    const QJsonArray data = json.value(QStringLiteral("#data")).toArray();
+    QList<Form *> forms;
 
-    for(const QJsonValue &item : data)
-    {
+    for (const QJsonValue &item : data) {
         const QJsonObject formObj = item.toObject();
         Form *form = new Form(this);
-        if( QObjectSerializer::fromJson(formObj, form) )
-        {
+        if (QObjectSerializer::fromJson(formObj, form)) {
             forms << form;
             continue;
         }
@@ -544,22 +519,23 @@ void Forms::deserializeFromJson(const QJsonObject &json)
 
 void Forms::itemInsertEvent(Form *ptr)
 {
-    if(ptr)
+    if (ptr)
         connect(ptr, &Form::aboutToDelete, this, &Forms::objectDestroyed);
 }
 
 void Forms::itemRemoveEvent(Form *ptr)
 {
-    if(ptr)
+    if (ptr)
         disconnect(ptr, &Form::aboutToDelete, this, &Forms::objectDestroyed);
 }
 
 void Forms::downloadForms()
 {
-    if( this->findChild<QNetworkReply*>() != nullptr )
+    if (this->findChild<QNetworkReply *>() != nullptr)
         return;
 
-    const QUrl url = QUrl( QStringLiteral("http://www.teriflix.in/scrite/library/forms/forms.hexdb") );
+    const QUrl url =
+            QUrl(QStringLiteral("http://www.teriflix.in/scrite/library/forms/forms.hexdb"));
 
     QNetworkAccessManager *nam = NetworkAccessManager::instance();
     QNetworkRequest request(url);
@@ -572,11 +548,11 @@ void Forms::downloadForms()
         const QByteArray bson = qUncompress(QByteArray::fromHex(bytes));
 
         const QJsonDocument doc = QJsonDocument::fromBinaryData(bson);
-        if(doc.isNull())
+        if (doc.isNull())
             return;
 
         QJsonArray records;
-        if(doc.isArray())
+        if (doc.isArray())
             records = doc.array();
         else
             records.append(doc.object());
@@ -584,16 +560,16 @@ void Forms::downloadForms()
         ErrorReport *actualErrorReport = m_errorReport;
         QStringList errors;
 
-        QList<Form*> forms = this->list();
+        QList<Form *> forms = this->list();
 
-        for(const QJsonValue &record : qAsConst(records)) {
+        for (const QJsonValue &record : qAsConst(records)) {
             ErrorReport tempErrorReport;
             m_errorReport = &tempErrorReport;
 
             const QJsonObject formJson = record.toObject();
 
             Form *form = new Form(this);
-            if(QObjectSerializer::fromJson(formJson, form))
+            if (QObjectSerializer::fromJson(formJson, form))
                 forms.append(form);
             else {
                 errors << tempErrorReport.errorMessage();
@@ -605,8 +581,7 @@ void Forms::downloadForms()
 
         m_errorReport = actualErrorReport;
 
-        if(!errors.isEmpty())
-            m_errorReport->setErrorMessage( errors.join(QStringLiteral(", ")) );
+        if (!errors.isEmpty())
+            m_errorReport->setErrorMessage(errors.join(QStringLiteral(", ")));
     });
 }
-

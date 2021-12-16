@@ -25,7 +25,7 @@ class ItemPositionMapper : public QObject
     Q_OBJECT
 
 public:
-    ItemPositionMapper(QObject *parent=nullptr);
+    ItemPositionMapper(QObject *parent = nullptr);
     ~ItemPositionMapper();
 
     Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged)
@@ -34,13 +34,13 @@ public:
     Q_SIGNAL void positionChanged();
 
     Q_PROPERTY(QQuickItem* from READ from WRITE setFrom NOTIFY fromChanged)
-    void setFrom(QQuickItem* val);
-    QQuickItem* from() const { return m_from; }
+    void setFrom(QQuickItem *val);
+    QQuickItem *from() const { return m_from; }
     Q_SIGNAL void fromChanged();
 
     Q_PROPERTY(QQuickItem* to READ to WRITE setTo NOTIFY toChanged)
-    void setTo(QQuickItem* val);
-    QQuickItem* to() const { return m_to; }
+    void setTo(QQuickItem *val);
+    QQuickItem *to() const { return m_to; }
     Q_SIGNAL void toChanged();
 
     Q_PROPERTY(QPointF mappedPosition READ mappedPosition NOTIFY mappedPositionChanged)
@@ -55,15 +55,15 @@ private:
 private:
     void trackFromItemMovement();
     void trackToItemMovement();
-    void trackMovement(QQuickItem *item, QList<QObject*> &list);
+    void trackMovement(QQuickItem *item, QList<QObject *> &list);
     Q_SLOT void trackedObjectDestroyed(QObject *ptr);
     void recomputeMappedPosition();
 
 private:
     QObjectProperty<QQuickItem> m_to;
     QObjectProperty<QQuickItem> m_from;
-    QList<QObject*> m_toItemsBeingTracked;
-    QList<QObject*> m_fromItemsBeingTracked;
+    QList<QObject *> m_toItemsBeingTracked;
+    QList<QObject *> m_fromItemsBeingTracked;
     QPointF m_position;
     QPointF m_mappedPosition;
     QTimer m_recomputePositionTimer;

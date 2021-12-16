@@ -23,7 +23,7 @@ class FileInfo : public QObject
     Q_OBJECT
 
 public:
-    FileInfo(QObject *parent=nullptr);
+    FileInfo(QObject *parent = nullptr);
     ~FileInfo();
 
     Q_PROPERTY(QString absoluteFilePath READ absoluteFilePath WRITE setAbsoluteFilePath NOTIFY fileInfoChanged)
@@ -69,7 +69,7 @@ private:
     QImage requestImage(const QFileInfo &fi);
 
 private:
-    QMap<QString,QImage> m_suffixImageMap;
+    QMap<QString, QImage> m_suffixImageMap;
 };
 
 #endif // FILEINFO_H

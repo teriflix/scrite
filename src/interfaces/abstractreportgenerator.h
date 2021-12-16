@@ -32,11 +32,7 @@ public:
     ~AbstractReportGenerator();
     Q_SIGNAL void aboutToDelete(AbstractReportGenerator *gen);
 
-    enum Format
-    {
-        AdobePDF,
-        OpenDocumentFormat
-    };
+    enum Format { AdobePDF, OpenDocumentFormat };
     Q_ENUM(Format)
     Q_PROPERTY(Format format READ format WRITE setFormat NOTIFY formatChanged STORED false)
     void setFormat(Format val);
@@ -89,13 +85,14 @@ protected:
     QString polishFileName(const QString &fileName) const;
 
 protected:
-    AbstractReportGenerator(QObject *parent=nullptr);
+    AbstractReportGenerator(QObject *parent = nullptr);
     virtual bool usePdfWriter() const;
     virtual bool doGenerate(QTextDocument *) { return false; }
     virtual void configureWriter(QTextDocumentWriter *, const QTextDocument *) const { }
     virtual void configureWriter(QPdfWriter *, const QTextDocument *) const { }
     virtual void configureWriter(QPrinter *, const QTextDocument *) const { }
-    virtual void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *) { }
+    virtual void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *) {
+    }
 
     virtual bool canDirectPrintToPdf() const { return false; }
     virtual bool directPrintToPdf(QPdfWriter *) { return false; }

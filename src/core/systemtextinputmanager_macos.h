@@ -23,7 +23,7 @@ class SystemTextInputManagerBackend_macOS : public AbstractSystemTextInputManage
     Q_OBJECT
 
 public:
-    SystemTextInputManagerBackend_macOS(SystemTextInputManager *parent=nullptr);
+    SystemTextInputManagerBackend_macOS(SystemTextInputManager *parent = nullptr);
     ~SystemTextInputManagerBackend_macOS();
 
     // AbstractSystemTextInputManagerBackend interface
@@ -45,7 +45,8 @@ class SystemTextInputSource_macOS : public AbstractSystemTextInputSource
     Q_OBJECT
 
 public:
-    SystemTextInputSource_macOS(TISInputSourceRef inputSource, SystemTextInputManager *parent=nullptr);
+    SystemTextInputSource_macOS(TISInputSourceRef inputSource,
+                                SystemTextInputManager *parent = nullptr);
     ~SystemTextInputSource_macOS();
 
     bool equals(TISInputSourceRef source) const { return m_inputSource == source; }

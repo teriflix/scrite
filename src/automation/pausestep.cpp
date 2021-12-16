@@ -18,20 +18,16 @@
 #include <QElapsedTimer>
 #include <QEventLoop>
 
-PauseStep::PauseStep(QObject *parent)
-    : AbstractAutomationStep(parent)
+PauseStep::PauseStep(QObject *parent) : AbstractAutomationStep(parent)
 {
     connect(&m_timer, &QTimer::timeout, this, &PauseStep::finish);
 }
 
-PauseStep::~PauseStep()
-{
-
-}
+PauseStep::~PauseStep() { }
 
 void PauseStep::setDurationType(PauseStep::DurationType val)
 {
-    if(m_durationType == val)
+    if (m_durationType == val)
         return;
 
     m_durationType = val;
@@ -40,7 +36,7 @@ void PauseStep::setDurationType(PauseStep::DurationType val)
 
 void PauseStep::setDuration(int val)
 {
-    if(m_duration == val)
+    if (m_duration == val)
         return;
 
     m_duration = val;
@@ -49,9 +45,8 @@ void PauseStep::setDuration(int val)
 
 void PauseStep::run()
 {
-    if(m_duration > 0)
-    {
-        const int msecs = m_durationType == Milliseconds ? m_duration : m_duration*1000;
+    if (m_duration > 0) {
+        const int msecs = m_durationType == Milliseconds ? m_duration : m_duration * 1000;
         m_timer.setInterval(msecs);
         m_timer.setSingleShot(true);
         m_timer.start();

@@ -21,24 +21,24 @@ QVector<QPointF> PolygonTessellator::tessellate(const QList<QPolygonF> &polygons
 
     auto triangulateSegment = [](const QList<QPolygonF> segment) {
         QVector<QPointF> ret;
-        if( segment.isEmpty() )
+        if (segment.isEmpty())
             return ret;
 
-        QList< p2t::Point* > points;
-        QList< std::vector<p2t::Point*> > polylines;
+        QList<p2t::Point *> points;
+        QList<std::vector<p2t::Point *>> polylines;
 
         QRectF segmentArea;
-        for(int i=0; i<segment.size(); i++) {
+        for (int i = 0; i < segment.size(); i++) {
             const QPolygonF polygon = segment.at(i);
             const QRectF polygonRect = polygon.boundingRect();
-            std::vector<p2t::Point*> polyline;
-            for(int p=polygon.isClosed() ? 1 : 0; p<polygon.size(); p++) {
+            std::vector<p2t::Point *> polyline;
+            for (int p = polygon.isClosed() ? 1 : 0; p < polygon.size(); p++) {
                 const QPointF pt = polygon.at(p);
                 points << new p2t::Point(pt.x(), pt.y());
-                polyline.push_back( points.last() );
+                polyline.push_back(points.last());
             }
 
-            if( !segmentArea.isNull() && segmentArea.contains(polygonRect) )
+            if (!segmentArea.isNull() && segmentArea.contains(polygonRect))
                 polylines.append(polyline);
             else {
                 polylines.prepend(polyline);
@@ -47,20 +47,20 @@ QVector<QPointF> PolygonTessellator::tessellate(const QList<QPolygonF> &polygons
         }
 
         p2t::CDT cdt(polylines.first());
-        for(int i=1; i<polylines.size(); i++)
+        for (int i = 1; i < polylines.size(); i++)
             cdt.AddHole(polylines.at(i));
 
         cdt.Triangulate();
 
-        std::vector<p2t::Triangle*> tgls = cdt.GetTriangles();
-        std::vector<p2t::Triangle*>::iterator it = tgls.begin();
-        std::vector<p2t::Triangle*>::iterator end = tgls.end();
-        while(it != end) {
+        std::vector<p2t::Triangle *> tgls = cdt.GetTriangles();
+        std::vector<p2t::Triangle *>::iterator it = tgls.begin();
+        std::vector<p2t::Triangle *>::iterator end = tgls.end();
+        while (it != end) {
             p2t::Triangle *tgl = *it;
 
-            ret << QPointF( tgl->GetPoint(0)->x, tgl->GetPoint(0)->y );
-            ret << QPointF( tgl->GetPoint(1)->x, tgl->GetPoint(1)->y );
-            ret << QPointF( tgl->GetPoint(2)->x, tgl->GetPoint(2)->y );
+            ret << QPointF(tgl->GetPoint(0)->x, tgl->GetPoint(0)->y);
+            ret << QPointF(tgl->GetPoint(1)->x, tgl->GetPoint(1)->y);
+            ret << QPointF(tgl->GetPoint(2)->x, tgl->GetPoint(2)->y);
 
             ++it;
         }
@@ -73,19 +73,14 @@ QVector<QPointF> PolygonTessellator::tessellate(const QList<QPolygonF> &polygons
     QRectF logicalSegmentArea;
     QList<QPolygonF> logicalSegment;
 
-    Q_FOREACH(QPolygonF polygon, polygons)
-    {
+    Q_FOREACH (QPolygonF polygon, polygons) {
         const QRectF polygonRect = polygon.boundingRect();
 
-        if( logicalSegmentArea.isNull() ||
-            logicalSegmentArea.contains(polygonRect) ||
-            polygonRect.contains(logicalSegmentArea) )
-        {
+        if (logicalSegmentArea.isNull() || logicalSegmentArea.contains(polygonRect)
+            || polygonRect.contains(logicalSegmentArea)) {
             logicalSegment.append(polygon);
             logicalSegmentArea |= polygonRect;
-        }
-        else
-        {
+        } else {
             triangles += triangulateSegment(logicalSegment);
 
             logicalSegment.clear();
@@ -95,7 +90,7 @@ QVector<QPointF> PolygonTessellator::tessellate(const QList<QPolygonF> &polygons
         }
     }
 
-    if(!logicalSegment.isEmpty())
+    if (!logicalSegment.isEmpty())
         triangles += triangulateSegment(logicalSegment);
 
     return triangles;

@@ -24,20 +24,16 @@
 #include <QPaintEngine>
 #include <QGuiApplication>
 
-PdfExportableGraphicsScene::PdfExportableGraphicsScene(QObject *parent)
-    : QGraphicsScene(parent)
+PdfExportableGraphicsScene::PdfExportableGraphicsScene(QObject *parent) : QGraphicsScene(parent)
 {
     this->setBackgroundBrush(Qt::white);
 }
 
-PdfExportableGraphicsScene::~PdfExportableGraphicsScene()
-{
-
-}
+PdfExportableGraphicsScene::~PdfExportableGraphicsScene() { }
 
 void PdfExportableGraphicsScene::setTitle(QString val)
 {
-    if(m_title == val)
+    if (m_title == val)
         return;
 
     m_title = val;
@@ -46,7 +42,7 @@ void PdfExportableGraphicsScene::setTitle(QString val)
 
 void PdfExportableGraphicsScene::setComment(const QString &val)
 {
-    if(m_comment == val)
+    if (m_comment == val)
         return;
 
     m_comment = val;
@@ -55,7 +51,7 @@ void PdfExportableGraphicsScene::setComment(const QString &val)
 
 void PdfExportableGraphicsScene::setWatermark(const QString &val)
 {
-    if(m_watermark == val)
+    if (m_watermark == val)
         return;
 
     m_watermark = val;
@@ -65,7 +61,7 @@ void PdfExportableGraphicsScene::setWatermark(const QString &val)
 bool PdfExportableGraphicsScene::exportToPdf(const QString &fileName)
 {
     QFile file(fileName);
-    if(!file.open(QFile::WriteOnly))
+    if (!file.open(QFile::WriteOnly))
         return false;
 
     return this->exportToPdf(&file);
@@ -94,7 +90,8 @@ bool PdfExportableGraphicsScene::exportToPdf(QPdfWriter *pdfWriter)
     sceneRect.adjust(-dpi, -dpi, dpi, dpi);
 
     // Figure out the page size in which we have to create the PDF
-    QPageSize pageSize(sceneRect.size()/dpi, QPageSize::Inch, QStringLiteral("Custom"), QPageSize::FuzzyMatch );
+    QPageSize pageSize(sceneRect.size() / dpi, QPageSize::Inch, QStringLiteral("Custom"),
+                       QPageSize::FuzzyMatch);
 
     // Now, figure out the rect available on paper for printing
     QRectF pageRect = pageSize.rectPixels(dpi);
@@ -130,10 +127,9 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
 
     QRectF contentsRect = this->itemsBoundingRect();
 
-    if( !(items & DontIncludeScriteLink) )
-    {
+    if (!(items & DontIncludeScriteLink)) {
         QGraphicsSimpleTextItem *appInfoItem = new QGraphicsSimpleTextItem;
-        appInfoItem->setText( QStringLiteral("Created using Scrite (www.scrite.io)") );
+        appInfoItem->setText(QStringLiteral("Created using Scrite (www.scrite.io)"));
         appInfoItem->setZValue(999);
 
         QRectF appInfoRect = appInfoItem->boundingRect();
@@ -145,9 +141,8 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         contentsRect = this->itemsBoundingRect();
     }
 
-    QMap<HeaderFooter::Field,QString> fields;
-    if(items & HeaderFooterLayer)
-    {
+    QMap<HeaderFooter::Field, QString> fields;
+    if (items & HeaderFooterLayer) {
         fields[HeaderFooter::AppName] = Application::instance()->applicationName();
         fields[HeaderFooter::AppVersion] = Application::instance()->applicationVersion();
         fields[HeaderFooter::Title] = screenplay->title();
@@ -162,18 +157,22 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         fields[HeaderFooter::Watermark] = m_watermark;
         fields[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
         fields[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
-        fields[HeaderFooter::DateTime] = QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
+        fields[HeaderFooter::DateTime] =
+                QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
         fields[HeaderFooter::PageNumber] = QStringLiteral("1.");
         fields[HeaderFooter::PageNumberOfCount] = QStringLiteral("1/1");
     }
 
-    HeaderFooter *header = (items & HeaderLayer) ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
-    HeaderFooter *footer = (items & FooterLayer) ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
-    Watermark *watermark = ((items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer)) ? new Watermark(this) : nullptr;
+    HeaderFooter *header =
+            (items & HeaderLayer) ? new HeaderFooter(HeaderFooter::Header, this) : nullptr;
+    HeaderFooter *footer =
+            (items & FooterLayer) ? new HeaderFooter(HeaderFooter::Footer, this) : nullptr;
+    Watermark *watermark = ((items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer))
+            ? new Watermark(this)
+            : nullptr;
     QTextDocumentPagedPrinter::loadSettings(header, footer, watermark);
 
-    if(items & HeaderLayer)
-    {
+    if (items & HeaderLayer) {
         QRectF headerRect = contentsRect;
         headerRect.setHeight(40);
         headerRect.moveBottom(contentsRect.top());
@@ -183,8 +182,7 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         this->addItem(headerItem);
     }
 
-    if(items & FooterLayer)
-    {
+    if (items & FooterLayer) {
         QRectF footerRect = contentsRect;
         footerRect.setHeight(40);
         footerRect.moveTop(contentsRect.bottom());
@@ -194,9 +192,8 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         this->addItem(footerItem);
     }
 
-    if( (items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer) )
-    {
-        if(!m_watermark.isEmpty())
+    if ((items & WatermarkUnderlayLayer) || (items & WatermarkOverlayLayer)) {
+        if (!m_watermark.isEmpty())
             watermark->setText(m_watermark);
 
         GraphicsWatermarkItem *watermarkItem = new GraphicsWatermarkItem(watermark);
@@ -208,16 +205,17 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GraphicsHeaderFooterItem::GraphicsHeaderFooterItem(HeaderFooter *headerFooter, const QMap<HeaderFooter::Field,QString> &fields)
+GraphicsHeaderFooterItem::GraphicsHeaderFooterItem(HeaderFooter *headerFooter,
+                                                   const QMap<HeaderFooter::Field, QString> &fields)
     : m_headerFooter(headerFooter), m_fields(fields)
 {
-    if(m_headerFooter != nullptr)
+    if (m_headerFooter != nullptr)
         m_headerFooter->setVisibleFromPageOne(true);
 }
 
 GraphicsHeaderFooterItem::~GraphicsHeaderFooterItem()
 {
-    if(m_headerFooter != nullptr && m_headerFooter->parent() == nullptr)
+    if (m_headerFooter != nullptr && m_headerFooter->parent() == nullptr)
         delete m_headerFooter;
 }
 
@@ -229,9 +227,10 @@ void GraphicsHeaderFooterItem::setRect(const QRectF &rect)
     this->update();
 }
 
-void GraphicsHeaderFooterItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GraphicsHeaderFooterItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                                     QWidget *widget)
 {
-    if(m_headerFooter == nullptr)
+    if (m_headerFooter == nullptr)
         return;
 
     Q_UNUSED(option);
@@ -243,16 +242,15 @@ void GraphicsHeaderFooterItem::paint(QPainter *painter, const QStyleOptionGraphi
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GraphicsWatermarkItem::GraphicsWatermarkItem(Watermark *watermark)
-    : m_watermark(watermark)
+GraphicsWatermarkItem::GraphicsWatermarkItem(Watermark *watermark) : m_watermark(watermark)
 {
-    if(m_watermark != nullptr)
+    if (m_watermark != nullptr)
         m_watermark->setVisibleFromPageOne(true);
 }
 
 GraphicsWatermarkItem::~GraphicsWatermarkItem()
 {
-    if(m_watermark != nullptr && m_watermark->parent() == nullptr)
+    if (m_watermark != nullptr && m_watermark->parent() == nullptr)
         delete m_watermark;
 }
 
@@ -264,9 +262,10 @@ void GraphicsWatermarkItem::setRect(const QRectF &rect)
     this->update();
 }
 
-void GraphicsWatermarkItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GraphicsWatermarkItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                                  QWidget *widget)
 {
-    if(m_watermark == nullptr)
+    if (m_watermark == nullptr)
         return;
 
     Q_UNUSED(option);
@@ -277,8 +276,9 @@ void GraphicsWatermarkItem::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subtitle, qreal containerWidth)
-    :QGraphicsRectItem(nullptr)
+GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subtitle,
+                                       qreal containerWidth)
+    : QGraphicsRectItem(nullptr)
 {
     this->setBrush(Qt::NoBrush);
     this->setPen(Qt::NoPen);
@@ -293,7 +293,7 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
     const qreal actualTitleWidth = titleFontMetrics.width(title);
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
-    titleText->setTextWidth(qMin(actualTitleWidth,maxTitleWidth));
+    titleText->setTextWidth(qMin(actualTitleWidth, maxTitleWidth));
     titleText->setFont(titleFont);
     titleText->setPlainText(title);
     titleText->document()->setDocumentMargin(0);
@@ -304,7 +304,8 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
 
     const QFontMetricsF subtitleFontMetrics(subtitleFont);
 
-    const QPointF subtitleTextBottomLeft = this->childrenBoundingRect().bottomRight() + QPointF(20, 0);
+    const QPointF subtitleTextBottomLeft =
+            this->childrenBoundingRect().bottomRight() + QPointF(20, 0);
 
     QGraphicsTextItem *subtitleText = new QGraphicsTextItem(this);
     subtitleText->setFont(subtitleFont);
@@ -314,14 +315,17 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
 
     QRectF subtitleTextRect = subtitleText->boundingRect();
     subtitleTextRect.moveBottomLeft(subtitleTextBottomLeft);
-    subtitleTextRect.moveBottom( subtitleTextRect.bottom()-(titleFontMetrics.descent()-subtitleFontMetrics.descent()) );
+    subtitleTextRect.moveBottom(subtitleTextRect.bottom()
+                                - (titleFontMetrics.descent() - subtitleFontMetrics.descent()));
     subtitleText->setPos(subtitleTextRect.topLeft());
 
-    const QRectF subtitleRect = subtitleText->mapToParent(subtitleText->boundingRect()).boundingRect();
+    const QRectF subtitleRect =
+            subtitleText->mapToParent(subtitleText->boundingRect()).boundingRect();
 
     QGraphicsLineItem *separator = new QGraphicsLineItem(this);
-    separator->setLine( QLineF(subtitleRect.topLeft()-QPointF(10,0), subtitleRect.bottomLeft()-QPointF(10,0)) );
-    separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
+    separator->setLine(QLineF(subtitleRect.topLeft() - QPointF(10, 0),
+                              subtitleRect.bottomLeft() - QPointF(10, 0)));
+    separator->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap));
     separator->setOpacity(0.75);
 
     subtitleFont.setBold(false);
@@ -341,16 +345,17 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
     urlLinkTextRect = urlLinkText->mapToParent(urlLinkText->boundingRect()).boundingRect();
 
     separator = new QGraphicsLineItem(this);
-    separator->setLine( QLineF(urlLinkTextRect.topLeft()-QPointF(10,0), urlLinkTextRect.bottomLeft()-QPointF(10,0)) );
-    separator->setPen( QPen(Qt::black,2,Qt::SolidLine,Qt::RoundCap) );
+    separator->setLine(QLineF(urlLinkTextRect.topLeft() - QPointF(10, 0),
+                              urlLinkTextRect.bottomLeft() - QPointF(10, 0)));
+    separator->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap));
     separator->setOpacity(0.75);
 
     {
         const QPixmap scriteLogo(QStringLiteral(":/images/scrite_logo_for_report_header.png"));
         const qreal scale = this->childrenBoundingRect().height() / scriteLogo.height();
 
-        QRectF scriteLogoRect( QPointF(0,0), QSizeF(scriteLogo.size())*scale );
-        scriteLogoRect.moveRight(urlLinkTextRect.left()-20);
+        QRectF scriteLogoRect(QPointF(0, 0), QSizeF(scriteLogo.size()) * scale);
+        scriteLogoRect.moveRight(urlLinkTextRect.left() - 20);
         scriteLogoRect.moveBottom(this->childrenBoundingRect().bottom());
 
         QGraphicsPixmapItem *scriteLogoItem = new QGraphicsPixmapItem(this);
@@ -361,18 +366,14 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
 
     {
         QRectF cbrect = this->childrenBoundingRect();
-        cbrect.setHeight( cbrect.height() + 20 );
+        cbrect.setHeight(cbrect.height() + 20);
 
         QGraphicsLineItem *separator = new QGraphicsLineItem(this);
-        separator->setLine( QLineF(cbrect.bottomLeft(), cbrect.bottomRight()) );
+        separator->setLine(QLineF(cbrect.bottomLeft(), cbrect.bottomRight()));
         separator->setPen(QPen(Qt::gray));
     }
 
     this->setRect(this->childrenBoundingRect().adjusted(0, 0, 0, 20));
 }
 
-GraphicsHeaderItem::~GraphicsHeaderItem()
-{
-
-}
-
+GraphicsHeaderItem::~GraphicsHeaderItem() { }

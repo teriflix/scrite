@@ -16,22 +16,16 @@
 
 #include <QFile>
 
-AbstractDeviceIO::AbstractDeviceIO(QObject *parent)
-    : QObject(parent),
-      m_document(this, "document")
+AbstractDeviceIO::AbstractDeviceIO(QObject *parent) : QObject(parent), m_document(this, "document")
 {
-
 }
 
-AbstractDeviceIO::~AbstractDeviceIO()
-{
-
-}
+AbstractDeviceIO::~AbstractDeviceIO() { }
 
 void AbstractDeviceIO::setFileName(const QString &val)
 {
     QString val2 = val.trimmed();
-    if(m_fileName == val2 || val2.isEmpty())
+    if (m_fileName == val2 || val2.isEmpty())
         return;
 
     m_fileName = this->polishFileName(val2);
@@ -42,7 +36,7 @@ void AbstractDeviceIO::setFileName(const QString &val)
 
 void AbstractDeviceIO::setDocument(ScriteDocument *val)
 {
-    if(m_document == val)
+    if (m_document == val)
         return;
 
     m_document = val;

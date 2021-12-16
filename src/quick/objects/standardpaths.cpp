@@ -19,35 +19,25 @@
 #include <QtDebug>
 #include <QMetaEnum>
 
-StandardPaths::StandardPaths(QObject *parent)
-    :QObject(parent)
-{
+StandardPaths::StandardPaths(QObject *parent) : QObject(parent) { }
 
-}
-
-StandardPaths::~StandardPaths()
-{
-
-}
-
+StandardPaths::~StandardPaths() { }
 
 QString StandardPaths::writableLocation(StandardPaths::StandardLocation type) const
 {
-    switch(type)
-    {
+    switch (type) {
     case ApplicationBinaryLocation:
         return qApp->applicationDirPath();
     default:
         break;
     }
 
-    return QStandardPaths::writableLocation( QStandardPaths::StandardLocation(type) );
+    return QStandardPaths::writableLocation(QStandardPaths::StandardLocation(type));
 }
 
 QString StandardPaths::displayName(StandardPaths::StandardLocation type) const
 {
-    switch(type)
-    {
+    switch (type) {
     case ApplicationBinaryLocation:
 #ifdef Q_OS_WIN
         return QString("Location of %1.exe").arg(qApp->applicationName());
@@ -58,27 +48,27 @@ QString StandardPaths::displayName(StandardPaths::StandardLocation type) const
         break;
     }
 
-    return QStandardPaths::displayName( QStandardPaths::StandardLocation(type) );
+    return QStandardPaths::displayName(QStandardPaths::StandardLocation(type));
 }
 
 QString StandardPaths::findExecutable(const QString &executableName, const QStringList &paths)
 {
     {
         const QDir appDir(qApp->applicationDirPath());
-        if( appDir.exists(executableName) )
+        if (appDir.exists(executableName))
             return appDir.absoluteFilePath(executableName);
     }
 
-    return QStandardPaths::findExecutable( executableName, paths );
+    return QStandardPaths::findExecutable(executableName, paths);
 }
 
-QString StandardPaths::locateFile(StandardPaths::StandardLocation type, const QString &fileName) const
+QString StandardPaths::locateFile(StandardPaths::StandardLocation type,
+                                  const QString &fileName) const
 {
-    switch(type)
-    {
+    switch (type) {
     case ApplicationBinaryLocation: {
         const QDir appDir(qApp->applicationDirPath());
-        if( appDir.exists(fileName) )
+        if (appDir.exists(fileName))
             return appDir.absoluteFilePath(fileName);
         return QString();
     }
@@ -86,31 +76,38 @@ QString StandardPaths::locateFile(StandardPaths::StandardLocation type, const QS
         break;
     }
 
-    return QStandardPaths::locate( QStandardPaths::StandardLocation(type), fileName, QStandardPaths::LocateFile );
+    return QStandardPaths::locate(QStandardPaths::StandardLocation(type), fileName,
+                                  QStandardPaths::LocateFile);
 }
 
-QStringList StandardPaths::locateAllFiles(StandardPaths::StandardLocation type, const QString &fileName) const
+QStringList StandardPaths::locateAllFiles(StandardPaths::StandardLocation type,
+                                          const QString &fileName) const
 {
-    if( int(type) >= ApplicationBinaryLocation )
+    if (int(type) >= ApplicationBinaryLocation)
         return QStringList();
 
-    return QStandardPaths::locateAll( QStandardPaths::StandardLocation(type), fileName, QStandardPaths::LocateFile );
+    return QStandardPaths::locateAll(QStandardPaths::StandardLocation(type), fileName,
+                                     QStandardPaths::LocateFile);
 }
 
-QString StandardPaths::locateFolder(StandardPaths::StandardLocation type, const QString &fileName) const
+QString StandardPaths::locateFolder(StandardPaths::StandardLocation type,
+                                    const QString &fileName) const
 {
-    if( int(type) >= ApplicationBinaryLocation )
+    if (int(type) >= ApplicationBinaryLocation)
         return this->locateFile(type, fileName);
 
-    return QStandardPaths::locate( QStandardPaths::StandardLocation(type), fileName, QStandardPaths::LocateDirectory );
+    return QStandardPaths::locate(QStandardPaths::StandardLocation(type), fileName,
+                                  QStandardPaths::LocateDirectory);
 }
 
-QStringList StandardPaths::locateAllFolders(StandardPaths::StandardLocation type, const QString &fileName) const
+QStringList StandardPaths::locateAllFolders(StandardPaths::StandardLocation type,
+                                            const QString &fileName) const
 {
-    if( int(type) >= ApplicationBinaryLocation )
+    if (int(type) >= ApplicationBinaryLocation)
         return QStringList();
 
-    return QStandardPaths::locateAll( QStandardPaths::StandardLocation(type), fileName, QStandardPaths::LocateDirectory );
+    return QStandardPaths::locateAll(QStandardPaths::StandardLocation(type), fileName,
+                                     QStandardPaths::LocateDirectory);
 }
 
 QUrl StandardPaths::fromLocalFile(const QString &file) const
@@ -124,13 +121,12 @@ QString StandardPaths::resolvePath(const QString &path) const
     const QMetaEnum enumerator = StandardPaths::staticMetaObject.enumerator(enumIndex);
 
     QString retPath = path;
-    for(int i=0; i<enumerator.keyCount(); i++)
-    {
-        const QString key = QString("$$%1").arg( enumerator.key(i) );
-        if( path.startsWith(key) )
-        {
-            retPath.remove(0, key.length()+1);
-            retPath = this->locateFile( StandardPaths::StandardLocation(enumerator.value(i)), retPath );
+    for (int i = 0; i < enumerator.keyCount(); i++) {
+        const QString key = QString("$$%1").arg(enumerator.key(i));
+        if (path.startsWith(key)) {
+            retPath.remove(0, key.length() + 1);
+            retPath =
+                    this->locateFile(StandardPaths::StandardLocation(enumerator.value(i)), retPath);
             break;
         }
     }

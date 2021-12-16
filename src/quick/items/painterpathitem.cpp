@@ -15,23 +15,18 @@
 #include "application.h"
 
 PainterPathItem::PainterPathItem(QQuickItem *parent)
-    : AbstractShapeItem(parent),
-      m_painterPath(this, "painterPath")
+    : AbstractShapeItem(parent), m_painterPath(this, "painterPath")
 {
 }
 
-PainterPathItem::~PainterPathItem()
-{
-
-}
+PainterPathItem::~PainterPathItem() { }
 
 void PainterPathItem::setPainterPath(PainterPath *val)
 {
-    if(m_painterPath == val)
+    if (m_painterPath == val)
         return;
 
-    if(m_painterPath)
-    {
+    if (m_painterPath) {
         disconnect(m_painterPath, SIGNAL(updated()), this, SLOT(update()));
         disconnect(this, SIGNAL(widthChanged()), m_painterPath, SIGNAL(itemRectChanged()));
         disconnect(this, SIGNAL(heightChanged()), m_painterPath, SIGNAL(itemRectChanged()));
@@ -39,8 +34,7 @@ void PainterPathItem::setPainterPath(PainterPath *val)
 
     m_painterPath = val;
 
-    if(m_painterPath)
-    {
+    if (m_painterPath) {
         m_painterPath->setParent(this);
         connect(m_painterPath, SIGNAL(updated()), this, SLOT(update()));
         connect(this, SIGNAL(widthChanged()), m_painterPath, SIGNAL(itemRectChanged()));
@@ -54,7 +48,7 @@ void PainterPathItem::setPainterPath(PainterPath *val)
 
 void PainterPathItem::setPath(QPainterPath val)
 {
-    if(m_path == val)
+    if (m_path == val)
         return;
 
     m_path = val;
@@ -82,20 +76,13 @@ void PainterPathItem::resetPainterPath()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-AbstractPathElement::AbstractPathElement(QObject *parent)
-    : QObject(parent)
-{
+AbstractPathElement::AbstractPathElement(QObject *parent) : QObject(parent) { }
 
-}
-
-AbstractPathElement::~AbstractPathElement()
-{
-
-}
+AbstractPathElement::~AbstractPathElement() { }
 
 void AbstractPathElement::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
@@ -106,21 +93,14 @@ void AbstractPathElement::setEnabled(bool val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PainterPath::PainterPath(QObject *parent)
-    : QObject(parent)
-{
+PainterPath::PainterPath(QObject *parent) : QObject(parent) { }
 
-}
-
-PainterPath::~PainterPath()
-{
-
-}
+PainterPath::~PainterPath() { }
 
 QQmlListProperty<AbstractPathElement> PainterPath::elements()
 {
-    return QQmlListProperty<AbstractPathElement>(this,
-                                                 nullptr, elements_append, elements_count, elements_at, elements_clear);
+    return QQmlListProperty<AbstractPathElement>(this, nullptr, elements_append, elements_count,
+                                                 elements_at, elements_clear);
 }
 
 QJsonObject PainterPath::itemRect() const
@@ -143,8 +123,8 @@ QJsonObject PainterPath::itemRect() const
         return ret;
     };
 
-    PainterPathItem *item = qobject_cast<PainterPathItem*>(this->parent());
-    if(item)
+    PainterPathItem *item = qobject_cast<PainterPathItem *>(this->parent());
+    if (item)
         return createJson(item->boundingRect());
 
     return createJson(QRectF());
@@ -153,7 +133,7 @@ QJsonObject PainterPath::itemRect() const
 QPointF PainterPath::pointInLine(const QPointF &p1, const QPointF &p2, qreal t, bool absolute) const
 {
     const QLineF line(p1, p2);
-    if(absolute)
+    if (absolute)
         t = qBound(0.0, t / line.length(), 1.0);
     return line.pointAt(t);
 }
@@ -175,7 +155,7 @@ void PainterPath::reset()
 
 QPainterPath PainterPath::path()
 {
-    if(m_dirty)
+    if (m_dirty)
         this->composePath();
 
     return m_path;
@@ -191,8 +171,8 @@ void PainterPath::markDirty()
 void PainterPath::composePath()
 {
     m_path = QPainterPath();
-    Q_FOREACH(AbstractPathElement *element, m_pathElements) {
-        if(element->isEnabled())
+    Q_FOREACH (AbstractPathElement *element, m_pathElements) {
+        if (element->isEnabled())
             element->apply(m_path);
     }
 
@@ -200,19 +180,21 @@ void PainterPath::composePath()
     emit dirtyChanged();
 }
 
-AbstractPathElement *PainterPath::elements_at(QQmlListProperty<AbstractPathElement> *list, int index)
+AbstractPathElement *PainterPath::elements_at(QQmlListProperty<AbstractPathElement> *list,
+                                              int index)
 {
-    PainterPath *path = qobject_cast<PainterPath*>(list->object);
-    if(path == nullptr || index < 0 || index >= path->m_pathElements.size())
+    PainterPath *path = qobject_cast<PainterPath *>(list->object);
+    if (path == nullptr || index < 0 || index >= path->m_pathElements.size())
         return nullptr;
 
     return path->m_pathElements.at(index);
 }
 
-void PainterPath::elements_append(QQmlListProperty<AbstractPathElement> *list, AbstractPathElement *element)
+void PainterPath::elements_append(QQmlListProperty<AbstractPathElement> *list,
+                                  AbstractPathElement *element)
 {
-    PainterPath *path = qobject_cast<PainterPath*>(list->object);
-    if(path == nullptr || element == nullptr)
+    PainterPath *path = qobject_cast<PainterPath *>(list->object);
+    if (path == nullptr || element == nullptr)
         return;
 
     connect(element, SIGNAL(updated()), path, SLOT(markDirty()));
@@ -224,8 +206,8 @@ void PainterPath::elements_append(QQmlListProperty<AbstractPathElement> *list, A
 
 int PainterPath::elements_count(QQmlListProperty<AbstractPathElement> *list)
 {
-    PainterPath *path = qobject_cast<PainterPath*>(list->object);
-    if(path == nullptr)
+    PainterPath *path = qobject_cast<PainterPath *>(list->object);
+    if (path == nullptr)
         return 0;
 
     return path->m_pathElements.size();
@@ -233,12 +215,11 @@ int PainterPath::elements_count(QQmlListProperty<AbstractPathElement> *list)
 
 void PainterPath::elements_clear(QQmlListProperty<AbstractPathElement> *list)
 {
-    PainterPath *path = qobject_cast<PainterPath*>(list->object);
-    if(path == nullptr)
+    PainterPath *path = qobject_cast<PainterPath *>(list->object);
+    if (path == nullptr)
         return;
 
-    while(path->m_pathElements.size())
-    {
+    while (path->m_pathElements.size()) {
         AbstractPathElement *element = path->m_pathElements.takeFirst();
         disconnect(element, nullptr, path, nullptr);
     }
@@ -249,20 +230,13 @@ void PainterPath::elements_clear(QQmlListProperty<AbstractPathElement> *list)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MoveToElement::MoveToElement(QObject *parent)
-    : AbstractPathElement(parent)
-{
+MoveToElement::MoveToElement(QObject *parent) : AbstractPathElement(parent) { }
 
-}
-
-MoveToElement::~MoveToElement()
-{
-
-}
+MoveToElement::~MoveToElement() { }
 
 void MoveToElement::setX(qreal val)
 {
-    if(qFuzzyCompare(val, m_x))
+    if (qFuzzyCompare(val, m_x))
         return;
 
     m_x = val;
@@ -272,7 +246,7 @@ void MoveToElement::setX(qreal val)
 
 void MoveToElement::setY(qreal val)
 {
-    if(qFuzzyCompare(val, m_y))
+    if (qFuzzyCompare(val, m_y))
         return;
 
     m_y = val;
@@ -282,7 +256,7 @@ void MoveToElement::setY(qreal val)
 
 void MoveToElement::apply(QPainterPath &path)
 {
-    if( !this->isEnabled() )
+    if (!this->isEnabled())
         return;
 
     path.moveTo(m_x, m_y);
@@ -290,20 +264,13 @@ void MoveToElement::apply(QPainterPath &path)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-LineToElement::LineToElement(QObject *parent)
-    : MoveToElement(parent)
-{
+LineToElement::LineToElement(QObject *parent) : MoveToElement(parent) { }
 
-}
-
-LineToElement::~LineToElement()
-{
-
-}
+LineToElement::~LineToElement() { }
 
 void LineToElement::apply(QPainterPath &path)
 {
-    if( !this->isEnabled() )
+    if (!this->isEnabled())
         return;
 
     path.lineTo(m_x, m_y);
@@ -311,20 +278,13 @@ void LineToElement::apply(QPainterPath &path)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CloseSubpathElement::CloseSubpathElement(QObject *parent)
-    : AbstractPathElement(parent)
-{
+CloseSubpathElement::CloseSubpathElement(QObject *parent) : AbstractPathElement(parent) { }
 
-}
-
-CloseSubpathElement::~CloseSubpathElement()
-{
-
-}
+CloseSubpathElement::~CloseSubpathElement() { }
 
 void CloseSubpathElement::apply(QPainterPath &path)
 {
-    if( !this->isEnabled() )
+    if (!this->isEnabled())
         return;
 
     path.closeSubpath();
@@ -332,20 +292,13 @@ void CloseSubpathElement::apply(QPainterPath &path)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CubicToElement::CubicToElement(QObject *parent)
-               :AbstractPathElement(parent)
-{
+CubicToElement::CubicToElement(QObject *parent) : AbstractPathElement(parent) { }
 
-}
-
-CubicToElement::~CubicToElement()
-{
-
-}
+CubicToElement::~CubicToElement() { }
 
 void CubicToElement::setControlPoint1(const QPointF &val)
 {
-    if(m_controlPoint1 == val)
+    if (m_controlPoint1 == val)
         return;
 
     m_controlPoint1 = val;
@@ -355,7 +308,7 @@ void CubicToElement::setControlPoint1(const QPointF &val)
 
 void CubicToElement::setControlPoint2(const QPointF &val)
 {
-    if(m_controlPoint2 == val)
+    if (m_controlPoint2 == val)
         return;
 
     m_controlPoint2 = val;
@@ -365,7 +318,7 @@ void CubicToElement::setControlPoint2(const QPointF &val)
 
 void CubicToElement::setEndPoint(const QPointF &val)
 {
-    if(m_endPoint == val)
+    if (m_endPoint == val)
         return;
 
     m_endPoint = val;
@@ -380,20 +333,13 @@ void CubicToElement::apply(QPainterPath &path)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-QuadToElement::QuadToElement(QObject *parent)
-    :AbstractPathElement(parent)
-{
+QuadToElement::QuadToElement(QObject *parent) : AbstractPathElement(parent) { }
 
-}
-
-QuadToElement::~QuadToElement()
-{
-
-}
+QuadToElement::~QuadToElement() { }
 
 void QuadToElement::setControlPoint(const QPointF &val)
 {
-    if(m_controlPoint == val)
+    if (m_controlPoint == val)
         return;
 
     m_controlPoint = val;
@@ -403,7 +349,7 @@ void QuadToElement::setControlPoint(const QPointF &val)
 
 void QuadToElement::setEndPoint(const QPointF &val)
 {
-    if(m_endPoint == val)
+    if (m_endPoint == val)
         return;
 
     m_endPoint = val;
@@ -418,20 +364,13 @@ void QuadToElement::apply(QPainterPath &path)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ArcToElement::ArcToElement(QObject *parent)
-    :AbstractPathElement(parent)
-{
+ArcToElement::ArcToElement(QObject *parent) : AbstractPathElement(parent) { }
 
-}
-
-ArcToElement::~ArcToElement()
-{
-
-}
+ArcToElement::~ArcToElement() { }
 
 void ArcToElement::setRectangle(const QRectF &val)
 {
-    if(m_rectangle == val)
+    if (m_rectangle == val)
         return;
 
     m_rectangle = val;
@@ -441,7 +380,7 @@ void ArcToElement::setRectangle(const QRectF &val)
 
 void ArcToElement::setStartAngle(qreal val)
 {
-    if( qFuzzyCompare(m_startAngle, val) )
+    if (qFuzzyCompare(m_startAngle, val))
         return;
 
     m_startAngle = val;
@@ -451,7 +390,7 @@ void ArcToElement::setStartAngle(qreal val)
 
 void ArcToElement::setSweepLength(qreal val)
 {
-    if( qFuzzyCompare(m_sweepLength, val) )
+    if (qFuzzyCompare(m_sweepLength, val))
         return;
 
     m_sweepLength = val;

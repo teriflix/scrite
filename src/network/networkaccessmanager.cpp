@@ -21,14 +21,13 @@ NetworkAccessManager *NetworkAccessManager::INSTANCE = nullptr;
 
 NetworkAccessManager *NetworkAccessManager::instance()
 {
-    if(NetworkAccessManager::INSTANCE)
+    if (NetworkAccessManager::INSTANCE)
         return NetworkAccessManager::INSTANCE;
 
     return new NetworkAccessManager(qApp);
 }
 
-NetworkAccessManager::NetworkAccessManager(QObject *parent)
-    : QNetworkAccessManager(parent)
+NetworkAccessManager::NetworkAccessManager(QObject *parent) : QNetworkAccessManager(parent)
 {
     NetworkAccessManager::INSTANCE = this;
     connect(this, &QNetworkAccessManager::finished, this, &NetworkAccessManager::onReplyFinished);
@@ -40,10 +39,12 @@ NetworkAccessManager::~NetworkAccessManager()
     NetworkAccessManager::INSTANCE = nullptr;
 }
 
-QNetworkReply *NetworkAccessManager::createRequest(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
+QNetworkReply *NetworkAccessManager::createRequest(QNetworkAccessManager::Operation op,
+                                                   const QNetworkRequest &request,
+                                                   QIODevice *outgoingData)
 {
     QNetworkReply *reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
-    if(reply)
+    if (reply)
         m_replies.append(reply);
 
     return reply;
@@ -51,12 +52,10 @@ QNetworkReply *NetworkAccessManager::createRequest(QNetworkAccessManager::Operat
 
 void NetworkAccessManager::onReplyFinished(QNetworkReply *reply)
 {
-    if( reply != nullptr && m_replies.removeOne(reply) )
-    {
+    if (reply != nullptr && m_replies.removeOne(reply)) {
         GarbageCollector::instance()->add(reply);
 
-        if(m_replies.isEmpty())
-        {
+        if (m_replies.isEmpty()) {
             NetworkAccessManager::INSTANCE = nullptr;
             GarbageCollector::instance()->add(this);
         }

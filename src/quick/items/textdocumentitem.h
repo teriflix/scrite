@@ -23,12 +23,12 @@ class TextDocumentItem : public QQuickItem
     Q_OBJECT
 
 public:
-    TextDocumentItem(QQuickItem *parent=nullptr);
+    TextDocumentItem(QQuickItem *parent = nullptr);
     ~TextDocumentItem();
 
     Q_PROPERTY(QTextDocument* document READ document WRITE setDocument NOTIFY documentChanged)
-    void setDocument(QTextDocument* val);
-    QTextDocument* document() const { return m_document; }
+    void setDocument(QTextDocument *val);
+    QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
     Q_PROPERTY(qreal documentScale READ documentScale WRITE setDocumentScale NOTIFY documentScaleChanged)
@@ -37,8 +37,8 @@ public:
     Q_SIGNAL void documentScaleChanged();
 
     Q_PROPERTY(QQuickItem* flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
-    void setFlickable(QQuickItem* val);
-    QQuickItem* flickable() const { return m_flickable; }
+    void setFlickable(QQuickItem *val);
+    QQuickItem *flickable() const { return m_flickable; }
     Q_SIGNAL void flickableChanged();
 
     Q_PROPERTY(qreal verticalPadding READ verticalPadding WRITE setVerticalPadding NOTIFY verticalPaddingChanged)
@@ -59,8 +59,8 @@ private:
     bool m_invertColors = false;
     qreal m_documentScale = 1.0;
     qreal m_verticalPadding = 0;
-    QQuickItem* m_flickable = nullptr;
-    QTextDocument* m_document = nullptr;
+    QQuickItem *m_flickable = nullptr;
+    QTextDocument *m_document = nullptr;
     QTimer *m_viewportUpdateHandler = nullptr;
     QTimer *m_documentChangeHandler = nullptr;
     TextDocumentViewportItem *m_viewportItem = nullptr;

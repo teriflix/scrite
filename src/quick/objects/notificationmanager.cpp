@@ -23,8 +23,7 @@ NotificationManager *NotificationManager::instance()
     return ::theInstance;
 }
 
-NotificationManager::NotificationManager(QObject *parent)
-    : QAbstractListModel (parent)
+NotificationManager::NotificationManager(QObject *parent) : QAbstractListModel(parent)
 {
     ::theInstance = this;
 }
@@ -41,7 +40,7 @@ int NotificationManager::count() const
 
 Notification *NotificationManager::notificationAt(int row) const
 {
-    if(row < 0 || row >= m_notifications.size())
+    if (row < 0 || row >= m_notifications.size())
         return nullptr;
 
     return m_notifications.at(row);
@@ -54,27 +53,27 @@ int NotificationManager::rowCount(const QModelIndex &parent) const
 
 QVariant NotificationManager::data(const QModelIndex &index, int role) const
 {
-    if(index.row() < 0 || index.row() >= m_notifications.size())
+    if (index.row() < 0 || index.row() >= m_notifications.size())
         return QVariant();
 
-    if( role != NotificationRole )
+    if (role != NotificationRole)
         return QVariant();
 
     Notification *notification = m_notifications.at(index.row());
-    QObject *notificationObject = qobject_cast<QObject*>(notification);
-    return QVariant::fromValue<QObject*>(notificationObject);
+    QObject *notificationObject = qobject_cast<QObject *>(notification);
+    return QVariant::fromValue<QObject *>(notificationObject);
 }
 
 QHash<int, QByteArray> NotificationManager::roleNames() const
 {
-    QHash<int,QByteArray> roles;
+    QHash<int, QByteArray> roles;
     roles[NotificationRole] = "notificiation";
     return roles;
 }
 
 void NotificationManager::dismissNotification(int row)
 {
-    if( row < 0 || row >= m_notifications.size() )
+    if (row < 0 || row >= m_notifications.size())
         return;
 
     Notification *notification = m_notifications.at(row);
@@ -85,7 +84,7 @@ void NotificationManager::dismissNotification(int row)
 
 void NotificationManager::addNotification(Notification *notification)
 {
-    if( notification == nullptr || m_notifications.contains(notification) )
+    if (notification == nullptr || m_notifications.contains(notification))
         return;
 
     const int size = m_notifications.size();
@@ -99,7 +98,7 @@ void NotificationManager::addNotification(Notification *notification)
 void NotificationManager::removeNotification(Notification *notification)
 {
     int row = m_notifications.indexOf(notification);
-    if( row < 0 )
+    if (row < 0)
         return;
 
     this->beginRemoveRows(QModelIndex(), row, row);

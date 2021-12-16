@@ -23,7 +23,7 @@ class ScriptAutomationStep : public AbstractAutomationStep
     Q_OBJECT
 
 public:
-    ScriptAutomationStep(QObject *parent=nullptr);
+    ScriptAutomationStep(QObject *parent = nullptr);
     ~ScriptAutomationStep();
 
     Q_SIGNAL void runScript();

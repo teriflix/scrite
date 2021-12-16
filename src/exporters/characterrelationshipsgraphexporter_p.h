@@ -22,7 +22,8 @@
 class CharacterRelationshipsGraphScene : public PdfExportableGraphicsScene
 {
 public:
-    CharacterRelationshipsGraphScene(const CharacterRelationshipsGraph *graph, QObject *parent=nullptr);
+    CharacterRelationshipsGraphScene(const CharacterRelationshipsGraph *graph,
+                                     QObject *parent = nullptr);
     ~CharacterRelationshipsGraphScene();
 };
 

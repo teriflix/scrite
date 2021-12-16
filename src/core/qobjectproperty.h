@@ -38,28 +38,29 @@ private:
     QMetaProperty m_resettableProperty;
 };
 
-template <class T>
+template<class T>
 class QObjectProperty : public QObjectPropertyBase
 {
 public:
     QObjectProperty(QObject *notify, const char *resettablePropertyName)
-        : QObjectPropertyBase(notify, resettablePropertyName) { }
-    ~QObjectProperty() {
-        this->setPointer(nullptr);
+        : QObjectPropertyBase(notify, resettablePropertyName)
+    {
     }
+    ~QObjectProperty() { this->setPointer(nullptr); }
 
-    inline QObjectProperty & operator = (T *pointer) {
+    inline QObjectProperty &operator=(T *pointer)
+    {
         this->QObjectPropertyBase::setPointer(pointer);
         m_tpointer = pointer;
         return *this;
     }
 
-    inline operator bool () const { return m_tpointer != nullptr; }
-    inline bool operator == (T *pointer) const { return m_tpointer == pointer; }
-    inline T* data() const { return m_tpointer; }
-    inline T* operator->() const { return m_tpointer; }
-    inline T& operator*() const { return *m_tpointer; }
-    inline operator T*() const { return m_tpointer; }
+    inline operator bool() const { return m_tpointer != nullptr; }
+    inline bool operator==(T *pointer) const { return m_tpointer == pointer; }
+    inline T *data() const { return m_tpointer; }
+    inline T *operator->() const { return m_tpointer; }
+    inline T &operator*() const { return *m_tpointer; }
+    inline operator T *() const { return m_tpointer; }
     inline bool isNull() const { return m_tpointer == nullptr; }
 
 protected:

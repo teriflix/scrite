@@ -23,7 +23,7 @@ class StandardPaths : public QObject
     Q_OBJECT
 
 public:
-    StandardPaths(QObject *parent=nullptr);
+    StandardPaths(QObject *parent = nullptr);
     ~StandardPaths();
 
     // Copied from QStandardPaths
@@ -54,7 +54,8 @@ public:
 
     Q_INVOKABLE QString writableLocation(StandardLocation type) const;
     Q_INVOKABLE QString displayName(StandardLocation type) const;
-    Q_INVOKABLE QString findExecutable(const QString &executableName, const QStringList &paths = QStringList());
+    Q_INVOKABLE QString findExecutable(const QString &executableName,
+                                       const QStringList &paths = QStringList());
     Q_INVOKABLE QString locateFile(StandardLocation type, const QString &fileName) const;
     Q_INVOKABLE QStringList locateAllFiles(StandardLocation type, const QString &fileName) const;
     Q_INVOKABLE QString locateFolder(StandardLocation type, const QString &fileName) const;

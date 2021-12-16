@@ -36,12 +36,12 @@ public:
     Q_SIGNAL void fileNameChanged();
 
     Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged RESET resetDocument)
-    void setDocument(ScriteDocument* val);
-    ScriteDocument* document() const { return m_document; }
+    void setDocument(ScriteDocument *val);
+    ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
 protected:
-    AbstractDeviceIO(QObject *parent=nullptr);
+    AbstractDeviceIO(QObject *parent = nullptr);
     virtual QString polishFileName(const QString &fileName) const { return fileName; }
     void resetDocument();
 

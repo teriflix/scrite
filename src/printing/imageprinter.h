@@ -33,7 +33,7 @@ class ImagePrinter : public QAbstractListModel,
     Q_INTERFACES(QQmlParserStatus)
 
 public:
-    ImagePrinter(QObject *parent=nullptr);
+    ImagePrinter(QObject *parent = nullptr);
     ~ImagePrinter();
     Q_SIGNAL void aboutToDelete(ImagePrinter *ptr);
 
@@ -59,10 +59,10 @@ public:
     Q_SIGNAL void pagesChanged();
 
     Q_PROPERTY(qreal pageWidth READ pageWidth NOTIFY pagesChanged)
-    qreal pageWidth() const { return qMax(m_pageSize.width(),1); }
+    qreal pageWidth() const { return qMax(m_pageSize.width(), 1); }
 
     Q_PROPERTY(qreal pageHeight READ pageHeight NOTIFY pagesChanged)
-    qreal pageHeight() const { return qMax(m_pageSize.height(),1); }
+    qreal pageHeight() const { return qMax(m_pageSize.height(), 1); }
 
     QImage pageImageAt(int index); // this function is non-const on purpose.
     Q_INVOKABLE QString pageUrl(int index) const;
@@ -78,7 +78,7 @@ public:
     enum Roles { PageUrlRole = Qt::UserRole, PageWidthRole, PageHeightRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
 public:
     // QPaintDevice interface

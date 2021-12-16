@@ -24,11 +24,10 @@ class AbstractShapeItem : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    AbstractShapeItem(QQuickItem *parent=nullptr);
+    AbstractShapeItem(QQuickItem *parent = nullptr);
     ~AbstractShapeItem();
 
-    enum RenderType
-    {
+    enum RenderType {
         OutlineOnly = 1,
         OutlineAlso = OutlineOnly,
         FillOnly = 2,
@@ -41,12 +40,7 @@ public:
     RenderType renderType() const { return m_renderType; }
     Q_SIGNAL void renderTypeChanged();
 
-    enum RenderingMechanism
-    {
-        UseOpenGL,
-        UseQPainter,
-        UseAntialiasedQPainter
-    };
+    enum RenderingMechanism { UseOpenGL, UseQPainter, UseAntialiasedQPainter };
     Q_ENUM(RenderingMechanism)
     Q_PROPERTY(RenderingMechanism renderingMechanism READ renderingMechanism WRITE setRenderingMechanism NOTIFY renderingMechanismChanged)
     void setRenderingMechanism(RenderingMechanism val);
@@ -68,8 +62,7 @@ public:
     qreal outlineWidth() const { return m_outlineWidth; }
     Q_SIGNAL void outlineWidthChanged();
 
-    enum OutlineStyle
-    {
+    enum OutlineStyle {
         SolidLine = Qt::SolidLine,
         DashLine,
         DotLine,

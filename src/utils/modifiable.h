@@ -21,9 +21,10 @@ class Modifiable
 public:
     void markAsModified() { ++m_modificationTime; }
     int modificationTime() const { return m_modificationTime; }
-    bool isModified(int *time) const {
+    bool isModified(int *time) const
+    {
         const bool ret = time ? m_modificationTime > *time : true;
-        if(time)
+        if (time)
             *time = m_modificationTime;
         return ret;
     }
@@ -36,14 +37,15 @@ private:
 class ModificationTracker
 {
 public:
-    ModificationTracker(const Modifiable *target=nullptr) :
-        m_target(target) {
-        if(m_target)
+    ModificationTracker(const Modifiable *target = nullptr) : m_target(target)
+    {
+        if (m_target)
             m_modificationTime = m_target->modificationTime();
     }
     ~ModificationTracker() { }
 
-    ModificationTracker& operator = (const ModificationTracker &other) {
+    ModificationTracker &operator=(const ModificationTracker &other)
+    {
         m_target = other.m_target;
         m_modificationTime = other.m_modificationTime;
         return *this;
@@ -51,10 +53,11 @@ public:
 
     bool isTracking(const Modifiable *target) const { return m_target == target; }
 
-    void track(const Modifiable *target) {
-        if(m_target != target) {
+    void track(const Modifiable *target)
+    {
+        if (m_target != target) {
             m_target = target;
-            if(m_target)
+            if (m_target)
                 m_modificationTime = m_target->modificationTime();
             else
                 m_modificationTime = 0;
@@ -63,15 +66,17 @@ public:
 
     bool isModified() const { return m_target ? m_target->isModified(&m_modificationTime) : false; }
 
-    bool isModified(const Modifiable *target) {
-        if(this->isTracking(target))
+    bool isModified(const Modifiable *target)
+    {
+        if (this->isTracking(target))
             return this->isModified();
         track(target);
         return true;
     }
 
-    void touch() {
-        if(m_target != nullptr)
+    void touch()
+    {
+        if (m_target != nullptr)
             m_target->isModified(&m_modificationTime);
     }
 

@@ -19,13 +19,13 @@
 QString Application::buildTimestamp() const
 {
     static QString ret;
-    if(ret.isEmpty())
-    {
+    if (ret.isEmpty()) {
         const QString dateString = QString::fromLatin1(__DATE__).simplified();
         const QString timeString = QString::fromLatin1(__TIME__).simplified();
-        const QDate date = QDate::fromString( dateString, "MMM d yyyy");
-        const QTime time = QTime::fromString( timeString, "hh:mm:ss");
-        ret = date.toString(QStringLiteral("yyMMdd")) + "-" + time.toString(QStringLiteral("hhmmss"));
+        const QDate date = QDate::fromString(dateString, "MMM d yyyy");
+        const QTime time = QTime::fromString(timeString, "hh:mm:ss");
+        ret = date.toString(QStringLiteral("yyMMdd")) + "-"
+                + time.toString(QStringLiteral("hhmmss"));
     }
 
     return ret;

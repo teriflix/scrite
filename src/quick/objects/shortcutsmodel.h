@@ -27,17 +27,10 @@ public:
     ~ShortcutsModel();
 
     // QAbstractItemModel interface
-    enum Roles
-    {
-        TitleRole = Qt::UserRole+1,
-        ShortcutRole,
-        GroupRole,
-        EnabledRole,
-        VisibleRole
-    };
+    enum Roles { TitleRole = Qt::UserRole + 1, ShortcutRole, GroupRole, EnabledRole, VisibleRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
     Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
     void setGroups(const QStringList &val);
@@ -45,18 +38,18 @@ public:
     Q_SIGNAL void groupsChanged();
 
 private:
-    ShortcutsModel(QObject *parent=nullptr);
+    ShortcutsModel(QObject *parent = nullptr);
 
     void add(ShortcutsModelItem *item);
-    void remove(ShortcutsModelItem* item);
-    void update(ShortcutsModelItem *item, bool removeAndInsert=false);
+    void remove(ShortcutsModelItem *item);
+    void update(ShortcutsModelItem *item, bool removeAndInsert = false);
 
-    void sortItems(QList<ShortcutsModelItem*> &items);
+    void sortItems(QList<ShortcutsModelItem *> &items);
 
 private:
     friend class ShortcutsModelItem;
     QStringList m_groups;
-    QList<ShortcutsModelItem*> m_items;
+    QList<ShortcutsModelItem *> m_items;
 };
 
 class ShortcutsModelItem : public QObject
@@ -64,7 +57,7 @@ class ShortcutsModelItem : public QObject
     Q_OBJECT
 
 public:
-    ShortcutsModelItem(QObject *parent=nullptr);
+    ShortcutsModelItem(QObject *parent = nullptr);
     ~ShortcutsModelItem();
 
     static ShortcutsModelItem *qmlAttachedProperties(QObject *object);
@@ -107,7 +100,7 @@ private:
     QString m_shortcut;
     int m_priority = 0;
 };
-Q_DECLARE_METATYPE(ShortcutsModelItem*)
+Q_DECLARE_METATYPE(ShortcutsModelItem *)
 QML_DECLARE_TYPEINFO(ShortcutsModelItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // SHORTCUTSMODEL_H

@@ -23,7 +23,7 @@ class CharacterScreenplayReport : public AbstractScreenplaySubsetReport
     Q_CLASSINFO("Description", "Generate screenplay with only those scenes where one or more characters are present.")
 
 public:
-    Q_INVOKABLE CharacterScreenplayReport(QObject *parent=nullptr);
+    Q_INVOKABLE CharacterScreenplayReport(QObject *parent = nullptr);
     ~CharacterScreenplayReport();
 
     Q_CLASSINFO("includeNotes_FieldGroup", "Characters")
@@ -67,7 +67,7 @@ private:
     bool m_includeSceneIcons = true;
     bool m_highlightDialogues = true;
     bool m_includeSceneNumbers = true;
-    bool m_printEachSceneOnANewPage = false;    
+    bool m_printEachSceneOnANewPage = false;
 };
 
 #endif // CHARACTERSCREENPLAYREPORT_H

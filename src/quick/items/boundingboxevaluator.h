@@ -108,11 +108,12 @@ protected:
     void evaluateNow();
 
     void updatePreview();
-    static QPicture createPreviewPicture(const QList<QJsonObject> &items, const QRectF &bbox, const qreal scale);
+    static QPicture createPreviewPicture(const QList<QJsonObject> &items, const QRectF &bbox,
+                                         const qreal scale);
 
 private:
     void addItem(BoundingBoxItem *item);
-    void removeItem(BoundingBoxItem* item);
+    void removeItem(BoundingBoxItem *item);
     void markDirty(BoundingBoxItem *) { this->evaluateLater(); }
 
 private:
@@ -128,7 +129,7 @@ private:
     mutable QMutex m_previewLock;
     ExecLaterTimer m_evaluationTimer;
     ExecLaterTimer m_updatePreviewTimer;
-    QList<BoundingBoxItem*> m_items;
+    QList<BoundingBoxItem *> m_items;
 };
 
 class BoundingBoxItem : public QObject
@@ -136,7 +137,7 @@ class BoundingBoxItem : public QObject
     Q_OBJECT
 
 public:
-    BoundingBoxItem(QObject *parent=nullptr);
+    BoundingBoxItem(QObject *parent = nullptr);
     ~BoundingBoxItem();
 
     Q_SIGNAL void aboutToDestroy(BoundingBoxItem *ptr);
@@ -148,8 +149,8 @@ public:
     QRectF boundingRect() const;
 
     Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator STORED false)
-    void setEvaluator(BoundingBoxEvaluator* val);
-    BoundingBoxEvaluator* evaluator() const { return m_evaluator; }
+    void setEvaluator(BoundingBoxEvaluator *val);
+    BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
     Q_PROPERTY(qreal stackOrder READ stackOrder WRITE setStackOrder NOTIFY stackOrderChanged)
@@ -177,8 +178,7 @@ public:
     bool isLivePreview() const { return m_livePreview; }
     Q_SIGNAL void livePreviewChanged();
 
-    enum VisibilityMode
-    {
+    enum VisibilityMode {
         IgnoreVisibility,
         AlwaysVisible,
         AlwaysInvisible,
@@ -192,8 +192,8 @@ public:
     Q_SIGNAL void visibilityModeChanged();
 
     Q_PROPERTY(QQuickItem* viewportItem READ viewportItem WRITE setViewportItem NOTIFY viewportItemChanged RESET resetViewportItem STORED false)
-    void setViewportItem(QQuickItem* val);
-    QQuickItem* viewportItem() const { return m_viewportItem; }
+    void setViewportItem(QQuickItem *val);
+    QQuickItem *viewportItem() const { return m_viewportItem; }
     Q_SIGNAL void viewportItemChanged();
 
     Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
@@ -253,7 +253,7 @@ class BoundingBoxPreview : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    BoundingBoxPreview(QQuickItem *parent=nullptr);
+    BoundingBoxPreview(QQuickItem *parent = nullptr);
     ~BoundingBoxPreview();
 
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
@@ -267,8 +267,8 @@ public:
     Q_SIGNAL void backgroundOpacityChanged();
 
     Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
-    void setEvaluator(BoundingBoxEvaluator* val);
-    BoundingBoxEvaluator* evaluator() const { return m_evaluator; }
+    void setEvaluator(BoundingBoxEvaluator *val);
+    BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
     // QQuickPaintedItem interface
@@ -285,7 +285,7 @@ private:
     QObjectProperty<BoundingBoxEvaluator> m_evaluator;
 };
 
-Q_DECLARE_METATYPE(BoundingBoxItem*)
+Q_DECLARE_METATYPE(BoundingBoxItem *)
 QML_DECLARE_TYPEINFO(BoundingBoxItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // ITEMSBOUNDINGBOX_H

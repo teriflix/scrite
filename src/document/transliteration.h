@@ -39,12 +39,12 @@ class TransliterationEngine : public QObject
     Q_OBJECT
 
 public:
-    static TransliterationEngine *instance(QCoreApplication *app=nullptr);
+    static TransliterationEngine *instance(QCoreApplication *app = nullptr);
     ~TransliterationEngine();
 
-    // Must be manually kept in sync with SceneElementFormat::DefaultLanguage & SystemInputSource::Language
-    enum Language
-    {
+    // Must be manually kept in sync with SceneElementFormat::DefaultLanguage &
+    // SystemInputSource::Language
+    enum Language {
         English,
         Bengali,
         Gujarati,
@@ -82,7 +82,7 @@ public:
 
     Q_INVOKABLE void markLanguage(Language language, bool active);
     Q_INVOKABLE bool queryLanguage(Language language) const;
-    QMap<Language,bool> activeLanguages() const { return m_activeLanguages; }
+    QMap<Language, bool> activeLanguages() const { return m_activeLanguages; }
 
     Q_PROPERTY(QJsonArray languages READ languages NOTIFY languagesChanged)
     QJsonArray languages() const;
@@ -102,20 +102,27 @@ public:
     Q_SIGNAL void languageTextInputSourceMapChanged();
 
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
-    Q_INVOKABLE QString transliteratedParagraph(const QString &paragraph, bool includingLastWord=true) const;
+    Q_INVOKABLE QString transliteratedParagraph(const QString &paragraph,
+                                                bool includingLastWord = true) const;
     Q_INVOKABLE QString transliteratedWordInLanguage(const QString &word, Language language) const;
 
     static QString transliteratedWord(const QString &word, void *transliterator);
-    static QString transliteratedParagraph(const QString &paragraph, void *transliterator, bool includingLastWord=true);
+    static QString transliteratedParagraph(const QString &paragraph, void *transliterator,
+                                           bool includingLastWord = true);
 
-    Q_INVOKABLE QFont languageFont(Language language) const { return this->languageFont(language,true); }
+    Q_INVOKABLE QFont languageFont(Language language) const
+    {
+        return this->languageFont(language, true);
+    }
     QFont languageFont(Language language, bool preferAppFonts) const;
     QStringList languageFontFilePaths(Language language) const;
 
     Q_INVOKABLE QJsonObject availableLanguageFontFamilies(Language language) const;
     Q_INVOKABLE QString preferredFontFamilyForLanguage(Language language);
-    Q_INVOKABLE void setPreferredFontFamilyForLanguage(Language language, const QString &fontFamily);
-    Q_SIGNAL void preferredFontFamilyForLanguageChanged(Language language, const QString &fontFamily);
+    Q_INVOKABLE void setPreferredFontFamilyForLanguage(Language language,
+                                                       const QString &fontFamily);
+    Q_SIGNAL void preferredFontFamilyForLanguageChanged(Language language,
+                                                        const QString &fontFamily);
 
     static Language languageForScript(QChar::Script script);
     static QChar::Script scriptForLanguage(Language language);
@@ -131,23 +138,24 @@ public:
         void append(const QChar &ch, int pos);
         bool isEmpty() const;
     };
-    QList<Boundary> evaluateBoundaries(const QString &text, bool bundleCommonScriptChars=false) const;
+    QList<Boundary> evaluateBoundaries(const QString &text,
+                                       bool bundleCommonScriptChars = false) const;
     void evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const;
 
     Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
 
 private:
-    TransliterationEngine(QObject *parent=nullptr);
+    TransliterationEngine(QObject *parent = nullptr);
 
 private:
     void *m_transliterator = nullptr;
     Language m_language = English;
-    QMap<Language,QString> m_tisMap;
-    QMap<Language,bool> m_activeLanguages;
-    QMap<Language,int> m_languageBundledFontId;
-    QMap<Language,QString> m_languageFontFamily;
-    QMap<Language,QStringList> m_languageFontFilePaths;
-    mutable QMap<Language,QStringList> m_availableLanguageFontFamilies;
+    QMap<Language, QString> m_tisMap;
+    QMap<Language, bool> m_activeLanguages;
+    QMap<Language, int> m_languageBundledFontId;
+    QMap<Language, QString> m_languageFontFamily;
+    QMap<Language, QStringList> m_languageFontFilePaths;
+    mutable QMap<Language, QStringList> m_availableLanguageFontFamilies;
 };
 
 class Transliterator : public QObject
@@ -165,8 +173,8 @@ public:
     Q_SIGNAL void enabledChanged();
 
     Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
-    void setTextDocument(QQuickTextDocument* val);
-    QQuickTextDocument* textDocument() const { return m_textDocument; }
+    void setTextDocument(QQuickTextDocument *val);
+    QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
     Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
@@ -191,11 +199,7 @@ public:
 
     Q_INVOKABLE void enableFromNextWord() { m_enableFromNextWord = true; }
 
-    enum Mode
-    {
-        AutomaticMode,
-        SuggestionMode
-    };
+    enum Mode { AutomaticMode, SuggestionMode };
     Q_ENUM(Mode)
     Q_PROPERTY(Mode mode READ mode WRITE setMode NOTIFY modeChanged)
     void setMode(Mode val);
@@ -206,17 +210,20 @@ public:
     Q_INVOKABLE void transliterate(int from, int to);
     Q_INVOKABLE void transliterateToLanguage(int from, int to, int language);
 
-    Q_SIGNAL void aboutToTransliterate(int from, int to, const QString &replacement, const QString &original);
-    Q_SIGNAL void finishedTransliterating(int from, int to, const QString &replacement, const QString &original);
+    Q_SIGNAL void aboutToTransliterate(int from, int to, const QString &replacement,
+                                       const QString &original);
+    Q_SIGNAL void finishedTransliterating(int from, int to, const QString &replacement,
+                                          const QString &original);
 
-    Q_SIGNAL void transliterationSuggestion(int from, int to, const QString &replacement, const QString &original);
+    Q_SIGNAL void transliterationSuggestion(int from, int to, const QString &replacement,
+                                            const QString &original);
 
 private:
-    Transliterator(QObject *parent=nullptr);
+    Transliterator(QObject *parent = nullptr);
     QTextDocument *document() const;
     void resetTextDocument();
     void processTransliteration(int from, int charsRemoved, int charsAdded);
-    void transliterate(QTextCursor &cursor, void *transliterator=nullptr, bool force=false);
+    void transliterate(QTextCursor &cursor, void *transliterator = nullptr, bool force = false);
 
 private:
     bool m_enabled = true;
@@ -228,7 +235,7 @@ private:
     bool m_textDocumentUndoRedoEnabled = false;
     QObjectProperty<QQuickTextDocument> m_textDocument;
 };
-Q_DECLARE_METATYPE(Transliterator*)
+Q_DECLARE_METATYPE(Transliterator *)
 QML_DECLARE_TYPEINFO(Transliterator, QML_HAS_ATTACHED_PROPERTIES)
 
 class TransliterationEvent : public QEvent
@@ -236,7 +243,8 @@ class TransliterationEvent : public QEvent
 public:
     static QEvent::Type EventType();
 
-    TransliterationEvent(int start, int end, const QString &original, TransliterationEngine::Language language, const QString &replacement);
+    TransliterationEvent(int start, int end, const QString &original,
+                         TransliterationEngine::Language language, const QString &replacement);
     ~TransliterationEvent();
 
     int start() const { return m_start; }
@@ -258,7 +266,7 @@ class TransliteratedText : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    TransliteratedText(QQuickItem *parent=nullptr);
+    TransliteratedText(QQuickItem *parent = nullptr);
     ~TransliteratedText();
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
@@ -305,6 +313,5 @@ private:
     QStaticText m_staticText;
     ExecLaterTimer m_updateTimer;
 };
-
 
 #endif // TRANSLITERATION_H

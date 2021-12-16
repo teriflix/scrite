@@ -13,31 +13,23 @@
 
 #include "aggregation.h"
 
-Aggregation::Aggregation(QObject *parent)
-            :QObject(parent)
+Aggregation::Aggregation(QObject *parent) : QObject(parent) { }
+
+Aggregation::~Aggregation() { }
+
+QObject *Aggregation::find(QObject *object, const QString &className,
+                           const QString &objectName) const
 {
-
-}
-
-Aggregation::~Aggregation()
-{
-
-}
-
-QObject *Aggregation::find(QObject *object, const QString &className, const QString &objectName) const
-{
-    if(object == nullptr)
+    if (object == nullptr)
         return nullptr;
 
     QObjectList children = object->children();
-    Q_FOREACH(QObject *child, children)
-    {
-        if(child->inherits(qPrintable(className)))
-        {
-            if(objectName.isEmpty())
+    Q_FOREACH (QObject *child, children) {
+        if (child->inherits(qPrintable(className))) {
+            if (objectName.isEmpty())
                 return child;
 
-            if(child->objectName() == objectName)
+            if (child->objectName() == objectName)
                 return child;
         }
     }
@@ -45,13 +37,12 @@ QObject *Aggregation::find(QObject *object, const QString &className, const QStr
     return nullptr;
 }
 
-
 ErrorReport *Aggregation::findErrorReport(QObject *object) const
 {
-    return object->findChild<ErrorReport*>();
+    return object->findChild<ErrorReport *>();
 }
 
 ProgressReport *Aggregation::findProgressReport(QObject *object) const
 {
-    return object->findChild<ProgressReport*>();
+    return object->findChild<ProgressReport *>();
 }

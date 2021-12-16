@@ -20,66 +20,61 @@
 #include <QPainter>
 #include <QMimeDatabase>
 
-FileInfo::FileInfo(QObject *parent)
-    : QObject(parent)
-{
+FileInfo::FileInfo(QObject *parent) : QObject(parent) { }
 
-}
-
-FileInfo::~FileInfo()
-{
-
-}
+FileInfo::~FileInfo() { }
 
 void FileInfo::setAbsoluteFilePath(const QString &val)
 {
-    if(val.isEmpty())
-        this->setFileInfo( QFileInfo() );
+    if (val.isEmpty())
+        this->setFileInfo(QFileInfo());
     else
-        this->setFileInfo( QFileInfo(val) );
+        this->setFileInfo(QFileInfo(val));
 }
 
 void FileInfo::setAbsolutePath(const QString &val)
 {
-    if(m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty())
         return;
 
     const QString afp = val + QStringLiteral("/") + m_fileInfo.fileName();
-    this->setFileInfo( QFileInfo(afp) );
+    this->setFileInfo(QFileInfo(afp));
 }
 
 void FileInfo::setFileName(const QString &val)
 {
-    if(m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty())
         return;
 
     const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + val;
-    this->setFileInfo( QFileInfo(afp) );
+    this->setFileInfo(QFileInfo(afp));
 }
 
 void FileInfo::setSuffix(const QString &val)
 {
-    if(m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty())
         return;
 
     QString ext = val.trimmed();
-    if(ext.isEmpty())
+    if (ext.isEmpty())
         return;
 
-    if(ext.startsWith(QStringLiteral(".")))
+    if (ext.startsWith(QStringLiteral(".")))
         ext = ext.mid(1);
 
-    const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + m_fileInfo.baseName() + QStringLiteral(".") + ext;
-    this->setFileInfo( QFileInfo(afp) );
+    const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + m_fileInfo.baseName()
+            + QStringLiteral(".") + ext;
+    this->setFileInfo(QFileInfo(afp));
 }
 
 void FileInfo::setBaseName(const QString &val)
 {
-    if(m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty())
         return;
 
-    const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + val + QStringLiteral(".") + m_fileInfo.suffix();
-    this->setFileInfo( QFileInfo(afp) );
+    const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + val + QStringLiteral(".")
+            + m_fileInfo.suffix();
+    this->setFileInfo(QFileInfo(afp));
 }
 
 void FileInfo::setFileInfo(const QFileInfo &val)
@@ -90,16 +85,9 @@ void FileInfo::setFileInfo(const QFileInfo &val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileIconProvider::FileIconProvider()
-    : QQuickImageProvider(QQuickImageProvider::Image)
-{
+FileIconProvider::FileIconProvider() : QQuickImageProvider(QQuickImageProvider::Image) { }
 
-}
-
-FileIconProvider::~FileIconProvider()
-{
-
-}
+FileIconProvider::~FileIconProvider() { }
 
 QImage FileIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
@@ -129,15 +117,15 @@ QImage FileIconProvider::requestImage(const QString &id, QSize *size, const QSiz
 
     return pixmap.toImage();
 #else
-    QImage icon = this->requestImage( QFileInfo(id) );
+    QImage icon = this->requestImage(QFileInfo(id));
 
     QSize iconSize(96, 96);
-    if(requestedSize.isValid())
+    if (requestedSize.isValid())
         iconSize = requestedSize;
 
     icon = icon.scaled(iconSize, Qt::KeepAspectRatio);
 
-    if(size)
+    if (size)
         *size = icon.size();
 
     return icon;
@@ -148,30 +136,29 @@ QImage FileIconProvider::requestImage(const QFileInfo &fi)
 {
     const QString suffix = fi.suffix().toUpper();
 
-    if(m_suffixImageMap.contains(suffix))
+    if (m_suffixImageMap.contains(suffix))
         return m_suffixImageMap.value(suffix);
 
     Attachment::Type type = Attachment::determineType(fi);
-    if(type == Attachment::Photo)
-    {
-        const QString absFilePath = ScriteDocument::instance()->fileSystem()->absolutePath(fi.filePath());
+    if (type == Attachment::Photo) {
+        const QString absFilePath =
+                ScriteDocument::instance()->fileSystem()->absolutePath(fi.filePath());
         QImage image(absFilePath);
         image = image.scaled(96, 96, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
         return image;
     }
 
-    static const QMap<Attachment::Type, QString> typeIconBase
-            = {
-                    { Attachment::Photo, QStringLiteral("photo") },
-                    { Attachment::Video, QStringLiteral("video") },
-                    { Attachment::Audio, QStringLiteral("audio") },
-                    { Attachment::Document, QStringLiteral("document") },
-              };
-    const QString baseIconFile = QStringLiteral(":/icons/filetype/") + typeIconBase.value(type) + QStringLiteral(".png");
+    static const QMap<Attachment::Type, QString> typeIconBase = {
+        { Attachment::Photo, QStringLiteral("photo") },
+        { Attachment::Video, QStringLiteral("video") },
+        { Attachment::Audio, QStringLiteral("audio") },
+        { Attachment::Document, QStringLiteral("document") },
+    };
+    const QString baseIconFile =
+            QStringLiteral(":/icons/filetype/") + typeIconBase.value(type) + QStringLiteral(".png");
 
     QImage icon(baseIconFile);
-    if(suffix.isEmpty())
-    {
+    if (suffix.isEmpty()) {
         m_suffixImageMap[suffix] = icon;
         return icon;
     }
@@ -180,7 +167,7 @@ QImage FileIconProvider::requestImage(const QFileInfo &fi)
     paint.begin(&icon);
 
     QFont font = paint.font();
-    font.setPointSize( Application::instance()->idealFontPointSize() );
+    font.setPointSize(Application::instance()->idealFontPointSize());
     paint.setFont(font);
 
     const qreal maxTextWidth = icon.width() * 0.8;
@@ -188,32 +175,29 @@ QImage FileIconProvider::requestImage(const QFileInfo &fi)
     const QRectF sourceRect = fm.boundingRect(suffix);
     QRectF targetRect = sourceRect;
     qreal targetScale = 1.0;
-    if(targetRect.width() > maxTextWidth)
-    {
+    if (targetRect.width() > maxTextWidth) {
         targetScale = maxTextWidth / targetRect.width();
-        targetRect.setWidth( targetRect.width()*targetScale );
-        targetRect.setHeight( targetRect.height()*targetScale );
+        targetRect.setWidth(targetRect.width() * targetScale);
+        targetRect.setHeight(targetRect.height() * targetScale);
     }
 
     targetRect.moveCenter(icon.rect().center());
-    if(type == Attachment::Photo)
-        targetRect.moveTop(icon.rect().top() + icon.height()*0.25);
-    else if(type == Attachment::Video)
-    {
-        targetRect.moveTop(targetRect.top() + icon.height()*0.1);
+    if (type == Attachment::Photo)
+        targetRect.moveTop(icon.rect().top() + icon.height() * 0.25);
+    else if (type == Attachment::Video) {
+        targetRect.moveTop(targetRect.top() + icon.height() * 0.1);
         targetRect.moveLeft(targetRect.left() + 1);
-    }
-    else if(type == Attachment::Document)
-        targetRect.moveTop(targetRect.top() + icon.height()*0.1);
+    } else if (type == Attachment::Document)
+        targetRect.moveTop(targetRect.top() + icon.height() * 0.1);
 
     paint.setBrush(Qt::white);
     paint.setPen(Qt::black);
-    paint.drawRect(targetRect.adjusted(-2,-2,2,2));
+    paint.drawRect(targetRect.adjusted(-2, -2, 2, 2));
 
     paint.translate(targetRect.left(), targetRect.top());
     paint.scale(targetScale, targetScale);
     paint.setOpacity(1);
-    paint.drawText(QRectF(0,0,targetRect.width(),targetRect.height()), Qt::AlignCenter, suffix);
+    paint.drawText(QRectF(0, 0, targetRect.width(), targetRect.height()), Qt::AlignCenter, suffix);
 
     paint.end();
 

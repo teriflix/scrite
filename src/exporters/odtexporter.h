@@ -23,7 +23,7 @@ class OdtExporter : public AbstractTextDocumentExporter
     Q_CLASSINFO("NameFilters", "Open Document Format (*.odt)")
 
 public:
-    Q_INVOKABLE OdtExporter(QObject *parent=nullptr);
+    Q_INVOKABLE OdtExporter(QObject *parent = nullptr);
     ~OdtExporter();
 
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated document.")

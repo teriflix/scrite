@@ -40,14 +40,15 @@ public:
     virtual bool canImport(const QString &fileName) const = 0;
 
 protected:
-    AbstractImporter(QObject *parent=nullptr);
+    AbstractImporter(QObject *parent = nullptr);
     virtual bool doImport(QIODevice *device) = 0;
 
     void configureCanvas(int nrBlocks);
     Scene *createScene(const QString &heading);
     SceneElement *addSceneElement(Scene *scene, SceneElement::Type type, const QString &text);
 
-    void setBreakTitle(ScreenplayElement* element, const QString &title) {
+    void setBreakTitle(ScreenplayElement *element, const QString &title)
+    {
         element->setBreakTitle(title);
     }
 };
@@ -58,8 +59,11 @@ class TraverseDomElement
 {
 public:
     TraverseDomElement(QDomElement &element, ProgressReport *progress)
-        : m_element(&element), m_progress(progress) { }
-    ~TraverseDomElement() {
+        : m_element(&element), m_progress(progress)
+    {
+    }
+    ~TraverseDomElement()
+    {
         *m_element = m_element->nextSiblingElement(m_element->tagName());
         m_progress->tick();
     }

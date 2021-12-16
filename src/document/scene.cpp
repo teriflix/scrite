@@ -43,7 +43,7 @@ class SceneUndoCommand : public QUndoCommand
 public:
     static SceneUndoCommand *current;
 
-    SceneUndoCommand(Scene *scene, bool allowMerging=true);
+    SceneUndoCommand(Scene *scene, bool allowMerging = true);
     ~SceneUndoCommand();
 
     // QUndoCommand interface
@@ -71,18 +71,14 @@ private:
 SceneUndoCommand *SceneUndoCommand::current = nullptr;
 
 SceneUndoCommand::SceneUndoCommand(Scene *scene, bool allowMerging)
-    : m_scene(scene), m_allowMerging(allowMerging),
-      m_timestamp(QDateTime::currentDateTime())
+    : m_scene(scene), m_allowMerging(allowMerging), m_timestamp(QDateTime::currentDateTime())
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
     m_sceneId = m_scene->id();
     m_before = this->toByteArray(scene);
 }
 
-SceneUndoCommand::~SceneUndoCommand()
-{
-
-}
+SceneUndoCommand::~SceneUndoCommand() { }
 
 void SceneUndoCommand::undo()
 {
@@ -90,14 +86,13 @@ void SceneUndoCommand::undo()
     Scene *scene = this->fromByteArray(m_before);
     SceneUndoCommand::current = nullptr;
 
-    if(scene == nullptr)
+    if (scene == nullptr)
         this->setObsolete(true);
 }
 
 void SceneUndoCommand::redo()
 {
-    if(m_scene != nullptr)
-    {
+    if (m_scene != nullptr) {
         m_after = this->toByteArray(m_scene);
         m_scene = nullptr;
         return;
@@ -107,25 +102,23 @@ void SceneUndoCommand::redo()
     Scene *scene = this->fromByteArray(m_after);
     SceneUndoCommand::current = nullptr;
 
-    if(scene == nullptr)
+    if (scene == nullptr)
         this->setObsolete(true);
 }
 
 bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
 {
-    if(m_allowMerging && this->id() == other->id())
-    {
-        const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand*>(other);
-        if(cmd->m_allowMerging == false)
+    if (m_allowMerging && this->id() == other->id()) {
+        const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand *>(other);
+        if (cmd->m_allowMerging == false)
             return false;
 
-        if(cmd->m_sceneId != m_sceneId)
+        if (cmd->m_sceneId != m_sceneId)
             return false;
 
         const qint64 timegap = qAbs(m_timestamp.msecsTo(cmd->m_timestamp));
         static qint64 minTimegap = 1000;
-        if(timegap < minTimegap)
-        {
+        if (timegap < minTimegap) {
             m_after = cmd->m_after;
             m_timestamp = cmd->m_timestamp;
             return true;
@@ -150,7 +143,7 @@ class PushSceneUndoCommand
     static UndoStack *allowedStack;
 
 public:
-    PushSceneUndoCommand(Scene *scene, bool allowMerging=true);
+    PushSceneUndoCommand(Scene *scene, bool allowMerging = true);
     ~PushSceneUndoCommand();
 
 private:
@@ -161,24 +154,19 @@ UndoStack *PushSceneUndoCommand::allowedStack = nullptr;
 
 PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, bool allowMerging)
 {
-    if(allowedStack == nullptr)
+    if (allowedStack == nullptr)
         allowedStack = Application::instance()->findUndoStack("MainUndoStack");
 
-    if(SceneUndoCommand::current == nullptr &&
-       allowedStack != nullptr &&
-       UndoStack::active() != nullptr &&
-       UndoStack::active() == allowedStack &&
-       scene != nullptr && scene->isUndoRedoEnabled())
+    if (SceneUndoCommand::current == nullptr && allowedStack != nullptr
+        && UndoStack::active() != nullptr && UndoStack::active() == allowedStack && scene != nullptr
+        && scene->isUndoRedoEnabled())
         m_command = new SceneUndoCommand(scene, allowMerging);
 }
 
 PushSceneUndoCommand::~PushSceneUndoCommand()
 {
-    if(m_command != nullptr &&
-        SceneUndoCommand::current == nullptr &&
-        allowedStack != nullptr &&
-        UndoStack::active() != nullptr &&
-        UndoStack::active() == allowedStack)
+    if (m_command != nullptr && SceneUndoCommand::current == nullptr && allowedStack != nullptr
+        && UndoStack::active() != nullptr && UndoStack::active() == allowedStack)
         UndoStack::active()->push(m_command);
     else
         delete m_command;
@@ -187,27 +175,21 @@ PushSceneUndoCommand::~PushSceneUndoCommand()
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneHeading::SceneHeading(QObject *parent)
-    : QObject(parent),
-      m_scene(qobject_cast<Scene*>(parent))
+    : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
     connect(this, &SceneHeading::momentChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationTypeChanged, this, &SceneHeading::textChanged);
-    connect(this, &SceneHeading::textChanged, [=](){
-        this->markAsModified();
-    });
+    connect(this, &SceneHeading::textChanged, [=]() { this->markAsModified(); });
 }
 
-SceneHeading::~SceneHeading()
-{
-
-}
+SceneHeading::~SceneHeading() { }
 
 void SceneHeading::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     PushSceneUndoCommand cmd(m_scene);
@@ -219,7 +201,7 @@ void SceneHeading::setEnabled(bool val)
 void SceneHeading::setLocationType(const QString &val2)
 {
     const QString val = val2.toUpper().trimmed();
-    if(m_locationType == val)
+    if (m_locationType == val)
         return;
 
     PushSceneUndoCommand cmd(m_scene);
@@ -231,7 +213,7 @@ void SceneHeading::setLocationType(const QString &val2)
 void SceneHeading::setLocation(const QString &val2)
 {
     const QString val = val2.toUpper().trimmed();
-    if(m_location == val)
+    if (m_location == val)
         return;
 
     PushSceneUndoCommand cmd(m_scene);
@@ -243,7 +225,7 @@ void SceneHeading::setLocation(const QString &val2)
 void SceneHeading::setMoment(const QString &val2)
 {
     const QString val = val2.toUpper().trimmed();
-    if(m_moment == val)
+    if (m_moment == val)
         return;
 
     PushSceneUndoCommand cmd(m_scene);
@@ -254,15 +236,14 @@ void SceneHeading::setMoment(const QString &val2)
 
 QString SceneHeading::text() const
 {
-    if(m_enabled)
-    {
+    if (m_enabled) {
         const QString dot = QStringLiteral(". ");
         const QString dash = QStringLiteral(" - ");
 
-        if(m_locationType.isEmpty())
+        if (m_locationType.isEmpty())
             return m_moment.isEmpty() ? m_location : (m_location + dash + m_moment);
 
-        if(m_moment.isEmpty())
+        if (m_moment.isEmpty())
             return m_locationType + dot + m_location;
 
         return m_locationType + dot + m_location + dash + m_moment;
@@ -271,59 +252,57 @@ QString SceneHeading::text() const
     return QString();
 }
 
-bool SceneHeading::parse(const QString &text, QString &locationType, QString &location, QString &moment, bool strict)
+bool SceneHeading::parse(const QString &text, QString &locationType, QString &location,
+                         QString &moment, bool strict)
 {
     const Structure *structure = ScriteDocument::instance()->structure();
     const QString heading = text.toUpper().trimmed();
-    const QRegularExpression fieldSep( QStringLiteral("[\\.-]") );
+    const QRegularExpression fieldSep(QStringLiteral("[\\.-]"));
 
     const int field1SepLoc = heading.indexOf(fieldSep);
     int field2SepLoc = heading.lastIndexOf(fieldSep);
-    if(field2SepLoc == field1SepLoc)
+    if (field2SepLoc == field1SepLoc)
         field2SepLoc = -1;
 
-    if(strict && (field1SepLoc < 0 || field2SepLoc < 0))
+    if (strict && (field1SepLoc < 0 || field2SepLoc < 0))
         return false;
 
-    if(field1SepLoc < 0 && field2SepLoc < 0)
-    {
-        if( structure->standardLocationTypes().contains(heading) )
+    if (field1SepLoc < 0 && field2SepLoc < 0) {
+        if (structure->standardLocationTypes().contains(heading))
             locationType = heading;
-        else if( structure->standardMoments().contains(heading) )
+        else if (structure->standardMoments().contains(heading))
             moment = heading;
         else
             location = heading;
         return false;
     }
 
-    if(field1SepLoc < 0)
-    {
-        moment = heading.mid(field2SepLoc+1).trimmed();
-        location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+    if (field1SepLoc < 0) {
+        moment = heading.mid(field2SepLoc + 1).trimmed();
+        location = heading.mid(field1SepLoc + 1, (field2SepLoc - field1SepLoc - 1)).trimmed();
         return false;
     }
 
-    if(field2SepLoc < 0)
-    {
+    if (field2SepLoc < 0) {
         locationType = heading.left(field1SepLoc).trimmed();
-        location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+        location = heading.mid(field1SepLoc + 1, (field2SepLoc - field1SepLoc - 1)).trimmed();
         return false;
     }
 
     locationType = heading.left(field1SepLoc).trimmed();
-    moment = heading.mid(field2SepLoc+1).trimmed();
-    location = heading.mid(field1SepLoc+1,(field2SepLoc-field1SepLoc-1)).trimmed();
+    moment = heading.mid(field2SepLoc + 1).trimmed();
+    location = heading.mid(field1SepLoc + 1, (field2SepLoc - field1SepLoc - 1)).trimmed();
 
-    if(strict)
+    if (strict)
         return Structure::standardLocationTypes().contains(locationType);
 
-    return structure->standardLocationTypes().contains(locationType) &&
-           structure->standardMoments().contains(moment);
+    return structure->standardLocationTypes().contains(locationType)
+            && structure->standardMoments().contains(moment);
 }
 
 void SceneHeading::parseFrom(const QString &text)
 {
-    if(!m_enabled || this->text() == text)
+    if (!m_enabled || this->text() == text)
         return;
 
     QString _locationType, _location, _moment;
@@ -337,14 +316,11 @@ void SceneHeading::parseFrom(const QString &text)
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneElement::SceneElement(QObject *parent)
-    : QObject(parent),
-      m_scene(qobject_cast<Scene*>(parent))
+    : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
 {
     connect(this, &SceneElement::typeChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::textChanged, this, &SceneElement::elementChanged);
-    connect(this, &SceneElement::elementChanged, [=](){
-        this->markAsModified();
-    });
+    connect(this, &SceneElement::elementChanged, [=]() { this->markAsModified(); });
 }
 
 SceneElement::~SceneElement()
@@ -354,9 +330,8 @@ SceneElement::~SceneElement()
 
 SpellCheckService *SceneElement::spellCheck() const
 {
-    if(m_spellCheck == nullptr)
-    {
-        m_spellCheck = new SpellCheckService(const_cast<SceneElement*>(this));
+    if (m_spellCheck == nullptr) {
+        m_spellCheck = new SpellCheckService(const_cast<SceneElement *>(this));
         m_spellCheck->setMethod(SpellCheckService::OnDemand);
         m_spellCheck->setAsynchronous(true);
         m_spellCheck->setText(m_text);
@@ -367,7 +342,7 @@ SpellCheckService *SceneElement::spellCheck() const
 
 void SceneElement::setId(const QString &val)
 {
-    if(m_id == val || !m_id.isEmpty())
+    if (m_id == val || !m_id.isEmpty())
         return;
 
     m_id = val;
@@ -376,7 +351,7 @@ void SceneElement::setId(const QString &val)
 
 QString SceneElement::id() const
 {
-    if(m_id.isEmpty())
+    if (m_id.isEmpty())
         m_id = QUuid::createUuid().toString();
 
     return m_id;
@@ -384,7 +359,7 @@ QString SceneElement::id() const
 
 void SceneElement::setType(SceneElement::Type val)
 {
-    if(m_type == val)
+    if (m_type == val)
         return;
 
     PushSceneUndoCommand cmd(m_scene);
@@ -392,21 +367,27 @@ void SceneElement::setType(SceneElement::Type val)
     m_type = val;
     emit typeChanged();
 
-    if(m_scene != nullptr)
+    if (m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
 }
 
 QString SceneElement::typeAsString() const
 {
-    switch(m_type)
-    {
-    case Action: return "Action";
-    case Character: return "Character";
-    case Dialogue: return "Dialogue";
-    case Parenthetical: return "Parenthetical";
-    case Shot: return "Shot";
-    case Transition: return "Transition";
-    case Heading: return "Scene Heading";
+    switch (m_type) {
+    case Action:
+        return "Action";
+    case Character:
+        return "Character";
+    case Dialogue:
+        return "Dialogue";
+    case Parenthetical:
+        return "Parenthetical";
+    case Shot:
+        return "Shot";
+    case Transition:
+        return "Transition";
+    case Heading:
+        return "Scene Heading";
     }
 
     return "Unknown";
@@ -414,18 +395,18 @@ QString SceneElement::typeAsString() const
 
 void SceneElement::setText(const QString &val)
 {
-    if(m_text == val)
+    if (m_text == val)
         return;
 
     PushSceneUndoCommand cmd(m_scene);
 
     m_text = val.trimmed();
-    if(m_spellCheck != nullptr)
+    if (m_spellCheck != nullptr)
         m_spellCheck->setText(m_text);
 
     emit textChanged(val);
 
-    if(m_scene != nullptr)
+    if (m_scene != nullptr)
         emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
 }
 
@@ -448,18 +429,16 @@ SceneElementContentChange SceneElement::lastContentChange() const
 
 QString SceneElement::formattedText() const
 {
-    if(m_type == SceneElement::Parenthetical)
-    {
+    if (m_type == SceneElement::Parenthetical) {
         QString text = m_text;
-        if(!text.startsWith("("))
+        if (!text.startsWith("("))
             text.prepend("(");
-        if(!text.endsWith(")"))
+        if (!text.endsWith(")"))
             text.append(")");
         return text;
     }
 
-    switch(m_type)
-    {
+    switch (m_type) {
     case SceneElement::Shot:
     case SceneElement::Heading:
     case SceneElement::Character:
@@ -479,15 +458,13 @@ QJsonArray SceneElement::find(const QString &text, int flags) const
 
 void SceneElement::deserializeFromJson(const QJsonObject &)
 {
-    if(m_type == SceneElement::Character)
-    {
-        const int bo = m_text.indexOf( QStringLiteral("(") );
-        if(bo > 0 && !m_text.at(bo-1).isSpace())
-        {
+    if (m_type == SceneElement::Character) {
+        const int bo = m_text.indexOf(QStringLiteral("("));
+        if (bo > 0 && !m_text.at(bo - 1).isSpace()) {
             m_text.insert(bo, QChar(' '));
             emit textChanged(m_text);
 
-            if(m_scene != nullptr)
+            if (m_scene != nullptr)
                 emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
         }
     }
@@ -495,8 +472,8 @@ void SceneElement::deserializeFromJson(const QJsonObject &)
 
 bool SceneElement::event(QEvent *event)
 {
-    if(event->type() == QEvent::ParentChange)
-        m_scene = qobject_cast<Scene*>(this->parent());
+    if (event->type() == QEvent::ParentChange)
+        m_scene = qobject_cast<Scene *>(this->parent());
 
     return QObject::event(event);
 }
@@ -510,16 +487,15 @@ bool CharacterElementMap::include(SceneElement *element)
 {
     // This function returns true if characterNames() would return
     // a different list after this function returns
-    if(element == nullptr)
+    if (element == nullptr)
         return false;
 
-    if(element->type() == SceneElement::Character)
-    {
+    if (element->type() == SceneElement::Character) {
         const bool ret = this->remove(element);
 
         QString newName = element->formattedText();
         newName = newName.section('(', 0, 0).trimmed();
-        if(newName.isEmpty())
+        if (newName.isEmpty())
             return ret;
 
         m_forwardMap[element] = newName;
@@ -527,7 +503,7 @@ bool CharacterElementMap::include(SceneElement *element)
         return true;
     }
 
-    if(m_forwardMap.contains(element))
+    if (m_forwardMap.contains(element))
         return this->remove(element);
 
     return false;
@@ -538,21 +514,17 @@ bool CharacterElementMap::remove(SceneElement *element)
     // This function returns true if characterNames() would return
     // a different list after this function returns
     const QString oldName = m_forwardMap.take(element);
-    if(!oldName.isEmpty())
-    {
-        QList<SceneElement*> &list = m_reverseMap[oldName];
-        if(list.removeOne(element))
-        {
-            if(list.isEmpty())
-            {
+    if (!oldName.isEmpty()) {
+        QList<SceneElement *> &list = m_reverseMap[oldName];
+        if (list.removeOne(element)) {
+            if (list.isEmpty()) {
                 m_reverseMap.remove(oldName);
                 return true;
             }
 
-            if(list.size() == 1)
-            {
+            if (list.size() == 1) {
                 const QVariant value = list.first()->property("#mute");
-                if(value.isValid() && value.toBool())
+                if (value.isValid() && value.toBool())
                     return true;
             }
         }
@@ -563,14 +535,14 @@ bool CharacterElementMap::remove(SceneElement *element)
 
 bool CharacterElementMap::remove(const QString &name)
 {
-    if(name.isEmpty())
+    if (name.isEmpty())
         return false;
 
-    const QList<SceneElement*> elements = m_reverseMap.take(name);
-    if(elements.isEmpty())
+    const QList<SceneElement *> elements = m_reverseMap.take(name);
+    if (elements.isEmpty())
         return false;
 
-    Q_FOREACH(SceneElement *element, elements)
+    Q_FOREACH (SceneElement *element, elements)
         m_forwardMap.take(element);
 
     return true;
@@ -598,18 +570,17 @@ QList<SceneElement *> CharacterElementMap::characterElements(const QString &name
 
 void CharacterElementMap::include(const CharacterElementMap &other)
 {
-    const QList<SceneElement*> elements = other.characterElements();
-    Q_FOREACH(SceneElement *element, elements)
+    const QList<SceneElement *> elements = other.characterElements();
+    Q_FOREACH (SceneElement *element, elements)
         this->include(element);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Scene::Scene(QObject *parent)
-    : QAbstractListModel(parent)
+Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
-    m_structureElement = qobject_cast<StructureElement*>(parent);
+    m_structureElement = qobject_cast<StructureElement *>(parent);
 
     connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
@@ -620,9 +591,7 @@ Scene::Scene(QObject *parent)
     connect(this, &Scene::commentsChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::enabledChanged, this, &Scene::sceneChanged);
-    connect(this, &Scene::sceneChanged, [=](){
-        this->markAsModified();
-    });
+    connect(this, &Scene::sceneChanged, [=]() { this->markAsModified(); });
 
     connect(this, &Scene::sceneElementChanged, this, &Scene::onSceneElementChanged);
     connect(this, &Scene::aboutToRemoveSceneElement, this, &Scene::onAboutToRemoveSceneElement);
@@ -655,8 +624,7 @@ Scene *Scene::clone(QObject *parent) const
     newScene->heading()->setLocation(m_heading->location());
     newScene->heading()->setLocationType(m_heading->locationType());
 
-    Q_FOREACH(SceneElement *element, m_elements)
-    {
+    Q_FOREACH (SceneElement *element, m_elements) {
         SceneElement *newElement = new SceneElement(newScene);
         newElement->setType(element->type());
         newElement->setText(element->text());
@@ -677,7 +645,7 @@ Scene *Scene::clone(QObject *parent) const
 
 void Scene::setId(const QString &val)
 {
-    if(m_id == val || !m_id.isEmpty())
+    if (m_id == val || !m_id.isEmpty())
         return;
 
     m_id = val;
@@ -686,7 +654,7 @@ void Scene::setId(const QString &val)
 
 QString Scene::id() const
 {
-    if(m_id.isEmpty())
+    if (m_id.isEmpty())
         m_id = QUuid::createUuid().toString();
 
     return m_id;
@@ -694,7 +662,7 @@ QString Scene::id() const
 
 QString Scene::name() const
 {
-    if(m_title.length() > 15)
+    if (m_title.length() > 15)
         return QString("Scene: %1...").arg(m_title.left(13));
 
     return QString("Scene: %1").arg(m_title);
@@ -702,12 +670,12 @@ QString Scene::name() const
 
 void Scene::setTitle(const QString &val)
 {
-    if(m_title == val)
+    if (m_title == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "title");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked() && m_undoRedoEnabled)
+    if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_title = val;
@@ -721,22 +689,20 @@ void Scene::inferTitleFromContent()
      * scene contents.
      *
      * Here we look for the first action paragraph and extract its first sentence as synopsis.
-     * If the scene doesnt have any action paragraph, we extract the first dialogue and infer from it.
-     * If that is not present either, we try to use scene heading as title.
-     * In scene heading is disabled, then we leave the title empty.
+     * If the scene doesnt have any action paragraph, we extract the first dialogue and infer from
+     * it. If that is not present either, we try to use scene heading as title. In scene heading is
+     * disabled, then we leave the title empty.
      */
 
     auto setTitleInternal = [=](const QString &val) {
         m_title = val;
         emit titleChanged();
     };
-    setTitleInternal( QStringLiteral("Empty Scene") );
+    setTitleInternal(QStringLiteral("Empty Scene"));
 
     // First lets look for an action paragraph.
-    if(m_elements.isEmpty())
-    {
-        if(m_heading->isEnabled())
-        {
+    if (m_elements.isEmpty()) {
+        if (m_heading->isEnabled()) {
             setTitleInternal(m_heading->text());
             return;
         }
@@ -746,47 +712,44 @@ void Scene::inferTitleFromContent()
 
     auto findParagraph = [=](SceneElement::Type type, SceneElement *fromElement = nullptr) {
         bool checkElement = fromElement == nullptr;
-        for(SceneElement *element : qAsConst(m_elements)) {
-            if(!checkElement && fromElement != nullptr && element == fromElement) {
+        for (SceneElement *element : qAsConst(m_elements)) {
+            if (!checkElement && fromElement != nullptr && element == fromElement) {
                 checkElement = true;
                 continue;
             }
-            if(element->type() == type && !element->text().isEmpty())
+            if (element->type() == type && !element->text().isEmpty())
                 return element;
         }
-        return (SceneElement*)nullptr;
+        return (SceneElement *)nullptr;
     };
 
     auto firstSentence = [](const QString &text) {
         QTextBoundaryFinder sentenceFinder(QTextBoundaryFinder::Sentence, text);
         const int from = sentenceFinder.position();
         const int to = sentenceFinder.toNextBoundary();
-        if(from < 0 || to < 0)
+        if (from < 0 || to < 0)
             return text;
-        return text.mid(from, (to-from)).trimmed();
+        return text.mid(from, (to - from)).trimmed();
     };
 
     SceneElement *firstActionPara = findParagraph(SceneElement::Action);
-    if(firstActionPara != nullptr)
-    {
-        setTitleInternal( firstSentence(firstActionPara->text()) );
+    if (firstActionPara != nullptr) {
+        setTitleInternal(firstSentence(firstActionPara->text()));
         return;
     }
 
     SceneElement *firstCharacterPara = findParagraph(SceneElement::Character);
-    if(firstCharacterPara != nullptr)
-    {
+    if (firstCharacterPara != nullptr) {
         const QString name = firstCharacterPara->formattedText();
 
         SceneElement *firstDialoguePara = findParagraph(SceneElement::Dialogue, firstCharacterPara);
-        if(firstDialoguePara != nullptr)
-        {
+        if (firstDialoguePara != nullptr) {
             const QString dialogue = firstSentence(firstDialoguePara->text());
-            setTitleInternal( name + QStringLiteral(": ") + dialogue );
+            setTitleInternal(name + QStringLiteral(": ") + dialogue);
             return;
         }
 
-        setTitleInternal( name + QStringLiteral(" says something.") );
+        setTitleInternal(name + QStringLiteral(" says something."));
         return;
     }
 }
@@ -794,8 +757,7 @@ void Scene::inferTitleFromContent()
 void Scene::trimTitle()
 {
     const QString val = m_title.trimmed();
-    if(m_title != val)
-    {
+    if (m_title != val) {
         m_title = val;
         emit titleChanged();
     }
@@ -803,12 +765,12 @@ void Scene::trimTitle()
 
 void Scene::setEmotionalChange(const QString &val)
 {
-    if(m_emotionalChange == val)
+    if (m_emotionalChange == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "emotionalChange");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked() && m_undoRedoEnabled)
+    if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_emotionalChange = val;
@@ -817,12 +779,12 @@ void Scene::setEmotionalChange(const QString &val)
 
 void Scene::setCharactersInConflict(const QString &val)
 {
-    if(m_charactersInConflict == val)
+    if (m_charactersInConflict == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "charactersInConflict");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked() && m_undoRedoEnabled)
+    if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_charactersInConflict = val;
@@ -831,12 +793,12 @@ void Scene::setCharactersInConflict(const QString &val)
 
 void Scene::setColor(const QColor &val)
 {
-    if(m_color == val)
+    if (m_color == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "color");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked() && m_undoRedoEnabled)
+    if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_color = val;
@@ -845,12 +807,12 @@ void Scene::setColor(const QColor &val)
 
 void Scene::setPageTarget(const QString &val)
 {
-    if(m_pageTarget == val)
+    if (m_pageTarget == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "pageTarget");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked() && m_undoRedoEnabled)
+    if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_pageTarget = val;
@@ -859,22 +821,21 @@ void Scene::setPageTarget(const QString &val)
 
 bool Scene::validatePageTarget(int pageNumber) const
 {
-    if(m_pageTarget.isEmpty())
+    if (m_pageTarget.isEmpty())
         return true;
 
-    if(pageNumber < 0)
+    if (pageNumber < 0)
         return false;
 
     const QStringList fields = m_pageTarget.split(QStringLiteral(","), QString::SkipEmptyParts);
-    for(QString field : fields)
-    {
+    for (QString field : fields) {
         const QStringList nos = field.trimmed().split(QStringLiteral("-"), QString::SkipEmptyParts);
-        if(nos.isEmpty())
+        if (nos.isEmpty())
             continue;
 
         const int nr1 = nos.first().trimmed().toInt();
         const int nr2 = nos.size() == 1 ? nr1 : nos.last().trimmed().toInt();
-        if(pageNumber >= qMin(nr1,nr2) && pageNumber <= qMax(nr1,nr2))
+        if (pageNumber >= qMin(nr1, nr2) && pageNumber <= qMax(nr1, nr2))
             return true;
     }
 
@@ -883,7 +844,7 @@ bool Scene::validatePageTarget(int pageNumber) const
 
 void Scene::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
@@ -892,7 +853,7 @@ void Scene::setEnabled(bool val)
 
 void Scene::setType(Scene::Type val)
 {
-    if(m_type == val)
+    if (m_type == val)
         return;
 
     m_type = val;
@@ -901,12 +862,12 @@ void Scene::setType(Scene::Type val)
 
 void Scene::setComments(const QString &val)
 {
-    if(m_comments == val)
+    if (m_comments == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "comments");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked() && m_undoRedoEnabled)
+    if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_comments = val;
@@ -915,7 +876,7 @@ void Scene::setComments(const QString &val)
 
 void Scene::setUndoRedoEnabled(bool val)
 {
-    if(m_undoRedoEnabled == val)
+    if (m_undoRedoEnabled == val)
         return;
 
     m_undoRedoEnabled = val;
@@ -924,7 +885,7 @@ void Scene::setUndoRedoEnabled(bool val)
 
 void Scene::setCursorPosition(int val)
 {
-    if(m_cursorPosition == val)
+    if (m_cursorPosition == val)
         return;
 
     m_cursorPosition = val;
@@ -935,8 +896,8 @@ void Scene::addMuteCharacter(const QString &characterName)
 {
     HourGlass hourGlass;
 
-    const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
-    if(!elements.isEmpty())
+    const QList<SceneElement *> elements = m_characterElementMap.characterElements(characterName);
+    if (!elements.isEmpty())
         return;
 
     SceneElement *element = new SceneElement(this);
@@ -950,13 +911,12 @@ void Scene::addMuteCharacter(const QString &characterName)
 
 void Scene::removeMuteCharacter(const QString &characterName)
 {
-    const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
-    if(elements.isEmpty() || elements.size() > 1)
+    const QList<SceneElement *> elements = m_characterElementMap.characterElements(characterName);
+    if (elements.isEmpty() || elements.size() > 1)
         return;
 
     const QVariant value = elements.first()->property("#mute");
-    if(value.isValid() && value.toBool())
-    {
+    if (value.isValid() && value.toBool()) {
         emit aboutToRemoveSceneElement(elements.first());
         GarbageCollector::instance()->add(elements.first());
         emit sceneChanged();
@@ -965,8 +925,8 @@ void Scene::removeMuteCharacter(const QString &characterName)
 
 bool Scene::isCharacterMute(const QString &characterName) const
 {
-    const QList<SceneElement*> elements = m_characterElementMap.characterElements(characterName);
-    if(elements.isEmpty() || elements.size() > 1)
+    const QList<SceneElement *> elements = m_characterElementMap.characterElements(characterName);
+    if (elements.isEmpty() || elements.size() > 1)
         return false;
 
     const QVariant value = elements.first()->property("#mute");
@@ -976,54 +936,47 @@ bool Scene::isCharacterMute(const QString &characterName) const
 void Scene::scanMuteCharacters(const QStringList &characterNames)
 {
     QStringList names = characterNames;
-    if(names.isEmpty())
-    {
-        Structure *structure = qobject_cast<Structure*>(this->parent());
-        if(structure)
+    if (names.isEmpty()) {
+        Structure *structure = qobject_cast<Structure *>(this->parent());
+        if (structure)
             names = structure->characterNames();
     }
 
     const QStringList existingCharacters = this->characterNames();
-    Q_FOREACH(QString existingCharacter, existingCharacters)
+    Q_FOREACH (QString existingCharacter, existingCharacters)
         names.removeAll(existingCharacter);
 
     const QList<SceneElement::Type> skipTypes = QList<SceneElement::Type>()
             << SceneElement::Character << SceneElement::Transition << SceneElement::Shot;
 
-    Q_FOREACH(SceneElement *element, m_elements)
-    {
-        if(skipTypes.contains(element->type()))
+    Q_FOREACH (SceneElement *element, m_elements) {
+        if (skipTypes.contains(element->type()))
             continue;
 
         const QString text = element->text();
 
-        Q_FOREACH(QString name, names)
-        {
+        Q_FOREACH (QString name, names) {
             int pos = 0;
-            while(pos < text.length())
-            {
+            while (pos < text.length()) {
                 pos = text.indexOf(name, pos, Qt::CaseInsensitive);
-                if(pos < 0)
+                if (pos < 0)
                     break;
 
-                if(pos > 0)
-                {
-                    const QChar ch = text.at(pos-1);
-                    if( !ch.isPunct() && !ch.isSpace() )
-                    {
+                if (pos > 0) {
+                    const QChar ch = text.at(pos - 1);
+                    if (!ch.isPunct() && !ch.isSpace()) {
                         pos += name.length();
                         continue;
                     }
                 }
 
                 bool found = (pos + name.length() >= text.length());
-                if(!found)
-                {
-                    const QChar ch = text.at(pos+name.length());
+                if (!found) {
+                    const QChar ch = text.at(pos + name.length());
                     found = ch.isPunct() || ch.isSpace();
                 }
 
-                if(found)
+                if (found)
                     this->addMuteCharacter(name);
 
                 pos += name.length();
@@ -1035,7 +988,7 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
 void Scene::setAct(const QString &val)
 {
     const QString val2 = val.toUpper();
-    if(m_act == val2)
+    if (m_act == val2)
         return;
 
     m_act = val2;
@@ -1044,7 +997,7 @@ void Scene::setAct(const QString &val)
 
 void Scene::setActIndex(const int &val)
 {
-    if(m_actIndex == val)
+    if (m_actIndex == val)
         return;
 
     m_actIndex = val;
@@ -1053,7 +1006,7 @@ void Scene::setActIndex(const int &val)
 
 void Scene::setEpisodeIndex(const int &val)
 {
-    if(m_episodeIndex == val)
+    if (m_episodeIndex == val)
         return;
 
     m_episodeIndex = val;
@@ -1062,7 +1015,7 @@ void Scene::setEpisodeIndex(const int &val)
 
 void Scene::setEpisode(const QString &val)
 {
-    if(m_episode == val)
+    if (m_episode == val)
         return;
 
     m_episode = val;
@@ -1071,20 +1024,20 @@ void Scene::setEpisode(const QString &val)
 
 void Scene::setScreenplayElementIndexList(const QList<int> &val)
 {
-    if(m_screenplayElementIndexList == val)
+    if (m_screenplayElementIndexList == val)
         return;
 
     const bool flag = m_screenplayElementIndexList.isEmpty();
     m_screenplayElementIndexList = val;
     emit screenplayElementIndexListChanged();
 
-    if(flag != m_screenplayElementIndexList.isEmpty())
+    if (flag != m_screenplayElementIndexList.isEmpty())
         emit addedToScreenplayChanged();
 }
 
 void Scene::setGroups(const QStringList &val)
 {
-    if(m_groups == val)
+    if (m_groups == val)
         return;
 
     m_groups = QSet<QString>::fromList(val).toList();
@@ -1093,7 +1046,7 @@ void Scene::setGroups(const QStringList &val)
 
 void Scene::addToGroup(const QString &group)
 {
-    if(group.isEmpty() || this->isInGroup(group))
+    if (group.isEmpty() || this->isInGroup(group))
         return;
 
     m_groups.append(group);
@@ -1104,14 +1057,13 @@ void Scene::addToGroup(const QString &group)
 void Scene::removeFromGroup(const QString &group)
 {
     int index = -1;
-    for(const QString &item : qAsConst(m_groups))
-    {
+    for (const QString &item : qAsConst(m_groups)) {
         ++index;
-        if(!item.compare(group, Qt::CaseInsensitive))
+        if (!item.compare(group, Qt::CaseInsensitive))
             break;
     }
 
-    if(index < 0)
+    if (index < 0)
         return;
 
     m_groups.removeAt(index);
@@ -1125,11 +1077,10 @@ bool Scene::isInGroup(const QString &group) const
 
 void Scene::verifyGroups(const QJsonArray &groupsModel)
 {
-    if(m_groups.isEmpty())
+    if (m_groups.isEmpty())
         return;
 
-    if(groupsModel.isEmpty() && !m_groups.isEmpty())
-    {
+    if (groupsModel.isEmpty() && !m_groups.isEmpty()) {
         m_groups.clear();
         emit groupsChanged();
         return;
@@ -1139,13 +1090,13 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
         QStringList ret;
         std::copy_if(groups.begin(), groups.end(), std::back_inserter(ret),
                      [model](const QString &group) {
-            for(const QJsonValue &item : model) {
-                const QJsonObject obj = item.toObject();
-                if(obj.value(QStringLiteral("name")).toString() == group)
-                    return true;
-            }
-            return false;
-        });
+                         for (const QJsonValue &item : model) {
+                             const QJsonObject obj = item.toObject();
+                             if (obj.value(QStringLiteral("name")).toString() == group)
+                                 return true;
+                         }
+                         return false;
+                     });
         ret.sort(Qt::CaseInsensitive);
         return ret;
     };
@@ -1169,7 +1120,7 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
     verifiedGroupsFutureWatcher->setFuture(verifiedGroupsFuture);
 #else
     const QStringList filteredList = verifyGroupsImpl(groupsModel, m_groups);
-    if(filteredList != m_groups) {
+    if (filteredList != m_groups) {
         m_groups = filteredList;
         emit groupsChanged();
     }
@@ -1178,13 +1129,10 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
 
 QQmlListProperty<SceneElement> Scene::elements()
 {
-    return QQmlListProperty<SceneElement>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &Scene::staticAppendElement,
-                &Scene::staticElementCount,
-                &Scene::staticElementAt,
-                &Scene::staticClearElements);
+    return QQmlListProperty<SceneElement>(reinterpret_cast<QObject *>(this),
+                                          static_cast<void *>(this), &Scene::staticAppendElement,
+                                          &Scene::staticElementCount, &Scene::staticElementAt,
+                                          &Scene::staticClearElements);
 }
 
 SceneElement *Scene::appendElement(const QString &text, int type)
@@ -1204,16 +1152,16 @@ void Scene::addElement(SceneElement *ptr)
 void Scene::insertElementAfter(SceneElement *ptr, SceneElement *after)
 {
     int index = m_elements.indexOf(after);
-    if(index < 0)
+    if (index < 0)
         return;
 
-    this->insertElementAt(ptr, index+1);
+    this->insertElementAt(ptr, index + 1);
 }
 
 void Scene::insertElementBefore(SceneElement *ptr, SceneElement *before)
 {
     int index = m_elements.indexOf(before);
-    if(index < 0)
+    if (index < 0)
         return;
 
     this->insertElementAt(ptr, index);
@@ -1221,15 +1169,15 @@ void Scene::insertElementBefore(SceneElement *ptr, SceneElement *before)
 
 void Scene::insertElementAt(SceneElement *ptr, int index)
 {
-    if(ptr == nullptr || m_elements.indexOf(ptr) >= 0)
+    if (ptr == nullptr || m_elements.indexOf(ptr) >= 0)
         return;
 
-    if(index < 0 || index > m_elements.size())
+    if (index < 0 || index > m_elements.size())
         return;
 
     PushSceneUndoCommand cmd(this);
 
-    if(!m_inSetElementsList)
+    if (!m_inSetElementsList)
         this->beginInsertRows(QModelIndex(), index, index);
 
     ptr->setParent(this);
@@ -1239,29 +1187,29 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
     connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
-    if(!m_inSetElementsList)
+    if (!m_inSetElementsList)
         this->endInsertRows();
 
     emit elementCountChanged();
 
     // To ensure that character names are collected under all-character names
     // while an import is being done.
-    if(ptr->type() == SceneElement::Character)
+    if (ptr->type() == SceneElement::Character)
         emit sceneElementChanged(ptr, ElementTypeChange);
 }
 
 void Scene::removeElement(SceneElement *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int row = m_elements.indexOf(ptr);
-    if(row < 0)
+    if (row < 0)
         return;
 
     PushSceneUndoCommand cmd(this);
 
-    if(!m_inSetElementsList)
+    if (!m_inSetElementsList)
         this->beginRemoveRows(QModelIndex(), row, row);
 
     emit aboutToRemoveSceneElement(ptr);
@@ -1271,12 +1219,12 @@ void Scene::removeElement(SceneElement *ptr)
     disconnect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
     disconnect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
-    if(!m_inSetElementsList)
+    if (!m_inSetElementsList)
         this->endRemoveRows();
 
     emit elementCountChanged();
 
-    if(ptr->parent() == this)
+    if (ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
 }
 
@@ -1287,13 +1235,12 @@ SceneElement *Scene::elementAt(int index) const
 
 void Scene::setElements(const QList<SceneElement *> &list)
 {
-    if(!m_elements.isEmpty() || list.isEmpty())
+    if (!m_elements.isEmpty() || list.isEmpty())
         return;
 
     this->beginResetModel();
 
-    for(SceneElement *ptr : list)
-    {
+    for (SceneElement *ptr : list) {
         ptr->setParent(this);
         connect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
         connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
@@ -1313,18 +1260,17 @@ int Scene::elementCount() const
 
 void Scene::clearElements()
 {
-    while(m_elements.size())
+    while (m_elements.size())
         this->removeElement(m_elements.first());
 }
 
 void Scene::removeLastElementIfEmpty()
 {
-    if(m_elements.isEmpty())
+    if (m_elements.isEmpty())
         return;
 
     SceneElement *element = m_elements.last();
-    if(element->text().isEmpty())
-    {
+    if (element->text().isEmpty()) {
         emit sceneAboutToReset();
         this->removeElement(element);
         emit sceneReset(-1);
@@ -1333,7 +1279,7 @@ void Scene::removeLastElementIfEmpty()
 
 void Scene::beginUndoCapture(bool allowMerging)
 {
-    if(m_pushUndoCommand != nullptr)
+    if (m_pushUndoCommand != nullptr)
         return;
 
     m_pushUndoCommand = new PushSceneUndoCommand(this, allowMerging);
@@ -1341,28 +1287,25 @@ void Scene::beginUndoCapture(bool allowMerging)
 
 void Scene::endUndoCapture()
 {
-    if(m_pushUndoCommand == nullptr)
+    if (m_pushUndoCommand == nullptr)
         return;
 
     delete m_pushUndoCommand;
     m_pushUndoCommand = nullptr;
 }
 
-QHash< QString, QList<SceneElement *> > Scene::dialogueElements() const
+QHash<QString, QList<SceneElement *>> Scene::dialogueElements() const
 {
-    QHash<QString, QList<SceneElement *> > ret;
+    QHash<QString, QList<SceneElement *>> ret;
     QString characterName;
 
-    for(SceneElement *element : m_elements)
-    {
-        if(element->type() == SceneElement::Character)
+    for (SceneElement *element : m_elements) {
+        if (element->type() == SceneElement::Character)
             characterName = element->formattedText().section('(', 0, 0).trimmed();
-        else if(element->type() == SceneElement::Dialogue)
-        {
-            if(!characterName.isEmpty())
+        else if (element->type() == SceneElement::Dialogue) {
+            if (!characterName.isEmpty())
                 ret[characterName].append(element);
-        }
-        else if(element->type() != SceneElement::Parenthetical)
+        } else if (element->type() != SceneElement::Parenthetical)
             characterName.clear();
     }
 
@@ -1371,15 +1314,15 @@ QHash< QString, QList<SceneElement *> > Scene::dialogueElements() const
 
 Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *parent)
 {
-    if(element == nullptr)
+    if (element == nullptr)
         return nullptr;
 
     const int index = this->indexOfElement(element);
-    if(index < 0)
+    if (index < 0)
         return nullptr;
 
     // We cannot split the scene across these types.
-    if(element->type() == SceneElement::Heading || element->type() == SceneElement::Parenthetical)
+    if (element->type() == SceneElement::Heading || element->type() == SceneElement::Parenthetical)
         return nullptr;
 
     PushSceneUndoCommand cmd(this);
@@ -1389,29 +1332,26 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     const bool splitTitleAlso = !m_title.trimmed().isEmpty();
 
     Scene *newScene = new Scene(parent);
-    if(splitTitleAlso)
+    if (splitTitleAlso)
         newScene->setTitle("2nd Part Of " + this->title());
     newScene->setColor(this->color());
-    newScene->heading()->setEnabled( this->heading()->isEnabled() );
-    newScene->heading()->setLocationType( this->heading()->locationType() );
-    newScene->heading()->setLocation( this->heading()->location() );
+    newScene->heading()->setEnabled(this->heading()->isEnabled());
+    newScene->heading()->setLocationType(this->heading()->locationType());
+    newScene->heading()->setLocation(this->heading()->location());
     newScene->heading()->setMoment("LATER");
     newScene->id(); // trigger creation of new Scene ID
 
-    if(splitTitleAlso)
+    if (splitTitleAlso)
         this->setTitle("1st Part Of " + this->title());
 
     // Move all elements from index onwards to the new scene.
-    for(int i=this->elementCount()-1; i>=index; i--)
-    {
+    for (int i = this->elementCount() - 1; i >= index; i--) {
         SceneElement *oldElement = this->elementAt(i);
 
-        if(i==index && oldElement->type() == SceneElement::Action)
-        {
+        if (i == index && oldElement->type() == SceneElement::Action) {
             const QString oldElementText = oldElement->text().trimmed();
             QString locType, location, moment;
-            if(SceneHeading::parse(oldElementText, locType, location, moment, true))
-            {
+            if (SceneHeading::parse(oldElementText, locType, location, moment, true)) {
                 newScene->heading()->setEnabled(true);
                 newScene->heading()->setLocationType(locType);
                 newScene->heading()->setLocation(location);
@@ -1421,30 +1361,29 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
             }
 
             bool couldBeHeading = true;
-            for(const QChar ch : oldElementText)
-            {
-                if(ch.isLetter())
-                {
+            for (const QChar ch : oldElementText) {
+                if (ch.isLetter()) {
                     couldBeHeading = ch.script() == QChar::Script_Latin && ch.isUpper();
-                    if(!couldBeHeading)
+                    if (!couldBeHeading)
                         break;
                 }
             }
 
-            if(couldBeHeading)
-            {
+            if (couldBeHeading) {
                 newScene->heading()->setEnabled(true);
                 newScene->heading()->setLocationType(this->heading()->locationType());
                 newScene->heading()->setLocation(oldElementText);
-                newScene->heading()->setMoment(this->heading()->moment().isEmpty() ? QString() : QStringLiteral("CONTINUOUS"));
+                newScene->heading()->setMoment(this->heading()->moment().isEmpty()
+                                                       ? QString()
+                                                       : QStringLiteral("CONTINUOUS"));
                 this->removeElement(oldElement);
                 continue;
             }
         }
 
         SceneElement *newElement = new SceneElement(newScene);
-        newElement->setType( oldElement->type() );
-        newElement->setText( oldElement->text() );
+        newElement->setType(oldElement->type());
+        newElement->setText(oldElement->text());
         newScene->insertElementAt(newElement, 0);
 
         this->removeElement(oldElement);
@@ -1466,12 +1405,11 @@ bool Scene::mergeInto(Scene *otherScene)
     otherScene->addElement(newElement);
 
     int length = 0;
-    for(int i=0; i<otherScene->elementCount(); i++)
+    for (int i = 0; i < otherScene->elementCount(); i++)
         length += otherScene->elementAt(i)->text().length();
     length += otherScene->elementCount();
 
-    while(thisScene->elementCount())
-    {
+    while (thisScene->elementCount()) {
         SceneElement *element = thisScene->elementAt(0);
 
         newElement = new SceneElement(otherScene);
@@ -1497,15 +1435,15 @@ int Scene::rowCount(const QModelIndex &parent) const
 
 QVariant Scene::data(const QModelIndex &index, int role) const
 {
-    if(role == SceneElementRole && index.isValid())
-        return QVariant::fromValue<QObject*>(this->elementAt(index.row()));
+    if (role == SceneElementRole && index.isValid())
+        return QVariant::fromValue<QObject *>(this->elementAt(index.row()));
 
     return QVariant();
 }
 
 QHash<int, QByteArray> Scene::roleNames() const
 {
-    QHash<int,QByteArray> roles;
+    QHash<int, QByteArray> roles;
     roles[SceneElementRole] = "sceneElement";
     return roles;
 }
@@ -1522,8 +1460,7 @@ QByteArray Scene::toByteArray() const
     ds << m_heading->location();
     ds << m_heading->moment();
     ds << m_elements.size();
-    Q_FOREACH(SceneElement *element, m_elements)
-    {
+    Q_FOREACH (SceneElement *element, m_elements) {
         ds << element->id();
         ds << int(element->type());
         ds << element->text();
@@ -1540,9 +1477,9 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
 
     QString sceneID;
     ds >> sceneID;
-    if(m_id.isEmpty())
+    if (m_id.isEmpty())
         this->setId(sceneID);
-    else if(sceneID != m_id)
+    else if (sceneID != m_id)
         return false;
 
     emit sceneAboutToReset();
@@ -1584,8 +1521,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     QStringList paragraphIds;
 
     paragraphs.reserve(nrElements);
-    for(int i=0; i<nrElements; i++)
-    {
+    for (int i = 0; i < nrElements; i++) {
         _Paragraph e;
         ds >> e.id;
         ds >> e.type;
@@ -1595,29 +1531,26 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     }
 
     // Remove stale paragraphs
-    for(int i=m_elements.size()-1; i>=0; i--)
-    {
+    for (int i = m_elements.size() - 1; i >= 0; i--) {
         SceneElement *para = m_elements.at(i);
-        if(paragraphIds.removeOne(para->id()))
+        if (paragraphIds.removeOne(para->id()))
             continue;
         this->removeElement(para);
     }
 
     // Insert new paragraphs
-    for(int i=0; i<paragraphs.size(); i++)
-    {
+    for (int i = 0; i < paragraphs.size(); i++) {
         const _Paragraph para = paragraphs.at(i);
-        SceneElement *element = i <= m_elements.size()-1 ? m_elements.at(i) : nullptr;
-        if(element && element->id() == para.id)
-        {
-            element->setType( SceneElement::Type(para.type) );
+        SceneElement *element = i <= m_elements.size() - 1 ? m_elements.at(i) : nullptr;
+        if (element && element->id() == para.id) {
+            element->setType(SceneElement::Type(para.type));
             element->setText(para.text);
             continue;
         }
 
         element = new SceneElement(this);
         element->setId(para.id);
-        element->setType( SceneElement::Type(para.type) );
+        element->setType(SceneElement::Type(para.type));
         element->setText(para.text);
         this->insertElementAt(element, i);
     }
@@ -1636,11 +1569,11 @@ Scene *Scene::fromByteArray(const QByteArray &bytes)
 
     const Structure *structure = ScriteDocument::instance()->structure();
     const StructureElement *element = structure->findElementBySceneID(sceneId);
-    if(element == nullptr || element->scene() == nullptr)
+    if (element == nullptr || element->scene() == nullptr)
         return nullptr;
 
     Scene *scene = element->scene();
-    if(scene->resetFromByteArray(bytes))
+    if (scene->resetFromByteArray(bytes))
         return scene;
 
     return nullptr;
@@ -1648,7 +1581,7 @@ Scene *Scene::fromByteArray(const QByteArray &bytes)
 
 void Scene::setCharacterRelationshipGraph(const QJsonObject &val)
 {
-    if(m_characterRelationshipGraph == val)
+    if (m_characterRelationshipGraph == val)
         return;
 
     m_characterRelationshipGraph = val;
@@ -1660,22 +1593,21 @@ void Scene::serializeToJson(QJsonObject &json) const
     const QStringList names = m_characterElementMap.characterNames();
     QJsonArray invisibleCharacters;
 
-    Q_FOREACH(QString name, names)
-    {
-        if(this->isCharacterMute(name))
+    Q_FOREACH (QString name, names) {
+        if (this->isCharacterMute(name))
             invisibleCharacters.append(name);
     }
 
-    if(!invisibleCharacters.isEmpty())
+    if (!invisibleCharacters.isEmpty())
         json.insert(QStringLiteral("#invisibleCharacters"), invisibleCharacters);
 }
 
 void Scene::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonArray invisibleCharacters = json.value(QStringLiteral("#invisibleCharacters")).toArray();
-    if(!invisibleCharacters.isEmpty())
-    {
-        for(int i=0; i<invisibleCharacters.size(); i++)
+    const QJsonArray invisibleCharacters =
+            json.value(QStringLiteral("#invisibleCharacters")).toArray();
+    if (!invisibleCharacters.isEmpty()) {
+        for (int i = 0; i < invisibleCharacters.size(); i++)
             this->addMuteCharacter(invisibleCharacters.at(i).toString());
     }
 
@@ -1684,13 +1616,13 @@ void Scene::deserializeFromJson(const QJsonObject &json)
     // So, if we are loading a notes from a file created using older versions of Scrite,
     // we have to upgrade the notes to the newer format based on the Notes class.
     const QJsonValue notes = json.value(QStringLiteral("notes"));
-    if(notes.isArray())
+    if (notes.isArray())
         m_notes->loadOldNotes(notes.toArray());
 }
 
 bool Scene::canSetPropertyFromObjectList(const QString &propName) const
 {
-    if(propName == QStringLiteral("elements"))
+    if (propName == QStringLiteral("elements"))
         return m_elements.isEmpty();
 
     return false;
@@ -1698,18 +1630,16 @@ bool Scene::canSetPropertyFromObjectList(const QString &propName) const
 
 void Scene::setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects)
 {
-    if(propName == QStringLiteral("elements"))
-    {
-        this->setElements(qobject_list_cast<SceneElement*>(objects));
+    if (propName == QStringLiteral("elements")) {
+        this->setElements(qobject_list_cast<SceneElement *>(objects));
         return;
     }
 }
 
 bool Scene::event(QEvent *event)
 {
-    if(m_structureElement == nullptr && event->type() == QEvent::ParentChange)
-    {
-        m_structureElement = qobject_cast<StructureElement*>(this->parent());
+    if (m_structureElement == nullptr && event->type() == QEvent::ParentChange) {
+        m_structureElement = qobject_cast<StructureElement *>(this->parent());
         emit structureElementChanged();
     }
 
@@ -1718,7 +1648,7 @@ bool Scene::event(QEvent *event)
 
 void Scene::setStructureElement(StructureElement *ptr)
 {
-    if(m_structureElement == ptr)
+    if (m_structureElement == ptr)
         return;
 
     m_structureElement = ptr;
@@ -1730,45 +1660,42 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
 {
     QScopedValueRollback<bool> isel(m_inSetElementsList, true);
 
-    Q_FOREACH(SceneElement *item, list)
-    {
-        if(item->scene() != this)
+    Q_FOREACH (SceneElement *item, list) {
+        if (item->scene() != this)
             return;
     }
 
-    if(m_elements == list)
+    if (m_elements == list)
         return;
 
     const bool sizeChanged = m_elements.size() != list.size();
-    QList<SceneElement*> oldElements = m_elements;
+    QList<SceneElement *> oldElements = m_elements;
 
     this->beginResetModel();
 
     m_elements.clear();
     m_elements.reserve(list.size());
-    Q_FOREACH(SceneElement *item, list)
-    {
-        if( !oldElements.removeOne(item) )
+    Q_FOREACH (SceneElement *item, list) {
+        if (!oldElements.removeOne(item))
             this->addElement(item);
         else
             m_elements.append(item);
 
-        if(item->type() == SceneElement::Character)
+        if (item->type() == SceneElement::Character)
             m_characterElementMap.include(item);
     }
 
-    while(!oldElements.isEmpty())
-    {
+    while (!oldElements.isEmpty()) {
         SceneElement *ptr = oldElements.takeFirst();
         emit aboutToRemoveSceneElement(ptr);
-        if(ptr->type() == SceneElement::Character)
+        if (ptr->type() == SceneElement::Character)
             m_characterElementMap.remove(ptr);
         GarbageCollector::instance()->add(ptr);
     }
 
     this->endResetModel();
 
-    if(sizeChanged)
+    if (sizeChanged)
         emit elementCountChanged();
 
     emit sceneChanged();
@@ -1777,69 +1704,62 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
 
 void Scene::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
 {
-    if( m_characterElementMap.include(element) )
+    if (m_characterElementMap.include(element))
         emit characterNamesChanged();
 }
 
 void Scene::onAboutToRemoveSceneElement(SceneElement *element)
 {
-    if( m_characterElementMap.remove(element) )
+    if (m_characterElementMap.remove(element))
         emit characterNamesChanged();
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)
 {
-    reinterpret_cast< Scene* >(list->data)->addElement(ptr);
+    reinterpret_cast<Scene *>(list->data)->addElement(ptr);
 }
 
 void Scene::staticClearElements(QQmlListProperty<SceneElement> *list)
 {
-    reinterpret_cast< Scene* >(list->data)->clearElements();
+    reinterpret_cast<Scene *>(list->data)->clearElements();
 }
 
 SceneElement *Scene::staticElementAt(QQmlListProperty<SceneElement> *list, int index)
 {
-    return reinterpret_cast< Scene* >(list->data)->elementAt(index);
+    return reinterpret_cast<Scene *>(list->data)->elementAt(index);
 }
 
 int Scene::staticElementCount(QQmlListProperty<SceneElement> *list)
 {
-    return reinterpret_cast< Scene* >(list->data)->elementCount();
+    return reinterpret_cast<Scene *>(list->data)->elementCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneSizeHintItem::SceneSizeHintItem(QQuickItem *parent)
-    : QQuickItem(parent),
-      m_scene(this, "scene"),
-      m_format(this, "format")
+    : QQuickItem(parent), m_scene(this, "scene"), m_format(this, "format")
 {
-    this->setFlag(QQuickItem::ItemHasContents,false);
+    this->setFlag(QQuickItem::ItemHasContents, false);
     this->setVisible(false);
 }
 
-SceneSizeHintItem::~SceneSizeHintItem()
-{
-
-}
+SceneSizeHintItem::~SceneSizeHintItem() { }
 
 void SceneSizeHintItem::setScene(Scene *val)
 {
-    if(m_scene == val)
+    if (m_scene == val)
         return;
 
-    if(m_scene != nullptr)
-    {
+    if (m_scene != nullptr) {
         disconnect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::sceneReset);
         disconnect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     }
 
     m_scene = val;
 
-    if(m_scene != nullptr)
-    {
+    if (m_scene != nullptr) {
         connect(m_scene, &Scene::aboutToDelete, this, &SceneSizeHintItem::sceneReset);
-        if(m_trackSceneChanges)
+        if (m_trackSceneChanges)
             connect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     }
 
@@ -1850,13 +1770,13 @@ void SceneSizeHintItem::setScene(Scene *val)
 
 void SceneSizeHintItem::setTrackSceneChanges(bool val)
 {
-    if(m_trackSceneChanges == val)
+    if (m_trackSceneChanges == val)
         return;
 
     m_trackSceneChanges = val;
     emit trackSceneChangesChanged();
 
-    if(val)
+    if (val)
         connect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
     else
         disconnect(m_scene, &Scene::sceneChanged, this, &SceneSizeHintItem::onSceneChanged);
@@ -1864,22 +1784,22 @@ void SceneSizeHintItem::setTrackSceneChanges(bool val)
 
 void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 {
-    if(m_format == val)
+    if (m_format == val)
         return;
 
-    if(m_format != nullptr)
-    {
+    if (m_format != nullptr) {
         disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::formatReset);
-        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this,
+                   &SceneSizeHintItem::onFormatChanged);
     }
 
     m_format = val;
 
-    if(m_format != nullptr)
-    {
+    if (m_format != nullptr) {
         connect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::formatReset);
-        if(m_trackFormatChanges)
-            connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
+        if (m_trackFormatChanges)
+            connect(m_format, &ScreenplayFormat::formatChanged, this,
+                    &SceneSizeHintItem::onFormatChanged);
     }
 
     emit formatChanged();
@@ -1889,21 +1809,23 @@ void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 
 void SceneSizeHintItem::setTrackFormatChanges(bool val)
 {
-    if(m_trackFormatChanges == val)
+    if (m_trackFormatChanges == val)
         return;
 
     m_trackFormatChanges = val;
     emit trackFormatChangesChanged();
 
-    if(val)
-        connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
+    if (val)
+        connect(m_format, &ScreenplayFormat::formatChanged, this,
+                &SceneSizeHintItem::onFormatChanged);
     else
-        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this,
+                   &SceneSizeHintItem::onFormatChanged);
 }
 
 void SceneSizeHintItem::setLeftMargin(qreal val)
 {
-    if( qFuzzyCompare(m_leftMargin, val) )
+    if (qFuzzyCompare(m_leftMargin, val))
         return;
 
     m_leftMargin = val;
@@ -1914,7 +1836,7 @@ void SceneSizeHintItem::setLeftMargin(qreal val)
 
 void SceneSizeHintItem::setRightMargin(qreal val)
 {
-    if( qFuzzyCompare(m_rightMargin, val) )
+    if (qFuzzyCompare(m_rightMargin, val))
         return;
 
     m_rightMargin = val;
@@ -1925,7 +1847,7 @@ void SceneSizeHintItem::setRightMargin(qreal val)
 
 void SceneSizeHintItem::setTopMargin(qreal val)
 {
-    if( qFuzzyCompare(m_topMargin, val) )
+    if (qFuzzyCompare(m_topMargin, val))
         return;
 
     m_topMargin = val;
@@ -1936,7 +1858,7 @@ void SceneSizeHintItem::setTopMargin(qreal val)
 
 void SceneSizeHintItem::setBottomMargin(qreal val)
 {
-    if( qFuzzyCompare(m_bottomMargin, val) )
+    if (qFuzzyCompare(m_bottomMargin, val))
         return;
 
     m_bottomMargin = val;
@@ -1960,17 +1882,15 @@ void SceneSizeHintItem::componentComplete()
 
 void SceneSizeHintItem::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_updateTimer.timerId())
-    {
+    if (te->timerId() == m_updateTimer.timerId()) {
         m_updateTimer.stop();
 
         QFuture<QSizeF> future = QtConcurrent::run(this, &SceneSizeHintItem::evaluateSizeHint);
 
         QFutureWatcher<QSizeF> *watcher = new QFutureWatcher<QSizeF>(this);
         watcher->setFuture(future);
-        connect(watcher, &QFutureWatcher<void>::finished, [=]() {
-            this->updateSize( watcher->result() );
-        });
+        connect(watcher, &QFutureWatcher<void>::finished,
+                [=]() { this->updateSize(watcher->result()); });
         connect(watcher, &QFutureWatcher<void>::finished, watcher, &QObject::deleteLater);
     }
 }
@@ -1980,15 +1900,15 @@ void SceneSizeHintItem::updateSize(const QSizeF &size)
     this->setContentWidth(size.width());
     this->setContentHeight(size.height());
 
-    if(this->hasPendingComputeSize())
+    if (this->hasPendingComputeSize())
         this->setHasPendingComputeSize(false);
 }
 
 QSizeF SceneSizeHintItem::evaluateSizeHint()
 {
     m_lock.lockForRead();
-        const QMarginsF margins(m_leftMargin, m_topMargin, m_rightMargin, m_bottomMargin);
-        const qreal pageWidth = this->width();
+    const QMarginsF margins(m_leftMargin, m_topMargin, m_rightMargin, m_bottomMargin);
+    const qreal pageWidth = this->width();
     m_lock.unlock();
 
     QTextDocument document;
@@ -2004,16 +1924,15 @@ QSizeF SceneSizeHintItem::evaluateSizeHint()
 
     document.setTextWidth(pageWidth);
 
-    if(m_scene != nullptr && m_format != nullptr)
-    {
-        const qreal maxParaWidth = (pageWidth - margins.left() - margins.right()) / m_format->devicePixelRatio();
+    if (m_scene != nullptr && m_format != nullptr) {
+        const qreal maxParaWidth =
+                (pageWidth - margins.left() - margins.right()) / m_format->devicePixelRatio();
 
         QTextCursor cursor(&document);
-        for(int j=0; j<m_scene->elementCount(); j++)
-        {
+        for (int j = 0; j < m_scene->elementCount(); j++) {
             const SceneElement *para = m_scene->elementAt(j);
             const SceneElementFormat *style = m_format->elementFormat(para->type());
-            if(j)
+            if (j)
                 cursor.insertBlock();
 
             const QTextBlockFormat blockFormat = style->createBlockFormat(&maxParaWidth);
@@ -2044,7 +1963,7 @@ void SceneSizeHintItem::sceneReset()
 
 void SceneSizeHintItem::onSceneChanged()
 {
-    if(m_trackSceneChanges)
+    if (m_trackSceneChanges)
         this->evaluateSizeHintLater();
 }
 
@@ -2058,13 +1977,13 @@ void SceneSizeHintItem::formatReset()
 
 void SceneSizeHintItem::onFormatChanged()
 {
-    if(m_trackFormatChanges)
+    if (m_trackFormatChanges)
         this->evaluateSizeHintLater();
 }
 
 void SceneSizeHintItem::setContentWidth(qreal val)
 {
-    if( qFuzzyCompare(m_contentWidth, val) )
+    if (qFuzzyCompare(m_contentWidth, val))
         return;
 
     m_contentWidth = val;
@@ -2073,7 +1992,7 @@ void SceneSizeHintItem::setContentWidth(qreal val)
 
 void SceneSizeHintItem::setContentHeight(qreal val)
 {
-    if( qFuzzyCompare(m_contentHeight, val) )
+    if (qFuzzyCompare(m_contentHeight, val))
         return;
 
     m_contentHeight = val;
@@ -2082,7 +2001,7 @@ void SceneSizeHintItem::setContentHeight(qreal val)
 
 void SceneSizeHintItem::setHasPendingComputeSize(bool val)
 {
-    if(m_hasPendingComputeSize == val)
+    if (m_hasPendingComputeSize == val)
         return;
 
     m_hasPendingComputeSize = val;
@@ -2091,24 +2010,21 @@ void SceneSizeHintItem::setHasPendingComputeSize(bool val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SceneGroup::SceneGroup(QObject *parent) :
-    GenericArrayModel(parent),
-    m_groups(GenericArrayModel::internalArray()),
-    m_structure(this, "structure")
+SceneGroup::SceneGroup(QObject *parent)
+    : GenericArrayModel(parent),
+      m_groups(GenericArrayModel::internalArray()),
+      m_structure(this, "structure")
 {
     connect(this, &SceneGroup::sceneCountChanged, this, &SceneGroup::reevalLater);
 
-    this->setObjectMembers({"category", "desc", "label", "name", "type", "checked"});
+    this->setObjectMembers({ "category", "desc", "label", "name", "type", "checked" });
 }
 
-SceneGroup::~SceneGroup()
-{
-
-}
+SceneGroup::~SceneGroup() { }
 
 void SceneGroup::toggle(int row)
 {
-    if(row < 0 || row >= m_groups.size() || m_scenes.isEmpty())
+    if (row < 0 || row >= m_groups.size() || m_scenes.isEmpty())
         return;
 
     const QString nameKey = QStringLiteral("name");
@@ -2119,21 +2035,16 @@ void SceneGroup::toggle(int row)
     QJsonObject item = m_groups.at(row).toObject();
     const QString groupName = item.value(nameKey).toString();
 
-    if(item.value(checkedKey) != fullyCheckedVal)
-    {
-        for(Scene *scene : qAsConst(m_scenes))
-        {
+    if (item.value(checkedKey) != fullyCheckedVal) {
+        for (Scene *scene : qAsConst(m_scenes)) {
             disconnect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
             scene->addToGroup(groupName);
             connect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
         }
 
         item.insert(checkedKey, fullyCheckedVal);
-    }
-    else
-    {
-        for(Scene *scene : qAsConst(m_scenes))
-        {
+    } else {
+        for (Scene *scene : qAsConst(m_scenes)) {
             disconnect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
             scene->removeFromGroup(groupName);
             connect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
@@ -2152,10 +2063,10 @@ void SceneGroup::toggle(int row)
 
 void SceneGroup::setStructure(Structure *val)
 {
-    if(m_structure == val)
+    if (m_structure == val)
         return;
 
-    if(!m_structure.isNull())
+    if (!m_structure.isNull())
         m_structure->disconnect(this);
 
     m_structure = val;
@@ -2163,24 +2074,20 @@ void SceneGroup::setStructure(Structure *val)
 
     this->reload();
 
-    if(!m_structure.isNull())
+    if (!m_structure.isNull())
         connect(m_structure, &Structure::groupsModelChanged, this, &SceneGroup::reload);
 }
 
 QQmlListProperty<Scene> SceneGroup::scenes()
 {
-    return QQmlListProperty<Scene>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &SceneGroup::staticAppendScene,
-                &SceneGroup::staticSceneCount,
-                &SceneGroup::staticSceneAt,
-                &SceneGroup::staticClearScenes);
+    return QQmlListProperty<Scene>(reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+                                   &SceneGroup::staticAppendScene, &SceneGroup::staticSceneCount,
+                                   &SceneGroup::staticSceneAt, &SceneGroup::staticClearScenes);
 }
 
 void SceneGroup::addScene(Scene *ptr)
 {
-    if(ptr == nullptr || m_scenes.indexOf(ptr) >= 0)
+    if (ptr == nullptr || m_scenes.indexOf(ptr) >= 0)
         return;
 
     connect(ptr, &Scene::aboutToDelete, this, &SceneGroup::removeScene);
@@ -2191,12 +2098,12 @@ void SceneGroup::addScene(Scene *ptr)
 
 void SceneGroup::removeScene(Scene *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = m_scenes.indexOf(ptr);
-    if(index < 0)
-        return ;
+    if (index < 0)
+        return;
 
     disconnect(ptr, &Scene::aboutToDelete, this, &SceneGroup::removeScene);
     disconnect(ptr, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
@@ -2211,24 +2118,22 @@ Scene *SceneGroup::sceneAt(int index) const
 
 void SceneGroup::clearScenes()
 {
-    while(m_scenes.size())
+    while (m_scenes.size())
         this->removeScene(m_scenes.first());
 }
 
 void SceneGroup::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_reevalTimer.timerId())
-    {
+    if (te->timerId() == m_reevalTimer.timerId()) {
         m_reevalTimer.stop();
         this->reeval();
-    }
-    else
+    } else
         GenericArrayModel::timerEvent(te);
 }
 
 void SceneGroup::setSceneActs(const QStringList &val)
 {
-    if(m_sceneActs == val)
+    if (m_sceneActs == val)
         return;
 
     m_sceneActs = val;
@@ -2237,7 +2142,7 @@ void SceneGroup::setSceneActs(const QStringList &val)
 
 void SceneGroup::setGroupActs(const QStringList &val)
 {
-    if(m_groupActs == val)
+    if (m_groupActs == val)
         return;
 
     m_groupActs = val;
@@ -2246,7 +2151,7 @@ void SceneGroup::setGroupActs(const QStringList &val)
 
 void SceneGroup::setSceneStackIds(const QStringList &val)
 {
-    if(m_sceneStackIds == val)
+    if (m_sceneStackIds == val)
         return;
 
     m_sceneStackIds = val;
@@ -2260,16 +2165,14 @@ void SceneGroup::reload()
     QStringList acts;
 
     m_groups = QJsonArray();
-    if(!m_structure.isNull())
-    {
+    if (!m_structure.isNull()) {
         const QJsonArray array = m_structure->groupsModel();
-        for(int i=0; i<array.size(); i++)
-        {
+        for (int i = 0; i < array.size(); i++) {
             QJsonObject item = array.at(i).toObject();
-            item.insert( QStringLiteral("checked"), QStringLiteral("no") );
+            item.insert(QStringLiteral("checked"), QStringLiteral("no"));
 
-            const QString act = item.value( QStringLiteral("act") ).toString();
-            if( !acts.contains(act) )
+            const QString act = item.value(QStringLiteral("act")).toString();
+            if (!acts.contains(act))
                 acts.append(act);
 
             m_groups.append(item);
@@ -2285,28 +2188,25 @@ void SceneGroup::reload()
 
 void SceneGroup::reeval()
 {
-    QMap<QString,int> groupCounter;
+    QMap<QString, int> groupCounter;
     QStringList acts;
     QSet<QString> stackIds;
 
-    for(Scene *scene : qAsConst(m_scenes))
-    {
+    for (Scene *scene : qAsConst(m_scenes)) {
         const QStringList groups = scene->groups();
-        for(const QString &group : groups)
+        for (const QString &group : groups)
             groupCounter[group] = groupCounter.value(group, 0) + 1;
 
         const QString sceneAct = scene->act();
-        if( !sceneAct.isEmpty() && m_groupActs.contains(sceneAct) && !acts.contains(sceneAct) )
+        if (!sceneAct.isEmpty() && m_groupActs.contains(sceneAct) && !acts.contains(sceneAct))
             acts.append(sceneAct);
 
-        if(m_structure != nullptr)
-        {
+        if (m_structure != nullptr) {
             const int eindex = m_structure->indexOfScene(scene);
             const StructureElement *element = m_structure->elementAt(eindex);
-            if(element != nullptr)
-            {
+            if (element != nullptr) {
                 const QString stackId = element->stackId();
-                if(!stackId.isEmpty())
+                if (!stackId.isEmpty())
                     stackIds += stackId;
             }
         }
@@ -2318,8 +2218,7 @@ void SceneGroup::reeval()
     const QString partiallyCheckedVal = QStringLiteral("partial");
     const QString fullyCheckedVal = QStringLiteral("yes");
 
-    for(int i=0; i<m_groups.size(); i++)
-    {
+    for (int i = 0; i < m_groups.size(); i++) {
         const QModelIndex index = this->index(i, 0);
 
         QJsonObject item = m_groups.at(i).toObject();
@@ -2327,11 +2226,11 @@ void SceneGroup::reeval()
         const QString name = item.value(nameKey).toString();
         QString checkedVal = notCheckedVal;
 
-        if(groupCounter.contains(name))
-            checkedVal = groupCounter.value(name) == m_scenes.size() ? fullyCheckedVal : partiallyCheckedVal;
+        if (groupCounter.contains(name))
+            checkedVal = groupCounter.value(name) == m_scenes.size() ? fullyCheckedVal
+                                                                     : partiallyCheckedVal;
 
-        if(item.value(checkedKey) != checkedVal)
-        {
+        if (item.value(checkedKey) != checkedVal) {
             item.insert(checkedKey, checkedVal);
             m_groups.replace(i, item);
             emit dataChanged(index, index);
@@ -2349,20 +2248,20 @@ void SceneGroup::reevalLater()
 
 void SceneGroup::staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr)
 {
-    reinterpret_cast< SceneGroup* >(list->data)->addScene(ptr);
+    reinterpret_cast<SceneGroup *>(list->data)->addScene(ptr);
 }
 
 void SceneGroup::staticClearScenes(QQmlListProperty<Scene> *list)
 {
-    reinterpret_cast< SceneGroup* >(list->data)->clearScenes();
+    reinterpret_cast<SceneGroup *>(list->data)->clearScenes();
 }
 
 Scene *SceneGroup::staticSceneAt(QQmlListProperty<Scene> *list, int index)
 {
-    return reinterpret_cast< SceneGroup* >(list->data)->sceneAt(index);
+    return reinterpret_cast<SceneGroup *>(list->data)->sceneAt(index);
 }
 
 int SceneGroup::staticSceneCount(QQmlListProperty<Scene> *list)
 {
-    return reinterpret_cast< SceneGroup* >(list->data)->sceneCount();
+    return reinterpret_cast<SceneGroup *>(list->data)->sceneCount();
 }

@@ -15,16 +15,9 @@
 
 #include <QFileInfo>
 
-FountainExporter::FountainExporter(QObject *parent)
-    : AbstractExporter(parent)
-{
+FountainExporter::FountainExporter(QObject *parent) : AbstractExporter(parent) { }
 
-}
-
-FountainExporter::~FountainExporter()
-{
-
-}
+FountainExporter::~FountainExporter() { }
 
 bool FountainExporter::doExport(QIODevice *device)
 {
@@ -38,56 +31,48 @@ bool FountainExporter::doExport(QIODevice *device)
     ts.setAutoDetectUnicode(true);
 
     bool hasTitleSegment = false;
-    if(!screenplay->title().isEmpty())
-    {
+    if (!screenplay->title().isEmpty()) {
         ts << "Title: " << screenplay->title();
-        if(!screenplay->subtitle().isEmpty())
+        if (!screenplay->subtitle().isEmpty())
             ts << " (" << screenplay->subtitle() << ")\n";
         else
             ts << "\n";
         hasTitleSegment = true;
     }
 
-    if(!screenplay->author().isEmpty())
-    {
+    if (!screenplay->author().isEmpty()) {
         ts << "Author: " << screenplay->author() << "\n";
         hasTitleSegment = true;
     }
 
-    if(!screenplay->contact().isEmpty())
-    {
+    if (!screenplay->contact().isEmpty()) {
         ts << "Contact: " << screenplay->contact() << "\n";
         hasTitleSegment = true;
     }
 
-    if(!screenplay->version().isEmpty())
-    {
+    if (!screenplay->version().isEmpty()) {
         ts << "Version: " << screenplay->version() << "\n";
         hasTitleSegment = true;
     }
 
-    if(hasTitleSegment)
+    if (hasTitleSegment)
         ts << "\n\n";
 
-    for(int i=0; i<nrElements; i++)
-    {
+    for (int i = 0; i < nrElements; i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if( element->elementType() == ScreenplayElement::BreakElementType )
+        if (element->elementType() == ScreenplayElement::BreakElementType)
             ts << "#" << element->sceneID() << "\n\n";
-        else
-        {
+        else {
             const Scene *scene = element->scene();
             const SceneHeading *heading = scene->heading();
-            if(heading->isEnabled())
+            if (heading->isEnabled())
                 ts << "." << heading->text() << "\n\n";
 
             const int nrParas = scene->elementCount();
-            for(int j=0; j<nrParas; j++)
-            {
+            for (int j = 0; j < nrParas; j++) {
                 const SceneElement *para = scene->elementAt(j);
 
-                switch(para->type())
-                {
+                switch (para->type()) {
                 case SceneElement::Shot:
                 case SceneElement::Transition:
                     ts << "> ";
@@ -106,8 +91,7 @@ bool FountainExporter::doExport(QIODevice *device)
 
                 ts << para->formattedText();
 
-                switch(para->type())
-                {
+                switch (para->type()) {
                 case SceneElement::Transition:
                 case SceneElement::Heading:
                 case SceneElement::Action:
@@ -132,7 +116,7 @@ bool FountainExporter::doExport(QIODevice *device)
 QString FountainExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if( fi.suffix().toLower() != "fountain" )
+    if (fi.suffix().toLower() != "fountain")
         return fileName + ".fountain";
     return fileName;
 }

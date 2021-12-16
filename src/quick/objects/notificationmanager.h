@@ -25,7 +25,7 @@ class NotificationManager : public QAbstractListModel
 
 public:
     static NotificationManager *instance();
-    NotificationManager(QObject *parent=nullptr);
+    NotificationManager(QObject *parent = nullptr);
     ~NotificationManager();
 
     Q_PROPERTY(int count READ count NOTIFY countChanged)
@@ -37,7 +37,7 @@ public:
     enum { NotificationRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
     Q_INVOKABLE void dismissNotification(int row);
 
@@ -49,7 +49,7 @@ private:
 private:
     friend class Notification;
     friend class PlayerApp;
-    QList<Notification*> m_notifications;
+    QList<Notification *> m_notifications;
 };
 
 #endif // NOTIFICATIONMANAGER_H

@@ -14,10 +14,9 @@
 #include "announcement.h"
 #include "application.h"
 
-Q_GLOBAL_STATIC(QList<Announcement*>, Announcements);
+Q_GLOBAL_STATIC(QList<Announcement *>, Announcements);
 
-Announcement::Announcement(QObject *parent)
-    : QObject(parent)
+Announcement::Announcement(QObject *parent) : QObject(parent)
 {
     ::Announcements->append(this);
 }
@@ -34,12 +33,10 @@ Announcement *Announcement::qmlAttachedProperties(QObject *object)
 
 void Announcement::shout(const QString &type, const QJsonValue &data)
 {
-    for(Announcement *a : qAsConst(*::Announcements))
-    {
-        if(a == this)
+    for (Announcement *a : qAsConst(*::Announcements)) {
+        if (a == this)
             continue;
 
         emit a->incoming(type, data);
     }
 }
-

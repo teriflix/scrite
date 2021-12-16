@@ -14,20 +14,15 @@
 #include "propertyalias.h"
 
 PropertyAlias::PropertyAlias(QObject *parent)
-    : QObject(parent),
-      m_sourceObject(this, "sourceObject")
+    : QObject(parent), m_sourceObject(this, "sourceObject")
 {
-
 }
 
-PropertyAlias::~PropertyAlias()
-{
-
-}
+PropertyAlias::~PropertyAlias() { }
 
 void PropertyAlias::setSourceObject(QObject *val)
 {
-    if(m_sourceObject == val)
+    if (m_sourceObject == val)
         return;
 
     this->disconnectFromSource();
@@ -40,7 +35,7 @@ void PropertyAlias::setSourceObject(QObject *val)
 
 void PropertyAlias::setSourceProperty(const QByteArray &val)
 {
-    if(m_sourceProperty == val)
+    if (m_sourceProperty == val)
         return;
 
     this->disconnectFromSource();
@@ -53,13 +48,13 @@ void PropertyAlias::setSourceProperty(const QByteArray &val)
 
 void PropertyAlias::setValue(const QVariant &val)
 {
-    if(!m_sourceObject.isNull() && !m_sourceProperty.isEmpty())
+    if (!m_sourceObject.isNull() && !m_sourceProperty.isEmpty())
         m_sourceObject->setProperty(m_sourceProperty, val);
 }
 
 QVariant PropertyAlias::value() const
 {
-    if(!m_sourceObject.isNull() && !m_sourceProperty.isEmpty())
+    if (!m_sourceObject.isNull() && !m_sourceProperty.isEmpty())
         return m_sourceObject->property(m_sourceProperty);
 
     return QVariant();
@@ -67,20 +62,19 @@ QVariant PropertyAlias::value() const
 
 void PropertyAlias::connectToSource()
 {
-    if(m_sourceObject.isNull())
+    if (m_sourceObject.isNull())
         return;
 
-    if(m_sourceProperty.isEmpty())
+    if (m_sourceProperty.isEmpty())
         return;
 
     int propIndex = m_sourceObject->metaObject()->indexOfProperty(m_sourceProperty);
-    if(propIndex < 0)
+    if (propIndex < 0)
         return;
 
     const QMetaProperty prop = m_sourceObject->metaObject()->property(propIndex);
     m_sourcePropertyNotify = prop.notifySignal();
-    if(m_sourcePropertyNotify.isValid())
-    {
+    if (m_sourcePropertyNotify.isValid()) {
         const QMetaMethod signal = QMetaMethod::fromSignal(&PropertyAlias::valueChanged);
         m_sourceConnection = connect(m_sourceObject, m_sourcePropertyNotify, this, signal);
     }
@@ -88,9 +82,8 @@ void PropertyAlias::connectToSource()
 
 void PropertyAlias::disconnectFromSource()
 {
-    if(m_sourceConnection)
+    if (m_sourceConnection)
         disconnect(m_sourceConnection);
     m_sourceConnection = QMetaObject::Connection();
     m_sourcePropertyNotify = QMetaMethod();
 }
-

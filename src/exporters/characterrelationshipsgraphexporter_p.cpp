@@ -19,41 +19,40 @@
 
 struct SavePainterState
 {
-    SavePainterState(QPainter *painter) : m_painter(painter) {
-        m_painter->save();
-    }
-    ~SavePainterState() {
-        m_painter->restore();
-    }
+    SavePainterState(QPainter *painter) : m_painter(painter) { m_painter->save(); }
+    ~SavePainterState() { m_painter->restore(); }
 
 private:
     QPainter *m_painter;
 };
 #define SAVE_PAINTER_STATE SavePainterState painterStateSaver(painter);
 
-CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(const CharacterRelationshipsGraph *graph, QObject *parent)
+CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
+        const CharacterRelationshipsGraph *graph, QObject *parent)
     : PdfExportableGraphicsScene(parent)
 {
-    const ObjectListPropertyModel<CharacterRelationshipsGraphNode*> *nodes =
-            dynamic_cast< ObjectListPropertyModel<CharacterRelationshipsGraphNode*>* >(graph->nodes());
-    const ObjectListPropertyModel<CharacterRelationshipsGraphEdge*> *edges =
-            dynamic_cast< ObjectListPropertyModel<CharacterRelationshipsGraphEdge*>* >(graph->edges());
+    const ObjectListPropertyModel<CharacterRelationshipsGraphNode *> *nodes =
+            dynamic_cast<ObjectListPropertyModel<CharacterRelationshipsGraphNode *> *>(
+                    graph->nodes());
+    const ObjectListPropertyModel<CharacterRelationshipsGraphEdge *> *edges =
+            dynamic_cast<ObjectListPropertyModel<CharacterRelationshipsGraphEdge *> *>(
+                    graph->edges());
 
     const int nrNodes = nodes->rowCount(QModelIndex());
     const int nrEdges = edges->rowCount(QModelIndex());
 
-    for(int i=0; i<nrNodes; i++)
-    {
+    for (int i = 0; i < nrNodes; i++) {
         const CharacterRelationshipsGraphNode *node = nodes->at(i);
-        CharacterRelationshipsGraphNodeItem *nodeItem = new CharacterRelationshipsGraphNodeItem(node);
+        CharacterRelationshipsGraphNodeItem *nodeItem =
+                new CharacterRelationshipsGraphNodeItem(node);
         nodeItem->setZValue(2);
         this->addItem(nodeItem);
     }
 
-    for(int i=0; i<nrEdges; i++)
-    {
+    for (int i = 0; i < nrEdges; i++) {
         const CharacterRelationshipsGraphEdge *edge = edges->at(i);
-        CharacterRelationshipsGraphEdgeItem *edgeItem = new CharacterRelationshipsGraphEdgeItem(edge);
+        CharacterRelationshipsGraphEdgeItem *edgeItem =
+                new CharacterRelationshipsGraphEdgeItem(edge);
         edgeItem->setZValue(1);
         this->addItem(edgeItem);
     }
@@ -71,25 +70,21 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(const Charact
     this->addItem(headerItem);
 }
 
-CharacterRelationshipsGraphScene::~CharacterRelationshipsGraphScene()
-{
-
-}
+CharacterRelationshipsGraphScene::~CharacterRelationshipsGraphScene() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterRelationshipsGraphNodeItem::CharacterRelationshipsGraphNodeItem(const CharacterRelationshipsGraphNode *node)
+CharacterRelationshipsGraphNodeItem::CharacterRelationshipsGraphNodeItem(
+        const CharacterRelationshipsGraphNode *node)
     : QGraphicsRectItem(nullptr), m_node(node)
 {
     this->setRect(node->rect());
 }
 
-CharacterRelationshipsGraphNodeItem::~CharacterRelationshipsGraphNodeItem()
-{
+CharacterRelationshipsGraphNodeItem::~CharacterRelationshipsGraphNodeItem() { }
 
-}
-
-void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
+                                                QWidget *)
 {
     SAVE_PAINTER_STATE
 
@@ -100,11 +95,10 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
     const QStringList photos = character->photos();
     const bool hasPhotos = !photos.isEmpty();
 
-    if(hasPhotos)
-    {
-        const qreal margin = qMin(rect.width(),rect.height())*0.075;
-        const qreal radius = margin*0.5;
-        const QRectF backlight = rect.adjusted(-margin,-margin,margin,margin);
+    if (hasPhotos) {
+        const qreal margin = qMin(rect.width(), rect.height()) * 0.075;
+        const qreal radius = margin * 0.5;
+        const QRectF backlight = rect.adjusted(-margin, -margin, margin, margin);
 
         // While rendering scenes into PDF, transparency is best achieved by
         // setting painter opacity, rather than by setting alpha value in the
@@ -112,7 +106,7 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
         painter->setBrush(color);
         painter->setPen(Qt::NoPen);
         painter->setOpacity(0.15);
-        painter->drawRoundedRect(backlight,radius,radius,Qt::AbsoluteSize);
+        painter->drawRoundedRect(backlight, radius, radius, Qt::AbsoluteSize);
 
         QPen pen;
         pen.setWidth(1);
@@ -121,12 +115,10 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
         painter->setPen(pen);
         painter->setBrush(Qt::NoBrush);
         painter->setOpacity(0.5);
-        painter->drawRoundedRect(backlight,radius,radius,Qt::AbsoluteSize);
+        painter->drawRoundedRect(backlight, radius, radius, Qt::AbsoluteSize);
 
         painter->setOpacity(1.0);
-    }
-    else
-    {
+    } else {
         painter->setBrush(Qt::white);
         painter->setPen(Qt::NoPen);
         painter->setOpacity(0.5);
@@ -148,7 +140,8 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
     }
 
     QImage image(hasPhotos ? photos.first() : QStringLiteral(":/icons/content/character_icon.png"));
-    image = image.scaled(rect.size().toSize(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    image = image.scaled(rect.size().toSize(), Qt::KeepAspectRatioByExpanding,
+                         Qt::SmoothTransformation);
     painter->drawImage(rect, image);
 
     painter->setBrush(Qt::NoBrush);
@@ -160,12 +153,13 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
     QTextDocument document;
     document.setDefaultFont(qApp->font());
     document.setTextWidth(textWidth);
-    document.setHtml(QStringLiteral("<center><b>%1</b><br/><font size=\"-1\"><i>%2</i></font></center>")
-                     .arg(character->name(),character->designation()));
+    document.setHtml(
+            QStringLiteral("<center><b>%1</b><br/><font size=\"-1\"><i>%2</i></font></center>")
+                    .arg(character->name(), character->designation()));
 
-    QRectF documentRect( QPointF(0,0), document.size() );
+    QRectF documentRect(QPointF(0, 0), document.size());
     documentRect.moveCenter(rect.center());
-    documentRect.moveBottom(rect.bottom()-15.0);
+    documentRect.moveBottom(rect.bottom() - 15.0);
 
     painter->setBrush(Qt::white);
     painter->setPen(Qt::NoPen);
@@ -191,7 +185,8 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterRelationshipsGraphEdgeItem::CharacterRelationshipsGraphEdgeItem(const CharacterRelationshipsGraphEdge *edge)
+CharacterRelationshipsGraphEdgeItem::CharacterRelationshipsGraphEdgeItem(
+        const CharacterRelationshipsGraphEdge *edge)
     : QGraphicsPathItem(nullptr)
 {
     const QPainterPath path = Application::stringToPainterPath(edge->pathString());
@@ -211,13 +206,10 @@ CharacterRelationshipsGraphEdgeItem::CharacterRelationshipsGraphEdgeItem(const C
 
     QGraphicsRectItem *labelBackdrop = new QGraphicsRectItem(this);
     labelBackdrop->setZValue(-1);
-    labelBackdrop->setRect(labelRect.adjusted(-5,-2,5,2));
-    labelBackdrop->setBrush(QColor::fromRgbF(0.8,0.8,0.8));
+    labelBackdrop->setRect(labelRect.adjusted(-5, -2, 5, 2));
+    labelBackdrop->setBrush(QColor::fromRgbF(0.8, 0.8, 0.8));
     pen.setWidth(1.0);
     labelBackdrop->setPen(pen);
 }
 
-CharacterRelationshipsGraphEdgeItem::~CharacterRelationshipsGraphEdgeItem()
-{
-
-}
+CharacterRelationshipsGraphEdgeItem::~CharacterRelationshipsGraphEdgeItem() { }

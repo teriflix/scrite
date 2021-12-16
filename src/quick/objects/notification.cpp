@@ -18,15 +18,13 @@
 #include <QtDebug>
 
 Notification::Notification(QObject *parent)
-    : QObject(parent),
-      m_autoCloseTimer("Notification.m_autoCloseTimer")
+    : QObject(parent), m_autoCloseTimer("Notification.m_autoCloseTimer")
 {
-
 }
 
 Notification::~Notification()
 {
-    if(NotificationManager::instance())
+    if (NotificationManager::instance())
         NotificationManager::instance()->removeNotification(this);
 }
 
@@ -37,7 +35,7 @@ Notification *Notification::qmlAttachedProperties(QObject *object)
 
 void Notification::setTitle(const QString &val)
 {
-    if(m_title == val)
+    if (m_title == val)
         return;
 
     m_title = val;
@@ -46,7 +44,7 @@ void Notification::setTitle(const QString &val)
 
 void Notification::setText(const QString &val)
 {
-    if(m_text == val)
+    if (m_text == val)
         return;
 
     m_text = val;
@@ -55,7 +53,7 @@ void Notification::setText(const QString &val)
 
 void Notification::setColor(const QColor &val)
 {
-    if(m_color == val)
+    if (m_color == val)
         return;
 
     m_color = val;
@@ -64,7 +62,7 @@ void Notification::setColor(const QColor &val)
 
 void Notification::setTextColor(const QColor &val)
 {
-    if(m_textColor == val)
+    if (m_textColor == val)
         return;
 
     m_textColor = val;
@@ -73,18 +71,15 @@ void Notification::setTextColor(const QColor &val)
 
 void Notification::setActive(bool val)
 {
-    if(m_active == val)
+    if (m_active == val)
         return;
 
     m_active = val;
-    if(val)
-    {
+    if (val) {
         NotificationManager::instance()->addNotification(this);
-        if( m_autoClose && m_buttons.isEmpty() )
+        if (m_autoClose && m_buttons.isEmpty())
             m_autoCloseTimer.start(m_autoCloseDelay, this);
-    }
-    else
-    {
+    } else {
         NotificationManager::instance()->removeNotification(this);
         emit dismissed();
         m_autoCloseTimer.stop();
@@ -95,11 +90,11 @@ void Notification::setActive(bool val)
 
 void Notification::setAutoClose(bool val)
 {
-    if(m_autoClose == val)
+    if (m_autoClose == val)
         return;
 
     m_autoClose = val;
-    if(m_active)
+    if (m_active)
         m_autoCloseTimer.start(m_autoCloseDelay, this);
     else
         m_autoCloseTimer.stop();
@@ -109,11 +104,11 @@ void Notification::setAutoClose(bool val)
 
 void Notification::setAutoCloseDelay(int val)
 {
-    if(m_autoCloseDelay == val)
+    if (m_autoCloseDelay == val)
         return;
 
     m_autoCloseDelay = val;
-    if(m_autoCloseTimer.isActive())
+    if (m_autoCloseTimer.isActive())
         m_autoCloseTimer.start(m_autoCloseDelay, this);
 
     emit autoCloseDelayChanged();
@@ -121,7 +116,7 @@ void Notification::setAutoCloseDelay(int val)
 
 void Notification::setButtons(const QStringList &val)
 {
-    if(m_buttons == val)
+    if (m_buttons == val)
         return;
 
     m_buttons = val;
@@ -130,10 +125,10 @@ void Notification::setButtons(const QStringList &val)
 
 void Notification::notifyButtonClick(int index)
 {
-    if( !m_active )
+    if (!m_active)
         return;
 
-    if( index < 0 || index >= m_buttons.size() )
+    if (index < 0 || index >= m_buttons.size())
         return;
 
     emit buttonClicked(index);
@@ -142,15 +137,14 @@ void Notification::notifyButtonClick(int index)
 }
 
 void Notification::doAutoClose()
-{   
-    if(m_active && m_autoClose)
+{
+    if (m_active && m_autoClose)
         this->setActive(false);
 }
 
 void Notification::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_autoCloseTimer.timerId())
-    {
+    if (te->timerId() == m_autoCloseTimer.timerId()) {
         m_autoCloseTimer.stop();
         this->doAutoClose();
     }

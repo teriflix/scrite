@@ -59,7 +59,7 @@ public:
     bool requiresConfiguration() const { return true; }
 
 protected:
-    AbstractTextDocumentExporter(QObject *parent=nullptr);
+    AbstractTextDocumentExporter(QObject *parent = nullptr);
     void generate(QTextDocument *textDocument, const qreal pageWidth);
 
     // AbstractScreenplayTextDocumentInjectionInterface interface

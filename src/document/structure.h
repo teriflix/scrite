@@ -48,14 +48,14 @@ class StructureElement : public QObject, public QObjectSerializer::Interface
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Q_INVOKABLE StructureElement(QObject *parent=nullptr);
+    Q_INVOKABLE StructureElement(QObject *parent = nullptr);
     ~StructureElement();
     Q_SIGNAL void aboutToDelete(StructureElement *element);
 
     Q_INVOKABLE StructureElement *duplicate();
 
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
-    Structure* structure() const { return m_structure; }
+    Structure *structure() const { return m_structure; }
 
     Q_PROPERTY(qreal x READ x WRITE setX NOTIFY xChanged STORED false)
     void setX(qreal val);
@@ -82,8 +82,8 @@ public:
     Q_SIGNAL void geometryChanged();
 
     Q_PROPERTY(QQuickItem* follow READ follow WRITE setFollow NOTIFY followChanged RESET resetFollow STORED false)
-    void setFollow(QQuickItem* val);
-    QQuickItem* follow() const { return m_follow; }
+    void setFollow(QQuickItem *val);
+    QQuickItem *follow() const { return m_follow; }
     Q_SIGNAL void followChanged();
 
     Q_PROPERTY(bool syncWithFollow READ isSyncWithFollow WRITE setSyncWithFollow NOTIFY syncWithFollowChanged STORED false)
@@ -103,12 +103,12 @@ public:
 
     Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged STORED false)
     void setPosition(const QPointF &pos);
-    QPointF position() const { return QPointF(m_x,m_y); }
+    QPointF position() const { return QPointF(m_x, m_y); }
     Q_SIGNAL void positionChanged();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged)
-    void setScene(Scene* val);
-    Scene* scene() const { return m_scene; }
+    void setScene(Scene *val);
+    Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -163,7 +163,7 @@ private:
     QString m_stackId;
     bool m_stackLeader = false;
     QString m_title;
-    Scene* m_scene = nullptr;
+    Scene *m_scene = nullptr;
     bool m_selected = false;
     bool m_syncWithFollow = false;
     Structure *m_structure = nullptr;
@@ -174,7 +174,7 @@ class StructureElementStack : public ObjectListPropertyModel<StructureElement *>
 {
     Q_OBJECT
 
-    StructureElementStack(QObject *parent=nullptr);
+    StructureElementStack(QObject *parent = nullptr);
 
 public:
     ~StructureElementStack();
@@ -200,7 +200,7 @@ public:
     Q_SIGNAL void topmostElementIndexChanged();
 
     Q_PROPERTY(StructureElement* topmostElement READ topmostElement NOTIFY topmostElementChanged)
-    StructureElement* topmostElement() const;
+    StructureElement *topmostElement() const;
     Q_SIGNAL void topmostElementChanged();
 
     Q_PROPERTY(bool hasCurrentElement READ isHasCurrentElement NOTIFY hasCurrentElementChanged)
@@ -222,7 +222,7 @@ protected:
 
 private:
     void setHasCurrentElement(bool val);
-    void setTopmostElement(StructureElement* val);
+    void setTopmostElement(StructureElement *val);
     void setGeometry(const QRectF &val);
 
     void initialize();
@@ -240,7 +240,7 @@ private:
     bool m_enabled = false;
     bool m_hasCurrentElement = false;
     ExecLaterTimer m_initializeTimer;
-    StructureElement* m_topmostElement = nullptr;
+    StructureElement *m_topmostElement = nullptr;
 };
 
 class StructureElementStacks : public ObjectListPropertyModel<StructureElementStack *>
@@ -248,7 +248,7 @@ class StructureElementStacks : public ObjectListPropertyModel<StructureElementSt
     Q_OBJECT
 
 public:
-    StructureElementStacks(QObject *parent=nullptr);
+    StructureElementStacks(QObject *parent = nullptr);
     ~StructureElementStacks();
 
     Q_PROPERTY(Structure* structure READ structure CONSTANT)
@@ -280,15 +280,11 @@ class Relationship : public QObject, public QObjectSerializer::Interface
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Q_INVOKABLE Relationship(QObject *parent=nullptr);
+    Q_INVOKABLE Relationship(QObject *parent = nullptr);
     ~Relationship();
     Q_SIGNAL void aboutToDelete(Relationship *ptr);
 
-    enum Direction
-    {
-        OfWith,
-        WithOf
-    };
+    enum Direction { OfWith, WithOf };
     Q_ENUM(Direction)
     Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
     void setDirection(Direction val);
@@ -304,13 +300,13 @@ public:
 
     Q_PROPERTY(Character* withCharacter READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
     Q_PROPERTY(Character* with READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
-    void setWith(Character* val);
-    Character* with() const { return m_with; }
+    void setWith(Character *val);
+    Character *with() const { return m_with; }
     Q_SIGNAL void withChanged();
 
     Q_PROPERTY(Character* ofCharacter READ of NOTIFY ofChanged STORED false)
     Q_PROPERTY(Character* of READ of NOTIFY ofChanged STORED false)
-    Character* of() const { return m_of; }
+    Character *of() const { return m_of; }
     Q_SIGNAL void ofChanged();
 
     Q_PROPERTY(Notes* notes READ notes CONSTANT)
@@ -328,7 +324,7 @@ protected:
     bool event(QEvent *event);
 
 private:
-    void setOf(Character* val);
+    void setOf(Character *val);
     void resetWith();
 
 private:
@@ -346,12 +342,12 @@ class Character : public QObject, public QObjectSerializer::Interface
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Q_INVOKABLE Character(QObject *parent=nullptr);
+    Q_INVOKABLE Character(QObject *parent = nullptr);
     ~Character();
     Q_SIGNAL void aboutToDelete(Character *ptr);
 
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
-    Structure* structure() const { return m_structure; }
+    Structure *structure() const { return m_structure; }
 
     Q_PROPERTY(bool valid READ isValid NOTIFY nameChanged)
     bool isValid() const { return !m_name.isEmpty(); }
@@ -430,14 +426,17 @@ public:
     Q_SIGNAL void summaryChanged();
 
     Q_PROPERTY(QAbstractListModel* relationshipsModel READ relationshipsModel CONSTANT STORED false)
-    ObjectListPropertyModel<Relationship *> *relationshipsModel() const { return &((const_cast<Character*>(this))->m_relationships); }
+    ObjectListPropertyModel<Relationship *> *relationshipsModel() const
+    {
+        return &((const_cast<Character *>(this))->m_relationships);
+    }
 
     Q_PROPERTY(QQmlListProperty<Relationship> relationships READ relationships NOTIFY relationshipCountChanged)
     QQmlListProperty<Relationship> relationships();
     Q_INVOKABLE void addRelationship(Relationship *ptr);
     Q_INVOKABLE void removeRelationship(Relationship *ptr);
     Q_INVOKABLE Relationship *relationshipAt(int index) const;
-    void setRelationships(const QList<Relationship*> &list);
+    void setRelationships(const QList<Relationship *> &list);
     Q_PROPERTY(int relationshipCount READ relationshipCount NOTIFY relationshipCountChanged)
     int relationshipCount() const { return m_relationships.size(); }
     Q_INVOKABLE void clearRelationships();
@@ -447,14 +446,16 @@ public:
 
     Q_INVOKABLE Relationship *findRelationshipWith(const QString &with) const;
     Q_INVOKABLE Relationship *findRelationship(Character *with) const;
-    Q_INVOKABLE bool hasRelationshipWith(const QString &with) const {
+    Q_INVOKABLE bool hasRelationshipWith(const QString &with) const
+    {
         return this->findRelationshipWith(with) != nullptr;
     }
-    Q_INVOKABLE bool isDirectlyRelatedTo(Character *with) const {
+    Q_INVOKABLE bool isDirectlyRelatedTo(Character *with) const
+    {
         return this->findRelationship(with) != nullptr;
     }
     Q_INVOKABLE bool isRelatedTo(Character *with) const;
-    Q_INVOKABLE QList<Relationship*> findRelationshipsWith(const QString &name=QString()) const;
+    Q_INVOKABLE QList<Relationship *> findRelationshipsWith(const QString &name = QString()) const;
     Q_INVOKABLE QStringList unrelatedCharacterNames() const;
 
     Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
@@ -471,7 +472,7 @@ public:
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
     bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
 
     void resolveRelationships();
 
@@ -479,12 +480,12 @@ protected:
     bool event(QEvent *event);
 
 private:
-    bool isRelatedToImpl(Character *with, QStack<Character*> &stack) const;
+    bool isRelatedToImpl(Character *with, QStack<Character *> &stack) const;
     void onDfsAuction(const QString &filePath, int *claims);
 
     static void staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr);
     static void staticClearRelationships(QQmlListProperty<Relationship> *list);
-    static Relationship* staticRelationshipAt(QQmlListProperty<Relationship> *list, int index);
+    static Relationship *staticRelationshipAt(QQmlListProperty<Relationship> *list, int index);
     static int staticRelationshipCount(QQmlListProperty<Relationship> *list);
 
 private:
@@ -501,8 +502,8 @@ private:
     QString m_designation;
     QStringList m_aliases;
     bool m_visibleOnNotebook = true;
-    Structure* m_structure = nullptr;
-    Notes* m_notes = new Notes(this);
+    Structure *m_structure = nullptr;
+    Notes *m_notes = new Notes(this);
     QJsonObject m_characterRelationshipGraph;
     Attachments *m_attachments = new Attachments(this);
     ObjectListPropertyModel<Relationship *> m_relationships;
@@ -513,12 +514,12 @@ class Annotation : public QObject
     Q_OBJECT
 
 public:
-    Q_INVOKABLE Annotation(QObject *parent=nullptr);
+    Q_INVOKABLE Annotation(QObject *parent = nullptr);
     ~Annotation();
     Q_SIGNAL void aboutToDelete(Annotation *ptr);
 
     Q_PROPERTY(Structure* structure READ structure CONSTANT STORED false)
-    Structure* structure() const { return m_structure; }
+    Structure *structure() const { return m_structure; }
 
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     void setType(const QString &val);
@@ -540,14 +541,17 @@ public:
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
 
-    Q_INVOKABLE void move(qreal x, qreal y) {
-        this->setGeometry( QRectF(x,y,m_geometry.width(),m_geometry.height()) );
+    Q_INVOKABLE void move(qreal x, qreal y)
+    {
+        this->setGeometry(QRectF(x, y, m_geometry.width(), m_geometry.height()));
     }
-    Q_INVOKABLE void resize(qreal w, qreal h) {
-        this->setGeometry( QRectF(m_geometry.x(), m_geometry.y(), w, h) );
+    Q_INVOKABLE void resize(qreal w, qreal h)
+    {
+        this->setGeometry(QRectF(m_geometry.x(), m_geometry.y(), w, h));
     }
-    Q_INVOKABLE void place(qreal x, qreal y, qreal w, qreal h) {
-        this->setGeometry(QRectF(x,y,w,h));
+    Q_INVOKABLE void place(qreal x, qreal y, qreal w, qreal h)
+    {
+        this->setGeometry(QRectF(x, y, w, h));
     }
 
     Q_PROPERTY(QJsonObject attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
@@ -595,7 +599,7 @@ class Structure : public QObject, public QObjectSerializer::Interface
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Structure(QObject *parent=nullptr);
+    Structure(QObject *parent = nullptr);
     ~Structure();
     Q_SIGNAL void aboutToDelete(Structure *ptr);
 
@@ -614,11 +618,7 @@ public:
     qreal canvasGridSize() const { return m_canvasGridSize; }
     Q_SIGNAL void canvasGridSizeChanged();
 
-    enum CanvasUIMode
-    {
-        SynopsisEditorUI,
-        IndexCardUI
-    };
+    enum CanvasUIMode { SynopsisEditorUI, IndexCardUI };
     Q_ENUM(CanvasUIMode)
     Q_PROPERTY(CanvasUIMode canvasUIMode READ canvasUIMode WRITE setCanvasUIMode NOTIFY canvasUIModeChanged)
     void setCanvasUIMode(CanvasUIMode val);
@@ -626,23 +626,26 @@ public:
     Q_SIGNAL void canvasUIModeChanged();
 
     Q_INVOKABLE qreal snapToGrid(qreal val) const;
-    static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize=10.0);
+    static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize = 10.0);
 
     void captureStructureAsImage(const QString &fileName);
     Q_SIGNAL void captureStructureAsImageRequest(const QString &fileName);
 
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
-    ScriteDocument* scriteDocument() const { return m_scriteDocument; }
+    ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
     Q_PROPERTY(QAbstractListModel* charactersModel READ charactersModel CONSTANT STORED false)
-    ObjectListPropertyModel<Character *> *charactersModel() const { return &((const_cast<Structure*>(this))->m_characters); }
+    ObjectListPropertyModel<Character *> *charactersModel() const
+    {
+        return &((const_cast<Structure *>(this))->m_characters);
+    }
 
     Q_PROPERTY(QQmlListProperty<Character> characters READ characters NOTIFY characterCountChanged)
     QQmlListProperty<Character> characters();
     Q_INVOKABLE void addCharacter(Character *ptr);
     Q_INVOKABLE void removeCharacter(Character *ptr);
     Q_INVOKABLE Character *characterAt(int index) const;
-    void setCharacters(const QList<Character*> &list);
+    void setCharacters(const QList<Character *> &list);
     Q_PROPERTY(int characterCount READ characterCount NOTIFY characterCountChanged)
     int characterCount() const { return m_characters.size(); }
     Q_INVOKABLE void clearCharacters();
@@ -654,20 +657,30 @@ public:
     Q_INVOKABLE void addCharacters(const QStringList &names);
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
-    QList<Character*> findCharacters(const QStringList &names, bool returnAssociativeList=false) const;
+    QList<Character *> findCharacters(const QStringList &names,
+                                      bool returnAssociativeList = false) const;
 
     Q_PROPERTY(Notes* notes READ notes CONSTANT)
     Notes *notes() const { return m_notes; }
 
     Q_PROPERTY(QAbstractListModel* elementsModel READ elementsModel CONSTANT STORED false)
-    ObjectListPropertyModel<StructureElement *> *elementsModel() const { return &((const_cast<Structure*>(this))->m_elements); }
+    ObjectListPropertyModel<StructureElement *> *elementsModel() const
+    {
+        return &((const_cast<Structure *>(this))->m_elements);
+    }
 
     Q_PROPERTY(QRectF elementsBoundingBox READ elementsBoundingBox NOTIFY elementsBoundingBoxChanged)
-    QRectF elementsBoundingBox() const { return m_elementsBoundingBoxAggregator.aggregateValue().toRectF(); }
+    QRectF elementsBoundingBox() const
+    {
+        return m_elementsBoundingBoxAggregator.aggregateValue().toRectF();
+    }
     Q_SIGNAL void elementsBoundingBoxChanged();
 
     Q_PROPERTY(StructureElementStacks* elementStacks READ elementStacks CONSTANT STORED false)
-    StructureElementStacks *elementStacks() const { return &((const_cast<Structure*>(this))->m_elementStacks); }
+    StructureElementStacks *elementStacks() const
+    {
+        return &((const_cast<Structure *>(this))->m_elementStacks);
+    }
 
     Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<StructureElement> elements();
@@ -675,7 +688,7 @@ public:
     Q_INVOKABLE void removeElement(StructureElement *ptr);
     Q_INVOKABLE void insertElement(StructureElement *ptr, int index);
     Q_INVOKABLE void moveElement(StructureElement *ptr, int toRow);
-    void setElements(const QList<StructureElement*> &list);
+    void setElements(const QList<StructureElement *> &list);
     Q_INVOKABLE StructureElement *elementAt(int index) const;
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const { return m_elements.size(); }
@@ -687,13 +700,7 @@ public:
     Q_INVOKABLE int indexOfElement(StructureElement *element) const;
     Q_INVOKABLE StructureElement *findElementBySceneID(const QString &id) const;
 
-    enum LayoutType
-    {
-        HorizontalLayout,
-        VerticalLayout,
-        FlowHorizontalLayout,
-        FlowVerticalLayout
-    };
+    enum LayoutType { HorizontalLayout, VerticalLayout, FlowHorizontalLayout, FlowVerticalLayout };
     Q_ENUM(LayoutType)
     Q_INVOKABLE QRectF layoutElements(LayoutType layoutType);
 
@@ -704,7 +711,8 @@ public:
 
     Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay) const;
     Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay) const;
-    Q_INVOKABLE QJsonObject evaluateEpisodeAndGroupBoxes(Screenplay *screenplay, const QString &category) const;
+    Q_INVOKABLE QJsonObject evaluateEpisodeAndGroupBoxes(Screenplay *screenplay,
+                                                         const QString &category) const;
 
     Q_INVOKABLE QJsonObject queryBreakElements(ScreenplayElement *breakElement) const;
 
@@ -714,7 +722,10 @@ public:
     Q_INVOKABLE static QStringList standardMoments();
 
     Q_INVOKABLE QStringList allLocations() const { return m_locationHeadingsMap.keys(); }
-    QMap< QString, QList<SceneHeading*> > locationHeadingsMap() const { return m_locationHeadingsMap; }
+    QMap<QString, QList<SceneHeading *>> locationHeadingsMap() const
+    {
+        return m_locationHeadingsMap;
+    }
 
     Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY currentElementIndexChanged STORED false)
     void setCurrentElementIndex(int val);
@@ -731,10 +742,16 @@ public:
     Q_SIGNAL void characterNamesChanged();
 
     Q_PROPERTY(QAbstractListModel* annotationsModel READ annotationsModel CONSTANT STORED false)
-    QAbstractListModel *annotationsModel() const { return &((const_cast<Structure*>(this))->m_annotations); }
+    QAbstractListModel *annotationsModel() const
+    {
+        return &((const_cast<Structure *>(this))->m_annotations);
+    }
 
     Q_PROPERTY(QRectF annotationsBoundingBox READ annotationsBoundingBox NOTIFY annotationsBoundingBoxChanged)
-    QRectF annotationsBoundingBox() const { return m_annotationsBoundingBoxAggregator.aggregateValue().toRectF(); }
+    QRectF annotationsBoundingBox() const
+    {
+        return m_annotationsBoundingBoxAggregator.aggregateValue().toRectF();
+    }
     Q_SIGNAL void annotationsBoundingBoxChanged();
 
     Q_PROPERTY(QQmlListProperty<Annotation> annotations READ annotations NOTIFY annotationCountChanged)
@@ -746,7 +763,7 @@ public:
     Q_INVOKABLE bool canSendToBack(Annotation *ptr) const;
     Q_INVOKABLE void bringToFront(Annotation *ptr);
     Q_INVOKABLE void sendToBack(Annotation *ptr);
-    void setAnnotations(const QList<Annotation*> &list);
+    void setAnnotations(const QList<Annotation *> &list);
     Q_PROPERTY(int annotationCount READ annotationCount NOTIFY annotationCountChanged)
     int annotationCount() const { return m_annotations.size(); }
     Q_INVOKABLE void clearAnnotations();
@@ -788,7 +805,7 @@ public:
     Q_SIGNAL void canPasteChanged();
 
     Q_INVOKABLE void copy(QObject *elementOrAnnotation);
-    Q_INVOKABLE void paste(const QPointF &pos=QPointF());
+    Q_INVOKABLE void paste(const QPointF &pos = QPointF());
 
     Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
     void setCharacterRelationshipGraph(const QJsonObject &val);
@@ -805,7 +822,7 @@ public:
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
     bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
 
 protected:
     bool event(QEvent *event);
@@ -818,7 +835,8 @@ private:
     friend class Screenplay;
     friend class ScriteDocument;
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
-    QList< QPair<QString, QList<StructureElement *> > > evaluateGroupsImpl(Screenplay *screenplay, const QString &category=QString()) const;
+    QList<QPair<QString, QList<StructureElement *>>>
+    evaluateGroupsImpl(Screenplay *screenplay, const QString &category = QString()) const;
 
 private:
     qreal m_canvasWidth = 120000;
@@ -829,16 +847,17 @@ private:
 
     static void staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr);
     static void staticClearCharacters(QQmlListProperty<Character> *list);
-    static Character* staticCharacterAt(QQmlListProperty<Character> *list, int index);
+    static Character *staticCharacterAt(QQmlListProperty<Character> *list, int index);
     static int staticCharacterCount(QQmlListProperty<Character> *list);
     ObjectListPropertyModel<Character *> m_characters;
 
     Notes *m_notes = new Notes(this);
 
     friend class StructureLayout;
-    static void staticAppendElement(QQmlListProperty<StructureElement> *list, StructureElement *ptr);
+    static void staticAppendElement(QQmlListProperty<StructureElement> *list,
+                                    StructureElement *ptr);
     static void staticClearElements(QQmlListProperty<StructureElement> *list);
-    static StructureElement* staticElementAt(QQmlListProperty<StructureElement> *list, int index);
+    static StructureElement *staticElementAt(QQmlListProperty<StructureElement> *list, int index);
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
     ObjectListPropertyModel<StructureElement *> m_elements;
     ModelAggregator m_elementsBoundingBoxAggregator;
@@ -849,9 +868,9 @@ private:
     void updateLocationHeadingMap();
     void updateLocationHeadingMapLater();
     ExecLaterTimer m_locationHeadingsMapTimer;
-    QMap< QString, QList<SceneHeading*> > m_locationHeadingsMap;
+    QMap<QString, QList<SceneHeading *>> m_locationHeadingsMap;
 
-    void onStructureElementSceneChanged(StructureElement *element=nullptr);
+    void onStructureElementSceneChanged(StructureElement *element = nullptr);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
     void updateCharacterNames();
@@ -862,7 +881,7 @@ private:
 
     static void staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr);
     static void staticClearAnnotations(QQmlListProperty<Annotation> *list);
-    static Annotation* staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
+    static Annotation *staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
     static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
     ObjectListPropertyModel<Annotation *> m_annotations;
     ModelAggregator m_annotationsBoundingBoxAggregator;
@@ -886,7 +905,7 @@ class StructureElementConnector : public AbstractShapeItem
     Q_OBJECT
 
 public:
-    StructureElementConnector(QQuickItem *parent=nullptr);
+    StructureElementConnector(QQuickItem *parent = nullptr);
     ~StructureElementConnector();
 
     enum LineType { StraightLine, CurvedLine };
@@ -897,13 +916,13 @@ public:
     Q_SIGNAL void lineTypeChanged();
 
     Q_PROPERTY(StructureElement* fromElement READ fromElement WRITE setFromElement NOTIFY fromElementChanged RESET resetFromElement)
-    void setFromElement(StructureElement* val);
-    StructureElement* fromElement() const { return m_fromElement; }
+    void setFromElement(StructureElement *val);
+    StructureElement *fromElement() const { return m_fromElement; }
     Q_SIGNAL void fromElementChanged();
 
     Q_PROPERTY(StructureElement* toElement READ toElement WRITE setToElement NOTIFY toElementChanged RESET resetToElement)
-    void setToElement(StructureElement* val);
-    StructureElement* toElement() const { return m_toElement; }
+    void setToElement(StructureElement *val);
+    StructureElement *toElement() const { return m_toElement; }
     Q_SIGNAL void toElementChanged();
 
     Q_PROPERTY(qreal arrowAndLabelSpacing READ arrowAndLabelSpacing WRITE setArrowAndLabelSpacing NOTIFY arrowAndLabelSpacingChanged)
@@ -955,12 +974,12 @@ class StructureCanvasViewportFilterModel : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    StructureCanvasViewportFilterModel(QObject *parent=nullptr);
+    StructureCanvasViewportFilterModel(QObject *parent = nullptr);
     ~StructureCanvasViewportFilterModel();
 
     Q_PROPERTY(Structure* structure READ structure WRITE setStructure RESET resetStructure NOTIFY structureChanged)
-    void setStructure(Structure* val);
-    Structure* structure() const { return m_structure; }
+    void setStructure(Structure *val);
+    Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -1021,7 +1040,7 @@ private:
     QObjectProperty<Structure> m_structure;
     FilterStrategy m_filterStrategy = IntersectsStrategy;
     ComputeStrategy m_computeStrategy = OnDemandComputeStrategy;
-    QList< QPair<const QObject*,bool> > m_visibleSourceRows;
+    QList<QPair<const QObject *, bool>> m_visibleSourceRows;
 };
 
 #endif // STRUCTURE_H

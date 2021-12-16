@@ -20,19 +20,13 @@
 
 #include <QtMath>
 
-GridBackgroundItemBorder::GridBackgroundItemBorder(QObject *parent)
-    : QObject(parent)
+GridBackgroundItemBorder::GridBackgroundItemBorder(QObject *parent) : QObject(parent) { }
+
+GridBackgroundItemBorder::~GridBackgroundItemBorder() { }
+
+void GridBackgroundItemBorder::setColor(const QColor &val)
 {
-
-}
-
-GridBackgroundItemBorder::~GridBackgroundItemBorder()
-{
-
-}
-
-void GridBackgroundItemBorder::setColor(const QColor &val) {
-    if(m_color == val)
+    if (m_color == val)
         return;
 
     m_color = val;
@@ -42,7 +36,7 @@ void GridBackgroundItemBorder::setColor(const QColor &val) {
 void GridBackgroundItemBorder::setWidth(qreal val)
 {
     val = qBound(0.0, val, 10.0);
-    if( qFuzzyCompare(m_width, val) )
+    if (qFuzzyCompare(m_width, val))
         return;
 
     m_width = val;
@@ -51,29 +45,21 @@ void GridBackgroundItemBorder::setWidth(qreal val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GridBackgroundItem::GridBackgroundItem(QQuickItem *parent)
-    : QQuickItem(parent)
+GridBackgroundItem::GridBackgroundItem(QQuickItem *parent) : QQuickItem(parent)
 {
     this->setFlag(ItemHasContents);
 
-    connect(this, &GridBackgroundItem::opacityChanged,
-            this, &GridBackgroundItem::update);
-    connect(this, &GridBackgroundItem::tickColorOpacityChanged,
-            this, &GridBackgroundItem::update);
-    connect(m_border, &GridBackgroundItemBorder::colorChanged,
-            this, &GridBackgroundItem::update);
-    connect(m_border, &GridBackgroundItemBorder::widthChanged,
-            this, &GridBackgroundItem::update);
+    connect(this, &GridBackgroundItem::opacityChanged, this, &GridBackgroundItem::update);
+    connect(this, &GridBackgroundItem::tickColorOpacityChanged, this, &GridBackgroundItem::update);
+    connect(m_border, &GridBackgroundItemBorder::colorChanged, this, &GridBackgroundItem::update);
+    connect(m_border, &GridBackgroundItemBorder::widthChanged, this, &GridBackgroundItem::update);
 }
 
-GridBackgroundItem::~GridBackgroundItem()
-{
-
-}
+GridBackgroundItem::~GridBackgroundItem() { }
 
 void GridBackgroundItem::setTickDistance(qreal val)
 {
-    if( qFuzzyCompare(m_tickDistance, val) )
+    if (qFuzzyCompare(m_tickDistance, val))
         return;
 
     m_tickDistance = val;
@@ -84,7 +70,7 @@ void GridBackgroundItem::setTickDistance(qreal val)
 
 void GridBackgroundItem::setMajorTickStride(int val)
 {
-    if(m_majorTickStride == val)
+    if (m_majorTickStride == val)
         return;
 
     m_majorTickStride = val;
@@ -95,7 +81,7 @@ void GridBackgroundItem::setMajorTickStride(int val)
 
 void GridBackgroundItem::setMinorTickLineWidth(qreal val)
 {
-    if( qFuzzyCompare(m_minorTickLineWidth, val) )
+    if (qFuzzyCompare(m_minorTickLineWidth, val))
         return;
 
     m_minorTickLineWidth = val;
@@ -106,7 +92,7 @@ void GridBackgroundItem::setMinorTickLineWidth(qreal val)
 
 void GridBackgroundItem::setMajorTickLineWidth(qreal val)
 {
-    if( qFuzzyCompare(m_majorTickLineWidth, val) )
+    if (qFuzzyCompare(m_majorTickLineWidth, val))
         return;
 
     m_majorTickLineWidth = val;
@@ -117,7 +103,7 @@ void GridBackgroundItem::setMajorTickLineWidth(qreal val)
 
 void GridBackgroundItem::setMinorTickColor(const QColor &val)
 {
-    if(m_minorTickColor == val)
+    if (m_minorTickColor == val)
         return;
 
     m_minorTickColor = val;
@@ -128,7 +114,7 @@ void GridBackgroundItem::setMinorTickColor(const QColor &val)
 
 void GridBackgroundItem::setMajorTickColor(const QColor &val)
 {
-    if(m_majorTickColor == val)
+    if (m_majorTickColor == val)
         return;
 
     m_majorTickColor = val;
@@ -140,7 +126,7 @@ void GridBackgroundItem::setMajorTickColor(const QColor &val)
 void GridBackgroundItem::setTickColorOpacity(qreal val)
 {
     val = qBound(0.0, val, 1.0);
-    if( qFuzzyCompare(m_tickColorOpacity, val) )
+    if (qFuzzyCompare(m_tickColorOpacity, val))
         return;
 
     m_tickColorOpacity = val;
@@ -151,7 +137,7 @@ void GridBackgroundItem::setTickColorOpacity(qreal val)
 
 void GridBackgroundItem::setGridIsVisible(bool val)
 {
-    if(m_gridIsVisible == val)
+    if (m_gridIsVisible == val)
         return;
 
     m_gridIsVisible = val;
@@ -162,7 +148,7 @@ void GridBackgroundItem::setGridIsVisible(bool val)
 
 void GridBackgroundItem::setBackgroundColor(const QColor &val)
 {
-    if(m_backgroundColor == val)
+    if (m_backgroundColor == val)
         return;
 
     m_backgroundColor = val;
@@ -171,13 +157,14 @@ void GridBackgroundItem::setBackgroundColor(const QColor &val)
     this->update();
 }
 
-QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNodeData *nodeData)
+QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
+                                             QQuickItem::UpdatePaintNodeData *nodeData)
 {
 #ifndef QT_NO_DEBUG
     qDebug("GridBackgroundItem is painting.");
 #endif
 
-    if(oldNode)
+    if (oldNode)
         delete oldNode;
     Q_UNUSED(nodeData)
 
@@ -186,15 +173,15 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
     const qreal h = this->height();
 
     {
-        if(!qFuzzyIsNull(m_backgroundColor.alphaF()))
-        {
+        if (!qFuzzyIsNull(m_backgroundColor.alphaF())) {
             QSGOpacityNode *backgroundNode = new QSGOpacityNode;
             backgroundNode->setFlag(QSGGeometryNode::OwnedByParent);
             backgroundNode->setOpacity(this->opacity());
             rootNode->appendChildNode(backgroundNode);
 
             QSGGeometryNode *geometryNode = new QSGGeometryNode;
-            geometryNode->setFlags(QSGNode::OwnsGeometry|QSGNode::OwnsMaterial|QSGNode::OwnedByParent);
+            geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
+                                   | QSGNode::OwnedByParent);
 
             QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 6);
             geometry->setDrawingMode(QSGGeometry::DrawTriangles);
@@ -205,20 +192,20 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
             points[0].x = 0.0f;
             points[0].y = 0.0f;
 
-            points[1].x = float(w)-1.0f;
+            points[1].x = float(w) - 1.0f;
             points[1].y = 0.0f;
 
-            points[2].x = float(w)-1.0f;
-            points[2].y = float(h)-1.0f;
+            points[2].x = float(w) - 1.0f;
+            points[2].y = float(h) - 1.0f;
 
             points[3].x = 0.0f;
             points[3].y = 0.0f;
 
-            points[4].x = float(w)-1.0f;
-            points[4].y = float(h)-1.0f;
+            points[4].x = float(w) - 1.0f;
+            points[4].y = float(h) - 1.0f;
 
             points[5].x = 0.0f;
-            points[5].y = float(h)-1.0f;
+            points[5].y = float(h) - 1.0f;
 
             QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
             geometryNode->setMaterial(material);
@@ -229,13 +216,13 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         }
     }
 
-    if( !m_gridIsVisible || qFuzzyIsNull(m_tickColorOpacity) )
+    if (!m_gridIsVisible || qFuzzyIsNull(m_tickColorOpacity))
         return rootNode;
 
-    const int nrXTicks = int( qCeil(w/m_tickDistance) ) - 1;
-    const int nrYTicks = int( qCeil(h/m_tickDistance) ) - 1;
-    const int nrXMajorTicks = int( qCeil(w/(m_tickDistance*m_majorTickStride)) ) - 1;
-    const int nrYMajorTicks = int( qCeil(h/(m_tickDistance*m_majorTickStride)) ) - 1;
+    const int nrXTicks = int(qCeil(w / m_tickDistance)) - 1;
+    const int nrYTicks = int(qCeil(h / m_tickDistance)) - 1;
+    const int nrXMajorTicks = int(qCeil(w / (m_tickDistance * m_majorTickStride))) - 1;
+    const int nrYMajorTicks = int(qCeil(h / (m_tickDistance * m_majorTickStride))) - 1;
     const int nrXMinorTicks = nrXTicks - nrXMajorTicks;
     const int nrYMinorTicks = nrYTicks - nrYMajorTicks;
     const int nrMinorTicks = nrXMinorTicks + nrYMinorTicks;
@@ -247,9 +234,11 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         rootNode->appendChildNode(minorTicksNode);
 
         QSGGeometryNode *geometryNode = new QSGGeometryNode;
-        geometryNode->setFlags(QSGNode::OwnsGeometry|QSGNode::OwnsMaterial|QSGNode::OwnedByParent);
+        geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
+                               | QSGNode::OwnedByParent);
 
-        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), nrMinorTicks*2);
+        QSGGeometry *geometry =
+                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), nrMinorTicks * 2);
         geometry->setDrawingMode(QSGGeometry::DrawLines);
         geometry->setLineWidth(float(m_minorTickLineWidth));
         geometryNode->setGeometry(geometry);
@@ -260,8 +249,7 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         int pointIndex = 0;
         int xLineIndex = 1, yLineIndex = 1;
 
-        while(x <= w)
-        {
+        while (x <= w) {
             points[pointIndex].x = float(x);
             points[pointIndex].y = 0.f;
             ++pointIndex;
@@ -273,15 +261,13 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
             x += m_tickDistance;
             ++xLineIndex;
 
-            if( xLineIndex%m_majorTickStride == 0 )
-            {
+            if (xLineIndex % m_majorTickStride == 0) {
                 x += m_tickDistance;
                 ++xLineIndex;
             }
         }
 
-        while(y <= h)
-        {
+        while (y <= h) {
             points[pointIndex].x = 0.f;
             points[pointIndex].y = float(y);
             ++pointIndex;
@@ -293,8 +279,7 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
             y += m_tickDistance;
             ++yLineIndex;
 
-            if( yLineIndex%m_majorTickStride == 0 )
-            {
+            if (yLineIndex % m_majorTickStride == 0) {
                 y += m_tickDistance;
                 ++yLineIndex;
             }
@@ -317,20 +302,21 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         rootNode->appendChildNode(majorTicksNode);
 
         QSGGeometryNode *geometryNode = new QSGGeometryNode;
-        geometryNode->setFlags(QSGNode::OwnsGeometry|QSGNode::OwnsMaterial|QSGNode::OwnedByParent);
+        geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
+                               | QSGNode::OwnedByParent);
 
-        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), nrMajorTicks*2);
+        QSGGeometry *geometry =
+                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), nrMajorTicks * 2);
         geometry->setDrawingMode(QSGGeometry::DrawLines);
         geometry->setLineWidth(float(m_majorTickLineWidth));
         geometryNode->setGeometry(geometry);
 
         QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
 
-        qreal x = m_tickDistance*m_majorTickStride, y = x;
+        qreal x = m_tickDistance * m_majorTickStride, y = x;
         int pointIndex = 0;
 
-        while(x < w)
-        {
+        while (x < w) {
             points[pointIndex].x = float(x);
             points[pointIndex].y = 0.f;
             ++pointIndex;
@@ -339,11 +325,10 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
             points[pointIndex].y = float(h);
             ++pointIndex;
 
-            x += m_tickDistance*m_majorTickStride;
+            x += m_tickDistance * m_majorTickStride;
         }
 
-        while(y < h)
-        {
+        while (y < h) {
             points[pointIndex].x = 0.f;
             points[pointIndex].y = float(y);
             ++pointIndex;
@@ -352,7 +337,7 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
             points[pointIndex].y = float(y);
             ++pointIndex;
 
-            y += m_tickDistance*m_majorTickStride;
+            y += m_tickDistance * m_majorTickStride;
         }
 
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
@@ -366,14 +351,14 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         majorTicksNode->appendChildNode(geometryNode);
     }
 
-    if( !qFuzzyIsNull(m_border->width()) )
-    {
+    if (!qFuzzyIsNull(m_border->width())) {
         QSGNode *borderNode = new QSGOpacityNode;
         borderNode->setFlags(QSGNode::OwnedByParent);
         rootNode->appendChildNode(borderNode);
 
         QSGGeometryNode *geometryNode = new QSGGeometryNode;
-        geometryNode->setFlags(QSGNode::OwnsGeometry|QSGNode::OwnsMaterial|QSGNode::OwnedByParent);
+        geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
+                               | QSGNode::OwnedByParent);
 
         QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 4);
         geometry->setDrawingMode(QSGGeometry::DrawLineLoop);
@@ -385,14 +370,14 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
         points[0].x = 0.0f;
         points[0].y = 0.0f;
 
-        points[1].x = float(w)-1.0f;
+        points[1].x = float(w) - 1.0f;
         points[1].y = 0.0f;
 
-        points[2].x = float(w)-1.0f;
-        points[2].y = float(h)-1.0f;
+        points[2].x = float(w) - 1.0f;
+        points[2].y = float(h) - 1.0f;
 
         points[3].x = 0.0f;
-        points[3].y = float(h)-1.0f;
+        points[3].y = float(h) - 1.0f;
 
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
         geometryNode->setMaterial(material);
@@ -407,4 +392,3 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode, QQuickItem::Updat
 
     return rootNode;
 }
-

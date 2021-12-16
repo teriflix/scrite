@@ -29,10 +29,10 @@
 #include <QMetaClassInfo>
 #include <QTextDocumentWriter>
 
-AbstractReportGenerator::AbstractReportGenerator(QObject *parent)
-                        :AbstractDeviceIO(parent)
+AbstractReportGenerator::AbstractReportGenerator(QObject *parent) : AbstractDeviceIO(parent)
 {
-    connect(User::instance(), &User::infoChanged, this, &AbstractReportGenerator::featureEnabledChanged);
+    connect(User::instance(), &User::infoChanged, this,
+            &AbstractReportGenerator::featureEnabledChanged);
 }
 
 AbstractReportGenerator::~AbstractReportGenerator()
@@ -42,17 +42,17 @@ AbstractReportGenerator::~AbstractReportGenerator()
 
 void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
 {
-    if(m_format == val)
+    if (m_format == val)
         return;
 
     m_format = val;
     emit formatChanged();
 
-    if(!this->fileName().isEmpty())
-    {
-        const QString suffix = m_format == AdobePDF ? QStringLiteral(".pdf") : QStringLiteral(".odt");
+    if (!this->fileName().isEmpty()) {
+        const QString suffix =
+                m_format == AdobePDF ? QStringLiteral(".pdf") : QStringLiteral(".odt");
         const QFileInfo fileInfo(this->fileName());
-        this->setFileName( fileInfo.absoluteDir().absoluteFilePath(fileInfo.baseName() + suffix) );
+        this->setFileName(fileInfo.absoluteDir().absoluteFilePath(fileInfo.baseName() + suffix));
     }
 }
 
@@ -70,19 +70,21 @@ QString AbstractReportGenerator::description() const
 
 bool AbstractReportGenerator::isFeatureEnabled() const
 {
-    if(User::instance()->isLoggedIn())
-    {
+    if (User::instance()->isLoggedIn()) {
         const bool allReportsEnabled = User::instance()->isFeatureEnabled(User::ReportFeature);
-        const bool thisSpecificImporterEnabled = allReportsEnabled ? User::instance()->isFeatureNameEnabled(QStringLiteral("report/") + this->title()) : false;
+        const bool thisSpecificImporterEnabled = allReportsEnabled
+                ? User::instance()->isFeatureNameEnabled(QStringLiteral("report/") + this->title())
+                : false;
         return allReportsEnabled && thisSpecificImporterEnabled;
     }
 
-    return QStringList({QStringLiteral("Character Report"), QStringLiteral("Location Report")}).contains(this->title());
+    return QStringList({ QStringLiteral("Character Report"), QStringLiteral("Location Report") })
+            .contains(this->title());
 }
 
 void AbstractReportGenerator::setWatermark(const QString &val)
 {
-    if(m_watermark == val)
+    if (m_watermark == val)
         return;
 
     m_watermark = val;
@@ -91,7 +93,7 @@ void AbstractReportGenerator::setWatermark(const QString &val)
 
 void AbstractReportGenerator::setComment(const QString &val)
 {
-    if(m_comment == val)
+    if (m_comment == val)
         return;
 
     m_comment = val;
@@ -101,7 +103,7 @@ void AbstractReportGenerator::setComment(const QString &val)
 QString AbstractReportGenerator::name() const
 {
     const int ciIndex = this->metaObject()->indexOfClassInfo("Title");
-    if(ciIndex >= 0)
+    if (ciIndex >= 0)
         return QString::fromLatin1(this->metaObject()->classInfo(ciIndex).value());
 
     return QString("Report");
@@ -116,60 +118,53 @@ bool AbstractReportGenerator::generate()
 
     this->error()->clear();
 
-    if(!this->isFeatureEnabled())
-    {
+    if (!this->isFeatureEnabled()) {
         this->error()->setErrorMessage(this->title() + QStringLiteral(" is disabled."));
         return false;
     }
 
-    if(fileName.isEmpty())
-    {
+    if (fileName.isEmpty()) {
         this->error()->setErrorMessage("Cannot export to an empty file.");
         return false;
     }
 
-    if(document == nullptr)
-    {
+    if (document == nullptr) {
         this->error()->setErrorMessage("No document available to export.");
         return false;
     }
 
     QFile file(fileName);
-    if( !file.open(QFile::WriteOnly) )
-    {
-        this->error()->setErrorMessage( QString("Could not open file '%1' for writing.").arg(fileName) );
+    if (!file.open(QFile::WriteOnly)) {
+        this->error()->setErrorMessage(
+                QString("Could not open file '%1' for writing.").arg(fileName));
         return false;
     }
 
     qScopeGuard([=]() {
         const QString reportName = QString::fromLatin1(this->metaObject()->className());
-        User::instance()->logActivity2( QStringLiteral("report"), reportName );
+        User::instance()->logActivity2(QStringLiteral("report"), reportName);
     });
 
     const bool usePdfWriter = this->usePdfWriter();
 
-    if(m_format == AdobePDF)
-    {
-        if(this->canDirectPrintToPdf())
-        {
+    if (m_format == AdobePDF) {
+        if (this->canDirectPrintToPdf()) {
             QScopedPointer<QPdfWriter> qpdfWriter;
             QScopedPointer<QPrinter> qprinter;
             bool success = false;
 
             this->progress()->start();
 
-            if(usePdfWriter)
-            {
+            if (usePdfWriter) {
                 qpdfWriter.reset(new QPdfWriter(&file));
                 qpdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
                 qpdfWriter->setTitle(screenplay->title() + QStringLiteral(" - ") + this->name());
-                qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+                qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                                       + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
                 format->pageLayout()->configure(qpdfWriter.data());
-                qpdfWriter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+                qpdfWriter->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
                 success = this->directPrintToPdf(qpdfWriter.data());
-            }
-            else
-            {
+            } else {
                 file.close();
 
                 qprinter.reset(new QPrinter);
@@ -177,9 +172,10 @@ bool AbstractReportGenerator::generate()
                 qprinter->setOutputFileName(fileName);
                 qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
                 qprinter->setDocName(screenplay->title() + QStringLiteral(" - ") + this->name());
-                qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
+                qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                                     + qApp->applicationVersion() + QStringLiteral(" Printer"));
                 format->pageLayout()->configure(qprinter.data());
-                qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+                qprinter->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
                 success = this->directPrintToPdf(qprinter.data());
             }
 
@@ -191,10 +187,8 @@ bool AbstractReportGenerator::generate()
         }
     }
 
-    if(m_format == OpenDocumentFormat)
-    {
-        if(this->canDirectExportToOdf())
-        {
+    if (m_format == OpenDocumentFormat) {
+        if (this->canDirectExportToOdf()) {
             this->progress()->start();
             bool success = this->directExportToOdf(&file);
             this->progress()->finish();
@@ -219,45 +213,39 @@ bool AbstractReportGenerator::generate()
 
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Title"));
-    this->progress()->setProgressText( QString("Generating \"%1\"").arg(classInfo.value()));
+    this->progress()->setProgressText(QString("Generating \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
     const bool ret = this->doGenerate(&textDocument);
 
-    if(!ret)
-    {
+    if (!ret) {
         this->progress()->finish();
         return ret;
     }
 
-    if(m_format == OpenDocumentFormat)
-    {
+    if (m_format == OpenDocumentFormat) {
         QTextDocumentWriter writer;
         writer.setFormat("ODF");
         writer.setDevice(&file);
         this->configureWriter(&writer, &textDocument);
         writer.write(&textDocument);
-    }
-    else
-    {
+    } else {
         QScopedPointer<QPdfWriter> qpdfWriter;
         QScopedPointer<QPrinter> qprinter;
         QPagedPaintDevice *pdfDevice = nullptr;
 
-        if(usePdfWriter)
-        {
+        if (usePdfWriter) {
             qpdfWriter.reset(new QPdfWriter(&file));
             qpdfWriter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
             qpdfWriter->setTitle(screenplay->title() + QStringLiteral(" - ") + this->name());
-            qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
+            qpdfWriter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                                   + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
             format->pageLayout()->configure(qpdfWriter.data());
-            qpdfWriter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+            qpdfWriter->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
             this->configureWriter(qpdfWriter.data(), &textDocument);
 
             pdfDevice = qpdfWriter.data();
-        }
-        else
-        {
+        } else {
             file.close();
 
             qprinter.reset(new QPrinter);
@@ -265,9 +253,10 @@ bool AbstractReportGenerator::generate()
             qprinter->setOutputFileName(fileName);
             qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
             qprinter->setDocName(screenplay->title() + QStringLiteral(" - ") + this->name());
-            qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ") + qApp->applicationVersion() + QStringLiteral(" Printer"));
+            qprinter->setCreator(qApp->applicationName() + QStringLiteral(" ")
+                                 + qApp->applicationVersion() + QStringLiteral(" Printer"));
             format->pageLayout()->configure(qprinter.data());
-            qprinter->setPageMargins(QMarginsF(0.2,0.1,0.2,0.1), QPageLayout::Inch);
+            qprinter->setPageMargins(QMarginsF(0.2, 0.1, 0.2, 0.1), QPageLayout::Inch);
             this->configureWriter(qprinter.data(), &textDocument);
 
             pdfDevice = qprinter.data();
@@ -290,7 +279,7 @@ bool AbstractReportGenerator::generate()
 
 bool AbstractReportGenerator::setConfigurationValue(const QString &name, const QVariant &value)
 {
-    return this->setProperty(qPrintable(name),value);
+    return this->setProperty(qPrintable(name), value);
 }
 
 QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) const
@@ -300,20 +289,20 @@ QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) con
 
 QJsonObject AbstractReportGenerator::configurationFormInfo() const
 {
-    return Application::instance()->objectConfigurationFormInfo(this, &AbstractReportGenerator::staticMetaObject);
+    return Application::instance()->objectConfigurationFormInfo(
+            this, &AbstractReportGenerator::staticMetaObject);
 }
 
 QString AbstractReportGenerator::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    switch(m_format)
-    {
+    switch (m_format) {
     case AdobePDF:
-        if(fi.suffix().toLower() != "pdf")
+        if (fi.suffix().toLower() != "pdf")
             return fileName + ".pdf";
         break;
     case OpenDocumentFormat:
-        if(fi.suffix().toLower() != "odt")
+        if (fi.suffix().toLower() != "odt")
             return fileName + ".odt";
         break;
     }
@@ -323,6 +312,9 @@ QString AbstractReportGenerator::polishFileName(const QString &fileName) const
 
 bool AbstractReportGenerator::usePdfWriter() const
 {
-    const bool val = Application::instance()->settings()->value(QStringLiteral("PdfExport/usePdfDriver"), true).toBool();
+    const bool val = Application::instance()
+                             ->settings()
+                             ->value(QStringLiteral("PdfExport/usePdfDriver"), true)
+                             .toBool();
     return val;
 }

@@ -21,7 +21,7 @@ class TextShapeItem : public AbstractShapeItem
     Q_OBJECT
 
 public:
-    TextShapeItem(QQuickItem *parent=nullptr);
+    TextShapeItem(QQuickItem *parent = nullptr);
     ~TextShapeItem();
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
@@ -41,6 +41,5 @@ private:
     QFont m_font;
     QString m_text;
 };
-
 
 #endif // TEXTSHAPEITEM_H

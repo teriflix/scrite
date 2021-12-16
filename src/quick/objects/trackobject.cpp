@@ -17,23 +17,19 @@
 #include <QTimerEvent>
 
 AbstractObjectTracker::AbstractObjectTracker(QObject *parent)
-    : QObject(parent),
-      m_target(this, "target")
+    : QObject(parent), m_target(this, "target")
 {
     connect(this, &AbstractObjectTracker::emitTracked, this, &AbstractObjectTracker::onEmitTracked);
 }
 
-AbstractObjectTracker::~AbstractObjectTracker()
-{
-
-}
+AbstractObjectTracker::~AbstractObjectTracker() { }
 
 void AbstractObjectTracker::setTarget(QObject *val)
 {
-    if(m_target == val)
+    if (m_target == val)
         return;
 
-    if(m_target != nullptr)
+    if (m_target != nullptr)
         disconnect(m_target, nullptr, this, nullptr);
 
     m_target = val;
@@ -44,7 +40,7 @@ void AbstractObjectTracker::setTarget(QObject *val)
 
 void AbstractObjectTracker::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
@@ -64,7 +60,7 @@ void AbstractObjectTracker::componentComplete()
 
 void AbstractObjectTracker::onEmitTracked()
 {
-    if(m_enabled)
+    if (m_enabled)
         emit tracked();
 }
 
@@ -75,23 +71,16 @@ void AbstractObjectTracker::resetTarget()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TrackProperty::TrackProperty(QObject *parent)
-    : AbstractObjectTracker(parent)
-{
+TrackProperty::TrackProperty(QObject *parent) : AbstractObjectTracker(parent) { }
 
-}
-
-TrackProperty::~TrackProperty()
-{
-
-}
+TrackProperty::~TrackProperty() { }
 
 void TrackProperty::setProperty(const QString &val)
 {
-    if(m_property == val)
+    if (m_property == val)
         return;
 
-    if(m_target != nullptr)
+    if (m_target != nullptr)
         disconnect(m_target, nullptr, this, nullptr);
 
     m_property = val;
@@ -102,37 +91,30 @@ void TrackProperty::setProperty(const QString &val)
 
 void TrackProperty::init()
 {
-    if(m_target == nullptr || m_property.isEmpty() || !this->isInitialized())
+    if (m_target == nullptr || m_property.isEmpty() || !this->isInitialized())
         return;
 
-    static QMetaMethod trackedSignalMethod = QMetaMethod::fromSignal(&AbstractObjectTracker::emitTracked);
+    static QMetaMethod trackedSignalMethod =
+            QMetaMethod::fromSignal(&AbstractObjectTracker::emitTracked);
 
     const QMetaObject *mo = m_target->metaObject();
-    const int propIndex = mo->indexOfProperty( qPrintable(m_property) );
-    if(propIndex >= 0)
-    {
+    const int propIndex = mo->indexOfProperty(qPrintable(m_property));
+    if (propIndex >= 0) {
         const QMetaProperty prop = mo->property(propIndex);
-        if(prop.hasNotifySignal())
+        if (prop.hasNotifySignal())
             connect(m_target, prop.notifySignal(), this, trackedSignalMethod);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TrackModelRow::TrackModelRow(QObject *parent)
-    : AbstractObjectTracker(parent)
-{
+TrackModelRow::TrackModelRow(QObject *parent) : AbstractObjectTracker(parent) { }
 
-}
-
-TrackModelRow::~TrackModelRow()
-{
-
-}
+TrackModelRow::~TrackModelRow() { }
 
 void TrackModelRow::setRow(int val)
 {
-    if(m_row == val)
+    if (m_row == val)
         return;
 
     m_row = val;
@@ -141,7 +123,7 @@ void TrackModelRow::setRow(int val)
 
 void TrackModelRow::setRootIndex(const QModelIndex &val)
 {
-    if(m_rootIndex == val)
+    if (m_rootIndex == val)
         return;
 
     m_rootIndex = val;
@@ -150,7 +132,7 @@ void TrackModelRow::setRootIndex(const QModelIndex &val)
 
 void TrackModelRow::setRowEvent(TrackModelRow::Event val)
 {
-    if(m_event == val)
+    if (m_event == val)
         return;
 
     m_event = val;
@@ -159,16 +141,18 @@ void TrackModelRow::setRowEvent(TrackModelRow::Event val)
 
 void TrackModelRow::init()
 {
-    if(m_target == nullptr || !this->isInitialized())
+    if (m_target == nullptr || !this->isInitialized())
         return;
 
-    QAbstractItemModel *model = qobject_cast<QAbstractItemModel*>(m_target);
-    if(model == nullptr)
+    QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(m_target);
+    if (model == nullptr)
         return;
 
-    connect(model, &QAbstractItemModel::rowsAboutToBeInserted, this, &TrackModelRow::onRowsAboutToInsert);
+    connect(model, &QAbstractItemModel::rowsAboutToBeInserted, this,
+            &TrackModelRow::onRowsAboutToInsert);
     connect(model, &QAbstractItemModel::rowsInserted, this, &TrackModelRow::onRowsInserted);
-    connect(model, &QAbstractItemModel::rowsAboutToBeRemoved, this, &TrackModelRow::onRowsAboutToDelete);
+    connect(model, &QAbstractItemModel::rowsAboutToBeRemoved, this,
+            &TrackModelRow::onRowsAboutToDelete);
     connect(model, &QAbstractItemModel::rowsRemoved, this, &TrackModelRow::onRowsDeleted);
     connect(model, &QAbstractItemModel::modelAboutToBeReset, this, &TrackModelRow::onAboutToReset);
     connect(model, &QAbstractItemModel::modelReset, this, &TrackModelRow::onReset);
@@ -176,13 +160,12 @@ void TrackModelRow::init()
 
 void TrackModelRow::onRowsAboutToInsert(const QModelIndex &parent, int start, int end)
 {
-    if(parent != m_rootIndex)
+    if (parent != m_rootIndex)
         return;
 
-    if(m_event == RowAboutToInsert && m_row >= start && m_row <= end)
+    if (m_event == RowAboutToInsert && m_row >= start && m_row <= end)
         emitTracked();
-    else
-    {
+    else {
         m_operation = Insert;
         m_start = start;
         m_end = end;
@@ -191,7 +174,7 @@ void TrackModelRow::onRowsAboutToInsert(const QModelIndex &parent, int start, in
 
 void TrackModelRow::onRowsInserted()
 {
-    if(m_event == RowInserted && m_operation == Insert && m_row >= m_start && m_row <= m_end)
+    if (m_event == RowInserted && m_operation == Insert && m_row >= m_start && m_row <= m_end)
         emitTracked();
 
     this->resetOperation();
@@ -199,13 +182,12 @@ void TrackModelRow::onRowsInserted()
 
 void TrackModelRow::onRowsAboutToDelete(const QModelIndex &parent, int start, int end)
 {
-    if(parent != m_rootIndex)
+    if (parent != m_rootIndex)
         return;
 
-    if(m_event == RowAboutToRemove && m_row >= start && m_row <= end)
+    if (m_event == RowAboutToRemove && m_row >= start && m_row <= end)
         emitTracked();
-    else
-    {
+    else {
         m_operation = Remove;
         m_start = start;
         m_end = end;
@@ -214,7 +196,7 @@ void TrackModelRow::onRowsAboutToDelete(const QModelIndex &parent, int start, in
 
 void TrackModelRow::onRowsDeleted()
 {
-    if(m_event == RowRemoved && m_operation == Remove && m_row >= m_start && m_row <= m_end)
+    if (m_event == RowRemoved && m_operation == Remove && m_row >= m_start && m_row <= m_end)
         emitTracked();
 
     this->resetOperation();
@@ -222,13 +204,13 @@ void TrackModelRow::onRowsDeleted()
 
 void TrackModelRow::onAboutToReset()
 {
-    if(m_event == RowAboutToRemove && m_row >= 0)
+    if (m_event == RowAboutToRemove && m_row >= 0)
         emitTracked();
 }
 
 void TrackModelRow::onReset()
 {
-    if(m_event == RowRemoved && m_row >= 0)
+    if (m_event == RowRemoved && m_row >= 0)
         emitTracked();
 
     this->resetOperation();
@@ -236,23 +218,16 @@ void TrackModelRow::onReset()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TrackSignal::TrackSignal(QObject *parent)
-    : AbstractObjectTracker(parent)
-{
+TrackSignal::TrackSignal(QObject *parent) : AbstractObjectTracker(parent) { }
 
-}
-
-TrackSignal::~TrackSignal()
-{
-
-}
+TrackSignal::~TrackSignal() { }
 
 void TrackSignal::setSignal(const QString &val)
 {
-    if(m_signal == val)
+    if (m_signal == val)
         return;
 
-    if(m_target != nullptr)
+    if (m_target != nullptr)
         disconnect(m_target, nullptr, this, nullptr);
 
     m_signal = val;
@@ -263,37 +238,30 @@ void TrackSignal::setSignal(const QString &val)
 
 void TrackSignal::init()
 {
-    if(m_target == nullptr || m_signal.isEmpty() || !this->isInitialized())
+    if (m_target == nullptr || m_signal.isEmpty() || !this->isInitialized())
         return;
 
-    static QMetaMethod trackedSignalMethod = QMetaMethod::fromSignal(&AbstractObjectTracker::emitTracked);
+    static QMetaMethod trackedSignalMethod =
+            QMetaMethod::fromSignal(&AbstractObjectTracker::emitTracked);
 
     const QMetaObject *mo = m_target->metaObject();
     const int signalIndex = mo->indexOfSignal(qPrintable(m_signal));
-    if(signalIndex >= 0)
-    {
+    if (signalIndex >= 0) {
         const QMetaMethod signalMethod = mo->method(signalIndex);
-        if(signalMethod.methodType() == QMetaMethod::Signal)
+        if (signalMethod.methodType() == QMetaMethod::Signal)
             connect(m_target, signalMethod, this, trackedSignalMethod);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TrackerPack::TrackerPack(QObject *parent)
-    : QObject(parent)
-{
+TrackerPack::TrackerPack(QObject *parent) : QObject(parent) { }
 
-}
-
-TrackerPack::~TrackerPack()
-{
-
-}
+TrackerPack::~TrackerPack() { }
 
 void TrackerPack::setDelay(int val)
 {
-    if(m_delay == val)
+    if (m_delay == val)
         return;
 
     m_delay = val;
@@ -302,14 +270,13 @@ void TrackerPack::setDelay(int val)
 
 void TrackerPack::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
     emit enabledChanged();
 
-    if(m_enabled && m_emitCallsWhileDisabled)
-    {
+    if (m_enabled && m_emitCallsWhileDisabled) {
         m_emitCallsWhileDisabled = false;
         emitChangesTrackedSignal();
     }
@@ -318,17 +285,14 @@ void TrackerPack::setEnabled(bool val)
 QQmlListProperty<AbstractObjectTracker> TrackerPack::trackers()
 {
     return QQmlListProperty<AbstractObjectTracker>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &TrackerPack::staticAppendTracker,
-                &TrackerPack::staticTrackerCount,
-                &TrackerPack::staticTrackerAt,
-                &TrackerPack::staticClearTrackers);
+            reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+            &TrackerPack::staticAppendTracker, &TrackerPack::staticTrackerCount,
+            &TrackerPack::staticTrackerAt, &TrackerPack::staticClearTrackers);
 }
 
 void TrackerPack::addTracker(AbstractObjectTracker *ptr)
 {
-    if(ptr == nullptr || m_trackers.indexOf(ptr) >= 0)
+    if (ptr == nullptr || m_trackers.indexOf(ptr) >= 0)
         return;
 
     connect(ptr, &AbstractObjectTracker::tracked, this, &TrackerPack::emitChangesTrackedSignal);
@@ -338,12 +302,12 @@ void TrackerPack::addTracker(AbstractObjectTracker *ptr)
 
 void TrackerPack::removeTracker(AbstractObjectTracker *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = m_trackers.indexOf(ptr);
-    if(index < 0)
-        return ;
+    if (index < 0)
+        return;
 
     disconnect(ptr, &AbstractObjectTracker::tracked, this, &TrackerPack::emitChangesTrackedSignal);
     m_trackers.removeAt(index);
@@ -357,14 +321,13 @@ AbstractObjectTracker *TrackerPack::trackerAt(int index) const
 
 void TrackerPack::clearTrackers()
 {
-    while(m_trackers.size())
+    while (m_trackers.size())
         this->removeTracker(m_trackers.first());
 }
 
 void TrackerPack::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_timer.timerId())
-    {
+    if (event->timerId() == m_timer.timerId()) {
         m_timer.stop();
         emit tracked();
     }
@@ -372,29 +335,30 @@ void TrackerPack::timerEvent(QTimerEvent *event)
 
 void TrackerPack::emitChangesTrackedSignal()
 {
-    if(m_enabled)
+    if (m_enabled)
         m_timer.start(m_delay, this);
     else
         m_emitCallsWhileDisabled = true;
 }
 
-void TrackerPack::staticAppendTracker(QQmlListProperty<AbstractObjectTracker> *list, AbstractObjectTracker *ptr)
+void TrackerPack::staticAppendTracker(QQmlListProperty<AbstractObjectTracker> *list,
+                                      AbstractObjectTracker *ptr)
 {
-    reinterpret_cast< TrackerPack* >(list->data)->addTracker(ptr);
+    reinterpret_cast<TrackerPack *>(list->data)->addTracker(ptr);
 }
 
 void TrackerPack::staticClearTrackers(QQmlListProperty<AbstractObjectTracker> *list)
 {
-    reinterpret_cast< TrackerPack* >(list->data)->clearTrackers();
+    reinterpret_cast<TrackerPack *>(list->data)->clearTrackers();
 }
 
-AbstractObjectTracker *TrackerPack::staticTrackerAt(QQmlListProperty<AbstractObjectTracker> *list, int index)
+AbstractObjectTracker *TrackerPack::staticTrackerAt(QQmlListProperty<AbstractObjectTracker> *list,
+                                                    int index)
 {
-    return reinterpret_cast< TrackerPack* >(list->data)->trackerAt(index);
+    return reinterpret_cast<TrackerPack *>(list->data)->trackerAt(index);
 }
 
 int TrackerPack::staticTrackerCount(QQmlListProperty<AbstractObjectTracker> *list)
 {
-    return reinterpret_cast< TrackerPack* >(list->data)->trackerCount();
+    return reinterpret_cast<TrackerPack *>(list->data)->trackerCount();
 }
-

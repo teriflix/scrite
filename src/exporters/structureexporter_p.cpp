@@ -38,9 +38,8 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
     this->setBackgroundBrush(Qt::white);
 
     // Add all elements as index cards
-    QHash<StructureElement*, StructureIndexCard*> elementIndexCardMap;
-    for(int i=0; i<structure->elementCount(); i++)
-    {
+    QHash<StructureElement *, StructureIndexCard *> elementIndexCardMap;
+    for (int i = 0; i < structure->elementCount(); i++) {
         StructureElement *element = structure->elementAt(i);
         StructureIndexCard *indexCard = new StructureIndexCard(element);
         indexCard->setZValue(10);
@@ -51,32 +50,33 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
 
     // Add all connectors
     QAbstractListModel *connectorsModel = document->structureElementConnectors();
-    StructureElementConnectors *connectors = qobject_cast<StructureElementConnectors*>(connectorsModel);
-    for(int i=0; i<connectors->count(); i++)
-    {
+    StructureElementConnectors *connectors =
+            qobject_cast<StructureElementConnectors *>(connectorsModel);
+    for (int i = 0; i < connectors->count(); i++) {
         StructureElement *from = connectors->fromElement(i);
         StructureElement *to = connectors->toElement(i);
         const QString label = connectors->label(i);
 
-        if(from->stackId().isEmpty() || to->stackId().isEmpty() || from->stackId() != to->stackId())
-        {
+        if (from->stackId().isEmpty() || to->stackId().isEmpty()
+            || from->stackId() != to->stackId()) {
             StructureIndexCard *fromIndexCard = elementIndexCardMap.value(from, nullptr);
             StructureIndexCard *toIndexCard = elementIndexCardMap.value(to, nullptr);
-            if(fromIndexCard == nullptr || toIndexCard == nullptr)
+            if (fromIndexCard == nullptr || toIndexCard == nullptr)
                 continue;
 
-            StructureIndexCardConnector *connector = new StructureIndexCardConnector(fromIndexCard, toIndexCard, label);
+            StructureIndexCardConnector *connector =
+                    new StructureIndexCardConnector(fromIndexCard, toIndexCard, label);
             connector->setZValue(9);
             this->addItem(connector);
         }
     }
 
-    const QJsonObject boxes = structure->evaluateEpisodeAndGroupBoxes(document->screenplay(), structure->preferredGroupCategory());
+    const QJsonObject boxes = structure->evaluateEpisodeAndGroupBoxes(
+            document->screenplay(), structure->preferredGroupCategory());
 
     // Add all chapters
     const QJsonArray episodeBoxes = boxes.value(QStringLiteral("episodeBoxes")).toArray();
-    for(int i=0; i<episodeBoxes.size(); i++)
-    {
+    for (int i = 0; i < episodeBoxes.size(); i++) {
         const QJsonObject episodeBox = episodeBoxes.at(i).toObject();
 
         StructureEpisodeBox *episode = new StructureEpisodeBox(episodeBox, structure);
@@ -86,8 +86,7 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
 
     // Add all groups
     const QJsonArray groupBoxes = boxes.value(QStringLiteral("groupBoxes")).toArray();
-    for(int i=0; i<groupBoxes.size(); i++)
-    {
+    for (int i = 0; i < groupBoxes.size(); i++) {
         const QJsonObject groupBox = groupBoxes.at(i).toObject();
 
         StructureIndexCardGroup *group = new StructureIndexCardGroup(groupBox, structure);
@@ -97,11 +96,10 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
 
     // Add stacks
     StructureElementStacks *stacks = structure->elementStacks();
-    for(int i=0; i<stacks->objectCount(); i++)
-    {
+    for (int i = 0; i < stacks->objectCount(); i++) {
         QObject *stackObject = stacks->objectAt(i);
-        StructureElementStack *stack = qobject_cast<StructureElementStack*>(stackObject);
-        if(stack == nullptr)
+        StructureElementStack *stack = qobject_cast<StructureElementStack *>(stackObject);
+        if (stack == nullptr)
             continue;
 
         StructureIndexCardStack *stackItem = new StructureIndexCardStack(stack);
@@ -112,24 +110,23 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
     const QRectF indexCardsBox = this->itemsBoundingRect();
 
     // Add annotations
-    for(int i=0; i<structure->annotationCount(); i++)
-    {
+    for (int i = 0; i < structure->annotationCount(); i++) {
         const Annotation *annotation = structure->annotationAt(i);
 
         QGraphicsItem *annotationItem = nullptr;
 
         const QString type = annotation->type();
-        if(type == QStringLiteral("rectangle"))
+        if (type == QStringLiteral("rectangle"))
             annotationItem = new StructureRectAnnotation(annotation);
-        else if(type == QStringLiteral("text"))
+        else if (type == QStringLiteral("text"))
             annotationItem = new StructureTextAnnotation(annotation);
-        else if(type == QStringLiteral("url"))
+        else if (type == QStringLiteral("url"))
             annotationItem = new StructureUrlAnnotation(annotation);
-        else if(type == QStringLiteral("image"))
+        else if (type == QStringLiteral("image"))
             annotationItem = new StructureImageAnnotation(annotation);
-        else if(type == QStringLiteral("line"))
+        else if (type == QStringLiteral("line"))
             annotationItem = new StructureLineAnnotation(annotation);
-        else if(type == QStringLiteral("oval"))
+        else if (type == QStringLiteral("oval"))
             annotationItem = new StructureOvalAnnotation(annotation);
         else
             annotationItem = new StructureUnknownAnnotation(annotation);
@@ -140,56 +137,54 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
 
     QRectF contentsRect = this->itemsBoundingRect();
 
-    if(exporter->isInsertTitleCard())
-    {
+    if (exporter->isInsertTitleCard()) {
         StructureTitleCard *titleCard = new StructureTitleCard(structure, exporter->comment());
         QRectF titleCardRect = titleCard->boundingRect();
-        titleCardRect.setLeft(indexCardsBox.left()+20);
-        titleCardRect.moveBottom(indexCardsBox.top()-20);
-        if( !this->items(titleCardRect).isEmpty())
-            titleCardRect.moveBottom(contentsRect.top()-20);
+        titleCardRect.setLeft(indexCardsBox.left() + 20);
+        titleCardRect.moveBottom(indexCardsBox.top() - 20);
+        if (!this->items(titleCardRect).isEmpty())
+            titleCardRect.moveBottom(contentsRect.top() - 20);
         titleCard->setPos(titleCardRect.topLeft());
         this->addItem(titleCard);
     }
 
-    this->addStandardItems(WatermarkUnderlayLayer + (exporter->isEnableHeaderFooter() ? HeaderFooterLayer : 0));
+    this->addStandardItems(WatermarkUnderlayLayer
+                           + (exporter->isEnableHeaderFooter() ? HeaderFooterLayer : 0));
 }
 
-StructureExporterScene::~StructureExporterScene()
-{
-
-}
+StructureExporterScene::~StructureExporterScene() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureIndexCard::StructureIndexCard(const StructureElement *element)
 {
-    this->setPos( element->x(), element->y() );
-    this->setRect( 0, 0, element->width(), element->height() );
+    this->setPos(element->x(), element->y());
+    this->setRect(0, 0, element->width(), element->height());
 
     const StructureElementStacks *stacks = element->structure()->elementStacks();
     const StructureElementStack *stack = stacks->findStackById(element->stackId());
     const bool stackedOnTop = stack == nullptr || stack->topmostElement() == element;
-    if(!stackedOnTop)
-    {
+    if (!stackedOnTop) {
         this->setVisible(false);
         return;
     }
 
     const QColor sceneColor = element->scene()->color();
-    const QColor penColor = Application::instance()->isLightColor(sceneColor) ? QColor(Qt::black) : sceneColor;
+    const QColor penColor =
+            Application::instance()->isLightColor(sceneColor) ? QColor(Qt::black) : sceneColor;
 
     // Transparency is best achived using opacity, rather than using alpha channel in color.
     this->setBrush(sceneColor);
     this->setPen(QPen(penColor, 2.0));
 
     QGraphicsRectItem *bgColorItem = new QGraphicsRectItem(this);
-    bgColorItem->setRect(this->rect().adjusted(2,2,-2,-2));
+    bgColorItem->setRect(this->rect().adjusted(2, 2, -2, -2));
     bgColorItem->setBrush(Qt::white);
     bgColorItem->setOpacity(0.9);
     bgColorItem->setPen(Qt::NoPen);
 
-    const QFont fixedWidthFont(QStringLiteral("Courier Prime"), Application::instance()->idealFontPointSize());
+    const QFont fixedWidthFont(QStringLiteral("Courier Prime"),
+                               Application::instance()->idealFontPointSize());
     const QFont normalFont = ::applicationFont();
     auto boldFont = [](const QFont &font) {
         QFont f = font;
@@ -198,16 +193,16 @@ StructureIndexCard::StructureIndexCard(const StructureElement *element)
     };
     auto smallFont = [](const QFont &font) {
         QFont f = font;
-        f.setPointSize(f.pointSize()-2);
+        f.setPointSize(f.pointSize() - 2);
         return f;
     };
 
-    const QRectF contentRect(this->rect().adjusted(5,5,-5,-5));
+    const QRectF contentRect(this->rect().adjusted(5, 5, -5, -5));
 
     // Draw scene heading at the top
     QGraphicsTextItem *headingTextItem = new QGraphicsTextItem(this);
     headingTextItem->setTextWidth(contentRect.width());
-    if(!element->title().isEmpty())
+    if (!element->title().isEmpty())
         headingTextItem->setPlainText(element->title());
     else
         headingTextItem->setPlainText(QStringLiteral("NO SCENE HEADING"));
@@ -217,108 +212,93 @@ StructureIndexCard::StructureIndexCard(const StructureElement *element)
     headingTextItem->setY(contentRect.y());
 
     // Draw tags at the bottom
-    const QString tagsText = element->structure()->presentableGroupNames(element->scene()->groups());
+    const QString tagsText =
+            element->structure()->presentableGroupNames(element->scene()->groups());
     QGraphicsTextItem *tagsTextItem = new QGraphicsTextItem(this);
     tagsTextItem->setTextWidth(contentRect.width());
     tagsTextItem->setHtml(tagsText);
     tagsTextItem->setFont(smallFont(normalFont));
 
     tagsTextItem->setX(contentRect.x());
-    tagsTextItem->setY(contentRect.bottom()-tagsTextItem->boundingRect().height());
+    tagsTextItem->setY(contentRect.bottom() - tagsTextItem->boundingRect().height());
 
-    const QRectF headingTextRect = headingTextItem->mapToParent(headingTextItem->boundingRect()).boundingRect();
-    const QRectF tagsTextRect = tagsTextItem->mapToParent(tagsTextItem->boundingRect()).boundingRect();
-    const QRectF synopsisTextRect = QRectF(headingTextRect.bottomLeft(), tagsTextRect.topRight()).adjusted(0, 10, 0, -10);
+    const QRectF headingTextRect =
+            headingTextItem->mapToParent(headingTextItem->boundingRect()).boundingRect();
+    const QRectF tagsTextRect =
+            tagsTextItem->mapToParent(tagsTextItem->boundingRect()).boundingRect();
+    const QRectF synopsisTextRect =
+            QRectF(headingTextRect.bottomLeft(), tagsTextRect.topRight()).adjusted(0, 10, 0, -10);
 
     // Synopsis text in between
     QGraphicsRectItem *synopsisTextRectItem = new QGraphicsRectItem(this);
     synopsisTextRectItem->setPos(synopsisTextRect.topLeft());
-    synopsisTextRectItem->setRect(QRectF(0,0,synopsisTextRect.width(),synopsisTextRect.height()));
-    synopsisTextRectItem->setBrush(QColor::fromRgbF(1,1,1,0.4));
+    synopsisTextRectItem->setRect(
+            QRectF(0, 0, synopsisTextRect.width(), synopsisTextRect.height()));
+    synopsisTextRectItem->setBrush(QColor::fromRgbF(1, 1, 1, 0.4));
     synopsisTextRectItem->setPen(Qt::NoPen);
     synopsisTextRectItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 
     QGraphicsTextItem *synopsisTextItem = new QGraphicsTextItem(synopsisTextRectItem);
-    synopsisTextItem->setPos(0,0);
+    synopsisTextItem->setPos(0, 0);
     synopsisTextItem->setTextWidth(contentRect.width());
     synopsisTextItem->setPlainText(element->scene()->title());
     synopsisTextItem->setFont(normalFont);
 
-    if(synopsisTextItem->boundingRect().height() > synopsisTextRectItem->rect().height())
-        synopsisTextRectItem->setPen( QPen(QColor::fromRgbF(0,0,0,0.5),1) );
+    if (synopsisTextItem->boundingRect().height() > synopsisTextRectItem->rect().height())
+        synopsisTextRectItem->setPen(QPen(QColor::fromRgbF(0, 0, 0, 0.5), 1));
 }
 
-StructureIndexCard::~StructureIndexCard()
-{
-
-}
+StructureIndexCard::~StructureIndexCard() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2, QPointF *labelPos=nullptr)
+QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2,
+                                   QPointF *labelPos = nullptr)
 {
-    const QRectF r1( givenR1.x(), givenR1.y(), givenR1.width(), qMin(givenR1.height(),100.0) );
-    const QRectF r2( givenR2.x(), givenR2.y(), givenR2.width(), qMin(givenR2.height(),100.0) );
+    const QRectF r1(givenR1.x(), givenR1.y(), givenR1.width(), qMin(givenR1.height(), 100.0));
+    const QRectF r2(givenR2.x(), givenR2.y(), givenR2.width(), qMin(givenR2.height(), 100.0));
 
     const QLineF line(r1.center(), r2.center());
     QPointF p1, p2;
     Qt::Edge e1, e2;
     QPainterPath path;
 
-    if(r2.center().x() < r1.left())
-    {
+    if (r2.center().x() < r1.left()) {
         p1 = QLineF(r1.topLeft(), r1.bottomLeft()).center();
         e1 = Qt::LeftEdge;
 
-        if(r2.top() > r1.bottom())
-        {
+        if (r2.top() > r1.bottom()) {
             p2 = QLineF(r2.topLeft(), r2.topRight()).center();
             e2 = Qt::TopEdge;
-        }
-        else if(r1.top() > r2.bottom())
-        {
+        } else if (r1.top() > r2.bottom()) {
             p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
             e2 = Qt::BottomEdge;
-        }
-        else
-        {
+        } else {
             p2 = QLineF(r2.topRight(), r2.bottomRight()).center();
             e2 = Qt::RightEdge;
         }
-    }
-    else if(r2.center().x() > r1.right())
-    {
+    } else if (r2.center().x() > r1.right()) {
         p1 = QLineF(r1.topRight(), r1.bottomRight()).center();
         e1 = Qt::RightEdge;
 
-        if(r2.top() > r1.bottom())
-        {
+        if (r2.top() > r1.bottom()) {
             p2 = QLineF(r2.topLeft(), r2.topRight()).center();
             e2 = Qt::TopEdge;
-        }
-        else if(r1.top() > r2.bottom())
-        {
+        } else if (r1.top() > r2.bottom()) {
             p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
             e2 = Qt::BottomEdge;
-        }
-        else
-        {
+        } else {
             p2 = QLineF(r2.topLeft(), r2.bottomLeft()).center();
             e2 = Qt::LeftEdge;
         }
-    }
-    else
-    {
-        if(r2.top() > r1.bottom())
-        {
+    } else {
+        if (r2.top() > r1.bottom()) {
             p1 = QLineF(r1.bottomLeft(), r1.bottomRight()).center();
             e1 = Qt::BottomEdge;
 
             p2 = QLineF(r2.topLeft(), r2.topRight()).center();
             e2 = Qt::TopEdge;
-        }
-        else
-        {
+        } else {
             p1 = QLineF(r1.topLeft(), r1.topRight()).center();
             e1 = Qt::TopEdge;
 
@@ -328,8 +308,7 @@ QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2,
     }
 
     QPointF cp = p1;
-    switch(e1)
-    {
+    switch (e1) {
     case Qt::LeftEdge:
     case Qt::RightEdge:
         cp = (e2 == Qt::BottomEdge || e2 == Qt::TopEdge) ? QPointF(p2.x(), p1.y()) : p1;
@@ -339,13 +318,10 @@ QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2,
         break;
     }
 
-    if(cp == p1)
-    {
+    if (cp == p1) {
         path.moveTo(p1);
         path.lineTo(p2);
-    }
-    else
-    {
+    } else {
         const qreal length = line.length();
         const qreal dist = 20.0;
         const qreal dt = dist / length;
@@ -355,9 +331,8 @@ QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2,
         qreal t = dt;
 
         path.moveTo(p1);
-        while(t < maxdt)
-        {
-            const QLineF l( l1.pointAt(t), l2.pointAt(t) );
+        while (t < maxdt) {
+            const QLineF l(l1.pointAt(t), l2.pointAt(t));
             const QPointF p = l.pointAt(t);
             path.lineTo(p);
             t += dt;
@@ -366,25 +341,27 @@ QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2,
     }
 
     static const QList<QPointF> arrowPoints = QList<QPointF>()
-            << QPointF(-10,-5) << QPointF(0, 0) << QPointF(-10,5);
+            << QPointF(-10, -5) << QPointF(0, 0) << QPointF(-10, 5);
 
     const qreal angle = path.angleAtPercent(0.5);
     const QPointF lineCenter = path.pointAtPercent(0.5);
 
-    if(labelPos)
+    if (labelPos)
         *labelPos = path.pointAtPercent(0.65);
 
     QTransform tx;
     tx.translate(lineCenter.x(), lineCenter.y());
     tx.rotate(-angle);
-    path.moveTo( tx.map(arrowPoints.at(0)) );
-    path.lineTo( tx.map(arrowPoints.at(1)) );
-    path.lineTo( tx.map(arrowPoints.at(2)) );
+    path.moveTo(tx.map(arrowPoints.at(0)));
+    path.lineTo(tx.map(arrowPoints.at(1)));
+    path.lineTo(tx.map(arrowPoints.at(2)));
 
     return path;
 }
 
-StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCard *from, const StructureIndexCard *to, const QString &label)
+StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCard *from,
+                                                         const StructureIndexCard *to,
+                                                         const QString &label)
 {
     const QRectF r1 = from->mapToScene(from->boundingRect()).boundingRect();
     const QRectF r2 = to->mapToScene(to->boundingRect()).boundingRect();
@@ -413,10 +390,7 @@ StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCar
     labelBackground->setRect(labelBgRect);
 }
 
-StructureIndexCardConnector::~StructureIndexCardConnector()
-{
-
-}
+StructureIndexCardConnector::~StructureIndexCardConnector() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -424,26 +398,25 @@ StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structur
 {
     Q_UNUSED(structure)
 
-    const QJsonObject geometryJson = data.value( QStringLiteral("geometry") ).toObject();
-          QRectF geometry( 0, 0,
-                           geometryJson.value( QStringLiteral("width") ).toDouble(),
-                           geometryJson.value( QStringLiteral("height") ).toDouble() );
+    const QJsonObject geometryJson = data.value(QStringLiteral("geometry")).toObject();
+    QRectF geometry(0, 0, geometryJson.value(QStringLiteral("width")).toDouble(),
+                    geometryJson.value(QStringLiteral("height")).toDouble());
 
     geometry.adjust(-40, -140, 40, 40);
 
-    if(structure != nullptr && structure->elementStacks()->objectCount() > 0)
+    if (structure != nullptr && structure->elementStacks()->objectCount() > 0)
         geometry.adjust(0, -15, 0, 0);
 
     this->setRect(geometry);
     this->setBrush(Qt::NoBrush);
-    this->setPen( QPen(Qt::black,2) );
-    this->setPos( QPointF(geometryJson.value( QStringLiteral("x") ).toDouble(),
-                          geometryJson.value( QStringLiteral("y") ).toDouble()) );
+    this->setPen(QPen(Qt::black, 2));
+    this->setPos(QPointF(geometryJson.value(QStringLiteral("x")).toDouble(),
+                         geometryJson.value(QStringLiteral("y")).toDouble()));
 
     QGraphicsRectItem *bgItem = new QGraphicsRectItem(this);
-    bgItem->setRect( geometry.adjusted(1,1,-1,-1) );
+    bgItem->setRect(geometry.adjusted(1, 1, -1, -1));
     bgItem->setPen(Qt::NoPen);
-    bgItem->setBrush( Qt::gray);
+    bgItem->setBrush(Qt::gray);
     bgItem->setOpacity(0.1);
 
     const QFont normalFont = ::applicationFont();
@@ -451,53 +424,55 @@ StructureEpisodeBox::StructureEpisodeBox(const QJsonObject &data, const Structur
     const QString name = data.value(QStringLiteral("name")).toString();
     const int sceneCount = data.value(QStringLiteral("sceneCount")).toInt();
 
-    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" Scene"): QStringLiteral(" Scenes")) + QStringLiteral("</font>");
+    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ")
+            + QString::number(sceneCount)
+            + (sceneCount == 1 ? QStringLiteral(" Scene") : QStringLiteral(" Scenes"))
+            + QStringLiteral("</font>");
     QFont titleFont = normalFont;
-    titleFont.setPointSize( titleFont.pointSize()+8 );
+    titleFont.setPointSize(titleFont.pointSize() + 8);
 
     QGraphicsTextItem *titleItem = new QGraphicsTextItem(this);
     titleItem->setDefaultTextColor(Qt::black);
     titleItem->setFont(titleFont);
     titleItem->setHtml(title);
-    titleItem->setPos(geometry.topLeft() + QPointF(8,8));
+    titleItem->setPos(geometry.topLeft() + QPointF(8, 8));
 
     QGraphicsRectItem *titleBar = new QGraphicsRectItem(this);
     titleBar->setZValue(-1);
-    titleBar->setRect( QRectF(geometry.x(), geometry.y(), geometry.width(), titleItem->boundingRect().height() + 18).adjusted(1,1,-1,0) );
+    titleBar->setRect(QRectF(geometry.x(), geometry.y(), geometry.width(),
+                             titleItem->boundingRect().height() + 18)
+                              .adjusted(1, 1, -1, 0));
     titleBar->setBrush(QColor("#546E7A"));
     titleBar->setPen(Qt::NoPen);
     titleBar->setOpacity(0.3);
 }
 
-StructureEpisodeBox::~StructureEpisodeBox()
-{
-
-}
+StructureEpisodeBox::~StructureEpisodeBox() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const Structure *structure)
+StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data,
+                                                 const Structure *structure)
 {
-    const QJsonObject geometryJson = data.value( QStringLiteral("geometry") ).toObject();
-          QRectF geometry( 0, 0,
-                           geometryJson.value( QStringLiteral("width") ).toDouble(),
-                           geometryJson.value( QStringLiteral("height") ).toDouble() );
+    const QJsonObject geometryJson = data.value(QStringLiteral("geometry")).toObject();
+    QRectF geometry(0, 0, geometryJson.value(QStringLiteral("width")).toDouble(),
+                    geometryJson.value(QStringLiteral("height")).toDouble());
 
     geometry.adjust(-20, -20, 20, 20);
 
-    if(structure != nullptr && structure->elementStacks()->objectCount() > 0)
+    if (structure != nullptr && structure->elementStacks()->objectCount() > 0)
         geometry.adjust(0, -15, 0, 0);
 
     this->setRect(geometry);
     this->setBrush(Qt::NoBrush);
-    this->setPen( QPen(Qt::gray,2) );
-    this->setPos( QPointF(geometryJson.value( QStringLiteral("x") ).toDouble(),
-                          geometryJson.value( QStringLiteral("y") ).toDouble()) );
+    this->setPen(QPen(Qt::gray, 2));
+    this->setPos(QPointF(geometryJson.value(QStringLiteral("x")).toDouble(),
+                         geometryJson.value(QStringLiteral("y")).toDouble()));
 
     QGraphicsRectItem *bgItem = new QGraphicsRectItem(this);
-    bgItem->setRect( geometry.adjusted(1,1,-1,-1) );
+    bgItem->setRect(geometry.adjusted(1, 1, -1, -1));
     bgItem->setPen(Qt::NoPen);
-    bgItem->setBrush( Qt::gray);
+    bgItem->setBrush(Qt::gray);
     bgItem->setOpacity(0.1);
 
     const QFont normalFont = ::applicationFont();
@@ -505,7 +480,10 @@ StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const 
     const QString name = data.value(QStringLiteral("name")).toString();
     const int sceneCount = data.value(QStringLiteral("sceneCount")).toInt();
 
-    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ") + QString::number(sceneCount) + (sceneCount == 1 ? QStringLiteral(" Scene"): QStringLiteral(" Scenes")) + QStringLiteral("</font>");
+    const QString title = QStringLiteral("<b>") + name + QStringLiteral("</b><font size=\"-2\">: ")
+            + QString::number(sceneCount)
+            + (sceneCount == 1 ? QStringLiteral(" Scene") : QStringLiteral(" Scenes"))
+            + QStringLiteral("</font>");
     const QFont titleFont = normalFont;
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
@@ -516,7 +494,7 @@ StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const 
 
     QRectF titleRect = titleText->boundingRect();
     titleRect.adjust(-10, -10, 10, 10);
-    titleRect.moveBottomLeft( geometry.topLeft() );
+    titleRect.moveBottomLeft(geometry.topLeft());
 
     QGraphicsRectItem *titleBackground = new QGraphicsRectItem(this);
     titleBackground->setRect(titleRect);
@@ -524,19 +502,16 @@ StructureIndexCardGroup::StructureIndexCardGroup(const QJsonObject &data, const 
     titleBackground->setPen(this->pen());
 
     bgItem = new QGraphicsRectItem(this);
-    bgItem->setRect(titleRect.adjusted(1,1,-1,-1));
+    bgItem->setRect(titleRect.adjusted(1, 1, -1, -1));
     bgItem->setPen(Qt::NoPen);
-    bgItem->setBrush( Qt::gray );
+    bgItem->setBrush(Qt::gray);
     bgItem->setOpacity(0.1);
 
     titleRect.adjust(10, 10, -10, -10);
     titleText->setPos(titleRect.topLeft());
 }
 
-StructureIndexCardGroup::~StructureIndexCardGroup()
-{
-
-}
+StructureIndexCardGroup::~StructureIndexCardGroup() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -544,20 +519,20 @@ StructureIndexCardStack::StructureIndexCardStack(const StructureElementStack *st
 {
     QRectF geometry1 = stack->geometry();
     this->setPos(geometry1.topLeft());
-    geometry1.moveTopLeft(QPointF(0,0));
+    geometry1.moveTopLeft(QPointF(0, 0));
 
     const int nrCards = qMin(5, stack->objectCount());
-    for(int i=nrCards-1; i>=0; i--)
-    {
+    for (int i = nrCards - 1; i >= 0; i--) {
         int idx = i;
-        if(idx == stack->topmostElementIndex())
+        if (idx == stack->topmostElementIndex())
             ++idx;
 
-        const StructureElement *element = qobject_cast<StructureElement*>(stack->objectAt(i));
-        const QColor lineColor = element == nullptr ? stack->topmostElement()->scene()->color() : element->scene()->color();
+        const StructureElement *element = qobject_cast<StructureElement *>(stack->objectAt(i));
+        const QColor lineColor = element == nullptr ? stack->topmostElement()->scene()->color()
+                                                    : element->scene()->color();
 
-        const int shift = i*3;
-        const QRectF geometry2 = geometry1.adjusted(shift,shift,shift,shift);
+        const int shift = i * 3;
+        const QRectF geometry2 = geometry1.adjusted(shift, shift, shift, shift);
         QPainterPath shadowPath;
         shadowPath.moveTo(geometry2.bottomLeft());
         shadowPath.lineTo(geometry2.bottomRight());
@@ -566,21 +541,19 @@ StructureIndexCardStack::StructureIndexCardStack(const StructureElementStack *st
         QGraphicsRectItem *shadow = new QGraphicsRectItem(this);
         shadow->setRect(geometry2);
         shadow->setBrush(Qt::white);
-        shadow->setPen(QPen(lineColor,1));
+        shadow->setPen(QPen(lineColor, 1));
     }
 }
 
-StructureIndexCardStack::~StructureIndexCardStack()
-{
-
-}
+StructureIndexCardStack::~StructureIndexCardStack() { }
 
 QRectF StructureIndexCardStack::boundingRect() const
 {
-    return QRectF(0,0,1,1);
+    return QRectF(0, 0, 1, 1);
 }
 
-void StructureIndexCardStack::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StructureIndexCardStack::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                                    QWidget *widget)
 {
     Q_UNUSED(painter);
     Q_UNUSED(option);
@@ -589,7 +562,8 @@ void StructureIndexCardStack::paint(QPainter *painter, const QStyleOptionGraphic
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StructureRectAnnotation::StructureRectAnnotation(const Annotation *annotation, const QString &bgColorAttr)
+StructureRectAnnotation::StructureRectAnnotation(const Annotation *annotation,
+                                                 const QString &bgColorAttr)
 {
     const QJsonObject attributes = annotation->attributes();
 
@@ -597,24 +571,22 @@ StructureRectAnnotation::StructureRectAnnotation(const Annotation *annotation, c
     const QColor borderColor = QColor(attributes.value(QStringLiteral("borderColor")).toString());
     const qreal borderWidth = attributes.value(QStringLiteral("borderWidth")).toDouble();
     const bool fillBackground = attributes.value(QStringLiteral("fillBackground")).toBool();
-    const qreal opacity = qBound(0.0, attributes.value(QStringLiteral("opacity")).toDouble(), 100.0)/100.0;
+    const qreal opacity =
+            qBound(0.0, attributes.value(QStringLiteral("opacity")).toDouble(), 100.0) / 100.0;
 
     const QRectF geometry = annotation->geometry();
     this->setPos(geometry.topLeft());
-    this->setRect(QRectF(0,0,geometry.width(),geometry.height()));
+    this->setRect(QRectF(0, 0, geometry.width(), geometry.height()));
 
-    if(fillBackground)
+    if (fillBackground)
         this->setBrush(backgroundColor);
     else
         this->setBrush(Qt::NoBrush);
-    this->setPen(QPen(borderColor,borderWidth));
+    this->setPen(QPen(borderColor, borderWidth));
     this->setOpacity(opacity);
 }
 
-StructureRectAnnotation::~StructureRectAnnotation()
-{
-
-}
+StructureRectAnnotation::~StructureRectAnnotation() { }
 
 StructureTextAnnotation::StructureTextAnnotation(const Annotation *annotation)
     : StructureRectAnnotation(annotation, QStringLiteral("backgroundColor"))
@@ -629,45 +601,45 @@ StructureTextAnnotation::StructureTextAnnotation(const Annotation *annotation)
     const QString text = attributes.value(QStringLiteral("text")).toString();
     const QColor textColor = QColor(attributes.value(QStringLiteral("textColor")).toString());
 
-    if(text.isEmpty())
+    if (text.isEmpty())
         return;
 
     QRectF textAreaRect = this->rect().adjusted(10, 10, -10, -10);
 
     QGraphicsRectItem *textArea = new QGraphicsRectItem(this);
     textArea->setPos(textAreaRect.topLeft());
-    textAreaRect.moveTopLeft(QPointF(0,0));
+    textAreaRect.moveTopLeft(QPointF(0, 0));
     textArea->setRect(textAreaRect);
     textArea->setBrush(Qt::NoBrush);
     textArea->setPen(Qt::NoPen);
     textArea->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 
     QGraphicsTextItem *textItem = new QGraphicsTextItem(textArea);
-    textItem->setPos(QPointF(0,0));
+    textItem->setPos(QPointF(0, 0));
     textItem->setTextWidth(textAreaRect.width());
     textItem->setPlainText(text);
     textItem->setDefaultTextColor(textColor);
 
     QFont font(fontFamily);
     font.setPixelSize(fontSize);
-    for(int i=0; i<fontStyles.size(); i++) {
+    for (int i = 0; i < fontStyles.size(); i++) {
         const QString fontStyle = fontStyles.at(i).toString();
-        if(!font.bold())
+        if (!font.bold())
             font.setBold(fontStyle == QStringLiteral("bold"));
-        if(!font.italic())
+        if (!font.italic())
             font.setItalic(fontStyle == QStringLiteral("italic"));
-        if(!font.underline())
+        if (!font.underline())
             font.setUnderline(fontStyle == QStringLiteral("underline"));
     }
 
     textItem->setFont(font);
 
     Qt::Alignment alignment;
-    if(hAlign == QStringLiteral("center"))
+    if (hAlign == QStringLiteral("center"))
         alignment |= Qt::AlignHCenter;
-    else if(hAlign == QStringLiteral("left"))
+    else if (hAlign == QStringLiteral("left"))
         alignment |= Qt::AlignLeft;
-    else if(hAlign == QStringLiteral("right"))
+    else if (hAlign == QStringLiteral("right"))
         alignment |= Qt::AlignRight;
 
     QTextCursor cursor(textItem->document());
@@ -680,47 +652,45 @@ StructureTextAnnotation::StructureTextAnnotation(const Annotation *annotation)
 
     QRectF textItemRect = textItem->boundingRect();
 
-    if(vAlign == QStringLiteral("center"))
+    if (vAlign == QStringLiteral("center"))
         textItemRect.moveCenter(textAreaRect.center());
-    else if(vAlign == QStringLiteral("top"))
+    else if (vAlign == QStringLiteral("top"))
         textItemRect.moveTop(textAreaRect.top());
-    else if(vAlign == QStringLiteral("bottom"))
+    else if (vAlign == QStringLiteral("bottom"))
         textItemRect.moveBottom(textAreaRect.bottom());
 
     textItem->setPos(textItemRect.topLeft());
 }
 
-StructureTextAnnotation::~StructureTextAnnotation()
-{
-
-}
+StructureTextAnnotation::~StructureTextAnnotation() { }
 
 StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
 {
     const Structure *structure = annotation->structure();
-    ScriteDocument *document = structure == nullptr ? ScriteDocument::instance() : structure->scriteDocument();
+    ScriteDocument *document =
+            structure == nullptr ? ScriteDocument::instance() : structure->scriteDocument();
 
     const QJsonObject attributes = annotation->attributes();
 
     const QString imageName = attributes.value(QStringLiteral("imageName")).toString();
-    const QString imagePath = imageName.isEmpty() ? QString() : document->fileSystem()->absolutePath(imageName);
+    const QString imagePath =
+            imageName.isEmpty() ? QString() : document->fileSystem()->absolutePath(imageName);
     const QString url = attributes.value(QStringLiteral("url")).toString();
     const QString title = attributes.value(QStringLiteral("title")).toString();
     const QString description = attributes.value(QStringLiteral("description")).toString();
 
     const QRectF geometry = annotation->geometry();
     this->setPos(geometry.topLeft());
-    this->setRect(QRectF(0,0,geometry.width(),geometry.height()));
+    this->setRect(QRectF(0, 0, geometry.width(), geometry.height()));
     this->setBrush(Qt::white);
-    this->setPen(QPen(Qt::black,1));
+    this->setPen(QPen(Qt::black, 1));
 
     const QFont normalFont = ::applicationFont();
 
-    if(url.isEmpty())
-    {
+    if (url.isEmpty()) {
         QGraphicsTextItem *textItem = new QGraphicsTextItem(this);
         textItem->setFont(normalFont);
-        textItem->setPlainText( QStringLiteral("No URL was set.") );
+        textItem->setPlainText(QStringLiteral("No URL was set."));
 
         QRectF textRect = textItem->boundingRect();
         textRect.moveCenter(this->rect().center());
@@ -733,7 +703,7 @@ StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
 
     QGraphicsRectItem *contentItem = new QGraphicsRectItem(this);
     contentItem->setPos(contentRect.topLeft());
-    contentItem->setRect(QRectF(0,0,contentRect.width(),contentRect.height()));
+    contentItem->setRect(QRectF(0, 0, contentRect.width(), contentRect.height()));
     contentItem->setBrush(Qt::NoBrush);
     contentItem->setPen(Qt::NoPen);
     contentItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
@@ -741,19 +711,17 @@ StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
     contentRect = contentItem->rect();
 
     QRectF imageRect = contentRect;
-    imageRect.setHeight( imageRect.width()*9.0/16.0 );
-    if(imagePath.isEmpty())
-    {
+    imageRect.setHeight(imageRect.width() * 9.0 / 16.0);
+    if (imagePath.isEmpty()) {
         QGraphicsRectItem *emptyImageItem = new QGraphicsRectItem(contentItem);
         emptyImageItem->setBrush(Qt::lightGray);
         emptyImageItem->setPen(Qt::NoPen);
         emptyImageItem->setPos(imageRect.topLeft());
-        emptyImageItem->setRect(QRectF(0,0,imageRect.width(),imageRect.height()));
-    }
-    else
-    {
+        emptyImageItem->setRect(QRectF(0, 0, imageRect.width(), imageRect.height()));
+    } else {
         QPixmap pixmap(imagePath);
-        pixmap = pixmap.scaled(imageRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        pixmap = pixmap.scaled(imageRect.size().toSize(), Qt::KeepAspectRatio,
+                               Qt::SmoothTransformation);
 
         QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem(contentItem);
         pixmapItem->setPixmap(pixmap);
@@ -761,7 +729,7 @@ StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
     }
 
     QFont titleFont = normalFont;
-    titleFont.setPointSize(titleFont.pointSize()+2);
+    titleFont.setPointSize(titleFont.pointSize() + 2);
     titleFont.setBold(true);
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem(contentItem);
@@ -771,12 +739,13 @@ StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
 
     QRectF titleRect = titleText->boundingRect();
     titleRect.moveLeft(contentRect.left());
-    titleRect.moveTop(imageRect.bottom()+8);
+    titleRect.moveTop(imageRect.bottom() + 8);
     titleText->setPos(titleRect.topLeft());
 
     QGraphicsTextItem *urlText = new QGraphicsTextItem(contentItem);
     urlText->setOpenExternalLinks(true);
-    urlText->setHtml(QStringLiteral("<a href=\"") + url + QStringLiteral("\">Click here to open link.</a>"));
+    urlText->setHtml(QStringLiteral("<a href=\"") + url
+                     + QStringLiteral("\">Click here to open link.</a>"));
     urlText->setFont(normalFont);
     urlText->setTextWidth(contentRect.width());
 
@@ -785,12 +754,12 @@ StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
     urlText->setPos(urlRect.topLeft());
 
     QRectF descRect = contentRect;
-    descRect.setTop(titleRect.bottom()+8);
-    descRect.setBottom(urlRect.top()-8);
+    descRect.setTop(titleRect.bottom() + 8);
+    descRect.setBottom(urlRect.top() - 8);
 
     QGraphicsRectItem *descArea = new QGraphicsRectItem(contentItem);
     descArea->setPos(descRect.topLeft());
-    descArea->setRect(QRectF(0,0,descRect.width(),descRect.height()));
+    descArea->setRect(QRectF(0, 0, descRect.width(), descRect.height()));
     descArea->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
     descArea->setBrush(Qt::NoBrush);
     descArea->setPen(Qt::NoPen);
@@ -802,22 +771,22 @@ StructureUrlAnnotation::StructureUrlAnnotation(const Annotation *annotation)
     descItem->setPlainText(description);
 }
 
-StructureUrlAnnotation::~StructureUrlAnnotation()
-{
-
-}
+StructureUrlAnnotation::~StructureUrlAnnotation() { }
 
 StructureImageAnnotation::StructureImageAnnotation(const Annotation *annotation)
     : StructureRectAnnotation(annotation, QStringLiteral("backgroundColor"))
 {
     const Structure *structure = annotation->structure();
-    ScriteDocument *document = structure == nullptr ? ScriteDocument::instance() : structure->scriteDocument();
+    ScriteDocument *document =
+            structure == nullptr ? ScriteDocument::instance() : structure->scriteDocument();
 
     const QJsonObject attributes = annotation->attributes();
     const QString image = attributes.value(QStringLiteral("image")).toString();
-    const QString imagePath = image.isEmpty() ? QString() : document->fileSystem()->absolutePath(image);
+    const QString imagePath =
+            image.isEmpty() ? QString() : document->fileSystem()->absolutePath(image);
     const QString caption = attributes.value(QStringLiteral("caption")).toString();
-    const QString captionAlignment = attributes.value(QStringLiteral("captionAlignment")).toString();
+    const QString captionAlignment =
+            attributes.value(QStringLiteral("captionAlignment")).toString();
     const QColor captionColor = QColor(attributes.value(QStringLiteral("captionColor")).toString());
 
     const QFont normalFont = ::applicationFont();
@@ -826,7 +795,7 @@ StructureImageAnnotation::StructureImageAnnotation(const Annotation *annotation)
 
     QGraphicsRectItem *contentItem = new QGraphicsRectItem(this);
     contentItem->setPos(contentRect.topLeft());
-    contentItem->setRect(QRectF(0,0,contentRect.width(),contentRect.height()));
+    contentItem->setRect(QRectF(0, 0, contentRect.width(), contentRect.height()));
     contentItem->setBrush(Qt::NoBrush);
     contentItem->setPen(Qt::NoPen);
     contentItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
@@ -834,18 +803,15 @@ StructureImageAnnotation::StructureImageAnnotation(const Annotation *annotation)
     contentRect = contentItem->rect();
 
     QRectF imageRect = contentRect;
-    if(imagePath.isEmpty())
-    {
-        imageRect.setHeight( imageRect.width()*9.0/16.0 );
+    if (imagePath.isEmpty()) {
+        imageRect.setHeight(imageRect.width() * 9.0 / 16.0);
 
         QGraphicsRectItem *emptyImageItem = new QGraphicsRectItem(contentItem);
         emptyImageItem->setBrush(Qt::lightGray);
         emptyImageItem->setPen(Qt::NoPen);
         emptyImageItem->setPos(imageRect.topLeft());
-        emptyImageItem->setRect(QRectF(0,0,imageRect.width(),imageRect.height()));
-    }
-    else
-    {
+        emptyImageItem->setRect(QRectF(0, 0, imageRect.width(), imageRect.height()));
+    } else {
         QPixmap pixmap(imagePath);
 
         QSize pixmapSize = pixmap.size();
@@ -861,7 +827,7 @@ StructureImageAnnotation::StructureImageAnnotation(const Annotation *annotation)
     }
 
     QRectF textRect = contentRect;
-    textRect.setTop(imageRect.bottom()+5);
+    textRect.setTop(imageRect.bottom() + 5);
 
     QGraphicsTextItem *textItem = new QGraphicsTextItem(contentItem);
     textItem->setFont(normalFont);
@@ -870,11 +836,11 @@ StructureImageAnnotation::StructureImageAnnotation(const Annotation *annotation)
     textItem->setPos(textRect.topLeft());
 
     Qt::Alignment alignment;
-    if(captionAlignment == QStringLiteral("center"))
+    if (captionAlignment == QStringLiteral("center"))
         alignment |= Qt::AlignHCenter;
-    else if(captionAlignment == QStringLiteral("left"))
+    else if (captionAlignment == QStringLiteral("left"))
         alignment |= Qt::AlignLeft;
-    else if(captionAlignment == QStringLiteral("right"))
+    else if (captionAlignment == QStringLiteral("right"))
         alignment |= Qt::AlignRight;
 
     QTextCursor cursor(textItem->document());
@@ -886,10 +852,7 @@ StructureImageAnnotation::StructureImageAnnotation(const Annotation *annotation)
     cursor.mergeBlockFormat(format);
 }
 
-StructureImageAnnotation::~StructureImageAnnotation()
-{
-
-}
+StructureImageAnnotation::~StructureImageAnnotation() { }
 
 StructureLineAnnotation::StructureLineAnnotation(const Annotation *annotation)
 {
@@ -904,7 +867,7 @@ StructureLineAnnotation::StructureLineAnnotation(const Annotation *annotation)
     const QPointF center = geometry.center();
     QLineF line;
 
-    if(orientation == QStringLiteral("Vertical"))
+    if (orientation == QStringLiteral("Vertical"))
         line = QLineF(center.x(), geometry.top(), center.x(), geometry.bottom());
     else
         line = QLineF(geometry.left(), center.y(), geometry.right(), center.y());
@@ -916,10 +879,7 @@ StructureLineAnnotation::StructureLineAnnotation(const Annotation *annotation)
     this->setOpacity(opacity);
 }
 
-StructureLineAnnotation::~StructureLineAnnotation()
-{
-
-}
+StructureLineAnnotation::~StructureLineAnnotation() { }
 
 StructureOvalAnnotation::StructureOvalAnnotation(const Annotation *annotation)
 {
@@ -929,49 +889,44 @@ StructureOvalAnnotation::StructureOvalAnnotation(const Annotation *annotation)
     const QColor borderColor = QColor(attributes.value(QStringLiteral("borderColor")).toString());
     const qreal borderWidth = attributes.value(QStringLiteral("borderWidth")).toDouble();
     const bool fillBackground = attributes.value(QStringLiteral("fillBackground")).toBool();
-    const qreal opacity = qBound(0.0, attributes.value(QStringLiteral("opacity")).toDouble(), 100.0)/100.0;
+    const qreal opacity =
+            qBound(0.0, attributes.value(QStringLiteral("opacity")).toDouble(), 100.0) / 100.0;
 
     const QRectF geometry = annotation->geometry();
     this->setPos(geometry.topLeft());
-    this->setRect(QRectF(0,0,geometry.width(),geometry.height()));
+    this->setRect(QRectF(0, 0, geometry.width(), geometry.height()));
 
-    if(fillBackground)
+    if (fillBackground)
         this->setBrush(backgroundColor);
     else
         this->setBrush(Qt::NoBrush);
-    this->setPen(QPen(borderColor,borderWidth));
+    this->setPen(QPen(borderColor, borderWidth));
     this->setOpacity(opacity);
 }
 
-StructureOvalAnnotation::~StructureOvalAnnotation()
-{
-
-}
+StructureOvalAnnotation::~StructureOvalAnnotation() { }
 
 StructureUnknownAnnotation::StructureUnknownAnnotation(const Annotation *annotation)
 {
     const QRectF geometry = annotation->geometry();
     this->setPos(geometry.topLeft());
-    this->setRect(QRectF(0,0,geometry.width(),geometry.height()));
+    this->setRect(QRectF(0, 0, geometry.width(), geometry.height()));
 
     QBrush brush(Qt::lightGray);
     brush.setStyle(Qt::CrossPattern);
 
     this->setBrush(brush);
-    this->setPen(QPen(Qt::black,1));
+    this->setPen(QPen(Qt::black, 1));
 }
 
-StructureUnknownAnnotation::~StructureUnknownAnnotation()
-{
-
-}
+StructureUnknownAnnotation::~StructureUnknownAnnotation() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureTitleCard::StructureTitleCard(const Structure *structure, const QString &comment)
 {
     ScriteDocument *document = structure->scriteDocument();
-    if(document == nullptr)
+    if (document == nullptr)
         document = ScriteDocument::instance();
 
     const Screenplay *screenplay = document->screenplay();
@@ -993,12 +948,12 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
       */
 
     const QString coverPhotoPath = screenplay->coverPagePhoto();
-    if(!coverPhotoPath.isEmpty())
-    {
+    if (!coverPhotoPath.isEmpty()) {
         QPixmap coverPhotoPixmap(coverPhotoPath);
         QSizeF coverPhotoSize = coverPhotoPixmap.size();
         coverPhotoSize.scale(maxCoverPhotoSize, Qt::KeepAspectRatio);
-        coverPhotoPixmap = coverPhotoPixmap.scaled(coverPhotoSize.toSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        coverPhotoPixmap = coverPhotoPixmap.scaled(coverPhotoSize.toSize(), Qt::IgnoreAspectRatio,
+                                                   Qt::SmoothTransformation);
 
         QGraphicsPixmapItem *coverPhotoItem = new QGraphicsPixmapItem(this);
         coverPhotoItem->setPixmap(coverPhotoPixmap);
@@ -1013,9 +968,10 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         cursor.mergeBlockFormat(format);
     };
 
-    const QString title = screenplay->title().isEmpty() ? QStringLiteral("Untitled Screenplay") : screenplay->title();
+    const QString title = screenplay->title().isEmpty() ? QStringLiteral("Untitled Screenplay")
+                                                        : screenplay->title();
     QFont titleFont = ::applicationFont();
-    titleFont.setPointSize(titleFont.pointSize()+8);
+    titleFont.setPointSize(titleFont.pointSize() + 8);
     titleFont.setBold(true);
 
     QGraphicsTextItem *titleItem = new QGraphicsTextItem(this);
@@ -1024,49 +980,45 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
     titleItem->setTextWidth(maxCoverPhotoSize.width());
     centerTextInDocument(titleItem->document());
 
-    if(!screenplay->subtitle().isEmpty())
-    {
+    if (!screenplay->subtitle().isEmpty()) {
         QGraphicsTextItem *subtitleItem = new QGraphicsTextItem(this);
         subtitleItem->setPlainText(screenplay->subtitle());
 
         QFont subtitleFont = ::applicationFont();
-        subtitleFont.setPointSize(subtitleFont.pointSize()+5);
+        subtitleFont.setPointSize(subtitleFont.pointSize() + 5);
         subtitleItem->setFont(subtitleFont);
         subtitleItem->setTextWidth(maxCoverPhotoSize.width());
         centerTextInDocument(subtitleItem->document());
     }
 
-    if(!screenplay->basedOn().isEmpty())
-    {
+    if (!screenplay->basedOn().isEmpty()) {
         QGraphicsTextItem *basedOnItem = new QGraphicsTextItem(this);
         basedOnItem->setPlainText(screenplay->basedOn());
 
         QFont basedOnFont = ::applicationFont();
-        basedOnFont.setPointSize(basedOnFont.pointSize()+5);
+        basedOnFont.setPointSize(basedOnFont.pointSize() + 5);
         basedOnItem->setFont(basedOnFont);
         basedOnItem->setTextWidth(maxCoverPhotoSize.width());
         centerTextInDocument(basedOnItem->document());
     }
 
-    if(!screenplay->author().isEmpty())
-    {
+    if (!screenplay->author().isEmpty()) {
         QGraphicsTextItem *authorItem = new QGraphicsTextItem(this);
         authorItem->setPlainText(QStringLiteral("Written by ") + screenplay->author());
 
         QFont authorFont = ::applicationFont();
-        authorFont.setPointSize(authorFont.pointSize()+5);
+        authorFont.setPointSize(authorFont.pointSize() + 5);
         authorItem->setFont(authorFont);
         authorItem->setTextWidth(maxCoverPhotoSize.width());
         centerTextInDocument(authorItem->document());
     }
 
-    if(!screenplay->version().isEmpty())
-    {
+    if (!screenplay->version().isEmpty()) {
         QGraphicsTextItem *versionItem = new QGraphicsTextItem(this);
         versionItem->setPlainText(screenplay->version());
 
         QFont versionFont = ::applicationFont();
-        versionFont.setPointSize(versionFont.pointSize()+2);
+        versionFont.setPointSize(versionFont.pointSize() + 2);
         versionItem->setFont(versionFont);
         versionItem->setTextWidth(maxCoverPhotoSize.width());
         centerTextInDocument(versionItem->document());
@@ -1076,40 +1028,34 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
     contactInfoDoc->setDefaultFont(::applicationFont());
 
     QTextCursor cursor(contactInfoDoc);
-    if(!screenplay->contact().isEmpty())
-    {
+    if (!screenplay->contact().isEmpty()) {
         cursor.insertText(screenplay->contact());
         cursor.insertBlock();
     }
 
-    if(!screenplay->address().isEmpty())
-    {
+    if (!screenplay->address().isEmpty()) {
         cursor.insertText(screenplay->address());
         cursor.insertBlock();
     }
 
-    if(!screenplay->phoneNumber().isEmpty())
-    {
+    if (!screenplay->phoneNumber().isEmpty()) {
         cursor.insertText(screenplay->phoneNumber());
         cursor.insertBlock();
     }
 
-    if(!screenplay->email().isEmpty())
-    {
+    if (!screenplay->email().isEmpty()) {
         cursor.insertText(screenplay->email());
         cursor.insertBlock();
     }
 
-    if(!screenplay->website().isEmpty())
-    {
+    if (!screenplay->website().isEmpty()) {
         cursor.insertText(screenplay->website());
         cursor.insertBlock();
     }
 
-    if(contactInfoDoc->isEmpty())
+    if (contactInfoDoc->isEmpty())
         delete contactInfoDoc;
-    else
-    {
+    else {
         cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
         cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
 
@@ -1122,8 +1068,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         contactInfoDoc->setParent(contactInfoItem);
     }
 
-    if(!screenplay->logline().isEmpty())
-    {
+    if (!screenplay->logline().isEmpty()) {
         QGraphicsTextItem *loglineItem = new QGraphicsTextItem(this);
         loglineItem->setFont(::applicationFont());
 
@@ -1132,8 +1077,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         loglineItem->setTextWidth(maxCoverPhotoSize.width());
     }
 
-    if(!comment.isEmpty())
-    {
+    if (!comment.isEmpty()) {
         QGraphicsTextItem *commentItem = new QGraphicsTextItem(this);
         commentItem->setFont(::applicationFont());
 
@@ -1144,19 +1088,19 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
 
     QGraphicsSimpleTextItem *groupingInfoItem = new QGraphicsSimpleTextItem(this);
     groupingInfoItem->setFont(::applicationFont());
-    if(structure->preferredGroupCategory().isEmpty())
-        groupingInfoItem->setText( QStringLiteral("Grouping: Act Wise") );
+    if (structure->preferredGroupCategory().isEmpty())
+        groupingInfoItem->setText(QStringLiteral("Grouping: Act Wise"));
     else
-        groupingInfoItem->setText( QStringLiteral("Grouping: ") + structure->preferredGroupCategory() );
+        groupingInfoItem->setText(QStringLiteral("Grouping: ")
+                                  + structure->preferredGroupCategory());
 
     // Now lets layout all the items in a column
     QRectF boundingRect;
-    const QList<QGraphicsItem*> items = this->childItems();
-    for(QGraphicsItem *item : items)
-    {
+    const QList<QGraphicsItem *> items = this->childItems();
+    for (QGraphicsItem *item : items) {
         QRectF itemBoundingRect = item->boundingRect();
 
-        if(!boundingRect.isEmpty())
+        if (!boundingRect.isEmpty())
             item->setPos(boundingRect.bottomLeft() + QPointF(0, 20));
 
         itemBoundingRect.moveTopLeft(item->pos());
@@ -1165,21 +1109,15 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
 
     this->setRect(boundingRect.adjusted(-20, -20, 20, 20));
     this->setBrush(Qt::white);
-    this->setPen(QPen(Qt::black,2));
+    this->setPen(QPen(Qt::black, 2));
 
     // Now lets layout items horizontally to the center
-    for(QGraphicsItem *item : items)
-    {
+    for (QGraphicsItem *item : items) {
         QRectF itemRect = item->boundingRect();
         itemRect.moveTopLeft(item->pos());
-        itemRect.moveCenter( QPointF(boundingRect.center().x(), itemRect.center().y()) );
+        itemRect.moveCenter(QPointF(boundingRect.center().x(), itemRect.center().y()));
         item->setPos(itemRect.topLeft());
     }
 }
 
-StructureTitleCard::~StructureTitleCard()
-{
-
-}
-
-
+StructureTitleCard::~StructureTitleCard() { }

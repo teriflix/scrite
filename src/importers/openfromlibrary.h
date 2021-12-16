@@ -31,7 +31,7 @@ class LibraryService : public AbstractImporter
     Q_CLASSINFO("Format", "Library")
 
 public:
-    LibraryService(QObject *parent=nullptr);
+    LibraryService(QObject *parent = nullptr);
     ~LibraryService();
 
     // This this class cannot be used to import anything from a local file system
@@ -42,7 +42,7 @@ public:
     Q_SIGNAL void busyChanged();
 
     Q_PROPERTY(Library* screenplays READ screenplays CONSTANT)
-    static Library* screenplays();
+    static Library *screenplays();
 
     Q_PROPERTY(Library* templates READ templates CONSTANT)
     static Library *templates();
@@ -71,11 +71,7 @@ class Library : public QAbstractListModel
 public:
     ~Library();
 
-    enum Type
-    {
-        Screenplays,
-        Templates
-    };
+    enum Type { Screenplays, Templates };
     Q_ENUM(Type)
 
     Q_PROPERTY(Type type READ type CONSTANT)
@@ -98,13 +94,13 @@ public:
     enum Roles { RecordRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
     Q_INVOKABLE void reload();
 
 private:
     friend class LibraryService;
-    Library(Type type, QObject *parent=nullptr);
+    Library(Type type, QObject *parent = nullptr);
 
     void fetchRecords();
     void loadDatabase(const QByteArray &bytes);
@@ -115,7 +111,7 @@ private:
     Type m_type = Screenplays;
     bool m_busy = false;
     QJsonArray m_records;
-    const QUrl m_baseUrl = QUrl( QStringLiteral("http://www.teriflix.in/scrite/library/") );
+    const QUrl m_baseUrl = QUrl(QStringLiteral("http://www.teriflix.in/scrite/library/"));
 };
 
 #endif

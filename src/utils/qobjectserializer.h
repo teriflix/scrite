@@ -22,48 +22,51 @@
 
 #include "qobjectfactory.h"
 
-namespace QObjectSerializer
+namespace QObjectSerializer {
+class Helper
 {
-    class Helper
+public:
+    virtual ~Helper();
+    virtual bool canHandle(int type) const = 0;
+    virtual QJsonValue toJson(const QVariant &value) const = 0;
+    virtual QVariant fromJson(const QJsonValue &value, int type) const = 0;
+};
+void registerHelper(Helper *helper);
+
+class Interface
+{
+public:
+    virtual ~Interface();
+    virtual void prepareForSerialization() { }
+    virtual void prepareForDeserialization() { }
+    virtual bool canSerialize(const QMetaObject *, const QMetaProperty &) const { return true; }
+    virtual void serializeToJson(QJsonObject &) const { }
+    virtual void deserializeFromJson(const QJsonObject &) { }
+
+    virtual bool canSetPropertyFromObjectList(const QString & /*propName*/) const { return false; }
+    virtual void setPropertyFromObjectList(const QString & /*propName*/,
+                                           const QList<QObject *> & /*objects*/)
     {
-    public:
-        virtual ~Helper();
-        virtual bool canHandle(int type) const = 0;
-        virtual QJsonValue toJson(const QVariant &value) const = 0;
-        virtual QVariant fromJson(const QJsonValue &value, int type) const = 0;
-    };
-    void registerHelper(Helper *helper);
-
-    class Interface
-    {
-    public:
-        virtual ~Interface();
-        virtual void prepareForSerialization() { }
-        virtual void prepareForDeserialization() { }
-        virtual bool canSerialize(const QMetaObject *, const QMetaProperty &) const { return true; }
-        virtual void serializeToJson(QJsonObject &) const { }
-        virtual void deserializeFromJson(const QJsonObject &) { }
-
-        virtual bool canSetPropertyFromObjectList(const QString &/*propName*/) const { return false; }
-        virtual void setPropertyFromObjectList(const QString &/*propName*/, const QList<QObject*> &/*objects*/) { }
-    };
-
-    QString toJsonString(const QObject *object);
-    bool fromJsonString(const QString &json, QObject *object, QObjectFactory *factory=nullptr);
-
-    QJsonObject toJson(const QObject *object);
-    bool fromJson(const QJsonObject &json, QObject *object, QObjectFactory *factory=nullptr);
-
-    QVariantMap cacheDefaultPropertyValues(const QObject *object, bool readonly=false);
+    }
 };
 
-#define CACHE_DEFAULT_PROPERTY_VALUES \
-    static bool defaultPropertyValuesCached = false; \
-    if(!defaultPropertyValuesCached) { \
-        QObjectSerializer::cacheDefaultPropertyValues(this); \
-        defaultPropertyValuesCached = true; \
+QString toJsonString(const QObject *object);
+bool fromJsonString(const QString &json, QObject *object, QObjectFactory *factory = nullptr);
+
+QJsonObject toJson(const QObject *object);
+bool fromJson(const QJsonObject &json, QObject *object, QObjectFactory *factory = nullptr);
+
+QVariantMap cacheDefaultPropertyValues(const QObject *object, bool readonly = false);
+};
+
+#define CACHE_DEFAULT_PROPERTY_VALUES                                                              \
+    static bool defaultPropertyValuesCached = false;                                               \
+    if (!defaultPropertyValuesCached) {                                                            \
+        QObjectSerializer::cacheDefaultPropertyValues(this);                                       \
+        defaultPropertyValuesCached = true;                                                        \
     }
 
-Q_DECLARE_INTERFACE(QObjectSerializer::Interface, "com.prashanthudupa.QObjectSerializer.Interface/1.0")
+Q_DECLARE_INTERFACE(QObjectSerializer::Interface,
+                    "com.prashanthudupa.QObjectSerializer.Interface/1.0")
 
 #endif // QOBJECTSERIALIZER_H

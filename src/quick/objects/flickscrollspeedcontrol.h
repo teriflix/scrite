@@ -25,14 +25,14 @@ class FlickScrollSpeedControl : public QObject
     Q_OBJECT
 
 public:
-    FlickScrollSpeedControl(QObject *parent=nullptr);
+    FlickScrollSpeedControl(QObject *parent = nullptr);
     ~FlickScrollSpeedControl();
 
     static FlickScrollSpeedControl *qmlAttachedProperties(QObject *object);
 
     Q_PROPERTY(QQuickItem* flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
-    void setFlickable(QQuickItem* val);
-    QQuickItem* flickable() const { return m_flickable; }
+    void setFlickable(QQuickItem *val);
+    QQuickItem *flickable() const { return m_flickable; }
     Q_SIGNAL void flickableChanged();
 
     Q_PROPERTY(qreal defaultFlickDeceleration READ defaultFlickDeceleration WRITE setDefaultFlickDeceleration NOTIFY defaultFlickDecelerationChanged)
@@ -66,14 +66,16 @@ private:
 
 private:
     QObjectProperty<QQuickItem> m_flickable;
-    qreal m_defaultMaximumVelocity = 2500; // Value of QML_FLICK_DEFAULTMAXVELOCITY in qquickflickablebehavior_p.h
-    qreal m_defaultFlickDeceleration = 1500; // Value of QML_FLICK_DEFAULTDECELERATION in qquickflickablebehavior_p.h
+    qreal m_defaultMaximumVelocity =
+            2500; // Value of QML_FLICK_DEFAULTMAXVELOCITY in qquickflickablebehavior_p.h
+    qreal m_defaultFlickDeceleration =
+            1500; // Value of QML_FLICK_DEFAULTDECELERATION in qquickflickablebehavior_p.h
     qreal m_factor = 1.0;
     qreal m_maximumVelocityFactor = -1.0;
     qreal m_flickDecelerationFactor = -1.0;
 };
 
-Q_DECLARE_METATYPE(FlickScrollSpeedControl*)
+Q_DECLARE_METATYPE(FlickScrollSpeedControl *)
 QML_DECLARE_TYPEINFO(FlickScrollSpeedControl, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // FLICKSCROLLSPEEDCONTROL_H

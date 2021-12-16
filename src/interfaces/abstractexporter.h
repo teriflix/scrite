@@ -42,20 +42,24 @@ public:
     Q_PROPERTY(bool canBundleFonts READ canBundleFonts CONSTANT)
     virtual bool canBundleFonts() const { return false; }
 
-    Q_INVOKABLE void bundleFontForLanguage(int language, bool on=true) {
+    Q_INVOKABLE void bundleFontForLanguage(int language, bool on = true)
+    {
         m_languageBundleMap[TransliterationEngine::Language(language)] = on;
     }
-    Q_INVOKABLE bool isFontForLanguageBundled(int language) const {
+    Q_INVOKABLE bool isFontForLanguageBundled(int language) const
+    {
         return m_languageBundleMap.value(TransliterationEngine::Language(language), false);
     }
 
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
     virtual bool requiresConfiguration() const { return false; }
 
-    Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value) {
-        return this->setProperty(qPrintable(name),value);
+    Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value)
+    {
+        return this->setProperty(qPrintable(name), value);
     }
-    Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const {
+    Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const
+    {
         return this->property(qPrintable(name));
     }
 
@@ -66,15 +70,16 @@ public:
     Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
 
 protected:
-    AbstractExporter(QObject *parent=nullptr);
+    AbstractExporter(QObject *parent = nullptr);
     virtual bool doExport(QIODevice *device) = 0;
 
-    QMap<TransliterationEngine::Language,bool> languageBundleMap() const {
+    QMap<TransliterationEngine::Language, bool> languageBundleMap() const
+    {
         return m_languageBundleMap;
     }
 
 private:
-    QMap<TransliterationEngine::Language,bool> m_languageBundleMap;
+    QMap<TransliterationEngine::Language, bool> m_languageBundleMap;
 };
 
 #endif // ABSTRACTEXPORTER_H

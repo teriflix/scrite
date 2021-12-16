@@ -27,7 +27,7 @@ class StructureExporterScene : public PdfExportableGraphicsScene
     Q_OBJECT
 
 public:
-    StructureExporterScene(const StructureExporter *exporter, QObject *parent=nullptr);
+    StructureExporterScene(const StructureExporter *exporter, QObject *parent = nullptr);
     ~StructureExporterScene();
 };
 
@@ -41,7 +41,8 @@ public:
 class StructureIndexCardConnector : public QGraphicsPathItem
 {
 public:
-    StructureIndexCardConnector(const StructureIndexCard *from, const StructureIndexCard *to, const QString &label);
+    StructureIndexCardConnector(const StructureIndexCard *from, const StructureIndexCard *to,
+                                const QString &label);
     ~StructureIndexCardConnector();
 };
 
@@ -73,7 +74,8 @@ public:
 class StructureRectAnnotation : public QGraphicsRectItem
 {
 public:
-    StructureRectAnnotation(const Annotation *annotation, const QString &bgColorAttr = QStringLiteral("color"));
+    StructureRectAnnotation(const Annotation *annotation,
+                            const QString &bgColorAttr = QStringLiteral("color"));
     ~StructureRectAnnotation();
 };
 

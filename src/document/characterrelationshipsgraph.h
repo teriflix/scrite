@@ -33,7 +33,7 @@ public:
     ~CharacterRelationshipsGraphNode();
 
     Q_PROPERTY(Character* character READ character NOTIFY characterChanged RESET resetCharacter)
-    Character* character() const { return m_character; }
+    Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
     Q_PROPERTY(bool marked READ isMarked WRITE setMarked NOTIFY markedChanged)
@@ -46,8 +46,8 @@ public:
     Q_SIGNAL void rectChanged();
 
     Q_PROPERTY(QQuickItem* item READ item WRITE setItem NOTIFY itemChanged RESET resetItem)
-    void setItem(QQuickItem* val);
-    QQuickItem* item() const { return m_item; }
+    void setItem(QQuickItem *val);
+    QQuickItem *item() const { return m_item; }
     Q_SIGNAL void itemChanged();
 
     bool isPlaced() const { return !m_rect.isNull(); }
@@ -65,8 +65,8 @@ protected:
 
 protected:
     friend class CharacterRelationshipsGraph;
-    CharacterRelationshipsGraphNode(QObject *parent=nullptr);
-    void setCharacter(Character* val);
+    CharacterRelationshipsGraphNode(QObject *parent = nullptr);
+    void setCharacter(Character *val);
     void resetCharacter();
     void resetItem();
     void updateRectFromItem();
@@ -92,7 +92,7 @@ public:
     ~CharacterRelationshipsGraphEdge();
 
     Q_PROPERTY(Relationship* relationship READ relationship NOTIFY relationshipChanged RESET resetRelationship)
-    Relationship* relationship() const { return m_relationship; }
+    Relationship *relationship() const { return m_relationship; }
     Q_SIGNAL void relationshipChanged();
 
     Q_PROPERTY(QString forwardLabel READ forwardLabel NOTIFY forwardLabelChanged)
@@ -130,8 +130,9 @@ public:
 
 protected:
     friend class CharacterRelationshipsGraph;
-    CharacterRelationshipsGraphEdge(CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to, QObject *parent=nullptr);
-    void setRelationship(Relationship* val);
+    CharacterRelationshipsGraphEdge(CharacterRelationshipsGraphNode *from,
+                                    CharacterRelationshipsGraphNode *to, QObject *parent = nullptr);
+    void setRelationship(Relationship *val);
     void resetRelationship();
     void setPath(const QPainterPath &val);
     void setForwardLabel(const QString &val);
@@ -159,13 +160,15 @@ public:
     ~CharacterRelationshipsGraph();
 
     Q_PROPERTY(QAbstractListModel* nodes READ nodes CONSTANT STORED false)
-    QAbstractListModel *nodes() const {
-        return &((const_cast<CharacterRelationshipsGraph*>(this))->m_nodes);
+    QAbstractListModel *nodes() const
+    {
+        return &((const_cast<CharacterRelationshipsGraph *>(this))->m_nodes);
     }
 
     Q_PROPERTY(QAbstractListModel* edges READ edges CONSTANT STORED false)
-    QAbstractListModel *edges() const {
-        return &(const_cast<CharacterRelationshipsGraph*>(this))->m_edges;
+    QAbstractListModel *edges() const
+    {
+        return &(const_cast<CharacterRelationshipsGraph *>(this))->m_edges;
     }
 
     Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
@@ -178,18 +181,18 @@ public:
     Q_SIGNAL void nodeSizeChanged();
 
     Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged RESET resetStructure)
-    void setStructure(Structure* val);
-    Structure* structure() const { return m_structure; }
+    void setStructure(Structure *val);
+    Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
-    void setScene(Scene* val);
-    Scene* scene() const { return m_scene; }
+    void setScene(Scene *val);
+    Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
     Q_PROPERTY(Character* character READ character WRITE setCharacter NOTIFY characterChanged RESET resetCharacter)
-    void setCharacter(Character* val);
-    Character* character() const { return m_character; }
+    void setCharacter(Character *val);
+    Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
     Q_PROPERTY(QString title READ title NOTIFY titleChanged)
@@ -274,7 +277,7 @@ private:
     bool m_dirty = false;
     int m_maxTime = 100;
     QString m_title;
-    QSizeF m_nodeSize = QSizeF(100,100);
+    QSizeF m_nodeSize = QSizeF(100, 100);
     qreal m_topMargin = 0;
     qreal m_leftMargin = 0;
     qreal m_rightMargin = 0;
@@ -282,13 +285,13 @@ private:
     int m_maxIterations = -1;
     QObjectProperty<Scene> m_scene;
     bool m_componentLoaded = false;
-    QRectF m_graphBoundingRect = QRectF(0,0,500,500);
+    QRectF m_graphBoundingRect = QRectF(0, 0, 500, 500);
     ExecLaterTimer m_loadTimer;
     ErrorReport *m_errorReport = new ErrorReport(this);
     QObjectProperty<Character> m_character;
     QObjectProperty<Structure> m_structure;
-    ObjectListPropertyModel<CharacterRelationshipsGraphNode*> m_nodes;
-    ObjectListPropertyModel<CharacterRelationshipsGraphEdge*> m_edges;
+    ObjectListPropertyModel<CharacterRelationshipsGraphNode *> m_nodes;
+    ObjectListPropertyModel<CharacterRelationshipsGraphEdge *> m_edges;
 };
 
 #endif // CHARACTERRELATIONSHIPSGRAPH_H

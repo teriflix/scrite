@@ -153,10 +153,10 @@ private:
 
 private:
 #ifdef REST_API_LOCALHOST
-    QUrl m_host = QUrl( QStringLiteral("http://localhost:8934") );
+    QUrl m_host = QUrl(QStringLiteral("http://localhost:8934"));
     QString m_root;
 #else
-    QUrl m_host = QUrl( QStringLiteral("https://www.scrite.io") );
+    QUrl m_host = QUrl(QStringLiteral("https://www.scrite.io"));
     QString m_root = QStringLiteral("api");
 #endif // REST_API_LOCALHOST
     Type m_type = POST;
@@ -169,8 +169,9 @@ private:
     bool m_autoDelete = true;
     bool m_isQmlInstance = false;
     QNetworkReply *m_reply = nullptr;
-    bool m_reportNetworkErrors = false; // when false, networkError() signal is emited to report
-                                        // network errors. When true, they are reported via error() also.
+    bool m_reportNetworkErrors =
+            false; // when false, networkError() signal is emited to report
+                   // network errors. When true, they are reported via error() also.
 };
 
 #endif // JSONHTTPREQUEST_H

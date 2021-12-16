@@ -13,8 +13,7 @@
 
 #include "delayedpropertybinder.h"
 
-DelayedPropertyBinder::DelayedPropertyBinder(QQuickItem *parent)
-    : QQuickItem(parent)
+DelayedPropertyBinder::DelayedPropertyBinder(QQuickItem *parent) : QQuickItem(parent)
 {
     this->setFlag(ItemHasContents, false);
     this->setVisible(false);
@@ -28,31 +27,26 @@ DelayedPropertyBinder::DelayedPropertyBinder(QQuickItem *parent)
 #endif
 }
 
-DelayedPropertyBinder::~DelayedPropertyBinder()
-{
-
-}
+DelayedPropertyBinder::~DelayedPropertyBinder() { }
 
 void DelayedPropertyBinder::setName(const QString &val)
 {
-    if(m_name == val)
+    if (m_name == val)
         return;
 
     m_name = val;
 
 #ifndef QT_NO_DEBUG
-    if(m_name.isEmpty())
-    {
+    if (m_name.isEmpty()) {
         connect(this, &QQuickItem::parentChanged, this, &DelayedPropertyBinder::parentHasChanged);
         this->parentHasChanged();
-    }
-    else
-    {
+    } else {
         m_timer.setName("DelayedPropertyBinder.m_timer[" + m_name + "]");
-        disconnect(this, &QQuickItem::parentChanged, this, &DelayedPropertyBinder::parentHasChanged);
+        disconnect(this, &QQuickItem::parentChanged, this,
+                   &DelayedPropertyBinder::parentHasChanged);
     }
 #else
-    if(m_name.isEmpty())
+    if (m_name.isEmpty())
         m_timer.setName("DelayedPropertyBinder.m_timer");
     else
         m_timer.setName("DelayedPropertyBinder.m_timer[" + m_name + "]");
@@ -63,7 +57,7 @@ void DelayedPropertyBinder::setName(const QString &val)
 
 void DelayedPropertyBinder::setSet(const QVariant &val)
 {
-    if(m_set == val)
+    if (m_set == val)
         return;
 
     m_set = val;
@@ -74,18 +68,18 @@ void DelayedPropertyBinder::setSet(const QVariant &val)
 
 void DelayedPropertyBinder::setInitial(const QVariant &val)
 {
-    if(m_initial == val || m_initial.isValid())
+    if (m_initial == val || m_initial.isValid())
         return;
 
     m_initial = val;
     emit initialChanged();
 
-    this->setGet( val );
+    this->setGet(val);
 }
 
 void DelayedPropertyBinder::setGet(const QVariant &val)
 {
-    if(m_get == val)
+    if (m_get == val)
         return;
 
     m_get = val;
@@ -94,7 +88,7 @@ void DelayedPropertyBinder::setGet(const QVariant &val)
 
 void DelayedPropertyBinder::setDelay(int val)
 {
-    if(m_delay == val || val < 0 || val >= 10000)
+    if (m_delay == val || val < 0 || val >= 10000)
         return;
 
     m_delay = val;
@@ -105,7 +99,7 @@ void DelayedPropertyBinder::setDelay(int val)
 
 void DelayedPropertyBinder::schedule()
 {
-    if( !this->isEnabled() )
+    if (!this->isEnabled())
         return;
 
     m_timer.start(m_delay, this);
@@ -113,25 +107,23 @@ void DelayedPropertyBinder::schedule()
 
 void DelayedPropertyBinder::timerEvent(QTimerEvent *te)
 {
-    if(te->timerId() == m_timer.timerId())
-    {
+    if (te->timerId() == m_timer.timerId()) {
         m_timer.stop();
 
-        if( this->isEnabled() )
-            this->setGet( this->set() );
+        if (this->isEnabled())
+            this->setGet(this->set());
     }
 }
 
 void DelayedPropertyBinder::parentHasChanged()
 {
 #ifndef QT_NO_DEBUG
-    if(m_name.isEmpty())
-    {
+    if (m_name.isEmpty()) {
         const QQuickItem *parentItem = this->parentItem();
         const QMetaObject *parentMO = parentItem ? parentItem->metaObject() : nullptr;
-        const QString name = parentMO ? QString::fromLatin1(parentMO->className()) : QStringLiteral("Unknown");
+        const QString name =
+                parentMO ? QString::fromLatin1(parentMO->className()) : QStringLiteral("Unknown");
         m_timer.setName("DelayedPropertyBinder.m_timer[" + name + "]");
     }
 #endif
 }
-

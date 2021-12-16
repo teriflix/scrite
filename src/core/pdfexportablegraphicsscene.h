@@ -26,7 +26,7 @@ class PdfExportableGraphicsScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    PdfExportableGraphicsScene(QObject *parent=nullptr);
+    PdfExportableGraphicsScene(QObject *parent = nullptr);
     ~PdfExportableGraphicsScene();
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -44,8 +44,7 @@ public:
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();
 
-    enum StandardItems
-    {
+    enum StandardItems {
         HeaderLayer = 1,
         FooterLayer = 2,
         HeaderFooterLayer = 3,
@@ -54,14 +53,13 @@ public:
         HeaderFooterAndWatermarkUnderlay = 7,
         DontIncludeScriteLink = 16
     };
-    void addStandardItems(int items=HeaderFooterAndWatermarkUnderlay);
+    void addStandardItems(int items = HeaderFooterAndWatermarkUnderlay);
 
     bool exportToPdf(const QString &fileName);
     bool exportToPdf(QIODevice *device);
     bool exportToPdf(QPdfWriter *pdfWriter);
 
 protected:
-
 private:
     QString m_title;
     QString m_comment;
@@ -71,7 +69,8 @@ private:
 class GraphicsHeaderFooterItem : public QGraphicsItem
 {
 public:
-    GraphicsHeaderFooterItem(HeaderFooter *headerFooter, const QMap<HeaderFooter::Field, QString> &fields);
+    GraphicsHeaderFooterItem(HeaderFooter *headerFooter,
+                             const QMap<HeaderFooter::Field, QString> &fields);
     ~GraphicsHeaderFooterItem();
 
     void setRect(const QRectF &rect);
@@ -84,7 +83,7 @@ public:
 private:
     QRectF m_rect;
     HeaderFooter *m_headerFooter = nullptr;
-    QMap<HeaderFooter::Field,QString> m_fields;
+    QMap<HeaderFooter::Field, QString> m_fields;
 };
 
 class GraphicsWatermarkItem : public QGraphicsItem

@@ -16,17 +16,13 @@
 ScreenplaySubsetReport::ScreenplaySubsetReport(QObject *parent)
     : AbstractScreenplaySubsetReport(parent)
 {
-
 }
 
-ScreenplaySubsetReport::~ScreenplaySubsetReport()
-{
-
-}
+ScreenplaySubsetReport::~ScreenplaySubsetReport() { }
 
 void ScreenplaySubsetReport::setSceneNumbers(const QList<int> &val)
 {
-    if(m_sceneNumbers == val)
+    if (m_sceneNumbers == val)
         return;
 
     m_sceneNumbers = val;
@@ -36,7 +32,7 @@ void ScreenplaySubsetReport::setSceneNumbers(const QList<int> &val)
 
 void ScreenplaySubsetReport::setGenerateSummary(bool val)
 {
-    if(m_generateSummary == val)
+    if (m_generateSummary == val)
         return;
 
     m_generateSummary = val;
@@ -45,7 +41,7 @@ void ScreenplaySubsetReport::setGenerateSummary(bool val)
 
 bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
-    if(element->scene() == nullptr)
+    if (element->scene() == nullptr)
         return false;
 
     return m_sceneNumbers.isEmpty() || m_sceneNumbers.contains(element->elementIndex());
@@ -53,10 +49,11 @@ bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *e
 
 QString ScreenplaySubsetReport::screenplaySubtitle() const
 {
-    if(m_sceneNumbers.isEmpty())
+    if (m_sceneNumbers.isEmpty())
         return QStringLiteral("All scenes of the screenplay.");
 
-    return QStringLiteral("Snapshot of ") + QString::number(m_sceneNumbers.size()) + QStringLiteral(" scene(s).");
+    return QStringLiteral("Snapshot of ") + QString::number(m_sceneNumbers.size())
+            + QStringLiteral(" scene(s).");
 }
 
 void ScreenplaySubsetReport::configureScreenplayTextDocument(ScreenplayTextDocument &stDoc)
@@ -64,11 +61,13 @@ void ScreenplaySubsetReport::configureScreenplayTextDocument(ScreenplayTextDocum
     Q_UNUSED(stDoc);
 }
 
-void ScreenplaySubsetReport::inject(QTextCursor &cursor, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
+void ScreenplaySubsetReport::inject(
+        QTextCursor &cursor,
+        AbstractScreenplayTextDocumentInjectionInterface::InjectLocation location)
 {
     AbstractScreenplaySubsetReport::inject(cursor, location);
 
-    if(location != AfterTitlePage || !m_generateSummary)
+    if (location != AfterTitlePage || !m_generateSummary)
         return;
 
     const QFont defaultFont = this->document()->printFormat()->defaultFont();
@@ -103,14 +102,14 @@ void ScreenplaySubsetReport::inject(QTextCursor &cursor, AbstractScreenplayTextD
     blockFormat.setIndent(2);
 
     const Screenplay *screenplay = this->screenplaySubset();
-    for(int i=0; i<screenplay->elementCount(); i++)
-    {
+    for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if(element->scene() == nullptr || !element->scene()->heading()->isEnabled())
+        if (element->scene() == nullptr || !element->scene()->heading()->isEnabled())
             continue;
 
         cursor.insertBlock(blockFormat, charFormat);
-        cursor.insertText( QStringLiteral("[") + element->resolvedSceneNumber() + QStringLiteral("] - ") + element->scene()->heading()->text() );
+        cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber()
+                          + QStringLiteral("] - ") + element->scene()->heading()->text());
     }
 
     blockFormat = defaultBlockFormat;

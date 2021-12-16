@@ -18,15 +18,14 @@
 #include <QThread>
 
 #ifndef QT_NO_DEBUG
-Q_GLOBAL_STATIC(QList<ExecLaterTimer*>, ExecLaterTimerList)
+Q_GLOBAL_STATIC(QList<ExecLaterTimer *>, ExecLaterTimerList)
 #endif
 
 ExecLaterTimer *ExecLaterTimer::get(int timerId)
 {
 #ifndef QT_NO_DEBUG
-    Q_FOREACH(ExecLaterTimer *timer, *ExecLaterTimerList)
-    {
-        if(timer->timerId() == timerId)
+    Q_FOREACH (ExecLaterTimer *timer, *ExecLaterTimerList) {
+        if (timer->timerId() == timerId)
             return timer;
     }
 #else
@@ -36,8 +35,7 @@ ExecLaterTimer *ExecLaterTimer::get(int timerId)
     return nullptr;
 }
 
-ExecLaterTimer::ExecLaterTimer(const QString &name, QObject *parent)
-    : QObject(parent), m_name(name)
+ExecLaterTimer::ExecLaterTimer(const QString &name, QObject *parent) : QObject(parent), m_name(name)
 {
 #ifndef QT_NO_DEBUG
     ExecLaterTimerList->append(this);
@@ -60,7 +58,7 @@ ExecLaterTimer::~ExecLaterTimer()
 
 void ExecLaterTimer::setName(const QString &val)
 {
-    if(m_name == val)
+    if (m_name == val)
         return;
 
     m_name = val;
@@ -69,7 +67,7 @@ void ExecLaterTimer::setName(const QString &val)
 
 void ExecLaterTimer::setRepeat(bool val)
 {
-    if(m_repeat == val)
+    if (m_repeat == val)
         return;
 
     m_repeat = val;
@@ -79,29 +77,26 @@ void ExecLaterTimer::setRepeat(bool val)
 
 void ExecLaterTimer::start(int msec, QObject *object)
 {
-    if(m_timer.isActive())
+    if (m_timer.isActive())
         this->stop();
 
-    if(object == nullptr || m_destroyed)
+    if (object == nullptr || m_destroyed)
         return;
 
-    if(object != m_object)
-    {
-        if(object)
+    if (object != m_object) {
+        if (object)
             disconnect(object, &QObject::destroyed, this, &ExecLaterTimer::onObjectDestroyed);
 
         m_object = object;
 
-        if(m_object)
+        if (m_object)
             connect(object, &QObject::destroyed, this, &ExecLaterTimer::onObjectDestroyed);
     }
 
-    if(this->thread() != nullptr && this->thread()->eventDispatcher() != nullptr)
-    {
+    if (this->thread() != nullptr && this->thread()->eventDispatcher() != nullptr) {
         m_timer.start(msec);
         m_timerId = m_timer.timerId();
-    }
-    else
+    } else
         m_timerId = -1;
 }
 
@@ -113,8 +108,7 @@ void ExecLaterTimer::stop()
 
 void ExecLaterTimer::onTimeout()
 {
-    if(m_object != nullptr && m_timerId >= 0)
-    {
+    if (m_object != nullptr && m_timerId >= 0) {
 #ifndef QT_NO_DEBUG
         qDebug() << "Posting Timer [" << m_name << "]." << m_timerId << " to " << m_object;
 #endif
@@ -124,8 +118,7 @@ void ExecLaterTimer::onTimeout()
 
 void ExecLaterTimer::onObjectDestroyed(QObject *ptr)
 {
-    if(m_object == ptr)
-    {
+    if (m_object == ptr) {
         m_object = nullptr;
         this->stop();
     }

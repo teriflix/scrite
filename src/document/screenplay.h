@@ -35,7 +35,7 @@ class ScreenplayElement : public QObject, public Modifiable, public QObjectSeria
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Q_INVOKABLE ScreenplayElement(QObject *parent=nullptr);
+    Q_INVOKABLE ScreenplayElement(QObject *parent = nullptr);
     ~ScreenplayElement();
     Q_SIGNAL void aboutToDelete(ScreenplayElement *element);
 
@@ -51,11 +51,7 @@ public:
     int episodeIndex() const { return m_episodeIndex; }
     Q_SIGNAL void episodeIndexChanged();
 
-    enum ElementType
-    {
-        SceneElementType,
-        BreakElementType
-    };
+    enum ElementType { SceneElementType, BreakElementType };
     Q_ENUM(ElementType)
     Q_PROPERTY(ElementType elementType READ elementType WRITE setElementType NOTIFY elementTypeChanged)
     void setElementType(ElementType val);
@@ -78,7 +74,7 @@ public:
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged STORED false RESET resetScreenplay)
     void setScreenplay(Screenplay *val);
-    Screenplay* screenplay() const { return m_screenplay; }
+    Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(QString sceneID READ sceneID WRITE setSceneFromID NOTIFY sceneChanged)
@@ -86,7 +82,10 @@ public:
     QString sceneID() const;
 
     Q_PROPERTY(int sceneNumber READ sceneNumber NOTIFY sceneNumberChanged)
-    int sceneNumber() const { return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber; }
+    int sceneNumber() const
+    {
+        return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber;
+    }
     Q_SIGNAL void sceneNumberChanged();
 
     Q_PROPERTY(QString userSceneNumber READ userSceneNumber WRITE setUserSceneNumber NOTIFY userSceneNumberChanged)
@@ -103,7 +102,7 @@ public:
 
     Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false RESET resetScene)
     void setScene(Scene *val);
-    Scene* scene() const { return m_scene; }
+    Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
     Q_PROPERTY(bool expanded READ isExpanded WRITE setExpanded NOTIFY expandedChanged)
@@ -132,11 +131,14 @@ public:
     Q_SIGNAL void breakSummaryChanged();
 
     Q_PROPERTY(Notes* notes READ notes NOTIFY notesChanged)
-    Notes* notes() const { return m_notes ? m_notes : (m_scene ? m_scene->notes() : nullptr); }
+    Notes *notes() const { return m_notes ? m_notes : (m_scene ? m_scene->notes() : nullptr); }
     Q_SIGNAL void notesChanged();
 
     Q_PROPERTY(Attachments* attachments READ attachments NOTIFY attachmentsChanged)
-    Attachments *attachments() const { return m_attachments ? m_attachments : (m_scene ? m_scene->attachments() : nullptr); }
+    Attachments *attachments() const
+    {
+        return m_attachments ? m_attachments : (m_scene ? m_scene->attachments() : nullptr);
+    }
     Q_SIGNAL void attachmentsChanged();
 
     Q_INVOKABLE void toggleSelection() { this->setSelected(!m_selected); }
@@ -180,7 +182,7 @@ private:
     int m_episodeIndex = -1;
     int m_sceneNumber = -1;
     QString m_sceneID;
-    Notes* m_notes = nullptr;
+    Notes *m_notes = nullptr;
     Attachments *m_attachments = nullptr;
     QString m_breakTitle;
     QJsonValue m_userData;
@@ -201,12 +203,12 @@ class Screenplay : public QAbstractListModel, public Modifiable, public QObjectS
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Screenplay(QObject *parent=nullptr);
+    Screenplay(QObject *parent = nullptr);
     ~Screenplay();
     Q_SIGNAL void aboutToDelete(Screenplay *ptr);
 
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
-    ScriteDocument* scriteDocument() const { return m_scriteDocument; }
+    ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     void setTitle(const QString &val);
@@ -316,35 +318,34 @@ public:
 
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
 
-    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element,
+                                                int textPosition);
     Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
 
     Q_INVOKABLE void removeSceneElements(Scene *scene);
     Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
-    Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max=-1) const;
-    QList<ScreenplayElement*> sceneElements(Scene *scene, int max=-1) const;
+    Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max = -1) const;
+    QList<ScreenplayElement *> sceneElements(Scene *scene, int max = -1) const;
     Q_INVOKABLE int firstSceneIndex() const;
     Q_INVOKABLE int lastSceneIndex() const;
     Q_INVOKABLE QList<int> sceneElementsInBreak(ScreenplayElement *element) const;
 
     int dialogueCount() const;
-    QList<ScreenplayElement*> getElements() const { return m_elements; }
-    QList<ScreenplayElement*> getFilteredElements(std::function<bool(ScreenplayElement*item)> filterFunc) const;
-    bool setElements(const QList<ScreenplayElement*> &list);
+    QList<ScreenplayElement *> getElements() const { return m_elements; }
+    QList<ScreenplayElement *>
+    getFilteredElements(std::function<bool(ScreenplayElement *item)> filterFunc) const;
+    bool setElements(const QList<ScreenplayElement *> &list);
 
-    enum BreakType
-    {
-        Act,
-        Episode,
-        Chapter = Episode,
-        Interval
-    };
+    enum BreakType { Act, Episode, Chapter = Episode, Interval };
     Q_ENUM(BreakType)
     Q_INVOKABLE void addBreakElement(BreakType type);
     Q_INVOKABLE void addBreakElementI(int type) { this->addBreakElement(BreakType(type)); }
     Q_INVOKABLE void insertBreakElement(BreakType type, int index);
-    Q_INVOKABLE void insertBreakElementI(int type, int index) { this->insertBreakElement(BreakType(type), index); }
+    Q_INVOKABLE void insertBreakElementI(int type, int index)
+    {
+        this->insertBreakElement(BreakType(type), index);
+    }
     Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
     void updateBreakTitlesLater();
@@ -372,14 +373,14 @@ public:
     Q_INVOKABLE int nextSceneElementIndex();
 
     Q_PROPERTY(Scene* activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged STORED false RESET resetActiveScene)
-    void setActiveScene(Scene* val);
-    Scene* activeScene() const { return m_activeScene; }
+    void setActiveScene(Scene *val);
+    Scene *activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
 
     Q_SIGNAL void sceneReset(int sceneIndex, int sceneElementIndex);
 
-    Q_INVOKABLE QJsonArray search(const QString &text, int flags=0) const;
-    Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags=0);
+    Q_INVOKABLE QJsonArray search(const QString &text, int flags = 0) const;
+    Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags = 0);
 
     Q_PROPERTY(int minimumParagraphCount READ minimumParagraphCount NOTIFY paragraphCountChanged)
     int minimumParagraphCount() const { return m_minimumParagraphCount; }
@@ -396,13 +397,19 @@ public:
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
     bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
 
     // QAbstractItemModel interface
-    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole };
+    enum Roles {
+        IdRole = Qt::UserRole,
+        ScreenplayElementRole,
+        ScreenplayElementTypeRole,
+        BreakTypeRole,
+        SceneRole
+    };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
 protected:
     bool event(QEvent *event);
@@ -417,7 +424,7 @@ protected:
     void setHasNonStandardScenes(bool val);
     void setHasTitlePageAttributes(bool val);
     void evaluateHasTitlePageAttributes();
-    QList<ScreenplayElement*> takeSelectedElements();
+    QList<ScreenplayElement *> takeSelectedElements();
     void setActCount(int val);
     void setSceneCount(int val);
     void setEpisodeCount(int val);
@@ -445,12 +452,14 @@ private:
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
     friend class ScreenplayTextDocument;
 
-    static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);
+    static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list,
+                                    ScreenplayElement *ptr);
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);
-    static ScreenplayElement* staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index);
+    static ScreenplayElement *staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index);
     static int staticElementCount(QQmlListProperty<ScreenplayElement> *list);
-    QList<ScreenplayElement *> m_elements; // We dont use ObjectListPropertyModel<ScreenplayElement*> for this because
-                                           // the Screenplay class is already a list model of screenplay elements.
+    QList<ScreenplayElement *>
+            m_elements; // We dont use ObjectListPropertyModel<ScreenplayElement*> for this because
+                        // the Screenplay class is already a list model of screenplay elements.
     int m_currentElementIndex = -1;
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;
@@ -472,12 +481,12 @@ class ScreenplayTracks : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ScreenplayTracks(QObject *parent=nullptr);
+    ScreenplayTracks(QObject *parent = nullptr);
     ~ScreenplayTracks();
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
-    void setScreenplay(Screenplay* val);
-    Screenplay* screenplay() const { return m_screenplay; }
+    void setScreenplay(Screenplay *val);
+    Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(int trackCount READ trackCount NOTIFY trackCountChanged)
@@ -488,7 +497,7 @@ public:
     enum { ModelDataRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
 protected:
     void timerEvent(QTimerEvent *te);
@@ -500,7 +509,7 @@ private:
 
 private:
     QObjectProperty<Screenplay> m_screenplay;
-    QList< QVariantMap > m_data;
+    QList<QVariantMap> m_data;
     ExecLaterTimer m_refreshTimer;
 };
 

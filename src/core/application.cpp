@@ -57,18 +57,17 @@ bool QtApplicationEventNotificationCallback(void **cbdata);
 
 Application *Application::instance()
 {
-    return qobject_cast<Application*>(qApp);
+    return qobject_cast<Application *>(qApp);
 }
 
 Application::Application(int &argc, char **argv, const QVersionNumber &version)
-    : QtApplicationClass(argc, argv),
-      m_versionNumber(version)
+    : QtApplicationClass(argc, argv), m_versionNumber(version)
 {
     QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-BoldItalic.ttf"));
     QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Regular.ttf"));
     QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Italic.ttf"));
     QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Bold.ttf"));
-    this->setFont( QFont( QStringLiteral("Rubik") ) );
+    this->setFont(QFont(QStringLiteral("Rubik")));
 
     connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
     connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
@@ -76,43 +75,47 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     connect(m_undoGroup, &QUndoGroup::redoTextChanged, this, &Application::redoTextChanged);
     connect(this, &QGuiApplication::fontChanged, this, &Application::applicationFontChanged);
 
-    this->setWindowIcon( QIcon(":/images/appicon.png") );
-    this->setBaseWindowTitle(Application::applicationName() + " " + Application::applicationVersion());
+    this->setWindowIcon(QIcon(":/images/appicon.png"));
+    this->setBaseWindowTitle(Application::applicationName() + " "
+                             + Application::applicationVersion());
 
-    const QString settingsFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
+    const QString settingsFile =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                    .absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
     this->installationId();
     this->installationTimestamp();
-    m_settings->setValue( QStringLiteral("Installation/launchCount"), this->launchCounter()+1);
+    m_settings->setValue(QStringLiteral("Installation/launchCount"), this->launchCounter() + 1);
 
-    if( m_settings->value( QStringLiteral("Installation/fileTypeRegistered") , false).toBool() == false )
-    {
+    if (m_settings->value(QStringLiteral("Installation/fileTypeRegistered"), false).toBool()
+        == false) {
         const bool rft = this->registerFileTypes();
-        m_settings->setValue( QStringLiteral("Installation/fileTypeRegistered"), rft );
-        if(rft)
-            m_settings->setValue( QStringLiteral("Installation/path"), this->applicationFilePath() );
+        m_settings->setValue(QStringLiteral("Installation/fileTypeRegistered"), rft);
+        if (rft)
+            m_settings->setValue(QStringLiteral("Installation/path"), this->applicationFilePath());
     }
 
 #ifndef QT_NO_DEBUG
-    QInternal::registerCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
+    QInternal::registerCallback(QInternal::EventNotifyCallback,
+                                QtApplicationEventNotificationCallback);
 #endif
 
-    const QVersionNumber sversion = QVersionNumber::fromString( m_settings->value( QStringLiteral("Installation/version") ).toString() );
-    if(sversion.isNull() || sversion == QVersionNumber(0,4,7))
-    {
+    const QVersionNumber sversion = QVersionNumber::fromString(
+            m_settings->value(QStringLiteral("Installation/version")).toString());
+    if (sversion.isNull() || sversion == QVersionNumber(0, 4, 7)) {
         // until we can fix https://github.com/teriflix/scrite/issues/138
         m_settings->setValue("Screenplay Editor/enableSpellCheck", false);
     }
-    m_settings->setValue( QStringLiteral("Installation/version"), m_versionNumber.toString() );
+    m_settings->setValue(QStringLiteral("Installation/version"), m_versionNumber.toString());
 
-    if(sversion.isNull() || sversion <= QVersionNumber(0,5,3))
-    {
+    if (sversion.isNull() || sversion <= QVersionNumber(0, 5, 3)) {
         const QString customResKey = QStringLiteral("ScreenplayPageLayout/customResolution");
-        const QString forceCustomResKey = QStringLiteral("ScreenplayPageLayout/forceCustomResolution");
+        const QString forceCustomResKey =
+                QStringLiteral("ScreenplayPageLayout/forceCustomResolution");
         const bool customResAlreadySet = m_settings->value(customResKey, 0).toDouble() > 0;
-        const bool forceCustomRes = !customResAlreadySet && m_settings->value(forceCustomResKey, true).toBool();
-        if(forceCustomRes)
-        {
+        const bool forceCustomRes =
+                !customResAlreadySet && m_settings->value(forceCustomResKey, true).toBool();
+        if (forceCustomRes) {
 #ifdef Q_OS_MAC
             m_settings->setValue(customResKey, 72);
 #endif
@@ -131,8 +134,8 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     m_networkConfiguration = new QNetworkConfigurationManager(this);
     m_networkConfiguration->allConfigurations(QNetworkConfiguration::Active);
-    connect(m_networkConfiguration, &QNetworkConfigurationManager::onlineStateChanged,
-            this, &Application::internetAvailableChanged);
+    connect(m_networkConfiguration, &QNetworkConfigurationManager::onlineStateChanged, this,
+            &Application::internetAvailableChanged);
 
     QtConcurrent::run(&Application::systemFontInfo);
 }
@@ -140,15 +143,15 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 Application::~Application()
 {
 #ifndef QT_NO_DEBUG
-    QInternal::unregisterCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
+    QInternal::unregisterCallback(QInternal::EventNotifyCallback,
+                                  QtApplicationEventNotificationCallback);
 #endif
 }
 
 QString Application::installationId() const
 {
     QString clientID = m_settings->value("Installation/ClientID").toString();
-    if(clientID.isEmpty())
-    {
+    if (clientID.isEmpty()) {
         clientID = QUuid::createUuid().toString();
         m_settings->setValue("Installation/ClientID", clientID);
     }
@@ -160,8 +163,7 @@ QDateTime Application::installationTimestamp() const
 {
     QString installTimestampStr = m_settings->value("Installation/timestamp").toString();
     QDateTime installTimestamp = QDateTime::fromString(installTimestampStr);
-    if(installTimestampStr.isEmpty() || !installTimestamp.isValid())
-    {
+    if (installTimestampStr.isEmpty() || !installTimestamp.isValid()) {
         installTimestamp = QDateTime::currentDateTime();
         installTimestampStr = installTimestamp.toString();
         m_settings->setValue("Installation/timestamp", installTimestampStr);
@@ -177,7 +179,7 @@ int Application::launchCounter() const
 
 void Application::setCustomFontPointSize(int val)
 {
-    if(m_customFontPointSize == val || val < 0 || val >= 100)
+    if (m_customFontPointSize == val || val < 0 || val >= 100)
         return;
 
     m_customFontPointSize = val;
@@ -188,11 +190,11 @@ void Application::setCustomFontPointSize(int val)
 
 QUrl Application::toHttpUrl(const QUrl &url) const
 {
-    if(url.scheme() != QStringLiteral("https"))
+    if (url.scheme() != QStringLiteral("https"))
         return url;
 
     QUrl url2 = url;
-    url2.setScheme( QStringLiteral("http") );
+    url2.setScheme(QStringLiteral("http"));
     return url2;
 }
 
@@ -245,7 +247,7 @@ QString Application::polishShortcutTextForDisplay(const QString &text) const
 
 void Application::setBaseWindowTitle(const QString &val)
 {
-    if(m_baseWindowTitle == val)
+    if (m_baseWindowTitle == val)
         return;
 
     m_baseWindowTitle = val;
@@ -254,7 +256,7 @@ void Application::setBaseWindowTitle(const QString &val)
 
 QString Application::typeName(QObject *object) const
 {
-    if(object == nullptr)
+    if (object == nullptr)
         return QString();
 
     return QString::fromLatin1(object->metaObject()->className());
@@ -272,12 +274,10 @@ bool Application::isTextInputItem(QQuickItem *item) const
 
 UndoStack *Application::findUndoStack(const QString &objectName) const
 {
-    const QList<QUndoStack*> stacks = m_undoGroup->stacks();
-    Q_FOREACH(QUndoStack *stack, stacks)
-    {
-        if(stack->objectName() == objectName)
-        {
-            UndoStack *ret = qobject_cast<UndoStack*>(stack);
+    const QList<QUndoStack *> stacks = m_undoGroup->stacks();
+    Q_FOREACH (QUndoStack *stack, stacks) {
+        if (stack->objectName() == objectName) {
+            UndoStack *ret = qobject_cast<UndoStack *>(stack);
             return ret;
         }
     }
@@ -302,23 +302,20 @@ QJsonObject Application::systemFontInfo()
     static QMutex retLock;
     QMutexLocker locker(&retLock);
 
-    if(ret.isEmpty())
-    {
+    if (ret.isEmpty()) {
         // Load all fonts, we will need it at some point anyway
         fontdb.families();
 
-        const QStringList allFamilies = fontdb.families( QFontDatabase::Latin );
+        const QStringList allFamilies = fontdb.families(QFontDatabase::Latin);
         QStringList families;
-        std::copy_if (allFamilies.begin(), allFamilies.end(),
-                      std::back_inserter(families), [fontdb](const QString &family) {
-            return !fontdb.isPrivateFamily(family);
-        });
+        std::copy_if(allFamilies.begin(), allFamilies.end(), std::back_inserter(families),
+                     [fontdb](const QString &family) { return !fontdb.isPrivateFamily(family); });
         ret.insert("families", QJsonArray::fromStringList(families));
 
         QJsonArray sizes;
         QList<int> stdSizes = fontdb.standardSizes();
-        Q_FOREACH(int stdSize, stdSizes)
-            sizes.append( QJsonValue(stdSize) );
+        Q_FOREACH (int stdSize, stdSizes)
+            sizes.append(QJsonValue(stdSize));
         ret.insert("standardSizes", sizes);
     }
 
@@ -328,7 +325,7 @@ QJsonObject Application::systemFontInfo()
 QColor Application::pickColor(const QColor &initial) const
 {
     QColorDialog::ColorDialogOptions options =
-            QColorDialog::ShowAlphaChannel|QColorDialog::DontUseNativeDialog;
+            QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog;
     return QColorDialog::getColor(initial, nullptr, "Select Color", options);
 }
 
@@ -346,12 +343,11 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     const QFileInfo fileInfo(pathIn);
 
     // Mac, Windows support folder or file.
-    if (this->platform() == WindowsDesktop)
-    {
+    if (this->platform() == WindowsDesktop) {
         const QString explorer = QStandardPaths::findExecutable("explorer.exe");
-        if (explorer.isEmpty())
-        {
-            m_errorReport->setErrorMessage("Could not find explorer.exe in path to launch Windows Explorer.");
+        if (explorer.isEmpty()) {
+            m_errorReport->setErrorMessage(
+                    "Could not find explorer.exe in path to launch Windows Explorer.");
             return;
         }
 
@@ -360,23 +356,19 @@ void Application::revealFileOnDesktop(const QString &pathIn)
             param += QLatin1String("/select,");
         param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
         QProcess::startDetached(explorer, param);
-    }
-    else if (this->platform() == MacOS)
-    {
+    } else if (this->platform() == MacOS) {
         QStringList scriptArgs;
         scriptArgs << QLatin1String("-e")
                    << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
-                                         .arg(fileInfo.canonicalFilePath());
+                              .arg(fileInfo.canonicalFilePath());
         QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
         scriptArgs.clear();
         scriptArgs << QLatin1String("-e")
                    << QLatin1String("tell application \"Finder\" to activate");
         QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
-    }
-    else
-    {
+    } else {
 #if 0 // TODO
-        // we cannot select a file here, because no file browser really supports it...
+      // we cannot select a file here, because no file browser really supports it...
         const QString folder = fileInfo.isDir() ? fileInfo.absoluteFilePath() : fileInfo.filePath();
         const QString app = UnixUtils::fileBrowser(ICore::settings());
         QProcess browserProc;
@@ -394,35 +386,35 @@ QJsonArray enumerationModel(const QMetaObject *metaObject, const QString &enumNa
 {
     QJsonArray ret;
 
-    if( metaObject == nullptr || enumName.isEmpty() )
+    if (metaObject == nullptr || enumName.isEmpty())
         return ret;
 
-    const int enumIndex = metaObject->indexOfEnumerator( qPrintable(enumName) );
-    if( enumIndex < 0 )
+    const int enumIndex = metaObject->indexOfEnumerator(qPrintable(enumName));
+    if (enumIndex < 0)
         return ret;
 
     const QMetaEnum enumInfo = metaObject->enumerator(enumIndex);
-    if( !enumInfo.isValid() )
+    if (!enumInfo.isValid())
         return ret;
 
     auto queryEnumIcon = [=](const char *key) {
-        const QByteArray cikey = QByteArrayLiteral("enum_") + QByteArray(key) + QByteArrayLiteral("_icon");
+        const QByteArray cikey =
+                QByteArrayLiteral("enum_") + QByteArray(key) + QByteArrayLiteral("_icon");
         const int ciIndex = metaObject->indexOfClassInfo(cikey.constData());
-        if(ciIndex < 0)
+        if (ciIndex < 0)
             return QString();
 
         const QMetaClassInfo ci = metaObject->classInfo(ciIndex);
         return QString::fromLatin1(ci.value());
     };
 
-    for(int i=0; i<enumInfo.keyCount(); i++)
-    {
+    for (int i = 0; i < enumInfo.keyCount(); i++) {
         QJsonObject item;
         item.insert(QStringLiteral("key"), QString::fromLatin1(enumInfo.key(i)));
         item.insert(QStringLiteral("value"), enumInfo.value(i));
 
         const QString icon = queryEnumIcon(enumInfo.key(i));
-        if(!icon.isEmpty())
+        if (!icon.isEmpty())
             item.insert(QStringLiteral("icon"), icon);
         ret.append(item);
     }
@@ -436,10 +428,12 @@ QJsonArray Application::enumerationModel(QObject *object, const QString &enumNam
     return ::enumerationModel(mo, enumName);
 }
 
-QJsonArray Application::enumerationModelForType(const QString &typeName, const QString &enumName) const
+QJsonArray Application::enumerationModelForType(const QString &typeName,
+                                                const QString &enumName) const
 {
-    const int typeId = QMetaType::type(qPrintable(typeName+"*"));
-    const QMetaObject *mo = typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const int typeId = QMetaType::type(qPrintable(typeName + "*"));
+    const QMetaObject *mo =
+            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
     return ::enumerationModel(mo, enumName);
 }
 
@@ -447,18 +441,18 @@ QString enumerationKey(const QMetaObject *metaObject, const QString &enumName, i
 {
     QString ret;
 
-    if( metaObject == nullptr || enumName.isEmpty() )
+    if (metaObject == nullptr || enumName.isEmpty())
         return ret;
 
-    const int enumIndex = metaObject->indexOfEnumerator( qPrintable(enumName) );
-    if( enumIndex < 0 )
+    const int enumIndex = metaObject->indexOfEnumerator(qPrintable(enumName));
+    if (enumIndex < 0)
         return ret;
 
     const QMetaEnum enumInfo = metaObject->enumerator(enumIndex);
-    if( !enumInfo.isValid() )
+    if (!enumInfo.isValid())
         return ret;
 
-    return QString::fromLatin1( enumInfo.valueToKey(value) );
+    return QString::fromLatin1(enumInfo.valueToKey(value));
 }
 
 QString Application::enumerationKey(QObject *object, const QString &enumName, int value) const
@@ -466,10 +460,12 @@ QString Application::enumerationKey(QObject *object, const QString &enumName, in
     return ::enumerationKey(object->metaObject(), enumName, value);
 }
 
-QString Application::enumerationKeyForType(const QString &typeName, const QString &enumName, int value) const
+QString Application::enumerationKeyForType(const QString &typeName, const QString &enumName,
+                                           int value) const
 {
-    const int typeId = QMetaType::type(qPrintable(typeName+"*"));
-    const QMetaObject *mo = typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const int typeId = QMetaType::type(qPrintable(typeName + "*"));
+    const QMetaObject *mo =
+            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
     return ::enumerationKey(mo, enumName, value);
 }
 
@@ -478,7 +474,7 @@ QJsonObject Application::fileInfo(const QString &path) const
     QFileInfo fi(path);
     QJsonObject ret;
     ret.insert("exists", fi.exists());
-    if(!fi.exists())
+    if (!fi.exists())
         return ret;
 
     ret.insert("baseName", fi.baseName());
@@ -501,7 +497,7 @@ QPointF Application::cursorPosition() const
 
 QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const
 {
-    if(item == nullptr)
+    if (item == nullptr)
         return pos;
 
     return item->mapFromGlobal(pos);
@@ -509,7 +505,7 @@ QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &po
 
 bool Application::isMouseOverItem(QQuickItem *item) const
 {
-    if(item == nullptr)
+    if (item == nullptr)
         return false;
 
     const QPointF pos = this->mapGlobalPositionToItem(item, QCursor::pos());
@@ -519,7 +515,8 @@ bool Application::isMouseOverItem(QQuickItem *item) const
 class ExecLater : public QObject
 {
 public:
-    ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &arg, QObject *parent=nullptr);
+    ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &arg,
+              QObject *parent = nullptr);
     ~ExecLater();
 
     void timerEvent(QTimerEvent *event);
@@ -530,10 +527,11 @@ private:
     QJSValueList m_arguments;
 };
 
-ExecLater::ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &args, QObject *parent)
+ExecLater::ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &args,
+                     QObject *parent)
     : QObject(parent), m_timer("ExecLater.m_timer"), m_function(function), m_arguments(args)
 {
-    howMuchLater = qBound(0, howMuchLater, 60*60*1000);
+    howMuchLater = qBound(0, howMuchLater, 60 * 60 * 1000);
     m_timer.start(howMuchLater, this);
 }
 
@@ -544,16 +542,16 @@ ExecLater::~ExecLater()
 
 void ExecLater::timerEvent(QTimerEvent *event)
 {
-    if(m_timer.timerId() == event->timerId())
-    {
+    if (m_timer.timerId() == event->timerId()) {
         m_timer.stop();
-        if(m_function.isCallable())
+        if (m_function.isCallable())
             m_function.call(m_arguments);
         GarbageCollector::instance()->add(this);
     }
 }
 
-void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args)
+void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function,
+                            const QJSValueList &args)
 {
     QObject *parent = context ? context : this;
 
@@ -576,19 +574,20 @@ AutoUpdate *Application::autoUpdate() const
     return AutoUpdate::instance();
 }
 
-QJsonObject Application::objectConfigurationFormInfo(const QObject *object, const QMetaObject *from) const
+QJsonObject Application::objectConfigurationFormInfo(const QObject *object,
+                                                     const QMetaObject *from) const
 {
     QJsonObject ret;
-    if(object == nullptr)
-            return ret;
+    if (object == nullptr)
+        return ret;
 
-    if(from == nullptr)
+    if (from == nullptr)
         from = object->metaObject();
 
     const QMetaObject *mo = object->metaObject();
     auto queryClassInfo = [mo](const char *key) {
         const int ciIndex = mo->indexOfClassInfo(key);
-        if(ciIndex < 0)
+        if (ciIndex < 0)
             return QString();
         const QMetaClassInfo ci = mo->classInfo(ciIndex);
         return QString::fromLatin1(ci.value());
@@ -605,15 +604,15 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
     QJsonArray fields;
     QJsonArray groupedFields;
 
-    auto addFieldToGroup = [&groupedFields,queryClassInfo](const QJsonObject &field) {
+    auto addFieldToGroup = [&groupedFields, queryClassInfo](const QJsonObject &field) {
         const QString fieldGroup = field.value("group").toString();
         int index = -1;
-        if(fieldGroup.isEmpty() && !groupedFields.isEmpty())
+        if (fieldGroup.isEmpty() && !groupedFields.isEmpty())
             index = 0;
         else {
-            for(int i=0; i<groupedFields.size(); i++) {
+            for (int i = 0; i < groupedFields.size(); i++) {
                 QJsonObject groupInfo = groupedFields.at(i).toObject();
-                if(groupInfo.value("name").toString() == fieldGroup) {
+                if (groupInfo.value("name").toString() == fieldGroup) {
                     index = i;
                     break;
                 }
@@ -621,7 +620,7 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         }
 
         QJsonObject groupInfo;
-        if(index < 0) {
+        if (index < 0) {
             const QString descKey = fieldGroup + QStringLiteral("_Description");
             groupInfo.insert("name", fieldGroup);
             groupInfo.insert("description", queryClassInfo(qPrintable(descKey)));
@@ -632,16 +631,15 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         QJsonArray fields = groupInfo.value("fields").toArray();
         fields.append(field);
         groupInfo.insert("fields", fields);
-        if(index < 0)
+        if (index < 0)
             groupedFields.append(groupInfo);
         else
             groupedFields.replace(index, groupInfo);
     };
 
-    for(int i=from->propertyOffset(); i<mo->propertyCount(); i++)
-    {
+    for (int i = from->propertyOffset(); i < mo->propertyCount(); i++) {
         const QMetaProperty prop = mo->property(i);
-        if(!prop.isWritable() || !prop.isStored())
+        if (!prop.isWritable() || !prop.isStored())
             continue;
 
         QJsonObject field;
@@ -655,21 +653,20 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         field.insert("group", queryPropertyInfo(prop, "FieldGroup"));
 
         const QString fieldEnum = queryPropertyInfo(prop, "FieldEnum");
-        if( !fieldEnum.isEmpty() )
-        {
+        if (!fieldEnum.isEmpty()) {
             const int enumIndex = mo->indexOfEnumerator(qPrintable(fieldEnum));
             const QMetaEnum enumerator = mo->enumerator(enumIndex);
 
             QJsonArray choices;
-            for(int j=0; j<enumerator.keyCount(); j++)
-            {
+            for (int j = 0; j < enumerator.keyCount(); j++) {
                 QJsonObject choice;
                 choice.insert("key", QString::fromLatin1(enumerator.key(j)));
                 choice.insert("value", enumerator.value(j));
 
-                const QByteArray ciKey = QByteArray(enumerator.name()) + "_" + QByteArray(enumerator.key(j));
+                const QByteArray ciKey =
+                        QByteArray(enumerator.name()) + "_" + QByteArray(enumerator.key(j));
                 const QString text = queryClassInfo(ciKey);
-                if(!text.isEmpty())
+                if (!text.isEmpty())
                     choice.insert("key", text);
 
                 choices.append(choice);
@@ -691,13 +688,13 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
 bool QtApplicationEventNotificationCallback(void **cbdata)
 {
 #ifndef QT_NO_DEBUG
-    QObject *object = reinterpret_cast<QObject*>(cbdata[0]);
-    QEvent *event = reinterpret_cast<QEvent*>(cbdata[1]);
-    bool *result = reinterpret_cast<bool*>(cbdata[2]);
+    QObject *object = reinterpret_cast<QObject *>(cbdata[0]);
+    QEvent *event = reinterpret_cast<QEvent *>(cbdata[1]);
+    bool *result = reinterpret_cast<bool *>(cbdata[2]);
 
     const bool ret = Application::instance()->notifyInternal(object, event);
 
-    if(result)
+    if (result)
         *result |= ret;
 
     return ret;
@@ -710,39 +707,36 @@ bool QtApplicationEventNotificationCallback(void **cbdata)
 bool Application::notify(QObject *object, QEvent *event)
 {
     // Note that notifyInternal() will be called first before we get here.
-    if(event->type() == QEvent::DeferredDelete)
+    if (event->type() == QEvent::DeferredDelete)
         return QtApplicationClass::notify(object, event);
 
-    if(event->type() == QEvent::KeyPress)
-    {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
-        if(ke->modifiers() & Qt::ControlModifier && ke->key() == Qt::Key_M)
-        {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        if (ke->modifiers() & Qt::ControlModifier && ke->key() == Qt::Key_M) {
             emit minimizeWindowRequest();
             return true;
         }
 
-        if(ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Z)
-        {
-            if( !UndoHandler::handleUndo() )
+        if (ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Z) {
+            if (!UndoHandler::handleUndo())
                 m_undoGroup->undo();
             return true;
         }
 
-        if( (ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Y)
+        if ((ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Y)
 #ifdef Q_OS_MAC
-           || (ke->modifiers()&Qt::ControlModifier && ke->modifiers()&Qt::ShiftModifier && ke->key() == Qt::Key_Z)
+            || (ke->modifiers() & Qt::ControlModifier && ke->modifiers() & Qt::ShiftModifier
+                && ke->key() == Qt::Key_Z)
 #endif
-                )
-        {
-            if(! UndoHandler::handleRedo() )
+        ) {
+            if (!UndoHandler::handleRedo())
                 m_undoGroup->redo();
             return true;
         }
 
-        if( ke->modifiers()&Qt::ControlModifier && ke->modifiers()&Qt::ShiftModifier && ke->key() == Qt::Key_T )
-        {
-            if(this->loadScript())
+        if (ke->modifiers() & Qt::ControlModifier && ke->modifiers() & Qt::ShiftModifier
+            && ke->key() == Qt::Key_T) {
+            if (this->loadScript())
                 return true;
         }
     }
@@ -752,13 +746,11 @@ bool Application::notify(QObject *object, QEvent *event)
     // The only reason we reimplement the notify() method is because we sometimes want to
     // handle an event AFTER it is handled by the target object.
 
-    if(event->type() == QEvent::ChildAdded)
-    {
-        QChildEvent *childEvent = reinterpret_cast<QChildEvent*>(event);
+    if (event->type() == QEvent::ChildAdded) {
+        QChildEvent *childEvent = reinterpret_cast<QChildEvent *>(event);
         QObject *childObject = childEvent->child();
 
-        if(!childObject->isWidgetType() && !childObject->isWindowType())
-        {
+        if (!childObject->isWidgetType() && !childObject->isWindowType()) {
             /**
              * For whatever reason, ParentChange event is only sent
              * if the child is a widget or window or declarative-item.
@@ -781,40 +773,38 @@ bool Application::notify(QObject *object, QEvent *event)
 bool Application::notifyInternal(QObject *object, QEvent *event)
 {
 #ifndef QT_NO_DEBUG
-    static QMap<QObject*,QString> objectNameMap;
-    auto evaluateObjectName = [](QObject *object, QMap<QObject*,QString> &from) {
+    static QMap<QObject *, QString> objectNameMap;
+    auto evaluateObjectName = [](QObject *object, QMap<QObject *, QString> &from) {
         QString objectName = from.value(object);
-        if(objectName.isEmpty()) {
-            QQuickItem *item = qobject_cast<QQuickItem*>(object);
-            QObject* parent = item && item->parentItem() ? item->parentItem() : object->parent();
+        if (objectName.isEmpty()) {
+            QQuickItem *item = qobject_cast<QQuickItem *>(object);
+            QObject *parent = item && item->parentItem() ? item->parentItem() : object->parent();
             QString parentName = parent ? from.value(parent) : "No Parent";
-            if(parentName.isEmpty()) {
+            if (parentName.isEmpty()) {
                 parentName = QString("%1 [%2] (%3)")
-                                    .arg(parent->metaObject()->className())
-                                    .arg((unsigned long)((void*)parent),0,16)
-                                    .arg(parent->objectName());
+                                     .arg(parent->metaObject()->className())
+                                     .arg((unsigned long)((void *)parent), 0, 16)
+                                     .arg(parent->objectName());
             }
             objectName = QString("%1 [%2] (%3) under %4")
-                    .arg(object->metaObject()->className())
-                    .arg((unsigned long)((void*)object),0,16)
-                    .arg(object->objectName())
-                    .arg(parentName);
+                                 .arg(object->metaObject()->className())
+                                 .arg((unsigned long)((void *)object), 0, 16)
+                                 .arg(object->objectName())
+                                 .arg(parentName);
             from[object] = objectName;
         }
         return objectName;
     };
 
-    if(event->type() == QEvent::DeferredDelete)
-    {
+    if (event->type() == QEvent::DeferredDelete) {
         const QString objectName = evaluateObjectName(object, objectNameMap);
         qDebug() << "DeferredDelete: " << objectName;
-    }
-    else if(event->type() == QEvent::Timer)
-    {
+    } else if (event->type() == QEvent::Timer) {
         const QString objectName = evaluateObjectName(object, objectNameMap);
-        QTimerEvent *te = static_cast<QTimerEvent*>(event);
+        QTimerEvent *te = static_cast<QTimerEvent *>(event);
         ExecLaterTimer *timer = ExecLaterTimer::get(te->timerId());
-        qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is " << (timer ? qPrintable(timer->name()) : "Qt Timer.");
+        qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is "
+                 << (timer ? qPrintable(timer->name()) : "Qt Timer.");
     }
 #else
     Q_UNUSED(object)
@@ -830,23 +820,22 @@ void Application::computeIdealFontPointSize()
 {
     int fontPointSize = 0;
 
-    if(m_customFontPointSize > 0)
+    if (m_customFontPointSize > 0)
         fontPointSize = m_customFontPointSize;
-    else
-    {
+    else {
 #ifndef Q_OS_MAC
         fontPointSize = 12;
 #else
         const qreal minInch = 0.12; // Font should occupy atleast 0.12 inches on the screen
-        const qreal nrPointsPerInch = qt_defaultDpi(); // These many dots make up one inch on the screen
+        const qreal nrPointsPerInch =
+                qt_defaultDpi(); // These many dots make up one inch on the screen
         const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
         const qreal dpr = this->primaryScreen()->devicePixelRatio();
-        fontPointSize = qCeil(minInch * nrPointsPerInch * qMax(dpr,scale));
+        fontPointSize = qCeil(minInch * nrPointsPerInch * qMax(dpr, scale));
 #endif
     }
 
-    if(m_idealFontPointSize != fontPointSize)
-    {
+    if (m_idealFontPointSize != fontPointSize) {
         m_idealFontPointSize = fontPointSize;
         emit idealFontPointSizeChanged();
     }
@@ -878,22 +867,24 @@ QString Application::sanitiseFileName(const QString &fileName) const
 
     QString baseName = fi.baseName();
     bool changed = false;
-    for(int i=baseName.length()-1; i>=0; i--)
-    {
+    for (int i = baseName.length() - 1; i >= 0; i--) {
         const QChar ch = baseName.at(i);
-        if(ch.isLetterOrNumber())
+        if (ch.isLetterOrNumber())
             continue;
 
-        static const QList<QChar> allowedChars = {'-', '_', '[', ']', '(', ')', '{', '}', '&', ' '};
-        if(allowedChars.contains(ch))
+        static const QList<QChar> allowedChars = {
+            '-', '_', '[', ']', '(', ')', '{', '}', '&', ' '
+        };
+        if (allowedChars.contains(ch))
             continue;
 
         baseName = baseName.remove(i, 1);
         changed = true;
     }
 
-    if(changed)
-        return fi.absoluteDir().absoluteFilePath( baseName + QStringLiteral(".") + fi.suffix().toLower() );
+    if (changed)
+        return fi.absoluteDir().absoluteFilePath(baseName + QStringLiteral(".")
+                                                 + fi.suffix().toLower());
 
     return fileName;
 }
@@ -907,10 +898,9 @@ void Application::log(const QString &message)
 bool Application::event(QEvent *event)
 {
 #ifdef Q_OS_MAC
-    if(event->type() == QEvent::FileOpen)
-    {
+    if (event->type() == QEvent::FileOpen) {
         QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
-        if(m_handleFileOpenEvents)
+        if (m_handleFileOpenEvents)
             emit openFileRequest(openEvent->file());
         else
             m_fileToOpen = openEvent->file();
@@ -926,18 +916,18 @@ bool Application::event(QEvent *event)
  */
 QString Application::registerObject(QObject *object, const QString &name)
 {
-    if(object == nullptr)
+    if (object == nullptr)
         return QString();
 
     QString objName = name;
-    if(objName.isEmpty())
+    if (objName.isEmpty())
         objName = object->objectName();
-    if(objName.isEmpty())
+    if (objName.isEmpty())
         objName = QString::fromLatin1(object->metaObject()->className());
 
     int index = 0;
     QString finalObjName = objName;
-    while( this->findRegisteredObject(finalObjName) )
+    while (this->findRegisteredObject(finalObjName))
         finalObjName = objName + QString::number(index++);
 
     // We are not using setObjectName on purpose!!
@@ -949,16 +939,15 @@ QString Application::registerObject(QObject *object, const QString &name)
 
 void Application::unregisterObject(QObject *object)
 {
-    m_objectRegistry.removeAt( m_objectRegistry.indexOf(object) );
+    m_objectRegistry.removeAt(m_objectRegistry.indexOf(object));
 }
 
 QObject *Application::findRegisteredObject(const QString &name) const
 {
-    const QList<QObject*> & objects = m_objectRegistry.list();
-    for(QObject *object : objects)
-    {
+    const QList<QObject *> &objects = m_objectRegistry.list();
+    for (QObject *object : objects) {
         const QString objName = object->property("#objectName").toString();
-        if(objName == name)
+        if (objName == name)
             return object;
     }
 
@@ -968,10 +957,10 @@ QObject *Application::findRegisteredObject(const QString &name) const
 QColor Application::pickStandardColor(int counter) const
 {
     const QVector<QColor> colors = this->standardColors();
-    if(colors.isEmpty())
+    if (colors.isEmpty())
         return QColor("white");
 
-    QColor ret = colors.at( qMax(counter,0)%colors.size() );
+    QColor ret = colors.at(qMax(counter, 0) % colors.size());
     return ret;
 }
 
@@ -993,23 +982,21 @@ QColor Application::textColorFor(const QColor &bgColor)
 
 QRectF Application::largestBoundingRect(const QStringList &strings, const QFont &font) const
 {
-    if(strings.isEmpty())
+    if (strings.isEmpty())
         return QRectF();
 
     const QFontMetricsF fm(font);
 
-    auto evalTextRect = [fm](const QString &item) -> QRectF {
-        return fm.boundingRect(item);
-    };
+    auto evalTextRect = [fm](const QString &item) -> QRectF { return fm.boundingRect(item); };
 
     auto pickLargestRect = [](QRectF &intermediate, const QRectF &rect) {
-        if(intermediate.isEmpty() || intermediate.width() < rect.width())
+        if (intermediate.isEmpty() || intermediate.width() < rect.width())
             intermediate = rect;
     };
 
     // Turns out that using QtConcurrent takes more time than using a simple for loop
     QRectF ret;
-    for(const QString &item : strings)
+    for (const QString &item : strings)
         pickLargestRect(ret, evalTextRect(item));
 
     return ret;
@@ -1041,7 +1028,8 @@ QRectF Application::uniteRectangles(const QRectF &r1, const QRectF &r2) const
     return r1.united(r2);
 }
 
-QRectF Application::adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom) const
+QRectF Application::adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right,
+                                    qreal bottom) const
 {
     return rect.adjusted(left, top, right, bottom);
 }
@@ -1051,21 +1039,21 @@ bool Application::isRectangleInRectangle(const QRectF &bigRect, const QRectF &sm
     return bigRect.contains(smallRect);
 }
 
-QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const
+QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF &bigRect,
+                                                                    const QRectF &smallRect) const
 {
     QPointF ret(0, 0);
 
-    if(!bigRect.contains(smallRect))
-    {
-        if(smallRect.left() < bigRect.left())
-            ret.setX( bigRect.left()-smallRect.left() );
-        else if(smallRect.right() > bigRect.right())
-            ret.setX( -(smallRect.right()-bigRect.right()) );
+    if (!bigRect.contains(smallRect)) {
+        if (smallRect.left() < bigRect.left())
+            ret.setX(bigRect.left() - smallRect.left());
+        else if (smallRect.right() > bigRect.right())
+            ret.setX(-(smallRect.right() - bigRect.right()));
 
-        if(smallRect.top() < bigRect.top())
-            ret.setY( bigRect.top()-smallRect.top() );
-        else if(smallRect.bottom() > bigRect.bottom())
-            ret.setY( -(smallRect.bottom()-bigRect.bottom()) );
+        if (smallRect.top() < bigRect.top())
+            ret.setY(bigRect.top() - smallRect.top());
+        else if (smallRect.bottom() > bigRect.bottom())
+            ret.setY(-(smallRect.bottom() - bigRect.bottom()));
     }
 
     return ret;
@@ -1076,18 +1064,19 @@ qreal Application::distanceBetweenPoints(const QPointF &p1, const QPointF &p2) c
     return QLineF(p1, p2).length();
 }
 
-QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, const QSizeF &atBest) const
+QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around,
+                                      const QSizeF &atBest) const
 {
-    if( in.width() < atBest.width() || in.height() < atBest.height() )
-    {
+    if (in.width() < atBest.width() || in.height() < atBest.height()) {
         QRectF ret(0, 0, atBest.width(), atBest.height());
         ret.moveCenter(around.center());
         return ret;
     }
 
     QRectF around2;
-    if(atBest.width() > in.width() || atBest.height() > in.height())
-        around2 = QRectF(0, 0, qMin(atBest.width(), in.width()), qMin(atBest.height(), in.height()));
+    if (atBest.width() > in.width() || atBest.height() > in.height())
+        around2 =
+                QRectF(0, 0, qMin(atBest.width(), in.width()), qMin(atBest.height(), in.height()));
     else
         around2 = QRectF(0, 0, atBest.width(), atBest.height());
     around2.moveCenter(around.center());
@@ -1095,19 +1084,20 @@ QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, co
     const QSizeF aroundSize = around2.size();
 
     around2 = in.intersected(around2);
-    if( qFuzzyCompare(around2.width(), aroundSize.width()) && qFuzzyCompare(around2.height(), aroundSize.height()))
+    if (qFuzzyCompare(around2.width(), aroundSize.width())
+        && qFuzzyCompare(around2.height(), aroundSize.height()))
         return around2;
 
     around2.setSize(aroundSize);
 
-    if(around2.left() < in.left())
+    if (around2.left() < in.left())
         around2.moveLeft(in.left());
-    else if(around2.right() > in.right())
+    else if (around2.right() > in.right())
         around2.moveRight(in.right());
 
-    if(around2.top() < in.top())
+    if (around2.top() < in.top())
         around2.moveTop(in.top());
-    else if(around2.bottom() > in.bottom())
+    else if (around2.bottom() > in.bottom())
         around2.moveBottom(in.bottom());
 
     return around2;
@@ -1116,8 +1106,7 @@ QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, co
 bool Application::writeToFile(const QString &fileName, const QString &fileContent)
 {
     QFile file(fileName);
-    if( file.open(QFile::WriteOnly) )
-    {
+    if (file.open(QFile::WriteOnly)) {
         file.write(fileContent.toLatin1());
         return true;
     }
@@ -1128,7 +1117,7 @@ bool Application::writeToFile(const QString &fileName, const QString &fileConten
 QString Application::fileContents(const QString &fileName) const
 {
     QFile file(fileName);
-    if( !file.open(QFile::ReadOnly) )
+    if (!file.open(QFile::ReadOnly))
         return QString();
 
     return QString::fromLatin1(file.readAll());
@@ -1147,12 +1136,12 @@ QString Application::neighbouringFilePath(const QString &filePath, const QString
 
 QScreen *Application::windowScreen(QObject *window) const
 {
-    QWindow *qwindow = qobject_cast<QWindow*>(window);
-    if(qwindow)
+    QWindow *qwindow = qobject_cast<QWindow *>(window);
+    if (qwindow)
         return qwindow->screen();
 
-    QWidget *qwidget = qobject_cast<QWidget*>(window);
-    if(qwidget)
+    QWidget *qwidget = qobject_cast<QWidget *>(window);
+    if (qwidget)
         return qwidget->window()->windowHandle()->screen();
 
     return nullptr;
@@ -1170,30 +1159,25 @@ QPointF Application::globalMousePosition() const
 
 QString Application::camelCased(const QString &val)
 {
-//    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
-//        return val;
+    //    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
+    //        return val;
 
     QString val2 = val.toLower();
-    if(val2.isEmpty())
+    if (val2.isEmpty())
         return val;
 
     bool capitalize = true;
-    for(int i=0; i<val2.length(); i++)
-    {
+    for (int i = 0; i < val2.length(); i++) {
         QCharRef ch = val2[i];
-        if(ch.isLetter() && ch.script() != QChar::Script_Latin)
+        if (ch.isLetter() && ch.script() != QChar::Script_Latin)
             return val;
 
-        if(capitalize)
-        {
-            if(ch.isLetter() && ch.script() == QChar::Script_Latin)
-            {
+        if (capitalize) {
+            if (ch.isLetter() && ch.script() == QChar::Script_Latin) {
                 ch = ch.toUpper();
                 capitalize = false;
             }
-        }
-        else
-        {
+        } else {
             const QList<QChar> exclude = QList<QChar>() << QChar('\'');
             capitalize = !ch.isLetter() && !exclude.contains(ch);
         }
@@ -1204,34 +1188,34 @@ QString Application::camelCased(const QString &val)
 
 void Application::saveWindowGeometry(QWindow *window, const QString &group)
 {
-    if(window == nullptr)
+    if (window == nullptr)
         return;
 
     const QRect geometry = window->geometry();
-    if(window->visibility() == QWindow::Windowed)
-    {
+    if (window->visibility() == QWindow::Windowed) {
         const QString geometryString = QString("%1 %2 %3 %4")
-                .arg(geometry.x()).arg(geometry.y())
-                .arg(geometry.width()).arg(geometry.height());
-        m_settings->setValue( group + QStringLiteral("/windowGeometry"), geometryString );
-    }
-    else
-        m_settings->setValue( group + QStringLiteral("/windowGeometry"), QStringLiteral("Maximized") );
+                                               .arg(geometry.x())
+                                               .arg(geometry.y())
+                                               .arg(geometry.width())
+                                               .arg(geometry.height());
+        m_settings->setValue(group + QStringLiteral("/windowGeometry"), geometryString);
+    } else
+        m_settings->setValue(group + QStringLiteral("/windowGeometry"),
+                             QStringLiteral("Maximized"));
 }
 
 bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
 {
-    if(window == nullptr)
+    if (window == nullptr)
         return false;
 
     const QString geometryArg = QStringLiteral("--windowGeometry");
     const int geometryArgPos = this->arguments().indexOf(geometryArg);
-    if(geometryArgPos >= 0 && this->arguments().size() >= geometryArgPos+5)
-    {
-        const int x = this->arguments().at(geometryArgPos+1).toInt();
-        const int y = this->arguments().at(geometryArgPos+2).toInt();
-        const int w = this->arguments().at(geometryArgPos+3).toInt();
-        const int h = this->arguments().at(geometryArgPos+4).toInt();
+    if (geometryArgPos >= 0 && this->arguments().size() >= geometryArgPos + 5) {
+        const int x = this->arguments().at(geometryArgPos + 1).toInt();
+        const int y = this->arguments().at(geometryArgPos + 2).toInt();
+        const int w = this->arguments().at(geometryArgPos + 3).toInt();
+        const int h = this->arguments().at(geometryArgPos + 4).toInt();
         window->setGeometry(x, y, w, h);
         return true;
     }
@@ -1239,9 +1223,9 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     const QScreen *screen = window->screen();
     const QRect screenGeo = screen->availableGeometry();
 
-    const QString geometryString = m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
-    if(geometryString == QStringLiteral("Maximized"))
-    {
+    const QString geometryString =
+            m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
+    if (geometryString == QStringLiteral("Maximized")) {
 #ifdef Q_OS_WIN
         window->setGeometry(screenGeo);
         QTimer *timer = new QTimer(window);
@@ -1259,25 +1243,27 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     }
 
     const QStringList geometry = geometryString.split(QStringLiteral(" "), QString::SkipEmptyParts);
-    if(geometry.length() != 4)
-    {
+    if (geometry.length() != 4) {
         window->setGeometry(screenGeo);
         return false;
     }
 
     const QString geoDeltaArg = QStringLiteral("--geodelta");
     const int geoDeltaArgPos = this->arguments().indexOf(geoDeltaArg);
-    const int geoDelta = qBound(0, geoDeltaArgPos >= 0 && this->arguments().size() >= geoDeltaArgPos+2 ? this->arguments().at(geoDeltaArgPos+1).toInt() : 0, 100);
+    const int geoDelta =
+            qBound(0,
+                   geoDeltaArgPos >= 0 && this->arguments().size() >= geoDeltaArgPos + 2
+                           ? this->arguments().at(geoDeltaArgPos + 1).toInt()
+                           : 0,
+                   100);
 
     const int x = geometry.at(0).toInt() + geoDelta;
     const int y = geometry.at(1).toInt() + geoDelta;
     const int w = geometry.at(2).toInt() + geoDelta;
     const int h = geometry.at(3).toInt() + geoDelta;
     QRect geo(x, y, w, h);
-    if(!screenGeo.contains(geo))
-    {
-        if(w > screenGeo.width() || h > screenGeo.height())
-        {
+    if (!screenGeo.contains(geo)) {
+        if (w > screenGeo.width() || h > screenGeo.height()) {
             window->setGeometry(screenGeo);
             return false;
         }
@@ -1299,20 +1285,18 @@ void Application::launchNewInstanceAndOpenAnonymously(QWindow *window, const QSt
     const QString appPath = this->applicationFilePath();
 
     QStringList args;
-    if(!filePath.isEmpty() && QFile::exists(filePath))
+    if (!filePath.isEmpty() && QFile::exists(filePath))
         args = QStringList({ QStringLiteral("--openAnonymously"), filePath });
 
-    if(window != nullptr)
-    {
+    if (window != nullptr) {
         const QRect geometry = window->geometry();
-        args += { QStringLiteral("--windowGeometry"),
-                  QString::number(geometry.x()+30), QString::number(geometry.y()+30),
-                  QString::number(geometry.width()), QString::number(geometry.height()) };
-    }
-    else
+        args += { QStringLiteral("--windowGeometry"), QString::number(geometry.x() + 30),
+                  QString::number(geometry.y() + 30), QString::number(geometry.width()),
+                  QString::number(geometry.height()) };
+    } else
         args += { QStringLiteral("--geodelta"), QStringLiteral("30") };
 
-    if( !JsonHttpRequest::sessionToken().isEmpty() )
+    if (!JsonHttpRequest::sessionToken().isEmpty())
         args += { QStringLiteral("--sessionToken"), JsonHttpRequest::sessionToken() };
 
     QProcess::startDetached(appPath, args);
@@ -1321,12 +1305,12 @@ void Application::launchNewInstanceAndOpenAnonymously(QWindow *window, const QSt
 bool Application::maybeOpenAnonymously()
 {
     const QStringList args = this->arguments();
-    const int oaIndex = args.indexOf( QStringLiteral("--openAnonymously") );
-    if(oaIndex < 0 || oaIndex >= args.size()-1)
+    const int oaIndex = args.indexOf(QStringLiteral("--openAnonymously"));
+    if (oaIndex < 0 || oaIndex >= args.size() - 1)
         return false;
 
-    const QString filePath = args.at(oaIndex+1);
-    if(filePath.isEmpty() || !QFile::exists(filePath))
+    const QString filePath = args.at(oaIndex + 1);
+    if (filePath.isEmpty() || !QFile::exists(filePath))
         return false;
 
     ScriteDocument::instance()->openAnonymously(filePath);
@@ -1336,16 +1320,13 @@ bool Application::maybeOpenAnonymously()
 void Application::toggleFullscreen(QWindow *window)
 {
     const char *propName = "#previouslyMaximised";
-    if(window->windowStates() & Qt::WindowFullScreen)
-    {
+    if (window->windowStates() & Qt::WindowFullScreen) {
         const bool waxMaxed = window->property(propName).toBool();
-        if(waxMaxed)
+        if (waxMaxed)
             window->showMaximized();
         else
             window->showNormal();
-    }
-    else
-    {
+    } else {
         window->setProperty(propName, window->windowStates().testFlag(Qt::WindowMaximized));
         window->showFullScreen();
     }
@@ -1353,17 +1334,16 @@ void Application::toggleFullscreen(QWindow *window)
 
 bool Application::hasActiveFocus(QQuickWindow *window, QQuickItem *item)
 {
-    if(window == nullptr || item == nullptr)
+    if (window == nullptr || item == nullptr)
         return false;
 
     QQuickItem *focusItem = window->activeFocusItem();
-    if(focusItem == nullptr)
+    if (focusItem == nullptr)
         return false;
 
     QQuickItem *i = focusItem;
-    while(i != nullptr)
-    {
-        if(i == item)
+    while (i != nullptr) {
+        if (i == item)
             return true;
         i = i->parentItem();
     }
@@ -1373,16 +1353,16 @@ bool Application::hasActiveFocus(QQuickWindow *window, QQuickItem *item)
 
 bool Application::resetObjectProperty(QObject *object, const QString &propName)
 {
-    if(object == nullptr || propName.isEmpty())
+    if (object == nullptr || propName.isEmpty())
         return false;
 
     const QMetaObject *mo = object->metaObject();
     const int propIndex = mo->indexOfProperty(qPrintable(propName));
-    if(propIndex < 0)
+    if (propIndex < 0)
         return false;
 
     const QMetaProperty prop = mo->property(propIndex);
-    if(!prop.isResettable())
+    if (!prop.isResettable())
         return false;
 
     return prop.reset(object);
@@ -1390,7 +1370,7 @@ bool Application::resetObjectProperty(QObject *object, const QString &propName)
 
 int Application::objectTreeSize(QObject *ptr) const
 {
-    return ptr->findChildren<QObject*>(QString(), Qt::FindChildrenRecursively).size() + 1;
+    return ptr->findChildren<QObject *>(QString(), Qt::FindChildrenRecursively).size() + 1;
 }
 
 QString Application::createUniqueId()
@@ -1403,8 +1383,7 @@ void Application::sleep(int ms)
     ms = qBound(0, ms, 2000);
 
     QEventLoop eventLoop;
-    if(ms == 0)
-    {
+    if (ms == 0) {
         eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents);
         return;
     }
@@ -1412,50 +1391,51 @@ void Application::sleep(int ms)
     QElapsedTimer timer;
     timer.start();
 
-    while(timer.elapsed() < ms)
+    while (timer.elapsed() < ms)
         eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
 QTime Application::secondsToTime(int seconds)
 {
-    if(seconds == 0)
-        return QTime(0,0,0);
+    if (seconds == 0)
+        return QTime(0, 0, 0);
     const int s = seconds > 60 ? seconds % 60 : seconds;
-    const int tm = seconds > 60 ? (seconds-s)/60 : 0;
-    const int m = tm > 60 ? tm%60 : tm;
-    const int h = seconds > 3600 ? (seconds - m*60 - s)/(60*60) : 0;
+    const int tm = seconds > 60 ? (seconds - s) / 60 : 0;
+    const int m = tm > 60 ? tm % 60 : tm;
+    const int h = seconds > 3600 ? (seconds - m * 60 - s) / (60 * 60) : 0;
     return QTime(h, m, s);
 }
 
 QString Application::relativeTime(const QDateTime &dt)
 {
-    if(!dt.isValid())
+    if (!dt.isValid())
         return QStringLiteral("Unknown Time");
 
     const QDateTime now = QDateTime::currentDateTime();
-    if(now.date() == dt.date())
-    {
+    if (now.date() == dt.date()) {
         const int secsInMin = 60;
         const int secsInHour = secsInMin * 60;
 
         // Just say how many minutes or hours ago.
         const int nrSecs = dt.time().secsTo(now.time());
-        const int nrHours = nrSecs > secsInHour ? qFloor( qreal(nrSecs)/qreal(secsInHour) ) : 0;
-        const int nrSecsRemaining = nrSecs-nrHours*secsInHour;
-        const int nrMins = nrSecs > secsInMin ? qCeil( qreal(nrSecsRemaining)/qreal(secsInMin) ) : 0;
+        const int nrHours = nrSecs > secsInHour ? qFloor(qreal(nrSecs) / qreal(secsInHour)) : 0;
+        const int nrSecsRemaining = nrSecs - nrHours * secsInHour;
+        const int nrMins =
+                nrSecs > secsInMin ? qCeil(qreal(nrSecsRemaining) / qreal(secsInMin)) : 0;
 
-        if(nrMins == 0)
+        if (nrMins == 0)
             return QStringLiteral("Less than a minute ago");
-        if(nrHours == 0)
-            return QString::number( qCeil(qreal(nrSecs)/qreal(secsInMin)) ) + QStringLiteral("m ago");
+        if (nrHours == 0)
+            return QString::number(qCeil(qreal(nrSecs) / qreal(secsInMin)))
+                    + QStringLiteral("m ago");
 
-        return QString::number(nrHours) + QStringLiteral("h ") + QString::number(nrMins) + QStringLiteral("m ago");
+        return QString::number(nrHours) + QStringLiteral("h ") + QString::number(nrMins)
+                + QStringLiteral("m ago");
     }
 
     const int nrDays = dt.date().daysTo(now.date());
     const QString time = dt.time().toString(QStringLiteral("h:mm A"));
-    switch(nrDays)
-    {
+    switch (nrDays) {
     case 1:
         return QStringLiteral("Yesterday @ ") + time;
     case 2:
@@ -1469,16 +1449,17 @@ QString Application::relativeTime(const QDateTime &dt)
         break;
     }
 
-    if(nrDays >= 7 && nrDays < 14)
-        return QStringLiteral("Last week ") + QLocale::system().standaloneDayName(dt.date().dayOfWeek()) + " @ " + time;
+    if (nrDays >= 7 && nrDays < 14)
+        return QStringLiteral("Last week ")
+                + QLocale::system().standaloneDayName(dt.date().dayOfWeek()) + " @ " + time;
 
-    if(nrDays >= 14 && nrDays < 21)
+    if (nrDays >= 14 && nrDays < 21)
         return QStringLiteral("Two weeks ago");
 
-    if(nrDays >= 21 && nrDays < 28)
+    if (nrDays >= 21 && nrDays < 28)
         return QStringLiteral("Three weeks ago");
 
-    if(nrDays >= 28 && nrDays < 60)
+    if (nrDays >= 28 && nrDays < 60)
         return QStringLiteral("Little more than a month ago");
 
     return QStringLiteral("More than two months ago");
@@ -1491,11 +1472,11 @@ Forms *Application::forms() const
 
 void Application::initializeStandardColors(QQmlEngine *)
 {
-    if(!m_standardColors.isEmpty())
+    if (!m_standardColors.isEmpty())
         return;
 
     const QVector<QColor> colors = this->standardColors();
-    for(int i=0; i<colors.size(); i++)
+    for (int i = 0; i < colors.size(); i++)
         m_standardColors << QVariant::fromValue<QColor>(colors.at(i));
 
     emit standardColorsChanged();
@@ -1504,18 +1485,17 @@ void Application::initializeStandardColors(QQmlEngine *)
 QVector<QColor> Application::standardColors(const QVersionNumber &version)
 {
     // Up-until version 0.2.17 Beta
-    if( !version.isNull() && version <= QVersionNumber(0,2,17) )
-        return QVector<QColor>() <<
-            QColor("blue") << QColor("magenta") << QColor("darkgreen") <<
-            QColor("purple") << QColor("yellow") << QColor("orange") <<
-            QColor("red") << QColor("brown") << QColor("gray") << QColor("white");
+    if (!version.isNull() && version <= QVersionNumber(0, 2, 17))
+        return QVector<QColor>() << QColor("blue") << QColor("magenta") << QColor("darkgreen")
+                                 << QColor("purple") << QColor("yellow") << QColor("orange")
+                                 << QColor("red") << QColor("brown") << QColor("gray")
+                                 << QColor("white");
 
     // New set of colors
-    return QVector<QColor>() <<
-        QColor("#2196f3") << QColor("#e91e63") << QColor("#009688") <<
-        QColor("#9c27b0") << QColor("#ffeb3b") << QColor("#ff9800") <<
-        QColor("#f44336") << QColor("#795548") << QColor("#9e9e9e") <<
-        QColor("#fafafa") << QColor("#3f51b5") << QColor("#cddc39");
+    return QVector<QColor>() << QColor("#2196f3") << QColor("#e91e63") << QColor("#009688")
+                             << QColor("#9c27b0") << QColor("#ffeb3b") << QColor("#ff9800")
+                             << QColor("#f44336") << QColor("#795548") << QColor("#9e9e9e")
+                             << QColor("#fafafa") << QColor("#3f51b5") << QColor("#cddc39");
 }
 
 #ifdef ENABLE_SCRIPT_HOTKEY
@@ -1526,25 +1506,23 @@ QVector<QColor> Application::standardColors(const QVersionNumber &version)
 
 bool Application::loadScript()
 {
-    QMessageBox::StandardButton answer = QMessageBox::question(nullptr,
-       QStringLiteral("Warning"),
-       QStringLiteral("Executing scripts on a scrite project is an experimental feature. Are you sure you want to use it?"),
-       QMessageBox::Yes|QMessageBox::No);
-    if(answer == QMessageBox::No)
+    QMessageBox::StandardButton answer = QMessageBox::question(
+            nullptr, QStringLiteral("Warning"),
+            QStringLiteral("Executing scripts on a scrite project is an experimental feature. Are "
+                           "you sure you want to use it?"),
+            QMessageBox::Yes | QMessageBox::No);
+    if (answer == QMessageBox::No)
         return true;
 
     ScriteDocument *document = ScriteDocument::instance();
-    if(document->isReadOnly())
-    {
-        QMessageBox::information(nullptr,
-             QStringLiteral("Warning"),
-             QStringLiteral("Cannot execute script on a readonly document."));
+    if (document->isReadOnly()) {
+        QMessageBox::information(nullptr, QStringLiteral("Warning"),
+                                 QStringLiteral("Cannot execute script on a readonly document."));
         return false;
     }
 
     QString scriptPath = QDir::homePath();
-    if( !document->fileName().isEmpty() )
-    {
+    if (!document->fileName().isEmpty()) {
         QFileInfo fi(document->fileName());
         scriptPath = fi.absolutePath();
     }
@@ -1552,33 +1530,30 @@ bool Application::loadScript()
     const QString caption = QStringLiteral("Select a JavaScript file to load");
     const QString filter = QStringLiteral("JavaScript File (*.js)");
     const QString scriptFile = QFileDialog::getOpenFileName(nullptr, caption, scriptPath, filter);
-    if(scriptFile.isEmpty())
+    if (scriptFile.isEmpty())
         return true;
 
     auto loadProgram = [](const QString &fileName) {
         QFile file(fileName);
-        if(!file.open(QFile::ReadOnly))
+        if (!file.open(QFile::ReadOnly))
             return QString();
         return QString::fromLatin1(file.readAll());
     };
     const QString program = loadProgram(scriptFile);
-    if(program.isEmpty())
-    {
-        QMessageBox::information(nullptr,
-             QStringLiteral("Script"),
-             QStringLiteral("No code was found in the selected file."));
+    if (program.isEmpty()) {
+        QMessageBox::information(nullptr, QStringLiteral("Script"),
+                                 QStringLiteral("No code was found in the selected file."));
         return true;
     }
 
     QJSEngine jsEngine;
 
     QJSValue globalObject = jsEngine.globalObject();
-    if(!document->isReadOnly())
+    if (!document->isReadOnly())
         globalObject.setProperty(QStringLiteral("document"), jsEngine.newQObject(document));
 
-    const QList<QObject*> objects = m_objectRegistry.list();
-    for(QObject *object : qAsConst(objects))
-    {
+    const QList<QObject *> objects = m_objectRegistry.list();
+    for (QObject *object : qAsConst(objects)) {
         const QString objName = object->property("#objectName").toString();
         globalObject.setProperty(objName, jsEngine.newQObject(object));
     }
@@ -1587,18 +1562,19 @@ bool Application::loadScript()
     const QJSValue result = jsEngine.evaluate(program, scriptFile);
     qApp->restoreOverrideCursor();
 
-    if(result.isError())
-    {
-        const QString msg = QStringLiteral("Uncaught exception at line ") +
-                result.property("lineNumber").toString() + ": " +
-                result.toString();
+    if (result.isError()) {
+        const QString msg = QStringLiteral("Uncaught exception at line ")
+                + result.property("lineNumber").toString() + ": " + result.toString();
         QMessageBox::warning(nullptr, QStringLiteral("Script"), msg);
     }
 
     return true;
 }
 #else
-bool Application::loadScript() { return false; }
+bool Application::loadScript()
+{
+    return false;
+}
 #endif
 
 bool Application::registerFileTypes()
@@ -1635,4 +1611,3 @@ bool Application::registerFileTypes()
 #endif
 #endif
 }
-

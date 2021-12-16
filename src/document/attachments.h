@@ -28,17 +28,11 @@ class Attachment : public QObject, public QObjectSerializer::Interface
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Attachment(QObject *parent=nullptr);
+    Attachment(QObject *parent = nullptr);
     ~Attachment();
     Q_SIGNAL void aboutToDelete(Attachment *ptr);
 
-    enum Type
-    {
-        Photo,
-        Video,
-        Audio,
-        Document
-    };
+    enum Type { Photo, Video, Audio, Document };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type NOTIFY typeChanged)
     Type type() const { return m_type; }
@@ -98,17 +92,17 @@ private:
     bool m_removeFileOnDelete = false;
 };
 
-class Attachments : public ObjectListPropertyModel<Attachment *>, public QObjectSerializer::Interface
+class Attachments : public ObjectListPropertyModel<Attachment *>,
+                    public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Attachments(QObject *parent=nullptr);
+    Attachments(QObject *parent = nullptr);
     ~Attachments();
 
-    enum AllowedType
-    {
+    enum AllowedType {
         PhotosOnly = 1,
         VideosOnly = 2,
         AudioOnly = 4,
@@ -129,8 +123,9 @@ public:
     QStringList nameFilters() const { return m_nameFilters; }
     Q_SIGNAL void nameFiltersChanged();
 
-    Q_INVOKABLE Attachment *includeAttachmentFromFileUrl(const QUrl &fileUrl) {
-        if(fileUrl.isLocalFile())
+    Q_INVOKABLE Attachment *includeAttachmentFromFileUrl(const QUrl &fileUrl)
+    {
+        if (fileUrl.isLocalFile())
             return this->includeAttachment(fileUrl.toLocalFile());
         return nullptr;
     }
@@ -138,7 +133,10 @@ public:
     Q_INVOKABLE void removeAttachment(Attachment *ptr);
     Q_INVOKABLE Attachment *attachmentAt(int index) const;
     Q_INVOKABLE Attachment *firstAttachment() const { return this->attachmentAt(0); }
-    Q_INVOKABLE Attachment *lastAttachment() const { return this->attachmentAt(this->attachmentCount()-1); }
+    Q_INVOKABLE Attachment *lastAttachment() const
+    {
+        return this->attachmentAt(this->attachmentCount() - 1);
+    }
     Q_INVOKABLE void removeAllAttachments();
 
     Q_PROPERTY(int attachmentCount READ attachmentCount NOTIFY attachmentCountChanged)
@@ -154,7 +152,7 @@ public:
 private:
     void includeAttachment(Attachment *ptr);
     void attachmentDestroyed(Attachment *ptr);
-    void includeAttachments(const QList<Attachment*> &list);
+    void includeAttachments(const QList<Attachment *> &list);
 
 private:
     AllowedType m_allowedType = DocumentsOfAnyType;
@@ -166,12 +164,12 @@ class AttachmentsDropArea : public QQuickItem
     Q_OBJECT
 
 public:
-    AttachmentsDropArea(QQuickItem *parent=nullptr);
+    AttachmentsDropArea(QQuickItem *parent = nullptr);
     ~AttachmentsDropArea();
 
     Q_PROPERTY(Attachments* target READ target WRITE setTarget NOTIFY targetChanged)
-    void setTarget(Attachments* val);
-    Attachments* target() const { return m_target; }
+    void setTarget(Attachments *val);
+    Attachments *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
     Q_PROPERTY(int allowedType READ allowedType WRITE setAllowedType NOTIFY allowedTypeChanged)
@@ -188,7 +186,7 @@ public:
     bool isActive() const { return m_attachment != nullptr; }
 
     Q_PROPERTY(Attachment* attachment READ attachment NOTIFY attachmentChanged)
-    Attachment* attachment() const { return m_attachment; }
+    Attachment *attachment() const { return m_attachment; }
     Q_SIGNAL void attachmentChanged();
 
     Q_PROPERTY(QPointF mouse READ mouse NOTIFY mouseChanged)
@@ -211,7 +209,7 @@ protected:
 private:
     void raiseWindow();
     void resetAttachments();
-    void setAttachment(Attachment* val);
+    void setAttachment(Attachment *val);
     void setMouse(const QPointF &val);
     bool prepareAttachmentFromMimeData(const QMimeData *mimeData);
 
@@ -221,8 +219,8 @@ private:
     bool m_allowDrop = true;
     int m_allowedType = 0;
     QStringList m_allowedExtensions;
-    Attachment* m_attachment = nullptr;
-    Attachments* m_target = nullptr;
+    Attachment *m_attachment = nullptr;
+    Attachments *m_target = nullptr;
     QPointer<QTimer> m_raiseWindowTimer;
 };
 

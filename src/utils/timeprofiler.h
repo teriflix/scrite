@@ -27,24 +27,16 @@ class TimeProfile
 public:
     static TimeProfile get(const QString &context);
 
-    enum PrintSortOrder
-    {
-        NoSort,
-        SortByTime,
-        SortByCounter,
-        SortByAverageTime
-    };
+    enum PrintSortOrder { NoSort, SortByTime, SortByCounter, SortByAverageTime };
 
-    enum PrintFormat
-    {
-        CSVFormat,
-        NormalFormat
-    };
-    static void print(PrintSortOrder sortOrder=NoSort, PrintFormat format=NormalFormat);
-    static void save(const QString &fileName, PrintSortOrder sortOrder=NoSort, PrintFormat format=CSVFormat);
+    enum PrintFormat { CSVFormat, NormalFormat };
+    static void print(PrintSortOrder sortOrder = NoSort, PrintFormat format = NormalFormat);
+    static void save(const QString &fileName, PrintSortOrder sortOrder = NoSort,
+                     PrintFormat format = CSVFormat);
 
-    TimeProfile() : m_time(0), m_avgTime(0), m_counter(0) {}
-    TimeProfile(const TimeProfile &other) {
+    TimeProfile() : m_time(0), m_avgTime(0), m_counter(0) { }
+    TimeProfile(const TimeProfile &other)
+    {
         m_context = other.m_context;
         m_time = other.m_time;
         m_counter = other.m_counter;
@@ -57,18 +49,19 @@ public:
     QString context() const { return m_context; }
 
     qint64 timeInNanoseconds() const { return m_time; }
-    qint64 timeInMicroseconds() const { return m_time/1000; }
-    qint64 timeInMilliseconds() const { return m_time/1000000; }
-    qint64 timeInSeconds() const { return m_time/1000000000; }
+    qint64 timeInMicroseconds() const { return m_time / 1000; }
+    qint64 timeInMilliseconds() const { return m_time / 1000000; }
+    qint64 timeInSeconds() const { return m_time / 1000000000; }
 
     qint64 averageTimeInNanoseconds() const { return m_avgTime; }
-    qint64 averageTimeInMicroseconds() const { return m_avgTime/1000; }
-    qint64 averageTimeInMilliseconds() const { return m_avgTime/1000000; }
-    qint64 averageTimeInSeconds() const { return m_avgTime/1000000000; }
+    qint64 averageTimeInMicroseconds() const { return m_avgTime / 1000; }
+    qint64 averageTimeInMilliseconds() const { return m_avgTime / 1000000; }
+    qint64 averageTimeInSeconds() const { return m_avgTime / 1000000000; }
 
     int counter() const { return m_counter; }
 
-    TimeProfile & operator = (const TimeProfile &other) {
+    TimeProfile &operator=(const TimeProfile &other)
+    {
         m_context = other.m_context;
         m_time = other.m_time;
         m_counter = other.m_counter;
@@ -76,8 +69,10 @@ public:
         return *this;
     }
 
-    QString toString(int indent=0, TimeProfile::PrintFormat format=TimeProfile::NormalFormat) const;
-    void printSelf(int indent=0, TimeProfile::PrintFormat format=TimeProfile::NormalFormat) const;
+    QString toString(int indent = 0,
+                     TimeProfile::PrintFormat format = TimeProfile::NormalFormat) const;
+    void printSelf(int indent = 0,
+                   TimeProfile::PrintFormat format = TimeProfile::NormalFormat) const;
 
 private:
     friend class TimeProfiler;
@@ -85,17 +80,18 @@ private:
 
     static TimeProfile put(const TimeProfile &profile);
 
-    TimeProfile operator + (const TimeProfile &other) const {
-        if( this->m_context == other.m_context ) {
-            return TimeProfile(this->m_context,
-                                this->m_time + other.m_time,
-                                this->m_counter + other.m_counter);
+    TimeProfile operator+(const TimeProfile &other) const
+    {
+        if (this->m_context == other.m_context) {
+            return TimeProfile(this->m_context, this->m_time + other.m_time,
+                               this->m_counter + other.m_counter);
         }
         return *this;
     }
 
-    TimeProfile & operator += (const TimeProfile &other) {
-        if( this->m_context == other.m_context ) {
+    TimeProfile &operator+=(const TimeProfile &other)
+    {
+        if (this->m_context == other.m_context) {
             this->m_time += other.m_time;
             this->m_counter += other.m_counter;
             this->computeAverageTime();
@@ -103,26 +99,30 @@ private:
         return *this;
     }
 
-    TimeProfile operator + (qint64 time) const {
-        return TimeProfile(this->m_context,
-                            this->m_time + time,
-                            this->m_counter + 1);
+    TimeProfile operator+(qint64 time) const
+    {
+        return TimeProfile(this->m_context, this->m_time + time, this->m_counter + 1);
     }
 
-    TimeProfile & operator += (qint64 time) {
+    TimeProfile &operator+=(qint64 time)
+    {
         this->m_time += time;
         this->m_counter++;
         this->computeAverageTime();
         return *this;
     }
 
-    void computeAverageTime() {
-        if( m_time == 0 ) m_avgTime = 0;
-        else if( m_counter > 0 ) m_avgTime = qint64( qreal(m_time)/qreal(m_counter) );
+    void computeAverageTime()
+    {
+        if (m_time == 0)
+            m_avgTime = 0;
+        else if (m_counter > 0)
+            m_avgTime = qint64(qreal(m_time) / qreal(m_counter));
     }
 
-    TimeProfile(const QString &context, qint64 time, int counter=1)
-        : m_context(context), m_time(time), m_counter(counter) {
+    TimeProfile(const QString &context, qint64 time, int counter = 1)
+        : m_context(context), m_time(time), m_counter(counter)
+    {
         this->computeAverageTime();
     }
 
@@ -139,11 +139,11 @@ private:
 class TimeProfiler
 {
 public:
-    TimeProfiler(const QString &context, bool print=false);
+    TimeProfiler(const QString &context, bool print = false);
     ~TimeProfiler();
 
     QString context() const { return m_context; }
-    TimeProfile profile(bool aggregate=false) const;
+    TimeProfile profile(bool aggregate = false) const;
 
     void capture();
 
@@ -159,7 +159,7 @@ class ProfilerItem : public QObject
     Q_OBJECT
 
 public:
-    ProfilerItem(QObject *parent=nullptr);
+    ProfilerItem(QObject *parent = nullptr);
     ~ProfilerItem();
 
     static ProfilerItem *qmlAttachedProperties(QObject *object);
@@ -180,7 +180,7 @@ private:
     QElapsedTimer *m_timer = nullptr;
 };
 
-Q_DECLARE_METATYPE(ProfilerItem*)
+Q_DECLARE_METATYPE(ProfilerItem *)
 QML_DECLARE_TYPEINFO(ProfilerItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #define PROFILE_THIS_FUNCTION TimeProfiler profiler##__LINE__(Q_FUNC_INFO, false)
@@ -191,11 +191,11 @@ QML_DECLARE_TYPEINFO(ProfilerItem, QML_HAS_ATTACHED_PROPERTIES)
 class TimeProfiler
 {
 public:
-    TimeProfiler(const QString &, bool=false) { }
+    TimeProfiler(const QString &, bool = false) { }
     ~TimeProfiler() { }
 
     QString context() const { return QString(); }
-    TimeProfile profile(bool=false) const { return TimeProfile(); }
+    TimeProfile profile(bool = false) const { return TimeProfile(); }
 };
 
 #define PROFILE_THIS_FUNCTION

@@ -40,7 +40,7 @@ public:
     ~SceneElementFormat();
 
     Q_PROPERTY(ScreenplayFormat* format READ format CONSTANT STORED false)
-    ScreenplayFormat* format() const { return m_format; }
+    ScreenplayFormat *format() const { return m_format; }
 
     Q_PROPERTY(SceneElement::Type elementType READ elementType CONSTANT)
     SceneElement::Type elementType() const { return m_elementType; }
@@ -99,8 +99,7 @@ public:
     Q_SIGNAL void rightMarginChanged();
 
     // Must be manually kept in sync with TransliterationEngine::Language
-    enum DefaultLanguage
-    {
+    enum DefaultLanguage {
         Default,
         English,
         Bengali,
@@ -127,13 +126,12 @@ public:
 
     Q_INVOKABLE void activateDefaultLanguage();
 
-    QTextBlockFormat createBlockFormat(const qreal *pageWidth=nullptr) const;
-    QTextCharFormat createCharFormat(const qreal *pageWidth=nullptr) const;
+    QTextBlockFormat createBlockFormat(const qreal *pageWidth = nullptr) const;
+    QTextCharFormat createCharFormat(const qreal *pageWidth = nullptr) const;
 
     Q_SIGNAL void elementFormatChanged();
 
-    enum Properties
-    {
+    enum Properties {
         FontFamily,
         FontSize,
         FontStyle,
@@ -156,7 +154,8 @@ public:
 
 private:
     friend class ScreenplayFormat;
-    SceneElementFormat(SceneElement::Type type=SceneElement::Action, ScreenplayFormat *parent=nullptr);
+    SceneElementFormat(SceneElement::Type type = SceneElement::Action,
+                       ScreenplayFormat *parent = nullptr);
     void countTransactionChange() { ++m_nrChangesDuringTransation; }
 
 private:
@@ -185,7 +184,7 @@ class ScreenplayPageLayout : public QObject
     Q_OBJECT
 
 public:
-    ScreenplayPageLayout(ScreenplayFormat *parent=nullptr);
+    ScreenplayPageLayout(ScreenplayFormat *parent = nullptr);
     ~ScreenplayPageLayout();
 
     Q_PROPERTY(ScreenplayFormat* format READ format CONSTANT)
@@ -291,15 +290,15 @@ class ScreenplayFormat : public QAbstractListModel, public Modifiable
     Q_OBJECT
 
 public:
-    ScreenplayFormat(QObject *parent=nullptr);
+    ScreenplayFormat(QObject *parent = nullptr);
     ~ScreenplayFormat();
 
     Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
-    ScriteDocument* scriteDocument() const { return m_scriteDocument; }
+    ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
     Q_PROPERTY(QScreen* screen READ screen WRITE setScreen NOTIFY screenChanged RESET resetScreen STORED false)
-    void setScreen(QScreen* val);
-    QScreen* screen() const { return m_screen; }
+    void setScreen(QScreen *val);
+    QScreen *screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
 
     Q_INVOKABLE void setSreeenFromWindow(QObject *windowObject);
@@ -310,7 +309,7 @@ public:
     qreal devicePixelRatio() const;
 
     Q_PROPERTY(ScreenplayPageLayout* pageLayout READ pageLayout CONSTANT STORED false)
-    ScreenplayPageLayout* pageLayout() const { return m_pageLayout; }
+    ScreenplayPageLayout *pageLayout() const { return m_pageLayout; }
 
     Q_PROPERTY(TransliterationEngine::Language defaultLanguage READ defaultLanguage WRITE setDefaultLanguage NOTIFY defaultLanguageChanged)
     void setDefaultLanguage(TransliterationEngine::Language val);
@@ -319,7 +318,10 @@ public:
 
     Q_PROPERTY(int defaultLanguageInt READ defaultLanguageInt WRITE setDefaultLanguageInt NOTIFY defaultLanguageChanged)
     int defaultLanguageInt() const { return int(m_defaultLanguage); }
-    void setDefaultLanguageInt(int val) { this->setDefaultLanguage(TransliterationEngine::Language(val)); }
+    void setDefaultLanguageInt(int val)
+    {
+        this->setDefaultLanguage(TransliterationEngine::Language(val));
+    }
 
     Q_PROPERTY(QFont defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
     void setDefaultFont(const QFont &val);
@@ -355,7 +357,7 @@ public:
 
     void applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties);
 
-    enum Role { SceneElementFomat=Qt::UserRole };
+    enum Role { SceneElementFomat = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
@@ -384,11 +386,11 @@ private:
     void countTransactionChange() { ++m_nrChangesDuringTransation; }
 
 private:
-    char  m_padding[4];
+    char m_padding[4];
     QFont m_defaultFont;
     qreal m_pageWidth = 750.0;
     int m_secondsPerPage = 60;
-    int   m_fontPointSizeDelta = 0;
+    int m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
     bool m_inTransaction = false;
     int m_nrChangesDuringTransation = 0;
@@ -399,12 +401,13 @@ private:
     QFontMetrics m_defaultFontMetrics;
     QFontMetrics m_defaultFont2Metrics;
     QStringList m_suggestionsAtCursor;
-    ScreenplayPageLayout* m_pageLayout = new ScreenplayPageLayout(this);
+    ScreenplayPageLayout *m_pageLayout = new ScreenplayPageLayout(this);
     TransliterationEngine::Language m_defaultLanguage = TransliterationEngine::English;
 
-    static SceneElementFormat* staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index);
+    static SceneElementFormat *staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list,
+                                                     int index);
     static int staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list);
-    QList<SceneElementFormat*> m_elementFormats;
+    QList<SceneElementFormat *> m_elementFormats;
 };
 
 class TextFormat : public QObject
@@ -412,7 +415,7 @@ class TextFormat : public QObject
     Q_OBJECT
 
 public:
-    TextFormat(QObject *parent=nullptr);
+    TextFormat(QObject *parent = nullptr);
     ~TextFormat();
 
     Q_PROPERTY(bool bold READ isBold WRITE setBold NOTIFY boldChanged)
@@ -436,7 +439,7 @@ public:
     Q_SIGNAL void textColorChanged();
 
     Q_PROPERTY(bool hasTextColor READ hasTextColor NOTIFY textColorChanged)
-    bool hasTextColor() const { return m_textColor.alpha() > 0 ; }
+    bool hasTextColor() const { return m_textColor.alpha() > 0; }
 
     Q_INVOKABLE void resetTextColor() { this->setTextColor(Qt::transparent); }
 
@@ -470,22 +473,22 @@ class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
     Q_INTERFACES(QQmlParserStatus)
 
 public:
-    SceneDocumentBinder(QObject *parent=nullptr);
+    SceneDocumentBinder(QObject *parent = nullptr);
     ~SceneDocumentBinder();
 
     Q_PROPERTY(ScreenplayFormat* screenplayFormat READ screenplayFormat WRITE setScreenplayFormat NOTIFY screenplayFormatChanged RESET resetScreenplayFormat)
-    void setScreenplayFormat(ScreenplayFormat* val);
-    ScreenplayFormat* screenplayFormat() const { return m_screenplayFormat; }
+    void setScreenplayFormat(ScreenplayFormat *val);
+    ScreenplayFormat *screenplayFormat() const { return m_screenplayFormat; }
     Q_SIGNAL void screenplayFormatChanged();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
-    void setScene(Scene* val);
-    Scene* scene() const { return m_scene; }
+    void setScene(Scene *val);
+    Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
     Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
-    void setTextDocument(QQuickTextDocument* val);
-    QQuickTextDocument* textDocument() const { return m_textDocument; }
+    void setTextDocument(QQuickTextDocument *val);
+    QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
     Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY spellCheckEnabledChanged)
@@ -509,7 +512,7 @@ public:
     Q_SIGNAL void cursorPositionChanged();
 
     Q_PROPERTY(TextFormat* textFormat READ textFormat CONSTANT)
-    TextFormat* textFormat() const { return m_textFormat; }
+    TextFormat *textFormat() const { return m_textFormat; }
 
     Q_SIGNAL void requestCursorPosition(int position);
 
@@ -519,7 +522,7 @@ public:
     Q_SIGNAL void characterNamesChanged();
 
     Q_PROPERTY(SceneElement* currentElement READ currentElement NOTIFY currentElementChanged RESET resetCurrentElement)
-    SceneElement* currentElement() const { return m_currentElement; }
+    SceneElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
     Q_PROPERTY(int currentElementCursorPosition READ currentElementCursorPosition NOTIFY cursorPositionChanged)
@@ -549,7 +552,7 @@ public:
     Q_INVOKABLE int currentBlockPosition() const;
 
     Q_PROPERTY(QStringList spellingSuggestions READ spellingSuggestions NOTIFY spellingSuggestionsChanged)
-    QStringList spellingSuggestions() const {return m_spellingSuggestions; }
+    QStringList spellingSuggestions() const { return m_spellingSuggestions; }
     Q_SIGNAL void spellingSuggestionsChanged();
 
     Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY wordUnderCursorIsMisspelledChanged)
@@ -559,17 +562,20 @@ public:
     Q_INVOKABLE QStringList spellingSuggestionsForWordAt(int position) const;
 
     Q_INVOKABLE void replaceWordAt(int position, const QString &with);
-    Q_INVOKABLE void replaceWordUnderCursor(const QString &with) {
+    Q_INVOKABLE void replaceWordUnderCursor(const QString &with)
+    {
         this->replaceWordAt(m_cursorPosition, with);
     }
 
     Q_INVOKABLE void addWordAtPositionToDictionary(int position);
-    Q_INVOKABLE void addWordUnderCursorToDictionary() {
+    Q_INVOKABLE void addWordUnderCursorToDictionary()
+    {
         this->addWordAtPositionToDictionary(m_cursorPosition);
     }
 
     Q_INVOKABLE void addWordAtPositionToIgnoreList(int position);
-    Q_INVOKABLE void addWordUnderCursorToIgnoreList() {
+    Q_INVOKABLE void addWordUnderCursorToIgnoreList()
+    {
         this->addWordAtPositionToIgnoreList(m_cursorPosition);
     }
 
@@ -597,7 +603,7 @@ public:
     Q_SIGNAL void spellingMistakesDetected();
 
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
-    Q_INVOKABLE int paste(int fromPosition=-1);
+    Q_INVOKABLE int paste(int fromPosition = -1);
 
     Q_PROPERTY(bool applyFormattingEvenInTransaction READ isApplyFormattingEvenInTransaction WRITE setApplyFormattingEvenInTransaction NOTIFY applyFormattingEvenInTransactionChanged)
     void setApplyFormattingEvenInTransaction(bool val);
@@ -623,12 +629,12 @@ private:
     void initializeDocument();
     void initializeDocumentLater();
     void setDocumentLoadCount(int val);
-    void setCurrentElement(SceneElement* val);
+    void setCurrentElement(SceneElement *val);
     void resetCurrentElement();
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     Q_SLOT void onSpellCheckUpdated();
     void onContentsChange(int from, int charsRemoved, int charsAdded);
-    void syncSceneFromDocument(int nrBlocks=-1);
+    void syncSceneFromDocument(int nrBlocks = -1);
     bool eventFilter(QObject *object, QEvent *event);
 
     void evaluateAutoCompleteHints();
@@ -651,7 +657,7 @@ private:
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
     int m_documentLoadCount = 0;
-    TextFormat* m_textFormat = new TextFormat(this);
+    TextFormat *m_textFormat = new TextFormat(this);
     bool m_sceneIsBeingReset = false;
     bool m_forceSyncDocument = false;
     bool m_spellCheckEnabled = true;

@@ -42,7 +42,7 @@ public:
 
 private:
     friend class EventFilter;
-    EventFilterResult(QObject *parent=nullptr);
+    EventFilterResult(QObject *parent = nullptr);
 
 private:
     bool m_filter = false;
@@ -54,7 +54,7 @@ class EventFilter : public QObject
     Q_OBJECT
 
 public:
-    EventFilter(QObject *parent=nullptr);
+    EventFilter(QObject *parent = nullptr);
     ~EventFilter();
 
     static EventFilter *qmlAttachedProperties(QObject *object);
@@ -65,8 +65,8 @@ public:
     Q_SIGNAL void activeChanged();
 
     Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
-    void setTarget(QObject* val);
-    QObject* target() const { return m_target; }
+    void setTarget(QObject *val);
+    QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
     Q_PROPERTY(QList<int> events READ events WRITE setEvents NOTIFY eventsChanged)
@@ -84,8 +84,7 @@ public:
 
     Q_SIGNAL void filter(QObject *object, const QJsonObject &event, EventFilterResult *result);
 
-    enum Event
-    {
+    enum Event {
         MouseButtonPress = QEvent::MouseButtonPress,
         MouseButtonRelease = QEvent::MouseButtonRelease,
         MouseButtonDblClick = QEvent::MouseButtonDblClick,
@@ -115,7 +114,7 @@ private:
     QObjectProperty<QObject> m_target;
 };
 
-Q_DECLARE_METATYPE(EventFilter*)
+Q_DECLARE_METATYPE(EventFilter *)
 QML_DECLARE_TYPEINFO(EventFilter, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // EVENTFILTER_H

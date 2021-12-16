@@ -22,7 +22,7 @@ class Announcement : public QObject
     Q_OBJECT
 
 public:
-    Announcement(QObject *parent=nullptr);
+    Announcement(QObject *parent = nullptr);
     ~Announcement();
 
     static Announcement *qmlAttachedProperties(QObject *object);
@@ -30,7 +30,7 @@ public:
     Q_INVOKABLE void shout(const QString &type, const QJsonValue &data);
     Q_SIGNAL void incoming(const QString &type, const QJsonValue &data);
 };
-Q_DECLARE_METATYPE(Announcement*)
+Q_DECLARE_METATYPE(Announcement *)
 QML_DECLARE_TYPEINFO(Announcement, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // ANNOUNCEMENT_H

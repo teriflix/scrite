@@ -14,16 +14,9 @@
 #include "locationreport.h"
 #include "transliteration.h"
 
-LocationReport::LocationReport(QObject *parent)
-    : AbstractReportGenerator(parent)
-{
+LocationReport::LocationReport(QObject *parent) : AbstractReportGenerator(parent) { }
 
-}
-
-LocationReport::~LocationReport()
-{
-
-}
+LocationReport::~LocationReport() { }
 
 bool LocationReport::doGenerate(QTextDocument *textDocument)
 {
@@ -58,11 +51,10 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         cursor.setCharFormat(charFormat);
 
         QString title = screenplay->title();
-        if(title.isEmpty())
+        if (title.isEmpty())
             title = "Untitled Screenplay";
         cursor.insertText(title);
-        if(!screenplay->subtitle().isEmpty())
-        {
+        if (!screenplay->subtitle().isEmpty()) {
             cursor.insertBlock();
             cursor.insertText(screenplay->subtitle());
         }
@@ -77,32 +69,31 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         blockFormat.setBottomMargin(20);
         charFormat = defaultCharFormat;
         cursor.insertBlock(blockFormat, charFormat);
-        cursor.insertHtml("This report was generated using <strong>Scrite</strong><br/>(<a href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
+        cursor.insertHtml("This report was generated using <strong>Scrite</strong><br/>(<a "
+                          "href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
     }
     this->progress()->tick();
 
-    const QMap< QString, QList<SceneHeading*> > locationHeadingsMap = structure->locationHeadingsMap();
-    this->progress()->setProgressStepFromCount(locationHeadingsMap.size()+2);
+    const QMap<QString, QList<SceneHeading *>> locationHeadingsMap =
+            structure->locationHeadingsMap();
+    this->progress()->setProgressStepFromCount(locationHeadingsMap.size() + 2);
 
-    QMap< QString, QList<SceneHeading*> >::const_iterator it = locationHeadingsMap.constBegin();
-    QMap< QString, QList<SceneHeading*> >::const_iterator end = locationHeadingsMap.constEnd();
-    while(it != end)
-    {
+    QMap<QString, QList<SceneHeading *>>::const_iterator it = locationHeadingsMap.constBegin();
+    QMap<QString, QList<SceneHeading *>>::const_iterator end = locationHeadingsMap.constEnd();
+    while (it != end) {
         this->progress()->tick();
-        QMap< QString, QMap< QString,QList<SceneHeading*> > > map;
-        QList<SceneHeading*> headings = it.value();
-        for(int i=headings.size()-1; i>=0; i--)
-        {
+        QMap<QString, QMap<QString, QList<SceneHeading *>>> map;
+        QList<SceneHeading *> headings = it.value();
+        for (int i = headings.size() - 1; i >= 0; i--) {
             SceneHeading *heading = headings.at(i);
             Scene *scene = heading->scene();
-            if(screenplay->firstIndexOfScene(scene) < 0)
+            if (screenplay->firstIndexOfScene(scene) < 0)
                 headings.removeAt(i);
             else
                 map[heading->locationType()][heading->moment()].prepend(heading);
         }
 
-        if(headings.isEmpty())
-        {
+        if (headings.isEmpty()) {
             ++it;
             continue;
         }
@@ -111,7 +102,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         blockFormat.setTopMargin(20);
 
         QTextCharFormat charFormat = defaultCharFormat;
-        charFormat.setFontPointSize(defaultCharFormat.fontPointSize()+3);
+        charFormat.setFontPointSize(defaultCharFormat.fontPointSize() + 3);
         charFormat.setFontWeight(QFont::Bold);
 
         cursor.insertBlock(blockFormat, charFormat);
@@ -119,14 +110,12 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         cursor.insertText(" (" + QString::number(headings.size()) + " occurances)");
 
         const QStringList locTypes = map.keys();
-        Q_FOREACH(QString locType, locTypes)
-        {
-            const QMap< QString,QList<SceneHeading*> > momentMap = map.value(locType);
-            QMap< QString,QList<SceneHeading*> >::const_iterator it2 = momentMap.constBegin();
-            QMap< QString,QList<SceneHeading*> >::const_iterator end2 = momentMap.constEnd();
+        Q_FOREACH (QString locType, locTypes) {
+            const QMap<QString, QList<SceneHeading *>> momentMap = map.value(locType);
+            QMap<QString, QList<SceneHeading *>>::const_iterator it2 = momentMap.constBegin();
+            QMap<QString, QList<SceneHeading *>>::const_iterator end2 = momentMap.constEnd();
             int counter = 0;
-            while(it2 != end2)
-            {
+            while (it2 != end2) {
                 counter += it2.value().size();
                 ++it2;
             }
@@ -141,35 +130,36 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
             cursor.insertText(locType + " (" + QString::number(counter) + ")");
 
             it2 = momentMap.constBegin();
-            while(it2 != end2)
-            {
+            while (it2 != end2) {
                 blockFormat = defaultBlockFormat;
                 blockFormat.setIndent(2);
                 charFormat = defaultCharFormat;
 
                 cursor.insertBlock(blockFormat, charFormat);
-                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, it2.value().first()->text());
+                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                        cursor, it2.value().first()->text());
                 cursor.insertText(" (" + QString::number(it.value().size()) + ")");
 
-                Q_FOREACH(SceneHeading *heading, it2.value())
-                {
+                Q_FOREACH (SceneHeading *heading, it2.value()) {
                     Scene *scene = heading->scene();
-                    int sceneNr = screenplay->firstIndexOfScene(scene)+1;
-                    ScreenplayElement *screenplayElement = screenplay->elementAt(sceneNr-1);
+                    int sceneNr = screenplay->firstIndexOfScene(scene) + 1;
+                    ScreenplayElement *screenplayElement = screenplay->elementAt(sceneNr - 1);
                     QString snippet = scene->title();
-                    if(snippet.length() > snippetLength)
-                        snippet = snippet.left(snippetLength-3) + "...";
+                    if (snippet.length() > snippetLength)
+                        snippet = snippet.left(snippetLength - 3) + "...";
 
                     blockFormat = defaultBlockFormat;
                     blockFormat.setIndent(3);
                     charFormat = defaultCharFormat;
 
                     cursor.insertBlock(blockFormat, charFormat);
-                    if(screenplayElement)
-                        cursor.insertText( "Scene #" + screenplayElement->resolvedSceneNumber() + + ": ");
+                    if (screenplayElement)
+                        cursor.insertText("Scene #" + screenplayElement->resolvedSceneNumber()
+                                          + +": ");
                     else
-                        cursor.insertText( "Scene #" + QString::number(sceneNr) + + ": ");
-                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, snippet);
+                        cursor.insertText("Scene #" + QString::number(sceneNr) + +": ");
+                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor,
+                                                                                       snippet);
                 }
 
                 ++it2;

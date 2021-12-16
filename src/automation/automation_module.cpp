@@ -28,7 +28,9 @@ void Automation::init(QQuickView *qmlWindow)
     qmlRegisterType<WindowCapture>("Scrite", 1, 0, "WindowCapture");
 
 #ifdef SCRITE_ENABLE_AUTOMATION
-    qmlRegisterUncreatableType<AbstractAutomationStep>("Scrite", 1, 0, "AbstractAutomationStep", QStringLiteral("Create concrete steps instead"));
+    qmlRegisterUncreatableType<AbstractAutomationStep>(
+            "Scrite", 1, 0, "AbstractAutomationStep",
+            QStringLiteral("Create concrete steps instead"));
     qmlRegisterType<PauseStep>("Scrite", 1, 0, "PauseStep");
     qmlRegisterType<Automation>("Scrite", 1, 0, "Automation");
     qmlRegisterType<EventAutomationStep>("Scrite", 1, 0, "EventStep");
@@ -37,8 +39,9 @@ void Automation::init(QQuickView *qmlWindow)
     new AutomationRecorder(qmlWindow);
 
     const QString automationScript = QString::fromLatin1(qgetenv("SCRITE_AUTOMATION_SCRIPT"));
-    if( QFile::exists(automationScript) )
-        qmlWindow->engine()->rootContext()->setContextProperty("automationScript", QUrl::fromLocalFile(automationScript));
+    if (QFile::exists(automationScript))
+        qmlWindow->engine()->rootContext()->setContextProperty(
+                "automationScript", QUrl::fromLocalFile(automationScript));
     else
 #else
     Q_UNUSED(qmlWindow)

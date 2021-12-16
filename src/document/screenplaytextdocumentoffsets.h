@@ -31,18 +31,18 @@ public:
     ~ScreenplayTextDocumentOffsets();
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
-    void setScreenplay(Screenplay* val);
-    Screenplay* screenplay() const { return m_screenplay; }
+    void setScreenplay(Screenplay *val);
+    Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(QTextDocument* document READ document WRITE setDocument NOTIFY documentChanged)
-    void setDocument(QTextDocument* val);
-    QTextDocument* document() const { return m_document; }
+    void setDocument(QTextDocument *val);
+    QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
     Q_PROPERTY(ScreenplayFormat* format READ format WRITE setFormat NOTIFY formatChanged)
-    void setFormat(ScreenplayFormat* val);
-    ScreenplayFormat* format() const { return m_format; }
+    void setFormat(ScreenplayFormat *val);
+    ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileNameChanged)
@@ -69,13 +69,13 @@ public:
 
     Q_INVOKABLE QJsonObject offsetInfoAt(int row) const { return this->at(row).toObject(); }
     Q_INVOKABLE QJsonObject offsetInfoAtPoint(const QPointF &pos) const;
-    Q_INVOKABLE QJsonObject offsetInfoAtTime(int timeInMs, int rowHint=-1) const;
-    Q_INVOKABLE int evaluateTimeAtPoint(const QPointF &pos, int rowHint=-1) const;
-    Q_INVOKABLE QPointF evaluatePointAtTime(int timeInMs, int rowHint=-1) const;
-    Q_INVOKABLE void setTime(int row, int timeInMs, bool adjustFollowingRows=false);
-    Q_INVOKABLE void resetTime(int row, bool andFollowingRows=false);
+    Q_INVOKABLE QJsonObject offsetInfoAtTime(int timeInMs, int rowHint = -1) const;
+    Q_INVOKABLE int evaluateTimeAtPoint(const QPointF &pos, int rowHint = -1) const;
+    Q_INVOKABLE QPointF evaluatePointAtTime(int timeInMs, int rowHint = -1) const;
+    Q_INVOKABLE void setTime(int row, int timeInMs, bool adjustFollowingRows = false);
+    Q_INVOKABLE void resetTime(int row, bool andFollowingRows = false);
     Q_INVOKABLE void toggleSceneTimeLock(int row);
-    Q_INVOKABLE void adjustUnlockedTimes(int duration=0);
+    Q_INVOKABLE void adjustUnlockedTimes(int duration = 0);
     Q_INVOKABLE void unlockAllSceneTimes();
     Q_INVOKABLE void resetAllTimes();
 

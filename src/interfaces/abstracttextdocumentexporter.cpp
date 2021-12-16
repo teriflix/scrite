@@ -15,19 +15,15 @@
 #include "screenplaytextdocument.h"
 
 AbstractTextDocumentExporter::AbstractTextDocumentExporter(QObject *parent)
-    :AbstractExporter(parent)
+    : AbstractExporter(parent)
 {
-
 }
 
-AbstractTextDocumentExporter::~AbstractTextDocumentExporter()
-{
-
-}
+AbstractTextDocumentExporter::~AbstractTextDocumentExporter() { }
 
 void AbstractTextDocumentExporter::setListSceneCharacters(bool val)
 {
-    if(m_listSceneCharacters == val)
+    if (m_listSceneCharacters == val)
         return;
 
     m_listSceneCharacters = val;
@@ -36,7 +32,7 @@ void AbstractTextDocumentExporter::setListSceneCharacters(bool val)
 
 void AbstractTextDocumentExporter::setIncludeSceneSynopsis(bool val)
 {
-    if(m_includeSceneSynopsis == val)
+    if (m_includeSceneSynopsis == val)
         return;
 
     m_includeSceneSynopsis = val;
@@ -45,7 +41,7 @@ void AbstractTextDocumentExporter::setIncludeSceneSynopsis(bool val)
 
 void AbstractTextDocumentExporter::setIncludeSceneContents(bool val)
 {
-    if(m_includeSceneContents == val)
+    if (m_includeSceneContents == val)
         return;
 
     m_includeSceneContents = val;
@@ -66,7 +62,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setPrintEachActOnANewPage(this->isPrintEachActOnANewPage());
     stDoc.setIncludeActBreaks(this->isIncludeActBreaks());
     stDoc.setSyncEnabled(false);
-    if(this->isExportForPrintingPurpose() || (this->usePageBreaks() && m_includeSceneContents))
+    if (this->isExportForPrintingPurpose() || (this->usePageBreaks() && m_includeSceneContents))
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
     else
         stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);
@@ -82,4 +78,3 @@ bool AbstractTextDocumentExporter::filterSceneElement() const
 {
     return !m_includeSceneContents;
 }
-

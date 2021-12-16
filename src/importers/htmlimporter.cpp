@@ -13,16 +13,9 @@
 
 #include "htmlimporter.h"
 
-HtmlImporter::HtmlImporter(QObject *parent)
-                  :AbstractImporter(parent)
-{
+HtmlImporter::HtmlImporter(QObject *parent) : AbstractImporter(parent) { }
 
-}
-
-HtmlImporter::~HtmlImporter()
-{
-
-}
+HtmlImporter::~HtmlImporter() { }
 
 bool HtmlImporter::canImport(const QString &fileName) const
 {
@@ -41,8 +34,7 @@ QByteArray HtmlImporter::preprocess(QIODevice *device) const
 
     // Check for celtx HTML format
     static const QByteArray celtxSignature("chrome://celtx/");
-    if( bytes.indexOf(celtxSignature) >= 0 )
-    {
+    if (bytes.indexOf(celtxSignature) >= 0) {
         const int index = bytes.indexOf("<body>");
         bytes.remove(0, index);
         bytes.prepend("<html>");
@@ -61,66 +53,65 @@ bool HtmlImporter::importFrom(const QByteArray &bytes)
     int errCol = -1;
 
     QDomDocument htmlDoc;
-    if( !htmlDoc.setContent(bytes, &errMsg, &errLine, &errCol) )
-    {
-        const QString msg = QString("Parse Error: %1 at Line %2, Column %3").arg(errMsg).arg(errLine).arg(errCol);
+    if (!htmlDoc.setContent(bytes, &errMsg, &errLine, &errCol)) {
+        const QString msg = QString("Parse Error: %1 at Line %2, Column %3")
+                                    .arg(errMsg)
+                                    .arg(errLine)
+                                    .arg(errCol);
         this->error()->setErrorMessage(msg);
         return false;
     }
 
     const QDomElement rootE = htmlDoc.documentElement();
     const QDomElement bodyE = rootE.firstChildElement("body");
-    if(bodyE.isNull())
-    {
+    if (bodyE.isNull()) {
         this->error()->setErrorMessage("Could not find <BODY> tag.");
         return false;
     }
 
     const QDomNodeList pList = bodyE.elementsByTagName("p");
-    if(pList.isEmpty())
-    {
+    if (pList.isEmpty()) {
         this->error()->setErrorMessage("No paragraphs to import.");
         return false;
     }
 
-    this->progress()->setProgressStep(1.0 / qreal(pList.size()+1));
+    this->progress()->setProgressStep(1.0 / qreal(pList.size() + 1));
     this->configureCanvas(pList.size());
 
-    static const QStringList types = QStringList()
-            << "heading" << "action" << "character"
-            << "dialog" << "parenthetical" << "shot"
-            << "transition";
+    static const QStringList types = QStringList() << "heading"
+                                                   << "action"
+                                                   << "character"
+                                                   << "dialog"
+                                                   << "parenthetical"
+                                                   << "shot"
+                                                   << "transition";
 
     Scene *scene = nullptr;
     QDomElement paragraphE = bodyE.firstChildElement("p");
-    while(!paragraphE.isNull())
-    {
+    while (!paragraphE.isNull()) {
         TraverseDomElement tde(paragraphE, this->progress());
 
         const QString type = paragraphE.attribute("class");
         const int typeIndex = types.indexOf(type);
-        if(typeIndex < 0)
+        if (typeIndex < 0)
             continue;
 
         QString text = paragraphE.text().trimmed();
         text = text.replace("\r\n", " ");
         text = text.replace("\n", " ");
-        if(text.isEmpty())
+        if (text.isEmpty())
             continue;
 
-        if(typeIndex == 0)
+        if (typeIndex == 0)
             scene = this->createScene(text);
-        else
-        {
-            if(scene == nullptr)
-            {
+        else {
+            if (scene == nullptr) {
                 scene = this->createScene(QStringLiteral("INT. SOMEWHERE - DAY"));
                 scene->heading()->setEnabled(false);
                 scene->setTitle(QString());
             }
 
-            switch(typeIndex)
-            {
+            switch (typeIndex) {
             case 1:
                 this->addSceneElement(scene, SceneElement::Action, text);
                 break;
@@ -145,4 +136,3 @@ bool HtmlImporter::importFrom(const QByteArray &bytes)
 
     return true;
 }
-

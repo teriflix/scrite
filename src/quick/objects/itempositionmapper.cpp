@@ -20,23 +20,19 @@
  */
 
 ItemPositionMapper::ItemPositionMapper(QObject *parent)
-    : QObject(parent),
-      m_to(this, "to"),
-      m_from(this, "from")
+    : QObject(parent), m_to(this, "to"), m_from(this, "from")
 {
     m_recomputePositionTimer.setSingleShot(true);
     m_recomputePositionTimer.setInterval(0);
-    connect(&m_recomputePositionTimer, &QTimer::timeout, this, &ItemPositionMapper::recomputeMappedPosition);
+    connect(&m_recomputePositionTimer, &QTimer::timeout, this,
+            &ItemPositionMapper::recomputeMappedPosition);
 }
 
-ItemPositionMapper::~ItemPositionMapper()
-{
-
-}
+ItemPositionMapper::~ItemPositionMapper() { }
 
 void ItemPositionMapper::setPosition(const QPointF &val)
 {
-    if(m_position == val)
+    if (m_position == val)
         return;
 
     m_position = val;
@@ -45,7 +41,7 @@ void ItemPositionMapper::setPosition(const QPointF &val)
 
 void ItemPositionMapper::setFrom(QQuickItem *val)
 {
-    if(m_from == val)
+    if (m_from == val)
         return;
 
     m_from = val;
@@ -56,7 +52,7 @@ void ItemPositionMapper::setFrom(QQuickItem *val)
 
 void ItemPositionMapper::setTo(QQuickItem *val)
 {
-    if(m_to == val)
+    if (m_to == val)
         return;
 
     m_to = val;
@@ -67,7 +63,7 @@ void ItemPositionMapper::setTo(QQuickItem *val)
 
 void ItemPositionMapper::setMappedPosition(const QPointF &val)
 {
-    if(m_mappedPosition == val)
+    if (m_mappedPosition == val)
         return;
 
     m_mappedPosition = val;
@@ -102,31 +98,31 @@ void ItemPositionMapper::trackToItemMovement()
     trackMovement(m_to, m_toItemsBeingTracked);
 }
 
-void ItemPositionMapper::trackMovement(QQuickItem *item, QList<QObject*> &list)
+void ItemPositionMapper::trackMovement(QQuickItem *item, QList<QObject *> &list)
 {
-    for(QObject *ptr : qAsConst(list))
-    {
-        disconnect(ptr, SIGNAL(destroyed(QObject*)), this, SLOT(trackedObjectDestroyed(QObject*)));
+    for (QObject *ptr : qAsConst(list)) {
+        disconnect(ptr, SIGNAL(destroyed(QObject *)), this,
+                   SLOT(trackedObjectDestroyed(QObject *)));
         disconnect(ptr, nullptr, &m_recomputePositionTimer, nullptr);
     }
     list.clear();
 
-    if(item == nullptr)
+    if (item == nullptr)
         return;
 
     QQuickItem *ptr = item;
-    while(ptr)
-    {
+    while (ptr) {
         list.append(ptr);
-        connect(ptr, SIGNAL(destroyed(QObject*)), this, SLOT(trackedObjectDestroyed(QObject*)));
+        connect(ptr, SIGNAL(destroyed(QObject *)), this, SLOT(trackedObjectDestroyed(QObject *)));
         connect(ptr, SIGNAL(xChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(yChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(widthChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(heightChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(rotationChanged()), &m_recomputePositionTimer, SLOT(start()));
         connect(ptr, SIGNAL(scaleChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(transformOriginChanged(TransformOrigin)), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(parentChanged(QQuickItem*)), &m_recomputePositionTimer, SLOT(start()));
+        connect(ptr, SIGNAL(transformOriginChanged(TransformOrigin)), &m_recomputePositionTimer,
+                SLOT(start()));
+        connect(ptr, SIGNAL(parentChanged(QQuickItem *)), &m_recomputePositionTimer, SLOT(start()));
         ptr = ptr->parentItem();
     }
 
@@ -137,12 +133,12 @@ void ItemPositionMapper::trackedObjectDestroyed(QObject *ptr)
 {
     bool success = m_fromItemsBeingTracked.removeOne(ptr);
     success |= m_toItemsBeingTracked.removeOne(ptr);
-    if(success)
+    if (success)
         m_recomputePositionTimer.start();
 }
 
 void ItemPositionMapper::recomputeMappedPosition()
 {
-    if(!m_to.isNull() && !m_from.isNull())
-        this->setMappedPosition( m_to->mapFromItem(m_from, m_position) );
+    if (!m_to.isNull() && !m_from.isNull())
+        this->setMappedPosition(m_to->mapFromItem(m_from, m_position));
 }

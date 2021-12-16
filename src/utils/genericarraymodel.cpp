@@ -16,23 +16,18 @@
 #include <QJSValue>
 #include <QtDebug>
 
-GenericArrayModel::GenericArrayModel(QObject *parent)
-    : QAbstractListModel(parent)
+GenericArrayModel::GenericArrayModel(QObject *parent) : QAbstractListModel(parent)
 {
     connect(this, &GenericArrayModel::rowsInserted, this, &GenericArrayModel::countChanged);
     connect(this, &GenericArrayModel::rowsRemoved, this, &GenericArrayModel::countChanged);
     connect(this, &GenericArrayModel::modelReset, this, &GenericArrayModel::countChanged);
 }
 
-GenericArrayModel::~GenericArrayModel()
-{
-
-}
-
+GenericArrayModel::~GenericArrayModel() { }
 
 void GenericArrayModel::setArray(const QJsonArray &val)
 {
-    if(m_array == val)
+    if (m_array == val)
         return;
 
     this->beginResetModel();
@@ -49,7 +44,7 @@ bool GenericArrayModel::arrayHasObjects() const
 
 void GenericArrayModel::setObjectMembers(const QStringList &val)
 {
-    if(m_objectMembers == val)
+    if (m_objectMembers == val)
         return;
 
     this->beginResetModel();
@@ -62,7 +57,7 @@ QJsonObject GenericArrayModel::objectMemberRoles() const
 {
     QJsonObject ret;
 
-    Q_FOREACH(QString objectMember, m_objectMembers)
+    Q_FOREACH (QString objectMember, m_objectMembers)
         ret.insert(objectMember, this->objectMemberRole(objectMember));
 
     return ret;
@@ -70,20 +65,20 @@ QJsonObject GenericArrayModel::objectMemberRoles() const
 
 QString GenericArrayModel::roleNameOf(int role) const
 {
-    return QString::fromLatin1( this->roleNames().value(role, QByteArrayLiteral("arrayItem")) );
+    return QString::fromLatin1(this->roleNames().value(role, QByteArrayLiteral("arrayItem")));
 }
 
 int GenericArrayModel::objectMemberRole(const QString &objectMember) const
 {
     const int index = m_objectMembers.indexOf(objectMember);
-    return index < 0 ? Qt::DisplayRole : (Qt::UserRole+index+1);
+    return index < 0 ? Qt::DisplayRole : (Qt::UserRole + index + 1);
 }
 
 QJsonArray GenericArrayModel::stringListArray(const QStringList &list) const
 {
     QJsonArray ret;
-    Q_FOREACH(QString item, list)
-        ret.append( QJsonValue(item.trimmed()) );
+    Q_FOREACH (QString item, list)
+        ret.append(QJsonValue(item.trimmed()));
     return ret;
 }
 
@@ -104,26 +99,26 @@ int GenericArrayModel::rowCount(const QModelIndex &parent) const
 
 QVariant GenericArrayModel::data(const QModelIndex &index, int role) const
 {
-    if( !index.isValid() || index.row() < 0 || index.row() >= m_array.size() )
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_array.size())
         return QVariant();
 
-    if(role == Qt::DisplayRole)
+    if (role == Qt::DisplayRole)
         return m_array.at(index.row());
 
     const QJsonObject item = m_array.at(index.row()).toObject();
-    const int memberIndex = role-(Qt::UserRole+1);
-    if(memberIndex < 0 || memberIndex >= m_objectMembers.size())
+    const int memberIndex = role - (Qt::UserRole + 1);
+    if (memberIndex < 0 || memberIndex >= m_objectMembers.size())
         return QVariant();
 
-    return item.value( m_objectMembers.at(memberIndex) );
+    return item.value(m_objectMembers.at(memberIndex));
 }
 
 QHash<int, QByteArray> GenericArrayModel::roleNames() const
 {
-    QHash<int,QByteArray> roles;
+    QHash<int, QByteArray> roles;
     roles[Qt::DisplayRole] = QByteArrayLiteral("arrayItem");
 
-    Q_FOREACH(QString objectMember, m_objectMembers)
+    Q_FOREACH (QString objectMember, m_objectMembers)
         roles[this->objectMemberRole(objectMember)] = objectMember.toLatin1();
 
     return roles;
@@ -132,20 +127,15 @@ QHash<int, QByteArray> GenericArrayModel::roleNames() const
 ///////////////////////////////////////////////////////////////////////////////
 
 GenericArraySortFilterProxyModel::GenericArraySortFilterProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent),
-      m_arrayModel(this, "arrayModel")
+    : QSortFilterProxyModel(parent), m_arrayModel(this, "arrayModel")
 {
-
 }
 
-GenericArraySortFilterProxyModel::~GenericArraySortFilterProxyModel()
-{
-
-}
+GenericArraySortFilterProxyModel::~GenericArraySortFilterProxyModel() { }
 
 void GenericArraySortFilterProxyModel::setArrayModel(GenericArrayModel *val)
 {
-    if(m_arrayModel == val)
+    if (m_arrayModel == val)
         return;
 
     m_arrayModel = val;
@@ -155,7 +145,7 @@ void GenericArraySortFilterProxyModel::setArrayModel(GenericArrayModel *val)
 
 QHash<int, QByteArray> GenericArraySortFilterProxyModel::roleNames() const
 {
-    if(m_arrayModel == nullptr)
+    if (m_arrayModel == nullptr)
         return QSortFilterProxyModel::roleNames();
 
     return m_arrayModel->roleNames();

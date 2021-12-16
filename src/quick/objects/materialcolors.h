@@ -24,8 +24,8 @@ class MaterialColors : public QObject
     Q_OBJECT
 
 public:
-    MaterialColors(QObject *parent=nullptr);
-    MaterialColors(const QString &name, QObject *parent=nullptr);
+    MaterialColors(QObject *parent = nullptr);
+    MaterialColors(const QString &name, QObject *parent = nullptr);
     ~MaterialColors();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
@@ -91,7 +91,7 @@ private:
     QJSEngine *m_jsEngine = nullptr;
     QJsonObject m_palette;
     QColor m_defaultTextColor = Qt::black;
-    QColor m_defaultBackgroundColor = QColor::fromRgbF(1,1,1,0);
+    QColor m_defaultBackgroundColor = QColor::fromRgbF(1, 1, 1, 0);
 };
 
 #endif // MATERIALCOLORS_H

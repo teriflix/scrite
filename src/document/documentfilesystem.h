@@ -31,28 +31,28 @@ class DocumentFileSystem : public QObject
 public:
     static void setMarker(const QByteArray &marker);
 
-    DocumentFileSystem(QObject *parent=nullptr);
+    DocumentFileSystem(QObject *parent = nullptr);
     ~DocumentFileSystem();
 
     enum Format { UnknownFormat, ScriteFormat, ZipFormat };
 
     void reset();
-    bool load(const QString &fileName, Format *format=nullptr);
-    bool save(const QString &fileName, bool encrypt=false);
+    bool load(const QString &fileName, Format *format = nullptr);
+    bool save(const QString &fileName, bool encrypt = false);
 
     void setHeader(const QByteArray &header);
     QByteArray header() const;
 
-    QFile *open(const QString &path, QFile::OpenMode mode=QFile::ReadOnly);
+    QFile *open(const QString &path, QFile::OpenMode mode = QFile::ReadOnly);
 
     QByteArray read(const QString &path);
     bool write(const QString &path, const QByteArray &bytes);
 
-    QString add(const QString &fileName, const QString &ns=QString());
-    QString duplicate(const QString &fileName, const QString &ns=QString());
+    QString add(const QString &fileName, const QString &ns = QString());
+    QString duplicate(const QString &fileName, const QString &ns = QString());
     bool remove(const QString &path);
 
-    QString absolutePath(const QString &path, bool mkpath=false) const;
+    QString absolutePath(const QString &path, bool mkpath = false) const;
     QString relativePath(const QString &path) const;
     bool contains(const QString &path) const;
 
@@ -60,9 +60,11 @@ public:
     QFileInfo fileInfo(const QString &path) const;
 
     // API to add/replace/remove an external file into the DFS under a specific path/name
-    QString addFile(const QString &srcFile, const QString &dstPath, bool replaceIfExists=true);
-    QString addImage(const QString &srcFile, const QString &dstPath, const QSize &scaleTo=QSize(), bool replaceIfExists=true);
-    QString addImage(const QImage &srcImage, const QString &dstPath, const QSize &scaleTo=QSize(), bool replaceIfExists=true);
+    QString addFile(const QString &srcFile, const QString &dstPath, bool replaceIfExists = true);
+    QString addImage(const QString &srcFile, const QString &dstPath, const QSize &scaleTo = QSize(),
+                     bool replaceIfExists = true);
+    QString addImage(const QImage &srcImage, const QString &dstPath, const QSize &scaleTo = QSize(),
+                     bool replaceIfExists = true);
 
     // API to cleanup unreferenced files that may be lying around.
     void cleanup();
@@ -83,7 +85,7 @@ public:
     ~DocumentFile();
 
 private:
-    DocumentFile(const QString &filePath, DocumentFileSystem *parent=nullptr);
+    DocumentFile(const QString &filePath, DocumentFileSystem *parent = nullptr);
     void onAboutToClose();
 
 private:

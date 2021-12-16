@@ -72,8 +72,7 @@ public:
     Q_PROPERTY(int currentInstallationIndex READ currentInstallationIndex NOTIFY installationsChanged)
     int currentInstallationIndex() const { return m_currentInstallationIndex; }
 
-    enum AppFeature
-    {
+    enum AppFeature {
         ScreenplayFeature,
         StructureFeature,
         NotebookFeature,
@@ -90,9 +89,7 @@ public:
     Q_ENUM(AppFeature)
 
     QList<int> enabledFeatures() const { return m_enabledFeatures; }
-    bool isFeatureEnabled(AppFeature feature) const {
-        return m_enabledFeatures.contains(feature);
-    }
+    bool isFeatureEnabled(AppFeature feature) const { return m_enabledFeatures.contains(feature); }
     bool isFeatureNameEnabled(const QString &featureName) const;
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
@@ -106,14 +103,17 @@ public:
     Q_SLOT void deactivateInstallation(const QString &id);
     Q_SLOT void refreshInstallations();
 
-    Q_SLOT void logActivity1(const QString &activity) { this->logActivity2(activity, QJsonValue()); }
+    Q_SLOT void logActivity1(const QString &activity)
+    {
+        this->logActivity2(activity, QJsonValue());
+    }
     Q_SLOT void logActivity2(const QString &activity, const QJsonValue &data);
 
 signals:
     void forceLoginRequest();
 
 private:
-    User(QObject *parent=nullptr);
+    User(QObject *parent = nullptr);
     void setInfo(const QJsonObject &val);
     void setInstallations(const QJsonArray &val);
 
@@ -161,7 +161,7 @@ class AppFeature : public QObject
     Q_OBJECT
 
 public:
-    AppFeature(QObject *parent=nullptr);
+    AppFeature(QObject *parent = nullptr);
     ~AppFeature();
 
     Q_PROPERTY(QString featureName READ featureName WRITE setFeatureName NOTIFY featureNameChanged)

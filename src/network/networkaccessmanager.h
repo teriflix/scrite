@@ -24,16 +24,17 @@ public:
 
 protected:
     // QNetworkAccessManager interface
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData);
+    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request,
+                                 QIODevice *outgoingData);
 
 private:
     static NetworkAccessManager *INSTANCE;
-    NetworkAccessManager(QObject *parent=nullptr);
+    NetworkAccessManager(QObject *parent = nullptr);
     void onReplyFinished(QNetworkReply *reply);
     void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
 private:
-    QList<QNetworkReply*> m_replies;
+    QList<QNetworkReply *> m_replies;
 };
 
 #endif // NETWORKACCESSMANAGER_H

@@ -24,17 +24,17 @@ class ErrorReport : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ErrorReport(QObject *parent=nullptr);
+    ErrorReport(QObject *parent = nullptr);
     ~ErrorReport();
     Q_SIGNAL void aboutToDelete(ErrorReport *val);
 
     Q_PROPERTY(ErrorReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET resetProxyFor)
-    void setProxyFor(ErrorReport* val);
-    ErrorReport* proxyFor() const { return m_proxyFor; }
+    void setProxyFor(ErrorReport *val);
+    ErrorReport *proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
 
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    void setErrorMessage(const QString &val, const QJsonObject &details=QJsonObject());
+    void setErrorMessage(const QString &val, const QJsonObject &details = QJsonObject());
     QString errorMessage() const { return m_errorMessage; }
     Q_SIGNAL void errorMessageChanged();
 
@@ -49,7 +49,10 @@ public:
     Q_SIGNAL void warningMessageCountChanged();
 
     Q_PROPERTY(QString lastWarningMessage READ lastWarningMessage NOTIFY warningMessageCountChanged)
-    QString lastWarningMessage() const { return m_warningMessages.empty() ? QString() : m_warningMessages.last(); }
+    QString lastWarningMessage() const
+    {
+        return m_warningMessages.empty() ? QString() : m_warningMessages.last();
+    }
 
     Q_PROPERTY(QStringList warningMessages READ warningMessages NOTIFY warningMessageCountChanged)
     QStringList warningMessages() const { return m_warningMessages; }
@@ -58,10 +61,10 @@ public:
     void addWarning(const QString &warning);
 
     // QAbstractItemModel interface
-    enum Role { WarningMessageRole=Qt::DisplayRole };
+    enum Role { WarningMessageRole = Qt::DisplayRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
 private:
     void resetProxyFor();

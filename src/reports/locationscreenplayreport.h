@@ -23,7 +23,7 @@ class LocationScreenplayReport : public AbstractScreenplaySubsetReport
     Q_CLASSINFO("Description", "Generate screenplay with only those scenes at one or more locations.")
 
 public:
-    Q_INVOKABLE LocationScreenplayReport(QObject *parent=nullptr);
+    Q_INVOKABLE LocationScreenplayReport(QObject *parent = nullptr);
     ~LocationScreenplayReport();
 
     Q_CLASSINFO("locations_FieldGroup", "Locations")
@@ -55,7 +55,7 @@ private:
     int m_summaryLocation = -1;
     QStringList m_locations;
     bool m_generateSummary = true;
-    mutable QMap< QString, QList<const ScreenplayElement *> > m_locationSceneNumberList;
+    mutable QMap<QString, QList<const ScreenplayElement *>> m_locationSceneNumberList;
 };
 
 #endif // LOCATIONSCREENPLAYREPORT_H

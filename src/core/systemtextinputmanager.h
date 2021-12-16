@@ -40,7 +40,7 @@ public:
     AbstractSystemTextInputSource *sourceAt(int index) const;
 
     // language = AbstractSystemTextInputSource::Language
-    Q_INVOKABLE QList<AbstractSystemTextInputSource*> sourcesForLanguage(int language) const;
+    Q_INVOKABLE QList<AbstractSystemTextInputSource *> sourcesForLanguage(int language) const;
     Q_INVOKABLE QJsonArray sourcesForLanguageJson(int language) const;
 
     Q_INVOKABLE AbstractSystemTextInputSource *findSourceById(const QString &id) const;
@@ -53,11 +53,10 @@ public:
     AbstractSystemTextInputSource *defaultInputSource() const { return m_defaultInputSource; }
     Q_SIGNAL void defaultInputSourceChanged();
 
-    AbstractSystemTextInputSource *fallbackInputSource(int fallbackLanguage=0) const;
+    AbstractSystemTextInputSource *fallbackInputSource(int fallbackLanguage = 0) const;
 
     // QAbstractItemModel interface
-    enum Role
-    {
+    enum Role {
         TextInputSourceRole = Qt::UserRole,
         TextInputSourceIDRole,
         TextInputSourceDisplayNameRole,
@@ -67,13 +66,13 @@ public:
     };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    SystemTextInputManager(QObject *parent=nullptr);
+    SystemTextInputManager(QObject *parent = nullptr);
 
     void clear();
     void add(AbstractSystemTextInputSource *source);
@@ -84,7 +83,7 @@ private:
 private:
     friend class AbstractSystemTextInputSource;
     AbstractSystemTextInputManagerBackend *m_backend = nullptr;
-    QList<AbstractSystemTextInputSource*> m_inputSources;
+    QList<AbstractSystemTextInputSource *> m_inputSources;
     AbstractSystemTextInputSource *m_defaultInputSource = nullptr;
     AbstractSystemTextInputSource *m_selectedInputSource = nullptr;
     QString m_revertToInputSourceUponActivation;
@@ -95,7 +94,7 @@ class AbstractSystemTextInputSource : public QObject
     Q_OBJECT
 
 public:
-    AbstractSystemTextInputSource(SystemTextInputManager *parent=nullptr);
+    AbstractSystemTextInputSource(SystemTextInputManager *parent = nullptr);
     ~AbstractSystemTextInputSource();
     Q_SIGNAL void aboutToDelete(AbstractSystemTextInputSource *source);
 
@@ -106,7 +105,10 @@ public:
     virtual QString displayName() const = 0;
 
     Q_PROPERTY(QString title READ title CONSTANT)
-    QString title() const { return this->displayName() + QStringLiteral(" - [") + this->id() + QStringLiteral("] "); }
+    QString title() const
+    {
+        return this->displayName() + QStringLiteral(" - [") + this->id() + QStringLiteral("] ");
+    }
 
     Q_PROPERTY(bool selected READ isSelected NOTIFY selectedChanged)
     bool isSelected() const { return m_selected; }
@@ -133,12 +135,12 @@ private:
 class AbstractSystemTextInputManagerBackend : public QObject
 {
 public:
-    AbstractSystemTextInputManagerBackend(SystemTextInputManager *parent=nullptr);
+    AbstractSystemTextInputManagerBackend(SystemTextInputManager *parent = nullptr);
     ~AbstractSystemTextInputManagerBackend();
 
     SystemTextInputManager *inputManager() const { return m_inputManager; }
 
-    virtual QList<AbstractSystemTextInputSource*> reloadSources() = 0;
+    virtual QList<AbstractSystemTextInputSource *> reloadSources() = 0;
     void determineSelectedInputSource();
 
 private:

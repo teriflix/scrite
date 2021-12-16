@@ -23,10 +23,11 @@ class Aggregation : public QObject
     Q_OBJECT
 
 public:
-    Aggregation(QObject *parent=nullptr);
+    Aggregation(QObject *parent = nullptr);
     ~Aggregation();
 
-    Q_INVOKABLE QObject *find(QObject *object, const QString &className, const QString &objectName=QString()) const;
+    Q_INVOKABLE QObject *find(QObject *object, const QString &className,
+                              const QString &objectName = QString()) const;
     Q_INVOKABLE ErrorReport *findErrorReport(QObject *object) const;
     Q_INVOKABLE ProgressReport *findProgressReport(QObject *object) const;
 };

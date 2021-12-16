@@ -23,7 +23,7 @@ class FountainImporter : public AbstractImporter
     Q_CLASSINFO("NameFilters", "Fountain (*.fountain *.txt)")
 
 public:
-    Q_INVOKABLE FountainImporter(QObject *parent=nullptr);
+    Q_INVOKABLE FountainImporter(QObject *parent = nullptr);
     ~FountainImporter();
 
     bool canImport(const QString &fileName) const;

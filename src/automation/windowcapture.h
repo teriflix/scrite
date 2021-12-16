@@ -24,12 +24,12 @@ class WindowCapture : public AbstractAutomationStep
     Q_OBJECT
 
 public:
-    WindowCapture(QObject *parent=nullptr);
+    WindowCapture(QObject *parent = nullptr);
     ~WindowCapture();
 
     Q_PROPERTY(QWindow* window READ window WRITE setWindow RESET resetWindow NOTIFY windowChanged)
-    void setWindow(QWindow* val);
-    QWindow* window() const { return m_window; }
+    void setWindow(QWindow *val);
+    QWindow *window() const { return m_window; }
     Q_SIGNAL void windowChanged();
 
     Q_PROPERTY(QRectF area READ area WRITE setArea NOTIFY areaChanged)
@@ -74,11 +74,7 @@ public:
     bool isReplaceExistingFile() const { return m_replaceExistingFile; }
     Q_SIGNAL void replaceExistingFileChanged();
 
-    enum CaptureMode
-    {
-        FileOnly,
-        FileAndClipboard
-    };
+    enum CaptureMode { FileOnly, FileAndClipboard };
     Q_ENUM(CaptureMode)
     Q_PROPERTY(CaptureMode captureMode READ captureMode WRITE setCaptureMode NOTIFY captureModeChanged)
     void setCaptureMode(CaptureMode val);

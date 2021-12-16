@@ -21,16 +21,12 @@
 #include <QRandomGenerator>
 #include <QRegularExpression>
 
-AbstractImporter::AbstractImporter(QObject *parent)
-                 :AbstractDeviceIO(parent)
+AbstractImporter::AbstractImporter(QObject *parent) : AbstractDeviceIO(parent)
 {
     connect(User::instance(), &User::infoChanged, this, &AbstractImporter::featureEnabledChanged);
 }
 
-AbstractImporter::~AbstractImporter()
-{
-
-}
+AbstractImporter::~AbstractImporter() { }
 
 QString AbstractImporter::format() const
 {
@@ -46,14 +42,16 @@ QString AbstractImporter::nameFilters() const
 
 bool AbstractImporter::isFeatureEnabled() const
 {
-    if(User::instance()->isLoggedIn())
-    {
+    if (User::instance()->isLoggedIn()) {
         const bool allImportersEnabled = User::instance()->isFeatureEnabled(User::ImportFeature);
-        const bool thisSpecificImporterEnabled = allImportersEnabled ? User::instance()->isFeatureNameEnabled(QStringLiteral("import/") + this->format()) : false;
+        const bool thisSpecificImporterEnabled = allImportersEnabled
+                ? User::instance()->isFeatureNameEnabled(QStringLiteral("import/") + this->format())
+                : false;
         return allImportersEnabled && thisSpecificImporterEnabled;
     }
 
-    return QStringList({QStringLiteral("Final Draft"), QStringLiteral("Fountain")}).contains(this->format());
+    return QStringList({ QStringLiteral("Final Draft"), QStringLiteral("Fountain") })
+            .contains(this->format());
 }
 
 bool AbstractImporter::read()
@@ -63,20 +61,18 @@ bool AbstractImporter::read()
 
     this->error()->clear();
 
-    if(!this->isFeatureEnabled())
-    {
-        this->error()->setErrorMessage(QStringLiteral("Importing from ") + this->format() + QStringLiteral(" is not enabled."));
+    if (!this->isFeatureEnabled()) {
+        this->error()->setErrorMessage(QStringLiteral("Importing from ") + this->format()
+                                       + QStringLiteral(" is not enabled."));
         return false;
     }
 
-    if(fileName.isEmpty())
-    {
+    if (fileName.isEmpty()) {
         this->error()->setErrorMessage(QStringLiteral("Nothing to import."));
         return false;
     }
 
-    if(document == nullptr)
-    {
+    if (document == nullptr) {
         this->error()->setErrorMessage(QStringLiteral("No document available to import into."));
         return false;
     }
@@ -84,20 +80,20 @@ bool AbstractImporter::read()
     document->reset();
 
     QFile file(fileName);
-    if( !file.open(QFile::ReadOnly) )
-    {
-        this->error()->setErrorMessage( QString("Could not open file '%1' for reading.").arg(fileName) );
+    if (!file.open(QFile::ReadOnly)) {
+        this->error()->setErrorMessage(
+                QString("Could not open file '%1' for reading.").arg(fileName));
         return false;
     }
 
     qScopeGuard([=]() {
         const QString importerName = QString::fromLatin1(this->metaObject()->className());
-        User::instance()->logActivity2( QStringLiteral("import"), importerName );
+        User::instance()->logActivity2(QStringLiteral("import"), importerName);
     });
 
     const QMetaObject *mo = this->metaObject();
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
-    this->progress()->setProgressText( QString("Importing from \"%1\"").arg(classInfo.value()));
+    this->progress()->setProgressText(QString("Importing from \"%1\"").arg(classInfo.value()));
 
     ScriteDocument *doc = this->document();
     Screenplay *screenplay = doc->screenplay();
@@ -105,13 +101,11 @@ bool AbstractImporter::read()
     this->progress()->start();
     UndoStack::ignoreUndoCommands = true;
     const bool ret = this->doImport(&file);
-    if(ret)
-    {
+    if (ret) {
         Structure *structure = doc->structure();
-        for(int i=0; i<structure->elementCount(); i++)
-        {
+        for (int i = 0; i < structure->elementCount(); i++) {
             StructureElement *element = structure->elementAt(i);
-            if(element != nullptr && element->scene() != nullptr)
+            if (element != nullptr && element->scene() != nullptr)
                 element->scene()->inferTitleFromContent();
         }
     }
@@ -134,9 +128,8 @@ static const qreal canvasSpaceBuffer = 500;
 void AbstractImporter::configureCanvas(int nrBlocks)
 {
     Structure *structure = this->document()->structure();
-    const qreal requiredSpace = nrBlocks*elementYSpacing + canvasSpaceBuffer;
-    if(structure->canvasHeight() < requiredSpace)
-    {
+    const qreal requiredSpace = nrBlocks * elementYSpacing + canvasSpaceBuffer;
+    if (structure->canvasHeight() < requiredSpace) {
         structure->setCanvasWidth(requiredSpace);
         structure->setCanvasHeight(requiredSpace);
     }
@@ -157,11 +150,11 @@ Scene *AbstractImporter::createScene(const QString &heading)
     scene->setColor(sceneColors.at(sceneIndex%sceneColors.length()));
 #else
     QRandomGenerator *rand = QRandomGenerator::global();
-    scene->setColor( sceneColors.at(rand->bounded(sceneColors.length()-1)) );
+    scene->setColor(sceneColors.at(rand->bounded(sceneColors.length() - 1)));
 #endif
     structureElement->setScene(scene);
-    structureElement->setX(elementX + (sceneIndex%2 ? elementXSpacing : 0));
-    structureElement->setY(elementY + elementYSpacing*sceneIndex);
+    structureElement->setX(elementX + (sceneIndex % 2 ? elementXSpacing : 0));
+    structureElement->setY(elementY + elementYSpacing * sceneIndex);
     structure->addElement(structureElement);
 
     ScreenplayElement *screenplayElement = new ScreenplayElement(screenplay);
@@ -173,14 +166,15 @@ Scene *AbstractImporter::createScene(const QString &heading)
 
     const QString location = scene->heading()->location();
     const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
-    scene->setTitle( QString("Scene number #%1 at %2").arg(sceneIndex+1).arg(titleBit.toLower()) );
+    scene->setTitle(QString("Scene number #%1 at %2").arg(sceneIndex + 1).arg(titleBit.toLower()));
 
     return scene;
 }
 
-SceneElement *AbstractImporter::addSceneElement(Scene *scene, SceneElement::Type type, const QString &text)
+SceneElement *AbstractImporter::addSceneElement(Scene *scene, SceneElement::Type type,
+                                                const QString &text)
 {
-    if(scene == nullptr || type == SceneElement::Heading || text.isEmpty())
+    if (scene == nullptr || type == SceneElement::Heading || text.isEmpty())
         return nullptr;
 
     SceneElement *element = new SceneElement(scene);

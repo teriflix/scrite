@@ -34,26 +34,24 @@ class NotebookModel : public QStandardItemModel
     Q_OBJECT
 
 public:
-    NotebookModel(QObject *parent=nullptr);
+    NotebookModel(QObject *parent = nullptr);
     ~NotebookModel();
 
     Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument RESET resetDocument NOTIFY documentChanged)
-    void setDocument(ScriteDocument* val);
-    ScriteDocument* document() const { return m_document; }
+    void setDocument(ScriteDocument *val);
+    ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    enum ItemType
-    {
+    enum ItemType {
         CategoryType, // Just heading text, no "live" object
         EpisodeBreakType,
         ActBreakType,
-        NotesType,   // Represents a Notes instance
-        NoteType     // Represents a Note instance
+        NotesType, // Represents a Notes instance
+        NoteType // Represents a Note instance
     };
     Q_ENUM(ItemType)
 
-    enum ItemCategory
-    {
+    enum ItemCategory {
         BookmarksCategory,
         ScreenplayCategory,
         UnusedScenesCategory,
@@ -64,8 +62,7 @@ public:
     };
     Q_ENUM(ItemCategory)
 
-    enum ItemRoles
-    {
+    enum ItemRoles {
         TitleRole = Qt::DisplayRole,
         IdRole = Qt::UserRole,
         TypeRole,
@@ -126,7 +123,7 @@ class BookmarkedNotes : public ObjectListPropertyModel<QObject *>
     Q_OBJECT
 
 public:
-    BookmarkedNotes(QObject *parent=nullptr);
+    BookmarkedNotes(QObject *parent = nullptr);
     ~BookmarkedNotes();
 
     Q_INVOKABLE bool toggleBookmark(QObject *object);
@@ -134,12 +131,7 @@ public:
     Q_INVOKABLE bool removeFromBookmark(QObject *object);
     Q_INVOKABLE bool isBookmarked(QObject *object) const;
 
-    enum Roles
-    {
-        TitleRole,
-        SummaryRole,
-        ObjectRole
-    };
+    enum Roles { TitleRole, SummaryRole, ObjectRole };
     QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
 

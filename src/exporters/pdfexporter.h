@@ -23,7 +23,7 @@ class PdfExporter : public AbstractTextDocumentExporter
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
-    Q_INVOKABLE PdfExporter(QObject *parent=nullptr);
+    Q_INVOKABLE PdfExporter(QObject *parent = nullptr);
     ~PdfExporter();
 
     Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")

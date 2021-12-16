@@ -24,7 +24,8 @@ class ExecLaterTimer : public QObject
 public:
     static ExecLaterTimer *get(int timerId);
 
-    ExecLaterTimer(const QString &name=QStringLiteral("Scrite ExecLaterTimer"), QObject *parent=nullptr);
+    ExecLaterTimer(const QString &name = QStringLiteral("Scrite ExecLaterTimer"),
+                   QObject *parent = nullptr);
     ~ExecLaterTimer();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
@@ -34,7 +35,7 @@ public:
 
     Q_PROPERTY(bool repeat READ isRepeat WRITE setRepeat NOTIFY repeatChanged)
     void setRepeat(bool val);
-    bool isRepeat() const {return m_repeat; }
+    bool isRepeat() const { return m_repeat; }
     Q_SIGNAL void repeatChanged();
 
     void start(int msec, QObject *object);
@@ -56,4 +57,3 @@ private:
 };
 
 #endif // EXECLATERTIMER_H
-

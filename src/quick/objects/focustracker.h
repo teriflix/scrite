@@ -30,8 +30,8 @@ public:
     ~FocusTrackerIndicator();
 
     Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
-    void setTarget(QObject* val);
-    QObject* target() const { return m_target; }
+    void setTarget(QObject *val);
+    QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
     Q_PROPERTY(QString property READ property WRITE setProperty NOTIFY propertyChanged)
@@ -51,13 +51,13 @@ public:
 
 private:
     friend class FocusTracker;
-    FocusTrackerIndicator(FocusTracker *parent=nullptr);
+    FocusTrackerIndicator(FocusTracker *parent = nullptr);
     void apply();
     void resetTarget();
 
 private:
     QVariant m_onValue;
-    QQuickItem* m_item = nullptr;
+    QQuickItem *m_item = nullptr;
     QString m_property;
     QVariant m_offValue;
     FocusTracker *m_tracker = nullptr;
@@ -69,7 +69,7 @@ class FocusTracker : public QObject
     Q_OBJECT
 
 public:
-    FocusTracker(QObject *parent=nullptr);
+    FocusTracker(QObject *parent = nullptr);
     ~FocusTracker();
 
     static FocusTracker *qmlAttachedProperties(QObject *object);
@@ -78,8 +78,8 @@ public:
     QQuickItem *item() const { return m_item; }
 
     Q_PROPERTY(QQuickWindow* window READ window WRITE setWindow NOTIFY windowChanged RESET resetWindow)
-    void setWindow(QQuickWindow* val);
-    QQuickWindow* window() const { return m_window; }
+    void setWindow(QQuickWindow *val);
+    QQuickWindow *window() const { return m_window; }
     Q_SIGNAL void windowChanged();
 
     Q_PROPERTY(bool hasFocus READ hasFocus NOTIFY hasFocusChanged)
@@ -87,7 +87,7 @@ public:
     Q_SIGNAL void hasFocusChanged();
 
     Q_PROPERTY(FocusTrackerIndicator* indicator READ indicator CONSTANT)
-    FocusTrackerIndicator* indicator() const { return m_indicator; }
+    FocusTrackerIndicator *indicator() const { return m_indicator; }
 
 private:
     void resetWindow();
@@ -97,10 +97,10 @@ private:
 private:
     bool m_hasFocus = false;
     QQuickItem *m_item = nullptr;
-    FocusTrackerIndicator* m_indicator = new FocusTrackerIndicator(this);
+    FocusTrackerIndicator *m_indicator = new FocusTrackerIndicator(this);
     QObjectProperty<QQuickWindow> m_window;
 };
-Q_DECLARE_METATYPE(FocusTracker*)
+Q_DECLARE_METATYPE(FocusTracker *)
 QML_DECLARE_TYPEINFO(FocusTracker, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // FOCUSTRACKER_H

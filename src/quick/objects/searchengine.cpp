@@ -20,18 +20,15 @@
 #include <QTimerEvent>
 
 SearchAgent::SearchAgent(QObject *parent)
-            :QObject(parent),
-             m_engine(this, "engine"),
-             m_textDocument(this, "textDocument")
+    : QObject(parent), m_engine(this, "engine"), m_textDocument(this, "textDocument")
 {
-
 }
 
 SearchAgent::~SearchAgent()
 {
     emit aboutToDelete(this);
 
-    if(m_engine != nullptr)
+    if (m_engine != nullptr)
         m_engine->removeSearchAgent(this);
     m_engine = nullptr;
 }
@@ -43,15 +40,15 @@ SearchAgent *SearchAgent::qmlAttachedProperties(QObject *object)
 
 void SearchAgent::setEngine(SearchEngine *val)
 {
-    if(m_engine == val)
+    if (m_engine == val)
         return;
 
-    if(m_engine != nullptr)
+    if (m_engine != nullptr)
         m_engine->removeSearchAgent(this);
 
     m_engine = val;
 
-    if(m_engine != nullptr)
+    if (m_engine != nullptr)
         m_engine->addSearchAgent(this);
 
     emit engineChanged();
@@ -68,11 +65,11 @@ void SearchAgent::resetEngine()
 
 void SearchAgent::setSequenceNumber(int val)
 {
-    if(m_sequenceNumber == val)
+    if (m_sequenceNumber == val)
         return;
 
     m_sequenceNumber = val;
-    if(m_engine != nullptr)
+    if (m_engine != nullptr)
         m_engine->sortSearchAgentsLater();
 
     emit sequenceNumberChanged();
@@ -80,7 +77,7 @@ void SearchAgent::setSequenceNumber(int val)
 
 void SearchAgent::setSearchResultCount(int val)
 {
-    if(m_searchResultCount == val)
+    if (m_searchResultCount == val)
         return;
 
     m_searchResultCount = val;
@@ -89,22 +86,19 @@ void SearchAgent::setSearchResultCount(int val)
 
 void SearchAgent::setCurrentSearchResultIndex(int val)
 {
-    if(m_searchResultCount == 0)
-    {
-        if(m_currentSearchResultIndex != -1)
-        {
+    if (m_searchResultCount == 0) {
+        if (m_currentSearchResultIndex != -1) {
             emit clearHighlight();
 
             m_currentSearchResultIndex = -1;
             emit currentSearchResultIndexChanged();
-
         }
 
         return;
     }
 
-    val = qBound(-1, val, m_searchResultCount-1);
-    if(m_currentSearchResultIndex == val)
+    val = qBound(-1, val, m_searchResultCount - 1);
+    if (m_currentSearchResultIndex == val)
         return;
 
     emit clearHighlight();
@@ -112,27 +106,25 @@ void SearchAgent::setCurrentSearchResultIndex(int val)
     m_currentSearchResultIndex = val;
     emit currentSearchResultIndexChanged();
 
-    if(val < 0 || val >= m_textDocumentSearchResults.size())
+    if (val < 0 || val >= m_textDocumentSearchResults.size())
         return;
 
-    const QPair<int,int> result = m_textDocumentSearchResults.at(val);
+    const QPair<int, int> result = m_textDocumentSearchResults.at(val);
     emit highlightText(result.first, result.second);
 }
 
 void SearchAgent::setTextDocument(QQuickTextDocument *val)
 {
-    if(m_textDocument == val)
+    if (m_textDocument == val)
         return;
 
     m_textDocument = val;
 
-    if(m_textDocument == nullptr)
-    {
+    if (m_textDocument == nullptr) {
         disconnect(this, &SearchAgent::searchRequest, this, &SearchAgent::onSearchRequest);
-        disconnect(this, &SearchAgent::clearSearchRequest, this, &SearchAgent::onClearSearchRequest);
-    }
-    else
-    {
+        disconnect(this, &SearchAgent::clearSearchRequest, this,
+                   &SearchAgent::onClearSearchRequest);
+    } else {
         connect(this, &SearchAgent::searchRequest, this, &SearchAgent::onSearchRequest);
         connect(this, &SearchAgent::clearSearchRequest, this, &SearchAgent::onClearSearchRequest);
     }
@@ -148,41 +140,42 @@ void SearchAgent::resetTextDocument()
 QJsonArray SearchAgent::indexesOf(const QString &of, const QString &in) const
 {
     SearchEngine::SearchFlags flags;
-    if(m_engine != nullptr)
+    if (m_engine != nullptr)
         flags = m_engine->searchFlags();
     return SearchEngine::indexesOf(of, in, int(flags));
 }
 
-QString SearchAgent::createMarkupText(const QString &text, int from, int to, const QColor &bg, const QColor &fg) const
+QString SearchAgent::createMarkupText(const QString &text, int from, int to, const QColor &bg,
+                                      const QColor &fg) const
 {
     return SearchEngine::createMarkupText(text, from, to, QBrush(bg), QBrush(fg));
 }
 
 void SearchAgent::onSearchRequest(const QString &string)
 {
-    if(m_textDocument == nullptr)
+    if (m_textDocument == nullptr)
         return;
 
     m_textDocumentSearchResults.clear();
     this->setSearchResultCount(0);
     this->setCurrentSearchResultIndex(-1);
 
-    if(string.isEmpty())
+    if (string.isEmpty())
         return;
 
     QTextDocument *document = m_textDocument->textDocument();
     QTextDocument::FindFlags flags;
-    if(m_engine != nullptr)
+    if (m_engine != nullptr)
         flags &= int(m_engine->searchFlags());
 
     QTextCursor cursor(document);
-    while(1)
-    {
+    while (1) {
         cursor = document->find(string, cursor, flags);
-        if(cursor.isNull())
+        if (cursor.isNull())
             break;
 
-        m_textDocumentSearchResults << qMakePair<int,int>(cursor.selectionStart(),cursor.selectionEnd());
+        m_textDocumentSearchResults
+                << qMakePair<int, int>(cursor.selectionStart(), cursor.selectionEnd());
         cursor.setPosition(cursor.selectionEnd());
     }
 
@@ -197,25 +190,19 @@ void SearchAgent::onClearSearchRequest()
 ///////////////////////////////////////////////////////////////////////////////
 
 SearchEngine::SearchEngine(QObject *parent)
-    :QObject(parent),
+    : QObject(parent),
       m_searchTimer("SearchEngine.m_searchTimer"),
       m_searchAgentSortTimer("SearchEngine.m_searchAgentSortTimer")
 {
-
 }
 
-SearchEngine::~SearchEngine()
-{
-
-}
+SearchEngine::~SearchEngine() { }
 
 QQmlListProperty<SearchAgent> SearchEngine::searchAgents()
 {
     return QQmlListProperty<SearchAgent>(
-                reinterpret_cast<QObject*>(this),
-                static_cast<void*>(this),
-                &SearchEngine::staticSearchAgentCount,
-                &SearchEngine::staticSearchAgentAt);
+            reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+            &SearchEngine::staticSearchAgentCount, &SearchEngine::staticSearchAgentAt);
 }
 
 SearchAgent *SearchEngine::searchAgentAt(int index) const
@@ -225,13 +212,13 @@ SearchAgent *SearchEngine::searchAgentAt(int index) const
 
 void SearchEngine::clearSearchAgents()
 {
-    while(m_searchAgents.size())
+    while (m_searchAgents.size())
         this->removeSearchAgent(m_searchAgents.first());
 }
 
 void SearchEngine::setSearchFlags(SearchFlags val)
 {
-    if(m_searchFlags == val)
+    if (m_searchFlags == val)
         return;
 
     m_searchFlags = val;
@@ -240,9 +227,8 @@ void SearchEngine::setSearchFlags(SearchFlags val)
 
 void SearchEngine::setSearchString(const QString &val)
 {
-    if(m_searchString == val)
-    {
-        if(m_searchResults.isEmpty())
+    if (m_searchString == val) {
+        if (m_searchResults.isEmpty())
             this->doSearchLater();
         return;
     }
@@ -257,10 +243,9 @@ void SearchEngine::replace(const QString &string)
 {
     HourGlass hourGlass;
 
-    if(m_currentSearchResultIndex >= 0 && m_currentSearchResultIndex < m_searchResults.size())
-    {
-        const QPair<SearchAgent*,int> result = m_searchResults.at(m_currentSearchResultIndex);
-        if(result.first != nullptr)
+    if (m_currentSearchResultIndex >= 0 && m_currentSearchResultIndex < m_searchResults.size()) {
+        const QPair<SearchAgent *, int> result = m_searchResults.at(m_currentSearchResultIndex);
+        if (result.first != nullptr)
             result.first->replaceCurrent(string);
     }
 }
@@ -269,17 +254,15 @@ void SearchEngine::replaceAll(const QString &string)
 {
     HourGlass hourGlass;
 
-    if(m_searchResults.isEmpty())
+    if (m_searchResults.isEmpty())
         return;
 
     this->setCurrentSearchResultIndex(-1);
 
     SearchAgent *agent = nullptr;
-    while(!m_searchResults.isEmpty())
-    {
-        const QPair<SearchAgent*,int> result = m_searchResults.takeFirst();
-        if(result.first != agent)
-        {
+    while (!m_searchResults.isEmpty()) {
+        const QPair<SearchAgent *, int> result = m_searchResults.takeFirst();
+        if (result.first != agent) {
             agent = result.first;
             agent->replaceAll(string);
             agent->clearHighlight();
@@ -299,21 +282,20 @@ void SearchEngine::clearSearch()
 
 void SearchEngine::nextSearchResult()
 {
-    this->setCurrentSearchResultIndex(m_currentSearchResultIndex+1);
+    this->setCurrentSearchResultIndex(m_currentSearchResultIndex + 1);
 }
 
 void SearchEngine::previousSearchResult()
 {
-    this->setCurrentSearchResultIndex(m_currentSearchResultIndex-1);
+    this->setCurrentSearchResultIndex(m_currentSearchResultIndex - 1);
 }
 
 void SearchEngine::cycleSearchResult()
 {
-    if(m_searchResults.isEmpty())
+    if (m_searchResults.isEmpty())
         this->setCurrentSearchResultIndex(-1);
-    else
-    {
-        const int newIndex = (m_currentSearchResultIndex+1)%m_searchResults.size();
+    else {
+        const int newIndex = (m_currentSearchResultIndex + 1) % m_searchResults.size();
         this->setCurrentSearchResultIndex(newIndex);
     }
 }
@@ -323,7 +305,7 @@ QJsonArray SearchEngine::indexesOf(const QString &of, const QString &in, int giv
     SearchEngine::SearchFlags flags(givenFlags);
     Qt::CaseSensitivity cs = Qt::CaseInsensitive;
 
-    if(flags.testFlag(SearchEngine::SearchCaseSensitively))
+    if (flags.testFlag(SearchEngine::SearchCaseSensitively))
         cs = Qt::CaseSensitive;
 
     auto createResultItem = [](int from, int to) {
@@ -335,19 +317,16 @@ QJsonArray SearchEngine::indexesOf(const QString &of, const QString &in, int giv
 
     QJsonArray ret;
     int from = 0;
-    while(1)
-    {
+    while (1) {
         int pos = in.indexOf(of, from, cs);
-        if(pos < 0)
+        if (pos < 0)
             break;
 
-        if(flags.testFlag(SearchEngine::SearchWholeWords))
-        {
-            if(pos + of.length() >= in.length() || in.at(pos+of.length()).isSpace())
-                ret.append( createResultItem(pos,pos+of.length()-1) );
-        }
-        else
-            ret.append( createResultItem(pos,pos+of.length()-1) );
+        if (flags.testFlag(SearchEngine::SearchWholeWords)) {
+            if (pos + of.length() >= in.length() || in.at(pos + of.length()).isSpace())
+                ret.append(createResultItem(pos, pos + of.length() - 1));
+        } else
+            ret.append(createResultItem(pos, pos + of.length() - 1));
 
         from = pos + of.length();
     }
@@ -355,24 +334,26 @@ QJsonArray SearchEngine::indexesOf(const QString &of, const QString &in, int giv
     return ret;
 }
 
-QString SearchEngine::createMarkupText(const QString &text, int from, int to, const QBrush &bg, const QBrush &fg)
+QString SearchEngine::createMarkupText(const QString &text, int from, int to, const QBrush &bg,
+                                       const QBrush &fg)
 {
     QString ret = text;
-    ret.insert(to+1, "</span>");
-    ret.insert(from, QString("<span style=\"background-color: %1; color: %2;\">").arg(bg.color().name()).arg(fg.color().name()));
+    ret.insert(to + 1, "</span>");
+    ret.insert(from,
+               QString("<span style=\"background-color: %1; color: %2;\">")
+                       .arg(bg.color().name())
+                       .arg(fg.color().name()));
     return ret;
 }
 
 void SearchEngine::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == m_searchAgentSortTimer.timerId())
-    {
+    if (event->timerId() == m_searchAgentSortTimer.timerId()) {
         m_searchAgentSortTimer.stop();
         this->sortSearchAgents();
     }
 
-    if(event->timerId() == m_searchTimer.timerId())
-    {
+    if (event->timerId() == m_searchTimer.timerId()) {
         m_searchTimer.stop();
         this->doSearch();
     }
@@ -380,7 +361,7 @@ void SearchEngine::timerEvent(QTimerEvent *event)
 
 void SearchEngine::addSearchAgent(SearchAgent *ptr)
 {
-    if(ptr == nullptr || m_searchAgents.indexOf(ptr) >= 0)
+    if (ptr == nullptr || m_searchAgents.indexOf(ptr) >= 0)
         return;
 
     m_searchAgents.append(ptr);
@@ -392,20 +373,19 @@ void SearchEngine::addSearchAgent(SearchAgent *ptr)
 
 void SearchEngine::removeSearchAgent(SearchAgent *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = m_searchAgents.indexOf(ptr);
-    if(index < 0)
+    if (index < 0)
         return;
 
     m_searchAgents.removeAt(index);
 
     const int oldSearchResultCount = m_searchResults.size();
-    for(int i=m_searchResults.size()-1; i>=0 ;i--)
-    {
-        const QPair<SearchAgent*,int> result = m_searchResults.at(i);
-        if(result.first == ptr)
+    for (int i = m_searchResults.size() - 1; i >= 0; i--) {
+        const QPair<SearchAgent *, int> result = m_searchResults.at(i);
+        if (result.first == ptr)
             m_searchResults.removeAt(i);
     }
     const int newSearchResultCount = m_searchResults.size();
@@ -413,8 +393,7 @@ void SearchEngine::removeSearchAgent(SearchAgent *ptr)
     emit searchAgentCountChanged();
     emit searchAgentsChanged();
 
-    if(newSearchResultCount != oldSearchResultCount)
-    {
+    if (newSearchResultCount != oldSearchResultCount) {
         emit searchResultCountChanged();
         this->setCurrentSearchResultIndex(0);
     }
@@ -438,25 +417,23 @@ void SearchEngine::sortSearchAgentsLater()
 
 SearchAgent *SearchEngine::staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, int index)
 {
-    return reinterpret_cast< SearchEngine* >(list->data)->searchAgentAt(index);
+    return reinterpret_cast<SearchEngine *>(list->data)->searchAgentAt(index);
 }
 
 int SearchEngine::staticSearchAgentCount(QQmlListProperty<SearchAgent> *list)
 {
-    return reinterpret_cast< SearchEngine* >(list->data)->searchAgentCount();
+    return reinterpret_cast<SearchEngine *>(list->data)->searchAgentCount();
 }
 
 void SearchEngine::doSearch()
 {
     HourGlass hourGlass;
 
-    if(!m_searchResults.isEmpty())
-    {        
+    if (!m_searchResults.isEmpty()) {
         SearchAgent *agent = nullptr;
-        QPair<SearchAgent*,int> result;
-        Q_FOREACH(result, m_searchResults)
-        {
-            if(agent == result.first)
+        QPair<SearchAgent *, int> result;
+        Q_FOREACH (result, m_searchResults) {
+            if (agent == result.first)
                 continue;
 
             agent = result.first;
@@ -472,25 +449,22 @@ void SearchEngine::doSearch()
 
     this->setCurrentSearchResultIndex(-1);
 
-    if(m_searchAgentSortTimer.isActive())
-    {
+    if (m_searchAgentSortTimer.isActive()) {
         this->sortSearchAgents();
         m_searchAgentSortTimer.stop();
     }
 
-    if(m_searchString.isEmpty())
+    if (m_searchString.isEmpty())
         return;
 
-    Q_FOREACH(SearchAgent *agent, m_searchAgents)
-    {
+    Q_FOREACH (SearchAgent *agent, m_searchAgents) {
         // Ask the agent to perform search
         agent->searchRequest(m_searchString);
 
         // Collect search results
         const int nrResults = agent->searchResultCount();
-        for(int i=0; i<nrResults; i++)
-        {
-            QPair<SearchAgent*,int> result(agent, i);
+        for (int i = 0; i < nrResults; i++) {
+            QPair<SearchAgent *, int> result(agent, i);
             m_searchResults << result;
         }
 
@@ -499,7 +473,7 @@ void SearchEngine::doSearch()
 
     emit searchResultCountChanged();
 
-    if(!m_searchResults.isEmpty())
+    if (!m_searchResults.isEmpty())
         this->setCurrentSearchResultIndex(0);
 }
 
@@ -510,10 +484,8 @@ void SearchEngine::doSearchLater()
 
 void SearchEngine::setCurrentSearchResultIndex(int val)
 {
-    if(m_searchResults.isEmpty())
-    {
-        if(m_currentSearchResultIndex != -1)
-        {
+    if (m_searchResults.isEmpty()) {
+        if (m_currentSearchResultIndex != -1) {
             m_currentSearchResultIndex = -1;
             emit currentSearchResultIndexChanged();
         }
@@ -521,15 +493,18 @@ void SearchEngine::setCurrentSearchResultIndex(int val)
         return;
     }
 
-    val = qBound(0, val, m_searchResults.size()-1);
-    if(m_currentSearchResultIndex == val)
+    val = qBound(0, val, m_searchResults.size() - 1);
+    if (m_currentSearchResultIndex == val)
         return;
 
-    const QPair<SearchAgent*,int> oldResult = (m_currentSearchResultIndex >= 0 && m_currentSearchResultIndex < m_searchResults.size()) ? m_searchResults.at(m_currentSearchResultIndex) : qMakePair<SearchAgent*,int>(nullptr,-1);
+    const QPair<SearchAgent *, int> oldResult =
+            (m_currentSearchResultIndex >= 0 && m_currentSearchResultIndex < m_searchResults.size())
+            ? m_searchResults.at(m_currentSearchResultIndex)
+            : qMakePair<SearchAgent *, int>(nullptr, -1);
     m_currentSearchResultIndex = val;
-    const QPair<SearchAgent*,int> newResult = m_searchResults.at(m_currentSearchResultIndex);
+    const QPair<SearchAgent *, int> newResult = m_searchResults.at(m_currentSearchResultIndex);
 
-    if(oldResult.first != nullptr && oldResult.first != newResult.first)
+    if (oldResult.first != nullptr && oldResult.first != newResult.first)
         oldResult.first->setCurrentSearchResultIndex(-1);
     newResult.first->setCurrentSearchResultIndex(newResult.second);
 
@@ -539,27 +514,21 @@ void SearchEngine::setCurrentSearchResultIndex(int val)
 ///////////////////////////////////////////////////////////////////////////////
 
 TextDocumentSearch::TextDocumentSearch(QObject *parent)
-                   : QObject(parent),
-                     m_textDocument(this, "textDocument")
+    : QObject(parent), m_textDocument(this, "textDocument")
 {
-
 }
 
-TextDocumentSearch::~TextDocumentSearch()
-{
-
-}
+TextDocumentSearch::~TextDocumentSearch() { }
 
 void TextDocumentSearch::setTextDocument(QQuickTextDocument *val)
 {
-    if(m_textDocument == val)
+    if (m_textDocument == val)
         return;
 
     m_textDocument = val;
 
-    if(m_textDocument != nullptr)
-    {
-        if(!m_searchString.isEmpty())
+    if (m_textDocument != nullptr) {
+        if (!m_searchString.isEmpty())
             this->doSearch(m_searchString);
     }
 
@@ -573,7 +542,7 @@ void TextDocumentSearch::resetTextDocument()
 
 void TextDocumentSearch::setSearchString(const QString &val)
 {
-    if(m_searchString == val)
+    if (m_searchString == val)
         return;
 
     this->doSearch(val);
@@ -584,10 +553,8 @@ void TextDocumentSearch::setSearchString(const QString &val)
 
 void TextDocumentSearch::setCurrentResultIndex(int val)
 {
-    if(m_searchResults.isEmpty())
-    {
-        if(m_currentResultIndex != -1)
-        {
+    if (m_searchResults.isEmpty()) {
+        if (m_currentResultIndex != -1) {
             emit clearHighlight();
 
             m_currentResultIndex = -1;
@@ -597,8 +564,8 @@ void TextDocumentSearch::setCurrentResultIndex(int val)
         return;
     }
 
-    val = qBound(-1, val, m_searchResults.size()-1);
-    if(m_currentResultIndex == val)
+    val = qBound(-1, val, m_searchResults.size() - 1);
+    if (m_currentResultIndex == val)
         return;
 
     emit clearHighlight();
@@ -606,16 +573,16 @@ void TextDocumentSearch::setCurrentResultIndex(int val)
     m_currentResultIndex = val;
     emit currentResultIndexChanged();
 
-    if(val < 0 || val >= m_searchResults.size())
+    if (val < 0 || val >= m_searchResults.size())
         return;
 
-    const QPair<int,int> result = m_searchResults.at(val);
+    const QPair<int, int> result = m_searchResults.at(val);
     emit highlightText(result.first, result.second);
 }
 
 void TextDocumentSearch::setSearchFlags(SearchEngine::SearchFlags val)
 {
-    if(m_searchFlags == val)
+    if (m_searchFlags == val)
         return;
 
     m_searchFlags = val;
@@ -626,14 +593,12 @@ void TextDocumentSearch::clearSearch()
 {
     this->setCurrentResultIndex(-1);
 
-    if(!m_searchResults.isEmpty())
-    {
+    if (!m_searchResults.isEmpty()) {
         m_searchResults.clear();
         emit searchResultCountChanged();
     }
 
-    if(!m_searchString.isEmpty())
-    {
+    if (!m_searchString.isEmpty()) {
         m_searchString.clear();
         emit searchStringChanged();
     }
@@ -641,48 +606,46 @@ void TextDocumentSearch::clearSearch()
 
 void TextDocumentSearch::nextSearchResult()
 {
-    this->setCurrentResultIndex(m_currentResultIndex+1);
+    this->setCurrentResultIndex(m_currentResultIndex + 1);
 }
 
 void TextDocumentSearch::previousSearchResult()
 {
-    this->setCurrentResultIndex(m_currentResultIndex-1);
+    this->setCurrentResultIndex(m_currentResultIndex - 1);
 }
 
 void TextDocumentSearch::cycleSearchResult()
 {
-    if(!m_searchResults.isEmpty())
-        this->setCurrentResultIndex((m_currentResultIndex+1)%m_searchResults.size());
+    if (!m_searchResults.isEmpty())
+        this->setCurrentResultIndex((m_currentResultIndex + 1) % m_searchResults.size());
     else
         this->setCurrentResultIndex(-1);
 }
 
 void TextDocumentSearch::replace(const QString &replacementText)
 {
-    if(m_currentResultIndex < 0 || m_currentResultIndex >= m_searchResults.size())
+    if (m_currentResultIndex < 0 || m_currentResultIndex >= m_searchResults.size())
         return;
 
-    if(m_textDocument == nullptr)
+    if (m_textDocument == nullptr)
         return;
 
     QTextDocument *document = m_textDocument->textDocument();
-    if(document == nullptr)
+    if (document == nullptr)
         return;
 
-    const QPair<int,int> result = m_searchResults.at(m_currentResultIndex);
+    const QPair<int, int> result = m_searchResults.at(m_currentResultIndex);
 
     QTextCursor cursor(document);
     cursor.setPosition(result.first);
-    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, result.second-result.first);
-    if(cursor.selectedText() != replacementText)
-    {
+    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                        result.second - result.first);
+    if (cursor.selectedText() != replacementText) {
         const int diff = replacementText.length() - cursor.selectedText().length();
         cursor.insertText(replacementText);
 
-        if(diff != 0 && m_currentResultIndex < m_searchResults.size()-1)
-        {
-            for(int i=m_currentResultIndex+1; i<m_searchResults.size(); i++)
-            {
+        if (diff != 0 && m_currentResultIndex < m_searchResults.size() - 1) {
+            for (int i = m_currentResultIndex + 1; i < m_searchResults.size(); i++) {
                 m_searchResults[i].first += diff;
                 m_searchResults[i].second += diff;
             }
@@ -692,31 +655,31 @@ void TextDocumentSearch::replace(const QString &replacementText)
 
 void TextDocumentSearch::replaceAll(const QString &replacementText)
 {
-    if(m_textDocument == nullptr)
+    if (m_textDocument == nullptr)
         return;
 
     QTextDocument *document = m_textDocument->textDocument();
-    if(document == nullptr)
+    if (document == nullptr)
         return;
 
     QTextCursor cursor(document);
-    for(int i=m_searchResults.size()-1; i>=0; i--)
-    {
-        const QPair<int,int> result = m_searchResults.at(i);
+    for (int i = m_searchResults.size() - 1; i >= 0; i--) {
+        const QPair<int, int> result = m_searchResults.at(i);
         cursor.setPosition(result.first);
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, result.second-result.first);
-        if(cursor.selectedText() != replacementText)
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                            result.second - result.first);
+        if (cursor.selectedText() != replacementText)
             cursor.insertText(replacementText);
     }
 }
 
 void TextDocumentSearch::doSearch(const QString &string)
 {
-    if(m_textDocument == nullptr)
+    if (m_textDocument == nullptr)
         return;
 
     this->clearSearch();
-    if(string.isEmpty())
+    if (string.isEmpty())
         return;
 
     QTextDocument *document = m_textDocument->textDocument();
@@ -724,19 +687,18 @@ void TextDocumentSearch::doSearch(const QString &string)
     flags &= int(m_searchFlags);
 
     QTextCursor cursor(document);
-    while(1)
-    {
+    while (1) {
         cursor = document->find(string, cursor, flags);
-        if(cursor.isNull())
+        if (cursor.isNull())
             break;
 
-        m_searchResults << qMakePair<int,int>(cursor.selectionStart(),cursor.selectionEnd());
+        m_searchResults << qMakePair<int, int>(cursor.selectionStart(), cursor.selectionEnd());
         cursor.setPosition(cursor.selectionEnd());
     }
 
     m_searchString = string;
     emit searchStringChanged();
 
-    if(!m_searchResults.isEmpty())
+    if (!m_searchResults.isEmpty())
         emit searchResultCountChanged();
 }

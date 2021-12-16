@@ -14,7 +14,6 @@
 #ifndef NOTIFICATION_H
 #define NOTIFICATION_H
 
-
 #include <QObject>
 #include <QColor>
 #include <QQmlEngine>
@@ -26,7 +25,7 @@ class Notification : public QObject
     Q_OBJECT
 
 public:
-    Notification(QObject *parent=nullptr);
+    Notification(QObject *parent = nullptr);
     ~Notification();
 
     static Notification *qmlAttachedProperties(QObject *object);
@@ -92,7 +91,7 @@ private:
     QStringList m_buttons;
     ExecLaterTimer m_autoCloseTimer;
 };
-Q_DECLARE_METATYPE(Notification*)
+Q_DECLARE_METATYPE(Notification *)
 QML_DECLARE_TYPEINFO(Notification, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // NOTIFICATION_H

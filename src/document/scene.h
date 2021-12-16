@@ -49,11 +49,11 @@ class SceneHeading : public QObject, public Modifiable
     Q_OBJECT
 
 public:
-    SceneHeading(QObject *parent=nullptr);
+    SceneHeading(QObject *parent = nullptr);
     ~SceneHeading();
 
     Q_PROPERTY(Scene* scene READ scene CONSTANT STORED false)
-    Scene* scene() const { return m_scene; }
+    Scene *scene() const { return m_scene; }
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     void setEnabled(bool val);
@@ -79,14 +79,15 @@ public:
     QString text() const;
     Q_SIGNAL void textChanged();
 
-    static bool parse(const QString &text, QString &locationType, QString &location, QString &moment, bool strict=false);
+    static bool parse(const QString &text, QString &locationType, QString &location,
+                      QString &moment, bool strict = false);
 
     Q_INVOKABLE void parseFrom(const QString &text);
 
 private:
     bool m_enabled = true;
     char m_padding[3];
-    Scene* m_scene = nullptr;
+    Scene *m_scene = nullptr;
     QString m_moment = "DAY";
     QString m_location = "Somewhere";
     QString m_locationType = "EXT";
@@ -96,17 +97,17 @@ class SceneElementContentChange
 {
 public:
     SceneElementContentChange() { }
-    SceneElementContentChange(int pos, int added, int rem, const QString &str=QString())
-        : position(pos), charsAdded(added), charsRemoved(rem), content(str) { }
+    SceneElementContentChange(int pos, int added, int rem, const QString &str = QString())
+        : position(pos), charsAdded(added), charsRemoved(rem), content(str)
+    {
+    }
 
     int position = -1;
     int charsAdded = -1;
     int charsRemoved = -1;
     QString content;
 
-    bool isValid() const {
-        return position >= 0 && (charsAdded > 0 || charsRemoved > 0);
-    }
+    bool isValid() const { return position >= 0 && (charsAdded > 0 || charsRemoved > 0); }
 };
 
 class SceneElement : public QObject, public Modifiable, public QObjectSerializer::Interface
@@ -115,12 +116,12 @@ class SceneElement : public QObject, public Modifiable, public QObjectSerializer
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Q_INVOKABLE SceneElement(QObject *parent=nullptr);
+    Q_INVOKABLE SceneElement(QObject *parent = nullptr);
     ~SceneElement();
     Q_SIGNAL void aboutToDelete(SceneElement *element);
 
     Q_PROPERTY(Scene* scene READ scene CONSTANT STORED false)
-    Scene* scene() const { return m_scene; }
+    Scene *scene() const { return m_scene; }
 
     Q_PROPERTY(SpellCheckService* spellCheck READ spellCheck CONSTANT STORED false)
     SpellCheckService *spellCheck() const;
@@ -129,13 +130,24 @@ public:
      * The 'id' is a special property. It can be set only once. If it is not
      * set an ID is automatically generated whenever the property value is
      * queried for the first time.
-    */
+     */
     Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     void setId(const QString &val);
     QString id() const;
     Q_SIGNAL void idChanged();
 
-    enum Type { Action, Character, Dialogue, Parenthetical, Shot, Transition, Heading, Min=Action, Max=Heading, All=-1 };
+    enum Type {
+        Action,
+        Character,
+        Dialogue,
+        Parenthetical,
+        Shot,
+        Transition,
+        Heading,
+        Min = Action,
+        Max = Heading,
+        All = -1
+    };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
     Q_CLASSINFO("UndoBundleFor_type", "cursorPosition")
@@ -174,7 +186,7 @@ private:
     mutable QString m_id;
     Type m_type = Action;
     QString m_text;
-    Scene* m_scene = nullptr;
+    Scene *m_scene = nullptr;
     mutable SpellCheckService *m_spellCheck = nullptr;
     mutable SceneElementContentChange m_lastContentChange;
 };
@@ -194,14 +206,14 @@ public:
 
     QStringList characterNames() const;
     bool containsCharacter(const QString &name) const;
-    QList<SceneElement*> characterElements() const;
-    QList<SceneElement*> characterElements(const QString &name) const;
+    QList<SceneElement *> characterElements() const;
+    QList<SceneElement *> characterElements(const QString &name) const;
 
     void include(const CharacterElementMap &other);
 
 private:
-    QMap<SceneElement*,QString> m_forwardMap;
-    QMap< QString, QList<SceneElement*> > m_reverseMap;
+    QMap<SceneElement *, QString> m_forwardMap;
+    QMap<QString, QList<SceneElement *>> m_reverseMap;
 };
 
 class Scene : public QAbstractListModel, public QObjectSerializer::Interface, public Modifiable
@@ -210,7 +222,7 @@ class Scene : public QAbstractListModel, public QObjectSerializer::Interface, pu
     Q_INTERFACES(QObjectSerializer::Interface)
 
 public:
-    Q_INVOKABLE Scene(QObject *parent=nullptr);
+    Q_INVOKABLE Scene(QObject *parent = nullptr);
     ~Scene();
     Q_SIGNAL void aboutToDelete(Scene *scene);
 
@@ -224,7 +236,7 @@ public:
      * The 'id' is a special property. It can be set only once. If it is not
      * set an ID is automatically generated whenever the property value is
      * queried for the first time.
-    */
+     */
     Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
     void setId(const QString &val);
     QString id() const;
@@ -280,7 +292,7 @@ public:
     Q_CLASSINFO("enum_Action_icon", "../icons/content/fight_scene.png")
     Q_CLASSINFO("enum_Montage_icon", "../icons/content/camera_alt.png")
 
-    enum Type { Standard=0, Song, Action, Montage };
+    enum Type { Standard = 0, Song, Action, Montage };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
     void setType(Type val);
@@ -307,7 +319,7 @@ public:
     Q_SIGNAL void cursorPositionChanged();
 
     Q_PROPERTY(SceneHeading* heading READ heading CONSTANT)
-    SceneHeading* heading() const { return m_heading; }
+    SceneHeading *heading() const { return m_heading; }
 
     Q_PROPERTY(bool hasCharacters READ hasCharacters NOTIFY characterNamesChanged)
     bool hasCharacters() const { return !m_characterElementMap.isEmpty(); }
@@ -316,18 +328,20 @@ public:
     QStringList characterNames() const { return m_characterElementMap.characterNames(); }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_INVOKABLE bool hasCharacter(const QString &characterName) const {
+    Q_INVOKABLE bool hasCharacter(const QString &characterName) const
+    {
         return m_characterElementMap.containsCharacter(characterName);
     }
 
-    Q_INVOKABLE int characterPresence(const QString &characterName) const {
+    Q_INVOKABLE int characterPresence(const QString &characterName) const
+    {
         return m_characterElementMap.characterElements(characterName).size();
     }
 
     Q_INVOKABLE void addMuteCharacter(const QString &characterName);
     Q_INVOKABLE void removeMuteCharacter(const QString &characterName);
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
-    void scanMuteCharacters(const QStringList &characterNames=QStringList());
+    void scanMuteCharacters(const QStringList &characterNames = QStringList());
 
     Q_PROPERTY(QString act READ act NOTIFY actChanged STORED false)
     void setAct(const QString &val);
@@ -370,13 +384,13 @@ public:
 
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements NOTIFY elementCountChanged)
     QQmlListProperty<SceneElement> elements();
-    Q_INVOKABLE SceneElement *appendElement(const QString &text, int type=SceneElement::Action);
+    Q_INVOKABLE SceneElement *appendElement(const QString &text, int type = SceneElement::Action);
     Q_INVOKABLE void addElement(SceneElement *ptr);
     Q_INVOKABLE void insertElementAfter(SceneElement *ptr, SceneElement *after);
     Q_INVOKABLE void insertElementBefore(SceneElement *ptr, SceneElement *before);
     Q_INVOKABLE void insertElementAt(SceneElement *ptr, int index);
     Q_INVOKABLE void removeElement(SceneElement *ptr);
-    Q_INVOKABLE int  indexOfElement(SceneElement *ptr) { return m_elements.indexOf(ptr); }
+    Q_INVOKABLE int indexOfElement(SceneElement *ptr) { return m_elements.indexOf(ptr); }
     Q_INVOKABLE SceneElement *elementAt(int index) const;
     void setElements(const QList<SceneElement *> &list);
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
@@ -397,20 +411,20 @@ public:
     Q_PROPERTY(Notes* notes READ notes CONSTANT)
     Notes *notes() const { return m_notes; }
 
-    Q_INVOKABLE void beginUndoCapture(bool allowMerging=true);
+    Q_INVOKABLE void beginUndoCapture(bool allowMerging = true);
     Q_INVOKABLE void endUndoCapture();
 
     // Used by stats report generator code.
-    QHash<QString, QList<SceneElement *> > dialogueElements() const;
+    QHash<QString, QList<SceneElement *>> dialogueElements() const;
 
-    Scene *splitScene(SceneElement *element, int textPosition, QObject *parent=nullptr);
+    Scene *splitScene(SceneElement *element, int textPosition, QObject *parent = nullptr);
     bool mergeInto(Scene *another);
 
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
 
     // Serializing functions for use with Undo/Redo
     QByteArray toByteArray() const;
@@ -429,7 +443,7 @@ public:
     void serializeToJson(QJsonObject &json) const;
     void deserializeFromJson(const QJsonObject &json);
     bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject*> &objects);
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
 
 protected:
     bool event(QEvent *event);
@@ -437,10 +451,10 @@ protected:
 private:
     void setStructureElement(StructureElement *ptr);
     QList<SceneElement *> elementsList() const { return m_elements; }
-    void setElementsList(const QList<SceneElement*> &list);
+    void setElementsList(const QList<SceneElement *> &list);
     void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
-    const CharacterElementMap & characterElementMap() const { return m_characterElementMap; }
+    const CharacterElementMap &characterElementMap() const { return m_characterElementMap; }
 
 private:
     friend class Structure;
@@ -466,7 +480,7 @@ private:
     char m_padding[7];
     mutable QString m_id;
     int m_cursorPosition = -1;
-    SceneHeading* m_heading = new SceneHeading(this);
+    SceneHeading *m_heading = new SceneHeading(this);
     bool m_isBeingReset = false;
     bool m_undoRedoEnabled = false;
     bool m_inSetElementsList = false;
@@ -477,7 +491,7 @@ private:
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);
-    static SceneElement* staticElementAt(QQmlListProperty<SceneElement> *list, int index);
+    static SceneElement *staticElementAt(QQmlListProperty<SceneElement> *list, int index);
     static int staticElementCount(QQmlListProperty<SceneElement> *list);
     QList<SceneElement *> m_elements;
 
@@ -491,12 +505,12 @@ class SceneSizeHintItem : public QQuickItem
     Q_OBJECT
 
 public:
-    SceneSizeHintItem(QQuickItem *parent=nullptr);
+    SceneSizeHintItem(QQuickItem *parent = nullptr);
     ~SceneSizeHintItem();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET sceneReset)
-    void setScene(Scene* val);
-    Scene* scene() const { return m_scene; }
+    void setScene(Scene *val);
+    Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
     Q_PROPERTY(bool trackSceneChanges READ trackSceneChanges WRITE setTrackSceneChanges NOTIFY trackSceneChangesChanged)
@@ -505,8 +519,8 @@ public:
     Q_SIGNAL void trackSceneChangesChanged();
 
     Q_PROPERTY(ScreenplayFormat* format READ format WRITE setFormat NOTIFY formatChanged)
-    void setFormat(ScreenplayFormat* val);
-    ScreenplayFormat* format() const { return m_format; }
+    void setFormat(ScreenplayFormat *val);
+    ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
     Q_PROPERTY(bool trackFormatChanges READ trackFormatChanges WRITE setTrackFormatChanges NOTIFY trackFormatChangesChanged)
@@ -589,7 +603,7 @@ class SceneGroup : public GenericArrayModel
     Q_OBJECT
 
 public:
-    SceneGroup(QObject *parent=nullptr);
+    SceneGroup(QObject *parent = nullptr);
     ~SceneGroup();
 
     Q_INVOKABLE void toggle(int row);
@@ -618,8 +632,8 @@ public:
 
     // Custom properties
     Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged)
-    void setStructure(Structure* val);
-    Structure* structure() const { return m_structure; }
+    void setStructure(Structure *val);
+    Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
     Q_PROPERTY(QQmlListProperty<Scene> scenes READ scenes NOTIFY sceneCountChanged)
@@ -646,7 +660,7 @@ private:
 private:
     static void staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr);
     static void staticClearScenes(QQmlListProperty<Scene> *list);
-    static Scene* staticSceneAt(QQmlListProperty<Scene> *list, int index);
+    static Scene *staticSceneAt(QQmlListProperty<Scene> *list, int index);
     static int staticSceneCount(QQmlListProperty<Scene> *list);
     QStringList m_sceneActs;
     QStringList m_groupActs;

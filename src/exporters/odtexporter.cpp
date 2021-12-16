@@ -17,20 +17,13 @@
 #include <QPdfWriter>
 #include <QTextDocumentWriter>
 
-OdtExporter::OdtExporter(QObject *parent)
-            :AbstractTextDocumentExporter(parent)
-{
+OdtExporter::OdtExporter(QObject *parent) : AbstractTextDocumentExporter(parent) { }
 
-}
-
-OdtExporter::~OdtExporter()
-{
-
-}
+OdtExporter::~OdtExporter() { }
 
 void OdtExporter::setIncludeSceneNumbers(bool val)
 {
-    if(m_includeSceneNumbers == val)
+    if (m_includeSceneNumbers == val)
         return;
 
     m_includeSceneNumbers = val;
@@ -54,7 +47,7 @@ bool OdtExporter::doExport(QIODevice *device)
 QString OdtExporter::polishFileName(const QString &fileName) const
 {
     QFileInfo fi(fileName);
-    if( fi.suffix().toLower() != "odt" )
+    if (fi.suffix().toLower() != "odt")
         return fileName + ".odt";
     return fileName;
 }

@@ -72,7 +72,10 @@ public:
     int customFontPointSize() const { return m_customFontPointSize; }
     Q_SIGNAL void customFontPointSizeChanged();
 
-    Q_INVOKABLE QUrl localFileToUrl(const QString &fileName) const { return QUrl::fromLocalFile(fileName); }
+    Q_INVOKABLE QUrl localFileToUrl(const QString &fileName) const
+    {
+        return QUrl::fromLocalFile(fileName);
+    }
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) const { return url.toLocalFile(); }
     Q_INVOKABLE QUrl toHttpUrl(const QUrl &url) const;
 
@@ -169,16 +172,21 @@ public:
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
     Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
     Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
-    Q_INVOKABLE QJsonArray enumerationModelForType(const QString &typeName, const QString &enumName) const;
+    Q_INVOKABLE QJsonArray enumerationModelForType(const QString &typeName,
+                                                   const QString &enumName) const;
     Q_INVOKABLE QString enumerationKey(QObject *object, const QString &enumName, int value) const;
-    Q_INVOKABLE QString enumerationKeyForType(const QString &typeName, const QString &enumName, int value) const;
+    Q_INVOKABLE QString enumerationKeyForType(const QString &typeName, const QString &enumName,
+                                              int value) const;
     Q_INVOKABLE QJsonObject fileInfo(const QString &path) const;
 
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
 
     Q_PROPERTY(TransliterationEngine* transliterationEngine READ transliterationEngine CONSTANT)
-    TransliterationEngine *transliterationEngine() const { return TransliterationEngine::instance(); }
+    TransliterationEngine *transliterationEngine() const
+    {
+        return TransliterationEngine::instance();
+    }
 
     Q_PROPERTY(SystemTextInputManager* textInputManager READ textInputManager CONSTANT)
     SystemTextInputManager *textInputManager() const { return SystemTextInputManager::instance(); }
@@ -187,16 +195,18 @@ public:
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
     Q_INVOKABLE bool isMouseOverItem(QQuickItem *item) const;
 
-    Q_INVOKABLE void execLater(QObject *context, int howMuchLater, const QJSValue &function, const QJSValueList &args=QJSValueList());
+    Q_INVOKABLE void execLater(QObject *context, int howMuchLater, const QJSValue &function,
+                               const QJSValueList &args = QJSValueList());
 
-    Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha=0.5);
+    Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
 
     QSettings *settings() const { return m_settings; }
 
     Q_PROPERTY(AutoUpdate* autoUpdate READ autoUpdate CONSTANT)
     AutoUpdate *autoUpdate() const;
 
-    Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object, const QMetaObject *from=nullptr) const;
+    Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object,
+                                                        const QMetaObject *from = nullptr) const;
 
     Q_PROPERTY(QVariantList standardColors READ standardColorsVariantList NOTIFY standardColorsChanged STORED false)
     QVariantList standardColorsVariantList() const { return m_standardColors; }
@@ -210,14 +220,17 @@ public:
     Q_INVOKABLE QRectF largestBoundingRect(const QStringList &text, const QFont &font) const;
     Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
     Q_INVOKABLE QRectF intersectedRectangle(const QRectF &of, const QRectF &with) const;
-    Q_INVOKABLE bool   doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const;
+    Q_INVOKABLE bool doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const;
     Q_INVOKABLE QSizeF scaledSize(const QSizeF &of, const QSizeF &into) const;
     Q_INVOKABLE QRectF uniteRectangles(const QRectF &r1, const QRectF &r2) const;
-    Q_INVOKABLE QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom) const;
-    Q_INVOKABLE bool   isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
-    Q_INVOKABLE QPointF translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
-    Q_INVOKABLE qreal  distanceBetweenPoints(const QPointF &p1, const QPointF &p2) const;
-    Q_INVOKABLE QRectF querySubRectangle(const QRectF &in, const QRectF &around, const QSizeF &atBest) const;
+    Q_INVOKABLE QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right,
+                                       qreal bottom) const;
+    Q_INVOKABLE bool isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
+    Q_INVOKABLE QPointF translationRequiredToBringRectangleInRectangle(
+            const QRectF &bigRect, const QRectF &smallRect) const;
+    Q_INVOKABLE qreal distanceBetweenPoints(const QPointF &p1, const QPointF &p2) const;
+    Q_INVOKABLE QRectF querySubRectangle(const QRectF &in, const QRectF &around,
+                                         const QSizeF &atBest) const;
 
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
@@ -225,7 +238,8 @@ public:
     Q_INVOKABLE bool writeToFile(const QString &fileName, const QString &fileContent);
     Q_INVOKABLE QString fileContents(const QString &fileName) const;
     Q_INVOKABLE QString fileName(const QString &path) const;
-    Q_INVOKABLE QString neighbouringFilePath(const QString &filePath, const QString &nfileName) const;
+    Q_INVOKABLE QString neighbouringFilePath(const QString &filePath,
+                                             const QString &nfileName) const;
 
     Q_INVOKABLE QScreen *windowScreen(QObject *window) const;
 
@@ -271,7 +285,7 @@ public:
 
 #ifdef Q_OS_MAC
     QString fileToOpen() const { return m_fileToOpen; }
-    void setHandleFileOpenEvents(bool val=true) { m_handleFileOpenEvents = val; }
+    void setHandleFileOpenEvents(bool val = true) { m_handleFileOpenEvents = val; }
 #endif
 
     static QString painterPathToString(const QPainterPath &val);
@@ -290,8 +304,9 @@ signals:
 
 public:
     Q_PROPERTY(QAbstractListModel* objectReigstry READ objectRegistry CONSTANT STORED false)
-    ObjectListPropertyModel<QObject*>* objectRegistry() const {
-        return &(const_cast<Application*>(this)->m_objectRegistry);
+    ObjectListPropertyModel<QObject *> *objectRegistry() const
+    {
+        return &(const_cast<Application *>(this)->m_objectRegistry);
     }
 
     Q_INVOKABLE QString registerObject(QObject *object, const QString &name);
@@ -315,7 +330,7 @@ private:
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;
     QVariantList m_standardColors;
-    ObjectListPropertyModel<QObject*> m_objectRegistry;
+    ObjectListPropertyModel<QObject *> m_objectRegistry;
     QNetworkConfigurationManager *m_networkConfiguration = nullptr;
 };
 

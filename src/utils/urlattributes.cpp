@@ -23,35 +23,29 @@
 #include <QUrlQuery>
 #include <QJsonDocument>
 
-UrlAttributes::UrlAttributes(QObject *parent)
-    : QObject(parent)
-{
-}
+UrlAttributes::UrlAttributes(QObject *parent) : QObject(parent) { }
 
-UrlAttributes::~UrlAttributes()
-{
-
-}
+UrlAttributes::~UrlAttributes() { }
 
 void UrlAttributes::setUrl(const QUrl &val)
 {
-    if(m_url == val)
+    if (m_url == val)
         return;
 
     m_url = val;
     emit urlChanged();
 
     static QNetworkAccessManager nam;
-    if(!m_reply.isNull())
+    if (!m_reply.isNull())
         delete m_reply;
     m_reply = nullptr;
 
-    if(!m_url.isEmpty() && m_url.isValid())
-    {
+    if (!m_url.isEmpty() && m_url.isValid()) {
         this->setAttributes(this->createDefaultAttributes());
         this->setStatus(Loading);
 
-        static const QUrl url( QStringLiteral("http://www.teriflix.in/scrite/urlattribs/urlattribs.php") );
+        static const QUrl url(
+                QStringLiteral("http://www.teriflix.in/scrite/urlattribs/urlattribs.php"));
         const QNetworkRequest request(url);
 
         QUrlQuery postData;
@@ -60,19 +54,16 @@ void UrlAttributes::setUrl(const QUrl &val)
         const QByteArray postDataBytes = postData.toString(QUrl::FullyEncoded).toLatin1();
 
         m_reply = nam.post(request, postDataBytes);
-        if(m_reply != nullptr)
-        {
+        if (m_reply != nullptr) {
             connect(m_reply, &QNetworkReply::finished, this, &UrlAttributes::onHttpRequestFinished);
             connect(m_reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-                [=](QNetworkReply::NetworkError){
-                m_reply->deleteLater();
-                m_reply = nullptr;
-                this->setStatus(Error);
-            });
+                    [=](QNetworkReply::NetworkError) {
+                        m_reply->deleteLater();
+                        m_reply = nullptr;
+                        this->setStatus(Error);
+                    });
         }
-    }
-    else
-    {
+    } else {
         this->setAttributes(QJsonObject());
         this->setStatus(Ready);
     }
@@ -80,7 +71,7 @@ void UrlAttributes::setUrl(const QUrl &val)
 
 void UrlAttributes::setStatus(UrlAttributes::Status val)
 {
-    if(m_status == val)
+    if (m_status == val)
         return;
 
     m_status = val;
@@ -89,7 +80,7 @@ void UrlAttributes::setStatus(UrlAttributes::Status val)
 
 void UrlAttributes::onHttpRequestFinished()
 {
-    if(m_reply == nullptr)
+    if (m_reply == nullptr)
         return;
 
     const QByteArray bytes = m_reply->readAll();
@@ -98,8 +89,9 @@ void UrlAttributes::onHttpRequestFinished()
 
     QJsonParseError parseError;
     const QJsonDocument jsonDoc = QJsonDocument::fromJson(bytes, &parseError);
-    QJsonObject jsonObj = parseError.error == QJsonParseError::NoError ? jsonDoc.object() : QJsonObject();
-    if(jsonObj.isEmpty())
+    QJsonObject jsonObj =
+            parseError.error == QJsonParseError::NoError ? jsonDoc.object() : QJsonObject();
+    if (jsonObj.isEmpty())
         jsonObj = this->createDefaultAttributes();
     this->setAttributes(jsonObj);
     this->setStatus(Ready);
@@ -107,11 +99,11 @@ void UrlAttributes::onHttpRequestFinished()
 
 void UrlAttributes::setAttributes(const QJsonObject &val)
 {
-    if(m_attributes == val)
+    if (m_attributes == val)
         return;
 
     m_attributes = val;
-    if(m_attributes.value(QStringLiteral("url")).toString() != m_url.toString())
+    if (m_attributes.value(QStringLiteral("url")).toString() != m_url.toString())
         m_attributes.insert(QStringLiteral("url"), m_url.toString());
     emit attributesChanged();
 }
@@ -126,5 +118,3 @@ QJsonObject UrlAttributes::createDefaultAttributes() const
     defaultAttrs.insert(QStringLiteral("description"), QStringLiteral(""));
     return defaultAttrs;
 }
-
-

@@ -32,12 +32,12 @@ class ScreenplayAdapter : public QIdentityProxyModel
     Q_OBJECT
 
 public:
-    ScreenplayAdapter(QObject *parent=nullptr);
+    ScreenplayAdapter(QObject *parent = nullptr);
     ~ScreenplayAdapter();
 
     Q_PROPERTY(QObject* source READ source WRITE setSource NOTIFY sourceChanged RESET resetSource)
-    void setSource(QObject* val);
-    QObject* source() const { return m_source; }
+    void setSource(QObject *val);
+    QObject *source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
     Q_PROPERTY(bool isSourceScene READ isSourceScene NOTIFY sourceChanged)
@@ -55,11 +55,11 @@ public:
     Q_SIGNAL void currentIndexChanged(int val);
 
     Q_PROPERTY(ScreenplayElement* currentElement READ currentElement NOTIFY currentElementChanged)
-    ScreenplayElement* currentElement() const { return m_currentElement; }
+    ScreenplayElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
     Q_PROPERTY(Scene* currentScene READ currentScene NOTIFY currentElementChanged)
-    Scene* currentScene() const;
+    Scene *currentScene() const;
 
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const;
@@ -74,16 +74,24 @@ public:
     int initialLoadTreshold() const { return m_initialLoadTreshold; }
     Q_SIGNAL void initialLoadTresholdChanged();
 
-    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element,
+                                                int textPosition);
     Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
     Q_INVOKABLE QVariant at(int row) const;
     Q_INVOKABLE void refresh();
 
-    enum Roles { IdRole = Qt::UserRole, ScreenplayElementRole, ScreenplayElementTypeRole, BreakTypeRole, SceneRole, ModelDataRole };
+    enum Roles {
+        IdRole = Qt::UserRole,
+        ScreenplayElementRole,
+        ScreenplayElementTypeRole,
+        BreakTypeRole,
+        SceneRole,
+        ModelDataRole
+    };
     Q_ENUMS(Roles)
-    QHash<int,QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void fetchMore(const QModelIndex &parent);
@@ -91,7 +99,7 @@ public:
 
 private:
     void setCurrentIndexInternal(int val);
-    void setCurrentElement(ScreenplayElement* val);
+    void setCurrentElement(ScreenplayElement *val);
     QVariant data(ScreenplayElement *element, int row, int role) const;
 
     void resetSource();

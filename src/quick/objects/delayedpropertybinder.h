@@ -14,7 +14,6 @@
 #ifndef DELAYEDPROPERTYBINDER_H
 #define DELAYEDPROPERTYBINDER_H
 
-
 #include <QQuickItem>
 
 #include "execlatertimer.h"
@@ -24,7 +23,7 @@ class DelayedPropertyBinder : public QQuickItem
     Q_OBJECT
 
 public:
-    DelayedPropertyBinder(QQuickItem *parent=nullptr);
+    DelayedPropertyBinder(QQuickItem *parent = nullptr);
     ~DelayedPropertyBinder();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)

@@ -36,7 +36,7 @@ public:
     void add(QObject *ptr);
 
 protected:
-    GarbageCollector(QObject *parent=nullptr);
+    GarbageCollector(QObject *parent = nullptr);
     void timerEvent(QTimerEvent *event);
     void onObjectDestroyed(QObject *obj);
 

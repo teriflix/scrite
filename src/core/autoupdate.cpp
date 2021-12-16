@@ -27,21 +27,16 @@ AutoUpdate *AutoUpdate::instance()
     return theInstance;
 }
 
-AutoUpdate::AutoUpdate(QObject *parent)
-    : QObject(parent),
-      m_updateTimer("AutoUpdate.m_updateTimer")
+AutoUpdate::AutoUpdate(QObject *parent) : QObject(parent), m_updateTimer("AutoUpdate.m_updateTimer")
 {
     m_updateTimer.start(1000, this);
 }
 
-AutoUpdate::~AutoUpdate()
-{
-
-}
+AutoUpdate::~AutoUpdate() { }
 
 void AutoUpdate::setUrl(const QUrl &val)
 {
-    if(m_url == val)
+    if (m_url == val)
         return;
 
     m_url = val;
@@ -65,14 +60,13 @@ void AutoUpdate::dontAskForSurveyAgain(bool val)
 
 void AutoUpdate::setUpdateInfo(const QJsonObject &val)
 {
-    if(m_updateInfo == val)
+    if (m_updateInfo == val)
         return;
 
     m_updateInfo = val;
 
     const QString link = m_updateInfo.value("link").toString();
-    if(!link.isEmpty())
-    {
+    if (!link.isEmpty()) {
         QUrl url(link);
         QUrlQuery uq(link);
         uq.addQueryItem("client", this->getClientId());
@@ -85,7 +79,7 @@ void AutoUpdate::setUpdateInfo(const QJsonObject &val)
 
 void AutoUpdate::setSurveyInfo(const QJsonObject &val)
 {
-    if(m_surveyInfo == val)
+    if (m_surveyInfo == val)
         return;
 
     QSettings *settings = Application::instance()->settings();
@@ -103,12 +97,14 @@ void AutoUpdate::setSurveyInfo(const QJsonObject &val)
     static const int minLaunchesBeforeSurvey = 5;
 
     const QDateTime now = QDateTime::currentDateTime();
-    const bool allowSurvey = Application::instance()->installationTimestamp().daysTo(now) >= minDaysBeforeSurvey && Application::instance()->launchCounter() > minLaunchesBeforeSurvey;
-    if(!allowSurvey)
+    const bool allowSurvey =
+            Application::instance()->installationTimestamp().daysTo(now) >= minDaysBeforeSurvey
+            && Application::instance()->launchCounter() > minLaunchesBeforeSurvey;
+    if (!allowSurvey)
         return;
 
     QString link = val.value("link").toString();
-    if(link.isEmpty())
+    if (link.isEmpty())
         return;
 
     QUrl url(link);
@@ -120,8 +116,7 @@ void AutoUpdate::setSurveyInfo(const QJsonObject &val)
     const int surveyCounter = val.value("counter").toInt();
     const int lastSurveyCounter = settings->value("Survey/counter").toInt();
     const bool dontAskAgain = settings->value("Survey/dontAskAgain").toBool();
-    if(lastSurveyCounter < surveyCounter || !dontAskAgain)
-    {
+    if (lastSurveyCounter < surveyCounter || !dontAskAgain) {
         settings->setValue("Survey/counter", surveyCounter);
         settings->setValue("Survey/dontAskAgain", false);
 
@@ -135,7 +130,7 @@ void AutoUpdate::setSurveyInfo(const QJsonObject &val)
 void AutoUpdate::checkForUpdates()
 {
     NetworkAccessManager &nam = *(NetworkAccessManager::instance());
-    if(m_url.isEmpty() || !m_url.isValid())
+    if (m_url.isEmpty() || !m_url.isValid())
         return;
 
     static QString userAgentString = this->getClientId();
@@ -143,23 +138,23 @@ void AutoUpdate::checkForUpdates()
     QNetworkRequest request(m_url);
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgentString);
     QNetworkReply *reply = nam.get(request);
-    if(reply == nullptr)
+    if (reply == nullptr)
         return;
 
-    connect(reply, &QNetworkReply::finished, [reply,this]() {
-        if(reply->error() != QNetworkReply::NoError) {
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
+        if (reply->error() != QNetworkReply::NoError) {
             this->checkForUpdatesAfterSometime();
             return;
         }
 
         const QByteArray bytes = reply->readAll();
-        if(bytes.isEmpty()) {
+        if (bytes.isEmpty()) {
             this->checkForUpdatesAfterSometime();
             return;
         }
 
         const QJsonDocument jsonDoc = QJsonDocument::fromJson(bytes);
-        if(jsonDoc.isNull() || jsonDoc.isEmpty()) {
+        if (jsonDoc.isNull() || jsonDoc.isEmpty()) {
             this->checkForUpdatesAfterSometime();
             return;
         }
@@ -173,7 +168,7 @@ void AutoUpdate::checkForUpdates()
 void AutoUpdate::checkForUpdatesAfterSometime()
 {
     // Check for updates after 1 hour
-    m_updateTimer.start(60*60*1000, this);
+    m_updateTimer.start(60 * 60 * 1000, this);
 }
 
 void AutoUpdate::lookForUpdates(const QJsonObject &json)
@@ -197,8 +192,7 @@ void AutoUpdate::lookForUpdates(const QJsonObject &json)
       */
 
     QJsonObject info;
-    switch(Application::instance()->platform())
-    {
+    switch (Application::instance()->platform()) {
     case Application::MacOS:
         info = json.value("macos").toObject();
         break;
@@ -210,21 +204,19 @@ void AutoUpdate::lookForUpdates(const QJsonObject &json)
         break;
     }
 
-    if(info.isEmpty())
-    {
+    if (info.isEmpty()) {
         this->checkForUpdatesAfterSometime();
         return;
     }
 
-    const QVersionNumber updateVersion = QVersionNumber::fromString(info.value("version").toString());
-    if(updateVersion.isNull())
-    {
+    const QVersionNumber updateVersion =
+            QVersionNumber::fromString(info.value("version").toString());
+    if (updateVersion.isNull()) {
         this->checkForUpdatesAfterSometime();
         return;
     }
 
-    if(updateVersion <= Application::instance()->versionNumber())
-    {
+    if (updateVersion <= Application::instance()->versionNumber()) {
         this->checkForUpdatesAfterSometime();
         return;
     }
@@ -236,7 +228,7 @@ void AutoUpdate::lookForUpdates(const QJsonObject &json)
 void AutoUpdate::lookForSurvey(const QJsonObject &json)
 {
     const QJsonObject info = json.value("survey").toObject();
-    if(info.isEmpty())
+    if (info.isEmpty())
         return;
 
     this->setSurveyInfo(info);
@@ -244,8 +236,7 @@ void AutoUpdate::lookForSurvey(const QJsonObject &json)
 
 void AutoUpdate::timerEvent(QTimerEvent *event)
 {
-    if(m_updateTimer.timerId() == event->timerId())
-    {
+    if (m_updateTimer.timerId() == event->timerId()) {
         m_updateTimer.stop();
         this->checkForUpdates();
         return;
@@ -257,10 +248,10 @@ void AutoUpdate::timerEvent(QTimerEvent *event)
 QString AutoUpdate::getClientId() const
 {
     static QString ret;
-    if(ret.isEmpty())
-    {
+    if (ret.isEmpty()) {
         ret = "scrite-";
-        ret += Application::instance()->applicationVersion() + "[" + Application::instance()->buildTimestamp() + "] ";
+        ret += Application::instance()->applicationVersion() + "["
+                + Application::instance()->buildTimestamp() + "] ";
         QString prodName = QSysInfo::prettyProductName() + "-" + QSysInfo::currentCpuArchitecture();
         prodName.replace(" ", "_");
         ret += prodName + " ";
@@ -269,5 +260,3 @@ QString AutoUpdate::getClientId() const
 
     return ret;
 }
-
-

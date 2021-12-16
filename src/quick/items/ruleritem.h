@@ -21,7 +21,7 @@ class RulerItem : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    RulerItem(QQuickItem *parent=nullptr);
+    RulerItem(QQuickItem *parent = nullptr);
     ~RulerItem();
 
     enum Unit { Inch, Centimeter, Pixels };
@@ -121,23 +121,23 @@ private:
     void setCanConvert(bool val);
 
 private:
-    QFont  m_font;
+    QFont m_font;
     QColor m_textColor = Qt::black;
-    qreal  m_zoomLevel = 1.0;
-    qreal  m_leftMargin = 0;
-    qreal  m_resolution = 0;
-    bool   m_canConvert = false;
-    qreal  m_rightMargin = 0;
+    qreal m_zoomLevel = 1.0;
+    qreal m_leftMargin = 0;
+    qreal m_resolution = 0;
+    bool m_canConvert = false;
+    qreal m_rightMargin = 0;
     QColor m_borderColor = Qt::gray;
-    Unit   m_displayUnit = Inch;
-    Unit   m_marginsUnit = Pixels;
+    Unit m_displayUnit = Inch;
+    Unit m_marginsUnit = Pixels;
     QColor m_majorTickColor = Qt::black;
     QColor m_minorTickColor = Qt::darkGray;
     QColor m_paragraphColor = Qt::lightGray;
     QColor m_pageMarginColor = Qt::gray;
     QColor m_backgroundColor = Qt::white;
-    qreal  m_paragraphRightMargin = 0;
-    qreal  m_paragraphLeftMargin = 0;
+    qreal m_paragraphRightMargin = 0;
+    qreal m_paragraphLeftMargin = 0;
 };
 
 #endif // RULERITEM_H

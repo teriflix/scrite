@@ -28,12 +28,12 @@ class PainterPathItem : public AbstractShapeItem
     Q_OBJECT
 
 public:
-    PainterPathItem(QQuickItem *parent=nullptr);
+    PainterPathItem(QQuickItem *parent = nullptr);
     ~PainterPathItem();
 
     Q_PROPERTY(PainterPath* painterPath READ painterPath WRITE setPainterPath NOTIFY painterPathChanged RESET resetPainterPath)
     void setPainterPath(PainterPath *val);
-    PainterPath* painterPath() const { return m_painterPath; }
+    PainterPath *painterPath() const { return m_painterPath; }
     Q_SIGNAL void painterPathChanged();
 
     Q_PROPERTY(QPainterPath path READ path WRITE setPath NOTIFY pathChanged)
@@ -58,7 +58,7 @@ class AbstractPathElement : public QObject
     Q_OBJECT
 
 public:
-    AbstractPathElement(QObject *parent=nullptr);
+    AbstractPathElement(QObject *parent = nullptr);
     ~AbstractPathElement();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -80,7 +80,7 @@ class PainterPath : public QObject
     Q_OBJECT
 
 public:
-    PainterPath(QObject *parent=nullptr);
+    PainterPath(QObject *parent = nullptr);
     ~PainterPath();
 
     Q_CLASSINFO("DefaultProperty", "elements")
@@ -96,7 +96,8 @@ public:
     bool isDirty() const { return m_dirty; }
     Q_SIGNAL void dirtyChanged();
 
-    Q_INVOKABLE QPointF pointInLine(const QPointF &p1, const QPointF &p2, qreal t, bool absolute=false) const;
+    Q_INVOKABLE QPointF pointInLine(const QPointF &p1, const QPointF &p2, qreal t,
+                                    bool absolute = false) const;
 
     Q_INVOKABLE QPointF pointAtPercent(qreal t) const;
     Q_INVOKABLE qreal length() const;
@@ -121,7 +122,7 @@ private:
 private:
     bool m_dirty = false;
     QPainterPath m_path;
-    QList<AbstractPathElement*> m_pathElements;
+    QList<AbstractPathElement *> m_pathElements;
 };
 
 class MoveToElement : public AbstractPathElement
@@ -129,7 +130,7 @@ class MoveToElement : public AbstractPathElement
     Q_OBJECT
 
 public:
-    MoveToElement(QObject *parent=nullptr);
+    MoveToElement(QObject *parent = nullptr);
     ~MoveToElement();
 
     Q_PROPERTY(qreal x READ x WRITE setX NOTIFY xChanged)
@@ -154,7 +155,7 @@ class LineToElement : public MoveToElement
     Q_OBJECT
 
 public:
-    LineToElement(QObject *parent=nullptr);
+    LineToElement(QObject *parent = nullptr);
     ~LineToElement();
 
     void apply(QPainterPath &path);
@@ -165,7 +166,7 @@ class CloseSubpathElement : public AbstractPathElement
     Q_OBJECT
 
 public:
-    CloseSubpathElement(QObject *parent=nullptr);
+    CloseSubpathElement(QObject *parent = nullptr);
     ~CloseSubpathElement();
 
     void apply(QPainterPath &path);
@@ -176,7 +177,7 @@ class CubicToElement : public AbstractPathElement
     Q_OBJECT
 
 public:
-    CubicToElement(QObject *parent=nullptr);
+    CubicToElement(QObject *parent = nullptr);
     ~CubicToElement();
 
     Q_PROPERTY(QPointF controlPoint1 READ controlPoint1 WRITE setControlPoint1 NOTIFY controlPoint1Changed)
@@ -207,7 +208,7 @@ class QuadToElement : public AbstractPathElement
     Q_OBJECT
 
 public:
-    QuadToElement(QObject *parent=nullptr);
+    QuadToElement(QObject *parent = nullptr);
     ~QuadToElement();
 
     Q_PROPERTY(QPointF controlPoint READ controlPoint WRITE setControlPoint NOTIFY controlPointChanged)
@@ -232,22 +233,22 @@ class ArcToElement : public AbstractPathElement
     Q_OBJECT
 
 public:
-    ArcToElement(QObject *parent=nullptr);
+    ArcToElement(QObject *parent = nullptr);
     ~ArcToElement();
 
     Q_PROPERTY(QRectF rectangle READ rectangle WRITE setRectangle NOTIFY rectangleChanged)
     void setRectangle(const QRectF &val);
-    QRectF rectangle() const {return m_rectangle; }
+    QRectF rectangle() const { return m_rectangle; }
     Q_SIGNAL void rectangleChanged();
 
     Q_PROPERTY(qreal startAngle READ startAngle WRITE setStartAngle NOTIFY startAngleChanged)
     void setStartAngle(qreal val);
-    qreal startAngle() const {return m_startAngle; }
+    qreal startAngle() const { return m_startAngle; }
     Q_SIGNAL void startAngleChanged();
 
     Q_PROPERTY(qreal sweepLength READ sweepLength WRITE setSweepLength NOTIFY sweepLengthChanged)
     void setSweepLength(qreal val);
-    qreal sweepLength() const {return m_sweepLength; }
+    qreal sweepLength() const { return m_sweepLength; }
     Q_SIGNAL void sweepLengthChanged();
 
     void apply(QPainterPath &path);

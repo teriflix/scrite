@@ -25,7 +25,7 @@
 #include <QSet>
 #include <QUuid>
 
-typedef QHash<QString,Note*> IdNoteMapType;
+typedef QHash<QString, Note *> IdNoteMapType;
 Q_GLOBAL_STATIC(IdNoteMapType, GlobalIdNoteMap)
 
 Note *Note::findById(const QString &id)
@@ -33,9 +33,7 @@ Note *Note::findById(const QString &id)
     return ::GlobalIdNoteMap->value(id);
 }
 
-Note::Note(QObject *parent)
-    : QObject(parent),
-      m_form(this, "form")
+Note::Note(QObject *parent) : QObject(parent), m_form(this, "form")
 {
     connect(this, &Note::typeChanged, this, &Note::noteModified);
     connect(this, &Note::titleChanged, this, &Note::noteModified);
@@ -53,14 +51,13 @@ Note::~Note()
 
 Notes *Note::notes() const
 {
-    return qobject_cast<Notes*>(this->parent());
+    return qobject_cast<Notes *>(this->parent());
 }
 
 QString Note::id() const
 {
-    if(m_id.isEmpty())
-    {
-        Note *that = const_cast<Note*>(this);
+    if (m_id.isEmpty()) {
+        Note *that = const_cast<Note *>(this);
         that->m_id = QUuid::createUuid().toString();
         ::GlobalIdNoteMap->insert(m_id, that);
     }
@@ -70,7 +67,7 @@ QString Note::id() const
 
 void Note::setId(const QString &val)
 {
-    if(m_id == val || !m_id.isEmpty())
+    if (m_id == val || !m_id.isEmpty())
         return;
 
     m_id = val;
@@ -80,7 +77,7 @@ void Note::setId(const QString &val)
 
 void Note::setType(Type val)
 {
-    if(m_type == val)
+    if (m_type == val)
         return;
 
     m_type = val;
@@ -89,46 +86,41 @@ void Note::setType(Type val)
 
 void Note::setForm(Form *val)
 {
-    if(m_form == val)
+    if (m_form == val)
         return;
 
-    if(!m_form.isNull())
+    if (!m_form.isNull())
         ScriteDocument::instance()->releaseForm(m_form);
 
     m_form = val;
 
-    if(!m_form.isNull())
-    {
+    if (!m_form.isNull()) {
         this->setTitle(m_form->title());
         this->setSummary(m_form->subtitle());
 
-        if(m_formData.isEmpty())
-        {
+        if (m_formData.isEmpty()) {
             m_formData = m_form->formDataTemplate();
             emit formDataChanged();
         }
 
-        if(m_summary.isEmpty())
-        {
+        if (m_summary.isEmpty()) {
             QStringList questions;
-            const QList<FormQuestion*> formQuestions = m_form->questionsModel()->list();
-            for(const FormQuestion *formQuestion : formQuestions)
+            const QList<FormQuestion *> formQuestions = m_form->questionsModel()->list();
+            for (const FormQuestion *formQuestion : formQuestions)
                 questions << formQuestion->questionText();
 
-            m_summary = QStringLiteral("Form with ") + QString::number(questions.size()) + QStringLiteral(" question(s). ");
-            m_summary += questions.join( QStringLiteral(", ") );
+            m_summary = QStringLiteral("Form with ") + QString::number(questions.size())
+                    + QStringLiteral(" question(s). ");
+            m_summary += questions.join(QStringLiteral(", "));
             emit summaryChanged();
         }
 
-        User::instance()->logActivity2( QStringLiteral("notebookform"), QJsonObject({
-                            { QStringLiteral("id"), m_form->id() },
-                            { QStringLiteral("name"), m_form->title() }
-                        }));
-    }
-    else
-    {
-        if(!m_formData.isEmpty())
-        {
+        User::instance()->logActivity2(
+                QStringLiteral("notebookform"),
+                QJsonObject({ { QStringLiteral("id"), m_form->id() },
+                              { QStringLiteral("name"), m_form->title() } }));
+    } else {
+        if (!m_formData.isEmpty()) {
             m_formData = QJsonObject();
             emit formDataChanged();
         }
@@ -145,7 +137,7 @@ void Note::resetForm()
 
 void Note::setTitle(const QString &val)
 {
-    if(m_title == val)
+    if (m_title == val)
         return;
 
     m_title = val;
@@ -154,7 +146,7 @@ void Note::setTitle(const QString &val)
 
 void Note::setSummary(const QString &val)
 {
-    if(m_summary == val)
+    if (m_summary == val)
         return;
 
     m_summary = val;
@@ -163,7 +155,7 @@ void Note::setSummary(const QString &val)
 
 void Note::setContent(const QJsonValue &val)
 {
-    if(m_content == val)
+    if (m_content == val)
         return;
 
     m_content = val;
@@ -172,12 +164,12 @@ void Note::setContent(const QJsonValue &val)
 
 void Note::setColor(const QColor &val)
 {
-    if(m_color == val)
+    if (m_color == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "color");
     QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if(!info->isLocked())
+    if (!info->isLocked())
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_color = val;
@@ -188,10 +180,10 @@ void Note::setFormId(const QString &val)
 {
     QString val2 = val;
     Form *form = ScriteDocument::instance()->requestForm(val2);
-    if(form == nullptr)
+    if (form == nullptr)
         val2.clear();
 
-    if(m_formId == val2)
+    if (m_formId == val2)
         return;
 
     m_formId = val2;
@@ -202,7 +194,7 @@ void Note::setFormId(const QString &val)
 
 void Note::setFormData(const QJsonObject &val)
 {
-    if(m_formData == val)
+    if (m_formData == val)
         return;
 
     m_formData = val;
@@ -222,34 +214,32 @@ QJsonValue Note::getFormData(const QString &key) const
 
 void Note::prepareForSerialization()
 {
-    if(!m_form.isNull())
+    if (!m_form.isNull())
         m_form->validateFormData(m_formData);
 }
 
 void Note::serializeToJson(QJsonObject &json) const
 {
-    json.insert( QStringLiteral("id"), this->id() );
+    json.insert(QStringLiteral("id"), this->id());
 
-    if(m_type == TextNoteType)
-        json.insert( QStringLiteral("type"), QStringLiteral("Text") );
-    else if(m_type == FormNoteType)
-    {
-        json.insert( QStringLiteral("type"), QStringLiteral("Form") );
-        json.insert( QStringLiteral("formId"), m_formId );
+    if (m_type == TextNoteType)
+        json.insert(QStringLiteral("type"), QStringLiteral("Text"));
+    else if (m_type == FormNoteType) {
+        json.insert(QStringLiteral("type"), QStringLiteral("Form"));
+        json.insert(QStringLiteral("formId"), m_formId);
     }
 }
 
 void Note::deserializeFromJson(const QJsonObject &json)
 {
-    this->setId( json.value( QStringLiteral("id") ).toString() );
+    this->setId(json.value(QStringLiteral("id")).toString());
 
-    const QString type = json.value( QStringLiteral("type") ).toString();
-    if(type == QStringLiteral("Text"))
+    const QString type = json.value(QStringLiteral("type")).toString();
+    if (type == QStringLiteral("Text"))
         this->setType(TextNoteType);
-    else if(type == QStringLiteral("Form"))
-    {
+    else if (type == QStringLiteral("Form")) {
         this->setType(FormNoteType);
-        this->setFormId( json.value(QStringLiteral("formId")).toString() );
+        this->setFormId(json.value(QStringLiteral("formId")).toString());
     }
 }
 
@@ -258,25 +248,26 @@ void Note::deserializeFromJson(const QJsonObject &json)
 class RemoveNoteUndoCommand : public QUndoCommand
 {
 public:
-    RemoveNoteUndoCommand(Notes *notes, Note *note)
-        : QUndoCommand(), m_note(note), m_notes(notes) {
+    RemoveNoteUndoCommand(Notes *notes, Note *note) : QUndoCommand(), m_note(note), m_notes(notes)
+    {
         m_connection1 = QObject::connect(m_notes, &Notes::aboutToDelete, m_notes, [=]() {
             m_notes = nullptr;
             this->setObsolete(true);
         });
-        m_connection2 = QObject::connect(m_note, &Note::aboutToDelete, m_note, [=]() {
-            m_note = nullptr;
-        });
+        m_connection2 =
+                QObject::connect(m_note, &Note::aboutToDelete, m_note, [=]() { m_note = nullptr; });
     }
-    ~RemoveNoteUndoCommand() {
+    ~RemoveNoteUndoCommand()
+    {
         QObject::disconnect(m_connection1);
         QObject::disconnect(m_connection2);
     }
 
     static QPointer<Note> noteCurrentlyBeingRemoved;
 
-    void redo() {
-        if(m_note == nullptr || m_notes == nullptr) {
+    void redo()
+    {
+        if (m_note == nullptr || m_notes == nullptr) {
             this->setObsolete(true);
             return;
         }
@@ -288,8 +279,9 @@ public:
         m_notes->removeNote(m_note);
         noteCurrentlyBeingRemoved = nullptr;
     }
-    void undo() {
-        if(m_notes == nullptr) {
+    void undo()
+    {
+        if (m_notes == nullptr) {
             this->setObsolete(true);
             return;
         }
@@ -313,7 +305,7 @@ private:
 
 QPointer<Note> RemoveNoteUndoCommand::noteCurrentlyBeingRemoved;
 
-typedef QHash<QString,Notes*> IdNotesMapType;
+typedef QHash<QString, Notes *> IdNotesMapType;
 Q_GLOBAL_STATIC(IdNotesMapType, GlobalIdNotesMap)
 
 Notes *Notes::findById(const QString &id)
@@ -321,51 +313,37 @@ Notes *Notes::findById(const QString &id)
     return ::GlobalIdNotesMap->value(id);
 }
 
-Notes::Notes(QObject *parent)
-      :ObjectListPropertyModel<Note *>(parent)
+Notes::Notes(QObject *parent) : ObjectListPropertyModel<Note *>(parent)
 {
     connect(this, &Notes::objectCountChanged, this, &Notes::noteCountChanged);
     connect(this, &Notes::noteCountChanged, this, &Notes::notesModified);
 
     m_compatibleFormType = Form::GeneralForm;
 
-    if(parent != nullptr)
-    {
+    if (parent != nullptr) {
         const QMetaObject *pmo = parent->metaObject();
-        if(pmo->inherits(&Structure::staticMetaObject))
-        {
+        if (pmo->inherits(&Structure::staticMetaObject)) {
             m_ownerType = StructureOwner;
             m_compatibleFormType = Form::StoryForm;
-        }
-        else if(pmo->inherits(&ScreenplayElement::staticMetaObject))
-        {
+        } else if (pmo->inherits(&ScreenplayElement::staticMetaObject)) {
             m_ownerType = BreakOwner;
             m_compatibleFormType = Form::SceneForm;
-        }
-        else if(pmo->inherits(&Scene::staticMetaObject))
-        {
+        } else if (pmo->inherits(&Scene::staticMetaObject)) {
             m_ownerType = SceneOwner;
             m_compatibleFormType = Form::SceneForm;
 
-            Scene *scene = (qobject_cast<Scene*>(parent));
+            Scene *scene = (qobject_cast<Scene *>(parent));
             m_color = scene->color();
-            connect(scene, &Scene::colorChanged, this, [=]() {
-                this->setColor(scene->color());
-            });
-        }
-        else if(pmo->inherits(&Character::staticMetaObject))
-        {
+            connect(scene, &Scene::colorChanged, this, [=]() { this->setColor(scene->color()); });
+        } else if (pmo->inherits(&Character::staticMetaObject)) {
             m_ownerType = CharacterOwner;
             m_compatibleFormType = Form::CharacterForm;
 
-            Character *character = (qobject_cast<Character*>(parent));
+            Character *character = (qobject_cast<Character *>(parent));
             m_color = character->color();
-            connect(character, &Character::colorChanged, this, [=]() {
-                this->setColor(character->color());
-            });
-        }
-        else if(pmo->inherits(&Relationship::staticMetaObject))
-        {
+            connect(character, &Character::colorChanged, this,
+                    [=]() { this->setColor(character->color()); });
+        } else if (pmo->inherits(&Relationship::staticMetaObject)) {
             m_ownerType = RelationshipOwner;
             m_compatibleFormType = Form::RelationshipForm;
         }
@@ -373,8 +351,7 @@ Notes::Notes(QObject *parent)
             m_ownerType = CharacterOwner;
         else if(pmo->inherits(&Prop::staticMetaObject))
             m_ownerType = PropOwner;*/
-        else
-        {
+        else {
             m_ownerType = LocationOwner;
             m_compatibleFormType = Form::LocationForm;
         }
@@ -394,34 +371,33 @@ Notes::OwnerType Notes::ownerType() const
 
 Structure *Notes::structure() const
 {
-    return qobject_cast<Structure*>(this->owner());
+    return qobject_cast<Structure *>(this->owner());
 }
 
 ScreenplayElement *Notes::breakElement() const
 {
-    return qobject_cast<ScreenplayElement*>(this->owner());
+    return qobject_cast<ScreenplayElement *>(this->owner());
 }
 
 Scene *Notes::scene() const
 {
-    return qobject_cast<Scene*>(this->owner());
+    return qobject_cast<Scene *>(this->owner());
 }
 
 Character *Notes::character() const
 {
-    return qobject_cast<Character*>(this->owner());
+    return qobject_cast<Character *>(this->owner());
 }
 
 Relationship *Notes::relationship() const
 {
-    return qobject_cast<Relationship*>(this->owner());
+    return qobject_cast<Relationship *>(this->owner());
 }
 
 QString Notes::id() const
 {
-    if(m_id.isEmpty())
-    {
-        Notes *that = const_cast<Notes*>(this);
+    if (m_id.isEmpty()) {
+        Notes *that = const_cast<Notes *>(this);
         that->m_id = QUuid::createUuid().toString();
         ::GlobalIdNotesMap->insert(m_id, that);
     }
@@ -431,18 +407,20 @@ QString Notes::id() const
 
 QString Notes::title() const
 {
-    switch(m_ownerType)
-    {
+    switch (m_ownerType) {
     case SceneOwner: {
         const Scene *scene = this->scene();
         const QList<int> idxList = scene->screenplayElementIndexList();
-        return (idxList.isEmpty() ? QStringLiteral("[-1]: ") : QStringLiteral("[") + QString::number(idxList.first()) + QStringLiteral("]: ")) +
-               scene->heading()->text();
-        } break;
+        return (idxList.isEmpty() ? QStringLiteral("[-1]: ")
+                                  : QStringLiteral("[") + QString::number(idxList.first())
+                                + QStringLiteral("]: "))
+                + scene->heading()->text();
+    } break;
     case StructureOwner:
         return QStringLiteral("Story");
     case BreakOwner:
-        return this->breakElement()->breakTitle() + QStringLiteral(": ") + this->breakElement()->breakSubtitle();
+        return this->breakElement()->breakTitle() + QStringLiteral(": ")
+                + this->breakElement()->breakSubtitle();
     case CharacterOwner:
         return this->character()->name();
     default:
@@ -454,17 +432,17 @@ QString Notes::title() const
 
 QString Notes::summary() const
 {
-    switch(m_ownerType)
-    {
+    switch (m_ownerType) {
     case SceneOwner: {
         const Scene *scene = this->scene();
         return scene->title();
-        } break;
+    } break;
     case BreakOwner:
         return this->breakElement()->breakSummary();
     case CharacterOwner:
-        return QStringList({ this->character()->designation(), this->character()->gender(), this->character()->age() })
-                .join( QStringLiteral(", ") );
+        return QStringList({ this->character()->designation(), this->character()->gender(),
+                             this->character()->age() })
+                .join(QStringLiteral(", "));
     default:
         break;
     }
@@ -474,14 +452,13 @@ QString Notes::summary() const
 
 void Notes::setColor(const QColor &val)
 {
-    if(m_color == val)
+    if (m_color == val)
         return;
 
     m_color = val;
     emit colorChanged();
 
-    switch(m_ownerType)
-    {
+    switch (m_ownerType) {
     case SceneOwner:
         this->scene()->setColor(val);
         break;
@@ -506,8 +483,7 @@ Note *Notes::addFormNote(const QString &id)
     Note *ptr = new Note(this);
     ptr->setType(Note::FormNoteType);
     ptr->setFormId(id);
-    if(ptr->form() == nullptr)
-    {
+    if (ptr->form() == nullptr) {
         delete ptr;
         return nullptr;
     }
@@ -516,10 +492,9 @@ Note *Notes::addFormNote(const QString &id)
     return ptr;
 }
 
-
 void Notes::setId(const QString &val)
 {
-    if(m_id == val || !m_id.isEmpty())
+    if (m_id == val || !m_id.isEmpty())
         return;
 
     m_id = val;
@@ -529,7 +504,7 @@ void Notes::setId(const QString &val)
 
 void Notes::addNote(Note *ptr)
 {
-    if(ptr == nullptr || this->indexOf(ptr) >= 0)
+    if (ptr == nullptr || this->indexOf(ptr) >= 0)
         return;
 
     ptr->setParent(this);
@@ -542,11 +517,10 @@ void Notes::addNote(Note *ptr)
 
 void Notes::setNotes(const QList<Note *> &list)
 {
-    if(!this->isEmpty())
+    if (!this->isEmpty())
         return;
 
-    for(Note *ptr : list)
-    {
+    for (Note *ptr : list) {
         ptr->setParent(this);
         connect(ptr, &Note::aboutToDelete, this, &Notes::removeNote);
         connect(ptr, &Note::noteModified, this, &Notes::notesModified);
@@ -557,22 +531,22 @@ void Notes::setNotes(const QList<Note *> &list)
 
 void Notes::removeNote(Note *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = this->indexOf(ptr);
-    if(index < 0)
+    if (index < 0)
         return;
 
     disconnect(ptr, &Note::aboutToDelete, this, &Notes::removeNote);
     disconnect(ptr, &Note::noteModified, this, &Notes::notesModified);
 
-    if(ptr->type() == Note::FormNoteType && ptr->form() != nullptr)
+    if (ptr->type() == Note::FormNoteType && ptr->form() != nullptr)
         ScriteDocument::instance()->releaseForm(ptr->form());
 
     this->removeAt(index);
 
-    if(UndoStack::active() && RemoveNoteUndoCommand::noteCurrentlyBeingRemoved.isNull())
+    if (UndoStack::active() && RemoveNoteUndoCommand::noteCurrentlyBeingRemoved.isNull())
         UndoStack::active()->push(new RemoveNoteUndoCommand(this, ptr));
 
     ptr->deleteLater();
@@ -585,65 +559,60 @@ Note *Notes::noteAt(int index) const
 
 void Notes::clearNotes()
 {
-    while(this->size())
+    while (this->size())
         this->removeNote(this->first());
 }
 
 void Notes::serializeToJson(QJsonObject &json) const
 {
-    json.insert( QStringLiteral("id"), this->id() );
+    json.insert(QStringLiteral("id"), this->id());
 
-    if(this->isEmpty())
+    if (this->isEmpty())
         return;
 
     QJsonArray jsNotes;
 
-    const QList<Note*> &notes = this->list();
-    for(Note *note : notes)
-    {
+    const QList<Note *> &notes = this->list();
+    for (Note *note : notes) {
         QJsonObject jsNote = QObjectSerializer::toJson(note);
         jsNotes.append(jsNote);
     }
 
-    json.insert( QStringLiteral("#data"), jsNotes );
+    json.insert(QStringLiteral("#data"), jsNotes);
 }
 
 void Notes::deserializeFromJson(const QJsonObject &json)
 {
-    this->setId( json.value(QStringLiteral("id")).toString() );
+    this->setId(json.value(QStringLiteral("id")).toString());
 
-    const QJsonArray jsNotes = json.value( QStringLiteral("#data") ).toArray();
-    if(jsNotes.isEmpty())
+    const QJsonArray jsNotes = json.value(QStringLiteral("#data")).toArray();
+    if (jsNotes.isEmpty())
         return;
 
     // Remove duplicate notes.
     const QString idAttr = QStringLiteral("id");
 
-    QList<Note*> notes;
+    QList<Note *> notes;
     QList<QJsonObject> uniqueJsNotes;
-    for(const QJsonValue &jsNoteItemValue : jsNotes)
-    {
+    for (const QJsonValue &jsNoteItemValue : jsNotes) {
         const QJsonObject jsNoteItem = jsNoteItemValue.toObject();
         const QString jsNoteId = jsNoteItem.value(idAttr).toString();
         bool jsNoteIsUnique = true;
-        for(const QJsonObject &uniqueJsNote : qAsConst(uniqueJsNotes))
-        {
-            if(uniqueJsNote.value(idAttr).toString() == jsNoteId)
-            {
+        for (const QJsonObject &uniqueJsNote : qAsConst(uniqueJsNotes)) {
+            if (uniqueJsNote.value(idAttr).toString() == jsNoteId) {
                 jsNoteIsUnique = false;
                 break;
             }
         }
 
-        if(jsNoteIsUnique)
+        if (jsNoteIsUnique)
             uniqueJsNotes.append(jsNoteItem);
     }
 
     notes.reserve(jsNotes.size());
-    for(const QJsonObject &jsNote : qAsConst(uniqueJsNotes))
-    {
+    for (const QJsonObject &jsNote : qAsConst(uniqueJsNotes)) {
         Note *note = new Note(this);
-        if( QObjectSerializer::fromJson(jsNote, note) )
+        if (QObjectSerializer::fromJson(jsNote, note))
             notes.append(note);
         else
             delete note;
@@ -654,24 +623,20 @@ void Notes::deserializeFromJson(const QJsonObject &json)
 
 void Notes::loadOldNotes(const QJsonArray &jsNotes)
 {
-    if(jsNotes.isEmpty() || !this->isEmpty())
+    if (jsNotes.isEmpty() || !this->isEmpty())
         return;
 
-    QList<Note*> notes;
+    QList<Note *> notes;
     notes.reserve(jsNotes.size());
-    for(const QJsonValue &jsNotesItem : jsNotes)
-    {
+    for (const QJsonValue &jsNotesItem : jsNotes) {
         const QJsonObject jsNote = jsNotesItem.toObject();
         Note *note = new Note(this);
         note->setType(Note::TextNoteType);
-        note->setColor( QColor(jsNote.value(QStringLiteral("color")).toString()) );
-        note->setTitle( jsNote.value(QStringLiteral("heading")).toString() );
-        note->setContent( jsNote.value(QStringLiteral("content")) );
+        note->setColor(QColor(jsNote.value(QStringLiteral("color")).toString()));
+        note->setTitle(jsNote.value(QStringLiteral("heading")).toString());
+        note->setContent(jsNote.value(QStringLiteral("content")));
         notes.append(note);
     }
 
     this->setNotes(notes);
 }
-
-
-

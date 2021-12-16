@@ -19,10 +19,11 @@
 
 #include <QAbstractNativeEventFilter>
 
-class SystemTextInputManagerBackend_Windows : public AbstractSystemTextInputManagerBackend, public QAbstractNativeEventFilter
+class SystemTextInputManagerBackend_Windows : public AbstractSystemTextInputManagerBackend,
+                                              public QAbstractNativeEventFilter
 {
 public:
-    SystemTextInputManagerBackend_Windows(SystemTextInputManager *parent=nullptr);
+    SystemTextInputManagerBackend_Windows(SystemTextInputManager *parent = nullptr);
     ~SystemTextInputManagerBackend_Windows();
 
     // AbstractSystemTextInputManagerBackend interface
@@ -36,7 +37,8 @@ public:
 class SystemTextInputSource_Windows : public AbstractSystemTextInputSource
 {
 public:
-    SystemTextInputSource_Windows(HKL keyboardLayoutHandle, SystemTextInputManager *parent=nullptr);
+    SystemTextInputSource_Windows(HKL keyboardLayoutHandle,
+                                  SystemTextInputManager *parent = nullptr);
     ~SystemTextInputSource_Windows();
 
     // AbstractSystemTextInputSource interface

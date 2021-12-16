@@ -20,21 +20,17 @@ UndoStack::UndoStack(QObject *parent) : QUndoStack(parent)
 {
     Application::instance()->undoGroup()->addStack(this);
 
-    connect(Application::instance()->undoGroup(),
-            &QUndoGroup::activeStackChanged,
-            this, &UndoStack::activeChanged);
+    connect(Application::instance()->undoGroup(), &QUndoGroup::activeStackChanged, this,
+            &UndoStack::activeChanged);
 }
 
-UndoStack::~UndoStack()
-{
-
-}
+UndoStack::~UndoStack() { }
 
 void UndoStack::setActive(bool val)
 {
-    if(val)
+    if (val)
         Application::instance()->undoGroup()->setActiveStack(this);
-    else if(this->isActive())
+    else if (this->isActive())
         Application::instance()->undoGroup()->setActiveStack(nullptr);
 }
 
@@ -45,8 +41,8 @@ bool UndoStack::isActive() const
 
 void UndoStack::clearAllStacks()
 {
-    QList<QUndoStack*> stacks = Application::instance()->undoGroup()->stacks();
-    Q_FOREACH(QUndoStack *stack, stacks)
+    QList<QUndoStack *> stacks = Application::instance()->undoGroup()->stacks();
+    Q_FOREACH (QUndoStack *stack, stacks)
         stack->clear();
 }
 
@@ -54,7 +50,7 @@ bool UndoStack::ignoreUndoCommands = false;
 
 QUndoStack *UndoStack::active()
 {
-    if(ignoreUndoCommands)
+    if (ignoreUndoCommands)
         return nullptr;
 
     QUndoStack *ret = Application::instance()->undoGroup()->activeStack();
@@ -70,30 +66,30 @@ static QByteArray objectUndoRedoLockProperty()
     return ret;
 }
 
-class ObjectPropertyInfoList : public QObject, public QList<ObjectPropertyInfo*>
+class ObjectPropertyInfoList : public QObject, public QList<ObjectPropertyInfo *>
 {
 public:
-    ObjectPropertyInfoList() : QObject() {
-        qApp->installEventFilter(this);
-    }
-    ~ObjectPropertyInfoList() {
+    ObjectPropertyInfoList() : QObject() { qApp->installEventFilter(this); }
+    ~ObjectPropertyInfoList()
+    {
         qDeleteAll(*this);
         this->clear();
     }
 
-    bool eventFilter(QObject *object, QEvent *event) {
-        if(event->type() != QEvent::DynamicPropertyChange)
+    bool eventFilter(QObject *object, QEvent *event)
+    {
+        if (event->type() != QEvent::DynamicPropertyChange)
             return false;
 
-        QDynamicPropertyChangeEvent *dpe = static_cast<QDynamicPropertyChangeEvent*>(event);
-        if(dpe->propertyName() != objectUndoRedoLockProperty())
+        QDynamicPropertyChangeEvent *dpe = static_cast<QDynamicPropertyChangeEvent *>(event);
+        if (dpe->propertyName() != objectUndoRedoLockProperty())
             return false;
 
         const bool locked = object->property(objectUndoRedoLockProperty()).toBool();
 
-        for(int i=0; i<this->size(); i++) {
+        for (int i = 0; i < this->size(); i++) {
             ObjectPropertyInfo *pinfo = this->at(i);
-            if(pinfo->object == object)
+            if (pinfo->object == object)
                 pinfo->m_objectIsLocked = locked;
         }
 
@@ -109,12 +105,11 @@ static inline QList<QByteArray> queryPropertyBundle(QObject *object, const QByte
     const QMetaObject *metaObject = object->metaObject();
     const QByteArray bundle = "UndoBundleFor_" + property;
     const int ciIndex = metaObject->indexOfClassInfo(bundle);
-    if(ciIndex >= 0)
-    {
+    if (ciIndex >= 0) {
         const QMetaClassInfo classInfo = metaObject->classInfo(ciIndex);
         const QByteArray value(classInfo.value());
         propertyBundle = value.split(',');
-        for(int i=propertyBundle.size()-1; i>=0; i--) {
+        for (int i = propertyBundle.size() - 1; i >= 0; i--) {
             QByteArray &prop = propertyBundle[i];
             prop = prop.trimmed();
         }
@@ -124,13 +119,14 @@ static inline QList<QByteArray> queryPropertyBundle(QObject *object, const QByte
 }
 
 ObjectPropertyInfo::ObjectPropertyInfo(QObject *o, const QMetaObject *mo, const QByteArray &prop)
-    : id(++ObjectPropertyInfo::counter), object(o), property(prop),
-      metaObject(mo), propertyBundle(queryPropertyBundle(o,prop))
+    : id(++ObjectPropertyInfo::counter),
+      object(o),
+      property(prop),
+      metaObject(mo),
+      propertyBundle(queryPropertyBundle(o, prop))
 {
     m_objectIsLocked = o->property(objectUndoRedoLockProperty()).toBool();
-    m_connection = QObject::connect(o, &QObject::destroyed, o,  [this]() {
-        this->deleteSelf();
-    });
+    m_connection = QObject::connect(o, &QObject::destroyed, o, [this]() { this->deleteSelf(); });
 
     ::GlobalObjectPropertyInfoList->append(this);
 }
@@ -145,7 +141,7 @@ QVariant ObjectPropertyInfo::read() const
 {
     QVariantList ret;
     ret << object->property(property);
-    Q_FOREACH(QByteArray prop, propertyBundle)
+    Q_FOREACH (QByteArray prop, propertyBundle)
         ret << object->property(prop);
     return ret;
 }
@@ -153,12 +149,11 @@ QVariant ObjectPropertyInfo::read() const
 bool ObjectPropertyInfo::write(const QVariant &val)
 {
     this->lock();
-    QObject *o = const_cast<QObject*>(object);
+    QObject *o = const_cast<QObject *>(object);
     QVariantList list = val.toList();
     const bool ret = o->setProperty(property, list.takeFirst());
-    Q_FOREACH(QByteArray prop, propertyBundle)
-    {
-        if(list.isEmpty())
+    Q_FOREACH (QByteArray prop, propertyBundle) {
+        if (list.isEmpty())
             break;
         o->setProperty(prop, list.takeFirst());
     }
@@ -170,28 +165,27 @@ ObjectPropertyInfo *ObjectPropertyInfo::get(QObject *object, const QByteArray &p
 {
     const QMetaObject *metaObject = object->metaObject();
     const int propIndex = metaObject->indexOfProperty(property);
-    if(propIndex < 0)
+    if (propIndex < 0)
         return nullptr;
 
     const QMetaProperty prop = metaObject->property(propIndex);
-    if(!prop.isReadable())
+    if (!prop.isReadable())
         return nullptr;
 
     const bool isQQmlListProperty = QByteArray(prop.typeName()).startsWith("QQmlListProperty");
-    if(!prop.isWritable() && !isQQmlListProperty)
+    if (!prop.isWritable() && !isQQmlListProperty)
         return nullptr;
 
-    while(metaObject != nullptr && propIndex < metaObject->propertyOffset())
+    while (metaObject != nullptr && propIndex < metaObject->propertyOffset())
         metaObject = metaObject->superClass();
 
-    if(metaObject == nullptr)
+    if (metaObject == nullptr)
         return nullptr; // dont know why this would happen. Just being paranoid
 
     ObjectPropertyInfoList &list = *::GlobalObjectPropertyInfoList();
-    for(int i=0; i<list.size(); i++)
-    {
+    for (int i = 0; i < list.size(); i++) {
         ObjectPropertyInfo *info = list.at(i);
-        if(info->object == object && info->metaObject == metaObject && info->property == property)
+        if (info->object == object && info->metaObject == metaObject && info->property == property)
             return info;
     }
 
@@ -200,29 +194,29 @@ ObjectPropertyInfo *ObjectPropertyInfo::get(QObject *object, const QByteArray &p
 
 void ObjectPropertyInfo::lockUndoRedoFor(QObject *object)
 {
-    if(object)
+    if (object)
         object->setProperty(objectUndoRedoLockProperty(), true);
 }
 
 void ObjectPropertyInfo::unlockUndoRedoFor(QObject *object)
 {
-    if(object)
+    if (object)
         object->setProperty(objectUndoRedoLockProperty(), false);
 }
 
 int ObjectPropertyInfo::querySetCounter(QObject *object, const QByteArray &property)
 {
-    if(object == nullptr || property.isEmpty())
+    if (object == nullptr || property.isEmpty())
         return -1;
 
     const int propIndex = object->metaObject()->indexOfProperty(property);
-    if(propIndex < 0)
+    if (propIndex < 0)
         return -1;
 
     const QByteArray counterProp = property + "_counter";
     const QVariant counterVal = object->property(counterProp);
     int counter = counterVal.isValid() ? counterVal.toInt() : 0;
-    object->setProperty(counterProp, counter+1);
+    object->setProperty(counterProp, counter + 1);
     return counter;
 }
 
@@ -234,17 +228,16 @@ void ObjectPropertyInfo::deleteSelf()
 ObjectPropertyUndoCommand::ObjectPropertyUndoCommand(QObject *object, const QByteArray &property)
     : QUndoCommand()
 {
-    if(object != nullptr)
-    {
+    if (object != nullptr) {
         m_propertyInfo = ObjectPropertyInfo::get(object, property);
-        if(m_propertyInfo != nullptr)
-        {
-            if(m_propertyInfo->isLocked())
+        if (m_propertyInfo != nullptr) {
+            if (m_propertyInfo->isLocked())
                 m_propertyInfo = nullptr;
-            else
-            {
+            else {
                 m_oldValue = m_propertyInfo->read();
-                this->setText( QString("%1.%2").arg(object->metaObject()->className()).arg(QString::fromLatin1(property)) );
+                this->setText(QString("%1.%2")
+                                      .arg(object->metaObject()->className())
+                                      .arg(QString::fromLatin1(property)));
                 m_connection = QObject::connect(object, &QObject::destroyed, object, [this]() {
                     m_propertyInfo = nullptr;
                     this->setObsolete(true);
@@ -261,79 +254,71 @@ ObjectPropertyUndoCommand::~ObjectPropertyUndoCommand()
 
 void ObjectPropertyUndoCommand::pushToActiveStack()
 {
-    if(m_propertyInfo != nullptr && UndoStack::active())
-    {
+    if (m_propertyInfo != nullptr && UndoStack::active()) {
         m_newValue = m_propertyInfo->read();
         UndoStack::active()->push(this);
-    }
-    else
+    } else
         delete this;
 }
 
 void ObjectPropertyUndoCommand::undo()
 {
-    if(m_propertyInfo != nullptr)
+    if (m_propertyInfo != nullptr)
         m_propertyInfo->write(m_oldValue);
 }
 
 void ObjectPropertyUndoCommand::redo()
 {
-    if(!m_firstRedoDone)
-    {
+    if (!m_firstRedoDone) {
         m_firstRedoDone = true;
         return;
     }
 
-    if(m_propertyInfo != nullptr)
+    if (m_propertyInfo != nullptr)
         m_propertyInfo->write(m_newValue);
 }
 
 bool ObjectPropertyUndoCommand::mergeWith(const QUndoCommand *other)
 {
-    if(other->id() != m_propertyInfo->id)
+    if (other->id() != m_propertyInfo->id)
         return false;
 
-    const ObjectPropertyUndoCommand *cmd = reinterpret_cast<const ObjectPropertyUndoCommand*>(other);
+    const ObjectPropertyUndoCommand *cmd =
+            reinterpret_cast<const ObjectPropertyUndoCommand *>(other);
     m_newValue = cmd->m_newValue;
     return true;
 }
 
-PushObjectPropertyUndoCommand::PushObjectPropertyUndoCommand(QObject *object, const QByteArray &property, bool flag)
+PushObjectPropertyUndoCommand::PushObjectPropertyUndoCommand(QObject *object,
+                                                             const QByteArray &property, bool flag)
 {
     const int counter = ObjectPropertyInfo::querySetCounter(object, property);
-    if(flag && UndoStack::active() && counter > 0)
+    if (flag && UndoStack::active() && counter > 0)
         m_command = new ObjectPropertyUndoCommand(object, property);
 }
 
 PushObjectPropertyUndoCommand::~PushObjectPropertyUndoCommand()
 {
-    if(m_command)
+    if (m_command)
         m_command->pushToActiveStack();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-UndoResult::UndoResult(QObject *parent)
-    : QObject(parent)
-{
+UndoResult::UndoResult(QObject *parent) : QObject(parent) { }
 
-}
-
-UndoResult::~UndoResult()
-{
-
-}
+UndoResult::~UndoResult() { }
 
 void UndoResult::setSuccess(bool val)
 {
-    if(m_success == val)
+    if (m_success == val)
         return;
 
     m_success = val;
     emit successChanged();
 }
 
-Q_GLOBAL_STATIC( QList<UndoHandler*>, AllUndoHandlers );
+Q_GLOBAL_STATIC(QList<UndoHandler *>, AllUndoHandlers);
 
 QList<UndoHandler *> UndoHandler::all()
 {
@@ -343,11 +328,9 @@ QList<UndoHandler *> UndoHandler::all()
 bool UndoHandler::handleUndo()
 {
     const QList<UndoHandler *> handlers = UndoHandler::all();
-    for(UndoHandler *handler : qAsConst(handlers))
-    {
-        if(handler->isEnabled() && handler->canUndo())
-        {
-            if(handler->undo())
+    for (UndoHandler *handler : qAsConst(handlers)) {
+        if (handler->isEnabled() && handler->canUndo()) {
+            if (handler->undo())
                 return true;
         }
     }
@@ -358,11 +341,9 @@ bool UndoHandler::handleUndo()
 bool UndoHandler::handleRedo()
 {
     const QList<UndoHandler *> handlers = UndoHandler::all();
-    for(UndoHandler *handler : qAsConst(handlers))
-    {
-        if(handler->isEnabled() && handler->canRedo())
-        {
-            if(handler->redo())
+    for (UndoHandler *handler : qAsConst(handlers)) {
+        if (handler->isEnabled() && handler->canRedo()) {
+            if (handler->redo())
                 return true;
         }
     }
@@ -370,8 +351,7 @@ bool UndoHandler::handleRedo()
     return false;
 }
 
-UndoHandler::UndoHandler(QObject *parent)
-    : QObject(parent)
+UndoHandler::UndoHandler(QObject *parent) : QObject(parent)
 {
     ::AllUndoHandlers->append(this);
 }
@@ -383,7 +363,7 @@ UndoHandler::~UndoHandler()
 
 void UndoHandler::setEnabled(bool val)
 {
-    if(m_enabled == val)
+    if (m_enabled == val)
         return;
 
     m_enabled = val;
@@ -392,7 +372,7 @@ void UndoHandler::setEnabled(bool val)
 
 void UndoHandler::setCanUndo(bool val)
 {
-    if(m_canUndo == val)
+    if (m_canUndo == val)
         return;
 
     m_canUndo = val;
@@ -401,7 +381,7 @@ void UndoHandler::setCanUndo(bool val)
 
 void UndoHandler::setCanRedo(bool val)
 {
-    if(m_canRedo == val)
+    if (m_canRedo == val)
         return;
 
     m_canRedo = val;

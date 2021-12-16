@@ -29,12 +29,17 @@
 static QStringList supportedExtensions(Attachment::Type type)
 {
     const QChar comma(',');
-    static const QStringList photoExtensions = QStringLiteral("jpg,bmp,png,jpeg,svg").split(comma, QString::SkipEmptyParts);
-    static const QStringList videoExtensions = QStringLiteral("mp4,mov,avi,wmv,m4v,mpg,mpeg").split(comma, QString::SkipEmptyParts);
-    static const QStringList audioExtensions = QStringLiteral("mp3,wav,m4a,ogg,flac,aiff,au").split(QChar(','), QString::SkipEmptyParts);
-    static const QStringList documentExtensions = QStringLiteral("pdf,txt,zip,docx,xlsx,doc,xls,ppt,pptx,odt,odp,ods,ics,ical,scrite,fdx,xml").split(QChar(','), QString::SkipEmptyParts);
-    switch(type)
-    {
+    static const QStringList photoExtensions =
+            QStringLiteral("jpg,bmp,png,jpeg,svg").split(comma, QString::SkipEmptyParts);
+    static const QStringList videoExtensions =
+            QStringLiteral("mp4,mov,avi,wmv,m4v,mpg,mpeg").split(comma, QString::SkipEmptyParts);
+    static const QStringList audioExtensions = QStringLiteral("mp3,wav,m4a,ogg,flac,aiff,au")
+                                                       .split(QChar(','), QString::SkipEmptyParts);
+    static const QStringList documentExtensions =
+            QStringLiteral(
+                    "pdf,txt,zip,docx,xlsx,doc,xls,ppt,pptx,odt,odp,ods,ics,ical,scrite,fdx,xml")
+                    .split(QChar(','), QString::SkipEmptyParts);
+    switch (type) {
     case Attachment::Audio:
         return audioExtensions;
     case Attachment::Video:
@@ -48,8 +53,7 @@ static QStringList supportedExtensions(Attachment::Type type)
     return audioExtensions + videoExtensions + photoExtensions + documentExtensions;
 }
 
-Attachment::Attachment(QObject *parent)
-    : QObject(parent)
+Attachment::Attachment(QObject *parent) : QObject(parent)
 {
     connect(this, &Attachment::titleChanged, this, &Attachment::attachmentModified);
     connect(this, &Attachment::filePathChanged, this, &Attachment::attachmentModified);
@@ -62,11 +66,11 @@ Attachment::Attachment(QObject *parent)
 
 Attachment::~Attachment()
 {
-    if(!m_anonFilePath.isEmpty() && QFile::exists(m_anonFilePath))
+    if (!m_anonFilePath.isEmpty() && QFile::exists(m_anonFilePath))
         QFile::remove(m_anonFilePath);
     m_anonFilePath = QString();
 
-    if(m_removeFileOnDelete)
+    if (m_removeFileOnDelete)
         this->removeAttachedFile();
 
     emit aboutToDelete(this);
@@ -74,7 +78,7 @@ Attachment::~Attachment()
 
 void Attachment::setTitle(const QString &val)
 {
-    if(m_title == val)
+    if (m_title == val)
         return;
 
     m_title = val;
@@ -87,38 +91,35 @@ void Attachment::openAttachmentAnonymously()
     DocumentFileSystem *dfs = doc->fileSystem();
     const QString path = dfs->absolutePath(m_filePath);
 
-    if(!m_anonFilePath.isEmpty())
-    {
-        if( QDesktopServices::openUrl( QUrl::fromLocalFile(m_anonFilePath) ) )
+    if (!m_anonFilePath.isEmpty()) {
+        if (QDesktopServices::openUrl(QUrl::fromLocalFile(m_anonFilePath)))
             return;
 
         QFile::remove(m_anonFilePath);
         m_anonFilePath = QString();
     }
 
-    if(m_anonFilePath.isEmpty())
-    {
+    if (m_anonFilePath.isEmpty()) {
         static QTemporaryDir tempDir;
         QString anonPath = QDir::cleanPath(tempDir.filePath(m_originalFileName));
 
         int index = 0;
-        while(1)
-        {
+        while (1) {
             QFileInfo fi(anonPath);
-            if(fi.exists())
-                anonPath = fi.absolutePath() + QStringLiteral("/") +
-                           fi.baseName() + QString::number(index++) +
-                           QStringLiteral(".") + fi.suffix();
+            if (fi.exists())
+                anonPath = fi.absolutePath() + QStringLiteral("/") + fi.baseName()
+                        + QString::number(index++) + QStringLiteral(".") + fi.suffix();
             else
                 break;
         }
 
         m_anonFilePath = anonPath;
-        if( QFile::copy(path, m_anonFilePath) && QDesktopServices::openUrl( QUrl::fromLocalFile(m_anonFilePath) ))
+        if (QFile::copy(path, m_anonFilePath)
+            && QDesktopServices::openUrl(QUrl::fromLocalFile(m_anonFilePath)))
             return;
 
         m_anonFilePath = QString();
-        QDesktopServices::openUrl( QUrl::fromLocalFile(path) );
+        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     }
 }
 
@@ -127,17 +128,18 @@ void Attachment::openAttachmentInPlace()
     ScriteDocument *doc = ScriteDocument::instance()->instance();
     DocumentFileSystem *dfs = doc->fileSystem();
     const QString path = dfs->absolutePath(m_filePath);
-    QDesktopServices::openUrl( QUrl::fromLocalFile(path) );
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
 bool Attachment::isValid() const
 {
-    return !( m_filePath.isEmpty() || m_title.isEmpty() || m_originalFileName.isEmpty() || m_mimeType.isEmpty() );
+    return !(m_filePath.isEmpty() || m_title.isEmpty() || m_originalFileName.isEmpty()
+             || m_mimeType.isEmpty());
 }
 
 void Attachment::setOriginalFileName(const QString &val)
 {
-    if(m_originalFileName == val || !m_originalFileName.isEmpty())
+    if (m_originalFileName == val || !m_originalFileName.isEmpty())
         return;
 
     m_originalFileName = val;
@@ -146,14 +148,14 @@ void Attachment::setOriginalFileName(const QString &val)
 
 void Attachment::setFilePath(const QString &val)
 {
-    if(m_filePath == val || !m_filePath.isEmpty())
+    if (m_filePath == val || !m_filePath.isEmpty())
         return;
 
     ScriteDocument *doc = ScriteDocument::instance()->instance();
     DocumentFileSystem *dfs = doc->fileSystem();
     const QString path = QFile::exists(val) ? val : dfs->absolutePath(val);
     QFileInfo fi(path);
-    if(!fi.exists() || !fi.isReadable())
+    if (!fi.exists() || !fi.isReadable())
         return;
 
     m_filePath = val;
@@ -162,7 +164,7 @@ void Attachment::setFilePath(const QString &val)
 
 void Attachment::setMimeType(const QString &val)
 {
-    if(m_mimeType == val || !m_mimeType.isEmpty())
+    if (m_mimeType == val || !m_mimeType.isEmpty())
         return;
 
     m_mimeType = val;
@@ -171,16 +173,15 @@ void Attachment::setMimeType(const QString &val)
 
 bool Attachment::removeAttachedFile()
 {
-    if(m_filePath.isEmpty())
+    if (m_filePath.isEmpty())
         return false;
 
     ScriteDocument *doc = ScriteDocument::instance()->instance();
     DocumentFileSystem *dfs = doc->fileSystem();
     const QString path = dfs->absolutePath(m_filePath);
 
-    if( QFile::remove(path) )
-    {
-        this->setFilePath( QString() );
+    if (QFile::remove(path)) {
+        this->setFilePath(QString());
         return true;
     }
 
@@ -189,27 +190,27 @@ bool Attachment::removeAttachedFile()
 
 void Attachment::onDfsAuction(const QString &filePath, int *claims)
 {
-    if(m_filePath == filePath)
+    if (m_filePath == filePath)
         *claims = *claims + 1;
 }
 
 void Attachment::serializeToJson(QJsonObject &json) const
 {
-    json.insert( QStringLiteral("#filePath"), m_filePath );
-    json.insert( QStringLiteral("#mimeType"), m_mimeType );
-    json.insert( QStringLiteral("#originalFileName"), m_originalFileName );
+    json.insert(QStringLiteral("#filePath"), m_filePath);
+    json.insert(QStringLiteral("#mimeType"), m_mimeType);
+    json.insert(QStringLiteral("#originalFileName"), m_originalFileName);
 }
 
 void Attachment::deserializeFromJson(const QJsonObject &json)
 {
-    this->setFilePath( json.value( QStringLiteral("#filePath") ).toString() );
-    this->setMimeType( json.value( QStringLiteral("#mimeType") ).toString() );
-    this->setOriginalFileName( json.value( QStringLiteral("#originalFileName") ).toString() );
+    this->setFilePath(json.value(QStringLiteral("#filePath")).toString());
+    this->setMimeType(json.value(QStringLiteral("#mimeType")).toString());
+    this->setOriginalFileName(json.value(QStringLiteral("#originalFileName")).toString());
 
     ScriteDocument *doc = ScriteDocument::instance()->instance();
     DocumentFileSystem *dfs = doc->fileSystem();
     const QString path = dfs->absolutePath(m_filePath);
-    this->setType( Attachment::determineType(QFileInfo(path)) );
+    this->setType(Attachment::determineType(QFileInfo(path)));
 }
 
 Attachment::Type Attachment::determineType(const QFileInfo &fi)
@@ -220,13 +221,13 @@ Attachment::Type Attachment::determineType(const QFileInfo &fi)
 
     const QString suffix = fi.suffix().toLower();
 
-    if(photoExtensions.contains(suffix))
+    if (photoExtensions.contains(suffix))
         return Photo;
 
-    if(videoExtensions.contains(suffix))
+    if (videoExtensions.contains(suffix))
         return Video;
 
-    if(audioExtensions.contains(suffix))
+    if (audioExtensions.contains(suffix))
         return Audio;
 
     return Document;
@@ -234,7 +235,7 @@ Attachment::Type Attachment::determineType(const QFileInfo &fi)
 
 void Attachment::setType(Type val)
 {
-    if(m_type == val)
+    if (m_type == val)
         return;
 
     m_type = val;
@@ -243,8 +244,7 @@ void Attachment::setType(Type val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Attachments::Attachments(QObject *parent)
-    : ObjectListPropertyModel<Attachment *>(parent)
+Attachments::Attachments(QObject *parent) : ObjectListPropertyModel<Attachment *>(parent)
 {
     connect(this, &Attachments::rowsMoved, this, &Attachments::attachmentsModified);
     connect(this, &Attachments::dataChanged, this, &Attachments::attachmentsModified);
@@ -252,34 +252,36 @@ Attachments::Attachments(QObject *parent)
     connect(this, &Attachments::objectCountChanged, this, &Attachments::attachmentCountChanged);
 }
 
-Attachments::~Attachments()
-{
-
-}
+Attachments::~Attachments() { }
 
 void Attachments::setAllowedType(AllowedType val)
 {
-    if(m_allowedType == val)
+    if (m_allowedType == val)
         return;
 
     auto toFilter = [](const QString &type, const QStringList &extensions) {
         QString filter;
-        for(const QString &ext : extensions)
+        for (const QString &ext : extensions)
             filter += QStringLiteral(" *.") + ext;
         return type + QStringLiteral(" (") + filter + QStringLiteral(" )");
     };
 
     m_nameFilters.clear();
-    if(val & PhotosOnly)
-        m_nameFilters << toFilter(QStringLiteral("Photos"), ::supportedExtensions(Attachment::Photo));
-    if(val & VideosOnly)
-        m_nameFilters << toFilter(QStringLiteral("Videos"), ::supportedExtensions(Attachment::Video));
-    if(val & AudioOnly)
-        m_nameFilters << toFilter(QStringLiteral("Audios"), ::supportedExtensions(Attachment::Video));
-    if(val & VideosOnly)
-        m_nameFilters << toFilter(QStringLiteral("Videos"), ::supportedExtensions(Attachment::Video));
-    if(val & NoMedia)
-        m_nameFilters << toFilter(QStringLiteral("Documents"), ::supportedExtensions(Attachment::Document));
+    if (val & PhotosOnly)
+        m_nameFilters << toFilter(QStringLiteral("Photos"),
+                                  ::supportedExtensions(Attachment::Photo));
+    if (val & VideosOnly)
+        m_nameFilters << toFilter(QStringLiteral("Videos"),
+                                  ::supportedExtensions(Attachment::Video));
+    if (val & AudioOnly)
+        m_nameFilters << toFilter(QStringLiteral("Audios"),
+                                  ::supportedExtensions(Attachment::Video));
+    if (val & VideosOnly)
+        m_nameFilters << toFilter(QStringLiteral("Videos"),
+                                  ::supportedExtensions(Attachment::Video));
+    if (val & NoMedia)
+        m_nameFilters << toFilter(QStringLiteral("Documents"),
+                                  ::supportedExtensions(Attachment::Document));
 
     m_allowedType = val;
     emit allowedTypeChanged();
@@ -287,22 +289,23 @@ void Attachments::setAllowedType(AllowedType val)
 
 bool Attachments::canAllow(const QFileInfo &fi, AllowedType allowed)
 {
-    if(!fi.exists() || !fi.isFile() || !fi.isReadable())
+    if (!fi.exists() || !fi.isFile() || !fi.isReadable())
         return false;
 
-    if(allowed == DocumentsOfAnyType)
+    if (allowed == DocumentsOfAnyType)
         return true;
 
     Attachment::Type type = Attachment::determineType(fi);
 
     bool ret = false;
-    if(allowed == NoMedia)
-        ret = !(type == Attachment::Photo || type == Attachment::Video || type == Attachment::Audio);
-    else if(allowed & PhotosOnly)
+    if (allowed == NoMedia)
+        ret = !(type == Attachment::Photo || type == Attachment::Video
+                || type == Attachment::Audio);
+    else if (allowed & PhotosOnly)
         ret = type == Attachment::Photo;
-    else if(allowed & AudioOnly)
+    else if (allowed & AudioOnly)
         ret = type == Attachment::Audio;
-    else if(allowed & VideosOnly)
+    else if (allowed & VideosOnly)
         ret = type == Attachment::Video;
 
     return ret;
@@ -317,18 +320,18 @@ QMimeType Attachments::mimeTypeFor(const QFileInfo &fi)
 
 Attachment *Attachments::includeAttachment(const QString &filePath)
 {
-    if(filePath.isEmpty())
+    if (filePath.isEmpty())
         return nullptr;
 
     QFileInfo fi(filePath);
-    if( !fi.exists() || !fi.isReadable() )
+    if (!fi.exists() || !fi.isReadable())
         return nullptr;
 
-    if(!Attachments::canAllow(fi, m_allowedType))
+    if (!Attachments::canAllow(fi, m_allowedType))
         return nullptr;
 
     const QMimeType mimeType = Attachments::mimeTypeFor(fi);
-    if(!mimeType.isValid())
+    if (!mimeType.isValid())
         return nullptr;
 
     const QString ns = QStringLiteral("attachments");
@@ -349,14 +352,14 @@ Attachment *Attachments::includeAttachment(const QString &filePath)
 
 void Attachments::removeAttachment(Attachment *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = this->indexOf(ptr);
-    if(index < 0)
+    if (index < 0)
         return;
 
-    if(ptr->removeAttachedFile())
+    if (ptr->removeAttachedFile())
         delete ptr;
 }
 
@@ -367,43 +370,41 @@ Attachment *Attachments::attachmentAt(int index) const
 
 void Attachments::removeAllAttachments()
 {
-    QList<Attachment*> &list = this->list();
-    while(!list.isEmpty())
+    QList<Attachment *> &list = this->list();
+    while (!list.isEmpty())
         this->removeAttachment(list.last());
 }
 
 void Attachments::serializeToJson(QJsonObject &json) const
 {
-    if(this->isEmpty())
+    if (this->isEmpty())
         return;
 
     QJsonArray jsAttachments;
 
-    const QList<Attachment*> &list = this->list();
-    for(Attachment *attachment : list)
-    {
+    const QList<Attachment *> &list = this->list();
+    for (Attachment *attachment : list) {
         QJsonObject jsAttachment = QObjectSerializer::toJson(attachment);
         jsAttachments.append(jsAttachment);
     }
 
-    json.insert( QStringLiteral("#data"), jsAttachments );
+    json.insert(QStringLiteral("#data"), jsAttachments);
 }
 
 void Attachments::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonArray jsAttachments = json.value( QStringLiteral("#data") ).toArray();
-    if(jsAttachments.isEmpty())
+    const QJsonArray jsAttachments = json.value(QStringLiteral("#data")).toArray();
+    if (jsAttachments.isEmpty())
         return;
 
     // Remove duplicate notes.
-    QList<Attachment*> list;
+    QList<Attachment *> list;
 
     list.reserve(jsAttachments.size());
-    for(const QJsonValue &jsItem : jsAttachments)
-    {
+    for (const QJsonValue &jsItem : jsAttachments) {
         const QJsonObject jsAttachment = jsItem.toObject();
         Attachment *attachment = new Attachment(this);
-        if( QObjectSerializer::fromJson(jsAttachment, attachment) )
+        if (QObjectSerializer::fromJson(jsAttachment, attachment))
             list.append(attachment);
         else
             delete attachment;
@@ -414,11 +415,10 @@ void Attachments::deserializeFromJson(const QJsonObject &json)
 
 void Attachments::includeAttachment(Attachment *ptr)
 {
-    if(ptr == nullptr || this->indexOf(ptr) >= 0)
+    if (ptr == nullptr || this->indexOf(ptr) >= 0)
         return;
 
-    if(!ptr->isValid())
-    {
+    if (!ptr->isValid()) {
         ptr->deleteLater();
         return;
     }
@@ -433,11 +433,11 @@ void Attachments::includeAttachment(Attachment *ptr)
 
 void Attachments::attachmentDestroyed(Attachment *ptr)
 {
-    if(ptr == nullptr)
+    if (ptr == nullptr)
         return;
 
     const int index = this->indexOf(ptr);
-    if(index < 0)
+    if (index < 0)
         return;
 
     disconnect(ptr, &Attachment::aboutToDelete, this, &Attachments::attachmentDestroyed);
@@ -450,13 +450,12 @@ void Attachments::attachmentDestroyed(Attachment *ptr)
 
 void Attachments::includeAttachments(const QList<Attachment *> &list)
 {
-    if(!this->isEmpty())
+    if (!this->isEmpty())
         return;
 
     // Here we dont have to check whether attachments match a specific type, because
     // they would have already been matched during their original creation.
-    for(Attachment *ptr : list)
-    {
+    for (Attachment *ptr : list) {
         ptr->setParent(this);
         connect(ptr, &Attachment::aboutToDelete, this, &Attachments::attachmentDestroyed);
         connect(ptr, &Attachment::attachmentModified, this, &Attachments::attachmentsModified);
@@ -467,8 +466,7 @@ void Attachments::includeAttachments(const QList<Attachment *> &list)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-AttachmentsDropArea::AttachmentsDropArea(QQuickItem *parent)
-                    :QQuickItem(parent)
+AttachmentsDropArea::AttachmentsDropArea(QQuickItem *parent) : QQuickItem(parent)
 {
     this->setFlag(QQuickItem::ItemHasContents, true);
     this->setAcceptHoverEvents(false);
@@ -476,20 +474,17 @@ AttachmentsDropArea::AttachmentsDropArea(QQuickItem *parent)
     this->setFlag(QQuickItem::ItemAcceptsDrops, true);
 }
 
-AttachmentsDropArea::~AttachmentsDropArea()
-{
-
-}
+AttachmentsDropArea::~AttachmentsDropArea() { }
 
 void AttachmentsDropArea::setTarget(Attachments *val)
 {
-    if(m_target == val)
+    if (m_target == val)
         return;
 
     m_target = val;
     emit targetChanged();
 
-    if(m_target != nullptr)
+    if (m_target != nullptr)
         this->setAllowedType(m_target->allowedType());
     else
         this->setAllowedType(Attachments::DocumentsOfAnyType);
@@ -497,10 +492,10 @@ void AttachmentsDropArea::setTarget(Attachments *val)
 
 void AttachmentsDropArea::setAllowedType(int val)
 {
-    if(m_target != nullptr)
+    if (m_target != nullptr)
         val = m_target->allowedType();
 
-    if(m_allowedType == val)
+    if (m_allowedType == val)
         return;
 
     m_allowedType = val;
@@ -509,7 +504,7 @@ void AttachmentsDropArea::setAllowedType(int val)
 
 void AttachmentsDropArea::setAllowedExtensions(const QStringList &val)
 {
-    if(m_allowedExtensions == val)
+    if (m_allowedExtensions == val)
         return;
 
     m_allowedExtensions = val;
@@ -529,19 +524,16 @@ void AttachmentsDropArea::denyDrop()
 void AttachmentsDropArea::dragEnterEvent(QDragEnterEvent *de)
 {
     this->setMouse(de->posF());
-    if(de->proposedAction() != Qt::CopyAction)
+    if (de->proposedAction() != Qt::CopyAction)
         return;
 
     const QMimeData *mimeData = de->mimeData();
-    if( this->prepareAttachmentFromMimeData(mimeData) )
+    if (this->prepareAttachmentFromMimeData(mimeData))
         de->acceptProposedAction();
 
-    if(m_raiseWindowTimer.isNull())
-    {
+    if (m_raiseWindowTimer.isNull()) {
         m_raiseWindowTimer = new QTimer(this);
-        connect(m_raiseWindowTimer, &QTimer::timeout, this, [=]() {
-            this->raiseWindow();
-        });
+        connect(m_raiseWindowTimer, &QTimer::timeout, this, [=]() { this->raiseWindow(); });
         m_raiseWindowTimer->setSingleShot(true);
         m_raiseWindowTimer->setInterval(500);
         m_raiseWindowTimer->start();
@@ -551,10 +543,10 @@ void AttachmentsDropArea::dragEnterEvent(QDragEnterEvent *de)
 void AttachmentsDropArea::dragMoveEvent(QDragMoveEvent *de)
 {
     this->setMouse(de->posF());
-    if(de->proposedAction() != Qt::CopyAction)
+    if (de->proposedAction() != Qt::CopyAction)
         return;
 
-    if(m_attachment != nullptr)
+    if (m_attachment != nullptr)
         de->acceptProposedAction();
 }
 
@@ -562,16 +554,14 @@ void AttachmentsDropArea::dragLeaveEvent(QDragLeaveEvent *)
 {
     this->setMouse(QPointF());
 
-    if(m_attachment != nullptr)
-    {
+    if (m_attachment != nullptr) {
         Attachment *ptr = m_attachment;
         this->setAttachment(nullptr);
-        if(ptr != nullptr)
+        if (ptr != nullptr)
             ptr->deleteLater();
     }
 
-    if(!m_raiseWindowTimer.isNull())
-    {
+    if (!m_raiseWindowTimer.isNull()) {
         m_raiseWindowTimer->stop();
         m_raiseWindowTimer->deleteLater();
     }
@@ -579,8 +569,7 @@ void AttachmentsDropArea::dragLeaveEvent(QDragLeaveEvent *)
 
 void AttachmentsDropArea::dropEvent(QDropEvent *de)
 {
-    if(m_attachment != nullptr)
-    {
+    if (m_attachment != nullptr) {
         this->raiseWindow();
 
         this->setMouse(de->posF());
@@ -588,12 +577,11 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
 
         emit dropped();
 
-        if(m_allowDrop)
-        {
+        if (m_allowDrop) {
             de->acceptProposedAction();
 
-            if(m_target != nullptr)
-                m_target->includeAttachment( m_attachment->filePath() );
+            if (m_target != nullptr)
+                m_target->includeAttachment(m_attachment->filePath());
         }
 
         m_attachment->deleteLater();
@@ -604,14 +592,12 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
 void AttachmentsDropArea::raiseWindow()
 {
     QQuickWindow *qmlWindow = this->window();
-    if(qmlWindow)
-    {
+    if (qmlWindow) {
         qmlWindow->requestActivate();
         qmlWindow->raise();
     }
 
-    if(!m_raiseWindowTimer.isNull())
-    {
+    if (!m_raiseWindowTimer.isNull()) {
         m_raiseWindowTimer->stop();
         m_raiseWindowTimer->deleteLater();
     }
@@ -619,10 +605,10 @@ void AttachmentsDropArea::raiseWindow()
 
 void AttachmentsDropArea::setAttachment(Attachment *val)
 {
-    if(m_attachment == val)
+    if (m_attachment == val)
         return;
 
-    if(m_attachment != nullptr && m_attachment->parent() == this)
+    if (m_attachment != nullptr && m_attachment->parent() == this)
         m_attachment->deleteLater();
 
     m_attachment = val;
@@ -631,7 +617,7 @@ void AttachmentsDropArea::setAttachment(Attachment *val)
 
 void AttachmentsDropArea::setMouse(const QPointF &val)
 {
-    if(m_mouse == val)
+    if (m_mouse == val)
         return;
 
     m_mouse = val;
@@ -641,25 +627,21 @@ void AttachmentsDropArea::setMouse(const QPointF &val)
 bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeData)
 {
     const QList<QUrl> urls = mimeData->urls();
-    if(urls.isEmpty())
-    {
+    if (urls.isEmpty()) {
         this->setAttachment(nullptr);
         return false;
     }
 
     // Find the first URL that has a local file.
     QUrl url;
-    for(const QUrl &_url : urls)
-    {
-        if(_url.scheme() == QStringLiteral("file"))
-        {
+    for (const QUrl &_url : urls) {
+        if (_url.scheme() == QStringLiteral("file")) {
             url = _url;
             break;
         }
     }
 
-    if(url.isEmpty() || !url.isValid())
-    {
+    if (url.isEmpty() || !url.isValid()) {
         this->setAttachment(nullptr);
         return false;
     }
@@ -667,27 +649,24 @@ bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeDat
     const QString filePath = url.toLocalFile();
     const QFileInfo fi(filePath);
 
-    if(!fi.exists() || !fi.isReadable() || fi.isDir())
-    {
+    if (!fi.exists() || !fi.isReadable() || fi.isDir()) {
         this->setAttachment(nullptr);
         return false;
     }
 
-    if(!Attachments::canAllow(fi, Attachments::AllowedType(m_allowedType)))
-    {
+    if (!Attachments::canAllow(fi, Attachments::AllowedType(m_allowedType))) {
         this->setAttachment(nullptr);
         return false;
     }
 
-    if(!m_allowedExtensions.isEmpty() && !m_allowedExtensions.contains(fi.suffix(), Qt::CaseInsensitive))
-    {
+    if (!m_allowedExtensions.isEmpty()
+        && !m_allowedExtensions.contains(fi.suffix(), Qt::CaseInsensitive)) {
         this->setAttachment(nullptr);
         return false;
     }
 
     const QMimeType mimeType = Attachments::mimeTypeFor(fi);
-    if(!mimeType.isValid())
-    {
+    if (!mimeType.isValid()) {
         this->setAttachment(nullptr);
         return false;
     }

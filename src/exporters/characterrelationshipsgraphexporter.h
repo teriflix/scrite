@@ -25,11 +25,11 @@ class CharacterRelationshipsGraphExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
-    CharacterRelationshipsGraphExporter(QObject *parent=nullptr);
+    CharacterRelationshipsGraphExporter(QObject *parent = nullptr);
     ~CharacterRelationshipsGraphExporter();
 
-    void setGraph(CharacterRelationshipsGraph* val);
-    CharacterRelationshipsGraph* graph() const { return m_graph; }
+    void setGraph(CharacterRelationshipsGraph *val);
+    CharacterRelationshipsGraph *graph() const { return m_graph; }
 
     virtual bool requiresConfiguration() const { return true; }
 

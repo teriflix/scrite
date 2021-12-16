@@ -23,7 +23,7 @@ class HtmlExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "HTML (*.html)")
 
 public:
-    Q_INVOKABLE HtmlExporter(QObject *parent=nullptr);
+    Q_INVOKABLE HtmlExporter(QObject *parent = nullptr);
     ~HtmlExporter();
 
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated HTML.")

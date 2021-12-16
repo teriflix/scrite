@@ -15,16 +15,9 @@
 
 #include "scriptautomationstep.h"
 
-ScriptAutomationStep::ScriptAutomationStep(QObject *parent)
-    : AbstractAutomationStep(parent)
-{
+ScriptAutomationStep::ScriptAutomationStep(QObject *parent) : AbstractAutomationStep(parent) { }
 
-}
-
-ScriptAutomationStep::~ScriptAutomationStep()
-{
-
-}
+ScriptAutomationStep::~ScriptAutomationStep() { }
 
 void ScriptAutomationStep::run()
 {
